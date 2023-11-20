@@ -133,22 +133,16 @@ import com.duckduckgo.app.browser.ui.dialogs.LaunchInExternalAppOptions
 import com.duckduckgo.app.browser.urlextraction.DOMUrlExtractor
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebView
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
-import com.duckduckgo.app.browser.webview.enableDarkMode
-import com.duckduckgo.app.browser.webview.enableLightMode
+import com.duckduckgo.app.browser.webshare.WebShareChooser
+import com.duckduckgo.app.browser.webview.WebContentDebugging
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.cta.ui.DaxDialogCta.*
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.downloads.DownloadsFileActions
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
-import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.DuckDuckGoFragment
-import com.duckduckgo.app.global.FragmentViewModelFactory
-import com.duckduckgo.app.global.extensions.html
-import com.duckduckgo.app.global.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
-import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.global.view.NonDismissibleBehavior
 import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.app.global.view.disableAnimation
@@ -170,7 +164,6 @@ import com.duckduckgo.app.survey.ui.SurveyActivity.Companion.SurveySource
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
-import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autoconsent.api.Autoconsent
@@ -198,25 +191,44 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.api.emailprotection.EmailInjector
 import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult.*
-import com.duckduckgo.autofill.api.systemautofill.SystemAutofillUsageMonitor
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
+import com.duckduckgo.common.ui.DuckDuckGoFragment
+import com.duckduckgo.common.ui.store.BrowserAppTheme
+import com.duckduckgo.common.ui.view.*
+import com.duckduckgo.common.ui.view.DaxDialog
+import com.duckduckgo.common.ui.view.DaxDialogListener
+import com.duckduckgo.common.ui.view.KeyboardAwareEditText
+import com.duckduckgo.common.ui.view.KeyboardAwareEditText.ShowSuggestionsListener
+import com.duckduckgo.common.ui.view.dialog.CustomAlertDialogBuilder
+import com.duckduckgo.common.ui.view.dialog.DaxAlertDialog
+import com.duckduckgo.common.ui.view.dialog.StackedAlertDialogBuilder
+import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.hide
+import com.duckduckgo.common.ui.view.hideKeyboard
+import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
+import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.ui.view.showKeyboard
+import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.FragmentViewModelFactory
+import com.duckduckgo.common.utils.extensions.html
+import com.duckduckgo.common.utils.extensions.websiteFromGeoLocationsApiOrigin
+import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.common.utils.webview.enableDarkMode
+import com.duckduckgo.common.utils.webview.enableLightMode
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_DELAY
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_LENGTH
 import com.duckduckgo.downloads.api.DownloadCommand
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessageCallback
+import com.duckduckgo.js.messaging.api.JsMessageHelper
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackerOnboardingActivityWithEmptyParamsParams
-import com.duckduckgo.mobile.android.ui.store.BrowserAppTheme
-import com.duckduckgo.mobile.android.ui.view.*
-import com.duckduckgo.mobile.android.ui.view.KeyboardAwareEditText.ShowSuggestionsListener
-import com.duckduckgo.mobile.android.ui.view.dialog.CustomAlertDialogBuilder
-import com.duckduckgo.mobile.android.ui.view.dialog.DaxAlertDialog
-import com.duckduckgo.mobile.android.ui.view.dialog.StackedAlertDialogBuilder
-import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.savedsites.api.models.SavedSite
@@ -225,6 +237,7 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
+import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.duckduckgo.voice.api.VoiceSearchLauncher
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
@@ -237,6 +250,7 @@ import javax.inject.Provider
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.cancellable
+import org.json.JSONObject
 import timber.log.Timber
 
 @InjectWith(FragmentScope::class)
@@ -248,8 +262,7 @@ class BrowserTabFragment :
     DownloadConfirmationDialogListener,
     SitePermissionsGrantedListener,
     AutofillEventListener,
-    EmailProtectionUserPromptListener,
-    SystemAutofillListener {
+    EmailProtectionUserPromptListener {
 
     private val supervisorJob = SupervisorJob()
 
@@ -405,7 +418,10 @@ class BrowserTabFragment :
     lateinit var contentScopeScripts: JsMessaging
 
     @Inject
-    lateinit var systemAutofillUsageMonitor: SystemAutofillUsageMonitor
+    lateinit var webContentDebugging: WebContentDebugging
+
+    @Inject
+    lateinit var jsMessageHelper: JsMessageHelper
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -456,20 +472,6 @@ class BrowserTabFragment :
         launchDownloadMessagesJob()
         viewModel
     }
-
-    /*
-        private val animatorHelper by lazy {
-            BrowserTrackersAnimatorHelper(
-                omnibarViews = listOf(clearTextButton, omnibarTextInput, searchIcon),
-                privacyGradeView = privacyGradeButton,
-                cookieView = cookieAnimation,
-                cookieScene = scene_root,
-                dummyCookieView = cookieDummyView,
-                container = animationContainer,
-                appTheme = appTheme
-            )
-        }
-     */
 
     private val binding: FragmentBrowserTabBinding by viewBinding()
 
@@ -697,6 +699,11 @@ class BrowserTabFragment :
     private var automaticFireproofDialog: DaxAlertDialog? = null
 
     private val pulseAnimation: PulseAnimation = PulseAnimation(this)
+
+    private var webShareRequest =
+        registerForActivityResult(WebShareChooser()) {
+            contentScopeScripts.onResponse(it)
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -1039,7 +1046,7 @@ class BrowserTabFragment :
         webView?.loadUrl(url, headers)
     }
 
-    fun onRefreshRequested() {
+    private fun onRefreshRequested() {
         viewModel.onRefreshRequested()
     }
 
@@ -1273,7 +1280,6 @@ class BrowserTabFragment :
 
             is Command.PrintLink -> launchPrint(it.url, it.mediaSize)
             is Command.ShowSitePermissionsDialog -> showSitePermissionsDialog(it.permissionsToRequest, it.request)
-            is Command.GrantSitePermissionRequest -> grantSitePermissionRequest(it.sitePermissionsToGrant, it.request)
             is Command.ShowUserCredentialSavedOrUpdatedConfirmation -> showAuthenticationSavedOrUpdatedSnackbar(
                 loginCredentials = it.credentials,
                 messageResourceId = it.messageResourceId,
@@ -2027,7 +2033,7 @@ class BrowserTabFragment :
 
     private fun userSelectedAutocomplete(suggestion: AutoCompleteSuggestion) {
         // send pixel before submitting the query and changing the autocomplete state to empty; otherwise will send the wrong params
-        appCoroutineScope.launch {
+        appCoroutineScope.launch(dispatchers.io()) {
             viewModel.fireAutocompletePixel(suggestion)
             withContext(dispatchers.main()) {
                 val origin = when (suggestion) {
@@ -2105,19 +2111,24 @@ class BrowserTabFragment :
             autoconsent.addJsInterface(it, autoconsentCallback)
             contentScopeScripts.register(
                 it,
-                object : JsMessageCallback(this) {
-                    override fun process(method: String) {
-                        runCatching {
-                            callback.javaClass.getDeclaredMethod(method)
-                        }.getOrNull()?.invoke(callback)
+                object : JsMessageCallback() {
+                    override fun process(featureName: String, method: String, id: String, data: JSONObject) {
+                        when (method) {
+                            "webShare" -> webShare(featureName, method, id, data)
+                            else -> {
+                                // NOOP
+                            }
+                        }
                     }
                 },
             )
         }
 
-        if (appBuildConfig.isDebug) {
-            WebView.setWebContentsDebuggingEnabled(true)
-        }
+        WebView.setWebContentsDebuggingEnabled(webContentDebugging.isEnabled())
+    }
+
+    private fun webShare(featureName: String, method: String, id: String, data: JSONObject) {
+        webShareRequest.launch(JsCallbackData(data, featureName, method, id))
     }
 
     private fun configureWebViewForAutofill(it: DuckDuckGoWebView) {
@@ -2136,8 +2147,6 @@ class BrowserTabFragment :
                 }
             }
         }
-
-        it.systemAutofillListener = this
     }
 
     private fun injectAutofillCredentials(
@@ -3641,7 +3650,7 @@ class BrowserTabFragment :
     }
 
     private fun showSitePermissionsDialog(
-        permissionsToRequest: Array<String>,
+        permissionsToRequest: SitePermissions,
         request: PermissionRequest,
     ) {
         if (!isActiveTab) {
@@ -3652,13 +3661,6 @@ class BrowserTabFragment :
         activity?.let {
             sitePermissionsDialogLauncher.askForSitePermission(it, request.origin.toString(), tabId, permissionsToRequest, request, this)
         }
-    }
-
-    private fun grantSitePermissionRequest(
-        sitePermissionsToGrant: Array<String>,
-        request: PermissionRequest,
-    ) {
-        request.grant(sitePermissionsToGrant)
     }
 
     override fun continueDownload(pendingFileDownload: PendingFileDownload) {
@@ -3681,9 +3683,5 @@ class BrowserTabFragment :
     override fun permissionsGrantedOnWhereby() {
         val roomParameters = "?skipMediaPermissionPrompt"
         webView?.loadUrl("${webView?.url.orEmpty()}$roomParameters")
-    }
-
-    override fun systemAutofillPerformed() {
-        systemAutofillUsageMonitor.onSystemAutofillUsed()
     }
 }

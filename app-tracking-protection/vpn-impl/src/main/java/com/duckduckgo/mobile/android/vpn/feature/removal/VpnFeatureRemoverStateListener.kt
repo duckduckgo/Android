@@ -19,6 +19,7 @@ package com.duckduckgo.mobile.android.vpn.feature.removal
 import androidx.work.ExistingWorkPolicy.KEEP
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.dao.VpnFeatureRemoverState
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
@@ -38,10 +39,11 @@ import logcat.logcat
 class VpnFeatureRemoverStateListener @Inject constructor(
     private val workManager: WorkManager,
     private val vpnDatabase: VpnDatabase,
+    private val dispatcherProvider: DispatcherProvider,
 ) : VpnServiceCallbacks {
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        coroutineScope.launch() {
+        coroutineScope.launch(dispatcherProvider.io()) {
             logcat { "FeatureRemoverVpnStateListener, new state ENABLED. Descheduling automatic feature removal" }
             resetState()
         }
@@ -60,7 +62,7 @@ class VpnFeatureRemoverStateListener @Inject constructor(
         vpnStopReason: VpnStopReason,
     ) {
         if (vpnStopReason == VpnStopReason.SELF_STOP) {
-            coroutineScope.launch() {
+            coroutineScope.launch(dispatcherProvider.io()) {
                 logcat { "FeatureRemoverVpnStateListener, new state DISABLED and it was MANUALLY. Scheduling automatic feature removal" }
                 scheduleFeatureRemoval()
             }

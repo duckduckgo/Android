@@ -29,9 +29,9 @@ import com.duckduckgo.app.browser.databinding.ViewListItemDescriptionBinding
 import com.duckduckgo.app.browser.databinding.ViewListItemEmptyHintBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.privacy.model.UserAllowListedDomain
+import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.mobile.android.databinding.RowOneLineListItemBinding
 import com.duckduckgo.mobile.android.databinding.ViewSectionHeaderBinding
-import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import kotlinx.coroutines.launch
 import timber.log.Timber
 

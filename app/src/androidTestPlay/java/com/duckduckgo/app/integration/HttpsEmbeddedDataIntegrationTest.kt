@@ -19,8 +19,8 @@ package com.duckduckgo.app.integration
 import android.net.Uri
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.global.store.BinaryDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.utils.store.BinaryDataStore
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import com.duckduckgo.httpsupgrade.impl.HttpsBloomFilterFactoryImpl

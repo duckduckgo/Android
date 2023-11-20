@@ -18,8 +18,8 @@ package com.duckduckgo.autoconsent.impl
 
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
-import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import org.json.JSONObject
 import timber.log.Timber
 

@@ -16,8 +16,9 @@
 
 package com.duckduckgo.networkprotection.impl.cohort
 
-import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -41,13 +42,16 @@ class NetPCohortUpdaterTest {
     private lateinit var networkProtectionState: NetworkProtectionState
 
     @Mock
+    private lateinit var pixels: NetworkProtectionPixels
+
+    @Mock
     private lateinit var cohortStore: NetpCohortStore
     private lateinit var testee: NetPCohortUpdater
 
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
-        testee = NetPCohortUpdater(networkProtectionState, cohortStore, coroutineRule.testDispatcherProvider)
+        testee = NetPCohortUpdater(networkProtectionState, cohortStore, coroutineRule.testDispatcherProvider, pixels)
     }
 
     @Test
@@ -57,6 +61,7 @@ class NetPCohortUpdaterTest {
         testee.onVpnStarted(coroutineRule.testScope)
 
         verifyNoInteractions(cohortStore)
+        verifyNoInteractions(pixels)
     }
 
     @Test
@@ -67,6 +72,7 @@ class NetPCohortUpdaterTest {
         testee.onVpnStarted(coroutineRule.testScope)
 
         verify(cohortStore).cohortLocalDate = any()
+        verify(pixels).reportEnabled()
     }
 
     @Test
@@ -77,6 +83,7 @@ class NetPCohortUpdaterTest {
         testee.onVpnStarted(coroutineRule.testScope)
 
         verify(cohortStore).cohortLocalDate
+        verify(pixels).reportEnabled()
         verifyNoMoreInteractions(cohortStore)
     }
 
@@ -91,6 +98,7 @@ class NetPCohortUpdaterTest {
         testee.onVpnReconfigured(coroutineRule.testScope)
 
         verify(cohortStore).cohortLocalDate = any()
+        verify(pixels).reportEnabled()
     }
 
     @Test
@@ -102,5 +110,6 @@ class NetPCohortUpdaterTest {
 
         verify(cohortStore).cohortLocalDate
         verifyNoMoreInteractions(cohortStore)
+        verify(pixels).reportEnabled()
     }
 }

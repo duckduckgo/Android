@@ -23,7 +23,7 @@
     android:paddingTop="@dimen/actionBottomSheetVerticalPadding"
     android:paddingBottom="@dimen/actionBottomSheetVerticalPadding">
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/downloadMessage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -35,14 +35,14 @@
         app:typography="body1"
         tools:text="sample-file.pdf" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/continueDownload"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:leadingIcon="@drawable/ic_downloads_24"
         app:primaryText="@string/downloadConfirmationContinue" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/cancel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

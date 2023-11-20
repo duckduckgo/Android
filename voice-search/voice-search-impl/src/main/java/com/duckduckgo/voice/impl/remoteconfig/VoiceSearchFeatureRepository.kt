@@ -16,7 +16,7 @@
 
 package com.duckduckgo.voice.impl.remoteconfig
 
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.voice.store.ManufacturerEntity
 import com.duckduckgo.voice.store.MinVersionEntity
 import com.duckduckgo.voice.store.VoiceSearchDao

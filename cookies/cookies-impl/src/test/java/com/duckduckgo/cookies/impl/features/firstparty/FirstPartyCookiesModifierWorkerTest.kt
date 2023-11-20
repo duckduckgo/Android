@@ -19,7 +19,7 @@ package com.duckduckgo.cookies.impl.features.firstparty
 import android.content.Context
 import androidx.work.ListenableWorker.Result
 import androidx.work.testing.TestListenableWorkerBuilder
-import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat

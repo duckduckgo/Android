@@ -23,19 +23,16 @@ import android.view.View
 import android.webkit.*
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DefaultDispatcherProvider
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.privacy.config.api.Drm
+import com.duckduckgo.common.utils.DefaultDispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 class BrowserChromeClient @Inject constructor(
-    private val drm: Drm,
     private val appBuildConfig: AppBuildConfig,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val coroutineDispatcher: DispatcherProvider = DefaultDispatcherProvider(),
@@ -139,13 +136,11 @@ class BrowserChromeClient @Inject constructor(
     }
 
     override fun onPermissionRequest(request: PermissionRequest) {
-        appCoroutineScope.launch(coroutineDispatcher.io()) {
-            val permissionsAllowedToAsk = sitePermissionsManager.getSitePermissionsAllowedToAsk(request.origin.toString(), request.resources)
-            if (permissionsAllowedToAsk.isNotEmpty()) {
-                webViewClientListener?.onSitePermissionRequested(request, permissionsAllowedToAsk)
-            } else {
-                withContext(coroutineDispatcher.main()) {
-                    request.deny()
+        webViewClientListener?.getCurrentTabId()?.let { tabId ->
+            appCoroutineScope.launch(coroutineDispatcher.io()) {
+                val permissionsAllowedToAsk = sitePermissionsManager.getSitePermissions(tabId, request)
+                if (permissionsAllowedToAsk.userHandled.isNotEmpty()) {
+                    webViewClientListener?.onSitePermissionRequested(request, permissionsAllowedToAsk)
                 }
             }
         }

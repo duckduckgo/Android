@@ -22,37 +22,37 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:id="@+id/settingsSectionMoreBottomDivider"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+    <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
         android:id="@+id/settingsAboutTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryText="@string/settingsHeadingAbout"/>
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/about"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryText="@string/settingsAboutDuckduckgo"/>
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/privacyPolicy"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryText="@string/settingsPrivacyPolicyDuckduckgo"/>
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
         android:id="@+id/version"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryText="@string/settingsVersion"
         tools:secondaryText="123.43.5456" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/provideFeedback"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -20,15 +20,21 @@ import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
-import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.*
 
 @RunWith(AndroidJUnit4::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class RestartReceiverTest {
+
+    @get:Rule
+    var coroutineRule = CoroutineTestRule()
 
     private val context: Context = mock()
     private val appBuildConfig: AppBuildConfig = mock()
@@ -37,14 +43,19 @@ class RestartReceiverTest {
 
     @Before
     fun setup() {
-        receiver = RestartReceiver(TestScope(), context, appBuildConfig)
+        receiver = RestartReceiver(
+            coroutineRule.testScope,
+            context,
+            appBuildConfig,
+            coroutineRule.testDispatcherProvider,
+        )
     }
 
     @Test
     fun whenInternalBuildThenRegisterReceiverOnStartVpn() {
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
 
-        receiver.onVpnStarted(TestScope())
+        receiver.onVpnStarted(coroutineRule.testScope)
 
         verify(context).unregisterReceiver(any())
         verify(context).registerReceiver(any(), any())
@@ -54,7 +65,7 @@ class RestartReceiverTest {
     fun whenNotInternalBuildThenRegisterReceiverOnStartVpn() {
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
 
-        receiver.onVpnStarted(TestScope())
+        receiver.onVpnStarted(coroutineRule.testScope)
 
         verify(context, never()).unregisterReceiver(any())
         verify(context, never()).registerReceiver(any(), any())
@@ -64,7 +75,7 @@ class RestartReceiverTest {
     fun whenInternalBuildThenUnregisterReceiverOnStopVpn() {
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
 
-        receiver.onVpnStopped(TestScope(), VpnStateMonitor.VpnStopReason.SELF_STOP)
+        receiver.onVpnStopped(coroutineRule.testScope, VpnStateMonitor.VpnStopReason.SELF_STOP)
 
         verify(context).unregisterReceiver(any())
         verify(context, never()).registerReceiver(any(), any())
@@ -74,7 +85,7 @@ class RestartReceiverTest {
     fun whenNotInternalBuildThenUnregisterReceiverOnStopVpn() {
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
 
-        receiver.onVpnStopped(TestScope(), VpnStateMonitor.VpnStopReason.SELF_STOP)
+        receiver.onVpnStopped(coroutineRule.testScope, VpnStateMonitor.VpnStopReason.SELF_STOP)
 
         verify(context).unregisterReceiver(any())
         verify(context, never()).registerReceiver(any(), any())

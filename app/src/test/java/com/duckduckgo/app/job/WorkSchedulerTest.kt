@@ -17,8 +17,8 @@
 package com.duckduckgo.app.job
 
 import androidx.lifecycle.LifecycleOwner
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.notification.AndroidNotificationScheduler
+import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest

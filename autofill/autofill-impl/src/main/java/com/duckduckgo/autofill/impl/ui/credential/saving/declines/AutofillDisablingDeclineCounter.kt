@@ -18,9 +18,9 @@ package com.duckduckgo.autofill.impl.ui.credential.saving.declines
 
 import androidx.annotation.VisibleForTesting
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DefaultDispatcherProvider
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.autofill.api.store.AutofillStore
+import com.duckduckgo.common.utils.DefaultDispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn

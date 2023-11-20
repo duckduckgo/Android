@@ -1,9 +1,9 @@
 package com.duckduckgo.networkprotection.impl.configuration
 
-import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.global.api.FakeChain
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.test.api.FakeChain
 import com.duckduckgo.networkprotection.impl.fakes.FakeNetPWaitlistDataStore
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
 import com.duckduckgo.networkprotection.impl.waitlist.store.RealNetPWaitlistRepository

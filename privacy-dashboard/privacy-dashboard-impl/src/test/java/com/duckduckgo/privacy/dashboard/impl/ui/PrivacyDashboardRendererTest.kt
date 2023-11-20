@@ -21,7 +21,7 @@ import android.webkit.WebView
 import androidx.core.net.toUri
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.global.domain
+import com.duckduckgo.common.utils.domain
 import com.duckduckgo.privacy.dashboard.impl.di.JsonModule
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.CookiePromptManagementState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.DetectedRequest

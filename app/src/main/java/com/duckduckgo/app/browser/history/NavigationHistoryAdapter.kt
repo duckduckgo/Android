@@ -23,8 +23,8 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.common.ui.view.listitem.OneLineListItem
 import com.duckduckgo.mobile.android.databinding.RowOneLineListItemBinding
-import com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
 import kotlinx.coroutines.launch
 
 class NavigationHistoryAdapter(

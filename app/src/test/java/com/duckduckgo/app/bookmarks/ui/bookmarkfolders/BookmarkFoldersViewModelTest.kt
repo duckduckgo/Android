@@ -18,8 +18,8 @@ package com.duckduckgo.app.bookmarks.ui.bookmarkfolders
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
-import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.InstantSchedulersRule
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.BookmarkFolderItem

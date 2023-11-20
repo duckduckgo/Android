@@ -17,12 +17,8 @@
 package com.duckduckgo.site.permissions.impl.di
 
 import android.content.Context
-import android.content.pm.PackageManager
 import androidx.room.Room
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.site.permissions.api.SitePermissionsManager
-import com.duckduckgo.site.permissions.impl.SitePermissionsManagerImpl
-import com.duckduckgo.site.permissions.impl.SitePermissionsRepositoryImpl
 import com.duckduckgo.site.permissions.store.ALL_MIGRATIONS
 import com.duckduckgo.site.permissions.store.SitePermissionsDatabase
 import com.duckduckgo.site.permissions.store.SitePermissionsPreferences
@@ -57,14 +53,6 @@ object SitePermissionsModule {
     @SingleInstanceIn(AppScope::class)
     fun providesSitePermissionsAllowedDao(sitePermissionsDatabase: SitePermissionsDatabase): SitePermissionsAllowedDao {
         return sitePermissionsDatabase.sitePermissionsAllowedDao()
-    }
-
-    @Provides
-    fun providesSitePermissionsManager(
-        sitePermissionsRepository: SitePermissionsRepositoryImpl,
-        packageManager: PackageManager,
-    ): SitePermissionsManager {
-        return SitePermissionsManagerImpl(packageManager, sitePermissionsRepository)
     }
 
     @Provides

@@ -16,7 +16,7 @@
 
 package com.duckduckgo.httpsupgrade.impl
 
-import com.duckduckgo.app.global.store.BinaryDataStore
+import com.duckduckgo.common.utils.store.BinaryDataStore
 import com.duckduckgo.httpsupgrade.store.HttpsBloomFilterSpec
 import com.duckduckgo.httpsupgrade.store.HttpsBloomFilterSpecDao
 import com.duckduckgo.httpsupgrade.store.HttpsFalsePositiveDomain

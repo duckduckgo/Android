@@ -3,7 +3,7 @@ package com.duckduckgo.js.messaging.impl
 import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.js.messaging.api.JsRequestResponse
 import com.duckduckgo.js.messaging.api.SubscriptionEvent
 import kotlinx.coroutines.ExperimentalCoroutinesApi

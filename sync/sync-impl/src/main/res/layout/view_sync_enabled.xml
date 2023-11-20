@@ -21,7 +21,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/disableSyncButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -30,11 +30,11 @@
         app:leadingIconBackground="circular"
         app:primaryText="@string/sync_disable_sync_item" />
 
-    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+    <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryText="@string/synced_devices_section_title" />
@@ -44,11 +44,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+    <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryText="@string/sync_new_device_section_title"
@@ -62,7 +62,7 @@
         android:visibility="gone"
         tools:ignore="ContentDescription" />
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/keyline_4"
@@ -70,7 +70,7 @@
         app:textType="secondary"
         app:typography="body2" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/showTextCodeItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -79,7 +79,7 @@
         app:primaryText="@string/sync_show_text_code_item"
         app:primaryTextTruncated="true" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/scanQrCodeItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -88,40 +88,36 @@
         app:primaryText="@string/sync_show_qr_code_item"
         app:primaryTextTruncated="true" />
 
-    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+    <LinearLayout
+        android:id="@+id/syncSettingsOptions"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/sync_enable_options" />
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+        <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/sync_enable_options" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-        android:id="@+id/sync_settings_option_bookmarks"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:leadingIcon="@drawable/ic_image_24"
-        app:leadingIconBackground="circular"
-        app:primaryText="@string/sync_enable_option_favicons_title"
-        app:secondaryText="@string/sync_enable_option_favicons_subtitle"
-        app:showSwitch="true" />
+        <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+            android:id="@+id/sync_settings_option_bookmarks"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:leadingIcon="@drawable/ic_image_24"
+            app:leadingIconBackground="circular"
+            app:primaryText="@string/sync_enable_option_favicons_title"
+            app:secondaryText="@string/sync_enable_option_favicons_subtitle"
+            app:showSwitch="true" />
+    </LinearLayout>
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-        android:id="@+id/sync_settings_option_favourites"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:leadingIcon="@drawable/ic_sync_device_all_24"
-        app:leadingIconBackground="circular"
-        app:primaryText="@string/sync_enable_option_favorites_title"
-        app:secondaryText="@string/sync_enable_option_favorites_subtitle"
-        app:showSwitch="true" />
-
-    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
         android:id="@+id/saveRecoveryCodeItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -131,11 +127,11 @@
         app:primaryTextTruncated="true"
         app:secondaryText="@string/sync_save_recovery_code_item_hint" />
 
-    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/deleteAccountButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

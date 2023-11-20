@@ -18,9 +18,9 @@ package com.duckduckgo.app.tabs.db
 
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
 import javax.inject.Inject

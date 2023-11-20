@@ -18,9 +18,9 @@ package com.duckduckgo.mobile.android.vpn.service
 
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
-import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.app.utils.ConflatedJob
+import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.ui.notification.VpnEnabledNotificationBuilder

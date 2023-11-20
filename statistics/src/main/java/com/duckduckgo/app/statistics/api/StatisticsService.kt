@@ -17,9 +17,9 @@
 package com.duckduckgo.app.statistics.api
 
 import com.duckduckgo.anvil.annotations.ContributesServiceApi
-import com.duckduckgo.app.global.AppUrl.ParamKey
 import com.duckduckgo.app.statistics.BuildConfig
 import com.duckduckgo.app.statistics.model.Atb
+import com.duckduckgo.common.utils.AppUrl.ParamKey
 import com.duckduckgo.di.scopes.AppScope
 import io.reactivex.Observable
 import okhttp3.ResponseBody

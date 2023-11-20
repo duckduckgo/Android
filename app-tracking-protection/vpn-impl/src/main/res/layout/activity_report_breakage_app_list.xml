@@ -41,7 +41,7 @@
                 android:paddingEnd="@dimen/keyline_4"
                 android:paddingStart="@dimen/keyline_4">
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                     android:id="@+id/appBreakageReportFeature"
                     app:typography="body2"
                     app:textType="secondary"
@@ -99,12 +99,12 @@
 
     </androidx.core.widget.NestedScrollView>
 
-    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
             app:defaultPadding="false"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+    <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
             android:id="@+id/ctaSubmitAppBreakage"
             app:buttonSize="large"
             android:layout_width="match_parent"

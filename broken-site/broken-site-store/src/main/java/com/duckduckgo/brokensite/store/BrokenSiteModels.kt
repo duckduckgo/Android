@@ -18,7 +18,7 @@ package com.duckduckgo.brokensite.store
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 
 @Entity(tableName = "broken_site_last_sent_report")
 data class BrokenSiteLastSentReportEntity(

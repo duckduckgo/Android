@@ -21,12 +21,14 @@ import android.content.Context
 import android.os.Bundle
 import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.*
 import com.duckduckgo.app.notification.NotificationSender
 import com.duckduckgo.app.notification.TaskStackBuilderFactory
 import com.duckduckgo.app.notification.model.Channel
 import com.duckduckgo.app.notification.model.NotificationSpec
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.notification.model.SchedulableNotificationPlugin
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
@@ -50,6 +52,7 @@ open class NetPWaitlistCodeNotification @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val networkProtectionState: NetworkProtectionState,
     private val notificationManager: NotificationManagerCompat,
+    private val dispatcherProvider: DispatcherProvider,
 ) : SchedulableNotification {
     override val id: String = "com.duckduckgo.netp.waitlist"
 
@@ -62,13 +65,13 @@ open class NetPWaitlistCodeNotification @Inject constructor(
     }
 
     internal fun cancelNotification() {
-        coroutineScope.launch {
+        coroutineScope.launch(dispatcherProvider.io()) {
             notificationManager.cancel(buildSpecification().systemId)
         }
     }
 
     internal fun sendNotification() {
-        coroutineScope.launch {
+        coroutineScope.launch(dispatcherProvider.io()) {
             notificationSender.get().sendNotification(this@NetPWaitlistCodeNotification)
         }
     }

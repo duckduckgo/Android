@@ -23,7 +23,7 @@
     android:paddingTop="@dimen/actionBottomSheetVerticalPadding"
     android:paddingBottom="@dimen/actionBottomSheetVerticalPadding">
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/actionBottomSheetDialogTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -35,13 +35,13 @@
         app:typography="body1"
         tools:text="Actions" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/actionBottomSheetDialogPrimaryItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryText="Primary Item" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/actionBottomSheetDialogSecondaryItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

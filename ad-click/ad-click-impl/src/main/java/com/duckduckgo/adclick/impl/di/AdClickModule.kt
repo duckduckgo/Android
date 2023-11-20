@@ -24,7 +24,7 @@ import com.duckduckgo.adclick.store.AdClickDatabase.Companion.ALL_MIGRATIONS
 import com.duckduckgo.adclick.store.AdClickFeatureToggleRepository
 import com.duckduckgo.adclick.store.RealAdClickAttributionRepository
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -49,10 +49,10 @@ class AdClickModule {
     @Provides
     fun provideAdClickAttributionRepository(
         database: AdClickDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
     ): AdClickAttributionRepository {
-        return RealAdClickAttributionRepository(database, coroutineScope, dispatcherProvider)
+        return RealAdClickAttributionRepository(database, appCoroutineScope, dispatcherProvider)
     }
 
     @SingleInstanceIn(AppScope::class)

@@ -62,7 +62,7 @@ class FingerprintProtectionTest {
         val scenario = ActivityScenario.launch<BrowserActivity>(
             BrowserActivity.intent(
                 InstrumentationRegistry.getInstrumentation().targetContext,
-                "https://privacy-test-pages.site/privacy-protections/fingerprinting/",
+                "https://privacy-test-pages.site/privacy-protections/fingerprinting/?disable_tests=navigator.requestMediaKeySystemAccess",
             ),
         )
         scenario.onActivity {

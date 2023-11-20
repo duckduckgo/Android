@@ -20,11 +20,11 @@ import android.content.Context
 import android.os.Build
 import android.webkit.WebSettings
 import androidx.core.net.toUri
-import com.duckduckgo.app.global.UriString
-import com.duckduckgo.app.global.device.DeviceInfo
-import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.common.utils.UriString
+import com.duckduckgo.common.utils.device.DeviceInfo
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.DefaultPolicy.CLOSEST

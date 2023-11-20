@@ -113,6 +113,7 @@ class RealWgProtocol @Inject constructor(
         var tx = 0L
         var serverIP = ""
         var publicKey = ""
+        var lastHandshakeEpochSeconds = 0L
         this.lines().forEach {
             if (it.startsWith("public_key=")) {
                 publicKey = Key.fromHex(it.substring(11)).toBase64()
@@ -130,6 +131,8 @@ class RealWgProtocol @Inject constructor(
                 }
             } else if (it.startsWith("endpoint=")) {
                 serverIP = it.substring(9)
+            } else if (it.startsWith("last_handshake_time_sec=")) {
+                lastHandshakeEpochSeconds = it.substringAfter('=').toLong()
             }
         }
         return NetworkProtectionStatistics(
@@ -137,6 +140,7 @@ class RealWgProtocol @Inject constructor(
             serverIP = serverIP,
             receivedBytes = rx,
             transmittedBytes = tx,
+            lastHandshakeEpochSeconds = lastHandshakeEpochSeconds,
         )
     }
 

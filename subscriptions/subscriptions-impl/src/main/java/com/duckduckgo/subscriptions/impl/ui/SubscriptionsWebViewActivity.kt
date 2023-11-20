@@ -23,18 +23,18 @@ import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionsWebviewBinding
-import com.duckduckgo.subscriptions.impl.messaging.SubscriptionCallback
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import javax.inject.Inject
 import javax.inject.Named
+import org.json.JSONObject
 
 data class SubscriptionsWebViewActivityWithParams(
     val url: String,
@@ -43,7 +43,7 @@ data class SubscriptionsWebViewActivityWithParams(
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(SubscriptionsWebViewActivityWithParams::class)
-class SubscriptionsWebViewActivity : DuckDuckGoActivity(), SubscriptionCallback {
+class SubscriptionsWebViewActivity : DuckDuckGoActivity() {
 
     @Inject
     @Named("Subscriptions")
@@ -71,11 +71,14 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), SubscriptionCallback 
         binding.simpleWebview.let {
             subscriptionJsMessaging.register(
                 it,
-                object : JsMessageCallback(this) {
-                    override fun process(method: String) {
-                        runCatching {
-                            callback.javaClass.getDeclaredMethod(method)
-                        }.getOrNull()?.invoke(callback)
+                object : JsMessageCallback() {
+                    override fun process(featureName: String, method: String, id: String, data: JSONObject) {
+                        when (method) {
+                            "backToSettings" -> backToSettings()
+                            else -> {
+                                // NOOP
+                            }
+                        }
                     }
                 },
             )
@@ -100,7 +103,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), SubscriptionCallback 
         }
     }
 
-    override fun backToSettings() {
+    private fun backToSettings() {
         finish()
     }
 

@@ -19,6 +19,7 @@ package com.duckduckgo.vpn.internal.feature.trackers
 import android.content.Context
 import android.content.Intent
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
@@ -55,6 +56,7 @@ class DeleteTrackersDebugReceiverRegister @Inject constructor(
     private val context: Context,
     private val appTrackerBlockingRepository: AppTrackerBlockingStatsRepository,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
 ) : VpnServiceCallbacks {
     private val className: String
         get() = DeleteTrackersDebugReceiver::class.java.simpleName
@@ -67,7 +69,7 @@ class DeleteTrackersDebugReceiverRegister @Inject constructor(
         receiver?.unregister()
 
         receiver = DeleteTrackersDebugReceiver(context) {
-            appCoroutineScope.launch {
+            appCoroutineScope.launch(dispatcherProvider.io()) {
                 appTrackerBlockingRepository.deleteAllTrackers()
             }
         }.apply { register() }

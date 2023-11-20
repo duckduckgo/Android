@@ -21,9 +21,9 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
 import kotlinx.coroutines.launch

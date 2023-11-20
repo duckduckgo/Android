@@ -26,10 +26,10 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.databinding.ActivityAccessibilitySettingsBinding
-import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.quietlySetValue
+import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.ui.view.quietlySetValue
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.google.android.material.slider.Slider
 import java.text.NumberFormat
 import kotlinx.coroutines.flow.launchIn

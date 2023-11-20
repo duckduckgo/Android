@@ -33,9 +33,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.DuckDuckGoFragment
-import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.FragmentAutofillManagementListModeBinding
@@ -50,13 +47,16 @@ import com.duckduckgo.autofill.impl.ui.credential.management.sorting.CredentialG
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.InitialExtractor
 import com.duckduckgo.autofill.impl.ui.credential.management.suggestion.SuggestionListBuilder
 import com.duckduckgo.autofill.impl.ui.credential.management.suggestion.SuggestionMatcher
+import com.duckduckgo.common.ui.DuckDuckGoFragment
+import com.duckduckgo.common.ui.view.SearchBar
+import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.R as CommonR
-import com.duckduckgo.mobile.android.ui.view.SearchBar
-import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
-import com.duckduckgo.mobile.android.ui.view.gone
-import com.duckduckgo.mobile.android.ui.view.show
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 import timber.log.Timber

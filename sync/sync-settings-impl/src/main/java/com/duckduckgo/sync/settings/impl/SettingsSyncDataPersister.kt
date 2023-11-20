@@ -16,9 +16,9 @@
 
 package com.duckduckgo.sync.settings.impl
 
-import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
-import com.duckduckgo.app.global.plugins.*
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.*
 import com.duckduckgo.sync.api.engine.*
@@ -154,6 +154,7 @@ class SettingsSyncDataPersister @Inject constructor(
         syncSettingsSyncStore.clientModifiedSince = "0"
         syncSettingsSyncStore.startTimeStamp = "0"
         settingsSyncMetadataDao.removeAll()
+        syncableSettings.getPlugins().forEach { it.onSyncDisabled() }
     }
 
     private class Adapters {

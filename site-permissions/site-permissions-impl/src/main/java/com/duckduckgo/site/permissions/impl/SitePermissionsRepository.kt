@@ -18,9 +18,9 @@ package com.duckduckgo.site.permissions.impl
 
 import android.webkit.PermissionRequest
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.extractDomain
-import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extractDomain
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.site.permissions.store.SitePermissionsPreferences
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsDao
@@ -53,7 +53,8 @@ interface SitePermissionsRepository {
     suspend fun savePermission(sitePermissionsEntity: SitePermissionsEntity)
 }
 
-@ContributesBinding(ActivityScope::class)
+// Cannot be a Singleton
+@ContributesBinding(AppScope::class)
 class SitePermissionsRepositoryImpl @Inject constructor(
     private val sitePermissionsDao: SitePermissionsDao,
     private val sitePermissionsAllowedDao: SitePermissionsAllowedDao,

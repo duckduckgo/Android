@@ -17,10 +17,10 @@
 package com.duckduckgo.app.trackerdetection
 
 import androidx.core.net.toUri
-import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.app.trackerdetection.model.Action.BLOCK
 import com.duckduckgo.app.trackerdetection.model.Action.IGNORE
 import com.duckduckgo.app.trackerdetection.model.TdsTracker
+import com.duckduckgo.common.utils.UriString.Companion.sameOrSubdomain
 import java.net.URI
 
 class TdsClient(

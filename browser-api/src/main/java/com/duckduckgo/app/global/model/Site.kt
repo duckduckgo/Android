@@ -19,13 +19,13 @@ package com.duckduckgo.app.global.model
 import android.net.Uri
 import android.net.http.SslCertificate
 import androidx.core.net.toUri
-import com.duckduckgo.app.global.baseHost
-import com.duckduckgo.app.global.domain
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.common.utils.baseHost
+import com.duckduckgo.common.utils.domain
 
 interface Site {
 

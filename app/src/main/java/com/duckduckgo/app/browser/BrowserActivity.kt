@@ -39,7 +39,6 @@ import com.duckduckgo.app.bookmarks.ui.BookmarksActivity.Companion.SAVED_SITE_UR
 import com.duckduckgo.app.bookmarks.ui.BookmarksScreenNoParams
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Query
-import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
 import com.duckduckgo.app.browser.databinding.ActivityBrowserBinding
 import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBinding
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
@@ -49,12 +48,9 @@ import com.duckduckgo.app.downloads.DownloadsActivity
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
-import com.duckduckgo.app.global.ApplicationClearDataState
-import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.app.global.*
 import com.duckduckgo.app.global.events.db.UserEventsStore
-import com.duckduckgo.app.global.intentText
 import com.duckduckgo.app.global.rating.PromptCount
-import com.duckduckgo.app.global.sanitize
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.global.view.renderIfChanged
@@ -70,11 +66,13 @@ import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
+import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
-import com.duckduckgo.mobile.android.ui.view.gone
-import com.duckduckgo.mobile.android.ui.view.show
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreen.PrivacyDashboardHybridWithTabIdParam
 import javax.inject.Inject
@@ -126,6 +124,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
     @Inject
     @AppCoroutineScope
     lateinit var appCoroutineScope: CoroutineScope
+
+    @Inject lateinit var dispatcherProvider: DispatcherProvider
 
     private val lastActiveTabs = TabList()
 
@@ -312,7 +312,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         if (intent.getBooleanExtra(PERFORM_FIRE_ON_ENTRY_EXTRA, false)) {
             Timber.i("Clearing everything as a result of $PERFORM_FIRE_ON_ENTRY_EXTRA flag being set")
-            appCoroutineScope.launch {
+            appCoroutineScope.launch(dispatcherProvider.io()) {
                 clearPersonalDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = true)
                 clearPersonalDataAction.setAppUsedSinceLastClearFlag(false)
                 clearPersonalDataAction.killAndRestartProcess(notifyDataCleared = false)
@@ -419,7 +419,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
         Timber.i("Processing command: $command")
         when (command) {
             is Query -> currentTab?.submitQuery(command.query)
-            is Refresh -> currentTab?.onRefreshRequested()
             is Command.LaunchPlayStore -> launchPlayStore()
             is Command.ShowAppEnjoymentPrompt -> showAppEnjoymentDialog(command.promptCount)
             is Command.ShowAppRatingPrompt -> showAppRatingDialog(command.promptCount)
@@ -437,9 +436,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         currentTab?.tabId?.let {
             val params = PrivacyDashboardHybridWithTabIdParam(it)
             val intent = globalActivityStarter.startIntent(this, params)
-            intent?.let {
-                startActivityForResult(it, DASHBOARD_REQUEST_CODE)
-            }
+            intent?.let { startActivity(it) }
         }
     }
 
@@ -453,6 +450,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             settingsDataStore = settingsDataStore,
             userEventsStore = userEventsStore,
             appCoroutineScope = appCoroutineScope,
+            dispatcherProvider = dispatcherProvider,
         )
         dialog.clearStarted = {
             removeObservers()
@@ -503,18 +501,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     fun launchDownloads() {
         startActivity(DownloadsActivity.intent(this))
-    }
-
-    override fun onActivityResult(
-        requestCode: Int,
-        resultCode: Int,
-        data: Intent?,
-    ) {
-        if (requestCode == DASHBOARD_REQUEST_CODE) {
-            viewModel.receivedDashboardResult(resultCode)
-        } else {
-            super.onActivityResult(requestCode, resultCode, data)
-        }
     }
 
     private fun configureOnBackPressedListener() {
@@ -576,7 +562,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         private const val APP_ENJOYMENT_DIALOG_TAG = "AppEnjoyment"
 
-        private const val DASHBOARD_REQUEST_CODE = 100
         private const val MAX_ACTIVE_TABS = 40
     }
 

@@ -26,7 +26,6 @@ import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.global.extractDomain
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.CredentialAutofillPickerDialog
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
@@ -46,6 +45,7 @@ import com.duckduckgo.autofill.impl.ui.credential.selecting.AutofillSelectCreden
 import com.duckduckgo.autofill.impl.ui.credential.selecting.AutofillSelectCredentialsDialogFragment.DialogEvent.Selected
 import com.duckduckgo.autofill.impl.ui.credential.selecting.AutofillSelectCredentialsDialogFragment.DialogEvent.Shown
 import com.duckduckgo.autofill.impl.ui.credential.selecting.CredentialsPickerRecyclerAdapter.ListItem
+import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog

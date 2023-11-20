@@ -23,7 +23,7 @@
         android:id="@+id/savedSiteAppBar"
         layout="@layout/include_default_toolbar" />
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
+    <com.duckduckgo.common.ui.view.text.DaxTextInput
         android:id="@+id/titleInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -32,7 +32,7 @@
         android:inputType="text|textCapWords"
         app:layout_constraintTop_toBottomOf="@id/savedSiteAppBar" />
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
+    <com.duckduckgo.common.ui.view.text.DaxTextInput
         android:id="@+id/urlInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -41,7 +41,7 @@
         android:inputType="textUri"
         app:layout_constraintTop_toBottomOf="@id/titleInput" />
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/savedSiteLocationLabel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -53,7 +53,7 @@
         app:textType="secondary"
         app:typography="caption" />
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/savedSiteLocation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

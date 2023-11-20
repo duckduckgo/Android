@@ -22,6 +22,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.common.utils.DispatcherProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
@@ -41,10 +42,11 @@ class AtbInitializer(
     private val statisticsDataStore: StatisticsDataStore,
     private val statisticsUpdater: StatisticsUpdater,
     private val listeners: Set<AtbInitializerListener>,
+    private val dispatcherProvider: DispatcherProvider,
 ) : MainProcessLifecycleObserver {
 
     override fun onResume(owner: LifecycleOwner) {
-        appCoroutineScope.launch { initialize() }
+        appCoroutineScope.launch(dispatcherProvider.io()) { initialize() }
     }
 
     @VisibleForTesting

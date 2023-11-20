@@ -21,12 +21,13 @@ import android.content.Context
 import android.content.pm.PackageManager
 import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
+import com.duckduckgo.networkprotection.impl.waitlist.NetPRemoteFeature
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
@@ -43,12 +44,13 @@ class NetPDisabledNotificationScheduler @Inject constructor(
     private val netPSettingsLocalConfig: NetPSettingsLocalConfig,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    private val netPRemoteFeature: NetPRemoteFeature,
 ) : VpnServiceCallbacks {
 
     private var isNetPEnabled: AtomicReference<Boolean> = AtomicReference(false)
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        coroutineScope.launch {
+        coroutineScope.launch(dispatcherProvider.io()) {
             isNetPEnabled.set(networkProtectionState.isEnabled())
             if (isNetPEnabled.get()) {
                 cancelDisabledNotification()
@@ -65,7 +67,7 @@ class NetPDisabledNotificationScheduler @Inject constructor(
         coroutineScope: CoroutineScope,
         vpnStopReason: VpnStopReason,
     ) {
-        coroutineScope.launch {
+        coroutineScope.launch(dispatcherProvider.io()) {
             when (vpnStopReason) {
                 VpnStopReason.RESTART -> {} // no-op
                 VpnStopReason.SELF_STOP -> onVPNManuallyStopped()
@@ -77,7 +79,7 @@ class NetPDisabledNotificationScheduler @Inject constructor(
 
     private suspend fun shouldShowImmediateNotification(): Boolean {
         // When VPN is stopped and if AppTP has been enabled AND user has been onboarded, then we show the disabled notif
-        return isNetPEnabled.get() && networkProtectionState.isOnboarded()
+        return isNetPEnabled.get() && networkProtectionState.isOnboarded() && netPRemoteFeature.waitlistBetaActive().isEnabled()
     }
 
     private suspend fun onVPNManuallyStopped() {
@@ -89,9 +91,9 @@ class NetPDisabledNotificationScheduler @Inject constructor(
     }
 
     override fun onVpnReconfigured(coroutineScope: CoroutineScope) {
-        coroutineScope.launch {
+        coroutineScope.launch(dispatcherProvider.io()) {
             val reconfiguredNetPState = networkProtectionState.isEnabled()
-            if (isNetPEnabled.getAndSet(reconfiguredNetPState) != reconfiguredNetPState) {
+            if (isNetPEnabled.getAndSet(reconfiguredNetPState) != reconfiguredNetPState && netPRemoteFeature.waitlistBetaActive().isEnabled()) {
                 if (!reconfiguredNetPState) {
                     logcat { "VPN has been reconfigured, showing disabled notification for NetP" }
                     showDisabledNotification()

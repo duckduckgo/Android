@@ -17,8 +17,6 @@
 package com.duckduckgo.app.di
 
 import android.content.Context
-import com.duckduckgo.app.global.device.ContextDeviceInfo
-import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.AtbInitializer
 import com.duckduckgo.app.statistics.AtbInitializerListener
@@ -27,6 +25,9 @@ import com.duckduckgo.app.statistics.api.StatisticsService
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.device.ContextDeviceInfo
+import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
@@ -109,8 +110,9 @@ class StubStatisticsModule {
         statisticsDataStore: StatisticsDataStore,
         statisticsUpdater: StatisticsUpdater,
         listeners: DaggerSet<AtbInitializerListener>,
+        dispatcherProvider: DispatcherProvider,
     ): MainProcessLifecycleObserver {
-        return AtbInitializer(appCoroutineScope, statisticsDataStore, statisticsUpdater, listeners)
+        return AtbInitializer(appCoroutineScope, statisticsDataStore, statisticsUpdater, listeners, dispatcherProvider)
     }
 
     @Provides

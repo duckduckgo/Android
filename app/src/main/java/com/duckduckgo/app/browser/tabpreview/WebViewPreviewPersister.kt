@@ -18,8 +18,8 @@ package com.duckduckgo.app.browser.tabpreview
 
 import android.content.Context
 import android.graphics.Bitmap
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.file.FileDeleter
+import com.duckduckgo.common.utils.DispatcherProvider
 import java.io.File
 import java.io.FileOutputStream
 import kotlinx.coroutines.withContext

@@ -20,6 +20,10 @@ plugins {
     id 'com.google.devtools.ksp' version "$ksp_version"
 }
 
+android {
+    namespace 'com.duckduckgo.adclick.store'
+}
+
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {

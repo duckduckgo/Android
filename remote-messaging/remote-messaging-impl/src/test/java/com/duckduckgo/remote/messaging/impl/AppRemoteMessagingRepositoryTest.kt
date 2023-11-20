@@ -20,10 +20,10 @@ import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.browser.api.UserBrowserProperties
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.Action.Share
 import com.duckduckgo.remote.messaging.api.Content.BigSingleAction

@@ -16,7 +16,7 @@
   ~ limitations under the License.
   -->
 
-<com.duckduckgo.mobile.android.ui.view.Chip
+<com.duckduckgo.common.ui.view.Chip
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"

@@ -23,6 +23,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ReceiverScope
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import dagger.android.AndroidInjection
@@ -44,6 +45,9 @@ class SharePromoLinkRMFBroadCastReceiver : BroadcastReceiver() {
     @AppCoroutineScope
     lateinit var coroutineScope: CoroutineScope
 
+    @Inject
+    lateinit var dispatcherProvider: DispatcherProvider
+
     override fun onReceive(
         context: Context,
         intent: Intent,
@@ -53,7 +57,7 @@ class SharePromoLinkRMFBroadCastReceiver : BroadcastReceiver() {
     }
 
     private fun onPromoLinkSharedSuccessfully() {
-        coroutineScope.launch {
+        coroutineScope.launch(dispatcherProvider.io()) {
             remoteMessagingRepository.messageFlow().map { it?.id }.take(1).collect {
                 val messageId = it.orEmpty()
                 remoteMessagingRepository.dismissMessage(messageId)

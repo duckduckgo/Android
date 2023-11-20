@@ -20,34 +20,41 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
+import com.duckduckgo.savedsites.impl.RealFavoritesDelegate
 import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
+import com.duckduckgo.savedsites.impl.sync.RealSavedSitesFormFactorSyncMigration
 import com.duckduckgo.savedsites.impl.sync.RealSavedSitesSyncStore
+import com.duckduckgo.savedsites.impl.sync.RealSyncSavedSitesRepository
+import com.duckduckgo.savedsites.impl.sync.SavedSitesFormFactorSyncMigration
 import com.duckduckgo.savedsites.impl.sync.SavedSitesSyncDataProvider
 import com.duckduckgo.savedsites.impl.sync.SavedSitesSyncStore
 import com.duckduckgo.savedsites.impl.sync.SyncBookmarkEntry
 import com.duckduckgo.savedsites.impl.sync.SyncBookmarkPage
 import com.duckduckgo.savedsites.impl.sync.SyncBookmarksRequest
 import com.duckduckgo.savedsites.impl.sync.SyncFolderChildren
+import com.duckduckgo.savedsites.impl.sync.SyncSavedSitesRepository
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 import com.duckduckgo.sync.api.SyncCrypto
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.*
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
 
@@ -63,8 +70,10 @@ class SavedSitesSyncDataProviderTest {
 
     private lateinit var db: AppDatabase
     private lateinit var repository: SavedSitesRepository
+    private lateinit var syncRepository: SyncSavedSitesRepository
     private lateinit var savedSitesEntitiesDao: SavedSitesEntitiesDao
     private lateinit var savedSitesRelationsDao: SavedSitesRelationsDao
+    private lateinit var savedSitesFormFactorSyncMigration: SavedSitesFormFactorSyncMigration
     private lateinit var store: SavedSitesSyncStore
 
     private lateinit var parser: SavedSitesSyncDataProvider
@@ -91,13 +100,37 @@ class SavedSitesSyncDataProviderTest {
         savedSitesEntitiesDao = db.syncEntitiesDao()
         savedSitesRelationsDao = db.syncRelationsDao()
 
-        repository = RealSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao)
+        val savedSitesSettingsRepository = FakeDisplayModeSettingsRepository()
+        val favoritesDelegate = RealFavoritesDelegate(
+            savedSitesEntitiesDao,
+            savedSitesRelationsDao,
+            savedSitesSettingsRepository,
+            coroutinesTestRule.testDispatcherProvider,
+        )
+
+        syncRepository = RealSyncSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao)
+        repository = RealSavedSitesRepository(
+            savedSitesEntitiesDao,
+            savedSitesRelationsDao,
+            favoritesDelegate,
+            coroutinesTestRule.testDispatcherProvider,
+        )
         store = RealSavedSitesSyncStore(InstrumentationRegistry.getInstrumentation().context)
 
-        parser = SavedSitesSyncDataProvider(repository, store, FakeCrypto())
+        savedSitesFormFactorSyncMigration = RealSavedSitesFormFactorSyncMigration(
+            savedSitesEntitiesDao,
+            savedSitesRelationsDao,
+            savedSitesSettingsRepository,
+        )
+        parser = SavedSitesSyncDataProvider(repository, syncRepository, store, FakeCrypto(), savedSitesFormFactorSyncMigration)
 
         favoritesFolder = repository.insert(favoritesFolder)
         bookmarksRootFolder = repository.insert(bookmarksRootFolder)
+    }
+
+    @After
+    fun after() {
+        db.close()
     }
 
     @Test
@@ -126,7 +159,7 @@ class SavedSitesSyncDataProviderTest {
     }
 
     @Test
-    fun whenFirstSyncAndUsersHasFavoritesThenChangesAreFormatted() {
+    fun whenFirstSyncAndUsersHasFavoritesThenFormFactorFolderPresent() {
         repository.insert(favourite1)
         repository.insert(bookmark3)
         repository.insert(bookmark4)
@@ -134,12 +167,15 @@ class SavedSitesSyncDataProviderTest {
         val syncChanges = parser.getChanges()
 
         val changes = Adapters.adapter.fromJson(syncChanges.jsonString)!!
-        assertTrue(changes.bookmarks.updates.size == 5)
+        assertTrue(changes.bookmarks.updates.size == 6)
         assertTrue(changes.bookmarks.updates[0].id == "favorites_root")
-        assertTrue(changes.bookmarks.updates[1].id == "bookmark1")
-        assertTrue(changes.bookmarks.updates[2].id == "bookmark3")
-        assertTrue(changes.bookmarks.updates[3].id == "bookmark4")
-        assertTrue(changes.bookmarks.updates[4].id == "bookmarks_root")
+        assertTrue(changes.bookmarks.updates[0].folder!!.children == listOf(favourite1.id))
+        assertTrue(changes.bookmarks.updates[1].id == "mobile_favorites_root")
+        assertTrue(changes.bookmarks.updates[1].folder!!.children == listOf(favourite1.id))
+        assertTrue(changes.bookmarks.updates[2].id == "bookmark1")
+        assertTrue(changes.bookmarks.updates[3].id == "bookmark3")
+        assertTrue(changes.bookmarks.updates[4].id == "bookmark4")
+        assertTrue(changes.bookmarks.updates[5].id == "bookmarks_root")
     }
 
     @Test
@@ -158,12 +194,15 @@ class SavedSitesSyncDataProviderTest {
 
     @Test
     fun whenNewFoldersAndBookmarksAndFavouritesSinceLastSyncThenChangesContainData() {
-        repository.insert(bookmark1)
-        repository.insert(bookmark2)
-        repository.insert(favourite1)
-        repository.insert(bookmark3)
-        repository.insert(bookmark4)
-        repository.insert(subFolder)
+        val modificationTimestamp = DatabaseDateFormatter.iso8601()
+        val lastSyncTimestamp = DatabaseDateFormatter.iso8601(twoHoursAgo)
+        setLastSyncTime(lastSyncTimestamp)
+        repository.insert(bookmark1.copy(lastModified = modificationTimestamp))
+        repository.insert(bookmark2.copy(lastModified = modificationTimestamp))
+        repository.insert(favourite1.copy(lastModified = modificationTimestamp))
+        repository.insert(bookmark3.copy(lastModified = modificationTimestamp))
+        repository.insert(bookmark4.copy(lastModified = modificationTimestamp))
+        repository.insert(subFolder.copy(lastModified = modificationTimestamp))
         repository.updateBookmark(bookmark1.copy(parentId = subFolder.id), SavedSitesNames.BOOKMARKS_ROOT)
         repository.updateBookmark(bookmark2.copy(parentId = subFolder.id), SavedSitesNames.BOOKMARKS_ROOT)
 
@@ -172,14 +211,14 @@ class SavedSitesSyncDataProviderTest {
         val changes = Adapters.adapter.fromJson(syncChanges.jsonString)!!
         assertTrue(changes.bookmarks.updates.size == 7)
         assertTrue(changes.bookmarks.updates[0].id == "favorites_root")
-        assertTrue(changes.bookmarks.updates[1].id == "bookmark3")
-        assertTrue(changes.bookmarks.updates[2].id == "bookmark4")
+        assertTrue(changes.bookmarks.updates[1].id == "bookmarks_root")
+        assertTrue(changes.bookmarks.updates[1].folder!!.children == listOf("bookmark3", "bookmark4", "1a8736c1-83ff-48ce-9f01-797887455891"))
+        assertTrue(changes.bookmarks.updates[2].id == "1a8736c1-83ff-48ce-9f01-797887455891")
+        assertTrue(changes.bookmarks.updates[2].folder!!.children == listOf("bookmark1", "bookmark2"))
         assertTrue(changes.bookmarks.updates[3].id == "bookmark1")
         assertTrue(changes.bookmarks.updates[4].id == "bookmark2")
-        assertTrue(changes.bookmarks.updates[5].id == "1a8736c1-83ff-48ce-9f01-797887455891")
-        assertTrue(changes.bookmarks.updates[5].folder!!.children == listOf("bookmark1", "bookmark2"))
-        assertTrue(changes.bookmarks.updates[6].id == "bookmarks_root")
-        assertTrue(changes.bookmarks.updates[6].folder!!.children == listOf("bookmark3", "bookmark4", "1a8736c1-83ff-48ce-9f01-797887455891"))
+        assertTrue(changes.bookmarks.updates[5].id == "bookmark3")
+        assertTrue(changes.bookmarks.updates[6].id == "bookmark4")
     }
 
     @Test

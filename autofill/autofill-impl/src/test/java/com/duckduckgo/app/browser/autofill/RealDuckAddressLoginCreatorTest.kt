@@ -1,11 +1,11 @@
 package com.duckduckgo.app.browser.autofill
 
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.RealDuckAddressLoginCreator
+import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule

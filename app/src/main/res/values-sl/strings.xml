@@ -215,18 +215,24 @@
     <string name="brokenSitesCategoriesTitle">Opišite, kaj se je zgodilo</string>
     <string name="brokenSitesCategoriesHint">Opišite, kaj se je zgodilo</string>
     <string name="brokenSiteSubmitButton">Pošljite poročilo</string>
-    <string name="brokenSiteDescription">Če pošljete poročilo o anonimnem pokvarjenem spletišču, nam pomagate odpraviti napake in izboljšati aplikacijo.</string>
+    <string name="brokenSiteDescription">Oddaja anonimnega poročila o nedelujočem mestu nam pomaga izboljšati aplikacijo.</string>
 
-    <string name="brokenSiteCategoryImages">Slike se niso naložile</string>
-    <string name="brokenSiteCategoryPaywall">Spletišče me je prosilo, da onemogočim</string>
-    <string name="brokenSiteCategoryComments">Komentarji se niso naložili</string>
-    <string name="brokenSiteCategoryVideos">Video se ni predvajal</string>
-    <string name="brokenSiteCategoryLinks">Povezave ali tipke ne delujejo</string>
-    <string name="brokenSiteCategoryContent">Vsebina manjka</string>
-    <string name="brokenSiteCategoryLogin">Ne morem se prijaviti</string>
-    <string name="brokenSiteCategoryUnsupported">Brskalnik ni združljiv</string>
+    <string name="brokenSiteCategoryBlocked">Stran je blokirana ali se ni naložila</string>
+    <string name="brokenSiteCategoryLayout">Postavitev spletnega mesta je neuporabna</string>
+    <string name="brokenSiteCategoryEmptySpaces">Spletno mesto vsebuje velike prazne prostore</string>
+    <string name="brokenSiteCategoryShopping">Ne morem plačati, se odjaviti ali nakupovati</string>
+    <string name="brokenSiteCategoryPaywall">Spletno mesto me je pozvalo, naj onemogočim preprečevalec oglasov</string>
+    <string name="brokenSiteCategoryComments">Komentarji, ocene ali klepeti se niso naložili</string>
+    <string name="brokenSiteCategoryVideos">Video se ni predvajal ali naložil</string>
+    <string name="brokenSiteCategoryLogin">Ne morem se prijaviti/registrirati</string>
     <string name="brokenSiteCategoryOther">Nekaj drugega</string>
     <string name="brokenSiteDescriptionTextInputHint">Zaupajte nam več podrobnosti (neobvezno)</string>
+    <string name="brokenSiteDescriptionCaption">Kaj se je zgodilo? Kaj bi se moralo zgoditi? Je izklop zaščite odpravil težavo?</string>
+
+    <string name="brokenSiteProtectionsOn">Zaščite so <b>VKLOPLJENE</b> za to spletno mesto</string>
+    <string name="brokenSiteProtectionsOff">Zaščite so <b>IZKLOPLJENE</b> za to spletno mesto</string>
+    <string name="brokenSiteProtectionsOnBannerMessage">IZKLOP zaščit lahko pomaga.</string>
+    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Zaščito zasebnosti smo začasno onemogočili, ker je videti, da zato prihaja do napak na tem spletnem mestu.</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Zaznamki</string>

@@ -30,6 +30,7 @@ import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.app.trackerdetection.db.TdsTrackerDao
 import com.duckduckgo.app.trackerdetection.model.TdsMetadata
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
@@ -55,10 +56,11 @@ class TrackerDataLoader @Inject constructor(
     private val appDatabase: AppDatabase,
     private val moshi: Moshi,
     private val urlToTypeMapper: UrlToTypeMapper,
+    private val dispatcherProvider: DispatcherProvider,
 ) : MainProcessLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
-        appCoroutineScope.launch { loadData() }
+        appCoroutineScope.launch(dispatcherProvider.io()) { loadData() }
     }
 
     private fun loadData() {

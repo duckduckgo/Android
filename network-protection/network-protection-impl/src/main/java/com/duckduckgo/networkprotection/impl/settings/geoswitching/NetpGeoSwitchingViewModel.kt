@@ -22,7 +22,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.R
@@ -73,9 +73,9 @@ class NetpGeoSwitchingViewModel @Inject constructor(
                     countryEmoji = getEmojiForCountryCode(it.countryCode),
                     countryCode = it.countryCode,
                     countryName = it.countryName,
-                    cities = it.cities,
+                    cities = it.cities.sorted(),
                 )
-            }
+            }.sortedBy { it.countryName }
 
             val completeList = mutableListOf(
                 HeaderItem(R.string.netpGeoswitchingHeaderRecommended),

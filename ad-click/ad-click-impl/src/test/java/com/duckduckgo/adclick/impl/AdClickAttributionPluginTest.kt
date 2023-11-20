@@ -24,7 +24,7 @@ import com.duckduckgo.adclick.store.AdClickAttributionLinkFormatEntity
 import com.duckduckgo.adclick.store.AdClickAttributionRepository
 import com.duckduckgo.adclick.store.AdClickFeatureToggleRepository
 import com.duckduckgo.adclick.store.AdClickFeatureToggles
-import com.duckduckgo.app.FileUtilities
+import com.duckduckgo.common.test.FileUtilities
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue

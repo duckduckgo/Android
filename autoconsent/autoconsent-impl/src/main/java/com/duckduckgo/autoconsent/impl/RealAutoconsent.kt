@@ -17,8 +17,6 @@
 package com.duckduckgo.autoconsent.impl
 
 import android.webkit.WebView
-import com.duckduckgo.app.global.UriString
-import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
@@ -27,6 +25,8 @@ import com.duckduckgo.autoconsent.impl.AutoconsentInterface.Companion.AUTOCONSEN
 import com.duckduckgo.autoconsent.impl.handlers.ReplyHandler
 import com.duckduckgo.autoconsent.store.AutoconsentRepository
 import com.duckduckgo.autoconsent.store.AutoconsentSettingsRepository
+import com.duckduckgo.common.utils.UriString
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary

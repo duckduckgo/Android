@@ -18,8 +18,8 @@ package com.duckduckgo.request.filterer.impl
 
 import android.webkit.WebResourceRequest
 import androidx.core.net.toUri
-import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.UriString
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.UriString
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
@@ -81,7 +81,7 @@ class RequestFiltererImpl @Inject constructor(
         currentPage = url
         hasTimeElapsed = false
         if (job?.isActive == true) job?.cancel()
-        job = scope.launch {
+        job = scope.launch(dispatcherProvider.io()) {
             delay(windowInMs)
             hasTimeElapsed = true
         }

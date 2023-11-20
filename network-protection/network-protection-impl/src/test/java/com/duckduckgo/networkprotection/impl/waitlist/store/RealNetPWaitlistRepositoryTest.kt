@@ -16,7 +16,7 @@
 
 package com.duckduckgo.networkprotection.impl.waitlist.store
 
-import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.networkprotection.impl.fakes.FakeNetPWaitlistDataStore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest

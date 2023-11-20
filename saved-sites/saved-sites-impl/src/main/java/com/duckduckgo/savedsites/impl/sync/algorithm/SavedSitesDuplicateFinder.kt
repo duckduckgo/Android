@@ -21,10 +21,12 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.impl.sync.SyncSavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesDuplicateResult.Duplicate
 import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesDuplicateResult.NotDuplicate
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import timber.log.*
 
 interface SavedSitesDuplicateFinder {
 
@@ -32,7 +34,7 @@ interface SavedSitesDuplicateFinder {
         bookmarkFolder: BookmarkFolder,
     ): SavedSitesDuplicateResult
 
-    fun findFavouriteDuplicate(favorite: Favorite): SavedSitesDuplicateResult
+    fun findFavouriteDuplicate(favorite: Favorite, favoriteFolder: String): SavedSitesDuplicateResult
     fun findBookmarkDuplicate(bookmark: Bookmark): SavedSitesDuplicateResult
 }
 
@@ -42,7 +44,10 @@ sealed class SavedSitesDuplicateResult {
 }
 
 @ContributesBinding(AppScope::class)
-class RealSavedSitesDuplicateFinder @Inject constructor(val repository: SavedSitesRepository) : SavedSitesDuplicateFinder {
+class RealSavedSitesDuplicateFinder @Inject constructor(
+    val repository: SavedSitesRepository,
+    val syncRepository: SyncSavedSitesRepository,
+) : SavedSitesDuplicateFinder {
     override fun findFolderDuplicate(bookmarkFolder: BookmarkFolder): SavedSitesDuplicateResult {
         val existingFolder = repository.getFolderByName(bookmarkFolder.name)
         return if (existingFolder != null) {
@@ -56,8 +61,9 @@ class RealSavedSitesDuplicateFinder @Inject constructor(val repository: SavedSit
         }
     }
 
-    override fun findFavouriteDuplicate(favorite: Favorite): SavedSitesDuplicateResult {
-        val presentUrl = repository.getFavorite(favorite.url)
+    override fun findFavouriteDuplicate(favorite: Favorite, favoriteFolder: String): SavedSitesDuplicateResult {
+        val presentUrl = syncRepository.getFavorite(favorite.url, favoriteFolder)
+
         return if (presentUrl != null) {
             if (presentUrl.title == favorite.title) {
                 Duplicate(presentUrl.id)

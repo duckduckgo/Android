@@ -17,7 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.cohort
 
 import androidx.annotation.VisibleForTesting
-import com.duckduckgo.app.global.plugins.pixel.PixelInterceptorPlugin
+import com.duckduckgo.common.utils.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject

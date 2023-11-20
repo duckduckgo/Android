@@ -23,7 +23,7 @@
     android:paddingEnd="@dimen/keyline_4"
     android:paddingBottom="@dimen/keyline_5">
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/downloads_empty_text_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

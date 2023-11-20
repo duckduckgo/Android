@@ -17,6 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.feature.settings
 
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureSettings
 import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
@@ -42,6 +43,7 @@ class ExceptionListsSettingStore @Inject constructor(
     private val vpnDatabase: VpnDatabase,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
+    private val dispatcherProvider: DispatcherProvider,
 ) : FeatureSettings.Store {
     private val jsonAdapter = Moshi.Builder().build().adapter(JsonConfigModel::class.java)
 
@@ -66,7 +68,7 @@ class ExceptionListsSettingStore @Inject constructor(
                 )
 
                 // Restart VPN now that the lists were updated
-                appCoroutineScope.launch {
+                appCoroutineScope.launch(dispatcherProvider.io()) {
                     vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
                 }
             }

@@ -20,17 +20,18 @@ import android.net.Uri
 import android.net.http.SslCertificate
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
-import com.duckduckgo.app.global.UriString
-import com.duckduckgo.app.global.isHttps
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
 import com.duckduckgo.app.global.model.PrivacyShield.UNPROTECTED
-import com.duckduckgo.app.privacy.db.UserAllowListDao
+import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.UriString
+import com.duckduckgo.common.utils.isHttps
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.CoroutineScope
@@ -41,9 +42,10 @@ class SiteMonitor(
     url: String,
     override var title: String?,
     override var upgradedHttps: Boolean = false,
-    private val userAllowListDao: UserAllowListDao,
+    private val userAllowListRepository: UserAllowListRepository,
     private val contentBlocking: ContentBlocking,
     private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
 ) : Site {
 
     override var url: String = url
@@ -108,7 +110,7 @@ class SiteMonitor(
 
     init {
         // httpsAutoUpgrade is not supported yet; for now, keep it equal to isHttps and don't penalise sites
-        appCoroutineScope.launch {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
             domain?.let { userAllowList = isAllowListed(it) }
         }
     }
@@ -161,7 +163,7 @@ class SiteMonitor(
 
     @WorkerThread
     private fun isAllowListed(domain: String): Boolean {
-        return userAllowListDao.contains(domain) || contentBlocking.isAnException(domain)
+        return userAllowListRepository.isDomainInUserAllowList(domain) || contentBlocking.isAnException(domain)
     }
 
     override var urlParametersRemoved: Boolean = false

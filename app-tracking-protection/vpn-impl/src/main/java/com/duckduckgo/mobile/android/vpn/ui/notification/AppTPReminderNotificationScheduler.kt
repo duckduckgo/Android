@@ -25,8 +25,8 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.vpn.feature.removal.VpnFeatureRemover
@@ -61,7 +61,7 @@ class AppTPReminderNotificationScheduler @Inject constructor(
     private var isAppTPEnabled: AtomicReference<Boolean> = AtomicReference(false)
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        coroutineScope.launch {
+        coroutineScope.launch(dispatchers.io()) {
             isAppTPEnabled.set(appTrackingProtection.isEnabled())
             if (isAppTPEnabled.get()) {
                 // These are all relevant for when AppTP has been enabled.
@@ -77,7 +77,7 @@ class AppTPReminderNotificationScheduler @Inject constructor(
         coroutineScope: CoroutineScope,
         vpnStopReason: VpnStopReason,
     ) {
-        coroutineScope.launch {
+        coroutineScope.launch(dispatchers.io()) {
             when (vpnStopReason) {
                 VpnStopReason.RESTART -> {} // no-op
                 VpnStopReason.SELF_STOP -> onVPNManuallyStopped()

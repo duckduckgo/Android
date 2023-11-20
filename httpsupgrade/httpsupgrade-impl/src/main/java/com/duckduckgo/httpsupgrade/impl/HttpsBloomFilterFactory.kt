@@ -18,8 +18,8 @@ package com.duckduckgo.httpsupgrade.impl
 
 import android.content.Context
 import androidx.annotation.WorkerThread
-import com.duckduckgo.app.global.store.BinaryDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.utils.store.BinaryDataStore
 import com.duckduckgo.httpsupgrade.api.HttpsEmbeddedDataPersister
 import com.duckduckgo.httpsupgrade.impl.BloomFilter.Config.PathConfig
 import com.duckduckgo.httpsupgrade.impl.HttpsUpgradePixelName.CREATE_BLOOM_FILTER_ERROR

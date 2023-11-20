@@ -46,7 +46,7 @@
         app:layout_constraintBottom_toBottomOf="@id/deviceShieldAppEntryIcon"
         app:layout_constraintEnd_toEndOf="@id/deviceShieldAppEntryIcon" />
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/deviceShieldAppExclusionReason"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -58,7 +58,7 @@
         app:typography="caption"
         tools:text="App issues may occur if enabled" />
 
-    <com.duckduckgo.mobile.android.ui.view.SwitchView
+    <com.duckduckgo.common.ui.view.SwitchView
         android:id="@+id/deviceShieldAppEntryShieldEnabled"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -69,7 +69,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.562" />
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/deviceShieldAppEntryName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

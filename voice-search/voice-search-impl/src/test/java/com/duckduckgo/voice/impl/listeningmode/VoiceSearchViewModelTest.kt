@@ -17,7 +17,7 @@
 package com.duckduckgo.voice.impl.listeningmode
 
 import app.cash.turbine.test
-import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Event
 import com.duckduckgo.voice.impl.listeningmode.VoiceSearchViewModel.Command
 import com.duckduckgo.voice.impl.listeningmode.VoiceSearchViewModel.ViewState

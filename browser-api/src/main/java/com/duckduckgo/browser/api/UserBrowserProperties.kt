@@ -16,7 +16,7 @@
 
 package com.duckduckgo.browser.api
 
-import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
+import com.duckduckgo.common.ui.DuckDuckGoTheme
 import java.util.*
 
 interface UserBrowserProperties {

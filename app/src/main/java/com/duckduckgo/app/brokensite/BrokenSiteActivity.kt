@@ -31,16 +31,16 @@ import com.duckduckgo.app.brokensite.BrokenSiteViewModel.ViewState
 import com.duckduckgo.app.brokensite.model.BrokenSiteCategory
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityBrokenSiteBinding
-import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
+import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.dialog.DaxAlertDialog
+import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.ui.view.dialog.DaxAlertDialog
-import com.duckduckgo.mobile.android.ui.view.dialog.RadioListAlertDialogBuilder
-import com.duckduckgo.mobile.android.ui.view.gone
-import com.duckduckgo.mobile.android.ui.view.show
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.google.android.material.snackbar.Snackbar
 import java.util.*
 import javax.inject.Inject
@@ -83,7 +83,6 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         val consentManaged = intent.getBooleanExtra(CONSENT_MANAGED_EXTRA, false)
         val consentOptOutFailed = intent.getBooleanExtra(CONSENT_OPT_OUT_FAILED_EXTRA, false)
         val consentSelfTestFailed = intent.getBooleanExtra(CONSENT_SELF_TEST_FAILED_EXTRA, false)
-        val params = intent.getStringArrayExtra(BOOLEAN_PARAMS).orEmpty()
         val errorCodes = intent.getStringArrayExtra(ERROR_CODES).orEmpty()
         val httpErrorCodes = intent.getStringExtra(HTTP_ERROR_CODES).orEmpty()
         val isDesktopMode = intent.getBooleanExtra(IS_DESKTOP_MODE, false)
@@ -96,7 +95,6 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
             consentManaged = consentManaged,
             consentOptOutFailed = consentOptOutFailed,
             consentSelfTestFailed = consentSelfTestFailed,
-            params = params,
             errorCodes = errorCodes,
             httpErrorCodes = httpErrorCodes,
             isDesktopMode = isDesktopMode,
@@ -164,6 +162,8 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
                 }
             },
         )
+
+        brokenSites.protectionsToggle.setOnProtectionsToggledListener(viewModel::onProtectionsToggled)
     }
 
     private fun configureObservers() {
@@ -213,6 +213,13 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
                 brokenSites.submitButton.isEnabled = true
             }
         }
+
+        if (viewState.protectionsState != null) {
+            brokenSites.protectionsToggle.isVisible = true
+            brokenSites.protectionsToggle.setState(viewState.protectionsState)
+        } else {
+            brokenSites.protectionsToggle.isVisible = false
+        }
     }
 
     private fun runValidation() {
@@ -233,7 +240,6 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         private const val CONSENT_MANAGED_EXTRA = "CONSENT_MANAGED_EXTRA"
         private const val CONSENT_OPT_OUT_FAILED_EXTRA = "CONSENT_OPT_OUT_FAILED_EXTRA"
         private const val CONSENT_SELF_TEST_FAILED_EXTRA = "CONSENT_SELF_TEST_FAILED_EXTRA"
-        private const val BOOLEAN_PARAMS = "BOOLEAN_PARAMS"
         private const val ERROR_CODES = "ERROR_CODES"
         private const val HTTP_ERROR_CODES = "HTTP_ERROR_CODES"
         private const val IS_DESKTOP_MODE = "IS_DESKTOP_MODE"
@@ -251,7 +257,6 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
             intent.putExtra(CONSENT_MANAGED_EXTRA, data.consentManaged)
             intent.putExtra(CONSENT_OPT_OUT_FAILED_EXTRA, data.consentOptOutFailed)
             intent.putExtra(CONSENT_SELF_TEST_FAILED_EXTRA, data.consentSelfTestFailed)
-            intent.putExtra(BOOLEAN_PARAMS, data.params.toTypedArray())
             intent.putExtra(ERROR_CODES, data.errorCodes.toTypedArray())
             intent.putExtra(HTTP_ERROR_CODES, data.httpErrorCodes)
             intent.putExtra(IS_DESKTOP_MODE, data.isDesktopMode)

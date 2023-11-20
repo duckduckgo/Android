@@ -24,8 +24,8 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.utils.ConflatedJob
+import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.network.ExternalVpnDetector
@@ -191,7 +191,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         if (!isTimerTickRunning) {
             isTimerTickRunning = true
             loadConnectionDetails()
-            timerTickJob += viewModelScope.launch(dispatcherProvider.default()) {
+            timerTickJob += viewModelScope.launch(dispatcherProvider.io()) {
                 var enabledTime = networkProtectionRepository.enabledTimeInMillis
                 while (isTimerTickRunning) {
                     if (enabledTime == -1L) {

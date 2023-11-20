@@ -26,7 +26,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/vpnTodayRunningTime"
             app:typography="h2"
             android:layout_width="0dp"
@@ -38,7 +38,7 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Today, the VPN has been running for 45 min" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/vpnDataSentLabel"
             app:typography="h3"
             android:layout_width="wrap_content"
@@ -50,7 +50,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/vpnTodayRunningTime" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/vpnSentStats"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -61,7 +61,7 @@
             app:layout_constraintTop_toBottomOf="@id/vpnDataSentLabel"
             tools:text="230MB sent from the device" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/vpnDataReceivedLabel"
             app:typography="h3"
             android:layout_width="wrap_content"
@@ -73,7 +73,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/vpnSentStats" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/vpnReceivedStats"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -84,7 +84,7 @@
             app:layout_constraintTop_toBottomOf="@id/vpnDataReceivedLabel"
             tools:text="1 GB received from the network" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/vpnAppTrackersLabel"
             app:typography="h2"
             android:layout_width="wrap_content"
@@ -96,7 +96,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/vpnReceivedStats" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/vpnAppTrackerCompaniesBlockedToday"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -108,7 +108,7 @@
             app:layout_constraintTop_toBottomOf="@id/vpnAppTrackersLabel"
             tools:text="26 tracker companies blocked last 24 hours" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/vpnAppTrackersBlockedToday"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -120,7 +120,7 @@
             app:layout_constraintTop_toBottomOf="@id/vpnAppTrackerCompaniesBlockedToday"
             tools:text="26 trackers blocked last 24 hours" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/vpnAppTrackerCompaniesBlockedWeek"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -132,7 +132,7 @@
             app:layout_constraintTop_toBottomOf="@id/vpnAppTrackersBlockedToday"
             tools:text="150 tracker companies blocked last week" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/vpnAppTrackersBlockedWeek"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -144,7 +144,7 @@
             app:layout_constraintTop_toBottomOf="@id/vpnAppTrackerCompaniesBlockedWeek"
             tools:text="457 trackers blocked last week" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/vpnAppLastTrackerDomain"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -156,7 +156,7 @@
             app:layout_constraintTop_toBottomOf="@id/vpnAppTrackersBlockedWeek"
             tools:text="Last tracker blocked 8h 34 min ago\ngoogle-analytics.com\n(owned by Google)" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/vpnWebTrackersLabel"
             app:typography="h2"
             android:layout_width="wrap_content"
@@ -168,7 +168,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/vpnAppLastTrackerDomain" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/vpnWebTrackerCompaniesBlockedToday"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -180,7 +180,7 @@
             app:layout_constraintTop_toBottomOf="@id/vpnWebTrackersLabel"
             tools:text="150 tracker companies blocked last week" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/vpnWebTrackersBlockedToday"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -192,7 +192,7 @@
             app:layout_constraintTop_toBottomOf="@id/vpnWebTrackerCompaniesBlockedToday"
             tools:text="26 trackers blocked last 24 hours" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/vpnWebTrackersCompaniesBlockedWeek"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -204,7 +204,7 @@
             app:layout_constraintTop_toBottomOf="@id/vpnWebTrackersBlockedToday"
             tools:text="457 trackers blocked last week" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/vpnWebTrackersBlockedWeek"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -216,7 +216,7 @@
             app:layout_constraintTop_toBottomOf="@id/vpnWebTrackersCompaniesBlockedWeek"
             tools:text="457 trackers blocked last week" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/vpnWebLastTrackerDomain"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -228,7 +228,7 @@
             app:layout_constraintTop_toBottomOf="@id/vpnWebTrackersBlockedWeek"
             tools:text="Last tracker blocked 8h 34 min ago\ngoogle-analytics.com\n(owned by Google)" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/vpnUUID"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -244,7 +244,7 @@
             app:layout_constraintTop_toBottomOf="@id/vpnWebLastTrackerDomain"
             tools:text="UUID is: XXXXXXXXXXXXXXXXXXX" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/appVersionText"
             app:textType="secondary"
             android:layout_width="wrap_content"

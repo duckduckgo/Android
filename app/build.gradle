@@ -17,7 +17,7 @@ ext {
 android {
     defaultConfig {
         if (project.hasProperty('internal-testing')) {
-            applicationId "com.quackquackgo.mobile"
+            applicationId "com.duckduckgo.dev.android"
         } else {
             applicationId "com.duckduckgo.mobile.android"
         }
@@ -59,6 +59,7 @@ android {
         } else {
             buildConfigField "boolean", "FORCE_DEFAULT_VARIANT", "false"
         }
+        namespace 'com.duckduckgo.app.browser'
     }
     buildFeatures {
         viewBinding = true

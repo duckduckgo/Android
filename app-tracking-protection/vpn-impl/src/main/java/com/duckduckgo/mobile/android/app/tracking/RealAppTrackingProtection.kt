@@ -17,7 +17,7 @@
 package com.duckduckgo.mobile.android.app.tracking
 
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
@@ -50,7 +50,7 @@ class RealAppTrackingProtection @Inject constructor(
     }
 
     override fun restart() {
-        coroutineScope.launch {
+        coroutineScope.launch(dispatcherProvider.io()) {
             vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
         }
     }

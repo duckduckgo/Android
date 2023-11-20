@@ -19,17 +19,16 @@ package com.duckduckgo.privacy.dashboard.impl.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.model.Site
-import com.duckduckgo.app.privacy.db.UserAllowListDao
+import com.duckduckgo.app.global.model.domain
+import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.DASHBOARD_TOGGLE_HIGHLIGHT
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVACY_DASHBOARD_ALLOWLIST_ADD
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVACY_DASHBOARD_ALLOWLIST_REMOVE
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVACY_DASHBOARD_OPENED
-import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardRemoteFeature
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchReportBrokenSite
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenSettings
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenURL
@@ -41,14 +40,20 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 @ContributesViewModel(ActivityScope::class)
 class PrivacyDashboardHybridViewModel @Inject constructor(
-    private val userAllowListDao: UserAllowListDao,
+    private val userAllowListRepository: UserAllowListRepository,
     private val pixel: Pixel,
     private val dispatcher: DispatcherProvider,
     private val siteViewStateMapper: SiteViewStateMapper,
@@ -56,7 +61,6 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     private val protectionStatusViewStateMapper: ProtectionStatusViewStateMapper,
     private val privacyDashboardPayloadAdapter: PrivacyDashboardPayloadAdapter,
     private val autoconsentStatusViewStateMapper: AutoconsentStatusViewStateMapper,
-    private val privacyDashboardRemoteFeature: PrivacyDashboardRemoteFeature,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -167,7 +171,6 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
 
     enum class LayoutType(val value: String) {
         DEFAULT("default"),
-        HIGHLIGHTED_PROTECTIONS_TOGGLE("highlighted-protections-toggle"),
     }
 
     data class PrimaryScreenSettings(
@@ -176,10 +179,25 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
 
     val viewState = MutableStateFlow<ViewState?>(null)
 
-    private var site: Site? = null
+    private val site = MutableStateFlow<Site?>(null)
 
     init {
         pixel.fire(PRIVACY_DASHBOARD_OPENED)
+
+        site.filterNotNull()
+            .onEach(::updateSite)
+            .launchIn(viewModelScope)
+
+        combine(site.filterNotNull(), userAllowListRepository.domainsInUserAllowListFlow()) { site, domains -> site to domains }
+            .map { (site, allowlistedDomains) ->
+                // Checking if site was added to / removed from allowlist since the screen was initialized
+                site.userAllowList != site.domain in allowlistedDomains
+            }
+            .onEach { allowlistChanged ->
+                // Closing the Privacy Dashboard screen
+                viewState.update { it?.copy(userChangedValues = allowlistChanged) }
+            }
+            .launchIn(viewModelScope)
     }
 
     fun viewState(): StateFlow<ViewState?> {
@@ -192,48 +210,16 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
 
     fun onReportBrokenSiteSelected() {
         viewModelScope.launch(dispatcher.io()) {
-            // when the broken site form is opened from the dashboard, send
-            // along a list of params to be sent with the `m_bsr` pixel
-            val siteData = BrokenSiteData.fromSite(site, pixelParamList())
+            val siteData = BrokenSiteData.fromSite(site.value)
             command.send(LaunchReportBrokenSite(siteData))
         }
     }
 
     fun onSiteChanged(site: Site?) {
-        this.site = site
-        if (site == null) return
-
-        viewModelScope.launch { updateSite(site) }
-    }
-
-    private fun pixelParamList(): List<String> {
-        val viewState = viewState.value ?: return emptyList()
-        if (viewState.remoteFeatureSettings.primaryScreen.layout == LayoutType.DEFAULT.value) return emptyList()
-        // otherwise, send the pixel param
-        return listOf(DASHBOARD_TOGGLE_HIGHLIGHT.pixelName)
-    }
-
-    private fun pixelParamMap(): Map<String, String> {
-        return pixelParamList().associateWith { true.toString() }
-    }
-
-    private suspend fun createRemoteFeatureSettingsViewState() = withContext(dispatcher.io()) {
-        val altLayoutEnabled = privacyDashboardRemoteFeature.highlightedProtectionsToggle().isEnabled()
-        val isEnglish = Locale.getDefault().language == Locale.ENGLISH.language
-        val primaryLayout = if (altLayoutEnabled && isEnglish) {
-            LayoutType.HIGHLIGHTED_PROTECTIONS_TOGGLE.value
-        } else {
-            LayoutType.DEFAULT.value
-        }
-        return@withContext RemoteFeatureSettingsViewState(
-            primaryScreen = PrimaryScreenSettings(
-                layout = primaryLayout,
-            ),
-        )
+        this.site.value = site
     }
 
     private suspend fun updateSite(site: Site) {
-        val remoteFeatureSettings = createRemoteFeatureSettingsViewState()
         withContext(dispatcher.main()) {
             viewState.emit(
                 ViewState(
@@ -241,7 +227,6 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                     requestData = requestDataViewStateMapper.mapFromSite(site),
                     protectionStatus = protectionStatusViewStateMapper.mapFromSite(site),
                     cookiePromptManagementStatus = autoconsentStatusViewStateMapper.mapFromSite(site),
-                    remoteFeatureSettings = remoteFeatureSettings,
                 ),
             )
         }
@@ -251,22 +236,15 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         Timber.i("PrivacyDashboard: onPrivacyProtectionsClicked $enabled")
 
         viewModelScope.launch(dispatcher.io()) {
-            currentViewState().siteViewState.domain?.let { domain ->
-                val pixelParams = pixelParamMap()
-                if (enabled) {
-                    userAllowListDao.delete(domain)
-                    pixel.fire(PRIVACY_DASHBOARD_ALLOWLIST_REMOVE, pixelParams)
-                } else {
-                    userAllowListDao.insert(domain)
-                    pixel.fire(PRIVACY_DASHBOARD_ALLOWLIST_ADD, pixelParams)
-                }
-            }
             delay(CLOSE_DASHBOARD_ON_INTERACTION_DELAY)
-            withContext(dispatcher.main()) {
-                viewState.value = currentViewState().copy(
-                    protectionStatus = currentViewState().protectionStatus.copy(allowlisted = enabled),
-                    userChangedValues = true,
-                )
+            currentViewState().siteViewState.domain?.let { domain ->
+                if (enabled) {
+                    userAllowListRepository.removeDomainFromUserAllowList(domain)
+                    pixel.fire(PRIVACY_DASHBOARD_ALLOWLIST_REMOVE)
+                } else {
+                    userAllowListRepository.addDomainToUserAllowList(domain)
+                    pixel.fire(PRIVACY_DASHBOARD_ALLOWLIST_ADD)
+                }
             }
         }
     }

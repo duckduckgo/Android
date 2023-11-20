@@ -16,8 +16,8 @@
 
 package com.duckduckgo.cookies.impl.features
 
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.cookies.api.CookiesFeatureName.Cookie
 import com.duckduckgo.cookies.store.CookiesFeatureToggleRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi

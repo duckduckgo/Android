@@ -17,7 +17,7 @@
 package com.duckduckgo.networkprotection.impl.waitlist.store
 
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.impl.state.NetPFeatureRemover
 import com.duckduckgo.networkprotection.store.waitlist.NetPWaitlistDataStore

@@ -19,7 +19,7 @@ package com.duckduckgo.request.filterer.impl.di
 import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.request.filterer.store.ALL_MIGRATIONS
 import com.duckduckgo.request.filterer.store.RealRequestFiltererFeatureToggleRepository
@@ -52,10 +52,10 @@ object RequestFiltererModule {
     @Provides
     fun provideRequestFiltererRepository(
         database: RequestFiltererDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
     ): RequestFiltererRepository {
-        return RealRequestFiltererRepository(database, coroutineScope, dispatcherProvider)
+        return RealRequestFiltererRepository(database, appCoroutineScope, dispatcherProvider)
     }
 
     @SingleInstanceIn(AppScope::class)

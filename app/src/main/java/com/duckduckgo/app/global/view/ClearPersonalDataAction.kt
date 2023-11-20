@@ -28,11 +28,11 @@ import com.duckduckgo.app.fire.AppCacheClearer
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
-import com.duckduckgo.app.global.DefaultDispatcherProvider
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.common.utils.DefaultDispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.site.permissions.api.SitePermissionsManager

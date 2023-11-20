@@ -17,7 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.network
 
 import android.content.Context
-import com.duckduckgo.app.global.extensions.getPrivateDnsServerName
+import com.duckduckgo.common.utils.extensions.getPrivateDnsServerName
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.network.util.getSystemActiveNetworkDefaultDns
 import com.squareup.anvil.annotations.ContributesBinding

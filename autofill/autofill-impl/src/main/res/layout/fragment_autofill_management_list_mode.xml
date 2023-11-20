@@ -26,7 +26,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
             android:id="@+id/enabledToggle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -37,7 +37,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+        <com.duckduckgo.common.ui.view.divider.HorizontalDivider
             android:id="@+id/topDivider"
             android:layout_width="0dp"
             app:layout_constraintStart_toStartOf="parent"

@@ -13,6 +13,7 @@
                 "blocklistVersion": "abc123",
                 "remoteConfigEtag": "abd142",
                 "remoteConfigVersion": "1234",
+                "protectionsEnabled": true,
                 "expectReportURLPrefix": "https://improving.duckduckgo.com/t/epbf",
                 "expectReportURLParams": [
                     {"name": "category", "value": "content"},
@@ -20,9 +21,65 @@
                     {"name": "upgradedHttps", "value": "true"},
                     {"name": "tds", "value": "abc123"},
                     {"name": "blockedTrackers", "value": "bad.tracker.test,tracking.test"},
-                    {"name": "surrogates", "value": "surrogate.domain.test,domain2.test"}
+                    {"name": "surrogates", "value": "surrogate.domain.test,domain2.test"},
+                    {"name": "protectionsState", "value": "true"}
                 ],
                 "exceptPlatforms": []
+            },
+            {
+                "name": "Protections disabled",
+                "siteURL": "https://example.test/",
+                "wasUpgraded": true,
+                "category": "content",
+                "blockedTrackers": ["bad.tracker.test", "tracking.test"],
+                "surrogates": ["surrogate.domain.test", "domain2.test"],
+                "atb": "v123-456g",
+                "blocklistVersion": "abc123",
+                "remoteConfigEtag": "abd142",
+                "remoteConfigVersion": "1234",
+                "protectionsEnabled": false,
+                "expectReportURLPrefix": "https://improving.duckduckgo.com/t/epbf",
+                "expectReportURLParams": [
+                    {"name": "category", "value": "content"},
+                    {"name": "siteUrl", "value": "https%3A%2F%2Fexample.test%2F"},
+                    {"name": "upgradedHttps", "value": "true"},
+                    {"name": "tds", "value": "abc123"},
+                    {"name": "blockedTrackers", "value": "bad.tracker.test,tracking.test"},
+                    {"name": "surrogates", "value": "surrogate.domain.test,domain2.test"},
+                    {"name": "protectionsState", "value": "false"}
+                ],
+                "exceptPlatforms": []
+            },
+            {
+                "name": "Protections force-enabled by the user",
+                "siteURL": "https://example.test/",
+                "wasUpgraded": true,
+                "category": "content",
+                "blockedTrackers": ["bad.tracker.test", "tracking.test"],
+                "surrogates": ["surrogate.domain.test", "domain2.test"],
+                "atb": "v123-456g",
+                "blocklistVersion": "abc123",
+                "remoteConfigEtag": "abd142",
+                "remoteConfigVersion": "1234",
+                "protectionsEnabled": false,
+                "denylisted": true,
+                "expectReportURLPrefix": "https://improving.duckduckgo.com/t/epbf",
+                "expectReportURLParams": [
+                    {"name": "category", "value": "content"},
+                    {"name": "siteUrl", "value": "https%3A%2F%2Fexample.test%2F"},
+                    {"name": "upgradedHttps", "value": "true"},
+                    {"name": "tds", "value": "abc123"},
+                    {"name": "blockedTrackers", "value": "bad.tracker.test,tracking.test"},
+                    {"name": "surrogates", "value": "surrogate.domain.test,domain2.test"},
+                    {"name": "protectionsState", "value": "true"}
+                ],
+                "exceptPlatforms": [
+                    "android-browser",
+                    "ios-browser",
+                    "macos-browser",
+                    "safari-extension",
+                    "windows-browser"
+                ]
             },
             {
                 "name": "Simple test with a common set of fields",
@@ -35,6 +92,7 @@
                 "blocklistVersion": "abc123",
                 "remoteConfigEtag": "abd142",
                 "remoteConfigVersion": "1234",
+                "protectionsEnabled": true,
                 "expectReportURLPrefix": "https://improving.duckduckgo.com/t/epbf",
                 "expectReportURLParams": [
                     {"name": "category", "value": "content"},
@@ -44,7 +102,8 @@
                     {"name": "remoteConfigEtag", "value": "abd142"},
                     {"name": "remoteConfigVersion", "value": "1234"},
                     {"name": "blockedTrackers", "value": "bad.tracker.test,tracking.test"},
-                    {"name": "surrogates", "value": "surrogate.domain.test,domain2.test"}
+                    {"name": "surrogates", "value": "surrogate.domain.test,domain2.test"},
+                    {"name": "protectionsState", "value": "true"}
                 ],
                 "exceptPlatforms": [
                     "ios-browser"
@@ -61,6 +120,7 @@
                 "blocklistVersion": "W/\"cb62f38dda52e13f76c06147b7aea50c\"",
                 "remoteConfigEtag": "W/\"4acd4754aff66f5da1ea044580a60cd3\"",
                 "remoteConfigVersion": "1234",
+                "protectionsEnabled": true,
                 "expectReportURLPrefix": "https://improving.duckduckgo.com/t/epbf",
                 "expectReportURLParams": [
                     {"name": "category", "value": "content"},
@@ -70,7 +130,8 @@
                     {"name": "remoteConfigEtag", "value": "W%2F%224acd4754aff66f5da1ea044580a60cd3%22"},
                     {"name": "remoteConfigVersion", "value": "1234"},
                     {"name": "blockedTrackers", "value": "bad.tracker.test,tracking.test"},
-                    {"name": "surrogates", "value": "surrogate.domain.test,domain2.test"}
+                    {"name": "surrogates", "value": "surrogate.domain.test,domain2.test"},
+                    {"name": "protectionsState", "value": "true"}
                 ],
                 "exceptPlatforms": [
                     "ios-browser"
@@ -87,6 +148,7 @@
                 "blocklistVersion": "\"cb62f38dda52e13f76c06147b7aea50c\"",
                 "remoteConfigEtag": "\"4acd4754aff66f5da1ea044580a60cd3\"",
                 "remoteConfigVersion": "1234",
+                "protectionsEnabled": true,
                 "expectReportURLPrefix": "https://improving.duckduckgo.com/t/epbf",
                 "expectReportURLParams": [
                     {"name": "category", "value": "content"},
@@ -96,7 +158,8 @@
                     {"name": "remoteConfigEtag", "value": "%224acd4754aff66f5da1ea044580a60cd3%22"},
                     {"name": "remoteConfigVersion", "value": "1234"},
                     {"name": "blockedTrackers", "value": "bad.tracker.test,tracking.test"},
-                    {"name": "surrogates", "value": "surrogate.domain.test,domain2.test"}
+                    {"name": "surrogates", "value": "surrogate.domain.test,domain2.test"},
+                    {"name": "protectionsState", "value": "true"}
                 ],
                 "exceptPlatforms": [
                     "ios-browser"
@@ -111,6 +174,7 @@
                 "surrogates": [],
                 "atb": "v123-456g",
                 "blocklistVersion": "abc123",
+                "protectionsEnabled": true,
                 "expectReportURLPrefix": "https://improving.duckduckgo.com/t/epbf",
                 "expectReportURLParams": [
                     {"name": "category", "value": "paywall"},
@@ -118,7 +182,8 @@
                     {"name": "upgradedHttps", "value": "false"},
                     {"name": "tds", "value": "abc123"},
                     {"name": "blockedTrackers", "value": ""},
-                    {"name": "surrogates", "value": ""}
+                    {"name": "surrogates", "value": ""},
+                    {"name": "protectionsState", "value": "true"}
                 ],
                 "exceptPlatforms": []
             },
@@ -132,6 +197,7 @@
                 "atb": "v123-456g",
                 "blocklistVersion": "abc123",
                 "providedDescription": "This is+a&description./\nThat spans %20lines\"'. With \\emoji: 😀",
+                "protectionsEnabled": true,
                 "expectReportURLPrefix": "https://improving.duckduckgo.com/t/epbf",
                 "expectReportURLParams": [
                     {"name": "category", "value": "content"},
@@ -140,7 +206,8 @@
                     {"name": "upgradedHttps", "value": "true"},
                     {"name": "tds", "value": "abc123"},
                     {"name": "blockedTrackers", "value": "bad.tracker.test,tracking.test"},
-                    {"name": "surrogates", "value": "surrogate.domain.test,domain2.test"}
+                    {"name": "surrogates", "value": "surrogate.domain.test,domain2.test"},
+                    {"name": "protectionsState", "value": "true"}
                 ],
                 "exceptPlatforms": [
                     "ios-browser",
@@ -160,6 +227,7 @@
                 "model": "305 RAMAC",
                 "os": "12",
                 "gpcEnabled": true,
+                "protectionsEnabled": true,
                 "expectReportURLPrefix": "https://improving.duckduckgo.com/t/epbf",
                 "expectReportURLParams": [
                     {"name": "category", "value": "images"},
@@ -171,7 +239,8 @@
                     {"name": "manufacturer", "value": "IBM"},
                     {"name": "model", "value": "305 RAMAC"},
                     {"name": "os", "value": "12"},
-                    {"name": "gpc", "value": "true"}
+                    {"name": "gpc", "value": "true"},
+                    {"name": "protectionsState", "value": "true"}
                 ],
                 "exceptPlatforms": [
                     "web-extension",
@@ -193,6 +262,7 @@
                 "surrogates": ["surrogate.domain.test", "domain2.com", "nested.sub.domain3.com"],
                 "atb": "v123-456g",
                 "blocklistVersion": "abc123",
+                "protectionsEnabled": true,
                 "expectReportURLPrefix": "https://improving.duckduckgo.com/t/epbf",
                 "expectReportURLParams": [
                     {"name": "category", "value": "content"},
@@ -204,7 +274,8 @@
                     {"name": "noActionRequests", "value": "noaction1.test,sub.noaction2.test"},
                     {"name": "adAttributionRequests", "value": "adattr1.test,sub.adattr2.test"},
                     {"name": "ignoredByUserRequests", "value": "ignoreuser1.test,sub.ignoreuser2.test"},
-                    {"name": "surrogates", "value": "surrogate.domain.test,domain2.com,nested.sub.domain3.com"}
+                    {"name": "surrogates", "value": "surrogate.domain.test,domain2.com,nested.sub.domain3.com"},
+                    {"name": "protectionsState", "value": "true"}
                 ],
                 "exceptPlatforms": [
                     "android-browser",
@@ -227,6 +298,7 @@
                 "surrogates": [],
                 "atb": "v123-456g",
                 "blocklistVersion": "abc123",
+                "protectionsEnabled": true,
                 "expectReportURLPrefix": "https://improving.duckduckgo.com/t/epbf",
                 "expectReportURLParams": [
                     {"name": "category", "value": "content"},
@@ -238,7 +310,8 @@
                     {"name": "noActionRequests", "value": ""},
                     {"name": "adAttributionRequests", "value": ""},
                     {"name": "ignoredByUserRequests", "value": "ignoreuser1.test,sub.ignoreuser2.test"},
-                    {"name": "surrogates", "value": ""}
+                    {"name": "surrogates", "value": ""},
+                    {"name": "protectionsState", "value": "true"}
                 ],
                 "exceptPlatforms": [
                     "android-browser",
@@ -261,6 +334,7 @@
                 "surrogates": ["surrogate.domain.test", "domain2.com", "nested.sub.domain3.com"],
                 "atb": "v123-456g",
                 "blocklistVersion": "abc123",
+                "protectionsEnabled": true,
                 "expectReportURLPrefix": "https://improving.duckduckgo.com/t/epbf",
                 "expectReportURLParams": [
                     {"name": "category", "value": "content"},
@@ -269,7 +343,8 @@
                     {"name": "tds", "value": "abc123"},
                     {"name": "blockedTrackers", "value": "bad.tracker.test,tracking.test"},
                     {"name": "surrogates", "value": "surrogate.domain.test,domain2.com,nested.sub.domain3.com"},
-                    {"name": "truncated", "value": "1"}
+                    {"name": "truncated", "value": "1"},
+                    {"name": "protectionsState", "value": "true"}
                 ],
                 "exceptPlatforms": [
                     "android-browser",
@@ -293,6 +368,7 @@
                 "surrogates": ["surrogate.domain.test", "domain2.com", "nested.sub.domain3.com"],
                 "atb": "v123-456g",
                 "blocklistVersion": "abc123",
+                "protectionsEnabled": true,
                 "expectReportURLPrefix": "https://improving.duckduckgo.com/t/epbf",
                 "expectReportURLParams": [
                     {"name": "category", "value": "content"},
@@ -302,7 +378,8 @@
                     {"name": "tds", "value": "abc123"},
                     {"name": "blockedTrackers", "value": "bad.tracker.test,tracking.test"},
                     {"name": "surrogates", "value": "surrogate.domain.test,domain2.com,nested.sub.domain3.com"},
-                    {"name": "truncated", "value": "1"}
+                    {"name": "truncated", "value": "1"},
+                    {"name": "protectionsState", "value": "true"}
                 ],
                 "exceptPlatforms": [
                     "android-browser",
@@ -325,6 +402,7 @@
                 "surrogates": ["surrogate.domain.test", "domain2.com", "nested.sub.domain3.com"],
                 "atb": "v123-456g",
                 "blocklistVersion": "abc123",
+                "protectionsEnabled": true,
                 "expectReportURLPrefix": "https://improving.duckduckgo.com/t/epbf",
                 "expectReportURLParams": [
                     {"name": "category", "value": "content"},
@@ -333,7 +411,8 @@
                     {"name": "tds", "value": "abc123"},
                     {"name": "blockedTrackers", "value": "bad.tracker.test,tracking.test"},
                     {"name": "surrogates", "value": "surrogate.domain.test,domain2.com,nested.sub.domain3.com"},
-                    {"name": "truncated", "value": "1"}
+                    {"name": "truncated", "value": "1"},
+                    {"name": "protectionsState", "value": "true"}
                 ],
                 "exceptPlatforms": [
                     "android-browser",

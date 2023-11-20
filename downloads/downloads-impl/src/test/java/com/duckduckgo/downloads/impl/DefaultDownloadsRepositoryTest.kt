@@ -16,7 +16,7 @@
 
 package com.duckduckgo.downloads.impl
 
-import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.downloads.api.DownloadsRepository
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadEntity

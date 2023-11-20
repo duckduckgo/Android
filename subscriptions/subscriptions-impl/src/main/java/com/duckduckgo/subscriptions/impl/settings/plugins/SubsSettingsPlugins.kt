@@ -18,8 +18,8 @@ package com.duckduckgo.subscriptions.impl.settings.plugins
 
 import android.content.Context
 import android.view.View
+import com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
 import com.duckduckgo.settings.api.ProSettingsPlugin
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingBuyView

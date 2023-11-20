@@ -22,11 +22,11 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.duckduckgo.adclick.api.AdClickManager
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
+import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.consumeAsFlow
@@ -84,7 +84,12 @@ class TabSwitcherViewModelTest {
             whenever(mockTabRepository.liveTabs)
                 .thenReturn(tabs)
             whenever(mockTabRepository.add()).thenReturn("TAB_ID")
-            testee = TabSwitcherViewModel(mockTabRepository, mockWebViewSessionStorage, mockAdClickManager)
+            testee = TabSwitcherViewModel(
+                mockTabRepository,
+                mockWebViewSessionStorage,
+                mockAdClickManager,
+                coroutinesTestRule.testDispatcherProvider,
+            )
             testee.command.observeForever(mockCommandObserver)
         }
     }

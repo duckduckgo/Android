@@ -40,7 +40,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/messageTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -55,7 +55,7 @@
         app:typography="h3"
         tools:text="Placeholder Title" />
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/messageSubtitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -76,7 +76,7 @@
         app:barrierDirection="top"
         app:constraint_referenced_ids="primaryActionButton, secondaryActionButton, actionButton" />
 
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+    <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
         android:id="@+id/primaryActionButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -89,7 +89,7 @@
         app:layout_goneMarginStart="0dp"
         tools:text="button" />
 
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
+    <com.duckduckgo.common.ui.view.button.DaxButtonGhost
         android:id="@+id/secondaryActionButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -101,7 +101,7 @@
         app:layout_constraintStart_toStartOf="parent"
         tools:text="button" />
 
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
+    <com.duckduckgo.common.ui.view.button.DaxButtonGhost
         android:id="@+id/actionButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

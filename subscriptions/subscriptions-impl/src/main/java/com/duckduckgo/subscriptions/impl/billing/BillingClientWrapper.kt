@@ -38,8 +38,8 @@ import com.android.billingclient.api.QueryPurchasesParams
 import com.android.billingclient.api.queryProductDetails
 import com.android.billingclient.api.queryPurchaseHistory
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState.Canceled
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState.InProgress
@@ -299,12 +299,12 @@ class RealBillingClientWrapper @Inject constructor(
 
     companion object {
         // List of subscriptions
-        const val BASIC_SUBSCRIPTION = "bundle_1"
+        const val BASIC_SUBSCRIPTION = "ddg_privacy_pro"
         private val LIST_OF_PRODUCTS = listOf(BASIC_SUBSCRIPTION)
 
         // List of plans
-        const val YEARLY_PLAN = "test-bundle-1-plan"
-        const val MONTHLY_PLAN = "test-bundle-2-plan"
+        const val YEARLY_PLAN = "ddg-privacy-pro-sandbox-yearly-renews-us"
+        const val MONTHLY_PLAN = "ddg-privacy-pro-sandbox-monthly-renews-us"
     }
 }
 

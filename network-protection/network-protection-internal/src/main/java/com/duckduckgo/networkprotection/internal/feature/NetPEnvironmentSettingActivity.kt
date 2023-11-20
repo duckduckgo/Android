@@ -23,11 +23,11 @@ import android.webkit.URLUtil
 import android.widget.CompoundButton
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.hide
+import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.ui.view.hide
-import com.duckduckgo.mobile.android.ui.view.show
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.networkprotection.internal.databinding.ActivityNetpEnvInternalSettingsBinding
 import com.duckduckgo.networkprotection.internal.feature.NetPEnvironmentSettingActivity.Companion.NetPEnvironmentSettingScreen

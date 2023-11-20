@@ -18,8 +18,8 @@ package com.duckduckgo.httpsupgrade.impl.di
 
 import android.content.Context
 import androidx.room.Room
-import com.duckduckgo.app.global.store.BinaryDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.utils.store.BinaryDataStore
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.httpsupgrade.api.HttpsEmbeddedDataPersister
 import com.duckduckgo.httpsupgrade.api.HttpsUpgradeDataDownloader

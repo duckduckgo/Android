@@ -215,18 +215,24 @@
     <string name="brokenSitesCategoriesTitle">Beskriv hva som skjedde</string>
     <string name="brokenSitesCategoriesHint">Beskriv hva som skjedde</string>
     <string name="brokenSiteSubmitButton">Send rapport</string>
-    <string name="brokenSiteDescription">Når du sender inn en anonym rapport om nettstedfeil, hjelper det oss med å feilsøke disse problemene og forbedre appen.</string>
+    <string name="brokenSiteDescription">Du kan hjelpe oss med å forbedre appen ved å sende inn en rapport om et defekt nettsted.</string>
 
-    <string name="brokenSiteCategoryImages">Bildene ble ikke lastet inn</string>
-    <string name="brokenSiteCategoryPaywall">Nettstedet ba meg om å deaktivere</string>
-    <string name="brokenSiteCategoryComments">Kommentarene ble ikke lastet inn</string>
-    <string name="brokenSiteCategoryVideos">Video ble ikke avspilt</string>
-    <string name="brokenSiteCategoryLinks">Linker eller knapper fungerer ikke</string>
-    <string name="brokenSiteCategoryContent">Innhold mangler</string>
-    <string name="brokenSiteCategoryLogin">Jeg kan ikke logge inn</string>
-    <string name="brokenSiteCategoryUnsupported">Nettleseren er inkompatibel</string>
+    <string name="brokenSiteCategoryBlocked">Nettstedet er blokkert eller ble ikke lastet</string>
+    <string name="brokenSiteCategoryLayout">Nettstedets layout er ødelagt</string>
+    <string name="brokenSiteCategoryEmptySpaces">Nettstedet inneholder store tomme områder</string>
+    <string name="brokenSiteCategoryShopping">Kan ikke betale, gå til kassen eller kjøpe</string>
+    <string name="brokenSiteCategoryPaywall">Nettstedet ba meg om å deaktivere annonseblokkering</string>
+    <string name="brokenSiteCategoryComments">Kommentarer, anmeldelser eller chatter ble ikke lastet</string>
+    <string name="brokenSiteCategoryVideos">Videoen ble ikke spilt av eller lastet</string>
+    <string name="brokenSiteCategoryLogin">Kan ikke logge på / registrere meg</string>
     <string name="brokenSiteCategoryOther">Noe annet</string>
     <string name="brokenSiteDescriptionTextInputHint">Del mer informasjon (valgfritt)</string>
+    <string name="brokenSiteDescriptionCaption">Hva skjedde? Hva skulle ha skjedd? Hjalp det å slå av beskyttelse?</string>
+
+    <string name="brokenSiteProtectionsOn">Beskyttelse er <b>PÅ</b> for dette nettstedet</string>
+    <string name="brokenSiteProtectionsOff">Beskyttelse er <b>AV</b> for dette nettstedet</string>
+    <string name="brokenSiteProtectionsOnBannerMessage">Det kan hjelpe å slå beskyttelsen AV.</string>
+    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Vi har midlertidig deaktivert personvernbeskyttelsene, da de ser ut til å få nettstedet til å slutte å fungere.</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Bokmerker</string>

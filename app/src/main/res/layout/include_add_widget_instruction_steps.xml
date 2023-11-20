@@ -38,7 +38,7 @@
         app:barrierDirection="end"
         app:constraint_referenced_ids="instruction1,instruction2,instruction3" />
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/instructionLabel1"
         app:typography="caption"
         android:layout_width="18dp"
@@ -52,7 +52,7 @@
         app:layout_constraintEnd_toStartOf="@id/instruction1"
         tools:ignore="SmallSp" />
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/instruction1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -66,7 +66,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_max="400dp" />
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/instructionLabel2"
         android:layout_width="18dp"
         android:layout_height="18dp"
@@ -80,7 +80,7 @@
         app:layout_constraintEnd_toStartOf="@id/instruction2"
         tools:ignore="SmallSp" />
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/instruction2"
         app:typography="body2"
         android:layout_width="0dp"
@@ -93,7 +93,7 @@
         app:layout_constraintTop_toBottomOf="@+id/instruction1"
         app:layout_constraintWidth_max="400dp" />
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/instructionLabel3"
         android:layout_width="18dp"
         android:layout_height="18dp"
@@ -107,7 +107,7 @@
         app:layout_constraintEnd_toStartOf="@id/instruction3"
         tools:ignore="SmallSp" />
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/instruction3"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

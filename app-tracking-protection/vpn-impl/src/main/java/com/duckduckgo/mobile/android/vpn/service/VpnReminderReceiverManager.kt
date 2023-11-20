@@ -20,7 +20,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.edit
-import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationContentPlugin.Type.DISABLED

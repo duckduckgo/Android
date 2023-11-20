@@ -17,7 +17,7 @@
 package com.duckduckgo.networkprotection.impl.state
 
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
@@ -61,7 +61,7 @@ class NetworkProtectionStateImpl @Inject constructor(
     }
 
     override fun restart() {
-        coroutineScope.launch {
+        coroutineScope.launch(dispatcherProvider.io()) {
             vpnFeaturesRegistry.refreshFeature(NetPVpnFeature.NETP_VPN)
         }
     }

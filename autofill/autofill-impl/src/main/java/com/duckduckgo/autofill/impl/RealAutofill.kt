@@ -16,9 +16,9 @@
 
 package com.duckduckgo.autofill.impl
 
-import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.autofill.api.Autofill
 import com.duckduckgo.autofill.store.feature.AutofillFeatureRepository
+import com.duckduckgo.common.utils.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.squareup.anvil.annotations.ContributesBinding

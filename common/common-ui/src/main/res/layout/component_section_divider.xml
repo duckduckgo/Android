@@ -22,7 +22,7 @@
               android:paddingTop="@dimen/keyline_5"
               android:paddingEnd="@dimen/keyline_4">
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+    <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
         android:id="@+id/label"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
@@ -30,36 +30,36 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
-    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:layout_height="wrap_content"
         android:layout_width="match_parent"/>
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+    <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         app:primaryText="Horizontal divider (Not Full Width)"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
-    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         app:fullWidth="false"/>
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+    <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         app:primaryText="Horizontal divider (Custom margins)"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
-    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:layout_margin="@dimen/keyline_7"
         app:defaultPadding="false"/>
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+    <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:paddingTop="@dimen/keyline_5"
@@ -73,16 +73,16 @@
         android:orientation="horizontal"
         android:gravity="center">
 
-        <com.duckduckgo.mobile.android.ui.view.button.IconButton
+        <com.duckduckgo.common.ui.view.button.IconButton
             android:layout_width="48dp"
             android:layout_height="48dp"
             app:srcCompat="@drawable/ic_union"/>
 
-        <com.duckduckgo.mobile.android.ui.view.divider.VerticalDivider
+        <com.duckduckgo.common.ui.view.divider.VerticalDivider
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"/>
 
-        <com.duckduckgo.mobile.android.ui.view.button.IconButton
+        <com.duckduckgo.common.ui.view.button.IconButton
             android:layout_width="48dp"
             android:layout_height="48dp"
             app:srcCompat="@drawable/ic_union"/>

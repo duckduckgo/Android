@@ -16,10 +16,10 @@
 
 package com.duckduckgo.app.pixels
 
-import com.duckduckgo.app.global.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.StatisticsPixelName
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.utils.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.downloads.impl.pixels.DownloadsPixelName
 import com.squareup.anvil.annotations.ContributesMultibinding

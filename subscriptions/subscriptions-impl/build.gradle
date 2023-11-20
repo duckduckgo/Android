@@ -22,6 +22,10 @@ plugins {
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
+android {
+    namespace 'com.duckduckgo.subscriptions.impl'
+}
+
 dependencies {
     testImplementation 'junit:junit:4.13.1'
     anvil project(path: ':anvil-compiler')

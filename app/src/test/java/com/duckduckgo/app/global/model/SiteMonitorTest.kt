@@ -20,7 +20,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
 import com.duckduckgo.app.global.model.PrivacyShield.UNPROTECTED
-import com.duckduckgo.app.privacy.db.UserAllowListDao
+import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.TestingEntity
 import com.duckduckgo.app.surrogates.SurrogateResponse
@@ -28,18 +28,23 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.privacy.config.api.ContentBlocking
-import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
 class SiteMonitorTest {
+    @get:Rule
+    var coroutineRule = CoroutineTestRule()
 
     companion object {
         private const val document = "http://example.com"
@@ -60,7 +65,7 @@ class SiteMonitorTest {
         private val majorNetwork = TestingEntity("MajorNetwork", "MajorNetwork", Entity.MAJOR_NETWORK_PREVALENCE + 1)
     }
 
-    private val mockAllowListDao: UserAllowListDao = mock()
+    private val mockAllowListRepository: UserAllowListRepository = mock()
 
     private val mockContentBlocking: ContentBlocking = mock()
 
@@ -69,9 +74,10 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = httpsDocument,
             title = null,
-            userAllowListDao = mockAllowListDao,
+            userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope(),
+            appCoroutineScope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
         assertEquals(HttpsStatus.SECURE, testee.https)
     }
@@ -81,9 +87,10 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = httpDocument,
             title = null,
-            userAllowListDao = mockAllowListDao,
+            userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope(),
+            appCoroutineScope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
         assertEquals(HttpsStatus.NONE, testee.https)
     }
@@ -93,9 +100,10 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = httpsDocument,
             title = null,
-            userAllowListDao = mockAllowListDao,
+            userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope(),
+            appCoroutineScope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
         testee.hasHttpResources = true
         assertEquals(HttpsStatus.MIXED, testee.https)
@@ -106,9 +114,10 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = malformedDocument,
             title = null,
-            userAllowListDao = mockAllowListDao,
+            userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope(),
+            appCoroutineScope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
         assertEquals(HttpsStatus.NONE, testee.https)
     }
@@ -118,9 +127,10 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
-            userAllowListDao = mockAllowListDao,
+            userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope(),
+            appCoroutineScope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
         assertEquals(document, testee.url)
     }
@@ -130,9 +140,10 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
-            userAllowListDao = mockAllowListDao,
+            userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope(),
+            appCoroutineScope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
         assertEquals(0, testee.trackerCount)
     }
@@ -142,9 +153,10 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
-            userAllowListDao = mockAllowListDao,
+            userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope(),
+            appCoroutineScope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -187,9 +199,10 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
-            userAllowListDao = mockAllowListDao,
+            userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope(),
+            appCoroutineScope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -232,9 +245,10 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
-            userAllowListDao = mockAllowListDao,
+            userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope(),
+            appCoroutineScope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -277,9 +291,10 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
-            userAllowListDao = mockAllowListDao,
+            userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope(),
+            appCoroutineScope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -300,9 +315,10 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
-            userAllowListDao = mockAllowListDao,
+            userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope(),
+            appCoroutineScope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -323,9 +339,10 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
-            userAllowListDao = mockAllowListDao,
+            userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope(),
+            appCoroutineScope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -357,9 +374,10 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
-            userAllowListDao = mockAllowListDao,
+            userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope(),
+            appCoroutineScope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
         assertFalse(testee.upgradedHttps)
     }
@@ -369,9 +387,10 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
-            userAllowListDao = mockAllowListDao,
+            userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope(),
+            appCoroutineScope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
         assertEquals(0, testee.surrogates.size)
     }
@@ -381,9 +400,10 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
-            userAllowListDao = mockAllowListDao,
+            userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope(),
+            appCoroutineScope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
         testee.surrogateDetected(SurrogateResponse())
         assertEquals(1, testee.surrogates.size)
@@ -394,9 +414,10 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
-            userAllowListDao = mockAllowListDao,
+            userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope(),
+            appCoroutineScope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -439,9 +460,10 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
-            userAllowListDao = mockAllowListDao,
+            userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope(),
+            appCoroutineScope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -515,7 +537,7 @@ class SiteMonitorTest {
     @Test
     fun whenSiteBelongsToUserAllowListThenPrivacyShieldIsUnprotected() {
         val testee = givenASiteMonitor(url = document)
-        whenever(mockAllowListDao.contains(document)).thenReturn(true)
+        whenever(mockAllowListRepository.isDomainInUserAllowList(document)).thenReturn(true)
 
         assertEquals(UNPROTECTED, testee.privacyProtection())
     }
@@ -560,9 +582,10 @@ class SiteMonitorTest {
         url = url,
         title = title,
         upgradedHttps = upgradedHttps,
-        userAllowListDao = mockAllowListDao,
+        userAllowListRepository = mockAllowListRepository,
         contentBlocking = mockContentBlocking,
-        appCoroutineScope = TestScope(),
+        appCoroutineScope = coroutineRule.testScope,
+        dispatcherProvider = coroutineRule.testDispatcherProvider,
     )
 
     fun givenSitePrivacyData(

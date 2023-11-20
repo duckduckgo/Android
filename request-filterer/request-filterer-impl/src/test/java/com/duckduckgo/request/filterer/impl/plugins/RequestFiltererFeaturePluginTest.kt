@@ -16,7 +16,7 @@
 
 package com.duckduckgo.request.filterer.impl.plugins
 
-import com.duckduckgo.app.FileUtilities
+import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.request.filterer.api.RequestFiltererFeatureName
 import com.duckduckgo.request.filterer.store.RequestFiltererExceptionEntity
 import com.duckduckgo.request.filterer.store.RequestFiltererFeatureToggleRepository

@@ -19,12 +19,12 @@ package com.duckduckgo.autoconsent.impl.di
 import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.autoconsent.store.AutoconsentDatabase
 import com.duckduckgo.autoconsent.store.AutoconsentFeatureToggleRepository
 import com.duckduckgo.autoconsent.store.AutoconsentRepository
 import com.duckduckgo.autoconsent.store.AutoconsentSettingsRepository
 import com.duckduckgo.autoconsent.store.RealAutoconsentRepository
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -53,10 +53,10 @@ object AutoconsentModule {
     @Provides
     fun provideAutoconsentRepository(
         database: AutoconsentDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
     ): AutoconsentRepository {
-        return RealAutoconsentRepository(database, coroutineScope, dispatcherProvider)
+        return RealAutoconsentRepository(database, appCoroutineScope, dispatcherProvider)
     }
 
     @SingleInstanceIn(AppScope::class)

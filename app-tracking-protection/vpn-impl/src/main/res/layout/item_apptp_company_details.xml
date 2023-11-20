@@ -33,7 +33,7 @@
         android:paddingTop="@dimen/keyline_2"
         android:paddingBottom="@dimen/keyline_1">
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/tracking_company_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -64,7 +64,7 @@
             app:layout_constraintTop_toTopOf="@+id/tracking_company_icon"
             app:srcCompat="@drawable/ic_block" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/tracking_company_attempts"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -85,7 +85,7 @@
         android:layout_marginTop="@dimen/keyline_1"
         android:orientation="vertical" />
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/tracking_company_show_more"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -104,7 +104,7 @@
         android:orientation="vertical"
         android:visibility="gone" />
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/tracking_company_show_less"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

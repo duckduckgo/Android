@@ -31,10 +31,10 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserActivity.Companion.FAVORITES_ONBOARDING_EXTRA
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.widget.FavoritesWidgetService.Companion.THEME_EXTRAS
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -97,7 +97,7 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         appWidgetIds: IntArray,
     ) {
         Timber.i("SearchAndFavoritesWidget - onUpdate")
-        appCoroutineScope.launch {
+        appCoroutineScope.launch(dispatchers.io()) {
             appWidgetIds.forEach { id ->
                 updateWidget(context, appWidgetManager, id, null)
             }
@@ -112,7 +112,7 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         newOptions: Bundle,
     ) {
         Timber.i("SearchAndFavoritesWidget - onAppWidgetOptionsChanged")
-        appCoroutineScope.launch {
+        appCoroutineScope.launch(dispatchers.io()) {
             updateWidget(context, appWidgetManager, appWidgetId, newOptions)
         }
         super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions)
@@ -157,7 +157,7 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
             voiceSearchWidgetConfigurator.configureVoiceSearch(context, remoteViews, true)
             configureFavoritesGridView(context, appWidgetId, remoteViews, widgetTheme)
             configureEmptyWidgetCta(context, appWidgetId, remoteViews, widgetTheme)
-
+// TODO: can this be moved to io?
             appWidgetManager.updateAppWidget(appWidgetId, remoteViews)
             appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.favoritesGrid)
             appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.emptyfavoritesGrid)

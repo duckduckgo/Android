@@ -16,10 +16,10 @@
 
 package com.duckduckgo.autofill.sync
 
-import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.store.CredentialsSyncMetadataEntity
 import com.duckduckgo.autofill.sync.provider.LoginCredentialEntry
+import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.securestorage.api.SecureStorage
 import com.duckduckgo.securestorage.api.WebsiteLoginDetails

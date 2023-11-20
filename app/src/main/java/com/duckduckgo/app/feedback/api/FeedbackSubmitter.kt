@@ -26,6 +26,7 @@ import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.utils.DispatcherProvider
 import java.util.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -56,6 +57,7 @@ class FireAndForgetFeedbackSubmitter(
     private val pixel: Pixel,
     private val appCoroutineScope: CoroutineScope,
     private val appBuildConfig: AppBuildConfig,
+    private val dispatcherProvider: DispatcherProvider,
 ) : FeedbackSubmitter {
     override suspend fun sendNegativeFeedback(
         mainReason: MainReason,
@@ -69,7 +71,7 @@ class FireAndForgetFeedbackSubmitter(
 
         sendPixel(pixelForNegativeFeedback(category, subcategory))
 
-        appCoroutineScope.launch {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
             runCatching {
                 submitFeedback(
                     openEnded = openEnded,
@@ -89,7 +91,7 @@ class FireAndForgetFeedbackSubmitter(
         sendPixel(pixelForPositiveFeedback())
 
         if (openEnded != null) {
-            appCoroutineScope.launch {
+            appCoroutineScope.launch(dispatcherProvider.io()) {
                 runCatching { submitFeedback(openEnded = openEnded, rating = POSITIVE_FEEDBACK) }
                     .onSuccess { Timber.i("Successfully submitted feedback") }
                     .onFailure { Timber.w(it, "Failed to send feedback") }
@@ -107,7 +109,7 @@ class FireAndForgetFeedbackSubmitter(
         val subcategory = apiKeyMapper.apiKeyFromSubReason(null)
         sendPixel(pixelForNegativeFeedback(category, subcategory))
 
-        appCoroutineScope.launch {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
             runCatching {
                 submitFeedback(
                     rating = NEGATIVE_FEEDBACK,

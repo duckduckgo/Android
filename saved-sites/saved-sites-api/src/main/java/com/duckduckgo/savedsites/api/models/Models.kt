@@ -86,6 +86,10 @@ data class BookmarkFolder(
 object SavedSitesNames {
     const val FAVORITES_ROOT = "favorites_root"
     const val FAVORITES_NAME = "Favorites"
+    const val FAVORITES_DESKTOP_ROOT = "desktop_favorites_root"
+    const val FAVORITES_DESKTOP_NAME = "Desktop Favorites"
+    const val FAVORITES_MOBILE_ROOT = "mobile_favorites_root"
+    const val FAVORITES_MOBILE_NAME = "Mobile Favorites"
     const val BOOKMARKS_ROOT = "bookmarks_root"
     const val BOOKMARKS_NAME = "Bookmarks"
     const val BOOMARKS_ROOT_ID = 0L

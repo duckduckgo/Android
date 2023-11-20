@@ -16,9 +16,9 @@
 
 package com.duckduckgo.autofill.sync
 
-import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.autofill.sync.CredentialsFixtures.toLoginCredentialEntryResponse
 import com.duckduckgo.autofill.sync.CredentialsFixtures.twitterCredentials
+import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.sync.api.SyncCrypto
 import org.junit.Assert.assertEquals
 import org.junit.Test

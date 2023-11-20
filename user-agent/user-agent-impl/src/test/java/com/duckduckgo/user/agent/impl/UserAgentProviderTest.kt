@@ -18,12 +18,12 @@ package com.duckduckgo.user.agent.impl
 
 import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.global.device.DeviceInfo
-import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.device.DeviceInfo
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.DefaultPolicy.CLOSEST
 import com.duckduckgo.privacy.config.api.DefaultPolicy.DDG
@@ -33,6 +33,8 @@ import com.duckduckgo.privacy.config.api.UserAgent
 import com.duckduckgo.user.agent.api.UserAgentInterceptor
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -468,6 +470,12 @@ class UserAgentProviderTest {
         override fun isDomainInUserAllowList(domain: String?): Boolean = (domain == ALLOWED_HOST)
 
         override fun domainsInUserAllowList(): List<String> = emptyList()
+
+        override fun domainsInUserAllowListFlow(): Flow<List<String>> = flowOf(emptyList())
+
+        override suspend fun addDomainToUserAllowList(domain: String) = Unit
+
+        override suspend fun removeDomainFromUserAllowList(domain: String) = Unit
     }
 
     companion object {

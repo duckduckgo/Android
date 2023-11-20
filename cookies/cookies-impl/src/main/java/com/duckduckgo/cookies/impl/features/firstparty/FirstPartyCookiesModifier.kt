@@ -22,9 +22,9 @@ import android.database.sqlite.SQLiteDatabase
 import androidx.core.net.toUri
 import com.duckduckgo.app.fire.DatabaseLocator
 import com.duckduckgo.app.fire.FireproofRepository
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.impl.CookiesPixelName.COOKIE_EXPIRE_ERROR
 import com.duckduckgo.cookies.impl.SQLCookieRemover
 import com.duckduckgo.cookies.impl.WebViewCookieManager.Companion.DDG_COOKIE_DOMAINS

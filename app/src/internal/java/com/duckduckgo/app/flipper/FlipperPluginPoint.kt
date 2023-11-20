@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.flipper
 
-import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.AppScope
 import com.facebook.flipper.core.FlipperPlugin

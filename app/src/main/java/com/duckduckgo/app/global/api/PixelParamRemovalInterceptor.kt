@@ -16,16 +16,16 @@
 
 package com.duckduckgo.app.global.api
 
-import com.duckduckgo.app.global.AppUrl
-import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.app.global.plugins.pixel.PixelInterceptorPlugin
-import com.duckduckgo.app.global.plugins.pixel.PixelParamRemovalPlugin
-import com.duckduckgo.app.global.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
-import com.duckduckgo.app.global.plugins.pixel.PixelParamRemovalPlugin.PixelParameter.APP_VERSION
-import com.duckduckgo.app.global.plugins.pixel.PixelParamRemovalPlugin.PixelParameter.ATB
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.StatisticsPixelName
+import com.duckduckgo.common.utils.AppUrl
+import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.common.utils.plugins.pixel.PixelInterceptorPlugin
+import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
+import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
+import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter.APP_VERSION
+import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter.ATB
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.voice.impl.VoiceSearchPixelNames
 import com.squareup.anvil.annotations.ContributesMultibinding

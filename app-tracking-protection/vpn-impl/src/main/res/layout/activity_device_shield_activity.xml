@@ -42,7 +42,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <com.duckduckgo.mobile.android.ui.notifyme.NotifyMeView
+                <com.duckduckgo.common.ui.notifyme.NotifyMeView
                     android:id="@+id/deviceShieldTrackerNotifyMe"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -50,7 +50,7 @@
                     app:secondaryText="@string/appTrackingProtectionNotifyMeSubtitle"
                     app:sharedPrefsKeyForDismiss="key_component_dismissed_in_apptp" />
 
-                <com.duckduckgo.mobile.android.ui.view.InfoPanel
+                <com.duckduckgo.common.ui.view.InfoPanel
                     android:id="@+id/deviceShieldTrackerLabelEnabled"
                     style="@style/Widget.DuckDuckGo.InfoPanel"
                     android:layout_margin="@dimen/keyline_4"
@@ -59,7 +59,7 @@
                     app:panelDrawable="@drawable/ic_info_panel_info"
                     app:panelText="@string/atp_ActivityEnabledBannerLabel" />
 
-                <com.duckduckgo.mobile.android.ui.view.InfoPanel
+                <com.duckduckgo.common.ui.view.InfoPanel
                     android:id="@+id/deviceShieldTrackerLabelDisabled"
                     style="@style/Widget.DuckDuckGo.InfoPanel"
                     android:layout_margin="@dimen/keyline_4"
@@ -75,7 +75,7 @@
                     android:layout_gravity="center"
                     android:src="@drawable/apptp_shield_enabled"/>
 
-                <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                <com.duckduckgo.common.ui.view.text.DaxTextView
                     android:id="@+id/deviceShieldTrackerBlockingTrackersDescription"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -88,7 +88,7 @@
                     app:textType="secondary"
                     app:typography="body1" />
 
-                <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+                <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                     android:id="@+id/past_week_activity"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -112,7 +112,7 @@
                         android:layout_weight="1"
                         android:text="@string/atp_ActivityPastWeekBlocked" />
 
-                    <com.duckduckgo.mobile.android.ui.view.divider.VerticalDivider
+                    <com.duckduckgo.common.ui.view.divider.VerticalDivider
                         android:id="@+id/vertical_divider"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
@@ -134,7 +134,7 @@
                     android:layout_height="0dp"
                     android:layout_weight="1" />
 
-                <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                <com.duckduckgo.common.ui.view.text.DaxTextView
                     android:id="@+id/cta_show_all"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -148,42 +148,42 @@
                     android:text="@string/atp_ActivityCtaShowAll"
                     android:visibility="gone" />
 
-                <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+                <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/keyline_2"
                     app:primaryText="@string/atp_ActivityAbout" />
 
-                <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+                <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                     android:id="@+id/cta_what_are_app_trackers"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:primaryText="@string/atp_ActivityAppTrackersFAQ" />
 
-                <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+                <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                     android:id="@+id/cta_tracker_faq"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:primaryText="@string/atp_FAQCta" />
 
-                <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+                <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:primaryText="@string/atp_ActivityManage" />
 
-                <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+                <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                     android:id="@+id/cta_manage_protection"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:primaryText="@string/atp_ActivityManageProtectionLabel" />
 
-                <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+                <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                     android:id="@+id/cta_manage_view_all_apps"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:primaryText="@string/atp_ActivityViewAppsLabel" />
 
-                <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+                <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                     android:id="@+id/cta_remove_feature"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

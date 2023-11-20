@@ -21,8 +21,11 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
-import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.savedsites.api.models.SavedSitesNames
+import com.duckduckgo.savedsites.store.EntityType.FOLDER
 import io.reactivex.Single
 import kotlinx.coroutines.flow.Flow
 
@@ -131,4 +134,40 @@ interface SavedSitesEntitiesDao {
 
     @Query("select * from entities where deleted = 1")
     fun allDeleted(): List<Entity>
+
+    @Query("select * from entities inner join relations on entities.entityId = relations.entityId and relations.folderId <> :favoritesRoot")
+    fun allBookmarks(favoritesRoot: String = SavedSitesNames.FAVORITES_ROOT): List<Entity>
+
+    @Transaction
+    fun createFormFactorFavoriteFolders() {
+        val rootFolder = entityById(SavedSitesNames.FAVORITES_ROOT)
+        if (rootFolder == null) {
+            insert(Entity(SavedSitesNames.FAVORITES_ROOT, SavedSitesNames.FAVORITES_NAME, "", FOLDER, lastModified = null))
+        }
+        val rootFolderLastModified = rootFolder?.lastModified ?: DatabaseDateFormatter.iso8601()
+        if (entityById(SavedSitesNames.FAVORITES_MOBILE_ROOT) == null) {
+            insert(
+                Entity(
+                    SavedSitesNames.FAVORITES_MOBILE_ROOT,
+                    SavedSitesNames.FAVORITES_MOBILE_NAME,
+                    "",
+                    FOLDER,
+                    lastModified = rootFolderLastModified,
+                ),
+            )
+        }
+        if (entityById(SavedSitesNames.FAVORITES_DESKTOP_ROOT) == null) {
+            insert(Entity(SavedSitesNames.FAVORITES_DESKTOP_ROOT, SavedSitesNames.FAVORITES_DESKTOP_NAME, "", FOLDER, lastModified = null))
+        }
+    }
+
+    @Transaction
+    fun removeFormFactorFavoriteFolders() {
+        entityById(SavedSitesNames.FAVORITES_MOBILE_ROOT)?.let {
+            deletePermanently(it)
+        }
+        entityById(SavedSitesNames.FAVORITES_DESKTOP_ROOT)?.let {
+            deletePermanently(it)
+        }
+    }
 }

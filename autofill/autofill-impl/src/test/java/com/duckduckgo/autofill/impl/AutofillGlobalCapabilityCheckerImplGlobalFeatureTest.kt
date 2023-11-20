@@ -16,11 +16,11 @@
 
 package com.duckduckgo.autofill.impl
 
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest

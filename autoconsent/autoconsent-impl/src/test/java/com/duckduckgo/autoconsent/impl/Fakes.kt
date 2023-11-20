@@ -19,13 +19,15 @@ package com.duckduckgo.autoconsent.impl
 import android.net.Uri
 import android.webkit.WebView
 import androidx.core.net.toUri
-import com.duckduckgo.app.global.domain
-import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.store.AutoconsentSettingsRepository
+import com.duckduckgo.common.utils.domain
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 
 class FakePluginPoint : PluginPoint<MessageHandlerPlugin> {
     val plugin = FakeMessageHandlerPlugin()
@@ -79,4 +81,12 @@ class FakeUserAllowlist(private val userAllowList: List<String>) : UserAllowList
     override fun domainsInUserAllowList(): List<String> {
         return emptyList()
     }
+
+    override fun domainsInUserAllowListFlow(): Flow<List<String>> {
+        return flowOf(emptyList())
+    }
+
+    override suspend fun addDomainToUserAllowList(domain: String) = Unit
+
+    override suspend fun removeDomainFromUserAllowList(domain: String) = Unit
 }

@@ -21,14 +21,14 @@
     android:orientation="vertical"
     android:paddingHorizontal="@dimen/keyline_5">
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/about_question"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:textType="primary"
         app:typography="h2" />
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/about_answer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

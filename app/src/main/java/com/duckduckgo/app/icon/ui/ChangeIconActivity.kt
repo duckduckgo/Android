@@ -23,11 +23,11 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityAppIconsBinding
-import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.R as CommonR
-import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 @InjectWith(ActivityScope::class)
 class ChangeIconActivity : DuckDuckGoActivity() {

@@ -17,8 +17,8 @@
 package com.duckduckgo.mobile.android.vpn.stats
 
 import androidx.annotation.WorkerThread
-import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.vpn.model.*
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import java.util.concurrent.TimeUnit
@@ -100,7 +100,7 @@ class RealAppTrackerBlockingStatsRepository constructor(
             .map { it.asListOfVpnTracker() }
             .distinctUntilChanged()
             .map { it.filter { tracker -> tracker.timestamp >= startTime() } }
-            .flowOn(dispatchers.default())
+            .flowOn(dispatchers.io())
     }
 
     @WorkerThread

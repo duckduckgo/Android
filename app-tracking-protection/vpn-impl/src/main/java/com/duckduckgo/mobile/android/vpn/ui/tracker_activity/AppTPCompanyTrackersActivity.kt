@@ -29,18 +29,20 @@ import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.global.extensions.safeGetApplicationIcon
+import com.duckduckgo.app.global.*
 import com.duckduckgo.browser.api.ui.WebViewActivityWithParams
+import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.InfoPanel
+import com.duckduckgo.common.ui.view.SwitchView
+import com.duckduckgo.common.ui.view.addClickableLink
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.quietlySetIsChecked
+import com.duckduckgo.common.ui.view.setEnabledOpacity
+import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.safeGetApplicationIcon
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.ui.view.InfoPanel
-import com.duckduckgo.mobile.android.ui.view.SwitchView
-import com.duckduckgo.mobile.android.ui.view.addClickableLink
-import com.duckduckgo.mobile.android.ui.view.gone
-import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
-import com.duckduckgo.mobile.android.ui.view.setEnabledOpacity
-import com.duckduckgo.mobile.android.ui.view.show
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature.APPTP_VPN
 import com.duckduckgo.mobile.android.vpn.R
@@ -79,6 +81,8 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
     @Inject
     @AppCoroutineScope
     lateinit var appCoroutineScope: CoroutineScope
+
+    @Inject lateinit var dispatcherProvider: DispatcherProvider
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
@@ -225,7 +229,7 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
 
     private fun restartVpn() {
         // we use the app coroutine scope to ensure this call outlives the Activity
-        appCoroutineScope.launch {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
             vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
         }
     }

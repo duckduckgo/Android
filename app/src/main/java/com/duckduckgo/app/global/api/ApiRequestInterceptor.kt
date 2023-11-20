@@ -17,8 +17,8 @@
 package com.duckduckgo.app.global.api
 
 import android.content.Context
-import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import okhttp3.Interceptor
 import okhttp3.Response

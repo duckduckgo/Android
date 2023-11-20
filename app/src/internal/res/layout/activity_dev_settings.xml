@@ -36,20 +36,20 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                 android:id="@+id/generalTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:primaryText="@string/devSettingsScreenGeneralSection" />
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                     android:id="@+id/useSandboxSurvey"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:primaryText="@string/devSettingsUseSandBoxSurvey"
                     app:showSwitch="true" />
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/enableAppStartupTrace"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -57,27 +57,36 @@
                 app:secondaryText="@string/devStartupTracingByline"
                 app:showSwitch="true" />
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                    android:id="@+id/enableWebContentDebugging"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryText="@string/devEnableWebContentDebuggingTitle"
+                    app:secondaryText="@string/devEnableWebContentDebuggingByline"
+                    app:showSwitch="true"
+            />
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/triggerAnr"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:primaryText="@string/devSettingsTriggerAnr"
                 app:secondaryText="@string/devSettingsTriggerAnrSubtitle" />
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/clearSavedSites"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:primaryText="@string/devSettingsClearSavedSites"
                 app:secondaryText="@string/devSettingsClearSavedSitesSubtitle" />
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                 android:id="@+id/privacyTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:primaryText="@string/devSettingsScreenPrivacySection" />
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/nextTdsEnabled"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -85,7 +94,7 @@
                 app:secondaryText="@string/devSettingsScreenTdsVersion"
                 app:showSwitch="true" />
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/overridePrivacyRemoteConfigUrl"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -93,25 +102,25 @@
                 app:secondaryText="@string/devSettingsScreenPrivacyRemoteConfigUrlOverrideSubtitle"
                 />
 
-            <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingBottom="0dp" />
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                 android:id="@+id/userAgentTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:primaryText="@string/devSettingsScreenUserAgentSection" />
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                 android:id="@+id/overrideUserAgentToggle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:primaryText="@string/devSettingsScreenUserAgentOverride"
                 app:showSwitch="true" />
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/overrideUserAgentSelector"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

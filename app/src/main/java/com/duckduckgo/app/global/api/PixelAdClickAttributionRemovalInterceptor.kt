@@ -17,8 +17,8 @@
 package com.duckduckgo.app.global.api
 
 import com.duckduckgo.adclick.impl.pixels.AdClickPixelName
-import com.duckduckgo.app.global.plugins.pixel.PixelParamRemovalPlugin
-import com.duckduckgo.app.global.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
+import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
+import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject

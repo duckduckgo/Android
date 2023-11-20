@@ -18,9 +18,9 @@ package com.duckduckgo.mobile.android.vpn
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.api.InMemorySharedPreferences
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.test.api.InMemorySharedPreferences
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest

@@ -18,15 +18,15 @@ package com.duckduckgo.app.appearance
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
-import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.ui.DuckDuckGoTheme
+import com.duckduckgo.common.ui.store.ThemingDataStore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals

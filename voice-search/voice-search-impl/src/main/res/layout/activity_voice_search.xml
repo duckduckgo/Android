@@ -31,7 +31,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu" />
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/speechResults"
         app:typography="body1"
         android:layout_width="match_parent"
@@ -57,7 +57,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/speechResults" />
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/footer"
         app:typography="body2"
         app:textType="secondary"

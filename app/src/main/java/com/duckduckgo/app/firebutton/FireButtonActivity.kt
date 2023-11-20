@@ -29,7 +29,6 @@ import com.duckduckgo.app.browser.databinding.ActivityFireButtonBinding
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity
 import com.duckduckgo.app.firebutton.FireButtonViewModel.AutomaticallyClearData
 import com.duckduckgo.app.firebutton.FireButtonViewModel.Command
-import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.FireAnimationActivity
 import com.duckduckgo.app.settings.clear.ClearWhatOption
@@ -40,9 +39,10 @@ import com.duckduckgo.app.settings.clear.getClearWhatOptionForIndex
 import com.duckduckgo.app.settings.clear.getClearWhenForIndex
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
+import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.ui.view.dialog.RadioListAlertDialogBuilder
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach

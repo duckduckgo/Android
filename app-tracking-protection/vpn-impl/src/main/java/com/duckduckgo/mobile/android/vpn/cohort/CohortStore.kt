@@ -19,10 +19,10 @@ package com.duckduckgo.mobile.android.vpn.cohort
 import android.content.SharedPreferences
 import androidx.annotation.WorkerThread
 import androidx.core.content.edit
-import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.utils.checkMainThread
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.checkMainThread
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature

@@ -20,7 +20,6 @@ import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
@@ -31,6 +30,7 @@ import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.ui.SurveyActivity.Companion.SurveySource
 import com.duckduckgo.app.usage.app.AppDaysUsedRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
 import kotlinx.coroutines.NonCancellable

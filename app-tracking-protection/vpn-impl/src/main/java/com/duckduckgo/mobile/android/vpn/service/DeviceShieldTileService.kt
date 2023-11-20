@@ -27,8 +27,8 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.utils.ConflatedJob
+import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.QuickSettingsScope
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
@@ -102,7 +102,7 @@ class DeviceShieldTileService : TileService() {
 
     private fun pollDeviceShieldState() {
         deviceShieldStatePollingJob +=
-            serviceScope.launch {
+            serviceScope.launch(dispatcherProvider.io()) {
                 while (isActive) {
                     val tile = qsTile
                     tile?.let {

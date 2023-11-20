@@ -19,7 +19,7 @@ package com.duckduckgo.mobile.android.vpn.feature.removal
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.WorkManager
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.dao.VpnFeatureRemoverState
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService

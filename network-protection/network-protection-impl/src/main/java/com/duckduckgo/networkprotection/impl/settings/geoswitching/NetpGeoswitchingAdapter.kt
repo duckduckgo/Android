@@ -24,8 +24,8 @@ import androidx.annotation.StringRes
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import com.duckduckgo.mobile.android.ui.view.gone
-import com.duckduckgo.mobile.android.ui.view.show
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.databinding.ItemGeoswitchingCountryBinding
 import com.duckduckgo.networkprotection.impl.databinding.ItemGeoswitchingDividerBinding

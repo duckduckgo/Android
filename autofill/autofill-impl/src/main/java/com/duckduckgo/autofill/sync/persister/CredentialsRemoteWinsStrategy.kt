@@ -16,10 +16,10 @@
 
 package com.duckduckgo.autofill.sync.persister
 
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.autofill.api.domain.app.*
 import com.duckduckgo.autofill.sync.*
 import com.duckduckgo.autofill.sync.isDeleted
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.sync.api.engine.SyncMergeResult
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Error
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Success

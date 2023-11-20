@@ -16,7 +16,7 @@
 
 package com.duckduckgo.networkprotection.impl.settings.geoswitching
 
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.impl.configuration.WgVpnControllerService
 import com.duckduckgo.networkprotection.impl.di.ProtectedVpnControllerService
@@ -46,15 +46,17 @@ class RealNetpEgressServersProvider @Inject constructor(
 ) : NetpEgressServersProvider {
     override suspend fun downloadServerLocations() {
         withContext(dispatcherProvider.io()) {
-            parseServersToServerLocations().map {
-                NetPGeoswitchingLocation(
-                    countryCode = it.countryCode,
-                    countryName = it.countryName,
-                    cities = it.cities,
-                )
-            }.also {
-                netPGeoswitchingRepository.replaceLocations(it)
-            }
+            wgVpnControllerService.getEligibleLocations()
+                .map { location ->
+                    NetPGeoswitchingLocation(
+                        countryCode = location.country,
+                        countryName = getDisplayableCountry(location.country),
+                        cities = location.cities.map { it.name },
+                    )
+                }.toList()
+                .also {
+                    netPGeoswitchingRepository.replaceLocations(it)
+                }
         }
     }
 
@@ -66,31 +68,5 @@ class RealNetpEgressServersProvider @Inject constructor(
                 cities = it.cities,
             )
         }
-    }
-
-    private suspend fun parseServersToServerLocations(): List<ServerLocation> {
-        val locations = mutableMapOf<String, MutableSet<String>>()
-
-        wgVpnControllerService.getServers().forEach {
-            if (it.server.attributes["country"] == null || it.server.attributes["city"] == null) {
-                return@forEach
-            }
-            val countryCode = it.server.attributes["country"] as String
-            val city = it.server.attributes["city"] as String
-
-            if (locations.containsKey(countryCode)) {
-                locations[countryCode]?.add(city)
-            } else {
-                locations[countryCode] = mutableSetOf(city)
-            }
-        }
-
-        return locations.map {
-            ServerLocation(
-                countryCode = it.key,
-                countryName = getDisplayableCountry(it.key),
-                cities = it.value.toList().sorted(),
-            )
-        }.toList().sortedBy { it.countryName }
     }
 }

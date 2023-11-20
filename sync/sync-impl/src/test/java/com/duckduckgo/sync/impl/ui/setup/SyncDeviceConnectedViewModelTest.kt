@@ -17,7 +17,7 @@
 package com.duckduckgo.sync.impl.ui.setup
 
 import app.cash.turbine.test
-import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.ui.setup.SyncDeviceConnectedViewModel.Command.FinishSetupFlow
 import kotlinx.coroutines.ExperimentalCoroutinesApi

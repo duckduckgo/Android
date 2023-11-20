@@ -46,7 +46,7 @@
                 app:srcCompat="@drawable/ic_lock"
                 tools:ignore="ContentDescription" />
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/statusTitle"
                 app:typography="h1"
                 android:layout_width="match_parent"
@@ -56,7 +56,7 @@
                 android:textAlignment="center"
             />
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/waitlistDescription"
                 app:typography="body1"
                 app:textType="secondary"
@@ -97,7 +97,7 @@
 
             </LinearLayout>
 
-            <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                 android:id="@+id/getStartedButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -106,7 +106,7 @@
                 app:buttonSize="large"
             />
 
-            <com.duckduckgo.mobile.android.ui.view.button.DaxButtonSecondary
+            <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
                 android:id="@+id/enterCodeButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -115,7 +115,7 @@
                 app:buttonSize="large"
             />
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                     android:id="@+id/disclaimerFooter"
                     app:typography="caption"
                     app:textType="secondary"

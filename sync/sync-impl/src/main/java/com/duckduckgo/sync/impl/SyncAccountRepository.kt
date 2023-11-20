@@ -17,6 +17,8 @@
 package com.duckduckgo.sync.impl
 
 import androidx.annotation.*
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.*
 import com.duckduckgo.sync.api.engine.*
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_CREATION
@@ -35,6 +37,8 @@ import com.squareup.moshi.Moshi
 import dagger.*
 import dagger.SingleInstanceIn
 import javax.inject.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 interface SyncAccountRepository {
@@ -64,6 +68,8 @@ class AppSyncAccountRepository @Inject constructor(
     private val syncStore: SyncStore,
     private val syncEngine: SyncEngine,
     private val syncPixels: SyncPixels,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
 ) : SyncAccountRepository {
 
     override fun createAccount(): Result<Boolean> {
@@ -346,7 +352,9 @@ class AppSyncAccountRepository @Inject constructor(
                     }
                 }
                 syncStore.storeCredentials(userId, deviceId, deviceName, preLogin.primaryKey, decryptResult.decryptedData, result.data.token)
-                syncEngine.triggerSync(ACCOUNT_LOGIN)
+                appCoroutineScope.launch(dispatcherProvider.io()) {
+                    syncEngine.triggerSync(ACCOUNT_LOGIN)
+                }
 
                 Result.Success(true)
             }

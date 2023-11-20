@@ -16,7 +16,7 @@
 
 package com.duckduckgo.networkprotection.impl.settings.geoswitching
 
-import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.networkprotection.impl.configuration.FakeWgVpnControllerService
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpEgressServersProvider.ServerLocation
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
@@ -66,7 +66,7 @@ class RealNetpEgressServersProviderTest {
             NetPGeoswitchingLocation(
                 countryCode = "us",
                 countryName = "United States",
-                cities = listOf("Des Moines", "El Segundo", "Newark"),
+                cities = listOf("Newark", "El Segundo", "Des Moines"),
             ),
         )
         verify(netPGeoswitchingRepository).replaceLocations(expectedResult)

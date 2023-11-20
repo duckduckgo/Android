@@ -42,10 +42,11 @@ import com.duckduckgo.app.settings.clear.getPixelValue
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.setAndPropagateUpFitsSystemWindows
+import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.mobile.android.R as CommonR
-import com.duckduckgo.mobile.android.ui.view.gone
-import com.duckduckgo.mobile.android.ui.view.setAndPropagateUpFitsSystemWindows
-import com.duckduckgo.mobile.android.ui.view.show
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.CoroutineScope
@@ -63,6 +64,7 @@ class FireDialog(
     private val settingsDataStore: SettingsDataStore,
     private val userEventsStore: UserEventsStore,
     private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
 ) : BottomSheetDialog(context, com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_FireDialog) {
 
     private lateinit var binding: SheetFireClearDataBinding
@@ -129,7 +131,7 @@ class FireDialog(
         cta.showCta(fireCtaBinding.daxCtaContainer)
         ctaViewModel.onCtaShown(cta)
         onClearDataOptionsDismissed = {
-            appCoroutineScope.launch {
+            appCoroutineScope.launch(dispatcherProvider.io()) {
                 ctaViewModel.onUserDismissedCta(cta)
             }
         }
@@ -150,7 +152,7 @@ class FireDialog(
         }
         clearStarted()
 
-        appCoroutineScope.launch {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
             userEventsStore.registerUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED)
             clearPersonalDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = true)
             clearPersonalDataAction.setAppUsedSinceLastClearFlag(false)

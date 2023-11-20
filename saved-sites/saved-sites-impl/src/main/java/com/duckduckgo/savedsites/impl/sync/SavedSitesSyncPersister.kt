@@ -16,7 +16,7 @@
 
 package com.duckduckgo.savedsites.impl.sync
 
-import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesSyncPersisterAlgorithm
@@ -41,6 +41,7 @@ class SavedSitesSyncPersister @Inject constructor(
     private val savedSitesRepository: SavedSitesRepository,
     private val savedSitesSyncStore: SavedSitesSyncStore,
     private val algorithm: SavedSitesSyncPersisterAlgorithm,
+    private val savedSitesFormFactorSyncMigration: SavedSitesFormFactorSyncMigration,
 ) : SyncableDataPersister {
 
     override fun persist(
@@ -61,6 +62,7 @@ class SavedSitesSyncPersister @Inject constructor(
         savedSitesSyncStore.serverModifiedSince = "0"
         savedSitesSyncStore.clientModifiedSince = "0"
         savedSitesSyncStore.startTimeStamp = "0"
+        savedSitesFormFactorSyncMigration.onFormFactorFavouritesDisabled()
     }
 
     fun process(

@@ -17,7 +17,6 @@
 package com.duckduckgo.privacy.dashboard.impl.ui
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.os.Bundle
 import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
@@ -28,19 +27,18 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.browser.webview.enableDarkMode
-import com.duckduckgo.app.browser.webview.enableLightMode
-import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.autoconsent.api.AutoconsentNav
 import com.duckduckgo.browser.api.brokensite.BrokenSiteNav
+import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.store.AppTheme
+import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.webview.enableDarkMode
+import com.duckduckgo.common.utils.webview.enableLightMode
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.ui.store.AppTheme
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.getActivityParams
-import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreen.Companion.RELOAD_RESULT_CODE
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreen.PrivacyDashboardHybridWithTabIdParam
 import com.duckduckgo.privacy.dashboard.impl.databinding.ActivityPrivacyHybridDashboardBinding
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command
@@ -85,7 +83,7 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
         rendererFactory.createRenderer(
             RendererViewHolder.WebviewRenderer(
                 holder = webView,
-                onPrivacyProtectionSettingChanged = { userChangedValues -> updateActivityResult(userChangedValues) },
+                onPrivacyProtectionSettingChanged = { userChangedValues -> if (userChangedValues) finish() },
                 onPrivacyProtectionsClicked = { newValue ->
                     viewModel.onPrivacyProtectionsClicked(newValue)
                 },
@@ -199,15 +197,6 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
                     binding.loadingIndicator.hide()
                     dashboardRenderer.render(it)
                 }
-        }
-    }
-
-    private fun updateActivityResult(shouldClose: Boolean) {
-        if (shouldClose) {
-            setResult(RELOAD_RESULT_CODE)
-            finish()
-        } else {
-            setResult(Activity.RESULT_OK)
         }
     }
 

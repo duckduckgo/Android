@@ -21,8 +21,8 @@ import android.content.Context
 import androidx.lifecycle.*
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.extensions.isIgnoringBatteryOptimizations
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.isIgnoringBatteryOptimizations
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.apps.AppsProtectionType.AppInfoType

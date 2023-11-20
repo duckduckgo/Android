@@ -19,10 +19,10 @@ package com.duckduckgo.autoconsent.impl.handlers
 import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
 import com.duckduckgo.autoconsent.impl.handlers.EvalMessageHandlerPlugin.EvalResp
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.ExperimentalCoroutinesApi

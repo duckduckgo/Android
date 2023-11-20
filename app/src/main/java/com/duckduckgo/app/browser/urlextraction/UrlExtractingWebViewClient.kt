@@ -28,7 +28,7 @@ import com.duckduckgo.app.browser.certificates.rootstore.CertificateValidationSt
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import kotlinx.coroutines.*
 import timber.log.Timber
@@ -50,7 +50,7 @@ class UrlExtractingWebViewClient(
     override fun onPageStarted(webView: WebView, url: String?, favicon: Bitmap?) {
         Timber.v("onPageStarted webViewUrl: ${webView.url} URL: $url")
         url?.let {
-            appCoroutineScope.launch(dispatcherProvider.default()) {
+            appCoroutineScope.launch(dispatcherProvider.io()) {
                 thirdPartyCookieManager.processUriForThirdPartyCookies(webView, url.toUri())
             }
         }

@@ -18,8 +18,6 @@ package com.duckduckgo.app.trackerdetection
 
 import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.trackerdetection.api.TdsJson
 import com.duckduckgo.app.trackerdetection.api.TdsJsonEntity
@@ -30,6 +28,8 @@ import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.app.trackerdetection.db.TdsTrackerDao
 import com.duckduckgo.app.trackerdetection.model.TdsMetadata
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.test.InstantSchedulersRule
 import com.squareup.moshi.Moshi
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -83,6 +83,7 @@ class TrackerDataLoaderTest {
             appDatabase = mockAppDatabase,
             moshi = Moshi.Builder().build(),
             urlToTypeMapper = mockUrlToTypeMapper,
+            coroutineRule.testDispatcherProvider,
         )
     }
 

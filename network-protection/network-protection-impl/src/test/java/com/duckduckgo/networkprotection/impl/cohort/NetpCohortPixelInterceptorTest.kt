@@ -16,7 +16,7 @@
 
 package com.duckduckgo.networkprotection.impl.cohort
 
-import com.duckduckgo.app.global.api.FakeChain
+import com.duckduckgo.common.test.api.FakeChain
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Before

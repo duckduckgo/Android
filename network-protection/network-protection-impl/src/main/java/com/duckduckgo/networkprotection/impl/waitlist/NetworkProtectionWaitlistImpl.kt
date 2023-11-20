@@ -17,9 +17,9 @@
 package com.duckduckgo.networkprotection.impl.waitlist
 
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.networkprotection.api.NetPWaitlistInvitedScreenNoParams
@@ -117,6 +117,7 @@ class NetPRemoteFeatureWrapper @Inject constructor(
     private val netPFeatureRemover: NetPFeatureRemover,
     private val appBuildConfig: AppBuildConfig,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
 ) {
     /**
      * @return `true` if the waitlist beta is active. This is different that having waitlist enabled and they are
@@ -132,7 +133,7 @@ class NetPRemoteFeatureWrapper @Inject constructor(
         } else {
             // waitlistBetaActive == false means the waitlist beta period has ended, ie. wipe out NetP
             // Skip for Internal users
-            coroutineScope.launch {
+            coroutineScope.launch(dispatcherProvider.io()) {
                 logcat { "NetP waitlist beta ended, wiping out everything" }
                 netPFeatureRemover.removeFeature()
             }

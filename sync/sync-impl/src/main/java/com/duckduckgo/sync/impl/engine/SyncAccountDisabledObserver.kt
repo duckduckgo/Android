@@ -18,8 +18,8 @@ package com.duckduckgo.sync.impl.engine
 
 import androidx.lifecycle.*
 import com.duckduckgo.app.di.*
-import com.duckduckgo.app.global.*
 import com.duckduckgo.app.lifecycle.*
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.*
 import com.duckduckgo.sync.api.engine.*
 import com.duckduckgo.sync.store.*

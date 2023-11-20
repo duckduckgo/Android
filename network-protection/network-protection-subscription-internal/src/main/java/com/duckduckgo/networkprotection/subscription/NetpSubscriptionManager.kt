@@ -16,7 +16,7 @@
 
 package com.duckduckgo.networkprotection.subscription
 
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistManager
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository

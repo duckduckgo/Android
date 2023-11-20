@@ -19,7 +19,6 @@ package com.duckduckgo.app.email
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.*
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.email.AppEmailManager.Companion.DUCK_EMAIL_DOMAIN
 import com.duckduckgo.app.email.AppEmailManager.Companion.UNKNOWN_COHORT
 import com.duckduckgo.app.email.api.EmailAlias
@@ -29,6 +28,7 @@ import com.duckduckgo.app.email.sync.*
 import com.duckduckgo.app.pixels.AppPixelName.EMAIL_DISABLED
 import com.duckduckgo.app.pixels.AppPixelName.EMAIL_ENABLED
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.sync.settings.api.SyncSettingsListener
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview

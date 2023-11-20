@@ -49,7 +49,7 @@
                 app:srcCompat="@drawable/ic_lock"
                 tools:ignore="ContentDescription" />
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/statusTitle"
                 app:typography="h1"
                 android:layout_width="match_parent"
@@ -61,7 +61,7 @@
                 android:textAlignment="center"
             />
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/waitlistDescription"
                 app:typography="body1"
                 app:textType="secondary"
@@ -83,7 +83,7 @@
                     android:layout_marginEnd="@dimen/keyline_4"
                     android:visibility="gone">
 
-                <com.duckduckgo.mobile.android.ui.notifyme.NotifyMeView
+                <com.duckduckgo.common.ui.notifyme.NotifyMeView
                         android:id="@+id/waitlistNotifyMe"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -94,7 +94,7 @@
                         app:sharedPrefsKeyForDismiss="key_component_dismissed_in_windows_waitlist" />
             </FrameLayout>
 
-            <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                 android:id="@+id/joinWaitlistButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -105,7 +105,7 @@
                 app:buttonSize="large"
             />
 
-            <com.duckduckgo.mobile.android.ui.view.button.DaxButtonSecondary
+            <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
                 android:id="@+id/enterInviteCode"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -117,7 +117,7 @@
                 app:buttonSize="large"
             />
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                     android:id="@+id/disclaimerFooter"
                     app:typography="caption"
                     app:textType="secondary"

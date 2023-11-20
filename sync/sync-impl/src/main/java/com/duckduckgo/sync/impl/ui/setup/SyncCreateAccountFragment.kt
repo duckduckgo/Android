@@ -24,10 +24,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.global.DuckDuckGoFragment
-import com.duckduckgo.app.global.FragmentViewModelFactory
+import com.duckduckgo.common.ui.DuckDuckGoFragment
+import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.FragmentViewModelFactory
+import com.duckduckgo.di.*
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.sync.api.*
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.FragmentCreateAccountBinding
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command
@@ -41,6 +43,7 @@ import com.google.android.material.snackbar.Snackbar
 import javax.inject.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import timber.log.*
 
 @InjectWith(FragmentScope::class)
 class SyncCreateAccountFragment : DuckDuckGoFragment(R.layout.fragment_create_account) {

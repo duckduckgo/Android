@@ -1,11 +1,11 @@
 package com.duckduckgo.autofill.impl.email.incontext.availability
 
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.autofill.impl.AutofillGlobalCapabilityChecker
 import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignupFeature
 import com.duckduckgo.autofill.impl.email.remoteconfig.EmailProtectionInContextExceptions
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import java.util.*

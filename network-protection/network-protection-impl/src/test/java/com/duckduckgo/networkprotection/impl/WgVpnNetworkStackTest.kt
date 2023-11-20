@@ -122,6 +122,7 @@ class WgVpnNetworkStackTest {
             location = "Stockholm, Sweden",
         )
         verify(networkProtectionRepository).clientInterface = ClientInterface(emptySet())
+        verify(netpPixels).reportEnableAttempt()
     }
 
     @Test
@@ -133,6 +134,8 @@ class WgVpnNetworkStackTest {
 
         assertNotNull(actual)
         assertEquals(0, actual.dns.size)
+        verify(netpPixels).reportEnableAttempt()
+        verifyNoMoreInteractions(netpPixels)
     }
 
     @Test
@@ -149,6 +152,9 @@ class WgVpnNetworkStackTest {
         )
 
         verify(networkProtectionRepository).enabledTimeInMillis = 1672229650358L
+        verify(netpPixels).reportEnableAttempt()
+        verify(netpPixels).reportEnableAttemptSuccess()
+        verifyNoMoreInteractions(netpPixels)
     }
 
     @Test
@@ -174,6 +180,10 @@ class WgVpnNetworkStackTest {
         )
         verify(networkProtectionRepository).enabledTimeInMillis
         verifyNoMoreInteractions(networkProtectionRepository)
+
+        verify(netpPixels).reportEnableAttempt()
+        verify(netpPixels).reportEnableAttemptSuccess()
+        verifyNoMoreInteractions(netpPixels)
     }
 
     @Test
@@ -183,6 +193,7 @@ class WgVpnNetworkStackTest {
 
         verifyNoInteractions(networkProtectionRepository)
         verify(netpPixels).reportErrorWgInvalidState()
+        verify(netpPixels).reportEnableAttemptFailure()
         verifyNoMoreInteractions(netpPixels)
     }
 
@@ -214,6 +225,8 @@ class WgVpnNetworkStackTest {
 
         assertTrue(wgVpnNetworkStack.onPrepareVpn().isFailure)
         verify(netpPixels).reportErrorInRegistration()
+        verify(netpPixels).reportEnableAttempt()
+        verify(netpPixels).reportEnableAttemptFailure()
         verifyNoMoreInteractions(netpPixels)
     }
 
@@ -226,6 +239,8 @@ class WgVpnNetworkStackTest {
 
         assertTrue(wgVpnNetworkStack.onStartVpn(mock()).isFailure)
         verify(netpPixels).reportErrorWgBackendCantStart()
+        verify(netpPixels).reportEnableAttempt()
+        verify(netpPixels).reportEnableAttemptFailure()
         verifyNoMoreInteractions(netpPixels)
     }
 
@@ -237,5 +252,9 @@ class WgVpnNetworkStackTest {
         wgVpnNetworkStack.onPrepareVpn()
 
         assertTrue(wgVpnNetworkStack.onStartVpn(mock()).isSuccess)
+
+        verify(netpPixels).reportEnableAttempt()
+        verify(netpPixels).reportEnableAttemptSuccess()
+        verifyNoMoreInteractions(netpPixels)
     }
 }

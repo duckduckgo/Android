@@ -18,17 +18,14 @@ package com.duckduckgo.savedsites.impl.sync.algorithm
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
-import com.duckduckgo.savedsites.impl.sync.SyncBookmarkEntries
-import com.duckduckgo.savedsites.impl.sync.SyncBookmarkEntry
-import com.duckduckgo.savedsites.impl.sync.SyncBookmarkPage
-import com.duckduckgo.savedsites.impl.sync.SyncFolderChildren
+import com.duckduckgo.savedsites.impl.sync.*
 import com.duckduckgo.sync.api.SyncCrypto
 import com.duckduckgo.sync.api.engine.SyncMergeResult
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Success
@@ -64,6 +61,7 @@ class SavedSitesSyncPersisterAlgorithmTest {
     private val remoteStrategy: SavedSitesSyncPersisterStrategy = mock()
     private val localStrategy: SavedSitesSyncPersisterStrategy = mock()
     private val repository: SavedSitesRepository = mock()
+    private val syncSavedSitesRepository: SyncSavedSitesRepository = mock()
 
     private lateinit var algorithm: SavedSitesSyncPersisterAlgorithm
 
@@ -75,6 +73,7 @@ class SavedSitesSyncPersisterAlgorithmTest {
         algorithm = RealSavedSitesSyncPersisterAlgorithm(
             FakeCrypto(),
             repository,
+            syncSavedSitesRepository,
             deduplicationStrategy,
             timestampStrategy,
             remoteStrategy,

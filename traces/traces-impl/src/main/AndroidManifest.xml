@@ -15,12 +15,11 @@
   ~ limitations under the License.
   -->
 
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.duckduckgo.app.traces">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application>
         <provider
-            android:name="com.duckduckgo.app.traces.AppStartUpTracer"
+            android:name="com.duckduckgo.traces.impl.AppStartUpTracer"
             android:authorities="${applicationId}.appStartProvider"
             android:initOrder="2147483647"
             android:exported="false" />

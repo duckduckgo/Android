@@ -22,7 +22,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.widget.FrameLayout
 import com.duckduckgo.app.browser.databinding.ViewTabSwitcherButtonBinding
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.common.ui.viewbinding.viewBinding
 
 class TabSwitcherButton @JvmOverloads constructor(
     context: Context,

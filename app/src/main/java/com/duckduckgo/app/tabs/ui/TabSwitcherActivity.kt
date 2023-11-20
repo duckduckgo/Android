@@ -33,8 +33,6 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.downloads.DownloadsActivity
-import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.FireDialog
@@ -46,8 +44,10 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.CloseAllTabsRequest
+import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
@@ -92,6 +92,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     @Inject
     @AppCoroutineScope
     lateinit var appCoroutineScope: CoroutineScope
+
+    @Inject
+    lateinit var dispatcherProvider: DispatcherProvider
 
     private val viewModel: TabSwitcherViewModel by bindViewModel()
 
@@ -216,6 +219,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             settingsDataStore = settingsDataStore,
             userEventsStore = userEventsStore,
             appCoroutineScope = appCoroutineScope,
+            dispatcherProvider = dispatcherProvider,
         )
         dialog.show()
     }

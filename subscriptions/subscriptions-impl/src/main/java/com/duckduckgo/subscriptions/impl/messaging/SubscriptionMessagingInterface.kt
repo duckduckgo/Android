@@ -20,8 +20,9 @@ import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import androidx.core.net.toUri
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
@@ -40,10 +41,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import logcat.logcat
 import org.json.JSONObject
-
-interface SubscriptionCallback {
-    fun backToSettings()
-}
 
 @ContributesBinding(ActivityScope::class)
 @Named("Subscriptions")
@@ -73,7 +70,7 @@ class SubscriptionMessagingInterface @Inject constructor(
                 webView.url?.toUri()?.host
             }
             jsMessage?.let {
-                if (context == jsMessage.context && allowedDomains.contains(domain)) {
+                if (this.secret == secret && context == jsMessage.context && allowedDomains.contains(domain)) {
                     handlers.firstOrNull {
                         it.method == jsMessage.method && it.featureName == jsMessage.featureName
                     }?.let {
@@ -100,6 +97,10 @@ class SubscriptionMessagingInterface @Inject constructor(
         // NOOP
     }
 
+    override fun onResponse(response: JsCallbackData) {
+        // NOOP
+    }
+
     override val context: String = "subscriptionPages"
     override val callbackName: String = "messageCallback"
     override val secret: String = "duckduckgo-android-messaging-secret"
@@ -108,7 +109,7 @@ class SubscriptionMessagingInterface @Inject constructor(
     inner class BackToSettingsMessage : JsMessageHandler {
         override fun process(jsMessage: JsMessage, secret: String, webView: WebView, jsMessageCallback: JsMessageCallback): JsRequestResponse? {
             if (jsMessage.featureName != featureName && jsMessage.method != method) return null
-            jsMessageCallback.process(method)
+            jsMessageCallback.process(featureName, method, jsMessage.id!!, jsMessage.params)
             return null
         }
 

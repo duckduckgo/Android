@@ -30,8 +30,8 @@ import com.duckduckgo.app.downloads.DownloadsViewModel.Command.DisplayMessage
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command.DisplayUndoMessage
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command.OpenFile
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command.ShareFile
-import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.formatters.time.TimeDiffFormatter
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.downloads.api.DownloadsRepository
 import com.duckduckgo.downloads.api.model.DownloadItem

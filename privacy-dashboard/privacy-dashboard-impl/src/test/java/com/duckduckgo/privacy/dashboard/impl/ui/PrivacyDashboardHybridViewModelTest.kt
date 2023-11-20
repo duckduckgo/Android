@@ -16,24 +16,27 @@
 
 package com.duckduckgo.privacy.dashboard.impl.ui
 
+import android.net.Uri
 import android.os.Build.VERSION_CODES
 import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
-import com.duckduckgo.app.privacy.db.UserAllowListDao
+import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
-import com.duckduckgo.privacy.dashboard.impl.pixels.FakePrivacyDashboardRemoteFeatureFactory
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVACY_DASHBOARD_ALLOWLIST_ADD
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchReportBrokenSite
 import com.nhaarman.mockitokotlin2.mock
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Assert.assertEquals
@@ -58,17 +61,16 @@ class PrivacyDashboardHybridViewModelTest {
         whenever(this.sdkInt).thenReturn(VERSION_CODES.Q)
     }
 
-    private val userAllowListDao = mock<UserAllowListDao>()
+    private val userAllowListRepository = FakeUserAllowListRepository()
 
     private val contentBlocking = mock<ContentBlocking>()
     private val unprotectedTemporary = mock<UnprotectedTemporary>()
 
     private val pixel = mock<Pixel>()
-    private val mockRemoteFeatures = FakePrivacyDashboardRemoteFeatureFactory.create()
 
     private val testee: PrivacyDashboardHybridViewModel by lazy {
         PrivacyDashboardHybridViewModel(
-            userAllowListDao = userAllowListDao,
+            userAllowListRepository = userAllowListRepository,
             pixel = pixel,
             dispatcher = coroutineRule.testDispatcherProvider,
             siteViewStateMapper = AppSiteViewStateMapper(PublicKeyInfoMapper(androidQAppBuildConfig)),
@@ -76,7 +78,6 @@ class PrivacyDashboardHybridViewModelTest {
             protectionStatusViewStateMapper = AppProtectionStatusViewStateMapper(contentBlocking, unprotectedTemporary),
             privacyDashboardPayloadAdapter = mock(),
             autoconsentStatusViewStateMapper = CookiePromptManagementStatusViewStateMapper(),
-            privacyDashboardRemoteFeature = mockRemoteFeatures,
         )
     }
 
@@ -116,28 +117,28 @@ class PrivacyDashboardHybridViewModelTest {
     }
 
     @Test
-    fun whenOnPrivacyProtectionClickedThenUpdateViewStateWithParam() = runTest {
-        mockRemoteFeatures.highlightedProtectionsToggle().setEnabled(Toggle.State(enable = true))
-
-        testee.onSiteChanged(site(siteAllowed = false))
-        testee.onPrivacyProtectionsClicked(enabled = false)
-
-        testee.viewState.test {
-            awaitItem()
-            val viewState = awaitItem()
-            assertTrue(viewState!!.userChangedValues)
-            assertFalse(viewState.protectionStatus.allowlisted)
-            verify(pixel).fire(PRIVACY_DASHBOARD_ALLOWLIST_ADD, mapOf("dashboard_highlighted_toggle" to true.toString()))
-        }
-    }
-
-    @Test
     fun whenOnPrivacyProtectionClickedThenValueStoredInStore() = runTest {
         val site = site(siteAllowed = false)
         testee.onSiteChanged(site)
-        testee.onPrivacyProtectionsClicked(enabled = false)
 
-        verify(userAllowListDao).insert(site.domain!!)
+        userAllowListRepository.domainsInUserAllowListFlow()
+            .test {
+                assertFalse(site.domain in awaitItem())
+                testee.onPrivacyProtectionsClicked(enabled = false)
+                assertTrue(site.domain in awaitItem())
+            }
+    }
+
+    @Test
+    fun whenAllowlistIsChangedThenViewStateIsUpdated() = runTest {
+        val site = site(siteAllowed = false)
+        testee.onSiteChanged(site)
+
+        testee.viewState.filterNotNull().test {
+            assertFalse(awaitItem().userChangedValues)
+            userAllowListRepository.addDomainToUserAllowList(site.domain!!)
+            assertTrue(awaitItem().userChangedValues)
+        }
     }
 
     private fun site(
@@ -150,4 +151,23 @@ class PrivacyDashboardHybridViewModelTest {
         whenever(site.userAllowList).thenReturn(siteAllowed)
         return site
     }
+}
+
+private class FakeUserAllowListRepository : UserAllowListRepository {
+
+    private val domains = MutableStateFlow<List<String>>(emptyList())
+
+    override fun isUrlInUserAllowList(url: String): Boolean = throw UnsupportedOperationException()
+
+    override fun isUriInUserAllowList(uri: Uri): Boolean = throw UnsupportedOperationException()
+
+    override fun isDomainInUserAllowList(domain: String?): Boolean = domain in domains.value
+
+    override fun domainsInUserAllowList(): List<String> = domains.value
+
+    override fun domainsInUserAllowListFlow(): Flow<List<String>> = domains
+
+    override suspend fun addDomainToUserAllowList(domain: String) = domains.update { it + domain }
+
+    override suspend fun removeDomainFromUserAllowList(domain: String) = domains.update { it - domain }
 }

@@ -21,8 +21,12 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
-import com.duckduckgo.savedsites.api.models.SavedSitesNames
+import com.duckduckgo.savedsites.api.models.*
+import com.duckduckgo.savedsites.api.models.SavedSitesNames.FAVORITES_DESKTOP_ROOT
+import com.duckduckgo.savedsites.api.models.SavedSitesNames.FAVORITES_MOBILE_ROOT
+import com.duckduckgo.savedsites.api.models.SavedSitesNames.FAVORITES_ROOT
 import io.reactivex.Single
 import kotlinx.coroutines.flow.Flow
 
@@ -59,8 +63,11 @@ interface SavedSitesRelationsDao {
         type: EntityType,
     ): Int
 
-    @Query("select * from relations where relations.entityId = :entityId and relations.folderId <> :favoritesRoot")
-    fun relationByEntityId(entityId: String, favoritesRoot: String = SavedSitesNames.FAVORITES_ROOT): Relation?
+    @Query(
+        "select * from relations where relations.entityId = :entityId and relations.folderId <> '$FAVORITES_MOBILE_ROOT' " +
+            "and relations.folderId <> '$FAVORITES_DESKTOP_ROOT' and relations.folderId <> '$FAVORITES_ROOT'",
+    )
+    fun relationByEntityId(entityId: String): Relation?
 
     @Query("select * from relations where relations.entityId = :entityId")
     fun relationsByEntityId(entityId: String): List<Relation>
@@ -91,13 +98,40 @@ interface SavedSitesRelationsDao {
 
     @Query(
         "select count(*) from entities inner join relations on entities.entityId = relations.entityId " +
-            "where entities.url LIKE :domain AND folderId == :folderId AND entities.deleted = 0",
+            "where entities.url LIKE '%' || :domain AND folderId == :folderId AND entities.deleted = 0",
     )
     fun countFavouritesByUrl(
         domain: String,
-        folderId: String = SavedSitesNames.FAVORITES_ROOT,
+        folderId: String,
     ): Int
 
     @Query("delete from relations")
     fun deleteAll()
+
+    @Transaction
+    fun migrateNativeFavoritesAsNewRoot() {
+        // clear non-native favorites
+        delete(SavedSitesNames.FAVORITES_DESKTOP_ROOT)
+        // clear unified folder
+        delete(SavedSitesNames.FAVORITES_ROOT)
+        // add all native favorites to unified folder
+        updateFolderId(SavedSitesNames.FAVORITES_MOBILE_ROOT, SavedSitesNames.FAVORITES_ROOT)
+    }
+
+    @Transaction
+    fun cloneFolder(from: String, to: String) {
+        delete(to)
+        copyRelationsFromTo(from, to)
+    }
+
+    @Query("INSERT INTO relations (folderId, entityId) Select :to, entityId from relations where folderId = :from")
+    fun copyRelationsFromTo(from: String, to: String)
+
+    @Transaction
+    fun migrateUnifiedFavoritesAsNewRoot() {
+        // clear non-native folder
+        delete(SavedSitesNames.FAVORITES_DESKTOP_ROOT)
+        // clear native folder
+        delete(SavedSitesNames.FAVORITES_MOBILE_ROOT)
+    }
 }

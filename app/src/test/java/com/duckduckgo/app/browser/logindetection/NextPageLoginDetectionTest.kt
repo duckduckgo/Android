@@ -19,11 +19,11 @@ package com.duckduckgo.app.browser.logindetection
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.WebNavigationStateChange
 import com.duckduckgo.app.browser.WebNavigationStateChange.NewPage
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.*

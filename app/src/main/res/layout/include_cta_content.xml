@@ -35,7 +35,7 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:src="@drawable/survey_cta_icon" />
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/ctaTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -48,7 +48,7 @@
         app:typography="h3"
         tools:text="@string/surveyCtaTitle" />
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/ctaSubtitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

@@ -34,8 +34,6 @@ import androidx.lifecycle.Observer
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.duckduckgo.adclick.api.AdClickManager
-import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.ValueCaptorObserver
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsSharedPreferences
@@ -83,9 +81,7 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryImpl
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
@@ -101,10 +97,8 @@ import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
-import com.duckduckgo.app.privacy.db.UserAllowListDao
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.privacy.model.TestEntity
-import com.duckduckgo.app.privacy.model.UserAllowListedDomain
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -125,13 +119,16 @@ import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
-import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.test.InstantSchedulersRule
+import com.duckduckgo.common.ui.store.AppTheme
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.feature.toggles.api.FeatureToggle
-import com.duckduckgo.mobile.android.ui.store.AppTheme
 import com.duckduckgo.privacy.config.api.*
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
@@ -143,7 +140,7 @@ import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
-import com.duckduckgo.site.permissions.api.SitePermissionsManager
+import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import dagger.Lazy
@@ -264,9 +261,6 @@ class BrowserTabViewModelTest {
     private lateinit var mockUserStageStore: UserStageStore
 
     @Mock
-    private lateinit var mockUserAllowListDao: UserAllowListDao
-
-    @Mock
     private lateinit var mockContentBlocking: ContentBlocking
 
     @Mock
@@ -327,9 +321,6 @@ class BrowserTabViewModelTest {
     private lateinit var mockAdClickManager: AdClickManager
 
     @Mock
-    private lateinit var mockSitePermissionsManager: SitePermissionsManager
-
-    @Mock
     private lateinit var mockUserAllowListRepository: UserAllowListRepository
 
     @Mock
@@ -386,8 +377,6 @@ class BrowserTabViewModelTest {
 
     private val favoriteListFlow = Channel<List<Favorite>>()
 
-    private val mockAutofillStore: AutofillStore = mock()
-
     private val mockAppTheme: AppTheme = mock()
 
     private val autofillCapabilityChecker: FakeCapabilityChecker = FakeCapabilityChecker(enabled = false)
@@ -431,7 +420,7 @@ class BrowserTabViewModelTest {
             surveyDao = mockSurveyDao,
             widgetCapabilities = mockWidgetCapabilities,
             dismissedCtaDao = mockDismissedCtaDao,
-            userAllowListDao = mockUserAllowListDao,
+            userAllowListRepository = mockUserAllowListRepository,
             settingsDataStore = mockSettingsStore,
             onboardingStore = mockOnboardingStore,
             userStageStore = mockUserStageStore,
@@ -442,9 +431,19 @@ class BrowserTabViewModelTest {
             surveyRepository = mockSurveyRepository,
         )
 
-        val siteFactory = SiteFactoryImpl(mockEntityLookup, mockUserAllowListDao, mockContentBlocking, TestScope())
+        val siteFactory = SiteFactoryImpl(
+            mockEntityLookup,
+            mockContentBlocking,
+            mockUserAllowListRepository,
+            coroutineRule.testScope,
+            coroutineRule.testDispatcherProvider,
+        )
 
-        accessibilitySettingsDataStore = AccessibilitySettingsSharedPreferences(context, coroutineRule.testDispatcherProvider, TestScope())
+        accessibilitySettingsDataStore = AccessibilitySettingsSharedPreferences(
+            context,
+            coroutineRule.testDispatcherProvider,
+            coroutineRule.testScope,
+        )
 
         whenever(mockOmnibarConverter.convertQueryToUrl(any(), any(), any())).thenReturn("duckduckgo.com")
         whenever(mockTabRepository.liveSelectedTab).thenReturn(selectedTabLiveData)
@@ -452,7 +451,8 @@ class BrowserTabViewModelTest {
         whenever(mockTabRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
         whenever(mockTabRepository.childClosedTabs).thenReturn(childClosedTabsFlow)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
-        whenever(mockUserAllowListDao.contains(anyString())).thenReturn(false)
+        whenever(mockUserAllowListRepository.isDomainInUserAllowList(anyString())).thenReturn(false)
+        whenever(mockUserAllowListRepository.domainsInUserAllowListFlow()).thenReturn(flowOf(emptyList()))
         whenever(mockContentBlocking.isAnException(anyString())).thenReturn(false)
         whenever(fireproofDialogsEventHandler.event).thenReturn(fireproofDialogsEventHandlerLiveData)
 
@@ -462,7 +462,7 @@ class BrowserTabViewModelTest {
             duckDuckGoUrlDetector = DuckDuckGoUrlDetectorImpl(),
             siteFactory = siteFactory,
             tabRepository = mockTabRepository,
-            userAllowListDao = mockUserAllowListDao,
+            userAllowListRepository = mockUserAllowListRepository,
             networkLeaderboardDao = mockNetworkLeaderboardDao,
             autoComplete = mockAutoCompleteApi,
             appSettingsPreferencesStore = mockSettingsStore,
@@ -500,9 +500,7 @@ class BrowserTabViewModelTest {
             voiceSearchAvailability = voiceSearchAvailability,
             voiceSearchPixelLogger = voiceSearchPixelLogger,
             settingsDataStore = mockSettingsDataStore,
-            autofillStore = mockAutofillStore,
             adClickManager = mockAdClickManager,
-            sitePermissionsManager = mockSitePermissionsManager,
             autofillCapabilityChecker = autofillCapabilityChecker,
             autofillFireproofDialogSuppressor = autofillFireproofDialogSuppressor,
             automaticSavedLoginsMonitor = automaticSavedLoginsMonitor,
@@ -1669,17 +1667,16 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenPrivacyProtectionMenuClickedAndSiteNotInAllowListThenSiteAddedToAllowListAndPixelSentAndPageRefreshed() = runTest {
-        whenever(mockUserAllowListDao.contains("www.example.com")).thenReturn(false)
+        whenever(mockUserAllowListRepository.isDomainInUserAllowList("www.example.com")).thenReturn(false)
         loadUrl("http://www.example.com/home.html")
         testee.onPrivacyProtectionMenuClicked()
-        verify(mockUserAllowListDao).insert(UserAllowListedDomain("www.example.com"))
+        verify(mockUserAllowListRepository).addDomainToUserAllowList("www.example.com")
         verify(mockPixel).fire(AppPixelName.BROWSER_MENU_ALLOWLIST_ADD)
-        verify(mockCommandObserver).onChanged(NavigationCommand.Refresh)
     }
 
     @Test
     fun whenPrivacyProtectionMenuClickedAndSiteNotInAllowListThenShowDisabledConfirmationMessage() = runTest {
-        whenever(mockUserAllowListDao.contains("www.example.com")).thenReturn(false)
+        whenever(mockUserAllowListRepository.isDomainInUserAllowList("www.example.com")).thenReturn(false)
         loadUrl("http://www.example.com/home.html")
         testee.onPrivacyProtectionMenuClicked()
         assertCommandIssued<ShowPrivacyProtectionDisabledConfirmation> {
@@ -1689,17 +1686,16 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenPrivacyProtectionMenuClickedForAllowListedSiteThenSiteRemovedFromAllowListAndPixelSentAndPageRefreshed() = runTest {
-        whenever(mockUserAllowListDao.contains("www.example.com")).thenReturn(true)
+        whenever(mockUserAllowListRepository.isDomainInUserAllowList("www.example.com")).thenReturn(true)
         loadUrl("http://www.example.com/home.html")
         testee.onPrivacyProtectionMenuClicked()
-        verify(mockUserAllowListDao).delete(UserAllowListedDomain("www.example.com"))
+        verify(mockUserAllowListRepository).removeDomainFromUserAllowList("www.example.com")
         verify(mockPixel).fire(AppPixelName.BROWSER_MENU_ALLOWLIST_REMOVE)
-        verify(mockCommandObserver).onChanged(NavigationCommand.Refresh)
     }
 
     @Test
     fun whenPrivacyProtectionMenuClickedForAllowListedSiteThenShowDisabledConfirmationMessage() = runTest {
-        whenever(mockUserAllowListDao.contains("www.example.com")).thenReturn(true)
+        whenever(mockUserAllowListRepository.isDomainInUserAllowList("www.example.com")).thenReturn(true)
         loadUrl("http://www.example.com/home.html")
         testee.onPrivacyProtectionMenuClicked()
         assertCommandIssued<ShowPrivacyProtectionEnabledConfirmation> {
@@ -3673,10 +3669,10 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenLoadUrlAndUrlIsInContentBlockingExceptionsListThenIsAllowListedIsTrue() {
+    fun whenLoadUrlAndUrlIsInContentBlockingExceptionsListThenIsPrivacyProtectionDisabledIsTrue() {
         whenever(mockContentBlocking.isAnException("example.com")).thenReturn(true)
         loadUrl("https://example.com")
-        assertTrue(browserViewState().isPrivacyProtectionEnabled)
+        assertTrue(browserViewState().isPrivacyProtectionDisabled)
     }
 
     @Test
@@ -4168,54 +4164,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun givenPermissionsAlreadyGrantedWhenWebsiteRequestsSitePermissionThenGrantItAutomatically() = runTest {
-        val request: PermissionRequest = mock()
-        val permissionsGranted = arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE, PermissionRequest.RESOURCE_VIDEO_CAPTURE)
-        whenever(mockSitePermissionsManager.getSitePermissionsGranted(any(), any(), any())).thenReturn(permissionsGranted)
-
-        givenSitePermissionsRequestFromDomain(request)
-
-        assertCommandIssued<Command.GrantSitePermissionRequest> {
-            assertEquals(this.request, request)
-            assertArrayEquals(this.sitePermissionsToGrant, permissionsGranted)
-        }
-    }
-
-    @Test
-    fun givenPermissionNeverGrantedWhenWebsiteRequestsSitePermissionThenGrantItAutomatically() = runTest {
-        val request: PermissionRequest = mock()
-        val permissionsGranted = arrayOf<String>()
-        val permissionsToAsk = arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE, PermissionRequest.RESOURCE_VIDEO_CAPTURE)
-        whenever(mockSitePermissionsManager.getSitePermissionsGranted(any(), any(), any())).thenReturn(permissionsGranted)
-
-        givenSitePermissionsRequestFromDomain(request)
-
-        assertCommandIssued<Command.ShowSitePermissionsDialog> {
-            assertEquals(this.request, request)
-            assertArrayEquals(this.permissionsToRequest, permissionsToAsk)
-        }
-    }
-
-    @Test
-    fun whenOnePermissionIsGrantedAndOtherNeedsToBeRequestedThenBothCommandsAreCalled() = runTest {
-        val request: PermissionRequest = mock()
-        val permissionsGranted = arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE)
-        val permissionsToAsk = arrayOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE)
-        whenever(mockSitePermissionsManager.getSitePermissionsGranted(any(), any(), any())).thenReturn(permissionsGranted)
-
-        givenSitePermissionsRequestFromDomain(request)
-
-        assertCommandIssued<Command.GrantSitePermissionRequest> {
-            assertEquals(this.request, request)
-            assertArrayEquals(this.sitePermissionsToGrant, permissionsGranted)
-        }
-        assertCommandIssued<Command.ShowSitePermissionsDialog> {
-            assertEquals(this.request, request)
-            assertArrayEquals(this.permissionsToRequest, permissionsToAsk)
-        }
-    }
-
-    @Test
     fun whenNotEditingUrlBarAndNotCancelledThenCanAutomaticallyShowAutofillPrompt() {
         configureOmnibarNotEditing()
         assertTrue(testee.canAutofillSelectCredentialsDialogCanAutomaticallyShow())
@@ -4362,6 +4310,21 @@ class BrowserTabViewModelTest {
         assertFalse(browserViewState().showVoiceSearch)
     }
 
+    @Test
+    fun whenOnSitePermissionRequestedThenSendCommand() = runTest {
+        val request: PermissionRequest = mock()
+        val sitePermissions = SitePermissions(
+            autoAccept = listOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE),
+            userHandled = listOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE),
+        )
+        whenever(request.origin).thenReturn("https://example.com".toUri())
+        testee.onSitePermissionRequested(request, sitePermissions)
+        assertCommandIssued<Command.ShowSitePermissionsDialog> {
+            assertEquals(request, this.request)
+            assertEquals(sitePermissions, this.permissionsToRequest)
+        }
+    }
+
     private fun aCredential(): LoginCredentials {
         return LoginCredentials(domain = null, username = null, password = null)
     }
@@ -4429,11 +4392,6 @@ class BrowserTabViewModelTest {
         permission: LocationPermissionType,
     ) {
         locationPermissionsDao.insert(LocationPermissionEntity(domain, permission))
-    }
-
-    private fun givenSitePermissionsRequestFromDomain(request: PermissionRequest) {
-        whenever(request.origin).thenReturn("https://example.com".toUri())
-        testee.onSitePermissionRequested(request, arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE, PermissionRequest.RESOURCE_VIDEO_CAPTURE))
     }
 
     class StubPermissionCallback : GeolocationPermissions.Callback {

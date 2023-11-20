@@ -22,8 +22,8 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.work.*
 import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.dao.VpnNotification
 import com.duckduckgo.mobile.android.vpn.dao.VpnNotificationsDao
@@ -46,12 +46,12 @@ object DeviceShieldNotificationSchedulerModule {
     @Provides
     @IntoSet
     fun provideDeviceShieldNotificationScheduler(
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         workManager: WorkManager,
         vpnDatabase: VpnDatabase,
         dispatchers: DispatcherProvider,
     ): MainProcessLifecycleObserver {
-        return DeviceShieldNotificationScheduler(coroutineScope, workManager, vpnDatabase, dispatchers)
+        return DeviceShieldNotificationScheduler(appCoroutineScope, workManager, vpnDatabase, dispatchers)
     }
 
     @Provides
@@ -72,7 +72,7 @@ class DeviceShieldNotificationScheduler(
 
     private fun scheduleDailyNotification() {
         val vpnNotificationsDao = vpnDatabase.vpnNotificationsDao()
-        coroutineScope.launch {
+        coroutineScope.launch(dispatchers.io()) {
             val exists = withContext(dispatchers.io()) {
                 vpnNotificationsDao.exists(VPN_DAILY_NOTIFICATION_ID)
             }

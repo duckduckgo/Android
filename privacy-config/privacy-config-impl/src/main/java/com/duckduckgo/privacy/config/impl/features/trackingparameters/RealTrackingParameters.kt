@@ -18,9 +18,9 @@ package com.duckduckgo.privacy.config.impl.features.trackingparameters
 
 import android.net.Uri
 import androidx.annotation.VisibleForTesting
-import com.duckduckgo.app.global.UriString
-import com.duckduckgo.app.global.replaceQueryParameters
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
+import com.duckduckgo.common.utils.UriString
+import com.duckduckgo.common.utils.replaceQueryParameters
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle

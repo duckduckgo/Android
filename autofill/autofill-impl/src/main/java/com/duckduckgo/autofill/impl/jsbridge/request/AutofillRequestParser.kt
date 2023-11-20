@@ -16,8 +16,8 @@
 
 package com.duckduckgo.autofill.impl.jsbridge.request
 
-import com.duckduckgo.app.global.DefaultDispatcherProvider
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DefaultDispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
@@ -39,13 +39,13 @@ class AutofillJsonRequestParser @Inject constructor(
     private val autofillStoreFormDataRequestParser by lazy { moshi.adapter(AutofillStoreFormDataRequest::class.java) }
 
     override suspend fun parseAutofillDataRequest(request: String): AutofillDataRequest {
-        return withContext(dispatchers.default()) {
+        return withContext(dispatchers.io()) {
             autofillDataRequestParser.fromJson(request) ?: throw IllegalArgumentException("Failed to parse autofill request")
         }
     }
 
     override suspend fun parseStoreFormDataRequest(request: String): AutofillStoreFormDataRequest {
-        return withContext(dispatchers.default()) {
+        return withContext(dispatchers.io()) {
             autofillStoreFormDataRequestParser.fromJson(request) ?: throw IllegalArgumentException("Failed to parse autofill request")
         }
     }

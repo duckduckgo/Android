@@ -18,7 +18,7 @@ package com.duckduckgo.vpn.internal.feature.logs
 
 import android.content.Context
 import android.content.Intent
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.mobile.android.vpn.feature.AppTpLocalFeature

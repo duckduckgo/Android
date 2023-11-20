@@ -17,9 +17,9 @@
 package com.duckduckgo.savedsites.impl.sync
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.FileUtilities
-import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.test.FileUtilities
+import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesSyncPersisterAlgorithm
 import com.duckduckgo.sync.api.engine.SyncChangesResponse
@@ -48,12 +48,13 @@ class SavedSitesSyncPersisterTest {
     private val repository: SavedSitesRepository = mock()
     private val store: SavedSitesSyncStore = mock()
     private val persisterAlgorithm: SavedSitesSyncPersisterAlgorithm = mock()
+    private val savedSitesFormFactorSyncMigration: SavedSitesFormFactorSyncMigration = mock()
 
     private lateinit var syncPersister: SavedSitesSyncPersister
 
     @Before
     fun setup() {
-        syncPersister = SavedSitesSyncPersister(repository, store, persisterAlgorithm)
+        syncPersister = SavedSitesSyncPersister(repository, store, persisterAlgorithm, savedSitesFormFactorSyncMigration)
     }
 
     @Test

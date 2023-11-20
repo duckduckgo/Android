@@ -17,7 +17,6 @@
 package com.duckduckgo.autofill.impl.ui.credential.management
 
 import app.cash.turbine.test
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
@@ -41,6 +40,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.searching.Credentia
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.duckaddress.DuckAddressIdentifier
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.duckaddress.RealDuckAddressIdentifier
 import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository
+import com.duckduckgo.common.test.CoroutineTestRule
 import kotlin.reflect.KClass
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf

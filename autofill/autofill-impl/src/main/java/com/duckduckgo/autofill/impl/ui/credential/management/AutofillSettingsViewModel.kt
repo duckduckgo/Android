@@ -21,7 +21,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
@@ -62,6 +61,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.searching.Credentia
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.duckaddress.DuckAddressIdentifier
 import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository
 import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository.ActivationStatusResult
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
@@ -348,7 +348,7 @@ class AutofillSettingsViewModel @Inject constructor(
     fun onDeleteCredentials(loginCredentials: LoginCredentials) {
         val credentialsId = loginCredentials.id ?: return
 
-        viewModelScope.launch(dispatchers.default()) {
+        viewModelScope.launch(dispatchers.io()) {
             loginCredentials.domain?.let {
                 faviconManager.deletePersistedFavicon(it)
             }
@@ -360,7 +360,7 @@ class AutofillSettingsViewModel @Inject constructor(
     }
 
     fun saveOrUpdateCredentials(credentials: LoginCredentials) {
-        viewModelScope.launch(dispatchers.default()) {
+        viewModelScope.launch(dispatchers.io()) {
             val credentialMode = _viewState.value.credentialMode
 
             if (credentialMode is EditingExisting) {

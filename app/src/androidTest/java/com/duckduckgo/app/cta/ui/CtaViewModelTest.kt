@@ -21,8 +21,6 @@ import android.net.Uri
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetectorImpl
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.db.DismissedCtaDao
@@ -35,7 +33,7 @@ import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.pixels.AppPixelName.*
-import com.duckduckgo.app.privacy.db.UserAllowListDao
+import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -51,7 +49,9 @@ import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
-import com.duckduckgo.mobile.android.ui.store.AppTheme
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.test.InstantSchedulersRule
+import com.duckduckgo.common.ui.store.AppTheme
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -109,7 +109,7 @@ class CtaViewModelTest {
     private lateinit var mockOnboardingStore: OnboardingStore
 
     @Mock
-    private lateinit var mockUserAllowListDao: UserAllowListDao
+    private lateinit var mockUserAllowListRepository: UserAllowListRepository
 
     @Mock
     private lateinit var mockUserStageStore: UserStageStore
@@ -144,7 +144,7 @@ class CtaViewModelTest {
             .build()
 
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
-        whenever(mockUserAllowListDao.contains(any())).thenReturn(false)
+        whenever(mockUserAllowListRepository.isDomainInUserAllowList(any())).thenReturn(false)
         whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(db.dismissedCtaDao().dismissedCtas())
         whenever(mockTabRepository.flowTabs).thenReturn(db.tabsDao().flowTabs())
 
@@ -154,7 +154,7 @@ class CtaViewModelTest {
             surveyDao = mockSurveyDao,
             widgetCapabilities = mockWidgetCapabilities,
             dismissedCtaDao = mockDismissedCtaDao,
-            userAllowListDao = mockUserAllowListDao,
+            userAllowListRepository = mockUserAllowListRepository,
             settingsDataStore = mockSettingsDataStore,
             onboardingStore = mockOnboardingStore,
             userStageStore = mockUserStageStore,
@@ -339,7 +339,7 @@ class CtaViewModelTest {
     @Test
     fun whenRefreshCtaWhileBrowsingAndPrivacyOffForSiteThenReturnNull() = runTest {
         givenDaxOnboardingActive()
-        whenever(mockUserAllowListDao.contains(any())).thenReturn(true)
+        whenever(mockUserAllowListRepository.isDomainInUserAllowList(any())).thenReturn(true)
         val site = site(url = "http://www.facebook.com", entity = TestEntity("Facebook", "Facebook", 9.0))
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)

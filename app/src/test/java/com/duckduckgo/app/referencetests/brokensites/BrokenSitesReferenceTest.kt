@@ -17,8 +17,6 @@
 package com.duckduckgo.app.referencetests.brokensites
 
 import android.net.Uri
-import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel
 import com.duckduckgo.app.brokensite.api.BrokenSiteSubmitter
 import com.duckduckgo.app.brokensite.model.BrokenSite
@@ -31,6 +29,8 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyConfig

@@ -16,7 +16,7 @@
 
 package com.duckduckgo.feature.toggles.impl
 
-import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.feature.toggles.api.FeatureTogglesPlugin
 import org.junit.Assert.*
 import org.junit.Test

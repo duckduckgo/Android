@@ -215,18 +215,24 @@
     <string name="brokenSitesCategoriesTitle">Aprašykite, kas atsitiko</string>
     <string name="brokenSitesCategoriesHint">Aprašykite, kas atsitiko</string>
     <string name="brokenSiteSubmitButton">Siųsti ataskaitą</string>
-    <string name="brokenSiteDescription">Pateikdami anoniminę sugadintos svetainės ataskaitą, galime padėti išspręsti šias problemas ir patobulinti programėlę.</string>
+    <string name="brokenSiteDescription">Anoniminio pranešimo apie neveikiančią svetainę pateikimas padeda mums tobulinti programėlę.</string>
 
-    <string name="brokenSiteCategoryImages">Vaizdai neįkelti</string>
-    <string name="brokenSiteCategoryPaywall">Svetainė paprašė manęs išjungti</string>
-    <string name="brokenSiteCategoryComments">Komentarai nebuvo įkelti</string>
-    <string name="brokenSiteCategoryVideos">Vaizdo įrašas nebuvo paleistas</string>
-    <string name="brokenSiteCategoryLinks">Nuorodos ar mygtukai neveikia</string>
-    <string name="brokenSiteCategoryContent">Trūksta turinio</string>
-    <string name="brokenSiteCategoryLogin">Negaliu prisijungti</string>
-    <string name="brokenSiteCategoryUnsupported">Naršyklė nesuderinama</string>
+    <string name="brokenSiteCategoryBlocked">Svetainė užblokuota arba neįkelta</string>
+    <string name="brokenSiteCategoryLayout">Svetainės išdėstymas sugadintas</string>
+    <string name="brokenSiteCategoryEmptySpaces">Svetainėje yra didelių tuščių vietų</string>
+    <string name="brokenSiteCategoryShopping">Negalite sumokėti, atsiskaityti ar apsipirkti</string>
+    <string name="brokenSiteCategoryPaywall">Svetainė paprašė manęs išjungti reklamos blokavimo programą</string>
+    <string name="brokenSiteCategoryComments">Nepavyko įkelti komentarų, apžvalgų ar pokalbių</string>
+    <string name="brokenSiteCategoryVideos">Vaizdo įrašas nebuvo paleistas arba įkeltas</string>
+    <string name="brokenSiteCategoryLogin">Nepavyksta prisijungti / užsiregistruoti</string>
     <string name="brokenSiteCategoryOther">Kažkas kito</string>
     <string name="brokenSiteDescriptionTextInputHint">Pasidalinkite daugiau informacijos (neprivaloma)</string>
+    <string name="brokenSiteDescriptionCaption">Kas nutiko? Kas turėjo nutikti? Ar padėjo išjungus apsaugos priemones?</string>
+
+    <string name="brokenSiteProtectionsOn">Šios svetainės apsaugos priemonės yra <b>ĮJUNGTOS</b></string>
+    <string name="brokenSiteProtectionsOff">Šios svetainės apsaugos priemonės yra <b>IŠJUNGTOS</b></string>
+    <string name="brokenSiteProtectionsOnBannerMessage">Gali padėti apsaugos priemonių išjungimas.</string>
+    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Laikinai išjungėme privatumo apsaugą, nes atrodo, kad ji trikdo šios svetainės veikimą.</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Žymės</string>

@@ -22,22 +22,21 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.blockingObserve
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.model.SiteFactoryImpl
-import com.duckduckgo.app.privacy.db.UserAllowListDao
+import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.trackerdetection.EntityLookup
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.*
@@ -410,14 +409,20 @@ class TabDataRepositoryTest {
     private fun tabDataRepository(
         dao: TabsDao = mockDatabase(),
         entityLookup: EntityLookup = mock(),
-        allowListDao: UserAllowListDao = mock(),
+        allowListRepository: UserAllowListRepository = mock(),
         contentBlocking: ContentBlocking = mock(),
         webViewPreviewPersister: WebViewPreviewPersister = mock(),
         faviconManager: FaviconManager = mock(),
     ): TabDataRepository {
         return TabDataRepository(
             dao,
-            SiteFactoryImpl(entityLookup, allowListDao, contentBlocking, TestScope()),
+            SiteFactoryImpl(
+                entityLookup,
+                contentBlocking,
+                allowListRepository,
+                coroutinesTestRule.testScope,
+                coroutinesTestRule.testDispatcherProvider,
+            ),
             webViewPreviewPersister,
             faviconManager,
             coroutinesTestRule.testScope,

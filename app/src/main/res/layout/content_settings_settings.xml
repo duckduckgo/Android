@@ -21,59 +21,59 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+    <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
         android:id="@+id/settingsSettingsTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryText="@string/settingsHeadingSettings" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/autofillLoginsSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryText="@string/settingsAutofillLoginsSetting" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/syncSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryText="@string/settingsSyncSetting" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/homeScreenWidgetSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryText="@string/settingsAddHomeScreenWidget" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/fireButtonSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryText="@string/settingsFireButton" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/permissionsSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryText="@string/settingsPermissionsSetting" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/appearanceSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryText="@string/settingsHeadingAppearance" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/accessibilitySetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryText="@string/settingsAccessibility" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/aboutSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

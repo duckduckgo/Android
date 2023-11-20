@@ -19,8 +19,8 @@ package com.duckduckgo.autofill.impl.ui.credential.saving
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.autofill.api.store.AutofillStore
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
 import kotlinx.coroutines.launch

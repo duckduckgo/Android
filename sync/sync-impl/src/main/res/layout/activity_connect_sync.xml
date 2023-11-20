@@ -39,13 +39,13 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"/>
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/keyline_4"
         android:text="@string/sync_connect_scan_qr_hint"/>
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/readTextCode"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -53,7 +53,7 @@
         app:leadingIcon="@drawable/ic_keyboard_24"
         app:leadingIconBackground="circular"/>
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/showQRCode"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

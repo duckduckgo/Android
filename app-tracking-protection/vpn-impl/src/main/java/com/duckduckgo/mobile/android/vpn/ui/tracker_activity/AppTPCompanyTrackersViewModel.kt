@@ -19,8 +19,8 @@ package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.formatters.time.TimeDiffFormatter
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository.ProtectionState
@@ -66,7 +66,7 @@ class AppTPCompanyTrackersViewModel @Inject constructor(
             statsRepository
                 .getTrackersForAppFromDate(date, packageName)
                 .map { aggregateDataPerApp(it, packageName) }
-                .flowOn(dispatchers.default())
+                .flowOn(dispatchers.io())
                 .collectLatest { state ->
                     viewStateFlow.emit(state)
                 }
@@ -150,7 +150,7 @@ class AppTPCompanyTrackersViewModel @Inject constructor(
         checked: Boolean,
         packageName: String,
     ) {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatchers.io()) {
             withContext(dispatchers.io()) {
                 if (checked) {
                     deviceShieldPixels.didEnableAppProtectionFromDetail()
