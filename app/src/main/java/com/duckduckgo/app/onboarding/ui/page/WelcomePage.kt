@@ -70,7 +70,8 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome) 
     private var typingAnimation: ViewPropertyAnimatorCompat? = null
     private var welcomeAnimationFinished = false
 
-    private val events = MutableSharedFlow<WelcomePageView.Event>(replay = 1)
+    // we use replay = 0 because we don't want to emit the last value upon subscription
+    private val events = MutableSharedFlow<WelcomePageView.Event>(replay = 0, extraBufferCapacity = 1)
 
     private val welcomePageViewModel: WelcomePageViewModel by lazy {
         ViewModelProvider(this, viewModelFactory).get(WelcomePageViewModel::class.java)
