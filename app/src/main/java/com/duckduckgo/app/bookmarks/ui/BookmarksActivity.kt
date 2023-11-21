@@ -45,8 +45,8 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.view.DividerAdapter
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.SearchBar
+import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog.EventListener
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
-import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder.EventListener
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -54,11 +54,11 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
-import com.duckduckgo.savedsites.api.models.FolderBranch
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.api.service.ExportSavedSitesResult
 import com.duckduckgo.savedsites.api.service.ImportSavedSitesResult
+import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import java.text.SimpleDateFormat
 import java.util.*
@@ -195,7 +195,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
                 is BookmarksViewModel.Command.OpenBookmarkFolder -> openBookmarkFolder(it.bookmarkFolder)
                 is BookmarksViewModel.Command.ShowEditBookmarkFolder -> editBookmarkFolder(it.bookmarkFolder)
                 is BookmarksViewModel.Command.DeleteBookmarkFolder -> deleteBookmarkFolder(it.bookmarkFolder)
-                is BookmarksViewModel.Command.ConfirmDeleteBookmarkFolder -> confirmDeleteBookmarkFolder(it.bookmarkFolder, it.folderBranch)
+                is BookmarksViewModel.Command.ConfirmDeleteBookmarkFolder -> confirmDeleteBookmarkFolder(it.bookmarkFolder)
             }
         }
     }
@@ -354,14 +354,27 @@ class BookmarksActivity : DuckDuckGoActivity() {
             binding.root,
             message,
             Snackbar.LENGTH_LONG,
-        ).setAction(R.string.fireproofWebsiteSnackbarAction) {
-            viewModel.insert(savedSite)
-        }.show()
+        )
+            .setAction(R.string.fireproofWebsiteSnackbarAction) {
+                viewModel.undoDelete(savedSite)
+            }
+            .addCallback(
+                object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
+                    override fun onDismissed(
+                        transientBottomBar: Snackbar?,
+                        event: Int,
+                    ) {
+                        if (event != DISMISS_EVENT_ACTION) {
+                            viewModel.onDeleteSavedSiteSnackbarDismissed(savedSite)
+                        }
+                    }
+                },
+            )
+            .show()
     }
 
     private fun confirmDeleteBookmarkFolder(
         bookmarkFolder: BookmarkFolder,
-        folderBranch: FolderBranch,
     ) {
         val message = getString(R.string.bookmarkDeleteConfirmationMessage, bookmarkFolder.name).html(this)
         Snackbar.make(
@@ -369,8 +382,20 @@ class BookmarksActivity : DuckDuckGoActivity() {
             message,
             Snackbar.LENGTH_LONG,
         ).setAction(R.string.fireproofWebsiteSnackbarAction) {
-            viewModel.insertDeletedFolderBranch(folderBranch)
-        }.show()
+            viewModel.undoDelete(bookmarkFolder)
+        }
+            .addCallback(
+                object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
+                    override fun onDismissed(
+                        transientBottomBar: Snackbar?,
+                        event: Int,
+                    ) {
+                        if (event != DISMISS_EVENT_ACTION) {
+                            viewModel.onDeleteBookmarkFolderSnackbarDismissed(bookmarkFolder)
+                        }
+                    }
+                },
+            ).show()
     }
 
     private fun openBookmarkFolder(bookmarkFolder: BookmarkFolder) {
@@ -393,9 +418,9 @@ class BookmarksActivity : DuckDuckGoActivity() {
             .setPositiveButton(R.string.delete)
             .setNegativeButton(R.string.cancel)
             .addEventListener(
-                object : EventListener() {
+                object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
-                        viewModel.onBookmarkFolderDeleted(bookmarkFolder)
+                        viewModel.onDeleteFolderAccepted(bookmarkFolder)
                     }
                 },
             )

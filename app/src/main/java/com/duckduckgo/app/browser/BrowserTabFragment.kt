@@ -1960,7 +1960,7 @@ class BrowserTabFragment :
                 viewModel.onUserSubmittedQuery(it.favorite.url)
             },
             { viewModel.onEditSavedSiteRequested(it.favorite) },
-            { viewModel.onDeleteQuickAccessItemRequested(it.favorite) },
+            { viewModel.onDeleteSavedSiteRequested(it.favorite) },
         )
     }
 
@@ -2403,13 +2403,25 @@ class BrowserTabFragment :
             is Favorite -> getString(R.string.favoriteDeleteConfirmationMessage)
             is Bookmark -> getString(R.string.bookmarkDeleteConfirmationMessage, savedSite.title).html(requireContext())
         }
-        viewModel.deleteQuickAccessItem(savedSite)
         binding.rootView.makeSnackbarWithNoBottomInset(
             message,
             Snackbar.LENGTH_LONG,
         ).setAction(R.string.fireproofWebsiteSnackbarAction) {
-            viewModel.insertQuickAccessItem(savedSite)
-        }.show()
+            viewModel.undoDelete(savedSite)
+        }
+            .addCallback(
+                object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
+                    override fun onDismissed(
+                        transientBottomBar: Snackbar?,
+                        event: Int,
+                    ) {
+                        if (event != DISMISS_EVENT_ACTION) {
+                            viewModel.onDeleteSavedSiteSnackbarDismissed(savedSite)
+                        }
+                    }
+                },
+            )
+            .show()
     }
 
     private fun fireproofWebsiteConfirmation(entity: FireproofWebsiteEntity) {

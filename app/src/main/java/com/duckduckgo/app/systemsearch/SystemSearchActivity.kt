@@ -50,7 +50,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.*
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.common.ui.DuckDuckGoActivity
-import com.duckduckgo.common.ui.view.*
 import com.duckduckgo.common.ui.view.hideKeyboard
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -61,6 +60,7 @@ import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchLauncher
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.WIDGET
+import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 
@@ -178,6 +178,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
                     is SystemSearchViewModel.Suggestions.SystemSearchResultsViewState -> {
                         renderResultsViewState(it)
                     }
+
                     is SystemSearchViewModel.Suggestions.QuickAccessItems -> {
                         renderQuickAccessItems(it)
                     }
@@ -358,30 +359,39 @@ class SystemSearchActivity : DuckDuckGoActivity() {
                 omnibarTextInput.addTextChangedListener(textChangeWatcher)
                 updateVoiceSearchVisibility()
             }
+
             is LaunchDuckDuckGo -> {
                 launchDuckDuckGo()
             }
+
             is LaunchBrowser -> {
                 launchBrowser(command)
             }
+
             is LaunchDeviceApplication -> {
                 launchDeviceApp(command)
             }
+
             is ShowAppNotFoundMessage -> {
                 Toast.makeText(this, R.string.systemSearchAppNotFound, LENGTH_SHORT).show()
             }
+
             is DismissKeyboard -> {
                 omnibarTextInput.hideKeyboard()
             }
+
             is EditQuery -> {
                 editQuery(command.query)
             }
+
             is LaunchEditDialog -> {
                 showEditSavedSiteDialog(command.savedSite)
             }
+
             is DeleteSavedSiteConfirmation -> {
                 confirmDeleteSavedSite(command.savedSite)
             }
+
             is UpdateVoiceSearch -> {
                 updateVoiceSearchVisibility()
             }
@@ -400,8 +410,21 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             message,
             Snackbar.LENGTH_LONG,
         ).setAction(R.string.fireproofWebsiteSnackbarAction) {
-            viewModel.insertQuickAccessItem(savedSite)
-        }.show()
+            viewModel.undoDelete(savedSite)
+        }
+            .addCallback(
+                object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
+                    override fun onDismissed(
+                        transientBottomBar: Snackbar?,
+                        event: Int,
+                    ) {
+                        if (event != DISMISS_EVENT_ACTION) {
+                            viewModel.deleteSavedSiteSnackbarDismissed(savedSite)
+                        }
+                    }
+                },
+            )
+            .show()
     }
 
     private fun launchDuckDuckGo() {
