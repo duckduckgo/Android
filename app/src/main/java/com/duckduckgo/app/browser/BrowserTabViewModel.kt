@@ -2989,7 +2989,12 @@ class BrowserTabViewModel @Inject constructor(
         )
     }
 
-    private fun getDataForPermissionState(featureName: String, method: String, id: String, permissionState: SitePermissionQueryResponse): JsCallbackData {
+    private fun getDataForPermissionState(
+        featureName: String,
+        method: String,
+        id: String,
+        permissionState: SitePermissionQueryResponse,
+    ): JsCallbackData {
         val strPermissionState = when (permissionState) {
             SitePermissionQueryResponse.Granted -> "granted"
             SitePermissionQueryResponse.Prompt -> "prompt"
