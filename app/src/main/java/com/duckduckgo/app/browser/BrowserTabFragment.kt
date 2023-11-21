@@ -2112,7 +2112,7 @@ class BrowserTabFragment :
                     override fun process(featureName: String, method: String, id: String, data: JSONObject) {
                         when (method) {
                             "webShare" -> webShare(featureName, method, id, data)
-                            "permissionsQuery" -> permissionsQuery(featureName, method, id, data)
+                            "permissionsQuery" -> viewModel.onPermissionsQuery(featureName, method, id, data)
                             else -> {
                                 // NOOP
                             }
@@ -2127,10 +2127,6 @@ class BrowserTabFragment :
 
     private fun webShare(featureName: String, method: String, id: String, data: JSONObject) {
         webShareRequest.launch(JsCallbackData(data, featureName, method, id))
-    }
-
-    private fun permissionsQuery(featureName: String, method: String, id: String, data: JSONObject) {
-        viewModel.onPermissionsQuery(featureName, method, id, data)
     }
 
     private fun configureWebViewForAutofill(it: DuckDuckGoWebView) {
