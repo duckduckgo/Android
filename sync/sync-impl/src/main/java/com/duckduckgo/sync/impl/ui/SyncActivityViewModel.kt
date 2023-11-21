@@ -144,7 +144,7 @@ class SyncActivityViewModel @Inject constructor(
         data class AskTurnOffSync(val device: ConnectedDevice) : Command()
         object AskDeleteAccount : Command()
         object CheckIfUserHasStoragePermission : Command()
-        data class RecoveryCodePDFSuccess(val recoveryCodePDFFile: File) : Command()
+        data class RecoveryCodePDFSuccess(val recoveryCodePDFUri: Uri) : Command()
         object AskPDFLocation : Command()
         data class AskRemoveDevice(val device: ConnectedDevice) : Command()
         data class AskEditDevice(val device: ConnectedDevice) : Command()
@@ -233,9 +233,14 @@ class SyncActivityViewModel @Inject constructor(
         showAccountDetailsIfNeeded()
     }
 
-    fun onPdfLocationChosen(fileLocation: Uri) {
+    fun onPdfLocationChosen(viewContext: Context, fileLocation: Uri) {
         Timber.d("Sync: Pdf location chosen $fileLocation")
-
+        viewModelScope.launch(dispatchers.io()) {
+            val recoveryCodeB64 = syncAccountRepository.getRecoveryCode() ?: return@launch
+            val generateRecoveryCodePDF = recoveryCodePDF.storeRecoveryCodePDF(viewContext, recoveryCodeB64, fileLocation)
+            // should return a result (error, Uri)
+            command.send(RecoveryCodePDFSuccess(generateRecoveryCodePDF))
+        }
     }
 
     fun onDeleteAccountClicked() {

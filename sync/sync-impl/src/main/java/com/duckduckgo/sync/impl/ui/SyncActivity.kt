@@ -18,9 +18,7 @@ package com.duckduckgo.sync.impl.ui
 
 import android.app.Activity
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.provider.DocumentsContract
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -130,9 +128,8 @@ class SyncActivity : DuckDuckGoActivity() {
 
     private val savePDFLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            Timber.d("Sync: Pdf location chosen")
             result.data?.let {
-                viewModel.onPdfLocationChosen(it.data!!)
+                viewModel.onPdfLocationChosen(this@SyncActivity, it.data!!)
             }
         }
     }
@@ -231,7 +228,7 @@ class SyncActivity : DuckDuckGoActivity() {
             is AskTurnOffSync -> askTurnOffsync(it.device)
             is AskDeleteAccount -> askDeleteAccount()
             is RecoveryCodePDFSuccess -> {
-                shareAction.shareFile(this@SyncActivity, it.recoveryCodePDFFile)
+                shareAction.shareFileUri(this@SyncActivity, it.recoveryCodePDFUri)
             }
 
             is CheckIfUserHasStoragePermission -> {
@@ -243,11 +240,11 @@ class SyncActivity : DuckDuckGoActivity() {
             is AskRemoveDevice -> askRemoveDevice(it.device)
             is AskEditDevice -> askEditDevice(it.device)
             is ShowTextCode -> startActivity(ShowCodeActivity.intent(this))
-            is AskPDFLocation -> createFile()
+            is AskPDFLocation -> askForPdfLocation()
         }
     }
 
-    private fun createFile() {
+    private fun askForPdfLocation() {
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
             type = "application/pdf"

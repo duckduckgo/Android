@@ -30,7 +30,31 @@ import timber.log.Timber
 
 class ShareAction @Inject constructor(private val appBuildConfig: AppBuildConfig) {
 
+    fun shareFileUri(applicationContext: Context, uri: Uri): Boolean {
+        val intent = createShareUriIntent(applicationContext, uri)
+        return if (intent != null) startActivity(applicationContext, intent) else false
+    }
 
+    private fun createShareUriIntent(applicationContext: Context, uri: Uri): Intent? {
+        val intent =
+            Intent().apply {
+                setDataAndType(uri, applicationContext.contentResolver?.getType(uri))
+                action = Intent.ACTION_SEND
+                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+                putExtra(Intent.EXTRA_STREAM, uri)
+            }
+        return Intent.createChooser(
+            intent,
+            applicationContext.getString(R.string.sync_share_title),
+        )
+            .apply {
+                if (appBuildConfig.sdkInt >= Build.VERSION_CODES.Q) {
+                    // Show a thumbnail preview of the file to be shared on Android Q and above.
+                    clipData = ClipData.newRawUri(uri.toString(), uri)
+                }
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
+            }
+    }
 
     fun shareFile(applicationContext: Context, file: File): Boolean {
         val intent = createShareIntent(applicationContext, file)

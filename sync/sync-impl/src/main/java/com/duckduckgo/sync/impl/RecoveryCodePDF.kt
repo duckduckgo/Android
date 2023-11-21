@@ -19,6 +19,7 @@ package com.duckduckgo.sync.impl
 import android.content.Context
 import android.graphics.pdf.PdfDocument
 import android.graphics.pdf.PdfDocument.PageInfo.Builder
+import android.net.Uri
 import android.os.Environment
 import android.view.LayoutInflater
 import android.view.View
@@ -28,11 +29,22 @@ import com.duckduckgo.common.utils.checkMainThread
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.databinding.ViewRecoveryCodeBinding
 import com.squareup.anvil.annotations.ContributesBinding
+import timber.log.Timber
 import java.io.File
+import java.io.FileNotFoundException
 import java.io.FileOutputStream
+import java.io.IOException
 import javax.inject.*
 
 interface RecoveryCodePDF {
+
+    @WorkerThread
+    fun storeRecoveryCodePDF(
+        viewContext: Context,
+        recoveryCodeB64: String,
+        uri: Uri,
+    ): Uri
+
     @WorkerThread
     fun generateAndStoreRecoveryCodePDF(
         viewContext: Context,
@@ -44,6 +56,43 @@ interface RecoveryCodePDF {
 class RecoveryCodePDFImpl @Inject constructor(
     private val qrEncoder: QREncoder,
 ) : RecoveryCodePDF {
+    override fun storeRecoveryCodePDF(
+        viewContext: Context,
+        recoveryCodeB64: String,
+        uri: Uri
+    ): Uri {
+        checkMainThread()
+
+        val bitmapQR = qrEncoder.encodeAsBitmap(recoveryCodeB64, R.dimen.qrSizeLarge, R.dimen.qrSizeLarge)
+        val pdfDocument = PdfDocument()
+        val inflater = LayoutInflater.from(viewContext)
+        val page = pdfDocument.startPage(Builder(a4PageWidth.toPx(), a4PageHeight.toPx(), 1).create())
+        ViewRecoveryCodeBinding.inflate(inflater, null, false).apply {
+            this.qrCodeImageView.setImageBitmap(bitmapQR)
+            this.recoveryCodeText.text = recoveryCodeB64
+            val measureWidth: Int = View.MeasureSpec.makeMeasureSpec(page.canvas.width, View.MeasureSpec.EXACTLY)
+            val measuredHeight: Int = View.MeasureSpec.makeMeasureSpec(page.canvas.height, View.MeasureSpec.EXACTLY)
+            this.root.measure(measureWidth, measuredHeight)
+            this.root.layout(0, 0, page.canvas.width, page.canvas.height)
+            this.root.draw(page.canvas)
+        }
+        pdfDocument.finishPage(page)
+
+        try {
+            viewContext.contentResolver.openFileDescriptor(uri, "w")?.use { parcelFileDescriptor ->
+                FileOutputStream(parcelFileDescriptor.fileDescriptor).use { fileOutputStream ->
+                    pdfDocument.writeTo(fileOutputStream)
+                    pdfDocument.close()
+                }
+            }
+        } catch (e: FileNotFoundException) {
+            Timber.d("Sync: Pdf FileNotFoundException $e")
+        } catch (e: IOException) {
+            Timber.d("Sync: Pdf IOException $e")
+        }
+
+        return uri
+    }
 
     override fun generateAndStoreRecoveryCodePDF(
         viewContext: Context,
