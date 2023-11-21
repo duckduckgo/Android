@@ -90,7 +90,7 @@ class SyncActivityViewModel @Inject constructor(
             fetchRemoteDevices()
             Timber.d("Sync-Settings: Sync Settings screen opened, triggering sync")
             syncEngine.triggerSync(FEATURE_READ)
-        }
+        }.flowOn(dispatchers.io())
             .launchIn(viewModelScope)
     }
 
