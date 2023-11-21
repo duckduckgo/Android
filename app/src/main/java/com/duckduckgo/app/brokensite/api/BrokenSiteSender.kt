@@ -104,8 +104,11 @@ class BrokenSiteSubmitter @Inject constructor(
                 ERROR_CODES_KEY to brokenSite.errorCodes,
                 HTTP_ERROR_CODES_KEY to brokenSite.httpErrorCodes,
                 PROTECTIONS_STATE to protectionsState.toString(),
-                REPORT_FLOW to brokenSite.reportFlow.toStringValue(),
             )
+
+            brokenSite.reportFlow?.let { reportFlow ->
+                params[REPORT_FLOW] = reportFlow.toStringValue()
+            }
 
             val lastSentDay = brokenSiteLastSentReport.getLastSentDay(domain.orEmpty())
             if (lastSentDay != null) {

@@ -88,7 +88,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         val errorCodes = intent.getStringArrayExtra(ERROR_CODES).orEmpty()
         val httpErrorCodes = intent.getStringExtra(HTTP_ERROR_CODES).orEmpty()
         val isDesktopMode = intent.getBooleanExtra(IS_DESKTOP_MODE, false)
-        val reportFlow = intent.getSerializableExtra<ReportFlow>(REPORT_FLOW)!!
+        val reportFlow = intent.getSerializableExtra<ReportFlow>(REPORT_FLOW)
         viewModel.setInitialBrokenSite(
             url = url,
             blockedTrackers = blockedTrackers,
@@ -247,7 +247,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         private const val ERROR_CODES = "ERROR_CODES"
         private const val HTTP_ERROR_CODES = "HTTP_ERROR_CODES"
         private const val IS_DESKTOP_MODE = "IS_DESKTOP_MODE"
-        private const val REPORT_FLOW = "report_flow"
+        private const val REPORT_FLOW = "REPORT_FLOW"
 
         fun intent(
             context: Context,

@@ -106,7 +106,7 @@ class BrokenSiteViewModel @Inject constructor(
     private var errorCodes: Array<out String> = emptyArray()
     private var httpErrorCodes: String = ""
     private var isDesktopMode: Boolean = false
-    private lateinit var reportFlow: ReportFlow
+    private var reportFlow: ReportFlow? = null
 
     var shuffledCategories = mutableListOf<BrokenSiteCategory>()
 
@@ -127,7 +127,7 @@ class BrokenSiteViewModel @Inject constructor(
         errorCodes: Array<out String>,
         httpErrorCodes: String,
         isDesktopMode: Boolean,
-        reportFlow: ReportFlow,
+        reportFlow: ReportFlow?,
     ) {
         this.url = url
         this.blockedTrackers = blockedTrackers
@@ -259,7 +259,7 @@ class BrokenSiteViewModel @Inject constructor(
             errorCodes = jsonStringListAdapter.toJson(errorCodes.toList()).toString(),
             httpErrorCodes = httpErrorCodes,
             loginSite = loginSite,
-            reportFlow = reportFlow.mapToBrokenSiteModelReportFlow(),
+            reportFlow = reportFlow?.mapToBrokenSiteModelReportFlow(),
         )
     }
 

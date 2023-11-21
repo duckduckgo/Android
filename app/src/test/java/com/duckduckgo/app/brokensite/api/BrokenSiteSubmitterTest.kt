@@ -271,6 +271,20 @@ class BrokenSiteSubmitterTest {
         assertEquals("dashboard", params["reportFlow"])
     }
 
+    @Test
+    fun whenReportFlowIsNullThenDoNotIncludeParam() {
+        val brokenSite = getBrokenSite()
+            .copy(reportFlow = null)
+
+        testee.submitBrokenSiteFeedback(brokenSite)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any())
+        val params = paramsCaptor.firstValue
+
+        assertFalse("reportFlow" in params)
+    }
+
     private fun getBrokenSite(): BrokenSite {
         return BrokenSite(
             category = "category",
