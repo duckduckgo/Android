@@ -167,7 +167,7 @@ class ContentScopeScriptsJsMessagingTest {
 
     private val callback = object : JsMessageCallback() {
         var counter = 0
-        override fun process(featureName: String, method: String, id: String, data: JSONObject) {
+        override fun process(featureName: String, method: String, id: String?, data: JSONObject?) {
             counter++
         }
     }

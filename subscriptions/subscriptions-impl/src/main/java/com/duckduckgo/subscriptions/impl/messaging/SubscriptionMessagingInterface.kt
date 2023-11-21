@@ -56,9 +56,7 @@ class SubscriptionMessagingInterface @Inject constructor(
     private lateinit var jsMessageCallback: JsMessageCallback
 
     private val handlers = listOf(
-        BackToSettingsMessage(),
-        GetSubscriptionOptions(),
-        SubscriptionSelected(),
+        SubscriptionsHandler(),
         GetSubscriptionMessage(subscriptionsManager, dispatcherProvider),
         SetSubscriptionMessage(subscriptionsManager, appCoroutineScope, dispatcherProvider),
     )
@@ -72,15 +70,10 @@ class SubscriptionMessagingInterface @Inject constructor(
                 webView.url?.toUri()?.host
             }
             jsMessage?.let {
-                if (this.secret == secret && context == jsMessage.context && allowedDomains.contains(domain)) {
+                if (this.secret == secret && context == jsMessage.context && (allowedDomains.isEmpty() || allowedDomains.contains(domain))) {
                     handlers.firstOrNull {
-                        it.method == jsMessage.method && it.featureName == jsMessage.featureName
-                    }?.let {
-                        val response = it.process(jsMessage, secret, webView, jsMessageCallback)
-                        response?.let {
-                            jsMessageHelper.sendJsResponse(response, callbackName, secret, webView)
-                        }
-                    }
+                        it.methods.contains(jsMessage.method) && it.featureName == jsMessage.featureName
+                    }?.process(jsMessage, secret, webView, jsMessageCallback)
                 }
             }
         } catch (e: Exception) {
@@ -116,40 +109,14 @@ class SubscriptionMessagingInterface @Inject constructor(
     override val secret: String = "duckduckgo-android-messaging-secret"
     override val allowedDomains: List<String> = listOf("abrown.duckduckgo.com")
 
-    inner class SubscriptionSelected : JsMessageHandler {
-        override fun process(jsMessage: JsMessage, secret: String, webView: WebView, jsMessageCallback: JsMessageCallback): JsRequestResponse? {
-            if (jsMessage.featureName != featureName && jsMessage.method != method) return null
-            jsMessageCallback.process(featureName, method, "id", jsMessage.params)
-            return null
+    inner class SubscriptionsHandler : JsMessageHandler {
+        override fun process(jsMessage: JsMessage, secret: String, webView: WebView, jsMessageCallback: JsMessageCallback) {
+            jsMessageCallback.process(featureName, jsMessage.method, jsMessage.id, jsMessage.params)
         }
 
         override val allowedDomains: List<String> = emptyList()
         override val featureName: String = "useSubscription"
-        override val method: String = "subscriptionSelected"
-    }
-
-    inner class GetSubscriptionOptions : JsMessageHandler {
-        override fun process(jsMessage: JsMessage, secret: String, webView: WebView, jsMessageCallback: JsMessageCallback): JsRequestResponse? {
-            if (jsMessage.featureName != featureName && jsMessage.method != method) return null
-            jsMessageCallback.process(featureName, method, jsMessage.id!!, jsMessage.params)
-            return null
-        }
-
-        override val allowedDomains: List<String> = emptyList()
-        override val featureName: String = "useSubscription"
-        override val method: String = "getSubscriptionOptions"
-    }
-
-    inner class BackToSettingsMessage : JsMessageHandler {
-        override fun process(jsMessage: JsMessage, secret: String, webView: WebView, jsMessageCallback: JsMessageCallback): JsRequestResponse? {
-            if (jsMessage.featureName != featureName && jsMessage.method != method) return null
-            jsMessageCallback.process(featureName, method, jsMessage.id!!, jsMessage.params)
-            return null
-        }
-
-        override val allowedDomains: List<String> = emptyList()
-        override val featureName: String = "useSubscription"
-        override val method: String = "backToSettings"
+        override val methods: List<String> = listOf("subscriptionSelected", "getSubscriptionOptions", "backToSettings")
     }
 
     inner class GetSubscriptionMessage(
@@ -157,20 +124,19 @@ class SubscriptionMessagingInterface @Inject constructor(
         private val dispatcherProvider: DispatcherProvider,
     ) : JsMessageHandler {
 
-        override fun process(jsMessage: JsMessage, secret: String, webView: WebView, jsMessageCallback: JsMessageCallback): JsRequestResponse? {
-            if (jsMessage.featureName != featureName && jsMessage.method != method) return null
-            if (jsMessage.id == null) return null
+        override fun process(jsMessage: JsMessage, secret: String, webView: WebView, jsMessageCallback: JsMessageCallback) {
+            if (jsMessage.id == null) return
 
             val pat: AuthToken = runBlocking(dispatcherProvider.io()) {
                 subscriptionsManager.getAuthToken()
             }
 
-            return when (pat) {
+            val data = when (pat) {
                 is AuthToken.Success -> {
                     JsRequestResponse.Success(
                         context = jsMessage.context,
                         featureName = featureName,
-                        method = method,
+                        method = jsMessage.method,
                         id = jsMessage.id!!,
                         result = JSONObject("""{ "token":"${pat.authToken}"}"""),
                     )
@@ -180,17 +146,18 @@ class SubscriptionMessagingInterface @Inject constructor(
                     JsRequestResponse.Success(
                         context = jsMessage.context,
                         featureName = featureName,
-                        method = method,
+                        method = jsMessage.method,
                         id = jsMessage.id!!,
                         result = JSONObject("""{ }"""),
                     )
                 }
             }
+            jsMessageHelper.sendJsResponse(data, callbackName, secret, webView)
         }
 
         override val allowedDomains: List<String> = emptyList()
         override val featureName: String = "useSubscription"
-        override val method: String = "getSubscription"
+        override val methods: List<String> = listOf("getSubscription")
     }
 
     inner class SetSubscriptionMessage(
@@ -198,8 +165,7 @@ class SubscriptionMessagingInterface @Inject constructor(
         @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
         private val dispatcherProvider: DispatcherProvider,
     ) : JsMessageHandler {
-        override fun process(jsMessage: JsMessage, secret: String, webView: WebView, jsMessageCallback: JsMessageCallback): JsRequestResponse? {
-            if (jsMessage.featureName != featureName && jsMessage.method != method) return null
+        override fun process(jsMessage: JsMessage, secret: String, webView: WebView, jsMessageCallback: JsMessageCallback) {
             try {
                 val token = jsMessage.params.getString("token")
                 appCoroutineScope.launch(dispatcherProvider.io()) {
@@ -208,11 +174,10 @@ class SubscriptionMessagingInterface @Inject constructor(
             } catch (e: Exception) {
                 logcat { "Error parsing the token" }
             }
-            return null
         }
 
         override val allowedDomains: List<String> = emptyList()
         override val featureName: String = "useSubscription"
-        override val method: String = "setSubscription"
+        override val methods: List<String> = listOf("setSubscription")
     }
 }

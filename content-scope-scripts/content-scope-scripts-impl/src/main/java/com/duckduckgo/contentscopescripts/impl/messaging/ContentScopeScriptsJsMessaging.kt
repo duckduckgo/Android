@@ -73,7 +73,7 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
             jsMessage?.let {
                 if (this.secret == secret && context == jsMessage.context && (allowedDomains.isEmpty() || allowedDomains.contains(domain))) {
                     handlers.firstOrNull {
-                        it.method == jsMessage.method && it.featureName == jsMessage.featureName
+                        it.methods.contains(jsMessage.method) && it.featureName == jsMessage.featureName
                     }?.process(jsMessage, secret, webView, jsMessageCallback)
                 }
             }
@@ -105,16 +105,14 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
     }
 
     inner class WebShareHandler : JsMessageHandler {
-        override fun process(jsMessage: JsMessage, secret: String, webView: WebView, jsMessageCallback: JsMessageCallback): JsRequestResponse? {
-            if (jsMessage.featureName != featureName && jsMessage.method != method) return null
-            if (jsMessage.id == null) return null
-            jsMessageCallback.process(featureName, method, jsMessage.id!!, jsMessage.params)
-            return null
+        override fun process(jsMessage: JsMessage, secret: String, webView: WebView, jsMessageCallback: JsMessageCallback) {
+            if (jsMessage.id == null) return
+            jsMessageCallback.process(featureName, jsMessage.method, jsMessage.id, jsMessage.params)
         }
 
         override val allowedDomains: List<String> = emptyList()
         override val featureName: String = "webCompat"
-        override val method: String = "webShare"
+        override val methods: List<String> = listOf("webShare")
     }
 
     inner class PermissionsQueryMessage : JsMessageHandler {
