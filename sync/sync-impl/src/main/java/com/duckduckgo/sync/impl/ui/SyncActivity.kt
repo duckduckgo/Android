@@ -17,7 +17,10 @@
 package com.duckduckgo.sync.impl.ui
 
 import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.provider.DocumentsContract
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -45,6 +48,7 @@ import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code.CONNECT_CODE
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskDeleteAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskEditDevice
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskPDFLocation
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskRemoveDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
@@ -121,6 +125,15 @@ class SyncActivity : DuckDuckGoActivity() {
             viewModel.onDeviceConnected()
         } else {
             viewModel.onConnectionCancelled()
+        }
+    }
+
+    private val savePDFLauncher = registerForActivityResult(StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            Timber.d("Sync: Pdf location chosen")
+            result.data?.let {
+                viewModel.onPdfLocationChosen(it.data!!)
+            }
         }
     }
 
@@ -230,7 +243,17 @@ class SyncActivity : DuckDuckGoActivity() {
             is AskRemoveDevice -> askRemoveDevice(it.device)
             is AskEditDevice -> askEditDevice(it.device)
             is ShowTextCode -> startActivity(ShowCodeActivity.intent(this))
+            is AskPDFLocation -> createFile()
         }
+    }
+
+    private fun createFile() {
+        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "application/pdf"
+            putExtra(Intent.EXTRA_TITLE, "invoice.pdf")
+        }
+        savePDFLauncher.launch(intent)
     }
 
     private fun askEditDevice(device: ConnectedDevice) {

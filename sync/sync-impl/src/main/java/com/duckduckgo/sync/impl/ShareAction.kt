@@ -30,6 +30,8 @@ import timber.log.Timber
 
 class ShareAction @Inject constructor(private val appBuildConfig: AppBuildConfig) {
 
+
+
     fun shareFile(applicationContext: Context, file: File): Boolean {
         val intent = createShareIntent(applicationContext, file)
         return if (intent != null) startActivity(applicationContext, intent) else false
