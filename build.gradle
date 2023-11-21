@@ -7,14 +7,17 @@ buildscript {
         spotless = '6.1.2'
         anvil_version = '2.4.8'
         ksp_version = '1.9.20-1.0.14'
-        gradle_plugin = '8.1.2' // When updating, also update lint_version
-        lint_version = '31.1.2' // This value must always be gradle_plugin + 23
+        gradle_plugin = '8.1.2'
         min_sdk = 23
         target_sdk = 33
         compile_sdk = 34
         fladle_version = '0.17.4'
         kotlinter_version = '3.12.0'
         dokka_version = '1.8.20'
+
+        // Calculate lint_version (must always be gradle_plugin + 23)
+        def components = gradle_plugin.split('\\.')
+        lint_version = gradle_plugin.replaceFirst(components[0], (components[0].toInteger() + 23).toString())
     }
 
     repositories {
