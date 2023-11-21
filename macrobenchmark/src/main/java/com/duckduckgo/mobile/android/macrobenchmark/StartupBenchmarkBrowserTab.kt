@@ -43,38 +43,14 @@ class StartupBenchmarkBrowserTab {
     val benchmarkRule = MacrobenchmarkRule()
 
     //region AMP tests
-    @Test
-    fun loadGoogleVoxAmpSite() {
-        loadSite("https://www.google.com/amp/s/www.vox.com/platform/amp/identities/22530103/asians-americans-wealth-income-gap-crazy-rich-model-minority")
-    }
 
     @Test
-    fun loadGoogleNyTimesAmpSite() {
-        loadSite("https://www.google.com/amp/s/www.nytimes.com/2021/09/20/business/jeff-bezos-earth-fund.amp.html")
-    }
-
-    @Test
-    fun loadGoogleAmpSite() {
-        loadSite("https://www.google.fr/amp/s/www.brookings.edu/research/reforming-global-fossil-fuel-subsidies-how-the-united-states-can-restart-international-cooperation/?amp")
-    }
-
-    @Test
-    fun loadAmpProjectSite() {
+    fun loadWPXIAmpSite() {
         loadSite("https://www-wpxi-com.cdn.ampproject.org/v/s/www.wpxi.com/news/top-stories/pihl-bans-armstrong-student-section-hockey-games-after-vulgar-chants-directed-female-goalie/G2RP5FZA3ZDYRLFSWGDGQH2MY4/?amp_js_v=a6&_gsa=1&outputType=amp&usqp=mq331AQKKAFQArABIIACAw%3D%3D&referrer=https%3A%2F%2Fwww.google.com&_tf=From%20%251%24s&ampshare=https%3A%2F%2Fwww.wpxi.com%2Fnews%2Ftop-stories%2Fpihl-bans-armstrong-student-section-hockey-games-after-vulgar-chants-directed-female-goalie%2FG2RP5FZA3ZDYRLFSWGDGQH2MY4%2F")
     }
 
     @Test
-    fun loadDotAmpSite() {
-        loadSite("https://www.bbc.com/news/world-asia-china-19432800.amp")
-    }
-
-    @Test
-    fun loadAmpDotSite() {
-        loadSite("https://amp.theguardian.com/environment/2021/nov/05/british-firm-to-unveil-technology-for-zero-carbon-emission-flights-at-cop26/world-asia-china-19432800.amp")
-    }
-
-    @Test
-    fun loadQuestionMarkAmpSite() {
+    fun loadTheIndependentAmpSite() {
         loadSite("https://www.independent.co.uk/news/world/americas/us-politics/fauci-dog-tests-congress-letter-b1944407.html?amp")
     }
     
@@ -124,7 +100,7 @@ class StartupBenchmarkBrowserTab {
 
     @Test
     fun loadBBC() {
-        loadSite("https://www.bbc.com/")
+        loadSite("https://www.bbc.com/worklife/article/20231115-after-weworks-bankruptcy-what-is-the-future-of-coworking/")
     }
 
     @Test
@@ -134,12 +110,12 @@ class StartupBenchmarkBrowserTab {
 
     @Test
     fun loadESPN() {
-        loadSite("https://www.espn.com/")
+        loadSite("https://www.espn.com/f1/story/_/id/38940255/how-f1-rode-luck-win-big-las-vegas/")
     }
 
     @Test
     fun loadReddit() {
-        loadSite("https://www.reddit.com/")
+        loadSite("https://www.reddit.com/r/pcmasterrace/comments/180955q/which_one_actually_better_in_terms_both_comfort//")
     }
 
     @Test
