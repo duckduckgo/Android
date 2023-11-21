@@ -36,7 +36,6 @@ dependencies {
     implementation project(':browser-api')
     implementation project(':statistics')
 
-    implementation Kotlin.stdlib.jdk7
     implementation JakeWharton.timber
     implementation Square.retrofit2.converter.moshi
 

@@ -29,7 +29,6 @@ android {
 dependencies {
     implementation project(path: ':common-utils')
     implementation project(path: ':fingerprint-protection-api')
-    implementation Kotlin.stdlib.jdk7
     implementation AndroidX.core.ktx
 
     implementation KotlinX.coroutines.core

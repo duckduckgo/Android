@@ -24,7 +24,6 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
 
-    implementation Kotlin.stdlib.jdk7
     implementation KotlinX.coroutines.core
     implementation KotlinX.coroutines.android
     implementation AndroidX.room.runtime

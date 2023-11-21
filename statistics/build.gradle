@@ -33,7 +33,6 @@ dependencies {
     implementation project(path: ':browser-api')
     implementation project(path: ':autofill-api')
 
-    implementation Kotlin.stdlib.jdk7
     implementation KotlinX.coroutines.core
     implementation KotlinX.coroutines.android
 

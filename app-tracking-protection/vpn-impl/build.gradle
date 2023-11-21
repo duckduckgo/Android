@@ -61,8 +61,6 @@ dependencies {
     implementation project(':library-loader-api')
     implementation project(':network-protection-api')
 
-    implementation Kotlin.stdlib.jdk7
-
     implementation AndroidX.core.ktx
 
     implementation AndroidX.appCompat
