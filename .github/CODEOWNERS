@@ -2,3 +2,4 @@
 # Any changes to the source files of this module require approval from @malmstein or @nalcalag.
 /common/common-ui/ @malmstein @nalcalag
 /saved-sites/ @malmstein
+/example-feature/ @cdrussell
