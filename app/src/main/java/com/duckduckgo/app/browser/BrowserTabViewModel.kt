@@ -672,10 +672,10 @@ class BrowserTabViewModel @Inject constructor(
         observeAccessibilitySettings()
 
         savedSitesRepository.getFavorites()
-            .flowOn(dispatchers.io())
             .combine(hiddenIds) { favorites, hiddenIds ->
                 favorites.filter { it.id !in hiddenIds.favorites }
             }
+            .flowOn(dispatchers.io())
             .onEach { filteredFavourites ->
                 withContext(dispatchers.main()) {
                     val favorites = filteredFavourites.map { FavoritesQuickAccessAdapter.QuickAccessFavorite(it) }
@@ -685,7 +685,6 @@ class BrowserTabViewModel @Inject constructor(
                     browserViewState.value = currentBrowserViewState().copy(favorite = favorite)
                 }
             }
-            .flowOn(dispatchers.main())
             .launchIn(viewModelScope)
 
         savedSitesRepository.getBookmarks()
@@ -2802,7 +2801,6 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun hide(savedSite: SavedSite) {
-        Timber.d("FLOW: hide $savedSite")
         viewModelScope.launch(dispatchers.io()) {
             when (savedSite) {
                 is Bookmark -> {
@@ -2818,7 +2816,6 @@ class BrowserTabViewModel @Inject constructor(
                     hiddenIds.emit(hiddenIds.value.copy(favorites = hiddenIds.value.favorites + savedSite.id))
                 }
             }
-            Timber.d("FLOW: hide ${hiddenIds.value}")
             withContext(dispatchers.main()) {
                 command.value = DeleteSavedSiteConfirmation(savedSite)
             }
@@ -2826,7 +2823,6 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun undoDelete(savedSite: SavedSite) {
-        Timber.d("FLOW: undoDelete $savedSite")
         viewModelScope.launch(dispatchers.io()) {
             hiddenIds.emit(
                 hiddenIds.value.copy(
@@ -2834,7 +2830,6 @@ class BrowserTabViewModel @Inject constructor(
                     bookmarks = hiddenIds.value.bookmarks - savedSite.id,
                 ),
             )
-            Timber.d("FLOW: hide ${hiddenIds.value}")
         }
     }
 

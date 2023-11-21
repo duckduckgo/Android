@@ -50,7 +50,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.*
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.common.ui.DuckDuckGoActivity
-import com.duckduckgo.common.ui.view.*
 import com.duckduckgo.common.ui.view.hideKeyboard
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -64,7 +63,6 @@ import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.WIDGET
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
-import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
 class SystemSearchActivity : DuckDuckGoActivity() {
@@ -420,11 +418,8 @@ class SystemSearchActivity : DuckDuckGoActivity() {
                         transientBottomBar: Snackbar?,
                         event: Int,
                     ) {
-                        // when snackbar is not dismissed because of an action we want to
-                        // actually delete the saved site
-                        Timber.d("Bookmark: dismissed with $event")
                         if (event != DISMISS_EVENT_ACTION) {
-                            viewModel.deleteQuickAccessItem(savedSite)
+                            viewModel.deleteSavedSiteSnackbarDismissed(savedSite)
                         }
                     }
                 },

@@ -23,9 +23,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment
-import com.duckduckgo.app.browser.BrowserTabViewModel.Command.DeleteSavedSiteConfirmation
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
-import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
@@ -34,7 +32,6 @@ import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.UpdateVoiceSearch
-import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Suggestions.QuickAccessItems
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
@@ -124,10 +121,10 @@ class SystemSearchViewModel @Inject constructor(
         refreshAppList()
 
         savedSitesRepository.getFavorites()
-            .flowOn(dispatchers.io())
             .combine(hiddenIds) { favorites, hiddenIds ->
                 favorites.filter { it.id !in hiddenIds.favorites }
             }
+            .flowOn(dispatchers.io())
             .onEach { filteredFavourites ->
                 withContext(dispatchers.main()) {
                     latestQuickAccessItems =
@@ -135,7 +132,6 @@ class SystemSearchViewModel @Inject constructor(
                     resultsViewState.postValue(latestQuickAccessItems)
                 }
             }
-            .flowOn(dispatchers.main())
             .launchIn(viewModelScope)
     }
 
@@ -349,7 +345,7 @@ class SystemSearchViewModel @Inject constructor(
         }
     }
 
-    fun deleteQuickAccessItem(savedSite: SavedSite) {
+    fun deleteSavedSiteSnackbarDismissed(savedSite: SavedSite) {
         when (savedSite) {
             is SavedSite.Favorite -> {
                 viewModelScope.launch(dispatchers.io() + NonCancellable) {

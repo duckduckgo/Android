@@ -377,13 +377,15 @@ class SystemSearchViewModelTest {
         assertFalse(viewState.favorites.isEmpty())
 
         testee.undoDelete(savedSite)
+
+        assertFalse(viewState.favorites.isEmpty())
     }
 
     @Test
     fun whenQuickAccessDeletedThenRepositoryDeletesSavedSite() = runTest {
         val savedSite = Favorite("favorite1", "title", "http://example.com", "timestamp", 0)
 
-        testee.deleteQuickAccessItem(savedSite)
+        testee.deleteSavedSiteSnackbarDismissed(savedSite)
 
         verify(mocksavedSitesRepository).delete(savedSite)
     }
