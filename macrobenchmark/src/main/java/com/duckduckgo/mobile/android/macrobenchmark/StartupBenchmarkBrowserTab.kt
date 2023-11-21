@@ -98,7 +98,7 @@ class StartupBenchmarkBrowserTab {
     }
 
     @Test
-    fun startAndLoadNYTimes() {
+    fun loadNYTimes() {
         loadSite("https://www.nytimes.com/")
     }
     
