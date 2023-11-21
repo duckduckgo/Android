@@ -25,6 +25,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -41,17 +42,9 @@ class AtbInitializerTest {
 
     @Test
     fun whenReferrerInformationInstantlyAvailableThenAtbInitialized() = runTest {
-        whenever(statisticsDataStore.hasInstallationStatistics).thenReturn(false)
-        appReferrerStateListener = StubAppReferrerFoundStateListener(referrer = "xx")
-        testee = AtbInitializer(
-            coroutineRule.testScope,
-            statisticsDataStore,
-            statisticsUpdater,
-            setOf(appReferrerStateListener),
-            coroutineRule.testDispatcherProvider,
-        )
+        configureNeverInitialized()
 
-        testee.initialize()
+        testee.onPrivacyConfigDownloaded()
 
         verify(statisticsUpdater).initializeAtb()
     }
@@ -68,13 +61,13 @@ class AtbInitializerTest {
             coroutineRule.testDispatcherProvider,
         )
 
-        testee.initialize()
+        testee.onPrivacyConfigDownloaded()
 
         verify(statisticsUpdater).initializeAtb()
     }
 
     @Test
-    fun whenReferrerInformationTimesOutThenAtbInitialized() = runTest {
+    fun whenReferrerInformationTimesOutThenRefreshAtbNotCalled() = runTest {
         whenever(statisticsDataStore.hasInstallationStatistics).thenReturn(false)
         appReferrerStateListener = StubAppReferrerFoundStateListener(referrer = "xx", mockDelayMs = Long.MAX_VALUE)
         testee = AtbInitializer(
@@ -87,12 +80,39 @@ class AtbInitializerTest {
 
         testee.initialize()
 
-        verify(statisticsUpdater).initializeAtb()
+        verify(statisticsUpdater, never()).initializeAtb()
     }
 
     @Test
     fun whenAlreadyInitializedThenRefreshCalled() = runTest {
         configureAlreadyInitialized()
+
+        testee.initialize()
+
+        verify(statisticsUpdater).refreshAppRetentionAtb()
+    }
+
+    @Test
+    fun givenHasInstallationStatisticsWhenOnPrivacyConfigDownloadedThenAtbInitializedNeverCalled() = runTest {
+        configureAlreadyInitialized()
+
+        testee.onPrivacyConfigDownloaded()
+
+        verify(statisticsUpdater, never()).initializeAtb()
+    }
+
+    @Test
+    fun givenNeverInstallationStatisticsWhenOnPrivacyConfigDownloadedThenAtbInitialized() = runTest {
+        configureNeverInitialized()
+
+        testee.onPrivacyConfigDownloaded()
+
+        verify(statisticsUpdater).initializeAtb()
+    }
+
+    private fun configureNeverInitialized() {
+        whenever(statisticsDataStore.hasInstallationStatistics).thenReturn(false)
+        appReferrerStateListener = StubAppReferrerFoundStateListener(referrer = "xx")
         testee = AtbInitializer(
             coroutineRule.testScope,
             statisticsDataStore,
@@ -100,13 +120,17 @@ class AtbInitializerTest {
             setOf(appReferrerStateListener),
             coroutineRule.testDispatcherProvider,
         )
-
-        testee.initialize()
-        verify(statisticsUpdater).refreshAppRetentionAtb()
     }
 
     private fun configureAlreadyInitialized() {
         whenever(statisticsDataStore.hasInstallationStatistics).thenReturn(true)
         appReferrerStateListener = StubAppReferrerFoundStateListener(referrer = "xx")
+        testee = AtbInitializer(
+            coroutineRule.testScope,
+            statisticsDataStore,
+            statisticsUpdater,
+            setOf(appReferrerStateListener),
+            coroutineRule.testDispatcherProvider,
+        )
     }
 }

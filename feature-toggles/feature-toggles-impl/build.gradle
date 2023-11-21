@@ -40,6 +40,7 @@ dependencies {
 
     // Testing dependencies
     testImplementation project(':feature-toggles-test')
+    testImplementation project(':experiments-api')
     testImplementation project(':common-test')
     testImplementation project(':app-build-config-api')
     testImplementation project(':privacy-config-api')

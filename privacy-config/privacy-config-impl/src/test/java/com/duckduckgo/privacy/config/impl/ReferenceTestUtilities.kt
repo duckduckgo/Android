@@ -20,6 +20,7 @@ import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
+import com.duckduckgo.privacy.config.impl.RealPrivacyConfigPersisterTest.FakePrivacyVariantManagerPlugin
 import com.duckduckgo.privacy.config.impl.features.contentblocking.ContentBlockingPlugin
 import com.duckduckgo.privacy.config.impl.features.drm.DrmPlugin
 import com.duckduckgo.privacy.config.impl.features.gpc.GpcPlugin
@@ -52,7 +53,7 @@ import org.mockito.kotlin.mock
 @ExperimentalCoroutinesApi
 class ReferenceTestUtilities(
     db: PrivacyConfigDatabase,
-    val dispatcherProvider: DispatcherProvider,
+    dispatcherProvider: DispatcherProvider,
 ) {
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
 
@@ -86,6 +87,10 @@ class ReferenceTestUtilities(
 
     fun getPrivacyFeaturePluginPoint(): PluginPoint<PrivacyFeaturePlugin> {
         return FakePrivacyFeaturePluginPoint(getPrivacyFeaturePlugins())
+    }
+
+    fun getVariantManagerPlugin(): PrivacyFeaturePlugin {
+        return FakePrivacyVariantManagerPlugin()
     }
 
     internal class FakePrivacyFeaturePluginPoint(private val plugins: Collection<PrivacyFeaturePlugin>) :

@@ -139,8 +139,12 @@ subprojects {
                                 && dependencyPath != ":feature-toggles-api"
                                 && dependencyPath != ":navigation-api"
                         ) {
-                            throw new GradleException("Invalid dependency $projectPath -> $dependencyPath. " +
-                                    "'api' modules can't depend on other 'api' modules")
+                            if (projectPath.endsWith(":feature-toggles-api") && dependencyPath == ":experiments-api") {
+                                // noop
+                            } else {
+                                throw new GradleException("Invalid dependency $projectPath -> $dependencyPath. " +
+                                        "'api' modules can't depend on other 'api' modules")
+                            }
                         }
                         if (dependencyPath.endsWith(":app")) {
                             throw new GradleException("Invalid dependency $projectPath -> $dependencyPath. " +

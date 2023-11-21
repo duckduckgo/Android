@@ -39,8 +39,10 @@ class FeatureTogglesTest {
         toggleStore = FakeToggleStore()
         feature = FeatureToggles.Builder()
             .store(toggleStore)
+            .appVariantProvider { provider.variantKey }
             .appVersionProvider { provider.version }
             .flavorNameProvider { provider.flavorName }
+            .forceDefaultVariantProvider { provider.variantKey = "" }
             .featureName("test")
             .build()
             .create(TestFeature::class.java)
@@ -126,6 +128,20 @@ class FeatureTogglesTest {
         assertFalse(feature.internal().isEnabled())
         provider.flavorName = BuildFlavor.INTERNAL.name
         assertTrue(feature.internal().isEnabled())
+    }
+
+    @Test
+    fun testForcesDefaultVariantIfNull() {
+        assertNull(provider.variantKey)
+        assertFalse(feature.forcesDefaultVariant().isEnabled())
+        assertEquals("", provider.variantKey)
+    }
+
+    @Test
+    fun testSkipForcesDefaultVariantWhenNotNull() {
+        provider.variantKey = "ma"
+        assertFalse(feature.forcesDefaultVariant().isEnabled())
+        assertEquals("ma", provider.variantKey)
     }
 
     @Test(expected = java.lang.IllegalArgumentException::class)
@@ -342,6 +358,83 @@ class FeatureTogglesTest {
         toggleStore.set("test_enabledByDefault", state.copy(enable = false))
         assertFalse(feature.enabledByDefault().isEnabled())
     }
+
+    @Test
+    fun whenNoMatchingVariantThenFeatureIsDisabled() {
+        val state = Toggle.State(
+            remoteEnableState = null,
+            enable = true,
+            targets = listOf(Toggle.State.Target("ma")),
+        )
+
+        // Use directly the store because setEnabled() populates the local state when the remote state is null
+        toggleStore.set("test_disableByDefault", state)
+        assertFalse(feature.disableByDefault().isEnabled())
+
+        // Use directly the store because setEnabled() populates the local state when the remote state is null
+        toggleStore.set("test_enabledByDefault", state.copy(enable = false))
+        assertFalse(feature.enabledByDefault().isEnabled())
+    }
+
+    @Test
+    fun whenMatchingVariantThenReturnFeatureState() {
+        provider.variantKey = "ma"
+        val state = Toggle.State(
+            remoteEnableState = null,
+            enable = true,
+            targets = listOf(Toggle.State.Target(provider.variantKey!!)),
+        )
+
+        // Use directly the store because setEnabled() populates the local state when the remote state is null
+        toggleStore.set("test_disableByDefault", state)
+        assertTrue(feature.disableByDefault().isEnabled())
+
+        // Use directly the store because setEnabled() populates the local state when the remote state is null
+        toggleStore.set("test_enabledByDefault", state.copy(enable = false))
+        assertFalse(feature.enabledByDefault().isEnabled())
+    }
+
+    @Test
+    fun whenMultipleNotMatchingVariantThenReturnFeatureState() {
+        provider.variantKey = "zz"
+        val state = Toggle.State(
+            remoteEnableState = null,
+            enable = true,
+            targets = listOf(
+                Toggle.State.Target("ma"),
+                Toggle.State.Target("mb"),
+            ),
+        )
+
+        // Use directly the store because setEnabled() populates the local state when the remote state is null
+        toggleStore.set("test_disableByDefault", state)
+        assertFalse(feature.disableByDefault().isEnabled())
+
+        // Use directly the store because setEnabled() populates the local state when the remote state is null
+        toggleStore.set("test_enabledByDefault", state.copy(enable = false))
+        assertFalse(feature.enabledByDefault().isEnabled())
+    }
+
+    @Test
+    fun whenAnyMatchingVariantThenReturnFeatureState() {
+        provider.variantKey = "zz"
+        val state = Toggle.State(
+            remoteEnableState = null,
+            enable = true,
+            targets = listOf(
+                Toggle.State.Target("ma"),
+                Toggle.State.Target("zz"),
+            ),
+        )
+
+        // Use directly the store because setEnabled() populates the local state when the remote state is null
+        toggleStore.set("test_disableByDefault", state)
+        assertTrue(feature.disableByDefault().isEnabled())
+
+        // Use directly the store because setEnabled() populates the local state when the remote state is null
+        toggleStore.set("test_enabledByDefault", state.copy(enable = false))
+        assertFalse(feature.enabledByDefault().isEnabled())
+    }
 }
 
 interface TestFeature {
@@ -367,9 +460,14 @@ interface TestFeature {
     @Toggle.DefaultValue(false)
     @Toggle.InternalAlwaysEnabled
     fun internal(): Toggle
+
+    @Toggle.DefaultValue(false)
+    @Toggle.ForcesDefaultVariantIfNull
+    fun forcesDefaultVariant(): Toggle
 }
 
 private class FakeProvider {
     var version = Int.MAX_VALUE
     var flavorName = ""
+    var variantKey: String? = null
 }

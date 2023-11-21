@@ -106,6 +106,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                     .build(),
                             )
                             .addParameter("appBuildConfig", appBuildConfig.asClassName(module))
+                            .addParameter("variantManager", variantManager.asClassName(module))
                             .addCode(
                                 """
                             return %T.Builder()
@@ -113,6 +114,9 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                 .appVersionProvider({ appBuildConfig.versionCode })
                                 .flavorNameProvider({ appBuildConfig.flavor.name })
                                 .featureName(%S)
+                                .appVariantProvider({ appBuildConfig.variantName })
+                                // save empty variants will force the default variant to be set
+                                .forceDefaultVariantProvider({ variantManager.saveVariants(emptyList()) })
                                 .build()
                                 .create(%T::class.java)
                                 """.trimIndent(),
@@ -256,6 +260,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                             )
                             .addParameter("feature", dagger.Lazy::class.asClassName().parameterizedBy(boundType.asClassName()))
                             .addParameter("appBuildConfig", appBuildConfig.asClassName(module))
+                            .addParameter("variantManager", variantManager.asClassName(module))
                             .addParameter("context", context.asClassName(module))
                             .build(),
                     )
@@ -290,6 +295,11 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                             .build(),
                     )
                     .addProperty(
+                        PropertySpec.builder("variantManager", variantManager.asClassName(module), KModifier.PRIVATE)
+                            .initializer("variantManager")
+                            .build(),
+                    )
+                    .addProperty(
                         PropertySpec.builder("context", context.asClassName(module), KModifier.PRIVATE)
                             .initializer("context")
                             .build(),
@@ -309,6 +319,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                     .addFunction(createInvokeMethod(boundType))
                     .addType(createJsonRolloutDataClass(generatedPackage, module))
                     .addType(createJsonRolloutStepDataClass(generatedPackage, module))
+                    .addType(createJsonToggleTargetDataClass(generatedPackage, module))
                     .addType(createJsonToggleDataClass(generatedPackage, module))
                     .addType(createJsonFeatureDataClass(generatedPackage, module))
                     .addType(createJsonExceptionDataClass(generatedPackage, module))
@@ -416,6 +427,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                             remoteEnableState = isEnabled,
                             enable = isEnabled,
                             minSupportedVersion = feature.minSupportedVersion,
+                            targets = emptyList(),
                         )
                     )
         
@@ -432,6 +444,11 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                 
                                 val previousRolloutStep = previousState?.rolloutStep 
                                 val newStateValue = (jsonToggle.state == "enabled" || (appBuildConfig.flavor == %T && jsonToggle.state == "internal"))
+                                val targets = jsonToggle?.targets?.map { target ->
+                                    Toggle.State.Target(
+                                        variantKey = target.variantKey,
+                                    )
+                                } ?: emptyList()
                                 this.feature.get().invokeMethod(subfeature.key).setEnabled(
                                     Toggle.State(
                                         remoteEnableState = newStateValue,
@@ -439,6 +456,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                         minSupportedVersion = jsonToggle.minSupportedVersion?.toInt(),
                                         rollout = jsonToggle?.rollout?.steps?.map { it.percent },
                                         rolloutStep = previousRolloutStep,
+                                        targets = targets,
                                     ),
                                 )
                             } catch(e: Throwable) {
@@ -613,6 +631,22 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
             .build()
     }
 
+    private fun createJsonToggleTargetDataClass(
+        generatedPackage: String,
+        module: ModuleDescriptor,
+    ): TypeSpec {
+        return TypeSpec.classBuilder(FqName("$generatedPackage.JsonToggleTarget").asClassName(module))
+            .addModifiers(KModifier.PRIVATE)
+            .addModifiers(KModifier.DATA)
+            .primaryConstructor(
+                FunSpec.constructorBuilder()
+                    .addParameter("variantKey", String::class.asClassName())
+                    .build(),
+            )
+            .addProperty(PropertySpec.builder("variantKey", String::class.asClassName()).initializer("variantKey").build())
+            .build()
+    }
+
     private fun createJsonToggleDataClass(
         generatedPackage: String,
         module: ModuleDescriptor,
@@ -634,6 +668,10 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                         "rollout",
                         FqName("JsonToggleRollout").asClassName(module).copy(nullable = true),
                     )
+                    .addParameter(
+                        "targets",
+                        List::class.asClassName().parameterizedBy(FqName("JsonToggleTarget").asClassName(module)),
+                    )
                     .build(),
             )
             .addProperty(
@@ -652,6 +690,12 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                 PropertySpec
                     .builder("rollout", FqName("JsonToggleRollout").asClassName(module).copy(nullable = true))
                     .initializer("rollout")
+                    .build(),
+            )
+            .addProperty(
+                PropertySpec
+                    .builder("targets", List::class.asClassName().parameterizedBy(FqName("JsonToggleTarget").asClassName(module)))
+                    .initializer("targets")
                     .build(),
             )
             .build()
@@ -944,6 +988,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
         private val context = FqName("android.content.Context")
         private val privacyFeaturePlugin = FqName("com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin")
         private val appBuildConfig = FqName("com.duckduckgo.appbuildconfig.api.AppBuildConfig")
+        private val variantManager = FqName("com.duckduckgo.experiments.api.VariantManager")
         private val buildFlavorInternal = FqName("com.duckduckgo.appbuildconfig.api.BuildFlavor.INTERNAL")
         private val moshi = FqName("com.squareup.moshi.Moshi")
         private val jsonObjectAdapter = FqName("JSONObjectAdapter")
