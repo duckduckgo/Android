@@ -142,6 +142,7 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
+import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
@@ -4387,7 +4388,7 @@ class BrowserTabViewModelTest {
     fun whenOnPermissionsQueryThenSendCommand() = runTest {
         val url = "someUrl"
         loadUrl(url)
-        whenever(mockSitePermissionsManager.getPermissionsQueryResponse(eq(url), any(), any())).thenReturn("granted")
+        whenever(mockSitePermissionsManager.getPermissionsQueryResponse(eq(url), any(), any())).thenReturn(SitePermissionQueryResponse.Granted)
         testee.onPermissionsQuery("myFeature", "myMethod", "myId", JSONObject("""{ "name":"somePermission"}"""))
         assertCommandIssued<Command.OnPermissionsQueryResponse> {
             assertEquals("granted", this.jsCallbackData.params.getString("state"))

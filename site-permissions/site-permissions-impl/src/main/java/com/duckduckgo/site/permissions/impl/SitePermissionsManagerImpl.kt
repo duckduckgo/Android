@@ -21,6 +21,7 @@ import android.webkit.PermissionRequest
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
+import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -85,24 +86,20 @@ class SitePermissionsManagerImpl @Inject constructor(
     }
 
     override fun getPermissionsQueryResponse(
-        url: String?,
-        tabId: String?,
+        url: String,
+        tabId: String,
         queriedPermission: String,
-    ): String {
-        if (url == null || tabId == null) {
-            return PERMISSION_QUERY_STATE_DENIED
-        }
-
+    ): SitePermissionQueryResponse {
         getAndroidPermission(queriedPermission)?.let { androidPermission ->
             if (sitePermissionsRepository.isDomainGranted(url, tabId, androidPermission)) {
-                return PERMISSION_QUERY_STATE_GRANTED
+                return SitePermissionQueryResponse.Granted
             } else if (isHardwareSupported(androidPermission) && sitePermissionsRepository.isDomainAllowedToAsk(url, androidPermission)) {
-                return PERMISSION_QUERY_STATE_PROMPT
+                return SitePermissionQueryResponse.Prompt
             }
-            return PERMISSION_QUERY_STATE_DENIED
+            return SitePermissionQueryResponse.Denied
         }
 
-        return PERMISSION_QUERY_STATE_DENIED
+        return SitePermissionQueryResponse.Denied
     }
 
     private fun isPermissionSupported(permission: String): Boolean =
@@ -124,11 +121,5 @@ class SitePermissionsManagerImpl @Inject constructor(
             "microphone" -> PermissionRequest.RESOURCE_AUDIO_CAPTURE
             else -> null
         }
-    }
-
-    companion object {
-        private const val PERMISSION_QUERY_STATE_GRANTED = "granted"
-        private const val PERMISSION_QUERY_STATE_PROMPT = "prompt"
-        private const val PERMISSION_QUERY_STATE_DENIED = "denied"
     }
 }

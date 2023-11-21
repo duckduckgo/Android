@@ -45,10 +45,20 @@ interface SitePermissionsManager {
      * @param queriedPermission permission being queried (note: this is different from WebView permissions, check link above)
      * @return state of the permission as expected by the API: 'granted', 'prompt', or 'denied'
      */
-    fun getPermissionsQueryResponse(url: String?, tabId: String?, queriedPermission: String): String
+    fun getPermissionsQueryResponse(url: String, tabId: String, queriedPermission: String): SitePermissionQueryResponse
 
     data class SitePermissions(
         val autoAccept: List<String>,
         val userHandled: List<String>,
     )
+
+    /**
+     * Contains possible responses to the permissions.query JavaScript API call - see
+     * https://developer.mozilla.org/en-US/docs/Web/API/Permissions/query
+     */
+    sealed class SitePermissionQueryResponse {
+        object Granted : SitePermissionQueryResponse()
+        object Prompt : SitePermissionQueryResponse()
+        object Denied : SitePermissionQueryResponse()
+    }
 }

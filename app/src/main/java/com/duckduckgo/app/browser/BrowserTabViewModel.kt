@@ -138,6 +138,7 @@ import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
+import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
@@ -2988,15 +2989,28 @@ class BrowserTabViewModel @Inject constructor(
         )
     }
 
-    fun onPermissionsQuery(featureName: String, method: String, id: String, data: JSONObject) {
-        val permissionState = sitePermissionsManager.getPermissionsQueryResponse(url, tabId, data.getString("name"))
+    private fun getDataForPermissionState(featureName: String, method: String, id: String, permissionState: SitePermissionQueryResponse): JsCallbackData {
+        val strPermissionState = when (permissionState) {
+            SitePermissionQueryResponse.Granted -> "granted"
+            SitePermissionQueryResponse.Prompt -> "prompt"
+            SitePermissionQueryResponse.Denied -> "denied"
+        }
 
-        val response = JsCallbackData(
-            JSONObject("""{ "state":"$permissionState"}"""),
+        return JsCallbackData(
+            JSONObject("""{ "state":"$strPermissionState"}"""),
             featureName,
             method,
             id,
         )
+    }
+
+    fun onPermissionsQuery(featureName: String, method: String, id: String, data: JSONObject) {
+        val response = if (url == null) {
+            getDataForPermissionState(featureName, method, id, SitePermissionQueryResponse.Denied)
+        } else {
+            val permissionState = sitePermissionsManager.getPermissionsQueryResponse(url!!, tabId, data.getString("name"))
+            getDataForPermissionState(featureName, method, id, permissionState)
+        }
 
         viewModelScope.launch(dispatchers.main()) {
             command.value = OnPermissionsQueryResponse(response)
