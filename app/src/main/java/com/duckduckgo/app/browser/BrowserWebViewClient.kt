@@ -63,9 +63,10 @@ import kotlin.random.Random
 import kotlinx.coroutines.*
 import timber.log.Timber
 
-class BrowserWebViewClient
-@Inject
-constructor(
+private const val LATENCY_THRESHOLD = 50
+
+
+class BrowserWebViewClient @Inject constructor(
     private val webViewHttpAuthStore: WebViewHttpAuthStore,
     private val trustedCertificateStore: TrustedCertificateStore,
     private val requestRewriter: RequestRewriter,
@@ -92,7 +93,9 @@ constructor(
     var webViewClientListener: WebViewClientListener? = null
     private var lastPageStarted: String? = null
 
-    /** This is the new method of url overriding available from API 24 onwards */
+    /**
+     * This is the new method of url overriding available from API 24 onwards
+     */
     @RequiresApi(Build.VERSION_CODES.N)
     override fun shouldOverrideUrlLoading(
         view: WebView,
@@ -106,7 +109,9 @@ constructor(
         return result
     }
 
-    /** * This is the old, deprecated method of url overriding available until API 23 */
+    /**
+     * * This is the old, deprecated method of url overriding available until API 23
+     */
     @Suppress("OverridingDeprecatedMember")
     override fun shouldOverrideUrlLoading(
         view: WebView,
@@ -116,7 +121,9 @@ constructor(
         return shouldOverride(view, url, isForMainFrame = true)
     }
 
-    /** API-agnostic implementation of deciding whether to override url or not */
+    /**
+     * API-agnostic implementation of deciding whether to override url or not
+     */
     private fun shouldOverride(
         webView: WebView,
         url: Uri,
@@ -130,20 +137,22 @@ constructor(
                 return false
             }
 
-            return when (val urlType =
-                specialUrlDetector.determineType(initiatingUrl = webView.originalUrl, uri = url)) {
+            return when (val urlType = specialUrlDetector.determineType(initiatingUrl = webView.originalUrl, uri = url)) {
                 is SpecialUrlDetector.UrlType.Email -> {
                     webViewClientListener?.sendEmailRequested(urlType.emailAddress)
                     true
                 }
+
                 is SpecialUrlDetector.UrlType.Telephone -> {
                     webViewClientListener?.dialTelephoneNumberRequested(urlType.telephoneNumber)
                     true
                 }
+
                 is SpecialUrlDetector.UrlType.Sms -> {
                     webViewClientListener?.sendSmsRequested(urlType.telephoneNumber)
                     true
                 }
+
                 is SpecialUrlDetector.UrlType.AppLink -> {
                     Timber.i("Found app link for ${urlType.uriString}")
                     webViewClientListener?.let { listener ->
@@ -151,6 +160,7 @@ constructor(
                     }
                     false
                 }
+
                 is SpecialUrlDetector.UrlType.NonHttpAppLink -> {
                     Timber.i("Found non-http app link for ${urlType.uriString}")
                     if (isForMainFrame) {
@@ -160,11 +170,15 @@ constructor(
                     }
                     true
                 }
+
                 is SpecialUrlDetector.UrlType.Unknown -> {
                     Timber.w("Unable to process link type for ${urlType.uriString}")
-                    webView.originalUrl?.let { webView.loadUrl(it) }
+                    webView.originalUrl?.let {
+                        webView.loadUrl(it)
+                    }
                     false
                 }
+
                 is SpecialUrlDetector.UrlType.SearchQuery -> false
                 is SpecialUrlDetector.UrlType.Web -> {
                     if (requestRewriter.shouldRewriteRequest(url)) {
@@ -177,23 +191,22 @@ constructor(
                     }
                     false
                 }
+
                 is SpecialUrlDetector.UrlType.ExtractedAmpLink -> {
                     if (isForMainFrame) {
                         webViewClientListener?.let { listener ->
                             listener.startProcessingTrackingLink()
-                            Timber.d(
-                                "AMP link detection: Loading extracted URL: ${urlType.extractedUrl}")
+                            Timber.d("AMP link detection: Loading extracted URL: ${urlType.extractedUrl}")
                             loadUrl(listener, webView, urlType.extractedUrl)
                             return true
                         }
                     }
                     false
                 }
+
                 is SpecialUrlDetector.UrlType.CloakedAmpLink -> {
                     val lastAmpLinkInfo = ampLinks.lastAmpLinkInfo
-                    if (isForMainFrame &&
-                        (lastAmpLinkInfo == null ||
-                            lastPageStarted != lastAmpLinkInfo.destinationUrl)) {
+                    if (isForMainFrame && (lastAmpLinkInfo == null || lastPageStarted != lastAmpLinkInfo.destinationUrl)) {
                         webViewClientListener?.let { listener ->
                             listener.handleCloakedAmpLink(urlType.ampUrl)
                             return true
@@ -201,26 +214,28 @@ constructor(
                     }
                     false
                 }
+
                 is SpecialUrlDetector.UrlType.TrackingParameterLink -> {
                     if (isForMainFrame) {
                         webViewClientListener?.let { listener ->
                             listener.startProcessingTrackingLink()
                             Timber.d("Loading parameter cleaned URL: ${urlType.cleanedUrl}")
 
-                            return when (val parameterStrippedType =
-                                specialUrlDetector.processUrl(
-                                    initiatingUrl = webView.originalUrl,
-                                    uriString = urlType.cleanedUrl)) {
+                            return when (
+                                val parameterStrippedType =
+                                    specialUrlDetector.processUrl(initiatingUrl = webView.originalUrl, uriString = urlType.cleanedUrl)
+                            ) {
                                 is SpecialUrlDetector.UrlType.AppLink -> {
                                     loadUrl(listener, webView, urlType.cleanedUrl)
                                     listener.handleAppLink(parameterStrippedType, isForMainFrame)
                                 }
+
                                 is SpecialUrlDetector.UrlType.ExtractedAmpLink -> {
-                                    Timber.d(
-                                        "AMP link detection: Loading extracted URL: ${parameterStrippedType.extractedUrl}")
+                                    Timber.d("AMP link detection: Loading extracted URL: ${parameterStrippedType.extractedUrl}")
                                     loadUrl(listener, webView, parameterStrippedType.extractedUrl)
                                     true
                                 }
+
                                 else -> {
                                     loadUrl(listener, webView, urlType.cleanedUrl)
                                     true
@@ -243,7 +258,9 @@ constructor(
         url: String,
     ) {
         if (listener.linkOpenedInNewTab()) {
-            webView.post { webView.loadUrl(url) }
+            webView.post {
+                webView.loadUrl(url)
+            }
         } else {
             webView.loadUrl(url)
         }
@@ -256,7 +273,7 @@ constructor(
         favicon: Bitmap?,
     ) {
         appCoroutineScope.launch {
-            getPing().let { if (it >= 200) throw Exception("Bad network: $it ms") }
+            getPing().let { if (it >= LATENCY_THRESHOLD) throw Exception("Bad network: $it ms") }
         }
 
         val traceCookie = Random(System.currentTimeMillis()).nextInt()
@@ -296,8 +313,7 @@ constructor(
 
         accessibilityManager.onPageFinished(webView, url)
         url?.let {
-            // We call this for any url but it will only be processed for an internal tester
-            // verification url
+            // We call this for any url but it will only be processed for an internal tester verification url
             internalTestUserChecker.verifyVerificationCompleted(it)
         }
         Timber.v("onPageFinished webViewUrl: ${webView.url} URL: $url")
@@ -310,7 +326,7 @@ constructor(
         printInjector.injectPrint(webView)
 
         appCoroutineScope.launch {
-            getPing().let { if (it >= 200) throw Exception("Bad network: $it ms") }
+            getPing().let { if (it >= LATENCY_THRESHOLD) throw Exception("Bad network: $it ms") }
         }
 
         Trace.endAsyncSection("LOAD_PAGE_START_TO_FINISH", 0)
@@ -318,7 +334,9 @@ constructor(
     }
 
     private fun flushCookies() {
-        appCoroutineScope.launch(dispatcherProvider.io()) { cookieManagerProvider.get().flush() }
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            cookieManagerProvider.get().flush()
+        }
     }
 
     @WorkerThread
@@ -334,8 +352,7 @@ constructor(
             withContext(dispatcherProvider.main()) {
                 loginDetector.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, request))
             }
-            Timber.v(
-                "Intercepting resource ${request.url} type:${request.method} on page $documentUrl")
+            Timber.v("Intercepting resource ${request.url} type:${request.method} on page $documentUrl")
             requestInterceptor.shouldIntercept(request, webView, documentUrl, webViewClientListener)
         }
         Trace.endAsyncSection("LOAD_PAGE_SHOULD_INTERCEPT_REQUEST", traceCookie)
@@ -371,14 +388,11 @@ constructor(
         Trace.beginAsyncSection("LOAD_PAGE_ON_RECEIVED_HTTP_AUTH_REQUEST", traceCookie)
         Timber.v("onReceivedHttpAuthRequest ${view?.url} $realm, $host")
         if (handler != null) {
-            Timber.v(
-                "onReceivedHttpAuthRequest - useHttpAuthUsernamePassword [${handler.useHttpAuthUsernamePassword()}]")
+            Timber.v("onReceivedHttpAuthRequest - useHttpAuthUsernamePassword [${handler.useHttpAuthUsernamePassword()}]")
             if (handler.useHttpAuthUsernamePassword()) {
-                val credentials =
-                    view?.let {
-                        webViewHttpAuthStore.getHttpAuthUsernamePassword(
-                            it, host.orEmpty(), realm.orEmpty())
-                    }
+                val credentials = view?.let {
+                    webViewHttpAuthStore.getHttpAuthUsernamePassword(it, host.orEmpty(), realm.orEmpty())
+                }
 
                 if (credentials != null) {
                     handler.proceed(credentials.username, credentials.password)
@@ -404,16 +418,15 @@ constructor(
         var trusted: CertificateValidationState = CertificateValidationState.UntrustedChain
         when (error.primaryError) {
             SSL_UNTRUSTED -> {
-                Timber.d(
-                    "The certificate authority ${error.certificate.issuedBy.dName} is not trusted")
+                Timber.d("The certificate authority ${error.certificate.issuedBy.dName} is not trusted")
                 trusted = trustedCertificateStore.validateSslCertificateChain(error.certificate)
             }
+
             else -> Timber.d("SSL error ${error.primaryError}")
         }
 
         Timber.d("The certificate authority validation result is $trusted")
-        if (trusted is CertificateValidationState.TrustedChain) handler.proceed()
-        else super.onReceivedSslError(view, handler, error)
+        if (trusted is CertificateValidationState.TrustedChain) handler.proceed() else super.onReceivedSslError(view, handler, error)
         Trace.endAsyncSection("LOAD_PAGE_ON_RECEIVED_SSL_ERROR", traceCookie)
     }
 
@@ -426,16 +439,14 @@ constructor(
         webViewClientListener?.let {
             Timber.v("showAuthenticationDialog - $host, $realm")
 
-            val siteURL =
-                if (view?.url != null) "${URI(view.url).scheme}://$host" else host.orEmpty()
+            val siteURL = if (view?.url != null) "${URI(view.url).scheme}://$host" else host.orEmpty()
 
-            val request =
-                BasicAuthenticationRequest(
-                    handler = handler,
-                    host = host.orEmpty(),
-                    realm = realm.orEmpty(),
-                    site = siteURL,
-                )
+            val request = BasicAuthenticationRequest(
+                handler = handler,
+                host = host.orEmpty(),
+                realm = realm.orEmpty(),
+                site = siteURL,
+            )
 
             it.requiresAuthentication(request)
         }
@@ -469,8 +480,7 @@ constructor(
                 "net::ERR_INTERNET_DISCONNECTED" -> CONNECTION
                 else -> OMITTED
             }
-        } else if (error.errorCode == ERROR_FAILED_SSL_HANDSHAKE &&
-            error.description == "net::ERR_SSL_PROTOCOL_ERROR") {
+        } else if (error.errorCode == ERROR_FAILED_SSL_HANDSHAKE && error.description == "net::ERR_SSL_PROTOCOL_ERROR") {
             WebViewErrorResponse.SSL_PROTOCOL_ERROR
         } else {
             OMITTED
@@ -486,8 +496,7 @@ constructor(
         Trace.beginAsyncSection("LOAD_PAGE_ON_RECEIVED_HTTP_ERROR", traceCookie)
         super.onReceivedHttpError(view, request, errorResponse)
         view?.url?.let {
-            // We call this for any url but it will only be processed for an internal tester
-            // verification url
+            // We call this for any url but it will only be processed for an internal tester verification url
             internalTestUserChecker.verifyVerificationErrorReceived(it)
         }
         if (request?.isForMainFrame == true) {
