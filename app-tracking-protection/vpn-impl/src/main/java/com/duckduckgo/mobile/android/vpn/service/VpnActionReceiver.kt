@@ -26,6 +26,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ReceiverScope
 import com.duckduckgo.mobile.android.vpn.Vpn
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import dagger.android.AndroidInjection
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -41,6 +42,8 @@ class VpnActionReceiver : BroadcastReceiver() {
 
     @Inject lateinit var context: Context
 
+    @Inject lateinit var deviceShieldPixels: DeviceShieldPixels
+
     override fun onReceive(
         context: Context,
         intent: Intent,
@@ -54,6 +57,9 @@ class VpnActionReceiver : BroadcastReceiver() {
             ACTION_VPN_ENABLE -> {
                 logcat { "Entire VPN will be enabled because the user asked it" }
                 goAsync(pendingResult) {
+                    if (intent.getBooleanExtra(EXTRA_SNOOZE_COMPLETED, false)) {
+                        deviceShieldPixels.reportVpnSnoozedEnded()
+                    }
                     vpn.start()
                 }
             }
@@ -68,6 +74,7 @@ class VpnActionReceiver : BroadcastReceiver() {
             ACTION_VPN_SNOOZE -> {
                 logcat { "Entire VPN will snooze because the user asked it" }
                 goAsync(pendingResult) {
+                    deviceShieldPixels.reportVpnSnoozedStarted()
                     snoozeAndScheduleWakeUp()
                 }
             }
@@ -88,6 +95,7 @@ class VpnActionReceiver : BroadcastReceiver() {
             0,
             Intent(context, VpnActionReceiver::class.java).apply {
                 action = ACTION_VPN_ENABLE
+                putExtra(EXTRA_SNOOZE_COMPLETED, true)
             },
             PendingIntent.FLAG_IMMUTABLE,
         )
@@ -105,6 +113,7 @@ class VpnActionReceiver : BroadcastReceiver() {
         internal const val ACTION_VPN_ENABLE = "com.duckduckgo.vpn.ACTION_VPN_ENABLE"
         internal const val ACTION_VPN_DISABLE = "com.duckduckgo.vpn.ACTION_VPN_DISABLE"
         internal const val ACTION_VPN_SNOOZE = "com.duckduckgo.vpn.ACTION_VPN_SNOOZE"
+        private const val EXTRA_SNOOZE_COMPLETED = "extra_snooze_completed"
         private val DEFAULT_SNOOZE_LENGTH_IN_MILLIS = TimeUnit.MINUTES.toMillis(20)
     }
 }

@@ -24,6 +24,7 @@ import com.duckduckgo.di.scopes.ReceiverScope
 import com.duckduckgo.mobile.android.vpn.Vpn
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import dagger.android.AndroidInjection
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -39,6 +40,8 @@ class NetPEnableReceiver : BroadcastReceiver() {
     @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 
     @Inject lateinit var vpn: Vpn
+
+    @Inject lateinit var pixels: NetworkProtectionPixels
 
     override fun onReceive(
         context: Context,
@@ -57,6 +60,9 @@ class NetPEnableReceiver : BroadcastReceiver() {
         } else if (intent.action == ACTION_VPN_ENABLE) {
             logcat { "Entire VPN will be enabled because the user asked it" }
             goAsync(pendingResult) {
+                if (intent.getBooleanExtra(EXTRA_SNOOZED, false)) {
+                    pixels.reportVpnSnoozedCanceled()
+                }
                 vpn.start()
             }
         } else {
@@ -68,6 +74,7 @@ class NetPEnableReceiver : BroadcastReceiver() {
     companion object {
         internal const val ACTION_NETP_ENABLE = "com.duckduckgo.networkprotection.notification.ACTION_NETP_ENABLE"
         internal const val ACTION_VPN_ENABLE = "com.duckduckgo.vpn.ACTION_VPN_ENABLE"
+        internal const val EXTRA_SNOOZED = "extra_snoozed"
     }
 }
 
