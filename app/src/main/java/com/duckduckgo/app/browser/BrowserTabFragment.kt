@@ -2418,7 +2418,7 @@ class BrowserTabFragment :
                         event: Int,
                     ) {
                         if (event != DISMISS_EVENT_ACTION) {
-                            viewModel.undoDelete(savedSite)
+                            viewModel.onDeleteSavedSiteSnackbarDismissed(savedSite)
                         }
                     }
                 },
