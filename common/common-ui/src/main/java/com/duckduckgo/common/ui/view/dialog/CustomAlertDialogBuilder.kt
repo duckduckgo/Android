@@ -30,6 +30,7 @@ class CustomAlertDialogBuilder(val context: Context) : DaxAlertDialog {
     abstract class EventListener {
         open fun onDialogShown() {}
         open fun onDialogDismissed() {}
+        open fun onDialogCancelled() {}
         open fun onPositiveButtonClicked() {}
         open fun onNegativeButtonClicked() {}
     }
@@ -98,6 +99,23 @@ class CustomAlertDialogBuilder(val context: Context) : DaxAlertDialog {
             .setView(binding.root)
             .apply {
                 setCancelable(false)
+                setOnDismissListener { listener.onDialogDismissed() }
+            }
+        dialog = dialogBuilder.create()
+        setViews(binding, dialog!!)
+
+        return this
+    }
+
+    fun buildCancellable(): DaxAlertDialog {
+        val binding: DialogCustomAlertBinding = DialogCustomAlertBinding.inflate(LayoutInflater.from(context))
+        binding.customDialogContent.addView(customBinding?.root)
+
+        val dialogBuilder = MaterialAlertDialogBuilder(context)
+            .setView(binding.root)
+            .apply {
+                setCancelable(true)
+                setOnCancelListener { listener.onDialogCancelled() }
                 setOnDismissListener { listener.onDialogDismissed() }
             }
         dialog = dialogBuilder.create()

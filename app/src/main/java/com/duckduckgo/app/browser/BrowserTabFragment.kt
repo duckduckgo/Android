@@ -1391,7 +1391,14 @@ class BrowserTabFragment :
 
         val dialog = CustomAlertDialogBuilder(requireActivity())
             .setView(binding)
-            .build()
+            .addEventListener(
+                object : CustomAlertDialogBuilder.EventListener() {
+                    override fun onDialogCancelled() {
+                        viewModel.onSystemLocationPermissionNotAllowed()
+                    }
+                },
+            )
+            .buildCancellable()
 
         binding.allowLocationPermission.setOnClickListener {
             viewModel.onSystemLocationPermissionAllowed()
@@ -1442,7 +1449,14 @@ class BrowserTabFragment :
 
         val dialog = CustomAlertDialogBuilder(requireActivity())
             .setView(binding)
-            .build()
+            .addEventListener(
+                object : CustomAlertDialogBuilder.EventListener() {
+                    override fun onDialogCancelled() {
+                        viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.DENY_ONCE)
+                    }
+                },
+            )
+            .buildCancellable()
 
         binding.siteAllowAlwaysLocationPermission.setOnClickListener {
             viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.ALLOW_ALWAYS)
