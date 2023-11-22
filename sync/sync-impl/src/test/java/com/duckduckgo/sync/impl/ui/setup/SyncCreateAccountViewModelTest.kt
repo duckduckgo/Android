@@ -51,7 +51,13 @@ class SyncCreateAccountViewModelTest {
 
         testee.viewState().test {
             val viewState = awaitItem()
-            Assert.assertTrue(viewState.viewMode is SignedIn)
+            Assert.assertTrue(viewState.viewMode is CreatingAccount)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        testee.commands().test {
+            val command = awaitItem()
+            Assert.assertTrue(command is FinishSetupFlow)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -69,17 +75,6 @@ class SyncCreateAccountViewModelTest {
         testee.commands().test {
             val command = awaitItem()
             Assert.assertTrue(command is Error)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenNextClickedThenEmitFinishSetupCommand() = runTest {
-        testee.onNextClicked()
-
-        testee.commands().test {
-            val command = awaitItem()
-            Assert.assertTrue(command is FinishSetupFlow)
             cancelAndIgnoreRemainingEvents()
         }
     }
