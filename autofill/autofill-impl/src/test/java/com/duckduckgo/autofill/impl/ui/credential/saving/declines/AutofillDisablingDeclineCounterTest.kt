@@ -126,7 +126,7 @@ class AutofillDisablingDeclineCounterTest {
     @Test
     fun whenCounterNotActiveThenShouldNeverPromptToDisableAutofill() = runTest {
         initialiseDeclineCounter()
-        testee.isActive = false
+        testee.disableDeclineCounter()
         configureGlobalDeclineCountAtThreshold()
         assertFalse(testee.shouldPromptToDisableAutofill())
     }
@@ -135,14 +135,13 @@ class AutofillDisablingDeclineCounterTest {
     fun whenAutofillNotAvailableThenCounterNotActive() = runTest {
         whenever(autofillStore.autofillAvailable).thenReturn(false)
         initialiseDeclineCounter()
-        assertFalse(testee.isActive)
+        assertFalse(testee.isActive())
     }
 
     @Test
-    fun whenAutofillNotEnabledThenCounterNotActive() = runTest {
-        whenever(autofillStore.autofillEnabled).thenReturn(false)
+    fun whenAutofillAvailableThenCounterStartsAsActive() = runTest {
         initialiseDeclineCounter()
-        assertFalse(testee.isActive)
+        assertTrue(testee.isActive())
     }
 
     private fun configureGlobalDeclineCountAtThreshold() {
