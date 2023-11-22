@@ -54,12 +54,10 @@ class VpnActionReceiver : BroadcastReceiver() {
         val pendingResult = goAsync()
 
         when (intent.action) {
-            ACTION_VPN_ENABLE -> {
+            ACTION_VPN_SNOOZE_END -> {
                 logcat { "Entire VPN will be enabled because the user asked it" }
                 goAsync(pendingResult) {
-                    if (intent.getBooleanExtra(EXTRA_SNOOZE_COMPLETED, false)) {
-                        deviceShieldPixels.reportVpnSnoozedEnded()
-                    }
+                    deviceShieldPixels.reportVpnSnoozedEnded()
                     vpn.start()
                 }
             }
@@ -94,8 +92,7 @@ class VpnActionReceiver : BroadcastReceiver() {
             context,
             0,
             Intent(context, VpnActionReceiver::class.java).apply {
-                action = ACTION_VPN_ENABLE
-                putExtra(EXTRA_SNOOZE_COMPLETED, true)
+                action = ACTION_VPN_SNOOZE_END
             },
             PendingIntent.FLAG_IMMUTABLE,
         )
@@ -110,10 +107,9 @@ class VpnActionReceiver : BroadcastReceiver() {
     }
 
     companion object {
-        internal const val ACTION_VPN_ENABLE = "com.duckduckgo.vpn.ACTION_VPN_ENABLE"
+        internal const val ACTION_VPN_SNOOZE_END = "com.duckduckgo.vpn.ACTION_VPN_SNOOZE_END"
         internal const val ACTION_VPN_DISABLE = "com.duckduckgo.vpn.ACTION_VPN_DISABLE"
         internal const val ACTION_VPN_SNOOZE = "com.duckduckgo.vpn.ACTION_VPN_SNOOZE"
-        private const val EXTRA_SNOOZE_COMPLETED = "extra_snooze_completed"
         private val DEFAULT_SNOOZE_LENGTH_IN_MILLIS = TimeUnit.MINUTES.toMillis(20)
     }
 }
