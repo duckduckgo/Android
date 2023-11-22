@@ -71,6 +71,7 @@ class StatisticsRequesterTest {
     @Before
     fun before() {
         whenever(mockVariantManager.getVariantKey()).thenReturn("ma")
+        whenever(mockVariantManager.defaultVariantKey()).thenReturn("")
         whenever(mockService.atb(any(), any())).thenReturn(Observable.just(ATB))
         whenever(mockService.updateSearchAtb(any(), any(), any(), any())).thenReturn(Observable.just(Atb(NEW_ATB)))
         whenever(mockService.exti(any(), any())).thenReturn(Observable.just(mockResponseBody))
@@ -85,11 +86,27 @@ class StatisticsRequesterTest {
     }
 
     @Test
+    fun whenUpdateVersionPresentDuringRefreshSearchRetentionThenPreviousVariantIsReplacedWithDefaultVariant() {
+        configureStoredStatistics()
+        whenever(mockService.updateSearchAtb(any(), any(), any(), eq(0))).thenReturn(Observable.just(UPDATE_ATB))
+        testee.refreshSearchRetentionAtb()
+        verify(mockStatisticsStore).variant = ""
+    }
+
+    @Test
     fun whenUpdateVersionPresentDuringRefreshAppRetentionThenPreviousAtbIsReplacedWithUpdateVersion() {
         configureStoredStatistics()
         whenever(mockService.updateAppAtb(any(), any(), any(), eq(0))).thenReturn(Observable.just(UPDATE_ATB))
         testee.refreshAppRetentionAtb()
         verify(mockStatisticsStore).atb = Atb(UPDATE_ATB.updateVersion!!)
+    }
+
+    @Test
+    fun whenUpdateVersionPresentDuringRefreshAppRetentionThenPreviousVariantIsReplacedWithDefaultVariant() {
+        configureStoredStatistics()
+        whenever(mockService.updateAppAtb(any(), any(), any(), eq(0))).thenReturn(Observable.just(UPDATE_ATB))
+        testee.refreshAppRetentionAtb()
+        verify(mockStatisticsStore).variant = ""
     }
 
     @Test
