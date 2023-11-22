@@ -1640,7 +1640,15 @@ class BrowserTabFragment :
                     }
 
                     fallbackUrl != null -> {
-                        webView?.loadUrl(fallbackUrl, headers)
+                        webView?.let { webView ->
+                            if (viewModel.linkOpenedInNewTab()) {
+                                webView.post {
+                                    webView.loadUrl(fallbackUrl, headers)
+                                }
+                            } else {
+                                webView.loadUrl(fallbackUrl, headers)
+                            }
+                        }
                     }
 
                     else -> {
