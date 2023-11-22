@@ -41,7 +41,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CreateAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoverSyncData
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFStored
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.SyncedDevice
 import java.lang.String.format
 import kotlin.reflect.KClass
@@ -421,9 +421,9 @@ class SyncActivityViewModelTest {
         whenever(recoveryPDF.generateAndStoreRecoveryCodePDF(any(), eq(jsonRecoveryKeyEncoded))).thenReturn(TestSyncFixtures.pdfFile())
 
         testee.commands().test {
-            testee.generateRecoveryCode(mock())
+            testee.onStoragePermissionGranted(mock())
             val command = awaitItem()
-            assertTrue(command is RecoveryCodePDFSuccess)
+            assertTrue(command is RecoveryCodePDFStored)
             cancelAndIgnoreRemainingEvents()
         }
     }

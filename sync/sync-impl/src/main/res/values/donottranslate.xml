@@ -44,6 +44,8 @@
     <string name="sync_setup_single_device_secondary_cta_title">Recover Data</string>
     <string name="sync_setup_single_device_secondary_cta_subtitle">Recover synced data with a recovery code</string>
     <string name="sync_off_encrypted_hint">Your data is end-to-end encrypted, and DuckDuckGo does not have access to the decryption key.</string>
+    <string name="sync_generate_pdf_error">Can\'t generate PDF file, please try again.</string>
+    <string name="sync_generate_pdf_success">Recovery PDF file successfully stored.</string>
 
     <!-- Setup screen -->
     <string name="sync_enable_sync_title">All Set!</string>

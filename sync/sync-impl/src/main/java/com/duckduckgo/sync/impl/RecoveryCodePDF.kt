@@ -17,10 +17,12 @@
 package com.duckduckgo.sync.impl
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.pdf.PdfDocument
 import android.graphics.pdf.PdfDocument.PageInfo.Builder
 import android.net.Uri
 import android.os.Environment
+import android.provider.DocumentsContract
 import android.view.LayoutInflater
 import android.view.View
 import androidx.annotation.WorkerThread
@@ -38,12 +40,14 @@ import javax.inject.*
 
 interface RecoveryCodePDF {
 
+    fun generateFileCreationIntent(): Intent
+
     @WorkerThread
     fun storeRecoveryCodePDF(
         viewContext: Context,
         recoveryCodeB64: String,
         uri: Uri,
-    ): Uri
+    ): Boolean
 
     @WorkerThread
     fun generateAndStoreRecoveryCodePDF(
@@ -56,11 +60,20 @@ interface RecoveryCodePDF {
 class RecoveryCodePDFImpl @Inject constructor(
     private val qrEncoder: QREncoder,
 ) : RecoveryCodePDF {
+
+    override fun generateFileCreationIntent(): Intent {
+        return Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "application/pdf"
+            putExtra(Intent.EXTRA_TITLE, PDF_FILE_NAME)
+        }
+    }
+
     override fun storeRecoveryCodePDF(
         viewContext: Context,
         recoveryCodeB64: String,
         uri: Uri
-    ): Uri {
+    ): Boolean {
         checkMainThread()
 
         val bitmapQR = qrEncoder.encodeAsBitmap(recoveryCodeB64, R.dimen.qrSizeLarge, R.dimen.qrSizeLarge)
@@ -78,20 +91,24 @@ class RecoveryCodePDFImpl @Inject constructor(
         }
         pdfDocument.finishPage(page)
 
-        try {
+        return try {
             viewContext.contentResolver.openFileDescriptor(uri, "w")?.use { parcelFileDescriptor ->
                 FileOutputStream(parcelFileDescriptor.fileDescriptor).use { fileOutputStream ->
                     pdfDocument.writeTo(fileOutputStream)
                     pdfDocument.close()
                 }
             }
+            true
         } catch (e: FileNotFoundException) {
             Timber.d("Sync: Pdf FileNotFoundException $e")
+            false
         } catch (e: IOException) {
             Timber.d("Sync: Pdf IOException $e")
+            false
+        } catch (e: Exception){
+            Timber.d("Sync: Pdf Exception $e")
+            false
         }
-
-        return uri
     }
 
     override fun generateAndStoreRecoveryCodePDF(

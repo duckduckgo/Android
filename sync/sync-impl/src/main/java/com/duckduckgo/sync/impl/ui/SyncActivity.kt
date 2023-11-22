@@ -17,9 +17,9 @@
 package com.duckduckgo.sync.impl.ui
 
 import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import androidx.annotation.StringRes
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -39,7 +39,6 @@ import com.duckduckgo.sync.api.*
 import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.PermissionRequest
 import com.duckduckgo.sync.impl.R
-import com.duckduckgo.sync.impl.ShareAction
 import com.duckduckgo.sync.impl.databinding.ActivitySyncBinding
 import com.duckduckgo.sync.impl.databinding.DialogEditDeviceBinding
 import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code.CONNECT_CODE
@@ -53,8 +52,9 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasS
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CreateAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.DeviceConnected
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.EnterTextCode
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ErrorStoringRecoveryCodePDF
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoverSyncData
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFStored
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ScanQRCode
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowTextCode
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
@@ -91,9 +91,6 @@ class SyncActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var storagePermission: PermissionRequest
-
-    @Inject
-    lateinit var shareAction: ShareAction
 
     @Inject
     lateinit var syncSettingsPlugin: DaggerMap<Int, SyncSettingsPlugin>
@@ -227,30 +224,19 @@ class SyncActivity : DuckDuckGoActivity() {
             is DeviceConnected -> launcher.launch(SetupAccountActivity.intentDeviceConnectedFlow(this))
             is AskTurnOffSync -> askTurnOffsync(it.device)
             is AskDeleteAccount -> askDeleteAccount()
-            is RecoveryCodePDFSuccess -> {
-                shareAction.shareFileUri(this@SyncActivity, it.recoveryCodePDFUri)
-            }
-
+            is RecoveryCodePDFStored -> showMessage(it)
+            is ErrorStoringRecoveryCodePDF -> showMessage(it)
             is CheckIfUserHasStoragePermission -> {
                 storagePermission.invokeOrRequestPermission {
-                    viewModel.generateRecoveryCode(this@SyncActivity)
+                    viewModel.onStoragePermissionGranted()
                 }
             }
 
             is AskRemoveDevice -> askRemoveDevice(it.device)
             is AskEditDevice -> askEditDevice(it.device)
             is ShowTextCode -> startActivity(ShowCodeActivity.intent(this))
-            is AskPDFLocation -> askForPdfLocation()
+            is AskPDFLocation -> savePDFLauncher.launch(it.intent)
         }
-    }
-
-    private fun askForPdfLocation() {
-        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-            addCategory(Intent.CATEGORY_OPENABLE)
-            type = "application/pdf"
-            putExtra(Intent.EXTRA_TITLE, "invoice.pdf")
-        }
-        savePDFLauncher.launch(intent)
     }
 
     private fun askEditDevice(device: ConnectedDevice) {
@@ -337,5 +323,17 @@ class SyncActivity : DuckDuckGoActivity() {
         }
 
         syncedDevicesAdapter.updateData(viewState.syncedDevices)
+    }
+
+    private fun showMessage(command: Command) {
+        when (command) {
+            is ErrorStoringRecoveryCodePDF -> showErrorMessage(R.string.sync_generate_pdf_error)
+            is RecoveryCodePDFStored -> showErrorMessage(R.string.sync_generate_pdf_success)
+            else -> showErrorMessage(R.string.sync_general_error)
+        }
+    }
+
+    private fun showErrorMessage(@StringRes stringResource: Int) {
+        Snackbar.make(binding.root, stringResource, Snackbar.LENGTH_LONG).show()
     }
 }

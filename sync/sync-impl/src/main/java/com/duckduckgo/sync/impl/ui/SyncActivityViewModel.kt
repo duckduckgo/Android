@@ -17,6 +17,7 @@
 package com.duckduckgo.sync.impl.ui
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import androidx.lifecycle.ViewModel
@@ -42,10 +43,10 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskRemoveDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CreateAccount
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ErrorStoringRecoveryCodePDF
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFStored
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.LoadingItem
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.SyncedDevice
-import java.io.File
 import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -144,8 +145,9 @@ class SyncActivityViewModel @Inject constructor(
         data class AskTurnOffSync(val device: ConnectedDevice) : Command()
         object AskDeleteAccount : Command()
         object CheckIfUserHasStoragePermission : Command()
-        data class RecoveryCodePDFSuccess(val recoveryCodePDFUri: Uri) : Command()
-        object AskPDFLocation : Command()
+        object RecoveryCodePDFStored : Command()
+        object ErrorStoringRecoveryCodePDF : Command()
+        data class AskPDFLocation(val intent: Intent) : Command()
         data class AskRemoveDevice(val device: ConnectedDevice) : Command()
         data class AskEditDevice(val device: ConnectedDevice) : Command()
     }
@@ -233,13 +235,18 @@ class SyncActivityViewModel @Inject constructor(
         showAccountDetailsIfNeeded()
     }
 
-    fun onPdfLocationChosen(viewContext: Context, fileLocation: Uri) {
+    fun onPdfLocationChosen(
+        viewContext: Context,
+        fileLocation: Uri
+    ) {
         Timber.d("Sync: Pdf location chosen $fileLocation")
         viewModelScope.launch(dispatchers.io()) {
             val recoveryCodeB64 = syncAccountRepository.getRecoveryCode() ?: return@launch
-            val generateRecoveryCodePDF = recoveryCodePDF.storeRecoveryCodePDF(viewContext, recoveryCodeB64, fileLocation)
-            // should return a result (error, Uri)
-            command.send(RecoveryCodePDFSuccess(generateRecoveryCodePDF))
+            if (recoveryCodePDF.storeRecoveryCodePDF(viewContext, recoveryCodeB64, fileLocation)) {
+                command.send(RecoveryCodePDFStored)
+            } else {
+                command.send(ErrorStoringRecoveryCodePDF)
+            }
         }
     }
 
@@ -275,13 +282,9 @@ class SyncActivityViewModel @Inject constructor(
         }
     }
 
-    fun generateRecoveryCode(viewContext: Context) {
+    fun onStoragePermissionGranted() {
         viewModelScope.launch(dispatchers.io()) {
-            val recoveryCodeB64 = syncAccountRepository.getRecoveryCode() ?: return@launch
-            command.send(AskPDFLocation)
-
-            // val generateRecoveryCodePDF = recoveryCodePDF.generateAndStoreRecoveryCodePDF(viewContext, recoveryCodeB64)
-            // command.send(RecoveryCodePDFSuccess(generateRecoveryCodePDF))
+            command.send(AskPDFLocation(recoveryCodePDF.generateFileCreationIntent()))
         }
     }
 
