@@ -50,7 +50,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar"
-        app:layout_constraintBottom_toTopOf="@+id/sync_intro_next"
+        app:layout_constraintBottom_toTopOf="@+id/sync_intro_cta"
         android:scrollbarAlwaysDrawVerticalTrack="true"
         android:fadeScrollbars="false"
         android:scrollbars="vertical">
@@ -96,7 +96,7 @@
     </ScrollView>
 
     <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
-        android:id="@+id/sync_intro_next"
+        android:id="@+id/sync_intro_cta"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/keyline_5"
@@ -119,7 +119,6 @@
         android:text="@string/sync_enable_connecting"
         app:textType="secondary"
         app:typography="caption"
-
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>

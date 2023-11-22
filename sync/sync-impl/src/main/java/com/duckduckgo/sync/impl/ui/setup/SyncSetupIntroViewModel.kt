@@ -37,7 +37,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 @ContributesViewModel(ActivityScope::class)
-class SyncSetupIntroViewModel : ViewModel() {
+class SyncSetupIntroViewModel @Inject constructor() : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
 

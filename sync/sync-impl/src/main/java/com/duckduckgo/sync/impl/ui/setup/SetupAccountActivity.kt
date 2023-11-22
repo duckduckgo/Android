@@ -31,6 +31,9 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.R.id
 import com.duckduckgo.sync.impl.databinding.ActivitySyncSetupAccountBinding
+import com.duckduckgo.sync.impl.ui.EnterCodeActivity
+import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion
+import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.DEVICE_SYNCED
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_CODE
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_INTRO
@@ -158,6 +161,8 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
         private const val TAG_RECOVER_ACCOUNT = "tag_recover_account"
         private const val TAG_DEVICE_CONNECTED = "tag_device_connected"
 
+        const val SETUP_ACCOUNT_SCREEN_EXTRA = "SETUP_ACCOUNT_SCREEN_EXTRA"
+
         enum class Screen {
             SYNC_SETUP,
             SYNC_INTRO,
@@ -166,7 +171,11 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
             DEVICE_SYNCED,
         }
 
-        const val SETUP_ACCOUNT_SCREEN_EXTRA = "SETUP_ACCOUNT_SCREEN_EXTRA"
+        internal fun intent(context: Context, screen: Screen): Intent {
+            return Intent(context, SetupAccountActivity::class.java).apply {
+                putExtra(SETUP_ACCOUNT_SCREEN_EXTRA, screen)
+            }
+        }
 
         internal fun intentSetupFlow(context: Context): Intent {
             return Intent(context, SetupAccountActivity::class.java).apply {

@@ -25,6 +25,8 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
+import com.duckduckgo.common.ui.view.hide
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
@@ -67,7 +69,7 @@ class SyncSetupIntroFragment : DuckDuckGoFragment(R.layout.fragment_intro_sync) 
     }
 
     private fun configureListeners(){
-        binding.syncIntroNext.setOnClickListener {
+        binding.syncIntroCta.setOnClickListener {
             viewModel.onNextClicked()
         }
 
@@ -93,11 +95,19 @@ class SyncSetupIntroFragment : DuckDuckGoFragment(R.layout.fragment_intro_sync) 
     private fun renderViewState(viewState: ViewState) {
         when (viewState.viewMode) {
             is CreateAccountIntro -> {
-
+                binding.contentTitle.text = getString(R.string.sync_intro_enable_title)
+                binding.contentBody.text = getString(R.string.sync_intro_enable_content)
+                binding.contentIllustration.setImageResource(R.drawable.ic_sync_server_128)
+                binding.syncIntroCta.text = getString(R.string.sync_intro_enable_cta)
+                binding.syncIntroFooter.text = getString(R.string.sync_intro_enable_footer)
+                binding.syncIntroFooter.show()
             }
 
             is RecoverAccountIntro -> {
-
+                binding.contentTitle.text = getString(R.string.sync_intro_recover_title)
+                binding.contentBody.text = getString(R.string.sync_intro_recover_content)
+                binding.contentIllustration.setImageResource(R.drawable.ic_sync_recover_128)
+                binding.syncIntroFooter.hide()
             }
         }
     }

@@ -66,10 +66,10 @@
         android:id="@+id/sync_setup_initialize_sync"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:leadingIconBackground="circular"
         app:leadingIcon="@drawable/ic_start_stop_24"
+        app:leadingIconBackground="circular"
         app:primaryText="@string/sync_setup_single_device_primary_cta_title"
-        app:secondaryText="@string/sync_setup_single_device_primary_cta_subtitle"/>
+        app:secondaryText="@string/sync_setup_single_device_primary_cta_subtitle" />
 
     <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:layout_width="match_parent"

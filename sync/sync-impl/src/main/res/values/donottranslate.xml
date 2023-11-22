@@ -52,6 +52,13 @@
     <string name="sync_enable_option_favicons_title">Fetch Bookmark Icons</string>
     <string name="sync_enable_option_favicons_subtitle">Automatically download icons for synced bookmarks.</string>
     <string name="sync_enable_connecting">Connecting…</string>
+    <string name="sync_intro_enable_title">Sync and Back Up This Device</string>
+    <string name="sync_intro_enable_content">This creates an encrypted backup of your bookmarks and passwords on DuckDuckGo’s secure server, which can be synced with your other devices. \n\n The encryption key is only stored on your device, DuckDuckGo cannot access it.…</string>
+    <string name="sync_intro_enable_footer">You can sync with your other devices later.</string>
+    <string name="sync_intro_enable_cta">Turn on Sync &amp; Backup</string>
+    <string name="sync_intro_recover_title">Recover Synced Data</string>
+    <string name="sync_intro_recover_content">To restore your synced data, you\'ll need the Recovery Code you saved when you first set up Sync. This code may have been saved as a PDF on the device you originally used to set up Sync.</string>
+    <string name="sync_intro_recover_cta">Get Started</string>
 
     <!-- Device synced screen -->
     <string name="sync_connected_device_title">Device Synced!</string>

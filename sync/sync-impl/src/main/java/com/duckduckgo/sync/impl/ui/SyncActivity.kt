@@ -61,6 +61,9 @@ import com.duckduckgo.sync.impl.ui.setup.ConnectFlowContract
 import com.duckduckgo.sync.impl.ui.setup.EnterCodeContract
 import com.duckduckgo.sync.impl.ui.setup.LoginContract
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_INTRO
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SYNC_INTRO
+import com.duckduckgo.sync.impl.ui.setup.SyncIntroContract
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.*
 import kotlinx.coroutines.flow.launchIn
@@ -101,6 +104,14 @@ class SyncActivity : DuckDuckGoActivity() {
     lateinit var syncFeatureMessagesPlugin: DaggerSet<SyncMessagePlugin>
 
     private val loginFlow = registerForActivityResult(LoginContract()) { resultOk ->
+        if (resultOk) {
+            viewModel.onLoginSuccess()
+        }
+    }
+
+    private val syncIntroLauncher = registerForActivityResult(
+        SyncIntroContract(),
+    ) { resultOk ->
         if (resultOk) {
             viewModel.onLoginSuccess()
         }
@@ -230,8 +241,8 @@ class SyncActivity : DuckDuckGoActivity() {
         when (it) {
             is ScanQRCode -> connectFlow.launch(null)
             is EnterTextCode -> enterCodeLauncher.launch(CONNECT_CODE)
-            is CreateAccount -> launcher.launch(SetupAccountActivity.intentSetupFlow(this))
-            is RecoverSyncData -> loginFlow.launch(null)
+            is CreateAccount -> syncIntroLauncher.launch(SYNC_INTRO)
+            is RecoverSyncData -> syncIntroLauncher.launch(RECOVERY_INTRO)
             is DeviceConnected -> launcher.launch(SetupAccountActivity.intentDeviceConnectedFlow(this))
             is AskTurnOffSync -> askTurnOffsync(it.device)
             is AskDeleteAccount -> askDeleteAccount()
