@@ -26,11 +26,13 @@ class NetPVpnSettingsViewModelTest {
     private val networkProtectionState = mock<NetworkProtectionState>()
     private lateinit var locationProvider: FakeDisplayablePreferredLocationProvider
     private lateinit var netPSettingsLocalConfig: NetPSettingsLocalConfig
+    private var isIgnoringBatteryOptimizations: Boolean = false
 
     private lateinit var viewModel: NetPVpnSettingsViewModel
 
     @Before
     fun setup() {
+        isIgnoringBatteryOptimizations = false
         netPSettingsLocalConfig = FakeNetPSettingsLocalConfigFactory.create()
         locationProvider = FakeDisplayablePreferredLocationProvider()
 
@@ -39,7 +41,26 @@ class NetPVpnSettingsViewModelTest {
             locationProvider,
             netPSettingsLocalConfig,
             networkProtectionState,
+            { isIgnoringBatteryOptimizations },
         )
+    }
+
+    @Test
+    fun whenIgnoringBatteryOptimizationsFalseThenRecommendedSettingsAreCorrect() = runTest {
+        viewModel.recommendedSettings().test {
+            isIgnoringBatteryOptimizations = false
+            assertEquals(NetPVpnSettingsViewModel.RecommendedSettings(false), awaitItem())
+            ensureAllEventsConsumed()
+        }
+    }
+
+    @Test
+    fun whenIgnoringBatteryOptimizationsTrueThenRecommendedSettingsAreCorrect() = runTest {
+        viewModel.recommendedSettings().test {
+            isIgnoringBatteryOptimizations = true
+            assertEquals(NetPVpnSettingsViewModel.RecommendedSettings(false), awaitItem())
+            ensureAllEventsConsumed()
+        }
     }
 
     @Test

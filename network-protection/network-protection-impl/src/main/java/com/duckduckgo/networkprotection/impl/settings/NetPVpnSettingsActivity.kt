@@ -26,10 +26,12 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.extensions.launchAlwaysOnSystemSettings
+import com.duckduckgo.common.utils.extensions.launchIgnoreBatteryOptimizationSettings
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpVpnSettingsBinding
+import com.duckduckgo.networkprotection.impl.settings.NetPVpnSettingsViewModel.RecommendedSettings
 import com.duckduckgo.networkprotection.impl.settings.NetPVpnSettingsViewModel.ViewState
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpGeoswitchingScreenNoParams
 import javax.inject.Inject
@@ -70,6 +72,28 @@ class NetPVpnSettingsActivity : DuckDuckGoActivity() {
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach { renderViewState(it) }
             .launchIn(lifecycleScope)
+        viewModel.recommendedSettings()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { renderRecommendedSettings(it) }
+            .launchIn(lifecycleScope)
+    }
+
+    private fun renderRecommendedSettings(state: RecommendedSettings) {
+        val batteryTextTitle = if (state.isIgnoringBatteryOptimizations) {
+            R.string.netpManageRecentAppsProtectionUnrestrictedBattTitle
+        } else {
+            R.string.netpManageRecentAppsProtectionAllowUnrestrictedBattTitle
+        }
+        val batteryTextByline = if (state.isIgnoringBatteryOptimizations) {
+            R.string.netpManageRecentAppsProtectionUnrestrictedBattByline
+        } else {
+            R.string.netpManageRecentAppsProtectionAllowUnrestrictedBattByline
+        }
+        binding.unrestrictedBatteryUsage.setPrimaryText(getString(batteryTextTitle))
+        binding.unrestrictedBatteryUsage.setSecondaryText(getString(batteryTextByline))
+
+        // val alwaysOnLeadingIcon = if (state.alwaysOnState) R.drawable.ic_check_color_24 else R.drawable.ic_alert_color_24
+        // binding.alwaysOn.setLeadingIconResource(alwaysOnLeadingIcon)
     }
 
     private fun renderViewState(viewState: ViewState) {
@@ -77,6 +101,9 @@ class NetPVpnSettingsActivity : DuckDuckGoActivity() {
         binding.geoswitching.setSecondaryText(geoSwitchingSubtitle)
         binding.excludeLocalNetworks.quietlySetIsChecked(viewState.excludeLocalNetworks) { _, isChecked ->
             viewModel.onExcludeLocalRoutes(isChecked)
+        }
+        binding.unrestrictedBatteryUsage.setOnClickListener {
+            this.launchIgnoreBatteryOptimizationSettings()
         }
     }
 
