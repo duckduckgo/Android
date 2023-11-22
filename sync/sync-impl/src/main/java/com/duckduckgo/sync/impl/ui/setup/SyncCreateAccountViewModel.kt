@@ -65,13 +65,17 @@ class SyncCreateAccountViewModel @Inject constructor(
 
     private fun createAccount() = viewModelScope.launch(dispatchers.io()) {
         viewState.emit(ViewState(CreatingAccount))
-        when (syncAccountRepository.createAccount()) {
-            is Error -> {
-                command.send(Command.Error)
-            }
+        if (syncAccountRepository.isSignedIn()) {
+            command.send(FinishSetupFlow)
+        } else {
+            when (syncAccountRepository.createAccount()) {
+                is Error -> {
+                    command.send(Command.Error)
+                }
 
-            is Success -> {
-                command.send(FinishSetupFlow)
+                is Success -> {
+                    command.send(FinishSetupFlow)
+                }
             }
         }
     }

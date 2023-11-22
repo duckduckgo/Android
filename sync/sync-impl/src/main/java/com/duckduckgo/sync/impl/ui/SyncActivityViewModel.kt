@@ -139,6 +139,8 @@ class SyncActivityViewModel @Inject constructor(
         object ShowTextCode : Command()
         object DeviceConnected : Command()
 
+        object SyncIntroCompleted : Command()
+
         data class AskTurnOffSync(val device: ConnectedDevice) : Command()
         object AskDeleteAccount : Command()
         object CheckIfUserHasStoragePermission : Command()
@@ -169,6 +171,12 @@ class SyncActivityViewModel @Inject constructor(
     fun onRecoverYourSyncedData() {
         viewModelScope.launch {
             command.send(Command.IntroRecoverSyncData)
+        }
+    }
+
+    fun onIntroCompleted() {
+        viewModelScope.launch {
+            command.send(Command.SyncIntroCompleted)
         }
     }
 

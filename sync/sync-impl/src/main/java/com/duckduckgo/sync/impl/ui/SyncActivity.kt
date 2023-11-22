@@ -113,7 +113,7 @@ class SyncActivity : DuckDuckGoActivity() {
         SyncIntroContract(),
     ) { resultOk ->
         if (resultOk) {
-            viewModel.onLoginSuccess()
+            viewModel.onIntroCompleted()
         }
     }
 
@@ -259,6 +259,7 @@ class SyncActivity : DuckDuckGoActivity() {
             is AskRemoveDevice -> askRemoveDevice(it.device)
             is AskEditDevice -> askEditDevice(it.device)
             is ShowTextCode -> startActivity(ShowCodeActivity.intent(this))
+            else -> {}
         }
     }
 

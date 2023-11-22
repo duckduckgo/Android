@@ -58,7 +58,7 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
 
     private val loginFlow = registerForActivityResult(LoginContract()) { resultOk ->
         if (resultOk) {
-            viewModel.onSetupComplete()
+            viewModel.onSetupStart()
         }
     }
 

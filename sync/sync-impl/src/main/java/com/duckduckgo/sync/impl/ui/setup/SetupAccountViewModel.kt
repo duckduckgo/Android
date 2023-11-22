@@ -98,7 +98,7 @@ class SetupAccountViewModel @Inject constructor(
 
     fun onSetupComplete() {
         viewModelScope.launch {
-            command.send(SettingUpSync)
+            viewState.emit(ViewState(viewMode = AskSaveRecoveryCode))
         }
     }
 
