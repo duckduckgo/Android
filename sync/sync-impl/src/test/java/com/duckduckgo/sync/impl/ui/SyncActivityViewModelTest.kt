@@ -39,8 +39,8 @@ import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CreateAccount
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoverSyncData
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroCreateAccount
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroRecoverSyncData
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.SyncedDevice
 import java.lang.String.format
@@ -176,7 +176,7 @@ class SyncActivityViewModelTest {
         }
 
         testee.commands().test {
-            awaitItem().assertCommandType(CreateAccount::class)
+            awaitItem().assertCommandType(IntroCreateAccount::class)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -186,7 +186,7 @@ class SyncActivityViewModelTest {
         testee.onRecoverYourSyncedData()
 
         testee.commands().test {
-            awaitItem().assertCommandType(RecoverSyncData::class)
+            awaitItem().assertCommandType(IntroRecoverSyncData::class)
             cancelAndIgnoreRemainingEvents()
         }
     }

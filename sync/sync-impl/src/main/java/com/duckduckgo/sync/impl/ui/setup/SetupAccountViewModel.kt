@@ -29,6 +29,8 @@ import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.R
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SYNC_INTRO
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SYNC_SETUP
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.Close
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.RecoverData
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.SettingUpSync
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.AskSaveRecoveryCode
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.CreateAccount
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.DeviceSynced
@@ -83,6 +85,8 @@ class SetupAccountViewModel @Inject constructor(
     }
 
     sealed class Command {
+        object RecoverData : Command()
+        object SettingUpSync : Command()
         object Close : Command()
     }
 
@@ -94,13 +98,19 @@ class SetupAccountViewModel @Inject constructor(
 
     fun onSetupComplete() {
         viewModelScope.launch {
-            viewState.emit(ViewState(viewMode = AskSaveRecoveryCode))
+            command.send(SettingUpSync)
         }
     }
 
     fun onSetupStart() {
         viewModelScope.launch {
             viewState.emit(ViewState(viewMode = CreateAccount))
+        }
+    }
+
+    fun onRecoverAccountStart() {
+        viewModelScope.launch {
+            command.send(RecoverData)
         }
     }
 }

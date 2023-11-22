@@ -18,6 +18,6 @@ package com.duckduckgo.sync.impl.ui.setup
 
 interface SetupFlowListener {
     fun launchFinishSetupFlow()
-
     fun launchCreateAccountFlow()
+    fun launchRecoverAccountFlow()
 }

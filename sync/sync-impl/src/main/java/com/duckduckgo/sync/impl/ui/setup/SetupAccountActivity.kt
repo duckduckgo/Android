@@ -31,9 +31,6 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.R.id
 import com.duckduckgo.sync.impl.databinding.ActivitySyncSetupAccountBinding
-import com.duckduckgo.sync.impl.ui.EnterCodeActivity
-import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion
-import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.DEVICE_SYNCED
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_CODE
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_INTRO
@@ -41,6 +38,8 @@ import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.S
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SYNC_SETUP
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.Close
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.RecoverData
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.SettingUpSync
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.AskSaveRecoveryCode
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.CreateAccount
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.DeviceSynced
@@ -56,6 +55,12 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
     private val viewModel: SetupAccountViewModel by bindViewModel()
 
     private lateinit var screen: Screen
+
+    private val loginFlow = registerForActivityResult(LoginContract()) { resultOk ->
+        if (resultOk) {
+            viewModel.onSetupComplete()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -105,6 +110,11 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
                 setResult(Activity.RESULT_CANCELED)
                 finish()
             }
+            RecoverData -> loginFlow.launch(null)
+            SettingUpSync -> {
+                setResult(Activity.RESULT_OK)
+                finish()
+            }
         }
     }
 
@@ -116,7 +126,6 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
                     replace(id.fragment_container_view, SyncCreateAccountFragment.instance(), TAG_SYNC_SETUP)
                 }
             }
-
             IntroCreateAccount -> {
                 screen = SYNC_INTRO
                 supportFragmentManager.commitNow {
@@ -155,6 +164,10 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
         viewModel.onSetupStart()
     }
 
+    override fun launchRecoverAccountFlow() {
+        viewModel.onRecoverAccountStart()
+    }
+
     companion object {
         private const val TAG_SYNC_SETUP = "tag_sync_setup"
         private const val TAG_SYNC_INTRO = "tag_sync_intro"
@@ -174,12 +187,6 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
         internal fun intent(context: Context, screen: Screen): Intent {
             return Intent(context, SetupAccountActivity::class.java).apply {
                 putExtra(SETUP_ACCOUNT_SCREEN_EXTRA, screen)
-            }
-        }
-
-        internal fun intentSetupFlow(context: Context): Intent {
-            return Intent(context, SetupAccountActivity::class.java).apply {
-                putExtra(SETUP_ACCOUNT_SCREEN_EXTRA, SYNC_SETUP)
             }
         }
 

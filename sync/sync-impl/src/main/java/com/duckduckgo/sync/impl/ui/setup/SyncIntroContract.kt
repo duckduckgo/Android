@@ -20,8 +20,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
-import com.duckduckgo.sync.impl.ui.EnterCodeActivity
-import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen
 
 class SyncIntroContract : ActivityResultContract<Screen, Boolean>() {

@@ -34,7 +34,6 @@ import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command.AbortFlow
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command.Error
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command.FinishSetupFlow
-import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.ViewMode.CreatingAccount
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.ViewMode.SignedIn
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.ViewState
 import com.google.android.material.snackbar.Snackbar
@@ -85,7 +84,7 @@ class SyncCreateAccountFragment : DuckDuckGoFragment(R.layout.fragment_create_ac
                 listener?.launchFinishSetupFlow()
             }
             else -> {
-                //nothing for now
+                // nothing for now
             }
         }
     }

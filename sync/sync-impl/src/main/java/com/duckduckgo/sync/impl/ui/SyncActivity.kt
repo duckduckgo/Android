@@ -49,10 +49,10 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskEditDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskRemoveDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CreateAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.DeviceConnected
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.EnterTextCode
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoverSyncData
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroCreateAccount
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroRecoverSyncData
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ScanQRCode
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowTextCode
@@ -241,8 +241,8 @@ class SyncActivity : DuckDuckGoActivity() {
         when (it) {
             is ScanQRCode -> connectFlow.launch(null)
             is EnterTextCode -> enterCodeLauncher.launch(CONNECT_CODE)
-            is CreateAccount -> syncIntroLauncher.launch(SYNC_INTRO)
-            is RecoverSyncData -> syncIntroLauncher.launch(RECOVERY_INTRO)
+            is IntroCreateAccount -> syncIntroLauncher.launch(SYNC_INTRO)
+            is IntroRecoverSyncData -> syncIntroLauncher.launch(RECOVERY_INTRO)
             is DeviceConnected -> launcher.launch(SetupAccountActivity.intentDeviceConnectedFlow(this))
             is AskTurnOffSync -> askTurnOffsync(it.device)
             is AskDeleteAccount -> askDeleteAccount()

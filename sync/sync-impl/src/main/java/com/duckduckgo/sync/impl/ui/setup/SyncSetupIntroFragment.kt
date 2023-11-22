@@ -35,6 +35,7 @@ import com.duckduckgo.sync.impl.databinding.FragmentIntroSyncBinding
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupIntroViewModel.Command
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupIntroViewModel.Command.AbortFlow
+import com.duckduckgo.sync.impl.ui.setup.SyncSetupIntroViewModel.Command.RecoverDataFlow
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupIntroViewModel.Command.StartSetupFlow
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupIntroViewModel.ViewMode.CreateAccountIntro
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupIntroViewModel.ViewMode.RecoverAccountIntro
@@ -43,6 +44,7 @@ import com.google.android.material.snackbar.Snackbar
 import javax.inject.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import timber.log.Timber
 
 @InjectWith(FragmentScope::class)
 class SyncSetupIntroFragment : DuckDuckGoFragment(R.layout.fragment_intro_sync) {
@@ -68,11 +70,7 @@ class SyncSetupIntroFragment : DuckDuckGoFragment(R.layout.fragment_intro_sync) 
         observeUiEvents()
     }
 
-    private fun configureListeners(){
-        binding.syncIntroCta.setOnClickListener {
-            viewModel.onNextClicked()
-        }
-
+    private fun configureListeners() {
         binding.closeIcon.setOnClickListener {
             viewModel.onAbortClicked()
         }
@@ -80,7 +78,7 @@ class SyncSetupIntroFragment : DuckDuckGoFragment(R.layout.fragment_intro_sync) 
 
     private fun observeUiEvents() {
         viewModel
-            .viewState()
+            .viewState(getScreen())
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { viewState -> renderViewState(viewState) }
             .launchIn(lifecycleScope)
@@ -101,6 +99,9 @@ class SyncSetupIntroFragment : DuckDuckGoFragment(R.layout.fragment_intro_sync) 
                 binding.syncIntroCta.text = getString(R.string.sync_intro_enable_cta)
                 binding.syncIntroFooter.text = getString(R.string.sync_intro_enable_footer)
                 binding.syncIntroFooter.show()
+                binding.syncIntroCta.setOnClickListener {
+                    viewModel.onTurnSyncOnClicked()
+                }
             }
 
             is RecoverAccountIntro -> {
@@ -108,6 +109,9 @@ class SyncSetupIntroFragment : DuckDuckGoFragment(R.layout.fragment_intro_sync) 
                 binding.contentBody.text = getString(R.string.sync_intro_recover_content)
                 binding.contentIllustration.setImageResource(R.drawable.ic_sync_recover_128)
                 binding.syncIntroFooter.hide()
+                binding.syncIntroCta.setOnClickListener {
+                    viewModel.onStartRecoverDataClicked()
+                }
             }
         }
     }
@@ -121,10 +125,16 @@ class SyncSetupIntroFragment : DuckDuckGoFragment(R.layout.fragment_intro_sync) 
 
             StartSetupFlow -> listener?.launchCreateAccountFlow()
 
+            RecoverDataFlow -> listener?.launchRecoverAccountFlow()
+
             else -> {
                 Snackbar.make(binding.root, R.string.sync_general_error, Snackbar.LENGTH_LONG).show()
             }
         }
+    }
+
+    private fun getScreen(): Screen {
+        return requireArguments().getSerializable(KEY_CREATE_ACCOUNT_INTRO) as Screen
     }
 
     companion object {
@@ -132,6 +142,7 @@ class SyncSetupIntroFragment : DuckDuckGoFragment(R.layout.fragment_intro_sync) 
         const val KEY_CREATE_ACCOUNT_INTRO = "KEY_CREATE_ACCOUNT_INTRO"
 
         fun instance(screen: Screen): SyncSetupIntroFragment {
+            Timber.d("Sync-Setup: screen $screen")
             val fragment = SyncSetupIntroFragment()
             val bundle = Bundle()
             bundle.putSerializable(KEY_CREATE_ACCOUNT_INTRO, screen)

@@ -39,7 +39,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskEditDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskRemoveDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CreateAccount
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroCreateAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.LoadingItem
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.SyncedDevice
@@ -134,10 +134,11 @@ class SyncActivityViewModel @Inject constructor(
     sealed class Command {
         object ScanQRCode : Command()
         object EnterTextCode : Command()
-        object CreateAccount : Command()
-        object RecoverSyncData : Command()
+        object IntroCreateAccount : Command()
+        object IntroRecoverSyncData : Command()
         object ShowTextCode : Command()
         object DeviceConnected : Command()
+
         data class AskTurnOffSync(val device: ConnectedDevice) : Command()
         object AskDeleteAccount : Command()
         object CheckIfUserHasStoragePermission : Command()
@@ -161,13 +162,13 @@ class SyncActivityViewModel @Inject constructor(
     fun onInitializeSync() {
         viewModelScope.launch {
             viewState.value = viewState.value.toggle(true)
-            command.send(CreateAccount)
+            command.send(IntroCreateAccount)
         }
     }
 
     fun onRecoverYourSyncedData() {
         viewModelScope.launch {
-            command.send(Command.RecoverSyncData)
+            command.send(Command.IntroRecoverSyncData)
         }
     }
 
