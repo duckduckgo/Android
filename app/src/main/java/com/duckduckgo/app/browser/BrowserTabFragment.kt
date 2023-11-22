@@ -1636,7 +1636,7 @@ class BrowserTabFragment :
                 when {
                     fallbackIntent != null -> {
                         val fallbackActivities = pm.queryIntentActivities(fallbackIntent, 0)
-                        launchDialogForIntent(it, pm, fallbackIntent, fallbackActivities, useFirstActivityFound)
+                        launchDialogForIntent(it, pm, fallbackIntent, fallbackActivities, useFirstActivityFound, viewModel.linkOpenedInNewTab())
                     }
 
                     fallbackUrl != null -> {
@@ -1656,7 +1656,7 @@ class BrowserTabFragment :
                     }
                 }
             } else {
-                launchDialogForIntent(it, pm, intent, activities, useFirstActivityFound)
+                launchDialogForIntent(it, pm, intent, activities, useFirstActivityFound, viewModel.linkOpenedInNewTab())
             }
         }
     }
@@ -1667,8 +1667,9 @@ class BrowserTabFragment :
         intent: Intent,
         activities: List<ResolveInfo>,
         useFirstActivityFound: Boolean,
+        isOpenedInNewTab: Boolean,
     ) {
-        if (!isActiveTab) {
+        if (!isActiveTab && !isOpenedInNewTab) {
             Timber.v("Will not launch a dialog for an inactive tab")
             return
         }
