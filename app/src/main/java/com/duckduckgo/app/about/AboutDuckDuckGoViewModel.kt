@@ -21,10 +21,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.pixels.AppPixelName.*
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.NotUnlocked
@@ -65,13 +65,13 @@ class AboutDuckDuckGoViewModel @Inject constructor(
     private var netPEasterEggCounter = 0
 
     fun viewState(): Flow<ViewState> = viewState.onStart {
-        val variant = variantManager.getVariant()
+        val variantKey = variantManager.getVariantKey()
 
         viewModelScope.launch {
             viewState.emit(
                 currentViewState().copy(
                     networkProtectionWaitlistState = networkProtectionWaitlist.getState(),
-                    version = obtainVersion(variant.key),
+                    version = obtainVersion(variantKey),
                 ),
             )
         }
@@ -129,8 +129,8 @@ class AboutDuckDuckGoViewModel @Inject constructor(
         return viewState.value
     }
 
-    private fun obtainVersion(variantKey: String): String {
-        val formattedVariantKey = if (variantKey.isBlank()) " " else " $variantKey "
+    private fun obtainVersion(variantKey: String?): String {
+        val formattedVariantKey = if (variantKey.isNullOrBlank()) " " else " $variantKey "
         return "${appBuildConfig.versionName}$formattedVariantKey(${appBuildConfig.versionCode})"
     }
 

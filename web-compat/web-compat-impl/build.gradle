@@ -39,8 +39,7 @@ dependencies {
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':web-compat-store')
     implementation project(path: ':content-scope-scripts-api')
-
-    implementation Kotlin.stdlib.jdk7
+    implementation project(path: ':js-messaging-api')
 
     // Room
     implementation AndroidX.room.runtime

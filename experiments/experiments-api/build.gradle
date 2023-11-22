@@ -14,11 +14,24 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.bookmarks.ui
+plugins {
+    id 'java-library'
+    id 'kotlin'
+}
 
-import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
+apply from: "$rootProject.projectDir/code-formatting.gradle"
 
-/**
- * Use this model to launch the Bookmarks screen
- */
-object BookmarksScreenNoParams : ActivityParams
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+kotlin {
+    jvmToolchain(17)
+}
+
+dependencies {
+    implementation Kotlin.stdlib.jdk7
+
+}
+

@@ -19,10 +19,12 @@ package com.duckduckgo.app.brokensite.api
 import android.net.Uri
 import androidx.core.net.toUri
 import com.duckduckgo.app.brokensite.model.BrokenSite
+import com.duckduckgo.app.brokensite.model.ReportFlow
+import com.duckduckgo.app.brokensite.model.ReportFlow.DASHBOARD
+import com.duckduckgo.app.brokensite.model.ReportFlow.MENU
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
@@ -32,6 +34,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.absoluteString
 import com.duckduckgo.common.utils.domain
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.Gpc
@@ -103,6 +106,10 @@ class BrokenSiteSubmitter @Inject constructor(
                 PROTECTIONS_STATE to protectionsState.toString(),
             )
 
+            brokenSite.reportFlow?.let { reportFlow ->
+                params[REPORT_FLOW] = reportFlow.toStringValue()
+            }
+
             val lastSentDay = brokenSiteLastSentReport.getLastSentDay(domain.orEmpty())
             if (lastSentDay != null) {
                 params[LAST_SENT_DAY] = lastSentDay
@@ -130,7 +137,7 @@ class BrokenSiteSubmitter @Inject constructor(
     }
 
     private fun atbWithVariant(): String {
-        return statisticsStore.atb?.formatWithVariant(variantManager.getVariant()).orEmpty()
+        return statisticsStore.atb?.formatWithVariant(variantManager.getVariantKey()).orEmpty()
     }
 
     companion object {
@@ -160,7 +167,13 @@ class BrokenSiteSubmitter @Inject constructor(
         private const val PROTECTIONS_STATE = "protectionsState"
         private const val LAST_SENT_DAY = "lastSentDay"
         private const val LOGIN_SITE = "loginSite"
+        private const val REPORT_FLOW = "reportFlow"
     }
 }
 
 fun Boolean.toBinaryString(): String = if (this) "1" else "0"
+
+private fun ReportFlow.toStringValue(): String = when (this) {
+    DASHBOARD -> "dashboard"
+    MENU -> "menu"
+}

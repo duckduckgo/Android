@@ -41,7 +41,6 @@ dependencies {
     implementation project(':navigation-api')
     implementation project(':feature-toggles-api')
 
-    implementation Kotlin.stdlib.jdk7
     implementation AndroidX.appCompat
     implementation Google.android.material
     implementation AndroidX.constraintLayout

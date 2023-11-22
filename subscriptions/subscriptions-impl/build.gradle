@@ -43,7 +43,6 @@ dependencies {
     implementation project(path: ':subscriptions-store')
     implementation project(path: ':settings-api')
 
-    implementation Kotlin.stdlib.jdk7
     implementation AndroidX.appCompat
     implementation KotlinX.coroutines.core
     implementation Google.android.material

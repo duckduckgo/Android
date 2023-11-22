@@ -53,8 +53,6 @@ dependencies {
     implementation Square.moshi
     implementation Square.okHttp3.okHttp
 
-    implementation Kotlin.stdlib.jdk7
-
     implementation AndroidX.core.ktx
 
     implementation AndroidX.appCompat
@@ -65,7 +63,6 @@ dependencies {
     implementation AndroidX.lifecycle.runtime.ktx
     implementation AndroidX.lifecycle.commonJava8
     implementation AndroidX.work.runtimeKtx
-    implementation Kotlin.stdlib.jdk7
 
     // Dagger
     implementation Google.dagger

@@ -23,27 +23,27 @@
     <string name="managementDisabledModeSubtitle">É necessário um padrão de bloqueio de dispositivo, PIN ou biometria para proteger os teus inícios de sessão.</string>
     <string name="managementDisabledModeTitle">Proteger o dispositivo para guardar inícios de sessão</string>
 
-    <string name="saveLoginDialogButtonSave">Guardar início de sessão</string>
+    <string name="saveLoginDialogButtonSave">Guardar palavra-passe</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Guardar palavra-passe</string>
-    <string name="saveLoginDialogNotNow">Agora não</string>
-    <string name="saveLoginDialogSubtitle">Os inícios de sessão são armazenados com segurança no teu dispositivo, e podes efetuar a gestão dos mesmos a partir do menu Inícios de sessão nas Definições.</string>
-    <string name="saveLoginDialogTitle">Queres que o DuckDuckGo guarde o teu início de sessão?</string>
+    <string name="saveLoginDialogNotNow">Não guardar</string>
+    <string name="saveLoginDialogSubtitle">As palavras-passe são armazenadas de forma segura no teu dispositivo no menu Inícios de sessão.</string>
+    <string name="saveLoginDialogTitle">Queres que o DuckDuckGo guarde a tua palavra-passe?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Mais opções</string>
 
-    <string name="useSavedLoginDialogTitle">Utilizar um início de sessão guardado?</string>
+    <string name="useSavedLoginDialogTitle">Usar uma palavra-passe guardada?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Palavra-passe de %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Palavra-passe do site</string>
     <string name="useSavedLoginDialogGroupThisWebsite">Deste site</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">De %1$s</string>
 
     <string name="updateLoginDialogButtonUpdatePassword">Atualizar palavra-passe</string>
-    <string name="updateLoginDialogButtonNotNow">Agora não</string>
+    <string name="updateLoginDialogButtonNotNow">Não guardar</string>
 
     <string name="updateLoginDialogTitleUpdateUsername">Atualizar nome de utilizador?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Atualizar nome de utilizador</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Atualizar palavra-passe de \n%1$s?</string>
-    <string name="updateLoginUpdatePasswordExplanation">O DuckDuckGo vai atualizar este início de sessão armazenado no teu dispositivo.</string>
+    <string name="updateLoginUpdatePasswordExplanation">O DuckDuckGo vai atualizar esta palavra-passe armazenada no teu dispositivo.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Fechar caixa de diálogo de preenchimento automático</string>
 
@@ -60,12 +60,12 @@
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Dados de início de sessão atualizados pela última vez em %1$s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Guardar e preencher dados de início de sessão automaticamente</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Os inícios de sessão são armazenados com segurança no teu dispositivo</string>
     <string name="credentialManagementViewMenuEdit">Editar</string>
     <string name="credentialManagementViewMenuDelete">Eliminar</string>
 
     <string name="credentialManagementSuggestionsLabel">Sugerido</string>
     <string name="credentialManagementNoLoginsSavedTitle">Nenhum início de sessão guardado</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Os inícios de sessão são armazenados com segurança no teu dispositivo.</string>
 
     <string name="autofillManagementAddLogin">Adicionar início de sessão</string>
     <string name="autofillManagementSearchLogins">Pesquisar inícios de sessão</string>
@@ -79,9 +79,9 @@
     <string name="autofillManagementUsernameCopied">Nome de utilizador copiado</string>
     <string name="autofillManagementPasswordCopied">Palavra-passe copiada</string>
 
-    <string name="autofill_password_generation_offer_title">Utilizar palavra-passe gerada pelo DuckDuckGo?</string>
-    <string name="autofill_password_generation_offer_message">A palavra-passe será guardada em Início de sessão.</string>
-    <string name="autofill_password_generation_offer_accept">Utilizar palavra-passe gerada</string>
+    <string name="autofill_password_generation_offer_title">Utilizar uma palavra-passe forte do DuckDuckGo?</string>
+    <string name="autofill_password_generation_offer_message">As palavras-passe são armazenadas de forma segura no teu dispositivo no menu Inícios de sessão.</string>
+    <string name="autofill_password_generation_offer_accept">Utilizar palavra-passe forte</string>
     <string name="autofill_password_generation_offer_decline">Criar a minha própria palavra-passe</string>
 
     <string name="deviceNotSupportedTitle">Dispositivo não suportado</string>

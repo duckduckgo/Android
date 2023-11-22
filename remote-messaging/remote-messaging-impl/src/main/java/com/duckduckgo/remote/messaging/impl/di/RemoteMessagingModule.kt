@@ -18,7 +18,6 @@ package com.duckduckgo.remote.messaging.impl.di
 
 import android.content.Context
 import androidx.room.Room
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.AppProperties
 import com.duckduckgo.browser.api.UserBrowserProperties
@@ -29,8 +28,6 @@ import com.duckduckgo.remote.messaging.api.AttributeMatcherPlugin
 import com.duckduckgo.remote.messaging.api.MessageActionMapperPlugin
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.impl.*
-import com.duckduckgo.remote.messaging.impl.RealRemoteMessagingConfigDownloader
-import com.duckduckgo.remote.messaging.impl.RemoteMessagingConfigDownloader
 import com.duckduckgo.remote.messaging.impl.mappers.MessageMapper
 import com.duckduckgo.remote.messaging.impl.mappers.RemoteMessagingConfigJsonMapper
 import com.duckduckgo.remote.messaging.impl.matchers.AndroidAppAttributeMatcher
@@ -87,16 +84,12 @@ object DataSourceModule {
         remoteMessagesDao: RemoteMessagesDao,
         dispatchers: DispatcherProvider,
         messageMapper: MessageMapper,
-        userBrowserProperties: UserBrowserProperties,
-        variantManager: VariantManager,
     ): RemoteMessagingRepository {
         return AppRemoteMessagingRepository(
             remoteMessagingConfigRepository,
             remoteMessagesDao,
             dispatchers,
             messageMapper,
-            userBrowserProperties,
-            variantManager,
         )
     }
 

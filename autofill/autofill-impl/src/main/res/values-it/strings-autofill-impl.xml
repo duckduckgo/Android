@@ -25,8 +25,8 @@
 
     <string name="saveLoginDialogButtonSave">Salva dati di accesso</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Salva password</string>
-    <string name="saveLoginDialogNotNow">Non adesso</string>
-    <string name="saveLoginDialogSubtitle">I dati di accesso sono archiviati in modo sicuro sul tuo dispositivo e possono essere gestiti dal menu Accessi, in Impostazioni.</string>
+    <string name="saveLoginDialogNotNow">Non salvare</string>
+    <string name="saveLoginDialogSubtitle">Gli accessi sono archiviati in modo sicuro sul tuo dispositivo nel menu Accessi.</string>
     <string name="saveLoginDialogTitle">Vuoi che DuckDuckGo salvi i dati di accesso?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Altre opzioni</string>
 
@@ -37,7 +37,7 @@
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Da %1$s</string>
 
     <string name="updateLoginDialogButtonUpdatePassword">Aggiorna password</string>
-    <string name="updateLoginDialogButtonNotNow">Non adesso</string>
+    <string name="updateLoginDialogButtonNotNow">Non salvare</string>
 
     <string name="updateLoginDialogTitleUpdateUsername">Aggiornare nome utente?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Aggiorna nome utente</string>
@@ -60,12 +60,12 @@
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Ultimo aggiornamento dei dati di accesso %1$s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Salva e compila automaticamente i dati di accesso</string>
+    <string name="credentialManagementAutofillToggleSubtitle">I dati di accesso sono archiviati in modo sicuro sul tuo dispositivo</string>
     <string name="credentialManagementViewMenuEdit">Modifica</string>
     <string name="credentialManagementViewMenuDelete">Cancella</string>
 
     <string name="credentialManagementSuggestionsLabel">Suggerimenti</string>
     <string name="credentialManagementNoLoginsSavedTitle">Non ci sono ancora dati di accesso salvati</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">I dati di accesso sono archiviati in modo sicuro sul tuo dispositivo.</string>
 
     <string name="autofillManagementAddLogin">Aggiungi dati di accesso</string>
     <string name="autofillManagementSearchLogins">Cerca dati di accesso</string>
@@ -79,9 +79,9 @@
     <string name="autofillManagementUsernameCopied">Nome utente copiato</string>
     <string name="autofillManagementPasswordCopied">Password copiata</string>
 
-    <string name="autofill_password_generation_offer_title">Usare la password generata da DuckDuckGo?</string>
-    <string name="autofill_password_generation_offer_message">La password verrà salvata in Accessi.</string>
-    <string name="autofill_password_generation_offer_accept">Usa password generata</string>
+    <string name="autofill_password_generation_offer_title">Usare una password complessa da DuckDuckGo?</string>
+    <string name="autofill_password_generation_offer_message">Le password sono archiviate in modo sicuro sul tuo dispositivo nel menu Accessi.</string>
+    <string name="autofill_password_generation_offer_accept">Usa una password complessa</string>
     <string name="autofill_password_generation_offer_decline">Crea la mia</string>
 
     <string name="deviceNotSupportedTitle">Dispositivo non supportato</string>

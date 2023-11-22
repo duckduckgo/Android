@@ -40,7 +40,6 @@ dependencies {
     implementation project(':di')
     implementation project(path: ':common-utils')
 
-    implementation Kotlin.stdlib.jdk7
     implementation AndroidX.lifecycle.runtime.ktx
     implementation AndroidX.lifecycle.viewModelKtx
     implementation AndroidX.lifecycle.process

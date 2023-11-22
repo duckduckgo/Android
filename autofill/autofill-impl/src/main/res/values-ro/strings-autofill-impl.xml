@@ -23,27 +23,27 @@
     <string name="managementDisabledModeSubtitle">Este necesar un model de blocare a dispozitivului, un cod PIN sau date biometrice pentru a-ți proteja conectările.</string>
     <string name="managementDisabledModeTitle">Securizează-ți dispozitivul pentru a salva conectările</string>
 
-    <string name="saveLoginDialogButtonSave">Salvează autentificarea</string>
+    <string name="saveLoginDialogButtonSave">Salvează parola</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Salvează parola</string>
-    <string name="saveLoginDialogNotNow">Nu acum</string>
-    <string name="saveLoginDialogSubtitle">Datele de conectare sunt stocate în siguranță pe dispozitivul tău și pot fi gestionate din Setări, meniul Date de conectare.</string>
-    <string name="saveLoginDialogTitle">Vrei ca DuckDuckGo să îți salveze datele de conectare?</string>
+    <string name="saveLoginDialogNotNow">Nu salva</string>
+    <string name="saveLoginDialogSubtitle">Parolele sunt stocate în siguranță pe dispozitivul dvs. în meniul Autentificări.</string>
+    <string name="saveLoginDialogTitle">Dorești ca DuckDuckGo să-ți salveze parola?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Mai multe opțiuni</string>
 
-    <string name="useSavedLoginDialogTitle">Folosești datele de conectare salvate?</string>
+    <string name="useSavedLoginDialogTitle">Folosești o parolă salvată?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Parola pentru %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Parola pentru site</string>
     <string name="useSavedLoginDialogGroupThisWebsite">De pe acest site web</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Din %1$s</string>
 
     <string name="updateLoginDialogButtonUpdatePassword">Actualizează parola</string>
-    <string name="updateLoginDialogButtonNotNow">Nu acum</string>
+    <string name="updateLoginDialogButtonNotNow">Nu salva</string>
 
     <string name="updateLoginDialogTitleUpdateUsername">Actualizezi numele de utilizator?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Actualizează numele de utilizator</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Actualizezi parola pentru \n%1$s?</string>
-    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo va actualiza aceste date de conectare stocate pe dispozitivul tău.</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo va actualiza această parolă stocată pe dispozitivul tău.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Închide dialogul de completare automată</string>
 
@@ -60,12 +60,12 @@
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Ultima actualizare a datelor de autentificare %1$s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Salvează și completează automat datele de autentificare</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Datele de conectare sunt stocate în siguranță pe dispozitivul tău</string>
     <string name="credentialManagementViewMenuEdit">Editează</string>
     <string name="credentialManagementViewMenuDelete">Ștergere</string>
 
     <string name="credentialManagementSuggestionsLabel">Sugerat</string>
     <string name="credentialManagementNoLoginsSavedTitle">Nu au fost salvate încă date de autentificare</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Datele de conectare sunt stocate în siguranță pe dispozitivul tău.</string>
 
     <string name="autofillManagementAddLogin">Adaugă date de autentificare</string>
     <string name="autofillManagementSearchLogins">Date de autentificare pentru căutare</string>
@@ -79,9 +79,9 @@
     <string name="autofillManagementUsernameCopied">Numele de utilizator a fost copiat</string>
     <string name="autofillManagementPasswordCopied">Parolă copiată</string>
 
-    <string name="autofill_password_generation_offer_title">Vrei să folosești parola generată de DuckDuckGo?</string>
-    <string name="autofill_password_generation_offer_message">Parola va fi salvată în Datele de conectare.</string>
-    <string name="autofill_password_generation_offer_accept">Folosește parola generată</string>
+    <string name="autofill_password_generation_offer_title">Folosiți o parolă puternică de la DuckDuckGo?</string>
+    <string name="autofill_password_generation_offer_message">Parolele sunt stocate în siguranță pe dispozitivul dvs. în meniul Autentificări.</string>
+    <string name="autofill_password_generation_offer_accept">Utilizați o parolă puternică</string>
     <string name="autofill_password_generation_offer_decline">Îmi creez propria parolă</string>
 
     <string name="deviceNotSupportedTitle">Dispozitivul nu este acceptat</string>

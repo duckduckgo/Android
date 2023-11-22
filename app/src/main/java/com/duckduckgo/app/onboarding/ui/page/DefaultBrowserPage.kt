@@ -33,7 +33,6 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.view.button.DaxButton
 import com.duckduckgo.common.ui.view.show
@@ -47,9 +46,6 @@ class DefaultBrowserPage : OnboardingPageFragment(R.layout.content_onboarding_de
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
-
-    @Inject
-    lateinit var variantManager: VariantManager
 
     @Inject
     lateinit var appBuildConfig: AppBuildConfig

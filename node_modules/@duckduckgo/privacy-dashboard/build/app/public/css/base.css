@@ -532,6 +532,23 @@ a.link-action--rounded {
   padding-top: 14px;
   padding-bottom: 14px;
 }
+.environment--ios a.link-action--rounded {
+  font-size: 14px;
+  padding-top: 16px;
+  padding-bottom: 16px;
+}
+.environment--windows a.link-action--rounded {
+  line-height: 22px;
+  font-size: 14px;
+  padding-top: 16px;
+  padding-bottom: 16px;
+}
+.environment--browser a.link-action--rounded {
+  line-height: 18px;
+  font-size: 14px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
 
 /**
  * DDG Extension Helper Classes
@@ -611,10 +628,6 @@ a.link-action--rounded {
   padding-right: 16px;
 }
 
-.padding-spacer {
-  padding-top: 24px;
-}
-
 .padding-y {
   padding-top: 16px;
   padding-bottom: 16px;
@@ -626,7 +639,7 @@ a.link-action--rounded {
 }
 
 .padding-bottom-half {
-  padding-bottom: 8px;
+  padding-bottom: 10px;
 }
 
 .bg-primary {

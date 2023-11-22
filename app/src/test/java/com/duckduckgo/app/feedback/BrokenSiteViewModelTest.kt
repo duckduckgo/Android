@@ -24,10 +24,12 @@ import com.duckduckgo.app.brokensite.BrokenSiteViewModel.Command
 import com.duckduckgo.app.brokensite.api.BrokenSiteSender
 import com.duckduckgo.app.brokensite.model.BrokenSite
 import com.duckduckgo.app.brokensite.model.BrokenSiteCategory
+import com.duckduckgo.app.brokensite.model.ReportFlow
 import com.duckduckgo.app.brokensite.model.SiteProtectionsState
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.AmpLinkInfo
@@ -156,6 +158,7 @@ class BrokenSiteViewModelTest {
             errorCodes = emptyArray(),
             httpErrorCodes = "",
             isDesktopMode = false,
+            reportFlow = MENU,
         )
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion", "description", "")
@@ -176,6 +179,7 @@ class BrokenSiteViewModelTest {
             errorCodes = "[]",
             httpErrorCodes = "",
             loginSite = "",
+            reportFlow = ReportFlow.MENU,
         )
 
         verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to url))
@@ -198,6 +202,7 @@ class BrokenSiteViewModelTest {
             errorCodes = emptyArray(),
             httpErrorCodes = "",
             isDesktopMode = false,
+            reportFlow = MENU,
         )
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion", "description", "")
@@ -218,6 +223,7 @@ class BrokenSiteViewModelTest {
             errorCodes = "",
             httpErrorCodes = "",
             loginSite = "",
+            reportFlow = ReportFlow.MENU,
         )
 
         verify(mockPixel, never()).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to nullUrl))
@@ -241,6 +247,7 @@ class BrokenSiteViewModelTest {
             errorCodes = emptyArray(),
             httpErrorCodes = "",
             isDesktopMode = false,
+            reportFlow = MENU,
         )
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion", "description", "")
@@ -261,6 +268,7 @@ class BrokenSiteViewModelTest {
             errorCodes = "[]",
             httpErrorCodes = "",
             loginSite = "",
+            reportFlow = ReportFlow.MENU,
         )
 
         verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to url))
@@ -284,6 +292,7 @@ class BrokenSiteViewModelTest {
             errorCodes = emptyArray(),
             httpErrorCodes = "",
             isDesktopMode = false,
+            reportFlow = MENU,
         )
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion", "description", "")
@@ -304,6 +313,7 @@ class BrokenSiteViewModelTest {
             errorCodes = "[]",
             httpErrorCodes = "",
             loginSite = "",
+            reportFlow = ReportFlow.MENU,
         )
 
         verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to trackingUrl))
@@ -327,6 +337,7 @@ class BrokenSiteViewModelTest {
             errorCodes = emptyArray(),
             httpErrorCodes = "",
             isDesktopMode = false,
+            reportFlow = MENU,
         )
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion", "description", "")
@@ -353,6 +364,7 @@ class BrokenSiteViewModelTest {
             errorCodes = emptyArray(),
             httpErrorCodes = "",
             isDesktopMode = true,
+            reportFlow = MENU,
         )
         selectAndAcceptCategory()
 
@@ -374,6 +386,7 @@ class BrokenSiteViewModelTest {
             errorCodes = emptyArray(),
             httpErrorCodes = "",
             isDesktopMode = false,
+            reportFlow = MENU,
         )
         selectAndAcceptCategory()
 
@@ -397,6 +410,7 @@ class BrokenSiteViewModelTest {
             errorCodes = emptyArray(),
             httpErrorCodes = "",
             isDesktopMode = false,
+            reportFlow = MENU,
         )
         selectAndAcceptCategory(categoryIndex)
 
@@ -419,6 +433,7 @@ class BrokenSiteViewModelTest {
             errorCodes = emptyArray(),
             httpErrorCodes = "",
             isDesktopMode = false,
+            reportFlow = MENU,
         )
         selectAndAcceptCategory(0)
         testee.onCategoryIndexChanged(1)
@@ -441,6 +456,7 @@ class BrokenSiteViewModelTest {
             errorCodes = emptyArray(),
             httpErrorCodes = "",
             isDesktopMode = false,
+            reportFlow = MENU,
         )
         testee.onCategoryIndexChanged(1)
         testee.onCategorySelectionCancelled()
@@ -464,6 +480,7 @@ class BrokenSiteViewModelTest {
             errorCodes = emptyArray(),
             httpErrorCodes = "",
             isDesktopMode = false,
+            reportFlow = MENU,
         )
         selectAndAcceptCategory(categoryIndex)
         testee.onSubmitPressed("webViewVersion", "description", "test")
@@ -484,6 +501,7 @@ class BrokenSiteViewModelTest {
             errorCodes = "[]",
             httpErrorCodes = "",
             loginSite = "test",
+            reportFlow = ReportFlow.MENU,
         )
 
         verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to url))
@@ -507,6 +525,7 @@ class BrokenSiteViewModelTest {
             errorCodes = emptyArray(),
             httpErrorCodes = "",
             isDesktopMode = false,
+            reportFlow = MENU,
         )
         selectAndAcceptCategory(categoryIndex)
         testee.onSubmitPressed("webViewVersion", "description", "test")
@@ -527,6 +546,7 @@ class BrokenSiteViewModelTest {
             errorCodes = "[]",
             httpErrorCodes = "",
             loginSite = "",
+            reportFlow = ReportFlow.MENU,
         )
 
         verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to url))
@@ -550,6 +570,7 @@ class BrokenSiteViewModelTest {
             errorCodes = emptyArray(),
             httpErrorCodes = "",
             isDesktopMode = false,
+            reportFlow = MENU,
         )
 
         testee.onProtectionsToggled(protectionsEnabled = false)
@@ -582,6 +603,7 @@ class BrokenSiteViewModelTest {
             errorCodes = emptyArray(),
             httpErrorCodes = "",
             isDesktopMode = false,
+            reportFlow = MENU,
         )
 
         assertEquals(SiteProtectionsState.DISABLED_BY_REMOTE_CONFIG, viewState.protectionsState)
@@ -607,6 +629,7 @@ class BrokenSiteViewModelTest {
             errorCodes = emptyArray(),
             httpErrorCodes = "",
             isDesktopMode = false,
+            reportFlow = MENU,
         )
 
         assertEquals(SiteProtectionsState.DISABLED_BY_REMOTE_CONFIG, viewState.protectionsState)
@@ -632,6 +655,7 @@ class BrokenSiteViewModelTest {
             errorCodes = emptyArray(),
             httpErrorCodes = "",
             isDesktopMode = false,
+            reportFlow = MENU,
         )
 
         assertEquals(SiteProtectionsState.DISABLED_BY_REMOTE_CONFIG, viewState.protectionsState)
@@ -656,6 +680,7 @@ class BrokenSiteViewModelTest {
             errorCodes = emptyArray(),
             httpErrorCodes = "",
             isDesktopMode = false,
+            reportFlow = MENU,
         )
 
         assertEquals(SiteProtectionsState.DISABLED, viewState.protectionsState)
@@ -680,6 +705,7 @@ class BrokenSiteViewModelTest {
             errorCodes = emptyArray(),
             httpErrorCodes = "",
             isDesktopMode = false,
+            reportFlow = MENU,
         )
 
         assertEquals(SiteProtectionsState.ENABLED, viewState.protectionsState)
@@ -699,6 +725,7 @@ class BrokenSiteViewModelTest {
             errorCodes = emptyArray(),
             httpErrorCodes = "",
             isDesktopMode = false,
+            reportFlow = MENU,
         )
 
         testee.onProtectionsToggled(protectionsEnabled = false)
@@ -719,6 +746,7 @@ class BrokenSiteViewModelTest {
             errorCodes = emptyArray(),
             httpErrorCodes = "",
             isDesktopMode = false,
+            reportFlow = MENU,
         )
 
         testee.onProtectionsToggled(protectionsEnabled = true)

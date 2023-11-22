@@ -34,7 +34,7 @@ import com.duckduckgo.app.feedback.ui.negative.mainreason.MainReasonNegativeFeed
 import com.duckduckgo.app.feedback.ui.negative.openended.ShareOpenEndedFeedbackFragment
 import com.duckduckgo.app.feedback.ui.negative.subreason.SubReasonNegativeFeedbackFragment
 import com.duckduckgo.app.feedback.ui.positive.initial.PositiveFeedbackLandingFragment
-import com.duckduckgo.browser.api.ui.FeedbackActivityWithEmptyParams
+import com.duckduckgo.browser.api.ui.BrowserScreens.FeedbackActivityWithEmptyParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.hideKeyboard
 import com.duckduckgo.common.ui.viewbinding.viewBinding

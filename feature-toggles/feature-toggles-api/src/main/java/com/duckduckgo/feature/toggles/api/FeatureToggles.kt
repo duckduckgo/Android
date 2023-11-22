@@ -28,6 +28,8 @@ class FeatureToggles private constructor(
     private val appVersionProvider: () -> Int,
     private val flavorNameProvider: () -> String,
     private val featureName: String,
+    private val appVariantProvider: () -> String?,
+    private val forceDefaultVariant: () -> Unit,
 ) {
 
     private val featureToggleCache = mutableMapOf<Method, Toggle>()
@@ -37,12 +39,16 @@ class FeatureToggles private constructor(
         private var appVersionProvider: () -> Int = { Int.MAX_VALUE },
         private var flavorNameProvider: () -> String = { "" },
         private var featureName: String? = null,
+        private var appVariantProvider: () -> String? = { "" },
+        private var forceDefaultVariant: () -> Unit = { /** noop **/ },
     ) {
 
         fun store(store: Toggle.Store) = apply { this.store = store }
         fun appVersionProvider(appVersionProvider: () -> Int) = apply { this.appVersionProvider = appVersionProvider }
         fun flavorNameProvider(flavorNameProvider: () -> String) = apply { this.flavorNameProvider = flavorNameProvider }
         fun featureName(featureName: String) = apply { this.featureName = featureName }
+        fun appVariantProvider(variantName: () -> String?) = apply { this.appVariantProvider = variantName }
+        fun forceDefaultVariantProvider(forceDefaultVariant: () -> Unit) = apply { this.forceDefaultVariant = forceDefaultVariant }
         fun build(): FeatureToggles {
             val missing = StringBuilder()
             if (this.store == null) {
@@ -54,7 +60,7 @@ class FeatureToggles private constructor(
             if (missing.isNotBlank()) {
                 throw IllegalArgumentException("This following parameters can't be null: $missing")
             }
-            return FeatureToggles(this.store!!, appVersionProvider, flavorNameProvider, featureName!!)
+            return FeatureToggles(this.store!!, appVersionProvider, flavorNameProvider, featureName!!, appVariantProvider, forceDefaultVariant)
         }
     }
 
@@ -86,14 +92,20 @@ class FeatureToggles private constructor(
             val isInternalAlwaysEnabledAnnotated: Boolean = runCatching {
                 method.getAnnotation(Toggle.InternalAlwaysEnabled::class.java)
             }.getOrNull() != null
+            val forcesDefaultVariant: Boolean = runCatching {
+                method.getAnnotation(Toggle.ForcesDefaultVariantIfNull::class.java)
+            }.getOrNull() != null
 
             return ToggleImpl(
                 store = store,
                 key = getToggleNameForMethod(method),
                 defaultValue = defaultValue,
                 isInternalAlwaysEnabled = isInternalAlwaysEnabledAnnotated,
+                forcesDefaultVariant = forcesDefaultVariant,
                 appVersionProvider = appVersionProvider,
                 flavorNameProvider = flavorNameProvider,
+                appVariantProvider = appVariantProvider,
+                forceDefaultVariant = forceDefaultVariant,
             ).also { featureToggleCache[method] = it }
         }
     }
@@ -156,7 +168,12 @@ interface Toggle {
         val enabledOverrideValue: Boolean? = null,
         val rollout: List<Double>? = null,
         val rolloutStep: Int? = null,
-    )
+        val targets: List<Target> = emptyList(),
+    ) {
+        data class Target(
+            val variantKey: String,
+        )
+    }
 
     interface Store {
         fun set(key: String, state: State)
@@ -164,15 +181,32 @@ interface Toggle {
         fun get(key: String): State?
     }
 
+    /**
+     * This annotation is required.
+     * It specifies the default value of the feature flag when it's not remotely defined
+     */
     @Target(AnnotationTarget.FUNCTION)
     @Retention(AnnotationRetention.RUNTIME)
     annotation class DefaultValue(
         val defaultValue: Boolean,
     )
 
+    /**
+     * This annotation is optional.
+     * It will make the feature flag ALWAYS enabled for internal builds
+     */
     @Target(AnnotationTarget.FUNCTION)
     @Retention(AnnotationRetention.RUNTIME)
     annotation class InternalAlwaysEnabled
+
+    /**
+     * This annotation is optional and it should be used in feature flags that related to experimentation.
+     * It will make the feature flag to set the default variant if [isEnabled] is called BEFORE any variant has been allocated.
+     * This annotation should be used ONLY in experiments that happen in the first (eg. onboarding) screens of the application.
+     */
+    @Target(AnnotationTarget.FUNCTION)
+    @Retention(AnnotationRetention.RUNTIME)
+    annotation class ForcesDefaultVariantIfNull
 }
 
 internal class ToggleImpl constructor(
@@ -180,16 +214,35 @@ internal class ToggleImpl constructor(
     private val key: String,
     private val defaultValue: Boolean,
     private val isInternalAlwaysEnabled: Boolean,
+    private val forcesDefaultVariant: Boolean,
     private val appVersionProvider: () -> Int,
     private val flavorNameProvider: () -> String = { "" },
+    private val appVariantProvider: () -> String?,
+    private val forceDefaultVariant: () -> Unit,
 ) : Toggle {
+
+    private fun Toggle.State.isVariantTreated(variant: String?): Boolean {
+        // if no variants a present, we consider always treated
+        if (this.targets.isEmpty()) {
+            return true
+        }
+
+        return this.targets.map { it.variantKey }.contains(variant)
+    }
+
     override fun isEnabled(): Boolean {
         fun evaluateLocalEnable(state: State): Boolean {
-            return state.enable && appVersionProvider.invoke() >= (state.minSupportedVersion ?: 0)
+            return state.enable &&
+                state.isVariantTreated(appVariantProvider.invoke()) &&
+                appVersionProvider.invoke() >= (state.minSupportedVersion ?: 0)
         }
         // check if it should always be enabled for internal builds
         if (isInternalAlwaysEnabled && flavorNameProvider.invoke().lowercase() == "internal") {
             return true
+        }
+        // If there's not assigned variant yet and feature forces default variant, set default variant
+        if (appVariantProvider.invoke() == null && forcesDefaultVariant) {
+            forceDefaultVariant.invoke()
         }
 
         // normal check

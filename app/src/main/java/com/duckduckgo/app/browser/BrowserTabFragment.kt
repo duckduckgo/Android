@@ -133,6 +133,7 @@ import com.duckduckgo.app.browser.ui.dialogs.LaunchInExternalAppOptions
 import com.duckduckgo.app.browser.urlextraction.DOMUrlExtractor
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebView
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
+import com.duckduckgo.app.browser.webshare.WebShareChooser
 import com.duckduckgo.app.browser.webview.WebContentDebugging
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.cta.ui.DaxDialogCta.*
@@ -154,7 +155,6 @@ import com.duckduckgo.app.global.view.toggleFullScreen
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.playstore.PlayStoreUtils
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
 import com.duckduckgo.app.survey.model.Survey
@@ -223,7 +223,9 @@ import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_LENGTH
 import com.duckduckgo.downloads.api.DownloadCommand
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessageCallback
+import com.duckduckgo.js.messaging.api.JsMessageHelper
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -247,6 +249,7 @@ import javax.inject.Provider
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.cancellable
+import org.json.JSONObject
 import timber.log.Timber
 
 @InjectWith(FragmentScope::class)
@@ -306,9 +309,6 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var previewPersister: WebViewPreviewPersister
-
-    @Inject
-    lateinit var variantManager: VariantManager
 
     @Inject
     lateinit var loginDetector: DOMLoginDetector
@@ -416,6 +416,9 @@ class BrowserTabFragment :
     @Inject
     lateinit var webContentDebugging: WebContentDebugging
 
+    @Inject
+    lateinit var jsMessageHelper: JsMessageHelper
+
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
      * This is needed because the activity stack will be cleared if an external link is opened in our browser
@@ -465,20 +468,6 @@ class BrowserTabFragment :
         launchDownloadMessagesJob()
         viewModel
     }
-
-    /*
-        private val animatorHelper by lazy {
-            BrowserTrackersAnimatorHelper(
-                omnibarViews = listOf(clearTextButton, omnibarTextInput, searchIcon),
-                privacyGradeView = privacyGradeButton,
-                cookieView = cookieAnimation,
-                cookieScene = scene_root,
-                dummyCookieView = cookieDummyView,
-                container = animationContainer,
-                appTheme = appTheme
-            )
-        }
-     */
 
     private val binding: FragmentBrowserTabBinding by viewBinding()
 
@@ -706,6 +695,11 @@ class BrowserTabFragment :
     private var automaticFireproofDialog: DaxAlertDialog? = null
 
     private val pulseAnimation: PulseAnimation = PulseAnimation(this)
+
+    private var webShareRequest =
+        registerForActivityResult(WebShareChooser()) {
+            contentScopeScripts.onResponse(it)
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -1289,6 +1283,7 @@ class BrowserTabFragment :
             )
 
             is Command.WebViewError -> showError(it.errorType, it.url)
+            is Command.OnPermissionsQueryResponse -> contentScopeScripts.onResponse(it.jsCallbackData)
             else -> {
                 // NO OP
             }
@@ -1966,7 +1961,7 @@ class BrowserTabFragment :
                 viewModel.onUserSubmittedQuery(it.favorite.url)
             },
             { viewModel.onEditSavedSiteRequested(it.favorite) },
-            { viewModel.onDeleteQuickAccessItemRequested(it.favorite) },
+            { viewModel.onDeleteSavedSiteRequested(it.favorite) },
         )
     }
 
@@ -2113,17 +2108,25 @@ class BrowserTabFragment :
             autoconsent.addJsInterface(it, autoconsentCallback)
             contentScopeScripts.register(
                 it,
-                object : JsMessageCallback(this) {
-                    override fun process(method: String) {
-                        runCatching {
-                            callback.javaClass.getDeclaredMethod(method)
-                        }.getOrNull()?.invoke(callback)
+                object : JsMessageCallback() {
+                    override fun process(featureName: String, method: String, id: String, data: JSONObject) {
+                        when (method) {
+                            "webShare" -> webShare(featureName, method, id, data)
+                            "permissionsQuery" -> viewModel.onPermissionsQuery(featureName, method, id, data)
+                            else -> {
+                                // NOOP
+                            }
+                        }
                     }
                 },
             )
         }
 
         WebView.setWebContentsDebuggingEnabled(webContentDebugging.isEnabled())
+    }
+
+    private fun webShare(featureName: String, method: String, id: String, data: JSONObject) {
+        webShareRequest.launch(JsCallbackData(data, featureName, method, id))
     }
 
     private fun configureWebViewForAutofill(it: DuckDuckGoWebView) {
@@ -2402,13 +2405,25 @@ class BrowserTabFragment :
             is Favorite -> getString(R.string.favoriteDeleteConfirmationMessage)
             is Bookmark -> getString(R.string.bookmarkDeleteConfirmationMessage, savedSite.title).html(requireContext())
         }
-        viewModel.deleteQuickAccessItem(savedSite)
         binding.rootView.makeSnackbarWithNoBottomInset(
             message,
             Snackbar.LENGTH_LONG,
         ).setAction(R.string.fireproofWebsiteSnackbarAction) {
-            viewModel.insertQuickAccessItem(savedSite)
-        }.show()
+            viewModel.undoDelete(savedSite)
+        }
+            .addCallback(
+                object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
+                    override fun onDismissed(
+                        transientBottomBar: Snackbar?,
+                        event: Int,
+                    ) {
+                        if (event != DISMISS_EVENT_ACTION) {
+                            viewModel.onDeleteSavedSiteSnackbarDismissed(savedSite)
+                        }
+                    }
+                },
+            )
+            .show()
     }
 
     private fun fireproofWebsiteConfirmation(entity: FireproofWebsiteEntity) {
@@ -2599,9 +2614,6 @@ class BrowserTabFragment :
 
     fun onBackPressed(): Boolean {
         if (!isAdded) return false
-        if (errorView.errorLayout.visibility == VISIBLE) {
-            showBrowser()
-        }
         return viewModel.onUserPressedBack()
     }
 
@@ -3066,7 +3078,6 @@ class BrowserTabFragment :
                     viewModel.onPrintSelected()
                 }
                 onMenuItemClicked(menuBinding.autofillMenuItem) {
-                    pixel.fire(AppPixelName.MENU_ACTION_AUTOFILL_PRESSED)
                     viewModel.onAutofillMenuSelected()
                 }
             }
@@ -3553,6 +3564,7 @@ class BrowserTabFragment :
                 homeBackgroundLogo.hideLogo()
                 quickAccessAdapter.submitList(favorites)
                 quickAccessItems.quickAccessRecyclerView.show()
+                viewModel.onNewTabFavouritesShown()
             }
 
             newBrowserTab.newTabQuickAccessItemsLayout.show()

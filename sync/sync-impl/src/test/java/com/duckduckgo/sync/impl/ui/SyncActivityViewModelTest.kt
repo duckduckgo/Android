@@ -29,6 +29,8 @@ import com.duckduckgo.sync.api.SyncState.IN_PROGRESS
 import com.duckduckgo.sync.api.SyncState.OFF
 import com.duckduckgo.sync.api.SyncState.READY
 import com.duckduckgo.sync.api.SyncStateMonitor
+import com.duckduckgo.sync.api.engine.SyncEngine
+import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.RecoveryCodePDF
 import com.duckduckgo.sync.impl.Result
@@ -46,6 +48,7 @@ import kotlin.reflect.KClass
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -72,6 +75,7 @@ class SyncActivityViewModelTest {
     private val recoveryPDF: RecoveryCodePDF = mock()
     private val syncAccountRepository: SyncAccountRepository = mock()
     private val syncStateMonitor: SyncStateMonitor = mock()
+    private val syncEngine: SyncEngine = mock()
 
     private val stateFlow = MutableStateFlow(SyncState.READY)
 
@@ -84,8 +88,11 @@ class SyncActivityViewModelTest {
             syncAccountRepository = syncAccountRepository,
             dispatchers = coroutineTestRule.testDispatcherProvider,
             syncStateMonitor = syncStateMonitor,
+            syncEngine = syncEngine,
             recoveryCodePDF = recoveryPDF,
         )
+
+        whenever(syncStateMonitor.syncState()).thenReturn(emptyFlow())
     }
 
     @Test
@@ -106,6 +113,8 @@ class SyncActivityViewModelTest {
         testee.viewState().test {
             val viewState = expectMostRecentItem()
             assertTrue(viewState.showAccount)
+
+            verify(syncEngine).triggerSync(FEATURE_READ)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -117,6 +126,8 @@ class SyncActivityViewModelTest {
         testee.viewState().test {
             val viewState = expectMostRecentItem()
             assertTrue(viewState.loginQRCode != null)
+
+            verify(syncEngine).triggerSync(FEATURE_READ)
             cancelAndIgnoreRemainingEvents()
         }
     }

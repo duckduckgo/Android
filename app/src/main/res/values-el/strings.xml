@@ -150,7 +150,7 @@
     <string name="settingsWebTrackingProtectionDescription">Ενεργοποιημένο βάσει προεπιλογής</string>
     <string name="settingsHeadingSettings">Ρυθμίσεις</string>
     <string name="settingsPermissionsSetting">Δικαιώματα</string>
-    <string name="settingsAutofillLoginsSetting">Συνδέσεις αυτόματης συμπλήρωσης</string>
+    <string name="settingsAutofillLoginsSetting">Συνδέσεις</string>
     <string name="settingsSyncSetting">Συγχρονισμός και δημιουργία αντιγράφων ασφαλείας</string>
     <string name="settingsFireButton">Κουμπί Φωτιά</string>
 

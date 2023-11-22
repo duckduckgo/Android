@@ -23,27 +23,27 @@
     <string name="managementDisabledModeSubtitle">Kirjautumistietojen suojaamiseen tarvitaan laitteen lukituskuvio, PIN-koodi tai biometriset tiedot.</string>
     <string name="managementDisabledModeTitle">Suojaa laitteesi kirjautumistietojen tallentamiseksi</string>
 
-    <string name="saveLoginDialogButtonSave">Tallenna kirjautumistiedot</string>
+    <string name="saveLoginDialogButtonSave">Tallenna salasana</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Tallenna salasana</string>
-    <string name="saveLoginDialogNotNow">Ei nyt</string>
-    <string name="saveLoginDialogSubtitle">Kirjautumistiedot tallennetaan turvallisesti laitteellesi. Niitä voi hallita asetusten kirjautumistiedot-valikosta.</string>
-    <string name="saveLoginDialogTitle">Haluatko, että DuckDuckGo tallentaa kirjautumistietosi?</string>
+    <string name="saveLoginDialogNotNow">Älä tallenna</string>
+    <string name="saveLoginDialogSubtitle">Salasanat tallennetaan turvallisesti laitteellesi kirjautumistiedot-valikkoon.</string>
+    <string name="saveLoginDialogTitle">Haluatko, että DuckDuckGo tallentaa salasanasi?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Lisää vaihtoehtoja</string>
 
-    <string name="useSavedLoginDialogTitle">Käytä tallennettuja kirjautumistietoja?</string>
+    <string name="useSavedLoginDialogTitle">Käytetäänkö tallennettua salasanaa?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Sivuston %1$s salasana</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Sivuston salasana</string>
     <string name="useSavedLoginDialogGroupThisWebsite">Tältä sivustolta</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Sivustolta %1$s</string>
 
     <string name="updateLoginDialogButtonUpdatePassword">Päivitä salasana</string>
-    <string name="updateLoginDialogButtonNotNow">Ei nyt</string>
+    <string name="updateLoginDialogButtonNotNow">Älä tallenna</string>
 
     <string name="updateLoginDialogTitleUpdateUsername">Päivitetäänkö käyttäjätunnus?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Päivitä käyttäjätunnus</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Päivitä käyttäjän \n%1$s salasana?</string>
-    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo päivittää tämän laitteellesi tallennetun kirjautumistiedon.</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo päivittää tämän tallennetun salasanan laitteellesi.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Sulje automaattisen täytön valintaikkuna</string>
 
@@ -60,12 +60,12 @@
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Kirjautumistiedot päivitetty viimeksi %1$s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Tallenna ja täytä kirjautumistiedot automaattisesti</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Kirjautumiset tallennetaan laitteellesi turvallisesti</string>
     <string name="credentialManagementViewMenuEdit">Muokkaa</string>
     <string name="credentialManagementViewMenuDelete">Poista</string>
 
     <string name="credentialManagementSuggestionsLabel">Ehdotettu</string>
     <string name="credentialManagementNoLoginsSavedTitle">Kirjautumistietoja ei ole vielä tallennettu</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Kirjautumiset tallennetaan laitteellesi turvallisesti.</string>
 
     <string name="autofillManagementAddLogin">Lisää kirjautumistiedot</string>
     <string name="autofillManagementSearchLogins">Hae kirjautumistietoja</string>
@@ -79,9 +79,9 @@
     <string name="autofillManagementUsernameCopied">Käyttäjätunnus kopioitu</string>
     <string name="autofillManagementPasswordCopied">Salasana kopioitu</string>
 
-    <string name="autofill_password_generation_offer_title">Haluatko käyttää DuckDuckGon luomaa salasanaa?</string>
-    <string name="autofill_password_generation_offer_message">Salasana tallennetaan Kirjautumiset-osioon.</string>
-    <string name="autofill_password_generation_offer_accept">Käytä luotua salasanaa</string>
+    <string name="autofill_password_generation_offer_title">Käytetäänkö DuckDuckGon vahvaa salasanaa?</string>
+    <string name="autofill_password_generation_offer_message">Salasanat tallennetaan turvallisesti laitteellesi kirjautumistiedot-valikkoon.</string>
+    <string name="autofill_password_generation_offer_accept">Käytä vahvaa salasanaa</string>
     <string name="autofill_password_generation_offer_decline">Luo oma</string>
 
     <string name="deviceNotSupportedTitle">Laitetta ei tueta</string>

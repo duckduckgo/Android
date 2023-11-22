@@ -58,7 +58,6 @@ import retrofit2.Retrofit
         ResourceSurrogateModule::class,
         NotificationModule::class,
         OnboardingModule::class,
-        VariantModule::class,
         FaviconModule::class,
         PrivacyModule::class,
         WidgetModule::class,

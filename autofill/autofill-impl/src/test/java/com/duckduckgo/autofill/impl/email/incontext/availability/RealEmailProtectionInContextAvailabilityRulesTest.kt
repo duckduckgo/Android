@@ -7,7 +7,7 @@ import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSign
 import com.duckduckgo.autofill.impl.email.remoteconfig.EmailProtectionInContextExceptions
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.feature.toggles.api.toggle.TestToggle
 import java.util.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -113,12 +113,6 @@ class RealEmailProtectionInContextAvailabilityRulesTest {
         var enabled = true
 
         override fun self(): Toggle = TestToggle(enabled)
-    }
-
-    private open class TestToggle(val enabled: Boolean) : Toggle {
-        override fun getRawStoredState(): State? = null
-        override fun setEnabled(state: State) {}
-        override fun isEnabled() = enabled
     }
 
     companion object {

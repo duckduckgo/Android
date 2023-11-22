@@ -27,5 +27,4 @@ android {
 
 dependencies {
     implementation project(':navigation-api')
-    implementation Kotlin.stdlib.jdk7
 }

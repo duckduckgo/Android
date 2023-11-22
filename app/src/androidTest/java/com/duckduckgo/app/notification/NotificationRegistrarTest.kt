@@ -22,18 +22,22 @@ import com.duckduckgo.app.notification.model.NotificationPlugin
 import com.duckduckgo.app.notification.model.SchedulableNotificationPlugin
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.experiments.api.VariantManager
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.*
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 class NotificationRegistrarTest {
@@ -54,7 +58,7 @@ class NotificationRegistrarTest {
 
     @Before
     fun before() {
-        whenever(mockVariantManager.getVariant(any())).thenReturn(DEFAULT_VARIANT)
+        whenever(mockVariantManager.getVariantKey()).thenReturn("DEFAULT_VARIANT")
         whenever(appBuildConfig.sdkInt).thenReturn(30)
         testee = NotificationRegistrar(
             TestScope(),

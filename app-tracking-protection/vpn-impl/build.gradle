@@ -40,28 +40,27 @@ android {
 }
 
 dependencies {
-    anvil project(path: ':anvil-compiler')
-    implementation project(path: ':navigation-api')
-    implementation project(path: ':anvil-annotations')
-    implementation project(path: ':vpn-store')
-    implementation project(path: ':vpn-api')
-    implementation project(path: ':app-tracking-api')
-    implementation project(path: ':app-store')
-    implementation project(path: ':browser-api')
-    implementation project(path: ':di')
-    implementation project(path: ':common-utils')
-    implementation project(path: ':common-ui')
-    implementation project(path: ':statistics')
-    implementation project(path: ':app-build-config-api')
-    implementation project(path: ':feature-toggles-api')
-    implementation project(path: ':privacy-config-api')
-    implementation project(path: ':vpn-network-api')
-    implementation project(path: ':remote-messaging-api')
-    implementation project(path: ':statistics')
+    anvil project(':anvil-compiler')
+    implementation project(':navigation-api')
+    implementation project(':anrs-api')
+    implementation project(':anvil-annotations')
+    implementation project(':vpn-store')
+    implementation project(':vpn-api')
+    implementation project(':app-tracking-api')
+    implementation project(':app-store')
+    implementation project(':browser-api')
+    implementation project(':di')
+    implementation project(':common-utils')
+    implementation project(':common-ui')
+    implementation project(':statistics')
+    implementation project(':app-build-config-api')
+    implementation project(':feature-toggles-api')
+    implementation project(':privacy-config-api')
+    implementation project(':vpn-network-api')
+    implementation project(':remote-messaging-api')
+    implementation project(':statistics')
     implementation project(':library-loader-api')
     implementation project(':network-protection-api')
-
-    implementation Kotlin.stdlib.jdk7
 
     implementation AndroidX.core.ktx
 

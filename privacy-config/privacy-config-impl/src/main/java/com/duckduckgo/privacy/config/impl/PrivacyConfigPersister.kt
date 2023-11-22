@@ -22,7 +22,9 @@ import androidx.annotation.WorkerThread
 import androidx.core.content.edit
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
+import com.duckduckgo.privacy.config.impl.VariantManagerPlugin.Companion.VARIANT_MANAGER_FEATURE_NAME
 import com.duckduckgo.privacy.config.impl.di.ConfigPersisterPreferences
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
 import com.duckduckgo.privacy.config.store.PrivacyConfig
@@ -32,14 +34,21 @@ import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.UnprotectedTemporaryEntity
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesTo
+import dagger.Module
+import dagger.Provides
 import dagger.SingleInstanceIn
 import javax.inject.Inject
+import javax.inject.Qualifier
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.format.DateTimeFormatter
 import timber.log.Timber
 
 interface PrivacyConfigPersister {
-    suspend fun persistPrivacyConfig(jsonPrivacyConfig: JsonPrivacyConfig, eTag: String? = null)
+    suspend fun persistPrivacyConfig(
+        jsonPrivacyConfig: JsonPrivacyConfig,
+        eTag: String? = null,
+    )
 }
 
 private const val PRIVACY_SIGNATURE_KEY = "plugin_signature"
@@ -49,6 +58,7 @@ private const val PRIVACY_SIGNATURE_KEY = "plugin_signature"
 @ContributesBinding(AppScope::class)
 class RealPrivacyConfigPersister @Inject constructor(
     private val privacyFeaturePluginPoint: PluginPoint<PrivacyFeaturePlugin>,
+    @PluginVariantManager private val variantManagerPlugin: PrivacyFeaturePlugin,
     private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository,
     private val unprotectedTemporaryRepository: UnprotectedTemporaryRepository,
     private val privacyConfigRepository: PrivacyConfigRepository,
@@ -57,7 +67,10 @@ class RealPrivacyConfigPersister @Inject constructor(
     @ConfigPersisterPreferences private val persisterPreferences: SharedPreferences,
 ) : PrivacyConfigPersister {
 
-    override suspend fun persistPrivacyConfig(jsonPrivacyConfig: JsonPrivacyConfig, eTag: String?) {
+    override suspend fun persistPrivacyConfig(
+        jsonPrivacyConfig: JsonPrivacyConfig,
+        eTag: String?,
+    ) {
         val privacyConfig = privacyConfigRepository.get()
         val newVersion = jsonPrivacyConfig.version
         val previousVersion = privacyConfig?.version ?: 0
@@ -95,6 +108,11 @@ class RealPrivacyConfigPersister @Inject constructor(
                     unProtectedExceptions.add(UnprotectedTemporaryEntity(it.domain, it.reason.orEmpty()))
                 }
                 unprotectedTemporaryRepository.updateAll(unProtectedExceptions)
+                // First store the variants...
+                jsonPrivacyConfig.experimentalVariants?.let { jsonObject ->
+                    variantManagerPlugin.store(VARIANT_MANAGER_FEATURE_NAME, jsonObject.toString())
+                }
+                // Then feature flags
                 jsonPrivacyConfig.features.forEach { feature ->
                     feature.value?.let { jsonObject ->
                         privacyFeaturePluginPoint.getPlugins().firstOrNull { feature.key == it.featureName }?.let { featurePlugin ->
@@ -125,4 +143,18 @@ class RealPrivacyConfigPersister @Inject constructor(
 @VisibleForTesting
 fun PluginPoint<PrivacyFeaturePlugin>.signature(): Int {
     return this.getPlugins().sumOf { it.featureName.hashCode() }
+}
+
+@Retention(AnnotationRetention.BINARY)
+@Qualifier
+private annotation class PluginVariantManager
+
+@ContributesTo(AppScope::class)
+@Module
+object VariantManagerPluginModule {
+    @Provides
+    @PluginVariantManager
+    fun provideVariantManagerPlugin(variantManager: VariantManager): PrivacyFeaturePlugin {
+        return VariantManagerPlugin(variantManager)
+    }
 }

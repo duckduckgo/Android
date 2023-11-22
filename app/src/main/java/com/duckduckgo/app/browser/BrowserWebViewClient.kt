@@ -387,12 +387,7 @@ class BrowserWebViewClient @Inject constructor(
         }
 
         Timber.d("The certificate authority validation result is $trusted")
-        if (trusted is CertificateValidationState.TrustedChain) {
-            handler.proceed()
-        } else {
-            webViewClientListener?.onReceivedError(WebViewErrorResponse.SSL_PROTOCOL_ERROR, view?.url.toString())
-            super.onReceivedSslError(view, handler, error)
-        }
+        if (trusted is CertificateValidationState.TrustedChain) handler.proceed() else super.onReceivedSslError(view, handler, error)
     }
 
     private fun requestAuthentication(

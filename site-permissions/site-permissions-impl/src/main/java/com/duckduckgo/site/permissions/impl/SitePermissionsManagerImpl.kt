@@ -21,6 +21,7 @@ import android.webkit.PermissionRequest
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
+import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -84,6 +85,23 @@ class SitePermissionsManagerImpl @Inject constructor(
         }
     }
 
+    override fun getPermissionsQueryResponse(
+        url: String,
+        tabId: String,
+        queriedPermission: String,
+    ): SitePermissionQueryResponse {
+        getAndroidPermission(queriedPermission)?.let { androidPermission ->
+            if (sitePermissionsRepository.isDomainGranted(url, tabId, androidPermission)) {
+                return SitePermissionQueryResponse.Granted
+            } else if (isHardwareSupported(androidPermission) && sitePermissionsRepository.isDomainAllowedToAsk(url, androidPermission)) {
+                return SitePermissionQueryResponse.Prompt
+            }
+            return SitePermissionQueryResponse.Denied
+        }
+
+        return SitePermissionQueryResponse.Denied
+    }
+
     private fun isPermissionSupported(permission: String): Boolean =
         permission == PermissionRequest.RESOURCE_AUDIO_CAPTURE || permission == PermissionRequest.RESOURCE_VIDEO_CAPTURE ||
             permission == PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID
@@ -94,6 +112,14 @@ class SitePermissionsManagerImpl @Inject constructor(
         }
         else -> {
             true
+        }
+    }
+
+    private fun getAndroidPermission(webQueryPermission: String): String? {
+        return when (webQueryPermission) {
+            "camera" -> PermissionRequest.RESOURCE_VIDEO_CAPTURE
+            "microphone" -> PermissionRequest.RESOURCE_AUDIO_CAPTURE
+            else -> null
         }
     }
 }

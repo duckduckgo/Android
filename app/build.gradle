@@ -187,6 +187,8 @@ dependencies {
     implementation project(':app-build-config-api')
     implementation project(':browser-api')
     implementation project(':statistics')
+    implementation project(':experiments-api')
+    implementation project(':experiments-impl')
     implementation project(':common-utils')
     implementation project(':app-store')
     implementation project(':common-ui')
@@ -483,4 +485,8 @@ tasks.register('releaseTestLocal', Exec) {
 tasks.register('releaseTestCloud', Exec) {
     commandLine 'maestro', 'cloud', '--include-tags', 'releaseTest', "build/outputs/apk/play/release/duckduckgo-${buildVersionName()}-play-release.apk", '../.maestro'
     dependsOn 'assemblePlayRelease'
+}
+
+task newModule(type: com.duckduckgo.gradle.ModuleCreator) {
+    feature = project.hasProperty('feature') ? project.getProperty('feature') : null
 }

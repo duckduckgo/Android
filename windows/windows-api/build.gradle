@@ -35,6 +35,5 @@ android {
 }
 
 dependencies {
-    implementation Kotlin.stdlib.jdk7
     implementation project(':navigation-api')
 }

@@ -22,7 +22,6 @@ import androidx.lifecycle.Observer
 import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
-import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.onboarding.store.*
 import com.duckduckgo.app.pixels.AppPixelName.*
@@ -31,6 +30,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchDuckDuckGo
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.UpdateVoiceSearch
+import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Suggestions.QuickAccessItems
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Suggestions.SystemSearchResultsViewState
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
@@ -60,7 +60,6 @@ class SystemSearchViewModelTest {
     private val mockDeviceAppLookup: DeviceAppLookup = mock()
     private val mockAutoComplete: AutoComplete = mock()
     private val mocksavedSitesRepository: SavedSitesRepository = mock()
-    private val mockFaviconManager: FaviconManager = mock()
     private val mockPixel: Pixel = mock()
     private val mockSettingsStore: SettingsDataStore = mock()
 
@@ -83,7 +82,6 @@ class SystemSearchViewModelTest {
             mockDeviceAppLookup,
             mockPixel,
             mocksavedSitesRepository,
-            mockFaviconManager,
             mockSettingsStore,
             coroutineRule.testDispatcherProvider,
         )
@@ -339,21 +337,57 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun whenQuickAccessDeleteRequestedThenRepositoryUpdated() = runTest {
+    fun whenQuickAccessDeleteRequestedThenFavouriteDeletedFromViewState() = runTest {
         val savedSite = Favorite("favorite1", "title", "http://example.com", "timestamp", 0)
+        whenever(mocksavedSitesRepository.getFavorites()).thenReturn(flowOf(listOf(savedSite)))
+        testee = SystemSearchViewModel(
+            mockUserStageStore,
+            mockAutoComplete,
+            mockDeviceAppLookup,
+            mockPixel,
+            mocksavedSitesRepository,
+            mockSettingsStore,
+            coroutineRule.testDispatcherProvider,
+        )
+
+        val viewState = testee.resultsViewState.value as QuickAccessItems
+        assertFalse(viewState.favorites.isEmpty())
 
         testee.onDeleteQuickAccessItemRequested(QuickAccessFavorite(savedSite))
 
-        verify(mocksavedSitesRepository).delete(savedSite)
+        val newViewState = testee.resultsViewState.value as QuickAccessItems
+        assertTrue(newViewState.favorites.isEmpty())
     }
 
     @Test
-    fun whenQuickAccessInsertedThenRepositoryUpdated() {
+    fun whenQuickAccessDeleteUndoThenViewStateUpdated() = runTest {
+        val savedSite = Favorite("favorite1", "title", "http://example.com", "timestamp", 0)
+        whenever(mocksavedSitesRepository.getFavorites()).thenReturn(flowOf(listOf(savedSite)))
+        testee = SystemSearchViewModel(
+            mockUserStageStore,
+            mockAutoComplete,
+            mockDeviceAppLookup,
+            mockPixel,
+            mocksavedSitesRepository,
+            mockSettingsStore,
+            coroutineRule.testDispatcherProvider,
+        )
+
+        val viewState = testee.resultsViewState.value as QuickAccessItems
+        assertFalse(viewState.favorites.isEmpty())
+
+        testee.undoDelete(savedSite)
+
+        assertFalse(viewState.favorites.isEmpty())
+    }
+
+    @Test
+    fun whenQuickAccessDeletedThenRepositoryDeletesSavedSite() = runTest {
         val savedSite = Favorite("favorite1", "title", "http://example.com", "timestamp", 0)
 
-        testee.insertQuickAccessItem(savedSite)
+        testee.deleteSavedSiteSnackbarDismissed(savedSite)
 
-        verify(mocksavedSitesRepository).insert(savedSite)
+        verify(mocksavedSitesRepository).delete(savedSite)
     }
 
     @Test
@@ -376,7 +410,6 @@ class SystemSearchViewModelTest {
             mockDeviceAppLookup,
             mockPixel,
             mocksavedSitesRepository,
-            mockFaviconManager,
             mockSettingsStore,
             coroutineRule.testDispatcherProvider,
         )

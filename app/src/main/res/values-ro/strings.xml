@@ -150,7 +150,7 @@
     <string name="settingsWebTrackingProtectionDescription">Activat în mod implicit</string>
     <string name="settingsHeadingSettings">Setări</string>
     <string name="settingsPermissionsSetting">Permisiuni</string>
-    <string name="settingsAutofillLoginsSetting">Completare automată la autentificare</string>
+    <string name="settingsAutofillLoginsSetting">Conectări</string>
     <string name="settingsSyncSetting">Sincronizare și copiere de rezervă</string>
     <string name="settingsFireButton">Butonul Foc</string>
 

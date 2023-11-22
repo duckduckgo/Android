@@ -23,27 +23,27 @@
     <string name="managementDisabledModeSubtitle">Es sind ein Entsperrmuster, eine PIN oder biometrische Daten erforderlich, um deine Anmeldedaten zu schützen.</string>
     <string name="managementDisabledModeTitle">Sichere dein Gerät, um Anmeldungen zu speichern</string>
 
-    <string name="saveLoginDialogButtonSave">Anmeldedaten speichern</string>
+    <string name="saveLoginDialogButtonSave">Passwort speichern</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Passwort speichern</string>
-    <string name="saveLoginDialogNotNow">Jetzt nicht</string>
-    <string name="saveLoginDialogSubtitle">Die Anmeldedaten werden auf diesem Gerät sicher gespeichert und können über das Anmeldedaten-Menü in den Einstellungen verwaltet werden.</string>
-    <string name="saveLoginDialogTitle">Möchtest du, dass DuckDuckGo deine Anmeldedaten speichert?</string>
+    <string name="saveLoginDialogNotNow">Nicht speichern</string>
+    <string name="saveLoginDialogSubtitle">Passwörter werden sicher auf deinem Gerät im Anmeldedaten-Menü gespeichert.</string>
+    <string name="saveLoginDialogTitle">Möchtest du, dass DuckDuckGo dein Passwort speichert?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Weitere Optionen</string>
 
-    <string name="useSavedLoginDialogTitle">Gespeicherte Anmeldedaten verwenden?</string>
+    <string name="useSavedLoginDialogTitle">Gespeichertes Passwort verwenden?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Passwort für %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Passwort für die Website</string>
     <string name="useSavedLoginDialogGroupThisWebsite">Von dieser Website</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Von %1$s</string>
 
     <string name="updateLoginDialogButtonUpdatePassword">Passwort aktualisieren</string>
-    <string name="updateLoginDialogButtonNotNow">Jetzt nicht</string>
+    <string name="updateLoginDialogButtonNotNow">Nicht speichern</string>
 
     <string name="updateLoginDialogTitleUpdateUsername">Benutzernamen aktualisieren?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Benutzernamen aktualisieren</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Passwort für \n%1$s aktualisieren?</string>
-    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo aktualisiert diese gespeicherten Anmeldedaten auf deinem Gerät.</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo aktualisiert dieses gespeicherte Passwort auf deinem Gerät.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Autovervollständigen-Dialog schließen</string>
 
@@ -60,12 +60,12 @@
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Anmeldedaten zuletzt aktualisiert: %1$s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Anmeldedaten speichern und automatisch ausfüllen</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Die Anmeldedaten werden sicher auf deinem Gerät gespeichert</string>
     <string name="credentialManagementViewMenuEdit">Bearbeiten</string>
     <string name="credentialManagementViewMenuDelete">Löschen</string>
 
     <string name="credentialManagementSuggestionsLabel">Vorgeschlagen</string>
     <string name="credentialManagementNoLoginsSavedTitle">Noch keine Anmeldedaten gespeichert</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Die Anmeldedaten werden sicher auf deinem Gerät gespeichert.</string>
 
     <string name="autofillManagementAddLogin">Anmeldedaten hinzufügen</string>
     <string name="autofillManagementSearchLogins">Anmeldedaten suchen</string>
@@ -79,9 +79,9 @@
     <string name="autofillManagementUsernameCopied">Benutzername kopiert</string>
     <string name="autofillManagementPasswordCopied">Passwort kopiert</string>
 
-    <string name="autofill_password_generation_offer_title">Generiertes Passwort von DuckDuckGo verwenden?</string>
-    <string name="autofill_password_generation_offer_message">Das Passwort wird in den Anmeldedaten gespeichert.</string>
-    <string name="autofill_password_generation_offer_accept">Generiertes Passwort verwenden</string>
+    <string name="autofill_password_generation_offer_title">Ein sicheres Passwort von DuckDuckGo verwenden?</string>
+    <string name="autofill_password_generation_offer_message">Passwörter werden sicher auf deinem Gerät im Anmeldedaten-Menü gespeichert.</string>
+    <string name="autofill_password_generation_offer_accept">Sicheres Passwort verwenden</string>
     <string name="autofill_password_generation_offer_decline">Eigenes erstellen</string>
 
     <string name="deviceNotSupportedTitle">Gerät nicht unterstützt</string>

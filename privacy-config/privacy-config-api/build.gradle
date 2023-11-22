@@ -32,6 +32,5 @@ kotlin {
 
 dependencies {
     implementation project(path: ':feature-toggles-api')
-    implementation Kotlin.stdlib.jdk7
 }
 
