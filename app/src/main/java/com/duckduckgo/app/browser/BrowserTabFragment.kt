@@ -2108,8 +2108,8 @@ class BrowserTabFragment :
                     override fun process(featureName: String, method: String, id: String?, data: JSONObject?) {
                         when (method) {
                             "webShare" -> if (id != null && data != null) { webShare(featureName, method, id, data) }
-                            "permissionsQuery" -> viewModel.onPermissionsQuery(featureName, method, id, data)
-else -> {
+                            "permissionsQuery" -> if (id != null && data != null) { viewModel.onPermissionsQuery(featureName, method, id, data) }
+                            else -> {
                                 // NOOP
                             }
                         }

@@ -57,10 +57,7 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
     override val secret: String = coreContentScopeScripts.secret
     override val allowedDomains: List<String> = emptyList()
 
-    private val handlers: List<JsMessageHandler> = listOf(
-        WebShareHandler(),
-        PermissionsQueryMessage(),
-    )
+    private val handlers: List<JsMessageHandler> = listOf(ContentScopeHandler())
 
     @JavascriptInterface
     override fun process(message: String, secret: String) {
@@ -74,7 +71,7 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
                 if (this.secret == secret && context == jsMessage.context && (allowedDomains.isEmpty() || allowedDomains.contains(domain))) {
                     handlers.firstOrNull {
                         it.methods.contains(jsMessage.method) && it.featureName == jsMessage.featureName
-                    }?.process(jsMessage, secret, webView, jsMessageCallback)
+                    }?.process(jsMessage, secret, jsMessageCallback)
                 }
             }
         } catch (e: Exception) {
@@ -104,27 +101,14 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
         jsMessageHelper.sendJsResponse(jsResponse, callbackName, secret, webView)
     }
 
-    inner class WebShareHandler : JsMessageHandler {
-        override fun process(jsMessage: JsMessage, secret: String, webView: WebView, jsMessageCallback: JsMessageCallback) {
+    inner class ContentScopeHandler : JsMessageHandler {
+        override fun process(jsMessage: JsMessage, secret: String, jsMessageCallback: JsMessageCallback) {
             if (jsMessage.id == null) return
             jsMessageCallback.process(featureName, jsMessage.method, jsMessage.id, jsMessage.params)
         }
 
         override val allowedDomains: List<String> = emptyList()
         override val featureName: String = "webCompat"
-        override val methods: List<String> = listOf("webShare")
-    }
-
-    inner class PermissionsQueryMessage : JsMessageHandler {
-        override fun process(jsMessage: JsMessage, secret: String, webView: WebView, jsMessageCallback: JsMessageCallback): JsRequestResponse? {
-            if (jsMessage.featureName != featureName && jsMessage.method != method) return null
-            if (jsMessage.id == null) return null
-            jsMessageCallback.process(featureName, method, jsMessage.id!!, jsMessage.params)
-            return null
-        }
-
-        override val allowedDomains: List<String> = emptyList()
-        override val featureName: String = "webCompat"
-        override val method: String = "permissionsQuery"
+        override val methods: List<String> = listOf("webShare", "permissionsQuery")
     }
 }

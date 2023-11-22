@@ -73,7 +73,7 @@ class SubscriptionMessagingInterface @Inject constructor(
                 if (this.secret == secret && context == jsMessage.context && (allowedDomains.isEmpty() || allowedDomains.contains(domain))) {
                     handlers.firstOrNull {
                         it.methods.contains(jsMessage.method) && it.featureName == jsMessage.featureName
-                    }?.process(jsMessage, secret, webView, jsMessageCallback)
+                    }?.process(jsMessage, secret, jsMessageCallback)
                 }
             }
         } catch (e: Exception) {
@@ -110,7 +110,7 @@ class SubscriptionMessagingInterface @Inject constructor(
     override val allowedDomains: List<String> = listOf("abrown.duckduckgo.com")
 
     inner class SubscriptionsHandler : JsMessageHandler {
-        override fun process(jsMessage: JsMessage, secret: String, webView: WebView, jsMessageCallback: JsMessageCallback) {
+        override fun process(jsMessage: JsMessage, secret: String, jsMessageCallback: JsMessageCallback) {
             jsMessageCallback.process(featureName, jsMessage.method, jsMessage.id, jsMessage.params)
         }
 
@@ -124,7 +124,7 @@ class SubscriptionMessagingInterface @Inject constructor(
         private val dispatcherProvider: DispatcherProvider,
     ) : JsMessageHandler {
 
-        override fun process(jsMessage: JsMessage, secret: String, webView: WebView, jsMessageCallback: JsMessageCallback) {
+        override fun process(jsMessage: JsMessage, secret: String, jsMessageCallback: JsMessageCallback) {
             if (jsMessage.id == null) return
 
             val pat: AuthToken = runBlocking(dispatcherProvider.io()) {
@@ -165,7 +165,7 @@ class SubscriptionMessagingInterface @Inject constructor(
         @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
         private val dispatcherProvider: DispatcherProvider,
     ) : JsMessageHandler {
-        override fun process(jsMessage: JsMessage, secret: String, webView: WebView, jsMessageCallback: JsMessageCallback) {
+        override fun process(jsMessage: JsMessage, secret: String, jsMessageCallback: JsMessageCallback) {
             try {
                 val token = jsMessage.params.getString("token")
                 appCoroutineScope.launch(dispatcherProvider.io()) {
