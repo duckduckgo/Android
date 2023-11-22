@@ -33,4 +33,14 @@ tags:
 - copyTextFrom:
     id: "omnibarTextInput"
 - assertTrue: ${maestro.copiedText.indexOf("https://www.google.com") != 0}
+- tapOn:
+    id: "omnibarTextInput"
+# Test 4 - edge case: URLs containing "@" in the URI should still work
+- inputText: "https://medium.com/@duckduckgo"
+- pressKey: Enter
+- tapOn: "run"
+- assertVisible: "DuckDuckGo"
+- copyTextFrom:
+    id: "omnibarTextInput"
+- assertTrue: ${maestro.copiedText == "https://medium.com/@duckduckgo"}
 - pressKey: Back

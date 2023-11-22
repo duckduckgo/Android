@@ -1435,16 +1435,26 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch { updateBookmarkAndFavoriteState(url) }
     }
 
+    private fun stripBasicAuthFromUrl(url: String): String {
+        val uri = URI(url)
+        val userInfo = uri.userInfo
+
+        if (userInfo != null) {
+            val queryStr = uri.rawQuery?.let { "?$it" } ?: ""
+            val uriFragment = uri.fragment?.let { "#$it" } ?: ""
+            return "${uri.scheme}://${uri.host}${uri.path}$queryStr$uriFragment"
+        }
+
+        return url
+    }
+
     private fun omnibarTextForUrl(url: String?): String {
         if (url == null) return ""
 
         return if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
             duckDuckGoUrlDetector.extractQuery(url) ?: url
-        } else if (url.contains("@")) {
-            // Strip out the basic auth credentials from the address bar to prevent spoofing
-            url.split("@")[1]
         } else {
-            url
+            stripBasicAuthFromUrl(url)
         }
     }
 
