@@ -489,7 +489,7 @@ class BrowserTabViewModel @Inject constructor(
             val errorType: WebViewErrorResponse,
             val url: String,
         ) : Command()
-        
+
         class OnPermissionsQueryResponse(val jsCallbackData: JsCallbackData) : Command()
     }
 
