@@ -29,7 +29,6 @@ import androidx.core.net.toUri
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.ui.view.addClickableLink
-import com.duckduckgo.common.ui.view.dialog.CustomAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -42,6 +41,7 @@ import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermission
 import com.duckduckgo.site.permissions.impl.databinding.ContentSiteDrmPermissionDialogBinding
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.BaseTransientBottomBar.BaseCallback
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.snackbar.Snackbar.SnackbarLayout
@@ -155,9 +155,9 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
 
         // No session-based setting -> proceed to show dialog
         val binding = ContentSiteDrmPermissionDialogBinding.inflate(activity.layoutInflater)
-        val dialog = CustomAlertDialogBuilder(activity)
-            .setView(binding)
-            .build()
+        val dialog = MaterialAlertDialogBuilder(activity)
+            .setView(binding.root)
+            .create()
 
         val title = url.websiteFromGeoLocationsApiOrigin()
         binding.sitePermissionDialogTitle.text = activity.getString(R.string.drmSiteDialogTitle, title)
