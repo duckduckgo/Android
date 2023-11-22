@@ -4325,6 +4325,42 @@ class BrowserTabViewModelTest {
         }
     }
 
+    @Test
+    fun whenBasicAuthCredentialsInUrlThenStrippedSafely() {
+        val testUrls = listOf(
+            "https://user:pass@example.com",
+            "http://user:pass@example.com",
+            "ftp://user:pass@example.com",
+            "https://user@example.com",
+            "https://example.com?param=value",
+            "https://example.com/path/to/resource?param=value",
+            "https://example.com#fragment",
+            "https://example.com/path/to/resource#fragment",
+            "https://example.com?param=%E2%82%AC",
+            "https://example.com/@notbasicAuth?q=none#f",
+            "user:pass@https://example.com" // invalid URL, won't parse
+        )
+
+        val expectedUrls = listOf(
+            "https://example.com",
+            "http://example.com",
+            "ftp://example.com",
+            "https://example.com",
+            "https://example.com?param=value",
+            "https://example.com/path/to/resource?param=value",
+            "https://example.com#fragment",
+            "https://example.com/path/to/resource#fragment",
+            "https://example.com?param=%E2%82%AC",
+            "https://example.com/@notbasicAuth?q=none#f",
+            "user:pass@https://example.com"
+        )
+
+        for (i in testUrls.indices) {
+            val actual = testee.stripBasicAuthFromUrl(testUrls[i])
+            assertEquals(expectedUrls[i], actual)
+        }
+    }
+
     private fun aCredential(): LoginCredentials {
         return LoginCredentials(domain = null, username = null, password = null)
     }
