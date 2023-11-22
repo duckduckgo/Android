@@ -122,7 +122,7 @@ class RealNetPDisabledNotificationBuilder @Inject constructor(
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setCategory(NotificationCompat.CATEGORY_STATUS)
             .addAction(getAction())
-            .setAutoCancel(false)
+            .setOngoing(true)
             .build()
     }
 
