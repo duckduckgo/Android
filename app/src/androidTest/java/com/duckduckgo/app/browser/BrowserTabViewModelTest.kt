@@ -141,6 +141,8 @@ import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.site.permissions.api.SitePermissionsManager
+import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
@@ -163,6 +165,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
+import org.json.JSONObject
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -388,6 +391,8 @@ class BrowserTabViewModelTest {
 
     private val mockDeviceInfo: DeviceInfo = mock()
 
+    private val mockSitePermissionsManager: SitePermissionsManager = mock()
+
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
@@ -507,6 +512,7 @@ class BrowserTabViewModelTest {
             automaticSavedLoginsMonitor = automaticSavedLoginsMonitor,
             surveyNotificationScheduler = mockSurveyNotificationScheduler,
             device = mockDeviceInfo,
+            sitePermissionsManager = mockSitePermissionsManager,
         )
 
         testee.loadData("abc", null, false, false)
@@ -4375,6 +4381,20 @@ class BrowserTabViewModelTest {
         assertCommandIssued<Command.ShowSitePermissionsDialog> {
             assertEquals(request, this.request)
             assertEquals(sitePermissions, this.permissionsToRequest)
+        }
+    }
+
+    @Test
+    fun whenOnPermissionsQueryThenSendCommand() = runTest {
+        val url = "someUrl"
+        loadUrl(url)
+        whenever(mockSitePermissionsManager.getPermissionsQueryResponse(eq(url), any(), any())).thenReturn(SitePermissionQueryResponse.Granted)
+        testee.onPermissionsQuery("myFeature", "myMethod", "myId", JSONObject("""{ "name":"somePermission"}"""))
+        assertCommandIssued<Command.OnPermissionsQueryResponse> {
+            assertEquals("granted", this.jsCallbackData.params.getString("state"))
+            assertEquals("myFeature", this.jsCallbackData.featureName)
+            assertEquals("myMethod", this.jsCallbackData.method)
+            assertEquals("myId", this.jsCallbackData.id)
         }
     }
 

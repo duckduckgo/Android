@@ -57,7 +57,10 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
     override val secret: String = coreContentScopeScripts.secret
     override val allowedDomains: List<String> = emptyList()
 
-    private val handlers: List<JsMessageHandler> = listOf(WebShareHandler())
+    private val handlers: List<JsMessageHandler> = listOf(
+        WebShareHandler(),
+        PermissionsQueryMessage(),
+    )
 
     @JavascriptInterface
     override fun process(message: String, secret: String) {
@@ -112,5 +115,18 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
         override val allowedDomains: List<String> = emptyList()
         override val featureName: String = "webCompat"
         override val method: String = "webShare"
+    }
+
+    inner class PermissionsQueryMessage : JsMessageHandler {
+        override fun process(jsMessage: JsMessage, secret: String, webView: WebView, jsMessageCallback: JsMessageCallback): JsRequestResponse? {
+            if (jsMessage.featureName != featureName && jsMessage.method != method) return null
+            if (jsMessage.id == null) return null
+            jsMessageCallback.process(featureName, method, jsMessage.id!!, jsMessage.params)
+            return null
+        }
+
+        override val allowedDomains: List<String> = emptyList()
+        override val featureName: String = "webCompat"
+        override val method: String = "permissionsQuery"
     }
 }

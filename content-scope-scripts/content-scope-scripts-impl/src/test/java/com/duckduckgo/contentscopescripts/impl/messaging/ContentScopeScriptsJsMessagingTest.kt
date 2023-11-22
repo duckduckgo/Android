@@ -139,6 +139,32 @@ class ContentScopeScriptsJsMessagingTest {
         assertEquals(0, callback.counter)
     }
 
+    @Test
+    fun whenProcessAndPermissionsQueryThenCallbackExecutedAndNotResponseSent() = runTest {
+        givenInterfaceIsRegistered()
+
+        val message = """
+            {"context":"contentScopeScripts","featureName":"webCompat","id":"myId","method":"permissionsQuery","params":{}}
+        """.trimIndent()
+
+        contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
+
+        assertEquals(1, callback.counter)
+    }
+
+    @Test
+    fun whenProcessAndPermissionsQueryIfIdDoesNotExistThenDoNothing() = runTest {
+        givenInterfaceIsRegistered()
+
+        val message = """
+            {"context":"contentScopeScripts","featureName":"webCompat","method":"permissionsQuery","params":{}}
+        """.trimIndent()
+
+        contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
+
+        assertEquals(0, callback.counter)
+    }
+
     private val callback = object : JsMessageCallback() {
         var counter = 0
         override fun process(featureName: String, method: String, id: String, data: JSONObject) {
