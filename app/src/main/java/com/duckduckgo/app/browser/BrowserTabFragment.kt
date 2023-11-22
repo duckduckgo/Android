@@ -241,6 +241,7 @@ import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermission
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.duckduckgo.voice.api.VoiceSearchLauncher
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import java.io.File
@@ -1444,9 +1445,9 @@ class BrowserTabFragment :
             faviconManager.loadToViewFromLocalWithPlaceholder(tabId, domain, binding.sitePermissionDialogFavicon)
         }
 
-        val dialog = CustomAlertDialogBuilder(requireActivity())
-            .setView(binding)
-            .build()
+        val dialog = MaterialAlertDialogBuilder(requireActivity())
+            .setView(binding.root)
+            .create()
 
         binding.siteAllowAlwaysLocationPermission.setOnClickListener {
             viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.ALLOW_ALWAYS)
