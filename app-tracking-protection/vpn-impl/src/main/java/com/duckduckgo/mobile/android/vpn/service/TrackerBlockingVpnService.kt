@@ -296,6 +296,13 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             }
             it
         }
+        if (nullTun == null) {
+            logcat(ERROR) { "VPN log: Failed to establish the TUN interface" }
+            deviceShieldPixels.vpnEstablishTunInterfaceError()
+            stopVpn(VpnStopReason.ERROR, false)
+            return@withContext
+        }
+
         activeTun?.let {
             logcat { "VPN log: restarting the tunnel" }
             updateNetworkStackUponRestart()
@@ -362,22 +369,24 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
     private fun createNullRouteTempTunnel(): ParcelFileDescriptor? {
         checkMainThread()
 
-        return Builder().run {
-            allowFamily(AF_INET6)
-            addAddress(InetAddress.getByName("10.0.0.2"), 32)
-            addAddress(InetAddress.getByName("fd00:1:fd00:1:fd00:1:fd00:1"), 128)
-            // nobody will be listening here we just want to make sure no app has connection
-            addDnsServer("10.0.0.1")
-            // just so that we can connect to our BE
-            // TODO should we protect all comms with our controller BE? other VPNs do that
-            safelyAddDisallowedApps(listOf("com.duckduckgo.mobile.android", "com.duckduckgo.mobile.android.debug"))
-            setBlocking(true)
-            setMtu(1280)
-            prepare(this@TrackerBlockingVpnService)
-            establish()
-        }.also {
-            logcat { "VPN log: Hole TUN created ${it?.fd}" }
-        }
+        return runCatching {
+            Builder().run {
+                allowFamily(AF_INET6)
+                addAddress(InetAddress.getByName("10.0.0.2"), 32)
+                addAddress(InetAddress.getByName("fd00:1:fd00:1:fd00:1:fd00:1"), 128)
+                // nobody will be listening here we just want to make sure no app has connection
+                addDnsServer("10.0.0.1")
+                // just so that we can connect to our BE
+                // TODO should we protect all comms with our controller BE? other VPNs do that
+                safelyAddDisallowedApps(listOf("com.duckduckgo.mobile.android", "com.duckduckgo.mobile.android.debug"))
+                setBlocking(true)
+                setMtu(1280)
+                prepare(this@TrackerBlockingVpnService)
+                establish()
+            }.also {
+                logcat { "VPN log: Hole TUN created ${it?.fd}" }
+            }
+        }.getOrNull()
     }
 
     private suspend fun createTunnelInterface(
