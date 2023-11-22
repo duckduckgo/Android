@@ -16,66 +16,74 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:gravity="center"
-    android:orientation="vertical">
-
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/faviconImage"
-        android:layout_width="@dimen/dialogImageSize"
-        android:layout_height="@dimen/dialogImageSize"
-        android:layout_gravity="center"
-        android:importantForAccessibility="no"
-        android:layout_marginBottom="@dimen/keyline_4"
-        app:srcCompat="@drawable/ic_dax_icon"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
-
-    <com.duckduckgo.common.ui.view.text.DaxTextView
-        android:id="@+id/systemPermissionDialogTitle"
-        app:typography="h2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/preciseLocationSystemDialogTitle"/>
-
-    <com.duckduckgo.common.ui.view.text.DaxTextView
-        android:id="@+id/systemPermissionDialogSubtitle"
-        app:typography="body1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_2"
-        android:text="@string/preciseLocationSystemDialogSubtitle"/>
-
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_5"
-        android:gravity="end"
-        android:orientation="vertical">
-
-        <com.duckduckgo.common.ui.view.button.DaxButtonGhost
-            android:id="@+id/allowLocationPermission"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/preciseLocationSystemDialogAllow"/>
+            android:gravity="center"
+            android:orientation="vertical">
 
-        <com.duckduckgo.common.ui.view.button.DaxButtonGhost
-            android:id="@+id/denyLocationPermission"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/preciseLocationSystemDialogDeny"/>
+        <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/faviconImage"
+                android:layout_width="@dimen/dialogImageSize"
+                android:layout_height="@dimen/dialogImageSize"
+                android:layout_gravity="center"
+                android:importantForAccessibility="no"
+                android:layout_marginBottom="@dimen/keyline_4"
+                app:srcCompat="@drawable/ic_dax_icon"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
 
-        <com.duckduckgo.common.ui.view.button.DaxButtonGhost
-            android:id="@+id/neverAllowLocationPermission"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/preciseLocationSystemDialogNeverAllow"/>
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/systemPermissionDialogTitle"
+                app:typography="h2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/preciseLocationSystemDialogTitle"/>
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/systemPermissionDialogSubtitle"
+                app:typography="body1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_2"
+                android:text="@string/preciseLocationSystemDialogSubtitle"/>
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_5"
+                android:gravity="end"
+                android:orientation="vertical">
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonGhost
+                    android:id="@+id/allowLocationPermission"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="textEnd"
+                    android:text="@string/preciseLocationSystemDialogAllow"/>
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonGhost
+                    android:id="@+id/denyLocationPermission"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="textEnd"
+                    android:text="@string/preciseLocationSystemDialogDeny"/>
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonGhost
+                    android:id="@+id/neverAllowLocationPermission"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="textEnd"
+                    android:text="@string/preciseLocationSystemDialogNeverAllow"/>
+
+        </LinearLayout>
 
     </LinearLayout>
 
-</LinearLayout>
+</ScrollView>

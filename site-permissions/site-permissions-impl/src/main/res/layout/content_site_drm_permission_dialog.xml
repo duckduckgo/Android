@@ -16,79 +16,86 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:gravity="center"
-    android:orientation="vertical">
-
-    <FrameLayout
-        android:id="@+id/sitePermissionDialogFaviconContainer"
-        android:layout_width="@dimen/dialogImageSize"
-        android:layout_height="@dimen/dialogImageSize"
-        android:layout_marginBottom="@dimen/keyline_4"
-        android:background="@drawable/list_item_image_circular_background"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <ImageView
-            android:id="@+id/sitePermissionDialogFavicon"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
-            android:layout_gravity="center"
-            android:importantForAccessibility="no"
-            android:src="@drawable/ic_globe_gray_16dp"/>
-    </FrameLayout>
-
-    <com.duckduckgo.common.ui.view.text.DaxTextView
-        android:id="@+id/sitePermissionDialogTitle"
-        app:typography="h2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/drmSiteDialogTitle"/>
-
-    <com.duckduckgo.common.ui.view.text.DaxTextView
-        android:id="@+id/sitePermissionDialogSubtitle"
-        app:typography="body1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_2"
-        android:text="@string/drmSiteDialogSubtitle"/>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            style="@style/Widget.DuckDuckGo.Dialog.Content"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_5"
-        android:gravity="end"
-        android:orientation="vertical">
-
-        <com.duckduckgo.common.ui.view.button.DaxButtonGhost
-            android:id="@+id/siteAllowAlwaysDrmPermission"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/drmSiteDialogAllowAlways"/>
+            android:gravity="center"
+            android:orientation="vertical">
 
-        <com.duckduckgo.common.ui.view.button.DaxButtonGhost
-            android:id="@+id/siteAllowOnceDrmPermission"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/drmSiteDialogAllowOnce"/>
+        <FrameLayout
+                android:id="@+id/sitePermissionDialogFaviconContainer"
+                android:layout_width="@dimen/dialogImageSize"
+                android:layout_height="@dimen/dialogImageSize"
+                android:layout_marginBottom="@dimen/keyline_4"
+                android:background="@drawable/list_item_image_circular_background"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
-        <com.duckduckgo.common.ui.view.button.DaxButtonGhost
-            android:id="@+id/siteDenyOnceDrmPermission"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/drmSiteDialogDenyOnce"/>
+            <ImageView
+                    android:id="@+id/sitePermissionDialogFavicon"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_gravity="center"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_globe_gray_16dp"/>
+        </FrameLayout>
 
-        <com.duckduckgo.common.ui.view.button.DaxButtonGhost
-            android:id="@+id/siteDenyAlwaysDrmPermission"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/drmSiteDialogDenyAlways"/>
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/sitePermissionDialogTitle"
+                app:typography="h2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/drmSiteDialogTitle"/>
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/sitePermissionDialogSubtitle"
+                app:typography="body1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_2"
+                android:text="@string/drmSiteDialogSubtitle"/>
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_5"
+                android:gravity="end"
+                android:orientation="vertical">
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonGhost
+                    android:id="@+id/siteAllowAlwaysDrmPermission"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/drmSiteDialogAllowAlways"/>
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonGhost
+                    android:id="@+id/siteAllowOnceDrmPermission"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/drmSiteDialogAllowOnce"/>
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonGhost
+                    android:id="@+id/siteDenyOnceDrmPermission"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/drmSiteDialogDenyOnce"/>
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonGhost
+                    android:id="@+id/siteDenyAlwaysDrmPermission"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/drmSiteDialogDenyAlways"/>
+
+        </LinearLayout>
 
     </LinearLayout>
 
-</LinearLayout>
+</ScrollView>
