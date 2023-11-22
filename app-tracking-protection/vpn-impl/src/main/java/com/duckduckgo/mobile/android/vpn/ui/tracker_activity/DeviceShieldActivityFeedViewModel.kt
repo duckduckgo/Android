@@ -123,7 +123,7 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
             .flowOn(dispatcherProvider.io())
             .onStart {
                 startTickerRefresher()
-                emit(TrackerFeedViewState(listOf(TrackerLoadingSkeleton), VpnState(DISABLED(), ERROR)))
+                emit(TrackerFeedViewState(listOf(TrackerLoadingSkeleton), VpnState(DISABLED, ERROR)))
                 delay(300)
             }
     }

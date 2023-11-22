@@ -173,7 +173,7 @@ class WgVpnNetworkStack @Inject constructor(
         networkProtectionRepository.get().serverDetails = null
 
         // Only update if enabledTimeInMillis stop has been initiated by the user
-        if (reason == SELF_STOP) {
+        if (reason is SELF_STOP && reason.snoozedTriggerAtMillis == 0L) {
             networkProtectionRepository.get().enabledTimeInMillis = -1
         }
         return Result.success(Unit)

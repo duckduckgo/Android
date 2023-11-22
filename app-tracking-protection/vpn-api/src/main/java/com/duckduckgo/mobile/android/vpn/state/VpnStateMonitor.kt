@@ -15,6 +15,7 @@
  */
 
 package com.duckduckgo.mobile.android.vpn.state
+
 import com.duckduckgo.mobile.android.vpn.VpnFeature
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.AlwaysOnState.Companion.DEFAULT
 import kotlinx.coroutines.flow.Flow
@@ -56,17 +57,17 @@ interface VpnStateMonitor {
     }
 
     sealed class VpnRunningState {
-        object ENABLING : VpnRunningState()
-        object ENABLED : VpnRunningState()
-        data class DISABLED(val snoozedTriggerAtMillis: Long? = null) : VpnRunningState()
-        object INVALID : VpnRunningState()
+        data object ENABLING : VpnRunningState()
+        data object ENABLED : VpnRunningState()
+        data object DISABLED : VpnRunningState()
+        data object INVALID : VpnRunningState()
     }
 
-    enum class VpnStopReason {
-        SELF_STOP,
-        ERROR,
-        REVOKED,
-        UNKNOWN,
-        RESTART,
+    sealed class VpnStopReason {
+        data class SELF_STOP(val snoozedTriggerAtMillis: Long = 0L) : VpnStopReason()
+        data object ERROR : VpnStopReason()
+        data object REVOKED : VpnStopReason()
+        data object UNKNOWN : VpnStopReason()
+        data object RESTART : VpnStopReason()
     }
 }

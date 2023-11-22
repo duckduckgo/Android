@@ -24,18 +24,14 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
-import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
-import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
 import com.duckduckgo.networkprotection.impl.waitlist.NetPRemoteFeature
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import logcat.logcat
 
@@ -49,7 +45,6 @@ class NetPDisabledNotificationScheduler @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val netPRemoteFeature: NetPRemoteFeature,
-    private val vpnStateMonitor: VpnStateMonitor,
 ) : VpnServiceCallbacks {
 
     private var isNetPEnabled: AtomicReference<Boolean> = AtomicReference(false)
@@ -75,7 +70,7 @@ class NetPDisabledNotificationScheduler @Inject constructor(
         coroutineScope.launch(dispatcherProvider.io()) {
             when (vpnStopReason) {
                 VpnStopReason.RESTART -> {} // no-op
-                VpnStopReason.SELF_STOP -> onVPNManuallyStopped()
+                is VpnStopReason.SELF_STOP -> onVPNManuallyStopped(vpnStopReason.snoozedTriggerAtMillis)
                 VpnStopReason.REVOKED -> onVPNRevoked()
                 else -> {}
             }
@@ -87,10 +82,10 @@ class NetPDisabledNotificationScheduler @Inject constructor(
         return isNetPEnabled.get() && networkProtectionState.isOnboarded() && netPRemoteFeature.waitlistBetaActive().isEnabled()
     }
 
-    private suspend fun onVPNManuallyStopped() {
+    private suspend fun onVPNManuallyStopped(snoozedTriggerAtMillis: Long) {
         if (shouldShowImmediateNotification()) {
             logcat { "VPN Manually stopped, showing disabled notification for NetP" }
-            showDisabledOrSnoozeNotification()
+            showSnoozedOrDisabledNotification(snoozedTriggerAtMillis)
             isNetPEnabled.set(false)
         }
     }
@@ -109,30 +104,17 @@ class NetPDisabledNotificationScheduler @Inject constructor(
         }
     }
 
-    private fun showDisabledOrSnoozeNotification() {
-        fun showSnoozedNotification(triggerAtMillis: Long) {
-            coroutineScope.launch(dispatcherProvider.io()) {
+    private fun showSnoozedOrDisabledNotification(triggerAtMillis: Long) {
+        coroutineScope.launch(dispatcherProvider.io()) {
+            if (triggerAtMillis != 0L) {
                 if (!netPSettingsLocalConfig.vpnNotificationAlerts().isEnabled()) return@launch
                 notificationManager.notify(
                     NETP_REMINDER_NOTIFICATION_ID,
                     netPDisabledNotificationBuilder.buildSnoozeNotification(context, triggerAtMillis),
                 )
+            } else {
+                showDisabledNotification()
             }
-        }
-
-        coroutineScope.launch(dispatcherProvider.io()) {
-            // FIXME drop to skip the default value
-            val snoozeTrigger = vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN).drop(1).firstOrNull()
-            snoozeTrigger?.let { vpnState ->
-                if (vpnState.state is VpnStateMonitor.VpnRunningState.DISABLED) {
-                    val state = vpnState.state as VpnStateMonitor.VpnRunningState.DISABLED
-                    state.snoozedTriggerAtMillis?.let { triggerAtMillis ->
-                        showSnoozedNotification(triggerAtMillis)
-                    } ?: showDisabledNotification()
-                } else {
-                    showDisabledNotification()
-                }
-            } ?: showDisabledNotification()
         }
     }
 
