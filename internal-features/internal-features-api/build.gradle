@@ -26,5 +26,5 @@ android {
 }
 
 dependencies {
-    implementation Kotlin.stdlib.jdk7
+    
 }

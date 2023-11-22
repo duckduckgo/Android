@@ -37,7 +37,6 @@ dependencies {
     implementation project(path: ':browser-api')
     implementation project(path: ':experiments-api')
 
-    implementation Kotlin.stdlib.jdk7
     implementation AndroidX.appCompat
     implementation Google.android.material
     implementation AndroidX.constraintLayout

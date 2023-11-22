@@ -35,7 +35,6 @@ dependencies {
     implementation project(path: ':experiments-api')
     implementation project(path: ':privacy-config-api')
 
-    implementation Kotlin.stdlib.jdk7
     implementation KotlinX.coroutines.core
     implementation KotlinX.coroutines.android
 

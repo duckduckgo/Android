@@ -41,8 +41,6 @@ dependencies {
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':ad-click-store')
 
-    implementation Kotlin.stdlib.jdk7
-
     implementation AndroidX.core.ktx
 
     implementation AndroidX.appCompat

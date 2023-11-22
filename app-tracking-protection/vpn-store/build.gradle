@@ -49,7 +49,6 @@ dependencies {
     implementation project(path: ':feature-toggles-api')
     implementation project(path: ':app-build-config-api')
 
-    implementation Kotlin.stdlib.jdk7
     implementation AndroidX.core.ktx
 
     implementation "com.jakewharton.threetenabp:threetenabp:_"

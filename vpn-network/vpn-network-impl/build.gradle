@@ -31,7 +31,6 @@ dependencies {
     implementation project(':app-build-config-api')
     implementation project(':library-loader-api')
 
-    implementation Kotlin.stdlib.jdk7
     implementation "com.squareup.logcat:logcat:_"
     implementation "com.duckduckgo.netguard:netguard-android:_"
 

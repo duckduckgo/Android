@@ -34,7 +34,6 @@ kotlin {
 dependencies {
     implementation project(':common-utils')
 
-    implementation Kotlin.stdlib.jdk7
     implementation KotlinX.coroutines.core
     implementation KotlinX.coroutines.android
 

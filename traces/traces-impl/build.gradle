@@ -33,7 +33,6 @@ dependencies {
     implementation project(path: ':traces-api')
     implementation project(path: ':di')
 
-    implementation Kotlin.stdlib.jdk7
     implementation AndroidX.core.ktx
     implementation KotlinX.coroutines.core
 
