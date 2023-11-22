@@ -3564,6 +3564,7 @@ class BrowserTabFragment :
                 homeBackgroundLogo.hideLogo()
                 quickAccessAdapter.submitList(favorites)
                 quickAccessItems.quickAccessRecyclerView.show()
+                viewModel.onNewTabFavouritesShown()
             }
 
             newBrowserTab.newTabQuickAccessItemsLayout.show()
