@@ -158,6 +158,7 @@ import kotlinx.coroutines.flow.*
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.json.JSONObject
 import timber.log.Timber
+import java.net.URI
 
 @ContributesViewModel(FragmentScope::class)
 class BrowserTabViewModel @Inject constructor(
@@ -1479,14 +1480,15 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch { updateBookmarkAndFavoriteState(url) }
     }
 
-    private fun stripBasicAuthFromUrl(url: String): String {
+    fun stripBasicAuthFromUrl(url: String): String {
         val uri = URI(url)
         val userInfo = uri.userInfo
 
         if (userInfo != null) {
             val queryStr = uri.rawQuery?.let { "?$it" } ?: ""
             val uriFragment = uri.fragment?.let { "#$it" } ?: ""
-            return "${uri.scheme}://${uri.host}${uri.path}$queryStr$uriFragment"
+            val portStr = if (uri.port != -1) ":${uri.port}" else ""
+            return "${uri.scheme}://${uri.host}$portStr${uri.path}$queryStr$uriFragment"
         }
 
         return url
