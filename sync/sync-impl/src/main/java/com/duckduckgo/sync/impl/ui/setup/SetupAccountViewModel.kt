@@ -25,11 +25,15 @@ import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.DEVICE_SYNCED
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_CODE
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_INTRO
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SYNC_INTRO
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SYNC_SETUP
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.Close
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.AskSaveRecoveryCode
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.CreateAccount
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.DeviceSynced
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.IntroCreateAccount
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.IntroRecoveryCode
 import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -55,6 +59,8 @@ class SetupAccountViewModel @Inject constructor(
                 SYNC_SETUP -> CreateAccount
                 DEVICE_SYNCED -> DeviceSynced
                 RECOVERY_CODE -> AskSaveRecoveryCode
+                SYNC_INTRO -> IntroCreateAccount
+                RECOVERY_INTRO -> IntroRecoveryCode
             }
             viewState.emit(ViewState(viewMode))
             initialStateProcessed = true
@@ -71,6 +77,9 @@ class SetupAccountViewModel @Inject constructor(
         object CreateAccount : ViewMode()
         object AskSaveRecoveryCode : ViewMode()
         object DeviceSynced : ViewMode()
+
+        object IntroCreateAccount : ViewMode()
+        object IntroRecoveryCode : ViewMode()
     }
 
     sealed class Command {
@@ -86,6 +95,12 @@ class SetupAccountViewModel @Inject constructor(
     fun onSetupComplete() {
         viewModelScope.launch {
             viewState.emit(ViewState(viewMode = AskSaveRecoveryCode))
+        }
+    }
+
+    fun onSetupStart() {
+        viewModelScope.launch {
+            viewState.emit(ViewState(viewMode = CreateAccount))
         }
     }
 }

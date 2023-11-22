@@ -29,29 +29,28 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.sync.impl.R
-import com.duckduckgo.sync.impl.databinding.FragmentCreateAccountBinding
-import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command
-import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command.AbortFlow
-import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command.Error
-import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command.FinishSetupFlow
-import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.ViewMode.CreatingAccount
-import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.ViewMode.SignedIn
-import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.ViewState
+import com.duckduckgo.sync.impl.databinding.FragmentIntroSyncBinding
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen
+import com.duckduckgo.sync.impl.ui.setup.SyncSetupIntroViewModel.Command
+import com.duckduckgo.sync.impl.ui.setup.SyncSetupIntroViewModel.Command.AbortFlow
+import com.duckduckgo.sync.impl.ui.setup.SyncSetupIntroViewModel.Command.StartSetupFlow
+import com.duckduckgo.sync.impl.ui.setup.SyncSetupIntroViewModel.ViewMode.CreateAccountIntro
+import com.duckduckgo.sync.impl.ui.setup.SyncSetupIntroViewModel.ViewMode.RecoverAccountIntro
+import com.duckduckgo.sync.impl.ui.setup.SyncSetupIntroViewModel.ViewState
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import timber.log.*
 
 @InjectWith(FragmentScope::class)
-class SyncCreateAccountFragment : DuckDuckGoFragment(R.layout.fragment_create_account) {
+class SyncSetupIntroFragment : DuckDuckGoFragment(R.layout.fragment_intro_sync) {
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
 
-    private val binding: FragmentCreateAccountBinding by viewBinding()
+    private val binding: FragmentIntroSyncBinding by viewBinding()
 
-    private val viewModel: SyncCreateAccountViewModel by lazy {
-        ViewModelProvider(this, viewModelFactory)[SyncCreateAccountViewModel::class.java]
+    private val viewModel: SyncSetupIntroViewModel by lazy {
+        ViewModelProvider(this, viewModelFactory)[SyncSetupIntroViewModel::class.java]
     }
 
     private val listener: SetupFlowListener?
@@ -62,7 +61,19 @@ class SyncCreateAccountFragment : DuckDuckGoFragment(R.layout.fragment_create_ac
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+
+        configureListeners()
         observeUiEvents()
+    }
+
+    private fun configureListeners(){
+        binding.syncIntroNext.setOnClickListener {
+            viewModel.onNextClicked()
+        }
+
+        binding.closeIcon.setOnClickListener {
+            viewModel.onAbortClicked()
+        }
     }
 
     private fun observeUiEvents() {
@@ -81,11 +92,12 @@ class SyncCreateAccountFragment : DuckDuckGoFragment(R.layout.fragment_create_ac
 
     private fun renderViewState(viewState: ViewState) {
         when (viewState.viewMode) {
-            is SignedIn -> {
-                listener?.launchFinishSetupFlow()
+            is CreateAccountIntro -> {
+
             }
-            else -> {
-                //nothing for now
+
+            is RecoverAccountIntro -> {
+
             }
         }
     }
@@ -97,14 +109,24 @@ class SyncCreateAccountFragment : DuckDuckGoFragment(R.layout.fragment_create_ac
                 requireActivity().finish()
             }
 
-            FinishSetupFlow -> listener?.launchFinishSetupFlow()
-            Error -> {
+            StartSetupFlow -> listener?.launchCreateAccountFlow()
+
+            else -> {
                 Snackbar.make(binding.root, R.string.sync_general_error, Snackbar.LENGTH_LONG).show()
             }
         }
     }
 
     companion object {
-        fun instance() = SyncCreateAccountFragment()
+
+        const val KEY_CREATE_ACCOUNT_INTRO = "KEY_CREATE_ACCOUNT_INTRO"
+
+        fun instance(screen: Screen): SyncSetupIntroFragment {
+            val fragment = SyncSetupIntroFragment()
+            val bundle = Bundle()
+            bundle.putSerializable(KEY_CREATE_ACCOUNT_INTRO, screen)
+            fragment.arguments = bundle
+            return fragment
+        }
     }
 }
