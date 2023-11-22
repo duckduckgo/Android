@@ -65,13 +65,6 @@ class SyncCreateAccountFragment : DuckDuckGoFragment(R.layout.fragment_create_ac
     ) {
         super.onViewCreated(view, savedInstanceState)
         observeUiEvents()
-        configureListeners()
-    }
-
-    private fun configureListeners() {
-        binding.footerButton.setOnClickListener {
-            viewModel.onNextClicked()
-        }
     }
 
     private fun observeUiEvents() {
@@ -91,14 +84,10 @@ class SyncCreateAccountFragment : DuckDuckGoFragment(R.layout.fragment_create_ac
     private fun renderViewState(viewState: ViewState) {
         when (viewState.viewMode) {
             is SignedIn -> {
-                binding.footerButton.isEnabled = true
-                binding.footerButton.setOnClickListener {
-                    listener?.launchFinishSetupFlow()
-                }
+                listener?.launchFinishSetupFlow()
             }
-
-            CreatingAccount -> {
-                binding.footerButton.isEnabled = false
+            else -> {
+                //nothing for now
             }
         }
     }

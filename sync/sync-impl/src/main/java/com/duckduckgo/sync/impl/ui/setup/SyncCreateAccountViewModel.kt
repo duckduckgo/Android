@@ -72,14 +72,8 @@ class SyncCreateAccountViewModel @Inject constructor(
             }
 
             is Success -> {
-                viewState.emit(ViewState(SignedIn))
+                command.send(FinishSetupFlow)
             }
-        }
-    }
-
-    fun onNextClicked() {
-        viewModelScope.launch {
-            command.send(FinishSetupFlow)
         }
     }
 }

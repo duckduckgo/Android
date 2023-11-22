@@ -46,11 +46,12 @@
     <string name="sync_off_encrypted_hint">Your data is end-to-end encrypted, and DuckDuckGo does not have access to the decryption key.</string>
 
     <!-- Setup screen -->
-    <string name="sync_enable_sync_title">All Set!</string>
-    <string name="sync_enable_sync_content">You can sync this device’s bookmarks and Logins with additional devices at any time from the Sync &amp; Back Up menu in Settings.</string>
+    <string name="sync_enable_sync_title">Setting Up Sync and Backup!</string>
+    <string name="sync_enable_sync_content">Your bookmarks and passwords are being prepared to sync. This should only take a moment.</string>
     <string name="sync_enable_options">Options</string>
     <string name="sync_enable_option_favicons_title">Fetch Bookmark Icons</string>
     <string name="sync_enable_option_favicons_subtitle">Automatically download icons for synced bookmarks.</string>
+    <string name="sync_enable_connecting">Connecting…</string>
 
     <!-- Device synced screen -->
     <string name="sync_connected_device_title">Device Synced!</string>
@@ -82,7 +83,7 @@
     <string name="sync_recovery_code_secondary_button">Copy Code</string>
     <string name="sync_recovery_code_skip_button">Not Now</string>
     <string name="sync_connected_device_primary_button">Next</string>
-    <string name="sync_connect_scan_qr_hint">Go to Settings > Sync &amp; Back Up in the DuckDuckGo App on a different device and scan this QR code to sync.</string>
+    <string name="sync_connect_scan_qr_hint">Go to <b>Settings > Sync &amp; Back Up</b> in the DuckDuckGo Browser on a another device and select  ”Sync with Another Device.”</string>
     <string name="sync_connect_copy_code">Copy Code</string>
     <string name="turn_off_sync_dialog_title">Turn off sync?</string>
     <string name="turn_off_sync_dialog_content">This Device will no longer be able to access your synced data</string>
