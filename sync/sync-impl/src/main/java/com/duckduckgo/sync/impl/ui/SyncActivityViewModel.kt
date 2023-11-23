@@ -132,7 +132,7 @@ class SyncActivityViewModel @Inject constructor(
     )
 
     sealed class Command {
-        object ScanQRCode : Command()
+        object SyncWithAnotherDevice : Command()
         object EnterTextCode : Command()
         object IntroCreateAccount : Command()
         object IntroRecoverSyncData : Command()
@@ -149,19 +149,13 @@ class SyncActivityViewModel @Inject constructor(
         data class AskEditDevice(val device: ConnectedDevice) : Command()
     }
 
-    fun onScanQRCodeClicked() {
+    fun onSyncWithAnotherDevice() {
         viewModelScope.launch {
-            command.send(Command.ScanQRCode)
+            command.send(Command.SyncWithAnotherDevice)
         }
     }
 
-    fun onEnterTextCodeClicked() {
-        viewModelScope.launch {
-            command.send(Command.EnterTextCode)
-        }
-    }
-
-    fun onInitializeSync() {
+    fun onSyncThisDevice() {
         viewModelScope.launch {
             viewState.value = viewState.value.toggle(true)
             command.send(IntroCreateAccount)

@@ -54,7 +54,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.EnterTextCode
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroCreateAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroRecoverSyncData
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ScanQRCode
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.SyncWithAnotherDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowTextCode
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.setup.ConnectFlowContract
@@ -184,16 +184,12 @@ class SyncActivity : DuckDuckGoActivity() {
     }
 
     private fun setupClickListeners() {
-        binding.viewSyncDisabled.syncSetupScanQr.setClickListener {
-            viewModel.onScanQRCodeClicked()
+        binding.viewSyncDisabled.syncSetupWithAnotherDevice.setClickListener {
+            viewModel.onSyncWithAnotherDevice()
         }
 
-        binding.viewSyncDisabled.syncSetupEnterText.setClickListener {
-            viewModel.onEnterTextCodeClicked()
-        }
-
-        binding.viewSyncDisabled.syncSetupInitializeSync.setClickListener {
-            viewModel.onInitializeSync()
+        binding.viewSyncDisabled.syncSetupSyncThisDevice.setClickListener {
+            viewModel.onSyncThisDevice()
         }
 
         binding.viewSyncDisabled.syncSetupRecoverData.setClickListener {
@@ -213,7 +209,7 @@ class SyncActivity : DuckDuckGoActivity() {
         }
 
         binding.viewSyncEnabled.scanQrCodeItem.setOnClickListener {
-            viewModel.onScanQRCodeClicked()
+            viewModel.onSyncWithAnotherDevice()
         }
 
         binding.viewSyncEnabled.showTextCodeItem.setOnClickListener {
@@ -239,8 +235,7 @@ class SyncActivity : DuckDuckGoActivity() {
 
     private fun processCommand(it: Command) {
         when (it) {
-            is ScanQRCode -> connectFlow.launch(null)
-            is EnterTextCode -> enterCodeLauncher.launch(CONNECT_CODE)
+            is SyncWithAnotherDevice -> connectFlow.launch(null)
             is IntroCreateAccount -> syncIntroLauncher.launch(SYNC_INTRO)
             is IntroRecoverSyncData -> syncIntroLauncher.launch(RECOVERY_INTRO)
             is DeviceConnected -> launcher.launch(SetupAccountActivity.intentDeviceConnectedFlow(this))

@@ -32,17 +32,14 @@
     <!-- Sync -->
     <!-- Settings screen -->
     <string name="sync_screen_title">Sync &amp; Backup</string>
-    <string name="sync_off_hint">Securely sync bookmarks and Logins between your devices.</string>
-    <string name="sync_setup_quick_connect_title">Sync with Another Device</string>
-    <string name="sync_setup_quick_primary_cta_subtitle">Sync your devices by scanning a QR code</string>
-    <string name="sync_setup_quick_primary_cta_title">Scan QR Code</string>
-    <string name="sync_setup_quick_secondary_cta_title">Enter Text Code</string>
-    <string name="sync_setup_quick_secondary_cta_subtitle">Sync your devices by entering a text code</string>
+    <string name="sync_setup_begin_syncing">Begin Syncing</string>
+    <string name="sync_setup_with_another_device_cta_title">Sync with Another Device</string>
+    <string name="sync_setup_with_another_device_cta_subtitle">Securely sync bookmarks and passwords between your devices.</string>
+    <string name="sync_off_hint">Your data is end-to-end encrypted, and DuckDuckGo does not have access to the encryption key.</string>
     <string name="sync_setup_single_device_title">Single-Device Setup</string>
-    <string name="sync_setup_single_device_primary_cta_title">Start Sync &amp; Back Up</string>
-    <string name="sync_setup_single_device_primary_cta_subtitle">Set up this device now, sync with other devices later.</string>
-    <string name="sync_setup_single_device_secondary_cta_title">Recover Data</string>
-    <string name="sync_setup_single_device_secondary_cta_subtitle">Recover synced data with a recovery code</string>
+    <string name="sync_setup_single_recover_data_cta_title">Recover Synced Data</string>
+    <string name="sync_setup_single_sync_this_device_cta_title">Sync and Back Up This Device</string>
+
     <string name="sync_off_encrypted_hint">Your data is end-to-end encrypted, and DuckDuckGo does not have access to the decryption key.</string>
 
     <!-- Setup screen -->

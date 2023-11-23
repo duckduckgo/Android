@@ -147,29 +147,19 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenScanQRCodeClickedThenEmitCommandScanQRCode() = runTest {
-        testee.onScanQRCodeClicked()
+    fun whenSyncWithAnoterDeviceThenEmitCommandSyncWithAnotherDevice() = runTest {
+        testee.onSyncWithAnotherDevice()
 
         testee.commands().test {
-            awaitItem().assertCommandType(Command.ScanQRCode::class)
+            awaitItem().assertCommandType(Command.SyncWithAnotherDevice::class)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun whenEnterTextCodeClickedThenEmitCommandEnterTextCode() = runTest {
-        testee.onEnterTextCodeClicked()
-
-        testee.commands().test {
-            awaitItem().assertCommandType(Command.EnterTextCode::class)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenEnablingSyncThenLaunchDeviceSetupFlow() = runTest {
+    fun whenSyncThisDeviceThenLaunchCreateAccountFlow() = runTest {
         testee.viewState().test {
-            testee.onInitializeSync()
+            testee.onSyncThisDevice()
             val initialState = expectMostRecentItem()
             assertEquals(true, initialState.syncToggleState)
             cancelAndIgnoreRemainingEvents()
