@@ -69,6 +69,13 @@
     <string name="connect_screen_connect_qr_hint_content">Scan this code with another device to sync.”</string>
     <string name="connect_screen_share_code">Copy Code</string>
 
+    <!-- Enter Code screen -->
+    <string name="enter_code_screen_title">Manually Enter Code</string>
+    <string name="sync_enter_code_hint">Go to <b>Settings > Sync &amp; Backup > Sync With Another Device</b> and select <b>View Text Code</b> in the DuckDuckGo App on another synced device and paste the code here to sync this device.</string>
+    <string name="sync_enter_code_verifying">Verifying code</string>
+    <string name="sync_enter_code_invalid">⚠️ Invalid Code</string>
+    <string name="sync_enter_code_paste">Paste Code</string>
+
     <!-- Device synced screen -->
     <string name="sync_connected_device_title">Device Synced!</string>
     <string name="sync_connected_device_hint" instruction="Placeholder is a device name">Your bookmarks and Logins are now syncing with %1$s</string>
@@ -77,7 +84,7 @@
 
 
     <string name="show_qr_screen_title">Show QR Code</string>
-    <string name="enter_code_screen_title">Enter Text Code</string>
+
     <string name="show_code_screen_title">Code</string>
     <string name="enter_code_screen_cta">Enter Text Code</string>
     <string name="sync_login_device_hint">Scan the QR code on your Recovery PDF, or another synced device, to recover your data.</string>
@@ -125,10 +132,6 @@
     <string name="sync_device_this_device_hint">This device</string>
     <string name="sync_device_menu_option_edit">Edit</string>
     <string name="sync_device_menu_option_remove">Remove Device</string>
-    <string name="sync_enter_code_hint">Copy the code from the Settings > Sync page in the DuckDuckGo App on another synced device and paste it here to sync this device.</string>
-    <string name="sync_enter_code_verifying">Verifying code</string>
-    <string name="sync_enter_code_invalid">⚠️ Invalid Code</string>
-    <string name="sync_enter_code_paste">Paste Code</string>
     <string name="sync_show_code_copy">Copy Code</string>
     <string name="sync_show_code_copy_hint">Use this code after choosing "Manually Enter Code" during sync setup on a second device</string>
     <string name="sync_code_copied_message">Recovery Code Copied</string>
