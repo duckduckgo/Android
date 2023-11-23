@@ -29,9 +29,10 @@ import com.duckduckgo.js.messaging.api.JsMessageHandler
 import com.duckduckgo.js.messaging.api.JsMessageHelper
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.JsRequestResponse
+import com.duckduckgo.js.messaging.api.SubscriptionEvent
+import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
-import java.util.*
 import javax.inject.Inject
 import javax.inject.Named
 import kotlinx.coroutines.runBlocking
@@ -86,8 +87,14 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
         this.webView.addJavascriptInterface(this, coreContentScopeScripts.javascriptInterface)
     }
 
-    override fun sendSubscriptionEvent() {
-        // NOOP
+    override fun sendSubscriptionEvent(subscriptionEventData: SubscriptionEventData) {
+        val subscriptionEvent = SubscriptionEvent(
+            context,
+            subscriptionEventData.featureName,
+            subscriptionEventData.subscriptionName,
+            subscriptionEventData.params,
+        )
+        jsMessageHelper.sendSubscriptionEvent(subscriptionEvent, callbackName, secret, webView)
     }
 
     override fun onResponse(response: JsCallbackData) {

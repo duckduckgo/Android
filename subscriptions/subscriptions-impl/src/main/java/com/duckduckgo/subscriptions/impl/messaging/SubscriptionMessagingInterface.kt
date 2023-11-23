@@ -29,6 +29,8 @@ import com.duckduckgo.js.messaging.api.JsMessageHandler
 import com.duckduckgo.js.messaging.api.JsMessageHelper
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.JsRequestResponse
+import com.duckduckgo.js.messaging.api.SubscriptionEvent
+import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.subscriptions.impl.AuthToken
 import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
@@ -88,8 +90,14 @@ class SubscriptionMessagingInterface @Inject constructor(
         this.webView.addJavascriptInterface(this, context)
     }
 
-    override fun sendSubscriptionEvent() {
-        // NOOP
+    override fun sendSubscriptionEvent(subscriptionEventData: SubscriptionEventData) {
+        val subscriptionEvent = SubscriptionEvent(
+            context,
+            subscriptionEventData.featureName,
+            subscriptionEventData.subscriptionName,
+            subscriptionEventData.params,
+        )
+        jsMessageHelper.sendSubscriptionEvent(subscriptionEvent, callbackName, secret, webView)
     }
 
     override fun onResponse(response: JsCallbackData) {
@@ -116,7 +124,7 @@ class SubscriptionMessagingInterface @Inject constructor(
 
         override val allowedDomains: List<String> = emptyList()
         override val featureName: String = "useSubscription"
-        override val methods: List<String> = listOf("subscriptionSelected", "getSubscriptionOptions", "backToSettings")
+        override val methods: List<String> = listOf("subscriptionSelected", "getSubscriptionOptions", "backToSettings", "activateSubscription")
     }
 
     inner class GetSubscriptionMessage(

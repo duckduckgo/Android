@@ -185,7 +185,7 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun whenProcessAndGetSubscriptionsIfNoIdDoNothing() = runTest {
+    fun whenProcessAndGetSubscriptionIfNoIdDoNothing() = runTest {
         givenInterfaceIsRegistered()
         givenAuthTokenIsSuccess()
 
@@ -208,12 +208,11 @@ class SubscriptionMessagingInterfaceTest {
 
         messagingInterface.process(message, "duckduckgo-android-messaging-secret")
 
-        verifyNoInteractions(jsMessageHelper)
         assertEquals(0, callback.counter)
     }
 
     @Test
-    fun whenProcessAndBackToSettingsThenCallbackExecutedAndNotResponseSent() = runTest {
+    fun whenProcessAndBackToSettingsThenCallbackExecuted() = runTest {
         givenInterfaceIsRegistered()
 
         val message = """
@@ -222,22 +221,7 @@ class SubscriptionMessagingInterfaceTest {
 
         messagingInterface.process(message, "duckduckgo-android-messaging-secret")
 
-        verifyNoInteractions(jsMessageHelper)
         assertEquals(1, callback.counter)
-    }
-
-    @Test
-    fun whenProcessAndBackToSettingsIfIdDoesNotExistThenDoNothing() = runTest {
-        givenInterfaceIsRegistered()
-
-        val message = """
-            {"context":"subscriptionPages","featureName":"test","method":"backToSettings","params":{}}
-        """.trimIndent()
-
-        messagingInterface.process(message, "duckduckgo-android-messaging-secret")
-
-        verifyNoInteractions(jsMessageHelper)
-        assertEquals(0, callback.counter)
     }
 
     @Test
@@ -338,6 +322,32 @@ class SubscriptionMessagingInterfaceTest {
 
         val message = """
             {"context":"subscriptionPages","featureName":"useSubscription","method":"subscriptionSelected","id":"id","params":{}}
+        """.trimIndent()
+
+        messagingInterface.process(message, "duckduckgo-android-messaging-secret")
+
+        assertEquals(1, callback.counter)
+    }
+
+    @Test
+    fun whenProcessAndActivateSubscriptionIfFeatureNameDoesNotMatchDoNothing() = runTest {
+        givenInterfaceIsRegistered()
+
+        val message = """
+            {"context":"subscriptionPages","featureName":"test","id":"myId","method":"activateSubscription","params":{}}
+        """.trimIndent()
+
+        messagingInterface.process(message, "duckduckgo-android-messaging-secret")
+
+        assertEquals(0, callback.counter)
+    }
+
+    @Test
+    fun whenProcessAndActivateSubscriptionThenCallbackExecuted() = runTest {
+        givenInterfaceIsRegistered()
+
+        val message = """
+            {"context":"subscriptionPages","featureName":"useSubscription","id":"myId","method":"activateSubscription","params":{}}
         """.trimIndent()
 
         messagingInterface.process(message, "duckduckgo-android-messaging-secret")

@@ -13,7 +13,9 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.repository.SubscriptionsRepository
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Companion
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView.Success
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.SubscriptionOptionsJson
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -59,7 +61,12 @@ class SubscriptionWebViewViewModelTest {
             assertTrue(awaitItem().purchaseState is PurchaseStateView.Failure)
 
             flowTest.emit(CurrentPurchase.Success)
-            assertTrue(awaitItem().purchaseState is PurchaseStateView.Success)
+            val success = awaitItem().purchaseState
+            assertTrue(success is Success)
+            assertEquals(Companion.PURCHASE_COMPLETED_FEATURE_NAME, (success as Success).subscriptionEventData.featureName)
+            assertEquals(Companion.PURCHASE_COMPLETED_SUBSCRIPTION_NAME, success.subscriptionEventData.subscriptionName)
+            assertNotNull(success.subscriptionEventData.params)
+            assertEquals("completed", success.subscriptionEventData.params!!.getString("type"))
 
             flowTest.emit(CurrentPurchase.InProgress)
             assertTrue(awaitItem().purchaseState is PurchaseStateView.InProgress)
@@ -138,6 +145,14 @@ class SubscriptionWebViewViewModelTest {
             assertEquals("getSubscriptionOptions", response.method)
             assertEquals("yearly", params?.options?.first()?.id)
             assertEquals("monthly", params?.options?.last()?.id)
+        }
+    }
+
+    @Test
+    fun whenActivateSubscriptionThenCommandSent() = runTest {
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "activateSubscription", null, null)
+            assertTrue(awaitItem() is Command.ActivateOnAnotherDevice)
         }
     }
 
