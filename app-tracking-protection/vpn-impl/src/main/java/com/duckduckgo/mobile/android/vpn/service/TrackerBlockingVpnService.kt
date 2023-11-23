@@ -71,7 +71,10 @@ import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
 
-@InjectWith(VpnScope::class)
+@InjectWith(
+    scope = VpnScope::class,
+    delayGeneration = true,
+)
 class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), VpnSocketProtector {
 
     private external fun jni_wait_for_tun_up(tunFd: Int): Int
