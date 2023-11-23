@@ -46,10 +46,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 @ContributesViewModel(ActivityScope::class)
-class SetupAccountViewModel @Inject constructor(
-    private val syncAccountRepository: SyncAccountRepository,
-    private val dispatchers: DispatcherProvider,
-) : ViewModel() {
+class SetupAccountViewModel @Inject constructor() : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
     private val viewState = MutableStateFlow(ViewState())

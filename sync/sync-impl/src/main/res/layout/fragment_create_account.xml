@@ -87,7 +87,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/keyline_5"
+        android:layout_marginStart="@dimen/keyline_4"
         android:layout_marginEnd="@dimen/keyline_5"
         android:layout_marginBottom="@dimen/keyline_4"
         android:gravity="center"
@@ -110,6 +110,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
+            android:layout_marginStart="@dimen/keyline_2"
             android:text="@string/sync_enable_connecting"
             app:textType="secondary"
             app:typography="caption" />
