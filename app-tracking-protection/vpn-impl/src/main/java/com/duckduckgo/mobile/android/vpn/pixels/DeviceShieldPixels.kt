@@ -346,6 +346,9 @@ interface DeviceShieldPixels {
     fun notifyStartFailed()
 
     fun reportTLSParsingError(errorCode: Int)
+
+    fun reportVpnSnoozedStarted()
+    fun reportVpnSnoozedEnded()
 }
 
 @ContributesBinding(AppScope::class)
@@ -732,6 +735,16 @@ class RealDeviceShieldPixels @Inject constructor(
     override fun reportDeviceConnectivityError() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_REPORT_DEVICE_CONNECTIVITY_ERROR_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_REPORT_DEVICE_CONNECTIVITY_ERROR)
+    }
+
+    override fun reportVpnSnoozedStarted() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.VPN_SNOOZE_STARTED_DAILY)
+        firePixel(DeviceShieldPixelNames.VPN_SNOOZE_STARTED)
+    }
+
+    override fun reportVpnSnoozedEnded() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.VPN_SNOOZE_ENDED_DAILY)
+        firePixel(DeviceShieldPixelNames.VPN_SNOOZE_ENDED)
     }
 
     private fun suddenKill() {
