@@ -19,26 +19,28 @@ package com.duckduckgo.sync.impl.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
-import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.databinding.ActivityConnectSyncBinding
 import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code
+import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code.CONNECT_CODE
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command
-import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.LoginSucess
+import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.Error
+import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.LoginSuccess
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ReadTextCode
+import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ShowQRCode
-import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.ViewMode.SignedIn
-import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.ViewMode.UnAuthenticated
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.setup.ConnectViaQRCodeContract
 import com.duckduckgo.sync.impl.ui.setup.EnterCodeContract
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -49,7 +51,7 @@ class SyncConnectActivity : DuckDuckGoActivity() {
 
     private val showQRConnectLauncher = registerForActivityResult(ConnectViaQRCodeContract()) { resultOk ->
         if (resultOk) {
-            viewModel.onLoginSucess()
+            viewModel.onLoginSuccess()
         }
     }
 
@@ -57,7 +59,7 @@ class SyncConnectActivity : DuckDuckGoActivity() {
         EnterCodeContract(),
     ) { resultOk ->
         if (resultOk) {
-            viewModel.onLoginSucess()
+            viewModel.onLoginSuccess()
         }
     }
 
@@ -95,13 +97,12 @@ class SyncConnectActivity : DuckDuckGoActivity() {
             .launchIn(lifecycleScope)
     }
 
-    private fun render(it: ViewState) {
-        when (it.viewMode) {
-            SignedIn -> {
-                binding.showQRCode.hide()
-            }
-            UnAuthenticated -> {
-                binding.showQRCode.show()
+    private fun render(viewState: ViewState) {
+        viewState.qrCodeBitmap?.let {
+            binding.qrCodeImageView.show()
+            binding.qrCodeImageView.setImageBitmap(it)
+            binding.copyCodeButton.setOnClickListener {
+                viewModel.onCopyCodeClicked()
             }
         }
     }
@@ -109,26 +110,25 @@ class SyncConnectActivity : DuckDuckGoActivity() {
     private fun processCommand(it: Command) {
         when (it) {
             ReadTextCode -> {
-                enterCodeLauncher.launch(Code.CONNECT_CODE)
+                enterCodeLauncher.launch(CONNECT_CODE)
             }
-            LoginSucess -> {
+            LoginSuccess -> {
                 setResult(RESULT_OK)
                 finish()
             }
             ShowQRCode -> showQRConnectLauncher.launch(null)
-            Command.Error -> {
+            Error -> {
                 setResult(RESULT_CANCELED)
                 finish()
             }
+
+            is ShowMessage -> Snackbar.make(binding.root, it.messageId, Snackbar.LENGTH_SHORT).show()
         }
     }
 
     private fun configureListeners() {
         binding.readTextCode.setOnClickListener {
             viewModel.onReadTextCodeClicked()
-        }
-        binding.showQRCode.setOnClickListener {
-            viewModel.onShowQRCodeClicked()
         }
     }
 

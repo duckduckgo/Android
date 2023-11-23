@@ -59,7 +59,7 @@
         app:layout_constraintTop_toBottomOf="@id/linearLayout"
         app:typography="body1"
         android:layout_margin="@dimen/keyline_4"
-        android:text="@string/sync_connect_scan_qr_hint"/>
+        android:text="@string/connect_screen_connect_qr_hint_content"/>
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/copyCodeButton"
@@ -69,6 +69,6 @@
         android:layout_marginTop="@dimen/keyline_4"
         app:leadingIcon="@drawable/ic_keyboard_24"
         app:leadingIconBackground="circular"
-        app:primaryText="@string/sync_connect_copy_code" />
+        app:primaryText="@string/connect_screen_share_code" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

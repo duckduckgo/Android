@@ -16,29 +16,39 @@
 
 package com.duckduckgo.sync.impl.ui
 
+import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.sync.impl.Clipboard
+import com.duckduckgo.sync.impl.QREncoder
+import com.duckduckgo.sync.impl.R.dimen
+import com.duckduckgo.sync.impl.R.string
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
-import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.LoginSucess
+import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.LoginSuccess
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ReadTextCode
+import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ShowQRCode
 import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @ContributesViewModel(ActivityScope::class)
 class SyncConnectViewModel @Inject constructor(
     private val syncAccountRepository: SyncAccountRepository,
+    private val qrEncoder: QREncoder,
+    private val clipboard: Clipboard,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -46,27 +56,70 @@ class SyncConnectViewModel @Inject constructor(
 
     private val viewState = MutableStateFlow(ViewState())
     fun viewState(): Flow<ViewState> = viewState.onStart {
-        val viewMode = if (syncAccountRepository.isSignedIn()) {
-            ViewMode.SignedIn
-        } else {
-            ViewMode.UnAuthenticated
+        pollConnectionKeys()
+    }
+
+    private fun pollConnectionKeys() {
+        viewModelScope.launch(dispatchers.io()) {
+            showQRCode()
+            var polling = true
+            while (polling) {
+                delay(POLLING_INTERVAL)
+                when (syncAccountRepository.pollConnectionKeys()) {
+                    is Success -> {
+                        command.send(LoginSuccess)
+                        polling = false
+                    }
+
+                    else -> {
+                        // noop - keep polling
+                    }
+                }
+            }
         }
-        viewState.emit(ViewState(viewMode))
+    }
+
+    private suspend fun showQRCode() {
+        when (val result = syncAccountRepository.getConnectQR()) {
+            is Error -> {
+                command.send(Command.Error)
+            }
+
+            is Success -> {
+                val qrBitmap = withContext(dispatchers.io()) {
+                    qrEncoder.encodeAsBitmap(result.data, dimen.qrSizeSmall, dimen.qrSizeSmall)
+                }
+                viewState.emit(
+                    viewState.value.copy(
+                        qrCodeBitmap = qrBitmap,
+                    ),
+                )
+            }
+        }
+    }
+
+    fun onCopyCodeClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            when (val result = syncAccountRepository.getConnectQR()) {
+                is Error -> command.send(Command.Error)
+                is Success -> {
+                    clipboard.copyToClipboard(result.data)
+                    command.send(ShowMessage(string.sync_code_copied_message))
+                }
+            }
+        }
     }
 
     data class ViewState(
-        val viewMode: ViewMode = ViewMode.UnAuthenticated,
+        val qrCodeBitmap: Bitmap? = null,
     )
-
-    sealed class ViewMode {
-        object SignedIn : ViewMode()
-        object UnAuthenticated : ViewMode()
-    }
 
     sealed class Command {
         object ShowQRCode : Command()
         object ReadTextCode : Command()
-        object LoginSucess : Command()
+        object LoginSuccess : Command()
+
+        data class ShowMessage(val messageId: Int) : Command()
         object Error : Command()
     }
 
@@ -80,7 +133,7 @@ class SyncConnectViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             when (syncAccountRepository.processCode(qrCode)) {
                 is Error -> command.send(Command.Error)
-                is Success -> command.send(LoginSucess)
+                is Success -> command.send(LoginSuccess)
             }
         }
     }
@@ -91,9 +144,13 @@ class SyncConnectViewModel @Inject constructor(
         }
     }
 
-    fun onLoginSucess() {
+    fun onLoginSuccess() {
         viewModelScope.launch {
-            command.send(LoginSucess)
+            command.send(LoginSuccess)
         }
+    }
+
+    companion object {
+        const val POLLING_INTERVAL = 5000L
     }
 }

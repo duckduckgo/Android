@@ -34,12 +34,7 @@ class SetupAccountViewModelTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    private val syncRepostitory: SyncAccountRepository = mock()
-
-    private val testee = SetupAccountViewModel(
-        syncRepostitory,
-        coroutineTestRule.testDispatcherProvider,
-    )
+    private val testee = SetupAccountViewModel()
 
     @Test
     fun whenFlowStartedFromSetupScreenViewModeDeviceConnected() = runTest {

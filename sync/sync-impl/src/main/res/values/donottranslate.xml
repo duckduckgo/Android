@@ -57,18 +57,30 @@
     <string name="sync_intro_recover_content">To restore your synced data, you\'ll need the Recovery Code you saved when you first set up Sync. This code may have been saved as a PDF on the device you originally used to set up Sync.</string>
     <string name="sync_intro_recover_cta">Get Started</string>
 
+    <!-- Recover data screen -->
+    <string name="login_screen_title">Scan QR Code</string>
+    <string name="login_screen_enter_code_cta">Or Manually Enter Code</string>
+
+    <!-- Connect screen -->
+    <string name="connect_screen_title">Scan QR Code</string>
+    <string name="connect_screen_scan_qr_hint">Go to <b>Settings > Sync &amp; Back Up</b> in the DuckDuckGo Browser on a another device and select  ”Sync with Another Device.”</string>
+    <string name="connect_screen_enter_code_cta">Or Manually Enter Code</string>
+    <string name="connect_screen_connect_qr_hint_title">Mobile-to-Mobile?</string>
+    <string name="connect_screen_connect_qr_hint_content">Scan this code with another device to sync.”</string>
+    <string name="connect_screen_share_code">Copy Code</string>
+
     <!-- Device synced screen -->
     <string name="sync_connected_device_title">Device Synced!</string>
     <string name="sync_connected_device_hint" instruction="Placeholder is a device name">Your bookmarks and Logins are now syncing with %1$s</string>
 
-    <!-- Connect screen -->
-    <string name="login_screen_title">Scan QR Code</string>
-    <string name="connect_screen_title">Scan QR Code</string>
+
+
+
     <string name="show_qr_screen_title">Show QR Code</string>
     <string name="enter_code_screen_title">Enter Text Code</string>
     <string name="show_code_screen_title">Code</string>
     <string name="enter_code_screen_cta">Enter Text Code</string>
-    <string name="sync_login_device_hint">Scan the QR code on your Recovery PDF, or another synced device, to recover your synced data.</string>
+    <string name="sync_login_device_hint">Scan the QR code on your Recovery PDF, or another synced device, to recover your data.</string>
 
     <string name="synced_devices_section_title">Synced Devices</string>
     <string name="sync_new_device_section_title">Sync New Device</string>
@@ -87,8 +99,7 @@
     <string name="sync_recovery_code_secondary_button">Copy Code</string>
     <string name="sync_recovery_code_skip_button">Not Now</string>
     <string name="sync_connected_device_primary_button">Next</string>
-    <string name="sync_connect_scan_qr_hint">Go to <b>Settings > Sync &amp; Back Up</b> in the DuckDuckGo Browser on a another device and select  ”Sync with Another Device.”</string>
-    <string name="sync_connect_copy_code">Copy Code</string>
+
     <string name="turn_off_sync_dialog_title">Turn off sync?</string>
     <string name="turn_off_sync_dialog_content">This Device will no longer be able to access your synced data</string>
     <string name="turn_off_sync_dialog_primary_button">Turn Off</string>
