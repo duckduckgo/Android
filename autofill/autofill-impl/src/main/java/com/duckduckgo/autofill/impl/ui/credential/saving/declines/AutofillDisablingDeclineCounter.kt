@@ -31,15 +31,15 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 /**
-* Repeated prompts to use Autofill (e.g., save login credentials) might annoy a user who doesn't want to use Autofill.
-* If the user has declined too many times without using it, we will prompt them to disable.
-*
-* This class is used to track the number of times a user has declined to use Autofill when prompted.
-* It should be permanently disabled, by calling disableDeclineCounter(), when user:
-*    - saves a credential, or
-*    - chooses to disable autofill when prompted to disable autofill, or
-*    - chooses to keep using autofill when prompted to disable autofill
-*/
+ * Repeated prompts to use Autofill (e.g., save login credentials) might annoy a user who doesn't want to use Autofill.
+ * If the user has declined too many times without using it, we will prompt them to disable.
+ *
+ * This class is used to track the number of times a user has declined to use Autofill when prompted.
+ * It should be permanently disabled, by calling disableDeclineCounter(), when user:
+ *    - saves a credential, or
+ *    - chooses to disable autofill when prompted to disable autofill, or
+ *    - chooses to keep using autofill when prompted to disable autofill
+ */
 interface AutofillDeclineCounter {
 
     /**
@@ -68,8 +68,7 @@ class AutofillDisablingDeclineCounter @Inject constructor(
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
 ) : AutofillDeclineCounter {
 
-    @VisibleForTesting
-    var isActive = false
+    private var isActive = false
 
     /**
      * The previous domain for which we have recorded a decline, held in-memory only.
@@ -105,6 +104,8 @@ class AutofillDisablingDeclineCounter @Inject constructor(
     private fun shouldRecordDecline(domain: String) = domain != currentSessionPreviousDeclinedDomain
 
     override suspend fun disableDeclineCounter() {
+        Timber.d("Permanently disabling Autofill decline counter")
+
         isActive = false
         currentSessionPreviousDeclinedDomain = null
 
@@ -131,8 +132,12 @@ class AutofillDisablingDeclineCounter @Inject constructor(
 
     private suspend fun determineIfDeclineCounterIsActive(): Boolean {
         return withContext(dispatchers.io()) {
-            autofillStore.autofillEnabled && autofillStore.monitorDeclineCounts && autofillStore.autofillAvailable
+            autofillStore.monitorDeclineCounts && autofillStore.autofillAvailable
         }
+    }
+
+    fun isActive(): Boolean {
+        return isActive
     }
 
     companion object {
