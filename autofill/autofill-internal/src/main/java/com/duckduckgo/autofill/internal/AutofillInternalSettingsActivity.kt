@@ -25,11 +25,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.autofill.api.AutofillFeature
+import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreenNoParams
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.email.incontext.store.EmailProtectionInContextDataStore
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementActivity
 import com.duckduckgo.autofill.internal.R.string
 import com.duckduckgo.autofill.internal.databinding.ActivityAutofillInternalSettingsBinding
 import com.duckduckgo.browser.api.UserBrowserProperties
@@ -39,6 +39,7 @@ import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import java.text.SimpleDateFormat
 import javax.inject.Inject
 import kotlinx.coroutines.flow.first
@@ -70,6 +71,9 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var autofillFeature: AutofillFeature
+
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -149,7 +153,7 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
         }
 
         binding.viewSavedLoginsButton.setClickListener {
-            startActivity(AutofillManagementActivity.intentDefaultList(this))
+            globalActivityStarter.start(this, AutofillSettingsScreenNoParams)
         }
     }
 

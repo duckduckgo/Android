@@ -170,7 +170,8 @@ import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.AutofillEventListener
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
-import com.duckduckgo.autofill.api.AutofillSettingsActivityLauncher
+import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreenDirectlyViewCredentialsParams
+import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreenShowSuggestionsForSiteParams
 import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.Callback
 import com.duckduckgo.autofill.api.CredentialAutofillDialogFactory
@@ -335,9 +336,6 @@ class BrowserTabFragment :
     lateinit var browserAutofill: BrowserAutofill
 
     @Inject
-    lateinit var autofillSettingsLauncher: AutofillSettingsActivityLauncher
-
-    @Inject
     lateinit var faviconManager: FaviconManager
 
     @Inject
@@ -397,9 +395,6 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var autoconsent: Autoconsent
-
-    @Inject
-    lateinit var autofillSettingsActivityLauncher: AutofillSettingsActivityLauncher
 
     @Inject
     lateinit var autofillCapabilityChecker: AutofillCapabilityChecker
@@ -2230,7 +2225,9 @@ class BrowserTabFragment :
             val snackbar = binding.browserLayout.makeSnackbarWithNoBottomInset(messageResourceId, Snackbar.LENGTH_LONG)
             if (includeShortcutToViewCredential) {
                 snackbar.setAction(R.string.autofillSnackbarAction) {
-                    context?.let { startActivity(autofillSettingsActivityLauncher.intentDirectlyViewCredentials(it, loginCredentials)) }
+                    context?.let {
+                        globalActivityStarter.start(it, AutofillSettingsScreenDirectlyViewCredentialsParams(loginCredentials))
+                    }
                 }
             }
             snackbar.show()
@@ -2238,7 +2235,7 @@ class BrowserTabFragment :
     }
 
     private fun launchAutofillManagementScreen() {
-        startActivity(autofillSettingsLauncher.intentAlsoShowSuggestionsForSite(requireContext(), webView?.url))
+        globalActivityStarter.start(requireContext(), AutofillSettingsScreenShowSuggestionsForSiteParams(webView?.url))
     }
 
     private fun showDialogHidingPrevious(
