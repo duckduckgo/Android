@@ -4487,7 +4487,7 @@ class BrowserTabViewModelTest {
             assertEquals(testUrls[i], actual)
         }
     }
-    
+
     @Test
     fun whenOnPermissionsQueryThenSendCommand() = runTest {
         val url = "someUrl"
