@@ -104,6 +104,7 @@
 
             <com.facebook.shimmer.ShimmerFrameLayout
                 android:id="@+id/recoveryCodeSkeleton"
+                android:visibility="invisible"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="parent"
@@ -131,12 +132,12 @@
 
             </com.facebook.shimmer.ShimmerFrameLayout>
 
-            <LinearLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/recover_code_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="parent"
-                android:visibility="invisible"
+                android:visibility="visible"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:layout_margin="@dimen/keyline_5"
                 app:layout_constraintTop_toBottomOf="@id/content_body"
@@ -149,18 +150,44 @@
                     android:layout_width="96dp"
                     android:layout_height="96dp"
                     android:layout_gravity="center"
-                    tools:ignore="ContentDescription"/>
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:ignore="ContentDescription" />
 
                 <com.duckduckgo.common.ui.view.text.DaxTextView
                     android:id="@+id/recoveryCodeText"
-                    android:layout_width="match_parent"
-                    android:layout_marginStart="@dimen/keyline_4"
-                    app:typography="body1_mono"
+                    android:layout_width="0dp"
                     android:layout_height="96dp"
+                    android:layout_marginStart="16dp"
+                    android:ellipsize="end"
                     android:maxLines="4"
-                    android:ellipsize="end"/>
+                    app:layout_constraintStart_toEndOf="@+id/qrCodeImageView"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:typography="body1_mono" />
 
-            </LinearLayout>
+                <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+                    android:id="@+id/footer_primary_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/keyline_5"
+                    app:buttonSize="large"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/qrCodeImageView"
+                    android:text="@string/sync_recovery_code_primary_button"/>
+
+                <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+                    android:id="@+id/footer_secondary_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:buttonSize="large"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/footer_primary_button"
+                    android:text="@string/sync_recovery_code_secondary_button"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/content_recovery_hint"
@@ -178,30 +205,6 @@
     </ScrollView>
 
     <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
-        android:id="@+id/footer_primary_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/keyline_5"
-        android:layout_marginEnd="@dimen/keyline_5"
-        app:buttonSize="large"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/footer_secondary_button"
-        android:text="@string/sync_recovery_code_primary_button"/>
-
-    <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
-        android:id="@+id/footer_secondary_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/keyline_5"
-        android:layout_marginEnd="@dimen/keyline_5"
-        app:buttonSize="large"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/footer_next_button"
-        android:text="@string/sync_recovery_code_secondary_button"/>
-
-    <com.duckduckgo.common.ui.view.button.DaxButtonGhost
         android:id="@+id/footer_next_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

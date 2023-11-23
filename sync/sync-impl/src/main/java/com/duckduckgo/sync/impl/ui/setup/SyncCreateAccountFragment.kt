@@ -81,7 +81,7 @@ class SyncCreateAccountFragment : DuckDuckGoFragment(R.layout.fragment_create_ac
     private fun renderViewState(viewState: ViewState) {
         when (viewState.viewMode) {
             is SignedIn -> {
-                listener?.launchFinishSetupFlow()
+                listener?.launchRecoveryCodeFlow()
             }
             else -> {
                 // nothing for now
@@ -95,7 +95,6 @@ class SyncCreateAccountFragment : DuckDuckGoFragment(R.layout.fragment_create_ac
                 requireActivity().setResult(Activity.RESULT_CANCELED)
                 requireActivity().finish()
             }
-
             FinishSetupFlow -> listener?.launchFinishSetupFlow()
             Error -> {
                 Snackbar.make(binding.root, R.string.sync_general_error, Snackbar.LENGTH_LONG).show()

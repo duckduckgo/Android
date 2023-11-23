@@ -42,7 +42,7 @@ class SyncShowRecoveryCodeViewModelTest {
 
     @Test
     fun whenNextClickedThenEmitFinishSetupCommand() = runTest {
-        testee.onNextClicked()
+        testee.onDoneClicked()
 
         testee.commands().test {
             val command = awaitItem()

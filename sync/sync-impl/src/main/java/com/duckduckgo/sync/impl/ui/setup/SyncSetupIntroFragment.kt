@@ -109,6 +109,7 @@ class SyncSetupIntroFragment : DuckDuckGoFragment(R.layout.fragment_intro_sync) 
                 binding.contentBody.text = getString(R.string.sync_intro_recover_content)
                 binding.contentIllustration.setImageResource(R.drawable.ic_sync_recover_128)
                 binding.syncIntroFooter.hide()
+                binding.syncIntroCta.text = getString(R.string.sync_intro_recover_cta)
                 binding.syncIntroCta.setOnClickListener {
                     viewModel.onStartRecoverDataClicked()
                 }

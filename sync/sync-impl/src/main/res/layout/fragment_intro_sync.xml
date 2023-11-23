@@ -79,7 +79,7 @@
                 android:gravity="center"
                 app:textType="primary"
                 app:typography="h1"
-                android:text="@string/sync_connected_device_title"/>
+                android:text="@string/sync_setup_begin_syncing"/>
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/content_body"
@@ -89,7 +89,7 @@
                 android:gravity="center"
                 app:textType="primary"
                 app:typography="body1"
-                android:text="@string/sync_connected_device_hint"/>
+                android:text="@string/sync_setup_single_device_title"/>
 
         </LinearLayout>
 

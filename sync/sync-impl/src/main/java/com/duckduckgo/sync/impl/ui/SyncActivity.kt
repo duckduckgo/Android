@@ -54,6 +54,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroRecoverSyn
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.SyncWithAnotherDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowTextCode
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.SyncIntroCompleted
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.setup.ConnectFlowContract
 import com.duckduckgo.sync.impl.ui.setup.EnterCodeContract
@@ -61,6 +62,7 @@ import com.duckduckgo.sync.impl.ui.setup.LoginContract
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_CODE
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_INTRO
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SETUP_COMPLETE
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SYNC_INTRO
 import com.duckduckgo.sync.impl.ui.setup.SyncIntroContract
 import com.google.android.material.snackbar.Snackbar
@@ -102,25 +104,11 @@ class SyncActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var syncFeatureMessagesPlugin: DaggerSet<SyncMessagePlugin>
 
-    private val loginFlow = registerForActivityResult(LoginContract()) { resultOk ->
-        if (resultOk) {
-            viewModel.onLoginSuccess()
-        }
-    }
-
     private val syncIntroLauncher = registerForActivityResult(
         SyncIntroContract(),
     ) { resultOk ->
         if (resultOk) {
             viewModel.onIntroCompleted()
-        }
-    }
-
-    private val enterCodeLauncher = registerForActivityResult(
-        EnterCodeContract(),
-    ) { resultOk ->
-        if (resultOk) {
-            viewModel.onLoginSuccess()
         }
     }
 
@@ -238,6 +226,7 @@ class SyncActivity : DuckDuckGoActivity() {
             is IntroCreateAccount -> syncIntroLauncher.launch(SYNC_INTRO)
             is IntroRecoverSyncData -> syncIntroLauncher.launch(RECOVERY_INTRO)
             is ShowRecoveryCode -> syncIntroLauncher.launch(RECOVERY_CODE)
+            is SyncIntroCompleted -> syncIntroLauncher.launch(SETUP_COMPLETE)
             is AskTurnOffSync -> askTurnOffsync(it.device)
             is AskDeleteAccount -> askDeleteAccount()
             is RecoveryCodePDFSuccess -> {
