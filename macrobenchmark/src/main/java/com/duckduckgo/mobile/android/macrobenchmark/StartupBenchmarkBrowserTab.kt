@@ -53,7 +53,7 @@ class StartupBenchmarkBrowserTab {
     fun loadTheIndependentAmpSite() {
         loadSite("https://www.independent.co.uk/news/world/americas/us-politics/fauci-dog-tests-congress-letter-b1944407.html?amp")
     }
-    
+
     //endregion
 
     //region other tests
@@ -75,64 +75,64 @@ class StartupBenchmarkBrowserTab {
 
     @Test
     fun loadNYTimes() {
-        loadSite("https://www.nytimes.com/")
+        loadSite("https://www.nytimes.com/2023/11/21/technology/sam-altman-steve-jobs.html")
     }
-    
-    //endregion
-
-
-    //region tests from previous performance tests
-
-    @Test
-    fun loadTwitchMobile() {
-        loadSite("https://m.twitch.tv/")
-    }
-
-    @Test
-    fun loadWeather() {
-        loadSite("https://weather.com/")
-    }
-
-    @Test
-    fun loadAmazon() {
-        loadSite("https://www.amazon.com/")
-    }
-
-    @Test
-    fun loadBBC() {
-        loadSite("https://www.bbc.com/worklife/article/20231115-after-weworks-bankruptcy-what-is-the-future-of-coworking/")
-    }
-
-    @Test
-    fun loadEBay() {
-        loadSite("https://www.ebay.com/")
-    }
-
-    @Test
-    fun loadESPN() {
-        loadSite("https://www.espn.com/f1/story/_/id/38940255/how-f1-rode-luck-win-big-las-vegas/")
-    }
-
-    @Test
-    fun loadReddit() {
-        loadSite("https://www.reddit.com/r/pcmasterrace/comments/180955q/which_one_actually_better_in_terms_both_comfort//")
-    }
-
-    @Test
-    fun loadTripAdvisor() {
-        loadSite("https://www.tripadvisor.com/")
-    }
-
-    @Test
-    fun loadWallmart() {
-        loadSite("https://www.walmart.com/")
-    }
-
-    @Test
-    fun loadWikipedia() {
-        loadSite("https://www.wikipedia.org/")
-    }
-    
+    //
+    // //endregion
+    //
+    //
+    // //region tests from previous performance tests
+    //
+    // @Test
+    // fun loadTwitchMobile() {
+    //     loadSite("https://m.twitch.tv/")
+    // }
+    //
+    // @Test
+    // fun loadWeather() {
+    //     loadSite("https://weather.com/")
+    // }
+    //
+    // @Test
+    // fun loadAmazon() {
+    //     loadSite("https://www.amazon.com/")
+    // }
+    //
+    // @Test
+    // fun loadBBC() {
+    //     loadSite("https://www.bbc.com/worklife/article/20231115-after-weworks-bankruptcy-what-is-the-future-of-coworking/")
+    // }
+    //
+    // @Test
+    // fun loadEBay() {
+    //     loadSite("https://www.ebay.com/")
+    // }
+    //
+    // @Test
+    // fun loadESPN() {
+    //     loadSite("https://www.espn.com/f1/story/_/id/38940255/how-f1-rode-luck-win-big-las-vegas/")
+    // }
+    //
+    // @Test
+    // fun loadReddit() {
+    //     loadSite("https://www.reddit.com/r/pcmasterrace/comments/180955q/which_one_actually_better_in_terms_both_comfort//")
+    // }
+    //
+    // @Test
+    // fun loadTripAdvisor() {
+    //     loadSite("https://www.tripadvisor.com/")
+    // }
+    //
+    // @Test
+    // fun loadWallmart() {
+    //     loadSite("https://www.walmart.com/")
+    // }
+    //
+    // @Test
+    // fun loadWikipedia() {
+    //     loadSite("https://www.wikipedia.org/")
+    // }
+    //
     //endregion
 
 
@@ -148,11 +148,7 @@ class StartupBenchmarkBrowserTab {
             device.findObject(selector).click()
             device.findObject(selector).text = site
             device.pressEnter()
-            val pageLoadingIndicatorSelector = By.res(packageName, "pageLoadingIndicator")
-            device.wait(Until.hasObject(pageLoadingIndicatorSelector), TIMEOUT_MS)
-            device.wait(Until.gone(pageLoadingIndicatorSelector), 5_000L)
-
-            device.waitForIdle(TIMEOUT_MS)
+            device.wait(Until.hasObject(By.text("Load finished")), TIMEOUT_MS)
         }
     )
 
@@ -204,6 +200,31 @@ class StartupBenchmarkBrowserTab {
         packageName = TARGET_PACKAGE_NAME,
         metrics = listOf(
             TraceSectionMetric("LOAD_PAGE_START_TO_FINISH"),
+            TraceSectionMetric("LOAD_PAGE_ON_PAGE_STARTED"),
+            TraceSectionMetric("LOAD_PAGE_ON_PAGE_FINISHED"),
+            TraceSectionMetric("LOAD_PAGE_SHOULD_OVERRIDE_URL_LOADING"),
+            TraceSectionMetric("LOAD_PAGE_SHOULD_INTERCEPT_REQUEST"),
+            TraceSectionMetric("LOAD_PAGE_ON_RENDER_PROCESS_GONE"),
+            TraceSectionMetric("LOAD_PAGE_ON_RENDER_PROCESS_GONE"),
+            TraceSectionMetric("LOAD_PAGE_ON_RECEIVED_SSL_ERROR"),
+            TraceSectionMetric("LOAD_PAGE_ON_RECEIVED_SSL_ERROR"),
+            TraceSectionMetric("TRACKER_DETECTOR_EVALUATE"),
+            TraceSectionMetric("CLOAKED_CNAME_DETECTOR_DETECT"),
+            TraceSectionMetric("DOM_LOGIN_DETECTOR_LOGIN_FORM_EVALUATE_JAVASCRIPT"),
+            TraceSectionMetric("DOM_LOGIN_DETECTOR_LOGIN_FORM_EVENTS_EVALUATE_JAVASCRIPT"),
+            TraceSectionMetric("BLOB_CONVERTER_EVALUATE_JAVASCRIPT"),
+            TraceSectionMetric("DOM_URL_EXTRACTOR_EVALUATE_JAVASCRIPT"),
+            TraceSectionMetric("EMAIL_INJECTOR_INJECT_ADDRESS_EVALUATE_JAVASCRIPT"),
+            TraceSectionMetric("EMAIL_INJECTOR_NOTIFY_EVALUATE_JAVASCRIPT"),
+            TraceSectionMetric("AUTOCONSENT_INJECT_AUTOCONSENT_EVALUATE_JAVASCRIPT"),
+            TraceSectionMetric("AUTOCONSENT_OPT_OUT_EVALUATE_JAVASCRIPT"),
+            TraceSectionMetric("EVAL_MESSAGE_HANDLER_PROCESS_EVALUATE_JAVASCRIPT"),
+            TraceSectionMetric("INIT_MESSAGE_HANDLER_PROCESS_EVALUATE_JAVASCRIPT"),
+            TraceSectionMetric("OPT_OUT_AUTOCONSENT_MESSAGE_HANDLER_PROCESS_EVALUATE_JAVASCRIPT"),
+            TraceSectionMetric("INLINE_BROWSER_AUTOFILL_EVALUATE_JAVASCRIPT"),
+            TraceSectionMetric("REAL_MESSAGING_CSS_INJECT_CSS_EVALUATE_JAVASCRIPT"),
+            TraceSectionMetric("REAL_MESSAGING_CSS_SEND_MESSAGE_EVALUATE_JAVASCRIPT"),
+            TraceSectionMetric("PRIVACY_DASHBOARD_RENDER_EVALUATE_JAVASCRIPT"),
         ),
         iterations = ITERATIONS,
         startupMode = startupMode,

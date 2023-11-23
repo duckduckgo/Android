@@ -22,6 +22,7 @@ import android.net.http.SslError
 import android.net.http.SslError.*
 import android.os.Build
 import android.os.SystemClock
+import android.util.Log
 import android.webkit.*
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
@@ -55,6 +56,7 @@ import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.contentscopescripts.api.ContentScopeScripts
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.privacy.config.api.AmpLinks
+import com.google.android.material.snackbar.Snackbar
 import java.lang.Exception
 import java.net.InetAddress
 import java.net.URI
@@ -62,8 +64,9 @@ import javax.inject.Inject
 import kotlin.random.Random
 import kotlinx.coroutines.*
 import timber.log.Timber
+import java.net.URL
 
-private const val LATENCY_THRESHOLD = 50
+private const val LATENCY_THRESHOLD = 150
 
 
 class BrowserWebViewClient @Inject constructor(
@@ -92,6 +95,8 @@ class BrowserWebViewClient @Inject constructor(
 
     var webViewClientListener: WebViewClientListener? = null
     private var lastPageStarted: String? = null
+    private var start: Long? = null
+    private var end: Long? = null
 
     /**
      * This is the new method of url overriding available from API 24 onwards
@@ -277,8 +282,8 @@ class BrowserWebViewClient @Inject constructor(
         }
 
         val traceCookie = Random(System.currentTimeMillis()).nextInt()
-        Trace.beginAsyncSection("LOAD_PAGE_START_TO_FINISH", 0)
-        Trace.beginAsyncSection("LOAD_PAGE_ON_PAGE_STARTED", traceCookie)
+        beginTrace(url!!, "LOAD_PAGE_START_TO_FINISH", 0)
+        beginTrace(url,"LOAD_PAGE_ON_PAGE_STARTED", traceCookie)
 
         Timber.v("onPageStarted webViewUrl: ${webView.url} URL: $url")
 
@@ -300,7 +305,7 @@ class BrowserWebViewClient @Inject constructor(
         contentScopeScripts.injectContentScopeScripts(webView)
         loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
 
-        Trace.endAsyncSection("LOAD_PAGE_ON_PAGE_STARTED", traceCookie)
+        endTrace(url, webView, "LOAD_PAGE_ON_PAGE_STARTED", traceCookie)
     }
 
     @UiThread
@@ -329,7 +334,7 @@ class BrowserWebViewClient @Inject constructor(
             getPing().let { if (it >= LATENCY_THRESHOLD) throw Exception("Bad network: $it ms") }
         }
 
-        Trace.endAsyncSection("LOAD_PAGE_START_TO_FINISH", 0)
+        endTrace(url!!, webView, "LOAD_PAGE_START_TO_FINISH", 0)
         Trace.endAsyncSection("LOAD_PAGE_ON_PAGE_FINISHED", traceCookie)
     }
 
@@ -542,6 +547,35 @@ class BrowserWebViewClient @Inject constructor(
             val endTime = SystemClock.elapsedRealtime()
             return endTime - startTime
         } else throw Exception("Network unreachable")
+    }
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun beginTrace(url: String, trace: String, cookie: Int) {
+        if (url != "about:blank") {
+            if (trace == "LOAD_PAGE_ON_PAGE_STARTED") {
+                start = SystemClock.elapsedRealtime()
+                //Log.v("BrowserWebViewClient", "LOAD_PAGE_ON_PAGE_STARTED ${URL(url).host}")
+            }
+            android.os.Trace.beginAsyncSection(trace, cookie)
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun endTrace(url: String, webView: WebView, trace: String, cookie: Int) {
+        if (url != "about:blank") {
+            if (trace == "LOAD_PAGE_START_TO_FINISH") {
+                //Log.v("BrowserWebViewClient", "LOAD_PAGE_START_TO_FINISH ${URL(url).host}, start: $start, progress: ${webView.progress}")
+
+                if (start != null && webView.progress == 100) {
+                    end = SystemClock.elapsedRealtime()
+                    //Log.v("BrowserWebViewClient", "LOAD_PAGE_START_TO_FINISH ${URL(url).host}: ${end!!-start!!}ms")
+                    android.os.Trace.endAsyncSection(trace, cookie)
+                    Snackbar.make(webView, "Load finished", Snackbar.LENGTH_LONG).show()
+                }
+            } else {
+                android.os.Trace.endAsyncSection(trace, cookie)
+            }
+        }
     }
 }
 

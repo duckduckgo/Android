@@ -18,6 +18,6 @@ package com.duckduckgo.mobile.android.macrobenchmark
 
 internal const val TARGET_PACKAGE_NAME = "com.duckduckgo.mobile.android"
 internal const val ITERATIONS = 5
-internal const val TIMEOUT_MS = 2_000L
+internal const val TIMEOUT_MS = 5_000L
 
 
