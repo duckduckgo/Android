@@ -4388,7 +4388,7 @@ class BrowserTabViewModelTest {
             assertEquals(sitePermissions, this.permissionsToRequest)
         }
     }
- 
+
     @Test
     fun whenBasicAuthCredentialsInUrlThenStrippedSafely() {
         val testUrls = listOf(
@@ -4410,16 +4410,15 @@ class BrowserTabViewModelTest {
             "https://user:pass@sub.example.com:8080/path?param=value#fragment",
             "https://user:pass@192.0.2.0",
             "https://user:pass@[2001:db8::1]",
-            "https://user:pass@2001:db8::1",
-            "https://user:pass@2001:db8::1/path",
-            "https://user:pass@2001:db8::1/path?param=value",
-            "https://user:pass@2001:db8::1/path#fragment",
-            "https://user:pass@2001:db8::1/path?param=value#fragment",
-            "https://user:pass@2001:db8::1:8080",
-            "https://user:pass@2001:db8::1:8080/path",
-            "https://user:pass@2001:db8::1:8080/path?param=value",
-            "https://user:pass@2001:db8::1:8080/path#fragment",
-            "https://user:pass@2001:db8::1:8080/path?param=value#fragment",
+            "https://user:pass@[2001:db8::1]/path",
+            "https://user:pass@[2001:db8::1]/path?param=value",
+            "https://user:pass@[2001:db8::1]/path#fragment",
+            "https://user:pass@[2001:db8::1]/path?param=value#fragment",
+            "https://user:pass@[2001:db8::1]:8080",
+            "https://user:pass@[2001:db8::1]:8080/path",
+            "https://user:pass@[2001:db8::1]:8080/path?param=value",
+            "https://user:pass@[2001:db8::1]:8080/path#fragment",
+            "https://user:pass@[2001:db8::1]:8080/path?param=value#fragment",
         )
 
         val expectedUrls = listOf(
@@ -4440,26 +4439,25 @@ class BrowserTabViewModelTest {
             "https://sub.example.com:8080/path?param=value#fragment",
             "https://192.0.2.0",
             "https://[2001:db8::1]",
-            "https://2001:db8::1",
-            "https://2001:db8::1/path",
-            "https://2001:db8::1/path?param=value",
-            "https://2001:db8::1/path#fragment",
-            "https://2001:db8::1/path?param=value#fragment",
-            "https://2001:db8::1:8080",
-            "https://2001:db8::1:8080/path",
-            "https://2001:db8::1:8080/path?param=value",
-            "https://2001:db8::1:8080/path#fragment",
-            "https://2001:db8::1:8080/path?param=value#fragment",
+            "https://[2001:db8::1]/path",
+            "https://[2001:db8::1]/path?param=value",
+            "https://[2001:db8::1]/path#fragment",
+            "https://[2001:db8::1]/path?param=value#fragment",
+            "https://[2001:db8::1]:8080",
+            "https://[2001:db8::1]:8080/path",
+            "https://[2001:db8::1]:8080/path?param=value",
+            "https://[2001:db8::1]:8080/path#fragment",
+            "https://[2001:db8::1]:8080/path?param=value#fragment",
         )
 
-          for (i in testUrls.indices) {
-              val actual = testee.stripBasicAuthFromUrl(testUrls[i])
-              assertEquals(expectedUrls[i], actual)
-          }
+        for (i in testUrls.indices) {
+            val actual = testee.stripBasicAuthFromUrl(testUrls[i])
+            assertEquals(expectedUrls[i], actual)
+        }
     }
 
     @Test
-    fun whenNoBasicAuthProvidedThenDoNothing() {
+    fun whenNoBasicAuthProvidedThenDoNotAffectAddressBar() {
         val testUrls = listOf(
             // No basic auth, should not be affected
             "https://example.com/@?param=value",
@@ -4473,11 +4471,12 @@ class BrowserTabViewModelTest {
             "https://sub.domain.example.com:8080/?q=none#f",
             // IP address/port combinations
             "https://192.0.2.0",
+            "https://192.0.2.0:1337",
             "https://[2001:db8::1]",
-            "https://2001:db8::1/path?param=value#fragment",
-            "https://2001:db8::1:8080",
-            "https://2001:db8::1:8080/path",
-            "https://2001:db8::1:8080/path?param=value",
+            "https://[2001:db8::1]/path?param=value#fragment",
+            "https://[2001:db8::1]:8080",
+            "https://[2001:db8::1]:8080/path",
+            "https://[2001:db8::1]:8080/path?param=value",
             // invalid URLs, should do nothing
             "https://user:pass%40example.com/%40urlencoded@symbol",
             "user:pass@https://example.com",
