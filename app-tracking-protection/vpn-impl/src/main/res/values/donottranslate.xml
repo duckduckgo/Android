@@ -31,7 +31,7 @@
         <item quantity="other" instruction="´Placeholder is a number">Device traffic routing through the VPN. Tracking attempts blocked across &lt;b>%1$s apps&lt;/b> (past hour).</item>
     </plurals>
     <string name="vpn_NotificationCTASnoozeVpn">Snooze VPN</string>
-    <string name="vpn_NotificationCTADisableVpn">Disable VPN</string>
+    <string name="vpn_NotificationCTADisableVpn">Disconnect VPN</string>
 
     <!-- Lockdown notification -->
     <string name="vpn_LockdownNotificationTextWithNetPOnlyEnabled">Action required! An Android setting needs to be changed for Network Protection.</string>
