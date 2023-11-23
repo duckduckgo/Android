@@ -28,7 +28,7 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 
 @ExperimentalCoroutinesApi
-class SyncDeviceConnectedViewModelTest {
+class SyncShowRecoveryCodeViewModelTest {
 
     private val syncRepostitory: SyncAccountRepository = mock()
 

@@ -137,7 +137,7 @@ class SyncActivityViewModel @Inject constructor(
         object IntroCreateAccount : Command()
         object IntroRecoverSyncData : Command()
         object ShowTextCode : Command()
-        object DeviceConnected : Command()
+        object ShowRecoveryCode : Command()
 
         object SyncIntroCompleted : Command()
 
@@ -176,7 +176,7 @@ class SyncActivityViewModel @Inject constructor(
 
     fun onLoginSuccess() {
         viewModelScope.launch {
-            command.send(Command.DeviceConnected)
+            command.send(Command.ShowRecoveryCode)
         }
     }
 

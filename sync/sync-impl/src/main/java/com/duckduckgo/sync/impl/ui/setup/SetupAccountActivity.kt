@@ -189,11 +189,5 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
                 putExtra(SETUP_ACCOUNT_SCREEN_EXTRA, screen)
             }
         }
-
-        internal fun intentDeviceConnectedFlow(context: Context): Intent {
-            return Intent(context, SetupAccountActivity::class.java).apply {
-                putExtra(SETUP_ACCOUNT_SCREEN_EXTRA, DEVICE_SYNCED)
-            }
-        }
     }
 }
