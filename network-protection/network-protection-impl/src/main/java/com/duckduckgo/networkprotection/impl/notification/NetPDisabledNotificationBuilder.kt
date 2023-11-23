@@ -33,10 +33,10 @@ import com.duckduckgo.networkprotection.impl.alerts.RealNetPAlertNotiticationBui
 import com.duckduckgo.networkprotection.impl.alerts.RealNetPAlertNotiticationBuilder.Companion.NETP_ALERTS_CHANNEL_ID
 import com.duckduckgo.networkprotection.impl.alerts.RealNetPAlertNotiticationBuilder.Companion.NETP_ALERTS_CHANNEL_NAME
 import com.squareup.anvil.annotations.ContributesBinding
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.util.Date
 import javax.inject.Inject
-import org.threeten.bp.Instant
-import org.threeten.bp.LocalDateTime
-import org.threeten.bp.ZoneId
 
 interface NetPDisabledNotificationBuilder {
     fun buildDisabledNotification(context: Context): Notification
@@ -53,6 +53,7 @@ interface NetPDisabledNotificationBuilder {
 class RealNetPDisabledNotificationBuilder @Inject constructor(
     private val netPNotificationActions: NetPNotificationActions,
 ) : NetPDisabledNotificationBuilder {
+    private val defaultDateTimeFormatter = SimpleDateFormat.getTimeInstance(DateFormat.SHORT)
 
     private fun registerChannel(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -92,7 +93,7 @@ class RealNetPDisabledNotificationBuilder @Inject constructor(
         fun getAction(): NotificationCompat.Action {
             return NotificationCompat.Action(
                 R.drawable.ic_baseline_feedback_24,
-                context.getString(R.string.netpNotificationCTAEnableVpn),
+                context.getString(R.string.netpNotificationCTAReconnectNow),
                 PendingIntent.getBroadcast(
                     context,
                     0,
@@ -104,8 +105,6 @@ class RealNetPDisabledNotificationBuilder @Inject constructor(
             )
         }
         registerChannel(context)
-        val instant = LocalDateTime.ofInstant(Instant.ofEpochMilli(Instant.now().toEpochMilli() + triggerAtMillis), ZoneId.systemDefault())
-        val formatterTime = "${instant.hour}:${instant.minute.toString().padStart(2, '0')}"
 
         return NotificationCompat.Builder(context, NETP_ALERTS_CHANNEL_ID)
             .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
@@ -114,7 +113,7 @@ class RealNetPDisabledNotificationBuilder @Inject constructor(
                 NotificationCompat.BigTextStyle().bigText(
                     String.format(
                         context.getString(R.string.netpNotificationSnoozeBody),
-                        formatterTime,
+                        formatTime(triggerAtMillis),
                     ),
                 ),
             )
@@ -124,6 +123,10 @@ class RealNetPDisabledNotificationBuilder @Inject constructor(
             .addAction(getAction())
             .setOngoing(true)
             .build()
+    }
+
+    private fun formatTime(triggerAtMillis: Long): String {
+        return defaultDateTimeFormatter.format(Date(System.currentTimeMillis() + triggerAtMillis))
     }
 
     override fun buildDisabledByVpnNotification(context: Context): Notification {
