@@ -23,6 +23,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
+import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.subscriptions.impl.CurrentPurchase
 import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ITR
@@ -50,6 +51,9 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -73,18 +77,23 @@ class SubscriptionWebViewViewModel @Inject constructor(
     val currentPurchaseViewState = _currentPurchaseViewState.asStateFlow()
 
     fun start() {
-        viewModelScope.launch {
-            subscriptionsManager.currentPurchaseState.collect {
-                val state = when (it) {
-                    is CurrentPurchase.Failure -> Failure(it.message)
-                    is CurrentPurchase.Success -> Success
-                    is CurrentPurchase.InProgress, CurrentPurchase.PreFlowInProgress -> InProgress
-                    is CurrentPurchase.Recovered -> Recovered
-                    is CurrentPurchase.PreFlowFinished -> Inactive
-                }
-                _currentPurchaseViewState.emit(currentPurchaseViewState.value.copy(purchaseState = state))
+        subscriptionsManager.currentPurchaseState.onEach {
+            val state = when (it) {
+                is CurrentPurchase.Failure -> Failure(it.message)
+                is CurrentPurchase.Success -> Success(
+                    SubscriptionEventData(
+                        PURCHASE_COMPLETED_FEATURE_NAME,
+                        PURCHASE_COMPLETED_SUBSCRIPTION_NAME,
+                        JSONObject(PURCHASE_COMPLETED_JSON),
+                    ),
+                )
+                is CurrentPurchase.InProgress, CurrentPurchase.PreFlowInProgress -> InProgress
+                is CurrentPurchase.Recovered -> Recovered
+                is CurrentPurchase.PreFlowFinished -> Inactive
             }
-        }
+            _currentPurchaseViewState.emit(currentPurchaseViewState.value.copy(purchaseState = state))
+        }.flowOn(dispatcherProvider.io())
+            .launchIn(viewModelScope)
     }
 
     fun processJsCallbackMessage(featureName: String, method: String, id: String?, data: JSONObject?) {
@@ -92,6 +101,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
             "backToSettings" -> backToSettings()
             "getSubscriptionOptions" -> id?.let { getSubscriptionOptions(featureName, method, it) }
             "subscriptionSelected" -> subscriptionSelected(data)
+            "activateSubscription" -> activateOnAnotherDevice()
             else -> {
                 // NOOP
             }
@@ -102,7 +112,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             val id = runCatching { data?.getString("id") }.getOrNull()
             if (id.isNullOrBlank()) {
-                _currentPurchaseViewState.emit(currentPurchaseViewState.value.copy(purchaseState = Failure("context")))
+                _currentPurchaseViewState.emit(currentPurchaseViewState.value.copy(purchaseState = Failure("")))
             } else {
                 command.send(SubscriptionSelected(id))
             }
@@ -149,6 +159,12 @@ class SubscriptionWebViewViewModel @Inject constructor(
         }
     }
 
+    private fun activateOnAnotherDevice() {
+        viewModelScope.launch {
+            command.send(ActivateOnAnotherDevice)
+        }
+    }
+
     private fun backToSettings() {
         viewModelScope.launch {
             command.send(BackToSettings)
@@ -172,7 +188,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
     sealed class PurchaseStateView {
         data object Inactive : PurchaseStateView()
         data object InProgress : PurchaseStateView()
-        data object Success : PurchaseStateView()
+        data class Success(val subscriptionEventData: SubscriptionEventData) : PurchaseStateView()
         data object Recovered : PurchaseStateView()
         data class Failure(val message: String) : PurchaseStateView()
     }
@@ -181,5 +197,12 @@ class SubscriptionWebViewViewModel @Inject constructor(
         data object BackToSettings : Command()
         data class SendResponseToJs(val data: JsCallbackData) : Command()
         data class SubscriptionSelected(val id: String) : Command()
+        data object ActivateOnAnotherDevice : Command()
+    }
+
+    companion object {
+        const val PURCHASE_COMPLETED_FEATURE_NAME = "useSubscription"
+        const val PURCHASE_COMPLETED_SUBSCRIPTION_NAME = "onPurchaseUpdate"
+        const val PURCHASE_COMPLETED_JSON = """{ type: "completed" }"""
     }
 }

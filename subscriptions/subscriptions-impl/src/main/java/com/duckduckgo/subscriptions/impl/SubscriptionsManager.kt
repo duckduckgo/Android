@@ -36,6 +36,7 @@ import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -124,6 +125,7 @@ class RealSubscriptionsManager @Inject constructor(
     private val _hasSubscription = MutableStateFlow(false)
     override val hasSubscription = _hasSubscription.asStateFlow().onSubscription { emitHasSubscriptionsValues() }
 
+    private var purchaseStateJob: Job? = null
     private fun isUserAuthenticated(): Boolean = !authDataStore.accessToken.isNullOrBlank() && !authDataStore.authToken.isNullOrBlank()
 
     private suspend fun emitHasSubscriptionsValues() {
@@ -133,7 +135,8 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     private suspend fun emitCurrentPurchaseValues() {
-        coroutineScope.launch(dispatcherProvider.io()) {
+        purchaseStateJob?.cancel()
+        purchaseStateJob = coroutineScope.launch(dispatcherProvider.io()) {
             billingClientWrapper.purchaseState.collect {
                 when (it) {
                     is PurchaseState.Purchased -> checkPurchase()

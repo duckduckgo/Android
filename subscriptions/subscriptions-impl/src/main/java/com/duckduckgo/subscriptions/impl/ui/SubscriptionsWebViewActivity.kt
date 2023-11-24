@@ -21,6 +21,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
+import android.webkit.WebViewClient
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -35,11 +36,14 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
+import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.subscriptions.impl.R.string
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionsWebviewBinding
+import com.duckduckgo.subscriptions.impl.ui.AddDeviceActivity.Companion.AddDeviceScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.ActivateOnAnotherDevice
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.BackToSettings
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SendResponseToJs
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SubscriptionSelected
@@ -47,6 +51,7 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Purchas
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import javax.inject.Inject
 import javax.inject.Named
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import org.json.JSONObject
@@ -66,6 +71,9 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var userAgent: UserAgentProvider
+
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
 
     private val viewModel: SubscriptionWebViewViewModel by bindViewModel()
 
@@ -95,6 +103,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity() {
                 },
             )
             it.webChromeClient = WebChromeClient()
+            it.webViewClient = WebViewClient()
             it.settings.apply {
                 userAgentString = userAgent.userAgent(url)
                 javaScriptEnabled = true
@@ -121,7 +130,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity() {
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
 
-        viewModel.currentPurchaseViewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach {
+        viewModel.currentPurchaseViewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).distinctUntilChanged().onEach {
             renderPurchaseState(it.purchaseState)
         }.launchIn(lifecycleScope)
     }
@@ -131,6 +140,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity() {
             is BackToSettings -> backToSettings()
             is SendResponseToJs -> sendResponseToJs(command.data)
             is SubscriptionSelected -> selectSubscription(command.id)
+            is ActivateOnAnotherDevice -> activateOnAnotherDevice()
         }
     }
 
@@ -147,7 +157,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity() {
             is PurchaseStateView.Success -> {
                 binding.webview.show()
                 binding.progress.gone()
-                onPurchaseSuccess()
+                onPurchaseSuccess(purchaseState.subscriptionEventData)
             }
             is PurchaseStateView.Recovered -> {
                 binding.webview.show()
@@ -177,7 +187,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity() {
             .show()
     }
 
-    private fun onPurchaseSuccess() {
+    private fun onPurchaseSuccess(subscriptionEventData: SubscriptionEventData) {
         TextAlertDialogBuilder(this)
             .setTitle(getString(string.purchaseCompletedTitle))
             .setMessage(getString(string.purchaseCompletedText))
@@ -185,7 +195,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity() {
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
-                        finish()
+                        subscriptionJsMessaging.sendSubscriptionEvent(subscriptionEventData)
                     }
                 },
             )
@@ -218,6 +228,10 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity() {
 
     private fun backToSettings() {
         finish()
+    }
+
+    private fun activateOnAnotherDevice() {
+        globalActivityStarter.start(this, AddDeviceScreenWithEmptyParams)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

@@ -41,7 +41,7 @@ interface JsMessaging {
     /**
      * Method to send a subscription event
      */
-    fun sendSubscriptionEvent()
+    fun sendSubscriptionEvent(subscriptionEventData: SubscriptionEventData)
 
     /**
      * Context name
@@ -139,4 +139,5 @@ sealed class JsRequestResponse {
     ) : JsRequestResponse()
 }
 
+data class SubscriptionEventData(val featureName: String, val subscriptionName: String, val params: JSONObject?)
 data class SubscriptionEvent(val context: String, val featureName: String, val subscriptionName: String, val params: JSONObject?)
