@@ -38,6 +38,7 @@ import android.webkit.PermissionRequest
 import android.webkit.URLUtil
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
+import android.webkit.WebChromeClient.FileChooserParams
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebView.FindListener
@@ -109,6 +110,11 @@ import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.Companio
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.browser.favorites.QuickAccessDragTouchItemListener
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
+import com.duckduckgo.app.browser.filechooser.camera.launcher.UploadFromExternalCameraLauncher
+import com.duckduckgo.app.browser.filechooser.camera.launcher.UploadFromExternalCameraLauncher.CameraImageCaptureResult.CouldNotCapturePermissionDenied
+import com.duckduckgo.app.browser.filechooser.camera.launcher.UploadFromExternalCameraLauncher.CameraImageCaptureResult.ErrorAccessingCamera
+import com.duckduckgo.app.browser.filechooser.camera.launcher.UploadFromExternalCameraLauncher.CameraImageCaptureResult.ImageCaptured
+import com.duckduckgo.app.browser.filechooser.camera.launcher.UploadFromExternalCameraLauncher.CameraImageCaptureResult.NoImageCaptured
 import com.duckduckgo.app.browser.history.NavigationHistorySheet
 import com.duckduckgo.app.browser.history.NavigationHistorySheet.NavigationHistorySheetListener
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
@@ -195,11 +201,11 @@ import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.store.BrowserAppTheme
-import com.duckduckgo.common.ui.view.*
 import com.duckduckgo.common.ui.view.DaxDialog
 import com.duckduckgo.common.ui.view.DaxDialogListener
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText.ShowSuggestionsListener
+import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
 import com.duckduckgo.common.ui.view.dialog.CustomAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.DaxAlertDialog
 import com.duckduckgo.common.ui.view.dialog.StackedAlertDialogBuilder
@@ -415,6 +421,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var jsMessageHelper: JsMessageHelper
+
+    @Inject
+    lateinit var externalCameraLauncher: UploadFromExternalCameraLauncher
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -715,6 +724,23 @@ class BrowserTabFragment :
             }
         }
         sitePermissionsDialogLauncher.registerPermissionLauncher(this)
+        externalCameraLauncher.registerForResult(this) {
+            when (it) {
+                is ImageCaptured -> pendingUploadTask?.onReceiveValue(arrayOf(Uri.fromFile(it.file)))
+                CouldNotCapturePermissionDenied -> {
+                    pendingUploadTask?.onReceiveValue(null)
+                    activity?.let { activity ->
+                        externalCameraLauncher.showPermissionRationaleDialog(activity)
+                    }
+                }
+                NoImageCaptured -> pendingUploadTask?.onReceiveValue(null)
+                ErrorAccessingCamera -> {
+                    pendingUploadTask?.onReceiveValue(null)
+                    Snackbar.make(binding.root, R.string.imageCaptureCameraUnavailable, BaseTransientBottomBar.LENGTH_SHORT).show()
+                }
+            }
+            pendingUploadTask = null
+        }
     }
 
     private fun resumeWebView() {
@@ -1185,9 +1211,8 @@ class BrowserTabFragment :
             is Command.ShareLink -> launchSharePageChooser(it.url, it.title)
             is Command.SharePromoLinkRMF -> launchSharePromoRMFPageChooser(it.url, it.shareTitle)
             is Command.CopyLink -> clipboardManager.setPrimaryClip(ClipData.newPlainText(null, it.url))
-            is Command.ShowFileChooser -> {
-                launchFilePicker(it)
-            }
+            is Command.ShowFileChooser -> launchFilePicker(it.filePathCallback, it.fileChooserParams)
+            is Command.ShowExistingImageOrCameraChooser -> launchImageOrCameraChooser(it.fileChooserParams, it.filePathCallback)
 
             is Command.AddHomeShortcut -> {
                 context?.let { context ->
@@ -2714,11 +2739,51 @@ class BrowserTabFragment :
         showDialogHidingPrevious(downloadConfirmationFragment, DOWNLOAD_CONFIRMATION_TAG)
     }
 
-    private fun launchFilePicker(command: Command.ShowFileChooser) {
-        pendingUploadTask = command.filePathCallback
-        val canChooseMultipleFiles = command.fileChooserParams.mode == WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE
-        val intent = fileChooserIntentBuilder.intent(command.fileChooserParams.acceptTypes, canChooseMultipleFiles)
+    private fun launchFilePicker(filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: WebChromeClient.FileChooserParams) {
+        pendingUploadTask = filePathCallback
+        val canChooseMultipleFiles = fileChooserParams.mode == FileChooserParams.MODE_OPEN_MULTIPLE
+        val intent = fileChooserIntentBuilder.intent(fileChooserParams.acceptTypes, canChooseMultipleFiles)
         startActivityForResult(intent, REQUEST_CODE_CHOOSE_FILE)
+    }
+
+    private fun launchCameraCapture(filePathCallback: ValueCallback<Array<Uri>>) {
+        pendingUploadTask = filePathCallback
+        externalCameraLauncher.launch()
+    }
+
+    private fun launchImageOrCameraChooser(
+        fileChooserParams: FileChooserParams,
+        filePathCallback: ValueCallback<Array<Uri>>,
+    ) {
+        context?.let {
+            val cameraString = getString(R.string.imageCaptureCameraGalleryDisambiguationCameraOption)
+            val cameraIcon = com.duckduckgo.mobile.android.R.drawable.ic_camera_24
+
+            val galleryString = getString(R.string.imageCaptureCameraGalleryDisambiguationGalleryOption)
+            val galleryIcon = com.duckduckgo.mobile.android.R.drawable.ic_image_24
+
+            ActionBottomSheetDialog.Builder(it)
+                .setTitle(getString(R.string.imageCaptureCameraGalleryDisambiguationTitle))
+                .setPrimaryItem(galleryString, galleryIcon)
+                .setSecondaryItem(cameraString, cameraIcon)
+                .addEventListener(
+                    object : ActionBottomSheetDialog.EventListener() {
+                        override fun onPrimaryItemClicked() {
+                            launchFilePicker(filePathCallback, fileChooserParams)
+                        }
+
+                        override fun onSecondaryItemClicked() {
+                            launchCameraCapture(filePathCallback)
+                        }
+
+                        override fun onBottomSheetDismissed() {
+                            filePathCallback.onReceiveValue(null)
+                            pendingUploadTask = null
+                        }
+                    },
+                )
+                .show()
+        }
     }
 
     private fun minSdk30(): Boolean {

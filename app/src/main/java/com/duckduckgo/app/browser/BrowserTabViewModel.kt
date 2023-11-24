@@ -30,6 +30,7 @@ import android.webkit.GeolocationPermissions
 import android.webkit.PermissionRequest
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
+import android.webkit.WebChromeClient.FileChooserParams
 import android.webkit.WebView
 import androidx.annotation.AnyThread
 import androidx.annotation.VisibleForTesting
@@ -57,6 +58,7 @@ import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.NonHttpAppLink
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
+import com.duckduckgo.app.browser.camera.CameraHardwareChecker
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource.ImageFavicon
 import com.duckduckgo.app.browser.favicon.FaviconSource.UrlFavicon
@@ -208,6 +210,7 @@ class BrowserTabViewModel @Inject constructor(
     private val device: DeviceInfo,
     private val sitePermissionsManager: SitePermissionsManager,
     private val syncEngine: SyncEngine,
+    private val cameraHardwareChecker: CameraHardwareChecker,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -391,6 +394,10 @@ class BrowserTabViewModel @Inject constructor(
         class BrokenSiteFeedback(val data: BrokenSiteData) : Command()
         object DismissFindInPage : Command()
         class ShowFileChooser(
+            val filePathCallback: ValueCallback<Array<Uri>>,
+            val fileChooserParams: WebChromeClient.FileChooserParams,
+        ) : Command()
+        class ShowExistingImageOrCameraChooser(
             val filePathCallback: ValueCallback<Array<Uri>>,
             val fileChooserParams: WebChromeClient.FileChooserParams,
         ) : Command()
@@ -1846,9 +1853,13 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun showFileChooser(
         filePathCallback: ValueCallback<Array<Uri>>,
-        fileChooserParams: WebChromeClient.FileChooserParams,
+        fileChooserParams: FileChooserParams,
     ) {
-        command.value = ShowFileChooser(filePathCallback, fileChooserParams)
+        if (fileChooserParams.acceptTypes.contains("image/*") && cameraHardwareChecker.hasCameraHardware()) {
+            command.value = ShowExistingImageOrCameraChooser(filePathCallback, fileChooserParams)
+        } else {
+            command.value = ShowFileChooser(filePathCallback, fileChooserParams)
+        }
     }
 
     private fun currentGlobalLayoutState(): GlobalLayoutViewState = globalLayoutState.value!!
