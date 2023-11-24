@@ -16,30 +16,27 @@
 
 package com.duckduckgo.autofill.api
 
-import android.content.Context
-import android.content.Intent
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 
-/**
- * Used to access an Intent which will launch the autofill settings activity
- * The activity is implemented in the impl module and is otherwise inaccessible from outside this module.
- */
-interface AutofillSettingsActivityLauncher {
+sealed interface AutofillScreens {
 
     /**
      * Launch the Autofill management activity, which will show the full list of available credentials
      */
-    fun intent(context: Context): Intent
+    object AutofillSettingsScreenNoParams : ActivityParams {
+        private fun readResolve(): Any = AutofillSettingsScreenNoParams
+    }
 
     /**
      * Launch the Autofill management activity, which will show suggestions for the current url and the full list of available credentials
+     * @param currentUrl The current URL the user is viewing. This is used to show suggestions for the current site if available.
      */
-    fun intentAlsoShowSuggestionsForSite(context: Context, currentUrl: String?): Intent
+    data class AutofillSettingsScreenShowSuggestionsForSiteParams(val currentUrl: String?) : ActivityParams
 
     /**
      * Launch the Autofill management activity, directly showing particular credentials
-     * @param context
      * @param loginCredentials jump directly into viewing mode for these credentials
      */
-    fun intentDirectlyViewCredentials(context: Context, loginCredentials: LoginCredentials): Intent
+    data class AutofillSettingsScreenDirectlyViewCredentialsParams(val loginCredentials: LoginCredentials) : ActivityParams
 }
