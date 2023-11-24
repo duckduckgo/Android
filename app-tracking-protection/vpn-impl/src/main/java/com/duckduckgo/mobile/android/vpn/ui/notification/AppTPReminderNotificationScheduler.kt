@@ -29,7 +29,6 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
-import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.feature.removal.VpnFeatureRemover
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationContentPlugin
@@ -39,15 +38,12 @@ import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationWorker
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderReceiver
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.service.notification.getHighestPriorityPluginForType
-import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import logcat.logcat
 
@@ -61,7 +57,6 @@ class AppTPReminderNotificationScheduler @Inject constructor(
     private val vpnReminderNotificationBuilder: VpnReminderNotificationBuilder,
     private val vpnReminderNotificationContentPluginPoint: PluginPoint<VpnReminderNotificationContentPlugin>,
     private val appTrackingProtection: AppTrackingProtection,
-    private val vpnStateMonitor: VpnStateMonitor,
 ) : VpnServiceCallbacks {
     private var isAppTPEnabled: AtomicReference<Boolean> = AtomicReference(false)
 
@@ -85,26 +80,20 @@ class AppTPReminderNotificationScheduler @Inject constructor(
         coroutineScope.launch(dispatchers.io()) {
             when (vpnStopReason) {
                 VpnStopReason.RESTART -> {} // no-op
-                VpnStopReason.SELF_STOP -> onVPNManuallyStopped(coroutineScope)
+                is VpnStopReason.SELF_STOP -> onVPNManuallyStopped(coroutineScope, vpnStopReason.snoozedTriggerAtMillis)
                 VpnStopReason.REVOKED -> onVPNRevoked()
                 else -> onVPNUndesiredStop()
             }
         }
     }
 
-    private suspend fun onVPNManuallyStopped(coroutineScope: CoroutineScope) {
+    private suspend fun onVPNManuallyStopped(coroutineScope: CoroutineScope, snoozedTriggerAtMillis: Long) {
         coroutineScope.launch(dispatchers.io()) {
             if (vpnFeatureRemover.isFeatureRemoved()) {
                 logcat { "VPN Manually stopped because user disabled the feature, nothing to do" }
             } else {
-                val snoozeTrigger = vpnStateMonitor.getStateFlow(AppTpVpnFeature.APPTP_VPN).drop(1).firstOrNull()
-                snoozeTrigger?.let { vpnState ->
-                    if (vpnState.state is VpnStateMonitor.VpnRunningState.DISABLED) {
-                        val state = vpnState.state as VpnStateMonitor.VpnRunningState.DISABLED
-                        if (state.snoozedTriggerAtMillis == null) {
-                            handleNotifForDisabledAppTP()
-                        }
-                    }
+                if (snoozedTriggerAtMillis == 0L) {
+                    handleNotifForDisabledAppTP()
                 }
             }
         }

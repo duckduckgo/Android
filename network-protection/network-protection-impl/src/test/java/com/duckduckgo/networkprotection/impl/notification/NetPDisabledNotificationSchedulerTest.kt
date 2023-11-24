@@ -21,21 +21,13 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle.State
-import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
-import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.DISABLED
-import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.ENABLED
-import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.INVALID
-import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
-import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.settings.FakeNetPSettingsLocalConfigFactory
 import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
 import com.duckduckgo.networkprotection.impl.waitlist.FakeNetPRemoteFeatureFactory
 import com.duckduckgo.networkprotection.impl.waitlist.NetPRemoteFeature
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -66,9 +58,6 @@ class NetPDisabledNotificationSchedulerTest {
     @Mock
     private lateinit var networkProtectionState: NetworkProtectionState
 
-    @Mock
-    private lateinit var vpnStateMonitor: VpnStateMonitor
-
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
@@ -85,77 +74,43 @@ class NetPDisabledNotificationSchedulerTest {
             TestScope(),
             coroutineRule.testDispatcherProvider,
             netPRemoteFeature,
-            vpnStateMonitor,
         )
     }
 
     @Test
-    fun whenVpnManuallyStoppedWithInvalidStateThenDoNotShowSnooze() = runTest {
+    fun whenVpnManuallyStoppedThenDoNotShowSnooze() = runTest {
         netPRemoteFeature.waitlistBetaActive().setEnabled(State(enable = true))
         netPSettingsLocalConfig.vpnNotificationAlerts().setEnabled(State(enable = true))
         whenever(networkProtectionState.isEnabled()).thenReturn(true)
         whenever(networkProtectionState.isOnboarded()).thenReturn(true)
-        whenever(vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN)).thenReturn(
-            flowOf(
-                VpnState(state = ENABLED),
-                VpnState(state = INVALID),
-            ),
-        )
-
         testee.onVpnStarted(coroutineRule.testScope)
-        testee.onVpnStopped(coroutineRule.testScope, VpnStopReason.SELF_STOP)
+        testee.onVpnStopped(coroutineRule.testScope, VpnStopReason.SELF_STOP())
 
         verify(netPDisabledNotificationBuilder).buildDisabledNotification(any())
     }
 
     @Test
-    fun whenVpnManuallyStoppedWithNoVPNStateThenDoNotShowSnooze() = runTest {
+    fun whenVpnManuallyStoppedWithSnoozeButNoTriggerTimeThenDoNotShowSnooze() = runTest {
         netPRemoteFeature.waitlistBetaActive().setEnabled(State(enable = true))
         netPSettingsLocalConfig.vpnNotificationAlerts().setEnabled(State(enable = true))
         whenever(networkProtectionState.isEnabled()).thenReturn(true)
         whenever(networkProtectionState.isOnboarded()).thenReturn(true)
-        whenever(vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN)).thenReturn(emptyFlow())
 
         testee.onVpnStarted(coroutineRule.testScope)
-        testee.onVpnStopped(coroutineRule.testScope, VpnStopReason.SELF_STOP)
+        testee.onVpnStopped(coroutineRule.testScope, VpnStopReason.SELF_STOP())
 
         verify(netPDisabledNotificationBuilder).buildDisabledNotification(any())
     }
 
     @Test
-    fun whenVpnManuallyStoppedWithButIsNotSnoozedThenShowDisabledNotification() = runTest {
+    fun whenVpnSnoozedThenShowSnoozeNotification() = runTest {
         netPRemoteFeature.waitlistBetaActive().setEnabled(State(enable = true))
         netPSettingsLocalConfig.vpnNotificationAlerts().setEnabled(State(enable = true))
         whenever(networkProtectionState.isEnabled()).thenReturn(true)
         whenever(networkProtectionState.isOnboarded()).thenReturn(true)
-        whenever(vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN)).thenReturn(
-            flowOf(
-                VpnState(state = ENABLED),
-                VpnState(state = DISABLED()),
-            ),
-        )
 
         testee.onVpnStarted(coroutineRule.testScope)
-        testee.onVpnStopped(coroutineRule.testScope, VpnStopReason.SELF_STOP)
-
-        verify(netPDisabledNotificationBuilder).buildDisabledNotification(any())
-    }
-
-    @Test
-    fun whenVpnManuallyStoppedAndSnoozedThenShowSnoozeNotification() = runTest {
-        netPRemoteFeature.waitlistBetaActive().setEnabled(State(enable = true))
-        netPSettingsLocalConfig.vpnNotificationAlerts().setEnabled(State(enable = true))
-        whenever(networkProtectionState.isEnabled()).thenReturn(true)
-        whenever(networkProtectionState.isOnboarded()).thenReturn(true)
-        whenever(vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN)).thenReturn(
-            flowOf(
-                VpnState(state = DISABLED(20000L)),
-                VpnState(state = DISABLED(20000L)),
-            ),
-        )
-
-        testee.onVpnStarted(coroutineRule.testScope)
-        testee.onVpnStopped(coroutineRule.testScope, VpnStopReason.SELF_STOP)
+        testee.onVpnStopped(coroutineRule.testScope, VpnStopReason.SELF_STOP(20000L))
 
         verify(netPDisabledNotificationBuilder).buildSnoozeNotification(any(), eq(20000L))
     }

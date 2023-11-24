@@ -28,7 +28,6 @@ import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.dao.HeartBeatEntity
 import com.duckduckgo.mobile.android.vpn.heartbeat.VpnServiceHeartbeatMonitor
 import com.duckduckgo.mobile.android.vpn.model.VpnServiceState.DISABLED
-import com.duckduckgo.mobile.android.vpn.model.VpnServiceState.SNOOZED
 import com.duckduckgo.mobile.android.vpn.model.VpnServiceStateStats
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
@@ -78,7 +77,7 @@ class VpnStateMonitorService : Service() {
     // check last state, if it was enabled then we store disabled state reason unknown
     private fun maybeUpdateVPNState() {
         val lastStateStats = vpnDatabase.vpnServiceStateDao().getLastStateStats()
-        if (lastStateStats?.state != DISABLED && lastStateStats?.state != SNOOZED) {
+        if (lastStateStats?.state != DISABLED) {
             logcat { "VpnStateMonitorService destroyed but VPN state stored as ${lastStateStats?.state}, inserting DISABLED" }
             vpnDatabase.vpnServiceStateDao().insert(VpnServiceStateStats(state = DISABLED))
         }

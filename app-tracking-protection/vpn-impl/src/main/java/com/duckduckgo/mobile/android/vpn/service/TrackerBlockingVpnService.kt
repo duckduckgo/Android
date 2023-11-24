@@ -239,10 +239,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
                     launch(serviceDispatcher) {
                         async {
                             val snoozeTriggerAtMillisExtra = intent.getLongExtra(ACTION_SNOOZE_VPN_EXTRA, 0L)
-                            stopVpn(
-                                VpnStopReason.SELF_STOP,
-                                snoozed = snoozeTriggerAtMillisExtra != 0L,
-                            )
+                            stopVpn(VpnStopReason.SELF_STOP(snoozeTriggerAtMillisExtra))
                         }.await()
                     }
                 }
@@ -542,7 +539,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
     private suspend fun stopVpn(
         reason: VpnStopReason,
         hasVpnAlreadyStarted: Boolean = true,
-        snoozed: Boolean = false,
     ) = withContext(serviceDispatcher) {
         logcat { "VPN log: Stopping VPN. $reason" }
 
@@ -568,12 +564,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         }
 
         // Set the state to DISABLED here, then call the on stop/failure callbacks
-        vpnServiceStateStatsDao.insert(
-            createVpnState(
-                state = if (snoozed) VpnServiceState.SNOOZED else VpnServiceState.DISABLED,
-                stopReason = reason,
-            ),
-        )
+        vpnServiceStateStatsDao.insert(createVpnState(state = VpnServiceState.DISABLED, stopReason = reason))
 
         vpnStateServiceReference?.let {
             runCatching { unbindService(vpnStateServiceConnection).also { vpnStateServiceReference = null } }
@@ -585,7 +576,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
 
     private fun sendStopPixels(reason: VpnStopReason) {
         when (reason) {
-            VpnStopReason.SELF_STOP, VpnStopReason.RESTART, VpnStopReason.UNKNOWN -> {} // no-op
+            is VpnStopReason.SELF_STOP, VpnStopReason.RESTART, VpnStopReason.UNKNOWN -> {} // no-op
             VpnStopReason.ERROR -> deviceShieldPixels.startError()
             VpnStopReason.REVOKED -> deviceShieldPixels.suddenKillByVpnRevoked()
         }
@@ -700,7 +691,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         fun VpnStopReason.asVpnStoppingReason(): VpnStoppingReason {
             return when (this) {
                 VpnStopReason.RESTART -> VpnStoppingReason.RESTART
-                VpnStopReason.SELF_STOP -> VpnStoppingReason.SELF_STOP
+                is VpnStopReason.SELF_STOP -> VpnStoppingReason.SELF_STOP
                 VpnStopReason.REVOKED -> VpnStoppingReason.REVOKED
                 VpnStopReason.ERROR -> VpnStoppingReason.ERROR
                 VpnStopReason.UNKNOWN -> VpnStoppingReason.UNKNOWN

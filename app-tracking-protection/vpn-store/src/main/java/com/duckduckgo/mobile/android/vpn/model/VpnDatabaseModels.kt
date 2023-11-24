@@ -43,7 +43,6 @@ enum class VpnServiceState {
     ENABLING,
     ENABLED,
     DISABLED,
-    SNOOZED,
     INVALID,
 }
 

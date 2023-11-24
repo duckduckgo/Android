@@ -140,11 +140,11 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         vpnStopReason: VpnStopReason?,
         vpnAlwaysOnState: AlwaysOnState,
     ): AlertState {
-        return if (vpnRunningState is DISABLED && (reconnectState == Reconnecting || reconnectState == ReconnectingFailed)) {
+        return if (vpnRunningState == DISABLED && (reconnectState == Reconnecting || reconnectState == ReconnectingFailed)) {
             ShowReconnectingFailed
         } else if (reconnectState == Reconnecting) {
             ShowReconnecting
-        } else if (vpnRunningState is DISABLED && (vpnStopReason == REVOKED || vpnStopReason == ERROR)) {
+        } else if (vpnRunningState == DISABLED && (vpnStopReason == REVOKED || vpnStopReason == ERROR)) {
             ShowRevoked
         } else if (vpnRunningState == ENABLED && vpnAlwaysOnState.isAlwaysOnLockedDown()) {
             ShowAlwaysOnLockdownEnabled
@@ -158,7 +158,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         .combine(refreshVpnRunningState.asStateFlow()) { state, _ -> state }
 
     private fun VpnState.toConnectionState(reconnectState: ReconnectStatus): ConnectionState =
-        if (this.state !is DISABLED && reconnectState == Reconnecting) {
+        if (this.state != DISABLED && reconnectState == Reconnecting) {
             Connecting
         } else {
             when (this.state) {
