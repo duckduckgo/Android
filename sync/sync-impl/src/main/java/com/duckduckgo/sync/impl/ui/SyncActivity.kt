@@ -108,21 +108,15 @@ class SyncActivity : DuckDuckGoActivity() {
         SyncIntroContract(),
     ) { resultOk ->
         if (resultOk) {
-            viewModel.onIntroCompleted()
+            viewModel.onDeviceConnected()
+        } else {
+            viewModel.onConnectionCancelled()
         }
     }
 
     private val connectFlow = registerForActivityResult(ConnectFlowContract()) { resultOk ->
         if (resultOk) {
             viewModel.onLoginSuccess()
-        }
-    }
-
-    var launcher = registerForActivityResult(StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            viewModel.onDeviceConnected()
-        } else {
-            viewModel.onConnectionCancelled()
         }
     }
 

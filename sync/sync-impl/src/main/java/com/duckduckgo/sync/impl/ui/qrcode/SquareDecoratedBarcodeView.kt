@@ -97,7 +97,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             .onEach { processCommands(it) }
             .launchIn(coroutineScope)
 
-        binding.goToSettingsButton.setOnClickListener {
+        binding.goToSetting sButton.setOnClickListener {
             viewModel.goToSettings()
         }
     }

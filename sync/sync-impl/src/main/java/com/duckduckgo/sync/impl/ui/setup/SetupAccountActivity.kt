@@ -38,8 +38,8 @@ import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.S
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SYNC_SETUP
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.Close
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.RecoverData
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.SettingUpSync
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.RecoverAccount
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.Finish
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.AskSaveRecoveryCode
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.CreateAccount
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.SyncSetupCompleted
@@ -58,7 +58,7 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
 
     private val loginFlow = registerForActivityResult(LoginContract()) { resultOk ->
         if (resultOk) {
-            viewModel.onSetupStart()
+            viewModel.onCreateAccount()
         }
     }
 
@@ -110,8 +110,8 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
                 setResult(Activity.RESULT_CANCELED)
                 finish()
             }
-            RecoverData -> loginFlow.launch(null)
-            SettingUpSync -> {
+            RecoverAccount -> loginFlow.launch(null)
+            Finish -> {
                 setResult(Activity.RESULT_OK)
                 finish()
             }
@@ -156,12 +156,12 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
         }
     }
 
-    override fun launchFinishSetupFlow() {
-        viewModel.onSetupComplete()
+    override fun launchDeviceConnectedFlow() {
+        viewModel.onDeviceConnected()
     }
 
-    override fun launchSettingsFlow() {
-        viewModel.onLaunchSettings()
+    override fun finishSetup() {
+        viewModel.onSetupFinished()
     }
 
     override fun launchRecoveryCodeFlow() {
@@ -169,11 +169,11 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
     }
 
     override fun launchCreateAccountFlow() {
-        viewModel.onSetupStart()
+        viewModel.onCreateAccount()
     }
 
     override fun launchRecoverAccountFlow() {
-        viewModel.onRecoverAccountStart()
+        viewModel.onRecoverAccount()
     }
 
     companion object {

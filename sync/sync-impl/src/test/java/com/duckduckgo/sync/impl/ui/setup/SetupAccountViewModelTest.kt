@@ -81,7 +81,7 @@ class SetupAccountViewModelTest {
     @Test
     fun whenSetupCompleteThenAskSaveRecoveryCodeCommandSent() = runTest {
         testee.viewState(Screen.SETUP_COMPLETE).test {
-            testee.onSetupComplete()
+            testee.onDeviceConnected()
             val viewState = expectMostRecentItem()
             assertTrue(viewState.viewMode is ViewMode.AskSaveRecoveryCode)
         }

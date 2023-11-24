@@ -16,7 +16,6 @@
 
 package com.duckduckgo.sync.impl.ui.setup
 
-import android.app.Activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -29,7 +28,8 @@ import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.R
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SYNC_INTRO
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SYNC_SETUP
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.Close
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.RecoverData
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.Finish
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.RecoverAccount
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.AskSaveRecoveryCode
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.CreateAccount
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.SyncSetupCompleted
@@ -81,8 +81,8 @@ class SetupAccountViewModel @Inject constructor(private val dispatchers: Dispatc
     }
 
     sealed class Command {
-        object RecoverData : Command()
-        object SettingUpSync : Command()
+        object RecoverAccount : Command()
+        object Finish : Command()
         object Close : Command()
     }
 
@@ -92,27 +92,27 @@ class SetupAccountViewModel @Inject constructor(private val dispatchers: Dispatc
         }
     }
 
-    fun onSetupComplete() {
-        viewModelScope.launch {
-            viewState.emit(ViewState(viewMode = AskSaveRecoveryCode))
-        }
-    }
-
-    fun onLaunchSettings(){
-        viewModelScope.launch {
-            viewState.emit(ViewState(viewMode = SyncSetupCompleted))
-        }
-    }
-
-    fun onSetupStart() {
+    fun onCreateAccount() {
         viewModelScope.launch {
             viewState.emit(ViewState(viewMode = CreateAccount))
         }
     }
 
-    fun onRecoverAccountStart() {
+    fun onRecoverAccount() {
         viewModelScope.launch {
-            command.send(RecoverData)
+            command.send(RecoverAccount)
+        }
+    }
+
+    fun onDeviceConnected() {
+        viewModelScope.launch {
+            viewState.emit(ViewState(viewMode = SyncSetupCompleted))
+        }
+    }
+
+    fun onSetupFinished(){
+        viewModelScope.launch {
+            command.send(Finish)
         }
     }
 

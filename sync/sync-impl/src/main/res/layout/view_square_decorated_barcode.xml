@@ -32,6 +32,14 @@
         android:scaleType="fitXY"
         app:srcCompat="@drawable/frame" />
 
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        android:id="@+id/barcodeCta"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        app:trailingIcon="@drawable/ic_keyboard_24"
+        app:primaryText="@string/login_screen_enter_code_cta"/>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/cameraStatusContainer"
         android:layout_width="match_parent"

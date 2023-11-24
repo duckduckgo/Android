@@ -40,7 +40,6 @@ import com.google.android.material.snackbar.Snackbar
 import javax.inject.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import timber.log.*
 
 @InjectWith(FragmentScope::class)
 class SyncCreateAccountFragment : DuckDuckGoFragment(R.layout.fragment_create_account) {
@@ -95,7 +94,7 @@ class SyncCreateAccountFragment : DuckDuckGoFragment(R.layout.fragment_create_ac
                 requireActivity().setResult(Activity.RESULT_CANCELED)
                 requireActivity().finish()
             }
-            FinishSetupFlow -> listener?.launchFinishSetupFlow()
+            FinishSetupFlow -> listener?.launchRecoveryCodeFlow()
             Error -> {
                 Snackbar.make(binding.root, R.string.sync_general_error, Snackbar.LENGTH_LONG).show()
             }

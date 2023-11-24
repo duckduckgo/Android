@@ -64,9 +64,6 @@ class SaveRecoveryCodeFragment : DuckDuckGoFragment(R.layout.fragment_recovery_c
     lateinit var storagePermission: PermissionRequest
 
     @Inject
-    lateinit var recoveryCodePDF: RecoveryCodePDF
-
-    @Inject
     lateinit var shareAction: ShareAction
 
     private val binding: FragmentRecoveryCodeBinding by viewBinding()
@@ -74,6 +71,9 @@ class SaveRecoveryCodeFragment : DuckDuckGoFragment(R.layout.fragment_recovery_c
     private val viewModel: SaveRecoveryCodeViewModel by lazy {
         ViewModelProvider(this, viewModelFactory)[SaveRecoveryCodeViewModel::class.java]
     }
+
+    private val listener: SetupFlowListener?
+        get() = activity as? SetupFlowListener
 
     override fun onViewCreated(
         view: View,
@@ -124,8 +124,7 @@ class SaveRecoveryCodeFragment : DuckDuckGoFragment(R.layout.fragment_recovery_c
                 requireActivity().finish()
             }
             is Finish -> {
-                requireActivity().setResult(Activity.RESULT_OK)
-                requireActivity().finish()
+                listener?.launchDeviceConnectedFlow()
             }
             is RecoveryCodePDFSuccess -> {
                 shareAction.shareFile(requireContext(), it.recoveryCodePDFFile)

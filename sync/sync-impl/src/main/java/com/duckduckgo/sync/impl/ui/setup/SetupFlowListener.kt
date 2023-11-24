@@ -20,7 +20,6 @@ interface SetupFlowListener {
     fun launchRecoveryCodeFlow()
     fun launchCreateAccountFlow()
     fun launchRecoverAccountFlow()
-    fun launchFinishSetupFlow()
-
-    fun launchSettingsFlow()
+    fun launchDeviceConnectedFlow()
+    fun finishSetup()
 }
