@@ -87,10 +87,10 @@ class SubscriptionWebViewViewModel @Inject constructor(
         }
     }
 
-    fun processJsCallbackMessage(featureName: String, method: String, id: String, data: JSONObject) {
+    fun processJsCallbackMessage(featureName: String, method: String, id: String?, data: JSONObject?) {
         when (method) {
             "backToSettings" -> backToSettings()
-            "getSubscriptionOptions" -> getSubscriptionOptions(featureName, method, id)
+            "getSubscriptionOptions" -> id?.let { getSubscriptionOptions(featureName, method, it) }
             "subscriptionSelected" -> subscriptionSelected(data)
             else -> {
                 // NOOP

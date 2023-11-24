@@ -42,8 +42,10 @@ class SubscriptionMessagingInterfaceTest {
 
     private val callback = object : JsMessageCallback() {
         var counter = 0
+        var id: String? = null
 
-        override fun process(featureName: String, method: String, id: String, data: JSONObject) {
+        override fun process(featureName: String, method: String, id: String?, data: JSONObject?) {
+            this.id = id
             counter++
         }
     }
@@ -313,7 +315,8 @@ class SubscriptionMessagingInterfaceTest {
 
         messagingInterface.process(message, "duckduckgo-android-messaging-secret")
 
-        assertEquals(0, callback.counter)
+        assertEquals(1, callback.counter)
+        assertNull(callback.id)
     }
 
     @Test

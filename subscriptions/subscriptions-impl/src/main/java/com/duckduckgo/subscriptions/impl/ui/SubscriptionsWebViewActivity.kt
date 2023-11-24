@@ -89,7 +89,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity() {
             subscriptionJsMessaging.register(
                 it,
                 object : JsMessageCallback() {
-                    override fun process(featureName: String, method: String, id: String, data: JSONObject) {
+                    override fun process(featureName: String, method: String, id: String?, data: JSONObject?) {
                         viewModel.processJsCallbackMessage(featureName, method, id, data)
                     }
                 },

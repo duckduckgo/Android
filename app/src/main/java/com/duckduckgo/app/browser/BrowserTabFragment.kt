@@ -2105,10 +2105,10 @@ class BrowserTabFragment :
             contentScopeScripts.register(
                 it,
                 object : JsMessageCallback() {
-                    override fun process(featureName: String, method: String, id: String, data: JSONObject) {
+                    override fun process(featureName: String, method: String, id: String?, data: JSONObject?) {
                         when (method) {
-                            "webShare" -> webShare(featureName, method, id, data)
-                            "permissionsQuery" -> viewModel.onPermissionsQuery(featureName, method, id, data)
+                            "webShare" -> if (id != null && data != null) { webShare(featureName, method, id, data) }
+                            "permissionsQuery" -> if (id != null && data != null) { viewModel.onPermissionsQuery(featureName, method, id, data) }
                             else -> {
                                 // NOOP
                             }
