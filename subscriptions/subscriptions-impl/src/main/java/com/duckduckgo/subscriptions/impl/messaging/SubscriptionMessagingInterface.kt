@@ -124,7 +124,13 @@ class SubscriptionMessagingInterface @Inject constructor(
 
         override val allowedDomains: List<String> = emptyList()
         override val featureName: String = "useSubscription"
-        override val methods: List<String> = listOf("subscriptionSelected", "getSubscriptionOptions", "backToSettings", "activateSubscription")
+        override val methods: List<String> = listOf(
+            "subscriptionSelected",
+            "getSubscriptionOptions",
+            "backToSettings",
+            "activateSubscription",
+            "featureSelected",
+        )
     }
 
     inner class GetSubscriptionMessage(
