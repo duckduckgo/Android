@@ -26,32 +26,76 @@
         android:id="@+id/includeToolbar"
         layout="@layout/include_default_toolbar"/>
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:background="?attr/daxColorSurface">
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/connect_hint"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/keyline_4"
-            android:text="@string/connect_screen_scan_qr_hint"/>
+            android:text="@string/connect_screen_scan_qr_hint"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <com.duckduckgo.sync.impl.ui.qrcode.SquareDecoratedBarcodeView
             android:id="@+id/qrCodeReader"
             android:layout_width="match_parent"
-            android:layout_height="0dp"/>
+            android:layout_height="0dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/connect_hint" />
 
-        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/readTextCode"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:primaryText="@string/connect_screen_enter_code_cta"
-            app:leadingIcon="@drawable/ic_keyboard_24"
-            app:leadingIconBackground="circular"/>
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/oneLineItemHeight"
+            android:background="@drawable/background_rounded_surface"
+            android:layout_marginTop="@dimen/keyline_4"
+            android:paddingTop="@dimen/oneLineItemVerticalPadding"
+            android:paddingBottom="@dimen/oneLineItemVerticalPadding"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/qrCodeReader">
 
-    </LinearLayout>
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/primaryText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_1"
+                android:text="@string/login_screen_enter_code_cta"
+                android:textColor="@color/primary_text_color_selector"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:typography="h5"
+                tools:ignore="InvalidColorAttribute" />
+
+            <FrameLayout
+                android:id="@+id/trailingIconContainer"
+                android:layout_width="@dimen/listItemTrailingIconWidth"
+                android:layout_height="0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/primaryText"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:id="@+id/trailingIcon"
+                    android:layout_width="@dimen/listItemImageMediumSize"
+                    android:layout_height="@dimen/listItemImageMediumSize"
+                    android:layout_gravity="center"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    app:srcCompat="@drawable/ic_keyboard_24"
+                    tools:ignore="ContentDescription" />
+            </FrameLayout>
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

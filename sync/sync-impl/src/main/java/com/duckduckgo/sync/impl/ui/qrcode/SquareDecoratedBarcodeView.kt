@@ -58,7 +58,11 @@ import kotlinx.coroutines.flow.onEach
 @InjectWith(ViewScope::class)
 class SquareDecoratedBarcodeView
 @JvmOverloads
-constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) :
+constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
+) :
     FrameLayout(context, attrs, defStyleAttr) {
 
     @Inject
@@ -97,12 +101,15 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             .onEach { processCommands(it) }
             .launchIn(coroutineScope)
 
-        binding.goToSetting sButton.setOnClickListener {
+        binding.goToSettingsButton.setOnClickListener {
             viewModel.goToSettings()
         }
     }
 
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+    override fun onMeasure(
+        widthMeasureSpec: Int,
+        heightMeasureSpec: Int
+    ) {
         val size = listOf(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.getSize(heightMeasureSpec)).filter { it > 0 }.min()
         val squareMeasureSpec = MeasureSpec.makeMeasureSpec(size, MeasureSpec.EXACTLY)
         super.onMeasure(squareMeasureSpec, squareMeasureSpec)
@@ -114,6 +121,12 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 
     fun pause() {
         binding.barcodeView.pause()
+    }
+
+    fun onCtaClicked(onClick: () -> Unit) {
+        binding.barcodeCta.setOnClickListener {
+            onClick.invoke()
+        }
     }
 
     fun decodeSingle(onQrCodeRead: (String) -> Unit) {
@@ -144,6 +157,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         val cameraAvailable = context.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
         viewModel.handleCameraAvailability(cameraAvailable)
     }
+
     private fun checkPermissions() {
         val enabled = ActivityCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
         viewModel.handlePermissions(enabled == PackageManager.PERMISSION_GRANTED)
@@ -167,6 +181,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         binding.cameraStatusContainer.visibility = View.GONE
         binding.frame.visibility = View.GONE
     }
+
     private fun showPermissionsGranted() {
         resume()
         binding.cameraStatusContainer.visibility = View.GONE
