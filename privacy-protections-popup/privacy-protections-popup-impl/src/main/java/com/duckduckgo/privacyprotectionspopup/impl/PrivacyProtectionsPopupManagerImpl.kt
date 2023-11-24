@@ -25,6 +25,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 @ContributesBinding(FragmentScope::class)
 class PrivacyProtectionsPopupManagerImpl @Inject constructor() : PrivacyProtectionsPopupManager {
@@ -40,6 +41,7 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor() : PrivacyProtecti
 
     override fun onPageRefreshTriggeredByUser() {
         // TODO
+        _viewState.update { state -> state.copy(visible = true) }
     }
 
     override fun onPageLoaded(
