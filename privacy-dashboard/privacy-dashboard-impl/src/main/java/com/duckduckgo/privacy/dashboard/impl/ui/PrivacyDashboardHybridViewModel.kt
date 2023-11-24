@@ -42,6 +42,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -194,6 +195,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                 // Checking if site was added to / removed from allowlist since the screen was initialized
                 site.userAllowList != site.domain in allowlistedDomains
             }
+            .drop(1)
             .onEach { allowlistChanged ->
                 // Closing the Privacy Dashboard screen
                 viewState.update { it?.copy(userChangedValues = allowlistChanged) }
