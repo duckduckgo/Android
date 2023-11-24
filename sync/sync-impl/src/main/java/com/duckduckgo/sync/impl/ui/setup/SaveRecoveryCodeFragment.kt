@@ -35,7 +35,6 @@ import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.sync.impl.PermissionRequest
 import com.duckduckgo.sync.impl.R
-import com.duckduckgo.sync.impl.RecoveryCodePDF
 import com.duckduckgo.sync.impl.ShareAction
 import com.duckduckgo.sync.impl.databinding.FragmentRecoveryCodeBinding
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command

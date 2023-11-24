@@ -19,7 +19,6 @@ package com.duckduckgo.sync.impl.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -29,7 +28,6 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.databinding.ActivityConnectSyncBinding
-import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code
 import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code.CONNECT_CODE
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.Error
@@ -131,7 +129,6 @@ class SyncConnectActivity : DuckDuckGoActivity() {
                 viewModel.onReadTextCodeClicked()
             }
         }
-
     }
 
     companion object {

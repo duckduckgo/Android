@@ -61,7 +61,7 @@ class SquareDecoratedBarcodeView
 constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) :
     FrameLayout(context, attrs, defStyleAttr) {
 
@@ -108,7 +108,7 @@ constructor(
 
     override fun onMeasure(
         widthMeasureSpec: Int,
-        heightMeasureSpec: Int
+        heightMeasureSpec: Int,
     ) {
         val size = listOf(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.getSize(heightMeasureSpec)).filter { it > 0 }.min()
         val squareMeasureSpec = MeasureSpec.makeMeasureSpec(size, MeasureSpec.EXACTLY)
