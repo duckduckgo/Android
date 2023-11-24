@@ -240,6 +240,24 @@ class SurveyRepositoryTest {
 
         assertEquals(survey.copy(surveyId = "5"), surveyRepository.getScheduledSurvey())
     }
+
+    @Test
+    fun givenExistingSurveyWhenCheckingIfSurveyExistThenReturnTrue() {
+        val survey = Survey(
+            surveyId = "id",
+            status = Survey.Status.SCHEDULED,
+            daysInstalled = 4,
+            url = null,
+        )
+
+        surveyRepository.persistSurvey(survey)
+        assertTrue(surveyRepository.surveyExists("id"))
+    }
+
+    @Test
+    fun givenNonExistingSurveyWhenCheckingIfSurveyExistThenReturnFalse() {
+        assertFalse(surveyRepository.surveyExists("id"))
+    }
 }
 
 private class FakeSurveyDao : SurveyDao {
@@ -250,10 +268,6 @@ private class FakeSurveyDao : SurveyDao {
 
     override fun update(survey: Survey) {
         insert(survey)
-    }
-
-    override fun exists(surveyId: String): Boolean {
-        return surveys[surveyId] != null
     }
 
     override fun get(surveyId: String): Survey? {

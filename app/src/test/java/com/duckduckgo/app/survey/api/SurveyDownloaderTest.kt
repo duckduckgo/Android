@@ -17,7 +17,6 @@
 package com.duckduckgo.app.survey.api
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.model.Survey.Status.NOT_ALLOCATED
 import com.duckduckgo.app.survey.model.Survey.Status.SCHEDULED
@@ -40,7 +39,6 @@ import retrofit2.Response
 @RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalCoroutinesApi::class)
 class SurveyDownloaderTest {
-    private var mockDao: SurveyDao = mock()
     private var mockService: SurveyService = mock()
     private var mockEmailManager: EmailManager = mock()
     private var mockCall: Call<SurveyGroup?> = mock()
@@ -64,7 +62,7 @@ class SurveyDownloaderTest {
         whenever(netpMockCall.execute()).thenReturn(Response.error(400, "".toResponseBody()))
         whenever(mockService.surveyNetPWaitlistBeta()).thenReturn(netpMockCall)
 
-        testee = SurveyDownloader(mockService, mockDao, mockEmailManager, mockSurveyRepository, netpCohortStore)
+        testee = SurveyDownloader(mockService, mockEmailManager, mockSurveyRepository, netpCohortStore)
     }
 
     @Test
@@ -72,8 +70,8 @@ class SurveyDownloaderTest {
         whenever(mockCall.execute()).thenReturn(Response.success(surveyWithAllocation("abc")))
         whenever(mockService.survey()).thenReturn(mockCall)
         testee.download().blockingAwait()
-        verify(mockDao).insert(Survey("abc", SURVEY_URL, 7, SCHEDULED))
-        verify(mockDao).deleteUnusedSurveys()
+        verify(mockSurveyRepository).persistSurvey(Survey("abc", SURVEY_URL, 7, SCHEDULED))
+        verify(mockSurveyRepository).deleteUnusedSurveys()
     }
 
     @Test
@@ -83,18 +81,18 @@ class SurveyDownloaderTest {
         whenever(mockCall.execute()).thenReturn(Response.success(surveyNoAllocation("abc")))
         whenever(mockService.survey()).thenReturn(mockCall)
         testee.download().blockingAwait()
-        verify(mockDao).insert(surveyNotAllocated)
-        verify(mockDao).deleteUnusedSurveys()
+        verify(mockSurveyRepository).persistSurvey(surveyNotAllocated)
+        verify(mockSurveyRepository).deleteUnusedSurveys()
     }
 
     @Test
     fun whenSurveyAlreadyExistsThenNotSavedAndUnusedSurveysNotDeleted() {
-        whenever(mockDao.exists(any())).thenReturn(true)
+        whenever(mockSurveyRepository.surveyExists(any())).thenReturn(true)
         whenever(mockCall.execute()).thenReturn(Response.success(surveyWithAllocation("abc")))
         whenever(mockService.survey()).thenReturn(mockCall)
         testee.download().blockingAwait()
-        verify(mockDao, never()).insert(any())
-        verify(mockDao, never()).deleteUnusedSurveys()
+        verify(mockSurveyRepository, never()).persistSurvey(any())
+        verify(mockSurveyRepository, never()).deleteUnusedSurveys()
     }
 
     @Test
@@ -102,7 +100,7 @@ class SurveyDownloaderTest {
         whenever(mockCall.execute()).thenReturn(Response.success(null))
         whenever(mockService.survey()).thenReturn(mockCall)
         testee.download().blockingAwait()
-        verify(mockDao).deleteUnusedSurveys()
+        verify(mockSurveyRepository).deleteUnusedSurveys()
     }
 
     @Test(expected = RuntimeException::class)
@@ -121,7 +119,7 @@ class SurveyDownloaderTest {
         whenever(mockCall.execute()).thenReturn(Response.success(surveyWithAllocationForEmail("abc")))
         whenever(mockService.survey()).thenReturn(mockCall)
         testee.download().blockingAwait()
-        verify(mockDao).insert(surveyWithCohort)
+        verify(mockSurveyRepository).persistSurvey(surveyWithCohort)
     }
 
     @Test
@@ -131,7 +129,7 @@ class SurveyDownloaderTest {
         whenever(mockCall.execute()).thenReturn(Response.success(surveyWithAllocationForEmail("abc")))
         whenever(mockService.survey()).thenReturn(mockCall)
         testee.download().blockingAwait()
-        verify(mockDao, never()).insert(any())
+        verify(mockSurveyRepository, never()).persistSurvey(any())
     }
 
     @Test
@@ -139,8 +137,8 @@ class SurveyDownloaderTest {
         whenever(mockCall.execute()).thenReturn(Response.success(surveyWithAllocation("abc")))
         whenever(mockService.survey()).thenReturn(mockCall)
         testee.download().blockingAwait()
-        verify(mockDao).insert(Survey("abc", SURVEY_URL, 7, SCHEDULED))
-        verify(mockDao).deleteUnusedSurveys()
+        verify(mockSurveyRepository).persistSurvey(Survey("abc", SURVEY_URL, 7, SCHEDULED))
+        verify(mockSurveyRepository).deleteUnusedSurveys()
     }
 
     @Test
@@ -149,7 +147,7 @@ class SurveyDownloaderTest {
         whenever(mockCall.execute()).thenReturn(Response.success(surveyWithAllocation("abc")))
         whenever(mockService.survey()).thenReturn(mockCall)
         testee.download().blockingAwait()
-        verify(mockDao, never()).insert(any())
+        verify(mockSurveyRepository, never()).persistSurvey(any())
     }
 
     private fun surveyWithAllocation(id: String): SurveyGroup {
