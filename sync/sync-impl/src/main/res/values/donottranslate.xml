@@ -60,6 +60,8 @@
     <!-- Recover data screen -->
     <string name="login_screen_title">Scan QR Code</string>
     <string name="login_screen_enter_code_cta">Or Manually Enter Code</string>
+    <string name="login_screen_barcode_hint">Point camera at QR code to sync</string>
+    <string name="login_screen_cant_scan">Can\'t Scan? Share Text Code</string>
 
     <!-- Connect screen -->
     <string name="connect_screen_title">Scan QR Code</string>

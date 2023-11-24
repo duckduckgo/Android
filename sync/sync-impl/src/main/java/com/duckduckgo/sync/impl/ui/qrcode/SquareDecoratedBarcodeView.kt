@@ -35,6 +35,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ViewSquareDecoratedBarcodeBinding
@@ -78,7 +79,7 @@ constructor(
         ContextCompat.getDrawable(context, R.drawable.camera_permission)
     }
 
-    private val binding = ViewSquareDecoratedBarcodeBinding.inflate(LayoutInflater.from(context), this)
+    private val binding: ViewSquareDecoratedBarcodeBinding by viewBinding()
 
     private val viewModel: SquareDecoratedBarcodeViewModel by lazy {
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[SquareDecoratedBarcodeViewModel::class.java]
@@ -179,13 +180,11 @@ constructor(
     private fun showUnknownStatus() {
         pause()
         binding.cameraStatusContainer.visibility = View.GONE
-        binding.frame.visibility = View.GONE
     }
 
     private fun showPermissionsGranted() {
         resume()
         binding.cameraStatusContainer.visibility = View.GONE
-        binding.frame.visibility = View.VISIBLE
     }
 
     private fun showCameraUnavailable() {

@@ -15,12 +15,22 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content" xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical">
+    android:layout_height="match_parent"
+    android:background="?attr/daxColorSurface">
+
+    <LinearLayout
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
     <include
         android:id="@+id/includeToolbar"
@@ -48,52 +58,6 @@
             android:layout_marginTop="16dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/connect_hint" />
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/readTextCode"
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/oneLineItemHeight"
-            android:background="@drawable/background_rounded_surface"
-            android:layout_marginTop="@dimen/keyline_4"
-            android:paddingTop="@dimen/oneLineItemVerticalPadding"
-            android:paddingBottom="@dimen/oneLineItemVerticalPadding"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/qrCodeReader">
-
-            <com.duckduckgo.common.ui.view.text.DaxTextView
-                android:id="@+id/primaryText"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/keyline_4"
-                android:layout_marginEnd="@dimen/keyline_1"
-                android:text="@string/login_screen_enter_code_cta"
-                android:textColor="@color/primary_text_color_selector"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:typography="h5"
-                tools:ignore="InvalidColorAttribute" />
-
-            <FrameLayout
-                android:id="@+id/trailingIconContainer"
-                android:layout_width="@dimen/listItemTrailingIconWidth"
-                android:layout_height="0dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@id/primaryText"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <ImageView
-                    android:id="@+id/trailingIcon"
-                    android:layout_width="@dimen/listItemImageMediumSize"
-                    android:layout_height="@dimen/listItemImageMediumSize"
-                    android:layout_gravity="center"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    app:srcCompat="@drawable/ic_keyboard_24"
-                    tools:ignore="ContentDescription" />
-            </FrameLayout>
-
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -141,15 +105,20 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+    </LinearLayout>
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/copyCodeButton"
-        app:layout_constraintTop_toBottomOf="@+id/showQRCodeHint"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_4"
-        app:leadingIcon="@drawable/ic_keyboard_24"
-        app:leadingIconBackground="circular"
-        app:primaryText="@string/connect_screen_share_code" />
+        android:drawableEnd="@drawable/ic_arrow_circle_right_12"
+        android:drawablePadding="@dimen/keyline_2"
+        android:layout_marginBottom="@dimen/keyline_4"
+        app:textType="secondary"
+        android:textAlignment="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="@string/login_screen_cant_scan"/>
 
-
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
