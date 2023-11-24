@@ -199,6 +199,7 @@ class RealSubscriptionsManagerTest {
 
         subscriptionsManager.currentPurchaseState.test {
             subscriptionsManager.purchase(mock(), mock(), "", false)
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
             assertTrue(awaitItem() is CurrentPurchase.Failure)
             cancelAndConsumeRemainingEvents()
         }
@@ -241,6 +242,7 @@ class RealSubscriptionsManagerTest {
 
         subscriptionsManager.currentPurchaseState.test {
             subscriptionsManager.purchase(mock(), mock(), "", false)
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
             verify(billingClient, never()).billingFlowParamsBuilder(any(), any(), eq("1234"), any())
             verify(billingClient, never()).launchBillingFlow(any(), any())
             assertTrue(awaitItem() is CurrentPurchase.Recovered)
@@ -257,6 +259,7 @@ class RealSubscriptionsManagerTest {
 
         subscriptionsManager.currentPurchaseState.test {
             subscriptionsManager.purchase(mock(), mock(), "", false)
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
             assertTrue(awaitItem() is CurrentPurchase.Failure)
             cancelAndConsumeRemainingEvents()
         }
@@ -272,14 +275,18 @@ class RealSubscriptionsManagerTest {
     }
 
     @Test
-    fun whenPurchaseFlowIfValidateTokenSucceedsThenBillingFlowUsesCorrectExternalId() = runTest {
+    fun whenPurchaseFlowIfValidateTokenSucceedsThenBillingFlowUsesCorrectExternalIdAndEmitStates() = runTest {
         givenUserIsAuthenticated()
         givenValidateTokenSucceedsNoEntitlements()
 
-        subscriptionsManager.purchase(mock(), mock(), "", false)
-
-        verify(billingClient).billingFlowParamsBuilder(any(), any(), eq("1234"), any())
-        verify(billingClient).launchBillingFlow(any(), any())
+        subscriptionsManager.currentPurchaseState.test {
+            subscriptionsManager.purchase(mock(), mock(), "", false)
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
+            verify(billingClient).billingFlowParamsBuilder(any(), any(), eq("1234"), any())
+            verify(billingClient).launchBillingFlow(any(), any())
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowFinished)
+            cancelAndConsumeRemainingEvents()
+        }
     }
 
     @Test
@@ -289,6 +296,7 @@ class RealSubscriptionsManagerTest {
 
         subscriptionsManager.currentPurchaseState.test {
             subscriptionsManager.purchase(mock(), mock(), "", false)
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
             assertTrue(awaitItem() is CurrentPurchase.Failure)
             cancelAndConsumeRemainingEvents()
         }
@@ -548,8 +556,9 @@ class RealSubscriptionsManagerTest {
     }
 
     @Test
-    fun whenGetAuthTokenIfUserAuthenticatedAndTokenExpiredAndPurchaseInStoreExistsThenReturnSuccess() = runTest {
+    fun whenGetAuthTokenIfUserAuthenticatedWithSubscriptionAndTokenExpiredAndPurchaseInStoreExistsThenReturnSuccess() = runTest {
         givenUserIsAuthenticated()
+        givenValidateTokenSucceedsWithEntitlements()
         givenValidateTokenFailsAndThenSucceeds("""{ "error": "expired_token" }""")
         givenPurchaseStored()
         givenPurchaseStoredIsValid()
@@ -582,6 +591,17 @@ class RealSubscriptionsManagerTest {
         val result = subscriptionsManager.getAuthToken()
 
         verify(authService).storeLogin(any())
+        assertTrue(result is AuthToken.Failure)
+    }
+
+    @Test
+    fun whenGetAuthTokenIfUserAuthenticatedAndNoEntitlementsThenReturnFailure() = runTest {
+        givenUserIsAuthenticated()
+        givenValidateTokenSucceedsNoEntitlements()
+        givenPurchaseStored()
+
+        val result = subscriptionsManager.getAuthToken()
+
         assertTrue(result is AuthToken.Failure)
     }
 

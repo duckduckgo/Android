@@ -21,19 +21,34 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
+import com.duckduckgo.subscriptions.impl.R.string
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionsWebviewBinding
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.BackToSettings
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SendResponseToJs
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SubscriptionSelected
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import javax.inject.Inject
 import javax.inject.Named
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import org.json.JSONObject
 
 data class SubscriptionsWebViewActivityWithParams(
@@ -52,6 +67,8 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var userAgent: UserAgentProvider
 
+    private val viewModel: SubscriptionWebViewViewModel by bindViewModel()
+
     private val binding: ActivitySubscriptionsWebviewBinding by viewBinding()
 
     private val toolbar
@@ -68,23 +85,18 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity() {
         val url = params?.url
 
         title = params?.screenTitle.orEmpty()
-        binding.simpleWebview.let {
+        binding.webview.let {
             subscriptionJsMessaging.register(
                 it,
                 object : JsMessageCallback() {
                     override fun process(featureName: String, method: String, id: String, data: JSONObject) {
-                        when (method) {
-                            "backToSettings" -> backToSettings()
-                            else -> {
-                                // NOOP
-                            }
-                        }
+                        viewModel.processJsCallbackMessage(featureName, method, id, data)
                     }
                 },
             )
             it.webChromeClient = WebChromeClient()
             it.settings.apply {
-                userAgentString = userAgent.userAgent()
+                userAgentString = userAgent.userAgent(url)
                 javaScriptEnabled = true
                 domStorageEnabled = true
                 loadWithOverviewMode = true
@@ -99,8 +111,109 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity() {
         }
 
         url?.let {
-            binding.simpleWebview.loadUrl(it)
+            binding.webview.loadUrl(it)
         }
+
+        viewModel.start()
+
+        viewModel.commands()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { processCommand(it) }
+            .launchIn(lifecycleScope)
+
+        viewModel.currentPurchaseViewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach {
+            renderPurchaseState(it.purchaseState)
+        }.launchIn(lifecycleScope)
+    }
+
+    private fun processCommand(command: Command) {
+        when (command) {
+            is BackToSettings -> backToSettings()
+            is SendResponseToJs -> sendResponseToJs(command.data)
+            is SubscriptionSelected -> selectSubscription(command.id)
+        }
+    }
+
+    private fun renderPurchaseState(purchaseState: PurchaseStateView) {
+        when (purchaseState) {
+            is PurchaseStateView.InProgress -> {
+                binding.webview.gone()
+                binding.progress.show()
+            }
+            is PurchaseStateView.Inactive -> {
+                binding.webview.show()
+                binding.progress.gone()
+            }
+            is PurchaseStateView.Success -> {
+                binding.webview.show()
+                binding.progress.gone()
+                onPurchaseSuccess()
+            }
+            is PurchaseStateView.Recovered -> {
+                binding.webview.show()
+                binding.progress.gone()
+                onPurchaseRecovered()
+            }
+            is PurchaseStateView.Failure -> {
+                binding.webview.show()
+                binding.progress.gone()
+                onPurchaseFailure(purchaseState.message)
+            }
+        }
+    }
+
+    private fun onPurchaseRecovered() {
+        TextAlertDialogBuilder(this)
+            .setTitle(getString(string.purchaseCompletedTitle))
+            .setMessage(getString(string.purchaseRecoveredText))
+            .setPositiveButton(string.ok)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        finish()
+                    }
+                },
+            )
+            .show()
+    }
+
+    private fun onPurchaseSuccess() {
+        TextAlertDialogBuilder(this)
+            .setTitle(getString(string.purchaseCompletedTitle))
+            .setMessage(getString(string.purchaseCompletedText))
+            .setPositiveButton(string.ok)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        finish()
+                    }
+                },
+            )
+            .show()
+    }
+
+    private fun onPurchaseFailure(message: String) {
+        TextAlertDialogBuilder(this)
+            .setTitle(getString(string.purchaseErrorTitle))
+            .setMessage(message)
+            .setDestructiveButtons(true)
+            .setPositiveButton(string.ok)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        // NOOP
+                    }
+                },
+            )
+            .show()
+    }
+
+    private fun selectSubscription(id: String) {
+        viewModel.purchaseSubscription(this, id)
+    }
+
+    private fun sendResponseToJs(data: JsCallbackData) {
+        subscriptionJsMessaging.onResponse(data)
     }
 
     private fun backToSettings() {
@@ -118,8 +231,8 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity() {
     }
 
     override fun onBackPressed() {
-        if (binding.simpleWebview.canGoBack()) {
-            binding.simpleWebview.goBack()
+        if (binding.webview.canGoBack()) {
+            binding.webview.goBack()
         } else {
             super.onBackPressed()
         }

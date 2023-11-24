@@ -241,6 +241,7 @@ class RealSubscriptionsManager @Inject constructor(
         offerToken: String,
         isReset: Boolean,
     ) {
+        _currentPurchaseState.emit(CurrentPurchase.PreFlowInProgress)
         when (val response = prePurchaseFlow()) {
             is Success -> {
                 if (response.entitlements.isEmpty()) {
@@ -251,6 +252,7 @@ class RealSubscriptionsManager @Inject constructor(
                         isReset = isReset,
                     ).build()
                     logcat(LogPriority.DEBUG) { "Subs: external id is ${response.externalId}" }
+                    _currentPurchaseState.emit(CurrentPurchase.PreFlowFinished)
                     withContext(dispatcherProvider.main()) {
                         billingClientWrapper.launchBillingFlow(activity, billingParams)
                     }
@@ -290,7 +292,13 @@ class RealSubscriptionsManager @Inject constructor(
     override suspend fun getAuthToken(): AuthToken {
         return if (isUserAuthenticated()) {
             when (val response = getSubscriptionDataFromToken(authDataStore.authToken!!)) {
-                is Success -> return AuthToken.Success(authDataStore.authToken!!)
+                is Success -> {
+                    return if (response.entitlements.isEmpty()) {
+                        AuthToken.Failure("")
+                    } else {
+                        AuthToken.Success(authDataStore.authToken!!)
+                    }
+                }
                 is Failure -> {
                     when (response.message) {
                         "expired_token" -> {
@@ -371,6 +379,8 @@ sealed class SubscriptionsData {
 }
 
 sealed class CurrentPurchase {
+    object PreFlowInProgress : CurrentPurchase()
+    object PreFlowFinished : CurrentPurchase()
     object InProgress : CurrentPurchase()
     object Success : CurrentPurchase()
     object Recovered : CurrentPurchase()

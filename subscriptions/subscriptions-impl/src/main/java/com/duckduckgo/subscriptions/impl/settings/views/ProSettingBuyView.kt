@@ -27,11 +27,12 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BUY_URL
 import com.duckduckgo.subscriptions.impl.databinding.ViewSettingsBuyBinding
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingBuyViewModel.Command
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingBuyViewModel.Command.OpenBuyScreen
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingBuyViewModel.Factory
-import com.duckduckgo.subscriptions.impl.ui.SubscriptionsActivity.Companion.SubscriptionsScreenWithEmptyParams
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -90,7 +91,7 @@ class ProSettingBuyView @JvmOverloads constructor(
     private fun processCommands(command: Command) {
         when (command) {
             is OpenBuyScreen -> {
-                globalActivityStarter.start(context, SubscriptionsScreenWithEmptyParams)
+                globalActivityStarter.start(context, SubscriptionsWebViewActivityWithParams(url = BUY_URL, "Buy Subscription"))
             }
         }
     }
