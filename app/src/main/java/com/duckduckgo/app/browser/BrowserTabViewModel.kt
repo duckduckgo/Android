@@ -135,6 +135,9 @@ import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.privacy.config.api.*
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupManager
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupViewState
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
@@ -216,6 +219,7 @@ class BrowserTabViewModel @Inject constructor(
     private val syncEngine: SyncEngine,
     private val cameraHardwareChecker: CameraHardwareChecker,
     private val androidBrowserConfig: AndroidBrowserConfigFeature,
+    private val privacyProtectionsPopupManager: PrivacyProtectionsPopupManager,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -275,6 +279,7 @@ class BrowserTabViewModel @Inject constructor(
         val canPrintPage: Boolean = false,
         val showAutofill: Boolean = false,
         val browserError: WebViewErrorResponse = OMITTED,
+        val privacyProtectionsPopupViewState: PrivacyProtectionsPopupViewState = PrivacyProtectionsPopupViewState(visible = false),
     )
 
     sealed class HighlightableButton {
@@ -754,6 +759,12 @@ class BrowserTabViewModel @Inject constructor(
                 .flowOn(dispatchers.io())
                 .launchIn(viewModelScope)
         }
+
+        privacyProtectionsPopupManager.viewState
+            .onEach { popupViewState ->
+                browserViewState.value = currentBrowserViewState().copy(privacyProtectionsPopupViewState = popupViewState)
+            }
+            .launchIn(viewModelScope)
     }
 
     fun loadData(
@@ -1371,6 +1382,10 @@ class BrowserTabViewModel @Inject constructor(
         isLinkOpenedInNewTab = false
 
         automaticSavedLoginsMonitor.clearAutoSavedLoginId(tabId)
+
+        site?.run {
+            privacyProtectionsPopupManager.onPageLoaded(url, httpErrorCodeEvents)
+        }
     }
 
     private fun setAdClickActiveTabData(url: String?) {
@@ -2360,6 +2375,10 @@ class BrowserTabViewModel @Inject constructor(
         } else {
             command.value = NavigationCommand.Refresh
         }
+    }
+
+    fun onPrivacyProtectionsPopupUiEvent(event: PrivacyProtectionsPopupUiEvent) {
+        privacyProtectionsPopupManager.onUiEvent(event)
     }
 
     private fun initializeViewStates() {
