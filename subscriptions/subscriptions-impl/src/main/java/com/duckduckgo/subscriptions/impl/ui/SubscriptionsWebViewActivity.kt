@@ -42,9 +42,11 @@ import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.subscriptions.impl.R.string
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionsWebviewBinding
 import com.duckduckgo.subscriptions.impl.ui.AddDeviceActivity.Companion.AddDeviceScreenWithEmptyParams
+import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionActivity.Companion.RestoreSubscriptionScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.ActivateOnAnotherDevice
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.BackToSettings
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.RestoreSubscription
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SendResponseToJs
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SubscriptionSelected
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView
@@ -141,6 +143,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity() {
             is SendResponseToJs -> sendResponseToJs(command.data)
             is SubscriptionSelected -> selectSubscription(command.id)
             is ActivateOnAnotherDevice -> activateOnAnotherDevice()
+            is RestoreSubscription -> restoreSubscription()
         }
     }
 
@@ -232,6 +235,10 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity() {
 
     private fun activateOnAnotherDevice() {
         globalActivityStarter.start(this, AddDeviceScreenWithEmptyParams)
+    }
+
+    private fun restoreSubscription() {
+        globalActivityStarter.start(this, RestoreSubscriptionScreenWithEmptyParams)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
