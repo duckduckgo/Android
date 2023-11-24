@@ -28,17 +28,53 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:importantForAccessibility="no"
-        android:padding="40dp"
+        android:padding="60dp"
         android:scaleType="fitXY"
         app:srcCompat="@drawable/frame" />
 
-    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/barcodeCta"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/oneLineItemHeight"
         android:layout_gravity="bottom|end"
-        app:trailingIcon="@drawable/ic_keyboard_24"
-        app:primaryText="@string/login_screen_enter_code_cta"/>
+        android:layout_marginBottom="20dp"
+        android:layout_marginEnd="20dp"
+        android:background="@drawable/background_rounded_surface">
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/primaryText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:layout_marginEnd="@dimen/keyline_1"
+            android:textColor="@color/primary_text_color_selector"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:typography="h5"
+            android:text="@string/login_screen_enter_code_cta"
+            tools:ignore="InvalidColorAttribute" />
+
+        <FrameLayout
+            android:id="@+id/trailingIconContainer"
+            android:layout_width="@dimen/listItemTrailingIconWidth"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/primaryText"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/trailingIcon"
+                android:layout_width="@dimen/listItemImageMediumSize"
+                android:layout_height="@dimen/listItemImageMediumSize"
+                android:layout_gravity="center"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                app:srcCompat="@drawable/ic_keyboard_24"
+                tools:ignore="ContentDescription" />
+        </FrameLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/cameraStatusContainer"
