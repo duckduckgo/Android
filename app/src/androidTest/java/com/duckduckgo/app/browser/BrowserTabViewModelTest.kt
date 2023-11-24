@@ -142,6 +142,8 @@ import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER_VALUE
 import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupManager
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupViewState
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
@@ -407,6 +409,8 @@ class BrowserTabViewModelTest {
 
     private val mockToggle: Toggle = mock()
 
+    private val mockPrivacyProtectionsPopupManager: PrivacyProtectionsPopupManager = mock()
+
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
@@ -476,6 +480,7 @@ class BrowserTabViewModelTest {
         whenever(mockContentBlocking.isAnException(anyString())).thenReturn(false)
         whenever(fireproofDialogsEventHandler.event).thenReturn(fireproofDialogsEventHandlerLiveData)
         whenever(cameraHardwareChecker.hasCameraHardware()).thenReturn(true)
+        whenever(mockPrivacyProtectionsPopupManager.viewState).thenReturn(flowOf(PrivacyProtectionsPopupViewState(visible = false)))
 
         testee = BrowserTabViewModel(
             statisticsUpdater = mockStatisticsUpdater,
@@ -531,6 +536,7 @@ class BrowserTabViewModelTest {
             sitePermissionsManager = mockSitePermissionsManager,
             cameraHardwareChecker = cameraHardwareChecker,
             androidBrowserConfig = androidBrowserConfig,
+            privacyProtectionsPopupManager = mockPrivacyProtectionsPopupManager,
         )
 
         testee.loadData("abc", null, false, false)
