@@ -1499,7 +1499,7 @@ class BrowserTabViewModelTest {
         givenOneActiveTabSelected()
         givenInvalidatedGlobalLayout()
 
-        testee.onRefreshRequested()
+        testee.onRefreshRequested(triggeredByUser = true)
 
         assertCommandIssued<Command.OpenInNewTab> {
             assertNull(sourceTabId)
@@ -1511,7 +1511,7 @@ class BrowserTabViewModelTest {
         givenOneActiveTabSelected()
         givenInvalidatedGlobalLayout()
 
-        testee.onRefreshRequested()
+        testee.onRefreshRequested(triggeredByUser = true)
 
         runTest {
             verify(mockTabRepository).deleteTabAndSelectSource(selectedTabLiveData.value!!.tabId)
@@ -1520,7 +1520,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenRefreshRequestedWithBrowserGlobalLayoutThenRefresh() {
-        testee.onRefreshRequested()
+        testee.onRefreshRequested(triggeredByUser = true)
         assertCommandIssued<NavigationCommand.Refresh>()
     }
 
@@ -1528,7 +1528,7 @@ class BrowserTabViewModelTest {
     fun whenRefreshRequestedWithQuerySearchThenFireQueryChangePixelZero() {
         loadUrl("query")
 
-        testee.onRefreshRequested()
+        testee.onRefreshRequested(triggeredByUser = true)
 
         verify(mockPixel).fire("rq_0")
     }
@@ -1537,7 +1537,7 @@ class BrowserTabViewModelTest {
     fun whenRefreshRequestedWithUrlThenDoNotFireQueryChangePixel() {
         loadUrl("https://example.com")
 
-        testee.onRefreshRequested()
+        testee.onRefreshRequested(triggeredByUser = true)
 
         verify(mockPixel, never()).fire("rq_0")
     }
