@@ -34,6 +34,7 @@ interface SpecialUrlDetector {
             val appIntent: Intent? = null,
             val excludedComponents: List<ComponentName>? = null,
             val uriString: String,
+            val storePackage: String? = null,
         ) : UrlType()
 
         class NonHttpAppLink(

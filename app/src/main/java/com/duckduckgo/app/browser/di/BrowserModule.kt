@@ -25,6 +25,7 @@ import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.addtohome.AddToHomeSystemCapabilityDetector
+import com.duckduckgo.app.browser.applinks.SamsungStoreLinkHandler
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.AppThirdPartyCookieManager
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
@@ -174,8 +175,9 @@ class BrowserModule {
         packageManager: PackageManager,
         ampLinks: AmpLinks,
         trackingParameters: TrackingParameters,
+        samsungStoreLinkHandler: SamsungStoreLinkHandler,
         appBuildConfig: AppBuildConfig,
-    ): SpecialUrlDetector = SpecialUrlDetectorImpl(packageManager, ampLinks, trackingParameters, appBuildConfig)
+    ): SpecialUrlDetector = SpecialUrlDetectorImpl(packageManager, ampLinks, trackingParameters, samsungStoreLinkHandler, appBuildConfig)
 
     @Provides
     fun webViewRequestInterceptor(
