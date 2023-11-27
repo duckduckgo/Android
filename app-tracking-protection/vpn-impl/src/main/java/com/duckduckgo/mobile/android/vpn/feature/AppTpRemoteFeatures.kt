@@ -68,7 +68,9 @@ class AppTpRemoteFeaturesStore @Inject constructor(
     private val preferences: SharedPreferences by lazy {
         vpnSharedPreferencesProvider.getSharedPreferences(PREFS_FILENAME, multiprocess = true, migrate = false)
     }
-    private val stateAdapter: JsonAdapter<State> = moshi.newBuilder().add(KotlinJsonAdapterFactory()).build().adapter(State::class.java)
+    private val stateAdapter: JsonAdapter<State> by lazy {
+        moshi.newBuilder().add(KotlinJsonAdapterFactory()).build().adapter(State::class.java)
+    }
     private val listener = OnSharedPreferenceChangeListener { preferences, key ->
         coroutineScope.launch(dispatcherProvider.io()) {
             key?.let {
