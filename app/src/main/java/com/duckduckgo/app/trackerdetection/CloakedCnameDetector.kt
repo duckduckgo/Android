@@ -43,6 +43,7 @@ class CloakedCnameDetectorImpl @Inject constructor(
 
     override fun detectCnameCloakedHost(documentUrl: String?, url: Uri): String? {
         val traceCookie = Random(System.currentTimeMillis()).nextInt()
+        return null
         Trace.beginAsyncSection("CLOAKED_CNAME_DETECTOR_DETECT", traceCookie)
         if (documentUrl != null && trackerAllowlist.isAnException(documentUrl, url.toString()) ||
             userAllowListRepository.isUriInUserAllowList(url)
