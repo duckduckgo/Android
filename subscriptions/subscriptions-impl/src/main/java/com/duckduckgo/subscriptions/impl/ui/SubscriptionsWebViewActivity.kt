@@ -23,6 +23,7 @@ import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebViewClient
 import android.widget.Toast
+import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -31,6 +32,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
@@ -38,10 +40,12 @@ import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
+import com.duckduckgo.mobile.android.R
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.subscriptions.impl.R.string
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BUY_URL
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionsWebviewBinding
 import com.duckduckgo.subscriptions.impl.ui.AddDeviceActivity.Companion.AddDeviceScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionActivity.Companion.RestoreSubscriptionScreenWithEmptyParams
@@ -86,18 +90,20 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity() {
 
     private val binding: ActivitySubscriptionsWebviewBinding by viewBinding()
 
+    private var url: String? = null
+
     private val toolbar
-        get() = binding.includeToolbar.toolbar
+        get() = binding.toolbar
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContentView(binding.root)
-        setupToolbar(toolbar)
-
         val params = intent.getActivityParams(SubscriptionsWebViewActivityWithParams::class.java)
-        val url = params?.url
+        url = params?.url
+
+        setContentView(binding.root)
+        setupInternalToolbar(toolbar)
 
         title = params?.screenTitle.orEmpty()
         binding.webview.let {
@@ -140,6 +146,23 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity() {
         viewModel.currentPurchaseViewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).distinctUntilChanged().onEach {
             renderPurchaseState(it.purchaseState)
         }.launchIn(lifecycleScope)
+    }
+
+    private fun setupInternalToolbar(toolbar: Toolbar) {
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        if (url == BUY_URL) {
+            supportActionBar?.setDisplayShowTitleEnabled(false)
+            binding.logoToolbar.show()
+            binding.titleToolbar.show()
+            toolbar.setNavigationIcon(R.drawable.ic_close_24)
+            toolbar.setTitle(null)
+        } else {
+            supportActionBar?.setDisplayShowTitleEnabled(true)
+            toolbar.setNavigationIcon(R.drawable.ic_arrow_left_24)
+            binding.logoToolbar.hide()
+            binding.titleToolbar.hide()
+        }
     }
 
     private fun processCommand(command: Command) {
