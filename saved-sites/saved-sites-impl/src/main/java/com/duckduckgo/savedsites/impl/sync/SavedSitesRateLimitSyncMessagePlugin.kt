@@ -24,8 +24,8 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 @ContributesMultibinding(scope = ActivityScope::class)
-class SaveSitesRateLimitSyncMessagePlugin @Inject constructor() : SyncMessagePlugin {
+class SavedSitesRateLimitSyncMessagePlugin @Inject constructor() : SyncMessagePlugin {
     override fun getView(context: Context): View {
-        return SaveSiteRateLimitView(context)
+        return SavedSiteRateLimitView(context)
     }
 }

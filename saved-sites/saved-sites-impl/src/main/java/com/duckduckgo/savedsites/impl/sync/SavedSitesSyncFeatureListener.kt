@@ -66,12 +66,16 @@ class AppSavedSitesSyncFeatureListener @Inject constructor(
 
     private fun triggerNotification() {
         notificationManager.notify(
-            666,
+            SYNC_PAUSED_SAVED_SITES_NOTIFICATION_ID,
             notificationBuilder.buildRateLimitNotification(context),
         )
     }
 
     private fun cancelNotification() {
-        notificationManager.cancel(666)
+        notificationManager.cancel(SYNC_PAUSED_SAVED_SITES_NOTIFICATION_ID)
+    }
+
+    companion object {
+        private const val SYNC_PAUSED_SAVED_SITES_NOTIFICATION_ID = 5451
     }
 }

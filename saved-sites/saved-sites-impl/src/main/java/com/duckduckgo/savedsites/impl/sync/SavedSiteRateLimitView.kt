@@ -45,7 +45,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ViewScope::class)
-class SaveSiteRateLimitView @JvmOverloads constructor(
+class SavedSiteRateLimitView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,

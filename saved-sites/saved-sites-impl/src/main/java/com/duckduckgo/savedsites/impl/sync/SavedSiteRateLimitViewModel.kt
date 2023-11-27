@@ -16,6 +16,7 @@
 
 package com.duckduckgo.savedsites.impl.sync
 
+import android.annotation.SuppressLint
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -33,6 +34,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+@SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 class SavedSiteRateLimitViewModel(
     private val savedSitesSyncStore: SavedSitesSyncStore,
     private val dispatcherProvider: DispatcherProvider,

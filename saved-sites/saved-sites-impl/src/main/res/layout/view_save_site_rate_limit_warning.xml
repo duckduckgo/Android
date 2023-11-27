@@ -15,16 +15,10 @@
   ~ limitations under the License.
   -->
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:app="http://schemas.android.com/apk/res-auto"
-             android:layout_width="match_parent"
-             android:layout_height="wrap_content">
-
-    <com.duckduckgo.common.ui.view.InfoPanel
-        android:id="@+id/saveSiteRateLimitWarning"
-        style="@style/Widget.DuckDuckGo.InfoPanel"
-        app:panelBackground="@drawable/info_panel_alert_background"
-        app:panelDrawable="@drawable/ic_info_panel_alert"
-        android:layout_margin="16dp"/>
-
-</FrameLayout>
+<com.duckduckgo.common.ui.view.InfoPanel xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/saveSiteRateLimitWarning"
+    style="@style/Widget.DuckDuckGo.InfoPanel"
+    android:layout_margin="@dimen/keyline_4"
+    app:panelBackground="@drawable/info_panel_alert_background"
+    app:panelDrawable="@drawable/ic_info_panel_alert" />
