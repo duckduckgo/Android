@@ -26,6 +26,7 @@ import com.duckduckgo.app.brokensite.api.BrokenSiteSender
 import com.duckduckgo.app.brokensite.model.BrokenSite
 import com.duckduckgo.app.brokensite.model.BrokenSiteCategory
 import com.duckduckgo.app.brokensite.model.BrokenSiteCategory.*
+import com.duckduckgo.app.brokensite.model.ReportFlow as BrokenSiteModelReportFlow
 import com.duckduckgo.app.brokensite.model.SiteProtectionsState
 import com.duckduckgo.app.brokensite.model.SiteProtectionsState.DISABLED
 import com.duckduckgo.app.brokensite.model.SiteProtectionsState.DISABLED_BY_REMOTE_CONFIG
@@ -34,6 +35,9 @@ import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow
+import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.DASHBOARD
+import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
@@ -102,6 +106,7 @@ class BrokenSiteViewModel @Inject constructor(
     private var errorCodes: Array<out String> = emptyArray()
     private var httpErrorCodes: String = ""
     private var isDesktopMode: Boolean = false
+    private var reportFlow: ReportFlow? = null
 
     var shuffledCategories = mutableListOf<BrokenSiteCategory>()
 
@@ -122,6 +127,7 @@ class BrokenSiteViewModel @Inject constructor(
         errorCodes: Array<out String>,
         httpErrorCodes: String,
         isDesktopMode: Boolean,
+        reportFlow: ReportFlow?,
     ) {
         this.url = url
         this.blockedTrackers = blockedTrackers
@@ -134,6 +140,7 @@ class BrokenSiteViewModel @Inject constructor(
         this.errorCodes = errorCodes
         this.httpErrorCodes = httpErrorCodes
         this.isDesktopMode = isDesktopMode
+        this.reportFlow = reportFlow
 
         loadProtectionsState()
     }
@@ -252,6 +259,7 @@ class BrokenSiteViewModel @Inject constructor(
             errorCodes = jsonStringListAdapter.toJson(errorCodes.toList()).toString(),
             httpErrorCodes = httpErrorCodes,
             loginSite = loginSite,
+            reportFlow = reportFlow?.mapToBrokenSiteModelReportFlow(),
         )
     }
 
@@ -263,4 +271,9 @@ class BrokenSiteViewModel @Inject constructor(
 
 private fun MutableLiveData<ViewState>.setProtectionsState(state: SiteProtectionsState?) {
     value = value!!.copy(protectionsState = state)
+}
+
+private fun ReportFlow.mapToBrokenSiteModelReportFlow(): BrokenSiteModelReportFlow = when (this) {
+    MENU -> BrokenSiteModelReportFlow.MENU
+    DASHBOARD -> BrokenSiteModelReportFlow.DASHBOARD
 }

@@ -23,27 +23,27 @@
     <string name="managementDisabledModeSubtitle">Για προστασία των «Συνδέσεών» σας απαιτείται μοτίβο κλειδώματος συσκευής, PIN ή βιομετρικά στοιχεία.</string>
     <string name="managementDisabledModeTitle">Ασφαλίστε τη συσκευή σας για να αποθηκεύετε τις «Συνδέσεις»</string>
 
-    <string name="saveLoginDialogButtonSave">Αποθήκευση σύνδεσης</string>
+    <string name="saveLoginDialogButtonSave">Αποθήκευση κωδικού πρόσβασης</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Αποθήκευση κωδικού πρόσβασης</string>
-    <string name="saveLoginDialogNotNow">Όχι τώρα</string>
-    <string name="saveLoginDialogSubtitle">Οι συνδέσεις αποθηκεύονται με ασφάλεια στη συσκευή σας και η διαχείρισή τους γίνεται από το μενού Συνδέσεις, στις Ρυθμίσεις.</string>
-    <string name="saveLoginDialogTitle">Θέλετε να αποθηκεύσει το DuckDuckGo τη σύνδεσή σας;</string>
+    <string name="saveLoginDialogNotNow">Να μην αποθηκευτεί</string>
+    <string name="saveLoginDialogSubtitle">Οι κωδικοί πρόσβασης αποθηκεύονται με ασφάλεια στη συσκευή σας στο μενού Συνδέσεις.</string>
+    <string name="saveLoginDialogTitle">Θέλετε το DuckDuckGo να αποθηκεύσει τον κωδικό πρόσβασής σας;</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Περισσότερες επιλογές</string>
 
-    <string name="useSavedLoginDialogTitle">Χρήση αποθηκευμένων στοιχείων σύνδεσης;</string>
+    <string name="useSavedLoginDialogTitle">Χρήση αποθηκευμένου κωδικού πρόσβασης;</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Κωδικός πρόσβασης για %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Κωδικός πρόσβασης για τον ιστότοπο</string>
     <string name="useSavedLoginDialogGroupThisWebsite">Από αυτόν τον ιστότοπο</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Από %1$s</string>
 
     <string name="updateLoginDialogButtonUpdatePassword">Ενημέρωση κωδικού πρόσβασης</string>
-    <string name="updateLoginDialogButtonNotNow">Όχι τώρα</string>
+    <string name="updateLoginDialogButtonNotNow">Να μην αποθηκευτεί</string>
 
     <string name="updateLoginDialogTitleUpdateUsername">Ενημέρωση ονόματος χρήστη;</string>
     <string name="updateLoginDialogButtonUpdateUsername">Ενημέρωση ονόματος χρήστη</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Ενημέρωση κωδικού πρόσβασης για \n%1$s;</string>
-    <string name="updateLoginUpdatePasswordExplanation">Το DuckDuckGo θα ενημερώσει αυτήν την αποθηκευμένη σύνδεση στη συσκευή σας.</string>
+    <string name="updateLoginUpdatePasswordExplanation">Το DuckDuckGo θα ενημερώσει αυτόν τον αποθηκευμένο κωδικό πρόσβασης στη συσκευή σας.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Κλείσιμο διαλόγου αυτόματης συμπλήρωσης</string>
 
@@ -60,12 +60,12 @@
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Τελευταία ενημέρωση σύνδεσης %1$s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Αποθήκευση και αυτόματη συμπλήρωση στοιχείων σύνδεσης</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Τα στοιχεία σύνδεσης αποθηκεύονται με ασφάλεια στη συσκευή σας</string>
     <string name="credentialManagementViewMenuEdit">Επεξεργασία</string>
     <string name="credentialManagementViewMenuDelete">Διαγραφή</string>
 
     <string name="credentialManagementSuggestionsLabel">Προτεινόμενο</string>
     <string name="credentialManagementNoLoginsSavedTitle">Δεν έχουν αποθηκευτεί ακόμα στοιχεία σύνδεσης</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Τα στοιχεία σύνδεσης αποθηκεύονται με ασφάλεια στη συσκευή σας.</string>
 
     <string name="autofillManagementAddLogin">Προσθήκη στοιχείων σύνδεσης</string>
     <string name="autofillManagementSearchLogins">Αναζήτηση στοιχείων σύνδεσης</string>
@@ -79,9 +79,9 @@
     <string name="autofillManagementUsernameCopied">Το όνομα χρήστη αντιγράφηκε</string>
     <string name="autofillManagementPasswordCopied">Ο κωδικός πρόσβασης αντιγράφηκε</string>
 
-    <string name="autofill_password_generation_offer_title">Χρήση κωδικού πρόσβασης που δημιουργήθηκε από το DuckDuckGo;</string>
-    <string name="autofill_password_generation_offer_message">Ο κωδικός πρόσβασης θα αποθηκευτεί στις Συνδέσεις.</string>
-    <string name="autofill_password_generation_offer_accept">Χρήση του κωδικού πρόσβασης που δημιουργήθηκε</string>
+    <string name="autofill_password_generation_offer_title">Χρησιμοποιείτε ισχυρό κωδικό πρόσβασης από το DuckDuckGo;</string>
+    <string name="autofill_password_generation_offer_message">Οι κωδικοί πρόσβασης αποθηκεύονται με ασφάλεια στη συσκευή σας στο μενού Συνδέσεις.</string>
+    <string name="autofill_password_generation_offer_accept">Χρησιμοποιήστε ισχυρό κωδικό πρόσβασης</string>
     <string name="autofill_password_generation_offer_decline">Δημιουργία δικού μου</string>
 
     <string name="deviceNotSupportedTitle">Η συσκευή δεν υποστηρίζεται</string>

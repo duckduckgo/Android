@@ -37,7 +37,6 @@ dependencies {
     implementation project(':statistics')
     implementation project(':content-scope-scripts-api')
 
-    implementation Kotlin.stdlib.jdk7
     implementation JakeWharton.timber
     implementation Square.retrofit2.converter.moshi
 

@@ -126,6 +126,10 @@
     <!-- VPN settings -->
     <string name="netpVpnSettingKillSwitch">Always On</string>
     <string name="netpVpnSettingAlwaysOn">Always On</string>
+    <string name="netpManageRecentAppsProtectionAllowUnrestrictedBattTitle">Allow Unrestricted App Battery Usage</string>
+    <string name="netpManageRecentAppsProtectionAllowUnrestrictedBattByline">In App Battery Settings, allow Unrestricted usage to prevent Android from disabling the VPN in the background</string>
+    <string name="netpManageRecentAppsProtectionUnrestrictedBattTitle">App Battery Usage Is Unrestricted</string>
+    <string name="netpManageRecentAppsProtectionUnrestrictedBattByline">In App Battery Settings, this prevents Android from disabling the VPN in the background</string>
     <string name="netpVpnSettingAlwaysOnByline">Automatically restore a VPN connection after interruption</string>
     <string name="netpVpnSettingExcludeLocalNetworks">Exclude Local Networks</string>
     <string name="netpVpnSettingExcludeLocalNetworksByline">Let local traffic bypass the VPN and connect to devices on your local network, like a printer</string>

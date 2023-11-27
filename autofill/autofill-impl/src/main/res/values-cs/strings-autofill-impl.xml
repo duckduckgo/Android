@@ -23,27 +23,27 @@
     <string name="managementDisabledModeSubtitle">Na ochranu přihlašovacích údajů se vyžaduje gesto zámku obrazovky, PIN nebo biometrické ověření.</string>
     <string name="managementDisabledModeTitle">Zabezpeč si zařízení, ať si můžeš ukládat přihlašovací údaje</string>
 
-    <string name="saveLoginDialogButtonSave">Uložit přihlašovací údaje</string>
+    <string name="saveLoginDialogButtonSave">Uložit heslo</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Uložit heslo</string>
-    <string name="saveLoginDialogNotNow">Teď ne</string>
-    <string name="saveLoginDialogSubtitle">Přihlašovací údaje se bezpečně ukládají do tvého zařízení a dají se spravovat v nabídce Přihlášení v Nastavení.</string>
-    <string name="saveLoginDialogTitle">Má DuckDuckGo uložit přihlašovací údaje?</string>
+    <string name="saveLoginDialogNotNow">Neukládat</string>
+    <string name="saveLoginDialogSubtitle">Hesla jsou bezpečně uložená v zařízení v nabídce Přihlášení.</string>
+    <string name="saveLoginDialogTitle">Má DuckDuckGo uložit heslo?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Další možnosti</string>
 
-    <string name="useSavedLoginDialogTitle">Použít uložené přihlášení?</string>
+    <string name="useSavedLoginDialogTitle">Použít uložené heslo?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Heslo pro %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Heslo pro web</string>
     <string name="useSavedLoginDialogGroupThisWebsite">Z této webové stránky</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Ze stránky %1$ss</string>
 
     <string name="updateLoginDialogButtonUpdatePassword">Aktualizuj si heslo</string>
-    <string name="updateLoginDialogButtonNotNow">Teď ne</string>
+    <string name="updateLoginDialogButtonNotNow">Neukládat</string>
 
     <string name="updateLoginDialogTitleUpdateUsername">Aktualizovat uživatelské jméno?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Aktualizovat uživatelské jméno</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Aktualizovat heslo pro \n%1$s?</string>
-    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo zaktualizuje toto uložené přihlášení ve tvém zařízení.</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo aktualizuje tohle uložené heslo ve tvém zařízení.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Zavřít dialogové okno Automatické vyplňování</string>
 
@@ -60,12 +60,12 @@
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Přihlášení naposledy aktualizováno %1$s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Uložit a automaticky vyplnit přihlášení</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Přihlašovací údaje se bezpečně ukládají do tvého zařízení</string>
     <string name="credentialManagementViewMenuEdit">Upravit</string>
     <string name="credentialManagementViewMenuDelete">Smazat</string>
 
     <string name="credentialManagementSuggestionsLabel">Navrhované</string>
     <string name="credentialManagementNoLoginsSavedTitle">Zatím nemáš uložené žádné přihlašovací údaje</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Přihlašovací údaje se bezpečně ukládají do tvého zařízení.</string>
 
     <string name="autofillManagementAddLogin">Přidat přihlášení</string>
     <string name="autofillManagementSearchLogins">Hledání přihlašovacích údajů</string>
@@ -79,9 +79,9 @@
     <string name="autofillManagementUsernameCopied">Uživatelské jméno zkopírováno</string>
     <string name="autofillManagementPasswordCopied">Heslo zkopírováno</string>
 
-    <string name="autofill_password_generation_offer_title">Použít heslo vygenerované DuckDuckGo?</string>
-    <string name="autofill_password_generation_offer_message">Heslo se uloží do části Přihlášení.</string>
-    <string name="autofill_password_generation_offer_accept">Použít vygenerované heslo</string>
+    <string name="autofill_password_generation_offer_title">Použít silné heslo od DuckDuckGo?</string>
+    <string name="autofill_password_generation_offer_message">Hesla jsou bezpečně uložená v zařízení v nabídce Přihlášení.</string>
+    <string name="autofill_password_generation_offer_accept">Použít silné heslo</string>
     <string name="autofill_password_generation_offer_decline">Vytvořit vlastní</string>
 
     <string name="deviceNotSupportedTitle">Zařízení není podporované</string>

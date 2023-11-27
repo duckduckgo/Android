@@ -16,20 +16,28 @@
 
 package com.duckduckgo.app.statistics.api
 
-import com.duckduckgo.app.statistics.Variant
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.autofill.api.email.EmailManager
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.experiments.api.VariantManager
 import io.reactivex.Observable
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestScope
 import okhttp3.ResponseBody
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.*
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
+@ExperimentalCoroutinesApi
 class StatisticsRequesterTest {
 
     private var mockStatisticsStore: StatisticsDataStore = mock()
@@ -43,15 +51,27 @@ class StatisticsRequesterTest {
             return listOf()
         }
     }
-    private var testee: StatisticsRequester = StatisticsRequester(mockStatisticsStore, mockService, mockVariantManager, plugins, mockEmailManager)
 
     @get:Rule
-    @Suppress("unused")
     val schedulers = InstantSchedulersRule()
+
+    @get:Rule
+    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
+
+    private var testee: StatisticsRequester = StatisticsRequester(
+        mockStatisticsStore,
+        mockService,
+        mockVariantManager,
+        plugins,
+        mockEmailManager,
+        TestScope(),
+        coroutineTestRule.testDispatcherProvider,
+    )
 
     @Before
     fun before() {
-        whenever(mockVariantManager.getVariant()).thenReturn(Variant("ma", 100.0, filterBy = { true }))
+        whenever(mockVariantManager.getVariantKey()).thenReturn("ma")
+        whenever(mockVariantManager.defaultVariantKey()).thenReturn("")
         whenever(mockService.atb(any(), any())).thenReturn(Observable.just(ATB))
         whenever(mockService.updateSearchAtb(any(), any(), any(), any())).thenReturn(Observable.just(Atb(NEW_ATB)))
         whenever(mockService.exti(any(), any())).thenReturn(Observable.just(mockResponseBody))
@@ -66,11 +86,27 @@ class StatisticsRequesterTest {
     }
 
     @Test
+    fun whenUpdateVersionPresentDuringRefreshSearchRetentionThenPreviousVariantIsReplacedWithDefaultVariant() {
+        configureStoredStatistics()
+        whenever(mockService.updateSearchAtb(any(), any(), any(), eq(0))).thenReturn(Observable.just(UPDATE_ATB))
+        testee.refreshSearchRetentionAtb()
+        verify(mockStatisticsStore).variant = ""
+    }
+
+    @Test
     fun whenUpdateVersionPresentDuringRefreshAppRetentionThenPreviousAtbIsReplacedWithUpdateVersion() {
         configureStoredStatistics()
         whenever(mockService.updateAppAtb(any(), any(), any(), eq(0))).thenReturn(Observable.just(UPDATE_ATB))
         testee.refreshAppRetentionAtb()
         verify(mockStatisticsStore).atb = Atb(UPDATE_ATB.updateVersion!!)
+    }
+
+    @Test
+    fun whenUpdateVersionPresentDuringRefreshAppRetentionThenPreviousVariantIsReplacedWithDefaultVariant() {
+        configureStoredStatistics()
+        whenever(mockService.updateAppAtb(any(), any(), any(), eq(0))).thenReturn(Observable.just(UPDATE_ATB))
+        testee.refreshAppRetentionAtb()
+        verify(mockStatisticsStore).variant = ""
     }
 
     @Test
@@ -137,6 +173,7 @@ class StatisticsRequesterTest {
     @Test
     fun whenAlreadyInitializedWithLegacyAtbThenInitializationRemovesLegacyVariant() {
         configureStoredStatistics()
+        whenever(mockVariantManager.defaultVariantKey()).thenReturn("")
         whenever(mockStatisticsStore.atb).thenReturn(Atb("v123ma"))
         testee.initializeAtb()
         verify(mockStatisticsStore).atb = Atb("v123")

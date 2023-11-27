@@ -30,7 +30,6 @@ dependencies {
     implementation project(':common-utils')
     implementation project(':feature-toggles-api')
 
-    implementation Kotlin.stdlib.jdk7
     implementation AndroidX.appCompat
     implementation Google.android.material
     implementation AndroidX.constraintLayout
@@ -40,6 +39,7 @@ dependencies {
 
     // Testing dependencies
     testImplementation project(':feature-toggles-test')
+    testImplementation project(':experiments-api')
     testImplementation project(':common-test')
     testImplementation project(':app-build-config-api')
     testImplementation project(':privacy-config-api')

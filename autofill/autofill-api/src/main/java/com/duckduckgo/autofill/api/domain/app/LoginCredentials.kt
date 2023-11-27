@@ -17,6 +17,7 @@
 package com.duckduckgo.autofill.api.domain.app
 
 import android.os.Parcelable
+import java.io.Serializable
 import kotlinx.parcelize.Parcelize
 
 /**
@@ -31,7 +32,7 @@ data class LoginCredentials(
     val domainTitle: String? = null,
     val notes: String? = null,
     val lastUpdatedMillis: Long? = null,
-) : Parcelable {
+) : Parcelable, Serializable {
     override fun toString(): String {
         return """
             LoginCredentials(

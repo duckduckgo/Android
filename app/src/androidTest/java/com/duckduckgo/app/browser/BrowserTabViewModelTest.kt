@@ -56,6 +56,7 @@ import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource
+import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.browser.history.NavigationHistoryEntry
 import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler
@@ -104,7 +105,6 @@ import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.survey.api.SurveyRepository
-import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.notification.SurveyNotificationScheduler
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -140,7 +140,11 @@ import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.site.permissions.api.SitePermissionsManager
+import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
+import com.duckduckgo.sync.api.engine.SyncEngine
+import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import dagger.Lazy
@@ -162,6 +166,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
+import org.json.JSONObject
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -232,9 +237,6 @@ class BrowserTabViewModelTest {
 
     @Mock
     private lateinit var mockAddToHomeCapabilityDetector: AddToHomeCapabilityDetector
-
-    @Mock
-    private lateinit var mockSurveyDao: SurveyDao
 
     @Mock
     private lateinit var mockDismissedCtaDao: DismissedCtaDao
@@ -387,6 +389,10 @@ class BrowserTabViewModelTest {
 
     private val mockDeviceInfo: DeviceInfo = mock()
 
+    private val mockSitePermissionsManager: SitePermissionsManager = mock()
+
+    private val mockSyncEngine: SyncEngine = mock()
+
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
@@ -417,7 +423,6 @@ class BrowserTabViewModelTest {
         ctaViewModel = CtaViewModel(
             appInstallStore = mockAppInstallStore,
             pixel = mockPixel,
-            surveyDao = mockSurveyDao,
             widgetCapabilities = mockWidgetCapabilities,
             dismissedCtaDao = mockDismissedCtaDao,
             userAllowListRepository = mockUserAllowListRepository,
@@ -505,7 +510,9 @@ class BrowserTabViewModelTest {
             autofillFireproofDialogSuppressor = autofillFireproofDialogSuppressor,
             automaticSavedLoginsMonitor = automaticSavedLoginsMonitor,
             surveyNotificationScheduler = mockSurveyNotificationScheduler,
+            syncEngine = mockSyncEngine,
             device = mockDeviceInfo,
+            sitePermissionsManager = mockSitePermissionsManager,
         )
 
         testee.loadData("abc", null, false, false)
@@ -515,7 +522,6 @@ class BrowserTabViewModelTest {
     @ExperimentalCoroutinesApi
     @After
     fun after() {
-        ctaViewModel.isFireButtonPulseAnimationFlowEnabled.close()
         dismissedCtaDaoChannel.close()
         bookmarksListFlow.close()
         favoriteListFlow.close()
@@ -670,11 +676,22 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenBookmarkDeletedThenFaviconDeletedAndRepositoryIsUpdated() = runTest {
+    fun whenBookmarkDeleteRequestedThenViewStateUpdated() = runTest {
         val bookmark =
             Bookmark(id = UUID.randomUUID().toString(), title = "A title", url = "www.example.com", lastModified = "timestamp")
 
         testee.onSavedSiteDeleted(bookmark)
+
+        assertTrue(browserViewState().bookmark == null)
+        assertTrue(browserViewState().favorite == null)
+    }
+
+    @Test
+    fun whenBookmarkDeletionConfirmedThenFaviconDeletedAndRepositoryIsUpdated() = runTest {
+        val bookmark =
+            Bookmark(id = UUID.randomUUID().toString(), title = "A title", url = "www.example.com", lastModified = "timestamp")
+
+        testee.onDeleteSavedSiteSnackbarDismissed(bookmark)
 
         verify(mockFaviconManager).deletePersistedFavicon(bookmark.url)
         verify(mockSavedSitesRepository).delete(bookmark)
@@ -726,36 +743,18 @@ class BrowserTabViewModelTest {
     fun whenDeleteQuickAccessItemCalledWithFavoriteThenRepositoryUpdated() = runTest {
         val savedSite = Favorite(UUID.randomUUID().toString(), "title", "http://example.com", lastModified = "timestamp", 0)
 
-        testee.deleteQuickAccessItem(savedSite)
+        testee.onDeleteSavedSiteSnackbarDismissed(savedSite)
 
         verify(mockSavedSitesRepository).delete(savedSite)
-    }
-
-    @Test
-    fun whenInsertQuickAccessItemCalledWithFavoriteThenRepositoryUpdated() {
-        val savedSite = Favorite(UUID.randomUUID().toString(), "title", "http://example.com", lastModified = "timestamp", 0)
-
-        testee.insertQuickAccessItem(savedSite)
-
-        verify(mockSavedSitesRepository).insert(savedSite)
     }
 
     @Test
     fun whenDeleteQuickAccessItemCalledWithBookmarkThenRepositoryUpdated() = runTest {
         val savedSite = Bookmark(UUID.randomUUID().toString(), "title", "http://example.com", lastModified = "timestamp")
 
-        testee.deleteQuickAccessItem(savedSite)
+        testee.onDeleteSavedSiteSnackbarDismissed(savedSite)
 
         verify(mockSavedSitesRepository).delete(savedSite)
-    }
-
-    @Test
-    fun whenInsertQuickAccessItemCalledWithBookmarkThenRepositoryUpdated() {
-        val savedSite = Bookmark(UUID.randomUUID().toString(), "title", "http://example.com", lastModified = "timestamp")
-
-        testee.insertQuickAccessItem(savedSite)
-
-        verify(mockSavedSitesRepository).insert(savedSite)
     }
 
     @Test
@@ -2265,7 +2264,7 @@ class BrowserTabViewModelTest {
         val cta = HomePanelCta.Survey(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
         setCta(cta)
         testee.onUserDismissedCta()
-        verify(mockSurveyDao).cancelScheduledSurveys()
+        verify(mockSurveyRepository).cancelScheduledSurveys()
     }
 
     @Test
@@ -3757,13 +3756,14 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenRemoveFavoriteRequestedThenRepositoryDeleteIsCalledForThatSite() = runTest {
+    fun whenRemoveFavoriteRequestedThenViewStateUpdated() = runTest {
         val favoriteSite = Favorite(id = UUID.randomUUID().toString(), title = "", url = "www.example.com", position = 0, lastModified = "timestamp")
         whenever(mockSavedSitesRepository.getFavorite("www.example.com")).thenReturn(favoriteSite)
         favoriteListFlow.send(listOf(favoriteSite))
         loadUrl("www.example.com", isBrowserShowing = true)
         testee.onFavoriteMenuClicked()
-        verify(mockSavedSitesRepository, atLeastOnce()).delete(favoriteSite)
+
+        assertTrue(browserViewState().favorite == null)
     }
 
     @Test
@@ -3784,6 +3784,65 @@ class BrowserTabViewModelTest {
         val command = commandCaptor.lastValue as Command.DeleteSavedSiteConfirmation
         assertEquals("www.example.com", command.savedSite.url)
         assertEquals("title", command.savedSite.title)
+    }
+
+    @Test
+    fun whenRemoveFavoriteUndoThenViewStateUpdated() = runTest {
+        val favoriteSite = Favorite(id = UUID.randomUUID().toString(), title = "", url = "www.example.com", position = 0, lastModified = "timestamp")
+        val quickAccessFavorites = listOf(FavoritesQuickAccessAdapter.QuickAccessFavorite(favoriteSite))
+
+        whenever(mockSavedSitesRepository.getFavorite("www.example.com")).thenReturn(favoriteSite)
+        favoriteListFlow.send(listOf(favoriteSite))
+        loadUrl("www.example.com", isBrowserShowing = true)
+        testee.onFavoriteMenuClicked()
+
+        assertTrue(browserViewState().favorite == null)
+        assertTrue(autoCompleteViewState().favorites.isEmpty())
+        assertTrue(ctaViewState().favorites.isEmpty())
+
+        testee.undoDelete(favoriteSite)
+
+        assertTrue(browserViewState().favorite == favoriteSite)
+        assertTrue(autoCompleteViewState().favorites == quickAccessFavorites)
+        assertTrue(ctaViewState().favorites == quickAccessFavorites)
+    }
+
+    @Test
+    fun whenDeleteBookmarkUndoThenViewStateUpdated() = runTest {
+        val bookmark =
+            Bookmark(id = UUID.randomUUID().toString(), title = "A title", url = "www.example.com", lastModified = "timestamp")
+
+        bookmarksListFlow.send(listOf(bookmark))
+
+        loadUrl(bookmark.url, isBrowserShowing = true)
+
+        testee.onSavedSiteDeleted(bookmark)
+
+        assertTrue(browserViewState().bookmark == null)
+        assertTrue(browserViewState().favorite == null)
+
+        testee.undoDelete(bookmark)
+
+        assertTrue(browserViewState().bookmark == bookmark)
+    }
+
+    @Test
+    fun whenDeleteFavouriteUndoThenViewStateUpdated() = runTest {
+        val favourite =
+            Favorite(id = UUID.randomUUID().toString(), title = "A title", url = "www.example.com", lastModified = "timestamp", 0)
+
+        favoriteListFlow.send(listOf(favourite))
+
+        loadUrl(favourite.url, isBrowserShowing = true)
+
+        testee.onSavedSiteDeleted(favourite)
+
+        assertTrue(browserViewState().bookmark == null)
+        assertTrue(browserViewState().favorite == null)
+
+        testee.undoDelete(favourite)
+
+        assertTrue(browserViewState().favorite == favourite)
     }
 
     @Test
@@ -4323,6 +4382,31 @@ class BrowserTabViewModelTest {
             assertEquals(request, this.request)
             assertEquals(sitePermissions, this.permissionsToRequest)
         }
+    }
+
+    @Test
+    fun whenOnPermissionsQueryThenSendCommand() = runTest {
+        val url = "someUrl"
+        loadUrl(url)
+        whenever(mockSitePermissionsManager.getPermissionsQueryResponse(eq(url), any(), any())).thenReturn(SitePermissionQueryResponse.Granted)
+        testee.onPermissionsQuery("myFeature", "myMethod", "myId", JSONObject("""{ "name":"somePermission"}"""))
+        assertCommandIssued<Command.OnPermissionsQueryResponse> {
+            assertEquals("granted", this.jsCallbackData.params.getString("state"))
+            assertEquals("myFeature", this.jsCallbackData.featureName)
+            assertEquals("myMethod", this.jsCallbackData.method)
+            assertEquals("myId", this.jsCallbackData.id)
+        }
+    }
+
+    @Test
+    fun whenNewTabOpenedAndFavouritesPresentThenSyncTriggered() = runTest {
+        val favoriteSite = Favorite(id = UUID.randomUUID().toString(), title = "", url = "www.example.com", position = 0, lastModified = "timestamp")
+        favoriteListFlow.send(listOf(favoriteSite))
+        loadUrl("www.example.com", isBrowserShowing = true)
+
+        testee.onNewTabFavouritesShown()
+
+        verify(mockSyncEngine).triggerSync(FEATURE_READ)
     }
 
     private fun aCredential(): LoginCredentials {

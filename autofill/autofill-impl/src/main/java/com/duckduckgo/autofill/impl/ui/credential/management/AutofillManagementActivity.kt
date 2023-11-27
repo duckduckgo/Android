@@ -16,8 +16,6 @@
 
 package com.duckduckgo.autofill.impl.ui.credential.management
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.core.view.isVisible
@@ -26,9 +24,12 @@ import androidx.fragment.app.commitNow
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.autofill.api.AutofillSettingsActivityLauncher
+import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreenDirectlyViewCredentialsParams
+import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreenNoParams
+import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreenShowSuggestionsForSiteParams
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ActivityAutofillSettingsBinding
@@ -70,16 +71,16 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.showKeyboard
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.navigation.api.getActivityParams
 import com.google.android.material.snackbar.Snackbar
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
+@ContributeToActivityStarter(AutofillSettingsScreenNoParams::class)
+@ContributeToActivityStarter(AutofillSettingsScreenShowSuggestionsForSiteParams::class)
+@ContributeToActivityStarter(AutofillSettingsScreenDirectlyViewCredentialsParams::class)
 class AutofillManagementActivity : DuckDuckGoActivity() {
 
     val binding: ActivityAutofillSettingsBinding by viewBinding()
@@ -97,6 +98,16 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(binding.toolbar)
         observeViewModel()
+        sendLaunchPixel(savedInstanceState)
+    }
+
+    private fun sendLaunchPixel(savedInstanceState: Bundle?) {
+        if (savedInstanceState == null) {
+            val mode = extractViewMode()
+            val launchedFromBrowser = (mode is ViewMode.ListModeWithSuggestions)
+            val directLinkToCredentials = mode is ViewMode.CredentialMode
+            viewModel.sendLaunchPixel(launchedFromBrowser, directLinkToCredentials)
+        }
     }
 
     override fun onStart() {
@@ -115,12 +126,10 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
     }
 
     private fun setupInitialState() {
-        if (intent.hasExtra(EXTRAS_CREDENTIALS_TO_VIEW)) {
-            intent.getParcelableExtra<LoginCredentials>(EXTRAS_CREDENTIALS_TO_VIEW)?.let {
-                viewModel.onViewCredentials(it)
-            }
-        } else {
-            viewModel.onShowListMode()
+        when (val mode = extractViewMode()) {
+            is ViewMode.ListMode -> viewModel.onShowListMode()
+            is ViewMode.ListModeWithSuggestions -> viewModel.onShowListMode()
+            is ViewMode.CredentialMode -> viewModel.onViewCredentials(mode.loginCredentials)
         }
     }
 
@@ -203,7 +212,7 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
 
     private fun showListMode() {
         resetToolbar()
-        val currentUrl = intent.getStringExtra(EXTRAS_SUGGESTIONS_FOR_URL)
+        val currentUrl = extractSuggestionsUrl()
         Timber.v("showListMode. currentUrl is %s", currentUrl)
 
         supportFragmentManager.commitNow {
@@ -242,7 +251,7 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
     }
 
     private fun credentialModeLaunchedDirectly(): Boolean {
-        return intent.getParcelableExtra<LoginCredentials>(EXTRAS_CREDENTIALS_TO_VIEW) != null
+        return extractViewMode() is ViewMode.CredentialMode
     }
 
     private fun showLockMode() {
@@ -326,67 +335,43 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
         }
     }
 
+    private fun extractViewMode(): ViewMode {
+        intent.getActivityParams(AutofillSettingsScreenShowSuggestionsForSiteParams::class.java)?.let {
+            return ViewMode.ListModeWithSuggestions(it.currentUrl)
+        }
+
+        intent.getActivityParams(AutofillSettingsScreenDirectlyViewCredentialsParams::class.java)?.let {
+            return ViewMode.CredentialMode(it.loginCredentials)
+        }
+
+        // default if nothing else matches
+        return ViewMode.ListMode
+    }
+
+    private fun extractSuggestionsUrl(): String? {
+        val viewMode = extractViewMode()
+        if (viewMode is ViewMode.ListModeWithSuggestions) {
+            return viewMode.currentUrl
+        }
+        return null
+    }
+
     companion object {
-        private const val EXTRAS_CREDENTIALS_TO_VIEW = "extras_credentials_to_view"
-        private const val EXTRAS_SUGGESTIONS_FOR_URL = "extras_suggestions_for_url"
         private const val TAG_LOCKED = "tag_fragment_locked"
         private const val TAG_DISABLED = "tag_fragment_disabled"
         private const val TAG_UNSUPPORTED = "tag_fragment_unsupported"
         private const val TAG_CREDENTIAL = "tag_fragment_credential"
         private const val TAG_ALL_CREDENTIALS = "tag_fragment_credentials_list"
-
-        /**
-         * Launch the Autofill management activity, with LoginCredentials to jump directly into viewing mode.
-         */
-        fun intentDirectViewMode(
-            context: Context,
-            loginCredentials: LoginCredentials,
-        ): Intent {
-            return Intent(context, AutofillManagementActivity::class.java).apply {
-                putExtra(EXTRAS_CREDENTIALS_TO_VIEW, loginCredentials)
-            }
-        }
-
-        fun intentShowSuggestion(
-            context: Context,
-            currentUrl: String?,
-        ): Intent {
-            return Intent(context, AutofillManagementActivity::class.java).apply {
-                putExtra(EXTRAS_SUGGESTIONS_FOR_URL, currentUrl)
-            }
-        }
-
-        fun intentDefaultList(context: Context): Intent = Intent(context, AutofillManagementActivity::class.java)
     }
-}
 
-private sealed interface CopiedToClipboardDataType {
-    object Username : CopiedToClipboardDataType
-    object Password : CopiedToClipboardDataType
-}
+    private sealed interface ViewMode {
+        data object ListMode : ViewMode
+        data class ListModeWithSuggestions(val currentUrl: String? = null) : ViewMode
+        data class CredentialMode(val loginCredentials: LoginCredentials) : ViewMode
+    }
 
-@ContributesTo(AppScope::class)
-@Module
-class AutofillSettingsModule {
-
-    @Provides
-    fun activityLauncher(): AutofillSettingsActivityLauncher {
-        return object : AutofillSettingsActivityLauncher {
-            override fun intent(context: Context): Intent = AutofillManagementActivity.intentDefaultList(context)
-
-            override fun intentAlsoShowSuggestionsForSite(
-                context: Context,
-                currentUrl: String?,
-            ): Intent {
-                return AutofillManagementActivity.intentShowSuggestion(context, currentUrl)
-            }
-
-            override fun intentDirectlyViewCredentials(
-                context: Context,
-                loginCredentials: LoginCredentials,
-            ): Intent {
-                return AutofillManagementActivity.intentDirectViewMode(context, loginCredentials)
-            }
-        }
+    private sealed interface CopiedToClipboardDataType {
+        object Username : CopiedToClipboardDataType
+        object Password : CopiedToClipboardDataType
     }
 }

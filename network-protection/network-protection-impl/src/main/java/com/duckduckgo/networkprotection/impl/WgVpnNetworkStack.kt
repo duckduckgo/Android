@@ -17,6 +17,8 @@
 package com.duckduckgo.networkprotection.impl
 
 import android.os.ParcelFileDescriptor
+import com.duckduckgo.anrs.api.CrashLogger
+import com.duckduckgo.anrs.api.CrashLogger.Crash
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.network.DnsProvider
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack
@@ -53,6 +55,7 @@ class WgVpnNetworkStack @Inject constructor(
     private val netpPixels: Lazy<NetworkProtectionPixels>,
     private val netPDefaultConfigProvider: NetPDefaultConfigProvider,
     private val dnsProvider: DnsProvider,
+    private val crashLogger: CrashLogger,
 ) : VpnNetworkStack {
     private var wgTunnelData: WgTunnelData? = null
 
@@ -108,6 +111,7 @@ class WgVpnNetworkStack @Inject constructor(
             ).also { logcat { "Returning VPN configuration: ${it.getOrNull()}" } }
         } catch (e: Throwable) {
             logcat(LogPriority.ERROR) { "onPrepareVpn failed due to ${e.asLog()}" }
+            crashLogger.logCrash(Crash("vpn_on_prepare_error", e))
             Result.failure(e)
         }.onFailure {
             netpPixels.get().reportEnableAttemptFailure()

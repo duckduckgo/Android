@@ -28,6 +28,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.impl.R.string
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BUY_URL
 import com.duckduckgo.subscriptions.impl.databinding.ActivityRestoreSubscriptionBinding
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionActivity.Companion.RestoreSubscriptionScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command
@@ -36,7 +37,6 @@ import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.SubscriptionNotFound
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.Success
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsActivity.Companion.SubscriptionsSettingsScreenWithEmptyParams
-import com.duckduckgo.subscriptions.impl.ui.SubscriptionsActivity.Companion.SubscriptionsScreenWithEmptyParams
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -109,7 +109,10 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
-                        globalActivityStarter.start(this@RestoreSubscriptionActivity, SubscriptionsScreenWithEmptyParams)
+                        globalActivityStarter.start(
+                            this@RestoreSubscriptionActivity,
+                            SubscriptionsWebViewActivityWithParams(url = BUY_URL, "Buy Subscription"),
+                        )
                     }
                 },
             )

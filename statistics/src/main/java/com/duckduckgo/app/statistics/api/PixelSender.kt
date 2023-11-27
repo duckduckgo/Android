@@ -18,7 +18,6 @@ package com.duckduckgo.app.statistics.api
 
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.config.StatisticsLibraryConfig
 import com.duckduckgo.app.statistics.model.PixelEntity
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -26,6 +25,7 @@ import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.experiments.api.VariantManager
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
@@ -160,7 +160,7 @@ class RxPixelSender @Inject constructor(
         return defaultParameters.plus(parameters)
     }
 
-    private fun getAtbInfo() = statisticsDataStore.atb?.formatWithVariant(variantManager.getVariant()) ?: ""
+    private fun getAtbInfo() = statisticsDataStore.atb?.formatWithVariant(variantManager.getVariantKey()) ?: ""
 
     private fun getDeviceFactor() = deviceInfo.formFactor().description
 }

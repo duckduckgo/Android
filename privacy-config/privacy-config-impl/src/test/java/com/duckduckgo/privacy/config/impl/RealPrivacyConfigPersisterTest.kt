@@ -24,6 +24,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
+import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
@@ -63,6 +64,7 @@ class RealPrivacyConfigPersisterTest {
     private lateinit var privacyRepository: PrivacyConfigRepository
     private lateinit var unprotectedTemporaryRepository: UnprotectedTemporaryRepository
     private val pluginPoint = FakePrivacyFeaturePluginPoint(listOf(FakePrivacyFeaturePlugin()))
+    private val variantManagerPlugin = FakePrivacyVariantManagerPlugin()
     private lateinit var sharedPreferences: SharedPreferences
 
     private val context = RuntimeEnvironment.getApplication()
@@ -79,6 +81,7 @@ class RealPrivacyConfigPersisterTest {
         testee =
             RealPrivacyConfigPersister(
                 pluginPoint,
+                variantManagerPlugin,
                 mockTogglesRepository,
                 unprotectedTemporaryRepository,
                 privacyRepository,
@@ -217,7 +220,8 @@ class RealPrivacyConfigPersisterTest {
             version = 2,
             readme = "readme",
             features = mapOf(FEATURE_NAME to JSONObject(FEATURE_JSON)),
-            unprotectedTemporaryList,
+            unprotectedTemporary = unprotectedTemporaryList,
+            experimentalVariants = VARIANT_MANAGER_JSON,
         )
     }
 
@@ -243,9 +247,34 @@ class RealPrivacyConfigPersisterTest {
             PrivacyFeatureName.GpcFeatureName.value
     }
 
+    class FakePrivacyVariantManagerPlugin : PrivacyFeaturePlugin {
+
+        override fun store(
+            featureName: String,
+            jsonString: String,
+        ): Boolean {
+            return true
+        }
+
+        override val featureName = "experimentalVariants"
+    }
+
+    class FakeFakePrivacyConfigCallbackPluginPoint(
+        private val plugins: List<PrivacyConfigCallbackPlugin>,
+    ) : PluginPoint<PrivacyConfigCallbackPlugin> {
+        override fun getPlugins(): Collection<PrivacyConfigCallbackPlugin> {
+            return plugins
+        }
+    }
+
+    class FakePrivacyConfigCallbackPlugin : PrivacyConfigCallbackPlugin {
+        override fun onPrivacyConfigDownloaded() {}
+    }
+
     companion object {
         private const val FEATURE_NAME = "gpc"
         private const val FEATURE_JSON = "{\"state\": \"enabled\"}"
         val unprotectedTemporaryList = listOf(FeatureException("example.com", "reason"))
+        private val VARIANT_MANAGER_JSON = null
     }
 }

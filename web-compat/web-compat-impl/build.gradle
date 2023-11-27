@@ -41,8 +41,6 @@ dependencies {
     implementation project(path: ':content-scope-scripts-api')
     implementation project(path: ':js-messaging-api')
 
-    implementation Kotlin.stdlib.jdk7
-
     // Room
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2

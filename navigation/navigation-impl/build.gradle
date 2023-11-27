@@ -28,7 +28,6 @@ dependencies {
     implementation project(':navigation-api')
     implementation project(':di')
 
-    implementation Kotlin.stdlib.jdk7
     implementation Google.dagger
     implementation "com.squareup.logcat:logcat:_"
 

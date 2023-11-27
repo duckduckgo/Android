@@ -27,12 +27,10 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.ObsoleteCoroutinesApi
-import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.test.runTest
-import org.junit.After
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -65,9 +63,9 @@ class WelcomePageViewModelTest {
     @Mock
     private lateinit var defaultRoleBrowserDialog: DefaultRoleBrowserDialog
 
-    private val events = ConflatedBroadcastChannel<WelcomePageView.Event>()
+    private val events = MutableSharedFlow<WelcomePageView.Event>(replay = 1)
 
-    lateinit var viewModel: WelcomePageViewModel
+    private lateinit var viewModel: WelcomePageViewModel
 
     private lateinit var viewEvents: Flow<WelcomePageView.State>
 
@@ -81,19 +79,14 @@ class WelcomePageViewModelTest {
             defaultRoleBrowserDialog = defaultRoleBrowserDialog,
         )
 
-        viewEvents = events.asFlow().flatMapLatest { viewModel.reduce(it) }
-    }
-
-    @After
-    fun teardown() {
-        events.close()
+        viewEvents = events.flatMapLatest { viewModel.reduce(it) }
     }
 
     @Test
     fun whenOnPrimaryCtaClickedAndShouldNotShowDialogThenFireAndFinish() = runTest {
         whenever(defaultRoleBrowserDialog.shouldShowDialog()).thenReturn(false)
 
-        events.send(WelcomePageView.Event.OnPrimaryCtaClicked)
+        events.emit(WelcomePageView.Event.OnPrimaryCtaClicked)
 
         viewEvents.test {
             assertTrue(awaitItem() == WelcomePageView.State.Finish)
@@ -106,7 +99,7 @@ class WelcomePageViewModelTest {
         val intent = Intent()
         whenever(defaultRoleBrowserDialog.createIntent(any())).thenReturn(intent)
 
-        events.send(WelcomePageView.Event.OnPrimaryCtaClicked)
+        events.emit(WelcomePageView.Event.OnPrimaryCtaClicked)
 
         viewEvents.test {
             assertTrue(awaitItem() == WelcomePageView.State.ShowDefaultBrowserDialog(intent))
@@ -118,7 +111,7 @@ class WelcomePageViewModelTest {
         whenever(defaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
         whenever(defaultRoleBrowserDialog.createIntent(any())).thenReturn(null)
 
-        events.send(WelcomePageView.Event.OnPrimaryCtaClicked)
+        events.emit(WelcomePageView.Event.OnPrimaryCtaClicked)
 
         viewEvents.test {
             assertTrue(awaitItem() == WelcomePageView.State.Finish)
@@ -128,7 +121,7 @@ class WelcomePageViewModelTest {
 
     @Test
     fun whenOnDefaultBrowserSetThenCallDialogShownFireAndFinish() = runTest {
-        events.send(WelcomePageView.Event.OnDefaultBrowserSet)
+        events.emit(WelcomePageView.Event.OnDefaultBrowserSet)
 
         viewEvents.test {
             assertTrue(awaitItem() == WelcomePageView.State.Finish)
@@ -144,7 +137,7 @@ class WelcomePageViewModelTest {
 
     @Test
     fun whenOnDefaultBrowserNotSetThenCallDialogShownFireAndFinish() = runTest {
-        events.send(WelcomePageView.Event.OnDefaultBrowserNotSet)
+        events.emit(WelcomePageView.Event.OnDefaultBrowserNotSet)
 
         viewEvents.test {
             assertTrue(awaitItem() == WelcomePageView.State.Finish)

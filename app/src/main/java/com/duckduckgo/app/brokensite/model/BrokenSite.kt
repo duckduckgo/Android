@@ -35,6 +35,7 @@ data class BrokenSite(
     val errorCodes: String,
     val httpErrorCodes: String,
     val loginSite: String?,
+    val reportFlow: ReportFlow?,
 )
 
 sealed class BrokenSiteCategory(
@@ -63,3 +64,5 @@ sealed class BrokenSiteCategory(
         const val OTHER_CATEGORY_KEY = "other"
     }
 }
+
+enum class ReportFlow { DASHBOARD, MENU }

@@ -155,7 +155,6 @@ import com.duckduckgo.app.global.view.toggleFullScreen
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.playstore.PlayStoreUtils
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
 import com.duckduckgo.app.survey.model.Survey
@@ -171,7 +170,8 @@ import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.AutofillEventListener
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
-import com.duckduckgo.autofill.api.AutofillSettingsActivityLauncher
+import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreenDirectlyViewCredentialsParams
+import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreenShowSuggestionsForSiteParams
 import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.Callback
 import com.duckduckgo.autofill.api.CredentialAutofillDialogFactory
@@ -313,9 +313,6 @@ class BrowserTabFragment :
     lateinit var previewPersister: WebViewPreviewPersister
 
     @Inject
-    lateinit var variantManager: VariantManager
-
-    @Inject
     lateinit var loginDetector: DOMLoginDetector
 
     @Inject
@@ -337,9 +334,6 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var browserAutofill: BrowserAutofill
-
-    @Inject
-    lateinit var autofillSettingsLauncher: AutofillSettingsActivityLauncher
 
     @Inject
     lateinit var faviconManager: FaviconManager
@@ -401,9 +395,6 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var autoconsent: Autoconsent
-
-    @Inject
-    lateinit var autofillSettingsActivityLauncher: AutofillSettingsActivityLauncher
 
     @Inject
     lateinit var autofillCapabilityChecker: AutofillCapabilityChecker
@@ -1288,6 +1279,7 @@ class BrowserTabFragment :
             )
 
             is Command.WebViewError -> showError(it.errorType, it.url)
+            is Command.OnPermissionsQueryResponse -> contentScopeScripts.onResponse(it.jsCallbackData)
             else -> {
                 // NO OP
             }
@@ -1965,7 +1957,7 @@ class BrowserTabFragment :
                 viewModel.onUserSubmittedQuery(it.favorite.url)
             },
             { viewModel.onEditSavedSiteRequested(it.favorite) },
-            { viewModel.onDeleteQuickAccessItemRequested(it.favorite) },
+            { viewModel.onDeleteSavedSiteRequested(it.favorite) },
         )
     }
 
@@ -2113,9 +2105,10 @@ class BrowserTabFragment :
             contentScopeScripts.register(
                 it,
                 object : JsMessageCallback() {
-                    override fun process(featureName: String, method: String, id: String, data: JSONObject) {
+                    override fun process(featureName: String, method: String, id: String?, data: JSONObject?) {
                         when (method) {
-                            "webShare" -> webShare(featureName, method, id, data)
+                            "webShare" -> if (id != null && data != null) { webShare(featureName, method, id, data) }
+                            "permissionsQuery" -> if (id != null && data != null) { viewModel.onPermissionsQuery(featureName, method, id, data) }
                             else -> {
                                 // NOOP
                             }
@@ -2232,7 +2225,9 @@ class BrowserTabFragment :
             val snackbar = binding.browserLayout.makeSnackbarWithNoBottomInset(messageResourceId, Snackbar.LENGTH_LONG)
             if (includeShortcutToViewCredential) {
                 snackbar.setAction(R.string.autofillSnackbarAction) {
-                    context?.let { startActivity(autofillSettingsActivityLauncher.intentDirectlyViewCredentials(it, loginCredentials)) }
+                    context?.let {
+                        globalActivityStarter.start(it, AutofillSettingsScreenDirectlyViewCredentialsParams(loginCredentials))
+                    }
                 }
             }
             snackbar.show()
@@ -2240,7 +2235,7 @@ class BrowserTabFragment :
     }
 
     private fun launchAutofillManagementScreen() {
-        startActivity(autofillSettingsLauncher.intentAlsoShowSuggestionsForSite(requireContext(), webView?.url))
+        globalActivityStarter.start(requireContext(), AutofillSettingsScreenShowSuggestionsForSiteParams(webView?.url))
     }
 
     private fun showDialogHidingPrevious(
@@ -2408,13 +2403,25 @@ class BrowserTabFragment :
             is Favorite -> getString(R.string.favoriteDeleteConfirmationMessage)
             is Bookmark -> getString(R.string.bookmarkDeleteConfirmationMessage, savedSite.title).html(requireContext())
         }
-        viewModel.deleteQuickAccessItem(savedSite)
         binding.rootView.makeSnackbarWithNoBottomInset(
             message,
             Snackbar.LENGTH_LONG,
         ).setAction(R.string.fireproofWebsiteSnackbarAction) {
-            viewModel.insertQuickAccessItem(savedSite)
-        }.show()
+            viewModel.undoDelete(savedSite)
+        }
+            .addCallback(
+                object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
+                    override fun onDismissed(
+                        transientBottomBar: Snackbar?,
+                        event: Int,
+                    ) {
+                        if (event != DISMISS_EVENT_ACTION) {
+                            viewModel.onDeleteSavedSiteSnackbarDismissed(savedSite)
+                        }
+                    }
+                },
+            )
+            .show()
     }
 
     private fun fireproofWebsiteConfirmation(entity: FireproofWebsiteEntity) {
@@ -3069,7 +3076,6 @@ class BrowserTabFragment :
                     viewModel.onPrintSelected()
                 }
                 onMenuItemClicked(menuBinding.autofillMenuItem) {
-                    pixel.fire(AppPixelName.MENU_ACTION_AUTOFILL_PRESSED)
                     viewModel.onAutofillMenuSelected()
                 }
             }
@@ -3556,6 +3562,7 @@ class BrowserTabFragment :
                 homeBackgroundLogo.hideLogo()
                 quickAccessAdapter.submitList(favorites)
                 quickAccessItems.quickAccessRecyclerView.show()
+                viewModel.onNewTabFavouritesShown()
             }
 
             newBrowserTab.newTabQuickAccessItemsLayout.show()

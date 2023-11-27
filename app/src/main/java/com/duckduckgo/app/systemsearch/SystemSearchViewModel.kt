@@ -23,7 +23,6 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment
-import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.onboarding.store.AppStage
@@ -48,7 +47,13 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 data class SystemSearchResult(
@@ -63,7 +68,6 @@ class SystemSearchViewModel @Inject constructor(
     private val deviceAppLookup: DeviceAppLookup,
     private val pixel: Pixel,
     private val savedSitesRepository: SavedSitesRepository,
-    private val faviconManager: FaviconManager,
     private val appSettingsPreferencesStore: SettingsDataStore,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel(), EditSavedSiteDialogFragment.EditSavedSiteListener {
@@ -105,18 +109,30 @@ class SystemSearchViewModel @Inject constructor(
     private var resultsDisposable: Disposable? = null
     private var latestQuickAccessItems: Suggestions.QuickAccessItems = Suggestions.QuickAccessItems(emptyList())
 
+    val hiddenIds = MutableStateFlow(HiddenBookmarksIds())
+
+    data class HiddenBookmarksIds(val favorites: List<String> = emptyList())
+
     private var appsJob: Job? = null
 
     init {
         resetViewState()
         configureResults()
         refreshAppList()
-        viewModelScope.launch {
-            savedSitesRepository.getFavorites().collect { favorite ->
-                latestQuickAccessItems = Suggestions.QuickAccessItems(favorite.map { FavoritesQuickAccessAdapter.QuickAccessFavorite(it) })
-                resultsViewState.postValue(latestQuickAccessItems)
+
+        savedSitesRepository.getFavorites()
+            .combine(hiddenIds) { favorites, hiddenIds ->
+                favorites.filter { it.id !in hiddenIds.favorites }
             }
-        }
+            .flowOn(dispatchers.io())
+            .onEach { filteredFavourites ->
+                withContext(dispatchers.main()) {
+                    latestQuickAccessItems =
+                        Suggestions.QuickAccessItems(filteredFavourites.map { FavoritesQuickAccessAdapter.QuickAccessFavorite(it) })
+                    resultsViewState.postValue(latestQuickAccessItems)
+                }
+            }
+            .launchIn(viewModelScope)
     }
 
     private fun currentOnboardingState(): OnboardingViewState = onboardingViewState.value!!
@@ -220,6 +236,7 @@ class SystemSearchViewModel @Inject constructor(
                         appResults = updatedApps,
                     )
                 }
+
                 is Suggestions.QuickAccessItems -> Suggestions.SystemSearchResultsViewState(
                     autocompleteResults = AutoCompleteResult(results.autocomplete.query, updatedSuggestions),
                     appResults = updatedApps,
@@ -304,7 +321,7 @@ class SystemSearchViewModel @Inject constructor(
     }
 
     fun onDeleteQuickAccessItemRequested(it: FavoritesQuickAccessAdapter.QuickAccessFavorite) {
-        deleteQuickAccessItem(it.favorite)
+        hideQuickAccessItem(it)
         command.value = Command.DeleteSavedSiteConfirmation(it.favorite)
     }
 
@@ -328,25 +345,31 @@ class SystemSearchViewModel @Inject constructor(
         }
     }
 
-    private fun deleteQuickAccessItem(savedSite: SavedSite) {
+    fun deleteSavedSiteSnackbarDismissed(savedSite: SavedSite) {
         when (savedSite) {
             is SavedSite.Favorite -> {
                 viewModelScope.launch(dispatchers.io() + NonCancellable) {
                     savedSitesRepository.delete(savedSite)
                 }
             }
+
             else -> throw IllegalArgumentException("Illegal SavedSite to delete received")
         }
     }
 
-    fun insertQuickAccessItem(savedSite: SavedSite) {
-        when (savedSite) {
-            is SavedSite.Favorite -> {
-                viewModelScope.launch(dispatchers.io()) {
-                    savedSitesRepository.insert(savedSite)
-                }
-            }
-            else -> throw IllegalArgumentException("Illegal SavedSite to delete received")
+    private fun hideQuickAccessItem(quickAccessFavourite: FavoritesQuickAccessAdapter.QuickAccessFavorite) {
+        viewModelScope.launch(dispatchers.io()) {
+            hiddenIds.emit(hiddenIds.value.copy(favorites = hiddenIds.value.favorites + quickAccessFavourite.favorite.id))
+        }
+    }
+
+    fun undoDelete(savedSite: SavedSite) {
+        viewModelScope.launch(dispatchers.io()) {
+            hiddenIds.emit(
+                hiddenIds.value.copy(
+                    favorites = hiddenIds.value.favorites - savedSite.id,
+                ),
+            )
         }
     }
 

@@ -97,6 +97,7 @@ class WgVpnNetworkStackTest {
             { netpPixels },
             netPDefaultConfigProvider,
             privateDnsProvider,
+            mock(),
         )
     }
 

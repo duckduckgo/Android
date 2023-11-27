@@ -23,27 +23,27 @@
     <string name="managementDisabledModeSubtitle">Sisselogimise kaitsmiseks on vaja seadme lukustusmustrit, PIN-koodi või biomeetriat.</string>
     <string name="managementDisabledModeTitle">Sisselogimise salvestamiseks kaitske oma seadet</string>
 
-    <string name="saveLoginDialogButtonSave">Salvesta sisselogimisandmed</string>
+    <string name="saveLoginDialogButtonSave">Salvesta parool</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Salvesta parool</string>
-    <string name="saveLoginDialogNotNow">Mitte praegu</string>
-    <string name="saveLoginDialogSubtitle">Sisselogimisandmed salvestatakse turvaliselt selles seadmes ja neid saab hallata sätete menüüst Sisselogimisandmed.</string>
-    <string name="saveLoginDialogTitle">Kas soovid, et DuckDuckGo salvestaks sinu sisselogimisandmed?</string>
+    <string name="saveLoginDialogNotNow">Ära salvesta</string>
+    <string name="saveLoginDialogSubtitle">Paroole hoitakse turvaliselt sinu seadmes sisselogimisandmete menüüs.</string>
+    <string name="saveLoginDialogTitle">Kas soovid, et DuckDuckGo salvestaks sinu parooli?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Veel valikuid</string>
 
-    <string name="useSavedLoginDialogTitle">Kas kasutada salvestatud sisselogimisandmeid?</string>
+    <string name="useSavedLoginDialogTitle">Kas kasutada salvestatud parooli?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Saidi %1$s parool</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Saidi parool</string>
     <string name="useSavedLoginDialogGroupThisWebsite">Sellelt veebisaidilt</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Saidilt %1$s</string>
 
     <string name="updateLoginDialogButtonUpdatePassword">Värskenda parooli</string>
-    <string name="updateLoginDialogButtonNotNow">Mitte praegu</string>
+    <string name="updateLoginDialogButtonNotNow">Ära salvesta</string>
 
     <string name="updateLoginDialogTitleUpdateUsername">Kas värskendada kasutajanime?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Värskenda kasutajanime</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Kas värskendada kasutajanime \n%1$s parooli?</string>
-    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo värskendab need salvestatud sisselogimisandmed sinu seadmes.</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo värskendab selle salvestatud parooli sinu seadmes.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Sulge automaatse täitmise dialoog</string>
 
@@ -60,12 +60,12 @@
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Sisselogimist värskendati viimati %1$s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Salvesta ja täida sisselogimisandmed automaatselt</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Sisselogimisandmed salvestatakse turvaliselt sinu seadmesse</string>
     <string name="credentialManagementViewMenuEdit">Redigeeri</string>
     <string name="credentialManagementViewMenuDelete">Kustuta</string>
 
     <string name="credentialManagementSuggestionsLabel">Soovitatud</string>
     <string name="credentialManagementNoLoginsSavedTitle">Sisselogimisandmeid pole veel salvestatud</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Sisselogimisandmed salvestatakse turvaliselt sinu seadmesse.</string>
 
     <string name="autofillManagementAddLogin">Lisa sisselogimisandmed</string>
     <string name="autofillManagementSearchLogins">Otsi sisselogimisandmeid</string>
@@ -79,9 +79,9 @@
     <string name="autofillManagementUsernameCopied">Kasutajanimi on kopeeritud</string>
     <string name="autofillManagementPasswordCopied">Parool on kopeeritud</string>
 
-    <string name="autofill_password_generation_offer_title">Kas kasutada DuckDuckGo loodud parooli?</string>
-    <string name="autofill_password_generation_offer_message">Parool salvestatakse sisselogimisandmetesse.</string>
-    <string name="autofill_password_generation_offer_accept">Kasuta loodud parooli</string>
+    <string name="autofill_password_generation_offer_title">Kas kasutada DuckDuckGo tugevat parooli?</string>
+    <string name="autofill_password_generation_offer_message">Paroole hoitakse turvaliselt sinu seadmes sisselogimisandmete menüüs.</string>
+    <string name="autofill_password_generation_offer_accept">Kasuta tugevat parooli</string>
     <string name="autofill_password_generation_offer_decline">Loon selle ise</string>
 
     <string name="deviceNotSupportedTitle">Seadet ei toetata</string>

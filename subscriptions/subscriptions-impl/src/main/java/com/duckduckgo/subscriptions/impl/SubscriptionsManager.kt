@@ -36,6 +36,7 @@ import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -124,6 +125,7 @@ class RealSubscriptionsManager @Inject constructor(
     private val _hasSubscription = MutableStateFlow(false)
     override val hasSubscription = _hasSubscription.asStateFlow().onSubscription { emitHasSubscriptionsValues() }
 
+    private var purchaseStateJob: Job? = null
     private fun isUserAuthenticated(): Boolean = !authDataStore.accessToken.isNullOrBlank() && !authDataStore.authToken.isNullOrBlank()
 
     private suspend fun emitHasSubscriptionsValues() {
@@ -133,7 +135,8 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     private suspend fun emitCurrentPurchaseValues() {
-        coroutineScope.launch(dispatcherProvider.io()) {
+        purchaseStateJob?.cancel()
+        purchaseStateJob = coroutineScope.launch(dispatcherProvider.io()) {
             billingClientWrapper.purchaseState.collect {
                 when (it) {
                     is PurchaseState.Purchased -> checkPurchase()
@@ -241,6 +244,7 @@ class RealSubscriptionsManager @Inject constructor(
         offerToken: String,
         isReset: Boolean,
     ) {
+        _currentPurchaseState.emit(CurrentPurchase.PreFlowInProgress)
         when (val response = prePurchaseFlow()) {
             is Success -> {
                 if (response.entitlements.isEmpty()) {
@@ -251,6 +255,7 @@ class RealSubscriptionsManager @Inject constructor(
                         isReset = isReset,
                     ).build()
                     logcat(LogPriority.DEBUG) { "Subs: external id is ${response.externalId}" }
+                    _currentPurchaseState.emit(CurrentPurchase.PreFlowFinished)
                     withContext(dispatcherProvider.main()) {
                         billingClientWrapper.launchBillingFlow(activity, billingParams)
                     }
@@ -290,7 +295,13 @@ class RealSubscriptionsManager @Inject constructor(
     override suspend fun getAuthToken(): AuthToken {
         return if (isUserAuthenticated()) {
             when (val response = getSubscriptionDataFromToken(authDataStore.authToken!!)) {
-                is Success -> return AuthToken.Success(authDataStore.authToken!!)
+                is Success -> {
+                    return if (response.entitlements.isEmpty()) {
+                        AuthToken.Failure("")
+                    } else {
+                        AuthToken.Success(authDataStore.authToken!!)
+                    }
+                }
                 is Failure -> {
                     when (response.message) {
                         "expired_token" -> {
@@ -371,6 +382,8 @@ sealed class SubscriptionsData {
 }
 
 sealed class CurrentPurchase {
+    object PreFlowInProgress : CurrentPurchase()
+    object PreFlowFinished : CurrentPurchase()
     object InProgress : CurrentPurchase()
     object Success : CurrentPurchase()
     object Recovered : CurrentPurchase()

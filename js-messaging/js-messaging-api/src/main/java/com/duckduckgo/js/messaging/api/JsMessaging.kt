@@ -41,7 +41,7 @@ interface JsMessaging {
     /**
      * Method to send a subscription event
      */
-    fun sendSubscriptionEvent()
+    fun sendSubscriptionEvent(subscriptionEventData: SubscriptionEventData)
 
     /**
      * Context name
@@ -64,8 +64,8 @@ interface JsMessaging {
     val allowedDomains: List<String>
 }
 
-abstract class JsMessageCallback() {
-    abstract fun process(featureName: String, method: String, id: String, data: JSONObject)
+abstract class JsMessageCallback {
+    abstract fun process(featureName: String, method: String, id: String?, data: JSONObject?)
 }
 
 /**
@@ -88,7 +88,7 @@ interface JsMessageHandler {
      * This method processes a [JsMessage] and can return a JsRequestResponse to reply to the message if needed
      * @return `JsRequestResponse` or `null`
      */
-    fun process(jsMessage: JsMessage, secret: String, webView: WebView, jsMessageCallback: JsMessageCallback): JsRequestResponse?
+    fun process(jsMessage: JsMessage, secret: String, jsMessageCallback: JsMessageCallback)
 
     /**
      * List of domains where we can process the message
@@ -101,9 +101,9 @@ interface JsMessageHandler {
     val featureName: String
 
     /**
-     * Name of the method
+     * List of the methods the handler can handle
      */
-    val method: String
+    val methods: List<String>
 }
 
 data class JsMessage(
@@ -139,4 +139,5 @@ sealed class JsRequestResponse {
     ) : JsRequestResponse()
 }
 
+data class SubscriptionEventData(val featureName: String, val subscriptionName: String, val params: JSONObject?)
 data class SubscriptionEvent(val context: String, val featureName: String, val subscriptionName: String, val params: JSONObject?)

@@ -48,8 +48,6 @@ dependencies {
     implementation project(':internal-features-api')
     implementation project(':navigation-api')
 
-    implementation Kotlin.stdlib.jdk7
-
     implementation AndroidX.core.ktx
 
     implementation AndroidX.appCompat
@@ -61,7 +59,6 @@ dependencies {
     implementation AndroidX.lifecycle.commonJava8
     implementation AndroidX.work.runtimeKtx
     implementation AndroidX.appCompat
-    implementation Kotlin.stdlib.jdk7
     implementation AndroidX.constraintLayout
 
     implementation Square.retrofit2.converter.moshi

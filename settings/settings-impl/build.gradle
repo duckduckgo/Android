@@ -37,7 +37,6 @@ dependencies {
     implementation project(path: ':di')
     implementation project(path: ':settings-api')
 
-    implementation Kotlin.stdlib.jdk7
     implementation AndroidX.core.ktx
 
     // Dagger

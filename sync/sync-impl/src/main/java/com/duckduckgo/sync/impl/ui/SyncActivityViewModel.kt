@@ -25,6 +25,8 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.api.SyncState.OFF
 import com.duckduckgo.sync.api.SyncStateMonitor
+import com.duckduckgo.sync.api.engine.SyncEngine
+import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.R
@@ -61,6 +63,7 @@ class SyncActivityViewModel @Inject constructor(
     private val recoveryCodePDF: RecoveryCodePDF,
     private val syncAccountRepository: SyncAccountRepository,
     private val syncStateMonitor: SyncStateMonitor,
+    private val syncEngine: SyncEngine,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
 
@@ -84,7 +87,8 @@ class SyncActivityViewModel @Inject constructor(
         }.onStart {
             initViewStateThisDeviceState()
             fetchRemoteDevices()
-        }
+            syncEngine.triggerSync(FEATURE_READ)
+        }.flowOn(dispatchers.io())
             .launchIn(viewModelScope)
     }
 

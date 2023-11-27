@@ -3,11 +3,11 @@ package com.duckduckgo.app.brokensite.api
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel
 import com.duckduckgo.app.brokensite.model.BrokenSite
-import com.duckduckgo.app.brokensite.model.BrokenSiteCategory
+import com.duckduckgo.app.brokensite.model.ReportFlow
+import com.duckduckgo.app.brokensite.model.ReportFlow.DASHBOARD
+import com.duckduckgo.app.brokensite.model.ReportFlow.MENU
 import com.duckduckgo.app.pixels.AppPixelName.BROKEN_SITE_REPORT
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
-import com.duckduckgo.app.statistics.Variant
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -15,6 +15,7 @@ import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.brokensite.api.BrokenSiteLastSentReport
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.Gpc
@@ -81,7 +82,7 @@ class BrokenSiteSubmitterTest {
         whenever(mockGpc.isEnabled()).thenReturn(true)
         whenever(mockTdsMetadataDao.eTag()).thenReturn("eTAG")
         whenever(mockStatisticsDataStore.atb).thenReturn(Atb("v123-456"))
-        whenever(mockVariantManager.getVariant()).thenReturn(Variant("g", 1.0, emptyList()) { true })
+        whenever(mockVariantManager.getVariantKey()).thenReturn("g")
         whenever(mockPrivacyConfig.privacyConfigData()).thenReturn(PrivacyConfigData(version = "v", eTag = "e"))
 
         testee = BrokenSiteSubmitter(
@@ -207,12 +208,12 @@ class BrokenSiteSubmitterTest {
     }
 
     @Test
-    fun whenDeviceIsEnglishAndLoginReportThenIncludeLoginSite() {
+    fun whenDeviceIsEnglishThenIncludeLoginSite() {
         whenever(mockAppBuildConfig.deviceLocale).thenReturn(Locale.ENGLISH)
         whenever(mockContentBlocking.isAnException(any())).thenReturn(false)
         whenever(mockUserAllowListRepository.isDomainInUserAllowList(any())).thenReturn(false)
         whenever(mockUnprotectedTemporary.isAnException(any())).thenReturn(false)
-        val brokenSite = getBrokenSite(BrokenSiteCategory.LOGIN_CATEGORY_KEY)
+        val brokenSite = getBrokenSite()
 
         testee.submitBrokenSiteFeedback(brokenSite)
 
@@ -225,12 +226,12 @@ class BrokenSiteSubmitterTest {
     }
 
     @Test
-    fun whenDeviceIsNotEnglishAndLoginReportThenIncludeLoginSite() {
+    fun whenDeviceIsNotEnglishThenDoNotIncludeLoginSite() {
         whenever(mockAppBuildConfig.deviceLocale).thenReturn(Locale.FRANCE)
         whenever(mockContentBlocking.isAnException(any())).thenReturn(false)
         whenever(mockUserAllowListRepository.isDomainInUserAllowList(any())).thenReturn(false)
         whenever(mockUnprotectedTemporary.isAnException(any())).thenReturn(false)
-        val brokenSite = getBrokenSite(BrokenSiteCategory.LOGIN_CATEGORY_KEY)
+        val brokenSite = getBrokenSite()
 
         testee.submitBrokenSiteFeedback(brokenSite)
 
@@ -242,7 +243,49 @@ class BrokenSiteSubmitterTest {
         assertFalse(params.containsKey("loginSite"))
     }
 
-    private fun getBrokenSite(category: String = "category"): BrokenSite {
+    @Test
+    fun whenReportFlowIsMenuThenIncludeParam() {
+        val brokenSite = getBrokenSite()
+            .copy(reportFlow = MENU)
+
+        testee.submitBrokenSiteFeedback(brokenSite)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any())
+        val params = paramsCaptor.firstValue
+
+        assertEquals("menu", params["reportFlow"])
+    }
+
+    @Test
+    fun whenReportFlowIsDashboardThenIncludeParam() {
+        val brokenSite = getBrokenSite()
+            .copy(reportFlow = DASHBOARD)
+
+        testee.submitBrokenSiteFeedback(brokenSite)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any())
+        val params = paramsCaptor.firstValue
+
+        assertEquals("dashboard", params["reportFlow"])
+    }
+
+    @Test
+    fun whenReportFlowIsNullThenDoNotIncludeParam() {
+        val brokenSite = getBrokenSite()
+            .copy(reportFlow = null)
+
+        testee.submitBrokenSiteFeedback(brokenSite)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any())
+        val params = paramsCaptor.firstValue
+
+        assertFalse("reportFlow" in params)
+    }
+
+    private fun getBrokenSite(): BrokenSite {
         return BrokenSite(
             category = "category",
             description = "description",
@@ -259,6 +302,7 @@ class BrokenSiteSubmitterTest {
             errorCodes = "",
             httpErrorCodes = "",
             loginSite = null,
+            reportFlow = ReportFlow.MENU,
         )
     }
 }

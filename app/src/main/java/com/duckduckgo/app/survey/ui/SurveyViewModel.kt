@@ -25,7 +25,6 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.survey.api.SurveyRepository
-import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.ui.SurveyActivity.Companion.SurveySource
 import com.duckduckgo.app.usage.app.AppDaysUsedRepository
@@ -39,7 +38,6 @@ import kotlinx.coroutines.withContext
 
 @ContributesViewModel(ActivityScope::class)
 class SurveyViewModel @Inject constructor(
-    private val surveyDao: SurveyDao,
     private val statisticsStore: StatisticsDataStore,
     private val appInstallStore: AppInstallStore,
     private val appBuildConfig: AppBuildConfig,
@@ -106,7 +104,7 @@ class SurveyViewModel @Inject constructor(
         surveyRepository.clearSurveyNotification()
         viewModelScope.launch {
             withContext(dispatchers.io() + NonCancellable) {
-                surveyDao.update(survey)
+                surveyRepository.updateSurvey(survey)
             }
             withContext(dispatchers.main()) {
                 command.value = Command.Close

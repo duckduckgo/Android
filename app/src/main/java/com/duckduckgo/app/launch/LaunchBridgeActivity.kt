@@ -22,17 +22,12 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
-import javax.inject.Inject
 import kotlinx.coroutines.launch
 
 @InjectWith(ActivityScope::class)
 class LaunchBridgeActivity : DuckDuckGoActivity() {
-
-    @Inject
-    lateinit var variantManager: VariantManager
 
     private val viewModel: LaunchViewModel by bindViewModel()
 

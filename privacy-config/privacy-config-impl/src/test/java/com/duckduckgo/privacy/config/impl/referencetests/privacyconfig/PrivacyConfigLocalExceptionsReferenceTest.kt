@@ -120,6 +120,7 @@ class PrivacyConfigLocalExceptionsReferenceTest(private val testCase: TestCase) 
         referenceTestUtilities = ReferenceTestUtilities(db, coroutineRule.testDispatcherProvider)
         privacyConfigPersister = RealPrivacyConfigPersister(
             referenceTestUtilities.getPrivacyFeaturePluginPoint(),
+            referenceTestUtilities.getVariantManagerPlugin(),
             mockTogglesRepository,
             referenceTestUtilities.unprotectedTemporaryRepository,
             referenceTestUtilities.privacyRepository,

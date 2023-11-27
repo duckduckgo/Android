@@ -34,7 +34,6 @@ dependencies {
     implementation project(':privacy-config-api')
     implementation project(':statistics')
 
-    implementation Kotlin.stdlib.jdk7
     implementation AndroidX.appCompat
     implementation Google.android.material
     implementation AndroidX.constraintLayout

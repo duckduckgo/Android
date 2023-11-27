@@ -44,6 +44,7 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitli
 import com.duckduckgo.sync.api.DeviceSyncState
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -103,6 +104,7 @@ class SettingsViewModelTest {
             whenever(networkProtectionWaitlist.getState()).thenReturn(NotUnlocked)
             whenever(networkProtectionState.isRunning()).thenReturn(false)
             whenever(networkProtectionState.isEnabled()).thenReturn(false)
+            whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(emptyFlow())
             whenever(appTrackingProtection.isRunning()).thenReturn(false)
             whenever(appTrackingProtection.isEnabled()).thenReturn(false)
             whenever(appTrackingProtection.isOnboarded()).thenReturn(false)
@@ -375,12 +377,11 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenAutofillSettingsClickThenEmitCommandLaunchAutofillSettingsAndPixelFired() = runTest {
+    fun whenAutofillSettingsClickThenEmitCommandLaunchAutofillSettings() = runTest {
         testee.commands().test {
             testee.onAutofillSettingsClick()
 
             assertEquals(Command.LaunchAutofillSettings, awaitItem())
-            verify(mockPixel).fire(AppPixelName.SETTINGS_AUTOFILL_MANAGEMENT_OPENED)
 
             cancelAndConsumeRemainingEvents()
         }

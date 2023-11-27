@@ -35,7 +35,6 @@ import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.api.SurveyRepository
-import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
@@ -43,13 +42,11 @@ import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
-import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -58,7 +55,6 @@ import timber.log.Timber
 class CtaViewModel @Inject constructor(
     private val appInstallStore: AppInstallStore,
     private val pixel: Pixel,
-    private val surveyDao: SurveyDao,
     private val widgetCapabilities: WidgetCapabilities,
     private val dismissedCtaDao: DismissedCtaDao,
     private val userAllowListRepository: UserAllowListRepository,
@@ -71,17 +67,17 @@ class CtaViewModel @Inject constructor(
     private val appTheme: AppTheme,
     private val surveyRepository: SurveyRepository,
 ) {
-    val surveyLiveData: LiveData<Survey> = surveyDao.getLiveScheduled()
+    val surveyLiveData: LiveData<Survey> = surveyRepository.getScheduledLiveSurvey()
     var canShowAutoconsentCta: AtomicBoolean = AtomicBoolean(false)
 
     @ExperimentalCoroutinesApi
     @VisibleForTesting
-    val isFireButtonPulseAnimationFlowEnabled = ConflatedBroadcastChannel(true)
+    val isFireButtonPulseAnimationFlowEnabled = MutableStateFlow(true)
 
     @FlowPreview
     @ExperimentalCoroutinesApi
     val showFireButtonPulseAnimation: Flow<Boolean> =
-        isFireButtonPulseAnimationFlowEnabled.asFlow()
+        isFireButtonPulseAnimationFlowEnabled
             .flatMapLatest {
                 when (it) {
                     true -> getShowFireButtonPulseAnimationFlow()
@@ -157,7 +153,7 @@ class CtaViewModel @Inject constructor(
 
             if (cta is HomePanelCta.Survey) {
                 activeSurvey = null
-                surveyDao.cancelScheduledSurveys()
+                surveyRepository.cancelScheduledSurveys()
             } else {
                 dismissedCtaDao.insert(DismissedCta(cta.ctaId))
             }
@@ -350,7 +346,7 @@ class CtaViewModel @Inject constructor(
         .onEach { (_, forceStopAnimation) ->
             withContext(dispatchers.io()) {
                 if (pulseAnimationDisabled()) {
-                    isFireButtonPulseAnimationFlowEnabled.send(false)
+                    isFireButtonPulseAnimationFlowEnabled.emit(false)
                 }
                 if (forceStopAnimation) {
                     dismissPulseAnimation()

@@ -76,6 +76,17 @@
                     app:showSwitch="false"
             />
 
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                    android:id="@+id/unrestricted_battery_usage"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryText="@string/netpManageRecentAppsProtectionAllowUnrestrictedBattTitle"
+                    app:secondaryText="@string/netpManageRecentAppsProtectionAllowUnrestrictedBattByline"
+                    app:showSwitch="false"
+                    app:trailingIcon="@drawable/ic_open_in_24"
+            />
+
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                     android:id="@+id/exclude_local_networks"
                     android:layout_width="match_parent"
