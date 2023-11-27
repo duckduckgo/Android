@@ -19,7 +19,6 @@ package com.duckduckgo.sync.impl
 import android.content.Context
 import android.graphics.pdf.PdfDocument
 import android.graphics.pdf.PdfDocument.PageInfo.Builder
-import android.os.Environment
 import android.view.LayoutInflater
 import android.view.View
 import androidx.annotation.WorkerThread
