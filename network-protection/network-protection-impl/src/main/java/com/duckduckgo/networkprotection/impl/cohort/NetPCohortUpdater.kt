@@ -27,6 +27,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.threeten.bp.LocalDate
+import org.threeten.bp.ZoneId
 
 @ContributesMultibinding(
     scope = VpnScope::class,
@@ -50,7 +51,7 @@ class NetPCohortUpdater @Inject constructor(
         fun attemptToSetNetPCohort() {
             // skip if already stored
             cohortStore.cohortLocalDate?.let { return }
-            cohortStore.cohortLocalDate = LocalDate.now()
+            cohortStore.cohortLocalDate = LocalDate.now(ZoneId.of("America/New_York")) // ET time
         }
 
         coroutineScope.launch(dispatcherProvider.io()) {
