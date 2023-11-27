@@ -395,7 +395,6 @@
     <string name="atp_ExcludeAppsManuallyCTANotNow">Ikke nå</string>
     <string name="atp_ActivityRecentActivityHeader">Aktivitet</string>
     <string name="atp_ActivityManageProtectionLabel">Har du problemer?</string>
-    <string name="atp_ActivityEnabledBannerLabel">Under beta er beskyttelsen for enkelte apper automatisk deaktivert. <annotation type="app_settings_link">Vis apper</annotation></string>
     <string name="atp_ActivityDescription">Blokkerte sporingsforsøk vises her</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">%1$s av appene dine er beskyttet mot skjulte sporere vi finner som prøver å få tilgang til personopplysningene dine</item>
