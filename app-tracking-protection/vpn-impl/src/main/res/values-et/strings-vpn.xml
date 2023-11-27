@@ -395,6 +395,7 @@
     <string name="atp_ExcludeAppsManuallyCTANotNow">Mitte praegu</string>
     <string name="atp_ActivityRecentActivityHeader">Tegevus</string>
     <string name="atp_ActivityManageProtectionLabel">Kas sul on probleeme?</string>
+    <string name="atp_ActivityEnabledBannerLabel">Beetaversioonis on mõne rakenduse kaitse automaatselt välja lülitatud. <annotation type="app_settings_link">Kuva rakendused</annotation></string>
     <string name="atp_ActivityDescription">Siin kuvatakse blokeeritud jälgimiskatsed</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">%1$s rakendus on kaitstud varjatud jälgurite eest, mille me oleme tabanud katselt jälgida sinu isiklikku teavet</item>

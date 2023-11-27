@@ -395,6 +395,7 @@
     <string name="atp_ExcludeAppsManuallyCTANotNow">Niet nu</string>
     <string name="atp_ActivityRecentActivityHeader">Activiteit</string>
     <string name="atp_ActivityManageProtectionLabel">Ondervind je problemen?</string>
+    <string name="atp_ActivityEnabledBannerLabel">Tijdens de bètaversie wordt de beveiliging voor sommige apps automatisch uitgeschakeld. <annotation type="app_settings_link">Apps bekijken</annotation></string>
     <string name="atp_ActivityDescription">Geblokkeerde trackingpogingen worden hier weergegeven</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">%1$s van je apps is beschermd tegen verborgen trackers waarvan we merken dat ze toegang proberen te krijgen tot je persoonlijke gegevens</item>

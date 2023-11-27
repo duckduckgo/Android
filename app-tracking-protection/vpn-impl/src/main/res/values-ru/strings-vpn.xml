@@ -411,6 +411,7 @@
     <string name="atp_ExcludeAppsManuallyCTANotNow">Не сейчас</string>
     <string name="atp_ActivityRecentActivityHeader">Активность</string>
     <string name="atp_ActivityManageProtectionLabel">Возникли проблемы?</string>
+    <string name="atp_ActivityEnabledBannerLabel">Защита некоторых приложений автоматически отключается на время бета-тестирования. <annotation type="app_settings_link">Просмотреть приложения</annotation></string>
     <string name="atp_ActivityDescription">Заблокированные попытки отслеживания будут отображаться здесь</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">Мы защитили %1$s приложение от скрытых трекеров, которые пытались получить доступ к вашим личным данным</item>

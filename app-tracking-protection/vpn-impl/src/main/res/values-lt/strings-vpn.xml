@@ -411,6 +411,7 @@
     <string name="atp_ExcludeAppsManuallyCTANotNow">Ne dabar</string>
     <string name="atp_ActivityRecentActivityHeader">Veikla</string>
     <string name="atp_ActivityManageProtectionLabel">Turite problemų?</string>
+    <string name="atp_ActivityEnabledBannerLabel">Beta versijos metu kai kurių programėlių apsauga automatiškai išjungiama. <annotation type="app_settings_link">Rodyti programėles</annotation></string>
     <string name="atp_ActivityDescription">Čia bus rodomi užblokuoti sekimo bandymai</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">%1$s jūsų programėlė apsaugota nuo paslėptų sekimo priemonių, kurias randame bandydami pasiekti jūsų asmeninę informaciją</item>

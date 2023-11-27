@@ -395,6 +395,7 @@
     <string name="atp_ExcludeAppsManuallyCTANotNow">Όχι τώρα</string>
     <string name="atp_ActivityRecentActivityHeader">Δραστηριότητα</string>
     <string name="atp_ActivityManageProtectionLabel">Αντιμετωπίζετε προβλήματα;</string>
+    <string name="atp_ActivityEnabledBannerLabel">Κατά τη διάρκεια της έκδοσης beta, η προστασία για ορισμένες εφαρμογές απενεργοποιείται αυτόματα. <annotation type="app_settings_link">Προβολή εφαρμογών</annotation></string>
     <string name="atp_ActivityDescription">Οι αποκλεισμένες προσπάθειες παρακολούθησης θα εμφανίζονται εδώ</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">%1$s από τις εφαρμογές σας προστατεύεται από κρυφές εφαρμογές παρακολούθησης που εντοπίζουμε να προσπαθούν να αποκτήσουν πρόσβαση στις προσωπικές πληροφορίες σας</item>
