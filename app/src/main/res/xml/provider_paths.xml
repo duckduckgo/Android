@@ -18,4 +18,5 @@
     <external-path
         name="external_files"
         path="." />
+    <cache-path name="sync" path="sync" />
 </paths>
