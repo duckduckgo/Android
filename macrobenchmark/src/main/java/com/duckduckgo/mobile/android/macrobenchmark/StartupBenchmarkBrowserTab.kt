@@ -45,89 +45,84 @@ class StartupBenchmarkBrowserTab {
     //region already executed tests
 
     @Test
-    fun loadTheIndependentAmpSite() {
-        loadSite("https://www.independent.co.uk/news/world/americas/us-politics/fauci-dog-tests-congress-letter-b1944407.html?amp")
-    }
-
-    @Test
     fun loadTwitter() {
         loadSite("https://twitter.com/")
     }
+    //
+    // @Test
+    // fun loadTheIndependentAmpSite() {
+    //     loadSite("https://www.independent.co.uk/news/world/americas/us-politics/fauci-dog-tests-congress-letter-b1944407.html?amp")
+    // }
+    // @Test
+    // fun loadTwitchHttp() {
+    //     loadSite("http://twitch.tv")
+    // }
+    //
+    // @Test
+    // fun loadLegoWithQueryParams() {
+    //     loadSite("https://www.lego.com/es-es/product/christmas-tree-40573?cmp=PSO-FBIG-EMEA-EN-RE-FIS-CV-Masterbrand_Occasion-SHOP-CvLL-LkAd-LL-Primary_Campaign-Conversion-Ads_Manager-Standard_Creative-ChristmasTree40573_GEEL&fbclid=PAAaZOw6rQAvD6B9VFf1E2LiPIOFOFFZfkZ8OJp_LhIibg08u477xskJm2LKI_aem_AZHUEcjd4BE_ubDCykquVV_o-TrG-Osf11-0PFviN-wOZFEeE6w_NDC4Qj97JZx5He54XOL5VBliKIpodp-YfNR8&external_browser_redirect=true")
+    // }
+    // @Test
+    // fun loadNYTimes() {
+    //     loadSite("https://www.nytimes.com/2023/11/21/technology/sam-altman-steve-jobs.html")
+    // }
+    //
+    // @Test
+    // fun loadWPXIAmpSite() {
+    //     loadSite("https://www-wpxi-com.cdn.ampproject.org/v/s/www.wpxi.com/news/top-stories/pihl-bans-armstrong-student-section-hockey-games-after-vulgar-chants-directed-female-goalie/G2RP5FZA3ZDYRLFSWGDGQH2MY4/?amp_js_v=a6&_gsa=1&outputType=amp&usqp=mq331AQKKAFQArABIIACAw%3D%3D&referrer=https%3A%2F%2Fwww.google.com&_tf=From%20%251%24s&ampshare=https%3A%2F%2Fwww.wpxi.com%2Fnews%2Ftop-stories%2Fpihl-bans-armstrong-student-section-hockey-games-after-vulgar-chants-directed-female-goalie%2FG2RP5FZA3ZDYRLFSWGDGQH2MY4%2F")
+    // }
+    //
+    // @Test
+    // fun loadWeather() {
+    //     loadSite("https://weather.com/")
+    // }
+    //
+    // @Test
+    // fun loadBBC() {
+    //     loadSite("https://www.bbc.com/worklife/article/20231115-after-weworks-bankruptcy-what-is-the-future-of-coworking/")
+    // }
+    // @Test
+    // fun loadAmazon() {
+    //     loadSite("https://www.amazon.com/")
+    // }
+    //
+    // @Test
+    // fun loadTwitchMobile() {
+    //     loadSite("https://m.twitch.tv/")
+    // }
+    // @Test
+    // fun loadEBay() {
+    //     loadSite("https://www.ebay.com/")
+    // }
+    // @Test
+    // fun loadESPN() {
+    //     loadSite("https://www.espn.com/f1/story/_/id/38940255/how-f1-rode-luck-win-big-las-vegas/")
+    // }
 
-    @Test
-    fun loadLegoWithQueryParams() {
-        loadSite("https://www.lego.com/es-es/product/christmas-tree-40573?cmp=PSO-FBIG-EMEA-EN-RE-FIS-CV-Masterbrand_Occasion-SHOP-CvLL-LkAd-LL-Primary_Campaign-Conversion-Ads_Manager-Standard_Creative-ChristmasTree40573_GEEL&fbclid=PAAaZOw6rQAvD6B9VFf1E2LiPIOFOFFZfkZ8OJp_LhIibg08u477xskJm2LKI_aem_AZHUEcjd4BE_ubDCykquVV_o-TrG-Osf11-0PFviN-wOZFEeE6w_NDC4Qj97JZx5He54XOL5VBliKIpodp-YfNR8&external_browser_redirect=true")
-    }
-    @Test
-    fun loadTwitchHttp() {
-        loadSite("http://twitch.tv")
-    }
-    @Test
-    fun loadNYTimes() {
-        loadSite("https://www.nytimes.com/2023/11/21/technology/sam-altman-steve-jobs.html")
-    }
-    @Test
-    fun loadTwitchMobile() {
-        loadSite("https://m.twitch.tv/")
-    }
-
-    @Test
-    fun loadWeather() {
-        loadSite("https://weather.com/")
-    }
-
-    @Test
-    fun loadAmazon() {
-        loadSite("https://www.amazon.com/")
-    }
-    @Test
-    fun loadBBC() {
-        loadSite("https://www.bbc.com/worklife/article/20231115-after-weworks-bankruptcy-what-is-the-future-of-coworking/")
-    }
-
-    @Test
-    fun loadWPXIAmpSite() {
-        loadSite("https://www-wpxi-com.cdn.ampproject.org/v/s/www.wpxi.com/news/top-stories/pihl-bans-armstrong-student-section-hockey-games-after-vulgar-chants-directed-female-goalie/G2RP5FZA3ZDYRLFSWGDGQH2MY4/?amp_js_v=a6&_gsa=1&outputType=amp&usqp=mq331AQKKAFQArABIIACAw%3D%3D&referrer=https%3A%2F%2Fwww.google.com&_tf=From%20%251%24s&ampshare=https%3A%2F%2Fwww.wpxi.com%2Fnews%2Ftop-stories%2Fpihl-bans-armstrong-student-section-hockey-games-after-vulgar-chants-directed-female-goalie%2FG2RP5FZA3ZDYRLFSWGDGQH2MY4%2F")
-    }
-
+    // @Test
+    // fun loadReddit() {
+    //     loadSite("https://www.reddit.com/r/pcmasterrace/comments/180955q/which_one_actually_better_in_terms_both_comfort//")
+    // }
     //endregion
-
-
 
     //region execution pending
 
+    // @Test
+    // fun loadTripAdvisor() {
+    //     loadSite("https://www.tripadvisor.com/")
+    // }
 
-    @Test
-    fun loadEBay() {
-        loadSite("https://www.ebay.com/")
-    }
+    // @Test
+    // fun loadWallmart() {
+    //     loadSite("https://www.walmart.com/")
+    // }
+    //
+    // @Test
+    // fun loadWikipedia() {
+    //     loadSite("https://www.wikipedia.org/")
+    // }
 
-    @Test
-    fun loadESPN() {
-        loadSite("https://www.espn.com/f1/story/_/id/38940255/how-f1-rode-luck-win-big-las-vegas/")
-    }
-
-    @Test
-    fun loadReddit() {
-        loadSite("https://www.reddit.com/r/pcmasterrace/comments/180955q/which_one_actually_better_in_terms_both_comfort//")
-    }
-
-    @Test
-    fun loadTripAdvisor() {
-        loadSite("https://www.tripadvisor.com/")
-    }
-
-    @Test
-    fun loadWallmart() {
-        loadSite("https://www.walmart.com/")
-    }
-
-    @Test
-    fun loadWikipedia() {
-        loadSite("https://www.wikipedia.org/")
-    }
-
-    endregion
+    //endregion
 
 
     private fun loadSite(site: String) = startupBenchmark(
