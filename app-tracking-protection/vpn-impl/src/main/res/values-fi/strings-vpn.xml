@@ -395,7 +395,7 @@
     <string name="atp_ExcludeAppsManuallyCTANotNow">Ei nyt</string>
     <string name="atp_ActivityRecentActivityHeader">Toiminta</string>
     <string name="atp_ActivityManageProtectionLabel">Onko sinulla ongelmia?</string>
-    <string name="atp_ActivityEnabledBannerLabel">Beetaversion aikana joidenkin sovellusten suojaus poistetaan käytöstä automaattisesti. <annotation type="app_settings_link">Näytä sovellukset</annotation></string>
+    <string name="atp_ActivityEnabledBannerLabel">Joidenkin sovellusten suojaus poistetaan käytöstä automaattisesti. <annotation type="app_settings_link">Näytä sovellukset</annotation></string>
     <string name="atp_ActivityDescription">Estetyt seurantayritykset näkyvät täällä</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">%1$s sovelluksistasi on suojattu piilotetuilta seurantalaitteilta, jotka yrittävät päästä käsiksi henkilökohtaisiin tietoihin</item>
