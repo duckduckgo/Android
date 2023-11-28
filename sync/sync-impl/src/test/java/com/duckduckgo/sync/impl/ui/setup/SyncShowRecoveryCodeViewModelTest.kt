@@ -30,13 +30,10 @@ import org.mockito.kotlin.mock
 @ExperimentalCoroutinesApi
 class SyncShowRecoveryCodeViewModelTest {
 
-    private val syncRepostitory: SyncAccountRepository = mock()
-
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val testee = SyncDeviceConnectedViewModel(
-        syncRepostitory,
         coroutineTestRule.testDispatcherProvider,
     )
 
