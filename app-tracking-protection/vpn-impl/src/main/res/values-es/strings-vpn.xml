@@ -395,7 +395,7 @@
     <string name="atp_ExcludeAppsManuallyCTANotNow">Ahora no</string>
     <string name="atp_ActivityRecentActivityHeader">Actividad</string>
     <string name="atp_ActivityManageProtectionLabel">¿Tienes problemas?</string>
-    <string name="atp_ActivityEnabledBannerLabel">Durante la versión beta, la protección de algunas aplicaciones se desactiva automáticamente. <annotation type="app_settings_link">Ver aplicaciones</annotation></string>
+    <string name="atp_ActivityEnabledBannerLabel">La protección de algunas aplicaciones se desactiva automáticamente. <annotation type="app_settings_link">Ver aplicaciones</annotation></string>
     <string name="atp_ActivityDescription">Los intentos de rastreo bloqueados aparecerán aquí</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">%1$s de tus aplicaciones está protegida contra los rastreadores ocultos que encontramos que intentan acceder a tu información personal</item>
