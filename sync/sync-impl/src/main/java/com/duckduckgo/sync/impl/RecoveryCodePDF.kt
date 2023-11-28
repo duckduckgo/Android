@@ -19,7 +19,6 @@ package com.duckduckgo.sync.impl
 import android.content.Context
 import android.graphics.pdf.PdfDocument
 import android.graphics.pdf.PdfDocument.PageInfo.Builder
-import android.os.Environment
 import android.view.LayoutInflater
 import android.view.View
 import androidx.annotation.WorkerThread
@@ -65,8 +64,13 @@ class RecoveryCodePDFImpl @Inject constructor(
             this.root.draw(page.canvas)
         }
         pdfDocument.finishPage(page)
-        val downloads = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-        val file = File(downloads, PDF_FILE_NAME)
+
+        val syncDirectory = File(viewContext.cacheDir, PDF_CACHE_FOLDER)
+        if (!syncDirectory.exists()) {
+            syncDirectory.mkdir()
+        }
+        val file = File(syncDirectory, PDF_FILE_NAME)
+
         pdfDocument.writeTo(FileOutputStream(file))
         pdfDocument.close()
 
@@ -75,6 +79,7 @@ class RecoveryCodePDFImpl @Inject constructor(
 
     companion object {
         private const val PDF_FILE_NAME = "Sync Data Recovery - DuckDuckGo.pdf"
+        private const val PDF_CACHE_FOLDER = "sync"
         private const val a4PageWidth = 612
         private const val a4PageHeight = 792
     }
