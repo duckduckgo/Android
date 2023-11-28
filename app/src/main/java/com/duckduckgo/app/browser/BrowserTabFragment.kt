@@ -1433,9 +1433,6 @@ class BrowserTabFragment :
         } else {
             getString(R.string.preciseLocationSiteDialogSubtitle)
         }
-        lifecycleScope.launch {
-            faviconManager.loadToViewFromLocalWithPlaceholder(tabId, domain, binding.sitePermissionDialogFavicon)
-        }
 
         val dialog = MaterialAlertDialogBuilder(requireActivity())
             .setView(binding.root)

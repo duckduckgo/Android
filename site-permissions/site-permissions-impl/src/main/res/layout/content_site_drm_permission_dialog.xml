@@ -29,25 +29,6 @@
             android:gravity="center"
             android:orientation="vertical">
 
-        <FrameLayout
-                android:id="@+id/sitePermissionDialogFaviconContainer"
-                android:layout_width="@dimen/dialogImageSize"
-                android:layout_height="@dimen/dialogImageSize"
-                android:layout_marginBottom="@dimen/keyline_4"
-                android:background="@drawable/list_item_image_circular_background"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-            <ImageView
-                    android:id="@+id/sitePermissionDialogFavicon"
-                    android:layout_width="22dp"
-                    android:layout_height="22dp"
-                    android:layout_gravity="center"
-                    android:importantForAccessibility="no"
-                    android:src="@drawable/ic_globe_gray_16dp"/>
-        </FrameLayout>
-
         <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/sitePermissionDialogTitle"
                 app:typography="h2"
