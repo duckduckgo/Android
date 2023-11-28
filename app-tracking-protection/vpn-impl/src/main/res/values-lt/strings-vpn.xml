@@ -141,7 +141,7 @@
     <!-- Exclusion List -->
     <string name="atp_ExclusionListActivityTitle">Visos programėlės</string>
     <string name="atp_ExcludedAppsFeature">Apsauga nuo programėlių sekimo aptinka ir blokuoja kitų įmonių programų stebėjimo priemones, pvz., kai „Facebook“ bando jus sekti sveikatos programoje. Įmonės vis tiek gali jus sekti joms priklausančiose programose.\n\nJei programa neveikia taip, kaip tikėtasi, pabandykite išjungti tos programos apsaugą.</string>
-    <string name="atp_ExcludedAppsEnabledLabel">Beta versijos metu „DuckDuckGo“ gali išjungti kai kurių programų apsaugą, kad išspręstų žinomas turinio įkėlimo problemas. Jūsų pasirinkti nustatymai nepasikeis, nebent atkursite numatytuosius nustatymus.</string>
+    <string name="atp_ExcludedAppsEnabledLabel">„DuckDuckGo“ gali išjungti kai kurių programų apsaugą, kad išspręstų žinomas turinio įkėlimo problemas. Jūsų pasirinkti nustatymai nepasikeis, nebent atkursite numatytuosius nustatymus.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>Apsauga nuo programėlių sekimo išjungta</b> Ar apsauga nuo programėlių sekimo sukėlė problemų su jūsų programėlėmis <annotation type="report_issues_link">Pranešti apie problemas</annotation></string>
     <string name="atp_ExcludedAppsReport">Praneškite apie problemą su kita programa</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Rankiniu būdu išjungta</string>

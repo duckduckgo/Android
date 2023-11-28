@@ -133,7 +133,7 @@
     <!-- Exclusion List -->
     <string name="atp_ExclusionListActivityTitle">Alla appar</string>
     <string name="atp_ExcludedAppsFeature">App Tracking Protection upptäcker och blockerar appspårare från andra företag, till exempel när Facebook försöker spåra dig i en hälsoapp. Företag kan fortfarande spåra dig i appar som de äger.\n\nOm en app inte fungerar som väntat kan du prova med att inaktivera skyddet för den appen.</string>
-    <string name="atp_ExcludedAppsEnabledLabel">Under betaperioden kan det hända att DuckDuckGo inaktiverar skyddet för vissa appar för att lösa kända problem med inläsning av innehåll. Dina egna inställningar ändras inte om du inte återställer standardinställningarna.</string>
+    <string name="atp_ExcludedAppsEnabledLabel">DuckDuckGo kan inaktivera skyddet för vissa appar för att lösa kända problem med inläsning av innehåll. Dina egna inställningar ändras inte om du inte återställer standardinställningarna.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>App Tracking Protection är inaktiverat</b> Har App Tracking Protection orsakat problem med dina appar? <annotation type="report_issues_link">Rapportera problem</annotation></string>
     <string name="atp_ExcludedAppsReport">Rapportera problem med en annan app</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Manuellt inaktiverat</string>

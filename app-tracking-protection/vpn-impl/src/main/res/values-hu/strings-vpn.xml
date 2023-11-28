@@ -133,7 +133,7 @@
     <!-- Exclusion List -->
     <string name="atp_ExclusionListActivityTitle">Minden alkalmazás</string>
     <string name="atp_ExcludedAppsFeature">Az alkalmazáskövetés elleni védelem felismeri és blokkolja más cégek alkalmazáskövetőit, például amikor a Facebook megpróbál nyomon követni egy egészségügyi alkalmazásban. A cégek továbbra is követhetnek a saját alkalmazásaikban.\n\nHa egy alkalmazás nem a várt módon működik, próbáld meg kikapcsolni a védelmet az adott alkalmazásnál.</string>
-    <string name="atp_ExcludedAppsEnabledLabel">A bétaverzióban a DuckDuckGo kikapcsolhatja a védelmet egyes alkalmazásoknál az ismert tartalombetöltési problémák megoldása érdekében. Az egyéni beállításaid csak akkor változnak, ha visszaállítod az alapértelmezett beállításokat.</string>
+    <string name="atp_ExcludedAppsEnabledLabel">A DuckDuckGo kikapcsolhatja a védelmet egyes alkalmazásoknál az ismert tartalombetöltési problémák megoldása érdekében. Az egyéni beállításaid csak akkor változnak, ha visszaállítod az alapértelmezett beállításokat.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>Az alkalmazáskövetés elleni védelem ki van kapcsolva</b> Okozott problémát az alkalmazáskövetés elleni védelem az alkalmazásaidban? <annotation type="report_issues_link">Problémák jelentése</annotation></string>
     <string name="atp_ExcludedAppsReport">Másik alkalmazással kapcsolatos probléma jelentése</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Manuálisan kikapcsolva</string>

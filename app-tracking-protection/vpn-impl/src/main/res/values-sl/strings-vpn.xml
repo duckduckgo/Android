@@ -141,7 +141,7 @@
     <!-- Exclusion List -->
     <string name="atp_ExclusionListActivityTitle">Vse aplikacije</string>
     <string name="atp_ExcludedAppsFeature">Zaščita pred sledenjem aplikacijam App Tracking Protection zazna in blokira sledilnike aplikacij drugih podjetij, na primer ko vam Facebook poskuša slediti v zdravstveni aplikaciji. Podjetja lahko še vedno sledijo vašim aplikacijam v njihovi lasti.\n\nČe aplikacija ne deluje po pričakovanjih, poskusite onemogočiti zaščito za to aplikacijo.</string>
-    <string name="atp_ExcludedAppsEnabledLabel">V beta različici lahko DuckDuckGo onemogoči zaščito nekaterih aplikacij, da bi odpravil znane težave z nalaganjem vsebine. Nastavitve po meri se ne bodo spremenile, razen če obnovite privzete nastavitve.</string>
+    <string name="atp_ExcludedAppsEnabledLabel">DuckDuckGo lahko onemogoči zaščito nekaterih aplikacij, da bi odpravil znane težave z nalaganjem vsebine. Nastavitve po meri se ne bodo spremenile, razen če obnovite privzete nastavitve.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>Zaščita pred sledenjem aplikacijam App Tracking Protection je onemogočena</b> Ali je zaščita pred sledenjem aplikacijam povzročila težavo z vašimi aplikacijami <annotation type="report_issues_link">Prijavite težave</annotation></string>
     <string name="atp_ExcludedAppsReport">Prijavite težavo z drugo aplikacijo</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Ročno onemogočeno</string>

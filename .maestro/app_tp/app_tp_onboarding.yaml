@@ -36,7 +36,7 @@ tags:
       text: "Good news! App Tracking Protection is now enabled.*"
 - assertVisible: "Got it!"
 - tapOn: "Got it!"
-- assertVisible: "During beta, protection for some apps is automatically disabled. View apps"
+- assertVisible: "Protection for some apps is automatically disabled. View apps"
 - assertVisible: "Blocked tracking attempts will appear here"
 - assertVisible:
     id: "com.duckduckgo.mobile.android:id/activity_apps"
