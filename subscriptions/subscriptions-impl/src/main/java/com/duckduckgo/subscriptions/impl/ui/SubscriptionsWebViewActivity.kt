@@ -39,8 +39,8 @@ import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.navigation.api.getActivityParams
-import com.duckduckgo.networkprotection.api.NetPWaitlistInvitedScreenNoParams
 import com.duckduckgo.subscriptions.impl.R.string
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionsWebviewBinding
 import com.duckduckgo.subscriptions.impl.ui.AddDeviceActivity.Companion.AddDeviceScreenWithEmptyParams
@@ -66,7 +66,7 @@ import org.json.JSONObject
 data class SubscriptionsWebViewActivityWithParams(
     val url: String,
     val screenTitle: String,
-) : GlobalActivityStarter.ActivityParams
+) : ActivityParams
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(SubscriptionsWebViewActivityWithParams::class)
@@ -151,7 +151,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity() {
             is RestoreSubscription -> restoreSubscription()
             is GoToITR -> goToITR()
             is GoToPIR -> goToPIR()
-            is GoToNetP -> goToNetP()
+            is GoToNetP -> goToNetP(command.activityParams)
         }
     }
 
@@ -163,8 +163,8 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity() {
         Toast.makeText(this, "Go To PIR", Toast.LENGTH_SHORT).show()
     }
 
-    private fun goToNetP() {
-        globalActivityStarter.start(this, NetPWaitlistInvitedScreenNoParams)
+    private fun goToNetP(params: ActivityParams) {
+        globalActivityStarter.start(this, params)
     }
 
     private fun renderPurchaseState(purchaseState: PurchaseStateView) {
