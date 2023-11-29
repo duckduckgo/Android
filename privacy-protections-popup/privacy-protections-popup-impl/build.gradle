@@ -30,6 +30,7 @@ dependencies {
     implementation project(':anvil-annotations')
     implementation project(':di')
     implementation project(':common-ui')
+    implementation project(':common-utils')
 
     implementation KotlinX.coroutines.android
     implementation AndroidX.core.ktx
@@ -48,6 +49,7 @@ dependencies {
         // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
+    testImplementation AndroidX.test.ext.junit
 }
 
 android {
