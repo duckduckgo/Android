@@ -403,7 +403,7 @@
     <string name="atp_ExcludeAppsManuallyCTANotNow">Ne tagad</string>
     <string name="atp_ActivityRecentActivityHeader">Darbības</string>
     <string name="atp_ActivityManageProtectionLabel">Radušās problēmas?</string>
-    <string name="atp_ActivityEnabledBannerLabel">Beta versijas stadijā dažu lietotņu aizsardzība ir automātiski atspējota. <annotation type="app_settings_link">Skatīt lietotnes</annotation></string>
+    <string name="atp_ActivityEnabledBannerLabel">Dažu lietotņu aizsardzība ir automātiski atspējota. <annotation type="app_settings_link">Skatīt lietotnes</annotation></string>
     <string name="atp_ActivityDescription">Šeit tiks parādīti bloķētie izsekošanas mēģinājumi</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="zero">%1$s no tavām lietotnēm ir aizsargātas pret slēptiem izsekotājiem, kuri mēģina piekļūt tavai personiskajai informācijai</item>
