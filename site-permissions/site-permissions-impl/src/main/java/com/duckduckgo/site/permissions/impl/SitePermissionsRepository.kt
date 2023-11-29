@@ -21,6 +21,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.site.permissions.impl.drmblock.DrmBlock
 import com.duckduckgo.site.permissions.store.SitePermissionsPreferences
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsDao
@@ -46,6 +47,7 @@ interface SitePermissionsRepository {
     fun sitePermissionsAllowedFlow(): Flow<List<SitePermissionAllowedEntity>>
     fun getDrmForSession(domain: String): Boolean?
     fun saveDrmForSession(domain: String, allowed: Boolean)
+    fun isDrmBlockedForUrlByConfig(url: String): Boolean
     suspend fun undoDeleteAll(sitePermissions: List<SitePermissionsEntity>, allowedSites: List<SitePermissionAllowedEntity>)
     suspend fun deleteAll()
     suspend fun getSitePermissionsForWebsite(url: String): SitePermissionsEntity?
@@ -61,6 +63,7 @@ class SitePermissionsRepositoryImpl @Inject constructor(
     private val sitePermissionsPreferences: SitePermissionsPreferences,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    private val drmBlock: DrmBlock,
 ) : SitePermissionsRepository {
 
     override var askCameraEnabled: Boolean
@@ -165,6 +168,10 @@ class SitePermissionsRepositoryImpl @Inject constructor(
 
     override fun saveDrmForSession(domain: String, allowed: Boolean) {
         drmSessions[domain] = allowed
+    }
+
+    override fun isDrmBlockedForUrlByConfig(url: String): Boolean {
+        return drmBlock.isDrmBlockedForUrl(url)
     }
 
     override suspend fun undoDeleteAll(sitePermissions: List<SitePermissionsEntity>, allowedSites: List<SitePermissionAllowedEntity>) {
