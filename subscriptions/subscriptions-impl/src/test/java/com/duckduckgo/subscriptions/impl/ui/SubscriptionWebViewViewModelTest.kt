@@ -6,8 +6,11 @@ import com.android.billingclient.api.ProductDetails.PricingPhase
 import com.android.billingclient.api.ProductDetails.PricingPhases
 import com.android.billingclient.api.ProductDetails.SubscriptionOfferDetails
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.networkprotection.api.NetPWaitlistInvitedScreenNoParams
+import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist
 import com.duckduckgo.subscriptions.impl.CurrentPurchase
 import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
@@ -41,12 +44,19 @@ class SubscriptionWebViewViewModelTest {
     private val jsonAdapter: JsonAdapter<SubscriptionOptionsJson> = moshi.adapter(SubscriptionOptionsJson::class.java)
     private val subscriptionsManager: SubscriptionsManager = mock()
     private val subscriptionsRepository: SubscriptionsRepository = mock()
+    private val networkProtectionWaitlist: NetworkProtectionWaitlist = mock()
 
     private lateinit var viewModel: SubscriptionWebViewViewModel
 
     @Before
-    fun setup() {
-        viewModel = SubscriptionWebViewViewModel(coroutineTestRule.testDispatcherProvider, subscriptionsManager, subscriptionsRepository)
+    fun setup() = runTest {
+        whenever(networkProtectionWaitlist.getScreenForCurrentState()).thenReturn(NetPWaitlistInvitedScreenNoParams)
+        viewModel = SubscriptionWebViewViewModel(
+            coroutineTestRule.testDispatcherProvider,
+            subscriptionsManager,
+            subscriptionsRepository,
+            networkProtectionWaitlist,
+        )
     }
 
     @Test
@@ -163,6 +173,75 @@ class SubscriptionWebViewViewModelTest {
         viewModel.commands().test {
             viewModel.processJsCallbackMessage("test", "activateSubscription", null, null)
             assertTrue(awaitItem() is Command.RestoreSubscription)
+        }
+    }
+
+    @Test
+    fun whenFeatureSelectedAndNoDataThenCommandNotSent() = runTest {
+        whenever(subscriptionsManager.hasSubscription()).thenReturn(false)
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "featureSelected", null, null)
+            ensureAllEventsConsumed()
+        }
+    }
+
+    @Test
+    fun whenFeatureSelectedAndInvalidDataThenCommandNotSent() = runTest {
+        whenever(subscriptionsManager.hasSubscription()).thenReturn(false)
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "featureSelected", null, JSONObject("{}"))
+            ensureAllEventsConsumed()
+        }
+    }
+
+    @Test
+    fun whenFeatureSelectedAndInvalidFeatureThenCommandNotSent() = runTest {
+        whenever(subscriptionsManager.hasSubscription()).thenReturn(false)
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "featureSelected", null, JSONObject("""{"feature":"test"}"""))
+            ensureAllEventsConsumed()
+        }
+    }
+
+    @Test
+    fun whenFeatureSelectedAndFeatureIsNetPThenCommandSent() = runTest {
+        whenever(subscriptionsManager.hasSubscription()).thenReturn(false)
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage(
+                "test",
+                "featureSelected",
+                null,
+                JSONObject("""{"feature":"${SubscriptionsConstants.NETP}"}"""),
+            )
+            assertTrue(awaitItem() is Command.GoToNetP)
+        }
+    }
+
+    @Test
+    fun whenFeatureSelectedAndFeatureIsItrThenCommandSent() = runTest {
+        whenever(subscriptionsManager.hasSubscription()).thenReturn(false)
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage(
+                "test",
+                "featureSelected",
+                null,
+                JSONObject("""{"feature":"${SubscriptionsConstants.ITR}"}"""),
+            )
+            assertTrue(awaitItem() is Command.GoToITR)
+        }
+    }
+
+    @Test
+    fun whenFeatureSelectedAndFeatureIsPirThenCommandSent() = runTest {
+        whenever(subscriptionsManager.hasSubscription()).thenReturn(false)
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage(
+                "test",
+                "featureSelected",
+                null,
+                JSONObject("""{"feature":"${SubscriptionsConstants.PIR}"}"""),
+            )
+            assertTrue(awaitItem() is Command.GoToPIR)
         }
     }
 
