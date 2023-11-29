@@ -23,14 +23,14 @@
     <string name="managementDisabledModeSubtitle">Per proteggere i tuoi accessi sono necessari una sequenza di blocco del dispositivo, un PIN o dati biometrici.</string>
     <string name="managementDisabledModeTitle">Proteggi il tuo dispositivo per salvare gli accessi</string>
 
-    <string name="saveLoginDialogButtonSave">Salva password</string>
+    <string name="saveLoginDialogButtonSave">Salva dati di accesso</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Salva password</string>
     <string name="saveLoginDialogNotNow">Non salvare</string>
-    <string name="saveLoginDialogSubtitle">Le password sono archiviate in modo sicuro sul tuo dispositivo nel menu Accessi.</string>
-    <string name="saveLoginDialogTitle">Vuoi che DuckDuckGo salvi la password?</string>
+    <string name="saveLoginDialogSubtitle">Gli accessi sono archiviati in modo sicuro sul tuo dispositivo nel menu Accessi.</string>
+    <string name="saveLoginDialogTitle">Vuoi che DuckDuckGo salvi i dati di accesso?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Altre opzioni</string>
 
-    <string name="useSavedLoginDialogTitle">Utilizzare una password salvata?</string>
+    <string name="useSavedLoginDialogTitle">Usare i dati di accesso salvati?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Password per %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Password per il sito</string>
     <string name="useSavedLoginDialogGroupThisWebsite">Da questo sito web</string>
@@ -43,7 +43,7 @@
     <string name="updateLoginDialogButtonUpdateUsername">Aggiorna nome utente</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Aggiornare la password per \n%1$s?</string>
-    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo aggiornerà questa password memorizzata sul tuo dispositivo.</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo aggiornerà questo accesso memorizzato sul tuo dispositivo.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Chiudi la finestra di dialogo della compilazione automatica</string>
 
