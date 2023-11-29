@@ -18,22 +18,18 @@ package com.duckduckgo.site.permissions.impl.di
 
 import android.content.Context
 import androidx.room.Room
-import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.site.permissions.store.ALL_MIGRATIONS
 import com.duckduckgo.site.permissions.store.SitePermissionsDatabase
 import com.duckduckgo.site.permissions.store.SitePermissionsPreferences
 import com.duckduckgo.site.permissions.store.SitePermissionsPreferencesImp
-import com.duckduckgo.site.permissions.store.drmblock.DrmBlockRepository
-import com.duckduckgo.site.permissions.store.drmblock.RealDrmBlockRepository
+import com.duckduckgo.site.permissions.store.drmblock.DrmBlockDao
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsDao
 import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissionsAllowedDao
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.CoroutineScope
 
 @Module
 @ContributesTo(AppScope::class)
@@ -61,17 +57,13 @@ object SitePermissionsModule {
     }
 
     @Provides
-    fun providesSitePermissionsPreferences(context: Context): SitePermissionsPreferences {
-        return SitePermissionsPreferencesImp(context)
+    @SingleInstanceIn(AppScope::class)
+    fun providesDrmBlockDao(sitePermissionsDatabase: SitePermissionsDatabase): DrmBlockDao {
+        return sitePermissionsDatabase.drmBlockDao()
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun provideDrmBlockRepository(
-        database: SitePermissionsDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
-        dispatcherProvider: DispatcherProvider,
-    ): DrmBlockRepository {
-        return RealDrmBlockRepository(database, coroutineScope, dispatcherProvider)
+    fun providesSitePermissionsPreferences(context: Context): SitePermissionsPreferences {
+        return SitePermissionsPreferencesImp(context)
     }
 }

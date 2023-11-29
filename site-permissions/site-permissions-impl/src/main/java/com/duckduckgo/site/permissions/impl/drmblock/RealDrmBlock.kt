@@ -17,18 +17,14 @@
 package com.duckduckgo.site.permissions.impl.drmblock
 
 import androidx.core.net.toUri
-import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
+import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
-import com.duckduckgo.site.permissions.api.DrmBlock
-import com.duckduckgo.site.permissions.store.drmblock.DrmBlockRepository
 import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
 class RealDrmBlock @Inject constructor(
     private val drmBlockFeature: DrmBlockFeature,
     private val drmBlockRepository: DrmBlockRepository,

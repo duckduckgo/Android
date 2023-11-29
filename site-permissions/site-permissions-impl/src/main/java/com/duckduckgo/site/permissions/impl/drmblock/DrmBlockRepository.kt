@@ -14,12 +14,19 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.site.permissions.store.drmblock
+package com.duckduckgo.site.permissions.impl.drmblock
 
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
-import com.duckduckgo.site.permissions.store.SitePermissionsDatabase
+import com.duckduckgo.site.permissions.store.drmblock.DrmBlockDao
+import com.duckduckgo.site.permissions.store.drmblock.DrmBlockExceptionEntity
+import com.duckduckgo.site.permissions.store.drmblock.toFeatureException
+import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
 import java.util.concurrent.CopyOnWriteArrayList
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -28,17 +35,18 @@ interface DrmBlockRepository {
     val exceptions: CopyOnWriteArrayList<FeatureException>
 }
 
-class RealDrmBlockRepository(
-    val database: SitePermissionsDatabase,
-    coroutineScope: CoroutineScope,
+@ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
+class RealDrmBlockRepository @Inject constructor(
+    val drmBlockDao: DrmBlockDao,
+    @AppCoroutineScope appCoroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider,
 ) : DrmBlockRepository {
 
-    private val drmBlockDao: DrmBlockDao = database.drmBlockDao()
     override val exceptions = CopyOnWriteArrayList<FeatureException>()
 
     init {
-        coroutineScope.launch(dispatcherProvider.io()) {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
             loadToMemory()
         }
     }

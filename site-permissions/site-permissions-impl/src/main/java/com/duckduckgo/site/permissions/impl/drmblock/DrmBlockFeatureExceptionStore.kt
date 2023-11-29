@@ -20,7 +20,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureExceptions
 import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
 import com.duckduckgo.site.permissions.store.drmblock.DrmBlockExceptionEntity
-import com.duckduckgo.site.permissions.store.drmblock.DrmBlockRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
