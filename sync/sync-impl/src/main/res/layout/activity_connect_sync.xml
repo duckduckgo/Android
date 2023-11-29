@@ -21,8 +21,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="?attr/daxColorSurface">
+    android:layout_height="match_parent">
 
     <LinearLayout
         app:layout_constraintStart_toStartOf="parent"
@@ -30,6 +29,7 @@
         app:layout_constraintTop_toTopOf="parent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="?attr/daxColorSurface"
         android:orientation="vertical">
 
     <include
@@ -39,8 +39,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="?attr/daxColorSurface">
+        android:orientation="vertical">
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/connect_hint"
@@ -63,15 +62,16 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="?attr/daxColorBackground">
 
         <ImageView
             android:id="@+id/qrCodeImageView"
             android:layout_width="@dimen/qrSizeMedium"
             android:layout_height="@dimen/qrSizeMedium"
             android:layout_gravity="center"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginStart="@dimen/keyline_5"
+            android:layout_marginTop="@dimen/keyline_5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="ContentDescription" />
@@ -106,6 +106,13 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     </LinearLayout>
+    
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/copyCodeButton"/>
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/copyCodeButton"
