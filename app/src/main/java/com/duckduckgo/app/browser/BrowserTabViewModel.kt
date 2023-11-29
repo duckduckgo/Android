@@ -1842,6 +1842,8 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    override fun getSite(): Site? = site
+
     override fun showFileChooser(
         filePathCallback: ValueCallback<Array<Uri>>,
         fileChooserParams: WebChromeClient.FileChooserParams,

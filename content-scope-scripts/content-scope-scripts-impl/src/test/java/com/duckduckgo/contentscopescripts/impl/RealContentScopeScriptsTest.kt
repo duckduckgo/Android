@@ -16,6 +16,7 @@
 
 package com.duckduckgo.contentscopescripts.impl
 
+import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -72,10 +73,10 @@ class RealContentScopeScriptsTest {
 
     @Test
     fun whenGetScriptWhenVariablesAreCachedAndNoChangesThenUseCachedVariables() {
-        var js = testee.getScript()
+        var js = testee.getScript(null)
         verifyJsScript(js)
 
-        js = testee.getScript()
+        js = testee.getScript(null)
 
         verifyJsScript(js)
         verify(mockContentScopeJsReader).getContentScopeJS()
@@ -85,7 +86,7 @@ class RealContentScopeScriptsTest {
 
     @Test
     fun whenGetScriptAndVariablesAreCachedAndAllowListChangedThenUseNewAllowListValue() {
-        var js = testee.getScript()
+        var js = testee.getScript(null)
         verifyJsScript(js)
 
         val newRegEx = Regex(
@@ -95,13 +96,13 @@ class RealContentScopeScriptsTest {
                 "\"unprotectedTemporary\":\\[" +
                 "\\{\"domain\":\"example\\.com\",\"reason\":\"reason\"\\}," +
                 "\\{\"domain\":\"foo\\.com\",\"reason\":\"reason2\"\\}\\]\\}, \\[\"foo\\.com\"\\], " +
-                "\\{\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\},\"sessionKey\":\"5678\"," +
+                "\\{\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\},\"sessionKey\":\"5678\",\"desktopModeEnabled\":false," +
                 "\"messageSecret\":\"([\\da-f]{32})\"," +
                 "\"messageCallback\":\"([\\da-f]{32})\"," +
                 "\"javascriptInterface\":\"([\\da-f]{32})\"\\}\\)$",
         )
         whenever(mockUserAllowListRepository.domainsInUserAllowList()).thenReturn(listOf(exampleUrl2))
-        js = testee.getScript()
+        js = testee.getScript(null)
 
         verifyJsScript(js, newRegEx)
         verify(mockUnprotectedTemporary, times(3)).unprotectedTemporaryExceptions
@@ -111,7 +112,7 @@ class RealContentScopeScriptsTest {
 
     @Test
     fun whenGetScriptAndVariablesAreCachedAndGpcChangedThenUseNewGpcValue() {
-        var js = testee.getScript()
+        var js = testee.getScript(null)
         verifyJsScript(js)
 
         val newRegEx = Regex(
@@ -122,12 +123,12 @@ class RealContentScopeScriptsTest {
                 "\\{\"domain\":\"example\\.com\",\"reason\":\"reason\"\\}," +
                 "\\{\"domain\":\"foo\\.com\",\"reason\":\"reason2\"\\}\\]\\}, \\[\"example\\.com\"\\], " +
                 "\\{\"globalPrivacyControlValue\":false,\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\},\"sessionKey\":\"5678\"," +
-                "\"messageSecret\":\"([\\da-f]{32})\"," +
+                "\"desktopModeEnabled\":false,\"messageSecret\":\"([\\da-f]{32})\"," +
                 "\"messageCallback\":\"([\\da-f]{32})\"," +
                 "\"javascriptInterface\":\"([\\da-f]{32})\"\\}\\)$",
         )
         whenever(mockPlugin2.preferences()).thenReturn("\"globalPrivacyControlValue\":false")
-        js = testee.getScript()
+        js = testee.getScript(null)
 
         verifyJsScript(js, newRegEx)
         verify(mockUnprotectedTemporary, times(3)).unprotectedTemporaryExceptions
@@ -137,7 +138,7 @@ class RealContentScopeScriptsTest {
 
     @Test
     fun whenGetScriptAndVariablesAreCachedAndConfigChangedThenUseNewConfigValue() {
-        var js = testee.getScript()
+        var js = testee.getScript(null)
         verifyJsScript(js)
 
         val newRegEx = Regex(
@@ -147,13 +148,13 @@ class RealContentScopeScriptsTest {
                 "\\{\"domain\":\"example\\.com\",\"reason\":\"reason\"\\}," +
                 "\\{\"domain\":\"foo\\.com\",\"reason\":\"reason2\"\\}\\]\\}, \\[\"example\\.com\"\\], " +
                 "\\{\"globalPrivacyControlValue\":true,\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\},\"sessionKey\":\"5678\"," +
-                "\"messageSecret\":\"([\\da-f]{32})\"," +
+                "\"desktopModeEnabled\":false,\"messageSecret\":\"([\\da-f]{32})\"," +
                 "\"messageCallback\":\"([\\da-f]{32})\"," +
                 "\"javascriptInterface\":\"([\\da-f]{32})\"\\}\\)$",
         )
         whenever(mockPlugin1.preferences()).thenReturn("\"globalPrivacyControlValue\":true")
         whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(mockPlugin1))
-        js = testee.getScript()
+        js = testee.getScript(null)
 
         verifyJsScript(js, newRegEx)
         verify(mockUnprotectedTemporary, times(3)).unprotectedTemporaryExceptions
@@ -163,7 +164,7 @@ class RealContentScopeScriptsTest {
 
     @Test
     fun whenGetScriptAndVariablesAreCachedAndUnprotectedTemporaryChangedThenUseNewUnprotectedTemporaryValue() {
-        var js = testee.getScript()
+        var js = testee.getScript(null)
         verifyJsScript(js)
 
         val newRegEx = Regex(
@@ -172,18 +173,42 @@ class RealContentScopeScriptsTest {
                 "\"config2\":\\{\"state\":\"disabled\"\\}\\}," +
                 "\"unprotectedTemporary\":\\[" +
                 "\\{\"domain\":\"example\\.com\",\"reason\":\"reason\"\\}\\]\\}, \\[\"example\\.com\"\\], " +
-                "\\{\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\},\"sessionKey\":\"5678\"," +
+                "\\{\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\},\"sessionKey\":\"5678\",\"desktopModeEnabled\":false," +
                 "\"messageSecret\":\"([\\da-f]{32})\"," +
                 "\"messageCallback\":\"([\\da-f]{32})\"," +
                 "\"javascriptInterface\":\"([\\da-f]{32})\"\\}\\)$",
         )
         whenever(mockUnprotectedTemporary.unprotectedTemporaryExceptions).thenReturn(listOf(unprotectedTemporaryException))
-        js = testee.getScript()
+        js = testee.getScript(null)
 
         verifyJsScript(js, newRegEx)
         verify(mockUnprotectedTemporary, times(4)).unprotectedTemporaryExceptions
         verify(mockUserAllowListRepository, times(3)).domainsInUserAllowList()
         verify(mockContentScopeJsReader, times(2)).getContentScopeJS()
+    }
+
+    @Test
+    fun whenGetScriptAndVariablesAreCachedAndDesktopModeChangedThenUseNewDesktopModeValue() {
+        var js = testee.getScript(null)
+        verifyJsScript(js)
+
+        val newRegEx = Regex(
+            "^processConfig\\(\\{\"features\":\\{" +
+                "\"config1\":\\{\"state\":\"enabled\"\\}," +
+                "\"config2\":\\{\"state\":\"disabled\"\\}\\}," +
+                "\"unprotectedTemporary\":\\[" +
+                "\\{\"domain\":\"example\\.com\",\"reason\":\"reason\"\\}," +
+                "\\{\"domain\":\"foo\\.com\",\"reason\":\"reason2\"\\}\\]\\}, \\[\"example\\.com\"\\], " +
+                "\\{\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\},\"sessionKey\":\"5678\",\"desktopModeEnabled\":true," +
+                "\"messageSecret\":\"([\\da-f]{32})\"," +
+                "\"messageCallback\":\"([\\da-f]{32})\"," +
+                "\"javascriptInterface\":\"([\\da-f]{32})\"\\}\\)$",
+        )
+        val site: Site = mock()
+        whenever(site.isDesktopMode).thenReturn(true)
+        js = testee.getScript(site)
+
+        verifyJsScript(js, newRegEx)
     }
 
     @Test
@@ -200,7 +225,7 @@ class RealContentScopeScriptsTest {
 
     @Test
     fun whenGetScriptThenPopulateMessagingParameters() {
-        val js = testee.getScript()
+        val js = testee.getScript(null)
         verifyJsScript(js)
         verify(mockContentScopeJsReader).getContentScopeJS()
     }
@@ -254,7 +279,7 @@ class RealContentScopeScriptsTest {
                 "\"unprotectedTemporary\":\\[" +
                 "\\{\"domain\":\"example\\.com\",\"reason\":\"reason\"\\}," +
                 "\\{\"domain\":\"foo\\.com\",\"reason\":\"reason2\"\\}\\]\\}, \\[\"example\\.com\"\\], " +
-                "\\{\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\},\"sessionKey\":\"5678\"," +
+                "\\{\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\},\"sessionKey\":\"5678\",\"desktopModeEnabled\":false," +
                 "\"messageSecret\":\"([\\da-f]{32})\"," +
                 "\"messageCallback\":\"([\\da-f]{32})\"," +
                 "\"javascriptInterface\":\"([\\da-f]{32})\"\\}\\)$",
