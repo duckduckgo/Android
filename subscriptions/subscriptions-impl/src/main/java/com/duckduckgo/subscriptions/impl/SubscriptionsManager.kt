@@ -20,6 +20,7 @@ import android.app.Activity
 import android.content.Context
 import com.android.billingclient.api.ProductDetails
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.SubscriptionsData.*
@@ -114,6 +115,7 @@ class RealSubscriptionsManager @Inject constructor(
     private val authService: AuthService,
     private val authDataStore: AuthDataStore,
     private val billingClientWrapper: BillingClientWrapper,
+    private val emailManager: EmailManager,
     private val context: Context,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
@@ -300,6 +302,7 @@ class RealSubscriptionsManager @Inject constructor(
 
     override suspend fun getAuthToken(): AuthToken {
         return if (isUserAuthenticated()) {
+            logcat { "Subs auth token is ${authDataStore.authToken}" }
             when (val response = getSubscriptionDataFromToken(authDataStore.authToken!!)) {
                 is Success -> {
                     return if (response.entitlements.isEmpty()) {
@@ -355,7 +358,7 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     private suspend fun createAccount(): CreateAccountResponse {
-        return authService.createAccount()
+        return authService.createAccount("Bearer ${emailManager.getToken()}")
     }
 
     private fun parseError(e: HttpException): ResponseError? {

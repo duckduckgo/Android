@@ -5,6 +5,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.PurchaseHistoryRecord
+import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.subscriptions.impl.SubscriptionsData.Failure
 import com.duckduckgo.subscriptions.impl.SubscriptionsData.Success
@@ -47,6 +48,7 @@ class RealSubscriptionsManagerTest {
 
     private val authService: AuthService = mock()
     private val authDataStore: AuthDataStore = FakeDataStore()
+    private val emailManager: EmailManager = mock()
     private val billingClient: BillingClientWrapper = mock()
     private val billingBuilder: BillingFlowParams.Builder = mock()
     private val context: Context = mock()
@@ -54,6 +56,7 @@ class RealSubscriptionsManagerTest {
 
     @Before
     fun before() {
+        whenever(emailManager.getToken()).thenReturn(null)
         whenever(context.packageName).thenReturn("packageName")
         whenever(billingClient.billingFlowParamsBuilder(any(), any(), any(), any())).thenReturn(billingBuilder)
         whenever(billingBuilder.build()).thenReturn(mock())
@@ -61,6 +64,7 @@ class RealSubscriptionsManagerTest {
             authService,
             authDataStore,
             billingClient,
+            emailManager,
             context,
             TestScope(),
             coroutineRule.testDispatcherProvider,
@@ -189,7 +193,17 @@ class RealSubscriptionsManagerTest {
 
         subscriptionsManager.purchase(mock(), mock(), "", false)
 
-        verify(authService).createAccount()
+        verify(authService).createAccount(any())
+    }
+
+    @Test
+    fun whenPurchaseFlowIfUserNotAuthenticatedAndNotPurchaseStoredAndSignedInEmailThenCreateAccountWithEmailToken() = runTest {
+        whenever(emailManager.getToken()).thenReturn("emailToken")
+        givenUserIsNotAuthenticated()
+
+        subscriptionsManager.purchase(mock(), mock(), "", false)
+
+        verify(authService).createAccount("Bearer emailToken")
     }
 
     @Test
@@ -377,6 +391,7 @@ class RealSubscriptionsManagerTest {
             authService,
             authDataStore,
             billingClient,
+            emailManager,
             context,
             TestScope(),
             coroutineRule.testDispatcherProvider,
@@ -397,6 +412,7 @@ class RealSubscriptionsManagerTest {
             authService,
             authDataStore,
             billingClient,
+            emailManager,
             context,
             TestScope(),
             coroutineRule.testDispatcherProvider,
@@ -417,6 +433,7 @@ class RealSubscriptionsManagerTest {
             authService,
             authDataStore,
             billingClient,
+            emailManager,
             context,
             TestScope(),
             coroutineRule.testDispatcherProvider,
@@ -436,6 +453,7 @@ class RealSubscriptionsManagerTest {
             authService,
             authDataStore,
             billingClient,
+            emailManager,
             context,
             TestScope(),
             coroutineRule.testDispatcherProvider,
@@ -455,6 +473,7 @@ class RealSubscriptionsManagerTest {
             authService,
             authDataStore,
             billingClient,
+            emailManager,
             context,
             TestScope(),
             coroutineRule.testDispatcherProvider,
@@ -478,6 +497,7 @@ class RealSubscriptionsManagerTest {
             authService,
             authDataStore,
             billingClient,
+            emailManager,
             context,
             TestScope(),
             coroutineRule.testDispatcherProvider,
@@ -503,6 +523,7 @@ class RealSubscriptionsManagerTest {
             authService,
             authDataStore,
             billingClient,
+            emailManager,
             context,
             TestScope(),
             coroutineRule.testDispatcherProvider,
@@ -617,11 +638,11 @@ class RealSubscriptionsManagerTest {
 
     private suspend fun givenCreateAccountFails() {
         val exception = "account_failure".toResponseBody("text/json".toMediaTypeOrNull())
-        whenever(authService.createAccount()).thenThrow(HttpException(Response.error<String>(400, exception)))
+        whenever(authService.createAccount(any())).thenThrow(HttpException(Response.error<String>(400, exception)))
     }
 
     private suspend fun givenCreateAccountSucceeds() {
-        whenever(authService.createAccount()).thenReturn(
+        whenever(authService.createAccount(any())).thenReturn(
             CreateAccountResponse(
                 authToken = "authToken",
                 externalId = "1234",

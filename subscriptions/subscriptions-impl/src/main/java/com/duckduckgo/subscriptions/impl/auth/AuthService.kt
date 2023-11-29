@@ -27,7 +27,7 @@ import retrofit2.http.POST
 @ContributesNonCachingServiceApi(AppScope::class)
 interface AuthService {
     @POST("https://quackdev.duckduckgo.com/api/auth/account/create")
-    suspend fun createAccount(): CreateAccountResponse
+    suspend fun createAccount(@Header("Authorization") authorization: String?): CreateAccountResponse
 
     @POST("https://quackdev.duckduckgo.com/api/auth/store-login")
     suspend fun storeLogin(@Body storeLoginBody: StoreLoginBody): StoreLoginResponse

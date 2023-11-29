@@ -48,6 +48,16 @@ class DuckDuckGoUrlDetectorTest {
     }
 
     @Test
+    fun whenCheckingSubdomainAndETLDisDDGThenReturnTrue() {
+        assertTrue(testee.isDuckDuckGoUrl("https://test.duckduckgo.com"))
+    }
+
+    @Test
+    fun whenCheckingSubdomainAndETLDisNotDDGThenReturnFalse() {
+        assertFalse(testee.isDuckDuckGoUrl("https://test.duckduckgo.test.com"))
+    }
+
+    @Test
     fun whenDDGUrlContainsQueryThenQueryCanBeExtracted() {
         val query = testee.extractQuery("https://duckduckgo.com?q=test%20search")
         assertEquals("test search", query)
@@ -132,8 +142,13 @@ class DuckDuckGoUrlDetectorTest {
     }
 
     @Test
-    fun whenUrlContainsSubdomainAndIsFromDuckDuckGoEmailUrlThenReturnFalse() {
-        assertFalse(testee.isDuckDuckGoEmailUrl("https://test.duckduckgo.com/email"))
+    fun whenUrlContainsSubdomainAndIsETLDForDuckDuckGoEmailUrlThenReturnTrue() {
+        assertTrue(testee.isDuckDuckGoEmailUrl("https://test.duckduckgo.com/email"))
+    }
+
+    @Test
+    fun whenUrlContainsSubdomainAndIsNotETLDForDuckDuckGoEmailUrlThenReturnTrue() {
+        assertFalse(testee.isDuckDuckGoEmailUrl("https://test.duckduckgo.test.com/email"))
     }
 
     @Test
