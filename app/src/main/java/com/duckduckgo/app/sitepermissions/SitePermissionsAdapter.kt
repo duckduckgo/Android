@@ -196,9 +196,9 @@ class SitePermissionsAdapter(
                 }
                 R.string.sitePermissionsSettingsCamera -> {
                     if (item.enable) {
-                        R.drawable.ic_camera_24
+                        R.drawable.ic_video_24
                     } else {
-                        R.drawable.ic_camera_blocked_24
+                        R.drawable.ic_video_blocked_24
                     }
                 }
                 R.string.sitePermissionsSettingsMicrophone -> {
