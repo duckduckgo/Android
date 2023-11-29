@@ -26,6 +26,7 @@ import android.webkit.PermissionRequest
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
+import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
@@ -100,4 +101,6 @@ interface WebViewClientListener {
     fun recordHttpErrorCode(statusCode: Int, url: String)
 
     fun getCurrentTabId(): String
+
+    fun getSite(): Site?
 }

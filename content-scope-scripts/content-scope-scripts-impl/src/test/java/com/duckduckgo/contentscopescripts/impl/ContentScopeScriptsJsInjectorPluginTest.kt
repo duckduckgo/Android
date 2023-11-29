@@ -1,6 +1,7 @@
 package com.duckduckgo.contentscopescripts.impl
 
 import android.webkit.WebView
+import com.duckduckgo.app.global.model.Site
 import java.util.*
 import org.junit.Assert.*
 import org.junit.Before
@@ -27,18 +28,28 @@ class ContentScopeScriptsJsInjectorPluginTest {
     @Test
     fun whenEnabledAndInjectContentScopeScriptsThenPopulateMessagingParameters() {
         whenever(mockCoreContentScopeScripts.isEnabled()).thenReturn(true)
-        whenever(mockCoreContentScopeScripts.getScript()).thenReturn("")
-        contentScopeScriptsJsInjectorPlugin.onPageStarted(mockWebView, null)
+        whenever(mockCoreContentScopeScripts.getScript(null)).thenReturn("")
+        contentScopeScriptsJsInjectorPlugin.onPageStarted(mockWebView, null, null)
 
-        verify(mockCoreContentScopeScripts).getScript()
+        verify(mockCoreContentScopeScripts).getScript(null)
         verify(mockWebView).evaluateJavascript(any(), anyOrNull())
     }
 
     @Test
     fun whenDisabledAndInjectContentScopeScriptsThenDoNothing() {
         whenever(mockCoreContentScopeScripts.isEnabled()).thenReturn(false)
-        contentScopeScriptsJsInjectorPlugin.onPageStarted(mockWebView, null)
+        contentScopeScriptsJsInjectorPlugin.onPageStarted(mockWebView, null, null)
 
         verifyNoInteractions(mockWebView)
+    }
+
+    @Test
+    fun whenEnabledAndInjectContentScopeScriptsThenUseSite() {
+        val site: Site = mock()
+        whenever(mockCoreContentScopeScripts.isEnabled()).thenReturn(true)
+        whenever(mockCoreContentScopeScripts.getScript(site)).thenReturn("")
+        contentScopeScriptsJsInjectorPlugin.onPageStarted(mockWebView, null, site)
+
+        verify(mockCoreContentScopeScripts).getScript(site)
     }
 }
