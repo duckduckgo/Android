@@ -83,6 +83,11 @@ interface SubscriptionsManager {
     suspend fun getAccessToken(): AccessToken
 
     /**
+     * Returns [true] if the user has an active subscription and [false] otherwise
+     */
+    suspend fun hasSubscription(): Boolean
+
+    /**
      * Flow to know if a user is signed in or not
      */
     val isSignedIn: Flow<Boolean>
@@ -93,7 +98,7 @@ interface SubscriptionsManager {
     val hasSubscription: Flow<Boolean>
 
     /**
-     * Flow to know if a user is signed in or not
+     * Flow to know the state of the current purchase
      */
     val currentPurchaseState: Flow<CurrentPurchase>
 
@@ -173,10 +178,11 @@ class RealSubscriptionsManager @Inject constructor(
         _hasSubscription.emit(hasSubscription)
     }
 
-    private suspend fun hasSubscription(): Boolean {
+    override suspend fun hasSubscription(): Boolean {
         return when (val result = getSubscriptionData()) {
             is Success -> {
                 val isSubscribed = result.entitlements.isNotEmpty()
+                _hasSubscription.emit(isSubscribed)
                 isSubscribed
             }
             is Failure -> {

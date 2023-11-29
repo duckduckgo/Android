@@ -101,9 +101,19 @@ class SubscriptionWebViewViewModel @Inject constructor(
             "backToSettings" -> backToSettings()
             "getSubscriptionOptions" -> id?.let { getSubscriptionOptions(featureName, method, it) }
             "subscriptionSelected" -> subscriptionSelected(data)
-            "activateSubscription" -> activateOnAnotherDevice()
+            "activateSubscription" -> activateSubscription()
             else -> {
                 // NOOP
+            }
+        }
+    }
+
+    private fun activateSubscription() {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            if (subscriptionsManager.hasSubscription()) {
+                activateOnAnotherDevice()
+            } else {
+                recoverSubscription()
             }
         }
     }
@@ -159,6 +169,12 @@ class SubscriptionWebViewViewModel @Inject constructor(
         }
     }
 
+    private fun recoverSubscription() {
+        viewModelScope.launch {
+            command.send(RestoreSubscription)
+        }
+    }
+
     private fun activateOnAnotherDevice() {
         viewModelScope.launch {
             command.send(ActivateOnAnotherDevice)
@@ -198,6 +214,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
         data class SendResponseToJs(val data: JsCallbackData) : Command()
         data class SubscriptionSelected(val id: String) : Command()
         data object ActivateOnAnotherDevice : Command()
+        data object RestoreSubscription : Command()
     }
 
     companion object {
