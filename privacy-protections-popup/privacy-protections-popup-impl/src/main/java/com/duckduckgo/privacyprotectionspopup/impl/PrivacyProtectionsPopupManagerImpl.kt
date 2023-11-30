@@ -62,7 +62,7 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
         State(
             featureAvailable = false,
             protectionsEnabled = null,
-            refreshTriggered = false,
+            refreshTriggeredAt = null,
             domain = null,
             hasHttpErrorCodes = false,
             popupDismissed = null,
@@ -101,7 +101,7 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
     }
 
     override fun onPageRefreshTriggeredByUser() {
-        state.update { it.copy(refreshTriggered = true) }
+        state.update { it.copy(refreshTriggeredAt = timeProvider.getCurrentTime()) }
     }
 
     override fun onPageLoaded(
@@ -113,7 +113,7 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
 
             if (newDomain != oldState.domain) {
                 oldState.copy(
-                    refreshTriggered = false,
+                    refreshTriggeredAt = null,
                     protectionsEnabled = null,
                     domain = newDomain,
                     hasHttpErrorCodes = httpErrorCodes.isNotEmpty(),
@@ -182,7 +182,7 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
     private data class State(
         val featureAvailable: Boolean,
         val protectionsEnabled: Boolean?,
-        val refreshTriggered: Boolean,
+        val refreshTriggeredAt: Instant?,
         val domain: String?,
         val hasHttpErrorCodes: Boolean,
         val popupDismissed: PopupDismissed?,
@@ -194,6 +194,9 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
     }
 
     private fun createViewState(state: State): PrivacyProtectionsPopupViewState = with(state) {
+        val refreshTriggered = refreshTriggeredAt != null &&
+            refreshTriggeredAt + REFRESH_TRIGGER_VALID_DURATION > timeProvider.getCurrentTime()
+
         val popupDismissed = when (popupDismissed) {
             is DismissedAt -> {
                 popupDismissed.timestamp + DISMISS_REMEMBER_DURATION > timeProvider.getCurrentTime()
@@ -214,6 +217,7 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
     }
 
     private companion object {
+        val REFRESH_TRIGGER_VALID_DURATION: Duration = Duration.ofMillis(100)
         val DISMISS_REMEMBER_DURATION: Duration = Duration.ofDays(1)
     }
 }
