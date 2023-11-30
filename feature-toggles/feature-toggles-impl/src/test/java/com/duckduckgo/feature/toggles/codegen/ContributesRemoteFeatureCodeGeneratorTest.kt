@@ -42,7 +42,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.times
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
@@ -1112,8 +1111,19 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                     }
                                 ]
                             },
-                            "variantFeature": {
+                            "experimentFooFeature": {
                                 "state": "enabled",
+                                "targets": [
+                                    {
+                                        "variantKey": "ma"
+                                    },
+                                    {
+                                        "variantKey": "mb"
+                                    }
+                                ]
+                            },
+                            "variantFeature": {
+                                "state": "disabled",
                                 "targets": [
                                     {
                                         "variantKey": "mc"
@@ -1127,7 +1137,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         )
 
         assertTrue(testFeature.self().isEnabled())
-        assertFalse(testFeature.fooFeature().isEnabled())
+        // true because it's not an experiment and so variants are ignored
+        assertTrue(testFeature.fooFeature().isEnabled())
         assertEquals(
             listOf(
                 Toggle.State.Target("ma"),
@@ -1135,7 +1146,17 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             ),
             testFeature.fooFeature().getRawStoredState()!!.targets,
         )
-        assertTrue(testFeature.variantFeature().isEnabled())
+        // false because it is an experiment and so variants are considered
+        assertFalse(testFeature.experimentFooFeature().isEnabled())
+        assertEquals(
+            listOf(
+                Toggle.State.Target("ma"),
+                Toggle.State.Target("mb"),
+            ),
+            testFeature.experimentFooFeature().getRawStoredState()!!.targets,
+        )
+
+        assertFalse(testFeature.variantFeature().isEnabled())
         assertEquals(
             listOf(
                 Toggle.State.Target("mc"),
@@ -1151,6 +1172,14 @@ class ContributesRemoteFeatureCodeGeneratorTest {
 
         val privacyPlugin = (feature as PrivacyFeaturePlugin)
 
+        assertFalse(testFeature.self().isEnabled())
+        assertEquals(0, variantManager.saveVariantsCallCounter)
+        assertNull(variantManager.variant)
+        assertFalse(testFeature.experimentFooFeature().isEnabled())
+        // variant is null at this moment, feature flag targets variants, we should assign the default variant
+        assertEquals(1, variantManager.saveVariantsCallCounter)
+        assertEquals("", variantManager.variant)
+
         // all disabled
         assertTrue(
             privacyPlugin.store(
@@ -1159,7 +1188,67 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                     {
                         "state": "enabled",
                         "features": {
-                            "fooFeature": {
+                            "experimentFooFeature": {
+                                "state": "enabled",
+                                "targets": [
+                                    {
+                                        "variantKey": "ma"
+                                    },
+                                    {
+                                        "variantKey": "mb"
+                                    }
+                                ]
+                            },
+                            "variantFeature": {
+                                "state": "enabled",
+                                "targets": [
+                                    {
+                                        "variantKey": "mc"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                """.trimIndent(),
+            ),
+        )
+
+        // Remains false as assigned variant now is ""
+        assertFalse(testFeature.experimentFooFeature().isEnabled())
+        assertEquals(
+            listOf(
+                Toggle.State.Target("ma"),
+                Toggle.State.Target("mb"),
+            ),
+            testFeature.experimentFooFeature().getRawStoredState()!!.targets,
+        )
+        assertTrue(testFeature.variantFeature().isEnabled())
+        assertEquals("", variantManager.variant)
+        assertEquals(1, variantManager.saveVariantsCallCounter)
+        assertEquals(
+            listOf(
+                Toggle.State.Target("mc"),
+            ),
+            testFeature.variantFeature().getRawStoredState()!!.targets,
+        )
+    }
+
+    @Test
+    fun `test variant when assigned variant key is not null`() {
+        variantManager.variant = "na"
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+
+        // all disabled
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                    {
+                        "state": "enabled",
+                        "features": {
+                            "experimentFooFeature": {
                                 "state": "enabled",
                                 "targets": [
                                     {
@@ -1185,17 +1274,22 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         )
 
         assertTrue(testFeature.self().isEnabled())
-        assertFalse(testFeature.fooFeature().isEnabled())
         assertEquals(0, variantManager.saveVariantsCallCounter)
+        assertEquals("na", variantManager.variant)
+        assertFalse(testFeature.experimentFooFeature().isEnabled())
+        // variant is null at this moment, feature flag targets variants, we should assign the default variant
+        assertEquals(0, variantManager.saveVariantsCallCounter)
+        assertEquals("na", variantManager.variant)
         assertEquals(
             listOf(
                 Toggle.State.Target("ma"),
                 Toggle.State.Target("mb"),
             ),
-            testFeature.fooFeature().getRawStoredState()!!.targets,
+            testFeature.experimentFooFeature().getRawStoredState()!!.targets,
         )
-        assertFalse(testFeature.variantFeature().isEnabled())
+        assertTrue(testFeature.variantFeature().isEnabled())
         assertEquals(0, variantManager.saveVariantsCallCounter)
+        assertEquals("na", variantManager.variant)
         assertEquals(
             listOf(
                 Toggle.State.Target("mc"),
@@ -1219,7 +1313,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                     {
                         "state": "enabled",
                         "features": {
-                            "variantFeatureForcesDefaultVariant": {
+                            "experimentDisabledByDefault": {
                                 "state": "enabled",
                                 "targets": [
                                     {
@@ -1234,14 +1328,14 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         )
 
         assertTrue(testFeature.self().isEnabled())
-        assertFalse(testFeature.variantFeatureForcesDefaultVariant().isEnabled())
+        assertFalse(testFeature.experimentDisabledByDefault().isEnabled())
         assertEquals(1, variantManager.saveVariantsCallCounter)
         assertEquals("", variantManager.getVariantKey())
         assertEquals(
             listOf(
                 Toggle.State.Target("mc"),
             ),
-            testFeature.variantFeatureForcesDefaultVariant().getRawStoredState()!!.targets,
+            testFeature.experimentDisabledByDefault().getRawStoredState()!!.targets,
         )
     }
 
@@ -1260,7 +1354,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                     {
                         "state": "enabled",
                         "features": {
-                            "variantFeatureForcesDefaultVariant": {
+                            "experimentDisabledByDefault": {
                                 "state": "enabled",
                                 "targets": [
                                     {
@@ -1275,14 +1369,14 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         )
 
         assertTrue(testFeature.self().isEnabled())
-        assertTrue(testFeature.variantFeatureForcesDefaultVariant().isEnabled())
+        assertTrue(testFeature.experimentDisabledByDefault().isEnabled())
         assertEquals(1, variantManager.saveVariantsCallCounter)
         assertEquals("", variantManager.getVariantKey())
         assertEquals(
             listOf(
                 Toggle.State.Target(""),
             ),
-            testFeature.variantFeatureForcesDefaultVariant().getRawStoredState()!!.targets,
+            testFeature.experimentDisabledByDefault().getRawStoredState()!!.targets,
         )
     }
 
@@ -1301,7 +1395,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                     {
                         "state": "enabled",
                         "features": {
-                            "variantFeatureForcesDefaultVariant": {
+                            "experimentDisabledByDefault": {
                                 "state": "enabled",
                                 "targets": [
                                     {
@@ -1316,14 +1410,14 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         )
 
         assertTrue(testFeature.self().isEnabled())
-        assertTrue(testFeature.variantFeatureForcesDefaultVariant().isEnabled())
+        assertTrue(testFeature.experimentDisabledByDefault().isEnabled())
         assertEquals(0, variantManager.saveVariantsCallCounter)
         assertEquals("mc", variantManager.getVariantKey())
         assertEquals(
             listOf(
                 Toggle.State.Target("mc"),
             ),
-            testFeature.variantFeatureForcesDefaultVariant().getRawStoredState()!!.targets,
+            testFeature.experimentDisabledByDefault().getRawStoredState()!!.targets,
         )
     }
 

@@ -92,8 +92,8 @@ class FeatureToggles private constructor(
             val isInternalAlwaysEnabledAnnotated: Boolean = runCatching {
                 method.getAnnotation(Toggle.InternalAlwaysEnabled::class.java)
             }.getOrNull() != null
-            val forcesDefaultVariant: Boolean = runCatching {
-                method.getAnnotation(Toggle.ForcesDefaultVariantIfNull::class.java)
+            val isExperiment: Boolean = runCatching {
+                method.getAnnotation(Toggle.Experiment::class.java)
             }.getOrNull() != null
 
             return ToggleImpl(
@@ -101,7 +101,7 @@ class FeatureToggles private constructor(
                 key = getToggleNameForMethod(method),
                 defaultValue = defaultValue,
                 isInternalAlwaysEnabled = isInternalAlwaysEnabledAnnotated,
-                forcesDefaultVariant = forcesDefaultVariant,
+                isExperiment = isExperiment,
                 appVersionProvider = appVersionProvider,
                 flavorNameProvider = flavorNameProvider,
                 appVariantProvider = appVariantProvider,
@@ -200,13 +200,13 @@ interface Toggle {
     annotation class InternalAlwaysEnabled
 
     /**
-     * This annotation is optional and it should be used in feature flags that related to experimentation.
+     * This annotation should be used in feature flags that related to experimentation.
      * It will make the feature flag to set the default variant if [isEnabled] is called BEFORE any variant has been allocated.
-     * This annotation should be used ONLY in experiments that happen in the first (eg. onboarding) screens of the application.
+     * It will make the feature flag to consider the target variants during the [isEnabled] evaluation.
      */
     @Target(AnnotationTarget.FUNCTION)
     @Retention(AnnotationRetention.RUNTIME)
-    annotation class ForcesDefaultVariantIfNull
+    annotation class Experiment
 }
 
 internal class ToggleImpl constructor(
@@ -214,7 +214,7 @@ internal class ToggleImpl constructor(
     private val key: String,
     private val defaultValue: Boolean,
     private val isInternalAlwaysEnabled: Boolean,
-    private val forcesDefaultVariant: Boolean,
+    private val isExperiment: Boolean,
     private val appVersionProvider: () -> Int,
     private val flavorNameProvider: () -> String = { "" },
     private val appVariantProvider: () -> String?,
@@ -231,9 +231,12 @@ internal class ToggleImpl constructor(
     }
 
     override fun isEnabled(): Boolean {
-        fun evaluateLocalEnable(state: State): Boolean {
+        fun evaluateLocalEnable(state: State, isExperiment: Boolean): Boolean {
+            // variants are only considered for Experiment feature flags
+            val isVariantTreated = if (isExperiment) state.isVariantTreated(appVariantProvider.invoke()) else true
+
             return state.enable &&
-                state.isVariantTreated(appVariantProvider.invoke()) &&
+                isVariantTreated &&
                 appVersionProvider.invoke() >= (state.minSupportedVersion ?: 0)
         }
         // check if it should always be enabled for internal builds
@@ -241,15 +244,15 @@ internal class ToggleImpl constructor(
             return true
         }
         // If there's not assigned variant yet and feature forces default variant, set default variant
-        if (appVariantProvider.invoke() == null && forcesDefaultVariant) {
+        if (appVariantProvider.invoke() == null && isExperiment) {
             forceDefaultVariant.invoke()
         }
 
         // normal check
         return store.get(key)?.let { state ->
             state.remoteEnableState?.let { remoteState ->
-                remoteState && evaluateLocalEnable(state)
-            } ?: evaluateLocalEnable(state)
+                remoteState && evaluateLocalEnable(state, isExperiment)
+            } ?: evaluateLocalEnable(state, isExperiment)
         } ?: return defaultValue
     }
 
