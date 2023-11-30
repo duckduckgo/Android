@@ -62,6 +62,14 @@
         app:secondaryText="@string/cookiePopupProtectionDescription" />
 
     <com.duckduckgo.common.ui.view.listitem.CheckListItem
+        android:id="@+id/vpnSetting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/atp_SettingsTitle"
+        app:primaryTextTruncated="false"
+        app:secondaryText="@string/atp_SettingsDeviceShieldDisabled" />
+
+    <com.duckduckgo.common.ui.view.listitem.CheckListItem
         android:id="@+id/emailSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -69,14 +77,6 @@
         app:primaryTextTruncated="false"
         app:secondaryText="@string/settingsEmailProtectionSubtitle"
         app:showBetaPill="true" />
-
-    <com.duckduckgo.common.ui.view.listitem.CheckListItem
-        android:id="@+id/vpnSetting"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/atp_SettingsTitle"
-        app:primaryTextTruncated="false"
-        app:secondaryText="@string/atp_SettingsDeviceShieldDisabled" />
 
     <com.duckduckgo.common.ui.view.listitem.CheckListItem
         android:id="@+id/netpPSetting"
