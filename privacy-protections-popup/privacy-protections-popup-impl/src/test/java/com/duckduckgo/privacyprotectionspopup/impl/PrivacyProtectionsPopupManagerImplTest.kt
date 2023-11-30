@@ -19,6 +19,7 @@ package com.duckduckgo.privacyprotectionspopup.impl
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DISABLE_PROTECTIONS_CLICKED
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DISMISSED
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DISMISS_CLICKED
@@ -26,6 +27,10 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -33,6 +38,8 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.threeten.bp.Duration
+import org.threeten.bp.Instant
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
@@ -45,10 +52,16 @@ class PrivacyProtectionsPopupManagerImplTest {
 
     private val protectionsStateProvider = FakeProtectionsStateProvider()
 
+    private val timeProvider = FakeTimeProvider()
+
+    private val repository = FakePrivacyProtectionsPopupRepository()
+
     private val subject = PrivacyProtectionsPopupManagerImpl(
         appCoroutineScope = coroutineRule.testScope,
         featureAvailability = featureAvailability,
         protectionsStateProvider = protectionsStateProvider,
+        timeProvider = timeProvider,
+        repository = repository,
     )
 
     @Test
@@ -139,6 +152,7 @@ class PrivacyProtectionsPopupManagerImplTest {
         subject.onUiEvent(DISMISS_CLICKED)
 
         assertPopupVisible(visible = false)
+        assertStoredPopupDismissTimestamp(url = "https://www.example.com", expectedTimestamp = timeProvider.time)
     }
 
     @Test
@@ -151,6 +165,56 @@ class PrivacyProtectionsPopupManagerImplTest {
         subject.onUiEvent(DISABLE_PROTECTIONS_CLICKED)
 
         assertPopupVisible(visible = false)
+        assertStoredPopupDismissTimestamp(url = "https://www.example.com", expectedTimestamp = timeProvider.time)
+    }
+
+    @Test
+    fun whenPopupWasDismissedRecentlyForTheSameDomainThenItWontBeShownOnRefresh() = runTest {
+        subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList())
+        subject.onPageRefreshTriggeredByUser()
+        subject.onUiEvent(DISMISSED)
+        assertStoredPopupDismissTimestamp(url = "https://www.example.com", expectedTimestamp = timeProvider.time)
+
+        subject.onPageRefreshTriggeredByUser()
+
+        assertPopupVisible(visible = false)
+        assertStoredPopupDismissTimestamp(url = "https://www.example.com", expectedTimestamp = timeProvider.time)
+    }
+
+    @Test
+    fun whenPopupWasDismissedMoreThan24HoursAgoForTheSameDomainThenItIsShownAgainOnRefresh() = runTest {
+        timeProvider.time = Instant.parse("2023-11-29T10:15:30.000Z")
+        subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList())
+        subject.onPageRefreshTriggeredByUser()
+        subject.onUiEvent(DISMISSED)
+        assertStoredPopupDismissTimestamp(url = "https://www.example.com", expectedTimestamp = timeProvider.time)
+        timeProvider.time += Duration.ofHours(24)
+
+        subject.onPageRefreshTriggeredByUser()
+
+        assertPopupVisible(visible = true)
+    }
+
+    @Test
+    fun whenPopupWasDismissedRecentlyThenItWontBeShownOnForTheSameDomainButWillBeForOtherDomains() = runTest {
+        subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList())
+        subject.onPageRefreshTriggeredByUser()
+        subject.onUiEvent(DISMISSED)
+
+        subject.onPageRefreshTriggeredByUser()
+
+        assertPopupVisible(visible = false)
+
+        subject.onPageLoaded(url = "https://www.example2.com", httpErrorCodes = emptyList())
+        subject.onPageRefreshTriggeredByUser()
+
+        assertPopupVisible(visible = true)
+
+        subject.onUiEvent(DISMISSED)
+        subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList())
+        subject.onPageRefreshTriggeredByUser()
+
+        assertPopupVisible(visible = false)
     }
 
     private suspend fun assertPopupVisible(visible: Boolean) {
@@ -158,6 +222,11 @@ class PrivacyProtectionsPopupManagerImplTest {
             assertEquals(visible, awaitItem().visible)
             expectNoEvents()
         }
+    }
+
+    private suspend fun assertStoredPopupDismissTimestamp(url: String, expectedTimestamp: Instant?) {
+        val dismissedAt = repository.getPopupDismissTime(url.extractDomain()!!).first()
+        assertEquals(expectedTimestamp, dismissedAt)
     }
 }
 
@@ -179,4 +248,26 @@ private class FakeProtectionsStateProvider : ProtectionsStateProvider {
         get() = _protectionsEnabled.value
 
     override fun areProtectionsEnabled(domain: String): Flow<Boolean> = _protectionsEnabled.asStateFlow()
+}
+
+private class FakeTimeProvider : TimeProvider {
+
+    var time: Instant = Instant.parse("2023-11-29T10:15:30.000Z")
+
+    override fun getCurrentTime(): Instant = time
+}
+
+private class FakePrivacyProtectionsPopupRepository : PrivacyProtectionsPopupRepository {
+
+    private val data = MutableStateFlow(emptyMap<String, Instant>())
+
+    override fun getPopupDismissTime(domain: String): Flow<Instant?> =
+        data.map { it[domain] }.distinctUntilChanged()
+
+    override suspend fun setPopupDismissTime(
+        domain: String,
+        time: Instant,
+    ) {
+        data.update { it + (domain to time) }
+    }
 }
