@@ -27,14 +27,14 @@
         android:layout_height="wrap_content"
         app:primaryText="@string/settingsHeadingPrivacy" />
 
-    <com.duckduckgo.app.settings.CheckListItem
+    <com.duckduckgo.common.ui.view.listitem.CheckListItem
         android:id="@+id/setAsDefaultBrowserSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryText="@string/settingsDefaultBrowserTitle"
         app:secondaryText="@string/settingsDefaultBrowserNotSetDescription"/>
 
-    <com.duckduckgo.app.settings.CheckListItem
+    <com.duckduckgo.common.ui.view.listitem.CheckListItem
         android:id="@+id/privateSearchSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -43,7 +43,7 @@
         app:primaryTextTruncated="false"
         app:secondaryText="@string/settingsPrivateSearchDescription" />
 
-    <com.duckduckgo.app.settings.CheckListItem
+    <com.duckduckgo.common.ui.view.listitem.CheckListItem
         android:id="@+id/webTrackingProtectionSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -52,7 +52,7 @@
         app:primaryTextTruncated="false"
         app:secondaryText="@string/settingsWebTrackingProtectionDescription" />
 
-    <com.duckduckgo.app.settings.CheckListItem
+    <com.duckduckgo.common.ui.view.listitem.CheckListItem
         android:id="@+id/cookiePopupProtectionSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -61,7 +61,7 @@
         app:primaryTextTruncated="false"
         app:secondaryText="@string/cookiePopupProtectionDescription" />
 
-    <com.duckduckgo.app.settings.CheckListItem
+    <com.duckduckgo.common.ui.view.listitem.CheckListItem
         android:id="@+id/emailSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -70,7 +70,7 @@
         app:secondaryText="@string/settingsEmailProtectionSubtitle"
         app:showBetaPill="true" />
 
-    <com.duckduckgo.app.settings.CheckListItem
+    <com.duckduckgo.common.ui.view.listitem.CheckListItem
         android:id="@+id/vpnSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -79,7 +79,7 @@
         app:secondaryText="@string/atp_SettingsDeviceShieldDisabled"
         app:showBetaPill="true" />
 
-    <com.duckduckgo.app.settings.CheckListItem
+    <com.duckduckgo.common.ui.view.listitem.CheckListItem
         android:id="@+id/netpPSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
