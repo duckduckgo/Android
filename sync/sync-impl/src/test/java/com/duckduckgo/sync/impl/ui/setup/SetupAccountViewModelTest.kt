@@ -18,7 +18,6 @@ package com.duckduckgo.sync.impl.ui.setup
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode

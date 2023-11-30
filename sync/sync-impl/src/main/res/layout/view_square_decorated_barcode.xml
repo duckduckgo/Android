@@ -32,7 +32,8 @@
         app:typography="h5"
         android:padding="@dimen/keyline_2"
         android:background="@color/daxColorBlurLight"
-        android:text="@string/login_screen_barcode_hint" />
+        android:text="@string/login_screen_barcode_hint"
+        tools:ignore="RtlCompat" />
 
     <com.duckduckgo.sync.impl.ui.qrcode.BlurredTextContainer
         android:id="@+id/barcodeCta"

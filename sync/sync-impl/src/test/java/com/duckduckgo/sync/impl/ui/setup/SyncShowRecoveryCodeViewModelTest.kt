@@ -18,14 +18,12 @@ package com.duckduckgo.sync.impl.ui.setup
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.ui.setup.SyncDeviceConnectedViewModel.Command.FinishSetupFlow
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.mock
 
 @ExperimentalCoroutinesApi
 class SyncShowRecoveryCodeViewModelTest {
