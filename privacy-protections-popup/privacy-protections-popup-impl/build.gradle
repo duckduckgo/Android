@@ -31,6 +31,9 @@ dependencies {
     implementation project(':di')
     implementation project(':common-ui')
     implementation project(':common-utils')
+    implementation project(':browser-api')
+    implementation project(':privacy-config-api')
+    implementation project(':feature-toggles-api')
 
     implementation KotlinX.coroutines.android
     implementation AndroidX.core.ktx

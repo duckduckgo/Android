@@ -17,6 +17,7 @@
 package com.duckduckgo.privacyprotectionspopup.impl
 
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupManager
@@ -56,6 +57,7 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
     private val protectionsStateProvider: ProtectionsStateProvider,
     private val timeProvider: TimeProvider,
     private val repository: PrivacyProtectionsPopupRepository,
+    private val userAllowListRepository: UserAllowListRepository,
 ) : PrivacyProtectionsPopupManager {
 
     private val state = MutableStateFlow(
@@ -94,7 +96,11 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
 
             DISABLE_PROTECTIONS_CLICKED -> {
                 // TODO pixel
-                // TODO add to allowlist
+                state.value.domain?.let { domain ->
+                    appCoroutineScope.launch {
+                        userAllowListRepository.addDomainToUserAllowList(domain)
+                    }
+                }
                 dismissPopup()
             }
         }
