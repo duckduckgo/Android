@@ -57,12 +57,15 @@ class PrivacyProtectionsPopupManagerImplTest {
 
     private val repository = FakePrivacyProtectionsPopupRepository()
 
+    private val userAllowListRepository = FakeUserAllowlistRepository()
+
     private val subject = PrivacyProtectionsPopupManagerImpl(
         appCoroutineScope = coroutineRule.testScope,
         featureAvailability = featureAvailability,
         protectionsStateProvider = protectionsStateProvider,
         timeProvider = timeProvider,
         repository = repository,
+        userAllowListRepository = userAllowListRepository,
     )
 
     @Test
@@ -167,6 +170,19 @@ class PrivacyProtectionsPopupManagerImplTest {
 
         assertPopupVisible(visible = false)
         assertStoredPopupDismissTimestamp(url = "https://www.example.com", expectedTimestamp = timeProvider.time)
+    }
+
+    @Test
+    fun whenDisableProtectionsClickedEventIsHandledThenDomainIsAddedToUserAllowlist() = runTest {
+        subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList())
+        subject.onPageRefreshTriggeredByUser()
+        assertFalse(userAllowListRepository.isUrlInUserAllowList("https://www.example.com"))
+        assertPopupVisible(visible = true)
+
+        subject.onUiEvent(DISABLE_PROTECTIONS_CLICKED)
+
+        assertPopupVisible(visible = false)
+        assertTrue(userAllowListRepository.isUrlInUserAllowList("https://www.example.com"))
     }
 
     @Test
