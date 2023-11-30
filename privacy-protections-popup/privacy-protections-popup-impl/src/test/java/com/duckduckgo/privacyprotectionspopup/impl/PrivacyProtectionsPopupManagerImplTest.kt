@@ -25,6 +25,7 @@ import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DISMISS_CLICKED
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -217,6 +218,39 @@ class PrivacyProtectionsPopupManagerImplTest {
         assertPopupVisible(visible = false)
     }
 
+    @Test
+    fun whenRefreshIsTriggeredThenPopupIsNotShownUntilOtherConditionsAreMet() = runTest {
+        val protectionsEnabledFlow = MutableSharedFlow<Boolean>()
+        protectionsStateProvider.overrideProtectionsEnabledFlow(protectionsEnabledFlow)
+
+        subject.viewState.test {
+            assertFalse(awaitItem().visible)
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList())
+            subject.onPageRefreshTriggeredByUser()
+            expectNoEvents()
+            protectionsEnabledFlow.emit(true)
+            assertTrue(awaitItem().visible)
+        }
+    }
+
+    @Test
+    fun whenRefreshIsTriggeredThenPopupIsNotShownEvenIfOtherConditionsAreMetAfterAFewSeconds() = runTest {
+        val protectionsEnabledFlow = MutableSharedFlow<Boolean>()
+        protectionsStateProvider.overrideProtectionsEnabledFlow(protectionsEnabledFlow)
+
+        subject.viewState.test {
+            assertFalse(awaitItem().visible)
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList())
+            subject.onPageRefreshTriggeredByUser()
+            expectNoEvents()
+            timeProvider.time += Duration.ofSeconds(5)
+            protectionsEnabledFlow.emit(true)
+            expectNoEvents()
+        }
+
+        assertPopupVisible(visible = false)
+    }
+
     private suspend fun assertPopupVisible(visible: Boolean) {
         subject.viewState.test {
             assertEquals(visible, awaitItem().visible)
@@ -241,13 +275,21 @@ private class FakeProtectionsStateProvider : ProtectionsStateProvider {
 
     private var _protectionsEnabled = MutableStateFlow(true)
 
+    private var protectionsEnabledOverride: Flow<Boolean>? = null
+
     var protectionsEnabled: Boolean
         set(value) {
+            check(protectionsEnabledOverride == null)
             _protectionsEnabled.value = value
         }
         get() = _protectionsEnabled.value
 
-    override fun areProtectionsEnabled(domain: String): Flow<Boolean> = _protectionsEnabled.asStateFlow()
+    fun overrideProtectionsEnabledFlow(flow: Flow<Boolean>) {
+        protectionsEnabledOverride = flow
+    }
+
+    override fun areProtectionsEnabled(domain: String): Flow<Boolean> =
+        protectionsEnabledOverride ?: _protectionsEnabled.asStateFlow()
 }
 
 private class FakeTimeProvider : TimeProvider {
