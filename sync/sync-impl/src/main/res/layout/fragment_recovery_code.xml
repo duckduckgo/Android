@@ -52,9 +52,11 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        app:layout_constraintBottom_toTopOf="@+id/footer_primary_button"
         android:scrollbarAlwaysDrawVerticalTrack="true"
         android:fadeScrollbars="false"
-        android:scrollbars="vertical">
+        android:scrollbars="vertical"
+        tools:ignore="NotSibling">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
