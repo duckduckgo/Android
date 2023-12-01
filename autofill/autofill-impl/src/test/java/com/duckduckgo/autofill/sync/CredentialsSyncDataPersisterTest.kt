@@ -26,7 +26,9 @@ import com.duckduckgo.autofill.store.CredentialsSyncMetadataEntity
 import com.duckduckgo.autofill.sync.persister.CredentialsMergeStrategy
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.FileUtilities
+import com.duckduckgo.sync.api.engine.FeatureSyncError.COLLECTION_LIMIT_REACHED
 import com.duckduckgo.sync.api.engine.SyncChangesResponse
+import com.duckduckgo.sync.api.engine.SyncErrorResponse
 import com.duckduckgo.sync.api.engine.SyncMergeResult
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Error
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Success
@@ -45,6 +47,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
@@ -65,12 +68,14 @@ internal class CredentialsSyncDataPersisterTest {
     private val appBuildConfig = mock<AppBuildConfig>().apply {
         whenever(this.flavor).thenReturn(BuildFlavor.PLAY)
     }
+    private val credentialsSyncFeatureListener: CredentialsSyncFeatureListener = mock()
 
     private val syncPersister = CredentialsSyncDataPersister(
         credentialsSyncMetadata = credentialsSyncMetadata,
         credentialsSyncStore = autofillStore,
         strategies = strategies,
         appBuildConfig = appBuildConfig,
+        credentialsSyncFeatureListener = credentialsSyncFeatureListener,
     )
 
     @After
@@ -144,6 +149,28 @@ internal class CredentialsSyncDataPersisterTest {
 
         assertTrue(result is Success)
         assertNull(dao.getSyncMetadata(1L))
+    }
+
+    @Test
+    fun whenOnSuccessThenNotifyListener() {
+        val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/sync/merger_first_get.json")
+        val validChanges = SyncChangesResponse(CREDENTIALS, updatesJSON)
+
+        syncPersister.onSuccess(validChanges, TIMESTAMP)
+
+        verify(credentialsSyncFeatureListener).onSuccess(validChanges)
+    }
+
+    @Test
+    fun whenOnErrorThenNotifyListener() {
+        syncPersister.onError(SyncErrorResponse(CREDENTIALS, COLLECTION_LIMIT_REACHED))
+        verify(credentialsSyncFeatureListener).onError(COLLECTION_LIMIT_REACHED)
+    }
+
+    @Test
+    fun whenOnSyncDisabledTheNotifyListener() {
+        syncPersister.onSyncDisabled()
+        verify(credentialsSyncFeatureListener).onSyncDisabled()
     }
 
     private fun createFakeStrategies(): Map<SyncConflictResolution, CredentialsMergeStrategy> {

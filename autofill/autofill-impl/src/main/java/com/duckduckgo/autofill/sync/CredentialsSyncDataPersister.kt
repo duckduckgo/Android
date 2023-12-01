@@ -44,6 +44,7 @@ class CredentialsSyncDataPersister @Inject constructor(
     private val credentialsSyncStore: CredentialsSyncStore,
     private val strategies: DaggerMap<SyncConflictResolution, CredentialsMergeStrategy>,
     private val appBuildConfig: AppBuildConfig,
+    private val credentialsSyncFeatureListener: CredentialsSyncFeatureListener,
 ) : SyncableDataPersister {
     override fun onSuccess(
         changes: SyncChangesResponse,
@@ -54,6 +55,7 @@ class CredentialsSyncDataPersister @Inject constructor(
         return if (changes.type == CREDENTIALS) {
             Timber.d("Sync-autofill-Persist: received remote changes ${changes.jsonString}")
             Timber.d("Sync-autofill-Persist: received remote changes, merging with resolution $conflictResolution")
+            credentialsSyncFeatureListener.onSuccess(changes)
             val result = process(changes, conflictResolution)
             Timber.d("Sync-autofill-Persist: merging credentials finished with $result")
             return result
@@ -63,7 +65,9 @@ class CredentialsSyncDataPersister @Inject constructor(
     }
 
     override fun onError(error: SyncErrorResponse) {
-        // TODO: implement
+        if (error.type == CREDENTIALS) {
+            credentialsSyncFeatureListener.onError(error.featureSyncError)
+        }
     }
 
     private fun process(
@@ -127,6 +131,7 @@ class CredentialsSyncDataPersister @Inject constructor(
         credentialsSyncStore.serverModifiedSince = "0"
         credentialsSyncStore.startTimeStamp = "0"
         credentialsSyncStore.clientModifiedSince = "0"
+        credentialsSyncFeatureListener.onSyncDisabled()
     }
 
     private class Adapters {

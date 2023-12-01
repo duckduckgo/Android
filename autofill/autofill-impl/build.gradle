@@ -22,10 +22,6 @@ plugins {
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
-android {
-    namespace 'com.duckduckgo.autofill.impl'
-}
-
 dependencies {
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':privacy-config-api')
@@ -99,5 +95,6 @@ android {
             includeAndroidResources = true
         }
     }
+    namespace 'com.duckduckgo.autofill.impl'
 }
 
