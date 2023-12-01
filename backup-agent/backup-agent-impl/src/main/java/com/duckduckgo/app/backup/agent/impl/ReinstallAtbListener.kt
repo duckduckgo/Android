@@ -23,8 +23,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.api.VariantManager
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 @SingleInstanceIn(AppScope::class)
 @ContributesMultibinding(AppScope::class)
@@ -37,7 +37,7 @@ class ReinstallAtbListener @Inject constructor(
         if (statisticsDataStore.hasInstallationStatistics && backupDataStore.atb != statisticsDataStore.atb) {
             backupDataStore.atb = statisticsDataStore.atb
         }
-        if (statisticsDataStore.hasInstallationStatistics && !variantManager.isVariantInitialised()) {
+        if (!statisticsDataStore.hasInstallationStatistics && backupDataStore.atb != null) {
             statisticsDataStore.atb = null
             statisticsDataStore.variant = REINSTALL_USER_VARIANT
             Timber.d("Variant update for returning user")

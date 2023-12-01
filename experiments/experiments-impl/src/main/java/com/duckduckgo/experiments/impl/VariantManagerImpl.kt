@@ -23,7 +23,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.api.VariantConfig
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.experiments.impl.store.ExperimentVariantEntity
-import com.duckduckgo.experiments.impl.store.VariantDataStore
 import com.squareup.anvil.annotations.ContributesBinding
 import java.util.Locale
 import javax.inject.Inject
@@ -35,7 +34,6 @@ class VariantManagerImpl @Inject constructor(
     private val indexRandomizer: IndexRandomizer,
     private val appBuildConfig: AppBuildConfig,
     private val experimentVariantRepository: ExperimentVariantRepository,
-    private val variantDataStore: VariantDataStore,
 ) : VariantManager {
 
     override fun defaultVariantKey(): String {
@@ -52,17 +50,12 @@ class VariantManagerImpl @Inject constructor(
 
     override fun saveVariants(variants: List<VariantConfig>) {
         experimentVariantRepository.saveVariants(variants)
-        variantDataStore.variantInitialised = true
         Timber.d("Variants update ${experimentVariantRepository.getActiveVariants()}")
 
         val activeVariants = convertEntitiesToVariants(experimentVariantRepository.getActiveVariants())
         val currentVariantKey = experimentVariantRepository.getUserVariant()
 
         updateUserVariant(activeVariants, currentVariantKey)
-    }
-
-    override fun isVariantInitialised(): Boolean {
-        return variantDataStore.variantInitialised
     }
 
     private fun updateUserVariant(activeVariants: List<Variant>, currentVariantKey: String?) {

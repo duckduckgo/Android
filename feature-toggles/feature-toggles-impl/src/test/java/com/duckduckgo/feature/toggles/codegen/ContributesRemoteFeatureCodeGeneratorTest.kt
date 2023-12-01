@@ -1372,8 +1372,4 @@ private class FakeVariantManager : VariantManager {
         saveVariantsCallCounter++
         variant = ""
     }
-
-    override fun isVariantInitialised(): Boolean {
-        TODO("Not yet implemented")
-    }
 }

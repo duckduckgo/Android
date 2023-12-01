@@ -19,7 +19,6 @@ package com.duckduckgo.experiments.impl
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.experiments.api.VariantConfig
 import com.duckduckgo.experiments.impl.store.ExperimentVariantEntity
-import com.duckduckgo.experiments.impl.store.VariantDataStore
 import java.util.Locale
 import org.junit.Assert
 import org.junit.Assert.assertEquals
@@ -39,7 +38,6 @@ class ExperimentationVariantManagerTest {
     private val appBuildConfig: AppBuildConfig = mock()
     private val activeVariants = mutableListOf<Variant>()
     private val mockExperimentVariantRepository: ExperimentVariantRepository = mock()
-    private val mockVariantDataStore: VariantDataStore = mock()
 
     @Before
     fun setup() {
@@ -50,7 +48,6 @@ class ExperimentationVariantManagerTest {
             mockRandomizer,
             appBuildConfig,
             mockExperimentVariantRepository,
-            mockVariantDataStore,
         )
     }
 

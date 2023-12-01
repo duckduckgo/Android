@@ -39,9 +39,4 @@ interface VariantManager {
      * @param variants Updated list of VariantConfig objects
      */
     fun saveVariants(variants: List<VariantConfig>)
-
-    /**
-     * Determines if the user variant has been initialised
-     */
-    fun isVariantInitialised(): Boolean
 }
