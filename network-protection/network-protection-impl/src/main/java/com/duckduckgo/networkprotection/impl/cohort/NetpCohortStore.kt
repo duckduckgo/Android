@@ -57,7 +57,7 @@ class RealNetpCohortStore @Inject constructor(
             LocalDate.parse(it)
         }
         set(localDate) {
-            preferences.edit { putString(KEY_COHORT_LOCAL_DATE, formatter.format(localDate)) }
+            preferences.edit(commit = true) { putString(KEY_COHORT_LOCAL_DATE, formatter.format(localDate)) }
         }
 
     companion object {
