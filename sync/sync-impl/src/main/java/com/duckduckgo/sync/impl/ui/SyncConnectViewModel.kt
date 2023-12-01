@@ -32,7 +32,6 @@ import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.LoginSuccess
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ReadTextCode
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ShowMessage
-import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ShowQRCode
 import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -115,7 +114,6 @@ class SyncConnectViewModel @Inject constructor(
     )
 
     sealed class Command {
-        object ShowQRCode : Command()
         object ReadTextCode : Command()
         object LoginSuccess : Command()
 
@@ -135,12 +133,6 @@ class SyncConnectViewModel @Inject constructor(
                 is Error -> command.send(Command.Error)
                 is Success -> command.send(LoginSuccess)
             }
-        }
-    }
-
-    fun onShowQRCodeClicked() {
-        viewModelScope.launch {
-            command.send(ShowQRCode)
         }
     }
 

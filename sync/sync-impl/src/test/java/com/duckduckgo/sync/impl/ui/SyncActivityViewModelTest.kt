@@ -101,7 +101,7 @@ class SyncActivityViewModelTest {
 
         testee.viewState().test {
             val viewState = expectMostRecentItem()
-            assertTrue(viewState.syncToggleState)
+            assertTrue(viewState.showAccount)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -168,14 +168,8 @@ class SyncActivityViewModelTest {
 
     @Test
     fun whenSyncThisDeviceThenLaunchCreateAccountFlow() = runTest {
-        testee.viewState().test {
-            testee.onSyncThisDevice()
-            val initialState = expectMostRecentItem()
-            assertEquals(true, initialState.syncToggleState)
-            cancelAndIgnoreRemainingEvents()
-        }
-
         testee.commands().test {
+            testee.onSyncThisDevice()
             awaitItem().assertCommandType(IntroCreateAccount::class)
             cancelAndIgnoreRemainingEvents()
         }
@@ -221,11 +215,10 @@ class SyncActivityViewModelTest {
 
         testee.viewState().test {
             var viewState = expectMostRecentItem()
-            assertTrue(viewState.syncToggleState)
+            assertTrue(viewState.showAccount)
             testee.onTurnOffSyncConfirmed(connectedDevice)
             viewState = awaitItem()
             assertFalse(viewState.showAccount)
-            assertFalse(viewState.syncToggleState)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -240,7 +233,6 @@ class SyncActivityViewModelTest {
 
         testee.viewState().test {
             val viewState = awaitItem()
-            assertTrue(viewState.syncToggleState)
             assertTrue(viewState.showAccount)
             cancelAndIgnoreRemainingEvents()
         }
@@ -253,7 +245,7 @@ class SyncActivityViewModelTest {
         testee.viewState().test {
             testee.onTurnOffSyncCancelled()
             val viewState = expectMostRecentItem()
-            assertTrue(viewState.syncToggleState)
+            assertTrue(viewState.showAccount)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -276,11 +268,10 @@ class SyncActivityViewModelTest {
 
         testee.viewState().test {
             var viewState = expectMostRecentItem()
-            assertTrue(viewState.syncToggleState)
+            assertTrue(viewState.showAccount)
             testee.onDeleteAccountConfirmed()
             viewState = awaitItem()
             assertFalse(viewState.showAccount)
-            assertFalse(viewState.syncToggleState)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -295,7 +286,6 @@ class SyncActivityViewModelTest {
 
         testee.viewState().test {
             val viewState = awaitItem()
-            assertTrue(viewState.syncToggleState)
             assertTrue(viewState.showAccount)
             cancelAndIgnoreRemainingEvents()
         }
@@ -318,7 +308,6 @@ class SyncActivityViewModelTest {
         testee.viewState().test {
             testee.onDeleteAccountCancelled()
             val viewState = expectMostRecentItem()
-            assertTrue(viewState.syncToggleState)
             assertTrue(viewState.showAccount)
             cancelAndIgnoreRemainingEvents()
         }
@@ -460,10 +449,10 @@ class SyncActivityViewModelTest {
 
         testee.viewState().test {
             val initialState = expectMostRecentItem()
-            assertEquals(initialState.syncToggleState, true)
+            assertEquals(initialState.showAccount, true)
             stateFlow.value = OFF
             val updatedState = awaitItem()
-            assertEquals(updatedState.syncToggleState, false)
+            assertEquals(updatedState.showAccount, false)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -475,10 +464,10 @@ class SyncActivityViewModelTest {
 
         testee.viewState().test {
             val initialState = expectMostRecentItem()
-            assertEquals(initialState.syncToggleState, false)
+            assertEquals(initialState.showAccount, false)
             stateFlow.value = READY
             val updatedState = awaitItem()
-            assertEquals(updatedState.syncToggleState, true)
+            assertEquals(updatedState.showAccount, true)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -489,7 +478,7 @@ class SyncActivityViewModelTest {
 
         testee.viewState().test {
             val initialState = expectMostRecentItem()
-            assertEquals(initialState.syncToggleState, true)
+            assertEquals(initialState.showAccount, true)
             stateFlow.value = IN_PROGRESS
             expectNoEvents()
             cancelAndIgnoreRemainingEvents()

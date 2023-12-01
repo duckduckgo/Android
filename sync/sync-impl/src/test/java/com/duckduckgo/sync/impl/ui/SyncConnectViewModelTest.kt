@@ -157,16 +157,6 @@ class SyncConnectViewModelTest {
     }
 
     @Test
-    fun whenUseClicksOnShowQRCodeThenCommandIsShowQRCode() = runTest {
-        testee.commands().test {
-            testee.onShowQRCodeClicked()
-            val command = awaitItem()
-            assertTrue(command is Command.ShowQRCode)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
     fun whenLoginSucceedsThenCommandIsLoginSuccess() = runTest {
         testee.commands().test {
             testee.onLoginSuccess()

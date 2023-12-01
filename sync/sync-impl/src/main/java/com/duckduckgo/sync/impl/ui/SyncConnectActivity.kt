@@ -34,9 +34,7 @@ import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.Error
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.LoginSuccess
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ReadTextCode
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ShowMessage
-import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ShowQRCode
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.ViewState
-import com.duckduckgo.sync.impl.ui.setup.ConnectViaQRCodeContract
 import com.duckduckgo.sync.impl.ui.setup.EnterCodeContract
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.launchIn
@@ -46,12 +44,6 @@ import kotlinx.coroutines.flow.onEach
 class SyncConnectActivity : DuckDuckGoActivity() {
     private val binding: ActivityConnectSyncBinding by viewBinding()
     private val viewModel: SyncConnectViewModel by bindViewModel()
-
-    private val showQRConnectLauncher = registerForActivityResult(ConnectViaQRCodeContract()) { resultOk ->
-        if (resultOk) {
-            viewModel.onLoginSuccess()
-        }
-    }
 
     private val enterCodeLauncher = registerForActivityResult(
         EnterCodeContract(),
@@ -112,7 +104,6 @@ class SyncConnectActivity : DuckDuckGoActivity() {
                 setResult(RESULT_OK)
                 finish()
             }
-            ShowQRCode -> showQRConnectLauncher.launch(null)
             Error -> {
                 setResult(RESULT_CANCELED)
                 finish()

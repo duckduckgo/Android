@@ -106,7 +106,6 @@ class SyncActivityViewModel @Inject constructor(
         }
 
         return ViewState(
-            syncToggleState = syncAccountRepository.isSignedIn(),
             showAccount = syncAccountRepository.isSignedIn(),
             loginQRCode = qrBitmap,
             syncedDevices = syncedDevices,
@@ -126,7 +125,6 @@ class SyncActivityViewModel @Inject constructor(
     }
 
     data class ViewState(
-        val syncToggleState: Boolean = false,
         val showAccount: Boolean = false,
         val loginQRCode: Bitmap? = null,
         val syncedDevices: List<SyncDeviceListItem> = emptyList(),
@@ -182,8 +180,6 @@ class SyncActivityViewModel @Inject constructor(
             syncAccountRepository.getThisConnectedDevice()?.let {
                 command.send(AskTurnOffSync(it))
             } ?: showAccountDetailsIfNeeded()
-
-            viewState.value = viewState.value.toggle(false)
         }
     }
 
@@ -211,7 +207,7 @@ class SyncActivityViewModel @Inject constructor(
             viewState.value = viewState.value.hideAccount()
             when (syncAccountRepository.logout(connectedDevice.deviceId)) {
                 is Error -> {
-                    viewState.value = viewState.value.toggle(true).showAccount()
+                    viewState.value = viewState.value.showAccount()
                 }
 
                 is Success -> {
@@ -231,7 +227,6 @@ class SyncActivityViewModel @Inject constructor(
 
     fun onDeleteAccountClicked() {
         viewModelScope.launch {
-            viewState.value = viewState.value.toggle(false)
             command.send(AskDeleteAccount)
         }
     }
@@ -241,7 +236,7 @@ class SyncActivityViewModel @Inject constructor(
             viewState.value = viewState.value.hideAccount()
             when (syncAccountRepository.deleteAccount()) {
                 is Error -> {
-                    viewState.value = viewState.value.toggle(true).showAccount()
+                    viewState.value = viewState.value.showAccount()
                 }
 
                 is Success -> {
@@ -318,7 +313,7 @@ class SyncActivityViewModel @Inject constructor(
     private fun showAccountDetailsIfNeeded() {
         viewModelScope.launch(dispatchers.io()) {
             if (syncAccountRepository.isSignedIn()) {
-                viewState.value = viewState.value.toggle(true).showAccount()
+                viewState.value = viewState.value.showAccount()
             } else {
                 viewState.value = signedOutState()
             }
@@ -326,8 +321,6 @@ class SyncActivityViewModel @Inject constructor(
     }
 
     private fun signedOutState(): ViewState = ViewState()
-    private fun ViewState.isSignedInState() = this.loginQRCode != null && this.showAccount
-    private fun ViewState.toggle(isChecked: Boolean) = copy(syncToggleState = isChecked)
     private fun ViewState.setDevices(devices: List<SyncDeviceListItem>) = copy(syncedDevices = devices)
     private fun ViewState.hideDeviceListItemLoading() = copy(syncedDevices = syncedDevices.filterNot { it is LoadingItem })
     private fun ViewState.showDeviceListItemLoading() = copy(syncedDevices = syncedDevices + LoadingItem)
