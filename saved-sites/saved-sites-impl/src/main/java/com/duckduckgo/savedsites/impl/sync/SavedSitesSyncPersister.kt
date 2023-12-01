@@ -114,8 +114,6 @@ class SavedSitesSyncPersister @Inject constructor(
             "Sync-Bookmarks: updating client last_modified from ${savedSitesSyncStore.clientModifiedSince} to ${savedSitesSyncStore.startTimeStamp}",
         )
 
-        val lastClientModified = savedSitesSyncStore.clientModifiedSince
-
         savedSitesSyncStore.serverModifiedSince = bookmarks.last_modified
         savedSitesSyncStore.clientModifiedSince = savedSitesSyncStore.startTimeStamp
 
@@ -136,8 +134,6 @@ class SavedSitesSyncPersister @Inject constructor(
                 Timber.d("Sync-Bookmarks: updating $it modifiedSince to $modifiedSince")
             }
         }
-
-        // generate metadata of folders based on lastClientModified
 
         return result
     }

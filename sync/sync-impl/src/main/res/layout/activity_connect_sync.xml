@@ -54,7 +54,7 @@
             android:id="@+id/qrCodeReader"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="@dimen/keyline_4"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/connect_hint" />
 
@@ -63,6 +63,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+
         android:background="?attr/daxColorBackground">
 
         <ImageView
@@ -80,9 +81,9 @@
             android:id="@+id/qrCodeHintTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:layout_marginTop="@dimen/keyline_4"
+            android:layout_marginEnd="@dimen/keyline_4"
             app:typography="h5"
             android:text="@string/connect_screen_connect_qr_hint_title"
             app:layout_constraintEnd_toEndOf="parent"
@@ -93,9 +94,9 @@
             android:id="@+id/qrCodeHintContent"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:layout_marginEnd="@dimen/keyline_4"
             android:text="@string/connect_screen_connect_qr_hint_content"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/qrCodeImageView"

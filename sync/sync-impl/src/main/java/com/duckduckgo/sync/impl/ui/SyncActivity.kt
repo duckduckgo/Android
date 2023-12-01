@@ -52,13 +52,11 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroRecoverSyn
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowRecoveryCode
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowTextCode
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.SyncIntroCompleted
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.SyncWithAnotherDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.setup.ConnectFlowContract
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_CODE
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_INTRO
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SETUP_COMPLETE
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SYNC_INTRO
 import com.duckduckgo.sync.impl.ui.setup.SyncIntroContract
 import com.google.android.material.snackbar.Snackbar
@@ -216,7 +214,6 @@ class SyncActivity : DuckDuckGoActivity() {
             is IntroCreateAccount -> syncIntroLauncher.launch(SYNC_INTRO)
             is IntroRecoverSyncData -> syncIntroLauncher.launch(RECOVERY_INTRO)
             is ShowRecoveryCode -> syncIntroLauncher.launch(RECOVERY_CODE)
-            is SyncIntroCompleted -> syncIntroLauncher.launch(SETUP_COMPLETE)
             is AskTurnOffSync -> askTurnOffsync(it.device)
             is AskDeleteAccount -> askDeleteAccount()
             is RecoveryCodePDFSuccess -> {
@@ -232,7 +229,6 @@ class SyncActivity : DuckDuckGoActivity() {
             is AskRemoveDevice -> askRemoveDevice(it.device)
             is AskEditDevice -> askEditDevice(it.device)
             is ShowTextCode -> startActivity(ShowCodeActivity.intent(this))
-            else -> {}
         }
     }
 

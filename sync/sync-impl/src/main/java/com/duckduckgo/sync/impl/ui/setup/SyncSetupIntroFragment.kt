@@ -40,7 +40,6 @@ import com.duckduckgo.sync.impl.ui.setup.SyncSetupIntroViewModel.Command.StartSe
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupIntroViewModel.ViewMode.CreateAccountIntro
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupIntroViewModel.ViewMode.RecoverAccountIntro
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupIntroViewModel.ViewState
-import com.google.android.material.snackbar.Snackbar
 import javax.inject.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -123,14 +122,8 @@ class SyncSetupIntroFragment : DuckDuckGoFragment(R.layout.fragment_intro_sync) 
                 requireActivity().setResult(Activity.RESULT_CANCELED)
                 requireActivity().finish()
             }
-
             StartSetupFlow -> listener?.launchCreateAccountFlow()
-
             RecoverDataFlow -> listener?.launchRecoverAccountFlow()
-
-            else -> {
-                Snackbar.make(binding.root, R.string.sync_general_error, Snackbar.LENGTH_LONG).show()
-            }
         }
     }
 
