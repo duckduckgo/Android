@@ -14,19 +14,8 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacyprotectionspopup.impl
+package com.duckduckgo.privacyprotectionspopup.api
 
-import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
-import org.threeten.bp.Instant
-
-interface TimeProvider {
-    fun getCurrentTime(): Instant
-}
-
-@ContributesBinding(AppScope::class)
-class TimeProviderImpl @Inject constructor() : TimeProvider {
-
-    override fun getCurrentTime(): Instant = Instant.now()
+interface PrivacyProtectionsToggleUsageListener {
+    suspend fun onPrivacyProtectionsToggleUsed()
 }

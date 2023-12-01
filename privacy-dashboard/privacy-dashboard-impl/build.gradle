@@ -40,6 +40,7 @@ dependencies {
     implementation project(':app-build-config-api')
     implementation project(':navigation-api')
     implementation project(':feature-toggles-api')
+    implementation project(':privacy-protections-popup-api')
 
     implementation Google.dagger
     implementation AndroidX.appCompat

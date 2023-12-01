@@ -17,16 +17,18 @@
 package com.duckduckgo.privacyprotectionspopup.impl
 
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsToggleUsageListener
+import com.duckduckgo.privacyprotectionspopup.impl.db.ToggleUsageTimestampRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-import org.threeten.bp.Instant
-
-interface TimeProvider {
-    fun getCurrentTime(): Instant
-}
 
 @ContributesBinding(AppScope::class)
-class TimeProviderImpl @Inject constructor() : TimeProvider {
+class PrivacyProtectionsToggleUsageListenerImpl @Inject constructor(
+    private val timeProvider: TimeProvider,
+    private val toggleUsageTimestampRepository: ToggleUsageTimestampRepository,
+) : PrivacyProtectionsToggleUsageListener {
 
-    override fun getCurrentTime(): Instant = Instant.now()
+    override suspend fun onPrivacyProtectionsToggleUsed() {
+        toggleUsageTimestampRepository.setToggleUsageTimestamp(timeProvider.getCurrentTime())
+    }
 }

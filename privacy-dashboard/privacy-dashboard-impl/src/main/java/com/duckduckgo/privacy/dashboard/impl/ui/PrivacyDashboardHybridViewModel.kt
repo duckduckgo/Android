@@ -33,6 +33,7 @@ import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVA
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchReportBrokenSite
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenSettings
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenURL
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsToggleUsageListener
 import java.util.*
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -63,6 +64,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     private val protectionStatusViewStateMapper: ProtectionStatusViewStateMapper,
     private val privacyDashboardPayloadAdapter: PrivacyDashboardPayloadAdapter,
     private val autoconsentStatusViewStateMapper: AutoconsentStatusViewStateMapper,
+    private val protectionsToggleUsageListener: PrivacyProtectionsToggleUsageListener,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -239,6 +241,8 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         Timber.i("PrivacyDashboard: onPrivacyProtectionsClicked $enabled")
 
         viewModelScope.launch(dispatcher.io()) {
+            protectionsToggleUsageListener.onPrivacyProtectionsToggleUsed()
+
             delay(CLOSE_DASHBOARD_ON_INTERACTION_DELAY)
             currentViewState().siteViewState.domain?.let { domain ->
                 if (enabled) {
