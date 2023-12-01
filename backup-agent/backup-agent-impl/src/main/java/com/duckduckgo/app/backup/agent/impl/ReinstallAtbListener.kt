@@ -20,8 +20,10 @@ import com.duckduckgo.app.backup.agent.impl.store.BackupDataStore
 import com.duckduckgo.app.statistics.AtbInitializerListener
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.experiments.api.VariantManager
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
+import timber.log.Timber
 import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
@@ -29,10 +31,16 @@ import javax.inject.Inject
 class ReinstallAtbListener @Inject constructor(
     private val statisticsDataStore: StatisticsDataStore,
     private val backupDataStore: BackupDataStore,
+    private val variantManager: VariantManager,
 ) : AtbInitializerListener {
     override suspend fun beforeAtbInit() {
         if (statisticsDataStore.hasInstallationStatistics && backupDataStore.atb != statisticsDataStore.atb) {
             backupDataStore.atb = statisticsDataStore.atb
+        }
+        if (statisticsDataStore.hasInstallationStatistics && !variantManager.isVariantInitialised()) {
+            statisticsDataStore.atb = null
+            statisticsDataStore.variant = REINSTALL_USER_VARIANT
+            Timber.d("Variant update for returning user")
         }
     }
 
@@ -40,5 +48,6 @@ class ReinstallAtbListener @Inject constructor(
 
     companion object {
         private const val MAX_REINSTALL_WAIT_TIME_MS = 1_500L
+        const val REINSTALL_USER_VARIANT = "ru"
     }
 }

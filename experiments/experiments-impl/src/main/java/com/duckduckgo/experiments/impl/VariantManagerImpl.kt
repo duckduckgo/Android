@@ -17,11 +17,13 @@
 package com.duckduckgo.experiments.impl
 
 import androidx.annotation.WorkerThread
+import com.duckduckgo.app.statistics.ReinstallAtbListener.Companion.REINSTALL_USER_VARIANT
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.api.VariantConfig
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.experiments.impl.store.ExperimentVariantEntity
+import com.duckduckgo.experiments.impl.store.VariantDataStore
 import com.squareup.anvil.annotations.ContributesBinding
 import java.util.Locale
 import javax.inject.Inject
@@ -33,6 +35,7 @@ class VariantManagerImpl @Inject constructor(
     private val indexRandomizer: IndexRandomizer,
     private val appBuildConfig: AppBuildConfig,
     private val experimentVariantRepository: ExperimentVariantRepository,
+    private val variantDataStore: VariantDataStore,
 ) : VariantManager {
 
     override fun defaultVariantKey(): String {
@@ -49,6 +52,7 @@ class VariantManagerImpl @Inject constructor(
 
     override fun saveVariants(variants: List<VariantConfig>) {
         experimentVariantRepository.saveVariants(variants)
+        variantDataStore.variantInitialised = true
         Timber.d("Variants update ${experimentVariantRepository.getActiveVariants()}")
 
         val activeVariants = convertEntitiesToVariants(experimentVariantRepository.getActiveVariants())
@@ -57,8 +61,16 @@ class VariantManagerImpl @Inject constructor(
         updateUserVariant(activeVariants, currentVariantKey)
     }
 
+    override fun isVariantInitialised(): Boolean {
+        return variantDataStore.variantInitialised
+    }
+
     private fun updateUserVariant(activeVariants: List<Variant>, currentVariantKey: String?) {
         if (currentVariantKey == DEFAULT_VARIANT.key) {
+            return
+        }
+
+        if (currentVariantKey == REINSTALL_USER_VARIANT) {
             return
         }
 
