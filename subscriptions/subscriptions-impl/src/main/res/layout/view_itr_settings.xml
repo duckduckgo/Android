@@ -14,12 +14,12 @@
   ~ limitations under the License.
   -->
 
-<com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+<com.duckduckgo.common.ui.view.listitem.CheckListItem
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/buy"
+        android:id="@+id/itrSettings"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="Subscription Internal"
+        app:primaryText="@string/itrSettingTitle"
         app:primaryTextTruncated="false"
-        app:secondaryText="Buy" />
+        app:secondaryText="@string/itrSettingSubtitle" />

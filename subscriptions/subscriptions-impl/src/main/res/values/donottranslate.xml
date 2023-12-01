@@ -60,6 +60,7 @@
     <string name="subscriptionSetting">Subscription Settings</string>
     <string name="subscriptionSettingSubscribe">Subscribe To Privacy Pro</string>
     <string name="subscriptionSettingSubscribeSubtitle">More seamless privacy with three new protections, including:</string>
+    <string name="subscriptionSettingFeaturesList"><![CDATA[<ul><li>&nbsp;VPN (Virtual Private Network)</li><li>&nbsp;Personal Information Removal</li><li>&nbsp;Identity Theft Restoration</li></ul><br/><u><a href="">Learn More</a></u>]]></string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">You\'re all set.</string>
@@ -67,4 +68,12 @@
     <string name="purchaseRecoveredText">Your already had a subscription and we\'ve recovered that for you.</string>
     <string name="purchaseErrorTitle">Something went wrong :(</string>
     <string name="purchaseIdNotFound">We couldn\'t find the subscription. Please try again.</string>
+
+    <!-- PIR Settings-->
+    <string name="pirSettingTitle">Personal Information Removal</string>
+    <string name="pirSettingSubtitle">Remove your info from sites that sell it</string>
+
+    <!-- ITR Settings-->
+    <string name="itrSettingTitle">Identity Theft Restoration</string>
+    <string name="itrSettingSubtitle">If your identity is stolen, we\'ll help restore it</string>
 </resources>

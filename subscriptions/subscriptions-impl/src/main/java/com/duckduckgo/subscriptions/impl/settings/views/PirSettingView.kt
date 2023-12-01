@@ -20,19 +20,22 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.FrameLayout
+import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BUY_URL
-import com.duckduckgo.subscriptions.impl.databinding.ViewSettingsBuyBinding
-import com.duckduckgo.subscriptions.impl.settings.views.ProSettingBuyViewModel.Command
-import com.duckduckgo.subscriptions.impl.settings.views.ProSettingBuyViewModel.Command.OpenBuyScreen
-import com.duckduckgo.subscriptions.impl.settings.views.ProSettingBuyViewModel.Factory
-import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams
+import com.duckduckgo.subscriptions.impl.databinding.ViewPirSettingsBinding
+import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.Command
+import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.Command.OpenPir
+import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.Factory
+import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -43,7 +46,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ViewScope::class)
-class ProSettingBuyView @JvmOverloads constructor(
+class PirSettingView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
@@ -57,10 +60,10 @@ class ProSettingBuyView @JvmOverloads constructor(
 
     private var coroutineScope: CoroutineScope? = null
 
-    private val binding: ViewSettingsBuyBinding by viewBinding()
+    private val binding: ViewPirSettingsBinding by viewBinding()
 
-    private val viewModel: ProSettingBuyViewModel by lazy {
-        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[ProSettingBuyViewModel::class.java]
+    private val viewModel: PirSettingViewModel by lazy {
+        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[PirSettingViewModel::class.java]
     }
 
     private var job: ConflatedJob = ConflatedJob()
@@ -69,8 +72,10 @@ class ProSettingBuyView @JvmOverloads constructor(
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
 
-        binding.buy.setClickListener {
-            viewModel.onBuyClicked()
+        ViewTreeLifecycleOwner.get(this)?.lifecycle?.addObserver(viewModel)
+
+        binding.pirSettings.setClickListener {
+            viewModel.onPir()
         }
 
         @SuppressLint("NoHardcodedCoroutineDispatcher")
@@ -79,19 +84,32 @@ class ProSettingBuyView @JvmOverloads constructor(
         job += viewModel.commands()
             .onEach { processCommands(it) }
             .launchIn(coroutineScope!!)
+
+        viewModel.viewState
+            .onEach { renderView(it) }
+            .launchIn(coroutineScope!!)
     }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
+        ViewTreeLifecycleOwner.get(this)?.lifecycle?.removeObserver(viewModel)
         coroutineScope?.cancel()
         job.cancel()
         coroutineScope = null
     }
 
+    private fun renderView(viewState: ViewState) {
+        if (viewState.hasSubscription) {
+            binding.pirSettings.show()
+        } else {
+            binding.pirSettings.gone()
+        }
+    }
+
     private fun processCommands(command: Command) {
         when (command) {
-            is OpenBuyScreen -> {
-                globalActivityStarter.start(context, SubscriptionsWebViewActivityWithParams(url = BUY_URL, "Buy Subscription"))
+            is OpenPir -> {
+                Toast.makeText(context, "Open PIR", Toast.LENGTH_SHORT).show()
             }
         }
     }

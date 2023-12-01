@@ -25,7 +25,7 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 @ContributesMultibinding(ActivityScope::class)
-@PositionKey(150)
+@PositionKey(200)
 class ProSettingsNetP @Inject constructor() : ProSettingsPlugin {
     override fun getView(context: Context): View {
         return ProSettingNetPView(context)
