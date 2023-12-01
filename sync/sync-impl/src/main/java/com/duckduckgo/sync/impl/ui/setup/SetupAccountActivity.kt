@@ -156,7 +156,7 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
         }
     }
 
-    override fun launchDeviceConnectedFlow() {
+    override fun launchDeviceConnectedScreen() {
         viewModel.onDeviceConnected()
     }
 
@@ -164,15 +164,15 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
         viewModel.onSetupFinished()
     }
 
-    override fun launchRecoveryCodeFlow() {
+    override fun launchRecoveryCodeScreen() {
         viewModel.onRecoveryCodePrompt()
     }
 
-    override fun launchCreateAccountFlow() {
+    override fun launchCreateAccountScreen() {
         viewModel.onCreateAccount()
     }
 
-    override fun launchRecoverAccountFlow() {
+    override fun launchRecoverAccountScreen() {
         viewModel.onRecoverAccount()
     }
 

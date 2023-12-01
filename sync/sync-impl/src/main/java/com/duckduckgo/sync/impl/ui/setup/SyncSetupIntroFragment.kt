@@ -122,8 +122,8 @@ class SyncSetupIntroFragment : DuckDuckGoFragment(R.layout.fragment_intro_sync) 
                 requireActivity().setResult(Activity.RESULT_CANCELED)
                 requireActivity().finish()
             }
-            StartSetupFlow -> listener?.launchCreateAccountFlow()
-            RecoverDataFlow -> listener?.launchRecoverAccountFlow()
+            StartSetupFlow -> listener?.launchCreateAccountScreen()
+            RecoverDataFlow -> listener?.launchRecoverAccountScreen()
         }
     }
 

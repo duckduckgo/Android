@@ -17,9 +17,9 @@
 package com.duckduckgo.sync.impl.ui.setup
 
 interface SetupFlowListener {
-    fun launchRecoveryCodeFlow()
-    fun launchCreateAccountFlow()
-    fun launchRecoverAccountFlow()
-    fun launchDeviceConnectedFlow()
+    fun launchRecoveryCodeScreen()
+    fun launchCreateAccountScreen()
+    fun launchRecoverAccountScreen()
+    fun launchDeviceConnectedScreen()
     fun finishSetup()
 }

@@ -123,7 +123,7 @@ class SaveRecoveryCodeFragment : DuckDuckGoFragment(R.layout.fragment_recovery_c
                 requireActivity().finish()
             }
             is Finish -> {
-                listener?.launchDeviceConnectedFlow()
+                listener?.launchDeviceConnectedScreen()
             }
             is RecoveryCodePDFSuccess -> {
                 shareAction.shareFile(requireContext(), it.recoveryCodePDFFile)

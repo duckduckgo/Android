@@ -25,6 +25,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
@@ -34,6 +35,7 @@ import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command.AbortFlow
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command.Error
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command.FinishSetupFlow
+import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.ViewMode.CreatingAccount
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.ViewMode.SignedIn
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.ViewState
 import com.google.android.material.snackbar.Snackbar
@@ -80,10 +82,10 @@ class SyncCreateAccountFragment : DuckDuckGoFragment(R.layout.fragment_create_ac
     private fun renderViewState(viewState: ViewState) {
         when (viewState.viewMode) {
             is SignedIn -> {
-                listener?.launchRecoveryCodeFlow()
+                listener?.launchRecoveryCodeScreen()
             }
-            else -> {
-                // nothing for now
+            is CreatingAccount -> {
+                binding.connecting.show()
             }
         }
     }
@@ -94,7 +96,7 @@ class SyncCreateAccountFragment : DuckDuckGoFragment(R.layout.fragment_create_ac
                 requireActivity().setResult(Activity.RESULT_CANCELED)
                 requireActivity().finish()
             }
-            FinishSetupFlow -> listener?.launchRecoveryCodeFlow()
+            FinishSetupFlow -> listener?.launchRecoveryCodeScreen()
             Error -> {
                 Snackbar.make(binding.root, R.string.sync_general_error, Snackbar.LENGTH_LONG).show()
             }

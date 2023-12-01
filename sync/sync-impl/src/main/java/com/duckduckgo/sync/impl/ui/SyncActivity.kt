@@ -42,6 +42,7 @@ import com.duckduckgo.sync.impl.ShareAction
 import com.duckduckgo.sync.impl.databinding.ActivitySyncBinding
 import com.duckduckgo.sync.impl.databinding.DialogEditDeviceBinding
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AddAnotherDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskDeleteAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskEditDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskRemoveDevice
@@ -55,6 +56,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowTextCode
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.SyncWithAnotherDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.setup.ConnectFlowContract
+import com.duckduckgo.sync.impl.ui.setup.LoginContract
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_CODE
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_INTRO
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SYNC_INTRO
@@ -111,6 +113,12 @@ class SyncActivity : DuckDuckGoActivity() {
     private val connectFlow = registerForActivityResult(ConnectFlowContract()) { resultOk ->
         if (resultOk) {
             viewModel.onLoginSuccess()
+        }
+    }
+
+    private val loginFlow = registerForActivityResult(LoginContract()) { resultOk ->
+        if (resultOk) {
+            viewModel.onDeviceConnected()
         }
     }
 
@@ -184,7 +192,7 @@ class SyncActivity : DuckDuckGoActivity() {
         }
 
         binding.viewSyncEnabled.scanQrCodeItem.setOnClickListener {
-            viewModel.onSyncWithAnotherDevice()
+            viewModel.onAddAnotherDevice()
         }
 
         binding.viewSyncEnabled.showTextCodeItem.setOnClickListener {
@@ -229,6 +237,7 @@ class SyncActivity : DuckDuckGoActivity() {
             is AskRemoveDevice -> askRemoveDevice(it.device)
             is AskEditDevice -> askEditDevice(it.device)
             is ShowTextCode -> startActivity(ShowCodeActivity.intent(this))
+            is AddAnotherDevice -> loginFlow.launch(null)
         }
     }
 

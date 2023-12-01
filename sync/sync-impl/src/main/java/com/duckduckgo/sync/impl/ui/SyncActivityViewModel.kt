@@ -41,6 +41,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroCreateAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowRecoveryCode
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.LoadingItem
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.SyncedDevice
 import java.io.File
@@ -133,6 +134,7 @@ class SyncActivityViewModel @Inject constructor(
 
     sealed class Command {
         object SyncWithAnotherDevice : Command()
+        object AddAnotherDevice : Command()
         object IntroCreateAccount : Command()
         object IntroRecoverSyncData : Command()
         object ShowTextCode : Command()
@@ -148,6 +150,12 @@ class SyncActivityViewModel @Inject constructor(
     fun onSyncWithAnotherDevice() {
         viewModelScope.launch {
             command.send(Command.SyncWithAnotherDevice)
+        }
+    }
+
+    fun onAddAnotherDevice() {
+        viewModelScope.launch {
+            command.send(Command.AddAnotherDevice)
         }
     }
 

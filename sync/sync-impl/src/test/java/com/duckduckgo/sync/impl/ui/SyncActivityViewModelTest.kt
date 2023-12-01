@@ -157,6 +157,16 @@ class SyncActivityViewModelTest {
     }
 
     @Test
+    fun whenScanAnotherDeviceQRCodeThenEmitCommandAddAnotherDevice() = runTest {
+        testee.onAddAnotherDevice()
+
+        testee.commands().test {
+            awaitItem().assertCommandType(Command.AddAnotherDevice::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenSyncThisDeviceThenLaunchCreateAccountFlow() = runTest {
         testee.viewState().test {
             testee.onSyncThisDevice()
