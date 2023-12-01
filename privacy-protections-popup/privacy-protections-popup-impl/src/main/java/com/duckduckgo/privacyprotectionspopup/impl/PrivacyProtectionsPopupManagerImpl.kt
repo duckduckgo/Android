@@ -28,6 +28,7 @@ import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupViewState
 import com.duckduckgo.privacyprotectionspopup.impl.PrivacyProtectionsPopupManagerImpl.PopupDismissed.DismissedAt
 import com.duckduckgo.privacyprotectionspopup.impl.PrivacyProtectionsPopupManagerImpl.PopupDismissed.NotDismissed
+import com.duckduckgo.privacyprotectionspopup.impl.db.PopupDismissDomainRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -56,7 +57,7 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
     private val featureAvailability: PrivacyProtectionsPopupFeatureAvailability,
     private val protectionsStateProvider: ProtectionsStateProvider,
     private val timeProvider: TimeProvider,
-    private val repository: PrivacyProtectionsPopupRepository,
+    private val popupDismissDomainRepository: PopupDismissDomainRepository,
     private val userAllowListRepository: UserAllowListRepository,
 ) : PrivacyProtectionsPopupManager {
 
@@ -136,7 +137,7 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
 
         state.value.domain?.let { domain ->
             appCoroutineScope.launch {
-                repository.setPopupDismissTime(domain, popupDismissedAt)
+                popupDismissDomainRepository.setPopupDismissTime(domain, popupDismissedAt)
             }
         }
     }
@@ -167,7 +168,7 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
                 .distinctUntilChanged()
                 .flatMapLatest { domain ->
                     if (domain != null) {
-                        repository.getPopupDismissTime(domain)
+                        popupDismissDomainRepository.getPopupDismissTime(domain)
                     } else {
                         flowOf(null)
                     }

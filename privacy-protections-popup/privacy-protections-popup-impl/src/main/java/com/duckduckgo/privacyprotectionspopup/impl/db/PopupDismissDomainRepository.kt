@@ -14,32 +14,32 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacyprotectionspopup.impl
+package com.duckduckgo.privacyprotectionspopup.impl.db
 
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import org.threeten.bp.Instant
 
-interface PrivacyProtectionsPopupRepository {
+interface PopupDismissDomainRepository {
     fun getPopupDismissTime(domain: String): Flow<Instant?>
     suspend fun setPopupDismissTime(domain: String, time: Instant)
 }
 
 @ContributesBinding(FragmentScope::class)
-class PrivacyProtectionsPopupRepositoryImpl @Inject constructor() : PrivacyProtectionsPopupRepository {
+class PopupDismissDomainRepositoryImpl @Inject constructor(
+    private val dao: PopupDismissDomainsDao,
+) : PopupDismissDomainRepository {
 
-    override fun getPopupDismissTime(domain: String): Flow<Instant?> {
-        // TODO
-        return flowOf(null)
-    }
+    override fun getPopupDismissTime(domain: String): Flow<Instant?> =
+        dao.query(domain).map { it?.dismissedAt }
 
     override suspend fun setPopupDismissTime(
         domain: String,
         time: Instant,
     ) {
-        // TODO
+        dao.insert(PopupDismissDomain(domain = domain, dismissedAt = time))
     }
 }

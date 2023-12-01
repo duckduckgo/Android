@@ -23,6 +23,7 @@ import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DISABLE_PROTECTIONS_CLICKED
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DISMISSED
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DISMISS_CLICKED
+import com.duckduckgo.privacyprotectionspopup.impl.db.PopupDismissDomainRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -55,7 +56,7 @@ class PrivacyProtectionsPopupManagerImplTest {
 
     private val timeProvider = FakeTimeProvider()
 
-    private val repository = FakePrivacyProtectionsPopupRepository()
+    private val popupDismissDomainRepository = FakePopupDismissDomainRepository()
 
     private val userAllowListRepository = FakeUserAllowlistRepository()
 
@@ -64,7 +65,7 @@ class PrivacyProtectionsPopupManagerImplTest {
         featureAvailability = featureAvailability,
         protectionsStateProvider = protectionsStateProvider,
         timeProvider = timeProvider,
-        repository = repository,
+        popupDismissDomainRepository = popupDismissDomainRepository,
         userAllowListRepository = userAllowListRepository,
     )
 
@@ -275,7 +276,7 @@ class PrivacyProtectionsPopupManagerImplTest {
     }
 
     private suspend fun assertStoredPopupDismissTimestamp(url: String, expectedTimestamp: Instant?) {
-        val dismissedAt = repository.getPopupDismissTime(url.extractDomain()!!).first()
+        val dismissedAt = popupDismissDomainRepository.getPopupDismissTime(url.extractDomain()!!).first()
         assertEquals(expectedTimestamp, dismissedAt)
     }
 }
@@ -315,7 +316,7 @@ private class FakeTimeProvider : TimeProvider {
     override fun getCurrentTime(): Instant = time
 }
 
-private class FakePrivacyProtectionsPopupRepository : PrivacyProtectionsPopupRepository {
+private class FakePopupDismissDomainRepository : PopupDismissDomainRepository {
 
     private val data = MutableStateFlow(emptyMap<String, Instant>())
 
