@@ -75,6 +75,7 @@ class TrackerDetectorImpl @Inject constructor(
         checkFirstParty: Boolean,
         requestHeaders: Map<String, String>,
     ): TrackingEvent? {
+        return null
         val traceCookie = Random(System.currentTimeMillis()).nextInt()
         Trace.beginAsyncSection("TRACKER_DETECTOR_EVALUATE", traceCookie)
         if (checkFirstParty && firstParty(url, documentUrl)) {
