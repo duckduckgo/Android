@@ -18,4 +18,6 @@
     <!-- Setup screen -->
     <string name="sync_enable_option_favorites_title">Share Favorites</string>
     <string name="sync_enable_option_favorites_subtitle">Use the same favorites on all devices. Leave off to keep mobile and desktop favorites separate.</string>
+    <string name="saved_site_limit_warning"><b>Sync Paused</b>\nBookmark limit exceeded. Delete some to resume syncing.\n\n<annotation type="manage_bookmarks">Manage Bookmarks</annotation></string>
+    <string name="saved_site_limit_warning_notif"><b>Bookmarks Sync is Paused</b>\nYou have exceeded the bookmarks sync limit. Try deleting some bookmarks. Until this is resolved your bookmarks will not be backed up.</string>
 </resources>

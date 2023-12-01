@@ -14,15 +14,19 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.sync
+package com.duckduckgo.sync.impl.di
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
+import com.duckduckgo.di.*
+import com.duckduckgo.di.scopes.*
+import com.duckduckgo.sync.api.*
+import com.squareup.anvil.annotations.*
+import dagger.*
+import dagger.multibindings.*
 
-class FakeCredentialsSyncStore : CredentialsSyncStore {
-    override var serverModifiedSince: String = "0"
-    override var startTimeStamp: String = "0"
-    override var clientModifiedSince: String = "0"
-    override var isSyncPaused: Boolean = false
-    override fun isSyncPausedFlow(): Flow<Boolean> = emptyFlow()
+@Module
+@ContributesTo(ActivityScope::class)
+abstract class SyncMessageModule {
+    // we use multibinds as the list of plugins can be empty
+    @Multibinds
+    abstract fun provideSyncMessagePlugins(): DaggerSet<SyncMessagePlugin>
 }

@@ -14,15 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.sync
+package com.duckduckgo.sync.api
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
+import android.content.Context
+import android.view.View
 
-class FakeCredentialsSyncStore : CredentialsSyncStore {
-    override var serverModifiedSince: String = "0"
-    override var startTimeStamp: String = "0"
-    override var clientModifiedSince: String = "0"
-    override var isSyncPaused: Boolean = false
-    override fun isSyncPausedFlow(): Flow<Boolean> = emptyFlow()
+interface SyncMessagePlugin {
+    fun getView(context: Context): View
 }

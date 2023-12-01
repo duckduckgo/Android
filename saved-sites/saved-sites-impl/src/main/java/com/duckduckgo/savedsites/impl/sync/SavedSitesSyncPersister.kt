@@ -22,6 +22,7 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesSyncPersisterAlgorithm
 import com.duckduckgo.sync.api.engine.SyncChangesResponse
 import com.duckduckgo.sync.api.engine.SyncDataValidationResult
+import com.duckduckgo.sync.api.engine.SyncErrorResponse
 import com.duckduckgo.sync.api.engine.SyncMergeResult
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Success
 import com.duckduckgo.sync.api.engine.SyncableDataPersister
@@ -42,14 +43,16 @@ class SavedSitesSyncPersister @Inject constructor(
     private val savedSitesSyncStore: SavedSitesSyncStore,
     private val algorithm: SavedSitesSyncPersisterAlgorithm,
     private val savedSitesFormFactorSyncMigration: SavedSitesFormFactorSyncMigration,
+    private val savedSitesSyncState: SavedSitesSyncFeatureListener,
 ) : SyncableDataPersister {
 
-    override fun persist(
+    override fun onSuccess(
         changes: SyncChangesResponse,
         conflictResolution: SyncConflictResolution,
     ): SyncMergeResult {
         return if (changes.type == BOOKMARKS) {
             Timber.d("Sync-Bookmarks: received remote changes $changes, merging with resolution $conflictResolution")
+            savedSitesSyncState.onSuccess(changes)
             val result = process(changes, conflictResolution)
             Timber.d("Sync-Bookmarks: merging bookmarks finished with $result")
             result
@@ -58,11 +61,18 @@ class SavedSitesSyncPersister @Inject constructor(
         }
     }
 
+    override fun onError(error: SyncErrorResponse) {
+        if (error.type == BOOKMARKS) {
+            savedSitesSyncState.onError(error.featureSyncError)
+        }
+    }
+
     override fun onSyncDisabled() {
         savedSitesSyncStore.serverModifiedSince = "0"
         savedSitesSyncStore.clientModifiedSince = "0"
         savedSitesSyncStore.startTimeStamp = "0"
         savedSitesFormFactorSyncMigration.onFormFactorFavouritesDisabled()
+        savedSitesSyncState.onSyncDisabled()
     }
 
     fun process(

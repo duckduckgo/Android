@@ -30,6 +30,23 @@
         app:leadingIconBackground="circular"
         app:primaryText="@string/sync_disable_sync_item" />
 
+    <com.duckduckgo.common.ui.notifyme.NotifyMeView
+        android:id="@+id/sync_notification_notify_me"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:primaryText="@string/sync_notify_me_title"
+        app:secondaryText="@string/sync_notify_me_description"
+        app:dismissIcon="true"
+        app:contentOrientation="start"
+        app:sharedPrefsKeyForDismiss="key_component_dismissed_in_sync_settings" />
+
+    <LinearLayout
+        android:id="@+id/syncFeatureWarningsContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"/>
+
     <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />

@@ -16,13 +16,13 @@
 
 package com.duckduckgo.autofill.sync
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
+import android.content.Context
+import android.view.View
+import com.duckduckgo.sync.api.SyncMessagePlugin
+import javax.inject.Inject
 
-class FakeCredentialsSyncStore : CredentialsSyncStore {
-    override var serverModifiedSince: String = "0"
-    override var startTimeStamp: String = "0"
-    override var clientModifiedSince: String = "0"
-    override var isSyncPaused: Boolean = false
-    override fun isSyncPausedFlow(): Flow<Boolean> = emptyFlow()
+class CredentialsRateLimitSyncMessagePlugin @Inject constructor() : SyncMessagePlugin {
+    override fun getView(context: Context): View {
+        return CredentialsRateLimitView(context)
+    }
 }

@@ -47,6 +47,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 import com.duckduckgo.sync.api.SyncCrypto
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -58,6 +59,7 @@ import org.mockito.kotlin.*
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
 class SavedSitesSyncDataProviderTest {
 
@@ -115,7 +117,11 @@ class SavedSitesSyncDataProviderTest {
             favoritesDelegate,
             coroutinesTestRule.testDispatcherProvider,
         )
-        store = RealSavedSitesSyncStore(InstrumentationRegistry.getInstrumentation().context)
+        store = RealSavedSitesSyncStore(
+            InstrumentationRegistry.getInstrumentation().context,
+            coroutinesTestRule.testScope,
+            coroutinesTestRule.testDispatcherProvider,
+        )
 
         savedSitesFormFactorSyncMigration = RealSavedSitesFormFactorSyncMigration(
             savedSitesEntitiesDao,

@@ -22,10 +22,15 @@ interface SyncableDataPersister {
      * Changes from Sync Client have been received
      * Each feature is responsible for merging and solving conflicts
      */
-    fun persist(
+    fun onSuccess(
         changes: SyncChangesResponse,
         conflictResolution: SyncConflictResolution,
     ): SyncMergeResult
+
+    /**
+     * Syncing data failed due to an error related to this feature
+     */
+    fun onError(error: SyncErrorResponse)
 
     /**
      * Sync Feature has been disabled / device has been removed
