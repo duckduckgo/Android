@@ -38,6 +38,7 @@ import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsToggleUsageListener
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -82,6 +83,8 @@ class BrokenSiteViewModelTest {
 
     private val mockUserAllowListRepository: UserAllowListRepository = mock()
 
+    private val mockPrivacyProtectionsToggleUsageListener: PrivacyProtectionsToggleUsageListener = mock()
+
     private lateinit var testee: BrokenSiteViewModel
 
     private val viewState: BrokenSiteViewModel.ViewState
@@ -98,6 +101,7 @@ class BrokenSiteViewModelTest {
             mockContentBlocking,
             mockUnprotectedTemporary,
             mockUserAllowListRepository,
+            mockPrivacyProtectionsToggleUsageListener,
             Moshi.Builder().add(JSONObjectAdapter()).build(),
         )
         testee.command.observeForever(mockCommandObserver)

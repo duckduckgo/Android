@@ -45,6 +45,7 @@ import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsToggleUsageListener
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import javax.inject.Inject
@@ -63,6 +64,7 @@ class BrokenSiteViewModel @Inject constructor(
     private val contentBlocking: ContentBlocking,
     private val unprotectedTemporary: UnprotectedTemporary,
     private val userAllowListRepository: UserAllowListRepository,
+    private val protectionsToggleUsageListener: PrivacyProtectionsToggleUsageListener,
     moshi: Moshi,
 ) : ViewModel() {
     private val jsonStringListAdapter = moshi.adapter<List<String>>(
@@ -178,6 +180,8 @@ class BrokenSiteViewModel @Inject constructor(
                 userAllowListRepository.addDomainToUserAllowList(domain)
                 pixel.fire(AppPixelName.BROKEN_SITE_ALLOWLIST_ADD)
             }
+
+            protectionsToggleUsageListener.onPrivacyProtectionsToggleUsed()
         }
     }
 

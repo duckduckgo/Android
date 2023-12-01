@@ -144,6 +144,7 @@ import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEA
 import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupManager
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupViewState
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsToggleUsageListener
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
@@ -411,6 +412,8 @@ class BrowserTabViewModelTest {
 
     private val mockPrivacyProtectionsPopupManager: PrivacyProtectionsPopupManager = mock()
 
+    private val mockPrivacyProtectionsToggleUsageListener: PrivacyProtectionsToggleUsageListener = mock()
+
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
@@ -537,6 +540,7 @@ class BrowserTabViewModelTest {
             cameraHardwareChecker = cameraHardwareChecker,
             androidBrowserConfig = androidBrowserConfig,
             privacyProtectionsPopupManager = mockPrivacyProtectionsPopupManager,
+            privacyProtectionsToggleUsageListener = mockPrivacyProtectionsToggleUsageListener,
         )
 
         testee.loadData("abc", null, false, false)

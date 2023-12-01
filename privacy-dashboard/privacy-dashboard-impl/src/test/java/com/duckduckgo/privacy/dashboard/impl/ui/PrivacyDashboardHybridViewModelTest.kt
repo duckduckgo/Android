@@ -31,6 +31,7 @@ import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVACY_DASHBOARD_ALLOWLIST_ADD
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchReportBrokenSite
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsToggleUsageListener
 import com.nhaarman.mockitokotlin2.mock
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -64,6 +65,7 @@ class PrivacyDashboardHybridViewModelTest {
     private val unprotectedTemporary = mock<UnprotectedTemporary>()
 
     private val pixel = mock<Pixel>()
+    private val privacyProtectionsToggleUsageListener: PrivacyProtectionsToggleUsageListener = mock()
 
     private val testee: PrivacyDashboardHybridViewModel by lazy {
         PrivacyDashboardHybridViewModel(
@@ -75,6 +77,7 @@ class PrivacyDashboardHybridViewModelTest {
             protectionStatusViewStateMapper = AppProtectionStatusViewStateMapper(contentBlocking, unprotectedTemporary),
             privacyDashboardPayloadAdapter = mock(),
             autoconsentStatusViewStateMapper = CookiePromptManagementStatusViewStateMapper(),
+            protectionsToggleUsageListener = privacyProtectionsToggleUsageListener,
         )
     }
 
@@ -136,6 +139,16 @@ class PrivacyDashboardHybridViewModelTest {
             userAllowListRepository.addDomainToUserAllowList(site.domain!!)
             assertTrue(awaitItem().userChangedValues)
         }
+    }
+
+    @Test
+    fun whenOnPrivacyProtectionClickedThenListenerIsNotified() = runTest {
+        val site = site(siteAllowed = false)
+        testee.onSiteChanged(site)
+
+        testee.onPrivacyProtectionsClicked(enabled = false)
+
+        verify(privacyProtectionsToggleUsageListener).onPrivacyProtectionsToggleUsed()
     }
 
     private fun site(
