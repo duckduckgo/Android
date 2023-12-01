@@ -19,6 +19,7 @@ package com.duckduckgo.experiments.impl
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.experiments.api.VariantConfig
 import com.duckduckgo.experiments.impl.store.ExperimentVariantEntity
+import com.duckduckgo.experiments.impl.store.VariantDataStore
 import java.util.Locale
 import org.junit.Assert
 import org.junit.Assert.assertEquals
@@ -38,6 +39,7 @@ class ExperimentationVariantManagerTest {
     private val appBuildConfig: AppBuildConfig = mock()
     private val activeVariants = mutableListOf<Variant>()
     private val mockExperimentVariantRepository: ExperimentVariantRepository = mock()
+    private val mockVariantDataStore: VariantDataStore = mock()
 
     @Before
     fun setup() {
@@ -48,6 +50,7 @@ class ExperimentationVariantManagerTest {
             mockRandomizer,
             appBuildConfig,
             mockExperimentVariantRepository,
+            mockVariantDataStore,
         )
     }
 
@@ -81,9 +84,6 @@ class ExperimentationVariantManagerTest {
         verify(mockExperimentVariantRepository).saveVariants(variantsConfig)
     }
 
-    // val variantsConfig = listOf(VariantConfig("variant", 1.0))
-    // testee.saveVariants(variantsConfig)
-    // Old
     @Test
     fun whenVariantAlreadyPersistedThenVariantAllocatorNeverInvoked() {
         val variantsConfig = listOf(VariantConfig("variantKey", 1.0))
@@ -101,7 +101,19 @@ class ExperimentationVariantManagerTest {
         whenever(mockExperimentVariantRepository.getUserVariant()).thenReturn(null)
         testee.saveVariants(variantsConfig)
 
+        verify(mockExperimentVariantRepository).updateVariant(any())
         verify(mockRandomizer).random(any())
+    }
+
+    @Test
+    fun givenReturnUserVariantWhenVariantsConfigUpdatedThenNewVariantNoAllocated() {
+        val variantsConfig = listOf(VariantConfig("variant1", 1.0), VariantConfig("variant2", 1.0))
+        whenever(mockExperimentVariantRepository.getUserVariant()).thenReturn("ru")
+
+        testee.saveVariants(variantsConfig)
+
+        verify(mockExperimentVariantRepository, never()).updateVariant(any())
+        verify(mockRandomizer, never()).random(any())
     }
 
     @Test
