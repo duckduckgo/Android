@@ -38,10 +38,11 @@
             android:layout_margin="@dimen/keyline_4"
             android:text="@string/sync_login_device_hint"/>
 
-    <com.duckduckgo.sync.impl.ui.qrcode.SquareDecoratedBarcodeView
+    <com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeView
         android:id="@+id/qrCodeReader"
         android:layout_width="match_parent"
-        android:layout_height="0dp"/>
+        android:layout_height="@dimen/qrBarcodeSize"/>
+
     </LinearLayout>
 
 </LinearLayout>

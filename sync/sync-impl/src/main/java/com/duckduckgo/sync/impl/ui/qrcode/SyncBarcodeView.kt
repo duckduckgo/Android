@@ -56,7 +56,7 @@ import kotlinx.coroutines.flow.onEach
  * Encapsulates DecoratedBarcodeView forcing a 1:1 aspect ratio, and adds custom frame to the scanner
  */
 @InjectWith(ViewScope::class)
-class SquareDecoratedBarcodeView
+class SyncBarcodeView
 @JvmOverloads
 constructor(
     context: Context,
@@ -104,15 +104,6 @@ constructor(
         binding.goToSettingsButton.setOnClickListener {
             viewModel.goToSettings()
         }
-    }
-
-    override fun onMeasure(
-        widthMeasureSpec: Int,
-        heightMeasureSpec: Int,
-    ) {
-        val size = listOf(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.getSize(heightMeasureSpec)).filter { it > 0 }.min()
-        val squareMeasureSpec = MeasureSpec.makeMeasureSpec(size, MeasureSpec.EXACTLY)
-        super.onMeasure(squareMeasureSpec, squareMeasureSpec)
     }
 
     fun resume() {
