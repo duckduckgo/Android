@@ -50,7 +50,7 @@ class DuckDuckGoBackupAgent : BackupAgentHelper() {
     }
 
     companion object {
-        private const val FILENAME = "com.duckduckgo.app.statistics"
-        const val FILENAME_BACKUP = "com.duckduckgo.app.statistics.backup"
+        private const val FILENAME = "com.duckduckgo.app.statistics.backup"
+        const val FILENAME_BACKUP = "com.duckduckgo.app.backup.backup"
     }
 }
