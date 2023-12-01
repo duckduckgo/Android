@@ -17,7 +17,6 @@
 package com.duckduckgo.sync.impl.ui
 
 import android.os.Bundle
-import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
