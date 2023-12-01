@@ -127,6 +127,9 @@ constructor(
         binding.barcodeCta.setOnClickListener {
             onClick.invoke()
         }
+        binding.cameraPermissionsBarcodeCta.setOnClickListener {
+            onClick.invoke()
+        }
     }
 
     fun decodeSingle(onQrCodeRead: (String) -> Unit) {
