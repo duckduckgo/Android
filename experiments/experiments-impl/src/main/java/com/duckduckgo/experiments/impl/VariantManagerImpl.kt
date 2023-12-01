@@ -17,7 +17,7 @@
 package com.duckduckgo.experiments.impl
 
 import androidx.annotation.WorkerThread
-import com.duckduckgo.app.statistics.ReinstallAtbListener.Companion.REINSTALL_USER_VARIANT
+import com.duckduckgo.app.statistics.ReinstallAtbListener.Companion.REINSTALL_VARIANT
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.api.VariantConfig
@@ -63,7 +63,7 @@ class VariantManagerImpl @Inject constructor(
             return
         }
 
-        if (currentVariantKey == REINSTALL_USER_VARIANT) {
+        if (currentVariantKey == REINSTALL_VARIANT) {
             return
         }
 
