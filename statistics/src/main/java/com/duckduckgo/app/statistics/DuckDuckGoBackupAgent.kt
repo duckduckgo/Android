@@ -20,11 +20,21 @@ import android.app.backup.BackupAgentHelper
 import android.app.backup.BackupDataOutput
 import android.app.backup.SharedPreferencesBackupHelper
 import android.os.ParcelFileDescriptor
+import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.StatisticsPixelName.BACKUP_SERVICE_ENABLED
+import com.duckduckgo.di.scopes.BackupAgentScope
+import dagger.android.AndroidInjection
+import javax.inject.Inject
 
+@InjectWith(BackupAgentScope::class)
 class DuckDuckGoBackupAgent : BackupAgentHelper() {
+
+    @Inject lateinit var pixel: Pixel
 
     override fun onCreate() {
         super.onCreate()
+        AndroidInjection.inject(this, this)
         SharedPreferencesBackupHelper(this, FILENAME).also {
             addHelper(FILENAME_BACKUP, it)
         }
@@ -36,7 +46,7 @@ class DuckDuckGoBackupAgent : BackupAgentHelper() {
         newState: ParcelFileDescriptor?,
     ) {
         super.onBackup(oldState, data, newState)
-        // TODO add backup_service_enabled pixel
+        pixel.fire(BACKUP_SERVICE_ENABLED)
     }
 
     companion object {
