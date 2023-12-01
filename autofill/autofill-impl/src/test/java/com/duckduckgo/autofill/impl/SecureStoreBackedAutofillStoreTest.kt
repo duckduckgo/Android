@@ -38,6 +38,7 @@ import com.duckduckgo.autofill.sync.SyncCredentialsListener
 import com.duckduckgo.autofill.sync.inMemoryAutofillDatabase
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
@@ -585,6 +586,15 @@ class SecureStoreBackedAutofillStoreTest {
         override suspend fun deleteWebsiteLoginDetailsWithCredentials(id: Long) {
             credentials.removeAll { it.details.id == id }
         }
+
+        override suspend fun addToNeverSaveList(domain: String) {
+        }
+
+        override suspend fun clearNeverSaveList() {
+        }
+
+        override suspend fun neverSaveListCount(): Flow<Int> = emptyFlow()
+        override suspend fun isInNeverSaveList(domain: String): Boolean = false
 
         override fun canAccessSecureStorage(): Boolean = canAccessSecureStorage
     }

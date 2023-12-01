@@ -21,6 +21,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -30,7 +31,7 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.email.incontext.store.EmailProtectionInContextDataStore
-import com.duckduckgo.autofill.internal.R.string
+import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
 import com.duckduckgo.autofill.internal.databinding.ActivityAutofillInternalSettingsBinding
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -75,6 +76,9 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
+    @Inject
+    lateinit var neverSavedSiteRepository: NeverSavedSiteRepository
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -108,6 +112,24 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
     private fun configureUiEventHandlers() {
         configureEmailProtectionUiEventHandlers()
         configureLoginsUiEventHandlers()
+        configureNeverSavedSitesEventHandlers()
+    }
+
+    private fun configureNeverSavedSitesEventHandlers() = with(binding) {
+        numberNeverSavedSitesCount.setClickListener {
+            lifecycleScope.launch(dispatchers.io()) {
+                neverSavedSiteRepository.clearNeverSaveList()
+            }
+        }
+        addSampleNeverSavedSiteButton.setClickListener {
+            lifecycleScope.launch(dispatchers.io()) {
+                // should only actually add one entry for all these attempts
+                neverSavedSiteRepository.addToNeverSaveList("https://fill.dev")
+                neverSavedSiteRepository.addToNeverSaveList("fill.dev")
+                neverSavedSiteRepository.addToNeverSaveList("foo.fill.dev")
+                neverSavedSiteRepository.addToNeverSaveList("fill.dev/?q=123")
+            }
+        }
     }
 
     private fun configureLoginsUiEventHandlers() {
@@ -147,7 +169,16 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 autofillStore.getCredentialCount().collect { count ->
                     binding.clearAllSavedLoginsButton.isEnabled = count > 0
-                    binding.clearAllSavedLoginsButton.setSecondaryText(getString(string.autofillDevSettingsClearLoginsSubtitle, count))
+                    binding.clearAllSavedLoginsButton.setSecondaryText(getString(R.string.autofillDevSettingsClearLoginsSubtitle, count))
+                }
+            }
+        }
+
+        // keep the number of excluded sites (never saved) up-to-date
+        lifecycleScope.launch(dispatchers.io()) {
+            repeatOnLifecycle(STARTED) {
+                neverSavedSiteRepository.neverSaveListCount().collect { count ->
+                    binding.numberNeverSavedSitesCount.setSecondaryText(getString(R.string.autofillDevSettingsNeverSavedSitesCountSubtitle, count))
                 }
             }
         }
@@ -159,11 +190,11 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
 
     private fun confirmLoginDeletion(count: Int) {
         TextAlertDialogBuilder(this@AutofillInternalSettingsActivity)
-            .setTitle(string.autofillDevSettingsClearLogins)
-            .setMessage(getString(string.autofillDevSettingsClearLoginsConfirmationMessage, count))
+            .setTitle(R.string.autofillDevSettingsClearLogins)
+            .setMessage(getString(R.string.autofillDevSettingsClearLoginsConfirmationMessage, count))
             .setDestructiveButtons(true)
-            .setPositiveButton(string.autofillDevSettingsClearLoginsDeleteButton)
-            .setNegativeButton(string.autofillDevSettingsClearLoginsCancelButton)
+            .setPositiveButton(R.string.autofillDevSettingsClearLoginsDeleteButton)
+            .setNegativeButton(R.string.autofillDevSettingsClearLoginsCancelButton)
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
@@ -199,24 +230,24 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
         binding.emailProtectionClearNeverAskAgainButton.setClickListener {
             lifecycleScope.launch(dispatchers.io()) {
                 inContextDataStore.resetNeverAskAgainChoice()
-                getString(string.autofillDevSettingsEmailProtectionNeverAskAgainChoiceCleared).showToast()
+                getString(R.string.autofillDevSettingsEmailProtectionNeverAskAgainChoiceCleared).showToast()
             }
         }
 
         binding.emailProtectionSignOutButton.setClickListener {
             lifecycleScope.launch(dispatchers.io()) {
                 emailManager.signOut()
-                getString(string.autofillDevSettingsEmailProtectionSignedOut).showToast()
+                getString(R.string.autofillDevSettingsEmailProtectionSignedOut).showToast()
             }
         }
 
         @Suppress("DEPRECATION")
         binding.configureDaysFromInstallValue.setClickListener {
             RadioListAlertDialogBuilder(this)
-                .setTitle(string.autofillDevSettingsOverrideMaxInstallDialogTitle)
+                .setTitle(R.string.autofillDevSettingsOverrideMaxInstallDialogTitle)
                 .setOptions(daysInstalledOverrideOptions().map { it.first })
-                .setPositiveButton(string.autofillDevSettingsOverrideMaxInstallDialogOkButtonText)
-                .setNegativeButton(string.autofillDevSettingsOverrideMaxInstallDialogCancelButtonText)
+                .setPositiveButton(R.string.autofillDevSettingsOverrideMaxInstallDialogOkButtonText)
+                .setNegativeButton(R.string.autofillDevSettingsOverrideMaxInstallDialogCancelButtonText)
                 .addEventListener(
                     object : RadioListAlertDialogBuilder.EventListener() {
                         override fun onPositiveButtonClicked(selectedItem: Int) {
