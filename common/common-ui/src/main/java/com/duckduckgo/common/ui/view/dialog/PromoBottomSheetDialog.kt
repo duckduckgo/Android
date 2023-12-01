@@ -52,11 +52,13 @@ class PromoBottomSheetDialog(builder: Builder) : BottomSheetDialog(builder.conte
         setOnShowListener { builder.listener.onBottomSheetShown() }
         binding.bottomSheetPromoPrimaryButton.setOnClickListener {
             builder.listener.onPrimaryButtonClicked()
-            hide()
+            setOnDismissListener(null)
+            dismiss()
         }
         binding.bottomSheetPromoSecondaryButton.setOnClickListener {
             builder.listener.onSecondaryButtonClicked()
-            hide()
+            setOnDismissListener(null)
+            dismiss()
         }
 
         builder.icon?.let {
