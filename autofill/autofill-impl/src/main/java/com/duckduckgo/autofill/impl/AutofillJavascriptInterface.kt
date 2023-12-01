@@ -44,6 +44,7 @@ import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillTriggerTyp
 import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillTriggerType.USER_INITIATED
 import com.duckduckgo.autofill.impl.jsbridge.response.AutofillResponseWriter
 import com.duckduckgo.autofill.impl.sharedcreds.ShareableCredentials
+import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
 import com.duckduckgo.autofill.impl.systemautofill.SystemAutofillServiceSuppressor
 import com.duckduckgo.autofill.impl.ui.credential.passwordgeneration.Actions
 import com.duckduckgo.autofill.impl.ui.credential.passwordgeneration.Actions.DeleteAutoLogin
@@ -112,6 +113,7 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
     private val recentInstallChecker: EmailProtectionInContextRecentInstallChecker,
     private val loginDeduplicator: AutofillLoginDeduplicator,
     private val systemAutofillServiceSuppressor: SystemAutofillServiceSuppressor,
+    private val neverSavedSiteRepository: NeverSavedSiteRepository,
 ) : AutofillJavascriptInterface {
 
     override var callback: Callback? = null
@@ -260,6 +262,11 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
 
             if (!autofillCapabilityChecker.canSaveCredentialsFromWebView(currentUrl)) {
                 Timber.v("BrowserAutofill: storeFormData called but feature is disabled")
+                return@launch
+            }
+
+            if (neverSavedSiteRepository.isInNeverSaveList(currentUrl)) {
+                Timber.v("BrowserAutofill: storeFormData called but site is in never save list")
                 return@launch
             }
 

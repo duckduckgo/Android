@@ -42,7 +42,6 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SAVE_PASSW
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SAVE_PASSWORD_PROMPT_SAVED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SAVE_PASSWORD_PROMPT_SHOWN
 import com.duckduckgo.autofill.impl.ui.credential.dialog.animateClosed
-import com.duckduckgo.autofill.impl.ui.credential.management.sorting.InitialExtractor
 import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentialsDialogFragment.AutofillSavingPixelEventNames.Companion.pixelNameDialogAccepted
 import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentialsDialogFragment.AutofillSavingPixelEventNames.Companion.pixelNameDialogDismissed
 import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentialsDialogFragment.AutofillSavingPixelEventNames.Companion.pixelNameDialogShown
@@ -89,9 +88,6 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
     lateinit var pixel: Pixel
 
     @Inject
-    lateinit var initialExtractor: InitialExtractor
-
-    @Inject
     lateinit var dispatcherProvider: DispatcherProvider
 
     @Inject
@@ -131,14 +127,11 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
         viewModel.userPromptedToSaveCredentials()
 
         val binding = ContentAutofillSaveNewCredentialsBinding.inflate(inflater, container, false)
-        configureViews(binding, getCredentialsToSave())
+        configureViews(binding)
         return binding.root
     }
 
-    private fun configureViews(
-        binding: ContentAutofillSaveNewCredentialsBinding,
-        credentials: LoginCredentials,
-    ) {
+    private fun configureViews(binding: ContentAutofillSaveNewCredentialsBinding) {
         (dialog as BottomSheetDialog).behavior.state = BottomSheetBehavior.STATE_EXPANDED
         configureCloseButtons(binding)
         configureSaveButton(binding)
@@ -166,15 +159,21 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
     }
 
     override fun onCancel(dialog: DialogInterface) {
-        // need a reference to this early as it will could null after launching the coroutine
-        val parentFragmentForResult = parentFragment
-
         if (ignoreCancellationEvents) {
             Timber.v("onCancel: Ignoring cancellation event")
             return
         }
 
         Timber.v("onCancel: AutofillSavingCredentialsDialogFragment. User declined to save credentials")
+
+        onUserRejectedToSaveCredentials()
+
+        pixelNameDialogEvent(Dismissed)?.let { pixel.fire(it) }
+    }
+
+    private fun onUserRejectedToSaveCredentials() {
+        // need a reference to this early as it could be null after launching the coroutine
+        val parentFragmentForResult = parentFragment
 
         appCoroutineScope.launch(dispatcherProvider.io()) {
             autofillDeclineCounter.userDeclinedToSaveCredentials(getOriginalUrl().extractDomain())
@@ -185,13 +184,28 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
                 autofillFireproofDialogSuppressor.autofillSaveOrUpdateDialogVisibilityChanged(visible = false)
             }
         }
-
-        pixelNameDialogEvent(Dismissed)?.let { pixel.fire(it) }
     }
 
+    private fun onUserChoseNeverSaveThisSite() {
+        viewModel.addSiteToNeverSaveList(getOriginalUrl())
+
+        // this is another way to refuse saving credentials, so ensure that normal logic still runs
+        onUserRejectedToSaveCredentials()
+
+        // avoid the standard cancellation logic from running
+        ignoreCancellationEvents = true
+    }
+
+    /**
+     * Close button, back button and tapping outside the dialog all handled in [onCancel]
+     * For "never save" button, which is a special way of saying "no" to saving credentials, we need to do additional work to save that choice
+     */
     private fun configureCloseButtons(binding: ContentAutofillSaveNewCredentialsBinding) {
         binding.closeButton.setOnClickListener { animateClosed() }
-        binding.cancelButton.setOnClickListener { animateClosed() }
+        binding.neverSaveForThisSiteButton.setOnClickListener {
+            onUserChoseNeverSaveThisSite()
+            animateClosed()
+        }
     }
 
     private fun animateClosed() {

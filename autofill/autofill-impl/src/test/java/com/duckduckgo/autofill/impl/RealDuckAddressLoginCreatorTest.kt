@@ -20,6 +20,7 @@ import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.autofill.api.store.AutofillStore
+import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
@@ -34,6 +35,7 @@ class RealDuckAddressLoginCreatorTest {
     private val autofillStore: AutofillStore = mock()
     private val automaticSavedLoginsMonitor: AutomaticSavedLoginsMonitor = mock()
     private val autofillCapabilityChecker: AutofillCapabilityChecker = mock()
+    private val neverSavedSiteRepository: NeverSavedSiteRepository = mock()
 
     private val testee = RealDuckAddressLoginCreator(
         autofillStore = autofillStore,
@@ -41,6 +43,7 @@ class RealDuckAddressLoginCreatorTest {
         autofillCapabilityChecker = autofillCapabilityChecker,
         dispatchers = coroutineTestRule.testDispatcherProvider,
         appCoroutineScope = coroutineTestRule.testScope,
+        neverSavedSiteRepository = neverSavedSiteRepository,
     )
 
     @Test
@@ -52,17 +55,14 @@ class RealDuckAddressLoginCreatorTest {
 
     @Test
     fun whenNoAutoSavedLoginIdThenNewLoginSaved() = runTest {
-        whenever(autofillCapabilityChecker.canSaveCredentialsFromWebView(URL)).thenReturn(true)
-        whenever(automaticSavedLoginsMonitor.getAutoSavedLoginId(TAB_ID)).thenReturn(null)
+        configureReadyToAutoSave()
         testee.createLoginForPrivateDuckAddress(DUCK_ADDRESS, TAB_ID, URL)
         verifyLoginSaved()
     }
 
     @Test
     fun whenAutoSavedLoginIdSetButNoMatchingLoginFoundThenNewLoginSaved() = runTest {
-        whenever(autofillCapabilityChecker.canSaveCredentialsFromWebView(URL)).thenReturn(true)
-        whenever(automaticSavedLoginsMonitor.getAutoSavedLoginId(TAB_ID)).thenReturn(1)
-        whenever(autofillStore.getCredentialsWithId(1)).thenReturn(null)
+        configureReadyToAutoSave()
         testee.createLoginForPrivateDuckAddress(DUCK_ADDRESS, TAB_ID, URL)
         verifyLoginSaved()
     }
@@ -70,7 +70,7 @@ class RealDuckAddressLoginCreatorTest {
     @Test
     fun whenAutoSavedLoginFoundAndDetailsAlreadyMatchThenNotSavedOrUpdated() = runTest {
         val existingLogin = aLogin(id = 1, username = DUCK_ADDRESS)
-        whenever(autofillCapabilityChecker.canSaveCredentialsFromWebView(URL)).thenReturn(true)
+        configureReadyToAutoSave()
         whenever(automaticSavedLoginsMonitor.getAutoSavedLoginId(TAB_ID)).thenReturn(1)
         whenever(autofillStore.getCredentialsWithId(1)).thenReturn(existingLogin)
 
@@ -81,12 +81,34 @@ class RealDuckAddressLoginCreatorTest {
     @Test
     fun whenAutoSavedLoginFoundAndUsernameDifferentThenLoginUpdated() = runTest {
         val existingLogin = aLogin(id = 1, username = "different-username")
+        whenever(neverSavedSiteRepository.isInNeverSaveList(any())).thenReturn(false)
         whenever(autofillCapabilityChecker.canSaveCredentialsFromWebView(URL)).thenReturn(true)
         whenever(automaticSavedLoginsMonitor.getAutoSavedLoginId(TAB_ID)).thenReturn(1)
         whenever(autofillStore.getCredentialsWithId(1)).thenReturn(existingLogin)
 
         testee.createLoginForPrivateDuckAddress(DUCK_ADDRESS, TAB_ID, URL)
         verifyLoginUpdated()
+    }
+
+    @Test
+    fun whenSiteIsInNeverSaveListThenDoNotAutoSaveALogin() = runTest {
+        configureReadyToAutoSave()
+        whenever(neverSavedSiteRepository.isInNeverSaveList(URL)).thenReturn(true)
+        testee.createLoginForPrivateDuckAddress(DUCK_ADDRESS, TAB_ID, URL)
+        verifyNotSavedOrUpdated()
+    }
+
+    @Test
+    fun whenSiteIsNotInNeverSaveListThenAutoSaveALogin() = runTest {
+        configureReadyToAutoSave()
+        whenever(neverSavedSiteRepository.isInNeverSaveList(any())).thenReturn(false)
+        testee.createLoginForPrivateDuckAddress(DUCK_ADDRESS, TAB_ID, URL)
+        verifyLoginSaved()
+    }
+
+    private suspend fun configureReadyToAutoSave() {
+        whenever(neverSavedSiteRepository.isInNeverSaveList(any())).thenReturn(false)
+        whenever(autofillCapabilityChecker.canSaveCredentialsFromWebView(URL)).thenReturn(true)
     }
 
     private suspend fun verifyLoginSaved() = verify(autofillStore).saveCredentials(eq(URL), any())

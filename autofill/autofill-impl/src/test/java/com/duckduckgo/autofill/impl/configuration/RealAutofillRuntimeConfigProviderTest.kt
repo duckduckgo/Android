@@ -23,6 +23,7 @@ import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.email.incontext.availability.EmailProtectionInContextAvailabilityRules
 import com.duckduckgo.autofill.impl.jsbridge.response.AvailableInputTypeCredentials
 import com.duckduckgo.autofill.impl.sharedcreds.ShareableCredentials
+import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -43,6 +44,7 @@ class RealAutofillRuntimeConfigProviderTest {
     private val shareableCredentials: ShareableCredentials = mock()
     private val autofillCapabilityChecker: AutofillCapabilityChecker = mock()
     private val emailProtectionInContextAvailabilityRules: EmailProtectionInContextAvailabilityRules = mock()
+    private val neverSavedSiteRepository: NeverSavedSiteRepository = mock()
 
     @Before
     fun setUp() {
@@ -54,10 +56,12 @@ class RealAutofillRuntimeConfigProviderTest {
             autofillCapabilityChecker = autofillCapabilityChecker,
             shareableCredentials = shareableCredentials,
             emailProtectionInContextAvailabilityRules = emailProtectionInContextAvailabilityRules,
+            neverSavedSiteRepository = neverSavedSiteRepository,
         )
 
         runTest {
             whenever(autofillStore.getCredentials(EXAMPLE_URL)).thenReturn(emptyList())
+            whenever(neverSavedSiteRepository.isInNeverSaveList(any())).thenReturn(false)
         }
 
         whenever(runtimeConfigurationWriter.generateContentScope()).thenReturn("")
@@ -100,9 +104,7 @@ class RealAutofillRuntimeConfigProviderTest {
 
     @Test
     fun whenNoCredentialsForUrlThenConfigurationInputTypeCredentialsIsFalse() = runTest {
-        configureAutofillCapabilities(enabled = true)
-        whenever(autofillStore.getCredentials(EXAMPLE_URL)).thenReturn(emptyList())
-        configureNoShareableLogins()
+        configureAutofillEnabledWithNoSavedCredentials(EXAMPLE_URL)
         testee.getRuntimeConfiguration("", EXAMPLE_URL)
 
         val expectedCredentialResponse = AvailableInputTypeCredentials(username = false, password = false)
@@ -311,9 +313,7 @@ class RealAutofillRuntimeConfigProviderTest {
     @Test
     fun whenEmailIsSignedInThenConfigurationInputTypeEmailIsTrue() = runTest {
         val url = "example.com"
-        configureAutofillCapabilities(enabled = true)
-        whenever(autofillStore.getCredentials(url)).thenReturn(emptyList())
-        configureNoShareableLogins()
+        configureAutofillEnabledWithNoSavedCredentials(url)
         whenever(emailManager.isSignedIn()).thenReturn(true)
 
         testee.getRuntimeConfiguration("", url)
@@ -327,9 +327,7 @@ class RealAutofillRuntimeConfigProviderTest {
     @Test
     fun whenEmailIsSignedOutThenConfigurationInputTypeEmailIsFalse() = runTest {
         val url = "example.com"
-        configureAutofillCapabilities(enabled = true)
-        whenever(autofillStore.getCredentials(url)).thenReturn(emptyList())
-        configureNoShareableLogins()
+        configureAutofillEnabledWithNoSavedCredentials(url)
         whenever(emailManager.isSignedIn()).thenReturn(false)
 
         testee.getRuntimeConfiguration("", url)
@@ -338,6 +336,30 @@ class RealAutofillRuntimeConfigProviderTest {
             credentialsAvailable = any(),
             emailAvailable = eq(false),
         )
+    }
+
+    @Test
+    fun whenSiteNotInNeverSaveListThenCanSaveCredentials() = runTest {
+        val url = "example.com"
+        configureAutofillEnabledWithNoSavedCredentials(url)
+        testee.getRuntimeConfiguration("", url)
+        verifyCanSaveCredentialsReturnedAs(true)
+    }
+
+    @Test
+    fun whenSiteInNeverSaveListThenStillTellJsWeCanSaveCredentials() = runTest {
+        val url = "example.com"
+        configureAutofillEnabledWithNoSavedCredentials(url)
+        whenever(neverSavedSiteRepository.isInNeverSaveList(url)).thenReturn(true)
+
+        testee.getRuntimeConfiguration("", url)
+        verifyCanSaveCredentialsReturnedAs(true)
+    }
+
+    private suspend fun RealAutofillRuntimeConfigProviderTest.configureAutofillEnabledWithNoSavedCredentials(url: String) {
+        configureAutofillCapabilities(enabled = true)
+        whenever(autofillStore.getCredentials(url)).thenReturn(emptyList())
+        configureNoShareableLogins()
     }
 
     private suspend fun configureAutofillAvailableForSite(url: String) {
@@ -358,6 +380,16 @@ class RealAutofillRuntimeConfigProviderTest {
         verify(runtimeConfigurationWriter).generateUserPreferences(
             autofillCredentials = eq(expectedValue),
             credentialSaving = any(),
+            passwordGeneration = any(),
+            showInlineKeyIcon = any(),
+            showInContextEmailProtectionSignup = any(),
+        )
+    }
+
+    private fun verifyCanSaveCredentialsReturnedAs(expected: Boolean) {
+        verify(runtimeConfigurationWriter).generateUserPreferences(
+            autofillCredentials = any(),
+            credentialSaving = eq(expected),
             passwordGeneration = any(),
             showInlineKeyIcon = any(),
             showInContextEmailProtectionSignup = any(),
