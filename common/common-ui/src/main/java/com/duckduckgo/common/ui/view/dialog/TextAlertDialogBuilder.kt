@@ -77,8 +77,18 @@ class TextAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         return this
     }
 
+    fun setPositiveButton(text: String): TextAlertDialogBuilder {
+        positiveButtonText = text
+        return this
+    }
+
     fun setPositiveButton(@StringRes textId: Int): TextAlertDialogBuilder {
         positiveButtonText = context.getText(textId)
+        return this
+    }
+
+    fun setNegativeButton(t: String): TextAlertDialogBuilder {
+        negativeButtonText = t
         return this
     }
 
