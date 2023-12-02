@@ -146,7 +146,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         val sessionSetting = sitePermissionsRepository.getDrmForSession(domain)
         if (sessionSetting != null) {
             if (sessionSetting) {
-                systemPermissionGranted()
+                grantPermissions()
             } else {
                 denyPermissions()
             }
@@ -181,14 +181,14 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         }
 
         binding.siteAllowAlwaysDrmPermission.setOnClickListener {
-            systemPermissionGranted()
+            grantPermissions()
             onSiteDrmPermissionSave(domain, SitePermissionAskSettingType.ALLOW_ALWAYS)
             dialog.dismiss()
         }
 
         binding.siteAllowOnceDrmPermission.setOnClickListener {
             sitePermissionsRepository.saveDrmForSession(domain, true)
-            systemPermissionGranted()
+            grantPermissions()
             dialog.dismiss()
         }
 
@@ -283,9 +283,13 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         }
     }
 
-    private fun systemPermissionGranted() {
+    private fun grantPermissions() {
         val permissions = permissionsHandledAutomatically.toTypedArray() + permissionsHandledByUser
         sitePermissionRequest.grant(permissions)
+    }
+
+    private fun systemPermissionGranted() {
+        grantPermissions()
         permissionsHandledByUser.forEach {
             sitePermissionsRepository.sitePermissionGranted(siteURL, tabId, it)
         }
