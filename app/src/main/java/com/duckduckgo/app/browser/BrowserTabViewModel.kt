@@ -431,7 +431,7 @@ class BrowserTabViewModel @Inject constructor(
             val deniedForever: Boolean,
         ) : Command()
 
-        class AskDomainPermission(val domain: String) : Command()
+        class AskDomainPermission(val locationPermission: LocationPermission) : Command()
         object RequestSystemLocationPermission : Command()
         class RefreshUserAgent(
             val url: String?,
@@ -1670,7 +1670,7 @@ class BrowserTabViewModel @Inject constructor(
                 }
 
                 LocationPermissionType.ALLOW_ONCE -> {
-                    command.postValue(AskDomainPermission(locationPermission.origin))
+                    command.postValue(AskDomainPermission(locationPermission))
                 }
 
                 LocationPermissionType.DENY_ALWAYS -> {
@@ -1678,7 +1678,7 @@ class BrowserTabViewModel @Inject constructor(
                 }
 
                 LocationPermissionType.DENY_ONCE -> {
-                    command.postValue(AskDomainPermission(locationPermission.origin))
+                    command.postValue(AskDomainPermission(locationPermission))
                 }
             }
         }
@@ -1719,7 +1719,7 @@ class BrowserTabViewModel @Inject constructor(
             viewModelScope.launch {
                 val permissionEntity = locationPermissionsRepository.getDomainPermission(locationPermission.origin)
                 if (permissionEntity == null) {
-                    command.postValue(AskDomainPermission(locationPermission.origin))
+                    command.postValue(AskDomainPermission(locationPermission))
                 } else {
                     reactToSitePermission(permissionEntity.permission)
                 }

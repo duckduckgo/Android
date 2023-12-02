@@ -152,6 +152,10 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         val binding = ContentSiteDrmPermissionDialogBinding.inflate(activity.layoutInflater)
         val dialog = MaterialAlertDialogBuilder(activity)
             .setView(binding.root)
+            .setOnCancelListener {
+                // Called when user clicks outside the dialog - deny to be safe
+                denyPermissions()
+            }
             .create()
 
         val title = url.websiteFromGeoLocationsApiOrigin()
