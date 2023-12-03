@@ -19,6 +19,7 @@ package com.duckduckgo.app.global.store
 import android.content.Context
 import androidx.webkit.WebViewCompat
 import com.duckduckgo.app.playstore.PlayStoreUtils
+import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.browser.api.AppProperties
 import com.duckduckgo.experiments.api.VariantManager
@@ -49,6 +50,10 @@ class AndroidAppProperties(
 
     override fun installedGPlay(): Boolean {
         return playStoreUtils.installedFromPlayStore()
+    }
+
+    override fun storeOldAtb(oldAtb: String) {
+        statisticsStore.oldAtb = Atb(oldAtb)
     }
 
     override fun webView(): String {

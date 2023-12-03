@@ -20,25 +20,19 @@ import android.app.backup.BackupAgent
 import android.app.backup.BackupDataInput
 import android.app.backup.BackupDataOutput
 import android.os.ParcelFileDescriptor
-import android.util.Log
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.StatisticsPixelName.BACKUP_SERVICE_ENABLED
-import com.duckduckgo.app.statistics.store.BackupSharedPreferences
 import com.duckduckgo.browser.api.AppProperties
-import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.BackupAgentScope
 import dagger.android.AndroidInjection
-import org.json.JSONArray
-import org.json.JSONException
 import javax.inject.Inject
 
 @InjectWith(BackupAgentScope::class)
 class DuckDuckGoBackupAgent : BackupAgent() {
 
-    @Inject lateinit var backupSharedPreferences: BackupSharedPreferences
     @Inject lateinit var pixel: Pixel
+
     @Inject lateinit var appProperties: AppProperties
 
     override fun onCreate() {
@@ -66,7 +60,7 @@ class DuckDuckGoBackupAgent : BackupAgent() {
                 val buffer = ByteArray(dataSize)
                 data.readEntityData(buffer, 0, dataSize)
                 val oldAtb = String(buffer)
-                backupSharedPreferences.oldAtb = Atb(oldAtb)
+                appProperties.storeOldAtb(oldAtb)
             }
         }
     }

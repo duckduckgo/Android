@@ -23,4 +23,5 @@ interface AppProperties {
     fun expVariant(): String
     fun installedGPlay(): Boolean
     fun webView(): String
+    fun storeOldAtb(oldAtb: String)
 }

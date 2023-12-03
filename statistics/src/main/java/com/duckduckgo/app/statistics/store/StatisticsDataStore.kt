@@ -27,6 +27,7 @@ interface StatisticsDataStore {
     var searchRetentionAtb: String?
     var variant: String?
     var referrerVariant: String?
+    var oldAtb: Atb?
 
     fun saveAtb(atb: Atb)
     fun clearAtb()
