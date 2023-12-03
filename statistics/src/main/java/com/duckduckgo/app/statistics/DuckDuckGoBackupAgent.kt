@@ -16,28 +16,34 @@
 
 package com.duckduckgo.app.statistics
 
-import android.app.backup.BackupAgentHelper
+import android.app.backup.BackupAgent
+import android.app.backup.BackupDataInput
 import android.app.backup.BackupDataOutput
-import android.app.backup.SharedPreferencesBackupHelper
 import android.os.ParcelFileDescriptor
+import android.util.Log
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.StatisticsPixelName.BACKUP_SERVICE_ENABLED
+import com.duckduckgo.app.statistics.store.BackupSharedPreferences
+import com.duckduckgo.browser.api.AppProperties
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.BackupAgentScope
 import dagger.android.AndroidInjection
+import org.json.JSONArray
+import org.json.JSONException
 import javax.inject.Inject
 
 @InjectWith(BackupAgentScope::class)
-class DuckDuckGoBackupAgent : BackupAgentHelper() {
+class DuckDuckGoBackupAgent : BackupAgent() {
 
+    @Inject lateinit var backupSharedPreferences: BackupSharedPreferences
     @Inject lateinit var pixel: Pixel
+    @Inject lateinit var appProperties: AppProperties
 
     override fun onCreate() {
         super.onCreate()
         AndroidInjection.inject(this, this)
-        SharedPreferencesBackupHelper(this, FILENAME).also {
-            addHelper(FILENAME_BACKUP, it)
-        }
     }
 
     override fun onBackup(
@@ -45,12 +51,27 @@ class DuckDuckGoBackupAgent : BackupAgentHelper() {
         data: BackupDataOutput?,
         newState: ParcelFileDescriptor?,
     ) {
-        super.onBackup(oldState, data, newState)
+        val buffer: ByteArray = appProperties.atb().toByteArray()
+        val len = buffer.size
+        data?.writeEntityHeader(BACKUP_KEY, len)
+        data?.writeEntityData(buffer, len)
         pixel.fire(BACKUP_SERVICE_ENABLED)
     }
 
+    override fun onRestore(data: BackupDataInput, appVersionCode: Int, newState: ParcelFileDescriptor) {
+        while (data.readNextHeader()) {
+            val key: String = data.key
+            val dataSize: Int = data.dataSize
+            if (BACKUP_KEY == key) {
+                val buffer = ByteArray(dataSize)
+                data.readEntityData(buffer, 0, dataSize)
+                val oldAtb = String(buffer)
+                backupSharedPreferences.oldAtb = Atb(oldAtb)
+            }
+        }
+    }
+
     companion object {
-        private const val FILENAME = "com.duckduckgo.app.statistics"
-        const val FILENAME_BACKUP = "com.duckduckgo.app.statistics.backup"
+        const val BACKUP_KEY = "oldAtb"
     }
 }

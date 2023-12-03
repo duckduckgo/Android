@@ -21,6 +21,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
+import com.duckduckgo.app.statistics.store.BackupSharedPreferences
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.DaggerSet
@@ -58,6 +59,7 @@ class AtbInitializer @Inject constructor(
     private val statisticsUpdater: StatisticsUpdater,
     private val listeners: DaggerSet<AtbInitializerListener>,
     private val dispatcherProvider: DispatcherProvider,
+    private val backupSharedPreferences: BackupSharedPreferences,
 ) : MainProcessLifecycleObserver, PrivacyConfigCallbackPlugin {
 
     override fun onResume(owner: LifecycleOwner) {
@@ -70,7 +72,7 @@ class AtbInitializer @Inject constructor(
         listeners.forEach {
             withTimeoutOrNull(it.beforeAtbInitTimeoutMillis()) { it.beforeAtbInit() }
         }
-
+        Timber.d("MARCOS oldAATB is ${backupSharedPreferences.oldAtb}")
         initializeAtb()
     }
 
