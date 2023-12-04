@@ -40,7 +40,7 @@ class DuckDuckGoBackupAgent : BackupAgentHelper() {
 
     override fun onCreate() {
         super.onCreate()
-        AndroidInjection.inject(this, this)
+        AndroidInjection.inject(this)
         SharedPreferencesBackupHelper(this, FILENAME).also {
             addHelper(FILENAME_BACKUP, it)
         }

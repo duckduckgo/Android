@@ -128,10 +128,9 @@ class AndroidInjection {
 
         inline fun <reified T : BackupAgentHelper> inject(
             instance: T,
-            context: Context,
             bindingKey: Class<*>? = null,
         ) {
-            AndroidInjector.inject(context.applicationContext as Application, instance, bindingKey)
+            AndroidInjector.inject(instance, bindingKey)
         }
 
         /**
