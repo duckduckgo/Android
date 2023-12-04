@@ -17,7 +17,7 @@
 <resources>
 
     <string name="privacy_protections_popup_title">Website not working as expected?</string>
-    <string name="privacy_protections_popup_body">Turning protections off on this site might help.</string>
+    <string name="privacy_protections_popup_body">Turning protections off for this site might help.</string>
     <string name="privacy_protections_popup_button_dismiss">Dismiss</string>
     <string name="privacy_protections_popup_button_disable">Turn Off Protections</string>
 
