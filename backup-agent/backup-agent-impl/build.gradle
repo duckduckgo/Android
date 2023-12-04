@@ -18,7 +18,6 @@ plugins {
     id 'com.android.library'
     id 'kotlin-android'
     id 'com.squareup.anvil'
-    id 'com.google.devtools.ksp' version "$ksp_version"
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
@@ -28,20 +27,8 @@ dependencies {
     implementation project(path: ':anvil-annotations')
 
     implementation project(path: ':di')
-    implementation project(path: ':common-utils')
-    implementation project(path: ':experiments-api')
     implementation project(path: ':statistics')
     implementation project(path: ':backup-agent-api')
-    implementation project(path: ':app-build-config-api')
-
-    // Room
-    implementation AndroidX.room.runtime
-    implementation AndroidX.room.rxJava2
-    implementation AndroidX.room.ktx
-    ksp AndroidX.room.compiler
-
-    // Apache commons
-    implementation "org.apache.commons:commons-math3:_"
 
     implementation Kotlin.stdlib.jdk7
     implementation AndroidX.appCompat
@@ -50,8 +37,6 @@ dependencies {
     implementation KotlinX.coroutines.core
 
     implementation Google.dagger
-
-    implementation Square.retrofit2.converter.moshi
 
     testImplementation (KotlinX.coroutines.test) {
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
@@ -71,9 +56,7 @@ dependencies {
     testImplementation "androidx.test:runner:_"
     testImplementation Testing.robolectric
     testImplementation CashApp.turbine
-    testImplementation "org.threeten:threetenbp:_"
 
-    androidTestImplementation project(path: ':common-test')
     testImplementation project(path: ':common-test')
 }
 
@@ -86,6 +69,6 @@ android {
             includeAndroidResources = true
         }
     }
-  namespace 'com.duckduckgo.experiments.impl'
+  namespace 'com.duckduckgo.backup.agent.imp'
 }
 
