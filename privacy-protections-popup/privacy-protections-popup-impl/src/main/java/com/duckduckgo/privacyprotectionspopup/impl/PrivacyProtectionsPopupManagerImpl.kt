@@ -16,9 +16,11 @@
 
 package com.duckduckgo.privacyprotectionspopup.impl
 
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.common.utils.extractDomain
+import com.duckduckgo.common.utils.normalizeScheme
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupManager
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent
@@ -63,6 +65,7 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
     private val popupDismissDomainRepository: PopupDismissDomainRepository,
     private val userAllowListRepository: UserAllowListRepository,
     private val toggleUsageTimestampRepository: ToggleUsageTimestampRepository,
+    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
 ) : PrivacyProtectionsPopupManager {
 
     private val state = MutableStateFlow(
@@ -240,10 +243,13 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
             null -> null
         }
 
+        val isDuckDuckGoDomain = domain?.let { duckDuckGoUrlDetector.isDuckDuckGoUrl(it.normalizeScheme()) }
+
         val shouldShowPopup = featureAvailable &&
             refreshTriggered &&
             protectionsEnabled == true &&
             domain != null &&
+            isDuckDuckGoDomain == false &&
             !hasHttpErrorCodes &&
             popupDismissed == false &&
             toggleUsed == false
