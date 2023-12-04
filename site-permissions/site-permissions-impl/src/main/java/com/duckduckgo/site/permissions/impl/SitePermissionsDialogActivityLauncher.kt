@@ -153,7 +153,13 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
             return
         }
 
-        // No session-based setting -> proceed to show dialog
+        // No session-based setting --> check if DRM blocked by config
+        if (sitePermissionsRepository.isDrmBlockedForUrlByConfig(url)) {
+            denyPermissions()
+            return
+        }
+
+        // No session-based setting and no config --> proceed to show dialog
         val binding = ContentSiteDrmPermissionDialogBinding.inflate(activity.layoutInflater)
         val dialog = MaterialAlertDialogBuilder(activity)
             .setView(binding.root)

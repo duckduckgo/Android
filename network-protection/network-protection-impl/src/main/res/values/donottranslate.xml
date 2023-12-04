@@ -31,8 +31,8 @@
     <string name="netpManagementConnectionDetailsIp">IP Address</string>
 
     <!-- NetP enabled notification -->
-    <string name="netpEnabledNotificationInitialTitle">Network Protection is enabled and routing traffic through the VPN.</string>
-    <string name="netpEnabledNotificationTitle" instruction="Placeholder is location of server with format City,Country">Network Protection is enabled and routing device traffic through &lt;b>%1$s&lt;/b>.</string>
+    <string name="netpEnabledNotificationInitialTitle">Network Protection is connected and routing traffic through the VPN.</string>
+    <string name="netpEnabledNotificationTitle" instruction="Placeholder is location of server with format City,Country">Network Protection is connected and routing device traffic through &lt;b>%1$s&lt;/b>.</string>
 
     <!-- Reconnect -->
     <string name="netpMessageReconnecting">Network Protection interrupted. Attempting to reconnect now…</string>
@@ -136,8 +136,7 @@
     <string name="netpVpnSettingDnsLeak">Network Protection prevents DNS leaks to your Internet Service Provider by routing DNS queries though the VPN tunnel to our own resolver.</string>
     <string name="netpVpnSettingGeoswitching">Preferred Location</string>
     <string name="netpVpnSettingGeoswitchingDefault">Nearest Available</string>
-    <string name="netpVpnSettingSecureDNS">Secure DNS</string>
-    <string name="netpVpnSettingSecureDNSByLine">Prevents DNS leaks to your Internet Service Provider by routing DNS queries though the VPN tunnel to our own resolver. For your security, this feature cannot be disabled.</string>
+    <string name="netpVpnSettingSecureDNSByLine">Our VPN uses Secure DNS to keep your online activity private, so that your Internet provider can\'t see what websites you visit.</string>
 
     <string name="netpVpnSettingExcludeLocalNetworksBatteryUsage">Unrestricted Battery Usage</string>
     <string name="netpVpnSettingExcludeLocalNetworksBatteryUsageByline">Prevents Android from stopping the VPN.</string>
@@ -254,10 +253,13 @@
     <string name="netpPrivacyAnswerFive">• If you reach out to us for support by submitting a bug report or through email and agree to be contacted to troubleshoot the issue, we’ll contact you using the information you provide.\n• If you participate in a voluntary product survey or questionnaire and agree to provide further feedback, we may contact you using the information you provide.\n• We will permanently delete all personal information you provided to us (email, contact information), within 30 days after closing a support case or, in the case of follow up feedback, within 60 days after ending this beta service.</string>
 
     <!-- Notifications -->
-    <string name="netpNotificationCTAEnableNetp">Enable Network Protection</string>
+    <string name="netpNotificationCTAEnableNetp">Connect</string>
     <string name="netpNotificationCTAReportIssue">Having problems with an app?</string>
-    <string name="netpNotificationDisabled">Network Protection is disabled. Tap to continue securing your device traffic.</string>
-    <string name="netpNotificationDisabledByVpn">A VPN app on your device disabled Network Protection. Tap to re-enable.</string>
+    <string name="netpNotificationDisabled">Network Protection is disconnected. Tap to continue securing your device traffic.</string>
+    <string name="netpNotificationDisabledByVpn">A VPN app on your device disconnected Network Protection. Tap to reconnect.</string>
+    <string name="netpNotificationCTAReconnectNow">Reconnect Now</string>
+    <string name="netpNotificationSnoozeTitle">VPN is snoozed</string>
+    <string name="netpNotificationSnoozeBody" instruction="Placeholder is time in hh:mm format">VPN will reconnect at %1$s</string>
 
     <!-- Geoswitching -->
     <string name="netpGeoswitchingTitle">VPN Location</string>

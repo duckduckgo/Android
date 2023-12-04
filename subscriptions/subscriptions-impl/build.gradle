@@ -42,6 +42,8 @@ dependencies {
     implementation project(path: ':subscriptions-api')
     implementation project(path: ':subscriptions-store')
     implementation project(path: ':settings-api')
+    implementation project(path: ':autofill-api')
+    implementation project(path: ':network-protection-api')
 
     implementation AndroidX.appCompat
     implementation KotlinX.coroutines.core

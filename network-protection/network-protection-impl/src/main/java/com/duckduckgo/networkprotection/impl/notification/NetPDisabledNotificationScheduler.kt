@@ -70,7 +70,7 @@ class NetPDisabledNotificationScheduler @Inject constructor(
         coroutineScope.launch(dispatcherProvider.io()) {
             when (vpnStopReason) {
                 VpnStopReason.RESTART -> {} // no-op
-                VpnStopReason.SELF_STOP -> onVPNManuallyStopped()
+                is VpnStopReason.SELF_STOP -> onVPNManuallyStopped(vpnStopReason.snoozedTriggerAtMillis)
                 VpnStopReason.REVOKED -> onVPNRevoked()
                 else -> {}
             }
@@ -82,10 +82,10 @@ class NetPDisabledNotificationScheduler @Inject constructor(
         return isNetPEnabled.get() && networkProtectionState.isOnboarded() && netPRemoteFeature.waitlistBetaActive().isEnabled()
     }
 
-    private suspend fun onVPNManuallyStopped() {
+    private suspend fun onVPNManuallyStopped(snoozedTriggerAtMillis: Long) {
         if (shouldShowImmediateNotification()) {
             logcat { "VPN Manually stopped, showing disabled notification for NetP" }
-            showDisabledNotification()
+            showSnoozedOrDisabledNotification(snoozedTriggerAtMillis)
             isNetPEnabled.set(false)
         }
     }
@@ -100,6 +100,20 @@ class NetPDisabledNotificationScheduler @Inject constructor(
                 } else {
                     cancelDisabledNotification()
                 }
+            }
+        }
+    }
+
+    private fun showSnoozedOrDisabledNotification(triggerAtMillis: Long) {
+        coroutineScope.launch(dispatcherProvider.io()) {
+            if (triggerAtMillis != 0L) {
+                if (!netPSettingsLocalConfig.vpnNotificationAlerts().isEnabled()) return@launch
+                notificationManager.notify(
+                    NETP_REMINDER_NOTIFICATION_ID,
+                    netPDisabledNotificationBuilder.buildSnoozeNotification(context, triggerAtMillis),
+                )
+            } else {
+                showDisabledNotification()
             }
         }
     }

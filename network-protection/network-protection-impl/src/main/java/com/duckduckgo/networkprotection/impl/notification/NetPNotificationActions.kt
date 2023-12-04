@@ -59,7 +59,7 @@ class RealNetPNotificationActions @Inject constructor(
 
     override fun getEnableNetpNotificationAction(context: Context): NotificationCompat.Action {
         val launchIntent = Intent(context, NetPEnableReceiver::class.java).let { intent ->
-            intent.action = NetPEnableReceiver.ACTION_NETP_DISABLED_RESTART
+            intent.action = NetPEnableReceiver.ACTION_NETP_ENABLE
             PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
         }
         return NotificationCompat.Action(

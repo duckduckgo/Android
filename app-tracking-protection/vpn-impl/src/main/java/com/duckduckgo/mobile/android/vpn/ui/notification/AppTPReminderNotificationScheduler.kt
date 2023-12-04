@@ -80,18 +80,22 @@ class AppTPReminderNotificationScheduler @Inject constructor(
         coroutineScope.launch(dispatchers.io()) {
             when (vpnStopReason) {
                 VpnStopReason.RESTART -> {} // no-op
-                VpnStopReason.SELF_STOP -> onVPNManuallyStopped()
+                is VpnStopReason.SELF_STOP -> onVPNManuallyStopped(coroutineScope, vpnStopReason.snoozedTriggerAtMillis)
                 VpnStopReason.REVOKED -> onVPNRevoked()
                 else -> onVPNUndesiredStop()
             }
         }
     }
 
-    private suspend fun onVPNManuallyStopped() {
-        if (vpnFeatureRemover.isFeatureRemoved()) {
-            logcat { "VPN Manually stopped because user disabled the feature, nothing to do" }
-        } else {
-            handleNotifForDisabledAppTP()
+    private suspend fun onVPNManuallyStopped(coroutineScope: CoroutineScope, snoozedTriggerAtMillis: Long) {
+        coroutineScope.launch(dispatchers.io()) {
+            if (vpnFeatureRemover.isFeatureRemoved()) {
+                logcat { "VPN Manually stopped because user disabled the feature, nothing to do" }
+            } else {
+                if (snoozedTriggerAtMillis == 0L) {
+                    handleNotifForDisabledAppTP()
+                }
+            }
         }
     }
 

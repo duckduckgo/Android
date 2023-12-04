@@ -133,7 +133,7 @@
     <!-- Exclusion List -->
     <string name="atp_ExclusionListActivityTitle">Kaikki sovellukset</string>
     <string name="atp_ExcludedAppsFeature">App Tracking Protection havaitsee ja estää muiden yritysten seurantalaitteet, esimerkiksi kun Facebook yrittää seurata sinua terveyssovelluksessa. Yritykset voivat silti seurata sinua omistamissaan sovelluksissa.\n\nJos jokin sovellus ei toimi odotetulla tavalla, yritä poistaa kyseisen sovelluksen suojaus käytöstä.</string>
-    <string name="atp_ExcludedAppsEnabledLabel">Beetaversion aikana DuckDuckGo voi poistaa suojauksen käytöstä joistakin sovelluksista ratkaistakseen tunnettuja sisällön latausongelmia. Mukautetut asetukset eivät muutu, ellet palauta oletusasetuksia.</string>
+    <string name="atp_ExcludedAppsEnabledLabel">DuckDuckGo voi poistaa suojauksen käytöstä joistakin sovelluksista ratkaistakseen tunnettuja sisällön latausongelmia. Mukautetut asetukset eivät muutu, ellet palauta oletusasetuksia.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>App Tracking Protection on poistettu käytöstä</b> Aiheuttiko App Tracking Protection ongelmia sovelluksissasi <annotation type="report_issues_link">Ilmoita ongelmista</annotation></string>
     <string name="atp_ExcludedAppsReport">Ilmoita ongelmasta toisessa sovelluksessa</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Poistettu käytöstä manuaalisesti</string>
@@ -395,7 +395,7 @@
     <string name="atp_ExcludeAppsManuallyCTANotNow">Ei nyt</string>
     <string name="atp_ActivityRecentActivityHeader">Toiminta</string>
     <string name="atp_ActivityManageProtectionLabel">Onko sinulla ongelmia?</string>
-    <string name="atp_ActivityEnabledBannerLabel">Beetaversion aikana joidenkin sovellusten suojaus poistetaan käytöstä automaattisesti. <annotation type="app_settings_link">Näytä sovellukset</annotation></string>
+    <string name="atp_ActivityEnabledBannerLabel">Joidenkin sovellusten suojaus poistetaan käytöstä automaattisesti. <annotation type="app_settings_link">Näytä sovellukset</annotation></string>
     <string name="atp_ActivityDescription">Estetyt seurantayritykset näkyvät täällä</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">%1$s sovelluksistasi on suojattu piilotetuilta seurantalaitteilta, jotka yrittävät päästä käsiksi henkilökohtaisiin tietoihin</item>

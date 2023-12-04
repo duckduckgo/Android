@@ -279,7 +279,7 @@ class BrowserWebViewClient @Inject constructor(
         lastPageStarted = url
         browserAutofillConfigurator.configureAutofillForCurrentPage(webView, url)
         jsPlugins.getPlugins().forEach {
-            it.onPageStarted(webView, url)
+            it.onPageStarted(webView, url, webViewClientListener?.getSite())
         }
         loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
     }
@@ -290,7 +290,7 @@ class BrowserWebViewClient @Inject constructor(
         url: String?,
     ) {
         jsPlugins.getPlugins().forEach {
-            it.onPageFinished(webView, url)
+            it.onPageFinished(webView, url, webViewClientListener?.getSite())
         }
         accessibilityManager.onPageFinished(webView, url)
         url?.let {

@@ -49,7 +49,7 @@ class WgTunnelTest {
 
     @Test
     fun establishThenReturnWgTunnelData() = runTest {
-        val actual = wgTunnel.establish()!!.copy(userSpaceConfig = "")
+        val actual = wgTunnel.establish().getOrThrow().copy(userSpaceConfig = "")
         val expected = WgTunnel.WgTunnelData(
             serverName = serverData.serverName,
             userSpaceConfig = "",
@@ -68,7 +68,7 @@ class WgTunnelTest {
     fun establishErrorThenLogError() = runTest {
         whenever(wgServerApi.registerPublicKey(any())).thenReturn(serverData)
 
-        assertNull(wgTunnel.establish())
+        assertNull(wgTunnel.establish().getOrNull())
     }
 
     @Throws(Exception::class)

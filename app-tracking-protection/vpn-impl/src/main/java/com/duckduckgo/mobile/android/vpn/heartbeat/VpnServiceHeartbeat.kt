@@ -75,7 +75,7 @@ class VpnServiceHeartbeat @Inject constructor(
         logcat { "onVpnStopped called" }
         when (vpnStopReason) {
             ERROR -> logcat { "HB monitor: sudden vpn stopped $vpnStopReason" }
-            SELF_STOP, REVOKED, RESTART, UNKNOWN -> {
+            is SELF_STOP, REVOKED, RESTART, UNKNOWN -> {
                 logcat { "HB monitor: self stopped or revoked or restart: $vpnStopReason" }
                 // we absolutely want this to finish before VPN is stopped to avoid race conditions reading out the state
                 runBlocking { storeHeartbeat(VpnServiceHeartbeatMonitor.DATA_HEART_BEAT_TYPE_STOPPED) }

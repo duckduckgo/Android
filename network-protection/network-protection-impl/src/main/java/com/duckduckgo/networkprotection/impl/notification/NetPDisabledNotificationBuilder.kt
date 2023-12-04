@@ -33,10 +33,19 @@ import com.duckduckgo.networkprotection.impl.alerts.RealNetPAlertNotiticationBui
 import com.duckduckgo.networkprotection.impl.alerts.RealNetPAlertNotiticationBuilder.Companion.NETP_ALERTS_CHANNEL_ID
 import com.duckduckgo.networkprotection.impl.alerts.RealNetPAlertNotiticationBuilder.Companion.NETP_ALERTS_CHANNEL_NAME
 import com.squareup.anvil.annotations.ContributesBinding
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.util.Date
 import javax.inject.Inject
 
 interface NetPDisabledNotificationBuilder {
     fun buildDisabledNotification(context: Context): Notification
+
+    fun buildSnoozeNotification(
+        context: Context,
+        triggerAtMillis: Long,
+    ): Notification
+
     fun buildDisabledByVpnNotification(context: Context): Notification
 }
 
@@ -44,6 +53,7 @@ interface NetPDisabledNotificationBuilder {
 class RealNetPDisabledNotificationBuilder @Inject constructor(
     private val netPNotificationActions: NetPNotificationActions,
 ) : NetPDisabledNotificationBuilder {
+    private val defaultDateTimeFormatter = SimpleDateFormat.getTimeInstance(DateFormat.SHORT)
 
     private fun registerChannel(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -74,6 +84,49 @@ class RealNetPDisabledNotificationBuilder @Inject constructor(
             .addAction(netPNotificationActions.getReportIssueNotificationAction(context))
             .setAutoCancel(false)
             .build()
+    }
+
+    override fun buildSnoozeNotification(
+        context: Context,
+        triggerAtMillis: Long,
+    ): Notification {
+        fun getAction(): NotificationCompat.Action {
+            return NotificationCompat.Action(
+                R.drawable.ic_baseline_feedback_24,
+                context.getString(R.string.netpNotificationCTAReconnectNow),
+                PendingIntent.getBroadcast(
+                    context,
+                    0,
+                    Intent(context, NetPEnableReceiver::class.java).apply {
+                        action = NetPEnableReceiver.ACTION_VPN_SNOOZE_CANCEL
+                    },
+                    PendingIntent.FLAG_IMMUTABLE,
+                ),
+            )
+        }
+        registerChannel(context)
+
+        return NotificationCompat.Builder(context, NETP_ALERTS_CHANNEL_ID)
+            .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
+            .setContentTitle(context.getString(R.string.netpNotificationSnoozeTitle))
+            .setStyle(
+                NotificationCompat.BigTextStyle().bigText(
+                    String.format(
+                        context.getString(R.string.netpNotificationSnoozeBody),
+                        formatTime(triggerAtMillis),
+                    ),
+                ),
+            )
+            .setContentIntent(getPendingIntent(context))
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setCategory(NotificationCompat.CATEGORY_STATUS)
+            .addAction(getAction())
+            .setOngoing(true)
+            .build()
+    }
+
+    private fun formatTime(triggerAtMillis: Long): String {
+        return defaultDateTimeFormatter.format(Date(System.currentTimeMillis() + triggerAtMillis))
     }
 
     override fun buildDisabledByVpnNotification(context: Context): Notification {

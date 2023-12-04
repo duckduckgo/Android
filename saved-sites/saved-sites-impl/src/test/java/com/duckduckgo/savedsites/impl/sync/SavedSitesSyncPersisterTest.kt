@@ -22,7 +22,9 @@ import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesSyncPersisterAlgorithm
+import com.duckduckgo.sync.api.engine.FeatureSyncError.COLLECTION_LIMIT_REACHED
 import com.duckduckgo.sync.api.engine.SyncChangesResponse
+import com.duckduckgo.sync.api.engine.SyncErrorResponse
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Error
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Success
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.TIMESTAMP
@@ -34,6 +36,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 class SavedSitesSyncPersisterTest {
@@ -49,12 +52,19 @@ class SavedSitesSyncPersisterTest {
     private val store: SavedSitesSyncStore = mock()
     private val persisterAlgorithm: SavedSitesSyncPersisterAlgorithm = mock()
     private val savedSitesFormFactorSyncMigration: SavedSitesFormFactorSyncMigration = mock()
+    private val savedSitesSyncFeatureListener: SavedSitesSyncFeatureListener = mock()
 
     private lateinit var syncPersister: SavedSitesSyncPersister
 
     @Before
     fun setup() {
-        syncPersister = SavedSitesSyncPersister(repository, store, persisterAlgorithm, savedSitesFormFactorSyncMigration)
+        syncPersister = SavedSitesSyncPersister(
+            repository,
+            store,
+            persisterAlgorithm,
+            savedSitesFormFactorSyncMigration,
+            savedSitesSyncFeatureListener,
+        )
     }
 
     @Test
@@ -110,5 +120,27 @@ class SavedSitesSyncPersisterTest {
         val result = syncPersister.process(deletedChanges, TIMESTAMP)
 
         Assert.assertTrue(result is Success)
+    }
+
+    @Test
+    fun whenOnSuccessThenNotifyListener() {
+        val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/merger_first_get.json")
+        val validChanges = SyncChangesResponse(BOOKMARKS, updatesJSON)
+
+        syncPersister.onSuccess(validChanges, TIMESTAMP)
+
+        verify(savedSitesSyncFeatureListener).onSuccess(validChanges)
+    }
+
+    @Test
+    fun whenOnErrorThenNotifyListener() {
+        syncPersister.onError(SyncErrorResponse(BOOKMARKS, COLLECTION_LIMIT_REACHED))
+        verify(savedSitesSyncFeatureListener).onError(COLLECTION_LIMIT_REACHED)
+    }
+
+    @Test
+    fun whenOnSyncDisabledTheNotifyListener() {
+        syncPersister.onSyncDisabled()
+        verify(savedSitesSyncFeatureListener).onSyncDisabled()
     }
 }

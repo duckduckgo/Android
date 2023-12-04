@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2023 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,45 +14,41 @@
   ~ limitations under the License.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/appBar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-    >
+        android:id="@+id/appBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="?attr/daxColorSurface"
-                android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
-                app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu"/>
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/daxColorSurface"
+            android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
+            app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="64dp"
-            tools:ignore="Overdraw">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="64dp"
+        tools:ignore="Overdraw">
 
         <LinearLayout
-                android:id="@+id/vpnSettingsContent"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-        >
+            android:id="@+id/vpnSettingsContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/geoswitching"
@@ -61,50 +56,55 @@
                 android:layout_height="wrap_content"
                 app:primaryText="@string/netpVpnSettingGeoswitching"
                 app:secondaryText="@string/netpVpnSettingGeoswitchingDefault"
+                app:showSwitch="false" />
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/exclude_local_networks"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/netpVpnSettingExcludeLocalNetworks"
+                app:secondaryText="@string/netpVpnSettingExcludeLocalNetworksByline"
+                app:showSwitch="true" />
+
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/always_on"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true"
+                app:primaryText="@string/netpVpnSettingAlwaysOn"
+                app:secondaryText="@string/netpVpnSettingAlwaysOnByline"
                 app:showSwitch="false"
-                />
+                app:trailingIcon="@drawable/ic_open_in_24" />
 
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-                    android:id="@+id/always_on"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:clickable="true"
-                    android:focusable="true"
-                    app:primaryText="@string/netpVpnSettingAlwaysOn"
-                    app:secondaryText="@string/netpVpnSettingAlwaysOnByline"
-                    app:trailingIcon="@drawable/ic_open_in_24"
-                    app:showSwitch="false"
-            />
+                android:id="@+id/unrestricted_battery_usage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/netpManageRecentAppsProtectionAllowUnrestrictedBattTitle"
+                app:secondaryText="@string/netpManageRecentAppsProtectionAllowUnrestrictedBattByline"
+                app:showSwitch="false"
+                app:trailingIcon="@drawable/ic_open_in_24" />
 
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
-            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-                    android:id="@+id/unrestricted_battery_usage"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:primaryText="@string/netpManageRecentAppsProtectionAllowUnrestrictedBattTitle"
-                    app:secondaryText="@string/netpManageRecentAppsProtectionAllowUnrestrictedBattByline"
-                    app:showSwitch="false"
-                    app:trailingIcon="@drawable/ic_open_in_24"
-            />
-
-            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-                    android:id="@+id/exclude_local_networks"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:primaryText="@string/netpVpnSettingExcludeLocalNetworks"
-                    app:secondaryText="@string/netpVpnSettingExcludeLocalNetworksByline"
-                    app:showSwitch="true"
-            />
-
-            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/secure_dns"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:primaryText="@string/netpVpnSettingSecureDNS"
-                app:secondaryText="@string/netpVpnSettingSecureDNSByLine"
-                app:showSwitch="true"
-                />
-
+                android:layout_marginHorizontal="@dimen/keyline_4"
+                android:layout_marginVertical="@dimen/keyline_3"
+                android:drawableStart="@drawable/ic_info_gray"
+                android:drawablePadding="@dimen/keyline_4"
+                android:text="@string/netpVpnSettingSecureDNSByLine"
+                app:textType="secondary"
+                app:typography="body2" />
         </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

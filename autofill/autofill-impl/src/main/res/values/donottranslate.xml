@@ -15,5 +15,6 @@
   -->
 
 <resources>
-
+    <string name="credentials_limit_warning"><b>Sync Paused</b>\nLogins limit exceeded. Delete some to resume syncing.\n\n<annotation type="manage_logins">Manage Logins</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Passwords Sync is Paused</b>\nYou have exceeded the passwords sync limit. Try deleting some passwords. Until this is resolved your passwords will not be backed up.</string>
 </resources>

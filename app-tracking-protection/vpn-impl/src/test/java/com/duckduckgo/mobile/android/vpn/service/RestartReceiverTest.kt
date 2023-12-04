@@ -75,7 +75,7 @@ class RestartReceiverTest {
     fun whenInternalBuildThenUnregisterReceiverOnStopVpn() {
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
 
-        receiver.onVpnStopped(coroutineRule.testScope, VpnStateMonitor.VpnStopReason.SELF_STOP)
+        receiver.onVpnStopped(coroutineRule.testScope, VpnStateMonitor.VpnStopReason.SELF_STOP())
 
         verify(context).unregisterReceiver(any())
         verify(context, never()).registerReceiver(any(), any())
@@ -85,7 +85,7 @@ class RestartReceiverTest {
     fun whenNotInternalBuildThenUnregisterReceiverOnStopVpn() {
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
 
-        receiver.onVpnStopped(coroutineRule.testScope, VpnStateMonitor.VpnStopReason.SELF_STOP)
+        receiver.onVpnStopped(coroutineRule.testScope, VpnStateMonitor.VpnStopReason.SELF_STOP())
 
         verify(context).unregisterReceiver(any())
         verify(context, never()).registerReceiver(any(), any())

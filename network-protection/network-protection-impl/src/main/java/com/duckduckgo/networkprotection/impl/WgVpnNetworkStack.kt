@@ -77,13 +77,9 @@ class WgVpnNetworkStack @Inject constructor(
             netpPixels.get().reportEnableAttempt()
 
             wgTunnelData = wgTunnelLazy.get().establish()
+                .onFailure { netpPixels.get().reportErrorInRegistration() }
+                .getOrThrow()
             logcat { "Received config from BE: $wgTunnelData" }
-
-            if (wgTunnelData == null) {
-                logcat(LogPriority.ERROR) { "Unable to construct wgTunnelData" }
-                netpPixels.get().reportErrorInRegistration()
-                throw java.lang.IllegalStateException("Unable to construct wgTunnelData") // will be catch later on
-            }
 
             networkProtectionRepository.get().run {
                 serverDetails = ServerDetails(
@@ -177,7 +173,7 @@ class WgVpnNetworkStack @Inject constructor(
         networkProtectionRepository.get().serverDetails = null
 
         // Only update if enabledTimeInMillis stop has been initiated by the user
-        if (reason == SELF_STOP) {
+        if (reason is SELF_STOP && reason.snoozedTriggerAtMillis == 0L) {
             networkProtectionRepository.get().enabledTimeInMillis = -1
         }
         return Result.success(Unit)

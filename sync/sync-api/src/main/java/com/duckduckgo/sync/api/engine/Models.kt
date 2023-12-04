@@ -60,6 +60,15 @@ data class SyncChangesResponse(
     }
 }
 
+data class SyncErrorResponse(
+    val type: SyncableType,
+    val featureSyncError: FeatureSyncError,
+)
+
+enum class FeatureSyncError {
+    COLLECTION_LIMIT_REACHED,
+}
+
 enum class SyncableType(val field: String) {
     BOOKMARKS("bookmarks"),
     CREDENTIALS("credentials"),

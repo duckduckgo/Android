@@ -58,14 +58,14 @@ class NetworkProtectionStatusReporting(
     private fun scheduleNetworkProtectionStatusReporting() {
         logcat { "Scheduling the NetworkProtectionStatusReporting worker" }
 
-        PeriodicWorkRequestBuilder<NetworkProtectionStatusReportingWorker>(24, TimeUnit.HOURS)
-            .addTag(WORKER_STATUS_REPORTING_TAG)
+        PeriodicWorkRequestBuilder<NetworkProtectionStatusReportingWorker>(2, TimeUnit.HOURS)
+            .addTag(WORKER_STATUS_REPORTING_TAG_V2)
             .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.MINUTES)
-            .build().run { workManager.enqueueUniquePeriodicWork(WORKER_STATUS_REPORTING_TAG, ExistingPeriodicWorkPolicy.KEEP, this) }
+            .build().run { workManager.enqueueUniquePeriodicWork(WORKER_STATUS_REPORTING_TAG_V2, ExistingPeriodicWorkPolicy.KEEP, this) }
     }
 
     companion object {
-        private const val WORKER_STATUS_REPORTING_TAG = "WORKER_NETP_STATUS_REPORTING_TAG"
+        private const val WORKER_STATUS_REPORTING_TAG_V2 = "WORKER_STATUS_REPORTING_TAG_V2"
     }
 }
 

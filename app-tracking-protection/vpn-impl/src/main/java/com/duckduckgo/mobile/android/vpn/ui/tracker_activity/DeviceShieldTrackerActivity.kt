@@ -571,7 +571,7 @@ class DeviceShieldTrackerActivity :
 
             val (disabledLabel, annotation) = if (runningState.stopReason == REVOKED) {
                 R.string.atp_ActivityRevokedLabel to REPORT_ISSUES_ANNOTATION
-            } else if (runningState.stopReason == SELF_STOP) {
+            } else if (runningState.stopReason is SELF_STOP) {
                 R.string.atp_ActivityDisabledLabel to REPORT_ISSUES_ANNOTATION
             } else {
                 R.string.atp_ActivityDisabledBySystemLabel to RE_ENABLE_ANNOTATION

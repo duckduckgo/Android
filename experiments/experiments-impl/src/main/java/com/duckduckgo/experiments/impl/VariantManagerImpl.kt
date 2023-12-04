@@ -18,6 +18,7 @@ package com.duckduckgo.experiments.impl
 
 import androidx.annotation.WorkerThread
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.backup.agent.api.BackupAgentManager
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.api.VariantConfig
 import com.duckduckgo.experiments.api.VariantManager
@@ -33,6 +34,7 @@ class VariantManagerImpl @Inject constructor(
     private val indexRandomizer: IndexRandomizer,
     private val appBuildConfig: AppBuildConfig,
     private val experimentVariantRepository: ExperimentVariantRepository,
+    private val backupAgentManager: BackupAgentManager,
 ) : VariantManager {
 
     override fun defaultVariantKey(): String {
@@ -59,6 +61,10 @@ class VariantManagerImpl @Inject constructor(
 
     private fun updateUserVariant(activeVariants: List<Variant>, currentVariantKey: String?) {
         if (currentVariantKey == DEFAULT_VARIANT.key) {
+            return
+        }
+
+        if (backupAgentManager.isReinstallUser(currentVariantKey)) {
             return
         }
 

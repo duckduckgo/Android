@@ -133,7 +133,7 @@
     <!-- Exclusion List -->
     <string name="atp_ExclusionListActivityTitle">Kõik rakendused</string>
     <string name="atp_ExcludedAppsFeature">Rakenduse jälgimise kaitse tuvastab ja blokeerib teiste ettevõtete rakenduste jälgurid, näiteks siis, kui Facebook püüab sind terviserakenduses jälgida. Ettevõtted võivad sind enda rakendustes ikkagi jälgida.\n\nKui rakendus ei tööta ootuspäraselt, proovi keelata selle rakenduse kaitse.</string>
-    <string name="atp_ExcludedAppsEnabledLabel">Beeta-versiooni ajal võib DuckDuckGo mõne rakenduse kaitse keelata, et lahendada teada olevad sisu laadimisega seotud probleemid. Sinu kohandatud sätted ei muutu, kui sa just vaikesätteid ei taasta.</string>
+    <string name="atp_ExcludedAppsEnabledLabel">DuckDuckGo võib mõne rakenduse kaitse keelata, et lahendada teadaolevaid sisu laadimisega seotud probleeme. Sinu kohandatud sätted ei muutu, kui sa just vaikesätteid ei taasta.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>Rakenduse jälgimise kaitse on keelatud</b> Kas rakenduse jälgimise kaitse põhjustas sinu rakendustega probleeme <annotation type="report_issues_link">Teavita probleemidest</annotation></string>
     <string name="atp_ExcludedAppsReport">Teavita probleemist teise rakendusega</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Käsitsi keelatud</string>
@@ -395,7 +395,7 @@
     <string name="atp_ExcludeAppsManuallyCTANotNow">Mitte praegu</string>
     <string name="atp_ActivityRecentActivityHeader">Tegevus</string>
     <string name="atp_ActivityManageProtectionLabel">Kas sul on probleeme?</string>
-    <string name="atp_ActivityEnabledBannerLabel">Beetaversioonis on mõne rakenduse kaitse automaatselt välja lülitatud. <annotation type="app_settings_link">Kuva rakendused</annotation></string>
+    <string name="atp_ActivityEnabledBannerLabel">Mõne rakenduse kaitse keelatakse automaatselt. <annotation type="app_settings_link">Kuva rakendused</annotation></string>
     <string name="atp_ActivityDescription">Siin kuvatakse blokeeritud jälgimiskatsed</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">%1$s rakendus on kaitstud varjatud jälgurite eest, mille me oleme tabanud katselt jälgida sinu isiklikku teavet</item>

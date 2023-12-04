@@ -27,6 +27,7 @@ import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.BACKGROUND_SYNC
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.DATA_CHANGE
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
+import com.duckduckgo.sync.impl.API_CODE
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.engine.SyncOperation.DISCARD
@@ -42,6 +43,7 @@ import org.junit.Ignore
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -422,6 +424,42 @@ internal class SyncEngineTest {
         verify(syncPixels).fireOrphanPresentPixel(any())
     }
 
+    @Test
+    fun whenPatchNewDataFailsBecauseCountLimitThenNotifyFeature() {
+        givenLocalChanges()
+        givenPatchLimitError()
+        val persisterPluginMock = mock<SyncableDataPersister>()
+        whenever(persisterPlugins.getPlugins()).thenReturn(listOf(persisterPluginMock))
+
+        syncEngine.triggerSync(DATA_CHANGE)
+
+        verify(persisterPluginMock).onError(SyncErrorResponse(BOOKMARKS, FeatureSyncError.COLLECTION_LIMIT_REACHED))
+    }
+
+    @Test
+    fun whenPatchNewDataFailsBecauseContentTooLargeThenNotifyFeature() {
+        givenLocalChanges()
+        givenPatchContentTooLargeError()
+        val persisterPluginMock = mock<SyncableDataPersister>()
+        whenever(persisterPlugins.getPlugins()).thenReturn(listOf(persisterPluginMock))
+
+        syncEngine.triggerSync(DATA_CHANGE)
+
+        verify(persisterPluginMock).onError(SyncErrorResponse(BOOKMARKS, FeatureSyncError.COLLECTION_LIMIT_REACHED))
+    }
+
+    @Test
+    fun whenPatchNewDataFailsBecauseNonFeatureErrorThenDoNotNotifyFeature() {
+        givenLocalChanges()
+        givenPatchError()
+        val persisterPluginMock = mock<SyncableDataPersister>()
+        whenever(persisterPlugins.getPlugins()).thenReturn(listOf(persisterPluginMock))
+
+        syncEngine.triggerSync(DATA_CHANGE)
+
+        verify(persisterPluginMock, times(0)).onError(any())
+    }
+
     private fun givenNoLocalChanges() {
         val fakePersisterPlugin = FakeSyncableDataPersister()
         val fakeProviderPlugin = FakeSyncableDataProvider(SyncChangesRequest.empty())
@@ -468,6 +506,18 @@ internal class SyncEngineTest {
     private fun givenPatchError() {
         whenever(syncApiClient.patch(any())).thenReturn(
             Result.Error(400, "patch failed"),
+        )
+    }
+
+    private fun givenPatchLimitError() {
+        whenever(syncApiClient.patch(any())).thenReturn(
+            Result.Error(API_CODE.COUNT_LIMIT.code, "patch failed"),
+        )
+    }
+
+    private fun givenPatchContentTooLargeError() {
+        whenever(syncApiClient.patch(any())).thenReturn(
+            Result.Error(API_CODE.CONTENT_TOO_LARGE.code, "patch failed"),
         )
     }
 

@@ -45,20 +45,14 @@ tags:
 - assertVisible: "Primary Item"
 - tapOn: "Primary Item"
 - tapOn:
-    id: "com.duckduckgo.mobile.android:id/touch_outside"
-- tapOn:
     id: "com.duckduckgo.mobile.android:id/actionBottomSheetButtonWithTitle"
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/item_container"
     index: 0
 - tapOn:
-    id: "com.duckduckgo.mobile.android:id/touch_outside"
-- tapOn:
     id: "com.duckduckgo.mobile.android:id/promoBottomSheetButtonWithTitle"
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/bottomSheetPromoPrimaryButton"
-- tapOn:
-    id: "com.duckduckgo.mobile.android:id/touch_outside"
 - scrollUntilVisible:
     element:
       text: "Cookie Consent dialog with animation"

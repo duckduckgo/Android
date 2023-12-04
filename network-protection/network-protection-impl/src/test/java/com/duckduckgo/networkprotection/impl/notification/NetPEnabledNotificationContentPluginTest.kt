@@ -61,11 +61,9 @@ class NetPEnabledNotificationContentPluginTest {
     fun setup() {
         MockitoAnnotations.openMocks(this)
         plugin = NetPEnabledNotificationContentPlugin(
-            context,
             context.resources,
             networkProtectionState,
             appTrackingProtection,
-            notificationActions,
         ) { null }
     }
 
@@ -85,7 +83,7 @@ class NetPEnabledNotificationContentPluginTest {
         val content = plugin.getInitialContent()
 
         assertNotNull(content)
-        content!!.assertTitleEquals("Network Protection is enabled and routing traffic through the VPN.")
+        content!!.assertTitleEquals("Network Protection is connected and routing traffic through the VPN.")
     }
 
     @Test
@@ -108,7 +106,7 @@ class NetPEnabledNotificationContentPluginTest {
             val item = awaitItem()
 
             assertNotNull(item)
-            item!!.assertTitleEquals("Network Protection is enabled and routing traffic through the VPN.")
+            item!!.assertTitleEquals("Network Protection is connected and routing traffic through the VPN.")
 
             cancelAndIgnoreRemainingEvents()
         }
@@ -123,7 +121,7 @@ class NetPEnabledNotificationContentPluginTest {
             val item = awaitItem()
 
             assertNotNull(item)
-            item!!.assertTitleEquals("Network Protection is enabled and routing device traffic through Stockholm, SE.")
+            item!!.assertTitleEquals("Network Protection is connected and routing device traffic through Stockholm, SE.")
 
             cancelAndIgnoreRemainingEvents()
         }

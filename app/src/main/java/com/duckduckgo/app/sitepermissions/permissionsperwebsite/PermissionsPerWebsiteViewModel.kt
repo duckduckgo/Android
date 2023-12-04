@@ -113,7 +113,7 @@ class PermissionsPerWebsiteViewModel @Inject constructor(
                 locationSetting,
             ),
             WebsitePermissionSetting(
-                R.drawable.ic_camera_24,
+                R.drawable.ic_video_24,
                 R.string.sitePermissionsSettingsCamera,
                 cameraSetting,
             ),

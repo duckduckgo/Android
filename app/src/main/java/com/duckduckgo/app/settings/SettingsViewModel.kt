@@ -27,7 +27,6 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.pixels.AppPixelName.*
-import com.duckduckgo.app.settings.CheckListItem.CheckItemStatus
 import com.duckduckgo.app.settings.SettingsViewModel.NetPEntryState.Hidden
 import com.duckduckgo.app.settings.SettingsViewModel.NetPEntryState.Pending
 import com.duckduckgo.app.settings.SettingsViewModel.NetPEntryState.ShowState
@@ -35,6 +34,8 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.email.EmailManager
+import com.duckduckgo.common.ui.view.listitem.CheckListItem
+import com.duckduckgo.common.ui.view.listitem.CheckListItem.CheckItemStatus
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope

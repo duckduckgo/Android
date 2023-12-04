@@ -27,7 +27,6 @@ import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ClientInterface
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ServerDetails
 import java.net.InetAddress
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -36,7 +35,6 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.*
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class WgVpnNetworkStackTest {
 
     @Mock
@@ -55,6 +53,10 @@ class WgVpnNetworkStackTest {
     private lateinit var netpPixels: NetworkProtectionPixels
 
     private lateinit var wgTunnelData: WgTunnelData
+
+    private fun WgTunnelData.success(): Result<WgTunnelData> {
+        return Result.success(this)
+    }
 
     private lateinit var privateDnsProvider: FakeDnsProvider
 
@@ -103,7 +105,7 @@ class WgVpnNetworkStackTest {
 
     @Test
     fun whenOnPrepareVpnThenReturnVpnTunnelConfigAndStoreServerDetails() = runTest {
-        whenever(wgTunnel.establish()).thenReturn(wgTunnelData)
+        whenever(wgTunnel.establish()).thenReturn(wgTunnelData.success())
 
         val actual = wgVpnNetworkStack.onPrepareVpn().getOrNull()
         val expectedDns = (netPDefaultConfigProvider.fallbackDns() + InetAddress.getByName(wgTunnelData.gateway))
@@ -128,7 +130,7 @@ class WgVpnNetworkStackTest {
 
     @Test
     fun whenOnPrepareVpnAndPrivateDnsConfiguredThenReturnEmptyDnsList() = runTest {
-        whenever(wgTunnel.establish()).thenReturn(wgTunnelData)
+        whenever(wgTunnel.establish()).thenReturn(wgTunnelData.success())
         privateDnsProvider.mutablePrivateDns.add(InetAddress.getByName("1.1.1.1"))
 
         val actual = wgVpnNetworkStack.onPrepareVpn().getOrThrow()
@@ -141,7 +143,7 @@ class WgVpnNetworkStackTest {
 
     @Test
     fun whenOnStartVpnAndEnabledTimeHasBeenResetThenSetEnabledTimeInMillis() = runTest {
-        whenever(wgTunnel.establish()).thenReturn(wgTunnelData)
+        whenever(wgTunnel.establish()).thenReturn(wgTunnelData.success())
         whenever(networkProtectionRepository.enabledTimeInMillis).thenReturn(-1L)
         whenever(currentTimeProvider.getTimeInMillis()).thenReturn(1672229650358L)
 
@@ -160,7 +162,7 @@ class WgVpnNetworkStackTest {
 
     @Test
     fun whenOnStartVpnAndEnabledTimeHasBeenSetThenDoNotUpdateEnabledTime() = runTest {
-        whenever(wgTunnel.establish()).thenReturn(wgTunnelData)
+        whenever(wgTunnel.establish()).thenReturn(wgTunnelData.success())
         whenever(networkProtectionRepository.enabledTimeInMillis).thenReturn(16722296505000L)
         whenever(currentTimeProvider.getTimeInMillis()).thenReturn(1672229650358L)
 
@@ -202,7 +204,7 @@ class WgVpnNetworkStackTest {
     fun whenOnStopVpnWithSelfStopThenResetEnabledTimeInMillisAndServerDetails() = runTest {
         assertEquals(
             Result.success(Unit),
-            wgVpnNetworkStack.onStopVpn(SELF_STOP),
+            wgVpnNetworkStack.onStopVpn(SELF_STOP()),
         )
 
         verify(networkProtectionRepository).enabledTimeInMillis = -1
@@ -222,7 +224,7 @@ class WgVpnNetworkStackTest {
 
     @Test
     fun whenWgTunnelDataProviderThrowsExceptionThenOnPrepareShouldReturnFailure() = runTest {
-        whenever(wgTunnel.establish()).thenReturn(null)
+        whenever(wgTunnel.establish()).thenReturn(Result.failure(NullPointerException("null")))
 
         assertTrue(wgVpnNetworkStack.onPrepareVpn().isFailure)
         verify(netpPixels).reportErrorInRegistration()
@@ -234,7 +236,7 @@ class WgVpnNetworkStackTest {
     @Test
     fun whenWgProtocolStartWgReturnsFailureThenOnStartVpnShouldReturnFailure() = runTest {
         whenever(wgProtocol.startWg(any(), any(), eq(null))).thenReturn(Result.failure(java.lang.IllegalStateException()))
-        whenever(wgTunnel.establish()).thenReturn(wgTunnelData)
+        whenever(wgTunnel.establish()).thenReturn(wgTunnelData.success())
 
         wgVpnNetworkStack.onPrepareVpn()
 
@@ -248,7 +250,7 @@ class WgVpnNetworkStackTest {
     @Test
     fun whenWgProtocolStartWgReturnsSuccessThenOnStartVpnShouldReturnSuccess() = runTest {
         whenever(wgProtocol.startWg(any(), any(), eq(null))).thenReturn(Result.success(Unit))
-        whenever(wgTunnel.establish()).thenReturn(wgTunnelData)
+        whenever(wgTunnel.establish()).thenReturn(wgTunnelData.success())
 
         wgVpnNetworkStack.onPrepareVpn()
 

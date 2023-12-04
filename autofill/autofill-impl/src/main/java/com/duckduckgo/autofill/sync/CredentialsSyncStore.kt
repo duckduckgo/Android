@@ -19,20 +19,41 @@ package com.duckduckgo.autofill.sync
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.launch
 
 interface CredentialsSyncStore {
     var serverModifiedSince: String
     var startTimeStamp: String
     var clientModifiedSince: String
+    var isSyncPaused: Boolean
+    fun isSyncPausedFlow(): Flow<Boolean>
 }
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
-class RealCredentialsSyncStore @Inject constructor(private val context: Context) : CredentialsSyncStore {
+class RealCredentialsSyncStore @Inject constructor(
+    private val context: Context,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
+) : CredentialsSyncStore {
+
+    private val syncPausedSharedFlow = MutableSharedFlow<Boolean>(replay = 1, onBufferOverflow = DROP_OLDEST)
+    init {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            syncPausedSharedFlow.emit(isSyncPaused)
+        }
+    }
+
     override var serverModifiedSince: String
         get() = preferences.getString(KEY_MODIFIED_SINCE, "0") ?: "0"
         set(value) = preferences.edit(true) { putString(KEY_MODIFIED_SINCE, value) }
@@ -42,6 +63,20 @@ class RealCredentialsSyncStore @Inject constructor(private val context: Context)
     override var clientModifiedSince: String
         get() = preferences.getString(KEY_END_TIMESTAMP, "0") ?: "0"
         set(value) = preferences.edit(true) { putString(KEY_END_TIMESTAMP, value) }
+    override var isSyncPaused: Boolean
+        get() = preferences.getBoolean(KEY_CLIENT_LIMIT_EXCEEDED, false) ?: false
+        set(value) {
+            preferences.edit(true) { putBoolean(KEY_CLIENT_LIMIT_EXCEEDED, value) }
+            emitNewValue()
+        }
+
+    override fun isSyncPausedFlow(): Flow<Boolean> = syncPausedSharedFlow
+
+    private fun emitNewValue() {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            syncPausedSharedFlow.emit(isSyncPaused)
+        }
+    }
 
     private val preferences: SharedPreferences
         get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
@@ -51,5 +86,6 @@ class RealCredentialsSyncStore @Inject constructor(private val context: Context)
         private const val KEY_MODIFIED_SINCE = "KEY_MODIFIED_SINCE"
         private const val KEY_START_TIMESTAMP = "KEY_START_TIMESTAMP"
         private const val KEY_END_TIMESTAMP = "KEY_END_TIMESTAMP"
+        private const val KEY_CLIENT_LIMIT_EXCEEDED = "KEY_CLIENT_LIMIT_EXCEEDED"
     }
 }

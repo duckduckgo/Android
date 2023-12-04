@@ -141,7 +141,7 @@
     <!-- Exclusion List -->
     <string name="atp_ExclusionListActivityTitle">Všetky aplikácie</string>
     <string name="atp_ExcludedAppsFeature">Ochrana pred sledovaním aplikácií zisťuje a blokuje sledovacie aplikácie iných spoločností, napríklad keď sa vás Facebook pokúša sledovať v aplikácii pre zdravie. Spoločnosti vás môžu stále sledovať v aplikáciách, ktoré vlastnia.\n\nAk niektorá aplikácia nefunguje podľa očakávania, skúste vypnúť jej ochranu.</string>
-    <string name="atp_ExcludedAppsEnabledLabel">Počas beta verzie môže DuckDuckGo vypnúť ochranu niektorých aplikácií, aby sa vyriešili známe problémy s načítavaním obsahu. Vaše vlastné nastavenia sa nezmenia, pokiaľ neobnovíte predvolené nastavenia.</string>
+    <string name="atp_ExcludedAppsEnabledLabel">DuckDuckGo môže vypnúť ochranu niektorých aplikácií, aby sa vyriešili známe problémy s načítavaním obsahu. Vaše vlastné nastavenia sa nezmenia, pokiaľ neobnovíte predvolené nastavenia.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>Ochrana pred sledovaním aplikácií je vypnutá</b> Spôsobila ochrana pred sledovaním aplikácií problém s aplikáciami <annotation type="report_issues_link">nahlásiť problémy</annotation></string>
     <string name="atp_ExcludedAppsReport">Nahlásiť problém s inou aplikáciou</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Ručne vypnuté</string>
@@ -411,7 +411,7 @@
     <string name="atp_ExcludeAppsManuallyCTANotNow">Teraz nie</string>
     <string name="atp_ActivityRecentActivityHeader">Aktivita</string>
     <string name="atp_ActivityManageProtectionLabel">Máte problémy?</string>
-    <string name="atp_ActivityEnabledBannerLabel">Pri používaní beta verzie je ochrana niektorých aplikácií automaticky vypnutá. <annotation type="app_settings_link">Zobraziť aplikácie</annotation></string>
+    <string name="atp_ActivityEnabledBannerLabel">Ochrana je pre niektoré aplikácie automaticky vypnutá. <annotation type="app_settings_link">Zobraziť aplikácie</annotation></string>
     <string name="atp_ActivityDescription">Tu sa zobrazia zablokované pokusy o sledovanie</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">%1$s z vašich aplikácií je chránených pred skrytými sledovaniami, o ktorých si myslíme, že sa pokúšajú získať prístup k vašim osobným údajom</item>

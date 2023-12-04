@@ -24,6 +24,8 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
+import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
+import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist
 import com.duckduckgo.subscriptions.impl.CurrentPurchase
 import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ITR
@@ -63,6 +65,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val subscriptionsManager: SubscriptionsManager,
     private val subscriptionsRepository: SubscriptionsRepository,
+    private val networkProtectionWaitlist: NetworkProtectionWaitlist,
 ) : ViewModel() {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -101,9 +104,34 @@ class SubscriptionWebViewViewModel @Inject constructor(
             "backToSettings" -> backToSettings()
             "getSubscriptionOptions" -> id?.let { getSubscriptionOptions(featureName, method, it) }
             "subscriptionSelected" -> subscriptionSelected(data)
-            "activateSubscription" -> activateOnAnotherDevice()
+            "activateSubscription" -> activateSubscription()
+            "featureSelected" -> data?.let { featureSelected(data) }
             else -> {
                 // NOOP
+            }
+        }
+    }
+
+    private fun featureSelected(data: JSONObject) {
+        val feature = runCatching { data.getString("feature") }.getOrNull() ?: return
+        viewModelScope.launch {
+            val commandToSend = when (feature) {
+                NETP -> GoToNetP(networkProtectionWaitlist.getScreenForCurrentState())
+                ITR -> GoToITR
+                PIR -> GoToPIR
+                else -> null
+            }
+            commandToSend?.let {
+                command.send(commandToSend)
+            }
+        }
+    }
+    private fun activateSubscription() {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            if (subscriptionsManager.hasSubscription()) {
+                activateOnAnotherDevice()
+            } else {
+                recoverSubscription()
             }
         }
     }
@@ -159,6 +187,12 @@ class SubscriptionWebViewViewModel @Inject constructor(
         }
     }
 
+    private fun recoverSubscription() {
+        viewModelScope.launch {
+            command.send(RestoreSubscription)
+        }
+    }
+
     private fun activateOnAnotherDevice() {
         viewModelScope.launch {
             command.send(ActivateOnAnotherDevice)
@@ -198,6 +232,10 @@ class SubscriptionWebViewViewModel @Inject constructor(
         data class SendResponseToJs(val data: JsCallbackData) : Command()
         data class SubscriptionSelected(val id: String) : Command()
         data object ActivateOnAnotherDevice : Command()
+        data object RestoreSubscription : Command()
+        data object GoToITR : Command()
+        data object GoToPIR : Command()
+        data class GoToNetP(val activityParams: ActivityParams) : Command()
     }
 
     companion object {

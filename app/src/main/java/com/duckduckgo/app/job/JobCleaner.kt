@@ -36,6 +36,7 @@ interface JobCleaner {
         private const val APP_TP_WAITLIST_SYNC_WORK_TAG = "AppTPWaitlistWorker"
         private const val NETP_LATENCY_MONITOR_WORKER_TAG = "NETP_LATENCY_MONITOR_WORKER_TAG"
         private const val DAILY_NETP_REKEY_TAG = "DAILY_NETP_REKEY_TAG"
+        private const val WORKER_NETP_STATUS_REPORTING_TAG = "WORKER_NETP_STATUS_REPORTING_TAG"
 
         fun allDeprecatedNotificationWorkTags() = listOf(STICKY_SEARCH_CONTINUOUS_APP_USE_REQUEST_TAG, USE_OUR_APP_WORK_REQUEST_TAG)
         fun allDeprecatedWorkerTags() = listOf(
@@ -45,6 +46,7 @@ interface JobCleaner {
             APP_TP_WAITLIST_SYNC_WORK_TAG,
             NETP_LATENCY_MONITOR_WORKER_TAG,
             DAILY_NETP_REKEY_TAG,
+            WORKER_NETP_STATUS_REPORTING_TAG,
         )
     }
 }

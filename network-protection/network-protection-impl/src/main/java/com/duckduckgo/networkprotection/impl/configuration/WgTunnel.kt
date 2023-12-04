@@ -29,7 +29,7 @@ import logcat.asLog
 import logcat.logcat
 
 interface WgTunnel {
-    suspend fun establish(): WgTunnelData?
+    suspend fun establish(): Result<WgTunnelData>
     data class WgTunnelData(
         val serverName: String,
         val userSpaceConfig: String,
@@ -50,11 +50,11 @@ class RealWgTunnel @Inject constructor(
     private val wgServerApi: WgServerApi,
 ) : WgTunnel {
 
-    override suspend fun establish(): WgTunnelData? {
+    override suspend fun establish(): Result<WgTunnelData> {
         return try {
             // ensure we always return null on error
-            val serverData = wgServerApi.registerPublicKey(deviceKeys.publicKey) ?: return null
-            Config.Builder()
+            val serverData = wgServerApi.registerPublicKey(deviceKeys.publicKey) ?: return Result.failure(NullPointerException("serverData = null"))
+            val data = Config.Builder()
                 .setInterface(
                     Interface.Builder()
                         .parsePrivateKey(deviceKeys.privateKey)
@@ -78,9 +78,10 @@ class RealWgTunnel @Inject constructor(
                         tunnelAddress = getInterface().addresses.associate { Pair(it.address, it.mask) },
                     )
                 }
+            Result.success(data)
         } catch (e: Throwable) {
             logcat(LogPriority.ERROR) { "Error getting WgTunnelData: ${e.asLog()}" }
-            null
+            return Result.failure(e)
         }
     }
 }

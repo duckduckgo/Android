@@ -47,6 +47,7 @@ import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
 import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.print.PrintInjector
+import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.BrowserAutofill
@@ -701,14 +702,11 @@ class BrowserWebViewClientTest {
         var countFinished = 0
         var countStarted = 0
 
-        override fun onPageStarted(
-            webView: WebView,
-            url: String?,
-        ) {
+        override fun onPageStarted(webView: WebView, url: String?, site: Site?) {
             countStarted++
         }
 
-        override fun onPageFinished(webView: WebView, url: String?) {
+        override fun onPageFinished(webView: WebView, url: String?, site: Site?) {
             countFinished++
         }
     }

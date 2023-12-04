@@ -50,8 +50,16 @@ class PromoBottomSheetDialog(builder: Builder) : BottomSheetDialog(builder.conte
 
         setOnDismissListener { builder.listener.onBottomSheetDismissed() }
         setOnShowListener { builder.listener.onBottomSheetShown() }
-        binding.bottomSheetPromoPrimaryButton.setOnClickListener { builder.listener.onPrimaryButtonClicked() }
-        binding.bottomSheetPromoSecondaryButton.setOnClickListener { builder.listener.onSecondaryButtonClicked() }
+        binding.bottomSheetPromoPrimaryButton.setOnClickListener {
+            builder.listener.onPrimaryButtonClicked()
+            setOnDismissListener(null)
+            dismiss()
+        }
+        binding.bottomSheetPromoSecondaryButton.setOnClickListener {
+            builder.listener.onSecondaryButtonClicked()
+            setOnDismissListener(null)
+            dismiss()
+        }
 
         builder.icon?.let {
             binding.bottomSheetPromoIcon.setImageResource(it)

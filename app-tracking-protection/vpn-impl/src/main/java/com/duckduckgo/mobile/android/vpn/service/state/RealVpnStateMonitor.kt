@@ -24,9 +24,7 @@ import com.duckduckgo.mobile.android.vpn.dao.VpnHeartBeatDao
 import com.duckduckgo.mobile.android.vpn.dao.VpnServiceStateStatsDao
 import com.duckduckgo.mobile.android.vpn.heartbeat.VpnServiceHeartbeatMonitor
 import com.duckduckgo.mobile.android.vpn.model.AlwaysOnState
-import com.duckduckgo.mobile.android.vpn.model.VpnServiceState.DISABLED
-import com.duckduckgo.mobile.android.vpn.model.VpnServiceState.ENABLED
-import com.duckduckgo.mobile.android.vpn.model.VpnServiceState.ENABLING
+import com.duckduckgo.mobile.android.vpn.model.VpnServiceState.*
 import com.duckduckgo.mobile.android.vpn.model.VpnServiceStateStats
 import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason.ERROR
 import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason.RESTART
@@ -59,7 +57,7 @@ class RealVpnStateMonitor @Inject constructor(
             .map { vpnState ->
                 val isFeatureEnabled = vpnFeaturesRegistry.isFeatureRunning(vpnFeature)
 
-                if (!isFeatureEnabled) {
+                if (!isFeatureEnabled && vpnState.state !is VpnRunningState.DISABLED) {
                     vpnState.copy(state = VpnRunningState.DISABLED)
                 } else {
                     vpnState
@@ -103,7 +101,7 @@ class RealVpnStateMonitor @Inject constructor(
     private fun mapState(lastState: VpnServiceStateStats?): VpnState {
         val stoppingReason = when (lastState?.stopReason) {
             RESTART -> VpnStopReason.RESTART
-            SELF_STOP -> VpnStopReason.SELF_STOP
+            SELF_STOP -> VpnStopReason.SELF_STOP()
             REVOKED -> VpnStopReason.REVOKED
             ERROR -> VpnStopReason.ERROR
             else -> VpnStopReason.UNKNOWN
@@ -112,7 +110,7 @@ class RealVpnStateMonitor @Inject constructor(
             ENABLING -> VpnRunningState.ENABLING
             ENABLED -> VpnRunningState.ENABLED
             DISABLED -> VpnRunningState.DISABLED
-            else -> VpnRunningState.INVALID
+            null, INVALID -> VpnRunningState.INVALID
         }
         val alwaysOnState = when (lastState?.alwaysOnState) {
             AlwaysOnState.ALWAYS_ON_ENABLED -> VpnStateMonitor.AlwaysOnState.ALWAYS_ON_ENABLED

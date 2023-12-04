@@ -102,7 +102,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
 
             if (vpnState.state == ENABLED && !isTimerTickRunning) {
                 startElapsedTimeTimer()
-            } else if (vpnState.state == DISABLED || vpnState.state == ENABLING) {
+            } else if (vpnState.state is DISABLED || vpnState.state == ENABLING) {
                 stopElapsedTimeTimer()
                 connectionDetailsToEmit = null
             } else if (reconnectState == Reconnecting) {
@@ -164,7 +164,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
             when (this.state) {
                 ENABLING -> Connecting
                 ENABLED -> Connected
-                DISABLED -> Disconnected
+                is DISABLED -> Disconnected
                 else -> Unknown
             }
         }

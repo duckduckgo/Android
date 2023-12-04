@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.settings
+package com.duckduckgo.common.ui.view.listitem
 
 import android.content.Context
 import android.text.TextUtils
@@ -23,13 +23,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
-import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.databinding.ViewCheckListItemBinding
 import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.listitem.CheckListItem.CheckItemStatus.DISABLED
+import com.duckduckgo.common.ui.view.listitem.CheckListItem.CheckItemStatus.ENABLED
+import com.duckduckgo.common.ui.view.listitem.CheckListItem.CheckItemStatus.WARNING
 import com.duckduckgo.common.ui.view.setEnabledOpacity
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.R as CommonR
+import com.duckduckgo.mobile.android.R.styleable
+import com.duckduckgo.mobile.android.databinding.ViewCheckListItemBinding
 
 class CheckListItem @JvmOverloads constructor(
     context: Context,
@@ -67,9 +70,9 @@ class CheckListItem @JvmOverloads constructor(
             }
 
             val status = if (hasValue(CommonR.styleable.CheckListItem_itemState)) {
-                CheckItemStatus.from(getInt(CommonR.styleable.CheckListItem_itemState, 0))
+                CheckItemStatus.from(getInt(styleable.CheckListItem_itemState, 0))
             } else {
-                CheckItemStatus.DISABLED
+                DISABLED
             }
             setItemStatus(status)
 
@@ -106,9 +109,9 @@ class CheckListItem @JvmOverloads constructor(
     /** Sets the status: enabled, disabled, warning */
     fun setItemStatus(status: CheckItemStatus) {
         when (status) {
-            CheckItemStatus.DISABLED -> binding.leadingIcon.setImageResource(R.drawable.ic_check_grey_round_16)
-            CheckItemStatus.ENABLED -> binding.leadingIcon.setImageResource(R.drawable.ic_check_green_round_16)
-            CheckItemStatus.WARNING -> binding.leadingIcon.setImageResource(R.drawable.ic_exclamation_yellow_16)
+            DISABLED -> binding.leadingIcon.setImageResource(CommonR.drawable.ic_check_grey_round_16)
+            ENABLED -> binding.leadingIcon.setImageResource(CommonR.drawable.ic_check_green_round_16)
+            WARNING -> binding.leadingIcon.setImageResource(CommonR.drawable.ic_exclamation_yellow_16)
         }
     }
 

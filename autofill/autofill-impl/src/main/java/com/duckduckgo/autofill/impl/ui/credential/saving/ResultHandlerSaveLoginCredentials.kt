@@ -30,6 +30,7 @@ import com.duckduckgo.autofill.api.CredentialSavePickerDialog
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
+import com.duckduckgo.autofill.impl.ui.credential.saving.declines.AutofillDeclineCounter
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -43,6 +44,7 @@ import timber.log.Timber
 class ResultHandlerSaveLoginCredentials @Inject constructor(
     private val autofillFireproofDialogSuppressor: AutofillFireproofDialogSuppressor,
     private val dispatchers: DispatcherProvider,
+    private val declineCounter: AutofillDeclineCounter,
     private val autofillStore: AutofillStore,
     private val appBuildConfig: AppBuildConfig,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
@@ -66,6 +68,8 @@ class ResultHandlerSaveLoginCredentials @Inject constructor(
         appCoroutineScope.launch(dispatchers.io()) {
             val savedCredentials = autofillStore.saveCredentials(originalUrl, selectedCredentials)
             if (savedCredentials != null) {
+                declineCounter.disableDeclineCounter()
+
                 withContext(dispatchers.main()) {
                     autofillCallback.onSavedCredentials(savedCredentials)
                 }

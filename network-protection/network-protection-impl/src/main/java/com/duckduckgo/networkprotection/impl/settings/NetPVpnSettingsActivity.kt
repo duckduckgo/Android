@@ -112,10 +112,6 @@ class NetPVpnSettingsActivity : DuckDuckGoActivity() {
             viewModel.onExcludeLocalRoutes(isChecked)
         }
 
-        binding.secureDns.quietlySetIsChecked(true, null)
-        binding.secureDns.showSwitch()
-        binding.secureDns.setSwitchEnabled(false)
-
         binding.alwaysOn.setOnClickListener {
             this.launchAlwaysOnSystemSettings(appBuildConfig.sdkInt)
         }

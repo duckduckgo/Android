@@ -138,4 +138,8 @@ internal open class VpnServiceWrapper(
     override suspend fun stop() = withContext(dispatcherProvider.io()) {
         stopService()
     }
+
+    override suspend fun snooze(triggerAtMillis: Long) {
+        TrackerBlockingVpnService.snoozeService(context, triggerAtMillis)
+    }
 }

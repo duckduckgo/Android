@@ -20,6 +20,7 @@ import android.app.Activity
 import android.content.Context
 import com.android.billingclient.api.ProductDetails
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.SubscriptionsData.*
@@ -83,6 +84,11 @@ interface SubscriptionsManager {
     suspend fun getAccessToken(): AccessToken
 
     /**
+     * Returns [true] if the user has an active subscription and [false] otherwise
+     */
+    suspend fun hasSubscription(): Boolean
+
+    /**
      * Flow to know if a user is signed in or not
      */
     val isSignedIn: Flow<Boolean>
@@ -93,7 +99,7 @@ interface SubscriptionsManager {
     val hasSubscription: Flow<Boolean>
 
     /**
-     * Flow to know if a user is signed in or not
+     * Flow to know the state of the current purchase
      */
     val currentPurchaseState: Flow<CurrentPurchase>
 
@@ -109,6 +115,7 @@ class RealSubscriptionsManager @Inject constructor(
     private val authService: AuthService,
     private val authDataStore: AuthDataStore,
     private val billingClientWrapper: BillingClientWrapper,
+    private val emailManager: EmailManager,
     private val context: Context,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
@@ -173,10 +180,11 @@ class RealSubscriptionsManager @Inject constructor(
         _hasSubscription.emit(hasSubscription)
     }
 
-    private suspend fun hasSubscription(): Boolean {
+    override suspend fun hasSubscription(): Boolean {
         return when (val result = getSubscriptionData()) {
             is Success -> {
                 val isSubscribed = result.entitlements.isNotEmpty()
+                _hasSubscription.emit(isSubscribed)
                 isSubscribed
             }
             is Failure -> {
@@ -294,6 +302,7 @@ class RealSubscriptionsManager @Inject constructor(
 
     override suspend fun getAuthToken(): AuthToken {
         return if (isUserAuthenticated()) {
+            logcat { "Subs auth token is ${authDataStore.authToken}" }
             when (val response = getSubscriptionDataFromToken(authDataStore.authToken!!)) {
                 is Success -> {
                     return if (response.entitlements.isEmpty()) {
@@ -349,7 +358,7 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     private suspend fun createAccount(): CreateAccountResponse {
-        return authService.createAccount()
+        return authService.createAccount("Bearer ${emailManager.getToken()}")
     }
 
     private fun parseError(e: HttpException): ResponseError? {

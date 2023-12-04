@@ -52,8 +52,16 @@ class ActionBottomSheetDialog(builder: Builder) : BottomSheetDialog(builder.cont
 
         setOnDismissListener { builder.listener.onBottomSheetDismissed() }
         setOnShowListener { builder.listener.onBottomSheetShown() }
-        binding.actionBottomSheetDialogPrimaryItem.setOnClickListener { builder.listener.onPrimaryItemClicked() }
-        binding.actionBottomSheetDialogSecondaryItem.setOnClickListener { builder.listener.onSecondaryItemClicked() }
+        binding.actionBottomSheetDialogPrimaryItem.setOnClickListener {
+            builder.listener.onPrimaryItemClicked()
+            setOnDismissListener(null)
+            dismiss()
+        }
+        binding.actionBottomSheetDialogSecondaryItem.setOnClickListener {
+            builder.listener.onSecondaryItemClicked()
+            setOnDismissListener(null)
+            dismiss()
+        }
 
         builder.titleText?.let {
             binding.actionBottomSheetDialogTitle.text = it

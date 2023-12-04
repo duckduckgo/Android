@@ -19,6 +19,7 @@ package com.duckduckgo.sync.impl.ui
 import android.app.Activity
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -96,6 +97,9 @@ class SyncActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var syncSettingsPlugin: DaggerMap<Int, SyncSettingsPlugin>
 
+    @Inject
+    lateinit var syncFeatureMessagesPlugin: DaggerSet<SyncMessagePlugin>
+
     private val loginFlow = registerForActivityResult(LoginContract()) { resultOk ->
         if (resultOk) {
             viewModel.onLoginSuccess()
@@ -131,6 +135,7 @@ class SyncActivity : DuckDuckGoActivity() {
         observeUiEvents()
         registerForPermission()
         configureSettings()
+        configureMessageWarnings()
 
         setupClickListeners()
         setupRecyclerView()
@@ -150,6 +155,19 @@ class SyncActivity : DuckDuckGoActivity() {
                 syncSettingsPlugin[it]?.let { plugin ->
                     binding.viewSyncEnabled.syncSettingsOptions.addView(plugin.getView(this))
                 }
+            }
+        }
+    }
+
+    private fun configureMessageWarnings() {
+        if (syncFeatureMessagesPlugin.isEmpty()) {
+            binding.viewSyncEnabled.syncFeatureWarningsContainer.isVisible = false
+        } else {
+            syncFeatureMessagesPlugin.forEach { plugin ->
+                plugin.getView(this)?.let { view ->
+                    binding.viewSyncEnabled.syncFeatureWarningsContainer.addView(view)
+                }
+                binding.viewSyncEnabled.syncFeatureWarningsContainer.isVisible = true
             }
         }
     }
