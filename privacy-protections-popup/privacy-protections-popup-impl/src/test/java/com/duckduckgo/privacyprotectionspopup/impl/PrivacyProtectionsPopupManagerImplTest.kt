@@ -16,9 +16,12 @@
 
 package com.duckduckgo.privacyprotectionspopup.impl
 
+import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DISABLE_PROTECTIONS_CLICKED
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DISMISSED
@@ -63,6 +66,8 @@ class PrivacyProtectionsPopupManagerImplTest {
 
     private val toggleUsageTimestampRepository = FakeToggleUsageTimestampRepository()
 
+    private val duckDuckGoUrlDetector = FakeDuckDuckGoUrlDetector()
+
     private val subject = PrivacyProtectionsPopupManagerImpl(
         appCoroutineScope = coroutineRule.testScope,
         featureAvailability = featureAvailability,
@@ -71,6 +76,7 @@ class PrivacyProtectionsPopupManagerImplTest {
         popupDismissDomainRepository = popupDismissDomainRepository,
         userAllowListRepository = userAllowListRepository,
         toggleUsageTimestampRepository = toggleUsageTimestampRepository,
+        duckDuckGoUrlDetector = duckDuckGoUrlDetector,
     )
 
     @Test
@@ -94,6 +100,14 @@ class PrivacyProtectionsPopupManagerImplTest {
         subject.onPageRefreshTriggeredByUser()
 
         assertPopupVisible(visible = true)
+    }
+
+    @Test
+    fun whenUrlIsDuckDuckGoThenPopupIsNotShown() = runTest {
+        subject.onPageLoaded(url = "https://duckduckgo.com", httpErrorCodes = emptyList())
+        subject.onPageRefreshTriggeredByUser()
+
+        assertPopupVisible(visible = false)
     }
 
     @Test
@@ -365,4 +379,15 @@ private class FakeToggleUsageTimestampRepository : ToggleUsageTimestampRepositor
     override suspend fun setToggleUsageTimestamp(timestamp: Instant) {
         this.timestamp.value = timestamp
     }
+}
+
+private class FakeDuckDuckGoUrlDetector : DuckDuckGoUrlDetector {
+    override fun isDuckDuckGoUrl(url: String): Boolean = AppUrl.Url.HOST == Uri.parse(url).host
+
+    override fun isDuckDuckGoEmailUrl(url: String): Boolean = throw UnsupportedOperationException()
+    override fun isDuckDuckGoQueryUrl(uri: String): Boolean = throw UnsupportedOperationException()
+    override fun isDuckDuckGoStaticUrl(uri: String): Boolean = throw UnsupportedOperationException()
+    override fun extractQuery(uriString: String): String? = throw UnsupportedOperationException()
+    override fun isDuckDuckGoVerticalUrl(uri: String): Boolean = throw UnsupportedOperationException()
+    override fun extractVertical(uriString: String): String? = throw UnsupportedOperationException()
 }
