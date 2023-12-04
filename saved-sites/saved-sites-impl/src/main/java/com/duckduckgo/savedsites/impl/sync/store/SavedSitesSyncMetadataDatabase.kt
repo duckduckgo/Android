@@ -14,13 +14,21 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.savedsites.store
+package com.duckduckgo.savedsites.impl.sync.store
 
-import androidx.room.Dao
+import androidx.room.Database
+import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
 
-@Dao
-interface SavedSitesSyncMetadataDao {
-
-
-
+@Database(
+    exportSchema = true,
+    version = 1,
+    entities = [
+        SavedSitesSyncMetadataEntity::class,
+    ],
+)
+abstract class SavedSitesSyncMetadataDatabase : RoomDatabase() {
+    abstract fun syncMetadataDao(): SavedSitesSyncMetadataDao
 }
+
+val ALL_MIGRATIONS = emptyArray<Migration>()
