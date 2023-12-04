@@ -14,15 +14,21 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.backup.agent.api
+package com.duckduckgo.app.backup.agent.impl
 
-/** Public interface for backup agent feature*/
-interface BackupAgentManager {
+import com.duckduckgo.backup.agent.api.BackupAgentManager
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
 
-    /**
-     * Returns true if this is a returning user, false otherwise
-     *
-     * @param variantKey is the current user variant
-     */
-    fun isReinstallUser(variantKey: String?): Boolean
+@ContributesBinding(AppScope::class)
+class BackupAgentManagerImpl @Inject constructor() : BackupAgentManager {
+
+    override fun isReinstallUser(variantKey: String?): Boolean {
+        return variantKey == REINSTALL_VARIANT
+    }
+
+    companion object {
+        const val REINSTALL_VARIANT = "ru"
+    }
 }

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.backup.agent.impl
 
+import com.duckduckgo.app.backup.agent.impl.BackupAgentManagerImpl.Companion.REINSTALL_VARIANT
 import com.duckduckgo.app.backup.agent.impl.store.BackupDataStore
 import com.duckduckgo.app.statistics.AtbInitializerListener
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -23,6 +24,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
+import timber.log.Timber
 
 @SingleInstanceIn(AppScope::class)
 @ContributesMultibinding(AppScope::class)
@@ -33,6 +35,11 @@ class ReinstallAtbListener @Inject constructor(
     override suspend fun beforeAtbInit() {
         if (statisticsDataStore.hasInstallationStatistics && backupDataStore.atb != statisticsDataStore.atb) {
             backupDataStore.atb = statisticsDataStore.atb
+        }
+        if (!statisticsDataStore.hasInstallationStatistics && backupDataStore.atb != null) {
+            backupDataStore.atb = null
+            statisticsDataStore.variant = REINSTALL_VARIANT
+            Timber.d("Variant update for returning user")
         }
     }
 
