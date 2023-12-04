@@ -150,7 +150,6 @@
     <string name="settingsWebTrackingProtectionDescription">Varsayılan olarak etkinleştirildi</string>
     <string name="settingsHeadingSettings">Ayarlar</string>
     <string name="settingsPermissionsSetting">İzinler</string>
-    <string name="settingsAutofillLoginsSetting">Giriş bilgileri</string>
     <string name="settingsSyncSetting">Senkronizasyon ve Yedekleme</string>
     <string name="settingsFireButton">Fire Button</string>
 
@@ -634,8 +633,6 @@
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Görüntüle</string>
-    <string name="autofillLoginSavedSnackbarMessage">Giriş kaydedildi</string>
-    <string name="autofillLoginUpdatedSnackbarMessage">Giriş güncellendi</string>
 
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Sıra size geldiğinde size bir bildirim göndermemizi ister misiniz?</string>

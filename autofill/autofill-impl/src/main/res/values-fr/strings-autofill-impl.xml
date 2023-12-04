@@ -17,16 +17,12 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autofillManagementScreenTitle">Identifiants</string>
 
     <string name="managementDisabledModeCta"><b>Configurer dans les paramètres</b></string>
-    <string name="managementDisabledModeSubtitle">Un schéma de verrouillage de l\'appareil, un code PIN ou des données biométriques sont nécessaires pour protéger vos identifiants.</string>
-    <string name="managementDisabledModeTitle">Sécurisez votre appareil pour enregistrer des identifiants</string>
 
     <string name="saveLoginDialogButtonSave">Enregistrer le mot de passe</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Enregistrer le mot de passe</string>
     <string name="saveLoginDialogNotNow">Ne pas enregistrer</string>
-    <string name="saveLoginDialogSubtitle">Les mots de passe sont stockés en toute sécurité sur votre appareil dans le menu Identifiants.</string>
     <string name="saveLoginDialogTitle">Voulez-vous que DuckDuckGo enregistre votre mot de passe ?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Plus d\'options</string>
 
@@ -47,47 +43,35 @@
 
     <string name="autofillDialogCloseButtonContentDescription">Fermer la boîte de dialogue de saisie automatique</string>
 
-    <string name="credentialManagementEditLoginTitleHint">Titre de l\'identifiant</string>
     <string name="credentialManagementEditUsernameHint">Nom d\'utilisateur</string>
     <string name="credentialManagementEditPasswordHint">Mot de passe</string>
-    <string name="credentialManagementEditTitle">Modifier l\'identifiant</string>
     <string name="credentialManagementEditWebsiteHint">URL du site Web</string>
     <string name="credentialManagementEditNotesHint">Notes</string>
     <string name="credentialManagementEditButtonDelete">Supprimer</string>
     <string name="credentialManagementEditButtonSaveChanges">Enregistrer les modifications</string>
     <string name="credentialManagementEditButtonCopyUsername">Copier le nom d\'utilisateur</string>
     <string name="credentialManagementEditButtonCopyPassword">Copier le mot de passe</string>
-    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Dernière mise à jour de l\'identifiant %1$s</string>
 
-    <string name="credentialManagementAutofillToggleLabel">Enregistrer et saisir automatiquement les identifiants</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Les identifiants de connexion sont stockés en toute sécurité sur votre appareil</string>
     <string name="credentialManagementViewMenuEdit">Modifier</string>
     <string name="credentialManagementViewMenuDelete">Supprimer</string>
 
     <string name="credentialManagementSuggestionsLabel">Suggéré</string>
-    <string name="credentialManagementNoLoginsSavedTitle">Aucun identifiant enregistré pour l\'instant</string>
 
-    <string name="autofillManagementAddLogin">Ajouter un identifiant</string>
-    <string name="autofillManagementSearchLogins">Recherche d\'identifiants</string>
     <string name="autofillManagementSearchClearDescription">Effacer la recherche</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Aucun résultat pour « %1$s »</string>
 
     <string name="autofillDeleteLoginDialogCancel">Annuler</string>
     <string name="autofillDeleteLoginDialogDelete">Supprimer</string>
-    <string name="autofillDeleteLoginDialogTitle">Voulez-vous vraiment supprimer cet identifiant ?</string>
 
     <string name="autofillManagementUsernameCopied">Nom d\'utilisateur copié</string>
     <string name="autofillManagementPasswordCopied">Mot de passe copié</string>
 
     <string name="autofill_password_generation_offer_title">Utiliser un mot de passe fort généré par DuckDuckGo ?</string>
-    <string name="autofill_password_generation_offer_message">Les mots de passe sont stockés en toute sécurité sur votre appareil dans le menu Identifiants.</string>
     <string name="autofill_password_generation_offer_accept">Utiliser un mot de passe fort</string>
     <string name="autofill_password_generation_offer_decline">Créer le mien</string>
 
     <string name="deviceNotSupportedTitle">Appareil non pris en charge</string>
-    <string name="deviceNotSupportedSubtitle">Pour conserver vos identifiants de connexion en toute sécurité, nous devons les chiffrer et les stocker sur votre appareil. Ce dernier ne prenant pas en charge le stockage chiffré, Identifiants n\'est pas disponible.</string>
 
-    <string name="autofillManagementDeletedConfirmation">Identifiant supprimé</string>
     <string name="autofillManagementUndoDeletion">Annuler</string>
 
     <string name="credentialManagementLinkButtonContentDescription" instruction="Accessibility text for a button that will show next to a text field containing a website address; it will launch the website when tapped">Ouvrir le site Web</string>
@@ -116,7 +100,6 @@
     <string name="autofillTooltipGenerateAddress" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated.">Générer une Duck Address privée</string>
     <string name="autofillTooltipGenerateAddressDescription" instruction="&apos;hide address&apos; refers to using an alias so your real email address is not used">Bloquer les traqueurs d\'e-mails et masquer l\'adresse</string>
 
-    <string name="autofillDisableAutofillPromptTitle">Voulez-vous continuer à enregistrer les identifiants de connexion ?</string>
     <string name="autofillDisableAutofillPromptMessage">Cette fonction peut être désactivée à tout moment dans Paramètres.</string>
     <string name="autofillDisableAutofillPromptPositiveButton">Encore des économies</string>
     <string name="autofillDisableAutofillPromptNegativeButton">Désactiver</string>

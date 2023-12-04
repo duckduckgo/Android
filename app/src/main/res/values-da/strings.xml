@@ -150,7 +150,6 @@
     <string name="settingsWebTrackingProtectionDescription">Aktiveret som standard</string>
     <string name="settingsHeadingSettings">Indstillinger</string>
     <string name="settingsPermissionsSetting">Tilladelser</string>
-    <string name="settingsAutofillLoginsSetting">Logins</string>
     <string name="settingsSyncSetting">Synkronisering og sikkerhedskopiering</string>
     <string name="settingsFireButton">Fire Button</string>
 
@@ -634,8 +633,6 @@
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Se</string>
-    <string name="autofillLoginSavedSnackbarMessage">Login er gemt</string>
-    <string name="autofillLoginUpdatedSnackbarMessage">Login er opdateret</string>
 
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Vil du have os til at sende dig en meddelelse, når det er din tur?</string>

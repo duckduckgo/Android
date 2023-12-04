@@ -150,7 +150,6 @@
     <string name="settingsWebTrackingProtectionDescription">Ενεργοποιημένο βάσει προεπιλογής</string>
     <string name="settingsHeadingSettings">Ρυθμίσεις</string>
     <string name="settingsPermissionsSetting">Δικαιώματα</string>
-    <string name="settingsAutofillLoginsSetting">Συνδέσεις</string>
     <string name="settingsSyncSetting">Συγχρονισμός και δημιουργία αντιγράφων ασφαλείας</string>
     <string name="settingsFireButton">Κουμπί Φωτιά</string>
 
@@ -634,8 +633,6 @@
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Προβολή</string>
-    <string name="autofillLoginSavedSnackbarMessage">Η σύνδεση αποθηκεύτηκε</string>
-    <string name="autofillLoginUpdatedSnackbarMessage">Η σύνδεση ενημερώθηκε</string>
 
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Θα θέλατε να σας στείλουμε ειδοποίηση για το πότε θα είναι η σειρά σας;</string>

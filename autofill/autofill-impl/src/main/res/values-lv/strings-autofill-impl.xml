@@ -17,16 +17,12 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autofillManagementScreenTitle">Pieteikšanās dati</string>
 
     <string name="managementDisabledModeCta"><b>Iestati sadaļā Iestatījumi</b></string>
-    <string name="managementDisabledModeSubtitle">Lai aizsargātu jūsu pieteikšanās datus, ir nepieciešama ierīces bloķēšanas figūra, PIN kods vai biometriskā aizsardzība.</string>
-    <string name="managementDisabledModeTitle">Aizsargājiet savu ierīci, lai saglabātu pieteikšanās datus</string>
 
     <string name="saveLoginDialogButtonSave">Saglabāt paroli</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Saglabāt paroli</string>
     <string name="saveLoginDialogNotNow">Nesaglabāt</string>
-    <string name="saveLoginDialogSubtitle">Paroles tiek droši saglabātas tavā ierīcē, izvēlnē Pieteikšanās dati.</string>
     <string name="saveLoginDialogTitle">Vai vēlies, lai DuckDuckGo saglabātu tavu paroli?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Citas iespējas</string>
 
@@ -47,47 +43,35 @@
 
     <string name="autofillDialogCloseButtonContentDescription">Aizvērt automātiskās aizpildes dialoglodziņu</string>
 
-    <string name="credentialManagementEditLoginTitleHint">Pieteikšanās datu nosaukums</string>
     <string name="credentialManagementEditUsernameHint">Lietotājvārds</string>
     <string name="credentialManagementEditPasswordHint">Parole</string>
-    <string name="credentialManagementEditTitle">Rediģēt pieteikšanās datus</string>
     <string name="credentialManagementEditWebsiteHint">Tīmekļa vietnes URL</string>
     <string name="credentialManagementEditNotesHint">Piezīmes</string>
     <string name="credentialManagementEditButtonDelete">Dzēst</string>
     <string name="credentialManagementEditButtonSaveChanges">Saglabāt izmaiņas</string>
     <string name="credentialManagementEditButtonCopyUsername">Kopēt lietotājvārdu</string>
     <string name="credentialManagementEditButtonCopyPassword">Kopēt paroli</string>
-    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Pieteikšanās dati pēdējo reizi atjaunināti %1$s</string>
 
-    <string name="credentialManagementAutofillToggleLabel">Saglabāt un automātiski aizpildīt pieteikšanās datus</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Pieteikšanās dati tiek droši saglabāti tavā ierīcē</string>
     <string name="credentialManagementViewMenuEdit">Rediģēt</string>
     <string name="credentialManagementViewMenuDelete">Dzēst</string>
 
     <string name="credentialManagementSuggestionsLabel">Ieteikts</string>
-    <string name="credentialManagementNoLoginsSavedTitle">Nav saglabātu pieteikšanās datu</string>
 
-    <string name="autofillManagementAddLogin">Pievienot pieteikšanās datus</string>
-    <string name="autofillManagementSearchLogins">Meklēt pieteikšanās datus</string>
     <string name="autofillManagementSearchClearDescription">Notīrīt meklēšanas ievadi</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Vaicājumam “%1$s” nav rezultātu</string>
 
     <string name="autofillDeleteLoginDialogCancel">Atcelt</string>
     <string name="autofillDeleteLoginDialogDelete">Dzēst</string>
-    <string name="autofillDeleteLoginDialogTitle">Vai tiešām vēlies dzēst šos pieteikšanās datus?</string>
 
     <string name="autofillManagementUsernameCopied">Lietotājvārds nokopēts</string>
     <string name="autofillManagementPasswordCopied">Parole nokopēta</string>
 
     <string name="autofill_password_generation_offer_title">Vai izmantot spēcīgu DuckDuckGo paroli?</string>
-    <string name="autofill_password_generation_offer_message">Paroles tiek droši saglabātas tavā ierīcē, izvēlnē Pieteikšanās dati.</string>
     <string name="autofill_password_generation_offer_accept">Izmantot spēcīgu paroli</string>
     <string name="autofill_password_generation_offer_decline">Izveidot savu</string>
 
     <string name="deviceNotSupportedTitle">Ierīce netiek atbalstīta</string>
-    <string name="deviceNotSupportedSubtitle">Lai droši glabātu pieteikšanās datus, mums tie ir jāšifrē un jāsaglabā tavā ierīcē. Tā kā tava ierīce neatbalsta šifrētu datu glabāšanu, pieteikšanās dati nav pieejami.</string>
 
-    <string name="autofillManagementDeletedConfirmation">Pieteikšanās dati izdzēsti</string>
     <string name="autofillManagementUndoDeletion">Atsaukt</string>
 
     <string name="credentialManagementLinkButtonContentDescription" instruction="Accessibility text for a button that will show next to a text field containing a website address; it will launch the website when tapped">Atvērt tīmekļa vietni</string>
@@ -116,7 +100,6 @@
     <string name="autofillTooltipGenerateAddress" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated.">Ģenerēt privātu Duck adresi</string>
     <string name="autofillTooltipGenerateAddressDescription" instruction="&apos;hide address&apos; refers to using an alias so your real email address is not used">Bloķē e-pasta izsekotājus un paslēp adresi</string>
 
-    <string name="autofillDisableAutofillPromptTitle">Vai vēlies turpināt saglabāt pieteikšanās datus?</string>
     <string name="autofillDisableAutofillPromptMessage">Vari to jebkurā laikā atspējot iestatījumos.</string>
     <string name="autofillDisableAutofillPromptPositiveButton">Turpināt saglabāt</string>
     <string name="autofillDisableAutofillPromptNegativeButton">Atslēgt</string>

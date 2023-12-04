@@ -17,16 +17,12 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autofillManagementScreenTitle">Bejelentkezések</string>
 
     <string name="managementDisabledModeCta"><b>Beállítás a Beállításokban</b></string>
-    <string name="managementDisabledModeSubtitle">A bejelentkezések védelméhez az eszköz zárolási mintája, PIN-kód vagy biometrikus adatok szükségesek.</string>
-    <string name="managementDisabledModeTitle">Tedd biztonságossá a készülékedet a bejelentkezések mentéséhez</string>
 
     <string name="saveLoginDialogButtonSave">Jelszó mentése</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Jelszó mentése</string>
     <string name="saveLoginDialogNotNow">Mentés mellőzése</string>
-    <string name="saveLoginDialogSubtitle">A rendszer biztonságosan tárolja az eszköz Bejelentkezés menüjében elérhető jelszavakat.</string>
     <string name="saveLoginDialogTitle">A DuckDuckGo mentse a jelszót?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">További lehetőségek</string>
 
@@ -47,47 +43,35 @@
 
     <string name="autofillDialogCloseButtonContentDescription">Automatikus kitöltési párbeszédablak bezárása</string>
 
-    <string name="credentialManagementEditLoginTitleHint">Bejelentkezési cím</string>
     <string name="credentialManagementEditUsernameHint">Felhasználónév</string>
     <string name="credentialManagementEditPasswordHint">Jelszó</string>
-    <string name="credentialManagementEditTitle">Bejelentkezés szerkesztése</string>
     <string name="credentialManagementEditWebsiteHint">Webhely URL-címe</string>
     <string name="credentialManagementEditNotesHint">Megjegyzések</string>
     <string name="credentialManagementEditButtonDelete">Törlés</string>
     <string name="credentialManagementEditButtonSaveChanges">Módosítások mentése</string>
     <string name="credentialManagementEditButtonCopyUsername">Felhasználónév másolása</string>
     <string name="credentialManagementEditButtonCopyPassword">Jelszó másolása</string>
-    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Bejelentkezés utolsó frissítése: %1$s</string>
 
-    <string name="credentialManagementAutofillToggleLabel">Bejelentkezések mentése és automatikus kitöltése</string>
-    <string name="credentialManagementAutofillToggleSubtitle">A bejelentkezési adatokat az eszközöd biztonságosan tárolja</string>
     <string name="credentialManagementViewMenuEdit">Szerkesztés</string>
     <string name="credentialManagementViewMenuDelete">Törlés</string>
 
     <string name="credentialManagementSuggestionsLabel">Javasolt</string>
-    <string name="credentialManagementNoLoginsSavedTitle">Még nincsenek mentett bejelentkezési adatok</string>
 
-    <string name="autofillManagementAddLogin">Bejelentkezési adatok hozzáadása</string>
-    <string name="autofillManagementSearchLogins">Bejelentkezési adatok keresése</string>
     <string name="autofillManagementSearchClearDescription">Megadott keresés törlése</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Nincs találat erre: „%1$s”</string>
 
     <string name="autofillDeleteLoginDialogCancel">Mégsem</string>
     <string name="autofillDeleteLoginDialogDelete">Törlés</string>
-    <string name="autofillDeleteLoginDialogTitle">Biztosan törlöd ezen bejelentkezési adatokat?</string>
 
     <string name="autofillManagementUsernameCopied">Felhasználónév másolva</string>
     <string name="autofillManagementPasswordCopied">Jelszó másolva</string>
 
     <string name="autofill_password_generation_offer_title">A DuckDuckGo által kínált erős jelszót kívánsz használni?</string>
-    <string name="autofill_password_generation_offer_message">A rendszer biztonságosan tárolja az eszköz Bejelentkezés menüjében elérhető jelszavakat.</string>
     <string name="autofill_password_generation_offer_accept">Erős jelszó használata</string>
     <string name="autofill_password_generation_offer_decline">Saját létrehozása</string>
 
     <string name="deviceNotSupportedTitle">Az eszköz nem támogatott</string>
-    <string name="deviceNotSupportedSubtitle">A bejelentkezési adatok biztonságos tárolásához az eszközödön kell titkosítanunk és tárolnunk azokat. Mivel az eszközöd nem támogatja a titkosított tárhelyet, a bejelentkezési adatok védelme nem érhető el.</string>
 
-    <string name="autofillManagementDeletedConfirmation">Bejelentkezés törölve</string>
     <string name="autofillManagementUndoDeletion">Visszavonás</string>
 
     <string name="credentialManagementLinkButtonContentDescription" instruction="Accessibility text for a button that will show next to a text field containing a website address; it will launch the website when tapped">Webhely megnyitása</string>
@@ -116,7 +100,6 @@
     <string name="autofillTooltipGenerateAddress" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated.">Privát Duck-cím létrehozása</string>
     <string name="autofillTooltipGenerateAddressDescription" instruction="&apos;hide address&apos; refers to using an alias so your real email address is not used">E-mail-nyomkövetők blokkolása, és a cím elrejtése</string>
 
-    <string name="autofillDisableAutofillPromptTitle">Továbbra is el szeretnéd menteni a bejelentkezéseket?</string>
     <string name="autofillDisableAutofillPromptMessage">Ez bármikor kikapcsolható a beállításokban.</string>
     <string name="autofillDisableAutofillPromptPositiveButton">Mentés folytatása</string>
     <string name="autofillDisableAutofillPromptNegativeButton">Letiltás</string>

@@ -17,16 +17,12 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autofillManagementScreenTitle">Prijave</string>
 
     <string name="managementDisabledModeCta"><b>Nastavitev v nastavitvah</b></string>
-    <string name="managementDisabledModeSubtitle">Za zaščito prijav je potreben vzorec za zaklepanje naprave, koda PIN ali biometrični podatki.</string>
-    <string name="managementDisabledModeTitle">Zavarujte svojo napravo, če želite shraniti prijave</string>
 
     <string name="saveLoginDialogButtonSave">Shrani geslo</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Shrani geslo</string>
     <string name="saveLoginDialogNotNow">Ne shrani</string>
-    <string name="saveLoginDialogSubtitle">Gesla so varno shranjena v napravi v meniju Prijave.</string>
     <string name="saveLoginDialogTitle">Ali želite, da DuckDuckGo shrani vaše geslo?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Več možnosti</string>
 
@@ -47,47 +43,35 @@
 
     <string name="autofillDialogCloseButtonContentDescription">Zapri pogovorno okno za samodejno izpolnjevanje</string>
 
-    <string name="credentialManagementEditLoginTitleHint">Naslov prijave</string>
     <string name="credentialManagementEditUsernameHint">Uporabniško ime</string>
     <string name="credentialManagementEditPasswordHint">Geslo</string>
-    <string name="credentialManagementEditTitle">Uredi prijavo</string>
     <string name="credentialManagementEditWebsiteHint">URL spletnega mesta</string>
     <string name="credentialManagementEditNotesHint">Opombe</string>
     <string name="credentialManagementEditButtonDelete">Izbriši</string>
     <string name="credentialManagementEditButtonSaveChanges">Shrani spremembe</string>
     <string name="credentialManagementEditButtonCopyUsername">Kopiranje uporabniškega imena</string>
     <string name="credentialManagementEditButtonCopyPassword">Kopiranje gesla</string>
-    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Prijavni podatki nazadnje posodobljeni %1$s</string>
 
-    <string name="credentialManagementAutofillToggleLabel">Shrani in samodejno izpolni prijavne podatke</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Prijave so varno shranjene v vaši napravi.</string>
     <string name="credentialManagementViewMenuEdit">Uredi</string>
     <string name="credentialManagementViewMenuDelete">Izbriši</string>
 
     <string name="credentialManagementSuggestionsLabel">Predlagano</string>
-    <string name="credentialManagementNoLoginsSavedTitle">Podatki za prijavo še niso shranjeni</string>
 
-    <string name="autofillManagementAddLogin">Dodajanje podatkov za prijavo</string>
-    <string name="autofillManagementSearchLogins">Iskanje podatkov za prijavo</string>
     <string name="autofillManagementSearchClearDescription">Počisti vhod iskanja</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Ni rezultatov za »%1$s«</string>
 
     <string name="autofillDeleteLoginDialogCancel">Prekliči</string>
     <string name="autofillDeleteLoginDialogDelete">Izbriši</string>
-    <string name="autofillDeleteLoginDialogTitle">Ali ste prepričani, da želite izbrisati te podatke za prijavo?</string>
 
     <string name="autofillManagementUsernameCopied">Uporabniško ime je bilo kopirano</string>
     <string name="autofillManagementPasswordCopied">Geslo je bilo kopirano</string>
 
     <string name="autofill_password_generation_offer_title">Želite uporabiti močno geslo od DuckDuckGo?</string>
-    <string name="autofill_password_generation_offer_message">Gesla so varno shranjena v napravi v meniju Prijave.</string>
     <string name="autofill_password_generation_offer_accept">Uporabi močno geslo</string>
     <string name="autofill_password_generation_offer_decline">Ustvari svoje</string>
 
     <string name="deviceNotSupportedTitle">Naprava ni podprta</string>
-    <string name="deviceNotSupportedSubtitle">Za varno shranjevanje prijav jih moramo šifrirati in shraniti v vaši napravi. Ker vaša naprava ne podpira šifriranega shranjevanja, funkcija Prijave ni na voljo.</string>
 
-    <string name="autofillManagementDeletedConfirmation">Prijava je izbrisana</string>
     <string name="autofillManagementUndoDeletion">Razveljavi</string>
 
     <string name="credentialManagementLinkButtonContentDescription" instruction="Accessibility text for a button that will show next to a text field containing a website address; it will launch the website when tapped">Odpri spletno mesto</string>
@@ -116,7 +100,6 @@
     <string name="autofillTooltipGenerateAddress" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated.">Ustvarjanje zasebnega naslova Duck</string>
     <string name="autofillTooltipGenerateAddressDescription" instruction="&apos;hide address&apos; refers to using an alias so your real email address is not used">Blokirajte sledilnike e-pošte in skrijte naslov</string>
 
-    <string name="autofillDisableAutofillPromptTitle">Ali želite še naprej shranjevati prijave?</string>
     <string name="autofillDisableAutofillPromptMessage">To lahko kadar koli onemogočite v nastavitvah.</string>
     <string name="autofillDisableAutofillPromptPositiveButton">Še naprej shranjujte</string>
     <string name="autofillDisableAutofillPromptNegativeButton">Onemogoči</string>

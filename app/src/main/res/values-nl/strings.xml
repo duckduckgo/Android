@@ -150,7 +150,6 @@
     <string name="settingsWebTrackingProtectionDescription">Standaard ingeschakeld</string>
     <string name="settingsHeadingSettings">Instellingen</string>
     <string name="settingsPermissionsSetting">Toestemmingen</string>
-    <string name="settingsAutofillLoginsSetting">Aanmeldgegevens</string>
     <string name="settingsSyncSetting">Synchronisatie en back-up</string>
     <string name="settingsFireButton">Fire Button</string>
 
@@ -634,8 +633,6 @@
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Weergeven</string>
-    <string name="autofillLoginSavedSnackbarMessage">Aanmeldgegevens opgeslagen</string>
-    <string name="autofillLoginUpdatedSnackbarMessage">Aanmeldgegevens bijgewerkt</string>
 
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Wil je dat we je een melding sturen als je aan de beurt bent?</string>

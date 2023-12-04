@@ -17,16 +17,12 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autofillManagementScreenTitle">Přihlášení</string>
 
     <string name="managementDisabledModeCta"><b>Nastavit v Nastaveních</b></string>
-    <string name="managementDisabledModeSubtitle">Na ochranu přihlašovacích údajů se vyžaduje gesto zámku obrazovky, PIN nebo biometrické ověření.</string>
-    <string name="managementDisabledModeTitle">Zabezpeč si zařízení, ať si můžeš ukládat přihlašovací údaje</string>
 
     <string name="saveLoginDialogButtonSave">Uložit heslo</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Uložit heslo</string>
     <string name="saveLoginDialogNotNow">Neukládat</string>
-    <string name="saveLoginDialogSubtitle">Hesla jsou bezpečně uložená v zařízení v nabídce Přihlášení.</string>
     <string name="saveLoginDialogTitle">Má DuckDuckGo uložit heslo?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Další možnosti</string>
 
@@ -47,47 +43,35 @@
 
     <string name="autofillDialogCloseButtonContentDescription">Zavřít dialogové okno Automatické vyplňování</string>
 
-    <string name="credentialManagementEditLoginTitleHint">Přihlašovací jméno</string>
     <string name="credentialManagementEditUsernameHint">Uživatelské jméno</string>
     <string name="credentialManagementEditPasswordHint">Heslo</string>
-    <string name="credentialManagementEditTitle">Upravit přihlášení</string>
     <string name="credentialManagementEditWebsiteHint">URL webové stránky</string>
     <string name="credentialManagementEditNotesHint">Poznámky</string>
     <string name="credentialManagementEditButtonDelete">Smazat</string>
     <string name="credentialManagementEditButtonSaveChanges">Uložit změny</string>
     <string name="credentialManagementEditButtonCopyUsername">Kopírovat uživatelské jméno</string>
     <string name="credentialManagementEditButtonCopyPassword">Kopírovat heslo</string>
-    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Přihlášení naposledy aktualizováno %1$s</string>
 
-    <string name="credentialManagementAutofillToggleLabel">Uložit a automaticky vyplnit přihlášení</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Přihlašovací údaje se bezpečně ukládají do tvého zařízení</string>
     <string name="credentialManagementViewMenuEdit">Upravit</string>
     <string name="credentialManagementViewMenuDelete">Smazat</string>
 
     <string name="credentialManagementSuggestionsLabel">Navrhované</string>
-    <string name="credentialManagementNoLoginsSavedTitle">Zatím nemáš uložené žádné přihlašovací údaje</string>
 
-    <string name="autofillManagementAddLogin">Přidat přihlášení</string>
-    <string name="autofillManagementSearchLogins">Hledání přihlašovacích údajů</string>
     <string name="autofillManagementSearchClearDescription">Vymazat vyhledávací vstup</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Žádné výsledky pro dotaz „%1$s“</string>
 
     <string name="autofillDeleteLoginDialogCancel">Zrušit</string>
     <string name="autofillDeleteLoginDialogDelete">Smazat</string>
-    <string name="autofillDeleteLoginDialogTitle">Opravdu chceš tohle přihlášení smazat?</string>
 
     <string name="autofillManagementUsernameCopied">Uživatelské jméno zkopírováno</string>
     <string name="autofillManagementPasswordCopied">Heslo zkopírováno</string>
 
     <string name="autofill_password_generation_offer_title">Použít silné heslo od DuckDuckGo?</string>
-    <string name="autofill_password_generation_offer_message">Hesla jsou bezpečně uložená v zařízení v nabídce Přihlášení.</string>
     <string name="autofill_password_generation_offer_accept">Použít silné heslo</string>
     <string name="autofill_password_generation_offer_decline">Vytvořit vlastní</string>
 
     <string name="deviceNotSupportedTitle">Zařízení není podporované</string>
-    <string name="deviceNotSupportedSubtitle">Abychom mohli přihlašovací údaje bezpečně ukládat, musíme je zašifrovat a uložit do tvého zařízení. Protože tvoje zařízení nepodporuje šifrované úložiště, přihlašovací údaje není možné ukládat.</string>
 
-    <string name="autofillManagementDeletedConfirmation">Přihlašovací údaje smazány</string>
     <string name="autofillManagementUndoDeletion">Vrátit</string>
 
     <string name="credentialManagementLinkButtonContentDescription" instruction="Accessibility text for a button that will show next to a text field containing a website address; it will launch the website when tapped">Otevřít webovou stránku</string>
@@ -116,7 +100,6 @@
     <string name="autofillTooltipGenerateAddress" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated.">Vygenerovat soukromou adresu Duck</string>
     <string name="autofillTooltipGenerateAddressDescription" instruction="&apos;hide address&apos; refers to using an alias so your real email address is not used">Blokuj e-mailové trackery a skryj svou adresu</string>
 
-    <string name="autofillDisableAutofillPromptTitle">Chceš dál ukládat přihlašovací údaje?</string>
     <string name="autofillDisableAutofillPromptMessage">Funkci můžeš kdykoli vypnout v Nastaveních.</string>
     <string name="autofillDisableAutofillPromptPositiveButton">Dál ukládat</string>
     <string name="autofillDisableAutofillPromptNegativeButton">Vypnout</string>

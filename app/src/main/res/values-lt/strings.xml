@@ -150,7 +150,6 @@
     <string name="settingsWebTrackingProtectionDescription">Įjungta pagal numatytuosius nustatymus</string>
     <string name="settingsHeadingSettings">Nustatymai</string>
     <string name="settingsPermissionsSetting">Leidimai</string>
-    <string name="settingsAutofillLoginsSetting">Prisijungimai</string>
     <string name="settingsSyncSetting">Sinchronizuoti ir kurti atsarginę kopiją</string>
     <string name="settingsFireButton">Mygtukas „Fire“</string>
 
@@ -638,8 +637,6 @@
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Peržiūrėti</string>
-    <string name="autofillLoginSavedSnackbarMessage">Prisijungimas išsaugotas</string>
-    <string name="autofillLoginUpdatedSnackbarMessage">Prisijungimas atnaujintas</string>
 
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Ar norėtumėte, kad atsiųstume jums pranešimą, kai ateis jūsų eilė?</string>

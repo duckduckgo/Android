@@ -17,16 +17,12 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autofillManagementScreenTitle">Логины</string>
 
     <string name="managementDisabledModeCta"><b>Откройте «Настройки»</b></string>
-    <string name="managementDisabledModeSubtitle">Для защиты логинов требуются биометрические данные, графический ключ или ПИН-код.</string>
-    <string name="managementDisabledModeTitle">Защитите свое устройство, чтобы сохранять логины</string>
 
     <string name="saveLoginDialogButtonSave">Сохранить пароль</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Сохранить пароль</string>
     <string name="saveLoginDialogNotNow">Не сохранять</string>
-    <string name="saveLoginDialogSubtitle">Пароли надежно хранятся на вашем устройстве в меню «Логины».</string>
     <string name="saveLoginDialogTitle">Хотите, чтобы DuckDuckGo сохранил ваш пароль?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Другие параметры</string>
 
@@ -47,47 +43,35 @@
 
     <string name="autofillDialogCloseButtonContentDescription">Закрыть диалоговое окно автозаполнения</string>
 
-    <string name="credentialManagementEditLoginTitleHint">Название логина</string>
     <string name="credentialManagementEditUsernameHint">Имя пользователя</string>
     <string name="credentialManagementEditPasswordHint">Пароль</string>
-    <string name="credentialManagementEditTitle">Изменить логин</string>
     <string name="credentialManagementEditWebsiteHint">Адрес сайта</string>
     <string name="credentialManagementEditNotesHint">Примечания</string>
     <string name="credentialManagementEditButtonDelete">Удалить</string>
     <string name="credentialManagementEditButtonSaveChanges">Сохранить изменения</string>
     <string name="credentialManagementEditButtonCopyUsername">Копировать имя пользователя</string>
     <string name="credentialManagementEditButtonCopyPassword">Копировать пароль</string>
-    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Последнее обновление логина: %1$s</string>
 
-    <string name="credentialManagementAutofillToggleLabel">Сохранить и заполнять автоматически</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Учетные данные надежно хранятся на вашем устройстве</string>
     <string name="credentialManagementViewMenuEdit">Редактировать</string>
     <string name="credentialManagementViewMenuDelete">Удалить</string>
 
     <string name="credentialManagementSuggestionsLabel">Рекомендации</string>
-    <string name="credentialManagementNoLoginsSavedTitle">Сохраненных логинов пока нет</string>
 
-    <string name="autofillManagementAddLogin">Добавить логин</string>
-    <string name="autofillManagementSearchLogins">Поиск логинов</string>
     <string name="autofillManagementSearchClearDescription">Сбросить поисковый запрос</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Поиск «%1$s» не дал результатов</string>
 
     <string name="autofillDeleteLoginDialogCancel">Отменить</string>
     <string name="autofillDeleteLoginDialogDelete">Удалить</string>
-    <string name="autofillDeleteLoginDialogTitle">Действительно удалить этот логин?</string>
 
     <string name="autofillManagementUsernameCopied">Имя пользователя скопировано</string>
     <string name="autofillManagementPasswordCopied">Пароль скопирован</string>
 
     <string name="autofill_password_generation_offer_title">Как насчет надежного пароля от DuckDuckGo?</string>
-    <string name="autofill_password_generation_offer_message">Пароли надежно хранятся на вашем устройстве в меню «Логины».</string>
     <string name="autofill_password_generation_offer_accept">Применить надежный пароль</string>
     <string name="autofill_password_generation_offer_decline">Создать собственный</string>
 
     <string name="deviceNotSupportedTitle">Устройство не поддерживается</string>
-    <string name="deviceNotSupportedSubtitle">Для защиты учетных данных необходимо зашифровать и сохранить их на вашем устройстве. Однако данное устройство не поддерживает хранение зашифрованной информации, и поэтому логины недоступны.</string>
 
-    <string name="autofillManagementDeletedConfirmation">Логин удален</string>
     <string name="autofillManagementUndoDeletion">Отменить</string>
 
     <string name="credentialManagementLinkButtonContentDescription" instruction="Accessibility text for a button that will show next to a text field containing a website address; it will launch the website when tapped">Открыть сайт</string>
@@ -116,7 +100,6 @@
     <string name="autofillTooltipGenerateAddress" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated.">Создать адрес на Duck</string>
     <string name="autofillTooltipGenerateAddressDescription" instruction="&apos;hide address&apos; refers to using an alias so your real email address is not used">Скрывает ваш адрес и блокирует почтовые трекеры</string>
 
-    <string name="autofillDisableAutofillPromptTitle">Сохранять логины в дальнейшем?</string>
     <string name="autofillDisableAutofillPromptMessage">Вы всегда можете изменить свой выбор в «Настройках».</string>
     <string name="autofillDisableAutofillPromptPositiveButton">Сохранять</string>
     <string name="autofillDisableAutofillPromptNegativeButton">Отключить</string>
