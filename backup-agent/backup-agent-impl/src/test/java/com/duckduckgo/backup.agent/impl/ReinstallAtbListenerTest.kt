@@ -16,6 +16,7 @@
 
 package com.duckduckgo.backup.agent.impl
 
+import com.duckduckgo.app.backup.agent.impl.BackupAgentManagerImpl.Companion.REINSTALL_VARIANT
 import com.duckduckgo.app.backup.agent.impl.ReinstallAtbListener
 import com.duckduckgo.app.backup.agent.impl.store.BackupDataStore
 import com.duckduckgo.app.statistics.model.Atb
@@ -79,6 +80,39 @@ class ReinstallAtbListenerTest {
 
         testee.beforeAtbInit()
 
-        verify(mockBackupDataStore, never()).atb = mockStatisticsDataStore.atb
+        verify(mockBackupDataStore).atb != mockStatisticsDataStore.atb
+    }
+
+    @Test
+    fun givenReturningUserWhenInstallThenRemoveOldATB() = runTest {
+        whenever(mockStatisticsDataStore.atb).thenReturn(null)
+        whenever(mockBackupDataStore.atb).thenReturn(Atb("oldAtb"))
+        whenever(mockStatisticsDataStore.hasInstallationStatistics).thenReturn(false)
+
+        testee.beforeAtbInit()
+
+        verify(mockBackupDataStore).atb = null
+    }
+
+    @Test
+    fun givenReturningUserWhenInstallThenAssignReturningUserVariant() = runTest {
+        whenever(mockStatisticsDataStore.atb).thenReturn(null)
+        whenever(mockBackupDataStore.atb).thenReturn(Atb("oldAtb"))
+        whenever(mockStatisticsDataStore.hasInstallationStatistics).thenReturn(false)
+
+        testee.beforeAtbInit()
+
+        verify(mockStatisticsDataStore).variant = REINSTALL_VARIANT
+    }
+
+    @Test
+    fun givenNewUserWhenInstallThenDontAssignReturningUserVariant() = runTest {
+        whenever(mockStatisticsDataStore.atb).thenReturn(null)
+        whenever(mockBackupDataStore.atb).thenReturn(null)
+        whenever(mockStatisticsDataStore.hasInstallationStatistics).thenReturn(false)
+
+        testee.beforeAtbInit()
+
+        verify(mockStatisticsDataStore, never()).variant = REINSTALL_VARIANT
     }
 }

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.backup.agent.impl
 
+import com.duckduckgo.app.backup.agent.impl.BackupAgentManagerImpl.Companion.REINSTALL_VARIANT
 import com.duckduckgo.app.backup.agent.impl.store.BackupDataStore
 import com.duckduckgo.app.statistics.AtbInitializerListener
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -46,6 +47,5 @@ class ReinstallAtbListener @Inject constructor(
 
     companion object {
         private const val MAX_REINSTALL_WAIT_TIME_MS = 1_500L
-        const val REINSTALL_VARIANT = "ru"
     }
 }
