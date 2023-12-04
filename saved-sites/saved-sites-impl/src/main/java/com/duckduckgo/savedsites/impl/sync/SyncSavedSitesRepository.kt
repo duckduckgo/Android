@@ -100,4 +100,13 @@ interface SyncSavedSitesRepository {
         localId: String,
         favoriteFolder: String,
     )
+
+    /**
+     * Stores the list of children that belong to a folder
+     * If the list is empty the column 'children' will remain empty
+     */
+    fun insertFolderChildren(
+        folderId: String,
+        children: List<String>
+    )
 }
