@@ -141,7 +141,7 @@
     <!-- Exclusion List -->
     <string name="atp_ExclusionListActivityTitle">Wszystkie aplikacje</string>
     <string name="atp_ExcludedAppsFeature">Ochrona przed śledzeniem przez aplikacje wykrywa i blokuje aplikacje śledzące innych firm, na przykład w sytuacji, gdy Facebook próbuje Cię śledzić za pomocą aplikacji medycznej. Firmy mogą nadal śledzić Cię w aplikacjach, których są właścicielami.\n\nJeśli jakaś aplikacja nie działa zgodnie z oczekiwaniami, spróbuj wyłączyć ochronę dla tej aplikacji.</string>
-    <string name="atp_ExcludedAppsEnabledLabel">Podczas wersji beta DuckDuckGo może wyłączyć ochronę dla niektórych aplikacji, aby rozwiązać znane problemy z ładowaniem treści. Ustawienia niestandardowe nie ulegną zmianie, chyba że przywrócisz ustawienia domyślne.</string>
+    <string name="atp_ExcludedAppsEnabledLabel">DuckDuckGo może wyłączyć ochronę dla niektórych aplikacji, aby rozwiązać znane problemy z ładowaniem treści. Ustawienia niestandardowe nie ulegną zmianie, chyba że przywrócisz ustawienia domyślne.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>Ochrona przed śledzeniem przez aplikacje jest wyłączona.</b>\nCzy ochrona przed śledzeniem przez aplikacje wywołała problem z Twoimi aplikacjami? <annotation type="report_issues_link">Zgłoś problemy</annotation></string>
     <string name="atp_ExcludedAppsReport">Zgłoś problem z inną aplikacją</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Wyłączone ręcznie</string>
@@ -411,7 +411,7 @@
     <string name="atp_ExcludeAppsManuallyCTANotNow">Nie teraz</string>
     <string name="atp_ActivityRecentActivityHeader">Aktywność</string>
     <string name="atp_ActivityManageProtectionLabel">Masz problemy?</string>
-    <string name="atp_ActivityEnabledBannerLabel">W wersji beta w przypadku niektórych aplikacji ochrona jest automatycznie wyłączona. <annotation type="app_settings_link">Wyświetl aplikacje</annotation></string>
+    <string name="atp_ActivityEnabledBannerLabel">Ochrona niektórych aplikacji jest automatycznie wyłączona. <annotation type="app_settings_link">Wyświetl aplikacje</annotation></string>
     <string name="atp_ActivityDescription">Tutaj pojawią się zablokowane próby śledzenia</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">%1$s z Twoich aplikacji jest chroniona przed ukrytymi trackerami, które według nas próbują uzyskać dostęp do Twoich danych osobowych.</item>

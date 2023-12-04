@@ -133,7 +133,7 @@
     <!-- Exclusion List -->
     <string name="atp_ExclusionListActivityTitle">Tüm Uygulamalar</string>
     <string name="atp_ExcludedAppsFeature">Uygulama İzleme Koruması, Facebook\'un sizi bir sağlık uygulamasında izlemeye çalışması gibi diğer şirketlerin uygulama izleyicilerini algılar ve engeller. Şirketler, sahip oldukları uygulamalarda sizi izlemeye devam edebilir.\n\nBir uygulama beklendiği gibi çalışmıyorsa, o uygulama için korumayı devre dışı bırakmayı deneyin.</string>
-    <string name="atp_ExcludedAppsEnabledLabel">Beta sırasında DuckDuckGo, bilinen içerik yükleme sorunlarını çözmek üzere bazı uygulamalar için korumayı devre dışı bırakabilir. Varsayılan ayarlara geri dönmediğiniz sürece özel ayarlarınız değişmez.</string>
+    <string name="atp_ExcludedAppsEnabledLabel">DuckDuckGo, bilinen içerik yükleme sorunlarını çözmek üzere bazı uygulamalar için korumayı devre dışı bırakabilir. Varsayılan ayarlara geri dönmediğiniz sürece özel ayarlarınız değişmez.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>Uygulama İzleme Koruması devre dışı</b> Uygulama İzleme Koruması uygulamalarınızda bir soruna mı neden oldu? <annotation type="report_issues_link">Sorunları Bildirin</annotation></string>
     <string name="atp_ExcludedAppsReport">Başka Bir Uygulamayla İlgili Sorun Bildir</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Manuel olarak devre dışı bırakıldı</string>
@@ -395,7 +395,7 @@
     <string name="atp_ExcludeAppsManuallyCTANotNow">Şimdi Değil</string>
     <string name="atp_ActivityRecentActivityHeader">Etkinlik</string>
     <string name="atp_ActivityManageProtectionLabel">Sorun mu yaşıyorsunuz?</string>
-    <string name="atp_ActivityEnabledBannerLabel">Beta sırasında bazı uygulamalar için koruma otomatik olarak devre dışı bırakılır. <annotation type="app_settings_link">Uygulamaları Görüntüle</annotation></string>
+    <string name="atp_ActivityEnabledBannerLabel">Bazı uygulamalar için koruma otomatik olarak devre dışı bırakılır. <annotation type="app_settings_link">Uygulamaları görüntüle</annotation></string>
     <string name="atp_ActivityDescription">Engellenen izleme girişimleri burada görünecek</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">Uygulamalarınızdan %1$s tanesi, kişisel bilgilerinize erişmeye çalışırken bulduğumuz gizli izleyicilerden korunuyor</item>

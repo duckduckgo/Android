@@ -141,7 +141,7 @@
     <!-- Exclusion List -->
     <string name="atp_ExclusionListActivityTitle">Všechny aplikace</string>
     <string name="atp_ExcludedAppsFeature">App Tracking Protection detekuje a blokuje trackery jiných společností, například když se tě Facebook snaží sledovat ve zdravotní aplikaci. Společnosti tě i nadále můžou sledovat v aplikacích, které samy vlastní.\n\nPokud některá aplikace nefunguje podle očekávání, zkus vypnout její ochranu.</string>
-    <string name="atp_ExcludedAppsEnabledLabel">V betaverzi může DuckDuckGo ochranu pro některé aplikace vypnout, a vyřešit tak známé problémy s načítáním obsahu. Pokud neobnovíš výchozí nastavení, tvoje vlastní nastavení se nezmění.</string>
+    <string name="atp_ExcludedAppsEnabledLabel">DuckDuckGo může ochranu pro některé aplikace vypnout, a vyřešit tak známé problémy s načítáním obsahu. Pokud neobnovíš výchozí nastavení, tvoje vlastní nastavení se nezmění.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>App Tracking Protection je vypnutá</b> Způsobila ti App Tracking Protection problém s aplikacemi <annotation type="report_issues_link">Nahlásit problémy</annotation></string>
     <string name="atp_ExcludedAppsReport">Nahlásit problém s jinou aplikací</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Ručně vypnuto</string>
@@ -411,7 +411,7 @@
     <string name="atp_ExcludeAppsManuallyCTANotNow">Teď ne</string>
     <string name="atp_ActivityRecentActivityHeader">Aktivita</string>
     <string name="atp_ActivityManageProtectionLabel">Něco nefunguje?</string>
-    <string name="atp_ActivityEnabledBannerLabel">V beta verzi je ochrana některých aplikací automaticky zakázaná. <annotation type="app_settings_link">Zobrazit aplikace</annotation></string>
+    <string name="atp_ActivityEnabledBannerLabel">Ochrana některých aplikací je automaticky zakázaná. <annotation type="app_settings_link">Zobrazit aplikace</annotation></string>
     <string name="atp_ActivityDescription">Tady se zobrazí zablokované pokusy o sledování</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">%1$s tvoje aplikace je chráněná před skrytými trackery, které se snaží získat přístup k tvým osobním údajům</item>

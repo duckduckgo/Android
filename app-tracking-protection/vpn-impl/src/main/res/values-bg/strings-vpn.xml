@@ -133,7 +133,7 @@
     <!-- Exclusion List -->
     <string name="atp_ExclusionListActivityTitle">Всички приложения</string>
     <string name="atp_ExcludedAppsFeature">App Tracking Protection открива и блокира тракери на други компании в приложенията, например когато Facebook се опитва да Ви следи в приложение за здраве. Въпреки това компаниите могат да Ви следят в приложения, които притежават.\n\nАко дадено приложение не работи според очакванията, опитайте да деактивирате защитата за това приложение.</string>
-    <string name="atp_ExcludedAppsEnabledLabel">Бета версията на DuckDuckGo може да деактивира защитата за някои приложения с цел разрешаване на известни проблеми със зареждането на съдържание. Вашите персонализирани настройки няма да се променят, освен ако не възстановите настройките по подразбиране.</string>
+    <string name="atp_ExcludedAppsEnabledLabel">DuckDuckGo може да деактивира защитата за някои приложения с цел разрешаване на известни проблеми със зареждането на съдържание. Вашите персонализирани настройки няма да се променят, освен ако не възстановите настройките по подразбиране.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>App Tracking Protection е деактивирана</b> App Tracking Protection предизвиква ли проблеми с Вашите приложения <annotation type="report_issues_link">Докладване на проблеми</annotation></string>
     <string name="atp_ExcludedAppsReport">Докладване на проблем с друго приложение</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Деактивирана ръчно</string>
@@ -395,7 +395,7 @@
     <string name="atp_ExcludeAppsManuallyCTANotNow">Не сега</string>
     <string name="atp_ActivityRecentActivityHeader">Дейност</string>
     <string name="atp_ActivityManageProtectionLabel">Имате проблеми?</string>
-    <string name="atp_ActivityEnabledBannerLabel">В бета версията защитата на някои приложения се деактивира автоматично. <annotation type="app_settings_link">Преглед на приложенията</annotation></string>
+    <string name="atp_ActivityEnabledBannerLabel">Защитата за някои приложения се деактивира автоматично. <annotation type="app_settings_link">Преглед на приложенията</annotation></string>
     <string name="atp_ActivityDescription">Блокираните опити за проследяване се показват тук</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">%1$s от Вашите приложения е защитено от скрити тракери, които установихме, че се опитват да получат достъп до Вашата лична информация</item>

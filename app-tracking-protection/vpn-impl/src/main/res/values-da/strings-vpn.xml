@@ -133,7 +133,7 @@
     <!-- Exclusion List -->
     <string name="atp_ExclusionListActivityTitle">Alle apps</string>
     <string name="atp_ExcludedAppsFeature">App Tracking Protection opdager og blokerer app-trackere fra andre virksomheder, f.eks. når Facebook forsøger at spore dig i en sundhedsapp. Virksomheder kan stadig spore dig i apps, de selv ejer.\n\nHvis en app ikke fungerer som forventet, kan du prøve at deaktivere beskyttelsen for den pågældende app.</string>
-    <string name="atp_ExcludedAppsEnabledLabel">I betafasen kan DuckDuckGo deaktivere beskyttelsen for nogle apps for at løse kendte problemer med indlæsning af indhold. Dine brugerdefinerede indstillinger ændres ikke, medmindre du gendanner standardindstillingerne.</string>
+    <string name="atp_ExcludedAppsEnabledLabel">DuckDuckGo kan deaktivere beskyttelsen for nogle apps for at løse kendte problemer med indlæsning af indhold. Dine brugerdefinerede indstillinger ændres ikke, medmindre du gendanner standardindstillingerne.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>App Tracking Protection er deaktiveret</b> Forårsagede App Tracking Protection et problem med dine apps <annotation type="report_issues_link">Rapportér problemer</annotation></string>
     <string name="atp_ExcludedAppsReport">Rapportér problem med en anden app</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Manuelt deaktiveret</string>
@@ -395,7 +395,7 @@
     <string name="atp_ExcludeAppsManuallyCTANotNow">Ikke nu</string>
     <string name="atp_ActivityRecentActivityHeader">Aktivitet</string>
     <string name="atp_ActivityManageProtectionLabel">Har du problemer?</string>
-    <string name="atp_ActivityEnabledBannerLabel">Under betaversionen deaktiveres beskyttelsen af nogle apps automatisk. <annotation type="app_settings_link">Se apps</annotation></string>
+    <string name="atp_ActivityEnabledBannerLabel">Beskyttelsen af nogle apps deaktiveres automatisk. <annotation type="app_settings_link">Se apps</annotation></string>
     <string name="atp_ActivityDescription">Blokerede sporingsforsøg vises her</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">%1$s af dine apps er beskyttet mod skjulte trackere, som vi finder, der forsøger at få adgang til dine personlige oplysninger</item>

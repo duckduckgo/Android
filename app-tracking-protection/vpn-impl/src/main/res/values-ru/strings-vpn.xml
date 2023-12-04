@@ -141,7 +141,7 @@
     <!-- Exclusion List -->
     <string name="atp_ExclusionListActivityTitle">Все приложения</string>
     <string name="atp_ExcludedAppsFeature">Защита от слежки блокирует трекеры сторонних компаний (например, Facebook) при попытке следить за вами в таких приложениях как «Здоровье». Однако компании могут отслеживать вас в собственных приложениях.\n\nЕсли приложение сбоит, отключите для него защиту.</string>
-    <string name="atp_ExcludedAppsEnabledLabel">Чтобы устранить проблемы с загрузкой контента, DuckDuckGo может отключить защиту для некоторых приложений при тестировании бета-версий. Ваши собственные настройки не изменятся, если вы сами не сбросите их на значения по умолчанию.</string>
+    <string name="atp_ExcludedAppsEnabledLabel">Чтобы устранить проблемы с загрузкой контента, DuckDuckGo может отключить защиту для некоторых приложений. Ваши собственные настройки не изменятся, если вы сами не сбросите их на значения по умолчанию.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>Защита от слежки отключена</b> Она нарушает работу приложений? <annotation type="report_issues_link">Сообщите о проблемах</annotation></string>
     <string name="atp_ExcludedAppsReport">Сообщить о проблеме с другим приложением</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Выключено вручную</string>
