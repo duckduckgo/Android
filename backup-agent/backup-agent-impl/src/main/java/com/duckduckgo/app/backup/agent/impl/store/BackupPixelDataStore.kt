@@ -19,32 +19,27 @@ package com.duckduckgo.app.backup.agent.impl.store
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
-/** Private interface for a SharedPreferences class persisted across reinstalls */
-interface BackupDataStore {
-    var atb: Atb?
+interface BackupPixelDataStore {
+    var backupEnabledPixelSent: Boolean
 }
 
 @ContributesBinding(AppScope::class)
-class BackupSharedPreferences @Inject constructor(
+class BackupPixelSharedPreferences @Inject constructor(
     private val context: Context,
-) : BackupDataStore {
+) : BackupPixelDataStore {
 
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
 
-    override var atb: Atb?
-        get() {
-            val atbString = preferences.getString(KEY_ATB, null) ?: return null
-            return Atb(atbString)
-        }
-        set(atb) = preferences.edit { putString(KEY_ATB, atb?.version) }
+    override var backupEnabledPixelSent: Boolean
+        get() = preferences.getBoolean(KEY_PIXEL_SENT, false)
+        set(value) = preferences.edit { putBoolean(KEY_PIXEL_SENT, value) }
 
     companion object {
-        private const val FILENAME = "com.duckduckgo.app.statistics.backup"
-        private const val KEY_ATB = "com.duckduckgo.app.statistics.backup.atb"
+        private const val FILENAME = "com.duckduckgo.app.statistics.backup.pixel"
+        private const val KEY_PIXEL_SENT = "com.duckduckgo.app.statistics.backup.pixel.sent"
     }
 }

@@ -17,8 +17,8 @@
 package com.duckduckgo.backup.agent.impl
 
 import com.duckduckgo.app.backup.agent.impl.ReinstallAtbListener
+import com.duckduckgo.app.backup.agent.impl.store.BackupDataStore
 import com.duckduckgo.app.statistics.model.Atb
-import com.duckduckgo.app.statistics.store.BackupDataStore
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi

@@ -33,7 +33,6 @@ interface Pixel {
     enum class StatisticsPixelName(override val pixelName: String) : PixelName {
         APPLICATION_CRASH_GLOBAL("m_d_ac_g"),
         BROWSER_DAILY_ACTIVE_FEATURE_STATE("m_browser_feature_daily_active_user_d"),
-        BACKUP_SERVICE_ENABLED("m_backup_service_enabled"),
     }
 
     object PixelParameter {

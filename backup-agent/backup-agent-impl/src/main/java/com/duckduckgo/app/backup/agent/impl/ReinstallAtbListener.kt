@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.backup.agent.impl
 
+import com.duckduckgo.app.backup.agent.impl.store.BackupDataStore
 import com.duckduckgo.app.statistics.AtbInitializerListener
-import com.duckduckgo.app.statistics.store.BackupDataStore
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding

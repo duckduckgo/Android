@@ -28,6 +28,7 @@ dependencies {
 
     implementation project(path: ':di')
     implementation project(path: ':statistics')
+    implementation project(path: ':backup-agent-api')
 
     // Apache commons
     implementation "org.apache.commons:commons-math3:_"

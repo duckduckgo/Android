@@ -21,8 +21,10 @@ import android.app.backup.BackupDataOutput
 import android.app.backup.SharedPreferencesBackupHelper
 import android.os.ParcelFileDescriptor
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.backup.agent.impl.pixel.BackupAgentPixelName.BACKUP_SERVICE_ENABLED
+import com.duckduckgo.app.backup.agent.impl.store.BackupPixelDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.StatisticsPixelName.BACKUP_SERVICE_ENABLED
+import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.di.scopes.BackupAgentScope
 import dagger.android.AndroidInjection
 import javax.inject.Inject
@@ -31,6 +33,10 @@ import javax.inject.Inject
 class DuckDuckGoBackupAgent : BackupAgentHelper() {
 
     @Inject lateinit var pixel: Pixel
+
+    @Inject lateinit var backupPixelDataStore: BackupPixelDataStore
+
+    @Inject lateinit var statisticsDataStore: StatisticsDataStore
 
     override fun onCreate() {
         super.onCreate()
@@ -46,7 +52,10 @@ class DuckDuckGoBackupAgent : BackupAgentHelper() {
         newState: ParcelFileDescriptor?,
     ) {
         super.onBackup(oldState, data, newState)
-        pixel.fire(BACKUP_SERVICE_ENABLED)
+        if (!backupPixelDataStore.backupEnabledPixelSent) {
+            pixel.fire(BACKUP_SERVICE_ENABLED)
+            backupPixelDataStore.backupEnabledPixelSent = true
+        }
     }
 
     companion object {
