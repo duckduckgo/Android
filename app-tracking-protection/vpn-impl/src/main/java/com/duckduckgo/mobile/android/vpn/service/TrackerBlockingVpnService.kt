@@ -234,11 +234,12 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
                     stopSelf()
                 }
             }
-            ACTION_STOP_VPN -> {
+            ACTION_STOP_VPN, ACTION_SNOOZE_VPN -> {
                 synchronized(this) {
                     launch(serviceDispatcher) {
                         async {
-                            stopVpn(VpnStopReason.SELF_STOP)
+                            val snoozeTriggerAtMillisExtra = intent.getLongExtra(ACTION_SNOOZE_VPN_EXTRA, 0L)
+                            stopVpn(VpnStopReason.SELF_STOP(snoozeTriggerAtMillisExtra))
                         }.await()
                     }
                 }
@@ -575,7 +576,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
 
     private fun sendStopPixels(reason: VpnStopReason) {
         when (reason) {
-            VpnStopReason.SELF_STOP, VpnStopReason.RESTART, VpnStopReason.UNKNOWN -> {} // no-op
+            is VpnStopReason.SELF_STOP, VpnStopReason.RESTART, VpnStopReason.UNKNOWN -> {} // no-op
             VpnStopReason.ERROR -> deviceShieldPixels.startError()
             VpnStopReason.REVOKED -> deviceShieldPixels.suddenKillByVpnRevoked()
         }
@@ -690,7 +691,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         fun VpnStopReason.asVpnStoppingReason(): VpnStoppingReason {
             return when (this) {
                 VpnStopReason.RESTART -> VpnStoppingReason.RESTART
-                VpnStopReason.SELF_STOP -> VpnStoppingReason.SELF_STOP
+                is VpnStopReason.SELF_STOP -> VpnStoppingReason.SELF_STOP
                 VpnStopReason.REVOKED -> VpnStoppingReason.REVOKED
                 VpnStopReason.ERROR -> VpnStoppingReason.ERROR
                 VpnStopReason.UNKNOWN -> VpnStoppingReason.UNKNOWN
@@ -733,6 +734,13 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             }
         }
 
+        private fun snoozeIntent(context: Context, triggerAtMillis: Long): Intent {
+            return serviceIntent(context).also {
+                it.action = ACTION_SNOOZE_VPN
+                it.putExtra(ACTION_SNOOZE_VPN_EXTRA, triggerAtMillis)
+            }
+        }
+
         // This method was deprecated in API level 26. As of Build.VERSION_CODES.O,
         // this method is no longer available to third party applications.
         // For backwards compatibility, it will still return the caller's own services.
@@ -758,6 +766,16 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
 
         internal fun startService(context: Context) {
             startVpnService(context.applicationContext)
+        }
+
+        internal fun snoozeService(context: Context, triggerAtMillis: Long) {
+            val appContext = context.applicationContext
+
+            if (!isServiceRunning(appContext)) return
+
+            snoozeIntent(appContext, triggerAtMillis).run {
+                ContextCompat.startForegroundService(appContext, this)
+            }
         }
 
         // TODO commented out for now, we'll see if we need it once we enable the new networking layer
@@ -827,6 +845,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         private const val ACTION_START_VPN = "ACTION_START_VPN"
         private const val ACTION_STOP_VPN = "ACTION_STOP_VPN"
         private const val ACTION_RESTART_VPN = "ACTION_RESTART_VPN"
+        private const val ACTION_SNOOZE_VPN = "ACTION_SNOOZE_VPN"
+        private const val ACTION_SNOOZE_VPN_EXTRA = "triggerAtMillis"
         private const val ACTION_ALWAYS_ON_START = "android.net.VpnService"
     }
 

@@ -101,7 +101,7 @@ class AppTPCPUMonitorTest {
     fun whenVPNStoppedStopWorker() {
         assertStartWorker()
 
-        cpuMonitor.onVpnStopped(coroutineRule.testScope, SELF_STOP)
+        cpuMonitor.onVpnStopped(coroutineRule.testScope, SELF_STOP())
         assertWorkerNotRunning()
     }
 

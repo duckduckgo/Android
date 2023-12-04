@@ -26,6 +26,7 @@ import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin
+import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin.NotificationActions
 import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin.VpnEnabledNotificationContent
 import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin.VpnEnabledNotificationPriority
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -43,11 +44,9 @@ import kotlinx.coroutines.runBlocking
 @ContributesMultibinding(VpnScope::class)
 @SingleInstanceIn(VpnScope::class)
 class NetPEnabledNotificationContentPlugin @Inject constructor(
-    private val context: Context,
     private val resources: Resources,
     private val networkProtectionState: NetworkProtectionState,
     private val appTrackingProtection: AppTrackingProtection,
-    private val netPNotificationActions: NetPNotificationActions,
     netPIntentProvider: IntentProvider,
 ) : VpnEnabledNotificationContentPlugin {
 
@@ -61,7 +60,7 @@ class NetPEnabledNotificationContentPlugin @Inject constructor(
             return VpnEnabledNotificationContent(
                 title = SpannableStringBuilder(title),
                 onNotificationPressIntent = onPressIntent,
-                notificationAction = netPNotificationActions.getReportIssueNotificationAction(context),
+                notificationActions = NotificationActions.VPNActions,
             )
         } else {
             null

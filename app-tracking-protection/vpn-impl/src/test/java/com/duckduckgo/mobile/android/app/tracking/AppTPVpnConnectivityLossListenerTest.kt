@@ -206,7 +206,7 @@ class AppTPVpnConnectivityLossListenerTest {
 
         listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
         listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
-        listener.onVpnStopped(coroutinesTestRule.testScope, VpnStateMonitor.VpnStopReason.SELF_STOP)
+        listener.onVpnStopped(coroutinesTestRule.testScope, VpnStateMonitor.VpnStopReason.SELF_STOP())
         listener.onVpnConnectivityLoss(coroutinesTestRule.testScope)
 
         verify(appTrackingProtection, never()).restart()

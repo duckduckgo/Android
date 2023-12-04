@@ -204,7 +204,7 @@ class WgVpnNetworkStackTest {
     fun whenOnStopVpnWithSelfStopThenResetEnabledTimeInMillisAndServerDetails() = runTest {
         assertEquals(
             Result.success(Unit),
-            wgVpnNetworkStack.onStopVpn(SELF_STOP),
+            wgVpnNetworkStack.onStopVpn(SELF_STOP()),
         )
 
         verify(networkProtectionRepository).enabledTimeInMillis = -1

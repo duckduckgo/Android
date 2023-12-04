@@ -78,11 +78,11 @@
             android:exported="false" />
         <receiver
             android:name=".notification.NetPEnableReceiver"
-            android:enabled="false"
             android:exported="false"
             android:process=":vpn">
             <intent-filter>
-                <action android:name="com.duckduckgo.networkprotection.notification.disabled.restart" />
+                <action android:name="com.duckduckgo.networkprotection.notification.ACTION_NETP_ENABLE" />
+                <action android:name="com.duckduckgo.vpn.ACTION_VPN_SNOOZE_CANCEL" />
             </intent-filter>
         </receiver>
 
