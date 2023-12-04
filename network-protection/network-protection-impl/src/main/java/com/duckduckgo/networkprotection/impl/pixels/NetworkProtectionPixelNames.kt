@@ -111,5 +111,5 @@ enum class NetworkProtectionPixelNames(
     NETP_TUNNEL_FAILURE_RECOVERED("m_netp_ev_tunnel_failure_recovered_c", enqueue = true),
     VPN_SNOOZE_CANCELED("m_vpn_ev_snooze_canceled_c", enqueue = true),
     VPN_SNOOZE_CANCELED_DAILY("m_vpn_ev_snooze_canceled_d", enqueue = true),
-    NETP_SETTINGS_PRESSED("m_netp_setting_pressed"),
+    NETP_SETTINGS_PRESSED("m_netp_ev_setting_pressed_c"),
 }

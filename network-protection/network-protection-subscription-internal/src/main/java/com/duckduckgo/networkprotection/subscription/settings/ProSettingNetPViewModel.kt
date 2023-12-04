@@ -51,7 +51,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import logcat.logcat
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 class ProSettingNetPViewModel(
@@ -113,9 +112,7 @@ class ProSettingNetPViewModel(
     }
 
     private suspend fun getNetworkProtectionEntryState(networkProtectionConnectionState: ConnectionState): NetPEntryState {
-        val networkProtectionWaitlistState = networkProtectionWaitlist.getState()
-        logcat { "MARCOS is $networkProtectionConnectionState" }
-        return when (networkProtectionWaitlistState) {
+        return when (val networkProtectionWaitlistState = networkProtectionWaitlist.getState()) {
             is NetPWaitlistState.InBeta -> {
                 if (networkProtectionWaitlistState.termsAccepted || networkProtectionState.isOnboarded()) {
                     val subtitle = when (networkProtectionConnectionState) {
