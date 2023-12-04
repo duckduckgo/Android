@@ -338,13 +338,6 @@ private class FakeProtectionsStateProvider : ProtectionsStateProvider {
         protectionsEnabledOverride ?: _protectionsEnabled.asStateFlow()
 }
 
-private class FakeTimeProvider : TimeProvider {
-
-    var time: Instant = Instant.parse("2023-11-29T10:15:30.000Z")
-
-    override fun getCurrentTime(): Instant = time
-}
-
 private class FakePopupDismissDomainRepository : PopupDismissDomainRepository {
 
     private val data = MutableStateFlow(emptyMap<String, Instant>())
@@ -358,6 +351,9 @@ private class FakePopupDismissDomainRepository : PopupDismissDomainRepository {
     ) {
         data.update { it + (domain to time) }
     }
+
+    override suspend fun removeEntriesOlderThan(time: Instant) =
+        throw UnsupportedOperationException()
 }
 
 private class FakeToggleUsageTimestampRepository : ToggleUsageTimestampRepository {

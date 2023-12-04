@@ -21,6 +21,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
+import org.threeten.bp.Instant
 
 @Dao
 abstract class PopupDismissDomainsDao {
@@ -30,4 +31,7 @@ abstract class PopupDismissDomainsDao {
 
     @Query("SELECT * FROM popup_dismiss_domains WHERE domain = :domain")
     abstract fun query(domain: String): Flow<PopupDismissDomain?>
+
+    @Query("DELETE FROM popup_dismiss_domains WHERE dismissedAt < :time")
+    abstract suspend fun removeEntriesOlderThan(time: Instant)
 }

@@ -58,6 +58,9 @@ dependencies {
 
     implementation "com.jakewharton.threetenabp:threetenabp:_"
     testImplementation "org.threeten:threetenbp:_"
+
+    implementation AndroidX.work.runtimeKtx
+    testImplementation AndroidX.work.testing
 }
 
 android {

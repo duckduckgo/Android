@@ -95,4 +95,19 @@ class PopupDismissDomainRepositoryTest {
         val storedDismissAt = subject.getPopupDismissTime(domain).first()
         assertEquals(Instant.parse("2023-11-28T10:15:30.000Z"), storedDismissAt)
     }
+
+    @Test
+    fun whenRemoveEntriesInvokedThenCorrectDataIsDeleted() = runTest {
+        subject.setPopupDismissTime("www.example1.com", Instant.parse("2023-11-28T10:15:30.000Z"))
+        subject.setPopupDismissTime("www.example2.com", Instant.parse("2023-11-29T10:15:30.000Z"))
+        subject.setPopupDismissTime("www.example3.com", Instant.parse("2023-12-01T10:00:00.000Z"))
+        subject.setPopupDismissTime("www.example4.com", Instant.parse("2023-12-01T10:30:00.000Z"))
+
+        subject.removeEntriesOlderThan(Instant.parse("2023-12-01T10:15:00.000Z"))
+
+        assertNull(subject.getPopupDismissTime("www.example1.com").first())
+        assertNull(subject.getPopupDismissTime("www.example2.com").first())
+        assertNull(subject.getPopupDismissTime("www.example3.com").first())
+        assertEquals(Instant.parse("2023-12-01T10:30:00.000Z"), subject.getPopupDismissTime("www.example4.com").first())
+    }
 }
