@@ -2964,7 +2964,7 @@
         /** @type {boolean} */
         #isDebugFlagSet = false
 
-        /** @type {{ debug?: boolean, featureSettings?: Record<string, unknown>, assets?: AssetConfig | undefined, site: Site, messagingConfig?: import('@duckduckgo/messaging').MessagingConfig } | null} */
+        /** @type {{ debug?: boolean, desktopModeEnabled?: boolean, featureSettings?: Record<string, unknown>, assets?: AssetConfig | undefined, site: Site, messagingConfig?: import('@duckduckgo/messaging').MessagingConfig } | null} */
         #args
 
         constructor (featureName) {
@@ -2975,6 +2975,10 @@
 
         get isDebug () {
             return this.#args?.debug || false
+        }
+
+        get desktopModeEnabled () {
+            return this.#args?.desktopModeEnabled || false
         }
 
         /**
@@ -7899,15 +7903,48 @@
         }
 
         viewportWidthFix () {
-            const viewportTag = document.querySelector('meta[name=viewport]');
-            if (!viewportTag) return
-            const viewportContent = viewportTag.getAttribute('content');
-            if (!viewportContent) return
-            const viewportContentParts = viewportContent.split(',');
-            const widthPart = viewportContentParts.find((part) => part.includes('width'));
-            // If we already have a width, don't add one
-            if (widthPart) return
-            viewportTag.setAttribute('content', `${viewportContent},width=device-width`);
+            const viewportTags = document.querySelectorAll('meta[name=viewport]');
+            // Chrome respects only the last viewport tag
+            let viewportTag = viewportTags.length === 0 ? null : viewportTags[viewportTags.length - 1];
+            const viewportContent = viewportTag?.getAttribute('content') || '';
+            const viewportContentParts = viewportContent ? viewportContent.split(/,|;/) : [];
+            const parsedViewportContent = viewportContentParts.map((part) => {
+                const [key, value] = part.split('=').map(p => p.trim().toLowerCase());
+                return [key, value]
+            });
+            if (!viewportTag || this.desktopModeEnabled) {
+                // force wide viewport width
+                const viewportTagExists = Boolean(viewportTag);
+                if (!viewportTag) {
+                    viewportTag = document.createElement('meta');
+                    viewportTag.setAttribute('name', 'viewport');
+                }
+                const forcedWidth = screen.width >= 1280 ? 1280 : 980;
+                // Race condition: depending on the loading state of the page, initial scale may or may not be respected, so the page may look zoomed-in after applying this hack.
+                // Usually this is just an annoyance, but it may be a bigger issue if user-scalable=no is set, so we remove it too.
+                const forcedInitialScale = (screen.width / forcedWidth).toFixed(3);
+                let newContent = `width=${forcedWidth}, initial-scale=${forcedInitialScale}`;
+                parsedViewportContent.forEach(([key], idx) => {
+                    if (!['width', 'initial-scale', 'user-scalable'].includes(key)) {
+                        newContent = newContent.concat(`,${viewportContentParts[idx]}`); // reuse the original values, not the parsed ones
+                    }
+                });
+                viewportTag.setAttribute('content', newContent);
+                if (!viewportTagExists) {
+                    document.head.appendChild(viewportTag);
+                }
+            } else { // mobile mode with a viewport tag
+                // fix an edge case where WebView forces the wide viewport
+                const widthPart = parsedViewportContent.find(([key]) => key === 'width');
+                const initialScalePart = parsedViewportContent.find(([key]) => key === 'initial-scale');
+                if (!widthPart && initialScalePart) {
+                    // Chromium accepts float values for initial-scale
+                    const parsedInitialScale = parseFloat(initialScalePart[1]);
+                    if (parsedInitialScale !== 1) {
+                        viewportTag.setAttribute('content', `width=device-width, ${viewportContent}`);
+                    }
+                }
+            }
         }
     }
 
