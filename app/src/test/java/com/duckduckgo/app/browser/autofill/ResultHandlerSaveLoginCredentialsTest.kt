@@ -27,6 +27,7 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
 import com.duckduckgo.autofill.impl.ui.credential.saving.ResultHandlerSaveLoginCredentials
+import com.duckduckgo.autofill.impl.ui.credential.saving.declines.AutofillDeclineCounter
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -45,12 +46,14 @@ class ResultHandlerSaveLoginCredentialsTest {
     private val callback: AutofillEventListener = mock()
 
     private val autofillFireproofDialogSuppressor: AutofillFireproofDialogSuppressor = mock()
+    private val declineCounter: AutofillDeclineCounter = mock()
     private val autofillStore: AutofillStore = mock()
     private val appBuildConfig: AppBuildConfig = mock()
 
     private val testee = ResultHandlerSaveLoginCredentials(
         autofillFireproofDialogSuppressor = autofillFireproofDialogSuppressor,
         dispatchers = coroutineTestRule.testDispatcherProvider,
+        declineCounter = declineCounter,
         autofillStore = autofillStore,
         appBuildConfig = appBuildConfig,
         appCoroutineScope = coroutineTestRule.testScope,
@@ -80,6 +83,23 @@ class ResultHandlerSaveLoginCredentialsTest {
         testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
         verify(autofillStore).saveCredentials(eq("example.com"), eq(loginCredentials))
         verify(callback).onSavedCredentials(loginCredentials)
+    }
+
+    @Test
+    fun whenSaveCredentialsForFirstTimeThenDisableDeclineCountMonitoringFlag() = runTest {
+        val loginCredentials = LoginCredentials(domain = "example.com", username = "foo", password = "bar")
+        val bundle = bundle("example.com", loginCredentials)
+        whenever(autofillStore.saveCredentials(any(), any())).thenReturn(loginCredentials)
+        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
+        verify(declineCounter).disableDeclineCounter()
+    }
+
+    @Test
+    fun whenSaveCredentialsUnsuccessfulThenDoesNotDisableDeclineCountMonitoringFlag() = runTest {
+        val bundle = bundle("example.com", someLoginCredentials())
+        whenever(autofillStore.saveCredentials(any(), any())).thenReturn(null)
+        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
+        verify(declineCounter, never()).disableDeclineCounter()
     }
 
     private suspend fun verifySaveNeverCalled() {
