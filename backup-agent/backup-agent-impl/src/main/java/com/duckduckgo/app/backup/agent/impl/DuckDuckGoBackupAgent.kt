@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.statistics
+package com.duckduckgo.app.backup.agent.impl
 
 import android.app.backup.BackupAgentHelper
 import android.app.backup.BackupDataOutput
