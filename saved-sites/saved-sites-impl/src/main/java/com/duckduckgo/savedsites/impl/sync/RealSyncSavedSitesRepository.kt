@@ -20,13 +20,21 @@ import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.savedsites.api.models.*
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.store.*
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
 import java.util.*
 import timber.log.*
 
 class RealSyncSavedSitesRepository(
     private val savedSitesEntitiesDao: SavedSitesEntitiesDao,
     private val savedSitesRelationsDao: SavedSitesRelationsDao,
+    private val savedSitesSyncMetadataDao: SavedSitesSyncMetadataDao,
+    private val moshi: Moshi
 ) : SyncSavedSitesRepository {
+
+    private val stringListType = Types.newParameterizedType(List::class.java, String::class.java)
+    private val stringListAdapter: JsonAdapter<List<String>> = Moshi.Builder().build().adapter(stringListType)
 
     override fun getFavoritesSync(favoriteFolder: String): List<Favorite> {
         return savedSitesEntitiesDao.entitiesInFolderSync(favoriteFolder).mapToFavorites()
@@ -179,5 +187,13 @@ class RealSyncSavedSitesRepository(
         savedSitesEntitiesDao.updateId(localId, favorite.id)
         savedSitesRelationsDao.updateEntityId(localId, favorite.id)
         updateFavourite(favorite, favoriteFolder)
+    }
+
+    override fun insertFolderChildren(
+        folderId: String,
+        children: List<String>
+    ) {
+        val childrenJSON = stringListAdapter.toJson(children)
+        savedSitesSyncMetadataDao.updateChildren(folderId, childrenJSON)
     }
 }
