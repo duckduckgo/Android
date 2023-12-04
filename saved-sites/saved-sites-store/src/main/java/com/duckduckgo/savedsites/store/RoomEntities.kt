@@ -61,11 +61,3 @@ data class Relation(
     var folderId: String = UUID.randomUUID().toString(),
     var entityId: String,
 )
-
-@Entity(tableName = "saved_sites_sync_meta")
-data class SavedSitesSyncMetadataEntity(
-    @PrimaryKey val folderId: String,
-    var children: String, // JSON representation of list of children confirmed by the BE
-    var request: String,  // JSON representation of list of children sent to the BE
-)
-
