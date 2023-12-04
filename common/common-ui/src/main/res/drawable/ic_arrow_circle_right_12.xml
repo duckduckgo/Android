@@ -11,7 +11,7 @@
         android:fillColor="?daxColorAccentBlue"/>
     <path
         android:pathData="M6.5,0C3.186,0 0.5,2.686 0.5,6C0.5,9.314 3.186,12 6.5,12C9.814,12 12.5,9.314 12.5,6C12.5,2.686 9.814,0 6.5,0ZM1.75,6C1.75,3.377 3.877,1.25 6.5,1.25C9.123,1.25 11.25,3.377 11.25,6C11.25,8.623 9.123,10.75 6.5,10.75C3.877,10.75 1.75,8.623 1.75,6Z"
-        android:fillColor="#7295F6"
+        android:fillColor="?daxColorAccentBlue"
         android:fillType="evenOdd"/>
   </group>
 </vector>

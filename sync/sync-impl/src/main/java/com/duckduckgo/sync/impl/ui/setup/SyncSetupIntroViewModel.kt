@@ -19,7 +19,7 @@ package com.duckduckgo.sync.impl.ui.setup
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SYNC_INTRO
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupIntroViewModel.Command.AbortFlow
@@ -36,7 +36,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
-@ContributesViewModel(ActivityScope::class)
+@ContributesViewModel(FragmentScope::class)
 class SyncSetupIntroViewModel @Inject constructor() : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
