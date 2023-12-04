@@ -251,9 +251,9 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
         return PrivacyProtectionsPopupViewState(visible = shouldShowPopup)
     }
 
-    private companion object {
-        val REFRESH_TRIGGER_VALID_DURATION: Duration = Duration.ofMillis(100)
-        val DISMISS_REMEMBER_DURATION: Duration = Duration.ofDays(1)
+    companion object {
+        private val REFRESH_TRIGGER_VALID_DURATION: Duration = Duration.ofMillis(100)
+        private val DISMISS_REMEMBER_DURATION: Duration = Duration.ofDays(1)
         val TOGGLE_USAGE_REMEMBER_DURATION: Duration = Duration.ofDays(14)
     }
 }

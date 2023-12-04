@@ -16,7 +16,7 @@
 
 package com.duckduckgo.privacyprotectionspopup.impl.db
 
-import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
@@ -26,9 +26,10 @@ import org.threeten.bp.Instant
 interface PopupDismissDomainRepository {
     fun getPopupDismissTime(domain: String): Flow<Instant?>
     suspend fun setPopupDismissTime(domain: String, time: Instant)
+    suspend fun removeEntriesOlderThan(time: Instant)
 }
 
-@ContributesBinding(FragmentScope::class)
+@ContributesBinding(AppScope::class)
 class PopupDismissDomainRepositoryImpl @Inject constructor(
     private val dao: PopupDismissDomainsDao,
 ) : PopupDismissDomainRepository {
@@ -41,5 +42,9 @@ class PopupDismissDomainRepositoryImpl @Inject constructor(
         time: Instant,
     ) {
         dao.insert(PopupDismissDomain(domain = domain, dismissedAt = time))
+    }
+
+    override suspend fun removeEntriesOlderThan(time: Instant) {
+        dao.removeEntriesOlderThan(time)
     }
 }
