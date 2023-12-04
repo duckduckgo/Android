@@ -130,7 +130,7 @@ class AndroidInjection {
             instance: T,
             bindingKey: Class<*>? = null,
         ) {
-            AndroidInjector.inject(instance, bindingKey)
+            AndroidInjector.inject(instance.applicationContext as Application, instance, bindingKey)
         }
 
         /**

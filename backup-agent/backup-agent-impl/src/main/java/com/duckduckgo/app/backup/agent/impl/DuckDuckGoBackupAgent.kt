@@ -24,7 +24,6 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.backup.agent.impl.pixel.BackupAgentPixelName.BACKUP_SERVICE_ENABLED
 import com.duckduckgo.app.backup.agent.impl.store.BackupPixelDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.di.scopes.BackupAgentScope
 import dagger.android.AndroidInjection
 import javax.inject.Inject
@@ -35,8 +34,6 @@ class DuckDuckGoBackupAgent : BackupAgentHelper() {
     @Inject lateinit var pixel: Pixel
 
     @Inject lateinit var backupPixelDataStore: BackupPixelDataStore
-
-    @Inject lateinit var statisticsDataStore: StatisticsDataStore
 
     override fun onCreate() {
         super.onCreate()
@@ -60,6 +57,6 @@ class DuckDuckGoBackupAgent : BackupAgentHelper() {
 
     companion object {
         private const val FILENAME = "com.duckduckgo.app.statistics.backup"
-        const val FILENAME_BACKUP = "com.duckduckgo.app.backup.backup"
+        private const val FILENAME_BACKUP = "com.duckduckgo.app.backup.backup"
     }
 }
