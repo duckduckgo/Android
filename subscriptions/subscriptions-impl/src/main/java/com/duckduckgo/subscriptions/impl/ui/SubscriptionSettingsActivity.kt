@@ -31,12 +31,15 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.impl.R.string
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus.AutoRenewable
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionSettingsBinding
 import com.duckduckgo.subscriptions.impl.ui.AddDeviceActivity.Companion.AddDeviceScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsActivity.Companion.SubscriptionsSettingsScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.FinishSignOut
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.ViewState
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -59,10 +62,16 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(toolbar)
 
+        lifecycle.addObserver(viewModel)
+
         viewModel.commands()
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
+
+        viewModel.viewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach {
+            renderView(it)
+        }.launchIn(lifecycleScope)
 
         binding.addDevice.setClickListener {
             globalActivityStarter.start(this, AddDeviceScreenWithEmptyParams)
@@ -99,6 +108,26 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         binding.faq.setClickListener {
             Toast.makeText(this, "This will take you to FAQs", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        lifecycle.removeObserver(viewModel)
+    }
+
+    private fun renderView(viewState: ViewState) {
+        val duration = if (viewState.duration is Monthly) {
+            getString(string.monthly)
+        } else {
+            getString(string.yearly)
+        }
+
+        val status = when (viewState.status) {
+            is AutoRenewable -> getString(string.renews)
+            else -> getString(string.expires)
+        }
+
+        binding.description.text = getString(string.subscriptionsData, duration, status, viewState.date)
     }
 
     private fun processCommand(command: Command) {
