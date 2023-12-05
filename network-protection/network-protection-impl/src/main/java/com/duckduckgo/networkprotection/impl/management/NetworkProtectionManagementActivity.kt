@@ -39,9 +39,9 @@ import com.duckduckgo.common.utils.extensions.launchAlwaysOnSystemSettings
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
-import com.duckduckgo.networkprotection.api.NetPAppExclusionListNoParams
-import com.duckduckgo.networkprotection.api.NetworkProtectionManagementScreenAndEnable
-import com.duckduckgo.networkprotection.api.NetworkProtectionManagementScreenNoParams
+import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetPAppExclusionListNoParams
+import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenAndEnable
+import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.about.NetPAboutVPNScreenNoParams
 import com.duckduckgo.networkprotection.impl.about.NetPFaqsScreenNoParams
