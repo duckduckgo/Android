@@ -47,7 +47,7 @@ interface SavedSitesSyncMetadataDao {
     )
 
     @Transaction
-    fun confirmAllChildren(){
+    fun confirmAllChildren() {
         confirmChildren()
         removeAllRequests()
     }

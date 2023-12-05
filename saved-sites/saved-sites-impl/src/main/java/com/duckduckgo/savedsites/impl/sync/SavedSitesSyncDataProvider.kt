@@ -52,7 +52,7 @@ class SavedSitesSyncDataProvider @Inject constructor(
         }
 
         // we store the current folder children state into the metadata table
-        if (updates.isEmpty()){
+        if (updates.isEmpty()) {
             Timber.d("Sync-Bookmarks-Metadata: no local changes, nothing to store")
         } else {
             syncSavedSitesRepository.addFolderChildrenMetadata(updates)

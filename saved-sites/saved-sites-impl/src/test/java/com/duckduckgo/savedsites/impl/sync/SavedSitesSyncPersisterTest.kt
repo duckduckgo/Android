@@ -53,6 +53,7 @@ class SavedSitesSyncPersisterTest {
     private val persisterAlgorithm: SavedSitesSyncPersisterAlgorithm = mock()
     private val savedSitesFormFactorSyncMigration: SavedSitesFormFactorSyncMigration = mock()
     private val savedSitesSyncFeatureListener: SavedSitesSyncFeatureListener = mock()
+    private val syncSavedSitesRepository: SyncSavedSitesRepository = mock()
 
     private lateinit var syncPersister: SavedSitesSyncPersister
 
@@ -61,6 +62,7 @@ class SavedSitesSyncPersisterTest {
         syncPersister = SavedSitesSyncPersister(
             repository,
             store,
+            syncSavedSitesRepository,
             persisterAlgorithm,
             savedSitesFormFactorSyncMigration,
             savedSitesSyncFeatureListener,
