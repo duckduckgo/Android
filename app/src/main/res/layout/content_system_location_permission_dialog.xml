@@ -27,18 +27,6 @@
             android:gravity="center"
             android:orientation="vertical">
 
-        <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/faviconImage"
-                android:layout_width="@dimen/dialogImageSize"
-                android:layout_height="@dimen/dialogImageSize"
-                android:layout_gravity="center"
-                android:importantForAccessibility="no"
-                android:layout_marginBottom="@dimen/keyline_4"
-                app:srcCompat="@drawable/ic_dax_icon"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"/>
-
         <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/systemPermissionDialogTitle"
                 app:typography="h2"

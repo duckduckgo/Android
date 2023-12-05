@@ -86,6 +86,7 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.FindInPageViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.HighlightableButton
 import com.duckduckgo.app.browser.BrowserTabViewModel.LoadingViewState
+import com.duckduckgo.app.browser.BrowserTabViewModel.LocationPermission
 import com.duckduckgo.app.browser.BrowserTabViewModel.NavigationCommand
 import com.duckduckgo.app.browser.BrowserTabViewModel.OmnibarViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.PrivacyShieldViewState
@@ -1238,7 +1239,7 @@ class BrowserTabFragment :
             is Command.ShowWebContent -> webView?.show()
             is Command.CheckSystemLocationPermission -> checkSystemLocationPermission(it.domain, it.deniedForever)
             is Command.RequestSystemLocationPermission -> requestLocationPermissions()
-            is Command.AskDomainPermission -> askSiteLocationPermission(it.domain)
+            is Command.AskDomainPermission -> askSiteLocationPermission(it.locationPermission)
             is Command.RefreshUserAgent -> refreshUserAgent(it.url, it.isDesktop)
             is Command.AskToFireproofWebsite -> askToFireproofWebsite(requireContext(), it.fireproofWebsite)
             is Command.AskToAutomateFireproofWebsite -> askToAutomateFireproofWebsite(requireContext(), it.fireproofWebsite)
@@ -1418,7 +1419,7 @@ class BrowserTabFragment :
         )
     }
 
-    private fun askSiteLocationPermission(domain: String) {
+    private fun askSiteLocationPermission(locationPermission: LocationPermission) {
         if (!isActiveTab) {
             Timber.v("Will not launch a dialog for an inactive tab")
             return
@@ -1426,6 +1427,7 @@ class BrowserTabFragment :
 
         val binding = ContentSiteLocationPermissionDialogBinding.inflate(layoutInflater)
 
+        val domain = locationPermission.origin
         val title = domain.websiteFromGeoLocationsApiOrigin()
         binding.sitePermissionDialogTitle.text = getString(R.string.preciseLocationSiteDialogTitle, title)
         binding.sitePermissionDialogSubtitle.text = if (title == DDG_DOMAIN) {
@@ -1433,12 +1435,13 @@ class BrowserTabFragment :
         } else {
             getString(R.string.preciseLocationSiteDialogSubtitle)
         }
-        lifecycleScope.launch {
-            faviconManager.loadToViewFromLocalWithPlaceholder(tabId, domain, binding.sitePermissionDialogFavicon)
-        }
 
         val dialog = MaterialAlertDialogBuilder(requireActivity())
             .setView(binding.root)
+            .setOnCancelListener {
+                // Called when user clicks outside the dialog - deny to be safe
+                locationPermission.callback.invoke(locationPermission.origin, false, false)
+            }
             .create()
 
         binding.siteAllowAlwaysLocationPermission.setOnClickListener {
