@@ -109,4 +109,18 @@ interface SyncSavedSitesRepository {
         folderId: String,
         children: List<String>
     )
+
+    /**
+     * Moves children in request column to children.
+     * This operation confirms that the BE and Client have the same children for a folder
+     * All request columns will be affected
+     */
+    fun confirmAllFolderChildrenMetadata()
+
+    /**
+     * Moves children in request column to children.
+     * This operation confirms that the BE and Client have the same children for a folder
+     * @param folders list of folders to be updated
+     */
+    fun confirmFolderChildrenMetadata(folders: List<String>)
 }

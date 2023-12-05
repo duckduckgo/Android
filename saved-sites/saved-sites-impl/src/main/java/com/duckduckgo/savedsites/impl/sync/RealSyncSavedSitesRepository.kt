@@ -196,4 +196,13 @@ class RealSyncSavedSitesRepository(
         val childrenJSON = stringListAdapter.toJson(children)
         savedSitesSyncMetadataDao.updateChildren(folderId, childrenJSON)
     }
+
+    override fun confirmAllFolderChildrenMetadata(){
+        savedSitesSyncMetadataDao.confirmChildren()
+
+    }
+
+    override fun confirmFolderChildrenMetadata(folders: List<String>) {
+        savedSitesSyncMetadataDao.confirmChildren(folders)
+    }
 }
