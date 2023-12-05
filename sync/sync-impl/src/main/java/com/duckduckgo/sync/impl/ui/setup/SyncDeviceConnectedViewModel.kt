@@ -21,29 +21,19 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.ui.setup.SyncDeviceConnectedViewModel.Command.FinishSetupFlow
 import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 @ContributesViewModel(ActivityScope::class)
 class SyncDeviceConnectedViewModel @Inject constructor(
-    private val syncAccountRepository: SyncAccountRepository,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
     private val command = Channel<Command>(1, DROP_OLDEST)
-    private val viewState = MutableStateFlow<ViewState?>(null)
-
-    fun viewState(): Flow<ViewState> = viewState.filterNotNull().onStart {
-        signedInStateOrError()
-    }
 
     fun commands(): Flow<Command> = command.receiveAsFlow()
     data class ViewState(val deviceName: String)
@@ -53,14 +43,8 @@ class SyncDeviceConnectedViewModel @Inject constructor(
         object Error : Command()
     }
 
-    private suspend fun signedInStateOrError() {
-        syncAccountRepository.getThisConnectedDevice()?.let {
-            viewState.emit(ViewState(deviceName = it.deviceName))
-        } ?: command.send(Command.Error)
-    }
-
-    fun onNextClicked() {
-        viewModelScope.launch {
+    fun onDoneClicked() {
+        viewModelScope.launch(dispatchers.main()) {
             command.send(FinishSetupFlow)
         }
     }

@@ -26,7 +26,6 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.Settings
 import android.util.AttributeSet
-import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
 import androidx.core.app.ActivityCompat
@@ -35,6 +34,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ViewSquareDecoratedBarcodeBinding
@@ -56,9 +56,13 @@ import kotlinx.coroutines.flow.onEach
  * Encapsulates DecoratedBarcodeView forcing a 1:1 aspect ratio, and adds custom frame to the scanner
  */
 @InjectWith(ViewScope::class)
-class SquareDecoratedBarcodeView
+class SyncBarcodeView
 @JvmOverloads
-constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) :
+constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0,
+) :
     FrameLayout(context, attrs, defStyleAttr) {
 
     @Inject
@@ -74,7 +78,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         ContextCompat.getDrawable(context, R.drawable.camera_permission)
     }
 
-    private val binding = ViewSquareDecoratedBarcodeBinding.inflate(LayoutInflater.from(context), this)
+    private val binding: ViewSquareDecoratedBarcodeBinding by viewBinding()
 
     private val viewModel: SquareDecoratedBarcodeViewModel by lazy {
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[SquareDecoratedBarcodeViewModel::class.java]
@@ -102,18 +106,21 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         }
     }
 
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val size = listOf(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.getSize(heightMeasureSpec)).filter { it > 0 }.min()
-        val squareMeasureSpec = MeasureSpec.makeMeasureSpec(size, MeasureSpec.EXACTLY)
-        super.onMeasure(squareMeasureSpec, squareMeasureSpec)
-    }
-
     fun resume() {
         binding.barcodeView.resume()
     }
 
     fun pause() {
         binding.barcodeView.pause()
+    }
+
+    fun onCtaClicked(onClick: () -> Unit) {
+        binding.barcodeCta.setOnClickListener {
+            onClick.invoke()
+        }
+        binding.cameraPermissionsBarcodeCta.setOnClickListener {
+            onClick.invoke()
+        }
     }
 
     fun decodeSingle(onQrCodeRead: (String) -> Unit) {
@@ -144,6 +151,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         val cameraAvailable = context.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
         viewModel.handleCameraAvailability(cameraAvailable)
     }
+
     private fun checkPermissions() {
         val enabled = ActivityCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
         viewModel.handlePermissions(enabled == PackageManager.PERMISSION_GRANTED)
@@ -165,12 +173,11 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     private fun showUnknownStatus() {
         pause()
         binding.cameraStatusContainer.visibility = View.GONE
-        binding.frame.visibility = View.GONE
     }
+
     private fun showPermissionsGranted() {
         resume()
         binding.cameraStatusContainer.visibility = View.GONE
-        binding.frame.visibility = View.VISIBLE
     }
 
     private fun showCameraUnavailable() {

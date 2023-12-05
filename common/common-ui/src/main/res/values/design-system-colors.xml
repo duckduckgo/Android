@@ -101,6 +101,8 @@
     <color name="alertRedOnDarkPressed">#D1454A</color>
     <color name="alertRedOnLightTextPressed">@color/alertRedOnLightPressed</color>
     <color name="alertRedOnDarkTextPressed">#FF7378</color>
+    <color name="daxColorBlurLight">#7A626262</color>
+    <color name="daxColorBlurDark">#B3111111</color>
 
     <!-- Design System Raw Colors -->
     <color name="red20">#F2A18A</color>

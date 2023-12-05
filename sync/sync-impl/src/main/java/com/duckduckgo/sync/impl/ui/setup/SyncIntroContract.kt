@@ -20,14 +20,14 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
-import com.duckduckgo.sync.impl.ui.ShowQRCodeActivity
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen
 
-internal class ConnectViaQRCodeContract : ActivityResultContract<Void?, Boolean>() {
+class SyncIntroContract : ActivityResultContract<Screen, Boolean>() {
     override fun createIntent(
         context: Context,
-        input: Void?,
+        screen: Screen,
     ): Intent {
-        return ShowQRCodeActivity.intent(context)
+        return SetupAccountActivity.intent(context, screen)
     }
 
     override fun parseResult(

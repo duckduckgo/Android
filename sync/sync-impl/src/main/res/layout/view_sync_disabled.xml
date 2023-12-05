@@ -22,6 +22,20 @@
     android:paddingBottom="@dimen/keyline_4"
     android:orientation="vertical">
 
+    <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/sync_setup_begin_syncing"/>
+
+    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+        android:id="@+id/sync_setup_with_another_device"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:leadingIconBackground="circular"
+        app:leadingIcon="@drawable/ic_sync_device_all_24"
+        app:primaryText="@string/sync_setup_with_another_device_cta_title"
+        app:secondaryText="@string/sync_setup_with_another_device_cta_subtitle"/>
+
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -29,29 +43,6 @@
         app:typography="body2"
         android:padding="@dimen/keyline_4"
         android:text="@string/sync_off_hint"/>
-
-    <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/sync_setup_quick_connect_title"/>
-
-    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-        android:id="@+id/sync_setup_scan_qr"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:leadingIconBackground="circular"
-        app:leadingIcon="@drawable/ic_sync_device_all_24"
-        app:primaryText="@string/sync_setup_quick_primary_cta_title"
-        app:secondaryText="@string/sync_setup_quick_primary_cta_subtitle"/>
-
-    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-        android:id="@+id/sync_setup_enter_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:leadingIconBackground="circular"
-        app:leadingIcon="@drawable/ic_keyboard_24"
-        app:primaryText="@string/sync_setup_quick_secondary_cta_title"
-        app:secondaryText="@string/sync_setup_quick_secondary_cta_subtitle"/>
 
     <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:layout_width="match_parent"
@@ -62,34 +53,16 @@
         android:layout_height="wrap_content"
         app:primaryText="@string/sync_setup_single_device_title"/>
 
-    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-        android:id="@+id/sync_setup_initialize_sync"
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        android:id="@+id/sync_setup_sync_this_device"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:leadingIconBackground="circular"
-        app:leadingIcon="@drawable/ic_start_stop_24"
-        app:primaryText="@string/sync_setup_single_device_primary_cta_title"
-        app:secondaryText="@string/sync_setup_single_device_primary_cta_subtitle"/>
+        app:primaryText="@string/sync_setup_single_sync_this_device_cta_title" />
 
-    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/sync_setup_recover_data"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:leadingIconBackground="circular"
-        app:leadingIcon="@drawable/ic_document_replace_24"
-        app:primaryText="@string/sync_setup_single_device_secondary_cta_title"
-        app:secondaryText="@string/sync_setup_single_device_secondary_cta_subtitle"/>
-
-    <com.duckduckgo.common.ui.view.text.DaxTextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="@dimen/keyline_4"
-        app:textType="secondary"
-        app:typography="body2"
-        android:text="@string/sync_off_encrypted_hint"/>
+        app:primaryText="@string/sync_setup_single_recover_data_cta_title" />
 
 </LinearLayout>

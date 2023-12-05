@@ -26,7 +26,6 @@ import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command.FinishSetupFlow
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.ViewMode.CreatingAccount
-import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.ViewMode.SignedIn
 import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -66,20 +65,18 @@ class SyncCreateAccountViewModel @Inject constructor(
 
     private fun createAccount() = viewModelScope.launch(dispatchers.io()) {
         viewState.emit(ViewState(CreatingAccount))
-        when (syncAccountRepository.createAccount()) {
-            is Error -> {
-                command.send(Command.Error)
-            }
-
-            is Success -> {
-                viewState.emit(ViewState(SignedIn))
-            }
-        }
-    }
-
-    fun onNextClicked() {
-        viewModelScope.launch {
+        if (syncAccountRepository.isSignedIn()) {
             command.send(FinishSetupFlow)
+        } else {
+            when (syncAccountRepository.createAccount()) {
+                is Error -> {
+                    command.send(Command.Error)
+                }
+
+                is Success -> {
+                    command.send(FinishSetupFlow)
+                }
+            }
         }
     }
 }

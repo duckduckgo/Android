@@ -74,6 +74,7 @@ class EnterCodeActivity : DuckDuckGoActivity() {
         binding.enterCodeHint.isVisible = viewState.code.isEmpty()
         binding.pastedCode.isVisible = viewState.code.isNotEmpty()
         binding.pastedCode.text = viewState.code
+
         when (viewState.authState) {
             AuthState.Error -> {
                 binding.loadingIndicatorContainer.hide()

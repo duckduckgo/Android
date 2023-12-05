@@ -15,51 +15,118 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content" xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/daxColorSurface"
+        android:orientation="vertical">
 
     <include
         android:id="@+id/includeToolbar"
         layout="@layout/include_default_toolbar"/>
 
-    <ImageView
-        android:id="@+id/qrCodeImageView"
-        android:layout_width="@dimen/qrSizeLarge"
-        android:layout_height="@dimen/qrSizeLarge"
-        android:layout_gravity="center"
-        android:visibility="gone"
-        tools:ignore="ContentDescription"/>
-
-    <com.duckduckgo.sync.impl.ui.qrcode.SquareDecoratedBarcodeView
-        android:id="@+id/qrCodeReader"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"/>
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/connect_hint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/keyline_4"
+            android:text="@string/connect_screen_scan_qr_hint"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeView
+            android:id="@+id/qrCodeReader"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/qrBarcodeSize"
+            android:layout_marginTop="@dimen/keyline_4"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/connect_hint" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:background="?attr/daxColorBackground">
+
+        <ImageView
+            android:id="@+id/qrCodeImageView"
+            android:layout_width="@dimen/qrSizeMedium"
+            android:layout_height="@dimen/qrSizeMedium"
+            android:layout_gravity="center"
+            android:layout_marginStart="@dimen/keyline_5"
+            android:layout_marginTop="@dimen/keyline_5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="ContentDescription" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/qrCodeHintTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:layout_marginTop="@dimen/keyline_4"
+            android:layout_marginEnd="@dimen/keyline_4"
+            app:typography="h5"
+            android:text="@string/connect_screen_connect_qr_hint_title"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/qrCodeImageView"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/qrCodeHintContent"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:layout_marginEnd="@dimen/keyline_4"
+            android:text="@string/connect_screen_connect_qr_hint_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/qrCodeImageView"
+            app:layout_constraintTop_toBottomOf="@+id/qrCodeHintTitle"
+            app:typography="caption"
+            app:textType="secondary"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </LinearLayout>
+
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/copyCodeButton"/>
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
-        android:layout_width="match_parent"
+        android:id="@+id/copyCodeButton"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/keyline_4"
-        android:text="@string/sync_connect_scan_qr_hint"/>
+        android:drawableEnd="@drawable/ic_arrow_circle_right_12"
+        android:drawablePadding="@dimen/keyline_2"
+        android:layout_marginBottom="@dimen/keyline_4"
+        app:textType="secondary"
+        android:textAlignment="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="@string/login_screen_cant_scan"/>
 
-    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-        android:id="@+id/readTextCode"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="Manually Enter Code"
-        app:leadingIcon="@drawable/ic_keyboard_24"
-        app:leadingIconBackground="circular"/>
-
-    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-        android:id="@+id/showQRCode"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="Show QR Code"
-        app:leadingIcon="@drawable/ic_qr_24"
-        android:visibility="gone"
-        app:leadingIconBackground="circular"/>
-
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

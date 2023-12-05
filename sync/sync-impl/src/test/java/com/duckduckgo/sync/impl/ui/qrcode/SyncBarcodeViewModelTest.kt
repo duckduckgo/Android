@@ -38,7 +38,7 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @ExperimentalCoroutinesApi
-class SquareDecoratedBarcodeViewModelTest {
+class SyncBarcodeViewModelTest {
 
     @ExperimentalCoroutinesApi
     @get:Rule

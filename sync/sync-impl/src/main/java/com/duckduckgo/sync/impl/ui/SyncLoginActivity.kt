@@ -54,8 +54,6 @@ class SyncLoginActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
 
-        binding.qrCodeReader.decodeSingle { result -> viewModel.onQRCodeScanned(result) }
-
         observeUiEvents()
         configureListeners()
     }
@@ -95,8 +93,11 @@ class SyncLoginActivity : DuckDuckGoActivity() {
     }
 
     private fun configureListeners() {
-        binding.readTextCode.setOnClickListener {
-            viewModel.onReadTextCodeClicked()
+        binding.qrCodeReader.apply {
+            decodeSingle { result -> viewModel.onQRCodeScanned(result) }
+            onCtaClicked {
+                viewModel.onReadTextCodeClicked()
+            }
         }
     }
 

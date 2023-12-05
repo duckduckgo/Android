@@ -56,7 +56,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:src="@drawable/ic_sync_start_128"
+                android:src="@drawable/ic_sync_connecting_128"
                 android:layout_gravity="center_horizontal"
                 tools:ignore="ContentDescription"/>
 
@@ -84,20 +84,38 @@
         </LinearLayout>
     </ScrollView>
 
-    <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
-        android:id="@+id/footer_button"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/keyline_5"
+        android:layout_marginStart="@dimen/keyline_4"
         android:layout_marginEnd="@dimen/keyline_5"
         android:layout_marginBottom="@dimen/keyline_4"
-        android:text="@string/sync_enable_sync_next_button"
-        app:buttonSize="large"
-        android:enabled="false"
+        android:gravity="center"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent">
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/loadingIndicator"
+            style="@style/Widget.App.CircularProgressIndicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            app:indicatorSize="16dp"
+            app:trackThickness="1dp" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/connecting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_marginStart="@dimen/keyline_2"
+            android:text="@string/sync_enable_connecting"
+            app:textType="secondary"
+            app:typography="caption" />
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

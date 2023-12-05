@@ -39,8 +39,9 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskEditDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskRemoveDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CreateAccount
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroCreateAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowRecoveryCode
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.LoadingItem
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.SyncedDevice
 import java.io.File
@@ -105,7 +106,6 @@ class SyncActivityViewModel @Inject constructor(
         }
 
         return ViewState(
-            syncToggleState = syncAccountRepository.isSignedIn(),
             showAccount = syncAccountRepository.isSignedIn(),
             loginQRCode = qrBitmap,
             syncedDevices = syncedDevices,
@@ -125,19 +125,18 @@ class SyncActivityViewModel @Inject constructor(
     }
 
     data class ViewState(
-        val syncToggleState: Boolean = false,
         val showAccount: Boolean = false,
         val loginQRCode: Bitmap? = null,
         val syncedDevices: List<SyncDeviceListItem> = emptyList(),
     )
 
     sealed class Command {
-        object ScanQRCode : Command()
-        object EnterTextCode : Command()
-        object CreateAccount : Command()
-        object RecoverSyncData : Command()
+        object SyncWithAnotherDevice : Command()
+        object AddAnotherDevice : Command()
+        object IntroCreateAccount : Command()
+        object IntroRecoverSyncData : Command()
         object ShowTextCode : Command()
-        object DeviceConnected : Command()
+        object ShowRecoveryCode : Command()
         data class AskTurnOffSync(val device: ConnectedDevice) : Command()
         object AskDeleteAccount : Command()
         object CheckIfUserHasStoragePermission : Command()
@@ -146,34 +145,33 @@ class SyncActivityViewModel @Inject constructor(
         data class AskEditDevice(val device: ConnectedDevice) : Command()
     }
 
-    fun onScanQRCodeClicked() {
+    fun onSyncWithAnotherDevice() {
         viewModelScope.launch {
-            command.send(Command.ScanQRCode)
+            command.send(Command.SyncWithAnotherDevice)
         }
     }
 
-    fun onEnterTextCodeClicked() {
+    fun onAddAnotherDevice() {
         viewModelScope.launch {
-            command.send(Command.EnterTextCode)
+            command.send(Command.AddAnotherDevice)
         }
     }
 
-    fun onInitializeSync() {
+    fun onSyncThisDevice() {
         viewModelScope.launch {
-            viewState.value = viewState.value.toggle(true)
-            command.send(CreateAccount)
+            command.send(IntroCreateAccount)
         }
     }
 
     fun onRecoverYourSyncedData() {
         viewModelScope.launch {
-            command.send(Command.RecoverSyncData)
+            command.send(Command.IntroRecoverSyncData)
         }
     }
 
     fun onLoginSuccess() {
         viewModelScope.launch {
-            command.send(Command.DeviceConnected)
+            command.send(Command.ShowRecoveryCode)
         }
     }
 
@@ -182,8 +180,6 @@ class SyncActivityViewModel @Inject constructor(
             syncAccountRepository.getThisConnectedDevice()?.let {
                 command.send(AskTurnOffSync(it))
             } ?: showAccountDetailsIfNeeded()
-
-            viewState.value = viewState.value.toggle(false)
         }
     }
 
@@ -211,7 +207,7 @@ class SyncActivityViewModel @Inject constructor(
             viewState.value = viewState.value.hideAccount()
             when (syncAccountRepository.logout(connectedDevice.deviceId)) {
                 is Error -> {
-                    viewState.value = viewState.value.toggle(true).showAccount()
+                    viewState.value = viewState.value.showAccount()
                 }
 
                 is Success -> {
@@ -231,7 +227,6 @@ class SyncActivityViewModel @Inject constructor(
 
     fun onDeleteAccountClicked() {
         viewModelScope.launch {
-            viewState.value = viewState.value.toggle(false)
             command.send(AskDeleteAccount)
         }
     }
@@ -241,7 +236,7 @@ class SyncActivityViewModel @Inject constructor(
             viewState.value = viewState.value.hideAccount()
             when (syncAccountRepository.deleteAccount()) {
                 is Error -> {
-                    viewState.value = viewState.value.toggle(true).showAccount()
+                    viewState.value = viewState.value.showAccount()
                 }
 
                 is Success -> {
@@ -318,7 +313,7 @@ class SyncActivityViewModel @Inject constructor(
     private fun showAccountDetailsIfNeeded() {
         viewModelScope.launch(dispatchers.io()) {
             if (syncAccountRepository.isSignedIn()) {
-                viewState.value = viewState.value.toggle(true).showAccount()
+                viewState.value = viewState.value.showAccount()
             } else {
                 viewState.value = signedOutState()
             }
@@ -326,8 +321,6 @@ class SyncActivityViewModel @Inject constructor(
     }
 
     private fun signedOutState(): ViewState = ViewState()
-    private fun ViewState.isSignedInState() = this.loginQRCode != null && this.showAccount
-    private fun ViewState.toggle(isChecked: Boolean) = copy(syncToggleState = isChecked)
     private fun ViewState.setDevices(devices: List<SyncDeviceListItem>) = copy(syncedDevices = devices)
     private fun ViewState.hideDeviceListItemLoading() = copy(syncedDevices = syncedDevices.filterNot { it is LoadingItem })
     private fun ViewState.showDeviceListItemLoading() = copy(syncedDevices = syncedDevices + LoadingItem)
