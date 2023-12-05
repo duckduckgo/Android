@@ -148,7 +148,6 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
                 processIds.add(child)
                 processChild(conflictResolution, child, processIds, remoteUpdates, folderId, lastModified)
             }
-
         }
     }
 
@@ -168,7 +167,7 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
                 TIMESTAMP -> timestampStrategy.processBookmarkFolder(folder)
             }
         }
-        val children = if (remoteFolder.folder == null){
+        val children = if (remoteFolder.folder == null) {
             emptyList()
         } else {
             remoteFolder.folder.children

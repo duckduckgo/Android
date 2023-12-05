@@ -107,7 +107,7 @@ interface SyncSavedSitesRepository {
      */
     fun insertFolderChildren(
         folderId: String,
-        children: List<String>
+        children: List<String>,
     )
 
     /**
@@ -123,4 +123,10 @@ interface SyncSavedSitesRepository {
      * @param folders list of folders to be updated
      */
     fun confirmFolderChildrenMetadata(folders: List<String>)
+
+    /**
+     * Stores the client children state for each folder before sending it to the Sync BE
+     * @param folders list of folders to be stored
+     */
+    fun addFolderChildrenMetadata(folders: List<SyncBookmarkEntry>)
 }
