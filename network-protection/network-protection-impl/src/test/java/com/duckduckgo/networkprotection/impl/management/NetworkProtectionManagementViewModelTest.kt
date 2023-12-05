@@ -33,7 +33,6 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.UNK
 import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
 import com.duckduckgo.mobile.android.vpn.ui.OpenVpnBreakageCategoryWithBrokenApp
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
-import com.duckduckgo.networkprotection.impl.alerts.reconnect.NetPReconnectNotifications
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.None
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowAlwaysOnLockdownEnabled
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowReconnecting
@@ -87,9 +86,6 @@ class NetworkProtectionManagementViewModelTest {
     private lateinit var networkProtectionRepository: NetworkProtectionRepository
 
     @Mock
-    private lateinit var reconnectNotifications: NetPReconnectNotifications
-
-    @Mock
     private lateinit var externalVpnDetector: ExternalVpnDetector
 
     @Mock
@@ -113,7 +109,6 @@ class NetworkProtectionManagementViewModelTest {
             vpnFeaturesRegistry,
             networkProtectionRepository,
             coroutineRule.testDispatcherProvider,
-            reconnectNotifications,
             externalVpnDetector,
             networkProtectionPixels,
             testbreakageCategories,
@@ -325,7 +320,6 @@ class NetworkProtectionManagementViewModelTest {
             vpnFeaturesRegistry,
             networkProtectionRepository,
             coroutineRule.testDispatcherProvider,
-            reconnectNotifications,
             externalVpnDetector,
             networkProtectionPixels,
             testbreakageCategories,
@@ -361,7 +355,6 @@ class NetworkProtectionManagementViewModelTest {
             vpnFeaturesRegistry,
             networkProtectionRepository,
             coroutineRule.testDispatcherProvider,
-            reconnectNotifications,
             externalVpnDetector,
             networkProtectionPixels,
             testbreakageCategories,
@@ -397,7 +390,6 @@ class NetworkProtectionManagementViewModelTest {
             vpnFeaturesRegistry,
             networkProtectionRepository,
             coroutineRule.testDispatcherProvider,
-            reconnectNotifications,
             externalVpnDetector,
             networkProtectionPixels,
             testbreakageCategories,
@@ -428,16 +420,8 @@ class NetworkProtectionManagementViewModelTest {
     fun whenOnStartVpnThenResetValuesInRepository() {
         testee.onStartVpn()
 
-        verify(reconnectNotifications).clearNotifications()
         verify(networkProtectionRepository).reconnectStatus = NotReconnecting
         verify(networkProtectionRepository).enabledTimeInMillis = -1L
-    }
-
-    @Test
-    fun whenOnNetpToggleClickedToDisabledThenResetReconnectState() {
-        testee.onNetpToggleClicked(false)
-
-        verify(reconnectNotifications).clearNotifications()
     }
 
     @Test

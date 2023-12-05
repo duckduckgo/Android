@@ -115,24 +115,6 @@ class RealNetworkProtectionPixelTest {
     }
 
     @Test
-    fun whenReportVpnConnectivityLossCalledTwiceThenFireCountPixelTwiceAndDailyPixelOnce() {
-        testee.reportVpnConnectivityLoss()
-        testee.reportVpnConnectivityLoss()
-
-        verify(pixel).enqueueFire("m_netp_ev_vpn_connectivity_lost_d", mapOf("ts" to "2000-01-01"))
-        verify(pixel, times(2)).enqueueFire("m_netp_ev_vpn_connectivity_lost_c", mapOf("ts" to "2000-01-01"))
-    }
-
-    @Test
-    fun whenReportVpnReconnectFailedCalledTwiceThenFireCountPixelTwiceAndDailyPixelOnce() {
-        testee.reportVpnReconnectFailed()
-        testee.reportVpnReconnectFailed()
-
-        verify(pixel).enqueueFire("m_netp_ev_vpn_reconnect_failed_d", mapOf("ts" to "2000-01-01"))
-        verify(pixel, times(2)).enqueueFire("m_netp_ev_vpn_reconnect_failed_c", mapOf("ts" to "2000-01-01"))
-    }
-
-    @Test
     fun whenReportWireguardLibraryLoadFailedCalledTwiceThenFireCountPixelTwiceAndDailyPixelOnce() {
         testee.reportWireguardLibraryLoadFailed()
         testee.reportWireguardLibraryLoadFailed()
