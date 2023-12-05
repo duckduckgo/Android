@@ -41,6 +41,7 @@ import timber.log.Timber
 class SavedSitesSyncPersister @Inject constructor(
     private val savedSitesRepository: SavedSitesRepository,
     private val savedSitesSyncStore: SavedSitesSyncStore,
+    private val savedSitesSyncRepository: SyncSavedSitesRepository,
     private val algorithm: SavedSitesSyncPersisterAlgorithm,
     private val savedSitesFormFactorSyncMigration: SavedSitesFormFactorSyncMigration,
     private val savedSitesSyncState: SavedSitesSyncFeatureListener,
@@ -81,12 +82,18 @@ class SavedSitesSyncPersister @Inject constructor(
     ): SyncMergeResult {
         val result = when (val validation = validateChanges(changes)) {
             is SyncDataValidationResult.Error -> SyncMergeResult.Error(reason = validation.reason)
-            is SyncDataValidationResult.Success -> processEntries(validation.data, conflictResolution)
-            else -> Success(false)
+            is SyncDataValidationResult.Success -> {
+                processEntries(validation.data, conflictResolution)
+            }
+            else -> {
+                updateSavedSitesMetadataWhenNoRemoteChanges()
+                Success(false)
+            }
         }
 
         if (result is Success) {
             pruneDeletedObjects()
+            updateSavedSitesMetadataWhenNoRemoteChanges()
         }
 
         return result
@@ -124,6 +131,9 @@ class SavedSitesSyncPersister @Inject constructor(
             algorithm.processEntries(bookmarks, conflictResolution, savedSitesSyncStore.clientModifiedSince)
         }
 
+        // we need to update the metadata of the entities
+        updateSavedSitesMetadataWhenRemoteChanges(bookmarks.entries)
+
         // it's possible that there were entities present in the device before the first sync
         // we need to make sure that those entities are sent to the BE after all new data has been stored
         // we do that by updating the modifiedSince date to a newer date that the last sync
@@ -140,6 +150,24 @@ class SavedSitesSyncPersister @Inject constructor(
 
     private fun pruneDeletedObjects() {
         savedSitesRepository.pruneDeleted()
+    }
+
+    private fun updateSavedSitesMetadataWhenNoRemoteChanges() {
+        // for all items in the metadata table
+        // copy request columns to children
+        // delete request column values
+        savedSitesSyncRepository.confirmAllFolderChildrenMetadata()
+    }
+
+    private fun updateSavedSitesMetadataWhenRemoteChanges(entites: List<SyncBookmarkEntry>) {
+        // for all items in the payload
+        // add children to children column
+        // delete request column values
+
+        // for all items in the metadata table and not in the payload
+        // copy request columns to children
+        // delete request column values
+        savedSitesSyncRepository.confirmFolderChildrenMetadata(entites.map { it.id })
     }
 
     private class Adapters {

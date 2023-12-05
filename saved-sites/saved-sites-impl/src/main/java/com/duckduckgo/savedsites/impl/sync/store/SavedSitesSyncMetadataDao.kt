@@ -23,8 +23,6 @@ import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Transaction
-import androidx.room.Update
-import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 
 @Dao
 interface SavedSitesSyncMetadataDao {
@@ -47,6 +45,22 @@ interface SavedSitesSyncMetadataDao {
         folderId: String,
         children: String
     )
+
+    @Query("update saved_sites_sync_meta set `children` = request")
+    fun confirmChildren()
+
+    @Query("update saved_sites_sync_meta set `children` = request where `folderId` = :folderId")
+    fun confirmChildren(folderId: String)
+
+    @Transaction
+    fun confirmChildren(folders: List<String>) {
+        folders.forEach {
+            confirmChildren(it)
+        }
+    }
+
+    @Query("update saved_sites_sync_meta set `request` = null")
+    fun removeAllRequests()
 
     @Query("Delete from saved_sites_sync_meta")
     fun removeAll()
