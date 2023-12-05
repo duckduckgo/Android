@@ -55,7 +55,7 @@ class SavedSitesSyncDataProvider @Inject constructor(
         if (updates.isEmpty()) {
             Timber.d("Sync-Bookmarks-Metadata: no local changes, nothing to store")
         } else {
-            syncSavedSitesRepository.addFolderChildrenMetadata(updates)
+            syncSavedSitesRepository.addRequestMetadata(updates)
         }
 
         Timber.d("Sync-Bookmarks: modifiedSince changes: $updates")

@@ -118,15 +118,14 @@ interface SyncSavedSitesRepository {
     fun confirmAllFolderChildrenMetadata()
 
     /**
-     * Moves children in request column to children.
-     * This operation confirms that the BE and Client have the same children for a folder
-     * @param folders list of folders to be updated
-     */
-    fun confirmFolderChildrenMetadata(folders: List<String>)
-
-    /**
      * Stores the client children state for each folder before sending it to the Sync BE
      * @param folders list of folders to be stored
      */
-    fun addFolderChildrenMetadata(folders: List<SyncBookmarkEntry>)
+    fun addRequestMetadata(folders: List<SyncBookmarkEntry>)
+
+    /**
+     * Stores the BE children state for each folder after receiving it
+     * @param folders list of folders to be stored
+     */
+    fun addResponseMetadata(folders: List<SyncBookmarkEntry>)
 }

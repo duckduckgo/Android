@@ -200,15 +200,19 @@ class RealSyncSavedSitesRepository(
         savedSitesSyncMetadataDao.confirmAllChildren()
     }
 
-    override fun confirmFolderChildrenMetadata(folders: List<String>) {
-        savedSitesSyncMetadataDao.confirmChildren(folders)
-    }
-
-    override fun addFolderChildrenMetadata(folders: List<SyncBookmarkEntry>) {
+    override fun addRequestMetadata(folders: List<SyncBookmarkEntry>) {
         val children = folders.filter { it.folder != null }.map {
             SavedSitesSyncMetadataEntity(it.id, null, stringListAdapter.toJson(it.folder?.children))
         }
-        Timber.d("Sync-Bookmarks-Metadata: adding children metadata for folders: $children")
+        Timber.d("Sync-Bookmarks-Metadata: adding children request metadata for folders: $children")
         savedSitesSyncMetadataDao.addOrUpdate(children)
+    }
+
+    override fun addResponseMetadata(folders: List<SyncBookmarkEntry>) {
+        val children = folders.filter { it.folder != null }.map {
+            SavedSitesSyncMetadataEntity(it.id, stringListAdapter.toJson(it.folder?.children), null)
+        }
+        Timber.d("Sync-Bookmarks-Metadata: adding children response metadata for folders: $children")
+        savedSitesSyncMetadataDao.confirmChildren(children)
     }
 }

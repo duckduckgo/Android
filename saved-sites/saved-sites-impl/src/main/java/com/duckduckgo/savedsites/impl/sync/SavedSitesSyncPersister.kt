@@ -174,7 +174,7 @@ class SavedSitesSyncPersister @Inject constructor(
         } else {
             val entitiesIds = entites.map { it.id }
             Timber.d("Sync-Bookmarks-Metadata: set metadata for $entitiesIds and confirm for all other local folders")
-            savedSitesSyncRepository.confirmFolderChildrenMetadata(entitiesIds)
+            savedSitesSyncRepository.addResponseMetadata(entites)
         }
     }
 
