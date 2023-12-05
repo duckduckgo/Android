@@ -29,5 +29,6 @@ interface PrivacyProtectionsPopupManager {
     fun onPageLoaded(
         url: String,
         httpErrorCodes: List<Int>,
+        hasBrowserError: Boolean,
     )
 }

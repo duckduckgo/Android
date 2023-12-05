@@ -75,6 +75,7 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
             refreshTriggeredAt = null,
             domain = null,
             hasHttpErrorCodes = false,
+            hasBrowserError = false,
             popupDismissed = null,
             toggleUsed = null,
         ),
@@ -122,6 +123,7 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
     override fun onPageLoaded(
         url: String,
         httpErrorCodes: List<Int>,
+        hasBrowserError: Boolean,
     ) {
         state.update { oldState ->
             val newDomain = url.extractDomain().takeUnless { it.isNullOrBlank() }
@@ -132,10 +134,14 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
                     protectionsEnabled = null,
                     domain = newDomain,
                     hasHttpErrorCodes = httpErrorCodes.isNotEmpty(),
+                    hasBrowserError = hasBrowserError,
                     popupDismissed = null,
                 )
             } else {
-                oldState.copy(hasHttpErrorCodes = httpErrorCodes.isNotEmpty())
+                oldState.copy(
+                    hasHttpErrorCodes = httpErrorCodes.isNotEmpty(),
+                    hasBrowserError = hasBrowserError,
+                )
             }
         }
     }
@@ -208,6 +214,7 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
         val refreshTriggeredAt: Instant?,
         val domain: String?,
         val hasHttpErrorCodes: Boolean,
+        val hasBrowserError: Boolean,
         val popupDismissed: PopupDismissed?,
         val toggleUsed: ToggleUsed?,
     )
@@ -251,6 +258,7 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
             domain != null &&
             isDuckDuckGoDomain == false &&
             !hasHttpErrorCodes &&
+            !hasBrowserError &&
             popupDismissed == false &&
             toggleUsed == false
 
