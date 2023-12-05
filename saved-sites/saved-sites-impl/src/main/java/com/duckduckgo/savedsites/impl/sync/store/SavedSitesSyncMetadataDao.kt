@@ -59,10 +59,8 @@ interface SavedSitesSyncMetadataDao {
     fun confirmChildren(folderId: String)
 
     @Transaction
-    fun confirmChildren(folders: List<String>) {
-        folders.forEach {
-            confirmChildren(it)
-        }
+    fun confirmChildren(folders: List<SavedSitesSyncMetadataEntity>) {
+        addOrUpdate(folders)
         confirmChildren()
         removeAllRequests()
     }
