@@ -85,6 +85,7 @@ class SavedSitesSyncPersister @Inject constructor(
             is SyncDataValidationResult.Success -> {
                 processEntries(validation.data, conflictResolution)
             }
+
             else -> {
                 updateSavedSitesMetadataWhenNoRemoteChanges()
                 Success(false)
@@ -93,7 +94,6 @@ class SavedSitesSyncPersister @Inject constructor(
 
         if (result is Success) {
             pruneDeletedObjects()
-            updateSavedSitesMetadataWhenNoRemoteChanges()
         }
 
         return result
@@ -131,8 +131,9 @@ class SavedSitesSyncPersister @Inject constructor(
             algorithm.processEntries(bookmarks, conflictResolution, savedSitesSyncStore.clientModifiedSince)
         }
 
-        // we need to update the metadata of the entities
         updateSavedSitesMetadataWhenRemoteChanges(bookmarks.entries)
+
+        // we need to update the metadata of the entities
 
         // it's possible that there were entities present in the device before the first sync
         // we need to make sure that those entities are sent to the BE after all new data has been stored
@@ -156,6 +157,7 @@ class SavedSitesSyncPersister @Inject constructor(
         // for all items in the metadata table
         // copy request columns to children
         // delete request column values
+        Timber.d("Sync-Bookmarks-Metadata: set metadata for all local folders")
         savedSitesSyncRepository.confirmAllFolderChildrenMetadata()
     }
 
@@ -167,7 +169,13 @@ class SavedSitesSyncPersister @Inject constructor(
         // for all items in the metadata table and not in the payload
         // copy request columns to children
         // delete request column values
-        savedSitesSyncRepository.confirmFolderChildrenMetadata(entites.map { it.id })
+        if (entites.isEmpty()) {
+            updateSavedSitesMetadataWhenNoRemoteChanges()
+        } else {
+            val entitiesIds = entites.map { it.id }
+            Timber.d("Sync-Bookmarks-Metadata: set metadata for $entitiesIds and confirm for all other local folders")
+            savedSitesSyncRepository.confirmFolderChildrenMetadata(entitiesIds)
+        }
     }
 
     private class Adapters {

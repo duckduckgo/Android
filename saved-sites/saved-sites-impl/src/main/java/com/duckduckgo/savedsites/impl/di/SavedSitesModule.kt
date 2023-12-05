@@ -41,6 +41,7 @@ import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 import com.duckduckgo.savedsites.store.SavedSitesSettingsSharedPrefStore
 import com.duckduckgo.savedsites.store.SavedSitesSettingsStore
+import com.duckduckgo.savedsites.store.SavedSitesSyncMetadataDao
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -106,8 +107,9 @@ class SavedSitesModule {
     fun providesSyncSavedSitesRepository(
         savedSitesEntitiesDao: SavedSitesEntitiesDao,
         savedSitesRelationsDao: SavedSitesRelationsDao,
+        savedSitesSyncMetadataDao: SavedSitesSyncMetadataDao,
     ): SyncSavedSitesRepository {
-        return RealSyncSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao)
+        return RealSyncSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao, savedSitesSyncMetadataDao)
     }
 
     @Provides

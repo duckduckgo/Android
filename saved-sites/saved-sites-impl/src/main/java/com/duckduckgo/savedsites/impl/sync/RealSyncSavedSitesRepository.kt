@@ -30,7 +30,6 @@ class RealSyncSavedSitesRepository(
     private val savedSitesEntitiesDao: SavedSitesEntitiesDao,
     private val savedSitesRelationsDao: SavedSitesRelationsDao,
     private val savedSitesSyncMetadataDao: SavedSitesSyncMetadataDao,
-    private val moshi: Moshi
 ) : SyncSavedSitesRepository {
 
     private val stringListType = Types.newParameterizedType(List::class.java, String::class.java)
@@ -191,18 +190,25 @@ class RealSyncSavedSitesRepository(
 
     override fun insertFolderChildren(
         folderId: String,
-        children: List<String>
+        children: List<String>,
     ) {
         val childrenJSON = stringListAdapter.toJson(children)
         savedSitesSyncMetadataDao.updateChildren(folderId, childrenJSON)
     }
 
-    override fun confirmAllFolderChildrenMetadata(){
-        savedSitesSyncMetadataDao.confirmChildren()
-
+    override fun confirmAllFolderChildrenMetadata() {
+        savedSitesSyncMetadataDao.confirmAllChildren()
     }
 
     override fun confirmFolderChildrenMetadata(folders: List<String>) {
         savedSitesSyncMetadataDao.confirmChildren(folders)
+    }
+
+    override fun addFolderChildrenMetadata(folders: List<SyncBookmarkEntry>) {
+        val children = folders.filter { it.folder != null }.map {
+            SavedSitesSyncMetadataEntity(it.id, null, stringListAdapter.toJson(it.folder?.children))
+        }
+        Timber.d("Sync-Bookmarks-Metadata: adding children metadata for folders: $children")
+        savedSitesSyncMetadataDao.addOrUpdate(children)
     }
 }

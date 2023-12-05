@@ -50,6 +50,14 @@ class SavedSitesSyncDataProvider @Inject constructor(
         } else {
             changesSince(savedSitesSyncStore.clientModifiedSince)
         }
+
+        // we store the current folder children state into the metadata table
+        if (updates.isEmpty()){
+            Timber.d("Sync-Bookmarks-Metadata: no local changes, nothing to store")
+        } else {
+            syncSavedSitesRepository.addFolderChildrenMetadata(updates)
+        }
+
         Timber.d("Sync-Bookmarks: modifiedSince changes: $updates")
         return formatUpdates(updates)
     }
@@ -128,6 +136,7 @@ class SavedSitesSyncDataProvider @Inject constructor(
                     childrenIds.add(eachFolder.id)
                 }
             }
+
             encryptFolder(storedFolder, childrenIds)
         } else {
             null

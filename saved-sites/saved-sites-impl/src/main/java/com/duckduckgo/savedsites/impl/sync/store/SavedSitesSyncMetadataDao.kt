@@ -43,10 +43,16 @@ interface SavedSitesSyncMetadataDao {
     @Query("update saved_sites_sync_meta set `children` = :children where `folderId` = :folderId")
     fun updateChildren(
         folderId: String,
-        children: String
+        children: String,
     )
 
-    @Query("update saved_sites_sync_meta set `children` = request")
+    @Transaction
+    fun confirmAllChildren(){
+        confirmChildren()
+        removeAllRequests()
+    }
+
+    @Query("update saved_sites_sync_meta set `children` = request where `request` not null")
     fun confirmChildren()
 
     @Query("update saved_sites_sync_meta set `children` = request where `folderId` = :folderId")
@@ -57,6 +63,8 @@ interface SavedSitesSyncMetadataDao {
         folders.forEach {
             confirmChildren(it)
         }
+        confirmChildren()
+        removeAllRequests()
     }
 
     @Query("update saved_sites_sync_meta set `request` = null")
