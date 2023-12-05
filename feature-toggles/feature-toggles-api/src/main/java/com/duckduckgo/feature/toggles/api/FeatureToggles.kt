@@ -243,7 +243,7 @@ internal class ToggleImpl constructor(
         if (isInternalAlwaysEnabled && flavorNameProvider.invoke().lowercase() == "internal") {
             return true
         }
-        // If there's not assigned variant yet and feature forces default variant, set default variant
+        // If there's not assigned variant yet and is an experiment feature, set default variant
         if (appVariantProvider.invoke() == null && isExperiment) {
             forceDefaultVariant.invoke()
         }
