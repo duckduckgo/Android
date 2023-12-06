@@ -188,19 +188,11 @@ class RealSyncSavedSitesRepository(
         updateFavourite(favorite, favoriteFolder)
     }
 
-    override fun insertFolderChildren(
-        folderId: String,
-        children: List<String>,
-    ) {
-        val childrenJSON = stringListAdapter.toJson(children)
-        savedSitesSyncMetadataDao.updateChildren(folderId, childrenJSON)
-    }
-
     override fun confirmAllFolderChildrenMetadata() {
-        savedSitesSyncMetadataDao.confirmAllChildren()
+        savedSitesSyncMetadataDao.confirmAllChildrenRequests()
     }
 
-    override fun addRequestMetadata(folders: List<SyncBookmarkEntry>) {
+    override fun addRequestMetadata(folders: List<SyncSavedSitesRequestEntry>) {
         val children = folders.filter { it.folder != null }.map {
             SavedSitesSyncMetadataEntity(it.id, null, stringListAdapter.toJson(it.folder?.children))
         }
@@ -208,7 +200,7 @@ class RealSyncSavedSitesRepository(
         savedSitesSyncMetadataDao.addOrUpdate(children)
     }
 
-    override fun addResponseMetadata(folders: List<SyncBookmarkEntry>) {
+    override fun addResponseMetadata(folders: List<SyncSavedSitesRequestEntry>) {
         val children = folders.filter { it.folder != null }.map {
             SavedSitesSyncMetadataEntity(it.id, stringListAdapter.toJson(it.folder?.children), null)
         }

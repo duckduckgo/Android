@@ -37,7 +37,7 @@ import com.duckduckgo.savedsites.impl.sync.RealSyncSavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.SavedSitesFormFactorSyncMigration
 import com.duckduckgo.savedsites.impl.sync.SavedSitesSyncDataProvider
 import com.duckduckgo.savedsites.impl.sync.SavedSitesSyncStore
-import com.duckduckgo.savedsites.impl.sync.SyncBookmarkEntry
+import com.duckduckgo.savedsites.impl.sync.SyncSavedSitesRequestEntry
 import com.duckduckgo.savedsites.impl.sync.SyncBookmarkPage
 import com.duckduckgo.savedsites.impl.sync.SyncBookmarksRequest
 import com.duckduckgo.savedsites.impl.sync.SyncFolderChildren
@@ -386,8 +386,8 @@ class SavedSitesSyncDataProviderTest {
         store.clientModifiedSince = lastClientSyncTimestmp
     }
 
-    private fun fromSavedSite(savedSite: SavedSite): SyncBookmarkEntry {
-        return SyncBookmarkEntry(
+    private fun fromSavedSite(savedSite: SavedSite): SyncSavedSitesRequestEntry {
+        return SyncSavedSitesRequestEntry(
             id = savedSite.id,
             title = savedSite.title,
             page = SyncBookmarkPage(savedSite.url),
@@ -400,8 +400,8 @@ class SavedSitesSyncDataProviderTest {
     private fun fromBookmarkFolder(
         bookmarkFolder: BookmarkFolder,
         children: List<String>,
-    ): SyncBookmarkEntry {
-        return SyncBookmarkEntry(
+    ): SyncSavedSitesRequestEntry {
+        return SyncSavedSitesRequestEntry(
             id = bookmarkFolder.id,
             title = bookmarkFolder.name,
             folder = SyncFolderChildren(children),

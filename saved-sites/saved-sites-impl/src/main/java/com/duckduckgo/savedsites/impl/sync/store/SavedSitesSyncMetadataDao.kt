@@ -40,14 +40,8 @@ interface SavedSitesSyncMetadataDao {
         }
     }
 
-    @Query("update saved_sites_sync_meta set `children` = :children where `folderId` = :folderId")
-    fun updateChildren(
-        folderId: String,
-        children: String,
-    )
-
     @Transaction
-    fun confirmAllChildren() {
+    fun confirmAllChildrenRequests() {
         confirmChildren()
         removeAllRequests()
     }
@@ -55,14 +49,10 @@ interface SavedSitesSyncMetadataDao {
     @Query("update saved_sites_sync_meta set `children` = request where `request` not null")
     fun confirmChildren()
 
-    @Query("update saved_sites_sync_meta set `children` = request where `folderId` = :folderId")
-    fun confirmChildren(folderId: String)
-
     @Transaction
     fun confirmChildren(folders: List<SavedSitesSyncMetadataEntity>) {
         addOrUpdate(folders)
-        confirmChildren()
-        removeAllRequests()
+        confirmAllChildrenRequests()
     }
 
     @Query("update saved_sites_sync_meta set `request` = null")
