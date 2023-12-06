@@ -1,14 +1,16 @@
-appId: com.duckduckgo.mobile.android
+appId: com.duckduckgo.mobile.android.debug
 tags:
     - securityTest
 ---
+- launchApp:
+    clearState: true
 - runFlow: ../shared/onboarding.yaml
 # Test 1
 - doubleTapOn:
     id: "omnibarTextInput"
-- pressKey: Backspace
 - inputText: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-form-action.html"
 - pressKey: Enter
+- tapOn: "Got It"
 - tapOn: "run"
 # Should do nothing - the navigation should be prevented.
 - copyTextFrom:

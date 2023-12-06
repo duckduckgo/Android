@@ -2,6 +2,8 @@ appId: com.duckduckgo.mobile.android
 tags:
     - securityTest
 ---
+- launchApp:
+    clearState: true
 - runFlow: ../shared/onboarding.yaml
 - doubleTapOn:
     id: "omnibarTextInput"
@@ -9,6 +11,7 @@ tags:
 # Test 1 - using \u2028 character
 - inputText: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-basicauth-2028.html"
 - pressKey: Enter
+- tapOn: "Got It"
 - tapOn: "run"
 - assertVisible: "Example Domain"
 - copyTextFrom:
@@ -39,7 +42,7 @@ tags:
 # Test 4 - edge case: URLs containing "@" in the URI should still work
 - inputText: "https://medium.com/@duckduckgo"
 - pressKey: Enter
-- tapOn: "run"
+- tapOn: "Phew!"
 - assertVisible: "DuckDuckGo"
 - copyTextFrom:
     id: "omnibarTextInput"

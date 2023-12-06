@@ -1,15 +1,18 @@
-appId: com.duckduckgo.mobile.android
+appId: com.duckduckgo.mobile.android.debug
 tags:
     - securityTest
 ---
+- launchApp:
+    clearState: true
 - runFlow: ../shared/onboarding.yaml
 # Test 1
 - doubleTapOn:
     id: "omnibarTextInput"
-- pressKey: Backspace
 - inputText: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-application-scheme.html"
 - pressKey: Enter
+- tapOn: "Got It"
 - tapOn: "Start"
+- tapOn: "Phew!"
 # This test should reject trying to load
 # This test is expected to load duckduckgo.com, not remain on the current page with spoofed content.
 - assertVisible: "Privacy, simplified." # DuckDuckGo home page
