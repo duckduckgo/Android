@@ -46,7 +46,10 @@ import kotlinx.coroutines.launch
     comment = "To use the right scope we first need to enable dagger component nesting",
     correctScope = ActivityScope::class,
 )
-@InjectWith(VpnScope::class)
+@InjectWith(
+    scope = VpnScope::class,
+    delayGeneration = true,
+)
 @ContributeToActivityStarter(OpenVpnBreakageCategoryWithBrokenApp::class)
 class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
 
