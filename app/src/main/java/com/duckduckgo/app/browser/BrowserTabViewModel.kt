@@ -1493,7 +1493,7 @@ class BrowserTabViewModel @Inject constructor(
                 val portStr = if (uri.port != -1) ":${uri.port}" else ""
                 return "${uri.scheme}://${uri.host}$portStr${uri.path}$queryStr$uriFragment"
             }
-        } catch(e: URISyntaxException) {
+        } catch (e: URISyntaxException) {
             Timber.e(e, "Failed to parse url for auth stripping")
             return url
         }
