@@ -2,6 +2,7 @@ appId: com.duckduckgo.mobile.android
 tags:
     - securityTest
 ---
+- runFlow: ../shared/onboarding.yaml
 - doubleTapOn:
     id: "omnibarTextInput"
 - pressKey: Backspace

@@ -2,6 +2,7 @@ appId: com.duckduckgo.mobile.android
 tags:
     - securityTest
 ---
+- runFlow: ../shared/onboarding.yaml
 # Test 1
 - doubleTapOn:
     id: "omnibarTextInput"

@@ -150,6 +150,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import java.net.URI
+import java.net.URISyntaxException
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
@@ -1480,17 +1481,22 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch { updateBookmarkAndFavoriteState(url) }
     }
 
-    fun stripBasicAuthFromUrl(url: String): String {
-        val uri = URI(url)
-        val userInfo = uri.userInfo
+    @VisibleForTesting
+    private fun stripBasicAuthFromUrl(url: String): String {
+        try {
+            val uri = URI(url)
+            val userInfo = uri.userInfo
 
-        if (userInfo != null) {
-            val queryStr = uri.rawQuery?.let { "?$it" } ?: ""
-            val uriFragment = uri.fragment?.let { "#$it" } ?: ""
-            val portStr = if (uri.port != -1) ":${uri.port}" else ""
-            return "${uri.scheme}://${uri.host}$portStr${uri.path}$queryStr$uriFragment"
+            if (userInfo != null) {
+                val queryStr = uri.rawQuery?.let { "?$it" } ?: ""
+                val uriFragment = uri.fragment?.let { "#$it" } ?: ""
+                val portStr = if (uri.port != -1) ":${uri.port}" else ""
+                return "${uri.scheme}://${uri.host}$portStr${uri.path}$queryStr$uriFragment"
+            }
+        } catch(e: URISyntaxException) {
+            Timber.e(e, "Failed to parse url for auth stripping")
+            return url
         }
-
         return url
     }
 
