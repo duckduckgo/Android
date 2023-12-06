@@ -16,6 +16,7 @@
 
 package com.duckduckgo.savedsites.impl.sync
 
+import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 
@@ -104,7 +105,7 @@ interface SyncSavedSitesRepository {
     /**
      * Returns the object needed for the sync request an existing [Favorite]
      * that represents the difference between remote and local state
-     * @param folderId id of the folder
+     * @param folderId id of the folder to get the diff from
      */
     fun getFolderDiff(folderId: String): SyncFolderChildren
 

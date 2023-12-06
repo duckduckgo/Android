@@ -219,28 +219,28 @@ class SavedSitesSyncPersisterAlgorithmTest {
         assertTrue(success.orphans)
     }
 
-    private fun fromSavedSite(savedSite: SavedSite): SyncSavedSitesRequestEntry {
-        return SyncSavedSitesRequestEntry(
+    private fun fromSavedSite(savedSite: SavedSite): SyncSavedSitesResponseEntry {
+        return SyncSavedSitesResponseEntry(
             id = savedSite.id,
             title = savedSite.title,
             page = SyncBookmarkPage(savedSite.url),
             folder = null,
             deleted = null,
-            client_last_modified = savedSite.lastModified ?: DatabaseDateFormatter.iso8601(),
+            last_modified = savedSite.lastModified ?: DatabaseDateFormatter.iso8601(),
         )
     }
 
     private fun fromBookmarkFolder(
         bookmarkFolder: BookmarkFolder,
         children: List<String>,
-    ): SyncSavedSitesRequestEntry {
-        return SyncSavedSitesRequestEntry(
+    ): SyncSavedSitesResponseEntry {
+        return SyncSavedSitesResponseEntry(
             id = bookmarkFolder.id,
             title = bookmarkFolder.name,
-            folder = SyncFolderChildren(children),
+            folder = SyncSavedSiteFolder(children),
             page = null,
             deleted = null,
-            client_last_modified = bookmarkFolder.lastModified ?: DatabaseDateFormatter.iso8601(),
+            last_modified = bookmarkFolder.lastModified ?: DatabaseDateFormatter.iso8601(),
         )
     }
 

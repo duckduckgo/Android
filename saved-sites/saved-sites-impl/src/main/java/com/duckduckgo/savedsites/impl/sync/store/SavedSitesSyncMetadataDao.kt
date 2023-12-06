@@ -46,7 +46,7 @@ interface SavedSitesSyncMetadataDao {
         removeAllRequests()
     }
 
-    @Query("update saved_sites_sync_meta set `children` = request where `request` not null")
+    @Query("update saved_sites_sync_meta set childrenResponse = childrenRequest where childrenRequest not null")
     fun confirmChildren()
 
     @Transaction
@@ -55,7 +55,7 @@ interface SavedSitesSyncMetadataDao {
         confirmAllChildrenRequests()
     }
 
-    @Query("update saved_sites_sync_meta set `request` = null")
+    @Query("update saved_sites_sync_meta set childrenRequest = null")
     fun removeAllRequests()
 
     @Query("Delete from saved_sites_sync_meta")
@@ -68,6 +68,6 @@ interface SavedSitesSyncMetadataDao {
 @Entity(tableName = "saved_sites_sync_meta")
 data class SavedSitesSyncMetadataEntity(
     @PrimaryKey val folderId: String,
-    var children: String, // JSON representation of list of children confirmed by the BE
-    var request: String, // JSON representation of list of children sent to the BE
+    var childrenResponse: String, // JSON representation of list of children confirmed by the BE
+    var childrenRequest: String, // JSON representation of list of children sent to the BE
 )
