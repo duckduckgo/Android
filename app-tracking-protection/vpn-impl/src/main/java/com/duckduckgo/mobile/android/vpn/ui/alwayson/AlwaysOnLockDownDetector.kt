@@ -24,7 +24,7 @@ import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
-import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackerActivityWithEmptyParams
+import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerActivityWithEmptyParams
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.dao.VpnServiceStateStatsDao
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks

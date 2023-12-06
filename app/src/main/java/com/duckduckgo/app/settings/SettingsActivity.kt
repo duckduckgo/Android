@@ -61,8 +61,8 @@ import com.duckduckgo.di.DaggerMap
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.internal.features.api.InternalFeaturePlugin
 import com.duckduckgo.macos.api.MacOsScreenWithEmptyParams
-import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackerActivityWithEmptyParams
-import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackerOnboardingActivityWithEmptyParamsParams
+import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerActivityWithEmptyParams
+import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.settings.api.ProSettingsPlugin

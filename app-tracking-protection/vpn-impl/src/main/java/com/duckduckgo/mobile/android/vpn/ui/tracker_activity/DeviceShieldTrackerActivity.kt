@@ -48,7 +48,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.launchAlwaysOnSystemSettings
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackerActivityWithEmptyParams
+import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerActivityWithEmptyParams
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
