@@ -242,13 +242,13 @@ class SavedSitesSyncDataProvider @Inject constructor(
 }
 
 data class SyncBookmarkPage(val url: String)
-data class SyncFolderChildren(val children: List<String>)
+data class SyncFolderChildren(val current: List<String>, val insert: List<String>, val remove: List<String>)
 
 data class SyncBookmarkEntry(
     val id: String,
     val title: String?,
     val page: SyncBookmarkPage?,
-    val folder: SyncFolderChildren?,
+    val children: SyncFolderChildren?,
     val deleted: String?,
     val client_last_modified: String?,
 )
