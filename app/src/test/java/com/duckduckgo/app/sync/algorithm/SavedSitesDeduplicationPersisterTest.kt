@@ -37,6 +37,7 @@ import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesDeduplicationPers
 import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesDuplicateFinder
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
+import com.duckduckgo.savedsites.store.SavedSitesSyncMetadataDao
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -58,6 +59,7 @@ class SavedSitesDeduplicationPersisterTest {
     private lateinit var syncSavedSitesRepository: SyncSavedSitesRepository
     private lateinit var savedSitesEntitiesDao: SavedSitesEntitiesDao
     private lateinit var savedSitesRelationsDao: SavedSitesRelationsDao
+    private lateinit var savedSitesMetadataDao: SavedSitesSyncMetadataDao
     private lateinit var duplicateFinder: SavedSitesDuplicateFinder
 
     private lateinit var persister: SavedSitesDeduplicationPersister
@@ -70,6 +72,7 @@ class SavedSitesDeduplicationPersisterTest {
 
         savedSitesEntitiesDao = db.syncEntitiesDao()
         savedSitesRelationsDao = db.syncRelationsDao()
+        savedSitesMetadataDao = db.savedSitesSyncMetadataDao()
 
         val favoritesDelegate = RealFavoritesDelegate(
             savedSitesEntitiesDao,
@@ -78,7 +81,7 @@ class SavedSitesDeduplicationPersisterTest {
             coroutinesTestRule.testDispatcherProvider,
         )
 
-        syncSavedSitesRepository = RealSyncSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao)
+        syncSavedSitesRepository = RealSyncSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao, savedSitesMetadataDao)
         repository = RealSavedSitesRepository(
             savedSitesEntitiesDao,
             savedSitesRelationsDao,

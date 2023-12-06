@@ -44,6 +44,7 @@ import com.duckduckgo.savedsites.impl.sync.SyncFolderChildren
 import com.duckduckgo.savedsites.impl.sync.SyncSavedSitesRepository
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
+import com.duckduckgo.savedsites.store.SavedSitesSyncMetadataDao
 import com.duckduckgo.sync.api.SyncCrypto
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -73,6 +74,7 @@ class SavedSitesSyncDataProviderTest {
     private lateinit var syncRepository: SyncSavedSitesRepository
     private lateinit var savedSitesEntitiesDao: SavedSitesEntitiesDao
     private lateinit var savedSitesRelationsDao: SavedSitesRelationsDao
+    private lateinit var savedSitesMetadataDao: SavedSitesSyncMetadataDao
     private lateinit var savedSitesFormFactorSyncMigration: SavedSitesFormFactorSyncMigration
     private lateinit var store: SavedSitesSyncStore
 
@@ -99,6 +101,7 @@ class SavedSitesSyncDataProviderTest {
 
         savedSitesEntitiesDao = db.syncEntitiesDao()
         savedSitesRelationsDao = db.syncRelationsDao()
+        savedSitesMetadataDao = db.savedSitesSyncMetadataDao()
 
         val savedSitesSettingsRepository = FakeDisplayModeSettingsRepository()
         val favoritesDelegate = RealFavoritesDelegate(
@@ -108,7 +111,7 @@ class SavedSitesSyncDataProviderTest {
             coroutinesTestRule.testDispatcherProvider,
         )
 
-        syncRepository = RealSyncSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao)
+        syncRepository = RealSyncSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao, savedSitesMetadataDao)
         repository = RealSavedSitesRepository(
             savedSitesEntitiesDao,
             savedSitesRelationsDao,

@@ -161,7 +161,7 @@ class SavedSitesSyncPersister @Inject constructor(
         savedSitesSyncRepository.confirmAllFolderChildrenMetadata()
     }
 
-    private fun updateSavedSitesMetadataWhenRemoteChanges(entites: List<SyncBookmarkEntry>) {
+    private fun updateSavedSitesMetadataWhenRemoteChanges(entities: List<SyncBookmarkEntry>) {
         // for all items in the payload
         // add children to children column
         // delete request column values
@@ -169,12 +169,12 @@ class SavedSitesSyncPersister @Inject constructor(
         // for all items in the metadata table and not in the payload
         // copy request columns to children
         // delete request column values
-        if (entites.isEmpty()) {
+        if (entities.isEmpty()) {
             updateSavedSitesMetadataWhenNoRemoteChanges()
         } else {
-            val entitiesIds = entites.map { it.id }
+            val entitiesIds = entities.map { it.id }
             Timber.d("Sync-Bookmarks-Metadata: set metadata for $entitiesIds and confirm for all other local folders")
-            savedSitesSyncRepository.addResponseMetadata(entites)
+            savedSitesSyncRepository.addResponseMetadata(entities)
         }
     }
 

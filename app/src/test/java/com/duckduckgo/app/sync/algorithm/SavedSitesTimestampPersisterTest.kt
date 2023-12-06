@@ -36,6 +36,7 @@ import com.duckduckgo.savedsites.impl.sync.SyncSavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesTimestampPersister
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
+import com.duckduckgo.savedsites.store.SavedSitesSyncMetadataDao
 import org.junit.Assert
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -60,6 +61,7 @@ class SavedSitesTimestampPersisterTest {
     private lateinit var syncRepository: SyncSavedSitesRepository
     private lateinit var savedSitesEntitiesDao: SavedSitesEntitiesDao
     private lateinit var savedSitesRelationsDao: SavedSitesRelationsDao
+    private lateinit var savedSitesMetadataDao: SavedSitesSyncMetadataDao
 
     private lateinit var persister: SavedSitesTimestampPersister
 
@@ -74,6 +76,7 @@ class SavedSitesTimestampPersisterTest {
 
         savedSitesEntitiesDao = db.syncEntitiesDao()
         savedSitesRelationsDao = db.syncRelationsDao()
+        savedSitesMetadataDao = db.savedSitesSyncMetadataDao()
 
         val favoritesDelegate = RealFavoritesDelegate(
             savedSitesEntitiesDao,
@@ -81,7 +84,7 @@ class SavedSitesTimestampPersisterTest {
             FakeDisplayModeSettingsRepository(),
             coroutinesTestRule.testDispatcherProvider,
         )
-        syncRepository = RealSyncSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao)
+        syncRepository = RealSyncSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao, savedSitesMetadataDao)
         repository = RealSavedSitesRepository(
             savedSitesEntitiesDao,
             savedSitesRelationsDao,
