@@ -19,6 +19,8 @@ package com.duckduckgo.savedsites.impl.sync
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.savedsites.api.models.*
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.impl.sync.store.SavedSitesSyncMetadataDao
+import com.duckduckgo.savedsites.impl.sync.store.SavedSitesSyncMetadataEntity
 import com.duckduckgo.savedsites.store.*
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -188,21 +190,45 @@ class RealSyncSavedSitesRepository(
         updateFavourite(favorite, favoriteFolder)
     }
 
+    override fun getFolderDiff(folderId: String): SyncFolderChildren {
+        // we get the previous children metadata
+        // if not present, we just add everything to children and insert
+        // if present, we check for items that have been added or removed locally
+        // and send them alongside the current list of local children
+        val entities = savedSitesEntitiesDao.allEntitiesInFolderSync(folderId)
+        val childrenLocal = entities.filterNot { it.deleted}.map { it.entityId }
+
+        val metadata = savedSitesSyncMetadataDao.get(folderId)
+        if (metadata != null){
+            val childrenResponse = stringListAdapter.fromJson(metadata.childrenResponse)!!
+            if (childrenResponse == childrenLocal){
+                // both lists are the same, nothing has changed
+                return SyncFolderChildren(current = childrenLocal, insert = emptyList(), remove = emptyList())
+            }
+            val notInResponse = childrenLocal.minus(childrenResponse.toSet()) // to be added to insert
+            val notInLocal = childrenResponse.minus(childrenLocal.toSet()) // to be added to deleted
+            return SyncFolderChildren(current = childrenLocal, insert = notInResponse, remove = notInLocal)
+
+        } else {
+            return SyncFolderChildren(current = childrenLocal, insert = childrenLocal, remove = emptyList())
+        }
+    }
+
     override fun confirmAllFolderChildrenMetadata() {
         savedSitesSyncMetadataDao.confirmAllChildrenRequests()
     }
 
     override fun addRequestMetadata(folders: List<SyncSavedSitesRequestEntry>) {
-        val children = folders.filter { it.folder != null }.map {
-            SavedSitesSyncMetadataEntity(it.id, null, stringListAdapter.toJson(it.folder?.children))
+        val children = folders.filter { it.children != null }.map {
+            SavedSitesSyncMetadataEntity(it.id, "[]", stringListAdapter.toJson(it.children?.current))
         }
         Timber.d("Sync-Bookmarks-Metadata: adding children request metadata for folders: $children")
         savedSitesSyncMetadataDao.addOrUpdate(children)
     }
 
-    override fun addResponseMetadata(folders: List<SyncSavedSitesRequestEntry>) {
+    override fun addResponseMetadata(folders: List<SyncSavedSitesResponseEntry>) {
         val children = folders.filter { it.folder != null }.map {
-            SavedSitesSyncMetadataEntity(it.id, stringListAdapter.toJson(it.folder?.children), null)
+            SavedSitesSyncMetadataEntity(it.id, stringListAdapter.toJson(it.folder?.children), "[]")
         }
         Timber.d("Sync-Bookmarks-Metadata: adding children response metadata for folders: $children")
         savedSitesSyncMetadataDao.confirmChildren(children)

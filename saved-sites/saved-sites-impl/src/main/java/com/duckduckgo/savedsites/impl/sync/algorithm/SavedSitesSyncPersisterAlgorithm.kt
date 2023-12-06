@@ -170,7 +170,7 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
         val children = if (remoteFolder.folder == null) {
             emptyList()
         } else {
-            remoteFolder.folder?.children
+            remoteFolder.folder.children
         }
         // syncSavedSitesRepository.insertFolderChildren(remoteFolder.id, children)
     }
@@ -318,7 +318,7 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
             id = remoteEntry.id,
             name = syncCrypto.decrypt(remoteEntry.titleOrFallback()),
             parentId = parentId,
-            lastModified = remoteEntry.client_last_modified ?: lastModified,
+            lastModified = remoteEntry.last_modified ?: lastModified,
             deleted = remoteEntry.deleted,
         )
         Timber.d("Sync-Bookmarks: decrypted $folder")
@@ -335,7 +335,7 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
             title = syncCrypto.decrypt(remoteEntry.titleOrFallback()),
             url = syncCrypto.decrypt(remoteEntry.page!!.url),
             parentId = parentId,
-            lastModified = remoteEntry.client_last_modified ?: lastModified,
+            lastModified = remoteEntry.last_modified ?: lastModified,
             deleted = remoteEntry.deleted,
         )
         Timber.d("Sync-Bookmarks: decrypted $bookmark")
@@ -351,7 +351,7 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
             id = remoteEntry.id,
             title = syncCrypto.decrypt(remoteEntry.titleOrFallback()),
             url = syncCrypto.decrypt(remoteEntry.page!!.url),
-            lastModified = remoteEntry.client_last_modified ?: lastModified,
+            lastModified = remoteEntry.last_modified ?: lastModified,
             position = position,
         )
         Timber.d("Sync-Bookmarks: decrypted $favourite")

@@ -24,7 +24,6 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.sync.FakeDisplayModeSettingsRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
-import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
@@ -35,9 +34,10 @@ import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.RealSyncSavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.SyncSavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesTimestampPersister
+import com.duckduckgo.savedsites.impl.sync.store.SavedSitesSyncMetadataDao
+import com.duckduckgo.savedsites.impl.sync.store.SavedSitesSyncMetadataDatabase
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
-import com.duckduckgo.savedsites.store.SavedSitesSyncMetadataDao
 import org.junit.Assert
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -58,6 +58,7 @@ class SavedSitesTimestampPersisterTest {
     var coroutinesTestRule = CoroutineTestRule()
 
     private lateinit var db: AppDatabase
+    private lateinit var savedSitesDatabase: SavedSitesSyncMetadataDatabase
 
     private lateinit var repository: SavedSitesRepository
     private lateinit var syncRepository: SyncSavedSitesRepository
@@ -78,7 +79,11 @@ class SavedSitesTimestampPersisterTest {
 
         savedSitesEntitiesDao = db.syncEntitiesDao()
         savedSitesRelationsDao = db.syncRelationsDao()
-        savedSitesMetadataDao = db.savedSitesSyncMetadataDao()
+
+        savedSitesDatabase = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, SavedSitesSyncMetadataDatabase::class.java)
+            .allowMainThreadQueries()
+            .build()
+        savedSitesMetadataDao = savedSitesDatabase.syncMetadataDao()
 
         val favoritesDelegate = RealFavoritesDelegate(
             savedSitesEntitiesDao,

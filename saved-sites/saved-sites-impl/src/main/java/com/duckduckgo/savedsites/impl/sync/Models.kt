@@ -42,7 +42,7 @@ fun SyncSavedSitesRequestEntry.isBookmark(): Boolean = this.page != null
 data class SyncFolderChildren(
     val current: List<String>,
     val insert: List<String>,
-    val remove: List<String>
+    val remove: List<String>,
 )
 
 data class SyncSavedSitesResponseEntry(

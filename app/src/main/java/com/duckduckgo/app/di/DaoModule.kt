@@ -97,7 +97,4 @@ object DaoModule {
 
     @Provides
     fun syncRelationsDao(database: AppDatabase) = database.syncRelationsDao()
-
-    @Provides
-    fun syncSavedSitesMetadataDao(database: AppDatabase) = database.savedSitesSyncMetadataDao()
 }
