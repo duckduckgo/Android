@@ -161,7 +161,7 @@ class SavedSitesSyncPersister @Inject constructor(
         savedSitesSyncRepository.confirmAllFolderChildrenMetadata()
     }
 
-    private fun updateSavedSitesMetadataWhenRemoteChanges(entities: List<SyncBookmarkEntry>) {
+    private fun updateSavedSitesMetadataWhenRemoteChanges(entities: List<SyncSavedSitesResponseEntry>) {
         // for all items in the payload
         // add children to children column
         // delete request column values
@@ -193,6 +193,6 @@ data class SyncBookmarkRemoteUpdates(
 )
 
 data class SyncBookmarkEntries(
-    val entries: List<SyncBookmarkEntry>,
+    val entries: List<SyncSavedSitesResponseEntry>,
     val last_modified: String,
 )

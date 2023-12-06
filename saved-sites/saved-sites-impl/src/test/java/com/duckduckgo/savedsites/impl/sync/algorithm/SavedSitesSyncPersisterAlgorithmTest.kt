@@ -219,8 +219,8 @@ class SavedSitesSyncPersisterAlgorithmTest {
         assertTrue(success.orphans)
     }
 
-    private fun fromSavedSite(savedSite: SavedSite): SyncBookmarkEntry {
-        return SyncBookmarkEntry(
+    private fun fromSavedSite(savedSite: SavedSite): SyncSavedSitesRequestEntry {
+        return SyncSavedSitesRequestEntry(
             id = savedSite.id,
             title = savedSite.title,
             page = SyncBookmarkPage(savedSite.url),
@@ -233,8 +233,8 @@ class SavedSitesSyncPersisterAlgorithmTest {
     private fun fromBookmarkFolder(
         bookmarkFolder: BookmarkFolder,
         children: List<String>,
-    ): SyncBookmarkEntry {
-        return SyncBookmarkEntry(
+    ): SyncSavedSitesRequestEntry {
+        return SyncSavedSitesRequestEntry(
             id = bookmarkFolder.id,
             title = bookmarkFolder.name,
             folder = SyncFolderChildren(children),
