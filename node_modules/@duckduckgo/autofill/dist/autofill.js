@@ -2602,6 +2602,9 @@ module.exports={
   "gmx.net": {
     "password-rules": "minlength: 8; maxlength: 40; allowed: lower, upper, digit, [-<=>~!|()@#{}$%,.?^'&*_+`:;\"[]];"
   },
+  "gocurb.com": {
+    "password-rules": "minlength: 8; required: lower; required: upper; required: digit; required: [$%&#*?!@^];"
+  },
   "google.com": {
     "password-rules": "minlength: 8; allowed: lower, upper, digit, [-!\"#$%&'()*+,./:;<=>?@[^_{|}~]];"
   },
@@ -2793,6 +2796,9 @@ module.exports={
   },
   "myhealthrecord.com": {
     "password-rules": "minlength: 8; maxlength: 20; allowed: lower, upper, digit, [_.!$*=];"
+  },
+  "mysavings.breadfinancial.com": {
+    "password-rules": "minlength: 8; maxlength: 25; required: lower; required: upper; required: digit; required: [+_%@!$*~];"
   },
   "mysedgwick.com": {
     "password-rules": "minlength: 8; maxlength: 16; allowed: lower; required: upper; required: digit; required: [@#%^&+=!]; allowed: [-~_$.,;]"
@@ -3075,6 +3081,9 @@ module.exports={
   },
   "wmata.com": {
     "password-rules": "minlength: 8; required: lower, upper; required: digit; required: digit; required: [-!@#$%^&*~/\"()_=+\\|,.?[]];"
+  },
+  "worldstrides.com": {
+    "password-rules": "minlength: 8; required: lower; required: upper; required: digit; required: [-!#$%&*+=?@^_~];"
   },
   "wsj.com": {
     "password-rules": "minlength: 5; maxlength: 15; required: digit; allowed: lower, upper, [-~!@#$^*_=`|(){}[:;\"'<>,.?]];"
@@ -5818,13 +5827,19 @@ class Form {
   }
   categorizeInputs() {
     const selector = this.matching.cssSelector('formInputsSelector');
+    // If there's no form container and it's just a lonely input field (this.form is an input field)
     if (this.form.matches(selector)) {
       this.addInput(this.form);
     } else {
-      let foundInputs = this.form.querySelectorAll(selector);
-      // If the markup is broken form.querySelectorAll may not return the fields, so we select from the parent
-      if (foundInputs.length === 0 && this.form instanceof HTMLFormElement && this.form.length > 0) {
-        foundInputs = this.form.parentElement?.querySelectorAll(selector) || foundInputs;
+      /** @type {Element[] | NodeList} */
+      let foundInputs = [];
+      if (this.form instanceof HTMLFormElement) {
+        // For form elements we use .elements to catch fields outside the form itself using the form attribute.
+        // It also catches all elements when the markup is broken.
+        // We use .filter to avoid fieldset, button, textarea etc.
+        foundInputs = [...this.form.elements].filter(el => el.matches(selector));
+      } else {
+        foundInputs = this.form.querySelectorAll(selector);
       }
       if (foundInputs.length < MAX_INPUTS_PER_FORM) {
         foundInputs.forEach(input => this.addInput(input));
@@ -7710,7 +7725,7 @@ const inputTypeConfig = {
   /** @type {CredentialsInputTypeConfig} */
   credentials: {
     type: 'credentials',
-    displayName: 'Logins',
+    displayName: 'passwords',
     getIconBase: (input, _ref3) => {
       let {
         device
@@ -7757,7 +7772,7 @@ const inputTypeConfig = {
   /** @type {CreditCardsInputTypeConfig} */
   creditCards: {
     type: 'creditCards',
-    displayName: 'Credit Cards',
+    displayName: 'credit cards',
     getIconBase: () => '',
     getIconFilled: () => '',
     getIconAlternate: () => '',
@@ -7773,7 +7788,7 @@ const inputTypeConfig = {
   /** @type {IdentitiesInputTypeConfig} */
   identities: {
     type: 'identities',
-    displayName: 'Identities',
+    displayName: 'identities',
     getIconBase: getIdentitiesIcon,
     getIconFilled: getIdentitiesIcon,
     getIconAlternate: getIdentitiesAlternateIcon,
