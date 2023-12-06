@@ -28,6 +28,6 @@ class FingerprintProtectionSeedManager @Inject constructor(
 ) : FingerprintProtectionManager {
 
     override fun getSeed(): String {
-        return fingerprintProtectionSeedRepository.fingerprintProtectionSeedEntity.seed
+        return fingerprintProtectionSeedRepository.seed
     }
 }
