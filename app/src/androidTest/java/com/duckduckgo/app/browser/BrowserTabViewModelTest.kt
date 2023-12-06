@@ -4480,17 +4480,6 @@ class BrowserTabViewModelTest {
             // invalid URLs, should do nothing
             "https://user:pass%40example.com/%40urlencoded@symbol",
             "user:pass@https://example.com",
-        )
-
-        for (i in testUrls.indices) {
-            val actual = testee.stripBasicAuthFromUrl(testUrls[i])
-            assertEquals(testUrls[i], actual)
-        }
-    }
-
-    @Test
-    fun whenInvalidURIProvidedThenDoNotAffectAddressBar() {
-        val testUrls = listOf(
             "not a valid URI",
             "982.000.564.11:65666",
             "http://example.com/index[/].html",
@@ -4502,7 +4491,6 @@ class BrowserTabViewModelTest {
             assertEquals(testUrls[i], actual)
         }
     }
-
 
     @Test
     fun whenOnPermissionsQueryThenSendCommand() = runTest {
