@@ -1482,7 +1482,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     @VisibleForTesting
-    private fun stripBasicAuthFromUrl(url: String): String {
+    fun stripBasicAuthFromUrl(url: String): String {
         try {
             val uri = URI(url)
             val userInfo = uri.userInfo
