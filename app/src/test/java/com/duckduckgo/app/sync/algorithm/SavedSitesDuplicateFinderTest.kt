@@ -37,6 +37,7 @@ import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesDuplicateFinder
 import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesDuplicateResult
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
+import com.duckduckgo.savedsites.store.SavedSitesSyncMetadataDao
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
@@ -60,6 +61,7 @@ class SavedSitesDuplicateFinderTest {
     private lateinit var syncRepository: SyncSavedSitesRepository
     private lateinit var savedSitesEntitiesDao: SavedSitesEntitiesDao
     private lateinit var savedSitesRelationsDao: SavedSitesRelationsDao
+    private lateinit var savedSitesMetadataDao: SavedSitesSyncMetadataDao
 
     private lateinit var duplicateFinder: SavedSitesDuplicateFinder
 
@@ -71,6 +73,7 @@ class SavedSitesDuplicateFinderTest {
 
         savedSitesEntitiesDao = db.syncEntitiesDao()
         savedSitesRelationsDao = db.syncRelationsDao()
+        savedSitesMetadataDao = db.savedSitesSyncMetadataDao()
 
         val favoritesDelegate = RealFavoritesDelegate(
             savedSitesEntitiesDao,
@@ -79,7 +82,7 @@ class SavedSitesDuplicateFinderTest {
             coroutinesTestRule.testDispatcherProvider,
         )
 
-        syncRepository = RealSyncSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao)
+        syncRepository = RealSyncSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao, savedSitesMetadataDao)
         repository = RealSavedSitesRepository(
             savedSitesEntitiesDao,
             savedSitesRelationsDao,
@@ -138,7 +141,6 @@ class SavedSitesDuplicateFinderTest {
         val bookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2", "timestamp")
         val updatedBookmark = Bookmark("bookmark1", "title1", "www.example.com", "folder2", "timestamp")
         repository.insert(bookmark)
-
         val result = duplicateFinder.findBookmarkDuplicate(updatedBookmark)
 
         Assert.assertTrue(result is SavedSitesDuplicateResult.NotDuplicate)
