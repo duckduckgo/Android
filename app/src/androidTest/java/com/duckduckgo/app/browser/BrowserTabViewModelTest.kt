@@ -4488,7 +4488,7 @@ class BrowserTabViewModelTest {
         }
     }
 
-    @Test 
+    @Test
     fun whenInvalidURIProvidedThenDoNotAffectAddressBar() {
         val testUrls = listOf(
             "not a valid URI",
