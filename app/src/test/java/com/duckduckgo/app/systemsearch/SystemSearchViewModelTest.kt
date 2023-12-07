@@ -37,6 +37,7 @@ import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import io.reactivex.Observable
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.*
 import org.junit.*
@@ -44,6 +45,7 @@ import org.junit.Assert.*
 import org.mockito.Mockito.verify
 import org.mockito.kotlin.*
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @Suppress("EXPERIMENTAL_API_USAGE")
 class SystemSearchViewModelTest {
 
@@ -84,6 +86,7 @@ class SystemSearchViewModelTest {
             mocksavedSitesRepository,
             mockSettingsStore,
             coroutineRule.testDispatcherProvider,
+            coroutineRule.testScope,
         )
         testee.command.observeForever(commandObserver)
     }
@@ -348,6 +351,7 @@ class SystemSearchViewModelTest {
             mocksavedSitesRepository,
             mockSettingsStore,
             coroutineRule.testDispatcherProvider,
+            coroutineRule.testScope,
         )
 
         val viewState = testee.resultsViewState.value as QuickAccessItems
@@ -371,6 +375,7 @@ class SystemSearchViewModelTest {
             mocksavedSitesRepository,
             mockSettingsStore,
             coroutineRule.testDispatcherProvider,
+            coroutineRule.testScope,
         )
 
         val viewState = testee.resultsViewState.value as QuickAccessItems
@@ -412,6 +417,7 @@ class SystemSearchViewModelTest {
             mocksavedSitesRepository,
             mockSettingsStore,
             coroutineRule.testDispatcherProvider,
+            coroutineRule.testScope,
         )
 
         val viewState = testee.resultsViewState.value as SystemSearchViewModel.Suggestions.QuickAccessItems

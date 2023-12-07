@@ -25,6 +25,7 @@ import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.EditSavedSite
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFragment.AddBookmarkFolderListener
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.EditBookmarkFolderDialogFragment.EditBookmarkFolderListener
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -42,7 +43,7 @@ import com.duckduckgo.savedsites.api.service.SavedSitesManager
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import javax.inject.Inject
-import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
@@ -57,6 +58,7 @@ class BookmarksViewModel @Inject constructor(
     private val pixel: Pixel,
     private val syncEngine: SyncEngine,
     private val dispatcherProvider: DispatcherProvider,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : EditSavedSiteListener, AddBookmarkFolderListener, EditBookmarkFolderListener, DeleteBookmarkListener, ViewModel() {
 
     data class ViewState(
@@ -136,7 +138,7 @@ class BookmarksViewModel @Inject constructor(
     }
 
     private fun delete(savedSite: SavedSite) {
-        viewModelScope.launch(dispatcherProvider.io() + NonCancellable) {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
             if (savedSite is Bookmark) {
                 faviconManager.deletePersistedFavicon(savedSite.url)
             }
@@ -250,7 +252,7 @@ class BookmarksViewModel @Inject constructor(
     }
 
     private fun delete(bookmarkFolder: BookmarkFolder) {
-        viewModelScope.launch(dispatcherProvider.io() + NonCancellable) {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
             savedSitesRepository.deleteFolderBranch(bookmarkFolder)
         }
     }

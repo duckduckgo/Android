@@ -28,7 +28,7 @@ import org.junit.Test
 class NonCancellableDetectorTest {
 
     @Test
-    fun whenUsedInsideWithContextThenDetectedAsAViolation() {
+    fun whenUsingNonCancellableToLaunchCoroutineThenDetectedAsAViolation() {
         val callSite = """
               package com.duckduckgo.lint
               import kotlinx.coroutines.CustomScope
@@ -51,7 +51,7 @@ class NonCancellableDetectorTest {
     }
 
     @Test
-    fun whenUsedInsideWithContextThenDetectedAsAViolation1() {
+    fun whenUsingNonCancellableAndDispatcherToLaunchCoroutineThenDetectedAsAViolation() {
         val callSite = """
               package com.duckduckgo.lint
               import kotlinx.coroutines.CustomScope
@@ -71,6 +71,26 @@ class NonCancellableDetectorTest {
                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 1 errors, 0 warnings
             """)
+    }
+
+    @Test
+    fun whenUsingNonCancellableInsideWithContextThenDetectedAsANotViolation() {
+        val callSite = """
+              package com.duckduckgo.lint
+              import kotlinx.coroutines.CustomScope
+                
+                class Duck {
+                    private val scope = CustomScope()
+                    fun quack() {
+                        scope.launch {
+                            withContext(NonCancellable) {
+                            }
+                        }                
+                    }
+                }
+            """
+
+        assertNotLintError(listOf(TestFiles.kotlin(callSite).indented(), TestFiles.kt(classDefinitions)))
     }
 
     private val classDefinitions = """
@@ -96,7 +116,12 @@ class CustomScope {
             .expectContains(expectedError)
     }
 
-    companion object {
-        private const val expectedError = "dafas"
+    private fun assertNotLintError(files: List<TestFile>) {
+        TestLintTask.lint()
+            .files(*files.toTypedArray())
+            .issues(ISSUE_NON_CANCELLABLE)
+            .testModes(TestMode.DEFAULT)
+            .run()
+            .expectClean()
     }
 }

@@ -27,6 +27,7 @@ import com.android.tools.lint.detector.api.SourceCodeScanner
 import com.intellij.psi.PsiMethod
 import org.jetbrains.uast.UCallExpression
 import org.jetbrains.uast.UExpression
+import org.jetbrains.uast.ULambdaExpression
 import java.util.EnumSet
 
 /*
@@ -73,6 +74,7 @@ class NonCancellableDetector : Detector(), SourceCodeScanner {
     }
 
     private fun isNonCancellable(argument: UExpression): Boolean {
+        if(argument is ULambdaExpression) return false
         // Check if the argument is NonCancellable
         return argument.asSourceString().contains("NonCancellable")
     }
