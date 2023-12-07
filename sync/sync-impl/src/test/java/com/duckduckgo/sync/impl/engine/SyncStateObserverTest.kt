@@ -10,7 +10,6 @@ import kotlinx.coroutines.test.*
 import org.junit.*
 import org.mockito.kotlin.*
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class SyncStateObserverTest {
 
     @get:Rule

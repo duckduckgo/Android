@@ -25,7 +25,6 @@ import com.duckduckgo.privacy.config.impl.RealPrivacyConfigPersisterTest.FakeFak
 import com.duckduckgo.privacy.config.impl.RealPrivacyConfigPersisterTest.FakePrivacyConfigCallbackPlugin
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
 import com.duckduckgo.privacy.config.impl.network.PrivacyConfigService
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Assert.assertTrue
@@ -38,7 +37,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import retrofit2.Response
 
-@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class RealPrivacyConfigDownloaderTest {
 

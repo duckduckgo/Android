@@ -34,7 +34,6 @@ import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.SELF_STOP
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import org.junit.After
 import org.junit.Assert.*
@@ -50,12 +49,10 @@ import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 
-@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class AppTPCPUMonitorTest {
     private lateinit var cpuMonitor: AppTPCPUMonitor
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 

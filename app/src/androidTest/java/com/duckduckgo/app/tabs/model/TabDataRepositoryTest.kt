@@ -33,7 +33,6 @@ import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.privacy.config.api.ContentBlocking
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
@@ -44,7 +43,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.*
 
-@ExperimentalCoroutinesApi
 class TabDataRepositoryTest {
 
     @get:Rule
@@ -55,7 +53,6 @@ class TabDataRepositoryTest {
     @Suppress("unused")
     val schedulers = InstantSchedulersRule()
 
-    @ExperimentalCoroutinesApi
     @get:Rule
     var coroutinesTestRule = CoroutineTestRule()
 
@@ -330,7 +327,6 @@ class TabDataRepositoryTest {
     }
 
     @Test
-    @ExperimentalCoroutinesApi
     fun whenDaoFLowDeletableTabsEmitsThenDropFirstEmission() = runTest {
         val testee = tabDataRepository()
         val tab = TabEntity("ID", position = 0)
@@ -346,7 +342,6 @@ class TabDataRepositoryTest {
     }
 
     @Test
-    @ExperimentalCoroutinesApi
     fun whenDaoFLowDeletableTabsEmitsThenEmit() = runTest {
         val testee = tabDataRepository()
         val tab = TabEntity("ID1", position = 0)
@@ -364,7 +359,6 @@ class TabDataRepositoryTest {
     }
 
     @Test
-    @ExperimentalCoroutinesApi
     fun whenDaoFLowDeletableTabsDoubleEmitsThenDistinctUntilChanged() = runTest {
         val testee = tabDataRepository()
         val tab = TabEntity("ID1", position = 0)

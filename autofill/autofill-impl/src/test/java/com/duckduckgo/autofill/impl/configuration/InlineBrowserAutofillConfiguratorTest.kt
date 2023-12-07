@@ -20,7 +20,6 @@ import android.webkit.WebView
 import com.duckduckgo.app.autofill.JavascriptInjector
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.common.test.CoroutineTestRule
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -32,7 +31,6 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-@ExperimentalCoroutinesApi
 class InlineBrowserAutofillConfiguratorTest {
 
     @get:Rule var coroutineRule = CoroutineTestRule()

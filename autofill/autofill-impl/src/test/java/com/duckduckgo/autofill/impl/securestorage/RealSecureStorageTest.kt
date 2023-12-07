@@ -22,7 +22,6 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.securestorage.store.SecureStorageRepository
 import com.duckduckgo.securestorage.store.SecureStorageRepository.Factory
 import com.duckduckgo.securestorage.store.db.WebsiteLoginCredentialsEntity
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -40,7 +39,6 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
-@ExperimentalCoroutinesApi
 class RealSecureStorageTest {
     private lateinit var testee: RealSecureStorage
 

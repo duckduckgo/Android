@@ -22,7 +22,6 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.autofill.store.AutofillDatabase
 import com.duckduckgo.autofill.store.CredentialsSyncMetadataEntity
 import com.duckduckgo.common.test.CoroutineTestRule
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -31,7 +30,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 internal class CredentialsSyncMetadataTest {
 

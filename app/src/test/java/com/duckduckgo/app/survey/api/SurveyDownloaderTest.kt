@@ -23,7 +23,6 @@ import com.duckduckgo.app.survey.model.Survey.Status.SCHEDULED
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.networkprotection.impl.cohort.NetpCohortStore
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody
 import okhttp3.ResponseBody.Companion.toResponseBody
@@ -37,7 +36,6 @@ import retrofit2.Call
 import retrofit2.Response
 
 @RunWith(AndroidJUnit4::class)
-@OptIn(ExperimentalCoroutinesApi::class)
 class SurveyDownloaderTest {
     private var mockService: SurveyService = mock()
     private var mockEmailManager: EmailManager = mock()

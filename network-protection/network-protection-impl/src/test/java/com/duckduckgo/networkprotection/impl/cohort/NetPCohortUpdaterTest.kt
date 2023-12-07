@@ -19,7 +19,6 @@ package com.duckduckgo.networkprotection.impl.cohort
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -33,7 +32,6 @@ import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import org.threeten.bp.LocalDate
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class NetPCohortUpdaterTest {
     @get:Rule
     var coroutineRule = CoroutineTestRule()

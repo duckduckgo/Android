@@ -30,7 +30,6 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.experiments.api.VariantManager
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.*
 import org.junit.Before
@@ -46,7 +45,6 @@ import org.mockito.kotlin.whenever
  * Would normally have separate tests for each assertion, but these tests are relatively expensive to run.
  */
 @LargeTest
-@ExperimentalCoroutinesApi
 class AtbIntegrationTest {
 
     private lateinit var mockVariantManager: VariantManager

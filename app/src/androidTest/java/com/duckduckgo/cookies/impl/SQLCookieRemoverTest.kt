@@ -32,7 +32,6 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
@@ -41,7 +40,6 @@ import org.junit.Assert.*
 import org.junit.Test
 import org.mockito.kotlin.*
 
-@ExperimentalCoroutinesApi
 @SuppressLint("NoHardcodedCoroutineDispatcher")
 class SQLCookieRemoverTest {
 

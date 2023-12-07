@@ -17,12 +17,10 @@
 package com.duckduckgo.autofill.impl.ui.credential.management.searching
 
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Test
 
-@ExperimentalCoroutinesApi
 class ManagementScreenAutofillCredentialMatcherTest {
 
     private val testee = ManagementScreenAutofillCredentialMatcher()

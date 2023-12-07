@@ -30,7 +30,6 @@ import com.duckduckgo.app.pixels.AppPixelName.EMAIL_ENABLED
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.sync.settings.api.SyncSettingsListener
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.TestScope
@@ -47,7 +46,6 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.*
 
 @FlowPreview
-@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class AppEmailManagerTest {
 

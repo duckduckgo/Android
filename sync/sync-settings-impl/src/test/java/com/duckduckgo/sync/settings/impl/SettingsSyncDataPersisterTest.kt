@@ -34,7 +34,6 @@ import org.junit.Assert.assertTrue
 import org.junit.runner.*
 import org.mockito.Mockito.*
 
-@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class SettingsSyncDataPersisterTest {
 

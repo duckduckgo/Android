@@ -24,14 +24,12 @@ import com.duckduckgo.downloads.store.DownloadStatus.FINISHED
 import com.duckduckgo.downloads.store.DownloadStatus.STARTED
 import com.duckduckgo.downloads.store.DownloadsDao
 import com.duckduckgo.downloads.store.DownloadsDatabase
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.*
 
-@ExperimentalCoroutinesApi
 class DefaultDownloadsRepositoryTest {
 
     @get:Rule

@@ -41,7 +41,6 @@ import com.squareup.moshi.Moshi
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import org.junit.After
@@ -52,7 +51,6 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import org.mockito.kotlin.mock
 
-@ExperimentalCoroutinesApi
 @RunWith(Parameterized::class)
 @SuppressLint("NoHardcodedCoroutineDispatcher")
 class FireproofingReferenceTest(private val testCase: TestCase) {

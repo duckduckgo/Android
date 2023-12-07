@@ -26,7 +26,6 @@ import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerEntity
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -38,7 +37,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.threeten.bp.LocalDateTime
 
-@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class AppTrackerBlockingStatsRepositoryTest {
 

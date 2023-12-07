@@ -36,7 +36,6 @@ import com.duckduckgo.common.utils.formatters.time.TimeDiffFormatter
 import com.duckduckgo.downloads.api.DownloadsRepository
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus.FINISHED
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -51,11 +50,9 @@ import org.robolectric.annotation.Config
 import org.threeten.bp.LocalDateTime
 
 @RunWith(AndroidJUnit4::class)
-@ExperimentalCoroutinesApi
 @Config(manifest = Config.NONE)
 class DownloadsViewModelTest {
 
-    @ExperimentalCoroutinesApi
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 

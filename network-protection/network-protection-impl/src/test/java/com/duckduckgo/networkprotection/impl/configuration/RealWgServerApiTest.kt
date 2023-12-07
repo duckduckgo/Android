@@ -20,7 +20,6 @@ import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.WgServerD
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.FakeNetPGeoswitchingRepository
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpEgressServersProvider
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository.UserPreferredLocation
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -29,7 +28,6 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.verify
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class RealWgServerApiTest {
     private val wgVpnControllerService = FakeWgVpnControllerService()
 

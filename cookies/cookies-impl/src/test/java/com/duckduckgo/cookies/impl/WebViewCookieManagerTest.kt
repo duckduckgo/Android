@@ -21,7 +21,6 @@ import android.webkit.ValueCallback
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.cookies.api.RemoveCookiesStrategy
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import org.junit.Before
@@ -34,7 +33,6 @@ private data class Cookie(
     val value: String,
 )
 
-@ExperimentalCoroutinesApi
 class WebViewCookieManagerTest {
     @get:Rule
     @Suppress("unused")

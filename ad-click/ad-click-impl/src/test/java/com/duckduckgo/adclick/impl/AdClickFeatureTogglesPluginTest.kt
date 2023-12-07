@@ -19,7 +19,6 @@ package com.duckduckgo.adclick.impl
 import com.duckduckgo.adclick.api.AdClickFeatureName
 import com.duckduckgo.adclick.store.AdClickFeatureToggleRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
@@ -27,7 +26,6 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
-@ExperimentalCoroutinesApi
 class AdClickFeatureTogglesPluginTest {
 
     private val adClickFeatureToggleRepository: AdClickFeatureToggleRepository = mock()

@@ -23,7 +23,6 @@ import com.duckduckgo.mobile.android.vpn.VpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.network.FakeVpnNetworkStack
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -31,7 +30,6 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class VpnNetworkStackProviderTest {
 
     private val vpnNetworkStacks: PluginPoint<VpnNetworkStack> = mock()
