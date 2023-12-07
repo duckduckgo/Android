@@ -18,6 +18,7 @@ package com.duckduckgo.privacyprotectionspopup.impl
 
 import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -26,6 +27,7 @@ import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DISABLE_PROTECTIONS_CLICKED
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DISMISSED
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DISMISS_CLICKED
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupViewState
 import com.duckduckgo.privacyprotectionspopup.impl.db.PopupDismissDomainRepository
 import com.duckduckgo.privacyprotectionspopup.impl.db.ToggleUsageTimestampRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -96,186 +98,217 @@ class PrivacyProtectionsPopupManagerImplTest {
 
     @Test
     fun whenRefreshIsTriggeredThenPopupIsShown() = runTest {
-        subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
-        subject.onPageRefreshTriggeredByUser()
+        subject.viewState.test {
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
 
-        assertPopupVisible(visible = true)
+            assertPopupVisible(visible = true)
+        }
     }
 
     @Test
     fun whenUrlIsDuckDuckGoThenPopupIsNotShown() = runTest {
-        subject.onPageLoaded(url = "https://duckduckgo.com", httpErrorCodes = emptyList(), hasBrowserError = false)
-        subject.onPageRefreshTriggeredByUser()
+        subject.viewState.test {
+            subject.onPageLoaded(url = "https://duckduckgo.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
 
-        assertPopupVisible(visible = false)
+            assertPopupVisible(visible = false)
+        }
     }
 
     @Test
     fun whenFeatureIsDisabledThenPopupIsNotShown() = runTest {
         featureAvailability.featureAvailable = false
-        subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
-        subject.onPageRefreshTriggeredByUser()
+        subject.viewState.test {
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
 
-        assertPopupVisible(visible = false)
+            assertPopupVisible(visible = false)
+        }
     }
 
     @Test
     fun whenProtectionsAreDisabledThenPopupIsNotShown() = runTest {
         protectionsStateProvider.protectionsEnabled = false
-        subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
-        subject.onPageRefreshTriggeredByUser()
 
-        assertPopupVisible(visible = false)
+        subject.viewState.test {
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
+
+            assertPopupVisible(visible = false)
+        }
     }
 
     @Test
     fun whenUrlIsMissingThenPopupIsNotShown() = runTest {
-        subject.onPageLoaded(url = "", httpErrorCodes = emptyList(), hasBrowserError = false)
-        subject.onPageRefreshTriggeredByUser()
+        subject.viewState.test {
+            subject.onPageLoaded(url = "", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
 
-        assertPopupVisible(visible = false)
+            assertPopupVisible(visible = false)
+        }
     }
 
     @Test
     fun whenPageLoadedWithHttpErrorThenPopupIsNotShown() = runTest {
-        subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = listOf(500), hasBrowserError = false)
-        subject.onPageRefreshTriggeredByUser()
+        subject.viewState.test {
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = listOf(500), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
 
-        assertPopupVisible(visible = false)
+            assertPopupVisible(visible = false)
+        }
     }
 
     @Test
     fun whenPageLoadedWithBrowserErrorThenPopupIsNotShown() = runTest {
-        subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = true)
-        subject.onPageRefreshTriggeredByUser()
+        subject.viewState.test {
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = true)
+            subject.onPageRefreshTriggeredByUser()
 
-        assertPopupVisible(visible = false)
+            assertPopupVisible(visible = false)
+        }
     }
 
     @Test
-    fun whenPageIsChangedThenPopupIsDismissed() = runTest {
-        subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
-        subject.onPageRefreshTriggeredByUser()
+    fun whenPageIsChangedThenPopupIsNotDismissed() = runTest {
+        subject.viewState.test {
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
 
-        assertPopupVisible(visible = true)
+            assertPopupVisible(visible = true)
 
-        subject.onPageLoaded(url = "https://www.example2.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageLoaded(url = "https://www.example2.com", httpErrorCodes = emptyList(), hasBrowserError = false)
 
-        assertPopupVisible(visible = false)
+            expectNoEvents()
+        }
     }
 
     @Test
     fun whenDismissEventIsHandledThenViewStateIsUpdated() = runTest {
-        subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
-        subject.onPageRefreshTriggeredByUser()
+        subject.viewState.test {
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
 
-        assertPopupVisible(visible = true)
+            assertPopupVisible(visible = true)
 
-        subject.onUiEvent(DISMISSED)
+            subject.onUiEvent(DISMISSED)
 
-        assertPopupVisible(visible = false)
+            assertPopupVisible(visible = false)
+        }
     }
 
     @Test
     fun whenDismissButtonClickedEventIsHandledThenPopupIsDismissed() = runTest {
-        subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
-        subject.onPageRefreshTriggeredByUser()
+        subject.viewState.test {
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
 
-        assertPopupVisible(visible = true)
+            assertPopupVisible(visible = true)
 
-        subject.onUiEvent(DISMISS_CLICKED)
+            subject.onUiEvent(DISMISS_CLICKED)
 
-        assertPopupVisible(visible = false)
-        assertStoredPopupDismissTimestamp(url = "https://www.example.com", expectedTimestamp = timeProvider.time)
+            assertPopupVisible(visible = false)
+            assertStoredPopupDismissTimestamp(url = "https://www.example.com", expectedTimestamp = timeProvider.time)
+        }
     }
 
     @Test
     fun whenDisableProtectionsClickedEventIsHandledThenPopupIsDismissed() = runTest {
-        subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
-        subject.onPageRefreshTriggeredByUser()
-
-        assertPopupVisible(visible = true)
-
-        subject.onUiEvent(DISABLE_PROTECTIONS_CLICKED)
-
-        assertPopupVisible(visible = false)
-        assertStoredPopupDismissTimestamp(url = "https://www.example.com", expectedTimestamp = timeProvider.time)
-    }
-
-    @Test
-    fun whenDisableProtectionsClickedEventIsHandledThenDomainIsAddedToUserAllowlist() = runTest {
-        subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
-        subject.onPageRefreshTriggeredByUser()
-        assertFalse(userAllowListRepository.isUrlInUserAllowList("https://www.example.com"))
-        assertPopupVisible(visible = true)
-
-        subject.onUiEvent(DISABLE_PROTECTIONS_CLICKED)
-
-        assertPopupVisible(visible = false)
-        assertTrue(userAllowListRepository.isUrlInUserAllowList("https://www.example.com"))
-    }
-
-    @Test
-    fun whenPopupWasDismissedRecentlyForTheSameDomainThenItWontBeShownOnRefresh() = runTest {
-        subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
-        subject.onPageRefreshTriggeredByUser()
-        subject.onUiEvent(DISMISSED)
-        assertStoredPopupDismissTimestamp(url = "https://www.example.com", expectedTimestamp = timeProvider.time)
-
-        subject.onPageRefreshTriggeredByUser()
-
-        assertPopupVisible(visible = false)
-        assertStoredPopupDismissTimestamp(url = "https://www.example.com", expectedTimestamp = timeProvider.time)
-    }
-
-    @Test
-    fun whenPopupWasDismissedMoreThan24HoursAgoForTheSameDomainThenItIsShownAgainOnRefresh() = runTest {
-        timeProvider.time = Instant.parse("2023-11-29T10:15:30.000Z")
-        subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
-        subject.onPageRefreshTriggeredByUser()
-        subject.onUiEvent(DISMISSED)
-        assertStoredPopupDismissTimestamp(url = "https://www.example.com", expectedTimestamp = timeProvider.time)
-        timeProvider.time += Duration.ofHours(24)
-
-        subject.onPageRefreshTriggeredByUser()
-
-        assertPopupVisible(visible = true)
-    }
-
-    @Test
-    fun whenPopupWasDismissedRecentlyThenItWontBeShownOnForTheSameDomainButWillBeForOtherDomains() = runTest {
-        subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
-        subject.onPageRefreshTriggeredByUser()
-        subject.onUiEvent(DISMISSED)
-
-        subject.onPageRefreshTriggeredByUser()
-
-        assertPopupVisible(visible = false)
-
-        subject.onPageLoaded(url = "https://www.example2.com", httpErrorCodes = emptyList(), hasBrowserError = false)
-        subject.onPageRefreshTriggeredByUser()
-
-        assertPopupVisible(visible = true)
-
-        subject.onUiEvent(DISMISSED)
-        subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
-        subject.onPageRefreshTriggeredByUser()
-
-        assertPopupVisible(visible = false)
-    }
-
-    @Test
-    fun whenRefreshIsTriggeredThenPopupIsNotShownUntilOtherConditionsAreMet() = runTest {
-        val protectionsEnabledFlow = MutableSharedFlow<Boolean>()
-        protectionsStateProvider.overrideProtectionsEnabledFlow(protectionsEnabledFlow)
-
         subject.viewState.test {
             assertFalse(awaitItem().visible)
             subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
             subject.onPageRefreshTriggeredByUser()
-            expectNoEvents()
-            protectionsEnabledFlow.emit(true)
+
             assertTrue(awaitItem().visible)
+
+            subject.onUiEvent(DISABLE_PROTECTIONS_CLICKED)
+
+            assertFalse(awaitItem().visible)
+            assertStoredPopupDismissTimestamp(url = "https://www.example.com", expectedTimestamp = timeProvider.time)
+        }
+    }
+
+    @Test
+    fun whenDisableProtectionsClickedEventIsHandledThenDomainIsAddedToUserAllowlist() = runTest {
+        subject.viewState.test {
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
+            assertFalse(userAllowListRepository.isUrlInUserAllowList("https://www.example.com"))
+            assertPopupVisible(visible = true)
+
+            subject.onUiEvent(DISABLE_PROTECTIONS_CLICKED)
+
+            assertPopupVisible(visible = false)
+            assertTrue(userAllowListRepository.isUrlInUserAllowList("https://www.example.com"))
+        }
+    }
+
+    @Test
+    fun whenPopupWasDismissedRecentlyForTheSameDomainThenItWontBeShownOnRefresh() = runTest {
+        subject.viewState.test {
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
+            subject.onUiEvent(DISMISSED)
+            assertStoredPopupDismissTimestamp(url = "https://www.example.com", expectedTimestamp = timeProvider.time)
+
+            subject.onPageRefreshTriggeredByUser()
+
+            assertPopupVisible(visible = false)
+            assertStoredPopupDismissTimestamp(url = "https://www.example.com", expectedTimestamp = timeProvider.time)
+        }
+    }
+
+    @Test
+    fun whenPopupWasDismissedMoreThan24HoursAgoForTheSameDomainThenItIsShownAgainOnRefresh() = runTest {
+        subject.viewState.test {
+            timeProvider.time = Instant.parse("2023-11-29T10:15:30.000Z")
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
+            subject.onUiEvent(DISMISSED)
+            assertStoredPopupDismissTimestamp(url = "https://www.example.com", expectedTimestamp = timeProvider.time)
+            timeProvider.time += Duration.ofHours(24)
+
+            subject.onPageRefreshTriggeredByUser()
+
+            assertPopupVisible(visible = true)
+        }
+    }
+
+    @Test
+    fun whenPopupWasDismissedRecentlyThenItWontBeShownOnForTheSameDomainButWillBeForOtherDomains() = runTest {
+        subject.viewState.test {
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
+            subject.onUiEvent(DISMISSED)
+
+            subject.onPageRefreshTriggeredByUser()
+
+            assertPopupVisible(visible = false)
+
+            subject.onPageLoaded(url = "https://www.example2.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
+
+            assertPopupVisible(visible = true)
+
+            subject.onUiEvent(DISMISSED)
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
+
+            assertPopupVisible(visible = false)
+        }
+    }
+
+    @Test
+    fun whenRefreshIsTriggeredBeforeDataIsLoadedThenPopupIsNotShown() = runTest {
+        val protectionsEnabledFlow = MutableSharedFlow<Boolean>()
+        protectionsStateProvider.overrideProtectionsEnabledFlow(protectionsEnabledFlow)
+
+        subject.viewState.test {
+            assertPopupVisible(visible = false)
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
+            protectionsEnabledFlow.emit(true)
+            expectNoEvents()
         }
     }
 
@@ -285,16 +318,12 @@ class PrivacyProtectionsPopupManagerImplTest {
         protectionsStateProvider.overrideProtectionsEnabledFlow(protectionsEnabledFlow)
 
         subject.viewState.test {
-            assertFalse(awaitItem().visible)
             subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
             subject.onPageRefreshTriggeredByUser()
-            expectNoEvents()
             timeProvider.time += Duration.ofSeconds(5)
             protectionsEnabledFlow.emit(true)
-            expectNoEvents()
+            assertPopupVisible(visible = false)
         }
-
-        assertPopupVisible(visible = false)
     }
 
     @Test
@@ -302,10 +331,12 @@ class PrivacyProtectionsPopupManagerImplTest {
         val toggleUsedAt = timeProvider.time - Duration.ofDays(10)
         toggleUsageTimestampRepository.setToggleUsageTimestamp(toggleUsedAt)
 
-        subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
-        subject.onPageRefreshTriggeredByUser()
+        subject.viewState.test {
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
 
-        assertPopupVisible(visible = false)
+            assertPopupVisible(visible = false)
+        }
     }
 
     @Test
@@ -313,17 +344,31 @@ class PrivacyProtectionsPopupManagerImplTest {
         val toggleUsedAt = timeProvider.time - Duration.ofDays(15)
         toggleUsageTimestampRepository.setToggleUsageTimestamp(toggleUsedAt)
 
-        subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
-        subject.onPageRefreshTriggeredByUser()
+        subject.viewState.test {
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
 
-        assertPopupVisible(visible = true)
+            assertPopupVisible(visible = true)
+        }
     }
 
-    private suspend fun assertPopupVisible(visible: Boolean) {
+    @Test
+    fun whenPageReloadsOnRefreshWithHttpErrorThenPopupIsNotDismissed() = runTest {
         subject.viewState.test {
-            assertEquals(visible, awaitItem().visible)
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
+
+            assertPopupVisible(visible = true)
+
+            timeProvider.time += Duration.ofSeconds(2)
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = listOf(500), hasBrowserError = false)
+
             expectNoEvents()
         }
+    }
+
+    private fun ReceiveTurbine<PrivacyProtectionsPopupViewState>.assertPopupVisible(visible: Boolean) {
+        assertEquals(visible, expectMostRecentItem().visible)
     }
 
     private suspend fun assertStoredPopupDismissTimestamp(url: String, expectedTimestamp: Instant?) {

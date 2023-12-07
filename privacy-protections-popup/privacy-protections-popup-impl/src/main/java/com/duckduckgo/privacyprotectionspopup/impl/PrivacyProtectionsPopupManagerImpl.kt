@@ -72,19 +72,19 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
         State(
             featureAvailable = false,
             protectionsEnabled = null,
-            refreshTriggeredAt = null,
             domain = null,
             hasHttpErrorCodes = false,
             hasBrowserError = false,
             popupDismissed = null,
             toggleUsed = null,
+            shouldShowPopup = false,
         ),
     )
 
     private var dataLoadingJob: Job? = null
 
     override val viewState = state
-        .map { createViewState(it) }
+        .map { PrivacyProtectionsPopupViewState(visible = it.shouldShowPopup) }
         .onStart { startDataLoading() }
         .onCompletion { stopDataLoading() }
         .stateIn(
@@ -117,7 +117,7 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
     }
 
     override fun onPageRefreshTriggeredByUser() {
-        state.update { it.copy(refreshTriggeredAt = timeProvider.getCurrentTime()) }
+        state.update { it.copy(shouldShowPopup = canShowPopup(state = it)) }
     }
 
     override fun onPageLoaded(
@@ -130,7 +130,6 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
 
             if (newDomain != oldState.domain) {
                 oldState.copy(
-                    refreshTriggeredAt = null,
                     protectionsEnabled = null,
                     domain = newDomain,
                     hasHttpErrorCodes = httpErrorCodes.isNotEmpty(),
@@ -147,6 +146,8 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
     }
 
     private fun dismissPopup() {
+        state.update { it.copy(shouldShowPopup = false) }
+
         val popupDismissedAt = timeProvider.getCurrentTime()
 
         state.value.domain?.let { domain ->
@@ -211,12 +212,12 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
     private data class State(
         val featureAvailable: Boolean,
         val protectionsEnabled: Boolean?,
-        val refreshTriggeredAt: Instant?,
         val domain: String?,
         val hasHttpErrorCodes: Boolean,
         val hasBrowserError: Boolean,
         val popupDismissed: PopupDismissed?,
         val toggleUsed: ToggleUsed?,
+        val shouldShowPopup: Boolean,
     )
 
     private sealed class PopupDismissed {
@@ -229,10 +230,7 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
         data class UsedAt(val timestamp: Instant) : ToggleUsed()
     }
 
-    private fun createViewState(state: State): PrivacyProtectionsPopupViewState = with(state) {
-        val refreshTriggered = refreshTriggeredAt != null &&
-            refreshTriggeredAt + REFRESH_TRIGGER_VALID_DURATION > timeProvider.getCurrentTime()
-
+    private fun canShowPopup(state: State): Boolean = with(state) {
         val popupDismissed = when (popupDismissed) {
             is DismissedAt -> {
                 popupDismissed.timestamp + DISMISS_REMEMBER_DURATION > timeProvider.getCurrentTime()
@@ -252,8 +250,7 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
 
         val isDuckDuckGoDomain = domain?.let { duckDuckGoUrlDetector.isDuckDuckGoUrl(it.normalizeScheme()) }
 
-        val shouldShowPopup = featureAvailable &&
-            refreshTriggered &&
+        featureAvailable &&
             protectionsEnabled == true &&
             domain != null &&
             isDuckDuckGoDomain == false &&
@@ -261,12 +258,9 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
             !hasBrowserError &&
             popupDismissed == false &&
             toggleUsed == false
-
-        return PrivacyProtectionsPopupViewState(visible = shouldShowPopup)
     }
 
     companion object {
-        private val REFRESH_TRIGGER_VALID_DURATION: Duration = Duration.ofMillis(100)
         private val DISMISS_REMEMBER_DURATION: Duration = Duration.ofDays(1)
         val TOGGLE_USAGE_REMEMBER_DURATION: Duration = Duration.ofDays(14)
     }
