@@ -27,7 +27,7 @@ interface CameraHardwareChecker {
 }
 
 @ContributesBinding(AppScope::class)
-class RealCameraHardwareChecker @Inject constructor(
+class CameraHardwareCheckerImpl @Inject constructor(
     private val context: Context,
 ) : CameraHardwareChecker {
 

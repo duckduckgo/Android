@@ -24,7 +24,7 @@ import android.provider.Settings
 import androidx.activity.result.ActivityResultCaller
 import androidx.activity.result.ActivityResultLauncher
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.filechooser.camera.RealCameraCaptureResultHandler
+import com.duckduckgo.app.browser.filechooser.camera.CameraCaptureResultHandler
 import com.duckduckgo.app.browser.filechooser.camera.launcher.UploadFromExternalCameraLauncher.CameraImageCaptureResult
 import com.duckduckgo.app.browser.filechooser.camera.permission.ExternalCameraSystemPermissionsHelper
 import com.duckduckgo.app.browser.filechooser.camera.postprocess.CameraCaptureDelayedDeleter
@@ -136,7 +136,7 @@ class PermissionAwareExternalCameraLauncher @Inject constructor(
     ) {
         callback = onResult
         registerPermissionLauncher(caller)
-        launcher = caller.registerForActivityResult(RealCameraCaptureResultHandler()) { interimFile ->
+        launcher = caller.registerForActivityResult(CameraCaptureResultHandler()) { interimFile ->
             if (interimFile == null) {
                 onResult(CameraImageCaptureResult.NoImageCaptured)
             } else {
