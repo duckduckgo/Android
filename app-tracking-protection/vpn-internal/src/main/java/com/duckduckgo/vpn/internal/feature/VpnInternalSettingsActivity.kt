@@ -34,7 +34,7 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.vpn.apps.VpnExclusionList
 import com.duckduckgo.mobile.android.vpn.apps.isSystemApp
@@ -54,11 +54,11 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
-@ContributeToActivityStarter(LaunchVpnInternalScreenWithEmptyParams::class)
 @InjectWith(
-    scope = VpnScope::class,
+    scope = ActivityScope::class,
     delayGeneration = true,
 )
+@ContributeToActivityStarter(LaunchVpnInternalScreenWithEmptyParams::class)
 class VpnInternalSettingsActivity : DuckDuckGoActivity() {
 
     @Inject

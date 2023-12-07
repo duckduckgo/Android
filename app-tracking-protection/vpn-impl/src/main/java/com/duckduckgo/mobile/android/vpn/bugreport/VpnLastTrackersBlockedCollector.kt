@@ -19,7 +19,7 @@ package com.duckduckgo.mobile.android.vpn.bugreport
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.common.utils.formatters.time.model.dateOfLastDay
-import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -30,7 +30,7 @@ import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import org.threeten.bp.LocalDateTime
 
-@ContributesMultibinding(VpnScope::class)
+@ContributesMultibinding(ActivityScope::class)
 class VpnLastTrackersBlockedCollector @Inject constructor(
     private val appTrackerBlockingRepository: AppTrackerBlockingStatsRepository,
     private val dispatcherProvider: DispatcherProvider,

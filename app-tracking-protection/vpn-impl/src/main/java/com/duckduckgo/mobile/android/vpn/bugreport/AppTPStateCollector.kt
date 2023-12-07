@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.integration
+package com.duckduckgo.mobile.android.vpn.bugreport
 
-import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
@@ -24,7 +24,7 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import org.json.JSONObject
 
-@ContributesMultibinding(VpnScope::class)
+@ContributesMultibinding(ActivityScope::class)
 class AppTPStateCollector @Inject constructor(
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
 ) : VpnStateCollectorPlugin {

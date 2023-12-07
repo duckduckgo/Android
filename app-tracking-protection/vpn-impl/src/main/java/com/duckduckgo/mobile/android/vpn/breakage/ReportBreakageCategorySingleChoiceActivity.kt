@@ -29,7 +29,6 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageCategorySingleChoiceViewModel.Command
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageCategorySingleChoiceViewModel.ViewState
@@ -37,17 +36,12 @@ import com.duckduckgo.mobile.android.vpn.databinding.ActivityReportBreakageCateg
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.ui.OpenVpnBreakageCategoryWithBrokenApp
 import com.duckduckgo.navigation.api.getActivityParams
-import dagger.WrongScope
 import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-@WrongScope(
-    comment = "To use the right scope we first need to enable dagger component nesting",
-    correctScope = ActivityScope::class,
-)
 @InjectWith(
-    scope = VpnScope::class,
+    scope = ActivityScope::class,
     delayGeneration = true,
 )
 @ContributeToActivityStarter(OpenVpnBreakageCategoryWithBrokenApp::class)
