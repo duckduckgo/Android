@@ -16,9 +16,9 @@
 
 package com.duckduckgo.autofill.sync
 
-import com.duckduckgo.securestorage.api.SecureStorage
-import com.duckduckgo.securestorage.api.WebsiteLoginDetails
-import com.duckduckgo.securestorage.api.WebsiteLoginDetailsWithCredentials
+import com.duckduckgo.autofill.impl.securestorage.SecureStorage
+import com.duckduckgo.autofill.impl.securestorage.WebsiteLoginDetails
+import com.duckduckgo.autofill.impl.securestorage.WebsiteLoginDetailsWithCredentials
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 

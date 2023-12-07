@@ -26,6 +26,9 @@ import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult
 import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult.UsernameMatch
 import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult.UsernameMissing
 import com.duckduckgo.autofill.impl.encoding.TestUrlUnicodeNormalizer
+import com.duckduckgo.autofill.impl.securestorage.SecureStorage
+import com.duckduckgo.autofill.impl.securestorage.WebsiteLoginDetails
+import com.duckduckgo.autofill.impl.securestorage.WebsiteLoginDetailsWithCredentials
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillDomainNameUrlMatcher
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillUrlMatcher
 import com.duckduckgo.autofill.store.AutofillPrefsStore
@@ -34,9 +37,6 @@ import com.duckduckgo.autofill.sync.CredentialsSyncMetadata
 import com.duckduckgo.autofill.sync.SyncCredentialsListener
 import com.duckduckgo.autofill.sync.inMemoryAutofillDatabase
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.securestorage.api.SecureStorage
-import com.duckduckgo.securestorage.api.WebsiteLoginDetails
-import com.duckduckgo.securestorage.api.WebsiteLoginDetailsWithCredentials
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first

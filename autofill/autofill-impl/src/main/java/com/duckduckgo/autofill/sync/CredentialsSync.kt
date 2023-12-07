@@ -17,13 +17,13 @@
 package com.duckduckgo.autofill.sync
 
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.impl.securestorage.SecureStorage
+import com.duckduckgo.autofill.impl.securestorage.WebsiteLoginDetails
+import com.duckduckgo.autofill.impl.securestorage.WebsiteLoginDetailsWithCredentials
 import com.duckduckgo.autofill.store.CredentialsSyncMetadataEntity
 import com.duckduckgo.autofill.sync.provider.LoginCredentialEntry
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.securestorage.api.SecureStorage
-import com.duckduckgo.securestorage.api.WebsiteLoginDetails
-import com.duckduckgo.securestorage.api.WebsiteLoginDetailsWithCredentials
 import com.duckduckgo.sync.api.SyncCrypto
 import dagger.SingleInstanceIn
 import javax.inject.*
