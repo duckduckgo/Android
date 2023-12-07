@@ -1,5 +1,4 @@
-appId: com.duckduckgo.mobile.android.debug
-tags:
+appId: com.duckduckgo.mobile.android
     - securityTest
 ---
 - launchApp:
