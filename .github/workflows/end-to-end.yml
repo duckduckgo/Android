@@ -74,6 +74,17 @@ jobs:
           workspace: .maestro
           include-tags: privacyTest
 
+      - name: Security Tests
+        if: always()
+        uses: mobile-dev-inc/action-maestro-cloud@v1.4.1
+        with:
+          api-key: ${{ secrets.MOBILE_DEV_API_KEY }}
+          name: ${{ github.sha }}
+          app-file: apk/release.apk
+          android-api-level: 30
+          workspace: .maestro
+          include-tags: securityTest
+
       - name: Release Tests
         if: always()
         uses: mobile-dev-inc/action-maestro-cloud@v1.4.1
