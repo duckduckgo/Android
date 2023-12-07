@@ -41,7 +41,7 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitli
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.PendingInviteCode
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.VerifySubscription
 import com.duckduckgo.networkprotection.impl.R
-import com.duckduckgo.networkprotection.impl.about.NetPTermsScreenNoParams
+import com.duckduckgo.networkprotection.impl.about.NetworkProtectionAboutScreens.NetPTermsScreenNoParams
 import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpWaitlistInvitedBinding
 import com.duckduckgo.networkprotection.impl.waitlist.NetPInviteCodeViewModel.Command
 import com.duckduckgo.networkprotection.impl.waitlist.NetPInviteCodeViewModel.Command.EnterInviteCode
