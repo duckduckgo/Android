@@ -35,9 +35,6 @@
     <string name="netpEnabledNotificationTitle" instruction="Placeholder is location of server with format City,Country">Network Protection is connected and routing device traffic through &lt;b>%1$s&lt;/b>.</string>
 
     <!-- Reconnect -->
-    <string name="netpMessageReconnecting">Network Protection interrupted. Attempting to reconnect now…</string>
-    <string name="netpMessageReconnectionFailed">Network Protection failed to connect. Please try again later.</string>
-    <string name="netpMessageReconnecionSuccess">Network Protection is ON. Your location and online activity are protected.</string>
     <string name="netpBannerReconnecting">Connection interrupted. Attempting to reconnect now…</string>
     <string name="netpBannerReconnectionFailed">Failed to connect. Please try again later.</string>
 
