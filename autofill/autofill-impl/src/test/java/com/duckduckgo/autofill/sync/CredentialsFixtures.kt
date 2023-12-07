@@ -17,8 +17,8 @@
 package com.duckduckgo.autofill.sync
 
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
-import com.duckduckgo.securestorage.api.WebsiteLoginDetails
-import com.duckduckgo.securestorage.api.WebsiteLoginDetailsWithCredentials
+import com.duckduckgo.autofill.impl.securestorage.WebsiteLoginDetails
+import com.duckduckgo.autofill.impl.securestorage.WebsiteLoginDetailsWithCredentials
 
 object CredentialsFixtures {
     val twitterCredentials = LoginCredentials(

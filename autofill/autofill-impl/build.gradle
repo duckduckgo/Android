@@ -30,7 +30,6 @@ dependencies {
     implementation project(path: ':common-utils')
     implementation project(path: ':common-ui')
     implementation project(path: ':autofill-api')
-    implementation project(path: ':secure-storage-api')
     implementation project(path: ':browser-api')
     implementation project(path: ':autofill-store')
     implementation project(path: ':statistics')
@@ -59,6 +58,8 @@ dependencies {
     implementation AndroidX.work.runtimeKtx
     implementation AndroidX.room.ktx
     implementation AndroidX.biometric
+
+    implementation "net.zetetic:android-database-sqlcipher:_"
 
     implementation "com.jakewharton.threetenabp:threetenabp:_"
     testImplementation "org.threeten:threetenbp:_"
