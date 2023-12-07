@@ -309,7 +309,7 @@ class BrowserWebViewClient @Inject constructor(
 
     private fun flushCookies() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            cookieManagerProvider.get().flush()
+            cookieManagerProvider.get()?.flush()
         }
     }
 
