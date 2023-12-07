@@ -30,6 +30,15 @@
     <string name="deviceNameSectionHeader">Device Name</string>
 
     <!-- Sync -->
+    <!-- Sync Disabled messages -->
+    <string name="sync_flows_disabled"><b>Service Unavailable</b>\nWe apologize, but the Sync &amp; Backup service is currently unavailable. Please try again later.</string>
+    <string name="sync_flows_disabled_new_version"><b>Service Unavailable</b>\nWe apologize, but the Sync &amp; Backup service is unavailable in this app version. Please update your app to the latest version.</string>
+    <string name="sync_create_account_disabled"><b>Service Unavailable</b>\nWe apologize, but enabling Sync &amp; Backup is currently unavailable. Please try again later.</string>
+    <string name="sync_create_account_disabled_new_version"><b>Service Unavailable</b>\nWe apologize, but enabling Sync &amp; Backup is unavailable in this app version. Please update your app to the latest version.</string>
+    <string name="sync_disabled_authenticated_user"><b>Sync Paused</b>\nWe apologize, but the Sync &amp; Backup service is currently unavailable.</string>
+    <string name="sync_disabled_authenticated_user_new_version"><b>Sync Paused</b>\nWe apologize, but the Sync &amp; Backup service is unavailable in this app version. Please update your app to resume syncing.</string>
+    <string name="sync_paused_notification"><b>Sync Paused</b>\nWe apologize, but the Sync &amp; Backup service is currently unavailable.</string>
+
     <!-- Settings screen -->
     <string name="sync_screen_title">Sync &amp; Backup</string>
     <string name="sync_setup_begin_syncing">Begin Syncing</string>

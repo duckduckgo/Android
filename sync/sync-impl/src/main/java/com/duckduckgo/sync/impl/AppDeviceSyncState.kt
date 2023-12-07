@@ -16,8 +16,6 @@
 
 package com.duckduckgo.sync.impl
 
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.DeviceSyncState
 import com.squareup.anvil.annotations.ContributesBinding
@@ -29,14 +27,13 @@ import javax.inject.*
     priority = ContributesBinding.Priority.HIGHEST,
 )
 class AppDeviceSyncState @Inject constructor(
-    private val appBuildConfig: AppBuildConfig,
-    private val syncFeature: SyncFeature,
+    private val syncFeatureToggle: SyncFeatureToggle,
     private val syncAccountRepository: SyncAccountRepository,
 ) : DeviceSyncState {
 
     override fun isUserSignedInOnDevice(): Boolean = syncAccountRepository.isSignedIn()
 
     override fun isFeatureEnabled(): Boolean {
-        return syncFeature.self().isEnabled() || appBuildConfig.isInternalBuild()
+        return syncFeatureToggle.showSync()
     }
 }

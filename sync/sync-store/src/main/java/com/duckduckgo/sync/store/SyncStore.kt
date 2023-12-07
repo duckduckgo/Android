@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 
 interface SyncStore {
+    var syncingDataEnabled: Boolean
     var userId: String?
     var deviceName: String?
     var deviceId: String?
@@ -112,6 +113,14 @@ constructor(
             }
         }
 
+    override var syncingDataEnabled: Boolean
+        get() = encryptedPreferences?.getBoolean(KEY_SYNCING_DATA_ENABLED, true) ?: true
+        set(value) {
+            encryptedPreferences?.edit(commit = true) {
+                putBoolean(KEY_SYNCING_DATA_ENABLED, value)
+            }
+        }
+
     override var secretKey: String?
         get() = encryptedPreferences?.getString(KEY_SK, null)
         set(value) {
@@ -161,6 +170,7 @@ constructor(
         private const val KEY_DEVICE_ID = "KEY_DEVICE_ID"
         private const val KEY_DEVICE_NAME = "KEY_DEVICE_NAME"
         private const val KEY_TOKEN = "KEY_TOKEN"
+        private const val KEY_SYNCING_DATA_ENABLED = "KEY_SYNCING_DATA_ENABLED"
         private const val KEY_PK = "KEY_PK"
         private const val KEY_SK = "KEY_SK"
     }

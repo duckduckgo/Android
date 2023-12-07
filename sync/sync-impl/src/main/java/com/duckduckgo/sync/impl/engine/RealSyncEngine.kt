@@ -61,7 +61,7 @@ class RealSyncEngine @Inject constructor(
 
     override fun triggerSync(trigger: SyncTrigger) {
         Timber.i("Sync-Engine: petition to sync now trigger: $trigger")
-        if (syncStore.isSignedIn()) {
+        if (syncStore.isSignedIn() && syncStore.syncingDataEnabled) {
             Timber.d("Sync-Engine: sync enabled, triggering operation: $trigger")
             when (trigger) {
                 BACKGROUND_SYNC -> scheduleSync(trigger)

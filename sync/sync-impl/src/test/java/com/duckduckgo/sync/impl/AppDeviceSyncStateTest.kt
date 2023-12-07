@@ -16,9 +16,7 @@
 
 package com.duckduckgo.sync.impl
 
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.appbuildconfig.api.BuildFlavor
-import com.duckduckgo.feature.toggles.api.Toggle
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -26,10 +24,9 @@ import org.mockito.kotlin.whenever
 
 internal class AppDeviceSyncStateTest {
 
-    private val appBuildConfig: AppBuildConfig = mock()
-    private val syncFeature: SyncFeature = mock()
+    private val syncFeatureToggle: SyncFeatureToggle = mock()
     private val syncAccountRepository: SyncAccountRepository = mock()
-    private val appDeviceSyncState = AppDeviceSyncState(appBuildConfig, syncFeature, syncAccountRepository)
+    private val appDeviceSyncState = AppDeviceSyncState(syncFeatureToggle, syncAccountRepository)
 
     @Test
     fun whenUserSignedInThenDeviceSyncEnabled() {
@@ -39,24 +36,20 @@ internal class AppDeviceSyncStateTest {
     }
 
     @Test
-    fun whenInternalBuildThenFeatureEnabled() {
-        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
+    fun whenShowSyncDisabledThenFeatureDisabled() {
         givenFeatureFlag(enabled = false)
 
-        assertTrue(appDeviceSyncState.isFeatureEnabled())
+        assertFalse(appDeviceSyncState.isFeatureEnabled())
     }
 
     @Test
-    fun whenFeatureFlagEnabledThenFeatureEnabled() {
-        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
+    fun whenShowSyncEnabledThenFeatureEnabled() {
         givenFeatureFlag(enabled = true)
 
         assertTrue(appDeviceSyncState.isFeatureEnabled())
     }
 
     private fun givenFeatureFlag(enabled: Boolean) {
-        val toggle: Toggle = mock()
-        whenever(toggle.isEnabled()).thenReturn(enabled)
-        whenever(syncFeature.self()).thenReturn(toggle)
+        whenever(syncFeatureToggle.showSync()).thenReturn(enabled)
     }
 }

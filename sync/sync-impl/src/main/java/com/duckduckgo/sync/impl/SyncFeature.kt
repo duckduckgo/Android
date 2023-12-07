@@ -22,9 +22,22 @@ import com.duckduckgo.feature.toggles.api.Toggle
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
-    featureName = "deviceSync",
+    featureName = "sync",
 )
 interface SyncFeature {
     @Toggle.DefaultValue(false)
+    @Toggle.InternalAlwaysEnabled
     fun self(): Toggle
+
+    @Toggle.DefaultValue(true)
+    fun level0ShowSync(): Toggle
+
+    @Toggle.DefaultValue(true)
+    fun level1AllowDataSyncing(): Toggle
+
+    @Toggle.DefaultValue(false)
+    fun level2AllowSetupFlows(): Toggle
+
+    @Toggle.DefaultValue(true)
+    fun level3AllowCreateAccount(): Toggle
 }
