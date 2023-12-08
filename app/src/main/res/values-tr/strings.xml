@@ -776,4 +776,14 @@
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Adres çubuğuna Gizli Sesli Arama seçeneğini ekleyin. Ses kaydı depolanmaz veya DuckDuckGo dâhil olmak üzere kimseyle paylaşılmaz.</string>
     <string name="accessibilityVoiceSearchTitle">Özel Sesli Arama</string>
+
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">Kameraya erişilemedi</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">Bir resim yükle</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Dosya Seç</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Fotoğraf Çek</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">DuckDuckGo\'nun bu cihazda kamera erişimi istemesine izin ver</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Siteler kameranızı yalnızca DuckDuckGo\'nun erişim istemesine izin verirseniz kullanabilir.</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">Ayarları Aç</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">Vazgeç</string>
 </resources>
