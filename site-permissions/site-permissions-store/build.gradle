@@ -34,6 +34,9 @@ android {
         androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
     }
     namespace 'com.duckduckgo.site.permissions.store'
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
+    }
 }
 
 dependencies {
@@ -41,10 +44,8 @@ dependencies {
     implementation project(path: ':common-utils')
     implementation project(path: ':feature-toggles-api')
     ksp AndroidX.room.compiler
-    implementation "com.jakewharton.threetenabp:threetenabp:_"
     implementation Google.dagger
 
     testImplementation project(path: ':common-test')
-    testImplementation "org.threeten:threetenbp:_"
     testImplementation Testing.junit4
 }

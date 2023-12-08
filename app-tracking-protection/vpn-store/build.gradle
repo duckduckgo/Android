@@ -40,6 +40,9 @@ android {
             includeAndroidResources = true
         }
     }
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
+    }
 }
 
 dependencies {
@@ -50,9 +53,6 @@ dependencies {
     implementation project(path: ':app-build-config-api')
 
     implementation AndroidX.core.ktx
-
-    implementation "com.jakewharton.threetenabp:threetenabp:_"
-    testImplementation "org.threeten:threetenbp:_"
 
     implementation "com.squareup.logcat:logcat:_"
 

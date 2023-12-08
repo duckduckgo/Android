@@ -32,6 +32,9 @@ android {
         }
     }
     namespace 'com.duckduckgo.sync.store'
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
+    }
 }
 
 dependencies {
@@ -47,9 +50,6 @@ dependencies {
     implementation project(path: ':common-utils')
 
     ksp AndroidX.room.compiler
-
-    implementation "com.jakewharton.threetenabp:threetenabp:_"
-    testImplementation "org.threeten:threetenbp:_"
 
     testImplementation Testing.junit4
     testImplementation Testing.robolectric

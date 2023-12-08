@@ -27,7 +27,6 @@ import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.DaggerMap
-import com.jakewharton.threetenabp.AndroidThreeTen
 import dagger.android.AndroidInjector
 import dagger.android.HasDaggerInjector
 import io.reactivex.exceptions.UndeliverableException
@@ -35,7 +34,6 @@ import io.reactivex.plugins.RxJavaPlugins
 import java.io.File
 import javax.inject.Inject
 import kotlinx.coroutines.*
-import org.threeten.bp.zone.ZoneRulesProvider
 import timber.log.Timber
 
 private const val VPN_PROCESS_NAME = "vpn"
@@ -78,7 +76,6 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
         configureDependencyInjection()
         setupActivityLifecycleCallbacks()
         configureUncaughtExceptionHandlerBrowser()
-        initializeDateLibrary()
 
         // Deprecated, we need to move all these into AppLifecycleEventObserver
         ProcessLifecycleOwner.get().lifecycle.apply {
@@ -99,7 +96,6 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
             Timber.d("Init for secondary process $shortProcessName with pid=${android.os.Process.myPid()}")
             configureDependencyInjection()
             configureUncaughtExceptionHandlerVpn()
-            initializeDateLibrary()
 
             // ProcessLifecycleOwner doesn't know about secondary processes, so the callbacks are our own callbacks and limited to onCreate which
             // is good enough.
@@ -185,14 +181,6 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
             }
         }
         return dir
-    }
-
-    private fun initializeDateLibrary() {
-        AndroidThreeTen.init(this)
-        // Query the ZoneRulesProvider so that it is loaded on a background coroutine
-        GlobalScope.launch(dispatchers.io()) {
-            ZoneRulesProvider.getAvailableZoneIds()
-        }
     }
 
     /**

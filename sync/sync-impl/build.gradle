@@ -70,9 +70,6 @@ dependencies {
     implementation AndroidX.room.runtime
     implementation AndroidX.room.ktx
 
-    implementation "com.jakewharton.threetenabp:threetenabp:_"
-    testImplementation "org.threeten:threetenbp:_"
-
     // Testing dependencies
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.junit4
@@ -106,6 +103,9 @@ android {
         unitTests {
             includeAndroidResources = true
         }
+    }
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
     }
 }
 
