@@ -47,6 +47,7 @@ class DatabaseDateFormatterTest {
     @Test
     fun whenIso8601isParsedThenDateIsCorrect() {
         val now = OffsetDateTime.now(ZoneOffset.UTC)
+            .truncatedTo(ChronoUnit.MILLIS) // SystemClock returns time with higher precision on JVM
         val format = DatabaseDateFormatter.iso8601(now)
         val offsetDateMillis = DatabaseDateFormatter.millisIso8601(now)
         val formatted = DatabaseDateFormatter.parseMillisIso8601(offsetDateMillis)
