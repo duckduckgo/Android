@@ -127,4 +127,10 @@ interface SyncSavedSitesRepository {
      * @param folders list of folders to be stored
      */
     fun addResponseMetadata(folders: List<SyncSavedSitesResponseEntry>)
+
+    /**
+     * Deletes all existing metadata
+     * This is called when Sync is disabled so all previous metadata is removed
+     */
+    fun removeMetadata()
 }

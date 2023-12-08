@@ -233,4 +233,8 @@ class RealSyncSavedSitesRepository(
         Timber.d("Sync-Bookmarks-Metadata: adding children response metadata for folders: $children")
         savedSitesSyncMetadataDao.confirmChildren(children)
     }
+
+    override fun removeMetadata() {
+        savedSitesSyncMetadataDao.removeAll()
+    }
 }

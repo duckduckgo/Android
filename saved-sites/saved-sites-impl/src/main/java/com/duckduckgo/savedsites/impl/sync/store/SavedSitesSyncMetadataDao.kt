@@ -68,6 +68,6 @@ interface SavedSitesSyncMetadataDao {
 @Entity(tableName = "saved_sites_sync_meta")
 data class SavedSitesSyncMetadataEntity(
     @PrimaryKey val folderId: String,
-    var childrenResponse: String, // JSON representation of list of children confirmed by the BE
-    var childrenRequest: String, // JSON representation of list of children sent to the BE
+    var childrenResponse: String?, // JSON representation of list of children confirmed by the BE
+    var childrenRequest: String?, // JSON representation of list of children sent to the BE
 )
