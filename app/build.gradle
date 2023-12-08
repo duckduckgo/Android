@@ -65,6 +65,7 @@ android {
         viewBinding = true
     }
     compileOptions {
+        coreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
@@ -442,6 +443,8 @@ dependencies {
     androidTestImplementation project(':common-test')
     testImplementation project(':common-test')
     lintChecks project(":lint-rules")
+
+    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 
 tasks.register('fastlaneVersionCode') {
