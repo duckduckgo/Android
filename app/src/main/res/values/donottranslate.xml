@@ -46,14 +46,4 @@
     <!-- DRM -->
     <string name="sitePermissionsSettingsDRM">DRM</string>
 
-    <string name="imageCaptureCameraUnavailable">Could not access camera</string>
-    <string name="imageCaptureCameraGalleryDisambiguationTitle">Upload an image</string>
-    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Choose File</string>
-    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Take Photo</string>
-
-    <string name="imageCaptureCameraPermissionDeniedTitle">Allow DuckDuckGo to ask for camera access on this device</string>
-    <string name="imageCaptureCameraPermissionDeniedMessage">Sites can only use your camera if you allow DuckDuckGo to ask for access.</string>
-    <string name="imageCaptureCameraPermissionDeniedPositiveButton">Open Settings</string>
-    <string name="imageCaptureCameraPermissionDeniedNegativeButton">Cancel</string>
-
 </resources>
