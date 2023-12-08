@@ -70,7 +70,7 @@ class FirstPartyCookiesReferenceTest(private val testCase: TestCase) {
 
     private val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
     private val cookieManagerProvider = DefaultCookieManagerProvider()
-    private val cookieManager = cookieManagerProvider.get()
+    private val cookieManager = cookieManagerProvider.get()!!
     private val cookiesRepository = mock<CookiesRepository>()
     private val unprotectedTemporary = mock<UnprotectedTemporary>()
     private val userAllowListRepository = mock<UserAllowListRepository>()

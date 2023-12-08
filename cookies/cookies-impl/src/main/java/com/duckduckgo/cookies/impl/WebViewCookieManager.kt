@@ -48,7 +48,7 @@ class WebViewCookieManager @Inject constructor(
         // These cookies are not stored in a personally identifiable way. For example, the large size setting is stored as 's=l.'
         // More info in https://duckduckgo.com/privacy
         val ddgCookies = getDuckDuckGoCookies()
-        if (cookieManager.get().hasCookies()) {
+        if (cookieManager.get()?.hasCookies() == true) {
             removeCookies.removeCookies()
             storeDuckDuckGoCookies(ddgCookies)
         }
@@ -69,7 +69,7 @@ class WebViewCookieManager @Inject constructor(
 
     private suspend fun storeCookie(cookie: String, host: String) {
         suspendCoroutine { continuation ->
-            cookieManager.get().setCookie(host, cookie) { success ->
+            cookieManager.get()?.setCookie(host, cookie) { success ->
                 Timber.v("Cookie $cookie stored successfully: $success")
                 continuation.resume(Unit)
             }
@@ -79,13 +79,13 @@ class WebViewCookieManager @Inject constructor(
     private fun getDuckDuckGoCookies(): Map<String, List<String>> {
         val map = mutableMapOf<String, List<String>>()
         DDG_COOKIE_DOMAINS.forEach { host ->
-            map[host] = cookieManager.get().getCookie(host)?.split(";").orEmpty()
+            map[host] = cookieManager.get()?.getCookie(host)?.split(";").orEmpty()
         }
         return map
     }
 
     override fun flush() {
-        cookieManager.get().flush()
+        cookieManager.get()?.flush()
     }
 
     companion object {

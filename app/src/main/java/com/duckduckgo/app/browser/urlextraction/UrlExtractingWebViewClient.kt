@@ -65,7 +65,7 @@ class UrlExtractingWebViewClient(
     }
 
     private fun flushCookies() {
-        appCoroutineScope.launch(dispatcherProvider.io()) { cookieManagerProvider.get().flush() }
+        appCoroutineScope.launch(dispatcherProvider.io()) { cookieManagerProvider.get()?.flush() }
     }
 
     @WorkerThread

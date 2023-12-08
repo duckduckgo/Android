@@ -44,7 +44,7 @@ class AppThirdPartyCookieManagerTest {
     var coroutinesTestRule = CoroutineTestRule()
 
     private val cookieManagerProvider = DefaultCookieManagerProvider()
-    private val cookieManager = cookieManagerProvider.get()
+    private val cookieManager = cookieManagerProvider.get()!!
     private lateinit var db: AppDatabase
     private lateinit var authCookiesAllowedDomainsDao: AuthCookiesAllowedDomainsDao
     private lateinit var authCookiesAllowedDomainsRepository: AuthCookiesAllowedDomainsRepository
