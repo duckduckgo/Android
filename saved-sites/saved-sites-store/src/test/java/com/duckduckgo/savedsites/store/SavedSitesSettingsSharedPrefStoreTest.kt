@@ -9,7 +9,6 @@ import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import com.duckduckgo.savedsites.store.FavoritesDisplayMode.NATIVE
 import com.duckduckgo.savedsites.store.SavedSitesSettingsSharedPrefStore.Companion.FILENAME
 import com.duckduckgo.savedsites.store.SavedSitesSettingsSharedPrefStore.Companion.KEY_FAVORITES_DISPLAY_MODE
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -18,7 +17,6 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
 class SavedSitesSettingsSharedPrefStoreTest {
 

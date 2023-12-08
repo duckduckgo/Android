@@ -22,7 +22,6 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.store.VoiceSearchRepository
 import kotlin.time.ExperimentalTime
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Rule
@@ -31,11 +30,9 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-@ExperimentalCoroutinesApi
 @ExperimentalTime
 class AccessibilitySettingsViewModelTest {
 
-    @ExperimentalCoroutinesApi
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 

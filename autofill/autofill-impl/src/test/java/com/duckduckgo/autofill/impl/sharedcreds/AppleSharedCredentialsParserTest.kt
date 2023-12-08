@@ -20,7 +20,6 @@ import com.duckduckgo.autofill.impl.sharedcreds.SharedCredentialsParser.SharedCr
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillUrlMatcher
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.squareup.moshi.Moshi
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Rule
@@ -28,7 +27,6 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
-@ExperimentalCoroutinesApi
 class AppleSharedCredentialsParserTest {
 
     @get:Rule

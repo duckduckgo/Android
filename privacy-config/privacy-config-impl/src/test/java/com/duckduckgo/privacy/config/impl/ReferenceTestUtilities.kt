@@ -46,11 +46,9 @@ import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.RealUnp
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import org.mockito.kotlin.mock
 
-@ExperimentalCoroutinesApi
 class ReferenceTestUtilities(
     db: PrivacyConfigDatabase,
     dispatcherProvider: DispatcherProvider,

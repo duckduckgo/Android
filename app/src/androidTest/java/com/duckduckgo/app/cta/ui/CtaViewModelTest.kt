@@ -53,7 +53,6 @@ import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.ui.store.AppTheme
 import java.util.*
 import java.util.concurrent.TimeUnit
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.first
@@ -69,7 +68,6 @@ import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.*
 
 @FlowPreview
-@ExperimentalCoroutinesApi
 class CtaViewModelTest {
 
     @get:Rule

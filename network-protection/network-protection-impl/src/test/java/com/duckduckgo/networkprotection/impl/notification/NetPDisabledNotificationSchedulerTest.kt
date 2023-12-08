@@ -27,7 +27,6 @@ import com.duckduckgo.networkprotection.impl.settings.FakeNetPSettingsLocalConfi
 import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
 import com.duckduckgo.networkprotection.impl.waitlist.FakeNetPRemoteFeatureFactory
 import com.duckduckgo.networkprotection.impl.waitlist.NetPRemoteFeature
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -41,7 +40,6 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
 class NetPDisabledNotificationSchedulerTest {
     @get:Rule

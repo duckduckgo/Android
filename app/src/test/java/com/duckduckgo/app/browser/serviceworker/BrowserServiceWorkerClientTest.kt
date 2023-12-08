@@ -20,7 +20,6 @@ import android.webkit.WebResourceRequest
 import androidx.test.filters.SdkSuppress
 import com.duckduckgo.app.browser.RequestInterceptor
 import com.duckduckgo.common.test.CoroutineTestRule
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -29,7 +28,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-@ExperimentalCoroutinesApi
 @SdkSuppress(minSdkVersion = 24)
 class BrowserServiceWorkerClientTest {
 

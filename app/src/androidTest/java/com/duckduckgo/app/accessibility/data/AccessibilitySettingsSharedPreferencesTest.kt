@@ -23,7 +23,6 @@ import com.duckduckgo.app.accessibility.data.AccessibilitySettingsSharedPreferen
 import com.duckduckgo.common.test.CoroutineTestRule
 import junit.framework.Assert.*
 import kotlin.time.ExperimentalTime
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -31,10 +30,8 @@ import org.junit.Rule
 import org.junit.Test
 
 @ExperimentalTime
-@ExperimentalCoroutinesApi
 class AccessibilitySettingsSharedPreferencesTest {
 
-    @ExperimentalCoroutinesApi
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 

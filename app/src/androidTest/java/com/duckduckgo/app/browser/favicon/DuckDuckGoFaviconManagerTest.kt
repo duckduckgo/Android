@@ -36,7 +36,6 @@ import com.duckduckgo.common.utils.faviconLocation
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import java.io.File
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertNull
 import org.junit.Before
@@ -44,7 +43,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.*
 
-@ExperimentalCoroutinesApi
 class DuckDuckGoFaviconManagerTest {
 
     @get:Rule

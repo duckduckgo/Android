@@ -27,7 +27,6 @@ import com.duckduckgo.networkprotection.impl.configuration.WgVpnControllerServic
 import com.duckduckgo.networkprotection.impl.waitlist.store.FakeNetPWaitlistRepository
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
 import com.squareup.moshi.Moshi
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -43,7 +42,6 @@ import org.mockito.kotlin.*
 import retrofit2.HttpException
 import retrofit2.Response
 
-@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class RealNetPWaitlistManagerTest {
 

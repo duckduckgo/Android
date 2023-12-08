@@ -25,7 +25,6 @@ import com.duckduckgo.autoconsent.impl.handlers.EvalMessageHandlerPlugin.EvalRes
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -37,7 +36,6 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.robolectric.Shadows.shadowOf
 
-@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class EvalMessageHandlerPluginTest {
     @get:Rule var coroutineRule = CoroutineTestRule()

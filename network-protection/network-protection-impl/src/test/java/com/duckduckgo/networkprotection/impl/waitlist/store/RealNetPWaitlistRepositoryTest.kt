@@ -18,14 +18,12 @@ package com.duckduckgo.networkprotection.impl.waitlist.store
 
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.networkprotection.impl.fakes.FakeNetPWaitlistDataStore
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.mockito.MockitoAnnotations
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class RealNetPWaitlistRepositoryTest {
 
     private val coroutineRule = CoroutineTestRule()

@@ -25,7 +25,6 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlin.time.ExperimentalTime
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -44,7 +43,6 @@ import org.mockito.kotlin.whenever
 
 @ObsoleteCoroutinesApi
 @ExperimentalTime
-@ExperimentalCoroutinesApi
 class WelcomePageViewModelTest {
 
     @get:Rule

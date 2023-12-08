@@ -20,7 +20,6 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.request.filterer.api.RequestFiltererFeatureName.RequestFilterer
 import com.duckduckgo.request.filterer.store.RequestFiltererFeatureToggleRepository
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -32,7 +31,6 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
-@ExperimentalCoroutinesApi
 class RequestFiltererFeatureTogglesPluginTest {
 
     @get:Rule var coroutineRule = CoroutineTestRule()

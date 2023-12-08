@@ -25,7 +25,6 @@ import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.BookmarkFolderItem
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import junit.framework.TestCase.*
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -34,7 +33,6 @@ import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.*
 
-@ExperimentalCoroutinesApi
 class BookmarkFoldersViewModelTest {
 
     @get:Rule

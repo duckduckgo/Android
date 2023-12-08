@@ -154,7 +154,6 @@ import java.util.Locale
 import java.util.UUID
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.TimeUnit
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -189,7 +188,6 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.whenever
 
 @FlowPreview
-@ExperimentalCoroutinesApi
 class BrowserTabViewModelTest {
 
     @get:Rule
@@ -198,7 +196,6 @@ class BrowserTabViewModelTest {
     @get:Rule
     val schedulers = InstantSchedulersRule()
 
-    @ExperimentalCoroutinesApi
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
@@ -519,7 +516,6 @@ class BrowserTabViewModelTest {
         testee.command.observeForever(mockCommandObserver)
     }
 
-    @ExperimentalCoroutinesApi
     @After
     fun after() {
         dismissedCtaDaoChannel.close()

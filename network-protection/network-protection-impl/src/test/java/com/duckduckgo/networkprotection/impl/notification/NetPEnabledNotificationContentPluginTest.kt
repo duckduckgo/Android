@@ -24,7 +24,6 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.*
 import org.junit.Assert.*
@@ -34,7 +33,6 @@ import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
-@OptIn(ExperimentalCoroutinesApi::class)
 class NetPEnabledNotificationContentPluginTest {
 
     @get:Rule

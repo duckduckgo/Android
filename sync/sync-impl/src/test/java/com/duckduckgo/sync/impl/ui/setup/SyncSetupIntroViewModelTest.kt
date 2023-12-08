@@ -25,13 +25,11 @@ import com.duckduckgo.sync.impl.ui.setup.SyncSetupIntroViewModel.Command.Recover
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupIntroViewModel.Command.StartSetupFlow
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupIntroViewModel.ViewMode.CreateAccountIntro
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupIntroViewModel.ViewMode.RecoverAccountIntro
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
 
-@ExperimentalCoroutinesApi
 class SyncSetupIntroViewModelTest {
 
     @get:Rule

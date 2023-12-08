@@ -59,7 +59,6 @@ import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.R
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ReconnectStatus.Reconnecting
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ReconnectStatus.ReconnectingFailed
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ServerDetails
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -75,7 +74,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class NetworkProtectionManagementViewModelTest {
     @get:Rule
     var coroutineRule = CoroutineTestRule()

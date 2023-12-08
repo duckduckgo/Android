@@ -35,18 +35,15 @@ import com.duckduckgo.savedsites.store.*
 import com.duckduckgo.savedsites.store.EntityType.BOOKMARK
 import java.util.UUID
 import junit.framework.Assert.*
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.test.runTest
 import org.junit.*
 import org.junit.runner.RunWith
 import org.mockito.kotlin.*
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
 class BookmarksMigrationTest {
 
-    @ExperimentalCoroutinesApi
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 

@@ -20,7 +20,6 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.downloads.api.DownloadFailReason
 import com.duckduckgo.downloads.api.FileDownloader
 import java.io.File
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody
 import okhttp3.ResponseBody.Companion.toResponseBody
@@ -32,7 +31,6 @@ import org.mockito.kotlin.*
 import retrofit2.Call
 import retrofit2.Response
 
-@ExperimentalCoroutinesApi
 class UrlFileDownloaderTest {
     @get:Rule
     @Suppress("unused")

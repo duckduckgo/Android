@@ -19,14 +19,12 @@ package com.duckduckgo.app.surrogates
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.surrogates.store.ResourceSurrogateDataStore
 import com.duckduckgo.common.test.CoroutineTestRule
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class ResourceSurrogateLoaderTest {
 
     @get:Rule
@@ -37,7 +35,6 @@ class ResourceSurrogateLoaderTest {
     private lateinit var dataStore: ResourceSurrogateDataStore
     private lateinit var resourceSurrogates: ResourceSurrogates
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Before
     fun setup() {
         resourceSurrogates = ResourceSurrogatesImpl()
