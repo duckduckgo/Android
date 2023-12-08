@@ -776,4 +776,14 @@
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Lisää yksityinen äänihakuvaihtoehto osoitepalkkiin. Ääntä ei tallenneta eikä jaeta kenellekään, edes DuckDuckGolle.</string>
     <string name="accessibilityVoiceSearchTitle">Yksityinen äänihaku</string>
+
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">Kameraa ei voitu käyttää</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">Lataa kuva</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Valitse tiedosto</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Ota valokuva</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Salli DuckDuckGon pyytää kameran käyttöoikeutta tällä laitteella</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Sivustot voivat käyttää kameraa vain, jos sallit DuckDuckGon pyytää sen käyttöoikeutta.</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">Avaa asetukset</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">Peruuta</string>
 </resources>
