@@ -22,15 +22,11 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.bookmarks.BookmarkTestUtils
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.sync.FakeDisplayModeSettingsRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
-import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
-import com.duckduckgo.savedsites.impl.RealFavoritesDelegate
-import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.RealSyncSavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.SyncSavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.store.SavedSitesSyncMetadataDao
@@ -38,7 +34,6 @@ import com.duckduckgo.savedsites.impl.sync.store.SavedSitesSyncMetadataDatabase
 import com.duckduckgo.savedsites.impl.sync.store.SavedSitesSyncMetadataEntity
 import com.duckduckgo.savedsites.store.Entity
 import com.duckduckgo.savedsites.store.EntityType.BOOKMARK
-import com.duckduckgo.savedsites.store.EntityType.FOLDER
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 import com.squareup.moshi.JsonAdapter
@@ -173,7 +168,7 @@ class SyncSavedSitesRepositoryTest {
     private fun givenSomeContentIn(
         folderId: String = SavedSitesNames.BOOKMARKS_ROOT,
         children: Int = 5,
-        saveMetadata: Boolean = true
+        saveMetadata: Boolean = true,
     ) {
         val entities = BookmarkTestUtils.givenSomeBookmarks(children)
         savedSitesEntitiesDao.insertList(entities)

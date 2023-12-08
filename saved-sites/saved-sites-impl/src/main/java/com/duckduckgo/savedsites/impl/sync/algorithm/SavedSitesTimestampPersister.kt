@@ -37,6 +37,7 @@ class SavedSitesTimestampPersister @Inject constructor(
 ) : SavedSitesSyncPersisterStrategy {
     override fun processBookmarkFolder(
         folder: BookmarkFolder,
+        children: List<String>,
     ) {
         // if there's a folder with the same id locally we check the conflict resolution
         // if TIMESTAMP -> new timestamp wins
@@ -50,7 +51,7 @@ class SavedSitesTimestampPersister @Inject constructor(
                     Timber.d("Sync-Bookmarks-Persister: folder ${folder.id} modified before local folder, nothing to do")
                 } else {
                     Timber.d("Sync-Bookmarks-Persister: folder ${folder.id} modified after local folder, replacing content")
-                    savedSitesRepository.replaceFolderContent(folder, localFolder.id)
+                    syncSavedSitesRepository.replaceFolder(folder, children)
                 }
             }
         } else {

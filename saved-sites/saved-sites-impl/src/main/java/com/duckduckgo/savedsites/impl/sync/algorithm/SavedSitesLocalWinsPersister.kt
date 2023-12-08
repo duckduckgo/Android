@@ -35,6 +35,7 @@ class SavedSitesLocalWinsPersister @Inject constructor(
 ) : SavedSitesSyncPersisterStrategy {
     override fun processBookmarkFolder(
         folder: BookmarkFolder,
+        children: List<String>,
     ) {
         val localFolder = savedSitesRepository.getFolder(folder.id)
         if (localFolder != null) {

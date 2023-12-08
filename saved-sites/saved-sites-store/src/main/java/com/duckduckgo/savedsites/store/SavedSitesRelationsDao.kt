@@ -54,6 +54,9 @@ interface SavedSitesRelationsDao {
     @Query("update relations set entityId = :newId where entityId = :oldId")
     fun updateEntityId(oldId: String, newId: String)
 
+    @Query("update relations set folderId = :parentId where entityId = :entityId")
+    fun updateParentId(parentId: String, entityId: String)
+
     @Query(
         "select count(*) from entities inner join relations on entities.entityId = relations.entityId " +
             "and entities.type = :type and relations.folderId = :folderId and entities.deleted = 0",

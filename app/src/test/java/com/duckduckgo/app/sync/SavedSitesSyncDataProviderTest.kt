@@ -37,11 +37,11 @@ import com.duckduckgo.savedsites.impl.sync.RealSyncSavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.SavedSitesFormFactorSyncMigration
 import com.duckduckgo.savedsites.impl.sync.SavedSitesSyncDataProvider
 import com.duckduckgo.savedsites.impl.sync.SavedSitesSyncStore
-import com.duckduckgo.savedsites.impl.sync.SyncSavedSitesRequestEntry
 import com.duckduckgo.savedsites.impl.sync.SyncBookmarkPage
 import com.duckduckgo.savedsites.impl.sync.SyncBookmarksRequest
 import com.duckduckgo.savedsites.impl.sync.SyncFolderChildren
 import com.duckduckgo.savedsites.impl.sync.SyncSavedSitesRepository
+import com.duckduckgo.savedsites.impl.sync.SyncSavedSitesRequestEntry
 import com.duckduckgo.savedsites.impl.sync.store.SavedSitesSyncMetadataDao
 import com.duckduckgo.savedsites.impl.sync.store.SavedSitesSyncMetadataDatabase
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
@@ -101,8 +101,10 @@ class SavedSitesSyncDataProviderTest {
             .allowMainThreadQueries()
             .build()
 
-
-        savedSitesDatabase = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, SavedSitesSyncMetadataDatabase::class.java)
+        savedSitesDatabase = Room.inMemoryDatabaseBuilder(
+            InstrumentationRegistry.getInstrumentation().targetContext,
+            SavedSitesSyncMetadataDatabase::class.java,
+        )
             .allowMainThreadQueries()
             .build()
         savedSitesMetadataDao = savedSitesDatabase.syncMetadataDao()

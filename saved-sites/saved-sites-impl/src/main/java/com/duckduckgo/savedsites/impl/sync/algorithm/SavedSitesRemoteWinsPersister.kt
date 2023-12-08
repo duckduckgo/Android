@@ -35,6 +35,7 @@ class SavedSitesRemoteWinsPersister @Inject constructor(
 ) : SavedSitesSyncPersisterStrategy {
     override fun processBookmarkFolder(
         folder: BookmarkFolder,
+        children: List<String>,
     ) {
         val localFolder = savedSitesRepository.getFolder(folder.id)
         if (localFolder != null) {
@@ -43,7 +44,7 @@ class SavedSitesRemoteWinsPersister @Inject constructor(
                 savedSitesRepository.delete(localFolder)
             } else {
                 Timber.d("Sync-Bookmarks-Persister: folder ${localFolder.id} exists locally, replacing content")
-                savedSitesRepository.replaceFolderContent(folder, folder.id)
+                syncSavedSitesRepository.replaceFolder(folder, children)
             }
         } else {
             if (folder.isDeleted()) {

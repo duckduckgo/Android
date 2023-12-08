@@ -161,13 +161,13 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
         if (folder.id != SavedSitesNames.BOOKMARKS_ROOT && folder.id != FAVORITES_ROOT) {
             Timber.d("Sync-Bookmarks: processing folder ${folder.id} with parentId $parentId")
             when (conflictResolution) {
-                DEDUPLICATION -> deduplicationStrategy.processBookmarkFolder(folder)
-                REMOTE_WINS -> remoteWinsStrategy.processBookmarkFolder(folder)
-                LOCAL_WINS -> localWinsStrategy.processBookmarkFolder(folder)
-                TIMESTAMP -> timestampStrategy.processBookmarkFolder(folder)
+                DEDUPLICATION -> deduplicationStrategy.processBookmarkFolder(folder, remoteFolder.folder?.children ?: emptyList())
+                REMOTE_WINS -> remoteWinsStrategy.processBookmarkFolder(folder, remoteFolder.folder?.children ?: emptyList())
+                LOCAL_WINS -> localWinsStrategy.processBookmarkFolder(folder, remoteFolder.folder?.children ?: emptyList())
+                TIMESTAMP -> timestampStrategy.processBookmarkFolder(folder, remoteFolder.folder?.children ?: emptyList())
             }
         }
-        val children = if (remoteFolder.folder == null) {
+        if (remoteFolder.folder == null) {
             emptyList()
         } else {
             remoteFolder.folder.children

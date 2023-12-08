@@ -22,6 +22,7 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.impl.sync.store.SavedSitesSyncMetadataDao
 import com.duckduckgo.savedsites.impl.sync.store.SavedSitesSyncMetadataEntity
 import com.duckduckgo.savedsites.store.*
+import com.duckduckgo.savedsites.store.EntityType.FOLDER
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
@@ -190,25 +191,47 @@ class RealSyncSavedSitesRepository(
         updateFavourite(favorite, favoriteFolder)
     }
 
+    override fun replaceFolder(
+        folder: BookmarkFolder,
+        children: List<String>,
+    ) {
+        // check the stored list of children for folderId
+        // the ones that are not in the new children list need to be moved to bookmarks_root
+        val storedChildren = savedSitesEntitiesDao.allEntitiesInFolderSync(folder.id).map { it.entityId }
+        val orphanedChildren = storedChildren.minus(children.toSet())
+        orphanedChildren.forEach {
+            savedSitesRelationsDao.updateParentId(SavedSitesNames.BOOKMARKS_ROOT, it)
+        }
+
+        savedSitesEntitiesDao.update(
+            Entity(
+                entityId = folder.id,
+                title = folder.name,
+                url = "",
+                type = FOLDER,
+                lastModified = folder.lastModified ?: DatabaseDateFormatter.iso8601(),
+            ),
+        )
+    }
+
     override fun getFolderDiff(folderId: String): SyncFolderChildren {
         // we get the previous children metadata
         // if not present, we just add everything to children and insert
         // if present, we check for items that have been added or removed locally
         // and send them alongside the current list of local children
         val entities = savedSitesEntitiesDao.allEntitiesInFolderSync(folderId)
-        val childrenLocal = entities.filterNot { it.deleted}.map { it.entityId }
+        val childrenLocal = entities.filterNot { it.deleted }.map { it.entityId }
 
         val metadata = savedSitesSyncMetadataDao.get(folderId)
-        if (metadata != null){
+        if (metadata != null) {
             val childrenResponse = stringListAdapter.fromJson(metadata.childrenResponse)!!
-            if (childrenResponse == childrenLocal){
+            if (childrenResponse == childrenLocal) {
                 // both lists are the same, nothing has changed
                 return SyncFolderChildren(current = childrenLocal, insert = emptyList(), remove = emptyList())
             }
             val notInResponse = childrenLocal.minus(childrenResponse.toSet()) // to be added to insert
             val notInLocal = childrenResponse.minus(childrenLocal.toSet()) // to be added to deleted
             return SyncFolderChildren(current = childrenLocal, insert = notInResponse, remove = notInLocal)
-
         } else {
             return SyncFolderChildren(current = childrenLocal, insert = childrenLocal, remove = emptyList())
         }
