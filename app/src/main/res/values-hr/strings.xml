@@ -784,4 +784,14 @@
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Dodaj opciju privatnog glasovnog pretraživanja na adresnu traku. Zvuk se ne pohranjuje i ne dijeli ni s kim, uključujući DuckDuckGo.</string>
     <string name="accessibilityVoiceSearchTitle">Privatno glasovno pretraživanje</string>
+
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">Nije moguće pristupiti kameri</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">Učitaj sliku</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Odaberi datoteku</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Snimi fotografiju</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Dopusti DuckDuckGou da zatraži pristup kameri na ovom uređaju</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Stranice mogu koristiti tvoju kameru samo ako dopustiš DuckDuckGou da zatraži pristup.</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">Otvori postavke</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">Odustani</string>
 </resources>
