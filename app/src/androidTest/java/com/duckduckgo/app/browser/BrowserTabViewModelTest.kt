@@ -26,6 +26,8 @@ import android.view.View
 import android.webkit.GeolocationPermissions
 import android.webkit.HttpAuthHandler
 import android.webkit.PermissionRequest
+import android.webkit.ValueCallback
+import android.webkit.WebChromeClient.FileChooserParams
 import android.webkit.WebView
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.core.net.toUri
@@ -54,6 +56,7 @@ import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
+import com.duckduckgo.app.browser.camera.CameraHardwareChecker
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
@@ -328,6 +331,9 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var mockSurveyRepository: SurveyRepository
 
+    @Mock
+    private lateinit var mockFileChooserCallback: ValueCallback<Array<Uri>>
+
     private lateinit var remoteMessagingModel: RemoteMessagingModel
 
     private val lazyFaviconManager = Lazy { mockFaviconManager }
@@ -389,6 +395,8 @@ class BrowserTabViewModelTest {
     private val mockSitePermissionsManager: SitePermissionsManager = mock()
 
     private val mockSyncEngine: SyncEngine = mock()
+
+    private val cameraHardwareChecker: CameraHardwareChecker = mock()
 
     @Before
     fun before() {
@@ -457,6 +465,7 @@ class BrowserTabViewModelTest {
         whenever(mockUserAllowListRepository.domainsInUserAllowListFlow()).thenReturn(flowOf(emptyList()))
         whenever(mockContentBlocking.isAnException(anyString())).thenReturn(false)
         whenever(fireproofDialogsEventHandler.event).thenReturn(fireproofDialogsEventHandlerLiveData)
+        whenever(cameraHardwareChecker.hasCameraHardware()).thenReturn(true)
 
         testee = BrowserTabViewModel(
             statisticsUpdater = mockStatisticsUpdater,
@@ -510,6 +519,7 @@ class BrowserTabViewModelTest {
             syncEngine = mockSyncEngine,
             device = mockDeviceInfo,
             sitePermissionsManager = mockSitePermissionsManager,
+            cameraHardwareChecker = cameraHardwareChecker,
         )
 
         testee.loadData("abc", null, false, false)
@@ -4508,6 +4518,42 @@ class BrowserTabViewModelTest {
         verify(mockSyncEngine).triggerSync(FEATURE_READ)
     }
 
+    @Test
+    fun whenOnShowFileChooserWithImageWildcardedTypeThenImageOrCameraChooserCommandSent() {
+        val params = buildFileChooserParams(arrayOf("image/*"))
+        testee.showFileChooser(mockFileChooserCallback, params)
+        assertCommandIssued<Command.ShowExistingImageOrCameraChooser>()
+    }
+
+    @Test
+    fun whenOnShowFileChooserWithImageWildcardedTypeButCameraHardwareUnavailableThenFileChooserCommandSent() {
+        whenever(cameraHardwareChecker.hasCameraHardware()).thenReturn(false)
+        val params = buildFileChooserParams(arrayOf("image/*"))
+        testee.showFileChooser(mockFileChooserCallback, params)
+        assertCommandIssued<Command.ShowFileChooser>()
+    }
+
+    @Test
+    fun whenOnShowFileChooserContainsImageWildcardedTypeThenImageOrCameraChooserCommandSent() {
+        val params = buildFileChooserParams(arrayOf("image/*", "application/pdf"))
+        testee.showFileChooser(mockFileChooserCallback, params)
+        assertCommandIssued<Command.ShowExistingImageOrCameraChooser>()
+    }
+
+    @Test
+    fun whenOnShowFileChooserWithImageSpecificTypeThenExistingFileChooserCommandSent() {
+        val params = buildFileChooserParams(arrayOf("image/png"))
+        testee.showFileChooser(mockFileChooserCallback, params)
+        assertCommandIssued<Command.ShowFileChooser>()
+    }
+
+    @Test
+    fun whenOnShowFileChooserWithNonImageTypeThenExistingFileChooserCommandSent() {
+        val params = buildFileChooserParams(arrayOf("application/pdf"))
+        testee.showFileChooser(mockFileChooserCallback, params)
+        assertCommandIssued<Command.ShowFileChooser>()
+    }
+
     private fun aCredential(): LoginCredentials {
         return LoginCredentials(domain = null, username = null, password = null)
     }
@@ -4769,6 +4815,17 @@ class BrowserTabViewModelTest {
         whenever(nav.progress).thenReturn(progress)
         whenever(nav.navigationHistory).thenReturn(navigationHistory)
         return nav
+    }
+
+    private fun buildFileChooserParams(acceptTypes: Array<String>): FileChooserParams {
+        return object : FileChooserParams() {
+            override fun getAcceptTypes(): Array<String> = acceptTypes
+            override fun getMode(): Int = 0
+            override fun isCaptureEnabled(): Boolean = false
+            override fun getTitle(): CharSequence? = null
+            override fun getFilenameHint(): String? = null
+            override fun createIntent(): Intent = Intent()
+        }
     }
 
     private fun privacyShieldState() = testee.privacyShieldViewState.value!!
