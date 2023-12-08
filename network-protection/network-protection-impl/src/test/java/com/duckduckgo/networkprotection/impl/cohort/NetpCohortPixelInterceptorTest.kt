@@ -17,6 +17,7 @@
 package com.duckduckgo.networkprotection.impl.cohort
 
 import com.duckduckgo.common.test.api.FakeChain
+import java.time.LocalDate
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Before
@@ -24,7 +25,6 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.whenever
-import org.threeten.bp.LocalDate
 
 class NetpCohortPixelInterceptorTest {
     @Mock

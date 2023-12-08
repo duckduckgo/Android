@@ -30,6 +30,7 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.WgProtocol
 import com.squareup.anvil.annotations.ContributesMultibinding
+import java.time.Instant
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.minutes
@@ -41,7 +42,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.WARN
 import logcat.logcat
-import org.threeten.bp.Instant
 
 @ContributesMultibinding(VpnScope::class)
 class WireguardHandshakeMonitor @Inject constructor(

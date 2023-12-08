@@ -16,13 +16,13 @@
 
 package com.duckduckgo.common.utils.formatters.time
 
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
+import java.time.temporal.ChronoUnit
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import org.threeten.bp.Instant
-import org.threeten.bp.LocalDateTime
-import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.ZoneOffset
-import org.threeten.bp.temporal.ChronoUnit
 
 class DatabaseDateFormatterTest {
 

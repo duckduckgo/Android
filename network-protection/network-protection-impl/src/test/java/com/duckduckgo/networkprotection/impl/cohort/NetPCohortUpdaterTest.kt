@@ -19,6 +19,7 @@ package com.duckduckgo.networkprotection.impl.cohort
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
+import java.time.LocalDate
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -30,7 +31,6 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
-import org.threeten.bp.LocalDate
 
 class NetPCohortUpdaterTest {
     @get:Rule

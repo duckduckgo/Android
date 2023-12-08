@@ -43,9 +43,9 @@ import com.duckduckgo.sync.store.model.SyncAttempt
 import com.duckduckgo.sync.store.model.SyncAttemptState.IN_PROGRESS
 import com.duckduckgo.sync.store.model.SyncAttemptState.SUCCESS
 import com.squareup.anvil.annotations.ContributesBinding
+import java.time.Duration
+import java.time.OffsetDateTime
 import javax.inject.Inject
-import org.threeten.bp.Duration
-import org.threeten.bp.OffsetDateTime
 import timber.log.Timber
 
 @ContributesBinding(scope = AppScope::class)

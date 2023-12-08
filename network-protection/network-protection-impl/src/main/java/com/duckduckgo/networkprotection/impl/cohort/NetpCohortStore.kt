@@ -23,9 +23,9 @@ import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.duckduckgo.networkprotection.impl.state.NetPFeatureRemover
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
-import org.threeten.bp.LocalDate
-import org.threeten.bp.format.DateTimeFormatter
 
 interface NetpCohortStore {
     var cohortLocalDate: LocalDate?

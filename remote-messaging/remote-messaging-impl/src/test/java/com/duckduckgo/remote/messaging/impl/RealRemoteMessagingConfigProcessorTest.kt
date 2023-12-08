@@ -24,6 +24,8 @@ import com.duckduckgo.remote.messaging.fixtures.RemoteMessagingConfigOM.aRemoteM
 import com.duckduckgo.remote.messaging.fixtures.messageActionPlugins
 import com.duckduckgo.remote.messaging.impl.mappers.RemoteMessagingConfigJsonMapper
 import com.duckduckgo.remote.messaging.store.RemoteMessagingConfigRepository
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -34,8 +36,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import org.threeten.bp.LocalDateTime
-import org.threeten.bp.format.DateTimeFormatter
 
 class RealRemoteMessagingConfigProcessorTest {
 

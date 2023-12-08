@@ -19,7 +19,7 @@ package com.duckduckgo.common.utils.formatters.time.model
 import android.content.res.Resources
 import com.duckduckgo.common.utils.R
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
-import org.threeten.bp.LocalDateTime
+import java.time.LocalDateTime
 
 fun dateOfPreviousMidnight(): String {
     val midnight = LocalDateTime.now().toLocalDate().atStartOfDay()
