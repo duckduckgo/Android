@@ -26,7 +26,9 @@ import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
+import javax.inject.Qualifier
 import org.threeten.bp.Instant
+import org.threeten.bp.ZoneId
 import org.threeten.bp.ZoneOffset
 import org.threeten.bp.format.DateTimeFormatter
 
@@ -318,6 +320,7 @@ class RealNetworkProtectionPixel @Inject constructor(
     private val pixel: Pixel,
     private val vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
     private val cohortStore: NetpCohortStore,
+    private val etTimestamp: ETTimestamp,
 ) : NetworkProtectionPixels {
 
     private val preferences: SharedPreferences by lazy {
@@ -559,7 +562,7 @@ class RealNetworkProtectionPixel @Inject constructor(
         enqueue: Boolean = false,
     ) {
         if (enqueue) {
-            pixel.enqueueFire(pixelName, payload)
+            pixel.enqueueFire(pixelName, payload.addTimestampAtZoneET())
         } else {
             pixel.fire(pixelName, payload)
         }
@@ -583,7 +586,7 @@ class RealNetworkProtectionPixel @Inject constructor(
         // check if pixel was already sent in the current day
         if (timestamp == null || now > timestamp) {
             if (enqueue) {
-                this.pixel.enqueueFire(pixelName, payload)
+                this.pixel.enqueueFire(pixelName, payload.addTimestampAtZoneET())
                     .also { preferences.edit { putString(pixelName.appendTimestampSuffix(), now) } }
             } else {
                 this.pixel.fire(pixelName, payload)
@@ -602,7 +605,7 @@ class RealNetworkProtectionPixel @Inject constructor(
         if (didExecuteAlready) return
 
         if (pixel.enqueue) {
-            this.pixel.enqueueFire(pixel, payload).also { preferences.edit { putBoolean(tag ?: pixel.pixelName, true) } }
+            this.pixel.enqueueFire(pixel, payload.addTimestampAtZoneET()).also { preferences.edit { putBoolean(tag ?: pixel.pixelName, true) } }
         } else {
             this.pixel.fire(pixel, payload).also { preferences.edit { putBoolean(tag ?: pixel.pixelName, true) } }
         }
@@ -612,6 +615,12 @@ class RealNetworkProtectionPixel @Inject constructor(
         return "${this}_timestamp"
     }
 
+    private fun Map<String, String>.addTimestampAtZoneET(): Map<String, String> {
+        return this.toMutableMap().apply {
+            put(TIMESTAMP_ET_PARAM, etTimestamp.formattedTimestamp())
+        }
+    }
+
     private fun getUtcIsoLocalDate(): String {
         // returns YYYY-MM-dd
         return Instant.now().atOffset(ZoneOffset.UTC).format(DateTimeFormatter.ISO_LOCAL_DATE)
@@ -619,5 +628,19 @@ class RealNetworkProtectionPixel @Inject constructor(
 
     companion object {
         private const val NETP_PIXELS_PREF_FILE = "com.duckduckgo.networkprotection.pixels.v1"
+        private const val TIMESTAMP_ET_PARAM = "ts"
+    }
+}
+
+@Retention(AnnotationRetention.BINARY)
+@Qualifier
+private annotation class InternalApi
+
+// This class is here for testing purposes
+@InternalApi
+open class ETTimestamp @Inject constructor() {
+    open fun formattedTimestamp(): String {
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
+        return Instant.now().atZone(ZoneId.of("America/New_York")).format(formatter)
     }
 }
