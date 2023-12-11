@@ -776,4 +776,14 @@
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Voeg de optie \'Private spraakopdracht\' toe aan de adresbalk. Audio wordt niet opgeslagen en met niemand gedeeld, ook niet met DuckDuckGo.</string>
     <string name="accessibilityVoiceSearchTitle">Private spraakzoekopdracht</string>
+
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">Kan geen toegang krijgen tot de camera</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">Upload een afbeelding</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Bestand kiezen</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Foto maken</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">DuckDuckGo toestaan om toegang tot de camera op dit apparaat te vragen</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Sites kunnen je camera alleen gebruiken als je DuckDuckGo toestaat om toegang te vragen.</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">Open Instellingen</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">Annuleren</string>
 </resources>
