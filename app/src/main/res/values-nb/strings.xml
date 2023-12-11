@@ -776,4 +776,14 @@
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Legg til alternativet privat talesøk i adressefeltet. Lydopptakene verken lagres eller deles med noen, inkludert DuckDuckGo.</string>
     <string name="accessibilityVoiceSearchTitle">Privat talesøk</string>
+
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">Fikk ikke tilgang til kameraet</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">Last opp et bilde</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Velg fil</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Ta bilde</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Tillat DuckDuckGo å be om kameratilgang på denne enheten</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Nettsteder kan bare bruke kameraet ditt hvis du lar DuckDuckGo be om tilgang.</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">Åpne innstillinger</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">Avbryt</string>
 </resources>
