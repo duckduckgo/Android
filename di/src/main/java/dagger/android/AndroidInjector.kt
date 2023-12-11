@@ -19,7 +19,6 @@ package dagger.android
 import android.app.Activity
 import android.app.Application
 import android.app.Service
-import android.app.backup.BackupAgentHelper
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.ContextWrapper
@@ -124,13 +123,6 @@ class AndroidInjection {
             bindingKey: Class<*>? = null,
         ) {
             AndroidInjector.inject(findHasDaggerInjectorForView(instance), instance, bindingKey)
-        }
-
-        inline fun <reified T : BackupAgentHelper> inject(
-            instance: T,
-            bindingKey: Class<*>? = null,
-        ) {
-            AndroidInjector.inject(instance.applicationContext as Application, instance, bindingKey)
         }
 
         /**
