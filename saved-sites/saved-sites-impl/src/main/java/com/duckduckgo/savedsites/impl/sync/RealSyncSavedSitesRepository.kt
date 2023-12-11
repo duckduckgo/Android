@@ -195,14 +195,12 @@ class RealSyncSavedSitesRepository(
         folder: BookmarkFolder,
         children: List<String>,
     ) {
-        // check the stored list of children for folderId
-        // the ones that are not in the new children list need to be moved to bookmarks_root
-        val storedChildren = savedSitesEntitiesDao.allEntitiesInFolderSync(folder.id).map { it.entityId }
-        val orphanedChildren = storedChildren.minus(children.toSet())
-        orphanedChildren.forEach {
-            savedSitesRelationsDao.updateParentId(SavedSitesNames.BOOKMARKS_ROOT, it)
-        }
-
+        // remove all current relations
+        // store the new children list
+        // at the end of the algorithm we check for entities - outer join relations
+        // those will be the new orphans
+        Timber.d("Sync-Bookmarks: replacing ${folder.id} with children $children")
+        savedSitesRelationsDao.replaceFolder(folder, children)
         savedSitesEntitiesDao.update(
             Entity(
                 entityId = folder.id,
@@ -220,40 +218,90 @@ class RealSyncSavedSitesRepository(
         // if present, we check for items that have been added or removed locally
         // and send them alongside the current list of local children
         val entities = savedSitesEntitiesDao.allEntitiesInFolderSync(folderId)
+        val deletedChildren = entities.filter { it.deleted }.map { it.entityId }
         val childrenLocal = entities.filterNot { it.deleted }.map { it.entityId }
 
         val metadata = savedSitesSyncMetadataDao.get(folderId)
         if (metadata != null) {
-            val childrenResponse = stringListAdapter.fromJson(metadata.childrenResponse)!!
-            if (childrenResponse == childrenLocal) {
-                // both lists are the same, nothing has changed
-                return SyncFolderChildren(current = childrenLocal, insert = emptyList(), remove = emptyList())
+            val childrenResponse = stringListAdapter.fromJson(metadata.childrenResponse!!)
+            if (childrenResponse != null) {
+                if (childrenResponse == childrenLocal) {
+                    // both lists are the same, nothing has changed
+                    return SyncFolderChildren(current = childrenLocal, insert = emptyList(), remove = deletedChildren)
+                }
+                val notInResponse = childrenLocal.minus(childrenResponse.toSet()) // to be added to insert
+                val notInLocal = childrenResponse.minus(childrenLocal.toSet()) // to be added to deleted
+                val deleted = deletedChildren.plus(notInLocal).distinct()
+                return SyncFolderChildren(current = childrenLocal, insert = notInResponse, remove = deleted)
+            } else {
+                return SyncFolderChildren(current = childrenLocal, insert = emptyList(), remove = deletedChildren)
             }
-            val notInResponse = childrenLocal.minus(childrenResponse.toSet()) // to be added to insert
-            val notInLocal = childrenResponse.minus(childrenLocal.toSet()) // to be added to deleted
-            return SyncFolderChildren(current = childrenLocal, insert = notInResponse, remove = notInLocal)
         } else {
-            return SyncFolderChildren(current = childrenLocal, insert = childrenLocal, remove = emptyList())
+            return SyncFolderChildren(current = childrenLocal, insert = childrenLocal, remove = deletedChildren)
         }
     }
 
-    override fun confirmAllFolderChildrenMetadata() {
+    private fun confirmPendingFolderRequests() {
+        Timber.d("Sync-Bookmarks-Metadata: updating children metadata column with values from request column")
         savedSitesSyncMetadataDao.confirmAllChildrenRequests()
     }
 
     override fun addRequestMetadata(folders: List<SyncSavedSitesRequestEntry>) {
-        val children = folders.filter { it.children != null }.map {
-            SavedSitesSyncMetadataEntity(it.id, "[]", stringListAdapter.toJson(it.children?.current))
+        val children = folders.filter { it.folder != null }.map {
+            SavedSitesSyncMetadataEntity(it.id, "[]", stringListAdapter.toJson(it.folder?.children?.current))
         }
         Timber.d("Sync-Bookmarks-Metadata: adding children request metadata for folders: $children")
         savedSitesSyncMetadataDao.addOrUpdate(children)
     }
 
-    override fun addResponseMetadata(folders: List<SyncSavedSitesResponseEntry>) {
-        val children = folders.filter { it.folder != null }.map {
-            SavedSitesSyncMetadataEntity(it.id, stringListAdapter.toJson(it.folder?.children), "[]")
+    // for all folders in the payload that are not deleted
+    // add children to children column
+    // for all items in the metadata table
+    // copy request columns to children
+    override fun addResponseMetadata(entities: List<SyncSavedSitesResponseEntry>) {
+        if (entities.isEmpty()) {
+            confirmPendingFolderRequests()
+        } else {
+            val folders = entities.filter { it.deleted != null }.filter { it.folder != null }
+            if (folders.isEmpty()) {
+                Timber.d("Sync-Bookmarks-Metadata: no folders received in the response, nothing to add")
+                confirmPendingFolderRequests()
+            } else {
+                val children = folders.map {
+                    val response = stringListAdapter.toJson(it.folder?.children)
+                    Timber.d("Sync-Bookmarks-Metadata: new children response $response for ${it.id}")
+                    SavedSitesSyncMetadataEntity(it.id, response, null)
+                }
+                Timber.d("Sync-Bookmarks-Metadata: storing children response metadata for: $children")
+                savedSitesSyncMetadataDao.addResponseMetadata(children)
+            }
         }
-        Timber.d("Sync-Bookmarks-Metadata: adding children response metadata for folders: $children")
-        savedSitesSyncMetadataDao.confirmChildren(children)
+    }
+
+    override fun removeMetadata() {
+        savedSitesSyncMetadataDao.removeAll()
+    }
+
+    override fun fixOrphans(): Boolean {
+        val orphans = savedSitesRelationsDao.getOrphans()
+        return if (orphans.isNotEmpty()) {
+            Timber.d("Sync-Bookmarks: Found ${orphans.size} orphans, $orphans attaching them to bookmarks root")
+            orphans.map { Relation(folderId = SavedSitesNames.BOOKMARKS_ROOT, entityId = it.entityId) }.also {
+                savedSitesRelationsDao.insertList(it)
+            }
+            true
+        } else {
+            Timber.d("Sync-Bookmarks: Orphans not present")
+            false
+        }
+    }
+
+    override fun pruneDeleted() {
+        Timber.d("Sync-Bookmarks: pruning soft deleted entities and metadata")
+        savedSitesEntitiesDao.allDeleted().forEach {
+            savedSitesRelationsDao.deleteRelationByEntity(it.entityId)
+            savedSitesEntitiesDao.deletePermanently(it)
+            savedSitesSyncMetadataDao.remove(it.entityId)
+        }
     }
 }

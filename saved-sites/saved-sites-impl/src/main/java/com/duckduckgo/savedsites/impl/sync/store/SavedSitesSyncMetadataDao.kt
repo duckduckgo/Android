@@ -42,21 +42,17 @@ interface SavedSitesSyncMetadataDao {
 
     @Transaction
     fun confirmAllChildrenRequests() {
-        confirmChildren()
-        removeAllRequests()
+        copyAllRequestsToResponse()
     }
 
-    @Query("update saved_sites_sync_meta set childrenResponse = childrenRequest where childrenRequest not null")
-    fun confirmChildren()
+    @Query("update saved_sites_sync_meta set childrenResponse = childrenRequest where childrenRequest is not null")
+    fun copyAllRequestsToResponse()
 
     @Transaction
-    fun confirmChildren(folders: List<SavedSitesSyncMetadataEntity>) {
+    fun addResponseMetadata(folders: List<SavedSitesSyncMetadataEntity>) {
         addOrUpdate(folders)
         confirmAllChildrenRequests()
     }
-
-    @Query("update saved_sites_sync_meta set childrenRequest = null")
-    fun removeAllRequests()
 
     @Query("Delete from saved_sites_sync_meta")
     fun removeAll()
@@ -68,6 +64,6 @@ interface SavedSitesSyncMetadataDao {
 @Entity(tableName = "saved_sites_sync_meta")
 data class SavedSitesSyncMetadataEntity(
     @PrimaryKey val folderId: String,
-    var childrenResponse: String, // JSON representation of list of children confirmed by the BE
-    var childrenRequest: String, // JSON representation of list of children sent to the BE
+    var childrenResponse: String?, // JSON representation of list of children confirmed by the BE
+    var childrenRequest: String?, // JSON representation of list of children sent to the BE
 )

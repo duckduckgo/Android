@@ -51,9 +51,8 @@ class SavedSitesSyncDataProvider @Inject constructor(
             changesSince(savedSitesSyncStore.clientModifiedSince)
         }
 
-        // we store the current folder children state into the metadata table
         if (updates.isEmpty()) {
-            Timber.d("Sync-Bookmarks-Metadata: no local changes, nothing to store")
+            Timber.d("Sync-Bookmarks-Metadata: no local changes, nothing to store as request")
         } else {
             syncSavedSitesRepository.addRequestMetadata(updates)
         }
@@ -151,7 +150,7 @@ class SavedSitesSyncDataProvider @Inject constructor(
             id = savedSite.id,
             title = syncCrypto.encrypt(savedSite.title),
             page = SyncBookmarkPage(syncCrypto.encrypt(savedSite.url)),
-            children = null,
+            folder = null,
             deleted = null,
             client_last_modified = savedSite.lastModified ?: DatabaseDateFormatter.iso8601(),
         )
@@ -159,10 +158,11 @@ class SavedSitesSyncDataProvider @Inject constructor(
 
     private fun encryptedFolder(bookmarkFolder: BookmarkFolder): SyncSavedSitesRequestEntry {
         val folderChildren = syncSavedSitesRepository.getFolderDiff(bookmarkFolder.id)
+        Timber.d("Sync-Bookmarks-Metadata: folder diff for ${bookmarkFolder.id} $folderChildren")
         return SyncSavedSitesRequestEntry(
             id = bookmarkFolder.id,
             title = syncCrypto.encrypt(bookmarkFolder.name),
-            children = folderChildren,
+            folder = SyncSavedSiteRequestFolder(folderChildren),
             page = null,
             deleted = bookmarkFolder.deleted,
             client_last_modified = bookmarkFolder.lastModified ?: DatabaseDateFormatter.iso8601(),
@@ -173,7 +173,7 @@ class SavedSitesSyncDataProvider @Inject constructor(
         return SyncSavedSitesRequestEntry(
             id = id,
             title = null,
-            children = null,
+            folder = null,
             page = null,
             deleted = "1",
             client_last_modified = null,

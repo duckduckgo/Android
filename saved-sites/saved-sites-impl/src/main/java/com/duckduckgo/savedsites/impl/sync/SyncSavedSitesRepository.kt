@@ -138,13 +138,6 @@ interface SyncSavedSitesRepository {
     fun getFolderDiff(folderId: String): SyncFolderChildren
 
     /**
-     * Moves children in request column to children.
-     * This operation confirms that the BE and Client have the same children for a folder
-     * All request columns will be affected
-     */
-    fun confirmAllFolderChildrenMetadata()
-
-    /**
      * Stores the client children state for each folder before sending it to the Sync BE
      * @param folders list of folders to be stored
      */
@@ -152,13 +145,25 @@ interface SyncSavedSitesRepository {
 
     /**
      * Stores the BE children state for each folder after receiving it
-     * @param folders list of folders to be stored
+     * @param entities list of entities received in the BE response
      */
-    fun addResponseMetadata(folders: List<SyncSavedSitesResponseEntry>)
+    fun addResponseMetadata(entities: List<SyncSavedSitesResponseEntry>)
 
     /**
      * Deletes all existing metadata
      * This is called when Sync is disabled so all previous metadata is removed
      */
     fun removeMetadata()
+
+    /**
+     * Finds all the orphans (entities that don't belong to a folder)
+     * and attached them to bookmarks root
+     */
+    fun fixOrphans(): Boolean
+
+    /**
+     * Deletes all entities with deleted = 1
+     * This makes the deletion permanent
+     */
+    fun pruneDeleted()
 }

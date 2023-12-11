@@ -77,6 +77,12 @@ class SavedSitesDuplicateFinderTest {
         savedSitesEntitiesDao = db.syncEntitiesDao()
         savedSitesRelationsDao = db.syncRelationsDao()
 
+        savedSitesDatabase = Room.inMemoryDatabaseBuilder(
+            InstrumentationRegistry.getInstrumentation().targetContext,
+            SavedSitesSyncMetadataDatabase::class.java,
+        )
+            .allowMainThreadQueries()
+            .build()
         savedSitesMetadataDao = savedSitesDatabase.syncMetadataDao()
 
         val favoritesDelegate = RealFavoritesDelegate(

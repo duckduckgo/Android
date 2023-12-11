@@ -101,7 +101,7 @@ class SavedSitesSyncPersisterAlgorithmTest {
         )
         algorithm.processEntries(someEntries, DEDUPLICATION, threeHoursAgo)
 
-        verify(deduplicationStrategy).processBookmarkFolder(folder)
+        verify(deduplicationStrategy).processBookmarkFolder(folder, listOf(bookmark.id))
         verify(deduplicationStrategy).processBookmark(bookmark, folder.id)
 
         verifyNoInteractions(remoteStrategy)
@@ -129,7 +129,7 @@ class SavedSitesSyncPersisterAlgorithmTest {
         )
         algorithm.processEntries(someEntries, TIMESTAMP, threeHoursAgo)
 
-        verify(timestampStrategy).processBookmarkFolder(folder)
+        verify(timestampStrategy).processBookmarkFolder(folder, listOf(bookmark.id))
         verify(timestampStrategy).processBookmark(bookmark, folder.id)
 
         verifyNoInteractions(remoteStrategy)
@@ -157,7 +157,7 @@ class SavedSitesSyncPersisterAlgorithmTest {
         )
         algorithm.processEntries(someEntries, REMOTE_WINS, threeHoursAgo)
 
-        verify(remoteStrategy).processBookmarkFolder(folder)
+        verify(remoteStrategy).processBookmarkFolder(folder, listOf(bookmark.id))
         verify(remoteStrategy).processBookmark(bookmark, folder.id)
 
         verifyNoInteractions(timestampStrategy)
@@ -190,7 +190,7 @@ class SavedSitesSyncPersisterAlgorithmTest {
         val success = result as Success
         assertFalse(success.orphans)
 
-        verify(localStrategy).processBookmarkFolder(folder)
+        verify(localStrategy).processBookmarkFolder(folder, listOf(bookmark.id))
         verify(localStrategy).processBookmark(bookmark, folder.id)
 
         verifyNoInteractions(timestampStrategy)
@@ -237,7 +237,7 @@ class SavedSitesSyncPersisterAlgorithmTest {
         return SyncSavedSitesResponseEntry(
             id = bookmarkFolder.id,
             title = bookmarkFolder.name,
-            folder = SyncSavedSiteFolder(children),
+            folder = SyncSavedSiteResponseFolder(children),
             page = null,
             deleted = null,
             last_modified = bookmarkFolder.lastModified ?: DatabaseDateFormatter.iso8601(),
