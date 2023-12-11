@@ -784,4 +784,14 @@
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Přidej si na adresní řádek funkci soukromého hlasového vyhledávání. Zvuk nikde neukládáme a s nikým ho nesdílíme. Ani DuckDuckGo se k němu nedostane.</string>
     <string name="accessibilityVoiceSearchTitle">Soukromé hlasové vyhledávání</string>
+
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">Nemáme přístup k fotoaparátu</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">Nahrát obrázek</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Vyber soubor</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Vyfotit se</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Povolit DuckDuckGo žádat na tomto zařízení o přístup k fotoaparátu</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Weby můžou používat fotoaparát, jen když službě DuckDuckGo povolíš žádat o přístup.</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">Otevřít nastavení</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">Zrušit</string>
 </resources>
