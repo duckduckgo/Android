@@ -784,4 +784,14 @@
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Adreso juostoje pridėkite privačios paieškos balsu parinktį. Garso įrašai nesaugomi ir jais su niekuo nesidalijama, įskaitant „DuckDuckGo“.</string>
     <string name="accessibilityVoiceSearchTitle">Privati paieška balsu</string>
+
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">Nepavyko pasiekti fotoaparato</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">Įkelti vaizdą</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Pasirinkti failą</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Padaryti nuotrauką</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Leisti „DuckDuckGo“ prašyti prieigos prie kameros šiame įrenginyje</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Svetainės gali naudoti jūsų kamerą tik tada, jei leisite „DuckDuckGo“ prašyti prieigos.</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">Atidaryti nustatymus</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">Atšaukti</string>
 </resources>
