@@ -66,20 +66,6 @@ interface NetworkProtectionPixels {
      * daily -> fire only once a day no matter how many times we call this fun
      * count -> fire a pixel on every call
      */
-    fun reportVpnConnectivityLoss()
-
-    /**
-     * This fun will fire two pixels
-     * daily -> fire only once a day no matter how many times we call this fun
-     * count -> fire a pixel on every call
-     */
-    fun reportVpnReconnectFailed()
-
-    /**
-     * This fun will fire two pixels
-     * daily -> fire only once a day no matter how many times we call this fun
-     * count -> fire a pixel on every call
-     */
     fun reportWireguardLibraryLoadFailed()
 
     /**
@@ -358,16 +344,6 @@ class RealNetworkProtectionPixel @Inject constructor(
 
     override fun reportDisabled() {
         tryToFireDailyPixel(NETP_DISABLE_DAILY)
-    }
-
-    override fun reportVpnConnectivityLoss() {
-        tryToFireDailyPixel(NETP_VPN_CONNECTIVITY_LOST_DAILY)
-        firePixel(NETP_VPN_CONNECTIVITY_LOST)
-    }
-
-    override fun reportVpnReconnectFailed() {
-        tryToFireDailyPixel(NETP_VPN_RECONNECT_FAILED_DAILY)
-        firePixel(NETP_VPN_RECONNECT_FAILED)
     }
 
     override fun reportWireguardLibraryLoadFailed() {

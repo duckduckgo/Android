@@ -43,7 +43,7 @@ import com.duckduckgo.common.utils.AppUrl.Url
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.R.attr
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.networkprotection.api.NetPWaitlistInvitedScreenNoParams
+import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetPWaitlistInvitedScreenNoParams
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn

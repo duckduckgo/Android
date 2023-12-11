@@ -42,7 +42,6 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.REV
 import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
 import com.duckduckgo.mobile.android.vpn.ui.OpenVpnBreakageCategoryWithBrokenApp
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
-import com.duckduckgo.networkprotection.impl.alerts.reconnect.NetPReconnectNotifications
 import com.duckduckgo.networkprotection.impl.di.NetpBreakageCategories
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.None
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowAlwaysOnLockdownEnabled
@@ -79,7 +78,6 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     private val featuresRegistry: VpnFeaturesRegistry,
     private val networkProtectionRepository: NetworkProtectionRepository,
     private val dispatcherProvider: DispatcherProvider,
-    private val reconnectNotifications: NetPReconnectNotifications,
     private val externalVpnDetector: ExternalVpnDetector,
     private val networkProtectionPixels: NetworkProtectionPixels,
     @NetpBreakageCategories private val netpBreakageCategories: List<AppBreakageCategory>,
@@ -174,12 +172,12 @@ class NetworkProtectionManagementViewModel @Inject constructor(
             this?.let { serverDetails ->
                 connectionDetailsFlow.value = if (connectionDetailsFlow.value == null) {
                     ConnectionDetails(
-                        location = serverDetails.location ?: "Los Angeles, United States",
+                        location = serverDetails.location,
                         ipAddress = serverDetails.ipAddress,
                     )
                 } else {
                     connectionDetailsFlow.value!!.copy(
-                        location = serverDetails.location ?: "Los Angeles, United States",
+                        location = serverDetails.location,
                         ipAddress = serverDetails.ipAddress,
                     )
                 }
@@ -262,7 +260,6 @@ class NetworkProtectionManagementViewModel @Inject constructor(
             // TODO find a better place to reset values when manually starting or stopping NetP.
             networkProtectionRepository.reconnectStatus = NotReconnecting
             networkProtectionRepository.enabledTimeInMillis = -1L
-            reconnectNotifications.clearNotifications()
             forceUpdateRunningState()
             tryShowAlwaysOnPromotion()
         }
@@ -310,7 +307,6 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     private fun onStopVpn() {
         viewModelScope.launch(dispatcherProvider.io()) {
             featuresRegistry.unregisterFeature(NetPVpnFeature.NETP_VPN)
-            reconnectNotifications.clearNotifications()
             forceUpdateRunningState()
         }
     }
