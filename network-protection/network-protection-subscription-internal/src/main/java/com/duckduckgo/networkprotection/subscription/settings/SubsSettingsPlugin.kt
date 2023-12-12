@@ -14,27 +14,20 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.settings.api
+package com.duckduckgo.networkprotection.subscription.settings
 
 import android.content.Context
 import android.view.View
-import dagger.MapKey
+import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.settings.api.PositionKey
+import com.duckduckgo.settings.api.ProSettingsPlugin
+import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 
-/**
- * Use this interface to create a new plugin that will be used to display a specific settings section
- */
-interface SettingsPlugin {
-    /**
-     * This method returns a [View] that will be used as a setting item
-     * @return [View]
-     */
-    fun getView(context: Context): View
+@ContributesMultibinding(ActivityScope::class)
+@PositionKey(150)
+class ProSettingsNetP @Inject constructor() : ProSettingsPlugin {
+    override fun getView(context: Context): View {
+        return ProSettingNetPView(context)
+    }
 }
-
-/**
- * This is the plugin for the subs settings
- */
-interface ProSettingsPlugin : SettingsPlugin
-
-@MapKey
-annotation class PositionKey(val pos: Int)

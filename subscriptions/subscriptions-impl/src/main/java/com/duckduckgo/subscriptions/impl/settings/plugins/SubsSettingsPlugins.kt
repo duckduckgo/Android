@@ -20,16 +20,13 @@ import android.content.Context
 import android.view.View
 import com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.settings.api.PositionKey
 import com.duckduckgo.settings.api.ProSettingsPlugin
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingBuyView
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingView
 import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.MapKey
 import javax.inject.Inject
-
-@MapKey
-annotation class PositionKey(val pos: Int)
 
 @ContributesMultibinding(ActivityScope::class)
 @PositionKey(100)

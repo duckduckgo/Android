@@ -107,7 +107,10 @@ subprojects {
 
                 for (dependency in dependencies) {
                     // API modules cannot depend on dagger/anvil
-                    if (projectPath.endsWith("api") && projectPath != ":feature-toggles-api") {
+                    if (projectPath.endsWith("api")
+                            && projectPath != ":feature-toggles-api"
+                            && projectPath != ":settings-api")
+                    {
                         def notAllowedDeps = ["anvil", "dagger"]
                         if (notAllowedDeps.contains(dependency.name)) {
                             throw new GradleException("Invalid dependency $projectPath -> " +

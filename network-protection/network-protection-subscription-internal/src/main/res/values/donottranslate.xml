@@ -20,4 +20,11 @@
     <string name="netpVerifySubscriptionInProgress">Please wait while we verify your subscription…</string>
     <string name="netpVerifySubscriptionNoSubscription">Oops! You don’t have any valid subscription.</string>
     <string name="netpVerifySubscriptionNoEntitlement">Oops! Your subscription is not valid for Network Protection.</string>
+
+    <!-- NetP Settings-->
+    <string name="netpSubscriptionSettingsTitle">VPN</string>
+    <string name="netpSubscriptionSettingsConnected">Enabled</string>
+    <string name="netpSubscriptionSettingsConnecting">Connecting…</string>
+    <string name="netpSubscriptionSettingsDisconnected">Disabled</string>
+    <string name="netpSubscriptionSettingsNeverEnabled">Secure your network connection anytime, anywhere</string>
 </resources>
