@@ -2332,6 +2332,7 @@ class BrowserTabFragment :
 
         binding.swipeRefreshContainer.setOnRefreshListener {
             onRefreshRequested()
+            pixel.fire(AppPixelName.BROWSER_PULL_TO_REFRESH)
         }
 
         binding.swipeRefreshContainer.setCanChildScrollUpCallback {
