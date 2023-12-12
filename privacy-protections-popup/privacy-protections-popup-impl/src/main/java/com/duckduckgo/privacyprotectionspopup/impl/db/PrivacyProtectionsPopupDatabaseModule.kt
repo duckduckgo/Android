@@ -30,7 +30,7 @@ class PrivacyProtectionsPopupDatabaseModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun providesRemoteMessagingDatabase(context: Context): PrivacyProtectionsPopupDatabase =
+    fun providesPrivacyProtectionsPopupDatabase(context: Context): PrivacyProtectionsPopupDatabase =
         Room
             .databaseBuilder(
                 context = context,
