@@ -52,7 +52,17 @@ class AccessibilitySettingsSharedPreferences(
 
     override val fontSize: Float
         get() {
-            return if (overrideSystemFontSize) appFontSize else systemFontSize
+            return if (overrideSystemFontSize) {
+                if (appFontSize <= FONT_SIZE_DEFAULT)
+                    appFontSize
+                else (
+                    // SCALE_FACTOR is needed to make the transition smoother for people
+                    // who were using this before introducing TEXT_AUTOSIZING
+                    FONT_SIZE_DEFAULT + (appFontSize - FONT_SIZE_DEFAULT) * SCALE_FACTOR
+                )
+            } else {
+                systemFontSize
+            }
         }
 
     override val systemFontSize: Float
@@ -96,6 +106,7 @@ class AccessibilitySettingsSharedPreferences(
         const val KEY_FORCE_ZOOM = "FORCE_ZOOM"
         const val KEY_FONT_SIZE = "FONT_SIZE"
         const val FONT_SIZE_DEFAULT = 100f
+        const val SCALE_FACTOR = 1.5f
     }
 }
 
