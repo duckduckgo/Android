@@ -103,10 +103,6 @@ class ProSettingView @JvmOverloads constructor(
 
     @SuppressLint("ClickableViewAccessibility")
     private fun renderView(viewState: ViewState) {
-        // binding.subscriptionBuy.isEnabled = false
-        // binding.subscribeSecondary.isEnabled = false
-        // binding.subscriptionSetting.isEnabled = false
-
         binding.subscriptionSetting.setOnClickListener(null)
         binding.subscriptionSetting.setOnTouchListener(null)
         binding.subscriptionBuy.setOnClickListener(null)
