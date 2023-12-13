@@ -784,4 +784,14 @@
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Добавить опцию «Частный голосовой поиск» в адресную строку. Ваш голосовой запрос не сохраняется и никуда не передается, даже в DuckDuckGo.</string>
     <string name="accessibilityVoiceSearchTitle">Конфиденциальный голосовой поиск</string>
+
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">Нет доступа к камере</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">Загрузка изображения</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Выбрать файл</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Снять фото</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Разрешить DuckDuckGo запрашивать доступ к камере на этом устройстве</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Если вы разрешите DuckDuckGo запрашивать доступ, сайты смогут использовать камеру.</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">Открыть Настройки</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">Отменить</string>
 </resources>

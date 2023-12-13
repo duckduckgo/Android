@@ -776,4 +776,14 @@
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Añadir la opción de búsqueda privada por voz a la barra de direcciones. El audio no se almacena ni se comparte con nadie, incluyendo DuckDuckGo.</string>
     <string name="accessibilityVoiceSearchTitle">Búsqueda privada por voz</string>
+
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">No se pudo acceder a la cámara</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">Subir imagen</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Elegir archivo</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Hacer foto</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Permitir que DuckDuckGo solicite acceso a la cámara en este dispositivo</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Los sitios solo pueden usar tu cámara si permites que DuckDuckGo solicite acceso.</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">Abrir configuración</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">Cancelar</string>
 </resources>

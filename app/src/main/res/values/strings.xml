@@ -775,4 +775,14 @@
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Add Private Voice Search option to the address bar. Audio is not stored or shared with anyone, including DuckDuckGo.</string>
     <string name="accessibilityVoiceSearchTitle">Private Voice Search</string>
+
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">Could not access camera</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">Upload an image</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Choose File</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Take Photo</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Allow DuckDuckGo to ask for camera access on this device</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Sites can only use your camera if you allow DuckDuckGo to ask for access.</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">Open Settings</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">Cancel</string>
 </resources>

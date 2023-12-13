@@ -776,4 +776,14 @@
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Lisa aadressiribale privaatse häälotsingu valik. Heli ei salvestata ega jagata kellegagi, sealhulgas DuckDuckGoga.</string>
     <string name="accessibilityVoiceSearchTitle">Privaatne häälotsing</string>
+
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">Juurdepääs kaamerale nurjus</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">Laadi pilt üles</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Vali fail</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Tee pilt</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Luba DuckDuckGo’l küsida juurdepääsu selle seadme kaamerale</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Saidid saavad sinu kaamerat kasutada ainult siis, kui lubad DuckDuckGo’l küsida sellele juurdepääsu.</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">Ava sätted</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">Loobu</string>
 </resources>

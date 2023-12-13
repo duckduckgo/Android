@@ -780,4 +780,14 @@
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Adaugă opțiunea de Căutare vocală privată în bara de adrese.Sunetul nu este stocat sau partajat cu nimeni, inclusiv cu DuckDuckGo.</string>
     <string name="accessibilityVoiceSearchTitle">Căutare vocală privată</string>
+
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">Nu s-a putut accesa camera</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">Încarcă o imagine</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Alege fișierul</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Fă o fotografie</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Permite ca DuckDuckGo să solicite accesul la cameră pe acest dispozitiv</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Site-urile îți pot utiliza camera numai dacă permiți ca DuckDuckGo să solicite accesul.</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">Deschide Setări</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">Anulare</string>
 </resources>

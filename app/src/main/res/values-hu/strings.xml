@@ -776,4 +776,14 @@
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Privát beszédhangalapú keresési opció hozzáadása a címsorhoz. A hangot nem tároljuk és nem osztjuk meg senkivel, még a DuckDuckGóval sem.</string>
     <string name="accessibilityVoiceSearchTitle">Privát beszédhangalapú keresés</string>
+
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">Nem sikerült hozzáférni a kamerához</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">Kép feltöltése</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Fájl kiválasztása</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Fénykép készítése</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Engedélyezés, hogy a DuckDuckGo hozzáférést kérjen a kamerához ezen az eszközön</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">A webhelyek csak akkor használhatják a kamerát, ha engedélyezed, hogy a DuckDuckGo hozzáférést kérjen.</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">Beállítások megnyitása</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">Mégsem</string>
 </resources>

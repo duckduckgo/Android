@@ -780,4 +780,14 @@
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Pievienot adreses joslai opciju \"Privātā meklēšana ar balsi\". Audioieraksti netiek saglabāti un kopīgoti ar citiem, pat ne ar DuckDuckGo.</string>
     <string name="accessibilityVoiceSearchTitle">Privātā balss meklēšana</string>
+
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">Nevar piekļūt kamerai</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">Augšupielādēt attēlu</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Izvēlēties failu</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Uzņemt foto</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Atļaut DuckDuckGo pieprasīt piekļuvi kamerai šajā ierīcē</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Vietnes var izmantot tavu kameru tikai tad, ja tu atļauj DuckDuckGo prasīt piekļuvi.</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">Atvērt iestatījumus</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">Atcelt</string>
 </resources>
