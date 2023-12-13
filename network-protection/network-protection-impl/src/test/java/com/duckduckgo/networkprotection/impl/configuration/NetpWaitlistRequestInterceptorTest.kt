@@ -14,12 +14,12 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
-class WgVpnControllerRequestInterceptorTest {
+class NetpWaitlistRequestInterceptorTest {
 
     private val coroutineRule = CoroutineTestRule()
     private val appBuildConfig: AppBuildConfig = mock()
     private lateinit var netPWaitlistRepository: NetPWaitlistRepository
-    private lateinit var interceptor: WgVpnControllerRequestInterceptor
+    private lateinit var interceptor: NetpWaitlistRequestInterceptor
 
     @Before
     fun setup() {
@@ -29,7 +29,7 @@ class WgVpnControllerRequestInterceptorTest {
             coroutineRule.testScope,
         )
 
-        interceptor = WgVpnControllerRequestInterceptor(
+        interceptor = NetpWaitlistRequestInterceptor(
             netPWaitlistRepository,
             appBuildConfig,
         )
