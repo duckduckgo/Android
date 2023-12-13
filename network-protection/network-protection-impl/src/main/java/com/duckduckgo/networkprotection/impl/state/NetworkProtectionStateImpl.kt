@@ -66,6 +66,10 @@ class NetworkProtectionStateImpl @Inject constructor(
         }
     }
 
+    override suspend fun disable() {
+        vpnFeaturesRegistry.unregisterFeature(NetPVpnFeature.NETP_VPN)
+    }
+
     override fun serverLocation(): String? {
         return networkProtectionRepository.serverDetails?.location
     }

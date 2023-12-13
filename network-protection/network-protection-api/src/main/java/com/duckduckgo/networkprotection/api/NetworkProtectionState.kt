@@ -41,9 +41,14 @@ interface NetworkProtectionState {
     suspend fun isRunning(): Boolean
 
     /**
-     * This method will restart the App Tracking Protection feature by disabling it and re-enabling back again
+     * This method will restart the Network Protection feature by disabling it and re-enabling back again
      */
     fun restart()
+
+    /**
+     * This method will stop the Network Protection feature by disabling it
+     */
+    suspend fun disable()
 
     /**
      * This method returns the current server location Network Protection is routing device's data through.
