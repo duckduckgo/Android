@@ -24,8 +24,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
-import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenBuyScreen
-import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenSettings
+import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.Command.OpenPir
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -36,14 +35,13 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
-class ProSettingViewModel(
+class PirSettingViewModel(
     private val subscriptionsManager: SubscriptionsManager,
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     sealed class Command {
-        data object OpenSettings : Command()
-        data object OpenBuyScreen : Command()
+        data object OpenPir : Command()
     }
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
@@ -53,12 +51,8 @@ class ProSettingViewModel(
     private val _viewState = MutableStateFlow(ViewState())
     val viewState = _viewState.asStateFlow()
 
-    fun onSettings() {
-        sendCommand(OpenSettings)
-    }
-
-    fun onBuy() {
-        sendCommand(OpenBuyScreen)
+    fun onPir() {
+        sendCommand(OpenPir)
     }
 
     override fun onResume(owner: LifecycleOwner) {
@@ -84,7 +78,7 @@ class ProSettingViewModel(
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return with(modelClass) {
                 when {
-                    isAssignableFrom(ProSettingViewModel::class.java) -> ProSettingViewModel(subscriptionsManager, dispatcherProvider)
+                    isAssignableFrom(PirSettingViewModel::class.java) -> PirSettingViewModel(subscriptionsManager, dispatcherProvider)
                     else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
                 }
             } as T

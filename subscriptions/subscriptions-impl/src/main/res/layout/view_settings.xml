@@ -14,12 +14,36 @@
   ~ limitations under the License.
   -->
 
-<com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+<com.duckduckgo.subscriptions.impl.settings.views.SubscriptionSettingLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/settings"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/settingContainer"
+        android:background="?attr/selectableItemBackground"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="Subscription Settings"
-        app:primaryTextTruncated="false"
-        app:secondaryText="More seamless privacy with three new protections, including:" />
+        android:layout_height="wrap_content">
+
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/subscriptionSetting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="56dp"
+            app:primaryText="@string/subscriptionSetting" tools:ignore="RtlSymmetry"/>
+
+    <com.duckduckgo.common.ui.view.listitem.CheckListItem
+            android:id="@+id/subscriptionBuy"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/subscriptionSettingSubscribe"
+            app:secondaryText="@string/subscriptionSettingSubscribeSubtitle" />
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/subscribeSecondary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="72dp"
+            app:textType="secondary"
+            app:typography="body2" />
+
+</com.duckduckgo.subscriptions.impl.settings.views.SubscriptionSettingLayout>

@@ -3,8 +3,8 @@ package com.duckduckgo.subscriptions.impl.settings.views
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
-import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenBuyScreen
-import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenSettings
+import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingViewModel.Command.OpenItr
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -14,32 +14,24 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
-class ProSettingViewModelTest {
+@ExperimentalCoroutinesApi
+class ItrSettingViewModelTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val subscriptionsManager: SubscriptionsManager = mock()
-    private lateinit var viewModel: ProSettingViewModel
+    private lateinit var viewModel: ItrSettingViewModel
 
     @Before
     fun before() {
-        viewModel = ProSettingViewModel(subscriptionsManager, coroutineTestRule.testDispatcherProvider)
+        viewModel = ItrSettingViewModel(subscriptionsManager, coroutineTestRule.testDispatcherProvider)
     }
 
     @Test
-    fun whenOnSettingsThenCommandSent() = runTest {
+    fun whenOnItrThenCommandSent() = runTest {
         viewModel.commands().test {
-            viewModel.onSettings()
-            assertTrue(awaitItem() is OpenSettings)
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenOnBuyThenCommandSent() = runTest {
-        viewModel.commands().test {
-            viewModel.onBuy()
-            assertTrue(awaitItem() is OpenBuyScreen)
+            viewModel.onItr()
+            assertTrue(awaitItem() is OpenItr)
             cancelAndConsumeRemainingEvents()
         }
     }
