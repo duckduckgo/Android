@@ -75,8 +75,8 @@
                         android:paddingTop="@dimen/keyline_4"
                         android:paddingBottom="@dimen/keyline_4"
                         android:stepSize="10"
-                        android:valueFrom="70"
-                        android:valueTo="170"
+                        android:valueFrom="50"
+                        android:valueTo="200"
                         app:labelBehavior="gone"
                         app:tickVisible="false" />
                 </LinearLayout>
