@@ -16,6 +16,7 @@
 
 package com.duckduckgo.savedsites.impl.sync
 
+import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 
@@ -102,13 +103,11 @@ interface SyncSavedSitesRepository {
     )
 
     /**
-     * Stores the list of children that belong to a folder
-     * If the list is empty the column 'children' will remain empty
+     * Returns the object needed for the sync request an existing [Favorite]
+     * that represents the difference between remote and local state
+     * @param folderId id of the folder to get the diff from
      */
-    fun insertFolderChildren(
-        folderId: String,
-        children: List<String>,
-    )
+    fun getFolderDiff(folderId: String): SyncFolderChildren
 
     /**
      * Moves children in request column to children.
@@ -121,11 +120,11 @@ interface SyncSavedSitesRepository {
      * Stores the client children state for each folder before sending it to the Sync BE
      * @param folders list of folders to be stored
      */
-    fun addRequestMetadata(folders: List<SyncBookmarkEntry>)
+    fun addRequestMetadata(folders: List<SyncSavedSitesRequestEntry>)
 
     /**
      * Stores the BE children state for each folder after receiving it
      * @param folders list of folders to be stored
      */
-    fun addResponseMetadata(folders: List<SyncBookmarkEntry>)
+    fun addResponseMetadata(folders: List<SyncSavedSitesResponseEntry>)
 }

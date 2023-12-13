@@ -63,20 +63,17 @@ class SavedSitesSyncDataProvider @Inject constructor(
     }
 
     @VisibleForTesting
-    fun changesSince(since: String): List<SyncBookmarkEntry> {
+    fun changesSince(since: String): List<SyncSavedSitesRequestEntry> {
         Timber.i("Sync-Bookmarks: generating changes since $since")
-        val updates = mutableListOf<SyncBookmarkEntry>()
+        val updates = mutableListOf<SyncSavedSitesRequestEntry>()
 
         // we start adding individual folders that have been modified
         val folders = repository.getFoldersModifiedSince(since)
         folders.forEach { folder ->
             if (folder.isDeleted()) {
-                updates.add(deletedEntry(folder.id, folder.deleted!!))
+                updates.add(deletedEntry(folder.id))
             } else {
-                val folderEntry = addFolderEntry(folder.id)
-                if (folderEntry != null) {
-                    updates.add(folderEntry)
-                }
+                updates.add(encryptedFolder(folder))
             }
         }
 
@@ -84,9 +81,9 @@ class SavedSitesSyncDataProvider @Inject constructor(
         val bookmarks = repository.getBookmarksModifiedSince(since)
         bookmarks.forEach { bookmark ->
             if (bookmark.isDeleted()) {
-                updates.add(deletedEntry(bookmark.id, bookmark.deleted!!))
+                updates.add(deletedEntry(bookmark.id))
             } else {
-                updates.add(encryptSavedSite(bookmark))
+                updates.add(encryptedSavedSite(bookmark))
             }
         }
 
@@ -94,7 +91,7 @@ class SavedSitesSyncDataProvider @Inject constructor(
     }
 
     @VisibleForTesting
-    fun allContent(): List<SyncBookmarkEntry> {
+    fun allContent(): List<SyncSavedSitesRequestEntry> {
         Timber.i("Sync-Bookmarks: generating all content")
         val hasFavorites = repository.hasFavorites()
         val hasBookmarks = repository.hasBookmarks()
@@ -104,118 +101,86 @@ class SavedSitesSyncDataProvider @Inject constructor(
             return emptyList()
         }
 
-        val updates = mutableListOf<SyncBookmarkEntry>()
+        val updates = mutableListOf<SyncSavedSitesRequestEntry>()
         // favorites (we don't add individual items, they are added as we go through bookmark folders)
         if (hasFavorites) {
             val favoritesFolders = listOf(SavedSitesNames.FAVORITES_ROOT, SavedSitesNames.FAVORITES_MOBILE_ROOT)
             favoritesFolders.forEach {
-                val favorites = syncSavedSitesRepository.getFavoritesSync(it)
                 val favoriteFolder = repository.getFolder(it)
                 favoriteFolder?.let {
-                    updates.add(encryptFolder(favoriteFolder, favorites.map { it.id }))
+                    updates.add(encryptedFolder(favoriteFolder))
                 }
             }
         }
 
-        addFolderEntryWithContent(SavedSitesNames.BOOKMARKS_ROOT, updates)
+        addAllFolders(SavedSitesNames.BOOKMARKS_ROOT, updates)
         return updates.distinct()
     }
 
-    private fun addFolderEntry(folderId: String): SyncBookmarkEntry? {
-        val folderContent = repository.getAllFolderContentSync(folderId)
-        val storedFolder = repository.getFolder(folderId)
-        val folder = if (storedFolder != null) {
-            val childrenIds = mutableListOf<String>()
-            for (bookmark in folderContent.first) {
-                if (bookmark.deleted == null) {
-                    childrenIds.add(bookmark.id)
-                }
-            }
-            for (eachFolder in folderContent.second) {
-                if (eachFolder.deleted == null) {
-                    childrenIds.add(eachFolder.id)
-                }
-            }
-
-            encryptFolder(storedFolder, childrenIds)
-        } else {
-            null
-        }
-        return folder
-    }
-
-    private fun addFolderEntryWithContent(
+    private fun addAllFolders(
         folderId: String,
-        updates: MutableList<SyncBookmarkEntry>,
-    ): List<SyncBookmarkEntry> {
+        updates: MutableList<SyncSavedSitesRequestEntry>,
+    ): List<SyncSavedSitesRequestEntry> {
         repository.getAllFolderContentSync(folderId).apply {
             val folder = repository.getFolder(folderId)
             if (folder != null) {
-                val childrenIds = mutableListOf<String>()
                 for (bookmark in this.first) {
                     if (bookmark.deleted != null) {
-                        updates.add(deletedEntry(bookmark.id, bookmark.deleted!!))
+                        updates.add(deletedEntry(bookmark.id))
                     } else {
-                        childrenIds.add(bookmark.id)
-                        updates.add(encryptSavedSite(bookmark))
+                        updates.add(encryptedSavedSite(bookmark))
                     }
                 }
                 for (eachFolder in this.second) {
                     if (eachFolder.deleted != null) {
-                        updates.add(deletedEntry(eachFolder.id, eachFolder.deleted!!))
+                        updates.add(deletedEntry(eachFolder.id))
                     } else {
-                        childrenIds.add(eachFolder.id)
-                        addFolderEntryWithContent(eachFolder.id, updates)
+                        addAllFolders(eachFolder.id, updates)
                     }
                 }
-                updates.add(encryptFolder(folder, childrenIds))
+                updates.add(encryptedFolder(folder))
             }
         }
         return updates
     }
 
-    private fun encryptSavedSite(
+    private fun encryptedSavedSite(
         savedSite: SavedSite,
-    ): SyncBookmarkEntry {
-        return SyncBookmarkEntry(
+    ): SyncSavedSitesRequestEntry {
+        return SyncSavedSitesRequestEntry(
             id = savedSite.id,
             title = syncCrypto.encrypt(savedSite.title),
             page = SyncBookmarkPage(syncCrypto.encrypt(savedSite.url)),
-            folder = null,
+            children = null,
             deleted = null,
             client_last_modified = savedSite.lastModified ?: DatabaseDateFormatter.iso8601(),
         )
     }
 
-    private fun encryptFolder(
-        bookmarkFolder: BookmarkFolder,
-        children: List<String>,
-    ): SyncBookmarkEntry {
-        return SyncBookmarkEntry(
+    private fun encryptedFolder(bookmarkFolder: BookmarkFolder): SyncSavedSitesRequestEntry {
+        val folderChildren = syncSavedSitesRepository.getFolderDiff(bookmarkFolder.id)
+        return SyncSavedSitesRequestEntry(
             id = bookmarkFolder.id,
             title = syncCrypto.encrypt(bookmarkFolder.name),
-            folder = SyncFolderChildren(children),
+            children = folderChildren,
             page = null,
             deleted = bookmarkFolder.deleted,
             client_last_modified = bookmarkFolder.lastModified ?: DatabaseDateFormatter.iso8601(),
         )
     }
 
-    private fun deletedEntry(
-        id: String,
-        deleted: String,
-    ): SyncBookmarkEntry {
-        return SyncBookmarkEntry(
+    private fun deletedEntry(id: String): SyncSavedSitesRequestEntry {
+        return SyncSavedSitesRequestEntry(
             id = id,
             title = null,
-            folder = null,
+            children = null,
             page = null,
             deleted = "1",
             client_last_modified = null,
         )
     }
 
-    private fun formatUpdates(updates: List<SyncBookmarkEntry>): SyncChangesRequest {
+    private fun formatUpdates(updates: List<SyncSavedSitesRequestEntry>): SyncChangesRequest {
         val modifiedSince = if (savedSitesSyncStore.serverModifiedSince == "0") {
             ModifiedSince.FirstSync
         } else {
@@ -240,32 +205,3 @@ class SavedSitesSyncDataProvider @Inject constructor(
         }
     }
 }
-
-data class SyncBookmarkPage(val url: String)
-data class SyncFolderChildren(val children: List<String>)
-
-data class SyncBookmarkEntry(
-    val id: String,
-    val title: String?,
-    val page: SyncBookmarkPage?,
-    val folder: SyncFolderChildren?,
-    val deleted: String?,
-    val client_last_modified: String?,
-)
-
-class SyncBookmarksRequest(
-    val bookmarks: SyncBookmarkUpdates,
-    val client_timestamp: String,
-)
-
-class SyncBookmarkUpdates(
-    val updates: List<SyncBookmarkEntry>,
-    val modified_since: String = "0",
-)
-
-fun SyncBookmarkEntry.isFolder(): Boolean = this.folder != null
-fun SyncBookmarkEntry.titleOrFallback(): String = this.title ?: "Bookmark"
-
-fun SyncBookmarkEntry.isBookmarksRoot(): Boolean = this.folder != null && this.id == SavedSitesNames.BOOKMARKS_ROOT
-fun SyncBookmarkEntry.isFavouritesRoot(): Boolean = this.folder != null && this.id == SavedSitesNames.FAVORITES_ROOT
-fun SyncBookmarkEntry.isBookmark(): Boolean = this.page != null

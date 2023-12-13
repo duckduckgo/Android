@@ -40,32 +40,22 @@ interface SavedSitesSyncMetadataDao {
         }
     }
 
-    @Query("update saved_sites_sync_meta set `children` = :children where `folderId` = :folderId")
-    fun updateChildren(
-        folderId: String,
-        children: String,
-    )
-
     @Transaction
-    fun confirmAllChildren() {
+    fun confirmAllChildrenRequests() {
         confirmChildren()
         removeAllRequests()
     }
 
-    @Query("update saved_sites_sync_meta set `children` = request where `request` not null")
+    @Query("update saved_sites_sync_meta set childrenResponse = childrenRequest where childrenRequest not null")
     fun confirmChildren()
-
-    @Query("update saved_sites_sync_meta set `children` = request where `folderId` = :folderId")
-    fun confirmChildren(folderId: String)
 
     @Transaction
     fun confirmChildren(folders: List<SavedSitesSyncMetadataEntity>) {
         addOrUpdate(folders)
-        confirmChildren()
-        removeAllRequests()
+        confirmAllChildrenRequests()
     }
 
-    @Query("update saved_sites_sync_meta set `request` = null")
+    @Query("update saved_sites_sync_meta set childrenRequest = null")
     fun removeAllRequests()
 
     @Query("Delete from saved_sites_sync_meta")
@@ -78,6 +68,6 @@ interface SavedSitesSyncMetadataDao {
 @Entity(tableName = "saved_sites_sync_meta")
 data class SavedSitesSyncMetadataEntity(
     @PrimaryKey val folderId: String,
-    var children: String, // JSON representation of list of children confirmed by the BE
-    var request: String, // JSON representation of list of children sent to the BE
+    var childrenResponse: String, // JSON representation of list of children confirmed by the BE
+    var childrenRequest: String, // JSON representation of list of children sent to the BE
 )

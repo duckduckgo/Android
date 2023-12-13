@@ -41,7 +41,6 @@ import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 import com.duckduckgo.savedsites.store.SavedSitesSettingsSharedPrefStore
 import com.duckduckgo.savedsites.store.SavedSitesSettingsStore
-import com.duckduckgo.savedsites.store.SavedSitesSyncMetadataDao
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -125,7 +124,7 @@ class SavedSitesModule {
     @SingleInstanceIn(AppScope::class)
     @Provides
     fun provideSavedSitesDatabase(context: Context): SavedSitesSyncMetadataDatabase {
-        return Room.databaseBuilder(context, SavedSitesSyncMetadataDatabase::class.java, "settings.db")
+        return Room.databaseBuilder(context, SavedSitesSyncMetadataDatabase::class.java, "saved_sites_metadata.db")
             .fallbackToDestructiveMigration()
             .addMigrations(*ALL_MIGRATIONS)
             .build()

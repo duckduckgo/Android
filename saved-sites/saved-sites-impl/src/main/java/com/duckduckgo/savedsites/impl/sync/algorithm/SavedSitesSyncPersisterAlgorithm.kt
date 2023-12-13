@@ -133,7 +133,7 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
     private fun processFolder(
         folderId: String,
         parentId: String,
-        remoteUpdates: List<SyncBookmarkEntry>,
+        remoteUpdates: List<SyncSavedSitesResponseEntry>,
         lastModified: String,
         processIds: MutableList<String>,
         conflictResolution: SyncConflictResolution,
@@ -153,7 +153,7 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
 
     private fun processBookmarkFolder(
         conflictResolution: SyncConflictResolution,
-        remoteFolder: SyncBookmarkEntry,
+        remoteFolder: SyncSavedSitesResponseEntry,
         parentId: String,
         lastModified: String,
     ) {
@@ -172,14 +172,14 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
         } else {
             remoteFolder.folder.children
         }
-        syncSavedSitesRepository.insertFolderChildren(remoteFolder.id, children)
+        // syncSavedSitesRepository.insertFolderChildren(remoteFolder.id, children)
     }
 
     private fun processChild(
         conflictResolution: SyncConflictResolution,
         child: String,
         processIds: MutableList<String>,
-        entries: List<SyncBookmarkEntry>,
+        entries: List<SyncSavedSitesResponseEntry>,
         folderId: String,
         lastModified: String,
     ) {
@@ -202,7 +202,7 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
     }
 
     private fun processBookmark(
-        childEntry: SyncBookmarkEntry,
+        childEntry: SyncSavedSitesResponseEntry,
         conflictResolution: SyncConflictResolution,
         folderId: String,
         lastModified: String,
@@ -219,7 +219,7 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
 
     private fun processFavouritesFolder(
         conflictResolution: SyncConflictResolution,
-        entries: List<SyncBookmarkEntry>,
+        entries: List<SyncSavedSitesResponseEntry>,
         favoriteFolder: String,
         lastModified: String,
     ) {
@@ -310,7 +310,7 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
     }
 
     private fun decryptFolder(
-        remoteEntry: SyncBookmarkEntry,
+        remoteEntry: SyncSavedSitesResponseEntry,
         parentId: String,
         lastModified: String,
     ): BookmarkFolder {
@@ -318,7 +318,7 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
             id = remoteEntry.id,
             name = syncCrypto.decrypt(remoteEntry.titleOrFallback()),
             parentId = parentId,
-            lastModified = remoteEntry.client_last_modified ?: lastModified,
+            lastModified = remoteEntry.last_modified ?: lastModified,
             deleted = remoteEntry.deleted,
         )
         Timber.d("Sync-Bookmarks: decrypted $folder")
@@ -326,7 +326,7 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
     }
 
     private fun decryptBookmark(
-        remoteEntry: SyncBookmarkEntry,
+        remoteEntry: SyncSavedSitesResponseEntry,
         parentId: String,
         lastModified: String,
     ): Bookmark {
@@ -335,7 +335,7 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
             title = syncCrypto.decrypt(remoteEntry.titleOrFallback()),
             url = syncCrypto.decrypt(remoteEntry.page!!.url),
             parentId = parentId,
-            lastModified = remoteEntry.client_last_modified ?: lastModified,
+            lastModified = remoteEntry.last_modified ?: lastModified,
             deleted = remoteEntry.deleted,
         )
         Timber.d("Sync-Bookmarks: decrypted $bookmark")
@@ -343,7 +343,7 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
     }
 
     private fun decryptFavourite(
-        remoteEntry: SyncBookmarkEntry,
+        remoteEntry: SyncSavedSitesResponseEntry,
         position: Int,
         lastModified: String,
     ): Favorite {
@@ -351,7 +351,7 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
             id = remoteEntry.id,
             title = syncCrypto.decrypt(remoteEntry.titleOrFallback()),
             url = syncCrypto.decrypt(remoteEntry.page!!.url),
-            lastModified = remoteEntry.client_last_modified ?: lastModified,
+            lastModified = remoteEntry.last_modified ?: lastModified,
             position = position,
         )
         Timber.d("Sync-Bookmarks: decrypted $favourite")
