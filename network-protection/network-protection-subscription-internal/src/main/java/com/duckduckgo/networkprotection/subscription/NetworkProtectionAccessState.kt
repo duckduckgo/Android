@@ -43,7 +43,7 @@ import kotlinx.coroutines.withContext
     AppScope::class,
     priority = HIGHEST, // binding for internal-testing build wins
 )
-class NetworkProtectionWaitlistWithSubsImpl @Inject constructor(
+class NetworkProtectionAccessState @Inject constructor(
     private val netPWaitlistRepository: NetPWaitlistRepository,
     private val networkProtectionState: NetworkProtectionState,
     private val appBuildConfig: AppBuildConfig,

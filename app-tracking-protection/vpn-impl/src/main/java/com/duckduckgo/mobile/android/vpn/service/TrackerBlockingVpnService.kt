@@ -383,7 +383,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
                 addDnsServer("10.0.0.1")
                 // just so that we can connect to our BE
                 // TODO should we protect all comms with our controller BE? other VPNs do that
-                safelyAddDisallowedApps(listOf("com.duckduckgo.mobile.android", "com.duckduckgo.mobile.android.debug"))
+                safelyAddDisallowedApps(listOf(this@TrackerBlockingVpnService.packageName))
                 setBlocking(true)
                 setMtu(1280)
                 prepare(this@TrackerBlockingVpnService)
