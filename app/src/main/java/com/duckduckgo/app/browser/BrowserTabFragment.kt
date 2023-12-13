@@ -2093,6 +2093,7 @@ class BrowserTabFragment :
 
             it.settings.apply {
                 userAgentString = userAgentProvider.userAgent()
+                layoutAlgorithm = WebSettings.LayoutAlgorithm.TEXT_AUTOSIZING
                 javaScriptEnabled = true
                 domStorageEnabled = true
                 loadWithOverviewMode = true
