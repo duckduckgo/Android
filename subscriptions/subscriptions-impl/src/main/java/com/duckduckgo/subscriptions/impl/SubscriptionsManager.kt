@@ -23,14 +23,21 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus.AutoRenewable
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus.Expired
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus.GracePeriod
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus.Inactive
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus.NotAutoRenewable
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus.Unknown
 import com.duckduckgo.subscriptions.impl.SubscriptionsData.*
-import com.duckduckgo.subscriptions.impl.auth.AuthService
-import com.duckduckgo.subscriptions.impl.auth.CreateAccountResponse
-import com.duckduckgo.subscriptions.impl.auth.Entitlement
-import com.duckduckgo.subscriptions.impl.auth.ResponseError
-import com.duckduckgo.subscriptions.impl.auth.StoreLoginBody
 import com.duckduckgo.subscriptions.impl.billing.BillingClientWrapper
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState
+import com.duckduckgo.subscriptions.impl.services.AuthService
+import com.duckduckgo.subscriptions.impl.services.CreateAccountResponse
+import com.duckduckgo.subscriptions.impl.services.Entitlement
+import com.duckduckgo.subscriptions.impl.services.ResponseError
+import com.duckduckgo.subscriptions.impl.services.StoreLoginBody
+import com.duckduckgo.subscriptions.impl.services.SubscriptionsService
 import com.duckduckgo.subscriptions.store.AuthDataStore
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
@@ -67,6 +74,11 @@ interface SubscriptionsManager {
      * Gets the subscription data for an authenticated user
      */
     suspend fun getSubscriptionData(): SubscriptionsData
+
+    /**
+     * Gets the subscription for an authenticated user
+     */
+    suspend fun getSubscription(): Subscription
 
     /**
      * Authenticates the user based on the auth token
@@ -113,6 +125,7 @@ interface SubscriptionsManager {
 @ContributesBinding(AppScope::class)
 class RealSubscriptionsManager @Inject constructor(
     private val authService: AuthService,
+    private val subscriptionsService: SubscriptionsService,
     private val authDataStore: AuthDataStore,
     private val billingClientWrapper: BillingClientWrapper,
     private val emailManager: EmailManager,
@@ -152,6 +165,35 @@ class RealSubscriptionsManager @Inject constructor(
                     }
                 }
             }
+        }
+    }
+
+    override suspend fun getSubscription(): Subscription {
+        return try {
+            if (isUserAuthenticated()) {
+                val response = subscriptionsService.subscription("Bearer ${authDataStore.accessToken}")
+                val state = when (response.status) {
+                    "Auto-Renewable" -> AutoRenewable
+                    "Not Auto-Renewable" -> NotAutoRenewable
+                    "Grace Period" -> GracePeriod
+                    "Inactive" -> Inactive
+                    "Expired" -> Expired
+                    else -> Unknown
+                }
+                return Subscription.Success(
+                    productId = response.productId,
+                    startedAt = response.startedAt,
+                    expiresOrRenewsAt = response.expiresOrRenewsAt,
+                    status = state,
+                )
+            } else {
+                Subscription.Failure("Subscription not found")
+            }
+        } catch (e: HttpException) {
+            val error = parseError(e)?.error ?: "An error happened"
+            Subscription.Failure(error)
+        } catch (e: Exception) {
+            Subscription.Failure(e.message ?: "An error happened")
         }
     }
 
@@ -390,11 +432,25 @@ sealed class SubscriptionsData {
     data class Failure(val message: String) : SubscriptionsData()
 }
 
+sealed class Subscription {
+    data class Success(val productId: String, val startedAt: Long, val expiresOrRenewsAt: Long, val status: SubscriptionStatus) : Subscription()
+    data class Failure(val message: String) : Subscription()
+}
+
+sealed class SubscriptionStatus {
+    data object AutoRenewable : SubscriptionStatus()
+    data object NotAutoRenewable : SubscriptionStatus()
+    data object GracePeriod : SubscriptionStatus()
+    data object Inactive : SubscriptionStatus()
+    data object Expired : SubscriptionStatus()
+    data object Unknown : SubscriptionStatus()
+}
+
 sealed class CurrentPurchase {
-    object PreFlowInProgress : CurrentPurchase()
-    object PreFlowFinished : CurrentPurchase()
-    object InProgress : CurrentPurchase()
-    object Success : CurrentPurchase()
-    object Recovered : CurrentPurchase()
+    data object PreFlowInProgress : CurrentPurchase()
+    data object PreFlowFinished : CurrentPurchase()
+    data object InProgress : CurrentPurchase()
+    data object Success : CurrentPurchase()
+    data object Recovered : CurrentPurchase()
     data class Failure(val message: String) : CurrentPurchase()
 }

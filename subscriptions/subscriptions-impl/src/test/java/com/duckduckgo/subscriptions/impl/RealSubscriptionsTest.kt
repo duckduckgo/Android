@@ -18,7 +18,7 @@ package com.duckduckgo.subscriptions.impl
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.subscriptions.impl.auth.Entitlement
+import com.duckduckgo.subscriptions.impl.services.Entitlement
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before

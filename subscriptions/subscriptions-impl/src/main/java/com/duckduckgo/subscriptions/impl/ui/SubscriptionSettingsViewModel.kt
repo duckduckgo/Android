@@ -16,26 +16,61 @@
 
 package com.duckduckgo.subscriptions.impl.ui
 
+import android.annotation.SuppressLint
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.subscriptions.impl.Subscription
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.FinishSignOut
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Yearly
+import java.text.SimpleDateFormat
+import java.util.*
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
+@SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ActivityScope::class)
 class SubscriptionSettingsViewModel @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
-) : ViewModel() {
+    private val dispatcherProvider: DispatcherProvider,
+) : ViewModel(), DefaultLifecycleObserver {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
+
+    private val _viewState = MutableStateFlow(ViewState())
+    val viewState = _viewState.asStateFlow()
+    data class ViewState(
+        val date: String? = null,
+        val duration: SubscriptionDuration? = null,
+        val status: SubscriptionStatus? = null,
+    )
+
+    override fun onResume(owner: LifecycleOwner) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            val subs = subscriptionsManager.getSubscription()
+            if (subs is Subscription.Success) {
+                val formatter = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
+                val date = formatter.format(Date(subs.expiresOrRenewsAt))
+                val type = if (subs.productId == MONTHLY_PLAN) Monthly else Yearly
+                _viewState.emit(viewState.value.copy(date = date, duration = type, status = subs.status))
+            }
+        }
+    }
 
     fun removeFromDevice() {
         viewModelScope.launch {
@@ -44,7 +79,12 @@ class SubscriptionSettingsViewModel @Inject constructor(
         }
     }
 
+    sealed class SubscriptionDuration {
+        data object Monthly : SubscriptionDuration()
+        data object Yearly : SubscriptionDuration()
+    }
+
     sealed class Command {
-        object FinishSignOut : Command()
+        data object FinishSignOut : Command()
     }
 }
