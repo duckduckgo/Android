@@ -7404,6 +7404,7 @@
     }
 
     const MSG_WEB_SHARE = 'webShare';
+    const MSG_PERMISSIONS_QUERY = 'permissionsQuery';
 
     function canShare (data) {
         if (typeof data !== 'object') return false
@@ -7640,28 +7641,7 @@
                     this.onchange = null; // noop
                 }
             }
-            // Default subset based upon Firefox (the full list is pretty large right now and these are the common ones)
-            const defaultValidPermissionNames = [
-                'geolocation',
-                'notifications',
-                'push',
-                'persistent-storage',
-                'midi',
-                'accelerometer',
-                'ambient-light-sensor',
-                'background-sync',
-                'bluetooth',
-                'camera',
-                'clipboard',
-                'device-info',
-                'gyroscope',
-                'magnetometer',
-                'microphone',
-                'speaker'
-            ];
-            const validPermissionNames = settings.validPermissionNames || defaultValidPermissionNames;
-            const returnStatus = settings.permissionResponse || 'prompt';
-            permissions.query = new Proxy((query) => {
+            permissions.query = new Proxy(async (query) => {
                 this.addDebugFlag();
                 if (!query) {
                     throw new TypeError("Failed to execute 'query' on 'Permissions': 1 argument required, but only 0 present.")
@@ -7669,10 +7649,21 @@
                 if (!query.name) {
                     throw new TypeError("Failed to execute 'query' on 'Permissions': Failed to read the 'name' property from 'PermissionDescriptor': Required member is undefined.")
                 }
-                if (!validPermissionNames.includes(query.name)) {
+                if (!settings.supportedPermissions || !(query.name in settings.supportedPermissions)) {
                     throw new TypeError(`Failed to execute 'query' on 'Permissions': Failed to read the 'name' property from 'PermissionDescriptor': The provided value '${query.name}' is not a valid enum value of type PermissionName.`)
                 }
-                return Promise.resolve(new PermissionStatus(query.name, returnStatus))
+                const permSetting = settings.supportedPermissions[query.name];
+                const returnName = permSetting.name || query.name;
+                let returnStatus = settings.permissionResponse || 'prompt';
+                if (permSetting.native) {
+                    try {
+                        const response = await this.messaging.request(MSG_PERMISSIONS_QUERY, query);
+                        returnStatus = response.state || 'prompt';
+                    } catch (err) {
+                        // do nothing - keep returnStatus as-is
+                    }
+                }
+                return Promise.resolve(new PermissionStatus(returnName, returnStatus))
             }, {
                 get (target, name) {
                     return Reflect.get(target, name)
