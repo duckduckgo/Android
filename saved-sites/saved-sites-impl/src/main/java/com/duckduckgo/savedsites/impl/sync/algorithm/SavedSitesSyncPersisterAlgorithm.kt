@@ -121,10 +121,20 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
             }
         }
 
+        // there are two types of orphans
+        // 1 - they come from the response -> (entity in response doesn't belong to any folder)
+        // 2 - they are created because the response (local entity is no longer part of a folder)
+        // for the first ones we don't do anything, but the second ones are attached to bookmarks root
         val unprocessedIds = allResponseIds.filterNot { processIds.contains(it) }
         if (unprocessedIds.isNotEmpty()) {
             orphans = true
-            Timber.d("Sync-Bookmarks: there are ${unprocessedIds.size} items orphaned $unprocessedIds")
+            Timber.d("Sync-Bookmarks: there are ${unprocessedIds.size} items orphan in the response $unprocessedIds")
+        }
+
+        val fixedOrphans = syncSavedSitesRepository.fixOrphans()
+        if (fixedOrphans) {
+            Timber.d("Sync-Bookmarks: fixed orphans, attached them to root")
+            orphans = true
         }
 
         return SyncMergeResult.Success(orphans = orphans)
@@ -161,18 +171,12 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
         if (folder.id != SavedSitesNames.BOOKMARKS_ROOT && folder.id != FAVORITES_ROOT) {
             Timber.d("Sync-Bookmarks: processing folder ${folder.id} with parentId $parentId")
             when (conflictResolution) {
-                DEDUPLICATION -> deduplicationStrategy.processBookmarkFolder(folder)
-                REMOTE_WINS -> remoteWinsStrategy.processBookmarkFolder(folder)
-                LOCAL_WINS -> localWinsStrategy.processBookmarkFolder(folder)
-                TIMESTAMP -> timestampStrategy.processBookmarkFolder(folder)
+                DEDUPLICATION -> deduplicationStrategy.processBookmarkFolder(folder, remoteFolder.folder?.children ?: emptyList())
+                REMOTE_WINS -> remoteWinsStrategy.processBookmarkFolder(folder, remoteFolder.folder?.children ?: emptyList())
+                LOCAL_WINS -> localWinsStrategy.processBookmarkFolder(folder, remoteFolder.folder?.children ?: emptyList())
+                TIMESTAMP -> timestampStrategy.processBookmarkFolder(folder, remoteFolder.folder?.children ?: emptyList())
             }
         }
-        val children = if (remoteFolder.folder == null) {
-            emptyList()
-        } else {
-            remoteFolder.folder.children
-        }
-        // syncSavedSitesRepository.insertFolderChildren(remoteFolder.id, children)
     }
 
     private fun processChild(

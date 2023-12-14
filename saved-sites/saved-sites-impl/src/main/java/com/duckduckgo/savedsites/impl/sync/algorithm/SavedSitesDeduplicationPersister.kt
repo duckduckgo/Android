@@ -38,6 +38,7 @@ class SavedSitesDeduplicationPersister @Inject constructor(
 ) : SavedSitesSyncPersisterStrategy {
     override fun processBookmarkFolder(
         folder: BookmarkFolder,
+        children: List<String>,
     ) {
         // in deduplication we replace local folder with remote folder (id, name, parentId, add children to existent ones)
         when (val result = duplicateFinder.findFolderDuplicate(folder)) {

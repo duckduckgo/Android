@@ -78,7 +78,10 @@ class SavedSitesRemoteWinsPersisterTest {
         savedSitesEntitiesDao = db.syncEntitiesDao()
         savedSitesRelationsDao = db.syncRelationsDao()
 
-        savedSitesDatabase = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, SavedSitesSyncMetadataDatabase::class.java)
+        savedSitesDatabase = Room.inMemoryDatabaseBuilder(
+            InstrumentationRegistry.getInstrumentation().targetContext,
+            SavedSitesSyncMetadataDatabase::class.java,
+        )
             .allowMainThreadQueries()
             .build()
         savedSitesMetadataDao = savedSitesDatabase.syncMetadataDao()
@@ -235,7 +238,7 @@ class SavedSitesRemoteWinsPersisterTest {
         val folder = BookmarkFolder("folder1", "title", SavedSitesNames.BOOKMARKS_ROOT, 0, 0)
         assertTrue(repository.getFolder(folder.id) == null)
 
-        persister.processBookmarkFolder(folder)
+        persister.processBookmarkFolder(folder, emptyList())
 
         assertTrue(repository.getFolder(folder.id) != null)
     }
@@ -247,7 +250,7 @@ class SavedSitesRemoteWinsPersisterTest {
         assertTrue(repository.getFolder(folder.id) != null)
 
         val deletedFolder = folder.copy(deleted = "1")
-        persister.processBookmarkFolder(deletedFolder)
+        persister.processBookmarkFolder(deletedFolder, emptyList())
 
         assertTrue(repository.getFolder(folder.id) == null)
     }
@@ -259,7 +262,7 @@ class SavedSitesRemoteWinsPersisterTest {
         assertTrue(repository.getFolder(folder.id) != null)
 
         val updatedFolder = folder.copy(name = "remoteFolder1")
-        persister.processBookmarkFolder(updatedFolder)
+        persister.processBookmarkFolder(updatedFolder, emptyList())
 
         assertTrue(repository.getFolder(folder.id) != null)
         assertTrue(repository.getFolder(folder.id)!!.name == updatedFolder.name)

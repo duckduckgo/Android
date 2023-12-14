@@ -24,6 +24,7 @@ interface SavedSitesSyncPersisterStrategy {
 
     fun processBookmarkFolder(
         folder: BookmarkFolder,
+        children: List<String>,
     )
 
     fun processFavourite(

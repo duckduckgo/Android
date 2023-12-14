@@ -30,12 +30,14 @@ data class SyncSavedSitesRequestEntry(
     val id: String,
     val title: String?,
     val page: SyncBookmarkPage?,
-    val children: SyncFolderChildren?,
+    val folder: SyncSavedSiteRequestFolder?,
     val deleted: String?,
     val client_last_modified: String?,
 )
 
-fun SyncSavedSitesRequestEntry.isFolder(): Boolean = this.children != null
+data class SyncSavedSiteRequestFolder(val children: SyncFolderChildren)
+
+fun SyncSavedSitesRequestEntry.isFolder(): Boolean = this.folder != null
 fun SyncSavedSitesRequestEntry.titleOrFallback(): String = this.title ?: "Bookmark"
 fun SyncSavedSitesRequestEntry.isBookmark(): Boolean = this.page != null
 
@@ -49,7 +51,7 @@ data class SyncSavedSitesResponseEntry(
     val id: String,
     val title: String?,
     val page: SyncBookmarkPage?,
-    val folder: SyncSavedSiteFolder?,
+    val folder: SyncSavedSiteResponseFolder?,
     val deleted: String?,
     val last_modified: String?,
 )
@@ -59,4 +61,4 @@ fun SyncSavedSitesResponseEntry.titleOrFallback(): String = this.title ?: "Bookm
 fun SyncSavedSitesResponseEntry.isBookmark(): Boolean = this.page != null
 
 data class SyncBookmarkPage(val url: String)
-data class SyncSavedSiteFolder(val children: List<String>)
+data class SyncSavedSiteResponseFolder(val children: List<String>)
