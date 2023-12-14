@@ -22,6 +22,7 @@ import android.app.Activity.RESULT_OK
 import android.app.ActivityOptions
 import android.app.PendingIntent
 import android.content.*
+import android.content.pm.ActivityInfo
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
@@ -2147,9 +2148,13 @@ class BrowserTabFragment :
                 it,
                 object : JsMessageCallback() {
                     override fun process(featureName: String, method: String, id: String?, data: JSONObject?) {
+                        if (id == null || data == null)
+                            return
+
                         when (method) {
-                            "webShare" -> if (id != null && data != null) { webShare(featureName, method, id, data) }
-                            "permissionsQuery" -> if (id != null && data != null) { viewModel.onPermissionsQuery(featureName, method, id, data) }
+                            "webShare" -> webShare(featureName, method, id, data)
+                            "permissionsQuery" -> viewModel.onPermissionsQuery(featureName, method, id, data)
+                            "screenLock" -> screenLock(featureName, method, id, data)
                             else -> {
                                 // NOOP
                             }
@@ -2164,6 +2169,40 @@ class BrowserTabFragment :
 
     private fun webShare(featureName: String, method: String, id: String, data: JSONObject) {
         webShareRequest.launch(JsCallbackData(data, featureName, method, id))
+    }
+
+    private fun screenLock(featureName: String, method: String, id: String, data: JSONObject) {
+
+        if (renderer.isFullScreen() == false) {
+            val returnData = JsCallbackData(
+                JSONObject("""{ "error":"notFullScreen"}"""),
+                featureName,
+                method,
+                id,
+            )
+            contentScopeScripts.onResponse(returnData)
+            return
+        }
+
+
+        Timber.v("Before reqOr = ${activity?.requestedOrientation}; config = ${resources.configuration.orientation}")
+
+
+        val orientation = data.getString("orientation")
+        when (orientation) {
+            "landscape-primary" -> activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+            "portrait-primary" -> activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        }
+
+        Timber.v("After reqOr = ${activity?.requestedOrientation}; config = ${resources.configuration.orientation}")
+
+        val returnData = JsCallbackData(
+            JSONObject("""{ "orientation":"landscape"}"""),
+            featureName,
+            method,
+            id,
+        )
+        contentScopeScripts.onResponse(returnData)
     }
 
     private fun configureWebViewForAutofill(it: DuckDuckGoWebView) {
@@ -3414,6 +3453,10 @@ class BrowserTabFragment :
                     if (it) exitFullScreen()
                 }
             }
+        }
+
+        fun isFullScreen() : Boolean? {
+            return lastSeenBrowserViewState?.isFullScreen
         }
 
         fun applyAccessibilitySettings(viewState: AccessibilityViewState) {
