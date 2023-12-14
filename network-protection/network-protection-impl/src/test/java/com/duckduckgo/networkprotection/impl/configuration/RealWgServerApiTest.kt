@@ -17,9 +17,8 @@
 package com.duckduckgo.networkprotection.impl.configuration
 
 import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.WgServerData
-import com.duckduckgo.networkprotection.impl.settings.geoswitching.FakeNetPGeoswitchingRepository
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpEgressServersProvider
-import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository.UserPreferredLocation
+import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpEgressServersProvider.PreferredLocation
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -27,13 +26,13 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 class RealWgServerApiTest {
     private val wgVpnControllerService = FakeWgVpnControllerService()
 
     private lateinit var productionWgServerDebugProvider: DefaultWgServerDebugProvider
     private lateinit var internalWgServerDebugProvider: FakeWgServerDebugProvider
-    private lateinit var geoswitchingRepository: FakeNetPGeoswitchingRepository
     private lateinit var productionApi: RealWgServerApi
     private lateinit var internalApi: RealWgServerApi
 
@@ -46,19 +45,16 @@ class RealWgServerApiTest {
 
         productionWgServerDebugProvider = DefaultWgServerDebugProvider()
         internalWgServerDebugProvider = FakeWgServerDebugProvider()
-        geoswitchingRepository = FakeNetPGeoswitchingRepository()
 
         internalApi = RealWgServerApi(
             wgVpnControllerService,
             internalWgServerDebugProvider,
             netpEgressServersProvider,
-            geoswitchingRepository,
         )
         productionApi = RealWgServerApi(
             wgVpnControllerService,
             productionWgServerDebugProvider,
             netpEgressServersProvider,
-            geoswitchingRepository,
         )
     }
 
@@ -150,19 +146,19 @@ class RealWgServerApiTest {
     fun whenRegisterInProductionThenDownloadGeoswitchingData() = runTest {
         productionApi.registerPublicKey("testpublickey")
 
-        verify(netpEgressServersProvider).downloadServerLocations()
+        verify(netpEgressServersProvider).updateServerLocationsAndReturnPreferred()
     }
 
     @Test
     fun whenRegisterInInternalThenDownloadGeoswitchingData() = runTest {
         internalApi.registerPublicKey("testpublickey")
 
-        verify(netpEgressServersProvider).downloadServerLocations()
+        verify(netpEgressServersProvider).updateServerLocationsAndReturnPreferred()
     }
 
     @Test
     fun whenUserPreferredCountrySetThenRegisterPublicKeyShouldRequestForCountry() = runTest {
-        geoswitchingRepository.setUserPreferredLocation(UserPreferredLocation(countryCode = "nl"))
+        whenever(netpEgressServersProvider.updateServerLocationsAndReturnPreferred()).thenReturn(PreferredLocation("nl"))
 
         assertEquals(
             WgServerData(
@@ -180,7 +176,9 @@ class RealWgServerApiTest {
 
     @Test
     fun whenUserPreferredLocationSetThenRegisterPublicKeyShouldRequestForCountryAndCity() = runTest {
-        geoswitchingRepository.setUserPreferredLocation(UserPreferredLocation(countryCode = "us", cityName = "Des Moines"))
+        whenever(netpEgressServersProvider.updateServerLocationsAndReturnPreferred()).thenReturn(
+            PreferredLocation(countryCode = "us", cityName = "Des Moines"),
+        )
 
         assertEquals(
             WgServerData(
@@ -199,7 +197,9 @@ class RealWgServerApiTest {
     @Test
     fun whenUserPreferredLocationSetAndInternalDebugServerSelectedThenRegisterPublicKeyShouldReturnDebugServer() = runTest {
         internalWgServerDebugProvider.selectedServer = "egress.euw.2"
-        geoswitchingRepository.setUserPreferredLocation(UserPreferredLocation(countryCode = "us", cityName = "Des Moines"))
+        whenever(netpEgressServersProvider.updateServerLocationsAndReturnPreferred()).thenReturn(
+            PreferredLocation(countryCode = "us", cityName = "Des Moines"),
+        )
 
         assertEquals(
             WgServerData(

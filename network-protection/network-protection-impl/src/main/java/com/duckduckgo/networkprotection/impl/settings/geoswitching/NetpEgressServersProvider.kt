@@ -20,6 +20,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.impl.configuration.WgVpnControllerService
 import com.duckduckgo.networkprotection.impl.di.ProtectedVpnControllerService
+import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpEgressServersProvider.PreferredLocation
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpEgressServersProvider.ServerLocation
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
 import com.duckduckgo.networkprotection.store.db.NetPGeoswitchingLocation
@@ -28,13 +29,18 @@ import javax.inject.Inject
 import kotlinx.coroutines.withContext
 
 interface NetpEgressServersProvider {
-    suspend fun downloadServerLocations()
+    suspend fun updateServerLocationsAndReturnPreferred(): PreferredLocation?
     suspend fun getServerLocations(): List<ServerLocation>
 
     data class ServerLocation(
         val countryCode: String,
         val countryName: String,
         val cities: List<String>,
+    )
+
+    data class PreferredLocation(
+        val countryCode: String,
+        val cityName: String? = null,
     )
 }
 
@@ -44,19 +50,50 @@ class RealNetpEgressServersProvider @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val netPGeoswitchingRepository: NetPGeoswitchingRepository,
 ) : NetpEgressServersProvider {
-    override suspend fun downloadServerLocations() {
-        withContext(dispatcherProvider.io()) {
-            wgVpnControllerService.getEligibleLocations()
-                .map { location ->
-                    NetPGeoswitchingLocation(
-                        countryCode = location.country,
-                        countryName = getDisplayableCountry(location.country),
-                        cities = location.cities.map { it.name },
-                    )
-                }.toList()
-                .also {
-                    netPGeoswitchingRepository.replaceLocations(it)
+    override suspend fun updateServerLocationsAndReturnPreferred(): PreferredLocation? = withContext(dispatcherProvider.io()) {
+        val serverLocations = wgVpnControllerService.getEligibleLocations()
+            .map { location ->
+                NetPGeoswitchingLocation(
+                    countryCode = location.country,
+                    countryName = getDisplayableCountry(location.country),
+                    cities = location.cities.map { it.name },
+                )
+            }.toList()
+        netPGeoswitchingRepository.replaceLocations(serverLocations)
+        val (selectedCountry, selectedCityName) = netPGeoswitchingRepository.getUserPreferredLocation()
+
+        if (selectedCountry != null) {
+            if (selectedCityName != null) {
+                val isPresent = serverLocations.asSequence()
+                    .filter { it.countryCode == selectedCountry }
+                    .flatMap { it.cities }
+                    .contains(selectedCityName)
+
+                if (isPresent) {
+                    // previously selected server location still exists in updated server list
+                    return@withContext PreferredLocation(selectedCountry, selectedCityName)
+                } else {
+                    val isCountryPresent = serverLocations.asSequence().map { it.countryCode }.contains(selectedCountry)
+                    if (isCountryPresent) {
+                        // previously selected server city location is no longer in updated server list
+                        return@withContext PreferredLocation(selectedCountry)
+                    } else {
+                        return@withContext null
+                    }
                 }
+            } else {
+                val isPresent = serverLocations.map { it.countryCode }.contains(selectedCountry)
+                if (isPresent) {
+                    // previously selected server location still exists in updated server list
+                    return@withContext PreferredLocation(selectedCountry)
+                } else {
+                    // previously selected server location is no longer in updated server list
+                    return@withContext null
+                }
+            }
+        } else {
+            // previously selected server location is no longer in updated server list
+            return@withContext null
         }
     }
 

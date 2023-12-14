@@ -30,7 +30,6 @@ import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository.UserPreferredLocation
 import com.duckduckgo.networkprotection.store.db.NetPGeoswitchingLocation
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -321,6 +320,8 @@ class NetpGeoSwitchingViewModelTest {
 class FakeNetPGeoswitchingRepository : NetPGeoswitchingRepository {
     private var _userPreferredCountry: String? = null
     private var _userPreferredCity: String? = null
+    private var locations: List<NetPGeoswitchingLocation> = emptyList()
+
     override suspend fun getUserPreferredLocation(): UserPreferredLocation = UserPreferredLocation(_userPreferredCountry, _userPreferredCity)
 
     override suspend fun setUserPreferredLocation(userPreferredLocation: UserPreferredLocation) {
@@ -328,9 +329,11 @@ class FakeNetPGeoswitchingRepository : NetPGeoswitchingRepository {
         _userPreferredCity = userPreferredLocation.cityName
     }
 
-    override fun getLocations(): List<NetPGeoswitchingLocation> = emptyList()
+    override fun getLocations(): List<NetPGeoswitchingLocation> = locations
 
-    override fun getLocationsFlow(): Flow<List<NetPGeoswitchingLocation>> = emptyFlow()
+    override fun getLocationsFlow(): Flow<List<NetPGeoswitchingLocation>> = TODO()
 
-    override fun replaceLocations(locations: List<NetPGeoswitchingLocation>) {}
+    override fun replaceLocations(locations: List<NetPGeoswitchingLocation>) {
+        this.locations = locations
+    }
 }
