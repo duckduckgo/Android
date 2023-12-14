@@ -54,6 +54,8 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.NavigationCommand
 import com.duckduckgo.app.browser.BrowserTabViewModel.NavigationCommand.Navigate
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
+import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
+import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
 import com.duckduckgo.app.browser.camera.CameraHardwareChecker
@@ -4552,6 +4554,15 @@ class BrowserTabViewModelTest {
         val params = buildFileChooserParams(arrayOf("application/pdf"))
         testee.showFileChooser(mockFileChooserCallback, params)
         assertCommandIssued<Command.ShowFileChooser>()
+    }
+
+    @Test
+    fun whenWebViewRefreshedThenBrowserErrorStateChangedToLoading() {
+        assertEquals(OMITTED, browserViewState().browserError)
+
+        testee.onWebViewRefreshed()
+
+        assertEquals(LOADING, browserViewState().browserError)
     }
 
     private fun aCredential(): LoginCredentials {

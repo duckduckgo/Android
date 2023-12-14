@@ -55,6 +55,7 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.HighlightableButton.Visibl
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.NonHttpAppLink
+import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
@@ -2889,7 +2890,12 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    fun resetErrors() {
+        site?.resetErrors()
+    }
+
     fun onWebViewRefreshed() {
+        browserViewState.value = currentBrowserViewState().copy(browserError = LOADING)
         accessibilityViewState.value = currentAccessibilityViewState().copy(refreshWebView = false)
         canAutofillSelectCredentialsDialogCanAutomaticallyShow = true
     }
