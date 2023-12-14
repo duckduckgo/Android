@@ -17,67 +17,31 @@
 package com.duckduckgo.networkprotection.subscription
 
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistManager
-import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
-import com.duckduckgo.networkprotection.subscription.NetpSubscriptionManager.NetpAuthorizationStatus
-import com.duckduckgo.networkprotection.subscription.NetpSubscriptionManager.NetpAuthorizationStatus.NoValidPAT
-import com.duckduckgo.networkprotection.subscription.NetpSubscriptionManager.NetpAuthorizationStatus.Success
-import com.duckduckgo.networkprotection.subscription.NetpSubscriptionManager.NetpAuthorizationStatus.UnableToAuthorize
-import com.duckduckgo.networkprotection.subscription.NetpSubscriptionManager.NetpAuthorizationStatus.Unknown
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
-import logcat.logcat
 
 interface NetpSubscriptionManager {
-    suspend fun authorize()
-    fun getState(): Flow<NetpAuthorizationStatus>
-
-    sealed class NetpAuthorizationStatus {
-        object Unknown : NetpAuthorizationStatus()
-        object Success : NetpAuthorizationStatus()
-        object NoValidPAT : NetpAuthorizationStatus()
-        data class UnableToAuthorize(val message: String) : NetpAuthorizationStatus()
-    }
+    suspend fun getToken(): String?
+    suspend fun hasValidSubscription(): Boolean
 }
 
-@ContributesBinding(ActivityScope::class)
+@ContributesBinding(AppScope::class)
 class RealNetpSubscriptionManager @Inject constructor(
-    private val service: NetworkProtectionAuthService,
-    private val dispatcherProvider: DispatcherProvider,
-    private val netPWaitlistRepository: NetPWaitlistRepository,
-    private val netPWaitlistManager: NetPWaitlistManager,
     private val subscriptions: Subscriptions,
+    private val dispatcherProvider: DispatcherProvider,
 ) : NetpSubscriptionManager {
-    private val state: MutableStateFlow<NetpAuthorizationStatus> = MutableStateFlow(Unknown)
-
-    override fun getState(): Flow<NetpAuthorizationStatus> {
-        return state.asStateFlow()
+    override suspend fun getToken(): String? = withContext(dispatcherProvider.io()) {
+        subscriptions.getAccessToken()
     }
 
-    override suspend fun authorize() {
-        withContext(dispatcherProvider.io()) {
-            try {
-                val accessToken = subscriptions.getAccessToken()
-                if (accessToken != null) {
-                    service.authorize(NetPAuthorizeRequest(accessToken)).also {
-                        netPWaitlistRepository.setAuthenticationToken(it.token)
-                        logcat { "Netp auth: Token received" }
-                        netPWaitlistManager.upsertState()
-                    }
-                    state.emit(Success)
-                } else {
-                    state.emit(NoValidPAT)
-                }
-            } catch (e: Exception) {
-                logcat { "Netp auth: error in authorize $e" }
-                state.emit(UnableToAuthorize(e.toString()))
-            }
-        }
+    override suspend fun hasValidSubscription(): Boolean = withContext(dispatcherProvider.io()) {
+        subscriptions.hasEntitlement(NETP_ENTITLEMENT)
+    }
+
+    companion object {
+        private const val NETP_ENTITLEMENT = "Dummy"
     }
 }

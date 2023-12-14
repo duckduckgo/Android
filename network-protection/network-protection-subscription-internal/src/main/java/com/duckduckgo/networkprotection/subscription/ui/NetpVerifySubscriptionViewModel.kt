@@ -22,11 +22,11 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.networkprotection.subscription.NetpSubscriptionManager
-import com.duckduckgo.networkprotection.subscription.NetpSubscriptionManager.NetpAuthorizationStatus.NoValidPAT
-import com.duckduckgo.networkprotection.subscription.NetpSubscriptionManager.NetpAuthorizationStatus.Success
-import com.duckduckgo.networkprotection.subscription.NetpSubscriptionManager.NetpAuthorizationStatus.UnableToAuthorize
-import com.duckduckgo.networkprotection.subscription.NetpSubscriptionManager.NetpAuthorizationStatus.Unknown
+import com.duckduckgo.networkprotection.subscription.NetpAuthManager
+import com.duckduckgo.networkprotection.subscription.NetpAuthManager.NetpAuthorizationStatus.NoValidPAT
+import com.duckduckgo.networkprotection.subscription.NetpAuthManager.NetpAuthorizationStatus.Success
+import com.duckduckgo.networkprotection.subscription.NetpAuthManager.NetpAuthorizationStatus.UnableToAuthorize
+import com.duckduckgo.networkprotection.subscription.NetpAuthManager.NetpAuthorizationStatus.Unknown
 import com.duckduckgo.networkprotection.subscription.R
 import com.duckduckgo.networkprotection.subscription.ui.NetpVerifySubscriptionViewModel.Command.LaunchNetPScreen
 import javax.inject.Inject
@@ -43,7 +43,7 @@ import logcat.logcat
 
 @ContributesViewModel(ActivityScope::class)
 class NetpVerifySubscriptionViewModel @Inject constructor(
-    private val netpSubscriptionManager: NetpSubscriptionManager,
+    private val netpAuthManager: NetpAuthManager,
     private val dispatchersProvider: DispatcherProvider,
 ) : ViewModel() {
     private val mutableViewState = MutableStateFlow(ViewState(R.string.netpVerifySubscriptionInProgress))
@@ -60,7 +60,7 @@ class NetpVerifySubscriptionViewModel @Inject constructor(
 
     fun start() {
         viewModelScope.launch {
-            netpSubscriptionManager.getState()
+            netpAuthManager.getState()
                 .flowOn(dispatchersProvider.io())
                 .collectLatest {
                     logcat { "Netp Auth: state received $it" }
@@ -80,7 +80,7 @@ class NetpVerifySubscriptionViewModel @Inject constructor(
 
     private fun attemptToAuthorize() {
         viewModelScope.launch {
-            netpSubscriptionManager.authorize()
+            netpAuthManager.authorize()
         }
     }
 }
