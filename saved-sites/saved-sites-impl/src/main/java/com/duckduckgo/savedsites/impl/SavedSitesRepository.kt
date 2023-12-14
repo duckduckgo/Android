@@ -83,16 +83,6 @@ class RealSavedSitesRepository(
         return Pair(bookmarks.distinct(), folders.distinct())
     }
 
-    override fun getAllFolderContentSync(folderId: String): Pair<List<Bookmark>, List<BookmarkFolder>> {
-        val entities = savedSitesEntitiesDao.allEntitiesInFolderSync(folderId)
-        val bookmarks = mutableListOf<Bookmark>()
-        val folders = mutableListOf<BookmarkFolder>()
-        entities.forEach { entity ->
-            mapEntity(entity, folderId, bookmarks, folders)
-        }
-        return Pair(bookmarks.distinct(), folders.distinct())
-    }
-
     private fun mapEntity(
         entity: Entity,
         folderId: String,
@@ -347,7 +337,9 @@ class RealSavedSitesRepository(
                     lastModified = savedSite.lastModified ?: DatabaseDateFormatter.iso8601(),
                 )
                 savedSitesEntitiesDao.insert(entity)
-                savedSitesRelationsDao.insert(Relation(folderId = savedSite.parentId, entityId = entity.entityId))
+                if (savedSitesRelationsDao.relation(savedSite.parentId, entityId = entity.entityId) == null) {
+                    savedSitesRelationsDao.insert(Relation(folderId = savedSite.parentId, entityId = entity.entityId))
+                }
                 savedSitesEntitiesDao.updateModified(savedSite.parentId, savedSite.lastModified ?: DatabaseDateFormatter.iso8601())
                 entity.mapToBookmark(savedSite.parentId)
             }
@@ -444,6 +436,7 @@ class RealSavedSitesRepository(
         folder: BookmarkFolder,
         oldId: String,
     ) {
+        // if the folder existed, we don't update the modified since so the next sync trigger it's picked up
         savedSitesEntitiesDao.updateId(oldId, folder.id)
         savedSitesRelationsDao.updateEntityId(oldId, folder.id)
         savedSitesRelationsDao.updateFolderId(oldId, folder.id)
@@ -465,36 +458,6 @@ class RealSavedSitesRepository(
             savedSitesRelationsDao.deleteRelationByEntity(folder.id)
             savedSitesRelationsDao.insert(Relation(folderId = folder.parentId, entityId = folder.id))
         }
-    }
-
-    override fun replaceBookmark(
-        bookmark: Bookmark,
-        localId: String,
-    ) {
-        // check if bookmark has moved
-        val storedBookmark = getBookmarkById(bookmark.id)
-        if (storedBookmark != null) {
-            if (storedBookmark.parentId != bookmark.parentId) {
-                // bookmark has moved to another folder
-                Timber.d("Sync-Bookmarks: ${bookmark.id} has moved from folder ${storedBookmark.parentId} to ${bookmark.parentId}")
-                savedSitesRelationsDao.deleteRelationByEntityAndFolder(bookmark.id, storedBookmark.parentId)
-                savedSitesRelationsDao.insert(Relation(folderId = bookmark.parentId, entityId = bookmark.id))
-            }
-        }
-
-        savedSitesEntitiesDao.updateId(localId, bookmark.id)
-        savedSitesRelationsDao.updateEntityId(localId, bookmark.id)
-        savedSitesEntitiesDao.update(
-            Entity(
-                bookmark.id,
-                bookmark.title,
-                bookmark.url,
-                BOOKMARK,
-                bookmark.lastModified ?: DatabaseDateFormatter.iso8601(),
-            ),
-        )
-
-        savedSitesEntitiesDao.updateModified(bookmark.parentId, bookmark.lastModified ?: DatabaseDateFormatter.iso8601())
     }
 
     override fun delete(folder: BookmarkFolder) {
@@ -571,65 +534,11 @@ class RealSavedSitesRepository(
         return savedSitesEntitiesDao.lastModified().map { it.entityId }
     }
 
-    override fun getFoldersModifiedSince(since: String): List<BookmarkFolder> {
-        val folders = savedSitesEntitiesDao.allEntitiesByTypeSync(FOLDER).filter { it.modifiedAfter(since) }
-        Timber.d("Sync-Bookmarks: folders modified since $since are ${folders.map { it.entityId }}")
-        return folders.map { mapBookmarkFolder(it) }
-    }
-
-    private fun mapBookmarkFolder(entity: Entity): BookmarkFolder {
-        val relation = savedSitesRelationsDao.relationByEntityId(entity.entityId)
-        val numFolders = savedSitesRelationsDao.countEntitiesInFolder(entity.entityId, FOLDER)
-        val numBookmarks = savedSitesRelationsDao.countEntitiesInFolder(entity.entityId, BOOKMARK)
-        val lastModified = entity.lastModified ?: null
-        return BookmarkFolder(
-            entity.entityId,
-            entity.title,
-            relation?.folderId ?: "",
-            numFolders = numFolders,
-            numBookmarks = numBookmarks,
-            lastModified = lastModified,
-            deleted = entity.deletedFlag(),
-        )
-    }
-
-    override fun getBookmarksModifiedSince(since: String): List<Bookmark> {
-        val bookmarks = savedSitesEntitiesDao.allEntitiesByTypeSync(BOOKMARK).filter { it.modifiedAfter(since) }
-        Timber.d("Sync-Bookmarks: bookmarks modified since $since are ${bookmarks.map { it.entityId }}")
-        return bookmarks.map { mapToBookmark(it)!! }
-    }
-
     override fun pruneDeleted() {
         Timber.d("Sync-Bookmarks: pruning soft deleted entities")
         savedSitesEntitiesDao.allDeleted().forEach {
             savedSitesRelationsDao.deleteRelationByEntity(it.entityId)
             savedSitesEntitiesDao.deletePermanently(it)
-        }
-    }
-
-    override fun getEntitiesModifiedBefore(date: String): List<String> {
-        val entities = savedSitesEntitiesDao.entities()
-            .filter { it.modifiedBefore(date) }
-            .filterNot { it.lastModified.isNullOrEmpty() }
-            .map { it.entityId }
-        Timber.d("Sync-Bookmarks: entities modified before $date are $entities")
-        return entities
-    }
-
-    override fun updateModifiedSince(
-        entityId: String,
-        modifiedSince: String,
-    ) {
-        savedSitesEntitiesDao.updateModified(entityId, modifiedSince)
-    }
-
-    private fun mapToBookmark(entity: Entity): Bookmark? {
-        val relation = savedSitesRelationsDao.relationByEntityId(entity.entityId)
-        return if (relation != null) {
-            entity.mapToBookmark(relation.folderId)
-        } else {
-            // bookmark was deleted, we can make the parent id up
-            entity.mapToBookmark(SavedSitesNames.BOOKMARKS_ROOT)
         }
     }
 
@@ -658,16 +567,6 @@ class RealSavedSitesRepository(
             val entityModified = OffsetDateTime.parse(this.lastModified)
             val sinceModified = OffsetDateTime.parse(since)
             entityModified.isAfter(sinceModified)
-        }
-    }
-
-    private fun Entity.modifiedBefore(since: String): Boolean {
-        return if (this.lastModified == null) {
-            false
-        } else {
-            val entityModified = OffsetDateTime.parse(this.lastModified)
-            val beforeModified = OffsetDateTime.parse(since)
-            entityModified.isBefore(beforeModified)
         }
     }
 

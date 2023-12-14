@@ -27,6 +27,9 @@ import androidx.room.Transaction
 @Dao
 interface SavedSitesSyncMetadataDao {
 
+    @Query("select * from saved_sites_sync_meta")
+    fun all(): List<SavedSitesSyncMetadataEntity>
+
     @Query("select * from saved_sites_sync_meta where `folderId` = :folderId")
     fun get(folderId: String): SavedSitesSyncMetadataEntity?
 
@@ -40,8 +43,29 @@ interface SavedSitesSyncMetadataDao {
         }
     }
 
+    @Transaction
+    fun confirmAllChildrenRequests() {
+        copyAllRequestsToResponse()
+    }
+
+    @Query("update saved_sites_sync_meta set childrenResponse = childrenRequest where childrenRequest is not null")
+    fun copyAllRequestsToResponse()
+
+    @Transaction
+    fun addResponseMetadata(folders: List<SavedSitesSyncMetadataEntity>) {
+        addOrUpdate(folders)
+        confirmAllChildrenRequests()
+    }
+
     @Query("Delete from saved_sites_sync_meta")
     fun removeAll()
+
+    @Transaction
+    fun deleteMetadata(folders: List<String>) {
+        folders.forEach {
+            remove(it)
+        }
+    }
 
     @Query("delete from saved_sites_sync_meta where `folderId` = :folderId")
     fun remove(folderId: String)
@@ -50,6 +74,6 @@ interface SavedSitesSyncMetadataDao {
 @Entity(tableName = "saved_sites_sync_meta")
 data class SavedSitesSyncMetadataEntity(
     @PrimaryKey val folderId: String,
-    var children: String, // JSON representation of list of children confirmed by the BE
-    var request: String, // JSON representation of list of children sent to the BE
+    var childrenResponse: String?, // JSON representation of list of children confirmed by the BE
+    var childrenRequest: String?, // JSON representation of list of children sent to the BE
 )

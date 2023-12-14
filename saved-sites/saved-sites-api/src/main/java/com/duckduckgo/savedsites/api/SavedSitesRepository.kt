@@ -47,13 +47,6 @@ interface SavedSitesRepository {
     fun getFolderContentSync(folderId: String): Pair<List<Bookmark>, List<BookmarkFolder>>
 
     /**
-     * Returns all [Bookmark] and [BookmarkFolder] inside a folder, also deleted objects
-     * @param folderId the id of the folder.
-     * @return [Pair] of [Bookmark] and [BookmarkFolder] inside a folder
-     */
-    fun getAllFolderContentSync(folderId: String): Pair<List<Bookmark>, List<BookmarkFolder>>
-
-    /**
      * Returns complete list of [BookmarkFolderItem] inside a folder. This method traverses all folders.
      * @param selectedFolderId the id of the folder.
      * @param currentFolder folder currently selected, used to determine the current depth in the tree.
@@ -271,18 +264,6 @@ interface SavedSitesRepository {
     fun replaceFolderContent(folder: BookmarkFolder, oldId: String)
 
     /**
-     * Replaces an existing [Bookmark]
-     * Used when syncing data from the backend
-     * There are scenarios when a duplicate remote bookmark has to be replace the local one
-     * @param bookmark the bookmark to replace locally
-     * @param localId the id of the local bookmark to be replaced
-     */
-    fun replaceBookmark(
-        bookmark: Bookmark,
-        localId: String,
-    )
-
-    /**
      * Returns a [BookmarkFolder] based on its id
      * @param folderId of the [BookmarkFolder]
      * @return [BookmarkFolder] if exists, or null if doesn't
@@ -320,33 +301,8 @@ interface SavedSitesRepository {
     fun lastModified(): Flow<String>
 
     /**
-     * Returns the list of [BookmarkFolder] modified after [since]
-     * @param since timestamp of modification for filtering
-     * @return [List] of [BookmarkFolder]
-     */
-    fun getFoldersModifiedSince(since: String): List<BookmarkFolder>
-
-    /**
-     * Returns the list of [Bookmark] modified after [since]
-     * @param since timestamp of modification for filtering
-     * @return [List] of [Bookmark]
-     */
-    fun getBookmarksModifiedSince(since: String): List<Bookmark>
-
-    /**
      * Deletes all entities with deleted = 1
      * This makes the deletion permanent
      */
     fun pruneDeleted()
-
-    /**
-     * Returns list of [String] of [Entity] id modified before [date] in ISO format
-     * @return [List] of [String]
-     */
-    fun getEntitiesModifiedBefore(date: String): List<String>
-
-    /**
-     * Updates entity [entityId] to a modified date of [modifiedSince]
-     */
-    fun updateModifiedSince(entityId: String, modifiedSince: String)
 }

@@ -37,11 +37,14 @@ import com.duckduckgo.savedsites.impl.sync.RealSyncSavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.SavedSitesFormFactorSyncMigration
 import com.duckduckgo.savedsites.impl.sync.SavedSitesSyncDataProvider
 import com.duckduckgo.savedsites.impl.sync.SavedSitesSyncStore
-import com.duckduckgo.savedsites.impl.sync.SyncBookmarkEntry
 import com.duckduckgo.savedsites.impl.sync.SyncBookmarkPage
 import com.duckduckgo.savedsites.impl.sync.SyncBookmarksRequest
 import com.duckduckgo.savedsites.impl.sync.SyncFolderChildren
+import com.duckduckgo.savedsites.impl.sync.SyncSavedSiteRequestFolder
 import com.duckduckgo.savedsites.impl.sync.SyncSavedSitesRepository
+import com.duckduckgo.savedsites.impl.sync.SyncSavedSitesRequestEntry
+import com.duckduckgo.savedsites.impl.sync.store.SavedSitesSyncMetadataDao
+import com.duckduckgo.savedsites.impl.sync.store.SavedSitesSyncMetadataDatabase
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 import com.duckduckgo.sync.api.SyncCrypto
@@ -69,10 +72,12 @@ class SavedSitesSyncDataProviderTest {
     var coroutinesTestRule = CoroutineTestRule()
 
     private lateinit var db: AppDatabase
+    private lateinit var savedSitesDatabase: SavedSitesSyncMetadataDatabase
     private lateinit var repository: SavedSitesRepository
     private lateinit var syncRepository: SyncSavedSitesRepository
     private lateinit var savedSitesEntitiesDao: SavedSitesEntitiesDao
     private lateinit var savedSitesRelationsDao: SavedSitesRelationsDao
+    private lateinit var savedSitesMetadataDao: SavedSitesSyncMetadataDao
     private lateinit var savedSitesFormFactorSyncMigration: SavedSitesFormFactorSyncMigration
     private lateinit var store: SavedSitesSyncStore
 
@@ -97,6 +102,14 @@ class SavedSitesSyncDataProviderTest {
             .allowMainThreadQueries()
             .build()
 
+        savedSitesDatabase = Room.inMemoryDatabaseBuilder(
+            InstrumentationRegistry.getInstrumentation().targetContext,
+            SavedSitesSyncMetadataDatabase::class.java,
+        )
+            .allowMainThreadQueries()
+            .build()
+        savedSitesMetadataDao = savedSitesDatabase.syncMetadataDao()
+
         savedSitesEntitiesDao = db.syncEntitiesDao()
         savedSitesRelationsDao = db.syncRelationsDao()
 
@@ -108,7 +121,7 @@ class SavedSitesSyncDataProviderTest {
             coroutinesTestRule.testDispatcherProvider,
         )
 
-        syncRepository = RealSyncSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao)
+        syncRepository = RealSyncSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao, savedSitesMetadataDao)
         repository = RealSavedSitesRepository(
             savedSitesEntitiesDao,
             savedSitesRelationsDao,
@@ -173,9 +186,9 @@ class SavedSitesSyncDataProviderTest {
         val changes = Adapters.adapter.fromJson(syncChanges.jsonString)!!
         assertTrue(changes.bookmarks.updates.size == 6)
         assertTrue(changes.bookmarks.updates[0].id == "favorites_root")
-        assertTrue(changes.bookmarks.updates[0].folder!!.children == listOf(favourite1.id))
+        assertTrue(changes.bookmarks.updates[0].folder!!.children.current == listOf(favourite1.id))
         assertTrue(changes.bookmarks.updates[1].id == "mobile_favorites_root")
-        assertTrue(changes.bookmarks.updates[1].folder!!.children == listOf(favourite1.id))
+        assertTrue(changes.bookmarks.updates[1].folder!!.children.current == listOf(favourite1.id))
         assertTrue(changes.bookmarks.updates[2].id == "bookmark1")
         assertTrue(changes.bookmarks.updates[3].id == "bookmark3")
         assertTrue(changes.bookmarks.updates[4].id == "bookmark4")
@@ -216,9 +229,9 @@ class SavedSitesSyncDataProviderTest {
         assertTrue(changes.bookmarks.updates.size == 7)
         assertTrue(changes.bookmarks.updates[0].id == "favorites_root")
         assertTrue(changes.bookmarks.updates[1].id == "bookmarks_root")
-        assertTrue(changes.bookmarks.updates[1].folder!!.children == listOf("bookmark3", "bookmark4", "1a8736c1-83ff-48ce-9f01-797887455891"))
+        assertTrue(changes.bookmarks.updates[1].folder!!.children.current == listOf("bookmark3", "bookmark4", "1a8736c1-83ff-48ce-9f01-797887455891"))
         assertTrue(changes.bookmarks.updates[2].id == "1a8736c1-83ff-48ce-9f01-797887455891")
-        assertTrue(changes.bookmarks.updates[2].folder!!.children == listOf("bookmark1", "bookmark2"))
+        assertTrue(changes.bookmarks.updates[2].folder!!.children.current == listOf("bookmark1", "bookmark2"))
         assertTrue(changes.bookmarks.updates[3].id == "bookmark1")
         assertTrue(changes.bookmarks.updates[4].id == "bookmark2")
         assertTrue(changes.bookmarks.updates[5].id == "bookmark3")
@@ -241,10 +254,10 @@ class SavedSitesSyncDataProviderTest {
         assertTrue(changes[0].id == favoritesFolder.id)
         assertTrue(changes[0].client_last_modified == modificationTimestamp)
         assertTrue(changes[0].deleted == null)
-        assertTrue(changes[0].folder!!.children == listOf(bookmark1.id))
+        assertTrue(changes[0].folder!!.children.current == listOf(bookmark1.id))
         assertTrue(changes[1].id == bookmarksRootFolder.id)
         assertTrue(changes[1].client_last_modified == modificationTimestamp)
-        assertTrue(changes[1].folder!!.children == listOf(bookmark3.id, bookmark4.id, bookmark1.id))
+        assertTrue(changes[1].folder!!.children.current == listOf(bookmark3.id, bookmark4.id, bookmark1.id))
         assertTrue(changes[2].id == bookmark3.id)
         assertTrue(changes[2].client_last_modified == modificationTimestamp)
         assertTrue(changes[2].deleted == null)
@@ -286,7 +299,7 @@ class SavedSitesSyncDataProviderTest {
         assertTrue(changes.isNotEmpty())
         assertTrue(changes[0].id == bookmarksRootFolder.id)
         assertTrue(changes[0].deleted == null)
-        assertTrue(changes[0].folder!!.children == listOf(bookmark3.id))
+        assertTrue(changes[0].folder!!.children.current == listOf(bookmark3.id))
         assertTrue(changes[1].id == bookmark3.id)
         assertTrue(changes[1].deleted == null)
         assertTrue(changes[2].id == bookmark4.id)
@@ -332,7 +345,7 @@ class SavedSitesSyncDataProviderTest {
         val changes = parser.changesSince(lastSyncTimestamp)
         assertTrue(changes.isNotEmpty())
         assertTrue(changes[0].id == SavedSitesNames.FAVORITES_ROOT)
-        assertTrue(changes[0].folder!!.children.isEmpty())
+        assertTrue(changes[0].folder!!.children.current.isEmpty())
     }
 
     @Test
@@ -349,9 +362,9 @@ class SavedSitesSyncDataProviderTest {
         val changes = parser.changesSince(lastSyncTimestamp)
         assertTrue(changes.isNotEmpty())
         assertTrue(changes[0].id == SavedSitesNames.FAVORITES_ROOT)
-        assertTrue(changes[0].folder!!.children.isEmpty())
+        assertTrue(changes[0].folder!!.children.current.isEmpty())
         assertTrue(changes[1].id == SavedSitesNames.BOOKMARKS_ROOT)
-        assertTrue(changes[1].folder!!.children == listOf(bookmark3.id, bookmark4.id))
+        assertTrue(changes[1].folder!!.children.current == listOf(bookmark3.id, bookmark4.id))
         assertTrue(changes[2].id == bookmark1.id)
         assertTrue(changes[2].deleted == "1")
     }
@@ -373,18 +386,39 @@ class SavedSitesSyncDataProviderTest {
         assertTrue(changes.isNotEmpty())
         assertTrue(changes.size == 2)
         assertTrue(changes[0].id == bookmarksRootFolder.id)
-        assertTrue(changes[0].folder!!.children == listOf(subFolder.id))
+        assertTrue(changes[0].folder!!.children.current == listOf(subFolder.id))
         assertTrue(changes[1].id == subFolder.id)
-        assertTrue(changes[1].folder!!.children == listOf(bookmark1.id))
+        assertTrue(changes[1].folder!!.children.current == listOf(bookmark1.id))
     }
 
-    private fun setLastSyncTime(lastServerSyncTimestamp: String, lastClientSyncTimestmp: String = lastServerSyncTimestamp) {
+    @Test
+    fun whenNoChangesNeedSyncThenChildrenRequestIsNotAddedToMetadata() {
+        val syncChanges = parser.allContent()
+        assertTrue(syncChanges.isEmpty())
+
+        assertTrue(savedSitesMetadataDao.all().isEmpty())
+    }
+
+    @Test
+    fun whenChangesNeedSyncThenChildrenRequestIsAddedToMetadata() {
+        repository.insert(bookmark3)
+        repository.insert(bookmark4)
+
+        parser.getChanges()
+
+        assertTrue(savedSitesMetadataDao.all().isNotEmpty())
+    }
+
+    private fun setLastSyncTime(
+        lastServerSyncTimestamp: String,
+        lastClientSyncTimestmp: String = lastServerSyncTimestamp,
+    ) {
         store.serverModifiedSince = lastServerSyncTimestamp
         store.clientModifiedSince = lastClientSyncTimestmp
     }
 
-    private fun fromSavedSite(savedSite: SavedSite): SyncBookmarkEntry {
-        return SyncBookmarkEntry(
+    private fun fromSavedSite(savedSite: SavedSite): SyncSavedSitesRequestEntry {
+        return SyncSavedSitesRequestEntry(
             id = savedSite.id,
             title = savedSite.title,
             page = SyncBookmarkPage(savedSite.url),
@@ -397,11 +431,11 @@ class SavedSitesSyncDataProviderTest {
     private fun fromBookmarkFolder(
         bookmarkFolder: BookmarkFolder,
         children: List<String>,
-    ): SyncBookmarkEntry {
-        return SyncBookmarkEntry(
+    ): SyncSavedSitesRequestEntry {
+        return SyncSavedSitesRequestEntry(
             id = bookmarkFolder.id,
             title = bookmarkFolder.name,
-            folder = SyncFolderChildren(children),
+            folder = SyncSavedSiteRequestFolder(SyncFolderChildren(current = children, insert = children, remove = emptyList())),
             page = null,
             deleted = null,
             client_last_modified = bookmarkFolder.lastModified ?: DatabaseDateFormatter.iso8601(),

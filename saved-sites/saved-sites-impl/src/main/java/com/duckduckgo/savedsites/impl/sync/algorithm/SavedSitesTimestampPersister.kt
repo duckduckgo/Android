@@ -21,7 +21,6 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
-import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.impl.sync.SyncSavedSitesRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -37,6 +36,7 @@ class SavedSitesTimestampPersister @Inject constructor(
 ) : SavedSitesSyncPersisterStrategy {
     override fun processBookmarkFolder(
         folder: BookmarkFolder,
+        children: List<String>,
     ) {
         // if there's a folder with the same id locally we check the conflict resolution
         // if TIMESTAMP -> new timestamp wins
@@ -50,7 +50,7 @@ class SavedSitesTimestampPersister @Inject constructor(
                     Timber.d("Sync-Bookmarks-Persister: folder ${folder.id} modified before local folder, nothing to do")
                 } else {
                     Timber.d("Sync-Bookmarks-Persister: folder ${folder.id} modified after local folder, replacing content")
-                    savedSitesRepository.replaceFolderContent(folder, localFolder.id)
+                    syncSavedSitesRepository.replaceBookmarkFolder(folder, children)
                 }
             }
         } else {
@@ -61,6 +61,14 @@ class SavedSitesTimestampPersister @Inject constructor(
                 savedSitesRepository.insert(folder)
             }
         }
+    }
+
+    override fun processFavouritesFolder(
+        favouriteFolder: String,
+        children: List<String>,
+    ) {
+        // process favourites means replacing the current children with the remote
+        syncSavedSitesRepository.replaceFavouriteFolder(favouriteFolder, children)
     }
 
     override fun processBookmark(
@@ -79,7 +87,7 @@ class SavedSitesTimestampPersister @Inject constructor(
                     Timber.d("Sync-Bookmarks-Persister: bookmark ${bookmark.id} modified before local bookmark, nothing to do")
                 } else {
                     Timber.d("Sync-Bookmarks-Persister: bookmark ${bookmark.id} modified after local bookmark, replacing content")
-                    savedSitesRepository.replaceBookmark(bookmark, bookmark.id)
+                    syncSavedSitesRepository.replaceBookmark(bookmark, bookmark.id)
                 }
             }
         } else {
@@ -88,33 +96,6 @@ class SavedSitesTimestampPersister @Inject constructor(
             } else {
                 Timber.d("Sync-Bookmarks-Persister: bookmark ${bookmark.id} not present locally, inserting")
                 savedSitesRepository.insert(bookmark)
-            }
-        }
-    }
-
-    override fun processFavourite(
-        favourite: Favorite,
-        favoriteFolder: String,
-    ) {
-        val storedFavourite = syncSavedSitesRepository.getFavoriteById(favourite.id, favoriteFolder)
-        if (storedFavourite != null) {
-            if (favourite.isDeleted()) {
-                Timber.d("Sync-Bookmarks-Persister: remote favourite ${favourite.id} deleted, deleting local favourite")
-                syncSavedSitesRepository.delete(favourite, favoriteFolder)
-            } else {
-                if (storedFavourite.modifiedAfter(favourite.lastModified)) {
-                    Timber.d("Sync-Bookmarks-Persister: favourite ${favourite.id} modified before local favourite, nothing to do")
-                } else {
-                    Timber.d("Sync-Bookmarks-Persister: favourite ${favourite.id} modified after local favourite, replacing content")
-                    syncSavedSitesRepository.replaceFavourite(favourite, favourite.id, favoriteFolder)
-                }
-            }
-        } else {
-            if (favourite.isDeleted()) {
-                Timber.d("Sync-Bookmarks-Persister: favourite ${favourite.id} not present locally but was deleted, nothing to do")
-            } else {
-                Timber.d("Sync-Bookmarks-Persister: favourite ${favourite.id} not present locally, inserting")
-                syncSavedSitesRepository.insert(favourite, favoriteFolder)
             }
         }
     }

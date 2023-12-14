@@ -53,6 +53,7 @@ class SavedSitesSyncPersisterTest {
     private val persisterAlgorithm: SavedSitesSyncPersisterAlgorithm = mock()
     private val savedSitesFormFactorSyncMigration: SavedSitesFormFactorSyncMigration = mock()
     private val savedSitesSyncFeatureListener: SavedSitesSyncFeatureListener = mock()
+    private val syncSavedSitesRepository: SyncSavedSitesRepository = mock()
 
     private lateinit var syncPersister: SavedSitesSyncPersister
 
@@ -61,6 +62,7 @@ class SavedSitesSyncPersisterTest {
         syncPersister = SavedSitesSyncPersister(
             repository,
             store,
+            syncSavedSitesRepository,
             persisterAlgorithm,
             savedSitesFormFactorSyncMigration,
             savedSitesSyncFeatureListener,
@@ -91,7 +93,6 @@ class SavedSitesSyncPersisterTest {
         whenever(store.serverModifiedSince).thenReturn(DatabaseDateFormatter.iso8601())
         whenever(store.startTimeStamp).thenReturn(DatabaseDateFormatter.iso8601())
         whenever(store.clientModifiedSince).thenReturn(DatabaseDateFormatter.iso8601())
-        whenever(repository.getEntitiesModifiedBefore(any())).thenReturn(emptyList())
 
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/merger_first_get.json")
         val validChanges = SyncChangesResponse(BOOKMARKS, updatesJSON)
@@ -141,6 +142,11 @@ class SavedSitesSyncPersisterTest {
     @Test
     fun whenOnSyncDisabledTheNotifyListener() {
         syncPersister.onSyncDisabled()
+        verify(store).serverModifiedSince = "0"
+        verify(store).clientModifiedSince = "0"
+        verify(store).startTimeStamp = "0"
+        verify(savedSitesFormFactorSyncMigration).onFormFactorFavouritesDisabled()
         verify(savedSitesSyncFeatureListener).onSyncDisabled()
+        verify(syncSavedSitesRepository).removeMetadata()
     }
 }

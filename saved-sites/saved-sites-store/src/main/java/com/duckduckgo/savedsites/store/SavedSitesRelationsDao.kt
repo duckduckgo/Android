@@ -24,6 +24,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import com.duckduckgo.savedsites.api.models.*
+import com.duckduckgo.savedsites.api.models.SavedSitesNames.BOOKMARKS_ROOT
 import com.duckduckgo.savedsites.api.models.SavedSitesNames.FAVORITES_DESKTOP_ROOT
 import com.duckduckgo.savedsites.api.models.SavedSitesNames.FAVORITES_MOBILE_ROOT
 import com.duckduckgo.savedsites.api.models.SavedSitesNames.FAVORITES_ROOT
@@ -46,13 +47,22 @@ interface SavedSitesRelationsDao {
     fun relations(folderId: String): Flow<List<Relation>>
 
     @Query("select * from relations where folderId =:folderId")
+    fun relationsByFolderId(folderId: String): List<Relation>
+
+    @Query("select * from relations where folderId =:folderId")
     fun relationsObservable(folderId: String): Single<List<Relation>>
 
     @Query("update relations set folderId = :newId where folderId = :oldId")
-    fun updateFolderId(oldId: String, newId: String)
+    fun updateFolderId(
+        oldId: String,
+        newId: String,
+    )
 
     @Query("update relations set entityId = :newId where entityId = :oldId")
-    fun updateEntityId(oldId: String, newId: String)
+    fun updateEntityId(
+        oldId: String,
+        newId: String,
+    )
 
     @Query(
         "select count(*) from entities inner join relations on entities.entityId = relations.entityId " +
@@ -68,6 +78,11 @@ interface SavedSitesRelationsDao {
             "and relations.folderId <> '$FAVORITES_DESKTOP_ROOT' and relations.folderId <> '$FAVORITES_ROOT'",
     )
     fun relationByEntityId(entityId: String): Relation?
+
+    @Query(
+        "select * from relations where relations.entityId = :entityId and relations.folderId = :folderId",
+    )
+    fun relation(folderId: String, entityId: String): Relation?
 
     @Query("select * from relations where relations.entityId = :entityId")
     fun relationsByEntityId(entityId: String): List<Relation>
@@ -88,13 +103,22 @@ interface SavedSitesRelationsDao {
     fun deleteRelationByEntity(entityId: String)
 
     @Query("delete from relations where relations.entityId = :entityId and relations.folderId = :folderId")
-    fun deleteRelationByEntityAndFolder(entityId: String, folderId: String)
+    fun deleteRelationByEntityAndFolder(
+        entityId: String,
+        folderId: String,
+    )
 
     @Query("delete from relations where entityId = :entityId AND folderId = :folderId")
     fun deleteRelationByEntity(
         entityId: String,
         folderId: String,
     )
+
+    @Query(
+        "delete from relations where relations.entityId = :entityId and relations.folderId <> '$FAVORITES_MOBILE_ROOT' " +
+            "and relations.folderId <> '$FAVORITES_DESKTOP_ROOT' and relations.folderId <> '$FAVORITES_ROOT'",
+    )
+    fun deleteOldRelationsByEntity(entityId: String)
 
     @Query(
         "select count(*) from entities inner join relations on entities.entityId = relations.entityId " +
@@ -119,13 +143,19 @@ interface SavedSitesRelationsDao {
     }
 
     @Transaction
-    fun cloneFolder(from: String, to: String) {
+    fun cloneFolder(
+        from: String,
+        to: String,
+    ) {
         delete(to)
         copyRelationsFromTo(from, to)
     }
 
     @Query("INSERT INTO relations (folderId, entityId) Select :to, entityId from relations where folderId = :from")
-    fun copyRelationsFromTo(from: String, to: String)
+    fun copyRelationsFromTo(
+        from: String,
+        to: String,
+    )
 
     @Transaction
     fun migrateUnifiedFavoritesAsNewRoot() {
@@ -133,5 +163,44 @@ interface SavedSitesRelationsDao {
         delete(SavedSitesNames.FAVORITES_DESKTOP_ROOT)
         // clear native folder
         delete(SavedSitesNames.FAVORITES_MOBILE_ROOT)
+    }
+
+    @Query(
+        "select * from entities WHERE entities.entityId NOT IN " +
+            "(select relations.entityId FROM relations WHERE relations.folderId <> '$FAVORITES_ROOT' " +
+            "AND relations.folderId<> '$FAVORITES_DESKTOP_ROOT' AND relations.folderId <> '$FAVORITES_MOBILE_ROOT')",
+    )
+    fun entitiesWithoutRelation(): List<Entity>
+
+    fun getOrphans(): List<Entity> {
+        // orphan = entities which id is not entityId in table relations
+        return entitiesWithoutRelation().filter {
+            it.entityId != BOOKMARKS_ROOT && it.entityId != FAVORITES_MOBILE_ROOT &&
+                it.entityId != FAVORITES_DESKTOP_ROOT && it.entityId != FAVORITES_ROOT
+        }
+    }
+
+    @Transaction
+    fun replaceBookmarkFolder(
+        folder: BookmarkFolder,
+        children: List<String>,
+    ) {
+        delete(folderId = folder.id)
+        children.forEach {
+            // before inserting the new relation, we remove old relations from this entity, but not the ones from favourites root
+            deleteOldRelationsByEntity(it)
+            insert(Relation(folderId = folder.id, entityId = it))
+        }
+    }
+
+    @Transaction
+    fun replaceFavouriteFolder(
+        favouriteFolder: String,
+        children: List<String>,
+    ) {
+        delete(folderId = favouriteFolder)
+        children.forEach {
+            insert(Relation(folderId = favouriteFolder, entityId = it))
+        }
     }
 }

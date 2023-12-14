@@ -20,7 +20,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
-import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.impl.sync.SyncSavedSitesRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -35,6 +34,7 @@ class SavedSitesLocalWinsPersister @Inject constructor(
 ) : SavedSitesSyncPersisterStrategy {
     override fun processBookmarkFolder(
         folder: BookmarkFolder,
+        children: List<String>,
     ) {
         val localFolder = savedSitesRepository.getFolder(folder.id)
         if (localFolder != null) {
@@ -52,6 +52,14 @@ class SavedSitesLocalWinsPersister @Inject constructor(
                 savedSitesRepository.insert(folder)
             }
         }
+    }
+
+    override fun processFavouritesFolder(
+        favouriteFolder: String,
+        children: List<String>,
+    ) {
+        // process favourites means replacing the current children with the remote
+        syncSavedSitesRepository.replaceFavouriteFolder(favouriteFolder, children)
     }
 
     override fun processBookmark(
@@ -72,28 +80,6 @@ class SavedSitesLocalWinsPersister @Inject constructor(
             } else {
                 Timber.d("Sync-Bookmarks-Persister: child ${bookmark.id} not present locally, inserting")
                 savedSitesRepository.insert(bookmark)
-            }
-        }
-    }
-
-    override fun processFavourite(
-        favourite: Favorite,
-        favoriteFolder: String,
-    ) {
-        val storedFavorite = syncSavedSitesRepository.getFavoriteById(favourite.id, favoriteFolder)
-        if (storedFavorite != null) {
-            if (favourite.isDeleted()) {
-                Timber.d("Sync-Bookmarks-Persister: remote favourite ${favourite.id} exists locally but was deleted remotely, deleting locally too")
-                syncSavedSitesRepository.delete(favourite, favoriteFolder)
-            } else {
-                Timber.d("Sync-Bookmarks-Persister: remote favourite ${favourite.id} exists locally, nothing to do")
-            }
-        } else {
-            if (favourite.isDeleted()) {
-                Timber.d("Sync-Bookmarks-Persister: favourite ${favourite.id} not present locally but was deleted, nothing to do")
-            } else {
-                Timber.d("Sync-Bookmarks-Persister: adding ${favourite.id} to Favourites")
-                syncSavedSitesRepository.insert(favourite, favoriteFolder)
             }
         }
     }

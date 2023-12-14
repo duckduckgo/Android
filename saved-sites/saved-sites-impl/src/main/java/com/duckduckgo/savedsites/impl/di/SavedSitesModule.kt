@@ -106,8 +106,9 @@ class SavedSitesModule {
     fun providesSyncSavedSitesRepository(
         savedSitesEntitiesDao: SavedSitesEntitiesDao,
         savedSitesRelationsDao: SavedSitesRelationsDao,
+        savedSitesSyncMetadataDao: SavedSitesSyncMetadataDao,
     ): SyncSavedSitesRepository {
-        return RealSyncSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao)
+        return RealSyncSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao, savedSitesSyncMetadataDao)
     }
 
     @Provides
@@ -123,7 +124,7 @@ class SavedSitesModule {
     @SingleInstanceIn(AppScope::class)
     @Provides
     fun provideSavedSitesDatabase(context: Context): SavedSitesSyncMetadataDatabase {
-        return Room.databaseBuilder(context, SavedSitesSyncMetadataDatabase::class.java, "settings.db")
+        return Room.databaseBuilder(context, SavedSitesSyncMetadataDatabase::class.java, "saved_sites_metadata.db")
             .fallbackToDestructiveMigration()
             .addMigrations(*ALL_MIGRATIONS)
             .build()
