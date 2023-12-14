@@ -24,6 +24,7 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.Toggle
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -37,6 +38,7 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -150,6 +152,30 @@ class WelcomePageViewModelTest {
                     Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString(),
                 ),
             )
+        }
+    }
+
+    @Test
+    fun givenExperimentalVariantWhenOnNotificationPermissionsRequestedThenFireAndEmitWelcomeAnimation() = runTest {
+        val mockToggle: Toggle = mock { on { isEnabled() } doReturn true }
+        whenever(mockNotificationPermissionsFeatureToggles.noPermissionsPrompt()).thenReturn(mockToggle)
+
+        events.emit(WelcomePageView.Event.OnNotificationPermissionsRequested)
+
+        viewEvents.test {
+            assertTrue(awaitItem() == WelcomePageView.State.ShowWelcomeAnimation)
+        }
+    }
+
+    @Test
+    fun givenControlVariantWhenOnNotificationPermissionsRequestedThenFireAndEmitShowNotificationsPermissionsPrompt() = runTest {
+        val mockToggle: Toggle = mock { on { isEnabled() } doReturn false }
+        whenever(mockNotificationPermissionsFeatureToggles.noPermissionsPrompt()).thenReturn(mockToggle)
+
+        events.emit(WelcomePageView.Event.OnNotificationPermissionsRequested)
+
+        viewEvents.test {
+            assertTrue(awaitItem() == WelcomePageView.State.ShowNotificationsPermissionsPrompt)
         }
     }
 }
