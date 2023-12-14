@@ -1021,7 +1021,7 @@ class BrowserTabFragment :
         dismissAppLinkSnackBar()
         errorSnackbar.dismiss()
         newBrowserTab.newTabLayout.show()
-        binding.browserLayout.gone()
+        webViewContainer.gone()
         omnibar.appBarLayout.setExpanded(true)
         webView?.onPause()
         webView?.hide()
@@ -1030,14 +1030,14 @@ class BrowserTabFragment :
 
     private fun showBrowser() {
         newBrowserTab.newTabLayout.gone()
-        binding.browserLayout.show()
+        webViewContainer.show()
         webView?.show()
         webView?.onResume()
         errorView.errorLayout.gone()
     }
 
     private fun showError(errorType: WebViewErrorResponse, url: String?) {
-        binding.browserLayout.gone()
+        webViewContainer.gone()
         newBrowserTab.newTabLayout.gone()
         omnibar.appBarLayout.setExpanded(true)
         omnibar.shieldIcon.isInvisible = true
