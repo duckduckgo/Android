@@ -43,7 +43,15 @@ interface AuthService {
      */
     @GET("https://quackdev.duckduckgo.com/api/auth/access-token")
     suspend fun accessToken(@Header("Authorization") authorization: String): AccessTokenResponse
+
+    /**
+     * Deletes an account
+     */
+    @POST("https://quackdev.duckduckgo.com/api/auth/account/delete")
+    suspend fun delete(@Header("Authorization") authorization: String): DeleteAccountResponse
 }
+
+data class DeleteAccountResponse(val status: String)
 
 data class StoreLoginBody(
     val signature: String,

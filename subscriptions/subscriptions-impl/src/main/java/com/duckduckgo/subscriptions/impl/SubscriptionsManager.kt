@@ -119,6 +119,11 @@ interface SubscriptionsManager {
      * Signs the user out
      */
     suspend fun signOut()
+
+    /**
+     * Deletes the current account
+     */
+    suspend fun deleteAccount(): Boolean
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -165,6 +170,15 @@ class RealSubscriptionsManager @Inject constructor(
                     }
                 }
             }
+        }
+    }
+
+    override suspend fun deleteAccount(): Boolean {
+        return try {
+            val state = authService.delete("Bearer ${authDataStore.authToken}")
+            (state.status == "deleted")
+        } catch (e: Exception) {
+            false
         }
     }
 
@@ -359,7 +373,11 @@ class RealSubscriptionsManager @Inject constructor(
                             logcat(LogPriority.DEBUG) { "Subs: auth token expired" }
                             val subscriptionsData = recoverSubscriptionFromStore()
                             if (subscriptionsData is Success) {
-                                AuthToken.Success(authDataStore.authToken!!)
+                                return if (subscriptionsData.entitlements.isEmpty()) {
+                                    AuthToken.Failure("")
+                                } else {
+                                    AuthToken.Success(authDataStore.authToken!!)
+                                }
                             } else {
                                 AuthToken.Failure(response.message)
                             }
