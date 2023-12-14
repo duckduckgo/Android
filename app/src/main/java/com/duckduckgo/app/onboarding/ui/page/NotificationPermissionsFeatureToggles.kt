@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,20 @@
 
 package com.duckduckgo.app.onboarding.ui.page
 
-import android.content.Intent
+import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.Experiment
 
-object WelcomePageView {
-    sealed class Event {
-        object OnPrimaryCtaClicked : Event()
-        object OnDefaultBrowserSet : Event()
-        object OnDefaultBrowserNotSet : Event()
-        object OnNotificationPermissionsRequested : Event()
-    }
+@ContributesRemoteFeature(
+    scope = AppScope::class,
+    featureName = "notificationPermissions",
+)
+interface NotificationPermissionsFeatureToggles {
+    @Toggle.DefaultValue(false)
+    fun self(): Toggle
 
-    sealed class State {
-        object Idle : State()
-        data class ShowDefaultBrowserDialog(val intent: Intent) : State()
-        object Finish : State()
-        object ShowWelcomeAnimation : State()
-        object ShowNotificationsPermissionsPrompt : State()
-    }
+    @Toggle.DefaultValue(false)
+    @Experiment
+    fun noPermissionsPrompt(): Toggle
 }

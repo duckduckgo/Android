@@ -61,6 +61,9 @@ class WelcomePageViewModelTest {
     @Mock
     private lateinit var defaultRoleBrowserDialog: DefaultRoleBrowserDialog
 
+    @Mock
+    private lateinit var mockNotificationPermissionsFeatureToggles: NotificationPermissionsFeatureToggles
+
     private val events = MutableSharedFlow<WelcomePageView.Event>(replay = 1)
 
     private lateinit var viewModel: WelcomePageViewModel
@@ -75,6 +78,7 @@ class WelcomePageViewModelTest {
             context = mock(),
             pixel = pixel,
             defaultRoleBrowserDialog = defaultRoleBrowserDialog,
+            notificationPermissionsFeatureToggles = mockNotificationPermissionsFeatureToggles,
         )
 
         viewEvents = events.flatMapLatest { viewModel.reduce(it) }
