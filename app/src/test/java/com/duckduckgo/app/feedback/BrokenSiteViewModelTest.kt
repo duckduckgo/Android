@@ -53,6 +53,7 @@ import org.mockito.Mockito.never
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -753,6 +754,29 @@ class BrokenSiteViewModelTest {
 
         testee.onProtectionsToggled(protectionsEnabled = true)
         verify(mockPixel).fire(AppPixelName.BROKEN_SITE_ALLOWLIST_REMOVE)
+    }
+
+    @Test
+    fun whenProtectionsAreToggledThenPrivacyProtectionsPopupListenerIsInvoked() = runTest {
+        testee.setInitialBrokenSite(
+            url = url,
+            blockedTrackers = "",
+            surrogates = "",
+            upgradedHttps = false,
+            urlParametersRemoved = false,
+            consentManaged = false,
+            consentOptOutFailed = false,
+            consentSelfTestFailed = false,
+            errorCodes = emptyArray(),
+            httpErrorCodes = "",
+            isDesktopMode = false,
+            reportFlow = MENU,
+        )
+
+        testee.onProtectionsToggled(protectionsEnabled = false)
+        verify(mockPrivacyProtectionsToggleUsageListener).onPrivacyProtectionsToggleUsed()
+        testee.onProtectionsToggled(protectionsEnabled = true)
+        verify(mockPrivacyProtectionsToggleUsageListener, times(2)).onPrivacyProtectionsToggleUsed()
     }
 
     private fun selectAndAcceptCategory(indexSelected: Int = 0) {
