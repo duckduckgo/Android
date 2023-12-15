@@ -2451,8 +2451,6 @@ class BrowserTabFragment :
     }
 
     private fun confirmDeleteSavedSite(savedSite: SavedSite) {
-        if (savedSite is Favorite) return
-
         val message = when (savedSite) {
             is Favorite -> getString(R.string.favoriteDeleteConfirmationMessage)
             is Bookmark -> getString(R.string.bookmarkDeleteConfirmationMessage, savedSite.title).html(requireContext())
