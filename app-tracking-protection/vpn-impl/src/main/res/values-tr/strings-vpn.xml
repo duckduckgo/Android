@@ -413,6 +413,7 @@
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Koruma Devre Dışı</string>
     <string name="atp_ExcludedAppsFilterMenuAllLabel">Tümü</string>
     <string name="atp_ActivityViewAppsLabel">Uygulamaları Görüntüle</string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Bir uygulamayla ilgili sorun mu yaşıyorsunuz? <annotation type="app_settings_link">Geliştirmemize yardımcı olun</annotation></string>
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Uygulama İzleme Koruması etkinleştirildiğinde bazı uygulamalar sorun yaşayabilir. <annotation type="learn_why_link">Nedenini Öğrenin</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Bilinen sorunları olan uygulamalar için koruma devre dışı bırakılır. Bu uygulamaları etkinleştirebilirsiniz, ancak beklendiği gibi çalışmayabilirler. <annotation type="learn_why_link">Nedenini öğrenin</annotation></string>
 
