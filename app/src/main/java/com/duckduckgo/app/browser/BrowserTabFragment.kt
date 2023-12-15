@@ -2432,7 +2432,7 @@ class BrowserTabFragment :
         val dialog: ActionBottomSheetDialog.Builder = ActionBottomSheetDialog.Builder(requireContext())
             .setTitle(getString(string.bookmarkAddedInBookmarks))
             .setPrimaryItem(getString(string.addToFavorites), icon = com.duckduckgo.mobile.android.R.drawable.ic_favorite_16)
-            .setSecondaryItem(getString(string.editBookmark), icon = R.drawable.ic_edit_16)
+            .setSecondaryItem(getString(string.editBookmark), icon = com.duckduckgo.mobile.android.R.drawable.ic_edit_16)
             .addEventListener(
                 object : ActionBottomSheetDialog.EventListener() {
                     override fun onPrimaryItemClicked() {
