@@ -46,4 +46,17 @@
     <!-- DRM -->
     <string name="sitePermissionsSettingsDRM">DRM</string>
 
+    <!-- Bookmarks -->
+    <string name="rearrangeBookmarks">Rearrange Bookmarks</string>
+    <string name="searchBookmarks">Search Bookmarks</string>
+    <string name="deleteFolder">"Delete %s folder?"</string>
+    <string name="bookmarkAddedInBookmarks">Bookmark added in Bookmarks</string>
+    <string name="addToFavorites">Add to favorites</string>
+    <string name="editBookmark">Edit Bookmark</string>
+    <string name="importBookmarksDescription">If your bookmarks are saved in another browser, you\ncan import them into DuckDuckGo.</string>
+    <string name="importBookmarks">Import Bookmarks</string>
+    <string name="noResultsFor">No results for \'%1$s\'</string>
+    <string name="removeFromFavorites">Remove From Favorites</string>
+    <string name="addToFavoritesMenu">Add to Favorites</string>
+
 </resources>

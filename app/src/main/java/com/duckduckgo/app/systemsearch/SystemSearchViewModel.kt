@@ -341,9 +341,10 @@ class SystemSearchViewModel @Inject constructor(
     override fun onBookmarkEdited(
         bookmark: Bookmark,
         oldFolderId: String,
+        updateFavorite: Boolean,
     ) {
         viewModelScope.launch(dispatchers.io()) {
-            savedSitesRepository.updateBookmark(bookmark, oldFolderId)
+            savedSitesRepository.updateBookmark(bookmark, oldFolderId, updateFavorite)
         }
     }
 

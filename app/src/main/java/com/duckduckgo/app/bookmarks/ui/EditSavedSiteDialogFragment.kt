@@ -23,6 +23,7 @@ import android.view.View
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.view.TextChangedWatcher
+import com.duckduckgo.common.ui.view.listitem.DaxListItem.ImageBackground.Circular
 import com.duckduckgo.common.ui.view.text.DaxTextInput
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.extensions.html
@@ -38,6 +39,7 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
         fun onBookmarkEdited(
             bookmark: Bookmark,
             oldFolderId: String,
+            updateFavorite: Boolean,
         )
     }
 
@@ -49,15 +51,37 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
 
     var listener: EditSavedSiteListener? = null
     var deleteBookmarkListener: DeleteBookmarkListener? = null
+    var isFavorite = false
 
     override fun configureUI() {
         validateBundleArguments()
+        val savedSite = getSavedSite()
 
-        if (getSavedSite() is Favorite) {
+        if (savedSite is Favorite) {
             setToolbarTitle(getString(R.string.favoriteDialogTitleEdit))
         } else {
             setToolbarTitle(getString(R.string.bookmarkDialogTitleEdit))
             binding.savedSiteLocationContainer.visibility = View.VISIBLE
+            binding.addToFavoritesBottomDivider.visibility = View.VISIBLE
+            isFavorite = (savedSite as Bookmark).isFavorite
+            if (isFavorite) {
+                binding.addToFavoritesItem.setLeadingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_favorite_solid_16)
+            } else {
+                binding.addToFavoritesItem.setLeadingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_favorite_16)
+            }
+            binding.addToFavoritesItem.setLeadingIconBackgroundType(Circular)
+            binding.addToFavoritesItem.setClickListener {
+                if (isFavorite) {
+                    binding.addToFavoritesItem.setLeadingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_favorite_16)
+                    isFavorite = false
+                } else {
+                    binding.addToFavoritesItem.setLeadingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_favorite_solid_16)
+                    isFavorite = true
+                }
+                favoriteChanged = savedSite.isFavorite != isFavorite
+                setConfirmationVisibility()
+            }
+            binding.addToFavoritesItem.visibility = View.VISIBLE
         }
         configureMenuItems()
 
@@ -95,8 +119,13 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
         when (savedSite) {
             is Bookmark -> {
                 val parentId = arguments?.getString(AddBookmarkFolderDialogFragment.KEY_PARENT_FOLDER_ID) ?: SavedSitesNames.BOOKMARKS_ROOT
-                val updatedBookmark = savedSite.copy(title = updatedTitle, url = updatedUrl, parentId = parentId)
-                listener?.onBookmarkEdited(updatedBookmark, savedSite.parentId)
+                val updatedBookmark = savedSite.copy(
+                    title = updatedTitle,
+                    url = updatedUrl,
+                    parentId = parentId,
+                    isFavorite = if (favoriteChanged) !savedSite.isFavorite else savedSite.isFavorite,
+                )
+                listener?.onBookmarkEdited(updatedBookmark, savedSite.parentId, favoriteChanged)
             }
 
             is Favorite -> {

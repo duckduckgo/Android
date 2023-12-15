@@ -73,4 +73,20 @@
         android:visibility="gone"
         app:constraint_referenced_ids="savedSiteLocationLabel,savedSiteLocation" />
 
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+        android:id="@+id/addToFavoritesBottomDivider"
+        app:layout_constraintTop_toBottomOf="@id/savedSiteLocation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"/>
+
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        android:id="@+id/addToFavoritesItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="8dp"
+        app:primaryText="@string/addToFavorites"
+        app:layout_constraintTop_toBottomOf="@id/addToFavoritesBottomDivider"
+        android:visibility="gone"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

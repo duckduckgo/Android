@@ -61,17 +61,6 @@ class BrowserPopupMenu(
             }
             binding.addBookmarksMenuItem.setIcon(if (isBookmark) drawable.ic_bookmark_solid_16 else drawable.ic_bookmark_16)
 
-            val isFavorite = viewState.favorite != null
-            binding.addFavoriteMenuItem.isVisible = viewState.addFavorite.isEnabled()
-            binding.addFavoriteMenuItem.label {
-                when {
-                    viewState.addFavorite.isHighlighted() -> context.getString(R.string.addFavoriteMenuTitleHighlighted)
-                    isFavorite -> context.getString(R.string.removeFavoriteMenuTitle)
-                    else -> context.getString(R.string.addFavoriteMenuTitle)
-                }
-            }
-            binding.addFavoriteMenuItem.setIcon(if (isFavorite) drawable.ic_favorite_solid_16 else drawable.ic_favorite_16)
-
             binding.fireproofWebsiteMenuItem.isVisible = viewState.canFireproofSite
             binding.fireproofWebsiteMenuItem.label {
                 context.getString(
