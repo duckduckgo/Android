@@ -26,7 +26,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.duckduckgo.app.bookmarks.ui.FavoritesAdapter
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ViewQuickAccessItemBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
@@ -53,7 +52,7 @@ class FavoritesQuickAccessAdapter(
         const val QUICK_ACCESS_ITEM_MAX_SIZE_DP = 90
     }
 
-    data class QuickAccessFavorite(val favorite: SavedSite.Favorite) : FavoritesAdapter.FavoriteItemTypes
+    data class QuickAccessFavorite(val favorite: SavedSite.Favorite)
 
     class QuickAccessViewHolder(
         private val inflater: LayoutInflater,

@@ -95,6 +95,7 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.PrivacyShieldViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.SavedSiteChangedViewState
 import com.duckduckgo.app.browser.DownloadConfirmationFragment.DownloadConfirmationDialogListener
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
+import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
@@ -2428,15 +2429,22 @@ class BrowserTabFragment :
     }
 
     private fun savedSiteAdded(savedSiteChangedViewState: SavedSiteChangedViewState) {
-        val snackbarMessage = when (savedSiteChangedViewState.savedSite) {
-            is Bookmark -> R.string.bookmarkAddedMessage
-            is Favorite -> R.string.favoriteAddedMessage
-        }
-        binding.browserLayout.makeSnackbarWithNoBottomInset(snackbarMessage, Snackbar.LENGTH_LONG)
-            .setAction(R.string.edit) {
-                editSavedSite(savedSiteChangedViewState)
-            }
-            .show()
+        val dialog: ActionBottomSheetDialog.Builder = ActionBottomSheetDialog.Builder(requireContext())
+            .setTitle(getString(string.bookmarkAddedInBookmarks))
+            .setPrimaryItem(getString(string.addToFavorites), icon = com.duckduckgo.mobile.android.R.drawable.ic_favorite_16)
+            .setSecondaryItem(getString(string.editBookmark), icon = R.drawable.ic_edit_16)
+            .addEventListener(
+                object : ActionBottomSheetDialog.EventListener() {
+                    override fun onPrimaryItemClicked() {
+                        viewModel.onFavoriteMenuClicked()
+                    }
+
+                    override fun onSecondaryItemClicked() {
+                        editSavedSite(savedSiteChangedViewState)
+                    }
+                },
+            )
+        dialog.show()
     }
 
     private fun editSavedSite(savedSiteChangedViewState: SavedSiteChangedViewState) {
@@ -2451,6 +2459,8 @@ class BrowserTabFragment :
     }
 
     private fun confirmDeleteSavedSite(savedSite: SavedSite) {
+        if (savedSite is Favorite) return
+
         val message = when (savedSite) {
             is Favorite -> getString(R.string.favoriteDeleteConfirmationMessage)
             is Bookmark -> getString(R.string.bookmarkDeleteConfirmationMessage, savedSite.title).html(requireContext())
@@ -3127,9 +3137,6 @@ class BrowserTabFragment :
                 }
                 onMenuItemClicked(menuBinding.addBookmarksMenuItem) {
                     viewModel.onBookmarkMenuClicked()
-                }
-                onMenuItemClicked(menuBinding.addFavoriteMenuItem) {
-                    viewModel.onFavoriteMenuClicked()
                 }
                 onMenuItemClicked(menuBinding.findInPageMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_FIND_IN_PAGE_PRESSED)

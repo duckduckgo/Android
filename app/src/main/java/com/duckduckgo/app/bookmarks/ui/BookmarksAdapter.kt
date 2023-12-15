@@ -25,15 +25,23 @@ import android.widget.ImageView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.duckduckgo.app.bookmarks.ui.BookmarkScreenViewHolders.BookmarkFoldersViewHolder
+import com.duckduckgo.app.bookmarks.ui.BookmarkScreenViewHolders.BookmarksViewHolder
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.databinding.ViewSavedSiteEmptyHintBinding
+import com.duckduckgo.app.browser.databinding.ViewSavedSiteEmptySearchHintBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.common.ui.menu.PopupMenu
-import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.ui.view.PopupMenuItemView
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.mobile.android.databinding.RowTwoLineItemBinding
+import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
+import java.util.Collections
 import kotlinx.coroutines.launch
 
 class BookmarksAdapter(
@@ -41,25 +49,31 @@ class BookmarksAdapter(
     private val viewModel: BookmarksViewModel,
     private val lifecycleOwner: LifecycleOwner,
     private val faviconManager: FaviconManager,
-    private val dispatchers: DispatcherProvider,
 ) : RecyclerView.Adapter<BookmarkScreenViewHolders>() {
 
     companion object {
         const val EMPTY_STATE_TYPE = 0
-        const val BOOKMARK_TYPE = 1
+        const val EMPTY_SEARCH_STATE_TYPE = 1
+        const val BOOKMARK_TYPE = 2
+        const val BOOKMARK_FOLDER_TYPE = 3
     }
 
-    private val bookmarkItems = mutableListOf<BookmarksItemTypes>()
+    val bookmarkItems = mutableListOf<BookmarksItemTypes>()
+    var isInSearchMode = false
+    var isReorderingModeEnabled = false
 
     interface BookmarksItemTypes
     object EmptyHint : BookmarksItemTypes
+    object EmptySearchHint : BookmarksItemTypes
     data class BookmarkItem(val bookmark: SavedSite.Bookmark) : BookmarksItemTypes
+    data class BookmarkFolderItem(val bookmarkFolder: BookmarkFolder) : BookmarksItemTypes
 
     fun setItems(
-        bookmarkItems: List<BookmarkItem>,
+        bookmarkItems: List<BookmarksItemTypes>,
         showEmptyHint: Boolean,
+        showEmptySearchHint: Boolean,
     ) {
-        val generatedList = generateNewList(bookmarkItems, showEmptyHint)
+        val generatedList = generateNewList(bookmarkItems, showEmptyHint, showEmptySearchHint)
         val diffCallback = DiffCallback(old = this.bookmarkItems, new = generatedList)
         val diffResult = DiffUtil.calculateDiff(diffCallback)
         this.bookmarkItems.clear().also { this.bookmarkItems.addAll(generatedList) }
@@ -69,7 +83,11 @@ class BookmarksAdapter(
     private fun generateNewList(
         value: List<BookmarksItemTypes>,
         showEmptyHint: Boolean,
+        showEmptySearchHint: Boolean,
     ): List<BookmarksItemTypes> {
+        if (showEmptySearchHint) {
+            return value.ifEmpty { listOf(EmptySearchHint) }
+        }
         if (!showEmptyHint) {
             return value
         }
@@ -84,7 +102,7 @@ class BookmarksAdapter(
         return when (viewType) {
             BOOKMARK_TYPE -> {
                 val binding = RowTwoLineItemBinding.inflate(inflater, parent, false)
-                return BookmarkScreenViewHolders.BookmarksViewHolder(
+                return BookmarksViewHolder(
                     layoutInflater,
                     binding,
                     viewModel,
@@ -92,9 +110,21 @@ class BookmarksAdapter(
                     faviconManager,
                 )
             }
+            BOOKMARK_FOLDER_TYPE -> {
+                val binding = RowTwoLineItemBinding.inflate(inflater, parent, false)
+                return BookmarkFoldersViewHolder(
+                    layoutInflater,
+                    binding,
+                    viewModel,
+                )
+            }
             EMPTY_STATE_TYPE -> {
                 val binding = ViewSavedSiteEmptyHintBinding.inflate(inflater, parent, false)
-                BookmarkScreenViewHolders.EmptyHint(binding)
+                BookmarkScreenViewHolders.EmptyHint(binding, viewModel)
+            }
+            EMPTY_SEARCH_STATE_TYPE -> {
+                val binding = ViewSavedSiteEmptySearchHintBinding.inflate(inflater, parent, false)
+                BookmarkScreenViewHolders.EmptySearchHint(binding, viewModel, lifecycleOwner)
             }
             else -> throw IllegalArgumentException("viewType not found")
         }
@@ -105,10 +135,18 @@ class BookmarksAdapter(
         position: Int,
     ) {
         when (holder) {
-            is BookmarkScreenViewHolders.BookmarksViewHolder -> {
+            is BookmarksViewHolder -> {
                 holder.update((this.bookmarkItems[position] as BookmarkItem).bookmark)
+                holder.showDragHandle(isReorderingModeEnabled, (this.bookmarkItems[position] as BookmarkItem).bookmark)
+            }
+            is BookmarkFoldersViewHolder -> {
+                holder.update((this.bookmarkItems[position] as BookmarkFolderItem).bookmarkFolder)
+                holder.showDragHandle(isReorderingModeEnabled, (this.bookmarkItems[position] as BookmarkFolderItem).bookmarkFolder)
             }
             is BookmarkScreenViewHolders.EmptyHint -> {
+                holder.bind()
+            }
+            is BookmarkScreenViewHolders.EmptySearchHint -> {
                 holder.bind()
             }
         }
@@ -117,12 +155,38 @@ class BookmarksAdapter(
     override fun getItemViewType(position: Int): Int {
         return when (this.bookmarkItems[position]) {
             is EmptyHint -> EMPTY_STATE_TYPE
+            is EmptySearchHint -> EMPTY_SEARCH_STATE_TYPE
+            is BookmarkFolderItem -> BOOKMARK_FOLDER_TYPE
             else -> BOOKMARK_TYPE
         }
     }
 
     override fun getItemCount(): Int {
         return this.bookmarkItems.size
+    }
+
+    fun onItemMove(fromPosition: Int, toPosition: Int) {
+        Collections.swap(bookmarkItems, fromPosition, toPosition)
+        notifyItemMoved(fromPosition, toPosition)
+    }
+
+    fun enterReorderingMode() {
+        isReorderingModeEnabled = true
+    }
+
+    fun exitReorderingMode() {
+        isReorderingModeEnabled = false
+    }
+
+    fun persistReorderedItems() {
+        val reorderedBookmarks = bookmarkItems.mapNotNull { item ->
+            when (item) {
+                is BookmarkItem -> item.bookmark as Any
+                is BookmarkFolderItem -> item.bookmarkFolder as Any
+                else -> null
+            }
+        }
+        viewModel.updateBookmarks(reorderedBookmarks)
     }
 
     class DiffCallback(
@@ -148,11 +212,37 @@ class BookmarksAdapter(
     }
 }
 
-sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder(itemView) {
+sealed class BookmarkScreenViewHolders(itemView: View, viewModel: BookmarksViewModel) : RecyclerView.ViewHolder(itemView) {
 
-    class EmptyHint(private val binding: ViewSavedSiteEmptyHintBinding) : BookmarkScreenViewHolders(binding.root) {
+    class EmptyHint(
+        private val binding: ViewSavedSiteEmptyHintBinding,
+        private val viewModel: BookmarksViewModel,
+    ) : BookmarkScreenViewHolders(binding.root, viewModel) {
         fun bind() {
-            binding.savedSiteEmptyHint.setText(R.string.bookmarksEmptyHint)
+            binding.savedSiteEmptyHintTitle.setText(R.string.bookmarksEmptyHint)
+            binding.savedSiteEmptyImportButton.setOnClickListener {
+                viewModel.launchBookmarkImport()
+            }
+        }
+    }
+
+    class EmptySearchHint(
+        private val binding: ViewSavedSiteEmptySearchHintBinding,
+        private val viewModel: BookmarksViewModel,
+        lifecycleOwner: LifecycleOwner,
+    ) : BookmarkScreenViewHolders(binding.root, viewModel) {
+
+        init {
+            viewModel.viewState.observe(lifecycleOwner) {
+                updateText(it.searchQuery)
+            }
+        }
+
+        private fun updateText(query: String) {
+            binding.savedSiteEmptyHint.text = binding.root.context.getString(string.noResultsFor, query)
+        }
+        fun bind() {
+            viewModel.viewState.value?.let { updateText(it.searchQuery) }
         }
     }
 
@@ -162,12 +252,33 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
         private val viewModel: BookmarksViewModel,
         private val lifecycleOwner: LifecycleOwner,
         private val faviconManager: FaviconManager,
-    ) : BookmarkScreenViewHolders(binding.root) {
+    ) : BookmarkScreenViewHolders(binding.root, viewModel) {
 
         private val context: Context = binding.root.context
+        private var isFavorite = false
+        private var faviconLoaded = false
+        private var currentBookmarkUrl = ""
+
+        fun showDragHandle(show: Boolean, bookmark: SavedSite.Bookmark) {
+            if (show) {
+                binding.root.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_menu_hamburger_24)
+                binding.root.setTrailingIconClickListener(null)
+            } else {
+                binding.root.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_menu_vertical_24)
+                setTrailingIconClickListener(bookmark)
+            }
+        }
+
+        private fun setTrailingIconClickListener(bookmark: SavedSite.Bookmark) {
+            binding.root.setTrailingIconClickListener { anchor ->
+                showOverFlowMenu(anchor, bookmark)
+            }
+        }
 
         fun update(bookmark: SavedSite.Bookmark) {
             val twoListItem = binding.root
+
+            twoListItem.setBackgroundColor(context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorSurface))
 
             twoListItem.setLeadingIconContentDescription(
                 context.getString(
@@ -178,7 +289,11 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
             twoListItem.setPrimaryText(bookmark.title)
             twoListItem.setSecondaryText(parseDisplayUrl(bookmark.url))
 
-            loadFavicon(bookmark.url, twoListItem.leadingIcon())
+            if (!faviconLoaded || currentBookmarkUrl != bookmark.url) {
+                loadFavicon(bookmark.url, twoListItem.leadingIcon())
+                faviconLoaded = true
+                currentBookmarkUrl = bookmark.url
+            }
 
             twoListItem.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_menu_vertical_24)
             twoListItem.setTrailingIconClickListener { anchor ->
@@ -186,8 +301,12 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
             }
 
             twoListItem.setClickListener {
+                (twoListItem.context as? BookmarksActivity)?.exitReorderingMode()
                 viewModel.onSelected(bookmark)
             }
+
+            isFavorite = bookmark.isFavorite
+            twoListItem.setPillVisible(isFavorite)
         }
 
         private fun loadFavicon(url: String, image: ImageView) {
@@ -205,11 +324,19 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
             anchor: View,
             bookmark: SavedSite.Bookmark,
         ) {
-            val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_edit_delete_menu)
+            val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_edit_favorite_delete_menu)
             val view = popupMenu.contentView
             popupMenu.apply {
                 onMenuItemClicked(view.findViewById(R.id.edit)) { editBookmark(bookmark) }
                 onMenuItemClicked(view.findViewById(R.id.delete)) { deleteBookmark(bookmark) }
+                onMenuItemClicked(view.findViewById(R.id.addRemoveFavorite)) {
+                    addRemoveFavorite(bookmark)
+                }
+            }
+            if (isFavorite) {
+                view.findViewById<PopupMenuItemView>(R.id.addRemoveFavorite).label(context.getString(string.removeFromFavorites))
+            } else {
+                view.findViewById<PopupMenuItemView>(R.id.addRemoveFavorite).label(context.getString(string.addToFavoritesMenu))
             }
             popupMenu.show(binding.root, anchor)
         }
@@ -221,5 +348,132 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
         private fun deleteBookmark(bookmark: SavedSite.Bookmark) {
             viewModel.onDeleteSavedSiteRequested(bookmark)
         }
+
+        private fun addRemoveFavorite(bookmark: SavedSite.Bookmark) {
+            if (bookmark.isFavorite) {
+                viewModel.removeFavorite(bookmark)
+            } else {
+                viewModel.addFavorite(bookmark)
+            }
+        }
+    }
+
+    class BookmarkFoldersViewHolder(
+        private val layoutInflater: LayoutInflater,
+        private val binding: RowTwoLineItemBinding,
+        private val viewModel: BookmarksViewModel,
+    ) : BookmarkScreenViewHolders(binding.root, viewModel) {
+
+        private val context: Context = binding.root.context
+
+        fun showDragHandle(show: Boolean, bookmarkFolder: BookmarkFolder) {
+            if (show) {
+                binding.root.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_menu_hamburger_24)
+                binding.root.setTrailingIconClickListener(null)
+            } else {
+                binding.root.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_menu_vertical_24)
+                setTrailingIconClickListener(bookmarkFolder)
+            }
+        }
+
+        private fun setTrailingIconClickListener(bookmarkFolder: BookmarkFolder) {
+            binding.root.setTrailingIconClickListener {
+                showOverFlowMenu(binding.root, bookmarkFolder)
+            }
+        }
+
+        fun update(bookmarkFolder: BookmarkFolder) {
+            val listItem = binding.root
+
+            listItem.setBackgroundColor(context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorSurface))
+
+            listItem.setPrimaryText(bookmarkFolder.name)
+
+            val totalItems = bookmarkFolder.numBookmarks + bookmarkFolder.numFolders
+
+            if (totalItems == 0) {
+                listItem.setSecondaryText(context.getString(R.string.bookmarkFolderEmpty))
+            } else {
+                listItem.setSecondaryText(context.resources.getQuantityString(R.plurals.bookmarkFolderItems, totalItems, totalItems))
+            }
+
+            listItem.setLeadingIconResource(R.drawable.ic_folder_24)
+
+            listItem.showTrailingIcon()
+
+            listItem.setTrailingIconClickListener {
+                showOverFlowMenu(listItem, bookmarkFolder)
+            }
+
+            listItem.setOnClickListener {
+                (listItem.context as? BookmarksActivity)?.exitReorderingMode()
+                viewModel.onBookmarkFolderSelected(bookmarkFolder)
+            }
+        }
+
+        private fun showOverFlowMenu(
+            anchor: View,
+            bookmarkFolder: BookmarkFolder,
+        ) {
+            val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_edit_delete_menu)
+            val view = popupMenu.contentView
+            popupMenu.apply {
+                onMenuItemClicked(view.findViewById(R.id.edit)) { editBookmarkFolder(bookmarkFolder) }
+                onMenuItemClicked(view.findViewById(R.id.delete)) { deleteBookmarkFolder(bookmarkFolder) }
+            }
+            popupMenu.show(binding.root, anchor)
+        }
+
+        private fun editBookmarkFolder(bookmarkFolder: BookmarkFolder) {
+            viewModel.onEditBookmarkFolderRequested(bookmarkFolder)
+        }
+
+        private fun deleteBookmarkFolder(bookmarkFolder: BookmarkFolder) {
+            viewModel.onDeleteBookmarkFolderRequested(bookmarkFolder)
+        }
+    }
+}
+
+class BookmarkItemTouchHelperCallback(
+    private val adapter: BookmarksAdapter,
+) : ItemTouchHelper.Callback() {
+
+    override fun isLongPressDragEnabled(): Boolean {
+        return !adapter.isInSearchMode
+    }
+    override fun getMovementFlags(
+        recyclerView: RecyclerView,
+        viewHolder: RecyclerView.ViewHolder,
+    ): Int {
+        val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN
+        return makeMovementFlags(dragFlags, 0)
+    }
+
+    override fun onMove(
+        recyclerView: RecyclerView,
+        viewHolder: RecyclerView.ViewHolder,
+        target: RecyclerView.ViewHolder,
+    ): Boolean {
+        adapter.onItemMove(viewHolder.bindingAdapterPosition, target.bindingAdapterPosition)
+        return true
+    }
+
+    override fun onSelectedChanged(
+        viewHolder: RecyclerView.ViewHolder?,
+        actionState: Int,
+    ) {
+        super.onSelectedChanged(viewHolder, actionState)
+        if (actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
+            (viewHolder?.itemView?.context as? BookmarksActivity)?.enterReorderingMode()
+        }
+    }
+
+    override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
+        super.clearView(recyclerView, viewHolder)
+        adapter.persistReorderedItems()
+    }
+
+    override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+        // Not handled
     }
 }

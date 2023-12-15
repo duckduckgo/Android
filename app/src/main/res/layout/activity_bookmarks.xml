@@ -51,7 +51,7 @@
                 android:layout_margin="@dimen/keyline_2"
                 android:visibility="gone"
                 app:clearActionContentDescription="@string/clearButtonContentDescription"
-                app:searchHint="@string/search" />
+                app:searchHint="@string/searchBookmarks" />
         </FrameLayout>
 
     </com.google.android.material.appbar.AppBarLayout>
