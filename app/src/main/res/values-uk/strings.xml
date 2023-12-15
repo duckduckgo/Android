@@ -1,0 +1,795 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="appName" translatable="false">DuckDuckGo</string>
+    <string name="appDescription" translatable="false">DuckDuckGo</string>
+    <string name="duckDuckGoLogoDescription">Логотип DuckDuckGo</string>
+    <string name="duckDuckGoPrivacySimplified">Максимум конфіденційності, мінімум зусиль</string>
+    <string name="yes">Так</string>
+    <string name="no">Ні</string>
+    <string name="open">Відкрити</string>
+    <string name="cancel">Скасувати</string>
+    <string name="search">Пошук</string>
+
+    <!-- Onboarding Activity -->
+    <string name="onboardingDefaultBrowserDescription">Щоб зробити DuckDuckGo браузером по замовчуванню, перейдіть в «Налаштування».</string>
+    <string name="onboardingDefaultBrowserTitle">Зробіть DuckDuckGo браузером по замовчуванню</string>
+
+    <!-- Default Browser -->
+    <string name="cannotLaunchDefaultAppSettings">Не вдається відкрити налаштування додатка по замовчуванню</string>
+    <string name="settingsDefaultBrowserEnabled">Зробити браузером по замовчуванню</string>
+    <string name="defaultBrowserMaybeLater">Пізніше</string>
+    <string name="defaultBrowserLetsDoIt">Зробити браузером по умовчанню</string>
+    <string name="defaultBrowserDescriptionNoDefault">Откривайте посилання, не переймаючись нічим.</string>
+    <string name="defaultBrowserInstructions">Виберіть DuckDuckGo і натисніть <font color="#678fff">Все</font>.</string>
+
+    <!-- Browser Activity -->
+    <string name="browserPopupMenu">Меню браузера</string>
+    <string name="refresh">Оновити</string>
+    <string name="back">Назад</string>
+    <string name="forward">Вперед</string>
+
+    <string name="omnibarInputHint">Введіть пошуковий запит або адресу сайту</string>
+    <string name="clearButtonContentDescription">Скинути пошуковий запит</string>
+    <string name="no_compatible_third_party_app_installed">Сумісне додаток не встановлено</string>
+    <string name="addBookmarkMenuTitle">Додати закладку</string>
+    <string name="editBookmarkMenuTitle">Редагувати закладку</string>
+    <string name="addFavoriteMenuTitle">Додати в обране</string>
+    <string name="removeFavoriteMenuTitle">Видалити з обраного</string>
+    <string name="favoriteAddedMessage">Сайт додано в обране</string>
+    <string name="bookmarkAddedMessage">Закладка додана</string>
+    <string name="requestDesktopSiteMenuTitle">Повна версія сайту</string>
+    <string name="fireproofWebsiteMenuTitleRemove">Зняти вогнестійкість</string>
+    <string name="requestMobileSiteMenuTitle">Мобільна версія</string>
+    <string name="downloadsMenuTitle">Завантаження</string>
+    <string name="printMenuTitle">Друк сторінки</string>
+    <string name="favoriteDeleteConfirmationMessage">Сторінку видалено з обраного</string>
+    <string name="fireproofDeleteConfirmationMessage">Вогнестійкість скасовано</string>
+    <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Захист конфіденційності на сайті %1$s увімкнено</string>
+    <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Захист конфіденційності на сайті %1$s вимкнено</string>
+    <string name="undoSnackbarAction">Скасувати</string>
+
+    <!-- Downloading files -->
+    <string name="downloadImage">Завантажити зображення</string>
+    <string name="permissionRequiredToDownload">Для завантаження потрібен дозвіл на зберігання</string>
+
+    <!-- Sharing options -->
+    <string name="options">Параметри</string>
+    <string name="shareLink">Поділитися посиланням</string>
+    <string name="shareMenuTitle">Поділитися</string>
+    <string name="copyUrl">Скопіювати посилання</string>
+
+    <!-- Find in page -->
+    <string name="findInPageMenuTitle">Знайти на сторінці</string>
+    <string name="nextSearchTermDescription">Знайти наступний</string>
+    <string name="previousSearchTermDescription">Знайти попередній</string>
+    <string name="closeFindInPageButtonDescription">Закрити вікно пошуку на сторінці</string>
+    <string name="findInPageHint">Знайти на сторінці</string>
+    <string name="findInPageMatches" translatable="false">%1$d/%2$d</string>
+
+    <!-- AutoComplete Suggestions -->
+    <string name="editQueryBeforeSubmitting">Редагувати запит перед пошуком</string>
+    <string name="settingsAutocompleteEnabled">Показати пропозиції автозаповнення</string>
+
+    <!-- Opening external apps -->
+    <string name="openExternalApp">Відкрити зовнішню програму</string>
+    <string name="launchingExternalApp">Відкрити в іншій програмі</string>
+    <string name="confirmOpenExternalApp">Вийти з DuckDuckGo для перегляду цього вмісту?</string>
+    <string name="unableToOpenLink">Неможливо відкрити посилання цього типу</string>
+
+    <!-- Tabs -->
+    <string name="homeTab" translatable="false">DuckDuckGo</string>
+    <string name="tabActivityTitle">Вкладки</string>
+    <string name="tabsMenuItem">Вкладки</string>
+    <string name="newTabMenuItem">Нова вкладка</string>
+    <string name="openInNewTab">Відкрити в новій вкладці</string>
+    <string name="openInNewBackgroundTab">Відкрити в фоновій вкладці</string>
+    <string name="openImageInNewTab">Відкрити зображення в фоновій вкладці</string>
+    <string name="faviconContentDescription">Значок сайту</string>
+    <string name="closeContentDescription">Закрити</string>
+    <string name="closeAllTabsMenuItem">Закрити всі вкладки</string>
+    <string name="closeTab">Закрити вкладку</string>
+    <string name="tabClosed">Вкладка закрита</string>
+    <string name="tabClosedUndo">Скасувати</string>
+    <string name="downloadsMenuItemTitle">Завантаження</string>
+
+    <!-- Fire -->
+    <string name="fireMenu">Скинути дані</string>
+    <string name="fireClearAll">Закрити вкладки і видалити дані</string>
+    <string name="fireCancel">Скасувати</string>
+    <string name="fireDataCleared">Дані скинуті</string>
+
+    <!-- Settings Activity -->
+    <string name="settingsActivityTitle">Налаштування</string>
+    <string name="settingsMenuItemTitle">Налаштування</string>
+    <string name="settingsHeadingPrivacy">Конфіденційність</string>
+    <string name="settingsHeadingAppearance">Зовнішній вигляд</string>
+    <string name="settingsHeadingCustomize">Власна настройка</string>
+    <string name="settingsHeadingAbout">Про нас</string>
+    <string name="settingsAboutDuckduckgo">Кілька слів про DuckDuckGo</string>
+    <string name="settingsVersion">Версія</string>
+    <string name="leaveFeedback">Залиште нам відгук</string>
+    <string name="settingsEmailProtectionTitle">Захист електронної пошти</string>
+    <string name="settingsEmailProtectionSubtitle">Блокування поштових трекерів та приховування адреси</string>
+    <string name="settingsHeadingMore">DuckDuckGo також пропонує...</string>
+    <string name="settingsLightTheme">Світла</string>
+    <string name="settingsTheme">Тема</string>
+    <string name="settingsDarkTheme">Темна</string>
+    <string name="settingsSystemTheme">За замовчуванням</string>
+    <string name="settingsThemeDialogSave">Задати тему</string>
+    <string name="settingsTitleAppLinks">Відкривати посилання в додатках</string>
+    <string name="settingsTitleAppLinksDialog">Відкривати посилання в додатках</string>
+    <string name="settingsAppLinksAskEveryTime">Питати кожен раз</string>
+    <string name="settingsAppLinksAlways">Завжди</string>
+    <string name="settingsAppLinksNever">Ніколи</string>
+    <string name="settingsTitleNotifications">Повідомлення</string>
+    <string name="settingsSubtitleNotificationsDisabled">Вимкнено</string>
+    <string name="settingsSubtitleNotificationsEnabled">Увімкнено</string>
+    <string name="settingsDefaultBrowserTitle">Браузер за замовчуванням</string>
+    <string name="settingsDefaultBrowserSetDescription">DuckDuckGo — ваш браузер за замовчуванням</string>
+    <string name="settingsDefaultBrowserNotSetDescription">Виберіть DuckGo браузером за замовчуванням</string>
+    <string name="settingsPrivateSearchTitle">Приватний пошук</string>
+    <string name="settingsPrivateSearchDescription">Увімкнено за замовчуванням</string>
+    <string name="settingsWebTrackingProtectionTitle">Захист від відстеження онлайн</string>
+    <string name="settingsWebTrackingProtectionDescription">Увімкнено за замовчуванням</string>
+    <string name="settingsHeadingSettings">Налаштування</string>
+    <string name="settingsPermissionsSetting">Дозволи</string>
+    <string name="settingsAutofillLoginsSetting">Логіни</string>
+    <string name="settingsSyncSetting">Синхронізація та резервне копіювання</string>
+    <string name="settingsFireButton">Кнопка «Тривога»</string>
+
+    <!-- Private Search -->
+    <string name="privateSearchActivityTitle">Приватний пошук</string>
+    <string name="privateSearchTitle">Увімкнена система Private Search</string>
+    <string name="privateSearchDescription">DuckDuckGo Private Search — ваша пошукова система за замовчуванням. Ви можете користуватися пошуком в Інтернеті, не боячись слідкування.</string>
+    <string name="privateSearchHeadingSearchSettings">Налаштування пошуку</string>
+    <string name="privateSearchAutocompleteToggle">Показати пропозиції автозаповнення</string>
+    <string name="privateSearchMoreSearchSettingsPrimaryText">Додатково</string>
+    <string name="privateSearchMoreSearchSettingsSecondaryText">Вибір мови пошуку, регіону та інше</string>
+    <string name="privateSearchMoreSearchSettingsTitle">Додаткові налаштування пошуку</string>
+
+    <!-- Web Tracking Protection -->
+    <string name="webTrackingProtectionActivityTitle">Захист від відстеження онлайн</string>
+    <string name="webTrackingProtectionLearnMoreTitle">Захист від відстеження онлайн</string>
+    <string name="webTrackingProtectionTitle">Увімкнено захист від відстеження онлайн</string>
+    <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo не стежить за вами онлайн і максимально захищає ваші дані. Ми постійно зміцнюємо і розвиваємо захист від нових способів відстеження, які за замовчуванням не надають інші браузери. <u><a href=\"\">Докладніше...</a><u/>]]></string>
+
+    <!-- Cookie Pop-Up Protection -->
+    <string name="cookiePopupProtectionTitle">Захист від спливаючих вікон кукі</string>
+    <string name="cookiePopupProtectionDescription">Позбавтеся від навітьких вікон і приймайте лише мінімум файлів кукі</string>
+    <string name="cookiePopupProtectionEnabled">Увімкнено</string>
+
+    <!-- Fire Button -->
+    <string name="fireButtonActivityTitle">Кнопка «Тривога»</string>
+
+    <!-- Permissions -->
+    <string name="permissionsActivityTitle">Дозволи</string>
+
+    <!-- Appearance -->
+    <string name="appearanceActivityTitle">Зовнішній вигляд</string>
+
+    <!-- Settings - Automatically clearing data -->
+    <string name="settingsAutomaticallyClearingDialogSave">Зберегти</string>
+
+    <string name="settingsAutomaticallyClearWhat">Автоматично скидати…</string>
+    <string name="settingsAutomaticallyClearWhatDialogTitle">Автоматично скидати…</string>
+    <string name="settingsAutomaticallyClearWhatOptionNone">Нічого</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabs">Вкладки</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Вкладки і дані</string>
+
+    <string name="settingsAutomaticallyClearWhen">Виконувати скидання…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Виконувати скидання…</string>
+    <string name="settingsAutomaticallyClearWhenAppExitOnly">Тільки після виходу з додатка</string>
+    <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Після виходу з додатка, через 5 секунд бездіяльності</string>
+    <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Після виходу з додатка, через 5 хвилин бездіяльності</string>
+    <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Після виходу з додатка, через 15 хвилин бездіяльності</string>
+    <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Після виходу з додатка, через 30 хвилин бездіяльності</string>
+    <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Після виходу з додатка, через 1 годину бездіяльності</string>
+
+    <!-- About Activity -->
+    <string name="aboutActivityTitle">Кілька слів про DuckDuckGo</string>
+    <string name="aboutHeader">Ласкаво просимо на Качиний берег!</string>
+    <string name="aboutDescription">DuckDuckGo — незалежна компанія, заснована в 2008 році, яка спеціалізується на захисті особистих даних в Інтернеті. Ми пропонуємо просте рішення для тих, хто хоче припинити слідкування за ними в Інтернеті. DuckDuckGo своїм прикладом демонструє, що захист конфіденційності онлайн можливий без жодних компромісів.\n\nУніверсальний браузер DuckDuckGo має всі звичайні функції — вкладки, закладки, паролі та багато іншого, а також <annotation type="privacy_protection_link">понад десяток потужних засобів захисту особистої інформації</annotation>, які відсутні в стандартних налаштуваннях інших популярних веб-оглядачів. Такий вичерпний набір інструментів може приховати від сторонніх погляд всі мережеві дії, включаючи пошук, навігацію та електронну пошту.\n\nЗасоби захисту конфіденційності не вимагають від користувачів знання технічних особливостей або розуміння складних налаштувань. Достатньо змінити свій браузер на DuckDuckGo на всіх пристроях, і конфіденційність стане вашим режимом за замовчуванням.\n\nЯкщо вас цікавить «конструкція», докладну інформацію про особливості захисту DuckDuckGo можна знайти на сторінках <annotation type="learn_more_link">довідки</annotation>.</string>
+    <string name="no_suggestions">Немає пропозицій</string>
+
+    <!-- Broken Site Activity -->
+    <string name="brokenSiteReportBrokenSiteMenuItem">Сповістити про несправний сайт</string>
+    <string name="brokenSiteHeading">Сповістити про несправний сайт</string>
+    <string name="brokenSiteSubmitted">Дякуємо! Ваш відгук надіслано.</string>
+    <string name="brokenSitesCategoriesTitle">Опишіть, що сталося</string>
+    <string name="brokenSitesCategoriesHint">Опишіть, що сталося</string>
+    <string name="brokenSiteSubmitButton">Надіслати скаргу</string>
+    <string name="brokenSiteDescription">Ваш анонімний відгук про проблеми на сайті допоможе нам вдосконалити додаток.</string>
+
+    <string name="brokenSiteCategoryBlocked">Сайт блокується або не завантажується</string>
+    <string name="brokenSiteCategoryLayout">Порушено структуру сайту</string>
+    <string name="brokenSiteCategoryEmptySpaces">Великі порожні простори</string>
+    <string name="brokenSiteCategoryShopping">Не вдається здійснити оплату або оформити замовлення/покупку</string>
+    <string name="brokenSiteCategoryPaywall">Сайт прохає вимкнути блокування реклами</string>
+    <string name="brokenSiteCategoryComments">Не завантажуються коментарі, відгуки або чат</string>
+    <string name="brokenSiteCategoryVideos">Не відтворюється або не завантажується відео</string>
+    <string name="brokenSiteCategoryLogin">Неможливо увійти/зареєструватися</string>
+    <string name="brokenSiteCategoryOther">Щось інше</string>
+    <string name="brokenSiteDescriptionTextInputHint">Надайте додаткову інформацію (необов\'язково)</string>
+    <string name="brokenSiteDescriptionCaption">Що сталося? Що мало відбутися? Чи допомогло вимкнення захисту?</string>
+
+    <string name="brokenSiteProtectionsOn">На цьому сайті <b>УВІМКНЕНІ</b> функції захисту</string>
+    <string name="brokenSiteProtectionsOff">На цьому сайті <b>ВИМКНЕНІ</b> функції захисту</string>
+    <string name="brokenSiteProtectionsOnBannerMessage">Спробуйте вимкнути захист.</string>
+    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Ми тимчасово вимкнули захист конфіденційності, оскільки він порушував роботу цього сайту.</string>
+
+    <!-- Bookmarks Activity -->
+    <string name="bookmarksMenuTitle">Закладки</string>
+    <string name="bookmarksActivityTitle">Закладки</string>
+    <string name="noBookmarks">Закладок наразі немає</string>
+    <string name="bookmarkOverflowContentDescription" instruction="Placeholder is the title of the bookmark">Інші параметри закладки %1$s</string>
+    <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">Закладка &lt;b&gt;%1$s&lt;/b&gt; видалена</string>
+    <string name="exportBookmarksMenu">Експорт</string>
+    <string name="exportBookmarksEmpty">Якщо у вас немає закладок, то експортувати нечого</string>
+    <string name="exportBookmarksError">Щось пішло не так, і експорт закладок не вдався</string>
+    <string name="exportBookmarksSuccess">Усі закладки успішно експортовано</string>
+    <string name="importBookmarksMenu">Імпорт</string>
+    <string name="importBookmarksFileTitle">Виберіть файл з закладками для імпорту</string>
+    <string name="importBookmarksError">Щось пішло не так, і імпорт закладок не вдався</string>
+    <string name="importBookmarksEmpty">Вказаному файлі немає закладок</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">Закладки (%1$d) успішно імпортовано</string>
+    <string name="savedSiteDialogTitleHint">Назва</string>
+    <string name="savedSiteDialogUrlHint">URL</string>
+    <string name="savedSiteDialogTitleEdit">Редагувати</string>
+    <string name="bookmarksSectionTitle">Закладки</string>
+    <string name="favoritesSectionTitle">Обране</string>
+    <string name="bookmarksEmptyHint">Закладок наразі немає</string>
+    <string name="favoritesEmptyHint">В обраному наразі нічого немає</string>
+
+    <!-- Dialogs -->
+    <string name="dialogConfirmTitle">Підтвердити</string>
+    <string name="dialogSave">Зберегти</string>
+    <string name="delete">Видалити</string>
+    <string name="edit">Редагувати</string>
+    <string name="remove">Видалити</string>
+    <string name="removeAll">Видалити все</string>
+
+    <!-- Widget -->
+    <string name="searchWidgetTextHint">Пошук в DuckDuckGo</string>
+
+    <!-- Favorites widget -->
+    <string name="addFavoriteMenuTitleHighlighted">👋 В обране</string>
+    <string name="widgetConfigurationTitleText">Вибрати тему</string>
+    <string name="widgetConfigurationSystemThemeOption">За замовчуванням</string>
+    <string name="widgetConfigurationLightThemeOption">Світла</string>
+    <string name="widgetConfigurationDarkThemeOption">Темна</string>
+    <string name="widgetConfigurationAddWidgetOption">Додати віджет</string>
+    <string name="searchWidgetEmtpyFavoritesHint">В обраному наразі нічого немає</string>
+    <string name="searchWidgetEmtpyFavoritesCta">Додати в обране</string>
+    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Улюблені сайти завжди під рукою!<br/><br/>Просто зайдіть на сайт, натисніть значок ⠇ і виберіть «В обране».]]></string>
+    <string name="daxFavoritesOnboardingCtaContentDescription">Улюблені сайти завжди під рукою! Просто зайдіть на сайт, натисніть значок меню браузера і виберіть опцію «В обране».</string>
+    <string name="widgetConfigurationActivityTitle">Налаштування віджета</string>
+    <string name="favoritesWidgetLabel">Обране</string>
+    <string name="searchWidgetLabel">Пошук</string>
+
+    <!-- Home Screen Shortcuts -->
+    <string name="addToHome">Додати на домашній екран</string>
+    <string name="shortcutAddedText" instruction="Placeholder is the name of a website">Готово! Ми додали %1$s на ваш домашній екран.</string>
+
+    <!-- User Survey -->
+    <string name="surveyCtaTitle">Допоможіть нам вдосконалити додаток!</string>
+    <string name="surveyCtaDescription">Поділіться своїми враженнями в короткому опитуванні.</string>
+    <string name="surveyCtaLaunchButton">Брати участь у опитуванні</string>
+    <string name="surveyCtaDismissButton">Ні, дякую</string>
+    <string name="surveyActivityTitle">Опитування користувачів</string>
+    <string name="surveyTitle">Опитування DuckDuckGo</string>
+    <string name="surveyDismissContentDescription">Закрити опитування</string>
+    <string name="surveyLoadingErrorTitle">О ні!</string>
+    <string name="surveyLoadingErrorText">Зараз неможливо завантажити опитування.\nСпробуйте пізніше.</string>
+
+    <!-- Add widget -->
+    <string name="addWidgetCtaTitle">Спробуйте наш пошуковий віджет!</string>
+    <string name="addWidgetCtaDescription">Додайте наш пошуковий віджет на домашній екран для швидкого та зручного доступу.</string>
+    <string name="addWidgetCtaAutoLaunchButton">Додати віджет</string>
+    <string name="addWidgetCtaInstructionsLaunchButton">Показати</string>
+    <string name="addWidgetCtaDismissButton">Відхилити</string>
+    <string name="addWidgetInstructionsActivityTitle">Додати віджет</string>
+    <string name="addWidgetInstruction1Label">1</string>
+    <string name="addWidgetInstruction1">Тримайте натискання на головному екрані та відкрийте меню віджетів.</string>
+    <string name="addWidgetInstruction2Label">2</string>
+    <string name="addWidgetInstruction2">Знайдіть віджет DuckDuckGo.</string>
+    <string name="addWidgetInstruction3Label">3</string>
+    <string name="addWidgetInstruction3">Перетягніть віджет на домашній екран.</string>
+    <string name="addWidgetInstructionsButtonGoHome">Перейти на домашній екран</string>
+    <string name="addWidgetInstructionsButtonClose">Закрити</string>
+
+    <!-- App Enjoyment / Rating / Feedback -->
+    <string name="appEnjoymentDialogTitle">Чи подобається вам DuckDuckGo?</string>
+    <string name="appEnjoymentDialogMessage">Ми будемо раді почути вашу думку.</string>
+    <string name="appEnjoymentDialogPositiveButton">Мені подобається</string>
+    <string name="appEnjoymentDialogNegativeButton">Потрібні покращення</string>
+
+    <string name="rateAppDialogTitle">Оцініть додаток</string>
+    <string name="rateAppDialogMessage">Ваша думка важлива для нас. Будь ласка, залиште свій відгук.</string>
+    <string name="rateAppDialogPositiveButton">Оцінити додаток</string>
+    <string name="rateAppDialogNegativeButton" translatable="false">@string/noThanks</string>
+
+    <string name="giveFeedbackDialogTitle">Дуже шкода</string>
+    <string name="giveFeedbackDialogMessage">Є ідеї щодо розвитку додатка? Сповістіть нас!</string>
+    <string name="giveFeedbackDialogPositiveButton">Залиште нам відгук</string>
+    <string name="giveFeedbackDialogNegativeButton" translatable="false">@string/noThanks</string>
+
+    <string name="noThanks">Ні, дякую</string>
+
+    <!-- Notification Channel Names -->
+    <string name="notificationChannelTutorials">Посібники</string>
+
+    <!-- Clear Notification -->
+    <string name="clearNotificationTitle">Скинути дані вручну</string>
+    <string name="clearNotificationDescription">Налаштуйте DuckDuckGo для автоматичного скидання даних браузера після кожного сеансу.</string>
+
+    <!-- Privacy Protection Notification -->
+    <string name="privacyProtectionNotificationDefaultTitle">Ми захищаємо вашу конфіденційність</string>
+    <string name="privacyProtectionNotificationReportTitle">Ваш звіт про конфіденційність</string>
+    <string name="privacyProtectionNotificationDefaultDescription">Додаток DuckDuckGo захищає ваші дані, блокуючи трекери та шифруючи з\'єднання.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription" instruction="Placeholder is a the number of connections we have protected">Ви захистили свої дані, захищаючи %1$d незашифрованих з\'єднань при використанні DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationTrackerDescription" instruction="Placeholder is the numer of trackers blocked">Ви захистили свої дані, заблокувавши %1$d трекерів при використанні DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationBothDescription" instruction="%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections">Ви захистили свої дані, заблокувавши %1$d трекерів і захистивши %2$d незашифрованих з\'єднань при використанні DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationLaunchButton">Продовжити</string>
+
+    <!-- Authentication -->
+    <string name="authenticationDialogTitle">Увійти</string>
+    <string name="authenticationDialogMessage" instruction="Placeholder is the name of a website">Для входу на %1$s потрібні ім\'я користувача та пароль.</string>
+    <string name="authenticationDialogPositiveButton">Увійти</string>
+    <string name="authenticationDialogNegativeButton">Скасувати</string>
+    <string name="authenticationDialogUsernameHint">Ім\'я користувача</string>
+    <string name="authenticationDialogPasswordHint">Пароль</string>
+
+    <!-- User-facing label for when a user selects text and might want to search for that text -->
+    <string name="systemTextSearchMessage">Пошук в DuckDuckGo</string>
+
+    <!-- App feedback disambiguation -->
+    <string name="feedbackActivityTitle">Залиште нам відгук</string>
+    <string name="missingBrowserFeaturesTitleLong">Відсутні або неправильно працюють функції браузера</string>
+    <string name="missingBrowserFeaturesTitleShort">Проблеми з функціями браузера</string>
+    <string name="missingBrowserFeaturesSubtitle">Яку функцію браузера ми могли б додати або вдосконалити?</string>
+    <string name="missingBrowserFeatureSubReasonNavigation">Перехід вперед і назад та/або оновлення сторінки</string>
+    <string name="missingBrowserFeatureSubReasonTabManagement">Створення вкладок/управління вкладками</string>
+    <string name="missingBrowserFeatureSubReasonAdPopups">Блокування реклами та спливаючих вікон</string>
+    <string name="missingBrowserFeatureSubReasonVideos">Перегляд відео</string>
+    <string name="missingBrowserFeatureSubReasonImages">Робота з зображеннями</string>
+    <string name="missingBrowserFeatureSubReasonBookmarks">Створення закладок/управління закладками</string>
+    <string name="missingBrowserFeatureSubReasonOther">Нічого з переліченого</string>
+
+    <string name="websiteNotLoadingTitleLong">Проблеми з завантаженням сайтів</string>
+    <string name="websiteNotLoadingTitleShort">Проблеми з завантаженням сайтів</string>
+    <string name="websiteNotLoadingSubtitle">На якому сайті виникла проблема?</string>
+
+    <string name="searchNotGoodEnoughTitleLong">Пошук в DuckDuckGo не влаштовує</string>
+    <string name="searchNotGoodEnoughTitleShort">Проблеми з пошуком DuckDuckGo</string>
+    <string name="searchNotGoodEnoughSubtitle">Яку функцію пошуку ми могли б додати або вдосконалити?</string>
+    <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Програмування/технічний пошук</string>
+    <string name="searchNotGoodEnoughSubReasonGoogleLayout">Оформлення має бути більше схоже на пошук Google</string>
+    <string name="searchNotGoodEnoughSubReasonFasterLoadTimes">Прискорення завантаження</string>
+    <string name="searchNotGoodEnoughSubReasonSpecificLanguage">Пошук за конкретною мовою чи регіоном</string>
+    <string name="searchNotGoodEnoughSubReasonBetterAutocomplete">Покращення автозаповнення</string>
+    <string name="searchNotGoodEnoughSubReasonOther">Нічого з переліченого</string>
+
+    <string name="needMoreCustomizationTitleLong">Мало варіантів налаштувань під себе</string>
+    <string name="needMoreCustomizationTitleShort">Проблеми з користувацькою настройкою</string>
+    <string name="needMoreCustomizationSubtitle">Які елементи налаштувань ми могли б додати або вдосконалити?</string>
+    <string name="needMoreCustomizationSubReasonHomeScreenConfiguration">Конфігурація головного екрану</string>
+    <string name="needMoreCustomizationSubReasonTabDisplay">Формат відображення вкладок</string>
+    <string name="needMoreCustomizationSubReasonAppLooks">Інтерфейс додатка</string>
+    <string name="needMoreCustomizationSubReasonWhichDataIsCleared">Тип даних, які скидаються</string>
+    <string name="needMoreCustomizationSubReasonWhenDataIsCleared">Час скидання даних</string>
+    <string name="needMoreCustomizationSubReasonBookmarksDisplay">Формат відображення закладок</string>
+    <string name="needMoreCustomizationSubReasonOther">Нічого з переліченого</string>
+
+    <string name="appIsSlowOrBuggyTitleLong">Додаток працює занадто повільно, часто виникають помилки або збої</string>
+    <string name="appIsSlowOrBuggyTitleShort">Проблеми з продуктивністю</string>
+    <string name="appIsSlowOrBuggySubtitle">Які проблеми виникають у вас?</string>
+    <string name="appIsSlowOrBuggySubReasonSlowResults">Повільне завантаження сторінок чи результатів пошуку</string>
+    <string name="appIsSlowOrBuggySubReasonAppCrashesOrFreezes">Додаток виходить з ладу або зависає</string>
+    <string name="appIsSlowOrBuggySubReasonMediaPlayback">Відео або мультимедіа відтворюються з помилками</string>
+    <string name="appIsSlowOrBuggySubReasonOther">Нічого з переліченого</string>
+
+    <string name="otherMainReasonTitleLong">Нічого з переліченого</string>
+    <string name="otherMainReasonTitleShort">Інші проблеми</string>
+
+    <string name="openEndedInputHint">Опишіть якомога детальніше</string>
+    <string name="submitFeedback">Підтвердити</string>
+
+    <string name="tellUsHowToImprove">Чим ми можемо покращити?</string>
+    <string name="thanksForTheFeedback">Дякуємо за відгук!</string>
+    <string name="feedbackNegativeMainReasonPageSubtitle">Що саме вам не сподобалося?</string>
+    <string name="feedbackNegativeMainReasonPageTitle">Дуже шкода</string>
+    <string name="feedbackShareDetails">Додати коментар</string>
+    <string name="sharePositiveFeedbackWithTheTeam">Хочете додати коментар для нашої команди розробників?</string>
+    <string name="whatHaveYouBeenEnjoying">Що вам більше всього сподобалося?</string>
+    <string name="awesomeToHear">Приємно чути!</string>
+    <string name="shareTheLoveWithARating">Будь ласка, оцініть наше додаток в Play Store.</string>
+    <string name="rateTheApp">Оцінити додаток</string>
+    <string name="declineFurtherFeedback">Ні, дякую</string>
+    <string name="whichBrokenSites">Де виникають ці проблеми?</string>
+    <string name="whichBrokenSitesHint">На якому сайті виникли проблеми?</string>
+    <string name="feedbackSpecificAsPossible">Опишіть якомога детальніше</string>
+    <string name="feedbackInitialDisambiguationTitle">Отже, почнемо!</string>
+    <string name="feedbackInitialDisambiguationSubtitle">До якої категорії ви б віднесли свій відгук?</string>
+    <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Кнопка позитивного відгуку</string>
+    <string name="feedbackInitialDisambiguationSadButtonContentDescription">Кнопка відгуку про проблеми</string>
+    <string name="feedbackIsImportantToUs">Ваш відгук важливий для нас. Він абсолютно анонімний.</string>
+
+    <!-- Webview Recovery -->
+    <string name="crashedWebViewErrorMessage">Неможливо відобразити сторінку.</string>
+    <string name="crashedWebViewErrorAction">Перезавантажити</string>
+
+    <!-- System Search-->
+    <string name="systemSearchDeviceAppLabel">З цього пристрою</string>
+    <string name="systemSearchAppNotFound">Додаток не знайдено</string>
+    <string name="systemSearchOnboardingText">Дякуємо, що обрали DuckDuckGo!\nТепер інформація про ваші пошукові запити під надійним захистом.</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">Додаток DuckDuckGo також:</string>
+    <string name="systemSearchOnboardingFeatureOneText">Блокує небезпечні трекери.</string>
+    <string name="systemSearchOnboardingFeatureTwoText">Примусово використовує шифрування на сайтах.</string>
+    <string name="systemSearchOnboardingFeatureThreeText">Видаляє дані в одне натискання.</string>
+    <string name="systemSearchOnboardingButtonMore">Докладніше</string>
+    <string name="systemSearchOnboardingButtonLess">Сховати</string>
+    <string name="systemSearchOnboardingButtonOk">Зрозуміло</string>
+
+    <!-- Dax Dialog -->
+    <string name="daxDialogHideButton">Сховати</string>
+    <string name="daxDialogPhew">Уф!</string>
+    <string name="daxDialogNext">Далі</string>
+    <string name="daxDialogHighFive">Дай п\'ять!</string>
+    <string name="daxDialogGotIt">Зрозуміло</string>
+    <string name="hideTipsTitle">Сховати інші поради?</string>
+    <string name="hideTipsText">Їх не багато, і ми намагалися зробити їх інформативними.</string>
+    <string name="hideTipsButton">Сховати поради назавжди</string>
+
+    <!-- AppTP Retention Experiment Dax Dialog -->
+    <string name="daxDialogAppTpRetentionText"><![CDATA[Тепер ви блокуєте трекери в Інтернеті 🎉<br/><br/>Можна також блокувати трекери в інших додатках, навіть коли ви не користуєтеся телефоном.]]></string>
+    <string name="daxDialogAppTpRetentionPrimaryButtonText">Увімкнути захист від слідкування</string>
+    <string name="daxDialogAppTpRetentionSecondaryButtonText">Не зараз</string>
+
+    <!-- New Onboarding Experience -->
+    <string name="onboardingWelcomeTitle">Ласкаво просимо в DuckDuckGo!</string>
+    <string name="onboardingDaxText"><![CDATA[Інтернет набитий трекерами.<br/><br/>Але виходить, це простіше, ніж ви думали. Використовуйте мережу без стеження за вами.]]></string>
+    <string name="onboardingLetsDoItButton">Почнемо!</string>
+    <string name="daxIntroCtaText"><![CDATA[А тепер спробуйте відвідати улюблений сайт!<br/><br/>Ми блокуватимемо трекери, перешкоджаючи стеженню. І навіть намагатимемося підвищити безпеку з\'єднання 🔒]]></string>
+    <string name="daxEndCtaText"><![CDATA[Просто так! Бродження по сайтах з нами — це відсіч нав\'язливій рекламі. 👍]]></string>
+    <string name="daxSerpCtaText">Ваші пошукові запити в DuckDuckGo анонімні. Завжди.</string>
+    <plurals name="daxTrackersBlockedCtaText">
+        <item quantity="one"><![CDATA[ і <b>ще %1$d сервіс</b> намагався стежити за вами.<br/><br/>Але ми його заблокували!<br/><br/> ☝️ Заходячи на новий сайт, завжди можете перевірити, чи слідкують за вами: просто подивіться в адресний рядок.]]></item>
+        <item quantity="few"><![CDATA[ і <b>ще %1$d сервіси</b> намагалися стежити за вами.<br/><br/>Але ми їх заблокували!<br/><br/> ☝️ Заходячи на новий сайт, завжди можете перевірити, чи слідкують за вами: просто подивіться в адресний рядок.]]></item>
+        <item quantity="many"><![CDATA[ і <b>ще %1$d сервісів</b> намагалися стежити за вами.<br/><br/>Але ми їх заблокували!<br/><br/> ☝️ Заходячи на новий сайт, завжди можете перевірити, чи слідкують за вами: просто подивіться в адресний рядок.]]></item>
+        <item quantity="other"><![CDATA[ і <b>ще %1$d сервіси</b> намагалися стежити за вами.<br/><br/>Але ми їх заблокували!<br/><br/> ☝️ Заходячи на новий сайт, завжди можете перевірити, чи слідкують за вами: просто подивіться в адресний рядок.]]></item>
+    </plurals>
+    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ намагався стежити за вами. <br/><br/>Але ми його заблокували!<br/><br/> ☝️ Заходячи на новий сайт, завжди можете перевірити, чи слідкують за вами: просто подивіться в адресний рядок.]]></item>
+        <item quantity="few"><![CDATA[ намагалися стежити за вами. <br/><br/>Але ми їх заблокували!<br/><br/> ☝️ Заходячи на новий сайт, завжди можете перевірити, чи слідкують за вами: просто подивіться в адресний рядок.]]></item>
+        <item quantity="many"><![CDATA[ намагалися стежити за вами. <br/><br/>Але ми їх заблокували!<br/><br/> ☝️ Заходячи на новий сайт, завжди можете перевірити, чи слідкують за вами: просто подивіться в адресний рядок.]]></item>
+        <item quantity="other"><![CDATA[ намагалися стежити за вами. <br/><br/>Але ми їх заблокували!<br/><br/> ☝️ Заходячи на новий сайт, завжди можете перевірити, чи слідкують за вами: просто подивіться в адресний рядок.]]></item>
+    </plurals>
+    <string name="daxNonSerpCtaText"><![CDATA[Ви натискайте кнопки і перегортаєте сторінки — ми блокуємо трекери. <br/><br/>Користуйтеся сайтами без страху!]]></string>
+    <string name="daxMainNetworkCtaText" instruction="%1$s — це назва компанії, %2$s — це веб-сайт, де відбувається слідкування, %3$s — це назва компанії, що вказана в %1$s">Увага! Ми не можемо приховати вашу активність на %2$s від %1$s.&lt;br/&gt;&lt;br/&gt;Використовуйте наш браузер, і ми скоротимо обсяг інформації, яку збирають про вас трекери %3$s на інших сайтах.</string>
+    <string name="daxMainNetworkOwnedCtaText" instruction="%1$s — це назва компанії, %2$s — це веб-сайт, де відбувається слідкування, %3$s — це назва компанії, що вказана в %1$s">Увага! Оскільки %2$s належить мережі %1$s, ми не можемо приховати вашу активність на цьому ресурсі.&lt;br/&gt;&lt;br/&gt;Використовуйте наш браузер, і ми скоротимо обсяг інформації, яку збирають про вас трекери %3$s на інших сайтах.</string>
+    <!-- Onboarding DDG Feature Options -->
+    <string name="onboardingFeatureOptionsTitle">Що привернуло вашу увагу в DuckDuckGo?</string>
+    <string name="onboardingFeatureOptionsContinue">Продовжити</string>
+    <string name="onboardingFeatureOptionsSkip">Пропустити цей крок</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionPrivateSearch">Конфіденційний пошук</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionTrackerBlocking">Блокування трекерів</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionSmallerDigitalFootprint">Менший цифровий слід</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionFasterPageLoads">Прискорена завантаження сторінок</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionFewerAds">Менше реклами</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionOneClickDataClearing">Очищення даних одним кліком</string>
+
+    <!-- Download Confirmation -->
+    <string name="downloadConfirmationContinue">Зберегти в «Завантаження»</string>
+    <string name="downloadConfirmationSaveFileTitle" instruction="Placeholder is the name of a file">Зберегти %1$s</string>
+    <string name="downloadConfirmationKeepBothFilesText">Залишити обидва</string>
+    <string name="downloadConfirmationReplaceOldFileText">Замінити</string>
+    <string name="downloadConfirmationOpenFileText">Відкрити</string>
+    <string name="downloadConfirmationUnableToOpenFileText">Не вдалося відкрити файл</string>
+    <string name="downloadConfirmationUnableToDeleteFileText">Проблема з видаленням старого файлу</string>
+
+    <!-- Change Icon Activity -->
+    <string name="changeIconActivityTitle">Значок додатка</string>
+    <string name="changeIconCtaLabel">Значок додатка</string>
+    <string name="changeIconCtaAccept">Застосувати</string>
+    <string name="changeIconCtaCancel">Скасувати</string>
+    <string name="changeIconDialogTitle">Застосувати новий значок?</string>
+    <string name="changeIconDialogMessage">Додаток може закритися для застосування змін. Повертайтеся, коли насолоджуватиметесь новим значком.</string>
+
+    <!-- New dashboard / menu buttons -->
+    <string name="manageAllowlist">Незахищені сайти</string>
+    <string name="reportBrokenSite">Повідомити про неробочий сайт</string>
+
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Додати</string>
+    <string name="dialogEditTitle">Редагувати</string>
+    <string name="dialogSaveAction">Зберегти</string>
+
+    <!-- Allowlist -->
+    <string name="allowlistActivityTitle">Незахищені сайти</string>
+    <string name="enablePrivacyProtection">Увімкнути захист конфіденційності</string>
+    <string name="disablePrivacyProtection">Вимкнути захист конфіденційності</string>
+    <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Додаткові параметри для незахищеного сайту %1$s</string>
+    <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Ви впевнені, що хочете видалити &lt;b&gt;%1$s&lt;/b&gt; зі списку незахищених сайтів?</string>
+    <string name="allowlistExplanation">Сайти без захисту конфіденційності.</string>
+    <string name="allowlistNoEntries">Захист конфіденційності увімкнений для всіх сайтів</string>
+    <string name="allowlistDomainHint">www.example.com</string>
+    <string name="allowlistFormatError">Введіть доменне ім\'я, наприклад, <b>example.com</b>, і повторіть спробу</string>
+
+    <!-- Settings -->
+    <string name="settingsPrivacyProtectionAllowlist">Незахищені сайти</string>
+
+    <!-- Fireproof websites -->
+    <string name="fireproofWebsitesActivityTitle">Вогнестійкі сайти</string>
+    <string name="settingsFireproofWebsites">Вогнестійкі сайти</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Зробити вогнестійким</string>
+    <string name="fireproofWebsiteSnackbarConfirmation" instruction="Placeholder is a website">&lt;b&gt;%1$s&lt;/b&gt; тепер вогнестійкий</string>
+    <string name="fireproofWebsiteSnackbarAction">Скасувати</string>
+    <string name="fireproofWebsiteDeleteConfirmMessage" instruction="Placeholder is a website">Ви впевнені, що хочете видалити &lt;b&gt;%1$s&lt;/b&gt;?</string>
+    <string name="fireproofWebsiteFeatureDescription">Щоб вам не доводилося кожен раз входити в свій обліковий запис, сайти використовують файли cookie. Якщо зробити сайт вогнестійким, ми не будемо видаляти його файли cookie, навіть якщо ви скористаєтеся кнопкою «Пожежа». Але ми все ще будемо блокувати сторонні трекери, в тому числі на вогнестійких сайтах.</string>
+    <string name="fireproofWebsiteOverflowContentDescription" instruction="Placeholder is a website">Додаткові параметри для вогнестійкого сайту %1$s</string>
+    <string name="fireproofWebsiteLoginDialogTitle" instruction="Placeholder is a website">Зробити сайт %1$s вогнестійким?</string>
+    <string name="fireproofWebsiteLoginDialogDescription">Вам не доведеться знову входити в свій обліковий запис навіть після використання кнопки «Пожежа».</string>
+    <string name="fireproofWebsiteLoginDialogPositive">Зробити</string>
+    <string name="fireproofWebsiteLoginDialogNegative">Не зараз</string>
+    <string name="fireproofWebsiteItemsSectionTitle">Вогнестійкі сайти</string>
+    <string name="fireproofWebsiteEmptyListHint">Вогнестійких сайтів немає</string>
+    <string name="fireproofWebsiteSettingSelectionTitle">Вогнестійкість при вході</string>
+    <string name="fireproofWebsiteRemoveAllConfirmation">Вогнестійкість скасована для всіх сайтів</string>
+    <string name="fireproofWebsiteRemovalConfirmation" instruction="Placeholder is a website">З сайту &lt;b&gt;%1$s&lt;/b&gt; знята вогнестійкість</string>
+    <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Питати кожен раз</string>
+    <string name="fireproofWebsiteSettingsSelectionDialogAlways">Завжди</string>
+    <string name="fireproofWebsiteSettingsSelectionDialogNever">Ніколи</string>
+    <string name="disableLoginDetectionDialogTitle">Вимкнути нагадування про вогнестійкість при вході на сайти?</string>
+    <string name="disableLoginDetectionDialogDescription">Це уподобання можна змінити в будь-який час в розділі «Налаштування».</string>
+    <string name="disableLoginDetectionDialogPositive">Вимкнути</string>
+    <string name="disableLoginDetectionDialogNegative">Скасувати</string>
+    <string name="automaticFireproofWebsiteLoginDialogTitle">Автоматично робити сайти вогнестійкими при вході?</string>
+    <string name="automaticFireproofWebsiteLoginDialogDescription">Вогнестійкість означає, що вам не доведеться знову входити в обліковий запис навіть після використання кнопки «Пожежа». Цю опцію завжди можна змінити в розділі «Налаштування». </string>
+    <string name="automaticFireproofWebsiteLoginDialogFirstOption">Постійна вогнестійкість</string>
+    <string name="automaticFireproofWebsiteLoginDialogSecondOption">Захистити цей сайт</string>
+    <string name="automaticFireproofWebsiteLoginDialogThirdOption">Не зараз</string>
+
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Анімація кнопки «Вогонь»</string>
+    <string name="settingsHeroFireAnimation">Інферно</string>
+    <string name="settingsHeroWaterAnimation">Водоворот</string>
+    <string name="settingsHeroAbstractAnimation">Повітряний потік</string>
+    <string name="settingsNoneAnimation">Нічого</string>
+    <string name="settingsSelectFireAnimationDialog">Анімація кнопки «Вогонь»</string>
+    <string name="settingsSelectFireAnimationDialogSave">Зберегти</string>
+
+    <!-- Dos Attack error-->
+    <string name="dosErrorMessage">З\'єднання перервано. Цей сайт може завдати шкоди вашому пристрою.</string>
+
+    <!-- Precise Location -->
+    <string name="preciseLocationSystemDialogTitle">Увімкнути визначення геопозиції пристрою для браузера DuckDuckGo з захистом даних?</string>
+    <string name="preciseLocationSystemDialogSubtitle" instruction="%1$s and %2$s are both the name of the website requesting the location">%1$s запитує геопозицію вашого пристрою. Спочатку вам потрібно дозволити додатку відправляти геопозицію пристрою, а потім %2$s зможе запитувати дозвіл.</string>
+    <string name="preciseLocationSystemDialogAllow">Увімкнути</string>
+    <string name="preciseLocationSystemDialogDeny">Пізніше</string>
+    <string name="preciseLocationSystemDialogNeverAllow">Більше не питати для цього сайту</string>
+    <string name="preciseLocationSiteDialogTitle" instruction="Placeholder is the name of a website">Надати доступ %1$s до геопозиції?</string>
+    <string name="preciseLocationDDGDialogSubtitle">Анонімна геопозиція дозволяє отримати більш точні результати поруч. Ви завжди зможете змінити цей параметр пізніше.</string>
+    <string name="preciseLocationSiteDialogSubtitle">Ви можете управляти дозволами на доступ до геопозиції, які ви надали окремим сайтам, в налаштуваннях.</string>
+    <string name="preciseLocationSiteDialogAllowAlways">Завжди</string>
+    <string name="preciseLocationSiteDialogAllowOnce">Лише для цієї сесії</string>
+    <string name="preciseLocationSiteDialogDenyAlways">Завжди відмовляти</string>
+    <string name="preciseLocationSiteDialogDenyOnce">Відмовити на цю сесію</string>
+    <string name="preciseLocationFeatureDescription">Сайти, які ви відвідуєте, можуть запитувати інформацію про геопозицію вашого пристрою. Вони не зможуть отримати доступ до неї, доки ви не надасте дозвіл. DuckDuckGo використовує вашу геопозицію анонімно для надання результатів місцевого пошуку.</string>
+    <string name="preciseLocationToggleText">Сайти можуть запитувати моє місцезнаходження</string>
+    <string name="preciseLocationEmptyListHint">Жодному сайту не надано дозвіл на доступ до геопозиції</string>
+    <string name="preciseLocationNoSystemPermission">Щоб управляти доступом до геопозиції, який ви надали окремим сайтам, увімкніть визначення геопозиції для цього додатка в налаштуваннях Android.</string>
+    <string name="preciseLocationActivityTitle">Геопозиція</string>
+    <string name="preciseLocationDeleteConfirmMessage" instruction="Placeholder is the name of a website">Ви впевнені, що хочете видалити &lt;b&gt;%1$s&lt;/b&gt;?</string>
+    <string name="preciseLocationDeleteContentDescription" instruction="Placeholder is the domain of a website">Додаткові параметри доступу до геопозиції в домені %1$s</string>
+    <string name="preciseLocationAllowedSitesSectionTitle">Надано</string>
+    <string name="preciseLocationDeniedSitesSectionTitle">Відмовлено</string>
+    <string name="preciseLocationSnackbarMessage" instruction="Placeholder is the name of a website">Раніше ви надавали %1$s дозвіл на доступ до геопозиції вашого пристрою.</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">В браузері можуть накопичуватися особисті дані. Фу! Використовуйте кнопку «Вогонь», щоб спалити увесь зайвий сміття. Спробуйте самі! 👇</string>
+
+    <!-- Global Privacy Control-->
+    <string name="globalPrivacyControlActivityTitle">Глобальний контроль конфіденційності (GPC)</string>
+    <string name="globalPrivacyControlDescription"><![CDATA[DuckDuckGo блокує багато трекерів автоматично. Функція «Глобальний контроль конфіденційності» (GPC) дозволяє вимагати від учасників програми сайтів зупинити передачу та продаж вашої особистої інформації іншим компаніям. <u><a href=\"\">Докладніше…</a><u/>]]></string>
+    <string name="globalPrivacyControlSetting">Глобальний контроль конфіденційності (GPC)</string>
+    <string name="globalPrivacyControlToggle">Глобальний контроль конфіденційності (GPC)</string>
+    <string name="disabled">Вимкнено</string>
+    <string name="enabled">Увімкнено</string>
+
+    <!-- Opening app links -->
+    <string name="settingTitleOpenLinksInAssociatedApps">Відкривати посилання в пов\'язаних додатках</string>
+    <string name="settingSubtitleOpenLinksInAssociatedApps">Вимкнення цієї функції не дозволить посиланням автоматично відкриватися в інших додатках.</string>
+    <string name="appLinkDialogTitle">Відкрити в іншому додатку?</string>
+    <string name="appLinkSnackBarAction">Відкрити в додатку</string>
+    <string name="appLinkMultipleSnackBarAction">Вибрати додаток</string>
+    <string name="appLinkSnackBarMessage" instruction="Placeholder is the name of an app">Це посилання можна відкрити в %1$s.</string>
+    <string name="appLinkMultipleSnackBarMessage">Це посилання можна відкрити в інших додатках.</string>
+    <string name="appLinkIntentChooserTitle">Відкрити в</string>
+    <string name="appLinkMenuItemTitle">Відкрити в додатку</string>
+
+    <!-- Email Autofill -->
+    <string name="aliasToClipboardMessage">Нова адреса скопійована в буфер обміну</string>
+    <string name="newEmailAliasMenuTitle">Створити адресу Duck</string>
+
+    <!-- Autofill -->
+    <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Перегляд</string>
+    <string name="autofillLoginSavedSnackbarMessage">Логін збережено</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Логін оновлено</string>
+
+    <!-- Waitlist Notification -->
+    <string name="waitlistNotificationDialogDescription">Хочете отримати повідомлення, коли настане ваш черговий момент?</string>
+    <string name="waitlistNotificationDialogNoThanks">Ні, дякую</string>
+    <string name="waitlistNotificationDialogNotifyMe">ПОВІДОМИТИ</string>
+
+    <!-- Email Protection -->
+    <string name="emailProtectionActivityTitle">Захист електронної пошти (бета)</string>
+    <string name="emailNotSupported">Пристрій не підтримується</string>
+    <string name="emailNotSupportedExplanation">Функція захисту електронної пошти дозволяє створювати закриті адреси електронної пошти, де трекери в листах видаляються. Нам необхідно шифрувати такі адреси і зберігати їх локально на вашому пристрої. Оскільки цей пристрій не підтримує зберігання зашифрованої інформації, ви не зможете скористатися захистом електронної пошти.</string>
+
+    <!-- Bookmark folders -->
+    <string name="bookmarkDialogTitleEdit">Редагувати закладку</string>
+    <string name="favoriteDialogTitleEdit">Змінити обране</string>
+    <string name="locationLabel">Геопозиція</string>
+    <string name="folderLocationTitle">Виберіть геопозицію</string>
+    <string name="addFolder">Додати папку</string>
+    <string name="editFolder">Змінити папку</string>
+    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Видалити папку разом з вмістом?"</string>
+    <string name="bookmarkFolderDeleteDialogMessage">"Дійсно видалити "</string>
+    <string name="bookmarkFolderEmpty">Порожньо</string>
+
+    <plurals name="bookmarkFolderDeleteDialogMessage">
+        <item quantity="one">%1$s%2$s і ще %3$d об\'єкт?</item>
+        <item quantity="few">%1$s%2$s і ще %3$d об\'єкта?</item>
+        <item quantity="many">%1$s%2$s і ще %3$d об\'єктів?</item>
+        <item quantity="other">%1$s%2$s і ще об\'єкти (%3$d)?</item>
+    </plurals>
+
+    <plurals name="bookmarkFolderItems">
+        <item quantity="one">%1$d об\'єкт</item>
+        <item quantity="few">%1$d об\'єкта</item>
+        <item quantity="many">%1$d об\'єктів</item>
+        <item quantity="other">%1$d об\'єкта</item>
+    </plurals>
+
+    <!-- Accessibility-->
+    <string name="settingsAccessibility">Універсальний доступ</string>
+    <string name="accessibilityActivityTitle">Універсальний доступ</string>
+    <string name="accessibilityFontSizeTitle">Розмір тексту</string>
+    <string name="accessibilityFontSizeHint">Потягніть повзунок, щоб вибрати приємний для очей вид. Вигляд сайтів, які ви переглядаєте в DuckDuckGo, буде відповідно змінено автоматично.</string>
+    <string name="accessibilityForceZoomTitle">Масштабування вручну</string>
+    <string name="accessibilityForceZoomSubtitle">Використовуйте жести масштабування на будь-якому сайті, навіть якщо він зазвичай їх не підтримує</string>
+    <string name="accessibilityTextSizeOverrideTitle">Розмір тексту</string>
+    <string name="accessibilityTextSizeOverrideSubtitle">DuckDuckGo скоригує розмір тексту на сайтах згідно з налаштуванням нижче</string>
+
+    <!-- Privacy Policy -->
+    <string name="settingsPrivacyPolicyDuckduckgo">Політика конфіденційності</string>
+
+    <!-- Home Screen Widget -->
+    <string name="homeScreenWidgetAdded" instruction="Placeholder is the name of the widget">Віджет %1$s доданий на головний екран</string>
+    <string name="settingsAddHomeScreenWidget">Віджет для головного екрану</string>
+
+    <!-- MacOs Settings -->
+    <string name="macos_settings_description">Повна конфіденційність в Інтернеті завдяки нашому додатку для Mac</string>
+    <string name="macos_settings_title">Додаток DuckDuckGo для Mac</string>
+
+    <!-- Downloads -->
+    <string name="downloadsMenuItem">Завантаження</string>
+    <string name="downloadsActivityTitle">Завантаження</string>
+    <string name="downloadsActivityNoItemsDescription">Поки що нічого не завантажено</string>
+    <string name="downloadsShareTitle">Поділитися з…</string>
+    <string name="downloadsDownloadFinishedActionName">Відкрити</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Не вдається відкрити файл. Спробуйте знайти сумісну програму.</string>
+    <string name="downloadsFileNotFoundErrorMessage">Файл більше не існує</string>
+    <string name="downloadsItemMenuShare">Поділитися</string>
+    <string name="downloadsItemMenuDelete">Видалити</string>
+    <string name="downloadsItemMenuCancel">Скасувати</string>
+    <string name="downloadsActivityMenuDeleteAll">Видалити все</string>
+    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Видалено %1$s</string>
+    <string name="downloadsAllFilesDeletedMessage">Всі файли видалено</string>
+    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Інші опції для %1$s</string>
+    <string name="downloadsUndoActionName">Скасувати</string>
+    <string name="downloadsStateInProgress">Виконується…</string>
+
+    <!-- App Tracking Protection -->
+    <string name="atp_SettingsTitle">Блокування відстеження додатками</string>
+    <string name="atp_SettingsDeviceShieldNeverEnabled">Блокуйте трекери додатків на своєму пристрої</string>
+    <string name="atp_SettingsDeviceShieldEnabled">Увімкнено</string>
+    <string name="atp_SettingsDeviceShieldDisabled">Вимкнено</string>
+
+    <!-- Autoconsent -->
+    <!-- smartling.character_limit = 82 -->
+    <string name="autoconsentDialogTitle"><![CDATA[<b>Автоматично закривати спливаючі вікна з повідомленнями про файли cookie?</b>]]></string>
+    <!-- smartling.character_limit = 160 -->
+    <string name="autoconsentDialogDescription">На скільки це можливо, будуть вибиратися найбільш обмежувальні параметри, і такі вікна будуть автоматично закриватися.</string>
+    <!-- smartling.character_limit = 42 -->
+    <string name="autoconsentPrimaryCta">Обробляти спливаючі вікна</string>
+    <!-- smartling.character_limit = 42 -->
+    <string name="autoconsentSecondaryCta">Ні, я буду керувати ними самостійно</string>
+
+    <string name="autoconsentSetting">Керування вікнами вибору файлів cookie</string>
+    <string name="autoconsentCosmeticNoticeAnimationText">Спливаюче вікно приховано</string>
+    <string name="autoconsentManagedNoticeAnimationText">Файли cookie вибрано</string>
+
+    <!-- Site Permissions Settings -->
+    <string name="settingsSitePermissions">Дозволи для сайтів</string>
+    <string name="sitePermissionsSettingsDescription">Сайти, які ви відвідуєте, можуть запитувати доступ до геопозиції, камери, мікрофону чи програм DRM (захисту авторських прав) вашого пристрою. Доступ надається тільки за вашого дозволу.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Дозволити всім сайтам запитувати:</string>
+    <string name="sitePermissionsSettingsLocation">Геопозиція</string>
+    <string name="sitePermissionsSettingsCamera">Камера</string>
+    <string name="sitePermissionsSettingsMicrophone">Мікрофон</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Керування сайтами</string>
+    <string name="sitePermissionsSettingsEmptyText">Поки немає сайтів</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Дозволи видалено для всіх сайтів</string>
+    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Дозволи для «%1$s» </string>
+    <string name="permissionsPerWebsiteAskSetting">Запитувати</string>
+    <string name="permissionsPerWebsiteDenySetting">Відмовити</string>
+    <string name="permissionsPerWebsiteAllowSetting">Дозволити</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">«Запитати» вимкнено для всіх сайтів</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">Дозвіл на доступ %2$s до %1$s</string>
+
+    <!-- Notify Me View on Downloads -->
+    <string name="downloadsNotifyMeTitle">Повідомлення про завершення завантажень</string>
+    <string name="downloadsNotifyMeSubtitle">Отримуйте повідомлення після завершення завантажень.</string>
+
+    <!-- Windows Settings -->
+    <string name="windows_settings_title">Додаток DuckDuckGo для Windows</string>
+    <string name="windows_settings_description">Повна конфіденційність в Інтернеті завдяки нашому додатку для Windows</string>
+    <string name="windows_settings_description_ready">Готово до завантаження</string>
+    <string name="windows_settings_description_list">Тепер ви у списку!</string>
+
+    <!-- Full screen message-->
+    <string name="fullScreenMessage">Щоб вийти з повноекранного режиму, потягніть верхній край екрана вниз та натисніть кнопку «Назад».</string>
+
+    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Закрити всі вкладки?</string>
+    <string name="closeAppTabsConfirmationDialogDescription">Ви точно хочете закрити всі вкладки?</string>
+    <string name="closeAppTabsConfirmationDialogCancel">Скасувати</string>
+    <string name="closeAppTabsConfirmationDialogClose">Закрити</string>
+
+    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
+    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Видалити цю закладку?</string>
+    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">Закладка на &lt;b&gt;«%1$s»&lt;/b&gt; буде видалена.</string>
+    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Видалити сайт з обраних?</string>
+    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Сайт &lt;b&gt;%1$s&lt;/b&gt; буде видалений з обраних.</string>
+    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Видалити цю теку закладок?</string>
+    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Тека &lt;b&gt;«%1$s»&lt;/b&gt; буде видалена.</string>
+    <string name="deleteSavedSiteConfirmationDialogCancel">Скасувати</string>
+    <string name="deleteSavedSiteConfirmationDialogDelete">Видалити</string>
+
+    <!-- Private voice search -->
+    <string name="accessibilityVoiceSearchSubtitle">Додати опцію «Приватний голосовий пошук» в адресний рядок. Ваш голосовий запит не зберігається і нікуди не передається, навіть в DuckDuckGo.</string>
+    <string name="accessibilityVoiceSearchTitle">Конфіденційний голосовий пошук</string>
+
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">Немає доступу до камери</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">Завантаження зображення</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Вибрати файл</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Зняти фото</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Дозволити DuckDuckGo запитувати доступ до камери на цьому пристрої</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Якщо ви дозволите DuckDuckGo запитувати доступ, сайти зможуть використовувати камеру.</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">Відкрити Налаштування</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">Скасувати</string>
+</resources>
