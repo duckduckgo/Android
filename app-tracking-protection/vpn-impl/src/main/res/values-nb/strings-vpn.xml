@@ -219,7 +219,6 @@
         <item quantity="one">App</item>
         <item quantity="other">Apper</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Denne funksjonen er i beta. Har du lagt merke til et problem med en app? <annotation type="app_settings_link">Rapporter et problem.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection er deaktivert</b>\nHar appsporingsbeskyttelse forårsaket et problem med appene dine? <annotation type="report_issues_link">Rapporter problemer</annotation></string>
     <string name="atp_ActivityDisabledBySystemLabel"><b>Android deaktiverte App Tracking Protection</b>. Vil du forhindre at dette skjer igjen? <annotation type="re_enable_link">Aktiver på nytt</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>App Tracking Protection er deaktivert.</b>\nEn VPN-app på enheten din kan ha deaktivert den. Bruk bryteren ovenfor for å aktivere på nytt.</string>
@@ -414,7 +413,6 @@
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Beskyttelse deaktivert</string>
     <string name="atp_ExcludedAppsFilterMenuAllLabel">Alle</string>
     <string name="atp_ActivityViewAppsLabel">Vis apper</string>
-    <string name="atp_ActivityEnabledMoreThanADayLabel">Denne funksjonen er i beta. Har du problemer med en app? <annotation type="app_settings_link"> Hjelp oss å bli bedre</annotation></string>
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Noen apper kan få problemer når App Tracking Protection er aktivert.\n<annotation type="learn_why_link">Finn ut hvorfor</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Beskyttelse er deaktivert for apper med kjente problemer. Du kan aktivere disse appene, men de fungerer kanskje ikke som forventet. <annotation type="learn_why_link">Finn ut hvorfor</annotation></string>
 

@@ -219,7 +219,6 @@
         <item quantity="one">Alkalmazás</item>
         <item quantity="other">Alkalmazások</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Ez a funkció bétaverzióban van. Problémáid vannak egy alkalmazással? <annotation type="app_settings_link">Jelentsd a hibát.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>Az alkalmazáskövetés elleni védelem le van tiltva</b> Okozott problémát az alkalmazáskövetés elleni védelem az Ön alkalmazásainál? <annotation type="report_issues_link">Problémák jelentése</annotation></string>
     <string name="atp_ActivityDisabledBySystemLabel"><b>Az Android kikapcsolta az alkalmazáskövetés elleni védelmet</b>. Meg szeretnéd akadályozni, hogy ez újra megtörténjen? <annotation type="re_enable_link">Újbóli engedélyezés</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>Az alkalmazáskövetés elleni védelem ki van kapcsolva.</b>\nElőfordulhat, hogy az eszközödön lévő VPN alkalmazás letiltotta. Az újbóli engedélyezéshez használd a fenti váltógombot.</string>
@@ -414,7 +413,6 @@
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Védelem letiltva</string>
     <string name="atp_ExcludedAppsFilterMenuAllLabel">Összes</string>
     <string name="atp_ActivityViewAppsLabel">Alkalmazások megtekintése</string>
-    <string name="atp_ActivityEnabledMoreThanADayLabel">Ez a funkció béta verzióban van. Problémáid vannak egy alkalmazással? <annotation type="app_settings_link">Segíts a fejlesztésben</annotation></string>
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Egyes alkalmazásoknál problémák merülhetnek fel, ha az alkalmazáskövetés elleni védelem engedélyezve van.\n<annotation type="learn_why_link">Tudd meg, miért</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Az ismert problémákat tartalmazó alkalmazások védelme le van tiltva. Engedélyezheted ezeket az alkalmazásokat, de előfordulhat, hogy nem a várt módon működnek. <annotation type="learn_why_link">Tudd meg, miért</annotation></string>
 

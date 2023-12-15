@@ -219,7 +219,6 @@
         <item quantity="one">App</item>
         <item quantity="other">Appar</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Den här funktionen är på betastadiet. Har du upptäckt ett problem med en app? <annotation type="app_settings_link">Rapportera ett problem.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection är inaktiverat</b>\nHar App Tracking Protection orsakat problem med dina appar? <annotation type="report_issues_link">Rapportera problem</annotation></string>
     <string name="atp_ActivityDisabledBySystemLabel"><b>Android har inaktiverat App Tracking Protection</b>. Vill du förhindra att detta händer igen? <annotation type="re_enable_link">Återaktivera</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>App Tracking Protection är inaktiverat.</b>\nEn VPN-app på din enhet kan ha inaktiverat det. Använd reglaget ovan för att återaktivera skyddet.</string>
@@ -414,7 +413,6 @@
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Skydd inaktiverat</string>
     <string name="atp_ExcludedAppsFilterMenuAllLabel">Alla</string>
     <string name="atp_ActivityViewAppsLabel">Visa appar</string>
-    <string name="atp_ActivityEnabledMoreThanADayLabel">Den här funktionen är på betastadiet. Har du problem med en app? <annotation type="app_settings_link">Hjälp oss att bli bättre</annotation></string>
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Aktivering av App Tracking Protection kan leda till problem med vissa appar.\n<annotation type="learn_why_link">Läs om varför</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Skyddet är inaktiverat för appar med kända problem. Du kan aktivera det för dessa appar, men det kan leda till att apparna inte fungerar som de ska. <annotation type="learn_why_link">Läs om varför</annotation></string>
 

@@ -219,7 +219,6 @@
         <item quantity="one">Rakendus</item>
         <item quantity="other">Rakendused</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">See funktsioon on beetaversioonis. Kas märkad rakendusega probleeme? <annotation type="app_settings_link">Teata probleemist.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>Rakenduse jälgimise kaitse on välja lülitatud</b>\nKas rakenduse jälgimise kaitse põhjustas sinu rakendustega probleeme? <annotation type="report_issues_link">Probleemidest teavitamine</annotation></string>
     <string name="atp_ActivityDisabledBySystemLabel"><b>Android keelas rakenduste jälgimise kaitse</b>. Kas soovid selle kordumist vältida? <annotation type="re_enable_link">Luba uuesti</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>Rakenduse jälgimiskaitse on keelatud.</b>\nSinu seadmes olev VPN-rakendus võib olla selle keelanud. Uuesti lubamiseks kasuta ülaltoodud lülitit.</string>
@@ -414,7 +413,6 @@
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Kaitse on keelatud</string>
     <string name="atp_ExcludedAppsFilterMenuAllLabel">Kõik</string>
     <string name="atp_ActivityViewAppsLabel">Kuva rakendused</string>
-    <string name="atp_ActivityEnabledMoreThanADayLabel">See funktsioon on beetaversioonis. Kas sul on rakendusega probleeme? <annotation type="app_settings_link">Aita meil paremaks saada</annotation></string>
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Kui rakenduse jälgimiskaitse on lubatud, võib mõnes rakenduses tekkida probleeme.\n<annotation type="learn_why_link">Loe, miks</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Teadaolevate probleemidega rakenduste kaitse on keelatud. Võid need rakendused lubada, kuid need ei pruugi töötada ootuspäraselt. <annotation type="learn_why_link">Loe, miks</annotation></string>
 

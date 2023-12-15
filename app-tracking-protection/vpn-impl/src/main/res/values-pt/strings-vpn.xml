@@ -219,7 +219,6 @@
         <item quantity="one">Aplicação</item>
         <item quantity="other">Aplicações</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Esta funcionalidade está em versão beta. Detetaste algum problema com uma aplicação? <annotation type="app_settings_link">Comunica o problema.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>A App Tracking Protection está desativada</b>\nA App Tracking Protection causou um problema com as tuas aplicações? <annotation type="report_issues_link">Comunicar problemas</annotation></string>
     <string name="atp_ActivityDisabledBySystemLabel"><b>O Android desativou a App Tracking Protection</b>. Queres impedir que aconteça novamente? <annotation type="re_enable_link">Reativa</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>A App Tracking Protection está desativada.</b>\nÉ possível que uma aplicação de VPN no teu dispositivo tenha desativado a proteção. Usa o botão acima para reativar.</string>
@@ -414,7 +413,6 @@
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Proteção inativa</string>
     <string name="atp_ExcludedAppsFilterMenuAllLabel">Todos</string>
     <string name="atp_ActivityViewAppsLabel">Ver aplicações</string>
-    <string name="atp_ActivityEnabledMoreThanADayLabel">Esta funcionalidade está em versão beta. Estás a ter problemas com uma aplicação? <annotation type="app_settings_link">Ajuda-nos a melhorar</annotation></string>
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Algumas aplicações podem ter problemas quando a App Tracking Protection está ativa.\n<annotation type="learn_why_link">Sabe porquê</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">A proteção é desativada para aplicações com problemas conhecidos. Podes ativá-la para estas aplicações, mas podem não funcionar como esperado. <annotation type="learn_why_link">Sabe porquê</annotation></string>
 

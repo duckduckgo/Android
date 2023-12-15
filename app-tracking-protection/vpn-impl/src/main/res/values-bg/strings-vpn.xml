@@ -219,7 +219,6 @@
         <item quantity="one">Приложение</item>
         <item quantity="other">Приложения</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Тази функция е в бета версия. Установили сте проблем с някое приложение? <annotation type="app_settings_link">Моля, докладвайте за проблем.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection е деактивирана</b>\nApp Tracking Protection предизвиква ли проблеми с Вашите приложения? <annotation type="report_issues_link">Докладване на проблеми</annotation></string>
     <string name="atp_ActivityDisabledBySystemLabel"><b>Android деактивира App Tracking Protection</b>. Искате ли да предотвратите това, за да не се случва отново? <annotation type="re_enable_link">Повторно активиране</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>App Tracking Protection е деактивирана.</b>\nВъзможно е защитата да е деактивирана от VPN приложение, инсталирано на устройството. Използвайте превключвателя по-горе, за да я активирате отново.</string>
@@ -414,7 +413,6 @@
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Деактивирана защита</string>
     <string name="atp_ExcludedAppsFilterMenuAllLabel">Всички</string>
     <string name="atp_ActivityViewAppsLabel">Преглед на приложенията</string>
-    <string name="atp_ActivityEnabledMoreThanADayLabel">Тази функция е в бета версия. Имате проблеми с някое приложение? <annotation type="app_settings_link">Помогнете ни да подобрим защитата</annotation></string>
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">При някои приложения може да възникнат проблеми, когато защитата App Tracking Protection е активирана.\n<annotation type="learn_why_link">Научете защо</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Защитата е деактивирана за приложения с вече известни проблеми. Можете да активирате защитата за тези приложения, но те може да не работят според очакванията. <annotation type="learn_why_link">Научете защо</annotation></string>
 
