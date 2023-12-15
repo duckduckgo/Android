@@ -66,7 +66,7 @@ class NetworkProtectionStateImpl @Inject constructor(
         }
     }
 
-    override suspend fun disable() {
+    override suspend fun stop() {
         vpnFeaturesRegistry.unregisterFeature(NetPVpnFeature.NETP_VPN)
     }
 

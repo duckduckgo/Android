@@ -65,7 +65,7 @@ class NetpSubscriptionChecker @Inject constructor(
     }
 
     private suspend fun runChecker() {
-        if (networkProtectionState.isRunning()) {
+        if (networkProtectionState.isEnabled()) {
             logcat { "Sub check: Scheduling checker" }
             PeriodicWorkRequestBuilder<NetpSubscriptionCheckWorker>(20, MINUTES)
                 .addTag(TAG_WORKER_NETP_SUBS_CHECK)
@@ -79,14 +79,11 @@ class NetpSubscriptionChecker @Inject constructor(
                         this,
                     )
                 }
-        } else {
-            logcat { "Sub check: cancelling scheduled checker" }
-            workManager.cancelAllWorkByTag(TAG_WORKER_NETP_SUBS_CHECK)
         }
     }
 
     companion object {
-        private const val TAG_WORKER_NETP_SUBS_CHECK = "TAG_WORKER_NETP_SUBS_CHECK"
+        internal const val TAG_WORKER_NETP_SUBS_CHECK = "TAG_WORKER_NETP_SUBS_CHECK"
     }
 }
 
@@ -101,12 +98,18 @@ class NetpSubscriptionCheckWorker(
     @Inject
     lateinit var netpSubscriptionManager: NetpSubscriptionManager
 
+    @Inject
+    lateinit var workManager: WorkManager
+
     override suspend fun doWork(): Result {
         logcat { "Sub check: checking entitlement" }
-        if (!netpSubscriptionManager.hasValidSubscription() && networkProtectionState.isRunning()) {
+        if (!netpSubscriptionManager.hasValidEntitlement() && networkProtectionState.isEnabled()) {
             logcat { "Sub check: disabling" }
-            networkProtectionState.disable()
+            networkProtectionState.stop()
             // TODO: Show notif
+        } else if (!networkProtectionState.isEnabled()) {
+            logcat { "Sub check: cancelling scheduled checker" }
+            workManager.cancelAllWorkByTag(NetpSubscriptionChecker.TAG_WORKER_NETP_SUBS_CHECK)
         }
         return Result.success()
     }

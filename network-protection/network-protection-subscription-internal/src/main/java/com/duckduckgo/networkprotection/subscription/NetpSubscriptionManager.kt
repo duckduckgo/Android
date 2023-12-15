@@ -25,7 +25,7 @@ import kotlinx.coroutines.withContext
 
 interface NetpSubscriptionManager {
     suspend fun getToken(): String?
-    suspend fun hasValidSubscription(): Boolean
+    suspend fun hasValidEntitlement(): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -37,7 +37,7 @@ class RealNetpSubscriptionManager @Inject constructor(
         subscriptions.getAccessToken()
     }
 
-    override suspend fun hasValidSubscription(): Boolean = withContext(dispatcherProvider.io()) {
+    override suspend fun hasValidEntitlement(): Boolean = withContext(dispatcherProvider.io()) {
         subscriptions.hasEntitlement(NETP_ENTITLEMENT)
     }
 

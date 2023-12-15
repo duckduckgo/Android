@@ -35,7 +35,6 @@ import com.duckduckgo.networkprotection.subscription.ui.NetpVerifySubscriptionPa
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesBinding.Priority.HIGHEST
 import javax.inject.Inject
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
 @ContributesBinding(
@@ -52,7 +51,7 @@ class NetworkProtectionAccessState @Inject constructor(
 
     override suspend fun getState(): NetPWaitlistState = withContext(dispatcherProvider.io()) {
         if (isTreated()) {
-            return@withContext if (!hasValidNetPEntitlements()) {
+            return@withContext if (!netpSubscriptionManager.hasValidEntitlement()) {
                 NotUnlocked
             } else if (netPWaitlistRepository.getAuthenticationToken() == null) {
                 VerifySubscription
@@ -61,10 +60,6 @@ class NetworkProtectionAccessState @Inject constructor(
             }
         }
         return@withContext NotUnlocked
-    }
-
-    private fun hasValidNetPEntitlements(): Boolean {
-        return runBlocking { netpSubscriptionManager.hasValidSubscription() }
     }
 
     override suspend fun getScreenForCurrentState(): ActivityParams {
@@ -76,6 +71,7 @@ class NetworkProtectionAccessState @Inject constructor(
                     NetPWaitlistInvitedScreenNoParams
                 }
             }
+
             JoinedWaitlist, NotUnlocked, PendingInviteCode, VerifySubscription -> NetpVerifySubscriptionParams
         }
     }

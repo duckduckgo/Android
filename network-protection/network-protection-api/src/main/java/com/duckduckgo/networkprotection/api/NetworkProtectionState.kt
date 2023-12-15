@@ -48,7 +48,7 @@ interface NetworkProtectionState {
     /**
      * This method will stop the Network Protection feature by disabling it
      */
-    suspend fun disable()
+    suspend fun stop()
 
     /**
      * This method returns the current server location Network Protection is routing device's data through.
