@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-
     <string name="managementDisabledModeCta"><b>Откройте «Настройки»</b></string>
 
     <string name="saveLoginDialogButtonSave">Сохранить пароль</string>
@@ -62,6 +61,7 @@
 
     <string name="autofillDeleteLoginDialogCancel">Отменить</string>
     <string name="autofillDeleteLoginDialogDelete">Удалить</string>
+
 
     <string name="autofillManagementUsernameCopied">Имя пользователя скопировано</string>
     <string name="autofillManagementPasswordCopied">Пароль скопирован</string>
@@ -112,5 +112,25 @@
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogTitle">Если вы прервете настройку, ваш адрес Duck Address не сохранится</string>
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogPositiveButton">Продолжить настройку</string>
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Выйти из настройки</string>
+
+    <string name="autofillManagementScreenTitle">Пароли</string>
+    <string name="credentialManagementNoLoginsSavedTitle">Сохраненных паролей пока нет</string>
+    <string name="credentialManagementAutofillToggleLabel">Хранение и автозаполнение паролей</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Пароли надежно хранятся на вашем устройстве.</string>
+    <string name="saveLoginDialogSubtitle">Пароли надежно защищены и хранятся на вашем устройстве.</string>
+    <string name="autofillManagementAddLogin">Добавление пароля</string>
+    <string name="credentialManagementEditLoginTitleHint">Название</string>
+    <string name="autofillDeleteLoginDialogTitle">Вы точно хотите удалить этот пароль?</string>
+    <string name="autofillManagementDeletedConfirmation">Пароль удален</string>
+    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Последнее обновление: %1$s</string>
+    <string name="autofillDisableAutofillPromptTitle">Продолжить сохранять пароли?</string>
+    <string name="deviceNotSupportedSubtitle">Чтобы надежно защитить пароли, нам нужно зашифровать и сохранить их на вашем устройстве. Однако оно не поддерживает хранение зашифрованной информации, и поэтому функция сохранения и автозаполнения паролей недоступна.</string>
+    <string name="autofill_password_generation_offer_message">Пароли надежно защищены и хранятся на вашем устройстве.</string>
+    <string name="autofillManagementSearchLogins">Найти пароль</string>
+    <string name="biometric_prompt_title">Пароли заблокированы</string>
+    <string name="autofill_auth_text_for_access">Разблокируйте устройство, чтобы получить доступ к паролям</string>
+    <string name="managementDisabledModeTitle">Защита устройства и паролей</string>
+    <string name="managementDisabledModeSubtitle">Для защиты паролей требуются биометрические данные, графический ключ или ПИН-код.</string>
+    <string name="credentialManagementEditTitle">Редактирование пароля</string>
 
 </resources>

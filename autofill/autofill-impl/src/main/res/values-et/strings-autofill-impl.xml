@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-
     <string name="managementDisabledModeCta"><b>Seadista sätetes</b></string>
 
     <string name="saveLoginDialogButtonSave">Salvesta parool</string>
@@ -62,6 +61,7 @@
 
     <string name="autofillDeleteLoginDialogCancel">Loobu</string>
     <string name="autofillDeleteLoginDialogDelete">Kustuta</string>
+
 
     <string name="autofillManagementUsernameCopied">Kasutajanimi on kopeeritud</string>
     <string name="autofillManagementPasswordCopied">Parool on kopeeritud</string>
@@ -112,5 +112,25 @@
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogTitle">Kui sa praegu väljud, siis sinu Duck Addressi ei salvestata</string>
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogPositiveButton">Jätka seadistamist</string>
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Välju seadistusest</string>
+
+    <string name="autofillManagementScreenTitle">Paroolid</string>
+    <string name="credentialManagementNoLoginsSavedTitle">Paroole ei ole veel salvestatud</string>
+    <string name="credentialManagementAutofillToggleLabel">Paroolide salvestamine ja automaatne sisestamine</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Paroolid salvestatakse turvaliselt sinu seadmesse.</string>
+    <string name="saveLoginDialogSubtitle">Paroolid salvestatakse turvaliselt sinu seadmesse.</string>
+    <string name="autofillManagementAddLogin">Parooli lisamine</string>
+    <string name="credentialManagementEditLoginTitleHint">Pealkiri</string>
+    <string name="autofillDeleteLoginDialogTitle">Kas oled kindel, et soovid selle parooli kustutada?</string>
+    <string name="autofillManagementDeletedConfirmation">Parool on kustutatud</string>
+    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Viimati uuendatud %1$s</string>
+    <string name="autofillDisableAutofillPromptTitle">Kas soovid jätkata paroolide salvestamist?</string>
+    <string name="deviceNotSupportedSubtitle">Paroolide turvaliseks salvestamiseks peame need krüptima ja sinu seadmesse salvestama. Kuna sinu seade ei toeta krüptitud salvestusruumi, ei ole paroolide salvestamine ja automaatne sisestamine võimalik.</string>
+    <string name="autofill_password_generation_offer_message">Paroolid salvestatakse turvaliselt sinu seadmesse.</string>
+    <string name="autofillManagementSearchLogins">Otsi paroole</string>
+    <string name="biometric_prompt_title">Paroolid lukustatud</string>
+    <string name="autofill_auth_text_for_access">Paroolidele juurdepääsuks ava seade</string>
+    <string name="managementDisabledModeTitle">Paroolide salvestamiseks muuda oma seade turvaliseks</string>
+    <string name="managementDisabledModeSubtitle">Paroolide kaitsmiseks on vaja seadme lukustusmustrit, PIN-koodi või biomeetriat.</string>
+    <string name="credentialManagementEditTitle">Parooli muutmine</string>
 
 </resources>

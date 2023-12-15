@@ -791,4 +791,9 @@
     <string name="imageCaptureCameraPermissionDeniedMessage">Если вы разрешите DuckDuckGo запрашивать доступ, сайты смогут использовать камеру.</string>
     <string name="imageCaptureCameraPermissionDeniedPositiveButton">Открыть Настройки</string>
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Отменить</string>
+
+    <!-- Autofill -->
+    <string name="settingsAutofillLoginsSetting">Пароли</string>
+    <string name="autofillLoginSavedSnackbarMessage">Пароль сохранен</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Пароль обновлен</string>
 </resources>

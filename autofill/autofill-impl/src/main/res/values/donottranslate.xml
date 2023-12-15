@@ -18,24 +18,4 @@
     <string name="credentials_limit_warning"><b>Sync Paused</b>\nLogins limit exceeded. Delete some to resume syncing.\n\n<annotation type="manage_logins">Manage Logins</annotation></string>
     <string name="credentials_limit_warning_notif"><b>Passwords Sync is Paused</b>\nYou have exceeded the passwords sync limit. Try deleting some passwords. Until this is resolved your passwords will not be backed up.</string>
 
-    <string name="autofillManagementScreenTitle">Passwords</string>
-    <string name="credentialManagementNoLoginsSavedTitle">No passwords saved yet</string>
-    <string name="credentialManagementAutofillToggleLabel">Save and autofill passwords</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Passwords are stored securely on your device.</string>
-    <string name="saveLoginDialogSubtitle">Passwords are stored securely on your device.</string>
-    <string name="autofillManagementAddLogin">Add Password</string>
-    <string name="credentialManagementEditLoginTitleHint">Title</string>
-    <string name="autofillDeleteLoginDialogTitle">Are you sure you want to delete this password?</string>
-    <string name="autofillManagementDeletedConfirmation">Password deleted</string>
-    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Last updated %1$s</string>
-    <string name="autofillDisableAutofillPromptTitle">Do you want to keep saving passwords?</string>
-    <string name="deviceNotSupportedSubtitle">To store passwords securely, we need to encrypt and store them on your device. Because your device does not support encrypted storage, saving and autofilling passwords is unavailable.</string>
-    <string name="autofill_password_generation_offer_message">Passwords are stored securely on your device.</string>
-    <string name="autofillManagementSearchLogins">Search passwords</string>
-    <string name="biometric_prompt_title">Passwords Locked</string>
-    <string name="autofill_auth_text_for_access">Unlock device to access passwords</string>
-    <string name="managementDisabledModeTitle">Secure your device to save passwords</string>
-    <string name="managementDisabledModeSubtitle">A device lock pattern, PIN, or biometrics is required to protect your passwords.</string>
-    <string name="credentialManagementEditTitle">Edit Password</string>
-
 </resources>

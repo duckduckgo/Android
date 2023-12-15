@@ -783,4 +783,9 @@
     <string name="imageCaptureCameraPermissionDeniedMessage">Siteler kameranızı yalnızca DuckDuckGo\'nun erişim istemesine izin verirseniz kullanabilir.</string>
     <string name="imageCaptureCameraPermissionDeniedPositiveButton">Ayarları Aç</string>
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Vazgeç</string>
+
+    <!-- Autofill -->
+    <string name="settingsAutofillLoginsSetting">Şifreler</string>
+    <string name="autofillLoginSavedSnackbarMessage">Şifre kaydedildi</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Şifre güncellendi</string>
 </resources>

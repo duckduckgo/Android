@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-
     <string name="managementDisabledModeCta"><b>Iestati sadaļā Iestatījumi</b></string>
 
     <string name="saveLoginDialogButtonSave">Saglabāt paroli</string>
@@ -62,6 +61,7 @@
 
     <string name="autofillDeleteLoginDialogCancel">Atcelt</string>
     <string name="autofillDeleteLoginDialogDelete">Dzēst</string>
+
 
     <string name="autofillManagementUsernameCopied">Lietotājvārds nokopēts</string>
     <string name="autofillManagementPasswordCopied">Parole nokopēta</string>
@@ -112,5 +112,25 @@
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogTitle">Ja tagad iziesi, tava Duck adrese netiks saglabāta</string>
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogPositiveButton">Turpināt iestatīšanu</string>
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Iziet no iestatīšanas</string>
+
+    <string name="autofillManagementScreenTitle">Paroles</string>
+    <string name="credentialManagementNoLoginsSavedTitle">Vēl nav saglabāta neviena parole</string>
+    <string name="credentialManagementAutofillToggleLabel">Saglabāt un automātiski aizpildīt paroles</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Paroles tiek droši glabātas tavā ierīcē.</string>
+    <string name="saveLoginDialogSubtitle">Paroles tiek droši glabātas tavā ierīcē.</string>
+    <string name="autofillManagementAddLogin">Pievienot paroli</string>
+    <string name="credentialManagementEditLoginTitleHint">Nosaukums</string>
+    <string name="autofillDeleteLoginDialogTitle">Vai tiešām vēlies dzēst šo paroli?</string>
+    <string name="autofillManagementDeletedConfirmation">Parole dzēsta</string>
+    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Pēdējoreiz atjaunināts %1$s</string>
+    <string name="autofillDisableAutofillPromptTitle">Vai vēlaties turpināt saglabāt paroles?</string>
+    <string name="deviceNotSupportedSubtitle">Lai droši glabātu pieteikšanās datus, mums tie ir jāšifrē un jāsaglabā tavā ierīcē. Tā kā tava ierīce neatbalsta šifrētu datu glabāšanu, paroļu saglabāšana un automātiskā aizpildīšana nav pieejama.</string>
+    <string name="autofill_password_generation_offer_message">Paroles tiek droši glabātas tavā ierīcē.</string>
+    <string name="autofillManagementSearchLogins">Meklēt paroles</string>
+    <string name="biometric_prompt_title">Paroles ir bloķētas</string>
+    <string name="autofill_auth_text_for_access">Atbloķē ierīci, lai piekļūtu parolēm</string>
+    <string name="managementDisabledModeTitle">Aizsargā savu ierīci, lai saglabātu paroles</string>
+    <string name="managementDisabledModeSubtitle">Lai aizsargātu tavus pieteikšanās datus, ir nepieciešama ierīces bloķēšanas figūra, PIN kods vai biometriskā aizsardzība.</string>
+    <string name="credentialManagementEditTitle">Paroles rediģēšana</string>
 
 </resources>

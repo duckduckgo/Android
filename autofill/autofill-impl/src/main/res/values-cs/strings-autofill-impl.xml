@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-
     <string name="managementDisabledModeCta"><b>Nastavit v Nastaveních</b></string>
 
     <string name="saveLoginDialogButtonSave">Uložit heslo</string>
@@ -62,6 +61,7 @@
 
     <string name="autofillDeleteLoginDialogCancel">Zrušit</string>
     <string name="autofillDeleteLoginDialogDelete">Smazat</string>
+
 
     <string name="autofillManagementUsernameCopied">Uživatelské jméno zkopírováno</string>
     <string name="autofillManagementPasswordCopied">Heslo zkopírováno</string>
@@ -112,5 +112,25 @@
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogTitle">Když teď odejdeš, tvoje adresa Duck Address se neuloží.</string>
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogPositiveButton">Pokračovat v nastavení</string>
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Ukončit nastavení</string>
+
+    <string name="autofillManagementScreenTitle">Hesla</string>
+    <string name="credentialManagementNoLoginsSavedTitle">Zatím nemáš uložená žádná hesla</string>
+    <string name="credentialManagementAutofillToggleLabel">Ukládání a automatické vyplňování hesel</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Hesla se bezpečně ukládají do tvého zařízení.</string>
+    <string name="saveLoginDialogSubtitle">Hesla se bezpečně ukládají do tvého zařízení.</string>
+    <string name="autofillManagementAddLogin">Přidat heslo</string>
+    <string name="credentialManagementEditLoginTitleHint">Název</string>
+    <string name="autofillDeleteLoginDialogTitle">Opravdu chceš smazat tohle heslo?</string>
+    <string name="autofillManagementDeletedConfirmation">Heslo smazáno</string>
+    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Poslední aktualizace %1$s</string>
+    <string name="autofillDisableAutofillPromptTitle">Chceš dál ukládat hesla?</string>
+    <string name="deviceNotSupportedSubtitle">Abychom mohli hesla bezpečně ukládat, musíme je zašifrovat a uložit do tvého zařízení. Protože tvoje zařízení nepodporuje šifrované úložiště, hesla není možné ukládat ani automaticky vyplňovat.</string>
+    <string name="autofill_password_generation_offer_message">Hesla se bezpečně ukládají do tvého zařízení.</string>
+    <string name="autofillManagementSearchLogins">Prohledat hesla</string>
+    <string name="biometric_prompt_title">Hesla jsou uzamčená</string>
+    <string name="autofill_auth_text_for_access">Pro přístup k heslům zařízení odemkni</string>
+    <string name="managementDisabledModeTitle">Zabezpeč si zařízení, ať si můžeš ukládat hesla</string>
+    <string name="managementDisabledModeSubtitle">Na ochranu hesel se vyžaduje gesto zámku obrazovky, PIN nebo biometrické ověření.</string>
+    <string name="credentialManagementEditTitle">Upravit heslo</string>
 
 </resources>

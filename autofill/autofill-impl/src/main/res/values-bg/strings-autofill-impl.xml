@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-
     <string name="managementDisabledModeCta"><b>Настройване в Настройки</b></string>
 
     <string name="saveLoginDialogButtonSave">Запазване на паролата</string>
@@ -62,6 +61,7 @@
 
     <string name="autofillDeleteLoginDialogCancel">Отмени</string>
     <string name="autofillDeleteLoginDialogDelete">Изтрий</string>
+
 
     <string name="autofillManagementUsernameCopied">Потребителското име е копирано</string>
     <string name="autofillManagementPasswordCopied">Паролата е копирана</string>
@@ -112,5 +112,25 @@
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogTitle">Ако излезете сега, Вашият Duck Address няма да бъде запазен</string>
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogPositiveButton">Продължаване с настройката</string>
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Изход от настройката</string>
+
+    <string name="autofillManagementScreenTitle">Пароли</string>
+    <string name="credentialManagementNoLoginsSavedTitle">Все още няма запазени пароли</string>
+    <string name="credentialManagementAutofillToggleLabel">Запазване и автоматично попълване на паролите</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Паролите се съхраняват сигурно на Вашето устройство.</string>
+    <string name="saveLoginDialogSubtitle">Паролите се съхраняват сигурно на Вашето устройство.</string>
+    <string name="autofillManagementAddLogin">Добавяне на парола</string>
+    <string name="credentialManagementEditLoginTitleHint">Заглавие</string>
+    <string name="autofillDeleteLoginDialogTitle">Сигурни ли сте, че искате да изтриете тази парола?</string>
+    <string name="autofillManagementDeletedConfirmation">Паролата е изтрита</string>
+    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Последна актуализация %1$s</string>
+    <string name="autofillDisableAutofillPromptTitle">Искате ли да продължите да запазвате пароли?</string>
+    <string name="deviceNotSupportedSubtitle">За да съхраняваме сигурно паролите, трябва да ги криптираме и да ги запазим на Вашето устройство. Тъй като Вашето устройство не поддържа криптирано съхранение, запазването и автоматичното попълване на пароли е недостъпно.</string>
+    <string name="autofill_password_generation_offer_message">Паролите се съхраняват сигурно на Вашето устройство.</string>
+    <string name="autofillManagementSearchLogins">Търсене на пароли</string>
+    <string name="biometric_prompt_title">Паролите са заключени</string>
+    <string name="autofill_auth_text_for_access">Отключете устройството, за да получите достъп до паролите</string>
+    <string name="managementDisabledModeTitle">Защитете устройството, за да можете да запазвате пароли</string>
+    <string name="managementDisabledModeSubtitle">За защита на паролите е необходимо да зададете модел за заключване, ПИН код или биометрични данни.</string>
+    <string name="credentialManagementEditTitle">Редактиране на парола</string>
 
 </resources>

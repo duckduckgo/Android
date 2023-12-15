@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-
     <string name="managementDisabledModeCta"><b>Odredi u Postavkama</b></string>
 
     <string name="saveLoginDialogButtonSave">Spremi lozinku</string>
@@ -62,6 +61,7 @@
 
     <string name="autofillDeleteLoginDialogCancel">Odustani</string>
     <string name="autofillDeleteLoginDialogDelete">Izbriši</string>
+
 
     <string name="autofillManagementUsernameCopied">Korisničko ime je kopirano</string>
     <string name="autofillManagementPasswordCopied">Lozinka je kopirana</string>
@@ -112,5 +112,25 @@
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogTitle">Ako izađeš sada, tvoja adresa Duck Address neće biti spremljena</string>
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogPositiveButton">Nastavi s postavljanjem</string>
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Izađi iz postavljanja</string>
+
+    <string name="autofillManagementScreenTitle">Lozinke</string>
+    <string name="credentialManagementNoLoginsSavedTitle">Još nema spremljenih lozinki</string>
+    <string name="credentialManagementAutofillToggleLabel">Spremi i automatski popuni lozinke</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Lozinke su sigurno pohranjene na tvom uređaju.</string>
+    <string name="saveLoginDialogSubtitle">Lozinke su sigurno pohranjene na tvom uređaju.</string>
+    <string name="autofillManagementAddLogin">Dodaj lozinku</string>
+    <string name="credentialManagementEditLoginTitleHint">Naslov</string>
+    <string name="autofillDeleteLoginDialogTitle">Sigurno želiš izbrisati ovu lozinku?</string>
+    <string name="autofillManagementDeletedConfirmation">Lozinka je izbrisana</string>
+    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Posljednje ažuriranje: %1$s</string>
+    <string name="autofillDisableAutofillPromptTitle">Želiš li nastaviti spremati lozinke?</string>
+    <string name="deviceNotSupportedSubtitle">Kako bismo sigurno pohranili lozinke, moramo ih šifrirati i pohraniti na tvom uređaju. Budući da tvoj uređaj ne podržava šifriranu pohranu, spremanje i automatsko popunjavanje lozinki nije dostupno.</string>
+    <string name="autofill_password_generation_offer_message">Lozinke su sigurno pohranjene na tvom uređaju.</string>
+    <string name="autofillManagementSearchLogins">Pretraživanje lozinki</string>
+    <string name="biometric_prompt_title">Lozinke su zaključane</string>
+    <string name="autofill_auth_text_for_access">Otključaj uređaj za pristup lozinkama</string>
+    <string name="managementDisabledModeTitle">Osiguraj svoj uređaj za spremanje lozinki</string>
+    <string name="managementDisabledModeSubtitle">Uzorak za zaključavanje uređaja, PIN ili biometrija potrebni su za zaštitu tvojih lozinki.</string>
+    <string name="credentialManagementEditTitle">Uredi lozinku</string>
 
 </resources>

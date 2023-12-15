@@ -783,4 +783,9 @@
     <string name="imageCaptureCameraPermissionDeniedMessage">Webbplatser kan endast använda din kamera om du tillåter DuckDuckGo att be om åtkomst.</string>
     <string name="imageCaptureCameraPermissionDeniedPositiveButton">Öppna inställningar</string>
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Avbryt</string>
+
+    <!-- Autofill -->
+    <string name="settingsAutofillLoginsSetting">Lösenord</string>
+    <string name="autofillLoginSavedSnackbarMessage">Lösenord sparat</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Lösenordet har uppdaterats</string>
 </resources>

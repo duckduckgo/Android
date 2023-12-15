@@ -791,4 +791,9 @@
     <string name="imageCaptureCameraPermissionDeniedMessage">Witryny mogą korzystać z Twojej kamery tylko wtedy, gdy pozwolisz DuckDuckGo poprosić o dostęp.</string>
     <string name="imageCaptureCameraPermissionDeniedPositiveButton">Otwórz ustawienia</string>
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Anuluj</string>
+
+    <!-- Autofill -->
+    <string name="settingsAutofillLoginsSetting">Hasła</string>
+    <string name="autofillLoginSavedSnackbarMessage">Hasło zapisane</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Zaktualizowano hasło</string>
 </resources>

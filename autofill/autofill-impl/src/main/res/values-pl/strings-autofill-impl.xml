@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-
     <string name="managementDisabledModeCta"><b>Dostosuj ustawienia</b></string>
 
     <string name="saveLoginDialogButtonSave">Zapisz hasło</string>
@@ -62,6 +61,7 @@
 
     <string name="autofillDeleteLoginDialogCancel">Anuluj</string>
     <string name="autofillDeleteLoginDialogDelete">Usuń</string>
+
 
     <string name="autofillManagementUsernameCopied">Skopiowano nazwę użytkownika</string>
     <string name="autofillManagementPasswordCopied">Skopiowano hasło</string>
@@ -112,5 +112,25 @@
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogTitle">Jeśli teraz wyjdziesz, Twój Duck Address nie zostanie zapisany</string>
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogPositiveButton">Kontynuuj konfigurację</string>
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Wyjdź z konfiguracji</string>
+
+    <string name="autofillManagementScreenTitle">Hasła</string>
+    <string name="credentialManagementNoLoginsSavedTitle">Nie zapisano jeszcze żadnych haseł</string>
+    <string name="credentialManagementAutofillToggleLabel">Zapisuj i automatycznie uzupełniaj hasła</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Hasła są bezpiecznie przechowywane na Twoim urządzeniu.</string>
+    <string name="saveLoginDialogSubtitle">Hasła są bezpiecznie przechowywane na Twoim urządzeniu.</string>
+    <string name="autofillManagementAddLogin">Dodaj hasło</string>
+    <string name="credentialManagementEditLoginTitleHint">Tytuł</string>
+    <string name="autofillDeleteLoginDialogTitle">Czy na pewno chcesz usunąć to hasło?</string>
+    <string name="autofillManagementDeletedConfirmation">Hasło usunięte</string>
+    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Ostatnia aktualizacja %1$s</string>
+    <string name="autofillDisableAutofillPromptTitle">Czy chcesz nadal zapisywać hasła?</string>
+    <string name="deviceNotSupportedSubtitle">Aby bezpiecznie przechowywać hasła, musimy je zaszyfrować i zapisać na Twoim urządzeniu. Ponieważ Twoje urządzenie nie obsługuje szyfrowanego przechowywania, zapisywanie i automatyczne wypełnianie haseł jest niedostępne.</string>
+    <string name="autofill_password_generation_offer_message">Hasła są bezpiecznie przechowywane na Twoim urządzeniu.</string>
+    <string name="autofillManagementSearchLogins">Wyszukaj hasła</string>
+    <string name="biometric_prompt_title">Zablokowane hasła</string>
+    <string name="autofill_auth_text_for_access">Odblokuj urządzenie, aby uzyskać dostęp do haseł</string>
+    <string name="managementDisabledModeTitle">Zabezpiecz urządzenie, aby zapisywać hasła</string>
+    <string name="managementDisabledModeSubtitle">Aby chronić hasła, korzystaj z blokady urządzenia za pomocą wzoru, kodu PIN lub danych biometrycznych.</string>
+    <string name="credentialManagementEditTitle">Edytuj hasło</string>
 
 </resources>
