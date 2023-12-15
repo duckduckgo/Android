@@ -92,7 +92,7 @@ class NetpGeoSwitchingViewModelTest {
                 assertEquals(
                     it.items[4],
                     CountryItem(
-                        countryCode = "uk",
+                        countryCode = "gb",
                         countryEmoji = "🇬🇧",
                         countryName = "UK",
                         cities = emptyList(),

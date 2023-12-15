@@ -32,7 +32,7 @@ class FakeNetpEgressServersProvider : NetpEgressServersProvider {
                 cities = listOf("El Segundo", "Chicago", "Atlanta", "Newark"),
             ),
             ServerLocation(
-                countryCode = "uk",
+                countryCode = "gb",
                 countryName = "UK",
                 cities = emptyList(),
             ),
