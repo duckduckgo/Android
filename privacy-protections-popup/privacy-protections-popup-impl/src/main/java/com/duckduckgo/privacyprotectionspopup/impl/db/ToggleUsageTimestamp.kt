@@ -24,8 +24,4 @@ import org.threeten.bp.Instant
 data class ToggleUsageTimestamp(
     @PrimaryKey val id: Long = 0,
     val timestamp: Instant,
-) {
-    init {
-        require(id == 0L)
-    }
-}
+)
