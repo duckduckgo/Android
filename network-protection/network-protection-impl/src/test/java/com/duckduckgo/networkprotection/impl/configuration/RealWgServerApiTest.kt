@@ -17,16 +17,22 @@
 package com.duckduckgo.networkprotection.impl.configuration
 
 import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.WgServerData
+import com.duckduckgo.networkprotection.impl.fakes.FakeNetworkProtectionRepository
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpEgressServersProvider
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpEgressServersProvider.PreferredLocation
+import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import kotlinx.coroutines.test.runTest
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
+import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.any
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import retrofit2.Response
 
 class RealWgServerApiTest {
     private val wgVpnControllerService = FakeWgVpnControllerService()
@@ -35,6 +41,7 @@ class RealWgServerApiTest {
     private lateinit var internalWgServerDebugProvider: FakeWgServerDebugProvider
     private lateinit var productionApi: RealWgServerApi
     private lateinit var internalApi: RealWgServerApi
+    private lateinit var networkProtectionRepository: NetworkProtectionRepository
 
     @Mock
     private lateinit var netpEgressServersProvider: NetpEgressServersProvider
@@ -45,16 +52,19 @@ class RealWgServerApiTest {
 
         productionWgServerDebugProvider = DefaultWgServerDebugProvider()
         internalWgServerDebugProvider = FakeWgServerDebugProvider()
+        networkProtectionRepository = FakeNetworkProtectionRepository()
 
         internalApi = RealWgServerApi(
             wgVpnControllerService,
             internalWgServerDebugProvider,
             netpEgressServersProvider,
+            networkProtectionRepository,
         )
         productionApi = RealWgServerApi(
             wgVpnControllerService,
             productionWgServerDebugProvider,
             netpEgressServersProvider,
+            networkProtectionRepository,
         )
     }
 
@@ -213,6 +223,45 @@ class RealWgServerApiTest {
             ),
             internalApi.registerPublicKey("testpublickey"),
         )
+    }
+
+    @Test
+    fun whenServerThrowExceptionAndRegisterReturns403ThenSetDisabledDueToInvalidSubscription() = runTest {
+        val mockService = Mockito.mock(WgVpnControllerService::class.java)
+        val testee = RealWgServerApi(
+            mockService,
+            internalWgServerDebugProvider,
+            netpEgressServersProvider,
+            networkProtectionRepository,
+        )
+        whenever(mockService.getServers()).thenThrow(RuntimeException())
+        whenever(mockService.registerKey(any())).thenReturn(
+            Response.error(403, "Test".toResponseBody()),
+        )
+
+        testee.registerPublicKey("test")
+
+        verify(mockService).registerKey(RegisterKeyBody(publicKey = "test", server = "*"))
+        assertTrue(networkProtectionRepository.disabledDueToAccessRevoked)
+    }
+
+    @Test
+    fun whenServerThrowExceptionAndRegisterReturns400ThenDoNotSetDisabledDueToInvalidSubscription() = runTest {
+        val mockService = Mockito.mock(WgVpnControllerService::class.java)
+        val testee = RealWgServerApi(
+            mockService,
+            internalWgServerDebugProvider,
+            netpEgressServersProvider,
+            networkProtectionRepository,
+        )
+        whenever(mockService.getServers()).thenThrow(RuntimeException())
+        whenever(mockService.registerKey(any())).thenReturn(
+            Response.error(400, "Test".toResponseBody()),
+        )
+
+        testee.registerPublicKey("test")
+
+        assertFalse(networkProtectionRepository.disabledDueToAccessRevoked)
     }
 }
 
