@@ -266,8 +266,6 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         remoteViews: RemoteViews,
         widgetTheme: WidgetTheme,
     ) {
-        remoteViews.setOnClickPendingIntent(R.id.emptyGridViewContainer, buildOnboardingPendingIntent(context, appWidgetId))
-
         val extras = Bundle()
         extras.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
         extras.putString(THEME_EXTRAS, widgetTheme.toString())

@@ -62,7 +62,7 @@ class EditBookmarkFolderDialogFragment : SavedSiteDialogFragment() {
         }
     }
 
-    override fun deleteConfirmationTitle() = getString(R.string.deleteBookmarkFolderConfirmationDialogTitle)
+    override fun deleteConfirmationTitle() = getString(R.string.deleteFolder, getBookmarkFolder()?.name)
 
     override fun deleteConfirmationMessage() = getBookmarkFolder()?.name?.let { folderName ->
         getString(R.string.deleteBookmarkFolderConfirmationDialogDescription, folderName).html(requireContext())

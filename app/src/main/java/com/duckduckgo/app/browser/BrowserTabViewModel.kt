@@ -724,7 +724,8 @@ class BrowserTabViewModel @Inject constructor(
             }
             .map { bookmarks ->
                 val bookmark = bookmarks.firstOrNull { it.url == url }
-                browserViewState.value = currentBrowserViewState().copy(bookmark = bookmark)
+                val isFavorite = currentBrowserViewState().favorite != null
+                browserViewState.value = currentBrowserViewState().copy(bookmark = bookmark?.copy(isFavorite = isFavorite))
             }
             .flowOn(dispatchers.main())
             .launchIn(viewModelScope)
@@ -1425,7 +1426,7 @@ class BrowserTabViewModel @Inject constructor(
         val favorite = getFavorite(url)
         withContext(dispatchers.main()) {
             browserViewState.value = currentBrowserViewState().copy(
-                bookmark = bookmark,
+                bookmark = bookmark?.copy(isFavorite = favorite != null),
                 favorite = favorite,
             )
         }
@@ -2070,9 +2071,6 @@ class BrowserTabViewModel @Inject constructor(
                         ),
                     )
                 }
-                withContext(dispatchers.main()) {
-                    command.value = ShowSavedSiteAddedConfirmation(SavedSiteChangedViewState(it, null))
-                }
             }
         }
     }
@@ -2172,9 +2170,10 @@ class BrowserTabViewModel @Inject constructor(
     override fun onBookmarkEdited(
         bookmark: Bookmark,
         oldFolderId: String,
+        updateFavorite: Boolean,
     ) {
         viewModelScope.launch(dispatchers.io()) {
-            savedSitesRepository.updateBookmark(bookmark, oldFolderId)
+            savedSitesRepository.updateBookmark(bookmark, oldFolderId, updateFavorite)
         }
     }
 
