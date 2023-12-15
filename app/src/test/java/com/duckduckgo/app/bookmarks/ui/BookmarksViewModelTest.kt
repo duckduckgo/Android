@@ -18,8 +18,8 @@ package com.duckduckgo.app.bookmarks.ui
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
-import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -70,6 +70,7 @@ class BookmarksViewModelTest {
     private val savedSitesManager: SavedSitesManager = mock()
     private val syncEngine: SyncEngine = mock()
     private val pixel: Pixel = mock()
+    private val appDatabase: AppDatabase = mock()
 
     private val bookmark =
         Bookmark(id = "bookmark1", title = "title", url = "www.example.com", parentId = SavedSitesNames.BOOKMARKS_ROOT, "timestamp")
@@ -86,6 +87,7 @@ class BookmarksViewModelTest {
             syncEngine,
             coroutineRule.testDispatcherProvider,
             coroutineRule.testScope,
+            appDatabase,
         )
         model.viewState.observeForever(viewStateObserver)
         model.command.observeForever(commandObserver)
@@ -100,8 +102,7 @@ class BookmarksViewModelTest {
             flowOf(
                 SavedSites(
                     listOf(favorite),
-                    listOf(bookmark),
-                    listOf(bookmarkFolder, bookmarkFolder, bookmarkFolder),
+                    listOf(bookmark, bookmarkFolder, bookmarkFolder, bookmarkFolder),
                 ),
             ),
         )
@@ -171,9 +172,9 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenBookmarkEditedThenDaoUpdated() = runTest {
-        testee.onBookmarkEdited(bookmark, "folder1")
+        testee.onBookmarkEdited(bookmark, "folder1", true)
 
-        verify(savedSitesRepository).updateBookmark(bookmark, "folder1")
+        verify(savedSitesRepository).updateBookmark(bookmark, "folder1", true)
     }
 
     @Test
@@ -226,14 +227,12 @@ class BookmarksViewModelTest {
 
         verify(viewStateObserver, times(3)).onChanged(viewStateCaptor.capture())
 
-        assertEquals(emptyList<BookmarkEntity>(), viewStateCaptor.allValues[0].bookmarks)
-        assertEquals(emptyList<BookmarkFolder>(), viewStateCaptor.allValues[0].bookmarkFolders)
+        assertEquals(null, viewStateCaptor.allValues[0].bookmarks)
         assertEquals(false, viewStateCaptor.allValues[0].enableSearch)
 
         assertEquals(listOf(favorite), viewStateCaptor.allValues[1].favorites)
-        assertEquals(listOf(bookmark), viewStateCaptor.allValues[1].bookmarks)
-        assertEquals(listOf(bookmarkFolder, bookmarkFolder, bookmarkFolder), viewStateCaptor.allValues[1].bookmarkFolders)
-        assertEquals(true, viewStateCaptor.allValues[1].enableSearch)
+        assertEquals(listOf(bookmark, bookmarkFolder, bookmarkFolder, bookmarkFolder), viewStateCaptor.allValues[1].bookmarks)
+        assertEquals(false, viewStateCaptor.allValues[1].enableSearch)
     }
 
     @Test
@@ -250,13 +249,11 @@ class BookmarksViewModelTest {
 
         verify(viewStateObserver, times(3)).onChanged(viewStateCaptor.capture())
 
-        assertEquals(emptyList<Bookmark>(), viewStateCaptor.allValues[0].bookmarks)
-        assertEquals(emptyList<BookmarkFolder>(), viewStateCaptor.allValues[0].bookmarkFolders)
+        assertEquals(null, viewStateCaptor.allValues[0].bookmarks)
         assertEquals(false, viewStateCaptor.allValues[0].enableSearch)
 
         assertEquals(listOf(favorite), viewStateCaptor.allValues[2].favorites)
-        assertEquals(listOf(bookmark, bookmark, bookmark), viewStateCaptor.allValues[2].bookmarks)
-        assertEquals(listOf(bookmarkFolder, bookmarkFolder), viewStateCaptor.allValues[2].bookmarkFolders)
+        assertEquals(listOf(bookmark, bookmark, bookmark, bookmarkFolder, bookmarkFolder), viewStateCaptor.allValues[2].bookmarks)
         assertEquals(true, viewStateCaptor.allValues[2].enableSearch)
     }
 

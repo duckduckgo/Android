@@ -891,17 +891,15 @@ class SavedSitesRepositoryTest {
 
         repository.getSavedSites(SavedSitesNames.BOOKMARKS_ROOT).test {
             val savedSites = awaitItem()
-            assertTrue(savedSites.bookmarks.size == 2)
+            assertTrue(savedSites.bookmarks.size == 3)
             assertTrue(savedSites.favorites.size == 2)
-            assertTrue(savedSites.folders.size == 1)
             cancelAndConsumeRemainingEvents()
         }
 
         repository.getSavedSites(subFolderId).test {
             val savedSites = awaitItem()
             assertTrue(savedSites.bookmarks.size == 10)
-            assertTrue(savedSites.favorites.isEmpty())
-            assertTrue(savedSites.folders.isEmpty())
+            assertTrue(savedSites.favorites.size == 2)
             cancelAndConsumeRemainingEvents()
         }
     }
