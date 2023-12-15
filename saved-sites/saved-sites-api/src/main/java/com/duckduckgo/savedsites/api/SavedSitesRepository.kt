@@ -219,11 +219,12 @@ interface SavedSitesRepository {
      * Updates the content of a [Bookmark]
      * @param savedSite to be updated
      * @param fromFolderId id of the previous bookmark folder
+     * @param updateFavorite specifies whether the bookmark's favorite state has changed, default value is false
      */
     fun updateBookmark(
         bookmark: Bookmark,
         fromFolderId: String,
-        updateFavorite: Boolean,
+        updateFavorite: Boolean = false,
     )
 
     /**
