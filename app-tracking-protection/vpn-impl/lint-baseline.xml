@@ -1706,17 +1706,6 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.string.atp_ActivityEnabledLabel` appears to be unused"
-        errorLine1="    &lt;string name=&quot;atp_ActivityEnabledLabel&quot;>Notice a problem with an app? &lt;annotation type=&quot;app_settings_link&quot;>Please report an issue.&lt;/annotation>&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings-vpn.xml"
-            line="224"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
         message="The resource `R.string.atp_WaitlistNotificationTitle` appears to be unused"
         errorLine1="    &lt;string name=&quot;atp_WaitlistNotificationTitle&quot;>Your App Tracking Protection Invitation is Here!&lt;/string>"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">

@@ -222,7 +222,6 @@
         <item quantity="one">App</item>
         <item quantity="other">Apps</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Notice a problem with an app? <annotation type="app_settings_link">Please report an issue.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection is disabled</b>\nDid App Tracking Protection cause a problem with your apps? <annotation type="report_issues_link">Report Issues</annotation></string>
     <string name="atp_ActivityDisabledBySystemLabel"><b>Android disabled App Tracking Protection</b>. Want to prevent this happening again? <annotation type="re_enable_link">Re-enable</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>App Tracking Protection is disabled.</b>\nA VPN app on your device may have disabled it. Use the toggle above to re-enable.</string>
