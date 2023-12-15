@@ -16,16 +16,17 @@
 
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content" xmlns:app="http://schemas.android.com/apk/res-auto"
-              android:orientation="vertical"
-              android:background="@drawable/popup_menu_bg">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/popup_menu_bg"
+    android:orientation="vertical">
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
-            android:id="@+id/edit"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:primaryText="@string/edit" />
+        android:id="@+id/edit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/edit" />
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
         android:id="@+id/addRemoveFavorite"
@@ -34,9 +35,9 @@
         app:primaryText="Add To Favorites" />
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
-            android:id="@+id/delete"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:primaryText="@string/delete" />
+        android:id="@+id/delete"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/delete" />
 
 </LinearLayout>
