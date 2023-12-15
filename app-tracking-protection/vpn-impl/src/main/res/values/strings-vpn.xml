@@ -222,7 +222,7 @@
         <item quantity="one">App</item>
         <item quantity="other">Apps</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">This feature is in beta. Notice a problem with an app? <annotation type="app_settings_link">Please report an issue.</annotation></string>
+    <string name="atp_ActivityEnabledLabel">Notice a problem with an app? <annotation type="app_settings_link">Please report an issue.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection is disabled</b>\nDid App Tracking Protection cause a problem with your apps? <annotation type="report_issues_link">Report Issues</annotation></string>
     <string name="atp_ActivityDisabledBySystemLabel"><b>Android disabled App Tracking Protection</b>. Want to prevent this happening again? <annotation type="re_enable_link">Re-enable</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>App Tracking Protection is disabled.</b>\nA VPN app on your device may have disabled it. Use the toggle above to re-enable.</string>
@@ -417,7 +417,7 @@
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Protection Disabled</string>
     <string name="atp_ExcludedAppsFilterMenuAllLabel">All</string>
     <string name="atp_ActivityViewAppsLabel">View Apps</string>
-    <string name="atp_ActivityEnabledMoreThanADayLabel">This feature is in beta. Having issues with an app? <annotation type="app_settings_link">Help us improve</annotation></string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Having issues with an app? <annotation type="app_settings_link">Help us improve</annotation></string>
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Some apps may experience issues when App Tracking Protection is enabled. <annotation type="learn_why_link">Learn why</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Protection is disabled for apps with known issues. You can enable these apps, but they may not work as expected. <annotation type="learn_why_link">Learn why</annotation></string>
 
