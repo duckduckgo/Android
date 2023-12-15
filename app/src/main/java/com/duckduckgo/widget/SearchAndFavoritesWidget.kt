@@ -28,7 +28,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.RemoteViews
 import com.duckduckgo.app.browser.BrowserActivity
-import com.duckduckgo.app.browser.BrowserActivity.Companion.FAVORITES_ONBOARDING_EXTRA
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DuckDuckGoApplication
@@ -57,10 +56,6 @@ enum class WidgetTheme {
 }
 
 class SearchAndFavoritesWidget : AppWidgetProvider() {
-
-    companion object {
-        const val ACTION_FAVORITE = "com.duckduckgo.widget.actionFavorite"
-    }
 
     @Inject
     lateinit var widgetPrefs: WidgetPreferences
@@ -280,15 +275,6 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
     private fun buildPendingIntent(context: Context): PendingIntent {
         val intent = SystemSearchActivity.fromFavWidget(context)
         return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-    }
-
-    private fun buildOnboardingPendingIntent(
-        context: Context,
-        appWidgetId: Int,
-    ): PendingIntent {
-        val intent = BrowserActivity.intent(context, newSearch = true)
-        intent.putExtra(FAVORITES_ONBOARDING_EXTRA, true)
-        return PendingIntent.getActivity(context, appWidgetId, intent, PendingIntent.FLAG_IMMUTABLE)
     }
 
     private fun inject(context: Context) {
