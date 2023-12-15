@@ -24,7 +24,7 @@ import java.util.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class BookmarksEntityQueryListener(
+class BookmarksQueryListener(
     private val viewModel: BookmarksViewModel,
     private val bookmarksAdapter: BookmarksAdapter,
 ) {

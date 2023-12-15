@@ -78,7 +78,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
     lateinit var faviconManager: FaviconManager
 
     lateinit var bookmarksAdapter: BookmarksAdapter
-    lateinit var searchListener: BookmarksEntityQueryListener
+    lateinit var searchListener: BookmarksQueryListener
 
     private var deleteDialog: AlertDialog? = null
     private var searchMenuItem: MenuItem? = null
@@ -362,7 +362,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
     }
 
     private fun initializeSearchBar() {
-        searchListener = BookmarksEntityQueryListener(viewModel, bookmarksAdapter)
+        searchListener = BookmarksQueryListener(viewModel, bookmarksAdapter)
         searchMenuItem?.setOnMenuItemClickListener {
             showSearchBar()
             return@setOnMenuItemClickListener true
