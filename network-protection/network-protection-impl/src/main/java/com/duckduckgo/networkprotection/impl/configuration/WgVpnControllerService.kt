@@ -37,6 +37,7 @@ import javax.net.ssl.TrustManagerFactory
 import javax.net.ssl.X509TrustManager
 import okhttp3.OkHttpClient
 import org.conscrypt.Conscrypt
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -120,7 +121,7 @@ interface WgVpnControllerService {
     @POST("$NETP_ENVIRONMENT_URL/register")
     suspend fun registerKey(
         @Body registerKeyBody: RegisterKeyBody,
-    ): List<EligibleServerInfo>
+    ): Response<List<EligibleServerInfo>>
 
     @GET("$NETP_ENVIRONMENT_URL/locations")
     suspend fun getEligibleLocations(): List<EligibleLocation>

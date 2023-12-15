@@ -31,6 +31,7 @@ import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
+import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.util.concurrent.TimeUnit.MINUTES
 import javax.inject.Inject
@@ -101,12 +102,15 @@ class NetpSubscriptionCheckWorker(
     @Inject
     lateinit var workManager: WorkManager
 
+    @Inject
+    lateinit var netpRepository: NetworkProtectionRepository
+
     override suspend fun doWork(): Result {
         logcat { "Sub check: checking entitlement" }
         if (!netpSubscriptionManager.hasValidEntitlement() && networkProtectionState.isEnabled()) {
             logcat { "Sub check: disabling" }
+            netpRepository.disabledDueToAccessRevoked = true
             networkProtectionState.stop()
-            // TODO: Show notif
         } else if (!networkProtectionState.isEnabled()) {
             logcat { "Sub check: cancelling scheduled checker" }
             workManager.cancelAllWorkByTag(NetpSubscriptionChecker.TAG_WORKER_NETP_SUBS_CHECK)

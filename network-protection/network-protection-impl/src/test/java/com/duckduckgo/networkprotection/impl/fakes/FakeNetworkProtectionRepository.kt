@@ -21,6 +21,7 @@ import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.S
 
 class FakeNetworkProtectionRepository : NetworkProtectionRepository {
     private var _serverDetails: ServerDetails? = null
+    private var _disabledDueToInvalidSubscription: Boolean = false
 
     override var privateKey: String?
         get() = null
@@ -40,4 +41,10 @@ class FakeNetworkProtectionRepository : NetworkProtectionRepository {
     override var clientInterface: NetworkProtectionRepository.ClientInterface?
         get() = null
         set(_) {}
+
+    override var disabledDueToAccessRevoked: Boolean
+        get() = _disabledDueToInvalidSubscription
+        set(value) {
+            _disabledDueToInvalidSubscription = value
+        }
 }

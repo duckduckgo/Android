@@ -19,6 +19,7 @@ package com.duckduckgo.networkprotection.impl.configuration
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
+import retrofit2.Response
 
 class FakeWgVpnControllerService : WgVpnControllerService {
     private val moshi: Moshi = Moshi.Builder().build()
@@ -43,7 +44,7 @@ class FakeWgVpnControllerService : WgVpnControllerService {
         return serverLocations
     }
 
-    override suspend fun registerKey(registerKeyBody: RegisterKeyBody): List<EligibleServerInfo> {
+    override suspend fun registerKey(registerKeyBody: RegisterKeyBody): Response<List<EligibleServerInfo>> {
         return servers.filter {
             return@filter if (registerKeyBody.server != "*") {
                 it.server.name == registerKeyBody.server
@@ -56,7 +57,9 @@ class FakeWgVpnControllerService : WgVpnControllerService {
             } else {
                 true
             }
-        }.map { it.toEligibleServerInfo() }
+        }.map {
+            it.toEligibleServerInfo()
+        }.run { Response.success(this) }
     }
 
     private fun RegisteredServerInfo.toEligibleServerInfo(): EligibleServerInfo {

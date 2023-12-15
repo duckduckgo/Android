@@ -21,6 +21,7 @@ import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.WgServerData
 import com.duckduckgo.networkprotection.impl.di.UnprotectedVpnControllerService
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpEgressServersProvider
+import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import logcat.logcat
@@ -44,43 +45,54 @@ class RealWgServerApi @Inject constructor(
     @UnprotectedVpnControllerService private val wgVpnControllerService: WgVpnControllerService,
     private val serverDebugProvider: WgServerDebugProvider,
     private val netNetpEgressServersProvider: NetpEgressServersProvider,
+    private val netpRepository: NetworkProtectionRepository,
 ) : WgServerApi {
 
     override suspend fun registerPublicKey(publicKey: String): WgServerData? {
-        // This bit of code gets all possible egress servers which should be order by proximity, caches them for internal builds and then
-        // returns the closest one or null if list is empty
-        val selectedServer = wgVpnControllerService.getServers().map { it.server }
-            .also { fetchedServers ->
-                logcat { "Fetched servers ${fetchedServers.map { it.name }}" }
-                serverDebugProvider.cacheServers(fetchedServers)
-            }
-            .map { it.name }
-            .firstOrNull { serverName ->
-                serverDebugProvider.getSelectedServerName()?.let { userSelectedServer ->
-                    serverName == userSelectedServer
-                } ?: false
-            }
+        val registerKeyBody = try {
+            // This bit of code gets all possible egress servers which should be order by proximity, caches them for internal builds and then
+            // returns the closest one or null if list is empty
+            val selectedServer = wgVpnControllerService.getServers().map { it.server }
+                .also { fetchedServers ->
+                    logcat { "Fetched servers ${fetchedServers.map { it.name }}" }
+                    serverDebugProvider.cacheServers(fetchedServers)
+                }
+                .map { it.name }
+                .firstOrNull { serverName ->
+                    serverDebugProvider.getSelectedServerName()?.let { userSelectedServer ->
+                        serverName == userSelectedServer
+                    } ?: false
+                }
 
-        val userPreferredLocation = netNetpEgressServersProvider.updateServerLocationsAndReturnPreferred()
-        val registerKeyBody = if (selectedServer != null) {
-            RegisterKeyBody(publicKey = publicKey, server = selectedServer)
-        } else if (userPreferredLocation != null) {
-            if (userPreferredLocation.cityName != null) {
-                RegisterKeyBody(publicKey = publicKey, country = userPreferredLocation.countryCode, city = userPreferredLocation.cityName)
+            logcat { "Register key in $selectedServer" }
+            val userPreferredLocation = netNetpEgressServersProvider.updateServerLocationsAndReturnPreferred()
+            if (selectedServer != null) {
+                RegisterKeyBody(publicKey = publicKey, server = selectedServer)
+            } else if (userPreferredLocation != null) {
+                if (userPreferredLocation.cityName != null) {
+                    RegisterKeyBody(publicKey = publicKey, country = userPreferredLocation.countryCode, city = userPreferredLocation.cityName)
+                } else {
+                    RegisterKeyBody(publicKey = publicKey, country = userPreferredLocation.countryCode)
+                }
             } else {
-                RegisterKeyBody(publicKey = publicKey, country = userPreferredLocation.countryCode)
+                RegisterKeyBody(publicKey = publicKey, server = "*")
             }
-        } else {
+        } catch (e: Exception) {
             RegisterKeyBody(publicKey = publicKey, server = "*")
         }
 
         return wgVpnControllerService.registerKey(registerKeyBody)
             .run {
-                logcat { "Register key in $selectedServer" }
-                logcat { "Register key returned ${this.map { it.server.name }}" }
-                val server = this.firstOrNull()?.toWgServerData()
-                logcat { "Selected Egress server is $server" }
-                server
+                if (isSuccessful) {
+                    logcat { "Register key returned ${this.body()?.map { it.server.name }}" }
+                    val server = this.body()?.firstOrNull()?.toWgServerData()
+                    logcat { "Selected Egress server is $server" }
+                    netpRepository.disabledDueToAccessRevoked = false
+                    server
+                } else {
+                    netpRepository.disabledDueToAccessRevoked = this.code() == 403
+                    null
+                }
             }
     }
 
