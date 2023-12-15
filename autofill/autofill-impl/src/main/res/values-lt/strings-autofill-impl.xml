@@ -17,16 +17,12 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autofillManagementScreenTitle">Prisijungimai</string>
 
     <string name="managementDisabledModeCta"><b>Nustatyti nustatymuose</b></string>
-    <string name="managementDisabledModeSubtitle">Prisijungimams apsaugoti reikia naudoti prietaiso užrakinimo šabloną, PIN kodą arba biometrinius duomenis.</string>
-    <string name="managementDisabledModeTitle">Apsaugokite įrenginį, kad išsaugotumėte prisijungimus</string>
 
     <string name="saveLoginDialogButtonSave">Išsaugoti slaptažodį</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Išsaugoti slaptažodį</string>
     <string name="saveLoginDialogNotNow">Neišsaugokite</string>
-    <string name="saveLoginDialogSubtitle">Slaptažodžiai saugiai saugomi jūsų įrenginio meniu „Prisijungimai“.</string>
     <string name="saveLoginDialogTitle">Ar norite, kad „DuckDuckGo“ išsaugotų jūsų slaptažodį?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Daugiau parinkčių</string>
 
@@ -47,47 +43,35 @@
 
     <string name="autofillDialogCloseButtonContentDescription">Uždaryti automatinio pildymo dialogo langą</string>
 
-    <string name="credentialManagementEditLoginTitleHint">Prisijungimo pavadinimas</string>
     <string name="credentialManagementEditUsernameHint">Naudotojo vardas</string>
     <string name="credentialManagementEditPasswordHint">Slaptažodis</string>
-    <string name="credentialManagementEditTitle">Redaguoti prisijungimą</string>
     <string name="credentialManagementEditWebsiteHint">Svetainės URL</string>
     <string name="credentialManagementEditNotesHint">Pastabos</string>
     <string name="credentialManagementEditButtonDelete">Trinti</string>
     <string name="credentialManagementEditButtonSaveChanges">Išsaugoti pakeitimus</string>
     <string name="credentialManagementEditButtonCopyUsername">Kopijuoti naudotojo vardą</string>
     <string name="credentialManagementEditButtonCopyPassword">Kopijuoti slaptažodį</string>
-    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Prisijungimas paskutinį kartą atnaujintas %1$s</string>
 
-    <string name="credentialManagementAutofillToggleLabel">Išsaugoti ir automatiškai pildyti prisijungimus</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Prisijungimai saugiai laikomi jūsų įrenginyje</string>
     <string name="credentialManagementViewMenuEdit">Redaguoti</string>
     <string name="credentialManagementViewMenuDelete">Trinti</string>
 
     <string name="credentialManagementSuggestionsLabel">Siūloma</string>
-    <string name="credentialManagementNoLoginsSavedTitle">Dar nėra išsaugotų prisijungimų</string>
 
-    <string name="autofillManagementAddLogin">Pridėti prisijungimą</string>
-    <string name="autofillManagementSearchLogins">Ieškoti prisijungimų</string>
     <string name="autofillManagementSearchClearDescription">Išvalyti paieškos įvestį</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Rezultatų pagal paiešką „%1$s“ nerasta</string>
 
     <string name="autofillDeleteLoginDialogCancel">Atšaukti</string>
     <string name="autofillDeleteLoginDialogDelete">Trinti</string>
-    <string name="autofillDeleteLoginDialogTitle">Ar tikrai norite ištrinti šį prisijungimą?</string>
 
     <string name="autofillManagementUsernameCopied">Naudotojo vardas nukopijuotas</string>
     <string name="autofillManagementPasswordCopied">Slaptažodis nukopijuotas</string>
 
     <string name="autofill_password_generation_offer_title">Naudoti stiprų „DuckDuckGo“ slaptažodį?</string>
-    <string name="autofill_password_generation_offer_message">Slaptažodžiai saugiai saugomi jūsų įrenginio meniu „Prisijungimai“.</string>
     <string name="autofill_password_generation_offer_accept">Naudoti stiprų slaptažodį</string>
     <string name="autofill_password_generation_offer_decline">Sukurti savo</string>
 
     <string name="deviceNotSupportedTitle">Nepalaikomas įrenginys</string>
-    <string name="deviceNotSupportedSubtitle">Norėdami saugiai laikyti prisijungimus, turime juos užšifruoti ir išsaugoti jūsų įrenginyje. Kadangi jūsų įrenginys nepalaiko šifruoto saugojimo, prisijungimai nepasiekiami.</string>
 
-    <string name="autofillManagementDeletedConfirmation">Prisijungimas ištrintas</string>
     <string name="autofillManagementUndoDeletion">Anuliuoti</string>
 
     <string name="credentialManagementLinkButtonContentDescription" instruction="Accessibility text for a button that will show next to a text field containing a website address; it will launch the website when tapped">Atidaryti svetainę</string>
@@ -116,7 +100,6 @@
     <string name="autofillTooltipGenerateAddress" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated.">Generuoti privatų „Duck“ adresą</string>
     <string name="autofillTooltipGenerateAddressDescription" instruction="&apos;hide address&apos; refers to using an alias so your real email address is not used">Blokuoti el. pašto stebėjimo priemones ir slėpti adresą</string>
 
-    <string name="autofillDisableAutofillPromptTitle">Ar norite toliau įrašyti prisijungimus?</string>
     <string name="autofillDisableAutofillPromptMessage">Tai galite bet kada išjungti nustatymuose.</string>
     <string name="autofillDisableAutofillPromptPositiveButton">Toliau įrašyti</string>
     <string name="autofillDisableAutofillPromptNegativeButton">Išjungti</string>

@@ -150,7 +150,6 @@
     <string name="settingsWebTrackingProtectionDescription">Активирано по подразбиране</string>
     <string name="settingsHeadingSettings">Настройки</string>
     <string name="settingsPermissionsSetting">Разрешения</string>
-    <string name="settingsAutofillLoginsSetting">Данни за вход</string>
     <string name="settingsSyncSetting">Синхронизиране и архивиране</string>
     <string name="settingsFireButton">Fire Button</string>
 
@@ -634,8 +633,6 @@
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Преглед</string>
-    <string name="autofillLoginSavedSnackbarMessage">Данните за вход са запазени</string>
-    <string name="autofillLoginUpdatedSnackbarMessage">Данните за вход са актуализирани</string>
 
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Искате ли да Ви изпратим известие, когато дойде Вашият ред?</string>

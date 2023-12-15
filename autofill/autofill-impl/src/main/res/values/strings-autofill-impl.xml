@@ -17,16 +17,11 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autofillManagementScreenTitle">Logins</string>
-
     <string name="managementDisabledModeCta"><b>Set up in Settings</b></string>
-    <string name="managementDisabledModeSubtitle">A device lock pattern, PIN, or biometrics is required to protect your Logins.</string>
-    <string name="managementDisabledModeTitle">Secure your device to save Logins</string>
 
     <string name="saveLoginDialogButtonSave">Save Password</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Save Password</string>
     <string name="saveLoginDialogNotNow">Don\'t Save</string>
-    <string name="saveLoginDialogSubtitle">Passwords are stored securely on your device in the Logins menu.</string>
     <string name="saveLoginDialogTitle">Do you want DuckDuckGo to save your password?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">More Options</string>
 
@@ -47,47 +42,36 @@
 
     <string name="autofillDialogCloseButtonContentDescription">Close Autofill Dialog</string>
 
-    <string name="credentialManagementEditLoginTitleHint">Login Title</string>
     <string name="credentialManagementEditUsernameHint">Username</string>
     <string name="credentialManagementEditPasswordHint">Password</string>
-    <string name="credentialManagementEditTitle">Edit Login</string>
     <string name="credentialManagementEditWebsiteHint">Website URL</string>
     <string name="credentialManagementEditNotesHint">Notes</string>
     <string name="credentialManagementEditButtonDelete">Delete</string>
     <string name="credentialManagementEditButtonSaveChanges">Save Changes</string>
     <string name="credentialManagementEditButtonCopyUsername">Copy Username</string>
     <string name="credentialManagementEditButtonCopyPassword">Copy Password</string>
-    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Login last updated %1$s</string>
 
-    <string name="credentialManagementAutofillToggleLabel">Save and Autofill Logins</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Logins are stored securely on your device</string>
     <string name="credentialManagementViewMenuEdit">Edit</string>
     <string name="credentialManagementViewMenuDelete">Delete</string>
 
     <string name="credentialManagementSuggestionsLabel">Suggested</string>
-    <string name="credentialManagementNoLoginsSavedTitle">No Logins saved yet</string>
 
-    <string name="autofillManagementAddLogin">Add Login</string>
-    <string name="autofillManagementSearchLogins">Search logins</string>
     <string name="autofillManagementSearchClearDescription">Clear search input</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for 'kittens'">No results for \'%1$s\'</string>
 
     <string name="autofillDeleteLoginDialogCancel">Cancel</string>
     <string name="autofillDeleteLoginDialogDelete">Delete</string>
-    <string name="autofillDeleteLoginDialogTitle">Are you sure you want to delete this Login?</string>
+
 
     <string name="autofillManagementUsernameCopied">Username copied</string>
     <string name="autofillManagementPasswordCopied">Password copied</string>
 
     <string name="autofill_password_generation_offer_title">Use a strong password from DuckDuckGo?</string>
-    <string name="autofill_password_generation_offer_message">Passwords are stored securely on your device in the Logins menu.</string>
     <string name="autofill_password_generation_offer_accept">Use Strong Password</string>
     <string name="autofill_password_generation_offer_decline">Create My Own</string>
 
     <string name="deviceNotSupportedTitle">Device not supported</string>
-    <string name="deviceNotSupportedSubtitle">To store Logins securely, we need to encrypt and store them on your device. Because your device does not support encrypted storage, Logins is unavailable.</string>
 
-    <string name="autofillManagementDeletedConfirmation">Login deleted</string>
     <string name="autofillManagementUndoDeletion">Undo</string>
 
     <string name="credentialManagementLinkButtonContentDescription" instruction="Accessibility text for a button that will show next to a text field containing a website address; it will launch the website when tapped">Open website</string>
@@ -116,7 +100,6 @@
     <string name="autofillTooltipGenerateAddress" instruction="'Duck Address' is the feature name, and should not be translated.">Generate Private Duck Address</string>
     <string name="autofillTooltipGenerateAddressDescription" instruction="'hide address' refers to using an alias so your real email address is not used">Block email trackers &amp; hide address</string>
 
-    <string name="autofillDisableAutofillPromptTitle">Do you want to keep saving Logins?</string>
     <string name="autofillDisableAutofillPromptMessage">You can disable this at any time in Settings.</string>
     <string name="autofillDisableAutofillPromptPositiveButton">Keep Saving</string>
     <string name="autofillDisableAutofillPromptNegativeButton">Disable</string>

@@ -17,16 +17,12 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autofillManagementScreenTitle">Inicios de sesión</string>
 
     <string name="managementDisabledModeCta"><b>Configurar en Ajustes</b></string>
-    <string name="managementDisabledModeSubtitle">Se requiere un patrón de bloqueo del dispositivo, un PIN o datos biométricos para proteger tus inicios de sesión.</string>
-    <string name="managementDisabledModeTitle">Protege tu dispositivo para guardar los inicios de sesión</string>
 
     <string name="saveLoginDialogButtonSave">Guardar contraseña</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Guardar contraseña</string>
     <string name="saveLoginDialogNotNow">No guardar</string>
-    <string name="saveLoginDialogSubtitle">Las contraseñas se almacenan de forma segura en tu dispositivo en el menú Inicios de sesión.</string>
     <string name="saveLoginDialogTitle">¿Quieres que DuckDuckGo guarde tu contraseña?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Más opciones</string>
 
@@ -47,47 +43,35 @@
 
     <string name="autofillDialogCloseButtonContentDescription">Cerrar cuadro de diálogo de Autocompletar</string>
 
-    <string name="credentialManagementEditLoginTitleHint">Título de inicio de sesión</string>
     <string name="credentialManagementEditUsernameHint">Nombre de usuario</string>
     <string name="credentialManagementEditPasswordHint">Contraseña</string>
-    <string name="credentialManagementEditTitle">Editar inicio de sesión</string>
     <string name="credentialManagementEditWebsiteHint">URL del sitio web</string>
     <string name="credentialManagementEditNotesHint">Notas</string>
     <string name="credentialManagementEditButtonDelete">Eliminar</string>
     <string name="credentialManagementEditButtonSaveChanges">Guardar cambios</string>
     <string name="credentialManagementEditButtonCopyUsername">Copiar nombre de usuario</string>
     <string name="credentialManagementEditButtonCopyPassword">Copiar contraseña</string>
-    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Última actualización de inicio de sesión %1$s</string>
 
-    <string name="credentialManagementAutofillToggleLabel">Guardar y autocompletar inicios de sesión</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Los inicios de sesión se almacenan de forma segura en tu dispositivo</string>
     <string name="credentialManagementViewMenuEdit">Editar</string>
     <string name="credentialManagementViewMenuDelete">Eliminar</string>
 
     <string name="credentialManagementSuggestionsLabel">Sugerencias</string>
-    <string name="credentialManagementNoLoginsSavedTitle">Aún no hay inicios de sesión guardados</string>
 
-    <string name="autofillManagementAddLogin">Añadir inicio de sesión</string>
-    <string name="autofillManagementSearchLogins">Buscar inicios de sesión</string>
     <string name="autofillManagementSearchClearDescription">Borrar búsqueda</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Sin resultados para «%1$s»</string>
 
     <string name="autofillDeleteLoginDialogCancel">Cancelar</string>
     <string name="autofillDeleteLoginDialogDelete">Eliminar</string>
-    <string name="autofillDeleteLoginDialogTitle">¿Seguro que quieres eliminar este inicio de sesión?</string>
 
     <string name="autofillManagementUsernameCopied">Nombre de usuario copiado</string>
     <string name="autofillManagementPasswordCopied">Contraseña copiada</string>
 
     <string name="autofill_password_generation_offer_title">¿Usar una contraseña segura de DuckDuckGo?</string>
-    <string name="autofill_password_generation_offer_message">Las contraseñas se almacenan de forma segura en tu dispositivo en el menú Inicios de sesión.</string>
     <string name="autofill_password_generation_offer_accept">Usar contraseña segura</string>
     <string name="autofill_password_generation_offer_decline">Crear la mía propia</string>
 
     <string name="deviceNotSupportedTitle">Dispositivo no compatible</string>
-    <string name="deviceNotSupportedSubtitle">Para almacenar los inicios de sesión de forma segura, necesitamos cifrarlos y almacenarlos en tu dispositivo. Debido a que tu dispositivo no admite el almacenamiento cifrado, los inicios de sesión no están disponibles.</string>
 
-    <string name="autofillManagementDeletedConfirmation">Inicio de sesión eliminado</string>
     <string name="autofillManagementUndoDeletion">Deshacer</string>
 
     <string name="credentialManagementLinkButtonContentDescription" instruction="Accessibility text for a button that will show next to a text field containing a website address; it will launch the website when tapped">Abrir sitio web</string>
@@ -116,7 +100,6 @@
     <string name="autofillTooltipGenerateAddress" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated.">Generar Duck Address privada</string>
     <string name="autofillTooltipGenerateAddressDescription" instruction="&apos;hide address&apos; refers to using an alias so your real email address is not used">Bloquear rastreadores de correo electrónico y ocultar dirección</string>
 
-    <string name="autofillDisableAutofillPromptTitle">¿Deseas seguir guardando inicios de sesión?</string>
     <string name="autofillDisableAutofillPromptMessage">Puedes desactivar esta opción en cualquier momento en Ajustes.</string>
     <string name="autofillDisableAutofillPromptPositiveButton">Seguir guardando</string>
     <string name="autofillDisableAutofillPromptNegativeButton">Deshabilitar</string>

@@ -150,7 +150,6 @@
     <string name="settingsWebTrackingProtectionDescription">Standardmäßig aktiviert</string>
     <string name="settingsHeadingSettings">Einstellungen</string>
     <string name="settingsPermissionsSetting">Berechtigungen</string>
-    <string name="settingsAutofillLoginsSetting">Anmeldungen</string>
     <string name="settingsSyncSetting">Synchronisieren und sichern</string>
     <string name="settingsFireButton">Fire Button</string>
 
@@ -634,8 +633,6 @@
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Ansehen</string>
-    <string name="autofillLoginSavedSnackbarMessage">Anmeldedaten gespeichert</string>
-    <string name="autofillLoginUpdatedSnackbarMessage">Anmeldedaten aktualisiert</string>
 
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Möchtest du eine Benachrichtigung erhalten, wenn du die E-Mail-Schutzfunktion testen kannst?</string>

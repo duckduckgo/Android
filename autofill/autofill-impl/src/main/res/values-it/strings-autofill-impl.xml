@@ -17,16 +17,12 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autofillManagementScreenTitle">Accessi</string>
 
     <string name="managementDisabledModeCta"><b>Configura in Impostazioni</b></string>
-    <string name="managementDisabledModeSubtitle">Per proteggere i tuoi accessi sono necessari una sequenza di blocco del dispositivo, un PIN o dati biometrici.</string>
-    <string name="managementDisabledModeTitle">Proteggi il tuo dispositivo per salvare gli accessi</string>
 
     <string name="saveLoginDialogButtonSave">Salva password</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Salva password</string>
     <string name="saveLoginDialogNotNow">Non salvare</string>
-    <string name="saveLoginDialogSubtitle">Le password sono archiviate in modo sicuro sul tuo dispositivo nel menu Accessi.</string>
     <string name="saveLoginDialogTitle">Vuoi che DuckDuckGo salvi la password?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Altre opzioni</string>
 
@@ -47,47 +43,35 @@
 
     <string name="autofillDialogCloseButtonContentDescription">Chiudi la finestra di dialogo della compilazione automatica</string>
 
-    <string name="credentialManagementEditLoginTitleHint">Titolo dati di accesso</string>
     <string name="credentialManagementEditUsernameHint">Nome utente</string>
     <string name="credentialManagementEditPasswordHint">Password</string>
-    <string name="credentialManagementEditTitle">Modifica dati di accesso</string>
     <string name="credentialManagementEditWebsiteHint">URL del sito Web</string>
     <string name="credentialManagementEditNotesHint">Note</string>
     <string name="credentialManagementEditButtonDelete">Cancella</string>
     <string name="credentialManagementEditButtonSaveChanges">Salva modifiche</string>
     <string name="credentialManagementEditButtonCopyUsername">Copia nome utente</string>
     <string name="credentialManagementEditButtonCopyPassword">Copia password</string>
-    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Ultimo aggiornamento dei dati di accesso %1$s</string>
 
-    <string name="credentialManagementAutofillToggleLabel">Salva e compila automaticamente i dati di accesso</string>
-    <string name="credentialManagementAutofillToggleSubtitle">I dati di accesso sono archiviati in modo sicuro sul tuo dispositivo</string>
     <string name="credentialManagementViewMenuEdit">Modifica</string>
     <string name="credentialManagementViewMenuDelete">Cancella</string>
 
     <string name="credentialManagementSuggestionsLabel">Suggerimenti</string>
-    <string name="credentialManagementNoLoginsSavedTitle">Non ci sono ancora dati di accesso salvati</string>
 
-    <string name="autofillManagementAddLogin">Aggiungi dati di accesso</string>
-    <string name="autofillManagementSearchLogins">Cerca dati di accesso</string>
     <string name="autofillManagementSearchClearDescription">Elimina input di ricerca</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Nessun risultato per \"%1$s\"</string>
 
     <string name="autofillDeleteLoginDialogCancel">Annulla</string>
     <string name="autofillDeleteLoginDialogDelete">Cancella</string>
-    <string name="autofillDeleteLoginDialogTitle">Vuoi davvero eliminare questi dati di accesso?</string>
 
     <string name="autofillManagementUsernameCopied">Nome utente copiato</string>
     <string name="autofillManagementPasswordCopied">Password copiata</string>
 
     <string name="autofill_password_generation_offer_title">Usare una password complessa da DuckDuckGo?</string>
-    <string name="autofill_password_generation_offer_message">Le password sono archiviate in modo sicuro sul tuo dispositivo nel menu Accessi.</string>
     <string name="autofill_password_generation_offer_accept">Usa una password complessa</string>
     <string name="autofill_password_generation_offer_decline">Crea la mia</string>
 
     <string name="deviceNotSupportedTitle">Dispositivo non supportato</string>
-    <string name="deviceNotSupportedSubtitle">Per archiviare i dati di accesso in modo sicuro, dobbiamo crittografarli e archiviarli sul tuo dispositivo. Poiché il dispositivo non supporta l\'archiviazione crittografata, Accessi non è disponibile.</string>
 
-    <string name="autofillManagementDeletedConfirmation">Dati di accesso eliminati</string>
     <string name="autofillManagementUndoDeletion">Annulla</string>
 
     <string name="credentialManagementLinkButtonContentDescription" instruction="Accessibility text for a button that will show next to a text field containing a website address; it will launch the website when tapped">Apri il sito web</string>
@@ -116,7 +100,6 @@
     <string name="autofillTooltipGenerateAddress" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated.">Genera Duck Address privato</string>
     <string name="autofillTooltipGenerateAddressDescription" instruction="&apos;hide address&apos; refers to using an alias so your real email address is not used">Blocca i sistemi di tracciamento e-mail e nascondi il tuo indirizzo</string>
 
-    <string name="autofillDisableAutofillPromptTitle">Vuoi continuare a salvare i dati di accesso?</string>
     <string name="autofillDisableAutofillPromptMessage">Puoi disattivare questa funzione in qualsiasi momento in Impostazioni.</string>
     <string name="autofillDisableAutofillPromptPositiveButton">Continua a salvare</string>
     <string name="autofillDisableAutofillPromptNegativeButton">Disabilita</string>

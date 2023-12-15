@@ -17,16 +17,12 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autofillManagementScreenTitle">Logins</string>
 
     <string name="managementDisabledModeCta"><b>Konfigurer i Indstillinger</b></string>
-    <string name="managementDisabledModeSubtitle">Der kræves et låsemønster, en pinkode eller biometri for at beskytte dine logins.</string>
-    <string name="managementDisabledModeTitle">Beskyt din enhed for at gemme logins</string>
 
     <string name="saveLoginDialogButtonSave">Gem adgangskode</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Gem adgangskode</string>
     <string name="saveLoginDialogNotNow">Gem ikke</string>
-    <string name="saveLoginDialogSubtitle">Adgangskoder gemmes sikkert på din enhed i menuen Logins.</string>
     <string name="saveLoginDialogTitle">Skal DuckDuckGo gemme din adgangskode?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Flere muligheder</string>
 
@@ -47,47 +43,35 @@
 
     <string name="autofillDialogCloseButtonContentDescription">Luk dialogboksen for automatisk udfyldning</string>
 
-    <string name="credentialManagementEditLoginTitleHint">Login-titel</string>
     <string name="credentialManagementEditUsernameHint">Brugernavn</string>
     <string name="credentialManagementEditPasswordHint">Adgangskode</string>
-    <string name="credentialManagementEditTitle">Rediger login</string>
     <string name="credentialManagementEditWebsiteHint">URL til webstedet</string>
     <string name="credentialManagementEditNotesHint">Noter</string>
     <string name="credentialManagementEditButtonDelete">Slet</string>
     <string name="credentialManagementEditButtonSaveChanges">Gem ændringer</string>
     <string name="credentialManagementEditButtonCopyUsername">Kopiér brugernavn</string>
     <string name="credentialManagementEditButtonCopyPassword">Kopiér adgangskode</string>
-    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Login sidst opdateret %1$s</string>
 
-    <string name="credentialManagementAutofillToggleLabel">Gem og udfyld automatisk logins</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Login gemmes sikkert på din enhed</string>
     <string name="credentialManagementViewMenuEdit">Rediger</string>
     <string name="credentialManagementViewMenuDelete">Slet</string>
 
     <string name="credentialManagementSuggestionsLabel">Foreslået</string>
-    <string name="credentialManagementNoLoginsSavedTitle">Ingen logins gemt endnu</string>
 
-    <string name="autofillManagementAddLogin">Tilføj login</string>
-    <string name="autofillManagementSearchLogins">Søg logins</string>
     <string name="autofillManagementSearchClearDescription">Ryd søgeinput</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Ingen resultater for \"%1$s\"</string>
 
     <string name="autofillDeleteLoginDialogCancel">Annuller</string>
     <string name="autofillDeleteLoginDialogDelete">Slet</string>
-    <string name="autofillDeleteLoginDialogTitle">Er du sikker på, at du vil slette dette login?</string>
 
     <string name="autofillManagementUsernameCopied">Brugernavn kopieret</string>
     <string name="autofillManagementPasswordCopied">Adgangskode kopieret</string>
 
     <string name="autofill_password_generation_offer_title">Brug en stærk adgangskode fra DuckDuckGo?</string>
-    <string name="autofill_password_generation_offer_message">Adgangskoder gemmes sikkert på din enhed i menuen Logins.</string>
     <string name="autofill_password_generation_offer_accept">Brug en stærk adgangskode</string>
     <string name="autofill_password_generation_offer_decline">Opret min egen</string>
 
     <string name="deviceNotSupportedTitle">Enheden understøttes ikke</string>
-    <string name="deviceNotSupportedSubtitle">For at gemme logins sikkert skal vi kryptere og gemme dem på din enhed. Da din enhed ikke understøtter krypteret lagring, er logins ikke tilgængelige.</string>
 
-    <string name="autofillManagementDeletedConfirmation">Login slettet</string>
     <string name="autofillManagementUndoDeletion">Fortryd</string>
 
     <string name="credentialManagementLinkButtonContentDescription" instruction="Accessibility text for a button that will show next to a text field containing a website address; it will launch the website when tapped">Åbn websted</string>
@@ -116,7 +100,6 @@
     <string name="autofillTooltipGenerateAddress" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated.">Opret privat Duck-adresse</string>
     <string name="autofillTooltipGenerateAddressDescription" instruction="&apos;hide address&apos; refers to using an alias so your real email address is not used">Bloker e-mailtrackere og skjul adresse</string>
 
-    <string name="autofillDisableAutofillPromptTitle">Vil du fortsat gemme logins?</string>
     <string name="autofillDisableAutofillPromptMessage">Du kan til enhver tid deaktivere automatisk udfyldning i Indstillinger.</string>
     <string name="autofillDisableAutofillPromptPositiveButton">Fortsæt med at gemme</string>
     <string name="autofillDisableAutofillPromptNegativeButton">Deaktiver</string>

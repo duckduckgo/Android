@@ -9,7 +9,7 @@ appId: com.duckduckgo.mobile.android
           - tapOn:
                   id: addLoginManually
           - assertVisible:
-                  text: Add Login
+                  text: Add Password
           - assertNotVisible:
                   id: view_menu_save
 
@@ -36,12 +36,12 @@ appId: com.duckduckgo.mobile.android
                 id: view_menu_save
                 retryTapIfNoChange: false
 
-          - assertVisible: "Login last updated.*"
+          - assertVisible: "Last updated.*"
 
           - tapOn: "Navigate up"
 
           - assertVisible:
-                text: "Save and Autofill Logins"
+                text: "Save and autofill passwords"
           - evalScript: ${output.addLogins.counter++}
 
 - assertVisible:

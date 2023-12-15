@@ -149,7 +149,6 @@
     <string name="settingsWebTrackingProtectionDescription">Enabled by default</string>
     <string name="settingsHeadingSettings">Settings</string>
     <string name="settingsPermissionsSetting">Permissions</string>
-    <string name="settingsAutofillLoginsSetting">Logins</string>
     <string name="settingsSyncSetting">Sync &amp; Backup</string>
     <string name="settingsFireButton">Fire Button</string>
 
@@ -633,8 +632,6 @@
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">View</string>
-    <string name="autofillLoginSavedSnackbarMessage">Login saved</string>
-    <string name="autofillLoginUpdatedSnackbarMessage">Login updated</string>
 
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Would you like us to send you a notification when it\'s your turn?</string>

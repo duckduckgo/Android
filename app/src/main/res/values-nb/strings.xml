@@ -150,7 +150,6 @@
     <string name="settingsWebTrackingProtectionDescription">Aktivert som standard</string>
     <string name="settingsHeadingSettings">Innstillinger</string>
     <string name="settingsPermissionsSetting">Tillatelser</string>
-    <string name="settingsAutofillLoginsSetting">Pålogginger</string>
     <string name="settingsSyncSetting">Synkronisering og sikkerhetskopiering</string>
     <string name="settingsFireButton">Fire Button</string>
 
@@ -634,8 +633,6 @@
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Vis</string>
-    <string name="autofillLoginSavedSnackbarMessage">Pålogging lagret</string>
-    <string name="autofillLoginUpdatedSnackbarMessage">Pålogging oppdatert</string>
 
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Skal vi sende et varsel til deg når det er din tur?</string>

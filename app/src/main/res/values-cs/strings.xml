@@ -150,7 +150,6 @@
     <string name="settingsWebTrackingProtectionDescription">Ve výchozím nastavení povoleno</string>
     <string name="settingsHeadingSettings">Nastavení</string>
     <string name="settingsPermissionsSetting">Oprávnění</string>
-    <string name="settingsAutofillLoginsSetting">Přihlášení</string>
     <string name="settingsSyncSetting">Synchronizace a zálohování</string>
     <string name="settingsFireButton">Fire Button</string>
 
@@ -638,8 +637,6 @@
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Zobrazit</string>
-    <string name="autofillLoginSavedSnackbarMessage">Přihlašovací údaje uloženy</string>
-    <string name="autofillLoginUpdatedSnackbarMessage">Příhlašovací údaje aktualizovány</string>
 
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Chcete, abychom vám poslali upozornění, až na vás bude řada?</string>

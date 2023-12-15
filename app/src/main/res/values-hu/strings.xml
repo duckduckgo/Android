@@ -150,7 +150,6 @@
     <string name="settingsWebTrackingProtectionDescription">Alapértelmezés szerint engedélyezve</string>
     <string name="settingsHeadingSettings">Beállítások</string>
     <string name="settingsPermissionsSetting">Engedélyek</string>
-    <string name="settingsAutofillLoginsSetting">Bejelentkezések</string>
     <string name="settingsSyncSetting">Szinkronizálás és biztonsági mentés</string>
     <string name="settingsFireButton">Tűz gomb</string>
 
@@ -634,8 +633,6 @@
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Megtekintés</string>
-    <string name="autofillLoginSavedSnackbarMessage">Bejelentkezés mentve</string>
-    <string name="autofillLoginUpdatedSnackbarMessage">Bejelentkezés frissítve</string>
 
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Szeretnéd, hogy értesítést küldjünk neked, amikor rád kerül a sor?</string>

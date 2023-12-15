@@ -150,7 +150,6 @@
     <string name="settingsWebTrackingProtectionDescription">Aktiverat som standard</string>
     <string name="settingsHeadingSettings">Inställningar</string>
     <string name="settingsPermissionsSetting">Behörigheter</string>
-    <string name="settingsAutofillLoginsSetting">Inloggningar</string>
     <string name="settingsSyncSetting">Synkronisering och säkerhetskopiering</string>
     <string name="settingsFireButton">Fire Button</string>
 
@@ -634,8 +633,6 @@
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Visa</string>
-    <string name="autofillLoginSavedSnackbarMessage">Inloggning sparad</string>
-    <string name="autofillLoginUpdatedSnackbarMessage">Inloggning uppdaterad</string>
 
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Vill du att vi ska skicka ett meddelande när det är din tur?</string>

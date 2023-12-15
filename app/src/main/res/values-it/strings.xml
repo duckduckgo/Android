@@ -150,7 +150,6 @@
     <string name="settingsWebTrackingProtectionDescription">Abilitato per impostazione predefinita</string>
     <string name="settingsHeadingSettings">Impostazioni</string>
     <string name="settingsPermissionsSetting">Autorizzazioni</string>
-    <string name="settingsAutofillLoginsSetting">Accessi</string>
     <string name="settingsSyncSetting">Sincronizzazione e backup</string>
     <string name="settingsFireButton">Fire Button</string>
 
@@ -634,8 +633,6 @@
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Visualizza</string>
-    <string name="autofillLoginSavedSnackbarMessage">Dati di accesso salvati</string>
-    <string name="autofillLoginUpdatedSnackbarMessage">Dati di accesso aggiornati</string>
 
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Vuoi ricevere una notifica quando è il tuo turno?</string>

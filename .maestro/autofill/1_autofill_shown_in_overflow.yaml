@@ -2,5 +2,5 @@ appId: com.duckduckgo.mobile.android
 ---
 - tapOn:
       id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
-- assertVisible: "Logins"
-- tapOn: "Logins"
+- assertVisible: "Passwords"
+- tapOn: "Passwords"
