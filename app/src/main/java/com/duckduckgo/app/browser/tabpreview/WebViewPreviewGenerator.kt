@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser.tabpreview
 
+import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.webkit.WebView
 import androidx.core.view.drawToBitmap
@@ -36,6 +37,7 @@ class FileBasedWebViewPreviewGenerator(private val dispatchers: DispatcherProvid
         return scaledBitmap
     }
 
+    @SuppressLint("AvoidComputationUsage")
     private suspend fun createBitmap(webView: WebView): Bitmap {
         return withContext(dispatchers.computation()) {
             webView.drawToBitmap()
@@ -56,6 +58,7 @@ class FileBasedWebViewPreviewGenerator(private val dispatchers: DispatcherProvid
         }
     }
 
+    @SuppressLint("AvoidComputationUsage")
     private suspend fun scaleBitmap(bitmap: Bitmap): Bitmap {
         return withContext(dispatchers.computation()) {
             return@withContext Bitmap.createScaledBitmap(
