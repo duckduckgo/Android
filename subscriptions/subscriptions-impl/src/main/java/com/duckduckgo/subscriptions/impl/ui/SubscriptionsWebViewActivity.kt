@@ -23,6 +23,8 @@ import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebViewClient
 import android.widget.Toast
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -45,6 +47,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.subscriptions.impl.R.string
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ACTIVATE_URL
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BUY_URL
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionsWebviewBinding
 import com.duckduckgo.subscriptions.impl.ui.AddDeviceActivity.Companion.AddDeviceScreenWithEmptyParams
@@ -273,6 +276,9 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity() {
     }
 
     private fun backToSettings() {
+        if (url == ACTIVATE_URL) {
+            setResult(RESULT_OK)
+        }
         finish()
     }
 
@@ -280,8 +286,14 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity() {
         globalActivityStarter.start(this, AddDeviceScreenWithEmptyParams)
     }
 
+    private val startForResultRestore = registerForActivityResult(StartActivityForResult()) { result: ActivityResult ->
+        if (result.resultCode == RESULT_OK) {
+            binding.webview.reload()
+        }
+    }
+
     private fun restoreSubscription() {
-        globalActivityStarter.start(this, RestoreSubscriptionScreenWithEmptyParams)
+        startForResultRestore.launch(globalActivityStarter.startIntent(this, RestoreSubscriptionScreenWithEmptyParams))
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

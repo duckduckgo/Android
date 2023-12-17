@@ -40,4 +40,5 @@ object SubscriptionsConstants {
 
     // URLs
     const val BUY_URL = "https://abrown.duckduckgo.com/subscriptions"
+    const val ACTIVATE_URL = "https://abrown.duckduckgo.com/subscriptions/activate"
 }

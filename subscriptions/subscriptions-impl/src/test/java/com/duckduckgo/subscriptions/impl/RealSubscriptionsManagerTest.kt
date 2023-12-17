@@ -593,7 +593,7 @@ class RealSubscriptionsManagerTest {
     }
 
     @Test
-    fun whenGetAuthTokenIfUserAuthenticatedWithSubscriptionAndTokenExpiredAndPurchaseInStoreExistsThenReturnSuccess() = runTest {
+    fun whenGetAuthTokenIfUserAuthenticatedWithSubscriptionAndTokenExpiredAndEntitlementsExistsThenReturnSuccess() = runTest {
         givenUserIsAuthenticated()
         givenValidateTokenSucceedsWithEntitlements()
         givenValidateTokenFailsAndThenSucceeds("""{ "error": "expired_token" }""")
@@ -606,6 +606,21 @@ class RealSubscriptionsManagerTest {
         verify(authService).storeLogin(any())
         assertTrue(result is AuthToken.Success)
         assertEquals("authToken", (result as AuthToken.Success).authToken)
+    }
+
+    @Test
+    fun whenGetAuthTokenIfUserAuthenticatedWithSubscriptionAndTokenExpiredAndEntitlementsDoNotExistThenReturnFailure() = runTest {
+        givenUserIsAuthenticated()
+        givenValidateTokenSucceedsNoEntitlements()
+        givenValidateTokenFailsAndThenSucceedsWithNoEntitlements("""{ "error": "expired_token" }""")
+        givenPurchaseStored()
+        givenPurchaseStoredIsValid()
+        givenAuthenticateSucceeds()
+
+        val result = subscriptionsManager.getAuthToken()
+
+        verify(authService).storeLogin(any())
+        assertTrue(result is AuthToken.Failure)
     }
 
     @Test
@@ -736,6 +751,21 @@ class RealSubscriptionsManagerTest {
                         entitlements = listOf(
                             Entitlement("id", "name", "testProduct"),
                         ),
+                    ),
+                ),
+            )
+    }
+
+    private suspend fun givenValidateTokenFailsAndThenSucceedsWithNoEntitlements(failure: String) {
+        val exception = failure.toResponseBody("text/json".toMediaTypeOrNull())
+        whenever(authService.validateToken(any()))
+            .thenThrow(HttpException(Response.error<String>(400, exception)))
+            .thenReturn(
+                ValidateTokenResponse(
+                    account = AccountResponse(
+                        email = "accessToken",
+                        externalId = "1234",
+                        entitlements = listOf(),
                     ),
                 ),
             )
