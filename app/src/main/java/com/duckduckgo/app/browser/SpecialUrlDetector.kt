@@ -81,7 +81,7 @@ class SpecialUrlDetectorImpl(
             SMSTO_SCHEME -> buildSmsTo(uriString)
             HTTP_SCHEME, HTTPS_SCHEME, DATA_SCHEME -> processUrl(initiatingUrl, uriString)
             JAVASCRIPT_SCHEME, ABOUT_SCHEME, FILE_SCHEME, SITE_SCHEME -> UrlType.SearchQuery(uriString)
-            null -> UrlType.SearchQuery(uriString)
+            null, FILETYPE_SCHEME, IN_TITLE_SCHEME, IN_URL_SCHEME -> UrlType.SearchQuery(uriString)
             else -> checkForIntent(scheme, uriString)
         }
     }
@@ -216,6 +216,9 @@ class SpecialUrlDetectorImpl(
         private const val FILE_SCHEME = "file"
         private const val SITE_SCHEME = "site"
         private const val EXTRA_FALLBACK_URL = "browser_fallback_url"
+        private const val FILETYPE_SCHEME = "filetype"
+        private const val IN_TITLE_SCHEME = "intitle"
+        private const val IN_URL_SCHEME = "inurl"
         const val SMS_MAX_LENGTH = 400
         const val PHONE_MAX_LENGTH = 20
         const val EMAIL_MAX_LENGTH = 1000
