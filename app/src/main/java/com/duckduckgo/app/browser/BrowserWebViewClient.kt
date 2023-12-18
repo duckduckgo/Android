@@ -277,6 +277,8 @@ class BrowserWebViewClient @Inject constructor(
         url: String?,
         favicon: Bitmap?,
     ) {
+
+        // [CRIS] TEMP: Throw exception on high latency to avoid polluting results
         appCoroutineScope.launch {
             getPing().let { if (it >= LATENCY_THRESHOLD) throw Exception("Bad network: $it ms") }
         }
@@ -330,6 +332,7 @@ class BrowserWebViewClient @Inject constructor(
         flushCookies()
         printInjector.injectPrint(webView)
 
+        // [CRIS] TEMP: Throw exception on high latency to avoid polluting results
         appCoroutineScope.launch {
             getPing().let { if (it >= LATENCY_THRESHOLD) throw Exception("Bad network: $it ms") }
         }
@@ -360,6 +363,9 @@ class BrowserWebViewClient @Inject constructor(
             Timber.v("Intercepting resource ${request.url} type:${request.method} on page $documentUrl")
             requestInterceptor.shouldIntercept(request, webView, documentUrl, webViewClientListener)
         }
+        // [CRIS] TEMP: This will log only one execution of the tens or hundreds that happen within a page load
+        // See https://app.asana.com/0/0/1206159443951489/f (Macrobenchmark can't handle webview methods well)
+
         Trace.endAsyncSection("LOAD_PAGE_SHOULD_INTERCEPT_REQUEST", traceCookie)
         return result
     }
@@ -551,10 +557,12 @@ class BrowserWebViewClient @Inject constructor(
 
     @RequiresApi(Build.VERSION_CODES.Q)
     private fun beginTrace(url: String, trace: String, cookie: Int) {
+        // [CRIS] TEMP: Ignore about:blank and store start time for LOAD_PAGE_ON_PAGE_STARTED
+        // See https://app.asana.com/0/0/1206159443951489/f (Macrobenchmark limitations and Webview limitations)
         if (url != "about:blank") {
             if (trace == "LOAD_PAGE_ON_PAGE_STARTED") {
                 start = SystemClock.elapsedRealtime()
-                //Log.v("BrowserWebViewClient", "LOAD_PAGE_ON_PAGE_STARTED ${URL(url).host}")
+                Log.v("BrowserWebViewClient", "LOAD_PAGE_ON_PAGE_STARTED ${URL(url).host}")
             }
             android.os.Trace.beginAsyncSection(trace, cookie)
         }
@@ -564,11 +572,14 @@ class BrowserWebViewClient @Inject constructor(
     private fun endTrace(url: String, webView: WebView, trace: String, cookie: Int) {
         if (url != "about:blank") {
             if (trace == "LOAD_PAGE_START_TO_FINISH") {
-                //Log.v("BrowserWebViewClient", "LOAD_PAGE_START_TO_FINISH ${URL(url).host}, start: $start, progress: ${webView.progress}")
-
                 if (start != null && webView.progress == 100) {
                     end = SystemClock.elapsedRealtime()
-                    //Log.v("BrowserWebViewClient", "LOAD_PAGE_START_TO_FINISH ${URL(url).host}: ${end!!-start!!}ms")
+                    // [CRIS] TEMP: Only log finish when
+                    //    1. Not about:blank
+                    //    2. Already started
+                    //    3. Webview progress == 100
+                    // See https://app.asana.com/0/0/1206159443951489/f (Macrobenchmark limitations and Webview limitations)
+                    Log.v("BrowserWebViewClient", "LOAD_PAGE_START_TO_FINISH ${URL(url).host}: ${end!!-start!!}ms")
                     android.os.Trace.endAsyncSection(trace, cookie)
                     Snackbar.make(webView, "Load finished", Snackbar.LENGTH_LONG).show()
                 }

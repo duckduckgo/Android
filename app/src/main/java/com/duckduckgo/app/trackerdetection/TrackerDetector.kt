@@ -76,6 +76,8 @@ class TrackerDetectorImpl @Inject constructor(
         requestHeaders: Map<String, String>,
     ): TrackingEvent? {
         val traceCookie = Random(System.currentTimeMillis()).nextInt()
+        // [CRIS] TEMP: This will log only one execution of the tens or hundreds that happen within a page load
+        // See https://app.asana.com/0/0/1206159443951489/f (Macrobenchmark can't handle webview methods well)
         Trace.beginAsyncSection("TRACKER_DETECTOR_EVALUATE", traceCookie)
         if (checkFirstParty && firstParty(url, documentUrl)) {
             Timber.v("$url is a first party url")
