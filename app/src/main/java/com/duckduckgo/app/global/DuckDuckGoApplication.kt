@@ -131,7 +131,8 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
     }
 
     private fun configureLogging() {
-        if (BuildConfig.DEBUG) Timber.plant(Timber.DebugTree())
+        // [CRIS] TEMP: Needed to get logs in release builds
+        Timber.plant(Timber.DebugTree())
     }
 
     private fun configureDependencyInjection() {
