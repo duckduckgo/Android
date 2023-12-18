@@ -2894,8 +2894,18 @@ class BrowserTabViewModel @Inject constructor(
         site?.resetErrors()
     }
 
+    fun resetBrowserError() {
+        browserViewState.value = currentBrowserViewState().copy(browserError = OMITTED)
+    }
+
+    fun refreshBrowserError() {
+        if (currentBrowserViewState().browserError != OMITTED && currentBrowserViewState().browserError != LOADING) {
+            browserViewState.value = currentBrowserViewState().copy(browserError = LOADING)
+        }
+    }
+
     fun onWebViewRefreshed() {
-        browserViewState.value = currentBrowserViewState().copy(browserError = LOADING)
+        refreshBrowserError()
         accessibilityViewState.value = currentAccessibilityViewState().copy(refreshWebView = false)
         canAutofillSelectCredentialsDialogCanAutomaticallyShow = true
     }
