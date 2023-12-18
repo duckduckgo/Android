@@ -150,7 +150,6 @@
     <string name="settingsWebTrackingProtectionDescription">Активирано по подразбиране</string>
     <string name="settingsHeadingSettings">Настройки</string>
     <string name="settingsPermissionsSetting">Разрешения</string>
-    <string name="settingsAutofillLoginsSetting">Данни за вход</string>
     <string name="settingsSyncSetting">Синхронизиране и архивиране</string>
     <string name="settingsFireButton">Fire Button</string>
 
@@ -634,8 +633,6 @@
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Преглед</string>
-    <string name="autofillLoginSavedSnackbarMessage">Данните за вход са запазени</string>
-    <string name="autofillLoginUpdatedSnackbarMessage">Данните за вход са актуализирани</string>
 
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Искате ли да Ви изпратим известие, когато дойде Вашият ред?</string>
@@ -776,4 +773,14 @@
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Добавете опция за поверително гласово търсене към адресната лента. Звукът не се съхранява и не се споделя с никого, включително с DuckDuckGo.</string>
     <string name="accessibilityVoiceSearchTitle">Поверително гласово търсене</string>
+
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">Няма достъп до камерата</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">Качване на изображение</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Изберете файл</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Направете снимка</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Разрешаване на DuckDuckGo да иска достъп до камерата на това устройство</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Сайтовете могат да използват камерата, само ако разрешите на DuckDuckGo да поиска достъп.</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">Отвори Настройки</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">Отмени</string>
 </resources>

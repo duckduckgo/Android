@@ -150,7 +150,6 @@
     <string name="settingsWebTrackingProtectionDescription">Ενεργοποιημένο βάσει προεπιλογής</string>
     <string name="settingsHeadingSettings">Ρυθμίσεις</string>
     <string name="settingsPermissionsSetting">Δικαιώματα</string>
-    <string name="settingsAutofillLoginsSetting">Συνδέσεις</string>
     <string name="settingsSyncSetting">Συγχρονισμός και δημιουργία αντιγράφων ασφαλείας</string>
     <string name="settingsFireButton">Κουμπί Φωτιά</string>
 
@@ -634,8 +633,6 @@
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Προβολή</string>
-    <string name="autofillLoginSavedSnackbarMessage">Η σύνδεση αποθηκεύτηκε</string>
-    <string name="autofillLoginUpdatedSnackbarMessage">Η σύνδεση ενημερώθηκε</string>
 
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Θα θέλατε να σας στείλουμε ειδοποίηση για το πότε θα είναι η σειρά σας;</string>
@@ -776,4 +773,14 @@
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Προσθήκη της επιλογής Ιδιωτική φωνητική αναζήτηση στη γραμμή διευθύνσεων. Ο ήχος δεν αποθηκεύεται ούτε κοινοποιείται σε οποιονδήποτε, συμπεριλαμβανομένου του DuckDuckGo.</string>
     <string name="accessibilityVoiceSearchTitle">Ιδιωτική φωνητική αναζήτηση</string>
+
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">Δεν ήταν δυνατή η πρόσβαση στην κάμερα</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">Μεταφορτώστε μια εικόνα</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Επιλέξτε αρχείο</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Τραβήξτε φωτογραφία</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Επιτρέψτε στο DuckDuckGo να αιτηθεί πρόσβαση στην κάμερα της συσκευής αυτής</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Οι ιστότοποι μπορούν να χρησιμοποιούν την κάμερά σας μόνο εάν επιτρέψετε στο DuckDuckGo να αιτηθεί πρόσβαση.</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">Άνοιγμα ρυθμίσεων</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">Ακύρωση</string>
 </resources>

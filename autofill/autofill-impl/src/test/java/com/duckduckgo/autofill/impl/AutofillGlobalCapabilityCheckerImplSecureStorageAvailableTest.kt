@@ -22,7 +22,6 @@ import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.common.test.CoroutineTestRule
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -32,7 +31,6 @@ import org.junit.runners.Parameterized
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
-@ExperimentalCoroutinesApi
 @RunWith(Parameterized::class)
 class AutofillGlobalCapabilityCheckerImplSecureStorageAvailableTest(
     private val testCase: TestCase,

@@ -131,6 +131,11 @@ class SiteMonitor(
         return HttpsStatus.NONE
     }
 
+    override fun resetErrors() {
+        errorCodeEvents.clear()
+        httpErrorCodeEvents.clear()
+    }
+
     override fun surrogateDetected(surrogate: SurrogateResponse) {
         surrogates.add(surrogate)
     }

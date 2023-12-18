@@ -22,7 +22,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.windows.impl.ui.WindowsViewModel.Command.GoToMacClientSettings
 import com.duckduckgo.windows.impl.ui.WindowsViewModel.Command.ShareLink
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -31,7 +30,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 
-@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 internal class WindowsViewModelTest {
     @get:Rule

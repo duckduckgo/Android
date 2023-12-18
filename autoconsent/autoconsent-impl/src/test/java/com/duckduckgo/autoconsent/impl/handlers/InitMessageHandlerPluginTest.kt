@@ -28,7 +28,6 @@ import com.duckduckgo.autoconsent.store.DisabledCmpsEntity
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.*
 import org.junit.Rule
@@ -39,7 +38,6 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.Shadows.shadowOf
 
-@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class InitMessageHandlerPluginTest {
     @get:Rule var coroutineRule = CoroutineTestRule()

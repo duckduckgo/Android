@@ -36,7 +36,6 @@ import org.junit.Assert.*
 import org.junit.Ignore
 import org.junit.runner.*
 
-@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class SettingsSyncDataProviderTest {
 

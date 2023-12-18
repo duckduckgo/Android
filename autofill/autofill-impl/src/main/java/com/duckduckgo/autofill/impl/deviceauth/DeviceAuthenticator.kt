@@ -23,7 +23,6 @@ import androidx.fragment.app.FragmentActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthResult
-import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.Features
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -35,23 +34,21 @@ interface DeviceAuthenticator {
     fun hasValidDeviceAuthentication(): Boolean
 
     /**
-     * Launches a device authentication flow for a specific [featureToAuth] from a [fragment]. [onResult] can be used to
+     * Launches a device authentication flow from a [fragment]. [onResult] can be used to
      * communicate back to the feature the result of the flow.
      */
     @UiThread
     fun authenticate(
-        featureToAuth: Features,
         fragment: Fragment,
         onResult: (AuthResult) -> Unit,
     )
 
     /**
-     * Launches a device authentication flow for a specific [featureToAuth] from a [fragmentActivity]. [onResult] can be used to
+     * Launches a device authentication flow from a [fragmentActivity]. [onResult] can be used to
      * communicate back to the feature the result of the flow.
      */
     @UiThread
     fun authenticate(
-        featureToAuth: Features,
         fragmentActivity: FragmentActivity,
         onResult: (AuthResult) -> Unit,
     )
@@ -60,11 +57,6 @@ interface DeviceAuthenticator {
         object Success : AuthResult()
         object UserCancelled : AuthResult()
         data class Error(val reason: String) : AuthResult()
-    }
-
-    enum class Features {
-        AUTOFILL_TO_USE_CREDENTIALS,
-        AUTOFILL_TO_ACCESS_CREDENTIALS,
     }
 }
 
@@ -88,12 +80,11 @@ class RealDeviceAuthenticator @Inject constructor(
 
     @UiThread
     override fun authenticate(
-        featureToAuth: Features,
         fragment: Fragment,
         onResult: (AuthResult) -> Unit,
     ) {
         if (autofillAuthGracePeriod.isAuthRequired()) {
-            authLauncher.launch(getAuthText(featureToAuth), fragment, onResult)
+            authLauncher.launch(R.string.autofill_auth_text_for_access, fragment, onResult)
         } else {
             onResult(AuthResult.Success)
         }
@@ -101,21 +92,13 @@ class RealDeviceAuthenticator @Inject constructor(
 
     @UiThread
     override fun authenticate(
-        featureToAuth: Features,
         fragmentActivity: FragmentActivity,
         onResult: (AuthResult) -> Unit,
     ) {
         if (autofillAuthGracePeriod.isAuthRequired()) {
-            authLauncher.launch(getAuthText(featureToAuth), fragmentActivity, onResult)
+            authLauncher.launch(R.string.autofill_auth_text_for_access, fragmentActivity, onResult)
         } else {
             onResult(AuthResult.Success)
         }
-    }
-
-    private fun getAuthText(
-        feature: Features,
-    ): Int = when (feature) {
-        Features.AUTOFILL_TO_USE_CREDENTIALS -> R.string.autofill_auth_text_for_using
-        Features.AUTOFILL_TO_ACCESS_CREDENTIALS -> R.string.autofill_auth_text_for_access
     }
 }

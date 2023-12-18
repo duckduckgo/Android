@@ -21,7 +21,6 @@ import androidx.work.ExistingPeriodicWorkPolicy.KEEP
 import androidx.work.WorkManager
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.sync.api.DeviceSyncState
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import org.junit.Before
 import org.junit.Rule
@@ -32,7 +31,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class BackgroundSyncWorkerSchedulerTest {
 
     @get:Rule

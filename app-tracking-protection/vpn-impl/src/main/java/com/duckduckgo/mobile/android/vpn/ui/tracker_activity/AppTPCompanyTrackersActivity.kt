@@ -62,7 +62,7 @@ import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPCompanyTracker
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPCompanyTrackersViewModel.ViewState
 import com.duckduckgo.mobile.android.vpn.ui.util.TextDrawable
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.networkprotection.api.NetPAppExclusionListNoParams
+import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetPAppExclusionListNoParams
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 import javax.inject.Provider

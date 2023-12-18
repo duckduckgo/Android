@@ -17,16 +17,12 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autofillManagementScreenTitle">Inloggningar</string>
 
     <string name="managementDisabledModeCta"><b>Konfigurera i Inställningar</b></string>
-    <string name="managementDisabledModeSubtitle">För att skydda dina inloggningar krävs ett enhetslåsmönster, en PIN-kod eller biometri.</string>
-    <string name="managementDisabledModeTitle">Säkra din enhet för att spara inloggningar</string>
 
     <string name="saveLoginDialogButtonSave">Spara lösenord</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Spara lösenord</string>
     <string name="saveLoginDialogNotNow">Spara inte</string>
-    <string name="saveLoginDialogSubtitle">Lösenord lagras säkert på din enhet i menyn Inloggningar.</string>
     <string name="saveLoginDialogTitle">Vill du att DuckDuckGo ska spara ditt lösenord?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Fler alternativ</string>
 
@@ -47,47 +43,35 @@
 
     <string name="autofillDialogCloseButtonContentDescription">Stäng dialogrutan för automatisk ifyllning</string>
 
-    <string name="credentialManagementEditLoginTitleHint">Inloggningens titel</string>
     <string name="credentialManagementEditUsernameHint">Användarnamn</string>
     <string name="credentialManagementEditPasswordHint">Lösenord</string>
-    <string name="credentialManagementEditTitle">Redigera inloggning</string>
     <string name="credentialManagementEditWebsiteHint">Webbplats-URL</string>
     <string name="credentialManagementEditNotesHint">Anteckningar</string>
     <string name="credentialManagementEditButtonDelete">Ta bort</string>
     <string name="credentialManagementEditButtonSaveChanges">Spara ändringar</string>
     <string name="credentialManagementEditButtonCopyUsername">Kopiera användarnamn</string>
     <string name="credentialManagementEditButtonCopyPassword">Kopiera lösenord</string>
-    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Inloggningen uppdaterades senast %1$s</string>
 
-    <string name="credentialManagementAutofillToggleLabel">Spara och fyll i inloggningar automatiskt</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Inloggningar lagras säkert på din enhet</string>
     <string name="credentialManagementViewMenuEdit">Redigera</string>
     <string name="credentialManagementViewMenuDelete">Ta bort</string>
 
     <string name="credentialManagementSuggestionsLabel">Förslag</string>
-    <string name="credentialManagementNoLoginsSavedTitle">Inga inloggningar sparade ännu</string>
 
-    <string name="autofillManagementAddLogin">Lägg till inloggning</string>
-    <string name="autofillManagementSearchLogins">Sök inloggningar</string>
     <string name="autofillManagementSearchClearDescription">Rensa sökfältet</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Inga resultat för ”%1$s”</string>
 
     <string name="autofillDeleteLoginDialogCancel">Avbryt</string>
     <string name="autofillDeleteLoginDialogDelete">Ta bort</string>
-    <string name="autofillDeleteLoginDialogTitle">Är du säker på att du vill radera inloggningen?</string>
 
     <string name="autofillManagementUsernameCopied">Användarnamn kopierat</string>
     <string name="autofillManagementPasswordCopied">Lösenord kopierat</string>
 
     <string name="autofill_password_generation_offer_title">Använd ett starkt lösenord från DuckDuckGo?</string>
-    <string name="autofill_password_generation_offer_message">Lösenord lagras säkert på din enhet i menyn Inloggningar.</string>
     <string name="autofill_password_generation_offer_accept">Använd starkt lösenord</string>
     <string name="autofill_password_generation_offer_decline">Skapa mitt eget</string>
 
     <string name="deviceNotSupportedTitle">Enheten stöds inte</string>
-    <string name="deviceNotSupportedSubtitle">Vi måste kryptera och lagra dina inloggningar för att spara dem på ett säkert sätt på din enhet. Eftersom enheten inte har stöd för krypterad lagring är funktionen Inloggningar inte tillgänglig.</string>
 
-    <string name="autofillManagementDeletedConfirmation">Inloggning raderad</string>
     <string name="autofillManagementUndoDeletion">Återställ</string>
 
     <string name="credentialManagementLinkButtonContentDescription" instruction="Accessibility text for a button that will show next to a text field containing a website address; it will launch the website when tapped">Öppna webbplatsen</string>
@@ -116,7 +100,6 @@
     <string name="autofillTooltipGenerateAddress" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated.">Generera privat Duck Address</string>
     <string name="autofillTooltipGenerateAddressDescription" instruction="&apos;hide address&apos; refers to using an alias so your real email address is not used">Blockera e-postspårare och dölj din adress</string>
 
-    <string name="autofillDisableAutofillPromptTitle">Vill du fortsätta att spara inloggningar?</string>
     <string name="autofillDisableAutofillPromptMessage">Du kan inaktivera det här när som helst i inställningarna.</string>
     <string name="autofillDisableAutofillPromptPositiveButton">Fortsätt att spara</string>
     <string name="autofillDisableAutofillPromptNegativeButton">Inaktivera</string>

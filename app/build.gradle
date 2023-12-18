@@ -235,10 +235,6 @@ dependencies {
     implementation project(':site-permissions-api')
     implementation project(':site-permissions-impl')
 
-    implementation project(':secure-storage-api')
-    implementation project(':secure-storage-impl')
-    implementation project(':secure-storage-store')
-
     implementation project(':ad-click-api')
     implementation project(':ad-click-impl')
     implementation project(':ad-click-store')
@@ -302,6 +298,7 @@ dependencies {
         implementation project(':subscriptions-api')
         implementation project(':subscriptions-impl')
         implementation project(':subscriptions-store')
+        internalImplementation project(':subscriptions-internal')
         internalImplementation project(':network-protection-subscription-internal')
     }
 

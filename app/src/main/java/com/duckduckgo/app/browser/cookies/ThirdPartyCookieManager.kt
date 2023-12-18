@@ -66,10 +66,10 @@ class AppThirdPartyCookieManager(
         withContext(dispatchers.main()) {
             if (domain != null && hasUserIdCookie()) {
                 Timber.d("Cookies enabled for $uri")
-                cookieManagerProvider.get().setAcceptThirdPartyCookies(webView, true)
+                cookieManagerProvider.get()?.setAcceptThirdPartyCookies(webView, true)
             } else {
                 Timber.d("Cookies disabled for $uri")
-                cookieManagerProvider.get().setAcceptThirdPartyCookies(webView, false)
+                cookieManagerProvider.get()?.setAcceptThirdPartyCookies(webView, false)
             }
             domain?.let { deleteHost(it) }
         }
@@ -93,7 +93,7 @@ class AppThirdPartyCookieManager(
     }
 
     private fun hasUserIdCookie(): Boolean {
-        return cookieManagerProvider.get().getCookie(GOOGLE_ACCOUNTS_URL)?.split(";")?.firstOrNull {
+        return cookieManagerProvider.get()?.getCookie(GOOGLE_ACCOUNTS_URL)?.split(";")?.firstOrNull {
             it.contains(USER_ID_COOKIE)
         } != null
     }

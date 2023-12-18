@@ -37,6 +37,7 @@ class RealNetworkProtectionPixelTest {
 
     @Mock
     private lateinit var vpnSharedPreferencesProvider: VpnSharedPreferencesProvider
+
     private lateinit var fakeNetpCohortStore: FakeNetpCohortStore
 
     private lateinit var testee: RealNetworkProtectionPixel
@@ -51,7 +52,16 @@ class RealNetworkProtectionPixelTest {
         whenever(
             vpnSharedPreferencesProvider.getSharedPreferences(eq("com.duckduckgo.networkprotection.pixels.v1"), eq(true), eq(false)),
         ).thenReturn(prefs)
-        testee = RealNetworkProtectionPixel(pixel, vpnSharedPreferencesProvider, fakeNetpCohortStore)
+        testee = RealNetworkProtectionPixel(
+            pixel,
+            vpnSharedPreferencesProvider,
+            fakeNetpCohortStore,
+            object : ETTimestamp() {
+                override fun formattedTimestamp(): String {
+                    return "2000-01-01"
+                }
+            },
+        )
     }
 
     @Test
@@ -59,8 +69,8 @@ class RealNetworkProtectionPixelTest {
         testee.reportErrorInRegistration()
         testee.reportErrorInRegistration()
 
-        verify(pixel).enqueueFire("m_netp_ev_backend_api_error_device_registration_failed_d")
-        verify(pixel, times(2)).enqueueFire("m_netp_ev_backend_api_error_device_registration_failed_c")
+        verify(pixel).enqueueFire("m_netp_ev_backend_api_error_device_registration_failed_d", mapOf("ts" to "2000-01-01"))
+        verify(pixel, times(2)).enqueueFire("m_netp_ev_backend_api_error_device_registration_failed_c", mapOf("ts" to "2000-01-01"))
     }
 
     @Test
@@ -68,8 +78,8 @@ class RealNetworkProtectionPixelTest {
         testee.reportErrorWgInvalidState()
         testee.reportErrorWgInvalidState()
 
-        verify(pixel).enqueueFire("m_netp_ev_wireguard_error_invalid_state_d")
-        verify(pixel, times(2)).enqueueFire("m_netp_ev_wireguard_error_invalid_state_c")
+        verify(pixel).enqueueFire("m_netp_ev_wireguard_error_invalid_state_d", mapOf("ts" to "2000-01-01"))
+        verify(pixel, times(2)).enqueueFire("m_netp_ev_wireguard_error_invalid_state_c", mapOf("ts" to "2000-01-01"))
     }
 
     @Test
@@ -77,8 +87,8 @@ class RealNetworkProtectionPixelTest {
         testee.reportErrorWgBackendCantStart()
         testee.reportErrorWgBackendCantStart()
 
-        verify(pixel).enqueueFire("m_netp_ev_wireguard_error_cannot_start_wireguard_backend_d")
-        verify(pixel, times(2)).enqueueFire("m_netp_ev_wireguard_error_cannot_start_wireguard_backend_c")
+        verify(pixel).enqueueFire("m_netp_ev_wireguard_error_cannot_start_wireguard_backend_d", mapOf("ts" to "2000-01-01"))
+        verify(pixel, times(2)).enqueueFire("m_netp_ev_wireguard_error_cannot_start_wireguard_backend_c", mapOf("ts" to "2000-01-01"))
     }
 
     @Test
@@ -86,8 +96,14 @@ class RealNetworkProtectionPixelTest {
         testee.reportEnabled()
         testee.reportEnabled()
 
-        verify(pixel).enqueueFire("m_netp_ev_enabled_d", mapOf("cohort" to fakeNetpCohortStore.cohortLocalDate?.toString().orEmpty()))
-        verify(pixel).enqueueFire(NETP_ENABLE_UNIQUE, mapOf("cohort" to fakeNetpCohortStore.cohortLocalDate?.toString().orEmpty()))
+        verify(pixel).enqueueFire(
+            "m_netp_ev_enabled_d",
+            mapOf("cohort" to fakeNetpCohortStore.cohortLocalDate?.toString().orEmpty(), "ts" to "2000-01-01"),
+        )
+        verify(pixel).enqueueFire(
+            NETP_ENABLE_UNIQUE,
+            mapOf("cohort" to fakeNetpCohortStore.cohortLocalDate?.toString().orEmpty(), "ts" to "2000-01-01"),
+        )
     }
 
     @Test
@@ -99,30 +115,12 @@ class RealNetworkProtectionPixelTest {
     }
 
     @Test
-    fun whenReportVpnConnectivityLossCalledTwiceThenFireCountPixelTwiceAndDailyPixelOnce() {
-        testee.reportVpnConnectivityLoss()
-        testee.reportVpnConnectivityLoss()
-
-        verify(pixel).enqueueFire("m_netp_ev_vpn_connectivity_lost_d")
-        verify(pixel, times(2)).enqueueFire("m_netp_ev_vpn_connectivity_lost_c")
-    }
-
-    @Test
-    fun whenReportVpnReconnectFailedCalledTwiceThenFireCountPixelTwiceAndDailyPixelOnce() {
-        testee.reportVpnReconnectFailed()
-        testee.reportVpnReconnectFailed()
-
-        verify(pixel).enqueueFire("m_netp_ev_vpn_reconnect_failed_d")
-        verify(pixel, times(2)).enqueueFire("m_netp_ev_vpn_reconnect_failed_c")
-    }
-
-    @Test
     fun whenReportWireguardLibraryLoadFailedCalledTwiceThenFireCountPixelTwiceAndDailyPixelOnce() {
         testee.reportWireguardLibraryLoadFailed()
         testee.reportWireguardLibraryLoadFailed()
 
-        verify(pixel).enqueueFire("m_netp_ev_wireguard_error_unable_to_load_wireguard_library_d")
-        verify(pixel, times(2)).enqueueFire("m_netp_ev_wireguard_error_unable_to_load_wireguard_library_c")
+        verify(pixel).enqueueFire("m_netp_ev_wireguard_error_unable_to_load_wireguard_library_d", mapOf("ts" to "2000-01-01"))
+        verify(pixel, times(2)).enqueueFire("m_netp_ev_wireguard_error_unable_to_load_wireguard_library_c", mapOf("ts" to "2000-01-01"))
     }
 
     @Test
@@ -130,8 +128,8 @@ class RealNetworkProtectionPixelTest {
         testee.reportRekeyCompleted()
         testee.reportRekeyCompleted()
 
-        verify(pixel).enqueueFire("m_netp_ev_rekey_completed_d")
-        verify(pixel, times(2)).enqueueFire("m_netp_ev_rekey_completed_c")
+        verify(pixel).enqueueFire("m_netp_ev_rekey_completed_d", mapOf("ts" to "2000-01-01"))
+        verify(pixel, times(2)).enqueueFire("m_netp_ev_rekey_completed_c", mapOf("ts" to "2000-01-01"))
     }
 
     @Test

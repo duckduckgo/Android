@@ -35,7 +35,6 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import junit.framework.TestCase.assertTrue
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -43,7 +42,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.*
 
-@ExperimentalCoroutinesApi
 class BrowserChromeClientTest {
 
     private lateinit var testee: BrowserChromeClient
@@ -58,7 +56,6 @@ class BrowserChromeClientTest {
     @get:Rule
     val coroutineTestRule = CoroutineTestRule()
 
-    @ExperimentalCoroutinesApi
     @UiThreadTest
     @Before
     fun setup() {
@@ -182,7 +179,6 @@ class BrowserChromeClientTest {
         verify(mockFilePathCallback).onReceiveValue(null)
     }
 
-    @ExperimentalCoroutinesApi
     @Test
     fun whenOnMediaPermissionRequestIfDomainIsAllowToAskThenRequestPermission() = runTest {
         val permissions = SitePermissions(
@@ -199,7 +195,6 @@ class BrowserChromeClientTest {
         verify(mockWebViewClientListener).onSitePermissionRequested(mockPermission, permissions)
     }
 
-    @ExperimentalCoroutinesApi
     @Test
     fun whenOnCameraPermissionRequestIfDomainIsAllowToAskThenRequestPermission() = runTest {
         val permissions = SitePermissions(
@@ -217,7 +212,6 @@ class BrowserChromeClientTest {
         verify(mockWebViewClientListener).onSitePermissionRequested(mockRequest, permissions)
     }
 
-    @ExperimentalCoroutinesApi
     @Test
     fun whenOnMicPermissionRequestIfDomainIsAllowToAskThenRequestPermission() = runTest {
         val permissions = SitePermissions(
@@ -235,7 +229,6 @@ class BrowserChromeClientTest {
         verify(mockWebViewClientListener).onSitePermissionRequested(mockRequest, permissions)
     }
 
-    @ExperimentalCoroutinesApi
     @Test
     fun whenNotSitePermissionsAreRequestedThenCallOnSitePermissionRequested() = runTest {
         val permissions = SitePermissions(emptyList(), emptyList())

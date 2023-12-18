@@ -37,9 +37,11 @@ class HttpsDataPersister constructor(
         bytes: ByteArray,
         falsePositives: List<HttpsFalsePositiveDomain>,
     ) {
-        httpsUpgradeDatabase.runInTransaction {
-            persistBloomFilter(specification, bytes)
-            persistFalsePositives(falsePositives)
+        runCatching {
+            httpsUpgradeDatabase.runInTransaction {
+                persistBloomFilter(specification, bytes)
+                persistFalsePositives(falsePositives)
+            }
         }
     }
 

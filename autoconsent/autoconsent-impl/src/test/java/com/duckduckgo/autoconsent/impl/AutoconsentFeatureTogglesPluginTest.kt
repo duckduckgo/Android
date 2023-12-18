@@ -19,7 +19,6 @@ package com.duckduckgo.autoconsent.impl
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autoconsent.api.AutoconsentFeatureName.Autoconsent
 import com.duckduckgo.autoconsent.store.AutoconsentFeatureToggleRepository
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -27,7 +26,6 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
-@ExperimentalCoroutinesApi
 class AutoconsentFeatureTogglesPluginTest {
 
     private val autoconsentFeatureToggleRepository: AutoconsentFeatureToggleRepository = mock()

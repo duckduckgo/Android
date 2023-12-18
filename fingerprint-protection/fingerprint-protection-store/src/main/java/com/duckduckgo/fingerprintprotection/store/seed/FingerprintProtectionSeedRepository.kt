@@ -16,45 +16,22 @@
 
 package com.duckduckgo.fingerprintprotection.store.seed
 
-import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.fingerprintprotection.store.FingerprintProtectionDatabase
-import com.duckduckgo.fingerprintprotection.store.FingerprintProtectionSeedEntity
 import java.util.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
+import java.util.concurrent.atomic.AtomicReference
 
 interface FingerprintProtectionSeedRepository {
-    var fingerprintProtectionSeedEntity: FingerprintProtectionSeedEntity
+    val seed: String
     fun storeNewSeed()
 }
 
-class RealFingerprintProtectionSeedRepository constructor(
-    val database: FingerprintProtectionDatabase,
-    val coroutineScope: CoroutineScope,
-    val dispatcherProvider: DispatcherProvider,
-) : FingerprintProtectionSeedRepository {
+class RealFingerprintProtectionSeedRepository constructor() : FingerprintProtectionSeedRepository {
 
-    private val fingerprintProtectionSeedDao: FingerprintProtectionSeedDao = database.fingerprintProtectionSeedDao()
-    override var fingerprintProtectionSeedEntity = FingerprintProtectionSeedEntity(seed = getRandomSeed())
-
-    init {
-        storeNewSeed()
-    }
+    private val atomicSeed = AtomicReference(getRandomSeed())
+    override val seed: String
+        get() = atomicSeed.get()
 
     override fun storeNewSeed() {
-        coroutineScope.launch(dispatcherProvider.io()) {
-            updateAll(FingerprintProtectionSeedEntity(seed = getRandomSeed()))
-        }
-    }
-
-    private fun updateAll(fingerprintProtectionSeedEntity: FingerprintProtectionSeedEntity) {
-        fingerprintProtectionSeedDao.updateAll(fingerprintProtectionSeedEntity)
-        loadToMemory()
-    }
-
-    private fun loadToMemory() {
-        fingerprintProtectionSeedEntity =
-            fingerprintProtectionSeedDao.get() ?: FingerprintProtectionSeedEntity(seed = getRandomSeed())
+        atomicSeed.set(getRandomSeed())
     }
 
     private fun getRandomSeed(): String {

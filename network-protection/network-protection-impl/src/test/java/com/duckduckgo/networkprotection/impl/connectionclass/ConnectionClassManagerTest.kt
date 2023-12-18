@@ -2,14 +2,12 @@ package com.duckduckgo.networkprotection.impl.connectionclass
 
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.mobile.android.vpn.prefs.FakeVpnSharedPreferencesProvider
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class ConnectionClassManagerTest {
 
     @get:Rule

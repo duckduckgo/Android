@@ -150,7 +150,6 @@
     <string name="settingsWebTrackingProtectionDescription">Iespējots pēc noklusējuma</string>
     <string name="settingsHeadingSettings">Iestatījumi</string>
     <string name="settingsPermissionsSetting">Atļaujas</string>
-    <string name="settingsAutofillLoginsSetting">Pieteikšanās dati</string>
     <string name="settingsSyncSetting">Sinhronizācija un dublēšana</string>
     <string name="settingsFireButton">Fire Button</string>
 
@@ -636,8 +635,6 @@
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Skatīt</string>
-    <string name="autofillLoginSavedSnackbarMessage">Pieteikšanās saglabāta</string>
-    <string name="autofillLoginUpdatedSnackbarMessage">Pieteikšanās atjaunināta</string>
 
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Vai vēlies, lai mēs nosūtām tev paziņojumu, kad pienāks tava kārta?</string>
@@ -780,4 +777,14 @@
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Pievienot adreses joslai opciju \"Privātā meklēšana ar balsi\". Audioieraksti netiek saglabāti un kopīgoti ar citiem, pat ne ar DuckDuckGo.</string>
     <string name="accessibilityVoiceSearchTitle">Privātā balss meklēšana</string>
+
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">Nevar piekļūt kamerai</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">Augšupielādēt attēlu</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Izvēlēties failu</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Uzņemt foto</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Atļaut DuckDuckGo pieprasīt piekļuvi kamerai šajā ierīcē</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Vietnes var izmantot tavu kameru tikai tad, ja tu atļauj DuckDuckGo prasīt piekļuvi.</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">Atvērt iestatījumus</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">Atcelt</string>
 </resources>

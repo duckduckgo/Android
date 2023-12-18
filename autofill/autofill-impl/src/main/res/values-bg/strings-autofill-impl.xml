@@ -17,16 +17,12 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autofillManagementScreenTitle">Данни за вход</string>
 
     <string name="managementDisabledModeCta"><b>Настройване в Настройки</b></string>
-    <string name="managementDisabledModeSubtitle">За защита на данните за вход е необходимо да зададете модел за заключване, ПИН код или биометрични данни.</string>
-    <string name="managementDisabledModeTitle">Защитете устройството, за да можете да запазвате данни за вход</string>
 
     <string name="saveLoginDialogButtonSave">Запазване на паролата</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Запазване на паролата</string>
     <string name="saveLoginDialogNotNow">Не записвай</string>
-    <string name="saveLoginDialogSubtitle">Паролите се съхраняват на сигурно място в менюто Данни за вход на Вашето устройство.</string>
     <string name="saveLoginDialogTitle">Искате ли DuckDuckGo да запази Вашата парола?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Повече опции</string>
 
@@ -47,47 +43,35 @@
 
     <string name="autofillDialogCloseButtonContentDescription">Затваряне на диалоговия прозорец за автоматично попълване</string>
 
-    <string name="credentialManagementEditLoginTitleHint">Име на данните за вход</string>
     <string name="credentialManagementEditUsernameHint">Потребителско име</string>
     <string name="credentialManagementEditPasswordHint">Парола</string>
-    <string name="credentialManagementEditTitle">Редактиране на данните за вход</string>
     <string name="credentialManagementEditWebsiteHint">Адрес на уебсайта</string>
     <string name="credentialManagementEditNotesHint">Бележки</string>
     <string name="credentialManagementEditButtonDelete">Изтриване</string>
     <string name="credentialManagementEditButtonSaveChanges">Запазване на промените</string>
     <string name="credentialManagementEditButtonCopyUsername">Копиране на потребителско име</string>
     <string name="credentialManagementEditButtonCopyPassword">Копиране на парола</string>
-    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Последна актуализация на данните за вход %1$s</string>
 
-    <string name="credentialManagementAutofillToggleLabel">Запазване и автоматично попълване на данните за вход</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Данните за вход се съхраняват сигурно на Вашето устройство</string>
     <string name="credentialManagementViewMenuEdit">Редактиране</string>
     <string name="credentialManagementViewMenuDelete">Изтриване</string>
 
     <string name="credentialManagementSuggestionsLabel">Предложения</string>
-    <string name="credentialManagementNoLoginsSavedTitle">Все още няма запазени данни за вход</string>
 
-    <string name="autofillManagementAddLogin">Добавяне на данни за вход</string>
-    <string name="autofillManagementSearchLogins">Търсене на данни за вход</string>
     <string name="autofillManagementSearchClearDescription">Изчистване на въведеното търсене</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Няма резултати за \'%1$s\'</string>
 
     <string name="autofillDeleteLoginDialogCancel">Отмени</string>
     <string name="autofillDeleteLoginDialogDelete">Изтрий</string>
-    <string name="autofillDeleteLoginDialogTitle">Сигурни ли сте, че искате да изтриете тези данни за вход?</string>
 
     <string name="autofillManagementUsernameCopied">Потребителското име е копирано</string>
     <string name="autofillManagementPasswordCopied">Паролата е копирана</string>
 
     <string name="autofill_password_generation_offer_title">Използване на силна парола от DuckDuckGo?</string>
-    <string name="autofill_password_generation_offer_message">Паролите се съхраняват на сигурно място в менюто Данни за вход на Вашето устройство.</string>
     <string name="autofill_password_generation_offer_accept">Използване на силна парола</string>
     <string name="autofill_password_generation_offer_decline">Създаване на собствена</string>
 
     <string name="deviceNotSupportedTitle">Устройството не се поддържа</string>
-    <string name="deviceNotSupportedSubtitle">За да съхраняваме сигурно данните Ви за вход, трябва да ги криптираме и да ги запазим на Вашето устройство. Тъй като Вашето устройство не поддържа криптирано съхранение, услугата „Данни за вход“ не е достъпна.</string>
 
-    <string name="autofillManagementDeletedConfirmation">Данните за вход са изтрити</string>
     <string name="autofillManagementUndoDeletion">Отмяна</string>
 
     <string name="credentialManagementLinkButtonContentDescription" instruction="Accessibility text for a button that will show next to a text field containing a website address; it will launch the website when tapped">Отваряне на уебсайта</string>
@@ -116,7 +100,6 @@
     <string name="autofillTooltipGenerateAddress" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated.">Генериране на личен Duck Address</string>
     <string name="autofillTooltipGenerateAddressDescription" instruction="&apos;hide address&apos; refers to using an alias so your real email address is not used">Блокиране на имейл тракерите и скриване на адреса</string>
 
-    <string name="autofillDisableAutofillPromptTitle">Искате ли да продължите да запазвате данни за вход?</string>
     <string name="autofillDisableAutofillPromptMessage">Можете да деактивирате тази функция по всяко време в Настройки.</string>
     <string name="autofillDisableAutofillPromptPositiveButton">Продължаване на запазването</string>
     <string name="autofillDisableAutofillPromptNegativeButton">Забрани</string>

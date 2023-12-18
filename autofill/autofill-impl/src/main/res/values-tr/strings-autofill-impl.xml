@@ -17,16 +17,12 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autofillManagementScreenTitle">Giriş bilgileri</string>
 
     <string name="managementDisabledModeCta"><b>Ayarlarda Ayarlama</b></string>
-    <string name="managementDisabledModeSubtitle">Giriş bilgilerinizin güvenliğini sağlamak için bir cihaz kilidi deseni, PIN veya biyometrik veri gereklidir.</string>
-    <string name="managementDisabledModeTitle">Giriş bilgilerini kaydetmek için cihazınızın güvenliğini sağlayın</string>
 
-    <string name="saveLoginDialogButtonSave">Şifre Kaydet</string>
+    <string name="saveLoginDialogButtonSave">Şifreyi Kaydet</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Şifre Kaydet</string>
     <string name="saveLoginDialogNotNow">Kaydetme</string>
-    <string name="saveLoginDialogSubtitle">Şifreler cihazınızdaki Oturum Açma menüsünde güvenli bir şekilde saklanır.</string>
     <string name="saveLoginDialogTitle">DuckDuckGo\'nun şifrenizi kaydetmesini istiyor musunuz?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Diğer Seçenekler</string>
 
@@ -47,47 +43,35 @@
 
     <string name="autofillDialogCloseButtonContentDescription">Otomatik Doldurma İletişim Kutusunu Kapat</string>
 
-    <string name="credentialManagementEditLoginTitleHint">Giriş Başlığı</string>
     <string name="credentialManagementEditUsernameHint">Kullanıcı adı</string>
     <string name="credentialManagementEditPasswordHint">Parola</string>
-    <string name="credentialManagementEditTitle">Girişi Düzenle</string>
     <string name="credentialManagementEditWebsiteHint">Web sitesi URL\'si</string>
     <string name="credentialManagementEditNotesHint">Notlar</string>
     <string name="credentialManagementEditButtonDelete">Sil</string>
     <string name="credentialManagementEditButtonSaveChanges">Değişiklikleri Kaydet</string>
     <string name="credentialManagementEditButtonCopyUsername">Kullanıcı Adını Kopyala</string>
     <string name="credentialManagementEditButtonCopyPassword">Şifreyi Kopyala</string>
-    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Son giriş güncelleme: %1$s</string>
 
-    <string name="credentialManagementAutofillToggleLabel">Girişleri Kaydet ve Otomatik Doldur</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Giriş bilgileri cihazınızda güvenli bir şekilde saklanır</string>
     <string name="credentialManagementViewMenuEdit">Düzenle</string>
     <string name="credentialManagementViewMenuDelete">Sil</string>
 
     <string name="credentialManagementSuggestionsLabel">Önerilen</string>
-    <string name="credentialManagementNoLoginsSavedTitle">Henüz kaydedilmiş Giriş yok</string>
 
-    <string name="autofillManagementAddLogin">Giriş Ekle</string>
-    <string name="autofillManagementSearchLogins">Giriş ara</string>
     <string name="autofillManagementSearchClearDescription">Arama girişini temizle</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">\'%1$s\' için sonuç yok</string>
 
     <string name="autofillDeleteLoginDialogCancel">Vazgeç</string>
     <string name="autofillDeleteLoginDialogDelete">Sil</string>
-    <string name="autofillDeleteLoginDialogTitle">Bu Girişi silmek istediğinizden emin misiniz?</string>
 
     <string name="autofillManagementUsernameCopied">Kullanıcı adı kopyalandı</string>
     <string name="autofillManagementPasswordCopied">Şifre kopyalandı</string>
 
     <string name="autofill_password_generation_offer_title">DuckDuckGo\'nun oluşturduğu güçlü bir şifre kullanmak ister misiniz?</string>
-    <string name="autofill_password_generation_offer_message">Şifreler cihazınızdaki Oturum Açma menüsünde güvenli bir şekilde saklanır.</string>
     <string name="autofill_password_generation_offer_accept">Güçlü Şifre Kullan</string>
     <string name="autofill_password_generation_offer_decline">Kendiminkini Oluştur</string>
 
     <string name="deviceNotSupportedTitle">Cihaz desteklenmiyor</string>
-    <string name="deviceNotSupportedSubtitle">Giriş bilgilerini güvenli bir şekilde saklamak için bunları şifrelememiz ve cihazınızda depolamamız gerekir. Cihazınız şifreli depolamayı desteklemediği için Girişler kullanılamıyor.</string>
 
-    <string name="autofillManagementDeletedConfirmation">Giriş bilgileri silindi</string>
     <string name="autofillManagementUndoDeletion">Geri al</string>
 
     <string name="credentialManagementLinkButtonContentDescription" instruction="Accessibility text for a button that will show next to a text field containing a website address; it will launch the website when tapped">Web sitesini aç</string>
@@ -116,7 +100,6 @@
     <string name="autofillTooltipGenerateAddress" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated.">Özel Duck Address Oluştur</string>
     <string name="autofillTooltipGenerateAddressDescription" instruction="&apos;hide address&apos; refers to using an alias so your real email address is not used">E-posta izleyicileri engelleyin ve adresi gizleyin</string>
 
-    <string name="autofillDisableAutofillPromptTitle">Giriş bilgilerini kaydetmeye devam etmek istiyor musunuz?</string>
     <string name="autofillDisableAutofillPromptMessage">Bunu dilediğiniz zaman Ayarlar\'dan devre dışı bırakabilirsiniz.</string>
     <string name="autofillDisableAutofillPromptPositiveButton">Kaydetmeye Devam Et</string>
     <string name="autofillDisableAutofillPromptNegativeButton">Devre dışı bırak</string>

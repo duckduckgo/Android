@@ -24,7 +24,6 @@ import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.experiments.api.VariantManager
 import io.reactivex.Observable
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import okhttp3.ResponseBody
 import org.junit.Before
@@ -37,7 +36,6 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-@ExperimentalCoroutinesApi
 class StatisticsRequesterTest {
 
     private var mockStatisticsStore: StatisticsDataStore = mock()

@@ -150,7 +150,6 @@
     <string name="settingsWebTrackingProtectionDescription">Varsayılan olarak etkinleştirildi</string>
     <string name="settingsHeadingSettings">Ayarlar</string>
     <string name="settingsPermissionsSetting">İzinler</string>
-    <string name="settingsAutofillLoginsSetting">Giriş bilgileri</string>
     <string name="settingsSyncSetting">Senkronizasyon ve Yedekleme</string>
     <string name="settingsFireButton">Fire Button</string>
 
@@ -634,8 +633,6 @@
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Görüntüle</string>
-    <string name="autofillLoginSavedSnackbarMessage">Giriş kaydedildi</string>
-    <string name="autofillLoginUpdatedSnackbarMessage">Giriş güncellendi</string>
 
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Sıra size geldiğinde size bir bildirim göndermemizi ister misiniz?</string>
@@ -776,4 +773,14 @@
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Adres çubuğuna Gizli Sesli Arama seçeneğini ekleyin. Ses kaydı depolanmaz veya DuckDuckGo dâhil olmak üzere kimseyle paylaşılmaz.</string>
     <string name="accessibilityVoiceSearchTitle">Özel Sesli Arama</string>
+
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">Kameraya erişilemedi</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">Bir resim yükle</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Dosya Seç</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Fotoğraf Çek</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">DuckDuckGo\'nun bu cihazda kamera erişimi istemesine izin ver</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Siteler kameranızı yalnızca DuckDuckGo\'nun erişim istemesine izin verirseniz kullanabilir.</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">Ayarları Aç</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">Vazgeç</string>
 </resources>

@@ -28,7 +28,6 @@ import com.duckduckgo.vpn.network.api.AddressRR
 import com.duckduckgo.vpn.network.api.DnsRR
 import com.duckduckgo.vpn.network.api.VpnNetwork
 import java.net.InetAddress
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Assert.*
@@ -41,7 +40,6 @@ import org.mockito.kotlin.*
 private const val TRACKER_HOSTNAME = "api2.branch.com"
 
 @RunWith(AndroidJUnit4::class)
-@OptIn(ExperimentalCoroutinesApi::class)
 class NgVpnNetworkStackTest {
 
     @get:Rule

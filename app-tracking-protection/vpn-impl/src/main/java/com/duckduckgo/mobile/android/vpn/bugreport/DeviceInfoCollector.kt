@@ -19,8 +19,8 @@ package com.duckduckgo.mobile.android.vpn.bugreport
 import android.content.Context
 import android.os.PowerManager
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.di.BatteryOptimizationState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -31,7 +31,7 @@ import javax.inject.Inject
 import javax.inject.Provider
 import org.json.JSONObject
 
-@ContributesMultibinding(VpnScope::class)
+@ContributesMultibinding(ActivityScope::class)
 class DeviceInfoCollector @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     @BatteryOptimizationState private val isIgnoringBatteryOptimizations: Provider<Boolean>,

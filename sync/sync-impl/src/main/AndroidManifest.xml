@@ -57,14 +57,6 @@
             android:screenOrientation="portrait"/>
 
         <activity
-            android:name=".ui.ShowQRCodeActivity"
-            android:exported="false"
-            android:label="@string/show_qr_screen_title"
-            android:theme="@style/Theme.DuckDuckGo.Dark"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".ui.setup.SetupAccountActivity"/>
-
-        <activity
             android:name=".ui.EnterCodeActivity"
             android:exported="false"
             android:label="@string/enter_code_screen_title"

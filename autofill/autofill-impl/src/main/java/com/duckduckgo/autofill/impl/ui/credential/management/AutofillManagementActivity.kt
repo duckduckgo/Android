@@ -37,7 +37,6 @@ import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthResult.Error
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthResult.Success
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthResult.UserCancelled
-import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.Features.AUTOFILL_TO_ACCESS_CREDENTIALS
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ExitCredentialMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ExitDisabledMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ExitListMode
@@ -136,7 +135,7 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
     private fun launchDeviceAuth() {
         viewModel.lock()
 
-        deviceAuthenticator.authenticate(AUTOFILL_TO_ACCESS_CREDENTIALS, this) {
+        deviceAuthenticator.authenticate(this) {
             when (it) {
                 Success -> onAuthenticationSuccessful()
                 UserCancelled -> onAuthenticationCancelled()

@@ -17,16 +17,12 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autofillManagementScreenTitle">Anmeldungen</string>
 
     <string name="managementDisabledModeCta"><b>In den Einstellungen einrichten</b></string>
-    <string name="managementDisabledModeSubtitle">Es sind ein Entsperrmuster, eine PIN oder biometrische Daten erforderlich, um deine Anmeldedaten zu schützen.</string>
-    <string name="managementDisabledModeTitle">Sichere dein Gerät, um Anmeldungen zu speichern</string>
 
     <string name="saveLoginDialogButtonSave">Passwort speichern</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Passwort speichern</string>
     <string name="saveLoginDialogNotNow">Nicht speichern</string>
-    <string name="saveLoginDialogSubtitle">Passwörter werden sicher auf deinem Gerät im Anmeldedaten-Menü gespeichert.</string>
     <string name="saveLoginDialogTitle">Möchtest du, dass DuckDuckGo dein Passwort speichert?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Weitere Optionen</string>
 
@@ -47,47 +43,35 @@
 
     <string name="autofillDialogCloseButtonContentDescription">Autovervollständigen-Dialog schließen</string>
 
-    <string name="credentialManagementEditLoginTitleHint">Titel der Anmeldedaten</string>
     <string name="credentialManagementEditUsernameHint">Benutzername</string>
     <string name="credentialManagementEditPasswordHint">Passwort</string>
-    <string name="credentialManagementEditTitle">Anmeldedaten bearbeiten</string>
     <string name="credentialManagementEditWebsiteHint">URL der Website</string>
     <string name="credentialManagementEditNotesHint">Notizen</string>
     <string name="credentialManagementEditButtonDelete">Löschen</string>
     <string name="credentialManagementEditButtonSaveChanges">Änderungen speichern</string>
     <string name="credentialManagementEditButtonCopyUsername">Benutzername kopieren</string>
     <string name="credentialManagementEditButtonCopyPassword">Passwort kopieren</string>
-    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Anmeldedaten zuletzt aktualisiert: %1$s</string>
 
-    <string name="credentialManagementAutofillToggleLabel">Anmeldedaten speichern und automatisch ausfüllen</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Die Anmeldedaten werden sicher auf deinem Gerät gespeichert</string>
     <string name="credentialManagementViewMenuEdit">Bearbeiten</string>
     <string name="credentialManagementViewMenuDelete">Löschen</string>
 
     <string name="credentialManagementSuggestionsLabel">Vorgeschlagen</string>
-    <string name="credentialManagementNoLoginsSavedTitle">Noch keine Anmeldedaten gespeichert</string>
 
-    <string name="autofillManagementAddLogin">Anmeldedaten hinzufügen</string>
-    <string name="autofillManagementSearchLogins">Anmeldedaten suchen</string>
     <string name="autofillManagementSearchClearDescription">Sucheingabe löschen</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Keine Ergebnisse für „%1$s“</string>
 
     <string name="autofillDeleteLoginDialogCancel">Abbrechen</string>
     <string name="autofillDeleteLoginDialogDelete">Löschen</string>
-    <string name="autofillDeleteLoginDialogTitle">Möchtest du diese Anmeldedaten wirklich löschen?</string>
 
     <string name="autofillManagementUsernameCopied">Benutzername kopiert</string>
     <string name="autofillManagementPasswordCopied">Passwort kopiert</string>
 
     <string name="autofill_password_generation_offer_title">Ein sicheres Passwort von DuckDuckGo verwenden?</string>
-    <string name="autofill_password_generation_offer_message">Passwörter werden sicher auf deinem Gerät im Anmeldedaten-Menü gespeichert.</string>
     <string name="autofill_password_generation_offer_accept">Sicheres Passwort verwenden</string>
     <string name="autofill_password_generation_offer_decline">Eigenes erstellen</string>
 
     <string name="deviceNotSupportedTitle">Gerät nicht unterstützt</string>
-    <string name="deviceNotSupportedSubtitle">Um die Anmeldedaten sicher zu speichern, müssen sie auf deinem Gerät verschlüsselt und gespeichert werden. Da dein Gerät keine verschlüsselte Speicherung unterstützt, sind die Anmeldedaten nicht verfügbar.</string>
 
-    <string name="autofillManagementDeletedConfirmation">Anmeldedaten gelöscht</string>
     <string name="autofillManagementUndoDeletion">Rückgängig machen</string>
 
     <string name="credentialManagementLinkButtonContentDescription" instruction="Accessibility text for a button that will show next to a text field containing a website address; it will launch the website when tapped">Website öffnen</string>
@@ -116,7 +100,6 @@
     <string name="autofillTooltipGenerateAddress" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated.">Private Duck-Adresse generieren</string>
     <string name="autofillTooltipGenerateAddressDescription" instruction="&apos;hide address&apos; refers to using an alias so your real email address is not used">E-Mail-Tracker blockieren &amp; Adresse verbergen</string>
 
-    <string name="autofillDisableAutofillPromptTitle">Möchtest du weiterhin Anmeldedaten speichern?</string>
     <string name="autofillDisableAutofillPromptMessage">Du kannst dies jederzeit in den Einstellungen deaktivieren.</string>
     <string name="autofillDisableAutofillPromptPositiveButton">Weiterhin speichern</string>
     <string name="autofillDisableAutofillPromptNegativeButton">Deaktivieren</string>

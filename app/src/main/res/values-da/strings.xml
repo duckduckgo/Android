@@ -150,7 +150,6 @@
     <string name="settingsWebTrackingProtectionDescription">Aktiveret som standard</string>
     <string name="settingsHeadingSettings">Indstillinger</string>
     <string name="settingsPermissionsSetting">Tilladelser</string>
-    <string name="settingsAutofillLoginsSetting">Logins</string>
     <string name="settingsSyncSetting">Synkronisering og sikkerhedskopiering</string>
     <string name="settingsFireButton">Fire Button</string>
 
@@ -634,8 +633,6 @@
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Se</string>
-    <string name="autofillLoginSavedSnackbarMessage">Login er gemt</string>
-    <string name="autofillLoginUpdatedSnackbarMessage">Login er opdateret</string>
 
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Vil du have os til at sende dig en meddelelse, når det er din tur?</string>
@@ -776,4 +773,14 @@
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Tilføj privat stemmesøgningsmulighed til adresselinjen Lyden bliver ikke gemt eller delt med nogen, heller ikke DuckDuckGo.</string>
     <string name="accessibilityVoiceSearchTitle">Privat stemmesøgning</string>
+
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">Kunne ikke få adgang til kameraet</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">Upload et billede</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Vælg fil</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Tag et billede</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Tillad DuckDuckGo at bede om adgang til kameraet på denne enhed</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Websteder kan kun bruge dit kamera, hvis du giver DuckDuckGo tilladelse til at bede om adgang.</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">Åbn indstillinger</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">Annuller</string>
 </resources>

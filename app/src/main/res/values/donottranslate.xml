@@ -46,4 +46,9 @@
     <!-- DRM -->
     <string name="sitePermissionsSettingsDRM">DRM</string>
 
+    <!-- Autofill -->
+    <string name="settingsAutofillLoginsSetting">Passwords</string>
+    <string name="autofillLoginSavedSnackbarMessage">Password saved</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Password updated</string>
+
 </resources>

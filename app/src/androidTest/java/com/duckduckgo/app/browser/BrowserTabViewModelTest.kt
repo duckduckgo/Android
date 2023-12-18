@@ -26,6 +26,8 @@ import android.view.View
 import android.webkit.GeolocationPermissions
 import android.webkit.HttpAuthHandler
 import android.webkit.PermissionRequest
+import android.webkit.ValueCallback
+import android.webkit.WebChromeClient.FileChooserParams
 import android.webkit.WebView
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.core.net.toUri
@@ -52,8 +54,11 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.NavigationCommand
 import com.duckduckgo.app.browser.BrowserTabViewModel.NavigationCommand.Navigate
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
+import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
+import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
+import com.duckduckgo.app.browser.camera.CameraHardwareChecker
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
@@ -154,7 +159,6 @@ import java.util.Locale
 import java.util.UUID
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.TimeUnit
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -189,7 +193,6 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.whenever
 
 @FlowPreview
-@ExperimentalCoroutinesApi
 class BrowserTabViewModelTest {
 
     @get:Rule
@@ -198,7 +201,6 @@ class BrowserTabViewModelTest {
     @get:Rule
     val schedulers = InstantSchedulersRule()
 
-    @ExperimentalCoroutinesApi
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
@@ -331,6 +333,9 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var mockSurveyRepository: SurveyRepository
 
+    @Mock
+    private lateinit var mockFileChooserCallback: ValueCallback<Array<Uri>>
+
     private lateinit var remoteMessagingModel: RemoteMessagingModel
 
     private val lazyFaviconManager = Lazy { mockFaviconManager }
@@ -392,6 +397,8 @@ class BrowserTabViewModelTest {
     private val mockSitePermissionsManager: SitePermissionsManager = mock()
 
     private val mockSyncEngine: SyncEngine = mock()
+
+    private val cameraHardwareChecker: CameraHardwareChecker = mock()
 
     @Before
     fun before() {
@@ -460,6 +467,7 @@ class BrowserTabViewModelTest {
         whenever(mockUserAllowListRepository.domainsInUserAllowListFlow()).thenReturn(flowOf(emptyList()))
         whenever(mockContentBlocking.isAnException(anyString())).thenReturn(false)
         whenever(fireproofDialogsEventHandler.event).thenReturn(fireproofDialogsEventHandlerLiveData)
+        whenever(cameraHardwareChecker.hasCameraHardware()).thenReturn(true)
 
         testee = BrowserTabViewModel(
             statisticsUpdater = mockStatisticsUpdater,
@@ -513,13 +521,13 @@ class BrowserTabViewModelTest {
             syncEngine = mockSyncEngine,
             device = mockDeviceInfo,
             sitePermissionsManager = mockSitePermissionsManager,
+            cameraHardwareChecker = cameraHardwareChecker,
         )
 
         testee.loadData("abc", null, false, false)
         testee.command.observeForever(mockCommandObserver)
     }
 
-    @ExperimentalCoroutinesApi
     @After
     fun after() {
         dismissedCtaDaoChannel.close()
@@ -4385,6 +4393,109 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenBasicAuthCredentialsInUrlThenStrippedSafely() {
+        val testUrls = listOf(
+            // Valid basic auth URLs
+            "https://user:pass@example.com",
+            "http://user:pass@example.com",
+            "ftp://user:pass@example.com",
+            "https://user@example.com",
+            "https://user:pass@sub.example.com",
+            "https://user:pass@sub.sub.example.com",
+            "https://user:pass@sub.example.com/path",
+            "https://user:pass@sub.example.com/path?param=value",
+            "https://user:pass@sub.example.com/path#fragment",
+            "https://user:pass@sub.example.com/path?param=value#fragment",
+            "https://user:pass@sub.example.com:8080",
+            "https://user:pass@sub.example.com:8080/path",
+            "https://user:pass@sub.example.com:8080/path?param=value",
+            "https://user:pass@sub.example.com:8080/path#fragment",
+            "https://user:pass@sub.example.com:8080/path?param=value#fragment",
+            "https://user:pass@192.0.2.0",
+            "https://user:pass@[2001:db8::1]",
+            "https://user:pass@[2001:db8::1]/path",
+            "https://user:pass@[2001:db8::1]/path?param=value",
+            "https://user:pass@[2001:db8::1]/path#fragment",
+            "https://user:pass@[2001:db8::1]/path?param=value#fragment",
+            "https://user:pass@[2001:db8::1]:8080",
+            "https://user:pass@[2001:db8::1]:8080/path",
+            "https://user:pass@[2001:db8::1]:8080/path?param=value",
+            "https://user:pass@[2001:db8::1]:8080/path#fragment",
+            "https://user:pass@[2001:db8::1]:8080/path?param=value#fragment",
+        )
+
+        val expectedUrls = listOf(
+            "https://example.com",
+            "http://example.com",
+            "ftp://example.com",
+            "https://example.com",
+            "https://sub.example.com",
+            "https://sub.sub.example.com",
+            "https://sub.example.com/path",
+            "https://sub.example.com/path?param=value",
+            "https://sub.example.com/path#fragment",
+            "https://sub.example.com/path?param=value#fragment",
+            "https://sub.example.com:8080",
+            "https://sub.example.com:8080/path",
+            "https://sub.example.com:8080/path?param=value",
+            "https://sub.example.com:8080/path#fragment",
+            "https://sub.example.com:8080/path?param=value#fragment",
+            "https://192.0.2.0",
+            "https://[2001:db8::1]",
+            "https://[2001:db8::1]/path",
+            "https://[2001:db8::1]/path?param=value",
+            "https://[2001:db8::1]/path#fragment",
+            "https://[2001:db8::1]/path?param=value#fragment",
+            "https://[2001:db8::1]:8080",
+            "https://[2001:db8::1]:8080/path",
+            "https://[2001:db8::1]:8080/path?param=value",
+            "https://[2001:db8::1]:8080/path#fragment",
+            "https://[2001:db8::1]:8080/path?param=value#fragment",
+        )
+
+        for (i in testUrls.indices) {
+            val actual = testee.stripBasicAuthFromUrl(testUrls[i])
+            assertEquals(expectedUrls[i], actual)
+        }
+    }
+
+    @Test
+    fun whenNoBasicAuthProvidedThenDoNotAffectAddressBar() {
+        val testUrls = listOf(
+            // No basic auth, should not be affected
+            "https://example.com/@?param=value",
+            "https://example.com/@path/to/resource?param=value",
+            "https://example.com#@fragment",
+            "https://example.com/path/to/@resource#fragment",
+            "https://example.com?param=%E2%82%AC",
+            "https://example.com/@notbasicAuth?q=none#f",
+            "https://example.com:8080/foobar/",
+            "https://sub.domain.example.com/foobar/",
+            "https://sub.domain.example.com:8080/?q=none#f",
+            // IP address/port combinations
+            "https://192.0.2.0",
+            "https://192.0.2.0:1337",
+            "https://[2001:db8::1]",
+            "https://[2001:db8::1]/path?param=value#fragment",
+            "https://[2001:db8::1]:8080",
+            "https://[2001:db8::1]:8080/path",
+            "https://[2001:db8::1]:8080/path?param=value",
+            // invalid URLs, should do nothing
+            "https://user:pass%40example.com/%40urlencoded@symbol",
+            "user:pass@https://example.com",
+            "not a valid URI",
+            "982.000.564.11:65666",
+            "http://example.com/index[/].html",
+            "http://example.com/</a/path>",
+        )
+
+        for (i in testUrls.indices) {
+            val actual = testee.stripBasicAuthFromUrl(testUrls[i])
+            assertEquals(testUrls[i], actual)
+        }
+    }
+
+    @Test
     fun whenOnPermissionsQueryThenSendCommand() = runTest {
         val url = "someUrl"
         loadUrl(url)
@@ -4407,6 +4518,51 @@ class BrowserTabViewModelTest {
         testee.onNewTabFavouritesShown()
 
         verify(mockSyncEngine).triggerSync(FEATURE_READ)
+    }
+
+    @Test
+    fun whenOnShowFileChooserWithImageWildcardedTypeThenImageOrCameraChooserCommandSent() {
+        val params = buildFileChooserParams(arrayOf("image/*"))
+        testee.showFileChooser(mockFileChooserCallback, params)
+        assertCommandIssued<Command.ShowExistingImageOrCameraChooser>()
+    }
+
+    @Test
+    fun whenOnShowFileChooserWithImageWildcardedTypeButCameraHardwareUnavailableThenFileChooserCommandSent() {
+        whenever(cameraHardwareChecker.hasCameraHardware()).thenReturn(false)
+        val params = buildFileChooserParams(arrayOf("image/*"))
+        testee.showFileChooser(mockFileChooserCallback, params)
+        assertCommandIssued<Command.ShowFileChooser>()
+    }
+
+    @Test
+    fun whenOnShowFileChooserContainsImageWildcardedTypeThenImageOrCameraChooserCommandSent() {
+        val params = buildFileChooserParams(arrayOf("image/*", "application/pdf"))
+        testee.showFileChooser(mockFileChooserCallback, params)
+        assertCommandIssued<Command.ShowExistingImageOrCameraChooser>()
+    }
+
+    @Test
+    fun whenOnShowFileChooserWithImageSpecificTypeThenExistingFileChooserCommandSent() {
+        val params = buildFileChooserParams(arrayOf("image/png"))
+        testee.showFileChooser(mockFileChooserCallback, params)
+        assertCommandIssued<Command.ShowFileChooser>()
+    }
+
+    @Test
+    fun whenOnShowFileChooserWithNonImageTypeThenExistingFileChooserCommandSent() {
+        val params = buildFileChooserParams(arrayOf("application/pdf"))
+        testee.showFileChooser(mockFileChooserCallback, params)
+        assertCommandIssued<Command.ShowFileChooser>()
+    }
+
+    @Test
+    fun whenWebViewRefreshedThenBrowserErrorStateChangedToLoading() {
+        assertEquals(OMITTED, browserViewState().browserError)
+
+        testee.onWebViewRefreshed()
+
+        assertEquals(LOADING, browserViewState().browserError)
     }
 
     private fun aCredential(): LoginCredentials {
@@ -4670,6 +4826,17 @@ class BrowserTabViewModelTest {
         whenever(nav.progress).thenReturn(progress)
         whenever(nav.navigationHistory).thenReturn(navigationHistory)
         return nav
+    }
+
+    private fun buildFileChooserParams(acceptTypes: Array<String>): FileChooserParams {
+        return object : FileChooserParams() {
+            override fun getAcceptTypes(): Array<String> = acceptTypes
+            override fun getMode(): Int = 0
+            override fun isCaptureEnabled(): Boolean = false
+            override fun getTitle(): CharSequence? = null
+            override fun getFilenameHint(): String? = null
+            override fun createIntent(): Intent = Intent()
+        }
     }
 
     private fun privacyShieldState() = testee.privacyShieldViewState.value!!

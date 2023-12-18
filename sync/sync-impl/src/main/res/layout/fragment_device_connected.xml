@@ -82,16 +82,6 @@
                 app:typography="h1"
                 android:text="@string/sync_connected_device_title"/>
 
-            <com.duckduckgo.common.ui.view.text.DaxTextView
-                android:id="@+id/content_body"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/keyline_5"
-                android:gravity="center"
-                app:textType="primary"
-                app:typography="body1"
-                android:text="@string/sync_connected_device_hint"/>
-
         </LinearLayout>
 
     </ScrollView>

@@ -1,0 +1,41 @@
+appId: com.duckduckgo.mobile.android
+tags:
+    - securityTest
+---
+- launchApp:
+    clearState: true
+- runFlow: ../shared/onboarding.yaml
+- doubleTapOn:
+    id: "omnibarTextInput"
+- pressKey: Backspace
+# Test 1 - using \u2028 character
+- inputText: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-basicauth-2028.html"
+- pressKey: Enter
+- tapOn: "Got It"
+- tapOn: "run"
+- assertVisible: "Example Domain"
+- copyTextFrom:
+    id: "omnibarTextInput"
+- assertTrue: ${maestro.copiedText.indexOf("https://www.google.com") != 0}
+- tapOn:
+    id: "omnibarTextInput"
+# Test 2 - using \u2029 character
+- inputText: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-basicauth-2029.html"
+- pressKey: Enter
+- tapOn: "run"
+- assertVisible: "Example Domain"
+- copyTextFrom:
+    id: "omnibarTextInput"
+- assertTrue: ${maestro.copiedText.indexOf("https://www.google.com") != 0}
+- tapOn:
+    id: "omnibarTextInput"
+# Test 3 - using repeated " " space character
+- inputText: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-basicauth-whitespace.html"
+- pressKey: Enter
+- tapOn: "run"
+- assertVisible: "Example Domain"
+- copyTextFrom:
+    id: "omnibarTextInput"
+- assertTrue: ${maestro.copiedText.indexOf("https://www.google.com") != 0}
+- tapOn:
+    id: "omnibarTextInput"

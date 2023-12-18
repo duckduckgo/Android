@@ -19,22 +19,30 @@ package com.duckduckgo.subscriptions.impl.settings.views
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
+import android.view.MotionEvent
 import android.widget.FrameLayout
+import android.widget.LinearLayout
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.impl.R
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.databinding.ViewSettingsBinding
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command
+import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenBuyScreen
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenSettings
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Factory
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.ViewState
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsActivity.Companion.SubscriptionsSettingsScreenWithEmptyParams
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -73,10 +81,6 @@ class ProSettingView @JvmOverloads constructor(
 
         ViewTreeLifecycleOwner.get(this)?.lifecycle?.addObserver(viewModel)
 
-        binding.settings.setClickListener {
-            viewModel.onSettings()
-        }
-
         @SuppressLint("NoHardcodedCoroutineDispatcher")
         coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
@@ -97,13 +101,29 @@ class ProSettingView @JvmOverloads constructor(
         coroutineScope = null
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun renderView(viewState: ViewState) {
+        binding.subscriptionSetting.setOnClickListener(null)
+        binding.subscriptionSetting.setOnTouchListener(null)
+        binding.subscriptionBuy.setOnClickListener(null)
+        binding.subscriptionBuy.setOnTouchListener(null)
+
         if (viewState.hasSubscription) {
-            binding.settings.setPrimaryText(context.getString(R.string.subscriptionSetting))
-            binding.settings.setSecondaryText("")
+            binding.subscriptionBuy.gone()
+            binding.subscribeSecondary.gone()
+            binding.subscriptionSetting.show()
+            binding.settingContainer.setOnClickListener {
+                viewModel.onSettings()
+            }
         } else {
-            binding.settings.setPrimaryText(context.getString(R.string.subscriptionSettingSubscribe))
-            binding.settings.setSecondaryText(context.getString(R.string.subscriptionSettingSubscribeSubtitle))
+            val htmlText = context.getString(R.string.subscriptionSettingFeaturesList).html(context)
+            binding.subscribeSecondary.show()
+            binding.subscribeSecondary.text = htmlText
+            binding.subscriptionBuy.show()
+            binding.subscriptionSetting.gone()
+            binding.settingContainer.setOnClickListener {
+                viewModel.onBuy()
+            }
         }
     }
 
@@ -112,6 +132,19 @@ class ProSettingView @JvmOverloads constructor(
             is OpenSettings -> {
                 globalActivityStarter.start(context, SubscriptionsSettingsScreenWithEmptyParams)
             }
+            is OpenBuyScreen -> {
+                globalActivityStarter.start(context, SubscriptionsWebViewActivityWithParams(url = SubscriptionsConstants.BUY_URL, ""))
+            }
         }
+    }
+}
+
+class SubscriptionSettingLayout @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0,
+) : LinearLayout(context, attrs, defStyleAttr) {
+    override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
+        return true
     }
 }

@@ -309,7 +309,7 @@ class BrowserWebViewClient @Inject constructor(
 
     private fun flushCookies() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            cookieManagerProvider.get().flush()
+            cookieManagerProvider.get()?.flush()
         }
     }
 
@@ -502,5 +502,6 @@ enum class WebViewErrorResponse(@StringRes val errorId: Int) {
     BAD_URL(R.string.webViewErrorBadUrl),
     CONNECTION(R.string.webViewErrorNoConnection),
     OMITTED(R.string.webViewErrorNoConnection),
+    LOADING(R.string.webViewErrorNoConnection),
     SSL_PROTOCOL_ERROR(R.string.webViewErrorSslProtocol),
 }

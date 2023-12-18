@@ -29,9 +29,6 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.TaskStackBuilder
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.networkprotection.impl.R
-import com.duckduckgo.networkprotection.impl.alerts.RealNetPAlertNotiticationBuilder.Companion.NETP_ALERTS_CHANNEL_DESCRIPTION
-import com.duckduckgo.networkprotection.impl.alerts.RealNetPAlertNotiticationBuilder.Companion.NETP_ALERTS_CHANNEL_ID
-import com.duckduckgo.networkprotection.impl.alerts.RealNetPAlertNotiticationBuilder.Companion.NETP_ALERTS_CHANNEL_NAME
 import com.squareup.anvil.annotations.ContributesBinding
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -153,5 +150,10 @@ class RealNetPDisabledNotificationBuilder @Inject constructor(
             ),
         )
         getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+    }
+    companion object {
+        const val NETP_ALERTS_CHANNEL_ID = "com.duckduckgo.networkprotection.impl.alerts"
+        const val NETP_ALERTS_CHANNEL_NAME = "Network Protection Alerts"
+        const val NETP_ALERTS_CHANNEL_DESCRIPTION = "Alerts from Network Protection"
     }
 }

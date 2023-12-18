@@ -20,16 +20,14 @@ import android.content.Context
 import android.view.View
 import com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.settings.api.PositionKey
 import com.duckduckgo.settings.api.ProSettingsPlugin
 import com.duckduckgo.subscriptions.impl.R
-import com.duckduckgo.subscriptions.impl.settings.views.ProSettingBuyView
+import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingView
+import com.duckduckgo.subscriptions.impl.settings.views.PirSettingView
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingView
 import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.MapKey
 import javax.inject.Inject
-
-@MapKey
-annotation class PositionKey(val pos: Int)
 
 @ContributesMultibinding(ActivityScope::class)
 @PositionKey(100)
@@ -42,17 +40,25 @@ class ProSettingsTitle @Inject constructor() : ProSettingsPlugin {
 }
 
 @ContributesMultibinding(scope = ActivityScope::class)
-@PositionKey(200)
-class ProSettingBuy @Inject constructor() : ProSettingsPlugin {
+@PositionKey(500)
+class ProSettings @Inject constructor() : ProSettingsPlugin {
     override fun getView(context: Context): View {
-        return ProSettingBuyView(context)
+        return ProSettingView(context)
     }
 }
 
 @ContributesMultibinding(scope = ActivityScope::class)
 @PositionKey(300)
-class ProSettings @Inject constructor() : ProSettingsPlugin {
+class PIRSettings @Inject constructor() : ProSettingsPlugin {
     override fun getView(context: Context): View {
-        return ProSettingView(context)
+        return PirSettingView(context)
+    }
+}
+
+@ContributesMultibinding(scope = ActivityScope::class)
+@PositionKey(400)
+class ITRSettings @Inject constructor() : ProSettingsPlugin {
+    override fun getView(context: Context): View {
+        return ItrSettingView(context)
     }
 }

@@ -89,7 +89,6 @@ class ResultHandlerCredentialSelection @Inject constructor(
 
         withContext(dispatchers.main()) {
             deviceAuthenticator.authenticate(
-                DeviceAuthenticator.Features.AUTOFILL_TO_USE_CREDENTIALS,
                 browserTabFragment,
             ) {
                 when (it) {

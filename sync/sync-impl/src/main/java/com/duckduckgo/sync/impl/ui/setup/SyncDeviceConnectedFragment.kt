@@ -26,15 +26,12 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
-import com.duckduckgo.common.utils.extensions.applyBoldSpanTo
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.FragmentDeviceConnectedBinding
 import com.duckduckgo.sync.impl.ui.setup.SyncDeviceConnectedViewModel.Command
 import com.duckduckgo.sync.impl.ui.setup.SyncDeviceConnectedViewModel.Command.FinishSetupFlow
-import com.duckduckgo.sync.impl.ui.setup.SyncDeviceConnectedViewModel.ViewState
 import com.google.android.material.snackbar.Snackbar
-import java.util.Locale
 import javax.inject.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -64,32 +61,22 @@ class SyncDeviceConnectedFragment : DuckDuckGoFragment(R.layout.fragment_device_
 
     private fun observeUiEvents() {
         viewModel
-            .viewState()
-            .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
-            .onEach { viewState -> renderViewState(viewState) }
-            .launchIn(lifecycleScope)
-
-        viewModel
             .commands()
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
+
+        binding.footerPrimaryButton.setOnClickListener {
+            viewModel.onDoneClicked()
+        }
     }
 
     private fun processCommand(it: Command) {
         when (it) {
-            FinishSetupFlow -> listener?.launchFinishSetupFlow()
+            FinishSetupFlow -> listener?.finishSetup()
             Command.Error -> {
                 Snackbar.make(binding.root, R.string.sync_general_error, Snackbar.LENGTH_LONG).show()
             }
-        }
-    }
-
-    private fun renderViewState(viewState: ViewState) {
-        val deviceName = String.format(Locale.US, getString(R.string.sync_connected_device_hint), viewState.deviceName)
-        binding.contentBody.text = deviceName.applyBoldSpanTo(viewState.deviceName)
-        binding.footerPrimaryButton.setOnClickListener {
-            viewModel.onNextClicked()
         }
     }
 

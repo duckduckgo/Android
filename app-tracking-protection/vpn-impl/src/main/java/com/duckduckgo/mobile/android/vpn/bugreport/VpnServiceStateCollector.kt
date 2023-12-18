@@ -19,14 +19,14 @@ package com.duckduckgo.mobile.android.vpn.bugreport
 import android.content.Context
 import com.duckduckgo.common.utils.extensions.getPrivateDnsServerName
 import com.duckduckgo.common.utils.extensions.isPrivateDnsActive
-import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import org.json.JSONObject
 
-@ContributesMultibinding(VpnScope::class)
+@ContributesMultibinding(ActivityScope::class)
 class VpnServiceStateCollector @Inject constructor(
     private val context: Context,
 ) : VpnStateCollectorPlugin {

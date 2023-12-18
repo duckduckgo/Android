@@ -18,17 +18,19 @@ package com.duckduckgo.networkprotection.impl.about
 
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 
-/**
- * Use this model to launch the "What is a VPN" screen
- */
-object NetPAboutVPNScreenNoParams : ActivityParams
+sealed class NetworkProtectionAboutScreens {
+    /**
+     * Use this model to launch the "What is a VPN" screen
+     */
+    object NetPAboutVPNScreenNoParams : ActivityParams
 
-/**
- * Use this model to launch the "Network Protection FAQs" screen
- */
-object NetPFaqsScreenNoParams : ActivityParams
+    /**
+     * Use this model to launch the "Network Protection FAQs" screen
+     */
+    object NetPFaqsScreenNoParams : ActivityParams
 
-/**
- * Use this model to launch the "Network Protection" terms and conditions screen
- */
-object NetPTermsScreenNoParams : ActivityParams
+    /**
+     * Use this model to launch the "Network Protection" terms and conditions screen
+     */
+    object NetPTermsScreenNoParams : ActivityParams
+}

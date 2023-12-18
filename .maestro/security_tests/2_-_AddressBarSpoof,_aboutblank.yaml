@@ -1,0 +1,21 @@
+appId: com.duckduckgo.mobile.android
+tags:
+    - securityTest
+---
+- launchApp:
+    clearState: true
+- runFlow: ../shared/onboarding.yaml
+- doubleTapOn:
+    id: "omnibarTextInput"
+- inputText: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-about-blank-rewrite.html"
+- pressKey: Enter
+- tapOn: "Got It"
+- tapOn: "Start"
+# This test is expected to load "about:blank" then duckduckgo.com, not remain on the current page with spoofed content.
+- extendedWaitUntil:
+    notVisible: "Not DDG."  # Spoofed content not visible
+    timeout: 10000
+- tapOn: "Phew!"
+- copyTextFrom:
+    id: "omnibarTextInput"
+- assertTrue: ${maestro.copiedText == "about:blank" || maestro.copiedText == "https://duckduckgo.com/"}

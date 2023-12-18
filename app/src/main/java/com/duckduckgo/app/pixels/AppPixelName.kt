@@ -39,6 +39,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
 
     BROWSER_MENU_ALLOWLIST_ADD("mb_wla"),
     BROWSER_MENU_ALLOWLIST_REMOVE("mb_wlr"),
+    BROWSER_PULL_TO_REFRESH("m_browser_pull_to_refresh"),
 
     DEFAULT_BROWSER_SET("m_db_s"),
     DEFAULT_BROWSER_NOT_SET("m_db_ns"),

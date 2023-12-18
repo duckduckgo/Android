@@ -91,6 +91,20 @@ private val SERVER_LOCATIONS_JSON = """
             "name": "Des Moines"
           }
         ]
+      },
+      {
+        "country": "se",
+        "cities": [
+          {
+            "name": "Gothenburg"
+          },
+          {
+            "name": "Malmo"
+          },
+          {
+            "name": "Stockholm"
+          }
+        ]
       }
     ]
 """.trimIndent()

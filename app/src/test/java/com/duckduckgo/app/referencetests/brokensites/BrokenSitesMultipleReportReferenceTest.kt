@@ -40,7 +40,6 @@ import com.squareup.moshi.Moshi
 import java.net.URLEncoder
 import java.util.*
 import java.util.regex.Pattern
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -58,11 +57,9 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.ParameterizedRobolectricTestRunner
 
-@ExperimentalCoroutinesApi
 @RunWith(ParameterizedRobolectricTestRunner::class)
 class BrokenSitesMultipleReportReferenceTest(private val testCase: MultipleReportTestCase) {
 
-    @ExperimentalCoroutinesApi
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 

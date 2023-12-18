@@ -26,23 +26,23 @@
         android:id="@+id/includeToolbar"
         layout="@layout/include_default_toolbar"/>
 
-    <com.duckduckgo.sync.impl.ui.qrcode.SquareDecoratedBarcodeView
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="?attr/daxColorSurface">
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/keyline_4"
+            android:text="@string/sync_login_device_hint"/>
+
+    <com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeView
         android:id="@+id/qrCodeReader"
         android:layout_width="match_parent"
-        android:layout_height="0dp"/>
+        android:layout_height="@dimen/qrBarcodeSize"/>
 
-    <com.duckduckgo.common.ui.view.text.DaxTextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/keyline_4"
-        android:text="@string/sync_login_device_hint"/>
-
-    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-        android:id="@+id/readTextCode"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/enter_code_screen_cta"
-        app:leadingIcon="@drawable/ic_keyboard_24"
-        app:leadingIconBackground="circular"/>
+    </LinearLayout>
 
 </LinearLayout>

@@ -41,7 +41,7 @@ import timber.log.Timber
 class CookieManagerRemover @Inject constructor(private val cookieManagerProvider: CookieManagerProvider) : CookieRemover {
     override suspend fun removeCookies(): Boolean {
         suspendCoroutine { continuation ->
-            cookieManagerProvider.get().removeAllCookies {
+            cookieManagerProvider.get()?.removeAllCookies {
                 Timber.v("All cookies removed; restoring DDG cookies")
                 continuation.resume(Unit)
             }

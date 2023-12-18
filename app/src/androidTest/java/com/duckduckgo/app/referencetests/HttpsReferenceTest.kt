@@ -56,7 +56,6 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import java.util.concurrent.CopyOnWriteArrayList
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
 import org.junit.Assert.assertFalse
@@ -71,11 +70,9 @@ import org.mockito.kotlin.whenever
 import timber.log.Timber
 
 // FIXME reference tests forced to have visibility in things we should not have visibility like httpsupgrade-impl and impl classes :shrug:
-@ExperimentalCoroutinesApi
 @RunWith(Parameterized::class)
 class HttpsReferenceTest(private val testCase: TestCase) {
 
-    @ExperimentalCoroutinesApi
     @get:Rule
     var coroutinesTestRule = CoroutineTestRule()
 

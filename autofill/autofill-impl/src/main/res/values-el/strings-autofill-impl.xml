@@ -17,16 +17,12 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autofillManagementScreenTitle">Συνδέσεις</string>
 
     <string name="managementDisabledModeCta"><b>Προσαρμογή στις Ρυθμίσεις</b></string>
-    <string name="managementDisabledModeSubtitle">Για προστασία των «Συνδέσεών» σας απαιτείται μοτίβο κλειδώματος συσκευής, PIN ή βιομετρικά στοιχεία.</string>
-    <string name="managementDisabledModeTitle">Ασφαλίστε τη συσκευή σας για να αποθηκεύετε τις «Συνδέσεις»</string>
 
     <string name="saveLoginDialogButtonSave">Αποθήκευση κωδικού πρόσβασης</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Αποθήκευση κωδικού πρόσβασης</string>
     <string name="saveLoginDialogNotNow">Να μην αποθηκευτεί</string>
-    <string name="saveLoginDialogSubtitle">Οι κωδικοί πρόσβασης αποθηκεύονται με ασφάλεια στη συσκευή σας στο μενού Συνδέσεις.</string>
     <string name="saveLoginDialogTitle">Θέλετε το DuckDuckGo να αποθηκεύσει τον κωδικό πρόσβασής σας;</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Περισσότερες επιλογές</string>
 
@@ -47,47 +43,35 @@
 
     <string name="autofillDialogCloseButtonContentDescription">Κλείσιμο διαλόγου αυτόματης συμπλήρωσης</string>
 
-    <string name="credentialManagementEditLoginTitleHint">Τίτλος σύνδεσης</string>
     <string name="credentialManagementEditUsernameHint">Όνομα χρήστη</string>
     <string name="credentialManagementEditPasswordHint">Κωδικός πρόσβασης</string>
-    <string name="credentialManagementEditTitle">Επεξεργασία σύνδεσης</string>
     <string name="credentialManagementEditWebsiteHint">Διεύθυνση URL ιστότοπου</string>
     <string name="credentialManagementEditNotesHint">Σημειώσεις</string>
     <string name="credentialManagementEditButtonDelete">Διαγραφή</string>
     <string name="credentialManagementEditButtonSaveChanges">Αποθήκευση αλλαγών</string>
     <string name="credentialManagementEditButtonCopyUsername">Αντιγραφή ονόματος χρήστη</string>
     <string name="credentialManagementEditButtonCopyPassword">Αντιγραφή κωδικού πρόσβασης</string>
-    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Τελευταία ενημέρωση σύνδεσης %1$s</string>
 
-    <string name="credentialManagementAutofillToggleLabel">Αποθήκευση και αυτόματη συμπλήρωση στοιχείων σύνδεσης</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Τα στοιχεία σύνδεσης αποθηκεύονται με ασφάλεια στη συσκευή σας</string>
     <string name="credentialManagementViewMenuEdit">Επεξεργασία</string>
     <string name="credentialManagementViewMenuDelete">Διαγραφή</string>
 
     <string name="credentialManagementSuggestionsLabel">Προτεινόμενο</string>
-    <string name="credentialManagementNoLoginsSavedTitle">Δεν έχουν αποθηκευτεί ακόμα στοιχεία σύνδεσης</string>
 
-    <string name="autofillManagementAddLogin">Προσθήκη στοιχείων σύνδεσης</string>
-    <string name="autofillManagementSearchLogins">Αναζήτηση στοιχείων σύνδεσης</string>
     <string name="autofillManagementSearchClearDescription">Εκκαθάριση εισαγωγής αναζήτησης</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Δεν υπάρχουν αποτελέσματα για «%1$s»</string>
 
     <string name="autofillDeleteLoginDialogCancel">Ακύρωση</string>
     <string name="autofillDeleteLoginDialogDelete">Διαγραφή</string>
-    <string name="autofillDeleteLoginDialogTitle">Θέλετε σίγουρα να διαγράψετε αυτά τα στοιχεία σύνδεσης;</string>
 
     <string name="autofillManagementUsernameCopied">Το όνομα χρήστη αντιγράφηκε</string>
     <string name="autofillManagementPasswordCopied">Ο κωδικός πρόσβασης αντιγράφηκε</string>
 
     <string name="autofill_password_generation_offer_title">Χρησιμοποιείτε ισχυρό κωδικό πρόσβασης από το DuckDuckGo;</string>
-    <string name="autofill_password_generation_offer_message">Οι κωδικοί πρόσβασης αποθηκεύονται με ασφάλεια στη συσκευή σας στο μενού Συνδέσεις.</string>
     <string name="autofill_password_generation_offer_accept">Χρησιμοποιήστε ισχυρό κωδικό πρόσβασης</string>
     <string name="autofill_password_generation_offer_decline">Δημιουργία δικού μου</string>
 
     <string name="deviceNotSupportedTitle">Η συσκευή δεν υποστηρίζεται</string>
-    <string name="deviceNotSupportedSubtitle">Για ασφαλή αποθήκευση των στοιχείων σύνδεσής σας, πρέπει να τα κρυπτογραφήσουμε και να τα αποθηκεύσουμε στη συσκευή σας. Καθώς η συσκευή σας δεν υποστηρίζει κρυπτογραφημένο χώρο αποθήκευσης, τα στοιχεία σύνδεσης δεν είναι διαθέσιμα.</string>
 
-    <string name="autofillManagementDeletedConfirmation">Η σύνδεση διαγράφηκε</string>
     <string name="autofillManagementUndoDeletion">Αναίρεση</string>
 
     <string name="credentialManagementLinkButtonContentDescription" instruction="Accessibility text for a button that will show next to a text field containing a website address; it will launch the website when tapped">Άνοιγμα ιστότοπου</string>
@@ -116,7 +100,6 @@
     <string name="autofillTooltipGenerateAddress" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated.">Δημιουργήστε ιδιωτική Duck Address</string>
     <string name="autofillTooltipGenerateAddressDescription" instruction="&apos;hide address&apos; refers to using an alias so your real email address is not used">Αποκλεισμός εφαρμογών παρακολούθησης email και απόκρυψη διεύθυνσης</string>
 
-    <string name="autofillDisableAutofillPromptTitle">Θέλετε να συνεχίσετε να αποθηκεύετε τις συνδέσεις;</string>
     <string name="autofillDisableAutofillPromptMessage">Μπορείτε να απενεργοποιήσετε τη λειτουργία αυτή οποιαδήποτε στιγμή από τις Ρυθμίσεις.</string>
     <string name="autofillDisableAutofillPromptPositiveButton">Συνεχίστε την αποθήκευση</string>
     <string name="autofillDisableAutofillPromptNegativeButton">Απενεργοποίηση</string>

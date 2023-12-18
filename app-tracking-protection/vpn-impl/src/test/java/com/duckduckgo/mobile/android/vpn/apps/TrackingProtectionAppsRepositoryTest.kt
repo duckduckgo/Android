@@ -25,7 +25,6 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository.ProtectionState
 import com.duckduckgo.mobile.android.vpn.trackers.FakeAppTrackerRepository
 import com.duckduckgo.networkprotection.api.NetworkProtectionExclusionList
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -37,7 +36,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
-@OptIn(ExperimentalCoroutinesApi::class)
 class TrackingProtectionAppsRepositoryTest {
 
     @get:Rule

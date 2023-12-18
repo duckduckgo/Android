@@ -30,6 +30,7 @@ import android.webkit.GeolocationPermissions
 import android.webkit.PermissionRequest
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
+import android.webkit.WebChromeClient.FileChooserParams
 import android.webkit.WebView
 import androidx.annotation.AnyThread
 import androidx.annotation.VisibleForTesting
@@ -54,9 +55,11 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.HighlightableButton.Visibl
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.NonHttpAppLink
+import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
+import com.duckduckgo.app.browser.camera.CameraHardwareChecker
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource.ImageFavicon
 import com.duckduckgo.app.browser.favicon.FaviconSource.UrlFavicon
@@ -149,6 +152,8 @@ import dagger.Lazy
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import java.net.URI
+import java.net.URISyntaxException
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
@@ -208,6 +213,7 @@ class BrowserTabViewModel @Inject constructor(
     private val device: DeviceInfo,
     private val sitePermissionsManager: SitePermissionsManager,
     private val syncEngine: SyncEngine,
+    private val cameraHardwareChecker: CameraHardwareChecker,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -394,6 +400,10 @@ class BrowserTabViewModel @Inject constructor(
             val filePathCallback: ValueCallback<Array<Uri>>,
             val fileChooserParams: WebChromeClient.FileChooserParams,
         ) : Command()
+        class ShowExistingImageOrCameraChooser(
+            val filePathCallback: ValueCallback<Array<Uri>>,
+            val fileChooserParams: WebChromeClient.FileChooserParams,
+        ) : Command()
 
         class HandleNonHttpAppLink(
             val nonHttpAppLink: NonHttpAppLink,
@@ -431,7 +441,7 @@ class BrowserTabViewModel @Inject constructor(
             val deniedForever: Boolean,
         ) : Command()
 
-        class AskDomainPermission(val domain: String) : Command()
+        class AskDomainPermission(val locationPermission: LocationPermission) : Command()
         object RequestSystemLocationPermission : Command()
         class RefreshUserAgent(
             val url: String?,
@@ -1479,13 +1489,32 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch { updateBookmarkAndFavoriteState(url) }
     }
 
+    @VisibleForTesting
+    fun stripBasicAuthFromUrl(url: String): String {
+        try {
+            val uri = URI(url)
+            val userInfo = uri.userInfo
+
+            if (userInfo != null) {
+                val queryStr = uri.rawQuery?.let { "?$it" } ?: ""
+                val uriFragment = uri.fragment?.let { "#$it" } ?: ""
+                val portStr = if (uri.port != -1) ":${uri.port}" else ""
+                return "${uri.scheme}://${uri.host}$portStr${uri.path}$queryStr$uriFragment"
+            }
+        } catch (e: URISyntaxException) {
+            Timber.e(e, "Failed to parse url for auth stripping")
+            return url
+        }
+        return url
+    }
+
     private fun omnibarTextForUrl(url: String?): String {
         if (url == null) return ""
 
         return if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
             duckDuckGoUrlDetector.extractQuery(url) ?: url
         } else {
-            url
+            stripBasicAuthFromUrl(url)
         }
     }
 
@@ -1670,7 +1699,7 @@ class BrowserTabViewModel @Inject constructor(
                 }
 
                 LocationPermissionType.ALLOW_ONCE -> {
-                    command.postValue(AskDomainPermission(locationPermission.origin))
+                    command.postValue(AskDomainPermission(locationPermission))
                 }
 
                 LocationPermissionType.DENY_ALWAYS -> {
@@ -1678,7 +1707,7 @@ class BrowserTabViewModel @Inject constructor(
                 }
 
                 LocationPermissionType.DENY_ONCE -> {
-                    command.postValue(AskDomainPermission(locationPermission.origin))
+                    command.postValue(AskDomainPermission(locationPermission))
                 }
             }
         }
@@ -1719,7 +1748,7 @@ class BrowserTabViewModel @Inject constructor(
             viewModelScope.launch {
                 val permissionEntity = locationPermissionsRepository.getDomainPermission(locationPermission.origin)
                 if (permissionEntity == null) {
-                    command.postValue(AskDomainPermission(locationPermission.origin))
+                    command.postValue(AskDomainPermission(locationPermission))
                 } else {
                     reactToSitePermission(permissionEntity.permission)
                 }
@@ -1846,9 +1875,13 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun showFileChooser(
         filePathCallback: ValueCallback<Array<Uri>>,
-        fileChooserParams: WebChromeClient.FileChooserParams,
+        fileChooserParams: FileChooserParams,
     ) {
-        command.value = ShowFileChooser(filePathCallback, fileChooserParams)
+        if (fileChooserParams.acceptTypes.contains("image/*") && cameraHardwareChecker.hasCameraHardware()) {
+            command.value = ShowExistingImageOrCameraChooser(filePathCallback, fileChooserParams)
+        } else {
+            command.value = ShowFileChooser(filePathCallback, fileChooserParams)
+        }
     }
 
     private fun currentGlobalLayoutState(): GlobalLayoutViewState = globalLayoutState.value!!
@@ -2857,7 +2890,12 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    fun resetErrors() {
+        site?.resetErrors()
+    }
+
     fun onWebViewRefreshed() {
+        browserViewState.value = currentBrowserViewState().copy(browserError = LOADING)
         accessibilityViewState.value = currentAccessibilityViewState().copy(refreshWebView = false)
         canAutofillSelectCredentialsDialogCanAutomaticallyShow = true
     }

@@ -43,7 +43,6 @@ abstract class FakeAuthenticator : DeviceAuthenticator {
     override fun hasValidDeviceAuthentication(): Boolean = true
 
     override fun authenticate(
-        featureToAuth: DeviceAuthenticator.Features,
         fragment: Fragment,
         onResult: (DeviceAuthenticator.AuthResult) -> Unit,
     ) {
@@ -51,7 +50,6 @@ abstract class FakeAuthenticator : DeviceAuthenticator {
     }
 
     override fun authenticate(
-        featureToAuth: DeviceAuthenticator.Features,
         fragmentActivity: FragmentActivity,
         onResult: (DeviceAuthenticator.AuthResult) -> Unit,
     ) {

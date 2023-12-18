@@ -39,10 +39,6 @@ enum class NetworkProtectionPixelNames(
     NETP_DISABLE_DAILY("m_netp_ev_disabled_d"),
     NETP_BACKEND_API_ERROR_DEVICE_REGISTRATION_FAILED("m_netp_ev_backend_api_error_device_registration_failed_c", enqueue = true),
     NETP_BACKEND_API_ERROR_DEVICE_REGISTRATION_FAILED_DAILY("m_netp_ev_backend_api_error_device_registration_failed_d", enqueue = true),
-    NETP_VPN_CONNECTIVITY_LOST("m_netp_ev_vpn_connectivity_lost_c", enqueue = true),
-    NETP_VPN_CONNECTIVITY_LOST_DAILY("m_netp_ev_vpn_connectivity_lost_d", enqueue = true),
-    NETP_VPN_RECONNECT_FAILED("m_netp_ev_vpn_reconnect_failed_c", enqueue = true),
-    NETP_VPN_RECONNECT_FAILED_DAILY("m_netp_ev_vpn_reconnect_failed_d", enqueue = true),
     NETP_WG_ERROR_INVALID_STATE("m_netp_ev_wireguard_error_invalid_state_c", enqueue = true),
     NETP_WG_ERROR_INVALID_STATE_DAILY("m_netp_ev_wireguard_error_invalid_state_d", enqueue = true),
     NETP_WG_ERROR_CANT_START_WG_BACKEND("m_netp_ev_wireguard_error_cannot_start_wireguard_backend_c", enqueue = true),
@@ -111,4 +107,5 @@ enum class NetworkProtectionPixelNames(
     NETP_TUNNEL_FAILURE_RECOVERED("m_netp_ev_tunnel_failure_recovered_c", enqueue = true),
     VPN_SNOOZE_CANCELED("m_vpn_ev_snooze_canceled_c", enqueue = true),
     VPN_SNOOZE_CANCELED_DAILY("m_vpn_ev_snooze_canceled_d", enqueue = true),
+    NETP_SETTINGS_PRESSED("m_netp_ev_setting_pressed_c"),
 }

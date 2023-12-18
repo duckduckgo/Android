@@ -17,16 +17,12 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autofillManagementScreenTitle">Sisselogimine</string>
 
     <string name="managementDisabledModeCta"><b>Seadista sätetes</b></string>
-    <string name="managementDisabledModeSubtitle">Sisselogimise kaitsmiseks on vaja seadme lukustusmustrit, PIN-koodi või biomeetriat.</string>
-    <string name="managementDisabledModeTitle">Sisselogimise salvestamiseks kaitske oma seadet</string>
 
     <string name="saveLoginDialogButtonSave">Salvesta parool</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Salvesta parool</string>
     <string name="saveLoginDialogNotNow">Ära salvesta</string>
-    <string name="saveLoginDialogSubtitle">Paroole hoitakse turvaliselt sinu seadmes sisselogimisandmete menüüs.</string>
     <string name="saveLoginDialogTitle">Kas soovid, et DuckDuckGo salvestaks sinu parooli?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Veel valikuid</string>
 
@@ -47,47 +43,35 @@
 
     <string name="autofillDialogCloseButtonContentDescription">Sulge automaatse täitmise dialoog</string>
 
-    <string name="credentialManagementEditLoginTitleHint">Sisselogimise pealkiri</string>
     <string name="credentialManagementEditUsernameHint">Kasutajanimi</string>
     <string name="credentialManagementEditPasswordHint">Parool</string>
-    <string name="credentialManagementEditTitle">Muuda sisselogimist</string>
     <string name="credentialManagementEditWebsiteHint">Veebisaidi URL</string>
     <string name="credentialManagementEditNotesHint">Märkused</string>
     <string name="credentialManagementEditButtonDelete">Kustuta</string>
     <string name="credentialManagementEditButtonSaveChanges">Salvesta muudatused</string>
     <string name="credentialManagementEditButtonCopyUsername">Kopeeri kasutajanimi</string>
     <string name="credentialManagementEditButtonCopyPassword">Kopeeri parool</string>
-    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Sisselogimist värskendati viimati %1$s</string>
 
-    <string name="credentialManagementAutofillToggleLabel">Salvesta ja täida sisselogimisandmed automaatselt</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Sisselogimisandmed salvestatakse turvaliselt sinu seadmesse</string>
     <string name="credentialManagementViewMenuEdit">Redigeeri</string>
     <string name="credentialManagementViewMenuDelete">Kustuta</string>
 
     <string name="credentialManagementSuggestionsLabel">Soovitatud</string>
-    <string name="credentialManagementNoLoginsSavedTitle">Sisselogimisandmeid pole veel salvestatud</string>
 
-    <string name="autofillManagementAddLogin">Lisa sisselogimisandmed</string>
-    <string name="autofillManagementSearchLogins">Otsi sisselogimisandmeid</string>
     <string name="autofillManagementSearchClearDescription">Tühjenda otsingusisend</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Päringule „%1$s” ei leitud tulemusi</string>
 
     <string name="autofillDeleteLoginDialogCancel">Loobu</string>
     <string name="autofillDeleteLoginDialogDelete">Kustuta</string>
-    <string name="autofillDeleteLoginDialogTitle">Kas oled kindel, et soovid need sisselogimisandmed kustutada?</string>
 
     <string name="autofillManagementUsernameCopied">Kasutajanimi on kopeeritud</string>
     <string name="autofillManagementPasswordCopied">Parool on kopeeritud</string>
 
     <string name="autofill_password_generation_offer_title">Kas kasutada DuckDuckGo tugevat parooli?</string>
-    <string name="autofill_password_generation_offer_message">Paroole hoitakse turvaliselt sinu seadmes sisselogimisandmete menüüs.</string>
     <string name="autofill_password_generation_offer_accept">Kasuta tugevat parooli</string>
     <string name="autofill_password_generation_offer_decline">Loon selle ise</string>
 
     <string name="deviceNotSupportedTitle">Seadet ei toetata</string>
-    <string name="deviceNotSupportedSubtitle">Sisselogimisandmete turvaliseks salvestamiseks peame need krüptima ja sinu seadmesse salvestama. Kuna sinu seade ei toeta krüptitud salvestusruumi, ei ole sisselogimisandmete salvestamine võimalik.</string>
 
-    <string name="autofillManagementDeletedConfirmation">Sisselogimisandmed kustutati</string>
     <string name="autofillManagementUndoDeletion">Võta tagasi</string>
 
     <string name="credentialManagementLinkButtonContentDescription" instruction="Accessibility text for a button that will show next to a text field containing a website address; it will launch the website when tapped">Ava veebisait</string>
@@ -116,7 +100,6 @@
     <string name="autofillTooltipGenerateAddress" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated.">Loo privaatne Duck Address</string>
     <string name="autofillTooltipGenerateAddressDescription" instruction="&apos;hide address&apos; refers to using an alias so your real email address is not used">Blokeeri e-posti jälgijad ja peida aadress</string>
 
-    <string name="autofillDisableAutofillPromptTitle">Kas soovid sisselogimisandmete salvestamist jätkata?</string>
     <string name="autofillDisableAutofillPromptMessage">Saad selle igal ajal sätetes keelata.</string>
     <string name="autofillDisableAutofillPromptPositiveButton">Jätka salvestamist</string>
     <string name="autofillDisableAutofillPromptNegativeButton">Keela</string>

@@ -150,7 +150,6 @@
     <string name="settingsWebTrackingProtectionDescription">Abilitato per impostazione predefinita</string>
     <string name="settingsHeadingSettings">Impostazioni</string>
     <string name="settingsPermissionsSetting">Autorizzazioni</string>
-    <string name="settingsAutofillLoginsSetting">Accessi</string>
     <string name="settingsSyncSetting">Sincronizzazione e backup</string>
     <string name="settingsFireButton">Fire Button</string>
 
@@ -634,8 +633,6 @@
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Visualizza</string>
-    <string name="autofillLoginSavedSnackbarMessage">Dati di accesso salvati</string>
-    <string name="autofillLoginUpdatedSnackbarMessage">Dati di accesso aggiornati</string>
 
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Vuoi ricevere una notifica quando è il tuo turno?</string>
@@ -776,4 +773,14 @@
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Aggiungi l\'opzione di ricerca vocale alla barra degli indirizzi. L\'audio non viene memorizzato né condiviso, nemmeno con DuckDuckGo.</string>
     <string name="accessibilityVoiceSearchTitle">Ricerca vocale privata</string>
+
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">Impossibile accedere alla fotocamera</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">Carica un\'immagine</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Scegli un file</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Scatta una foto</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Consenti a DuckDuckGo di richiedere l\'accesso alla fotocamera su questo dispositivo</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">I siti possono utilizzare la fotocamera solo se consenti a DuckDuckGo di richiederne l\'accesso.</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">Apri Impostazioni</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">Annulla</string>
 </resources>

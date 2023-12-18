@@ -18,21 +18,18 @@ package com.duckduckgo.networkprotection.impl.settings.geoswitching
 
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.networkprotection.impl.configuration.FakeWgVpnControllerService
+import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpEgressServersProvider.PreferredLocation
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpEgressServersProvider.ServerLocation
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
+import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository.UserPreferredLocation
 import com.duckduckgo.networkprotection.store.db.NetPGeoswitchingLocation
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mock
-import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class RealNetpEgressServersProviderTest {
 
     @get:Rule
@@ -41,12 +38,11 @@ class RealNetpEgressServersProviderTest {
     private lateinit var testee: RealNetpEgressServersProvider
     private var wgVpnControllerService = FakeWgVpnControllerService()
 
-    @Mock
     private lateinit var netPGeoswitchingRepository: NetPGeoswitchingRepository
 
     @Before
     fun setUp() {
-        MockitoAnnotations.openMocks(this)
+        netPGeoswitchingRepository = FakeNetPGeoswitchingRepository()
         testee = RealNetpEgressServersProvider(
             wgVpnControllerService,
             coroutineRule.testDispatcherProvider,
@@ -56,7 +52,7 @@ class RealNetpEgressServersProviderTest {
 
     @Test
     fun whenDownloadDateThenParseAndReplaceStoredLocations() = runTest {
-        testee.downloadServerLocations()
+        assertNull(testee.updateServerLocationsAndReturnPreferred())
         val expectedResult = listOf(
             NetPGeoswitchingLocation(
                 countryCode = "nl",
@@ -68,13 +64,168 @@ class RealNetpEgressServersProviderTest {
                 countryName = "United States",
                 cities = listOf("Newark", "El Segundo", "Des Moines"),
             ),
+            NetPGeoswitchingLocation(
+                countryCode = "se",
+                countryName = "Sweden",
+                cities = listOf("Gothenburg", "Malmo", "Stockholm"),
+            ),
         )
-        verify(netPGeoswitchingRepository).replaceLocations(expectedResult)
+        assertEquals(expectedResult, netPGeoswitchingRepository.getLocations())
+    }
+
+    @Test
+    fun whenUpdateLocationsUpdateUserPreferredIfNotPresent() = runTest {
+        netPGeoswitchingRepository.setUserPreferredLocation(
+            UserPreferredLocation(
+                countryCode = "se",
+                cityName = "Gothenburg",
+            ),
+        )
+
+        assertEquals(PreferredLocation(countryCode = "se", cityName = "Gothenburg"), testee.updateServerLocationsAndReturnPreferred())
+        val expectedResult = listOf(
+            NetPGeoswitchingLocation(
+                countryCode = "nl",
+                countryName = "Netherlands",
+                cities = listOf("Rotterdam"),
+            ),
+            NetPGeoswitchingLocation(
+                countryCode = "us",
+                countryName = "United States",
+                cities = listOf("Newark", "El Segundo", "Des Moines"),
+            ),
+            NetPGeoswitchingLocation(
+                countryCode = "se",
+                countryName = "Sweden",
+                cities = listOf("Gothenburg", "Malmo", "Stockholm"),
+            ),
+        )
+        assertEquals(expectedResult, netPGeoswitchingRepository.getLocations())
+    }
+
+    @Test
+    fun whenUpdateLocationsUpdateUserPreferredIfNotPresentGoneCity() = runTest {
+        netPGeoswitchingRepository.setUserPreferredLocation(
+            UserPreferredLocation(
+                countryCode = "se",
+                cityName = "wrong city",
+            ),
+        )
+
+        assertEquals(PreferredLocation(countryCode = "se"), testee.updateServerLocationsAndReturnPreferred())
+        val expectedResult = listOf(
+            NetPGeoswitchingLocation(
+                countryCode = "nl",
+                countryName = "Netherlands",
+                cities = listOf("Rotterdam"),
+            ),
+            NetPGeoswitchingLocation(
+                countryCode = "us",
+                countryName = "United States",
+                cities = listOf("Newark", "El Segundo", "Des Moines"),
+            ),
+            NetPGeoswitchingLocation(
+                countryCode = "se",
+                countryName = "Sweden",
+                cities = listOf("Gothenburg", "Malmo", "Stockholm"),
+            ),
+        )
+        assertEquals(expectedResult, netPGeoswitchingRepository.getLocations())
+    }
+
+    @Test
+    fun whenUpdateLocationsUpdateUserPreferredIfNotPresentGoneCountry() = runTest {
+        netPGeoswitchingRepository.setUserPreferredLocation(
+            UserPreferredLocation(
+                countryCode = "zz",
+                cityName = "Malmo",
+            ),
+        )
+
+        assertNull(testee.updateServerLocationsAndReturnPreferred())
+        val expectedResult = listOf(
+            NetPGeoswitchingLocation(
+                countryCode = "nl",
+                countryName = "Netherlands",
+                cities = listOf("Rotterdam"),
+            ),
+            NetPGeoswitchingLocation(
+                countryCode = "us",
+                countryName = "United States",
+                cities = listOf("Newark", "El Segundo", "Des Moines"),
+            ),
+            NetPGeoswitchingLocation(
+                countryCode = "se",
+                countryName = "Sweden",
+                cities = listOf("Gothenburg", "Malmo", "Stockholm"),
+            ),
+        )
+        assertEquals(expectedResult, netPGeoswitchingRepository.getLocations())
+    }
+
+    @Test
+    fun whenUpdateLocationsUpdateUserPreferredIfNotPresentGoneCountryAndCity() = runTest {
+        netPGeoswitchingRepository.setUserPreferredLocation(
+            UserPreferredLocation(
+                countryCode = "zz",
+                cityName = "wrong country",
+            ),
+        )
+
+        assertNull(testee.updateServerLocationsAndReturnPreferred())
+        val expectedResult = listOf(
+            NetPGeoswitchingLocation(
+                countryCode = "nl",
+                countryName = "Netherlands",
+                cities = listOf("Rotterdam"),
+            ),
+            NetPGeoswitchingLocation(
+                countryCode = "us",
+                countryName = "United States",
+                cities = listOf("Newark", "El Segundo", "Des Moines"),
+            ),
+            NetPGeoswitchingLocation(
+                countryCode = "se",
+                countryName = "Sweden",
+                cities = listOf("Gothenburg", "Malmo", "Stockholm"),
+            ),
+        )
+        assertEquals(expectedResult, netPGeoswitchingRepository.getLocations())
+    }
+
+    @Test
+    fun whenUpdateLocationsKeepUserPreferredIfPresent() = runTest {
+        netPGeoswitchingRepository.setUserPreferredLocation(
+            UserPreferredLocation(
+                countryCode = "se",
+                cityName = "Gothenburg",
+            ),
+        )
+
+        assertEquals(PreferredLocation(countryCode = "se", cityName = "Gothenburg"), testee.updateServerLocationsAndReturnPreferred())
+        val expectedResult = listOf(
+            NetPGeoswitchingLocation(
+                countryCode = "nl",
+                countryName = "Netherlands",
+                cities = listOf("Rotterdam"),
+            ),
+            NetPGeoswitchingLocation(
+                countryCode = "us",
+                countryName = "United States",
+                cities = listOf("Newark", "El Segundo", "Des Moines"),
+            ),
+            NetPGeoswitchingLocation(
+                countryCode = "se",
+                countryName = "Sweden",
+                cities = listOf("Gothenburg", "Malmo", "Stockholm"),
+            ),
+        )
+        assertEquals(expectedResult, netPGeoswitchingRepository.getLocations())
     }
 
     @Test
     fun whenGetDownloadedDataThenReturnDataFromRepository() = runTest {
-        whenever(netPGeoswitchingRepository.getLocations()).thenReturn(
+        netPGeoswitchingRepository.replaceLocations(
             listOf(
                 NetPGeoswitchingLocation(
                     countryCode = "se",

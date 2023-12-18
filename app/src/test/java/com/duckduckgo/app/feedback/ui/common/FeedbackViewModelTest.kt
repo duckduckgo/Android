@@ -30,7 +30,6 @@ import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -44,7 +43,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-@ExperimentalCoroutinesApi
 @Suppress("RemoveExplicitTypeArguments")
 class FeedbackViewModelTest {
 
@@ -56,7 +54,6 @@ class FeedbackViewModelTest {
     @Suppress("unused")
     val schedulers = InstantSchedulersRule()
 
-    @ExperimentalCoroutinesApi
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
@@ -72,7 +69,6 @@ class FeedbackViewModelTest {
     private val updateViewCommand
         get() = testee.updateViewCommand.value?.fragmentViewState
 
-    @ExperimentalCoroutinesApi
     @Before
     fun setup() {
         whenever(appBuildConfig.isDebug).thenReturn(true)

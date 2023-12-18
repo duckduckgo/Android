@@ -19,166 +19,37 @@ package com.duckduckgo.mobile.android.vpn.bugreport
 import android.content.Context
 import android.content.SharedPreferences
 import android.net.*
-import android.net.ConnectivityManager.NetworkCallback
 import android.os.SystemClock
-import androidx.core.content.edit
-import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.di.scopes.VpnScope
-import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.vpn.bugreport.NetworkTypeMonitor.Companion
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
-import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.frybits.harmony.getHarmonySharedPreferences
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
-import dagger.SingleInstanceIn
-import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import logcat.LogPriority
-import logcat.asLog
-import logcat.logcat
 import org.json.JSONObject
 
-@ContributesMultibinding(
-    scope = VpnScope::class,
-    boundType = VpnStateCollectorPlugin::class,
-)
-@ContributesMultibinding(
-    scope = VpnScope::class,
-    boundType = VpnServiceCallbacks::class,
-)
-@SingleInstanceIn(VpnScope::class)
+@ContributesMultibinding(ActivityScope::class)
 class NetworkTypeCollector @Inject constructor(
     private val context: Context,
-    @AppCoroutineScope private val coroutineScope: CoroutineScope,
-) : VpnStateCollectorPlugin, VpnServiceCallbacks {
-
-    private val databaseDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
+    private val dispatcherProvider: DispatcherProvider,
+) : VpnStateCollectorPlugin {
     private val adapter = Moshi.Builder().build().adapter(NetworkInfo::class.java)
-
     private val preferences: SharedPreferences
-        get() = context.getHarmonySharedPreferences(FILENAME)
-
-    private var currentNetworkInfo: String?
-        get() = preferences.getString(NETWORK_INFO_KEY, null)
-        set(value) = preferences.edit { putString(NETWORK_INFO_KEY, value) }
-
-    private val wifiNetworkRequest = NetworkRequest.Builder()
-        .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
-        .build()
-
-    private val cellularNetworkRequest = NetworkRequest.Builder()
-        .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
-        .build()
-
-    private val wifiNetworkCallback = object : NetworkCallback() {
-        override fun onAvailable(network: Network) {
-            updateNetworkInfo(Connection(network.networkHandle, NetworkType.WIFI, NetworkState.AVAILABLE))
-        }
-
-        override fun onLost(network: Network) {
-            updateNetworkInfo(Connection(network.networkHandle, NetworkType.WIFI, NetworkState.LOST))
-        }
-    }
-
-    private val cellularNetworkCallback = object : NetworkCallback() {
-        override fun onAvailable(network: Network) {
-            updateNetworkInfo(
-                Connection(network.networkHandle, NetworkType.CELLULAR, NetworkState.AVAILABLE, context.mobileNetworkCode(NetworkType.CELLULAR)),
-            )
-        }
-
-        override fun onLost(network: Network) {
-            updateNetworkInfo(
-                Connection(network.networkHandle, NetworkType.CELLULAR, NetworkState.LOST, context.mobileNetworkCode(NetworkType.CELLULAR)),
-            )
-        }
-    }
+        get() = context.getHarmonySharedPreferences(NetworkTypeMonitor.FILENAME)
 
     override val collectorName = "networkInfo"
 
-    override suspend fun collectVpnRelatedState(appPackageId: String?): JSONObject = withContext(databaseDispatcher) {
+    override suspend fun collectVpnRelatedState(appPackageId: String?): JSONObject = withContext(dispatcherProvider.io()) {
         return@withContext getNetworkInfoJsonObject()
     }
 
-    override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        (context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?)?.let {
-            it.safeRegisterNetworkCallback(wifiNetworkRequest, wifiNetworkCallback)
-            it.safeRegisterNetworkCallback(cellularNetworkRequest, cellularNetworkCallback)
-        }
-    }
-
-    override fun onVpnStopped(
-        coroutineScope: CoroutineScope,
-        vpnStopReason: VpnStopReason,
-    ) {
-        (context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?)?.let {
-            // always unregistered, even if not previously registered
-            it.safeUnregisterNetworkCallback(wifiNetworkCallback)
-            it.safeUnregisterNetworkCallback(cellularNetworkCallback)
-        }
-    }
-
-    private fun updateNetworkInfo(connection: Connection) {
-        coroutineScope.launch(databaseDispatcher) {
-            try {
-                val previousNetworkInfo: NetworkInfo? = currentNetworkInfo?.let { adapter.fromJson(it) }
-
-                // If android notifies of a lost connection that is not the current one, just return
-                if (connection.state == NetworkState.LOST &&
-                    previousNetworkInfo?.currentNetwork?.netId != null &&
-                    connection.netId != previousNetworkInfo.currentNetwork.netId
-                ) {
-                    logcat { "Lost of previously switched connection: $connection, current: ${previousNetworkInfo.currentNetwork}" }
-                    return@launch
-                }
-
-                // Calculate timestamp for when the network type last switched
-                val previousNetworkType = previousNetworkInfo?.currentNetwork
-                val didChange = previousNetworkType != connection
-                val lastSwitchTimestampMillis = if (didChange) {
-                    SystemClock.elapsedRealtime()
-                } else {
-                    previousNetworkInfo?.lastSwitchTimestampMillis ?: SystemClock.elapsedRealtime()
-                }
-
-                // Calculate how long ago the network type last switched
-                val previousNetwork = previousNetworkInfo?.currentNetwork
-                val secondsSinceLastSwitch = TimeUnit.MILLISECONDS.toSeconds(SystemClock.elapsedRealtime() - lastSwitchTimestampMillis)
-                val jsonInfo =
-                    adapter.toJson(
-                        NetworkInfo(
-                            currentNetwork = connection,
-                            previousNetwork = previousNetwork,
-                            lastSwitchTimestampMillis = lastSwitchTimestampMillis,
-                            secondsSinceLastSwitch = secondsSinceLastSwitch,
-                        ),
-                    )
-                currentNetworkInfo = jsonInfo
-                logcat { "New network info $jsonInfo" }
-            } catch (t: Throwable) {
-                logcat(LogPriority.WARN) { t.asLog() }
-            }
-        }
-    }
-
-    private fun updateSecondsSinceLastSwitch() {
-        val networkInfo: NetworkInfo = currentNetworkInfo?.let { adapter.fromJson(it) } ?: return
-        networkInfo.copy(
-            secondsSinceLastSwitch = TimeUnit.MILLISECONDS.toSeconds(SystemClock.elapsedRealtime() - networkInfo.lastSwitchTimestampMillis),
-        ).run {
-            currentNetworkInfo = adapter.toJson(this)
-        }
-    }
-
     private fun getNetworkInfoJsonObject(): JSONObject {
-        updateSecondsSinceLastSwitch()
         // redact the lastSwitchTimestampMillis from the report
-        val info = currentNetworkInfo?.let {
+        val info = getCurrentNetworkInfo()?.let {
             // Redact some values (set to -999) as they could be static values
             val temp = adapter.fromJson(it)
             adapter.toJson(
@@ -186,6 +57,7 @@ class NetworkTypeCollector @Inject constructor(
                     lastSwitchTimestampMillis = -999,
                     currentNetwork = temp.currentNetwork.copy(netId = -999),
                     previousNetwork = temp.previousNetwork?.copy(netId = -999),
+                    secondsSinceLastSwitch = TimeUnit.MILLISECONDS.toSeconds(SystemClock.elapsedRealtime() - temp.lastSwitchTimestampMillis),
                 ),
             )
         } ?: return JSONObject()
@@ -193,28 +65,8 @@ class NetworkTypeCollector @Inject constructor(
         return JSONObject(info)
     }
 
-    private fun ConnectivityManager.safeUnregisterNetworkCallback(networkCallback: NetworkCallback) {
-        kotlin.runCatching {
-            unregisterNetworkCallback(networkCallback)
-        }.onFailure {
-            logcat(LogPriority.ERROR) { it.asLog() }
-        }
-    }
-
-    private fun ConnectivityManager.safeRegisterNetworkCallback(networkRequest: NetworkRequest, networkCallback: NetworkCallback) {
-        kotlin.runCatching {
-            registerNetworkCallback(networkRequest, networkCallback)
-        }.onFailure {
-            logcat(LogPriority.ERROR) { it.asLog() }
-        }
-    }
-
-    private fun Context.mobileNetworkCode(networkType: NetworkType): Int? {
-        return if (networkType == NetworkType.WIFI) {
-            null
-        } else {
-            return kotlin.runCatching { resources.configuration.mnc }.getOrNull()
-        }
+    private fun getCurrentNetworkInfo(): String? {
+        return preferences.getString(Companion.NETWORK_INFO_KEY, null)
     }
 
     internal data class NetworkInfo(
@@ -224,7 +76,12 @@ class NetworkTypeCollector @Inject constructor(
         val secondsSinceLastSwitch: Long,
     )
 
-    internal data class Connection(val netId: Long, val type: NetworkType, val state: NetworkState, val mnc: Int? = null)
+    internal data class Connection(
+        val netId: Long,
+        val type: NetworkType,
+        val state: NetworkState,
+        val mnc: Int? = null,
+    )
 
     internal enum class NetworkType {
         WIFI,
@@ -234,10 +91,5 @@ class NetworkTypeCollector @Inject constructor(
     internal enum class NetworkState {
         AVAILABLE,
         LOST,
-    }
-
-    companion object {
-        private const val FILENAME = "network.type.collector.file.v1"
-        private const val NETWORK_INFO_KEY = "network.info.key"
     }
 }

@@ -17,16 +17,12 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autofillManagementScreenTitle">Conectări</string>
 
     <string name="managementDisabledModeCta"><b>Configurează în Setări</b></string>
-    <string name="managementDisabledModeSubtitle">Este necesar un model de blocare a dispozitivului, un cod PIN sau date biometrice pentru a-ți proteja conectările.</string>
-    <string name="managementDisabledModeTitle">Securizează-ți dispozitivul pentru a salva conectările</string>
 
     <string name="saveLoginDialogButtonSave">Salvează parola</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Salvează parola</string>
     <string name="saveLoginDialogNotNow">Nu salva</string>
-    <string name="saveLoginDialogSubtitle">Parolele sunt stocate în siguranță pe dispozitivul dvs. în meniul Autentificări.</string>
     <string name="saveLoginDialogTitle">Dorești ca DuckDuckGo să-ți salveze parola?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Mai multe opțiuni</string>
 
@@ -47,47 +43,35 @@
 
     <string name="autofillDialogCloseButtonContentDescription">Închide dialogul de completare automată</string>
 
-    <string name="credentialManagementEditLoginTitleHint">Titlu autentificare</string>
     <string name="credentialManagementEditUsernameHint">Nume utilizator</string>
     <string name="credentialManagementEditPasswordHint">Parolă</string>
-    <string name="credentialManagementEditTitle">Editează datele de autentificare</string>
     <string name="credentialManagementEditWebsiteHint">URL-ul site-ului</string>
     <string name="credentialManagementEditNotesHint">Note</string>
     <string name="credentialManagementEditButtonDelete">Ștergere</string>
     <string name="credentialManagementEditButtonSaveChanges">Salvează modificările</string>
     <string name="credentialManagementEditButtonCopyUsername">Copiază numele de utilizator</string>
     <string name="credentialManagementEditButtonCopyPassword">Copiază parola</string>
-    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Ultima actualizare a datelor de autentificare %1$s</string>
 
-    <string name="credentialManagementAutofillToggleLabel">Salvează și completează automat datele de autentificare</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Datele de conectare sunt stocate în siguranță pe dispozitivul tău</string>
     <string name="credentialManagementViewMenuEdit">Editează</string>
     <string name="credentialManagementViewMenuDelete">Ștergere</string>
 
     <string name="credentialManagementSuggestionsLabel">Sugerat</string>
-    <string name="credentialManagementNoLoginsSavedTitle">Nu au fost salvate încă date de autentificare</string>
 
-    <string name="autofillManagementAddLogin">Adaugă date de autentificare</string>
-    <string name="autofillManagementSearchLogins">Date de autentificare pentru căutare</string>
     <string name="autofillManagementSearchClearDescription">Șterge datele introduse pentru căutare</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Nu există rezultate pentru „%1$s”</string>
 
     <string name="autofillDeleteLoginDialogCancel">Anulare</string>
     <string name="autofillDeleteLoginDialogDelete">Ștergere</string>
-    <string name="autofillDeleteLoginDialogTitle">Sigur vrei să ștergi aceste date de autentificare?</string>
 
     <string name="autofillManagementUsernameCopied">Numele de utilizator a fost copiat</string>
     <string name="autofillManagementPasswordCopied">Parolă copiată</string>
 
     <string name="autofill_password_generation_offer_title">Folosiți o parolă puternică de la DuckDuckGo?</string>
-    <string name="autofill_password_generation_offer_message">Parolele sunt stocate în siguranță pe dispozitivul dvs. în meniul Autentificări.</string>
     <string name="autofill_password_generation_offer_accept">Utilizați o parolă puternică</string>
     <string name="autofill_password_generation_offer_decline">Îmi creez propria parolă</string>
 
     <string name="deviceNotSupportedTitle">Dispozitivul nu este acceptat</string>
-    <string name="deviceNotSupportedSubtitle">Pentru a stoca datele de conectare în siguranță, trebuie să le criptăm și să le stocăm pe dispozitivul tău. Deoarece dispozitivul tău nu acceptă stocarea criptată, secțiunea Date de conectare nu este disponibilă.</string>
 
-    <string name="autofillManagementDeletedConfirmation">Date de conectare șterse</string>
     <string name="autofillManagementUndoDeletion">Anulează</string>
 
     <string name="credentialManagementLinkButtonContentDescription" instruction="Accessibility text for a button that will show next to a text field containing a website address; it will launch the website when tapped">Deschide site-ul</string>
@@ -116,7 +100,6 @@
     <string name="autofillTooltipGenerateAddress" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated.">Generează o Duck Address privată</string>
     <string name="autofillTooltipGenerateAddressDescription" instruction="&apos;hide address&apos; refers to using an alias so your real email address is not used">Blochează tehnologiile de urmărire din e-mailuri și ascunde adresa</string>
 
-    <string name="autofillDisableAutofillPromptTitle">Vrei să salvezi în continuare datele de conectare?</string>
     <string name="autofillDisableAutofillPromptMessage">Poți dezactiva oricând acest lucru din Setări.</string>
     <string name="autofillDisableAutofillPromptPositiveButton">Continuă să salvezi</string>
     <string name="autofillDisableAutofillPromptNegativeButton">Dezactivează</string>

@@ -1,0 +1,27 @@
+appId: com.duckduckgo.mobile.android
+name: "ReleaseTest: Sync can recover a created account"
+tags:
+  - syncTest
+---
+- launchApp:
+    clearState: true
+    stopApp: true
+- runFlow: ../sync_flows/1_-_create_account.yaml
+- tapOn: "Show Text Code"
+- tapOn: "Copy Code"
+- tapOn: "Navigate up"
+- tapOn: "Turn Off Sync & Backup…"
+- tapOn: "Turn Off"
+- tapOn: "Recover Synced Data"
+- tapOn: "Get Started"
+- tapOn: "Or Manually Enter Code"
+- tapOn: "Paste Code"
+- extendedWaitUntil:
+    visible:
+      id: "com.duckduckgo.mobile.android:id/footer_next_button"
+      enabled: true
+    timeout: 5000
+- tapOn: "Next"
+- tapOn: "Done"
+- assertVisible:
+    id: "com.duckduckgo.mobile.android:id/qrCodeImageView"

@@ -31,6 +31,7 @@ import dagger.SingleInstanceIn
 import java.security.KeyStore
 import java.security.Security
 import javax.inject.Named
+import javax.inject.Qualifier
 import javax.net.ssl.SSLSocket
 import javax.net.ssl.TrustManagerFactory
 import javax.net.ssl.X509TrustManager
@@ -45,6 +46,32 @@ import retrofit2.http.POST
 @Module
 @ContributesTo(scope = VpnScope::class)
 object WgVpnControllerServiceModule {
+
+    @Retention(AnnotationRetention.BINARY)
+    @Qualifier
+    private annotation class InternalApi
+
+    @Provides
+    @InternalApi
+    @SingleInstanceIn(VpnScope::class)
+    fun provideInternalCustomHttpClient(
+        @Named("api") okHttpClient: OkHttpClient,
+        delegatingSSLSocketFactory: DelegatingSSLSocketFactory,
+    ): OkHttpClient {
+        val trustManagerFactory = TrustManagerFactory.getInstance(
+            TrustManagerFactory.getDefaultAlgorithm(),
+        )
+        trustManagerFactory.init(null as KeyStore?)
+        val trustManagers = trustManagerFactory.trustManagers
+        check(!(trustManagers.size != 1 || trustManagers[0] !is X509TrustManager)) {
+            ("Unexpected default trust managers: ${trustManagers.contentToString()}")
+        }
+        val trustManager = trustManagers[0] as X509TrustManager
+
+        return okHttpClient.newBuilder()
+            .sslSocketFactory(delegatingSSLSocketFactory, trustManager)
+            .build()
+    }
 
     @Provides
     @SingleInstanceIn(VpnScope::class)
@@ -66,26 +93,10 @@ object WgVpnControllerServiceModule {
     @SuppressLint("NoRetrofitCreateMethodCallDetector")
     fun providesWgVpnControllerService(
         @Named(value = "api") retrofit: Retrofit,
-        @Named("api") okHttpClient: Lazy<OkHttpClient>,
-        delegatingSSLSocketFactory: DelegatingSSLSocketFactory,
+        @InternalApi customClient: Lazy<OkHttpClient>,
     ): WgVpnControllerService {
-        val trustManagerFactory = TrustManagerFactory.getInstance(
-            TrustManagerFactory.getDefaultAlgorithm(),
-        )
-        trustManagerFactory.init(null as KeyStore?)
-        val trustManagers = trustManagerFactory.trustManagers
-        check(!(trustManagers.size != 1 || trustManagers[0] !is X509TrustManager)) {
-            ("Unexpected default trust managers: ${trustManagers.contentToString()}")
-        }
-        val trustManager = trustManagers[0] as X509TrustManager
-
         val customRetrofit = retrofit.newBuilder()
-            .callFactory {
-                okHttpClient.get().newBuilder()
-                    .sslSocketFactory(delegatingSSLSocketFactory, trustManager)
-                    .build()
-                    .newCall(it)
-            }
+            .callFactory { customClient.get().newCall(it) }
             .build()
 
         // insertProviderAt trick to avoid error during handshakes

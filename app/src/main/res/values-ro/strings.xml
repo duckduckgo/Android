@@ -150,7 +150,6 @@
     <string name="settingsWebTrackingProtectionDescription">Activat în mod implicit</string>
     <string name="settingsHeadingSettings">Setări</string>
     <string name="settingsPermissionsSetting">Permisiuni</string>
-    <string name="settingsAutofillLoginsSetting">Conectări</string>
     <string name="settingsSyncSetting">Sincronizare și copiere de rezervă</string>
     <string name="settingsFireButton">Butonul Foc</string>
 
@@ -636,8 +635,6 @@
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Vezi</string>
-    <string name="autofillLoginSavedSnackbarMessage">Date de conectare salvate</string>
-    <string name="autofillLoginUpdatedSnackbarMessage">Date de conectare actualizate</string>
 
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Dorești să îți trimitem o notificare când este rândul tău?</string>
@@ -780,4 +777,14 @@
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Adaugă opțiunea de Căutare vocală privată în bara de adrese.Sunetul nu este stocat sau partajat cu nimeni, inclusiv cu DuckDuckGo.</string>
     <string name="accessibilityVoiceSearchTitle">Căutare vocală privată</string>
+
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">Nu s-a putut accesa camera</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">Încarcă o imagine</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Alege fișierul</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Fă o fotografie</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Permite ca DuckDuckGo să solicite accesul la cameră pe acest dispozitiv</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Site-urile îți pot utiliza camera numai dacă permiți ca DuckDuckGo să solicite accesul.</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">Deschide Setări</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">Anulare</string>
 </resources>

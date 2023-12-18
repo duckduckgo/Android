@@ -61,6 +61,7 @@ interface Site {
     fun trackerDetected(event: TrackingEvent)
     fun onHttpErrorDetected(errorCode: Int)
     fun onErrorDetected(error: String)
+    fun resetErrors()
     fun updatePrivacyData(sitePrivacyData: SitePrivacyData)
     fun surrogateDetected(surrogate: SurrogateResponse)
 

@@ -22,6 +22,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.networkprotection.impl.about.NetworkProtectionAboutScreens.NetPTermsScreenNoParams
 import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpTermsBinding
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import javax.inject.Inject

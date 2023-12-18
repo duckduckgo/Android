@@ -50,7 +50,7 @@ object FingerprintProtectionModule {
     fun provideFingerprintProtectionDatabase(context: Context): FingerprintProtectionDatabase {
         return Room.databaseBuilder(context, FingerprintProtectionDatabase::class.java, "fingerprint_protection.db")
             .fallbackToDestructiveMigration()
-            .addMigrations(*ALL_MIGRATIONS)
+            .addMigrations(*ALL_MIGRATIONS.toTypedArray())
             .build()
     }
 
@@ -106,11 +106,7 @@ object FingerprintProtectionModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideFingerprintProtectionSeedRepository(
-        database: FingerprintProtectionDatabase,
-        @AppCoroutineScope appCoroutineScope: CoroutineScope,
-        dispatcherProvider: DispatcherProvider,
-    ): FingerprintProtectionSeedRepository {
-        return RealFingerprintProtectionSeedRepository(database, appCoroutineScope, dispatcherProvider)
+    fun provideFingerprintProtectionSeedRepository(): FingerprintProtectionSeedRepository {
+        return RealFingerprintProtectionSeedRepository()
     }
 }

@@ -25,11 +25,10 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
-import com.duckduckgo.di.*
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.sync.api.*
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.FragmentCreateAccountBinding
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command
@@ -43,7 +42,6 @@ import com.google.android.material.snackbar.Snackbar
 import javax.inject.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import timber.log.*
 
 @InjectWith(FragmentScope::class)
 class SyncCreateAccountFragment : DuckDuckGoFragment(R.layout.fragment_create_account) {
@@ -65,13 +63,6 @@ class SyncCreateAccountFragment : DuckDuckGoFragment(R.layout.fragment_create_ac
     ) {
         super.onViewCreated(view, savedInstanceState)
         observeUiEvents()
-        configureListeners()
-    }
-
-    private fun configureListeners() {
-        binding.footerButton.setOnClickListener {
-            viewModel.onNextClicked()
-        }
     }
 
     private fun observeUiEvents() {
@@ -91,14 +82,10 @@ class SyncCreateAccountFragment : DuckDuckGoFragment(R.layout.fragment_create_ac
     private fun renderViewState(viewState: ViewState) {
         when (viewState.viewMode) {
             is SignedIn -> {
-                binding.footerButton.isEnabled = true
-                binding.footerButton.setOnClickListener {
-                    listener?.launchFinishSetupFlow()
-                }
+                listener?.launchRecoveryCodeScreen()
             }
-
-            CreatingAccount -> {
-                binding.footerButton.isEnabled = false
+            is CreatingAccount -> {
+                binding.connecting.show()
             }
         }
     }
@@ -109,8 +96,7 @@ class SyncCreateAccountFragment : DuckDuckGoFragment(R.layout.fragment_create_ac
                 requireActivity().setResult(Activity.RESULT_CANCELED)
                 requireActivity().finish()
             }
-
-            FinishSetupFlow -> listener?.launchFinishSetupFlow()
+            FinishSetupFlow -> listener?.launchRecoveryCodeScreen()
             Error -> {
                 Snackbar.make(binding.root, R.string.sync_general_error, Snackbar.LENGTH_LONG).show()
             }

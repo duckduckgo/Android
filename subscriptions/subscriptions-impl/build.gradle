@@ -44,6 +44,7 @@ dependencies {
     implementation project(path: ':settings-api')
     implementation project(path: ':autofill-api')
     implementation project(path: ':network-protection-api')
+    implementation project(path: ':internal-features-api')
 
     implementation AndroidX.appCompat
     implementation KotlinX.coroutines.core
