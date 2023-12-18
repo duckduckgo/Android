@@ -25,6 +25,7 @@ import com.duckduckgo.sync.impl.Clipboard
 import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.LoginSuccess
 import kotlinx.coroutines.test.runTest
@@ -37,6 +38,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
@@ -47,11 +49,13 @@ class SyncConnectViewModelTest {
     private val syncRepostitory: SyncAccountRepository = mock()
     private val clipboard: Clipboard = mock()
     private val qrEncoder: QREncoder = mock()
+    private val syncPixels: SyncPixels = mock()
 
     private val testee = SyncConnectViewModel(
         syncRepostitory,
         qrEncoder,
         clipboard,
+        syncPixels,
         coroutineTestRule.testDispatcherProvider,
     )
 
@@ -96,6 +100,7 @@ class SyncConnectViewModelTest {
         testee.commands().test {
             val command = awaitItem()
             assertTrue(command is LoginSuccess)
+            verify(syncPixels).fireSignupConnectPixel()
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -138,6 +143,7 @@ class SyncConnectViewModelTest {
         testee.commands().test {
             testee.onQRCodeScanned(jsonConnectKeyEncoded)
             val command = awaitItem()
+            verify(syncPixels).fireLoginPixel()
             assertTrue(command is Command.LoginSuccess)
             cancelAndIgnoreRemainingEvents()
         }
@@ -150,6 +156,7 @@ class SyncConnectViewModelTest {
             testee.onQRCodeScanned(jsonConnectKeyEncoded)
             val command = awaitItem()
             assertTrue(command is Command.Error)
+            verifyNoInteractions(syncPixels)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -160,6 +167,7 @@ class SyncConnectViewModelTest {
             testee.onLoginSuccess()
             val command = awaitItem()
             assertTrue(command is Command.LoginSuccess)
+            verify(syncPixels).fireLoginPixel()
             cancelAndIgnoreRemainingEvents()
         }
     }

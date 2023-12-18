@@ -23,6 +23,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.LoginSucess
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.ReadTextCode
 import javax.inject.*
@@ -35,6 +36,7 @@ import kotlinx.coroutines.launch
 @ContributesViewModel(ActivityScope::class)
 class SyncLoginViewModel @Inject constructor(
     private val syncAccountRepository: SyncAccountRepository,
+    private val syncPixels: SyncPixels,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -54,6 +56,7 @@ class SyncLoginViewModel @Inject constructor(
 
     fun onLoginSuccess() {
         viewModelScope.launch {
+            syncPixels.fireLoginPixel()
             command.send(LoginSucess)
         }
     }
@@ -64,6 +67,7 @@ class SyncLoginViewModel @Inject constructor(
             if (result is Error) {
                 command.send(Command.Error)
             } else {
+                syncPixels.fireLoginPixel()
                 command.send(LoginSucess)
             }
         }

@@ -112,6 +112,8 @@ class RealSyncEngine @Inject constructor(
             Timber.d("Sync-Engine: sync is not in progress, starting to sync")
             syncStateRepository.store(SyncAttempt(state = IN_PROGRESS, meta = trigger.toString()))
 
+            syncPixels.fireDailyPixel()
+
             Timber.i("Sync-Engine: getChanges - performSync")
             val changes = getChanges()
             performFirstSync(changes.filter { it.isFirstSync() })

@@ -22,13 +22,14 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 
 interface SharedPrefsProvider {
-    fun getSharedPrefs(fileName: String): SharedPreferences?
+    fun getEncryptedSharedPrefs(fileName: String): SharedPreferences?
+    fun getSharedPrefs(fileName: String): SharedPreferences
 }
 
 class EncryptedSharedPrefsProvider(
     private val context: Context,
 ) : SharedPrefsProvider {
-    override fun getSharedPrefs(fileName: String): SharedPreferences? {
+    override fun getEncryptedSharedPrefs(fileName: String): SharedPreferences? {
         return try {
             EncryptedSharedPreferences.create(
                 context,
@@ -40,5 +41,9 @@ class EncryptedSharedPrefsProvider(
         } catch (e: Exception) {
             null
         }
+    }
+
+    override fun getSharedPrefs(fileName: String): SharedPreferences {
+        return context.getSharedPreferences(fileName, Context.MODE_PRIVATE)
     }
 }
