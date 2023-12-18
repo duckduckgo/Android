@@ -1156,11 +1156,13 @@ class BrowserTabFragment :
 
             is NavigationCommand.NavigateBack -> {
                 dismissAppLinkSnackBar()
+                viewModel.refreshBrowserError()
                 webView?.goBackOrForward(-it.steps)
             }
 
             is NavigationCommand.NavigateForward -> {
                 dismissAppLinkSnackBar()
+                viewModel.refreshBrowserError()
                 webView?.goForward()
             }
 
@@ -3291,6 +3293,7 @@ class BrowserTabFragment :
                 if (viewState.progress == MAX_PROGRESS) {
                     if (lastSeenBrowserViewState?.browserError == LOADING) {
                         showBrowser()
+                        viewModel.resetBrowserError()
                     }
                     webView?.setBottomMatchingBehaviourEnabled(true)
                 }
