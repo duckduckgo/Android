@@ -45,8 +45,6 @@ import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.di.NetpBreakageCategories
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.None
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowAlwaysOnLockdownEnabled
-import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowReconnecting
-import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowReconnectingFailed
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowRevoked
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.CheckVPNPermission
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.OpenVPNSettings
@@ -58,10 +56,6 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Unknown
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
-import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ReconnectStatus
-import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ReconnectStatus.NotReconnecting
-import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ReconnectStatus.Reconnecting
-import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ReconnectStatus.ReconnectingFailed
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -83,7 +77,6 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     @NetpBreakageCategories private val netpBreakageCategories: List<AppBreakageCategory>,
 ) : ViewModel(), DefaultLifecycleObserver {
 
-    private var reconnectStateFlow = MutableStateFlow(networkProtectionRepository.reconnectStatus)
     private val refreshVpnRunningState = MutableStateFlow(System.currentTimeMillis())
     private val connectionDetailsFlow = MutableStateFlow<ConnectionDetails?>(null)
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -95,7 +88,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
 
     internal fun viewState(): Flow<ViewState> {
-        return combine(connectionDetailsFlow, getRunningState(), reconnectStateFlow) { connectionDetails, vpnState, reconnectState ->
+        return combine(connectionDetailsFlow, getRunningState()) { connectionDetails, vpnState ->
             var connectionDetailsToEmit = connectionDetails
 
             if (vpnState.state == ENABLED && !isTimerTickRunning) {
@@ -103,14 +96,12 @@ class NetworkProtectionManagementViewModel @Inject constructor(
             } else if (vpnState.state is DISABLED || vpnState.state == ENABLING) {
                 stopElapsedTimeTimer()
                 connectionDetailsToEmit = null
-            } else if (reconnectState == Reconnecting) {
-                connectionDetailsToEmit = null
             }
 
             return@combine ViewState(
-                connectionState = vpnState.toConnectionState(reconnectState),
+                connectionState = vpnState.toConnectionState(),
                 connectionDetails = connectionDetailsToEmit,
-                alertState = getAlertState(vpnState.state, reconnectState, vpnState.stopReason, vpnState.alwaysOnState),
+                alertState = getAlertState(vpnState.state, vpnState.stopReason, vpnState.alwaysOnState),
             )
         }
     }
@@ -134,15 +125,10 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     @VisibleForTesting
     internal fun getAlertState(
         vpnRunningState: VpnRunningState,
-        reconnectState: ReconnectStatus,
         vpnStopReason: VpnStopReason?,
         vpnAlwaysOnState: AlwaysOnState,
     ): AlertState {
-        return if (vpnRunningState == DISABLED && (reconnectState == Reconnecting || reconnectState == ReconnectingFailed)) {
-            ShowReconnectingFailed
-        } else if (reconnectState == Reconnecting) {
-            ShowReconnecting
-        } else if (vpnRunningState == DISABLED && (vpnStopReason == REVOKED || vpnStopReason == ERROR)) {
+        return if (vpnRunningState == DISABLED && (vpnStopReason == REVOKED || vpnStopReason == ERROR)) {
             ShowRevoked
         } else if (vpnRunningState == ENABLED && vpnAlwaysOnState.isAlwaysOnLockedDown()) {
             ShowAlwaysOnLockdownEnabled
@@ -155,17 +141,14 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         .getStateFlow(NetPVpnFeature.NETP_VPN)
         .combine(refreshVpnRunningState.asStateFlow()) { state, _ -> state }
 
-    private fun VpnState.toConnectionState(reconnectState: ReconnectStatus): ConnectionState =
-        if (this.state != DISABLED && reconnectState == Reconnecting) {
-            Connecting
-        } else {
-            when (this.state) {
-                ENABLING -> Connecting
-                ENABLED -> Connected
-                is DISABLED -> Disconnected
-                else -> Unknown
-            }
+    private fun VpnState.toConnectionState(): ConnectionState {
+        return when (this.state) {
+            ENABLING -> Connecting
+            ENABLED -> Connected
+            is DISABLED -> Disconnected
+            else -> Unknown
         }
+    }
 
     private fun loadConnectionDetails() {
         networkProtectionRepository.serverDetails.run {
@@ -206,7 +189,6 @@ class NetworkProtectionManagementViewModel @Inject constructor(
                             )
                         }
                     }
-                    reconnectStateFlow.value = networkProtectionRepository.reconnectStatus
                     delay(500)
                 }
             }
@@ -257,8 +239,6 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     fun onStartVpn() {
         viewModelScope.launch(dispatcherProvider.io()) {
             featuresRegistry.registerFeature(NetPVpnFeature.NETP_VPN)
-            // TODO find a better place to reset values when manually starting or stopping NetP.
-            networkProtectionRepository.reconnectStatus = NotReconnecting
             networkProtectionRepository.enabledTimeInMillis = -1L
             forceUpdateRunningState()
             tryShowAlwaysOnPromotion()
@@ -360,8 +340,6 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     }
 
     enum class AlertState {
-        ShowReconnecting,
-        ShowReconnectingFailed,
         ShowRevoked,
         ShowAlwaysOnLockdownEnabled,
         None,

@@ -17,19 +17,11 @@
 package com.duckduckgo.networkprotection.impl.fakes
 
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
-import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ReconnectStatus
-import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ReconnectStatus.NotReconnecting
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ServerDetails
 
 class FakeNetworkProtectionRepository : NetworkProtectionRepository {
-    private var _reconnectStatus: ReconnectStatus? = null
     private var _serverDetails: ServerDetails? = null
 
-    override var reconnectStatus: ReconnectStatus
-        get() = _reconnectStatus ?: NotReconnecting
-        set(value) {
-            _reconnectStatus = value
-        }
     override var privateKey: String?
         get() = null
         set(_) {}
