@@ -5,7 +5,7 @@
     <application>
         <activity
             android:name=".email.incontext.EmailProtectionInContextSignupActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize|smallestScreenSize|screenLayout"
+            android:configChanges="keyboardHidden|orientation|screenSize|smallestScreenSize|screenLayout|navigation|keyboard"
             android:exported="false" />
         <activity
             android:name=".ui.credential.management.AutofillManagementActivity"
