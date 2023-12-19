@@ -229,7 +229,7 @@
 
         <activity
             android:name=".BrowserActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize|smallestScreenSize|screenLayout"
+            android:configChanges="keyboardHidden|orientation|screenSize|smallestScreenSize|screenLayout|navigation|keyboard"
             android:exported="true"
             android:label="@string/appDescription"
             android:launchMode="singleTask"
@@ -324,7 +324,7 @@
             android:parentActivityName=".BrowserActivity" />
         <activity
             android:name="com.duckduckgo.app.survey.ui.SurveyActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:configChanges="keyboardHidden|orientation|screenSize|smallestScreenSize|screenLayout|navigation|keyboard"
             android:exported="false"
             android:label="@string/surveyActivityTitle"
             android:parentActivityName=".BrowserActivity"
