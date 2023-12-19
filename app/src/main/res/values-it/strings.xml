@@ -55,12 +55,12 @@
     <string name="favoriteAddedMessage">Preferito aggiunto</string>
     <string name="bookmarkAddedMessage">Segnalibro aggiunto</string>
     <string name="requestDesktopSiteMenuTitle">Sito desktop</string>
-    <string name="fireproofWebsiteMenuTitleRemove">Rimuovi protezione</string>
+    <string name="fireproofWebsiteMenuTitleRemove">Rimuovi protezione dal fuoco</string>
     <string name="requestMobileSiteMenuTitle">Sito per dispositivi mobili</string>
     <string name="downloadsMenuTitle">Download</string>
     <string name="printMenuTitle">Stampa pagina</string>
     <string name="favoriteDeleteConfirmationMessage">Preferito rimosso</string>
-    <string name="fireproofDeleteConfirmationMessage">Protezione rimossa</string>
+    <string name="fireproofDeleteConfirmationMessage">Protezione dal fuoco rimossa</string>
     <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">Tutela della privacy attivata per %1$s</string>
     <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">Tutela della privacy disattivata per %1$s</string>
     <string name="undoSnackbarAction">Annulla</string>
@@ -534,34 +534,34 @@
     <string name="settingsPrivacyProtectionAllowlist">Siti non protetti</string>
 
     <!-- Fireproof websites -->
-    <string name="fireproofWebsitesActivityTitle">Siti protetti</string>
-    <string name="settingsFireproofWebsites">Siti protetti</string>
-    <string name="fireproofWebsiteMenuTitleAdd">Attiva protezione per questo sito</string>
-    <string name="fireproofWebsiteSnackbarConfirmation" instruction="Placeholder is a website">&lt;b&gt;%1$s&lt;/b&gt; è adesso protetto</string>
+    <string name="fireproofWebsitesActivityTitle">Siti ignifughi</string>
+    <string name="settingsFireproofWebsites">Siti ignifughi</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Proteggi questo sito dal fuoco</string>
+    <string name="fireproofWebsiteSnackbarConfirmation" instruction="Placeholder is a website">&lt;b&gt;%1$s&lt;/b&gt; è ora a prova di fuoco</string>
     <string name="fireproofWebsiteSnackbarAction">Annulla</string>
     <string name="fireproofWebsiteDeleteConfirmMessage" instruction="Placeholder is a website">Sei sicuro di voler eliminare &lt;b&gt;%1$s&lt;/b&gt;?</string>
-    <string name="fireproofWebsiteFeatureDescription">Per mantenere l\'accesso degli utenti, i siti web si affidano ai cookie. Quando attivi la protezione per un sito, i cookie non verranno cancellati e manterrai l\'accesso, anche dopo aver usato il pulsante Proteggi (icona del fuoco). Continueremo a bloccare i tracker di terze parti che si trovano su siti web protetti.</string>
+    <string name="fireproofWebsiteFeatureDescription">Per mantenere l\'accesso degli utenti, i siti web si affidano ai cookie. Quando attivi la Protezione dal fuoco per un sito, i cookie non verranno cancellati e manterrai l\'accesso, anche dopo aver usato il Fire Button (icona del fuoco). Continueremo a bloccare i tracker di terze parti anche sui siti ignifughi.</string>
     <string name="fireproofWebsiteOverflowContentDescription" instruction="Placeholder is a website">Altre opzioni per proteggere il sito web %1$s</string>
-    <string name="fireproofWebsiteLoginDialogTitle" instruction="Placeholder is a website">Vuoi proteggere %1$s?</string>
-    <string name="fireproofWebsiteLoginDialogDescription">L\'attivazione della protezione su questo sito ti consentirà di effettuare l\'accesso dopo aver utilizzato il pulsante Proteggi (icona del fuoco).</string>
-    <string name="fireproofWebsiteLoginDialogPositive">Proteggi</string>
+    <string name="fireproofWebsiteLoginDialogTitle" instruction="Placeholder is a website">Vuoi proteggere dal fuoco %1$s?</string>
+    <string name="fireproofWebsiteLoginDialogDescription">Proteggere dal fuoco questo sito manterrà valido l\'accesso dopo aver utilizzato il Fire Button (icona del fuoco).</string>
+    <string name="fireproofWebsiteLoginDialogPositive">Proteggi dal fuoco</string>
     <string name="fireproofWebsiteLoginDialogNegative">Non adesso</string>
-    <string name="fireproofWebsiteItemsSectionTitle">Siti protetti</string>
-    <string name="fireproofWebsiteEmptyListHint">Non esistono ancora siti resistenti al fuoco</string>
-    <string name="fireproofWebsiteSettingSelectionTitle">Proteggi i siti web al momento dell\'accesso</string>
-    <string name="fireproofWebsiteRemoveAllConfirmation">Resistenza al fuoco rimossa per tutti i siti web</string>
-    <string name="fireproofWebsiteRemovalConfirmation" instruction="Placeholder is a website">Protezione rimossa per &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="fireproofWebsiteItemsSectionTitle">Siti ignifughi</string>
+    <string name="fireproofWebsiteEmptyListHint">Non hai ancora aggiunto siti resistenti al fuoco</string>
+    <string name="fireproofWebsiteSettingSelectionTitle">Proteggi dal fuoco al momento dell\'accesso</string>
+    <string name="fireproofWebsiteRemoveAllConfirmation">Protezione dal fuoco rimossa per tutti i siti web</string>
+    <string name="fireproofWebsiteRemovalConfirmation" instruction="Placeholder is a website">Protezione dal fuoco rimossa per &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Chiedi ogni volta</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAlways">Sempre</string>
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Mai</string>
-    <string name="disableLoginDetectionDialogTitle">Disabilitare il promemoria per la protezione quando si accede ai siti?</string>
+    <string name="disableLoginDetectionDialogTitle">Disabilitare il promemoria per la protezione dal fuoco quando si accede ai siti?</string>
     <string name="disableLoginDetectionDialogDescription">Puoi modificare questa preferenza in qualsiasi momento nella sezione Impostazioni.</string>
     <string name="disableLoginDetectionDialogPositive">Disabilita</string>
     <string name="disableLoginDetectionDialogNegative">Annulla</string>
-    <string name="automaticFireproofWebsiteLoginDialogTitle">Proteggere automaticamente i siti web al momento dell\'accesso?</string>
-    <string name="automaticFireproofWebsiteLoginDialogDescription">L\'attivazione della protezione ti consentirà di effettuare l\'accesso dopo aver utilizzato il pulsante Proteggi (icona del fuoco). Puoi sempre modificare questa scelta in un secondo momento in Impostazioni. </string>
-    <string name="automaticFireproofWebsiteLoginDialogFirstOption">Proteggi sempre</string>
-    <string name="automaticFireproofWebsiteLoginDialogSecondOption">Attiva protezione per questo sito</string>
+    <string name="automaticFireproofWebsiteLoginDialogTitle">Proteggere i siti dal fuoco automaticamente al momento dell\'accesso?</string>
+    <string name="automaticFireproofWebsiteLoginDialogDescription">Attivare la protezione dal fuoco ti consentirà di effettuare l\'accesso dopo aver utilizzato il Fire Button (icona del fuoco). Puoi sempre modificare questa scelta dalle Impostazioni. </string>
+    <string name="automaticFireproofWebsiteLoginDialogFirstOption">Proteggi sempre dal fuoco</string>
+    <string name="automaticFireproofWebsiteLoginDialogSecondOption">Proteggi questo sito dal fuoco</string>
     <string name="automaticFireproofWebsiteLoginDialogThirdOption">Non adesso</string>
 
 
