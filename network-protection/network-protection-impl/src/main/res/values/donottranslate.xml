@@ -34,10 +34,6 @@
     <string name="netpEnabledNotificationInitialTitle">Network Protection is connected and routing traffic through the VPN.</string>
     <string name="netpEnabledNotificationTitle" instruction="Placeholder is location of server with format City,Country">Network Protection is connected and routing device traffic through &lt;b>%1$s&lt;/b>.</string>
 
-    <!-- Reconnect -->
-    <string name="netpBannerReconnecting">Connection interrupted. Attempting to reconnect now…</string>
-    <string name="netpBannerReconnectionFailed">Failed to connect. Please try again later.</string>
-
     <!-- VPN conflict -->
     <string name="netpVpnConflictTitle">Your VPN app may be disconnected</string>
     <string name="netpVpnConflictMessage">Android only allows one active VPN connection at a time. Enabling Network Protection may disconnect any active VPN on your device.</string>
