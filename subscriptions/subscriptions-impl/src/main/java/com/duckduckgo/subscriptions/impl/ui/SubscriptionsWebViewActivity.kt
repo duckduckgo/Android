@@ -119,7 +119,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity() {
                         featureName: String,
                         method: String,
                         id: String?,
-                        data: JSONObject?
+                        data: JSONObject?,
                     ) {
                         viewModel.processJsCallbackMessage(featureName, method, id, data)
                     }

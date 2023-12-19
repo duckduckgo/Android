@@ -26,6 +26,7 @@ dependencies {
     anvil project(':anvil-compiler')
     implementation project(':app-build-config-api')
     implementation project(':anvil-annotations')
+    implementation project(':browser-api')
     implementation project(':common-ui')
     implementation project(':common-utils')
     implementation project(':di')
