@@ -104,12 +104,24 @@ class VariantManagerImpl @Inject constructor(
         if (entity.key == "sc" || entity.key == "se") {
             return { isSerpRegionToggleCountry() }
         }
-        if (entity.localeFilter.isEmpty()) {
-            return { noFilter() }
+
+        var matchesLocaleFilter = true
+        var matchesAndroidVersionLocale = true
+        when {
+            entity.localeFilter.isNotEmpty() -> {
+                val userLocale = Locale.getDefault()
+                matchesLocaleFilter = entity.localeFilter.contains(userLocale.toString())
+            }
+            entity.androidVersionFilter.isNotEmpty() -> {
+                val userAndroidVersion = appBuildConfig.sdkInt.toString()
+                matchesAndroidVersionLocale = entity.androidVersionFilter.contains(userAndroidVersion)
+            }
+            else -> {
+                return { noFilter() }
+            }
         }
 
-        val userLocale = Locale.getDefault()
-        return { entity.localeFilter.contains(userLocale.toString()) }
+        return { matchesLocaleFilter && matchesAndroidVersionLocale }
     }
 
     private fun matchesReferrerVariant(key: String): Boolean {

@@ -24,4 +24,5 @@ data class VariantConfig(
 
 data class VariantFilters(
     val locale: List<String>? = null,
+    val androidVersion: List<String>? = null,
 )
