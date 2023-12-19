@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.global
+package com.duckduckgo.browser.api
 
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
-import com.duckduckgo.di.scopes.AppScope
 
-@ContributesPluginPoint(AppScope::class)
 interface ActivityLifecycleCallbacks : Application.ActivityLifecycleCallbacks {
     override fun onActivityCreated(
         activity: Activity,
