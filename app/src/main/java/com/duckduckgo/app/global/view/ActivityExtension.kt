@@ -19,6 +19,7 @@ package com.duckduckgo.app.global.view
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.os.Build
 import android.os.Bundle
 import android.view.View
@@ -28,6 +29,7 @@ import androidx.core.app.ActivityOptionsCompat
 import androidx.fragment.app.FragmentActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
+import com.duckduckgo.app.browser.orientation.JavaScriptScreenOrientation
 import timber.log.Timber
 
 fun FragmentActivity.launchExternalActivity(intent: Intent) {
@@ -55,7 +57,13 @@ fun Context.fadeTransitionConfig(): Bundle? {
     return config.toBundle()
 }
 
+@Synchronized
 fun FragmentActivity.toggleFullScreen() {
+    if (isFullScreen()) {
+        // If we are exiting full screen, reset the orientation
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+    }
+
     val newUiOptions = window.decorView.systemUiVisibility
         .xor(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
         .xor(View.SYSTEM_UI_FLAG_FULLSCREEN)
@@ -64,7 +72,22 @@ fun FragmentActivity.toggleFullScreen() {
     window.decorView.systemUiVisibility = newUiOptions
 }
 
+@Synchronized
+fun FragmentActivity.isFullScreen(): Boolean {
+    return window.decorView.systemUiVisibility.and(View.SYSTEM_UI_FLAG_FULLSCREEN) == View.SYSTEM_UI_FLAG_FULLSCREEN
+}
+
 fun FragmentActivity.isImmersiveModeEnabled(): Boolean {
     val uiOptions = window.decorView.systemUiVisibility
     return uiOptions or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY == uiOptions
+}
+
+@Synchronized
+fun FragmentActivity.requestJsOrientationChange(newOrientation: JavaScriptScreenOrientation): Boolean {
+    if (!isFullScreen()) {
+        return false
+    }
+
+    requestedOrientation = newOrientation.nativeValue
+    return true
 }

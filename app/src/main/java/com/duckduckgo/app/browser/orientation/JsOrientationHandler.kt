@@ -16,8 +16,9 @@
 
 package com.duckduckgo.app.browser.orientation
 
-import android.app.Activity
 import android.content.pm.ActivityInfo
+import androidx.fragment.app.FragmentActivity
+import com.duckduckgo.app.global.view.requestJsOrientationChange
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import org.json.JSONObject
 
@@ -28,20 +29,19 @@ class JsOrientationHandler {
      *
      * @return response data
      */
-    fun updateOrientation(data: JsCallbackData, isFullScreen: Boolean?, activity: Activity?): JsCallbackData {
-        val response = if (isFullScreen == null || isFullScreen == false) {
-            NOT_FULL_SCREEN_ERROR
-        } else if (activity == null) {
+    fun updateOrientation(data: JsCallbackData, activity: FragmentActivity?): JsCallbackData {
+        val response = if (activity == null) {
             NO_ACTIVITY_ERROR
         } else {
             val requestedOrientation = data.params.getString("orientation")
             val matchedOrientation = JavaScriptScreenOrientation.values().find { it.jsValue == requestedOrientation }
 
-            if (matchedOrientation != null) {
-                activity.requestedOrientation = matchedOrientation.nativeValue
-                EMPTY
-            } else {
+            if (matchedOrientation == null) {
                 String.format(TYPE_ERROR, requestedOrientation)
+            } else if (!activity.requestJsOrientationChange(matchedOrientation)) {
+                NOT_FULL_SCREEN_ERROR
+            } else {
+                EMPTY
             }
         }
 

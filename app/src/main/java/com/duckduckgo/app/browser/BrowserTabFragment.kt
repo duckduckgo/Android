@@ -22,7 +22,6 @@ import android.app.Activity.RESULT_OK
 import android.app.ActivityOptions
 import android.app.PendingIntent
 import android.content.*
-import android.content.pm.ActivityInfo
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
@@ -130,6 +129,7 @@ import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromAutocomplete
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
 import com.duckduckgo.app.browser.omnibar.animations.TrackersAnimatorListener
+import com.duckduckgo.app.browser.orientation.JavaScriptScreenOrientation
 import com.duckduckgo.app.browser.orientation.JsOrientationHandler
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.remotemessage.SharePromoLinkRMFBroadCastReceiver
@@ -161,6 +161,7 @@ import com.duckduckgo.app.global.view.isDifferent
 import com.duckduckgo.app.global.view.isImmersiveModeEnabled
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.renderIfChanged
+import com.duckduckgo.app.global.view.requestJsOrientationChange
 import com.duckduckgo.app.global.view.toggleFullScreen
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.pixels.AppPixelName
@@ -2171,12 +2172,12 @@ class BrowserTabFragment :
     }
 
     private fun screenLock(featureName: String, method: String, id: String, data: JSONObject) {
-        val returnData = JsOrientationHandler().updateOrientation(JsCallbackData(data, featureName, method, id), renderer.isFullScreen(), activity)
+        val returnData = JsOrientationHandler().updateOrientation(JsCallbackData(data, featureName, method, id), activity)
         contentScopeScripts.onResponse(returnData)
     }
 
     private fun screenUnlock() {
-        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED // reset orientation
+        activity?.requestJsOrientationChange(JavaScriptScreenOrientation.ANY)
     }
 
     private fun configureWebViewForAutofill(it: DuckDuckGoWebView) {
@@ -3429,10 +3430,6 @@ class BrowserTabFragment :
             }
         }
 
-        fun isFullScreen(): Boolean? {
-            return lastSeenBrowserViewState?.isFullScreen
-        }
-
         fun applyAccessibilitySettings(viewState: AccessibilityViewState) {
             Timber.v("Accessibility: render state applyAccessibilitySettings $viewState")
             val webView = webView ?: return
@@ -3738,7 +3735,6 @@ class BrowserTabFragment :
             binding.webViewFullScreenContainer.removeAllViews()
             binding.webViewFullScreenContainer.gone()
             activity?.toggleFullScreen()
-            activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED // reset orientation
             binding.focusDummy.requestFocus()
         }
 
