@@ -21,7 +21,7 @@ import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.S
 
 class FakeNetworkProtectionRepository : NetworkProtectionRepository {
     private var _serverDetails: ServerDetails? = null
-    private var _disabledDueToInvalidSubscription: Boolean = false
+    private var _vpnAccessRevoked: Boolean = false
 
     override var privateKey: String?
         get() = null
@@ -42,9 +42,9 @@ class FakeNetworkProtectionRepository : NetworkProtectionRepository {
         get() = null
         set(_) {}
 
-    override var disabledDueToAccessRevoked: Boolean
-        get() = _disabledDueToInvalidSubscription
+    override var vpnAccessRevoked: Boolean
+        get() = _vpnAccessRevoked
         set(value) {
-            _disabledDueToInvalidSubscription = value
+            _vpnAccessRevoked = value
         }
 }

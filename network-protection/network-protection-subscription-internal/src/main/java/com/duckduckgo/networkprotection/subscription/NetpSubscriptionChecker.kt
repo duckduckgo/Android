@@ -109,11 +109,14 @@ class NetpSubscriptionCheckWorker(
         logcat { "Sub check: checking entitlement" }
         if (!netpSubscriptionManager.hasValidEntitlement() && networkProtectionState.isEnabled()) {
             logcat { "Sub check: disabling" }
-            netpRepository.disabledDueToAccessRevoked = true
+            netpRepository.vpnAccessRevoked = true
             networkProtectionState.stop()
-        } else if (!networkProtectionState.isEnabled()) {
-            logcat { "Sub check: cancelling scheduled checker" }
-            workManager.cancelAllWorkByTag(NetpSubscriptionChecker.TAG_WORKER_NETP_SUBS_CHECK)
+        } else {
+            netpRepository.vpnAccessRevoked = false
+            if (!networkProtectionState.isEnabled()) {
+                logcat { "Sub check: cancelling scheduled checker" }
+                workManager.cancelAllWorkByTag(NetpSubscriptionChecker.TAG_WORKER_NETP_SUBS_CHECK)
+            }
         }
         return Result.success()
     }
