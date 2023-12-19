@@ -566,12 +566,12 @@
 
 
     <!-- Fire Animation settings -->
-    <string name="settingsFireAnimation">Animazione pulsante fuoco</string>
+    <string name="settingsFireAnimation">Animazione Fire Button</string>
     <string name="settingsHeroFireAnimation">Inferno</string>
     <string name="settingsHeroWaterAnimation">Mulinello</string>
     <string name="settingsHeroAbstractAnimation">Aria</string>
     <string name="settingsNoneAnimation">Niente</string>
-    <string name="settingsSelectFireAnimationDialog">Animazione pulsante fuoco</string>
+    <string name="settingsSelectFireAnimationDialog">Animazione Fire Button</string>
     <string name="settingsSelectFireAnimationDialogSave">Salva</string>
 
     <!-- Dos Attack error-->
@@ -602,7 +602,7 @@
     <string name="preciseLocationSnackbarMessage" instruction="Placeholder is the name of a website">In precedenza, hai concesso a %1$s l\'autorizzazione ad accedere alla posizione del tuo dispositivo.</string>
 
     <!--Fire button education-->
-    <string name="daxClearDataCtaText">I dati personali possono accumularsi nel tuo browser. Non va bene! Usa il pulsante Proteggi per sbarazzarti di tutto. Prova subito! 👇</string>
+    <string name="daxClearDataCtaText">I dati personali possono accumularsi nel tuo browser. Non va bene! Usa il Fire Button (icona del fuoco) per sbarazzarti di tutto. Prova subito! 👇</string>
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
