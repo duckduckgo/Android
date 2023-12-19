@@ -48,7 +48,7 @@ class NetAccessRevokedNotificationScheduler @Inject constructor(
 
     override fun onVpnStartFailed(coroutineScope: CoroutineScope) {
         super.onVpnStartFailed(coroutineScope)
-        if (networkProtectionRepository.disabledDueToAccessRevoked) {
+        if (networkProtectionRepository.vpnAccessRevoked) {
             notificationManager.notify(
                 NetPDisabledNotificationScheduler.NETP_REMINDER_NOTIFICATION_ID,
                 buildVpnAccessRevokedNotification(context),

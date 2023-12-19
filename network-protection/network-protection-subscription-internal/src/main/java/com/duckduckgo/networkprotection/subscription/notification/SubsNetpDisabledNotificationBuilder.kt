@@ -36,7 +36,7 @@ class SubsNetpDisabledNotificationBuilder @Inject constructor(
 ) : NetPDisabledNotificationBuilder {
 
     override fun buildDisabledNotification(context: Context): Notification {
-        return if (netpRepository.disabledDueToAccessRevoked) {
+        return if (netpRepository.vpnAccessRevoked) {
             buildVpnAccessRevokedNotification(context)
         } else {
             realNetPDisabledNotificationBuilder.buildDisabledNotification(context)
