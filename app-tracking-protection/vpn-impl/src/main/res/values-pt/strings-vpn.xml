@@ -413,6 +413,7 @@
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Proteção inativa</string>
     <string name="atp_ExcludedAppsFilterMenuAllLabel">Todos</string>
     <string name="atp_ActivityViewAppsLabel">Ver aplicações</string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Estás a ter problemas com uma aplicação? <annotation type="app_settings_link">Ajuda-nos a melhorar</annotation></string>
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Algumas aplicações podem ter problemas quando a App Tracking Protection está ativa.\n<annotation type="learn_why_link">Sabe porquê</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">A proteção é desativada para aplicações com problemas conhecidos. Podes ativá-la para estas aplicações, mas podem não funcionar como esperado. <annotation type="learn_why_link">Sabe porquê</annotation></string>
 

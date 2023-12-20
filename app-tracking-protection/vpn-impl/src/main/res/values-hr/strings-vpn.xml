@@ -433,6 +433,7 @@
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Zaštita je onemogućena</string>
     <string name="atp_ExcludedAppsFilterMenuAllLabel">Sve</string>
     <string name="atp_ActivityViewAppsLabel">Prikaži aplikacije</string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Imaš problema s aplikacijom? <annotation type="app_settings_link">Pomozi nam da se poboljšamo</annotation></string>
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Neke aplikacije mogu imati problema kad je omogućena zaštita od praćenja aplikacija App Tracking Protection.\n<annotation type="learn_why_link">Saznaj zašto</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Zaštita je onemogućena za aplikacije s poznatim problemima. Te aplikacije možeš omogućiti, ali one možda neće raditi kako se očekivalo. <annotation type="learn_why_link">Saznaj zašto</annotation></string>
 

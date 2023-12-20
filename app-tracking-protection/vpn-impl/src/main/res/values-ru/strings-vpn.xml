@@ -433,6 +433,7 @@
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Защита отключена</string>
     <string name="atp_ExcludedAppsFilterMenuAllLabel">Всё</string>
     <string name="atp_ActivityViewAppsLabel">Просмотреть приложения</string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Проблемы с приложением? <annotation type="app_settings_link">Давайте устраним их вместе!</annotation></string>
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Активация блокировки отслеживания приложениями может нарушить работу некоторых программ.\n<annotation type="learn_why_link">С чем это связано...</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Защита отключена для сбоивших приложений. Ее можно включить снова, но при этом приложения могут работать некорректно. <annotation type="learn_why_link">С чем это связано...</annotation></string>
 

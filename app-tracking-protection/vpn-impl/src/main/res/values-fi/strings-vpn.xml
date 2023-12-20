@@ -413,6 +413,7 @@
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Suojaus poistettu käytöstä</string>
     <string name="atp_ExcludedAppsFilterMenuAllLabel">Kaikki</string>
     <string name="atp_ActivityViewAppsLabel">Näytä sovellukset</string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Ongelmia sovelluksen kanssa? <annotation type="app_settings_link">Auta meitä parantamaan</annotation></string>
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Joissakin sovelluksissa voi esiintyä ongelmia, kun App Tracking Protection on käytössä.\n<annotation type="learn_why_link">Lue miksi</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Suojaus on poistettu käytöstä sovelluksissa, joissa on tunnettuja ongelmia. Voit ottaa nämä sovellukset käyttöön, mutta ne eivät välttämättä toimi odotetulla tavalla. <annotation type="learn_why_link">Lue miksi</annotation></string>
 

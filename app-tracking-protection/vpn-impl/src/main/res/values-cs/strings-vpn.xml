@@ -433,6 +433,7 @@
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Ochrana je vypnutá</string>
     <string name="atp_ExcludedAppsFilterMenuAllLabel">Vše</string>
     <string name="atp_ActivityViewAppsLabel">Zobrazit aplikace</string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Máš s aplikací problémy? <annotation type="app_settings_link">Pomoz nám se zlepšit</annotation></string>
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Když povolíš funkci App Tracking Protection, může u některých aplikací dojít k problémům. <annotation type="learn_why_link">Zjisti proč</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">U aplikací se známými problémy je ochrana vypnutá. Můžeš ji u&lt;br /&gt;nich zapnout, ale aplikace pak nemusí fungovat podle očekávání. <annotation type="learn_why_link">Zjisti proč</annotation></string>
 

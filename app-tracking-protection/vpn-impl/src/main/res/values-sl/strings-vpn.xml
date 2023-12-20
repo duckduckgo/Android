@@ -433,6 +433,7 @@
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Zaščita ni omogočena</string>
     <string name="atp_ExcludedAppsFilterMenuAllLabel">Vse</string>
     <string name="atp_ActivityViewAppsLabel">Prikaži aplikacije</string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Imate težave z aplikacijo? <annotation type="app_settings_link">Pomagajte nam jo izboljšati</annotation></string>
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Pri nekaterih aplikacijah se lahko pojavijo težave, ko je omogočena zaščita pred sledenjem aplikaciji.\n<annotation type="learn_why_link">Več o tem</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Zaščita je onemogočena za aplikacije z znanimi težavami. Te aplikacije lahko omogočite, vendar morda ne bodo delovale po pričakovanjih. <annotation type="learn_why_link">Več o tem</annotation></string>
 

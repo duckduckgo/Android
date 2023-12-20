@@ -413,6 +413,7 @@
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Деактивирана защита</string>
     <string name="atp_ExcludedAppsFilterMenuAllLabel">Всички</string>
     <string name="atp_ActivityViewAppsLabel">Преглед на приложенията</string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Имате проблеми с някое приложение? <annotation type="app_settings_link">Помогнете ни да подобрим защитата</annotation></string>
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">При някои приложения може да възникнат проблеми, когато защитата App Tracking Protection е активирана.\n<annotation type="learn_why_link">Научете защо</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Защитата е деактивирана за приложения с вече известни проблеми. Можете да активирате защитата за тези приложения, но те може да не работят според очакванията. <annotation type="learn_why_link">Научете защо</annotation></string>
 

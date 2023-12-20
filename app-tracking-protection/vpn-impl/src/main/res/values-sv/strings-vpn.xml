@@ -413,6 +413,7 @@
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Skydd inaktiverat</string>
     <string name="atp_ExcludedAppsFilterMenuAllLabel">Alla</string>
     <string name="atp_ActivityViewAppsLabel">Visa appar</string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Har du problem med en app? <annotation type="app_settings_link">Hjälp oss att bli bättre</annotation></string>
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Aktivering av App Tracking Protection kan leda till problem med vissa appar.\n<annotation type="learn_why_link">Läs om varför</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Skyddet är inaktiverat för appar med kända problem. Du kan aktivera det för dessa appar, men det kan leda till att apparna inte fungerar som de ska. <annotation type="learn_why_link">Läs om varför</annotation></string>
 

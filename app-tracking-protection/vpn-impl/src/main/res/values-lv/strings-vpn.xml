@@ -423,6 +423,7 @@
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Aizsardzība atspējota</string>
     <string name="atp_ExcludedAppsFilterMenuAllLabel">Viss</string>
     <string name="atp_ActivityViewAppsLabel">Skatīt lietotnes</string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Problēmas ar kādu lietotni? <annotation type="app_settings_link">Palīdzi mums veikt uzlabojumus</annotation></string>
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Dažām lietotnēm var rasties problēmas, ja ir iespējota lietotņu pretizsekošanas aizsardzība.\n<annotation type="learn_why_link">Uzzini, kāpēc</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Aizsardzība ir atspējota lietotnēm ar zināmām problēmām. Vari šīs lietotnes iespējot, taču tās var nedarboties, kā paredzēts. <annotation type="learn_why_link">Uzzini, kāpēc</annotation></string>
 

@@ -413,6 +413,7 @@
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Beskyttelse deaktiveret</string>
     <string name="atp_ExcludedAppsFilterMenuAllLabel">Alle</string>
     <string name="atp_ActivityViewAppsLabel">Se apps</string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Har du problemer med en app? <annotation type="app_settings_link">Hjælp os med at forbedre</annotation></string>
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Der kan opstå problemer med nogle apps, når App Tracking Protection er aktiveret.\n<annotation type="learn_why_link">Læs hvorfor</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Beskyttelse er deaktiveret for apps med kendte problemer. Du kan aktivere disse apps, men de fungerer muligvis ikke som forventet. <annotation type="learn_why_link">Læs hvorfor</annotation></string>
 

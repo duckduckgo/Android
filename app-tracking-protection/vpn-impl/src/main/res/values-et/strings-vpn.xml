@@ -413,6 +413,7 @@
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Kaitse on keelatud</string>
     <string name="atp_ExcludedAppsFilterMenuAllLabel">Kõik</string>
     <string name="atp_ActivityViewAppsLabel">Kuva rakendused</string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Kas sul on rakendusega probleeme? <annotation type="app_settings_link">Aita meil paremaks saada</annotation></string>
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Kui rakenduse jälgimiskaitse on lubatud, võib mõnes rakenduses tekkida probleeme.\n<annotation type="learn_why_link">Loe, miks</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Teadaolevate probleemidega rakenduste kaitse on keelatud. Võid need rakendused lubada, kuid need ei pruugi töötada ootuspäraselt. <annotation type="learn_why_link">Loe, miks</annotation></string>
 

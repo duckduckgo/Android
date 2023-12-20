@@ -423,6 +423,7 @@
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Protecție dezactivată</string>
     <string name="atp_ExcludedAppsFilterMenuAllLabel">Toate</string>
     <string name="atp_ActivityViewAppsLabel">Vezi aplicațiile</string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Ai probleme cu o aplicație? <annotation type="app_settings_link">Ajută-ne să ne îmbunătățim</annotation></string>
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Unele aplicații pot întâmpina probleme atunci când este activată funcția de Protecție împotriva urmăririi de către aplicație.\n<annotation type="learn_why_link">Află motivul</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Protecția este dezactivată pentru aplicațiile cu probleme cunoscute. Poți activa aceste aplicații, dar este posibil ca ele să nu funcționeze conform așteptărilor. <annotation type="learn_why_link">Află motivul</annotation></string>
 

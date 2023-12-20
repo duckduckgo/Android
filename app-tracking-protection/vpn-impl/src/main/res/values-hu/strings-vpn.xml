@@ -413,6 +413,7 @@
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Védelem letiltva</string>
     <string name="atp_ExcludedAppsFilterMenuAllLabel">Összes</string>
     <string name="atp_ActivityViewAppsLabel">Alkalmazások megtekintése</string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Problémáid vannak egy alkalmazással? <annotation type="app_settings_link">Segíts kijavítani</annotation></string>
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Egyes alkalmazásoknál problémák merülhetnek fel, ha az alkalmazáskövetés elleni védelem engedélyezve van.\n<annotation type="learn_why_link">Tudd meg, miért</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Az ismert problémákat tartalmazó alkalmazások védelme le van tiltva. Engedélyezheted ezeket az alkalmazásokat, de előfordulhat, hogy nem a várt módon működnek. <annotation type="learn_why_link">Tudd meg, miért</annotation></string>
 
