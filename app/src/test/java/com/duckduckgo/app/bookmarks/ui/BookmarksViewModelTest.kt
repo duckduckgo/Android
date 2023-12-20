@@ -85,6 +85,7 @@ class BookmarksViewModelTest {
             pixel,
             syncEngine,
             coroutineRule.testDispatcherProvider,
+            coroutineRule.testScope,
         )
         model.viewState.observeForever(viewStateObserver)
         model.command.observeForever(commandObserver)

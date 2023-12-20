@@ -16,6 +16,7 @@
 
 package com.duckduckgo.lint.registry
 
+import com.duckduckgo.lint.NonCancellableDetector.Companion.ISSUE_NON_CANCELLABLE
 import com.android.tools.lint.client.api.IssueRegistry
 import com.android.tools.lint.client.api.Vendor
 import com.android.tools.lint.detector.api.CURRENT_API
@@ -30,7 +31,6 @@ import com.duckduckgo.lint.NoSingletonDetector.Companion.NO_SINGLETON_ISSUE
 import com.duckduckgo.lint.NoSystemLoadLibraryDetector.Companion.NO_SYSTEM_LOAD_LIBRARY
 import com.duckduckgo.lint.strings.MissingInstructionDetector.Companion.MISSING_INSTRUCTION
 import com.duckduckgo.lint.strings.PlaceholderDetector.Companion.PLACEHOLDER_MISSING_POSITION
-import com.duckduckgo.lint.ui.ColorAttributeInXmlDetector
 import com.duckduckgo.lint.ui.ColorAttributeInXmlDetector.Companion.INVALID_COLOR_ATTRIBUTE
 import com.duckduckgo.lint.ui.DaxButtonStylingDetector.Companion.INVALID_DAX_BUTTON_PROPERTY
 import com.duckduckgo.lint.ui.DaxTextViewStylingDetector.Companion.INVALID_DAX_TEXT_VIEW_PROPERTY
@@ -41,8 +41,6 @@ import com.duckduckgo.lint.ui.NoAlertDialogDetector.Companion.NO_DESIGN_SYSTEM_D
 import com.duckduckgo.lint.ui.NoBottomSheetDialogDetector.Companion.NO_BOTTOM_SHEET
 import com.duckduckgo.lint.ui.NoStyleAppliedToDesignSystemComponentDetector.Companion.STYLE_IN_DESIGN_SYSTEM_COMPONENT
 import com.duckduckgo.lint.ui.SkeletonViewBackgroundDetector.Companion.INVALID_SKELETON_VIEW_BACKGROUND
-import com.duckduckgo.lint.ui.WrongStyleDetector
-import com.duckduckgo.lint.ui.WrongStyleDetector.Companion
 import com.duckduckgo.lint.ui.WrongStyleDetector.Companion.WRONG_STYLE_NAME
 import com.duckduckgo.lint.ui.WrongStyleDetector.Companion.WRONG_STYLE_PARAMETER
 
@@ -60,6 +58,7 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             PLACEHOLDER_MISSING_POSITION,
             NO_RETROFIT_CREATE_CALL,
             NO_ROBOLECTRIC_TEST_RUNNER_ISSUE,
+            ISSUE_NON_CANCELLABLE,
 
             // Android Design System
             DEPRECATED_WIDGET_IN_XML,

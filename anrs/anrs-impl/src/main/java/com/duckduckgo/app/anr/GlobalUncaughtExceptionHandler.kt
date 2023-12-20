@@ -29,7 +29,6 @@ import java.io.InterruptedIOException
 import javax.inject.Inject
 import javax.inject.Qualifier
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
 import logcat.LogPriority
 import logcat.asLog
@@ -70,7 +69,7 @@ class GlobalUncaughtExceptionHandler @Inject constructor(
         thread: Thread?,
         originalException: Throwable?,
     ) {
-        appCoroutineScope.launch(dispatcherProvider.io() + NonCancellable) {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
             try {
                 originalException?.let {
                     crashLogger.logCrash(

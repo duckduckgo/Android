@@ -2839,7 +2839,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun delete(savedSite: SavedSite) {
-        viewModelScope.launch(dispatchers.io() + NonCancellable) {
+        appCoroutineScope.launch(dispatchers.io()) {
             if (savedSite is Bookmark) {
                 faviconManager.deletePersistedFavicon(savedSite.url)
             }
