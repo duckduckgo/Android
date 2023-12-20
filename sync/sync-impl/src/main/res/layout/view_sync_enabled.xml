@@ -114,20 +114,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical" >
+
         <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:primaryText="@string/sync_enable_options" />
 
-        <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-            android:id="@+id/sync_settings_option_bookmarks"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:leadingIcon="@drawable/ic_image_24"
-            app:leadingIconBackground="circular"
-            app:primaryText="@string/sync_enable_option_favicons_title"
-            app:secondaryText="@string/sync_enable_option_favicons_subtitle"
-            app:showSwitch="true" />
     </LinearLayout>
 
     <com.duckduckgo.common.ui.view.divider.HorizontalDivider
