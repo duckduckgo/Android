@@ -27,13 +27,13 @@ import javax.inject.Inject
 class ContentScopeScriptsJsInjectorPlugin @Inject constructor(
     private val coreContentScopeScripts: CoreContentScopeScripts,
 ) : JsInjectorPlugin {
-    override fun onPageStarted(webView: WebView, url: String?, site: Site?) {
+    override fun onPageStarted(webView: WebView, url: String?, site: Site?, isForcedZoomEnabled: Boolean) {
         if (coreContentScopeScripts.isEnabled()) {
-            webView.evaluateJavascript("javascript:${coreContentScopeScripts.getScript(site)}", null)
+            webView.evaluateJavascript("javascript:${coreContentScopeScripts.getScript(site, isForcedZoomEnabled)}", null)
         }
     }
 
-    override fun onPageFinished(webView: WebView, url: String?, site: Site?) {
+    override fun onPageFinished(webView: WebView, url: String?, site: Site?, isForcedZoomEnabled: Boolean) {
         // NOOP
     }
 }

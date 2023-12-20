@@ -30,6 +30,7 @@ import androidx.core.net.toUri
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.accessibility.AccessibilityManager
+import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.browser.WebViewErrorResponse.BAD_URL
 import com.duckduckgo.app.browser.WebViewErrorResponse.CONNECTION
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
@@ -81,6 +82,7 @@ class BrowserWebViewClient @Inject constructor(
     private val pixel: Pixel,
     private val crashLogger: CrashLogger,
     private val jsPlugins: PluginPoint<JsInjectorPlugin>,
+    private val accessibilitySettingsDataStore: AccessibilitySettingsDataStore,
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -279,7 +281,7 @@ class BrowserWebViewClient @Inject constructor(
         lastPageStarted = url
         browserAutofillConfigurator.configureAutofillForCurrentPage(webView, url)
         jsPlugins.getPlugins().forEach {
-            it.onPageStarted(webView, url, webViewClientListener?.getSite())
+            it.onPageStarted(webView, url, webViewClientListener?.getSite(), accessibilitySettingsDataStore.forceZoom)
         }
         loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
     }
@@ -290,7 +292,7 @@ class BrowserWebViewClient @Inject constructor(
         url: String?,
     ) {
         jsPlugins.getPlugins().forEach {
-            it.onPageFinished(webView, url, webViewClientListener?.getSite())
+            it.onPageFinished(webView, url, webViewClientListener?.getSite(), accessibilitySettingsDataStore.forceZoom)
         }
         accessibilityManager.onPageFinished(webView, url)
         url?.let {

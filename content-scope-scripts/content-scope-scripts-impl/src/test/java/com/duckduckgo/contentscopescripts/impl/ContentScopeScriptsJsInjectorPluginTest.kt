@@ -28,28 +28,28 @@ class ContentScopeScriptsJsInjectorPluginTest {
     @Test
     fun whenEnabledAndInjectContentScopeScriptsThenPopulateMessagingParameters() {
         whenever(mockCoreContentScopeScripts.isEnabled()).thenReturn(true)
-        whenever(mockCoreContentScopeScripts.getScript(null)).thenReturn("")
-        contentScopeScriptsJsInjectorPlugin.onPageStarted(mockWebView, null, null)
+        whenever(mockCoreContentScopeScripts.getScript(null, false)).thenReturn("")
+        contentScopeScriptsJsInjectorPlugin.onPageStarted(mockWebView, null, null, false)
 
-        verify(mockCoreContentScopeScripts).getScript(null)
+        verify(mockCoreContentScopeScripts).getScript(null, false)
         verify(mockWebView).evaluateJavascript(any(), anyOrNull())
     }
 
     @Test
     fun whenDisabledAndInjectContentScopeScriptsThenDoNothing() {
         whenever(mockCoreContentScopeScripts.isEnabled()).thenReturn(false)
-        contentScopeScriptsJsInjectorPlugin.onPageStarted(mockWebView, null, null)
+        contentScopeScriptsJsInjectorPlugin.onPageStarted(mockWebView, null, null, false)
 
         verifyNoInteractions(mockWebView)
     }
 
     @Test
-    fun whenEnabledAndInjectContentScopeScriptsThenUseSite() {
+    fun whenEnabledAndInjectContentScopeScriptsThenUseSiteAndForcedZoom() {
         val site: Site = mock()
         whenever(mockCoreContentScopeScripts.isEnabled()).thenReturn(true)
-        whenever(mockCoreContentScopeScripts.getScript(site)).thenReturn("")
-        contentScopeScriptsJsInjectorPlugin.onPageStarted(mockWebView, null, site)
+        whenever(mockCoreContentScopeScripts.getScript(site, false)).thenReturn("")
+        contentScopeScriptsJsInjectorPlugin.onPageStarted(mockWebView, null, site, false)
 
-        verify(mockCoreContentScopeScripts).getScript(site)
+        verify(mockCoreContentScopeScripts).getScript(site, false)
     }
 }

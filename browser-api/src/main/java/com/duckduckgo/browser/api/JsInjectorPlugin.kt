@@ -22,12 +22,14 @@ import com.duckduckgo.app.global.model.Site
 /** Public interface to inject JS code to a website */
 interface JsInjectorPlugin {
     /**
-     * This method is called during onPageStarted and receives a [webView] instance, the [url] of the website and the [site]
+     * This method is called during onPageStarted and receives a [webView] instance, the [url] of the website, the [site] and a boolean
+     * indicating if forced zoom is enabled in Accessibility.
      */
-    fun onPageStarted(webView: WebView, url: String?, site: Site?)
+    fun onPageStarted(webView: WebView, url: String?, site: Site?, isForcedZoomEnabled: Boolean)
 
     /**
-     * This method is called during onPageFinished and receives a [webView] instance, the [url] of the website and the [site]
+     * This method is called during onPageFinished and receives a [webView] instance, the [url] of the website, the [site] and a boolean
+     * indicating if forced zoom is enabled in Accessibility.
      */
-    fun onPageFinished(webView: WebView, url: String?, site: Site?)
+    fun onPageFinished(webView: WebView, url: String?, site: Site?, isForcedZoomEnabled: Boolean)
 }
