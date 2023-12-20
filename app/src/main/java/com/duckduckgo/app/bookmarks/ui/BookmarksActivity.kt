@@ -18,12 +18,9 @@ package com.duckduckgo.app.bookmarks.ui
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Typeface
 import android.os.Bundle
-import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
-import android.text.style.StyleSpan
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.result.ActivityResult
@@ -504,20 +501,13 @@ class BookmarksActivity : DuckDuckGoActivity() {
             .show()
     }
 
-    private fun getMessageString(bookmarkFolder: BookmarkFolder): SpannableString {
+    private fun getMessageString(bookmarkFolder: BookmarkFolder): String {
         val totalItems = bookmarkFolder.numBookmarks + bookmarkFolder.numFolders
-        val message = getString(R.string.bookmarkFolderDeleteDialogMessage)
-        val string = SpannableString(
-            resources.getQuantityString(
-                plurals.bookmarkFolderDeleteDialogMessage,
-                totalItems,
-                message,
-                bookmarkFolder.name,
-                totalItems,
-            ),
+        return resources.getQuantityString(
+            plurals.bookmarkFolderDeleteMessage,
+            totalItems,
+            totalItems,
         )
-        string.setSpan(StyleSpan(Typeface.BOLD), message.length, message.length + bookmarkFolder.name.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-        return string
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {

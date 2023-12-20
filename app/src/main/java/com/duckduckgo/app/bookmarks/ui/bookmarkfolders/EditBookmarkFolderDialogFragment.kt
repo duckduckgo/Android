@@ -18,9 +18,10 @@ package com.duckduckgo.app.bookmarks.ui.bookmarkfolders
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.text.toSpannable
 import com.duckduckgo.app.bookmarks.ui.SavedSiteDialogFragment
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.common.utils.extensions.html
+import com.duckduckgo.app.browser.R.plurals
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 
 class EditBookmarkFolderDialogFragment : SavedSiteDialogFragment() {
@@ -64,8 +65,17 @@ class EditBookmarkFolderDialogFragment : SavedSiteDialogFragment() {
 
     override fun deleteConfirmationTitle() = getString(R.string.deleteFolder, getBookmarkFolder()?.name)
 
-    override fun deleteConfirmationMessage() = getBookmarkFolder()?.name?.let { folderName ->
-        getString(R.string.deleteBookmarkFolderConfirmationDialogDescription, folderName).html(requireContext())
+    override fun deleteConfirmationMessage() = getBookmarkFolder()?.let { folder ->
+        getMessageString(bookmarkFolder = folder)
+    }?.toSpannable()
+
+    private fun getMessageString(bookmarkFolder: BookmarkFolder): String {
+        val totalItems = bookmarkFolder.numBookmarks + bookmarkFolder.numFolders
+        return resources.getQuantityString(
+            plurals.bookmarkFolderDeleteMessage,
+            totalItems,
+            totalItems,
+        )
     }
 
     override fun onDeleteConfirmed() {

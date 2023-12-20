@@ -176,13 +176,12 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
 
     override fun deleteConfirmationTitle(): String {
         val isFavorite = (getSavedSite() as? Favorite != null)
-        val titleId = if (isFavorite) R.string.deleteFavoriteConfirmationDialogTitle else R.string.deleteBookmarkConfirmationDialogTitle
-        return getString(titleId)
+        return if (isFavorite) getString(R.string.deleteFavoriteConfirmationDialogTitle) else getString(R.string.deleteBookmark, getExistingTitle())
     }
 
     override fun deleteConfirmationMessage(): Spanned? {
         val isFavorite = (getSavedSite() as? Favorite != null)
-        val messageId = if (isFavorite) R.string.deleteFavoriteConfirmationDialogDescription else R.string.deleteBookmarkConfirmationDialogDescription
+        val messageId = if (isFavorite) R.string.deleteFavoriteConfirmationDialogDescription else R.string.deleteBookmarkConfirmationDescription
         return getString(messageId, getExistingTitle()).html(requireContext())
     }
 
