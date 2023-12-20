@@ -107,18 +107,14 @@ class VariantManagerImpl @Inject constructor(
 
         var matchesLocaleFilter = true
         var matchesAndroidVersionLocale = true
-        when {
-            entity.localeFilter.isNotEmpty() -> {
-                val userLocale = Locale.getDefault()
-                matchesLocaleFilter = entity.localeFilter.contains(userLocale.toString())
-            }
-            entity.androidVersionFilter.isNotEmpty() -> {
-                val userAndroidVersion = appBuildConfig.sdkInt.toString()
-                matchesAndroidVersionLocale = entity.androidVersionFilter.contains(userAndroidVersion)
-            }
-            else -> {
-                return { noFilter() }
-            }
+
+        if (entity.localeFilter.isNotEmpty()) {
+            val userLocale = Locale.getDefault()
+            matchesLocaleFilter = entity.localeFilter.contains(userLocale.toString())
+        }
+        if (entity.androidVersionFilter.isNotEmpty()) {
+            val userAndroidVersion = appBuildConfig.sdkInt.toString()
+            matchesAndroidVersionLocale = entity.androidVersionFilter.contains(userAndroidVersion)
         }
 
         return { matchesLocaleFilter && matchesAndroidVersionLocale }
