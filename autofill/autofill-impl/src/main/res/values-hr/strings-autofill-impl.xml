@@ -116,7 +116,7 @@
     <string name="autofillManagementScreenTitle">Lozinke</string>
     <string name="credentialManagementNoLoginsSavedTitle">Još nema spremljenih lozinki</string>
     <string name="credentialManagementAutofillToggleLabel">Spremi i automatski popuni lozinke</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Lozinke su sigurno pohranjene na tvom uređaju.</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Lozinke su sigurno pohranjene na tvom uređaju</string>
     <string name="saveLoginDialogSubtitle">Lozinke su sigurno pohranjene na tvom uređaju.</string>
     <string name="autofillManagementAddLogin">Dodaj lozinku</string>
     <string name="credentialManagementEditLoginTitleHint">Naslov</string>

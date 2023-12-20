@@ -116,7 +116,7 @@
     <string name="autofillManagementScreenTitle">Passwords</string>
     <string name="credentialManagementNoLoginsSavedTitle">No passwords saved yet</string>
     <string name="credentialManagementAutofillToggleLabel">Save and autofill passwords</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Passwords are stored securely on your device.</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Passwords are stored securely on your device</string>
     <string name="saveLoginDialogSubtitle">Passwords are stored securely on your device.</string>
     <string name="autofillManagementAddLogin">Add Password</string>
     <string name="credentialManagementEditLoginTitleHint">Title</string>

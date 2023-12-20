@@ -116,7 +116,7 @@
     <string name="autofillManagementScreenTitle">Gesla</string>
     <string name="credentialManagementNoLoginsSavedTitle">Nobeno geslo še ni shranjeno</string>
     <string name="credentialManagementAutofillToggleLabel">Shranite in samodejno izpolnite gesla</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Gesla so varno shranjena v vaši napravi.</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Gesla so varno shranjena v vaši napravi</string>
     <string name="saveLoginDialogSubtitle">Gesla so varno shranjena v vaši napravi.</string>
     <string name="autofillManagementAddLogin">Dodajte geslo</string>
     <string name="credentialManagementEditLoginTitleHint">Naslov</string>

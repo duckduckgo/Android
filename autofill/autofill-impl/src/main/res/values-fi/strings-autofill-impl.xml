@@ -116,7 +116,7 @@
     <string name="autofillManagementScreenTitle">Salasanat</string>
     <string name="credentialManagementNoLoginsSavedTitle">Salasanoja ei ole vielä tallennettu</string>
     <string name="credentialManagementAutofillToggleLabel">Tallenna ja täytä salasanat automaattisesti</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Salasanat tallennetaan laitteellesi turvallisesti.</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Salasanat tallennetaan laitteellesi turvallisesti</string>
     <string name="saveLoginDialogSubtitle">Salasanat tallennetaan laitteellesi turvallisesti.</string>
     <string name="autofillManagementAddLogin">Lisää salasana</string>
     <string name="credentialManagementEditLoginTitleHint">Otsikko</string>

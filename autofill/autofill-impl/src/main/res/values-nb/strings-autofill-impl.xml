@@ -116,7 +116,7 @@
     <string name="autofillManagementScreenTitle">Passord</string>
     <string name="credentialManagementNoLoginsSavedTitle">Ingen passord er lagret ennå</string>
     <string name="credentialManagementAutofillToggleLabel">Lagre og fyll ut passord automatisk</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Passord lagres på enheten din på en sikker måte.</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Passord lagres på enheten din på en sikker måte</string>
     <string name="saveLoginDialogSubtitle">Passord lagres på enheten din på en sikker måte.</string>
     <string name="autofillManagementAddLogin">Legg til passord</string>
     <string name="credentialManagementEditLoginTitleHint">Tittel</string>

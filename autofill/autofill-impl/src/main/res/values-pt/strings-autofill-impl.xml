@@ -116,7 +116,7 @@
     <string name="autofillManagementScreenTitle">Palavras-passe</string>
     <string name="credentialManagementNoLoginsSavedTitle">Ainda não há palavras-passe guardadas</string>
     <string name="credentialManagementAutofillToggleLabel">Guardar e preencher palavras-passe automaticamente</string>
-    <string name="credentialManagementAutofillToggleSubtitle">As palavras-passe são armazenadas com segurança no teu dispositivo.</string>
+    <string name="credentialManagementAutofillToggleSubtitle">As palavras-passe são armazenadas com segurança no teu dispositivo</string>
     <string name="saveLoginDialogSubtitle">As palavras-passe são armazenadas com segurança no teu dispositivo.</string>
     <string name="autofillManagementAddLogin">Adicionar palavra-passe</string>
     <string name="credentialManagementEditLoginTitleHint">Título</string>

@@ -116,7 +116,7 @@
     <string name="autofillManagementScreenTitle">Passwörter</string>
     <string name="credentialManagementNoLoginsSavedTitle">Noch keine Passwörter gespeichert</string>
     <string name="credentialManagementAutofillToggleLabel">Passwörter speichern und automatisch ausfüllen</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Passwörter werden sicher auf deinem Gerät gespeichert.</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Passwörter werden sicher auf deinem Gerät gespeichert</string>
     <string name="saveLoginDialogSubtitle">Passwörter werden sicher auf deinem Gerät gespeichert.</string>
     <string name="autofillManagementAddLogin">Passwort hinzufügen</string>
     <string name="credentialManagementEditLoginTitleHint">Titel</string>

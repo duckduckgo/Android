@@ -116,7 +116,7 @@
     <string name="autofillManagementScreenTitle">Slaptažodžiai</string>
     <string name="credentialManagementNoLoginsSavedTitle">Dar nėra išsaugotų slaptažodžių</string>
     <string name="credentialManagementAutofillToggleLabel">Išsaugokite ir automatiškai užpildykite slaptažodžius</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Slaptažodžiai saugiai saugomi jūsų įrenginyje.</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Slaptažodžiai saugiai saugomi jūsų įrenginyje</string>
     <string name="saveLoginDialogSubtitle">Slaptažodžiai saugiai saugomi jūsų įrenginyje.</string>
     <string name="autofillManagementAddLogin">Pridėti slaptažodį</string>
     <string name="credentialManagementEditLoginTitleHint">Pavadinimas</string>
