@@ -231,7 +231,6 @@
         <item quantity="many">Aplikacji</item>
         <item quantity="other">Aplikacji</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Ta funkcja jest w fazie beta. Masz problem z aplikacją? <annotation type="app_settings_link">Prześlij zgłoszenie.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>Ochrona przed śledzeniem przez aplikacje jest wyłączona.</b>\nCzy ochrona przed śledzeniem przez aplikacje wywołała problem z Twoimi aplikacjami? <annotation type="report_issues_link">Zgłoś problemy</annotation></string>
     <string name="atp_ActivityDisabledBySystemLabel"><b>System Android wyłączył ochronę przed śledzeniem aplikacji</b>. Chcesz temu zapobiec w przyszłości? <annotation type="re_enable_link">Włącz ją ponownie</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>Ochrona przed śledzeniem przez aplikacje jest wyłączona.</b>\nMogła zostać wyłączona przez aplikację VPN na Twoim urządzeniu. Użyj przełącznika powyżej, aby ponownie ją włączyć.</string>
@@ -434,7 +433,7 @@
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Ochrona wyłączona</string>
     <string name="atp_ExcludedAppsFilterMenuAllLabel">Wszystko</string>
     <string name="atp_ActivityViewAppsLabel">Wyświetl aplikacje</string>
-    <string name="atp_ActivityEnabledMoreThanADayLabel">Ta funkcja jest w fazie beta. Masz problemy z aplikacją? <annotation type="app_settings_link"> Pomóż nam naprawić błędy</annotation></string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Masz problemy z aplikacją? <annotation type="app_settings_link"> Pomóż nam naprawić błędy</annotation></string>
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Gdy ochrona przed śledzeniem przez aplikacje jest włączona, mogą wystąpić problemy z niektórymi aplikacjami.\n<annotation type="learn_why_link">Dowiedz się, dlaczego</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Ochrona została wyłączona dla aplikacji, w których występują znane problemy. Możesz włączyć ochronę dla tych aplikacji, ale wówczas mogą wystąpić z nimi problemy. <annotation type="learn_why_link">Dowiedz się, dlaczego</annotation></string>
 

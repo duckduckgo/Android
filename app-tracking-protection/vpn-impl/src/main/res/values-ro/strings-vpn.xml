@@ -225,7 +225,6 @@
         <item quantity="few">Aplicații</item>
         <item quantity="other">Aplicații</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Această funcție este în versiune beta. Ai observat o problemă cu o aplicație? <annotation type="app_settings_link">Raportează o problemă.</annotation></string>
     <string name="atp_ActivityDisabledLabel">Protecția împotriva urmăririi de către aplicație <b>este dezactivată</b>\nProtecția împotriva urmăririi de către aplicație a cauzat o problemă cu aplicațiile tale? <annotation type="report_issues_link">Raportează probleme</annotation></string>
     <string name="atp_ActivityDisabledBySystemLabel"><b>Android a dezactivat Protecția împotriva urmăririi de către aplicație</b>. Vrei să împiedici recurența acestei situații? <annotation type="re_enable_link">Reactivează</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b> Protecția împotriva urmăririi de către aplicație a fost dezactivată. </b>\nEste posibil ca o aplicație VPN de pe dispozitivul tău să o fi dezactivat. Utilizează comutatorul de mai sus pentru a reactiva.</string>
@@ -424,7 +423,7 @@
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Protecție dezactivată</string>
     <string name="atp_ExcludedAppsFilterMenuAllLabel">Toate</string>
     <string name="atp_ActivityViewAppsLabel">Vezi aplicațiile</string>
-    <string name="atp_ActivityEnabledMoreThanADayLabel">Această funcție este în versiune beta. Ai probleme cu o aplicație? <annotation type="app_settings_link">Ajută-ne să ne îmbunătățim</annotation></string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Ai probleme cu o aplicație? <annotation type="app_settings_link">Ajută-ne să ne îmbunătățim</annotation></string>
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Unele aplicații pot întâmpina probleme atunci când este activată funcția de Protecție împotriva urmăririi de către aplicație.\n<annotation type="learn_why_link">Află motivul</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Protecția este dezactivată pentru aplicațiile cu probleme cunoscute. Poți activa aceste aplicații, dar este posibil ca ele să nu funcționeze conform așteptărilor. <annotation type="learn_why_link">Află motivul</annotation></string>
 

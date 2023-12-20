@@ -219,7 +219,6 @@
         <item quantity="one">Aplicación</item>
         <item quantity="other">Aplicaciones</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Esta función está en versión beta. ¿Tienes problemas con una aplicación? <annotation type="app_settings_link">Informa de un problema.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection está desactivada</b>\n¿Ha causado App Tracking Protection un problema con tus aplicaciones? <annotation type="report_issues_link">Informa de los problemas</annotation></string>
     <string name="atp_ActivityDisabledBySystemLabel"><b>Android ha desactivado App Tracking Protection</b>. ¿Quieres evitar que esto vuelva a suceder? <annotation type="re_enable_link">Reactivar</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>App Tracking Protection está desactivada.</b>\nEs posible que una aplicación de VPN en tu dispositivo la haya desactivado. Usa el botón de arriba para volver a activarla.</string>
@@ -414,7 +413,7 @@
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Protección desactivada</string>
     <string name="atp_ExcludedAppsFilterMenuAllLabel">Todo</string>
     <string name="atp_ActivityViewAppsLabel">Ver aplicaciones</string>
-    <string name="atp_ActivityEnabledMoreThanADayLabel">Esta función está en versión beta. ¿Tienes problemas con una aplicación? <annotation type="app_settings_link">Ayúdanos a mejorar</annotation></string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">¿Tienes problemas con una aplicación? <annotation type="app_settings_link">Ayúdanos a mejorar</annotation></string>
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Algunas aplicaciones pueden tener problemas cuando App Tracking Protection está activada.\n<annotation type="learn_why_link">Averigua por qué</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">La protección está desactivada para aplicaciones con problemas conocidos. Puedes activar estas aplicaciones, pero es posible que no funcionen como deberían. <annotation type="learn_why_link">Averigua por qué</annotation></string>
 

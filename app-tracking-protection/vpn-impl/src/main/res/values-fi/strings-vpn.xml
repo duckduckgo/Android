@@ -219,7 +219,6 @@
         <item quantity="one">Sovellus</item>
         <item quantity="other">Sovellukset</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Tämä ominaisuus on beetavaiheessa. Huomasitko ongelman sovelluksessa? <annotation type="app_settings_link">Ilmoita ongelmasta.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection on poistettu käytöstä</b>\nAiheuttiko App Tracking Protection ongelmia sovelluksissasi? <annotation type="report_issues_link">Ilmoita ongelmista</annotation></string>
     <string name="atp_ActivityDisabledBySystemLabel"><b>Android poisti App Tracking Protectionin käytöstä</b>. Haluatko estää tämän jatkossa? <annotation type="re_enable_link">Ota uudelleen käyttöön</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>App Tracking Protection on poistettu käytöstä.</b>\nLaitteesi VPN-sovellus on saattanut poistaa sen käytöstä. Ota uudelleen käyttöön yllä olevalla vaihtonäppäimellä.</string>
@@ -414,7 +413,7 @@
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Suojaus poistettu käytöstä</string>
     <string name="atp_ExcludedAppsFilterMenuAllLabel">Kaikki</string>
     <string name="atp_ActivityViewAppsLabel">Näytä sovellukset</string>
-    <string name="atp_ActivityEnabledMoreThanADayLabel">Tämä ominaisuus on beetavaiheessa. Onko sinulla ongelmia sovelluksen kanssa? <annotation type="app_settings_link">Auta meitä parantamaan</annotation></string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Ongelmia sovelluksen kanssa? <annotation type="app_settings_link">Auta meitä parantamaan</annotation></string>
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Joissakin sovelluksissa voi esiintyä ongelmia, kun App Tracking Protection on käytössä.\n<annotation type="learn_why_link">Lue miksi</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Suojaus on poistettu käytöstä sovelluksissa, joissa on tunnettuja ongelmia. Voit ottaa nämä sovellukset käyttöön, mutta ne eivät välttämättä toimi odotetulla tavalla. <annotation type="learn_why_link">Lue miksi</annotation></string>
 

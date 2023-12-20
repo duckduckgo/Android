@@ -219,7 +219,6 @@
         <item quantity="one">App</item>
         <item quantity="other">Apps</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Deze functie is in bèta. Heb je een probleem met een app opgemerkt? <annotation type="app_settings_link">Meld dit probleem.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection is uitgeschakeld</b>\nHeeft App Tracking Protection een probleem met een van je apps veroorzaakt? <annotation type="report_issues_link">Problemen melden</annotation></string>
     <string name="atp_ActivityDisabledBySystemLabel"><b>Android heeft App Tracking Protection uitgeschakeld</b>. Wil je voorkomen dat dit nog een keer gebeurt? <annotation type="re_enable_link">Opnieuw inschakelen</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>App Tracking Protection is uitgeschakeld.</b>\nMogelijk komt dit door een VPN-app op je apparaat. Gebruik de schakelaar hierboven om de bescherming opnieuw in te schakelen.</string>
@@ -414,7 +413,7 @@
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Bescherming uitgeschakeld</string>
     <string name="atp_ExcludedAppsFilterMenuAllLabel">Alle</string>
     <string name="atp_ActivityViewAppsLabel">Apps bekijken</string>
-    <string name="atp_ActivityEnabledMoreThanADayLabel">Deze functie is in bèta. Ondervind je problemen met een app? <annotation type="app_settings_link">Help ons verbeteringen aan te brengen</annotation></string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Ondervind je problemen met een app? <annotation type="app_settings_link">Help ons verbeteringen aan te brengen</annotation></string>
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Sommige apps kunnen problemen ondervinden als App Tracking Protection is ingeschakeld.\n<annotation type="learn_why_link">Meer informatie</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Bescherming is uitgeschakeld voor apps met bekende problemen. Je kunt deze apps inschakelen, maar ze werken mogelijk niet zoals verwacht. <annotation type="learn_why_link">Meer informatie</annotation></string>
 

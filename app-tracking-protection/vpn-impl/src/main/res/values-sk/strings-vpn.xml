@@ -231,7 +231,6 @@
         <item quantity="many">Aplikácie</item>
         <item quantity="other">Aplikácií</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Táto funkcia je vo verzii beta. Zaznamenali ste nejaký problém s aplikáciou? <annotation type="app_settings_link">Prosím, nahláste problém.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>Ochrana sledovania aplikácií je vypnutá</b>\nSpôsobila ochrana sledovania aplikácií problém s vašimi aplikáciami? <annotation type="report_issues_link">Hlásenie problémov</annotation></string>
     <string name="atp_ActivityDisabledBySystemLabel"><b>Android zakázal ochranu pred sledovaním aplikácií</b>. Chcete zabrániť tomu, aby sa to opakovalo? <annotation type="re_enable_link">Znovu povoliť</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>Ochrana proti sledovaniu aplikácií je zakázaná. </b>\nMohla ju zakázať VPN aplikácia vo vašom zariadení. Na opätovné zapnutie použite vyššie uvedený prepínač.</string>
@@ -434,7 +433,7 @@
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Ochrana vypnutá</string>
     <string name="atp_ExcludedAppsFilterMenuAllLabel">Všetko</string>
     <string name="atp_ActivityViewAppsLabel">Zobraziť aplikácie</string>
-    <string name="atp_ActivityEnabledMoreThanADayLabel">Táto funkcia je vo verzii beta. Máte problémy s aplikáciou? <annotation type="app_settings_link"> Pomôžte nám zlepšiť sa </annotation></string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Máte problémy s aplikáciou? <annotation type="app_settings_link"> Pomôžte nám zlepšiť sa </annotation></string>
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Pri niektorých aplikáciách môžu nastať problémy, keď je zapnutá ochrana aplikácií pred sledovaním.\n<annotation type="learn_why_link">Zistite, prečo</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Ochrana je zakázaná pre aplikácie so známymi problémami. Tieto aplikácie môžete povoliť, ale nemusia fungovať podľa očakávania. <annotation type="learn_why_link">Zistite, prečo</annotation></string>
 

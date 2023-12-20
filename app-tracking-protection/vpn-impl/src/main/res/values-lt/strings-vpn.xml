@@ -231,7 +231,6 @@
         <item quantity="many">Programų</item>
         <item quantity="other">Programų</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Ši funkcija yra beta versijos. Pastebėjote programėlės problemą? <annotation type="app_settings_link">Praneškite apie problemą.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>Apsauga nuo programėlių sekimo yra išjungta</b>\nAr apsauga nuo programėlių sekimo sukėlė problemų su jūsų programėlėmis? <annotation type="report_issues_link">Pranešti apie problemas</annotation></string>
     <string name="atp_ActivityDisabledBySystemLabel"><b>„Android“ išjungė programėlių sekimo apsaugą</b>. Norite, kad tai nepasikartotų? <annotation type="re_enable_link">Iš naujo įjunkite</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>Apsauga nuo programėlių sekimo išjungta.</b>\nGali būti, kad ją išjungė jūsų įrenginio VPN programėlė. Norėdami iš naujo įjungti, naudokite aukščiau esantį jungiklį.</string>
@@ -434,7 +433,7 @@
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Apsauga išjungta</string>
     <string name="atp_ExcludedAppsFilterMenuAllLabel">Visi</string>
     <string name="atp_ActivityViewAppsLabel">Rodyti programėles</string>
-    <string name="atp_ActivityEnabledMoreThanADayLabel">Ši funkcija yra beta versijos. Kyla problemų dėl programėlės? <annotation type="app_settings_link">Padėkite mums tobulėti</annotation></string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Kyla problemų dėl programėlės? <annotation type="app_settings_link">Padėkite mums tobulėti</annotation></string>
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Kai kuriose programėlėse gali kilti problemų, kai įjungta programėlės sekimo apsauga.\n<annotation type="learn_why_link">Sužinokite, kodėl</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Programėlių, kuriose yra žinomų problemų, apsauga išjungta. Galite įjungti šias programėles, tačiau jos gali neveikti taip, kaip tikėtasi. <annotation type="learn_why_link">Sužinokite, kodėl</annotation></string>
 

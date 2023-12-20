@@ -219,7 +219,6 @@
         <item quantity="one">Application</item>
         <item quantity="other">Applications</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Cette fonctionnalité est disponible en version bêta. Vous rencontrez un problème lié à une application ? <annotation type="app_settings_link">Veuillez le signaler.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection est désactivé</b>\nVos applications ont-elles rencontré des problèmes à cause d\'App Tracking Protection ? <annotation type="report_issues_link">Signaler des problèmes</annotation></string>
     <string name="atp_ActivityDisabledBySystemLabel"><b>Android a désactivé App Tracking Protection.</b> Vous voulez éviter que cela se reproduise ? <annotation type="re_enable_link">Réactiver</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>L\'option App Tracking Protection est désactivée.</b>\nIl est possible qu\'une application VPN présente sur votre appareil l\'ait désactivée. Faites basculer le bouton ci-dessus pour la réactiver.</string>
@@ -414,7 +413,7 @@
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Protection désactivée</string>
     <string name="atp_ExcludedAppsFilterMenuAllLabel">Tous</string>
     <string name="atp_ActivityViewAppsLabel">Afficher les applications</string>
-    <string name="atp_ActivityEnabledMoreThanADayLabel">Cette fonctionnalité est disponible en version bêta. Vous rencontrez un problème lié à une application ? <annotation type="app_settings_link">Aidez-nous à nous améliorer</annotation></string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Vous rencontrez un problème lié à une application ? <annotation type="app_settings_link">Aidez-nous à nous améliorer</annotation></string>
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">L\'activation d\'App Tracking Protection peut affecter certaines applications.\n<annotation type="learn_why_link">En savoir plus</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">La protection est désactivée pour les applications présentant des problèmes connus. Vous pouvez l\'activer, mais cela peut affecter le fonctionnement de ces applications. <annotation type="learn_why_link">En savoir plus</annotation></string>
 

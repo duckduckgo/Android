@@ -219,7 +219,6 @@
         <item quantity="one">Εφαρμογή</item>
         <item quantity="other">Εφαρμογές</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Αυτή η λειτουργία είναι σε έκδοση beta. Παρατηρήσατε κάποιο πρόβλημα με μια εφαρμογή; <annotation type="app_settings_link">Αναφέρετε κάποιο πρόβλημα.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>Η Προστασία παρακολούθησης από εφαρμογές είναι απενεργοποιημένη</b>\nΠροκάλεσε η Προστασία παρακολούθησης από εφαρμογές πρόβλημα στις εφαρμογές σας; <annotation type="report_issues_link">Αναφορά προβλημάτων</annotation></string>
     <string name="atp_ActivityDisabledBySystemLabel"><b>Το Android απενεργοποίησε την Προστασία παρακολούθησης από εφαρμογές</b>. Θέλετε να αποτρέψετε την επανάληψή του; <annotation type="re_enable_link">Επανενεργοποίηση</annotation></string>
     <string name="atp_ActivityRevokedLabel">Η <b>Προστασία παρακολούθησης από εφαρμογές είναι απενεργοποιημένη.</b>\nΕνδέχεται να την έχει απενεργοποιήσει μια εφαρμογή VPN στη συσκευή σας. Χρησιμοποιήστε τον διακόπτη πιο πάνω για να την ενεργοποιήσετε ξανά.</string>
@@ -414,7 +413,7 @@
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Η προστασία απενεργοποιήθηκε</string>
     <string name="atp_ExcludedAppsFilterMenuAllLabel">Όλα</string>
     <string name="atp_ActivityViewAppsLabel">Προβολή εφαρμογών</string>
-    <string name="atp_ActivityEnabledMoreThanADayLabel">Αυτή η λειτουργία είναι σε έκδοση beta. Έχετε προβλήματα με μια εφαρμογή; <annotation type="app_settings_link">Βοηθήστε μας να βελτιωθούμε</annotation></string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Έχετε προβλήματα με μια εφαρμογή; <annotation type="app_settings_link">Βοηθήστε μας να βελτιωθούμε</annotation></string>
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Ορισμένες εφαρμογές ενδέχεται να αντιμετωπίζουν προβλήματα όταν είναι ενεργοποιημένη η Προστασία παρακολούθησης από εφαρμογές.\n<annotation type="learn_why_link">Μάθετε γιατί</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Η προστασία είναι απενεργοποιημένη για εφαρμογές με γνωστά προβλήματα. Μπορείτε να ενεργοποιήσετε τις εφαρμογές αυτές, ωστόσο ενδέχεται να μη λειτουργούν όπως αναμένεται. <annotation type="learn_why_link">Μάθετε γιατί</annotation></string>
 

@@ -231,7 +231,6 @@
         <item quantity="many">Aplikace</item>
         <item quantity="other">Aplikace</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Tahle funkce je ve fázi beta. Máš problémy s aplikací? <annotation type="app_settings_link">Nahlas nám to, prosím.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection je zakázána</b>\nZpůsobila ti APp Tracking Protection problém s tvými aplikacemi? <annotation type="report_issues_link">Oznámit problémy</annotation></string>
     <string name="atp_ActivityDisabledBySystemLabel"><b>Android deaktivoval ochranu App Tracking Protection</b>. Chceš zabránit tomu, aby se to opakovalo? <annotation type="re_enable_link">Znovu povolit</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>Funkce App Tracking Protection je vypnutá.</b>\nMohla ji zakázat aplikace pro VPN ve tvém zařízení. Přepínačem nahoře ji můžeš znovu povolit.</string>
@@ -434,7 +433,7 @@
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Ochrana je vypnutá</string>
     <string name="atp_ExcludedAppsFilterMenuAllLabel">Vše</string>
     <string name="atp_ActivityViewAppsLabel">Zobrazit aplikace</string>
-    <string name="atp_ActivityEnabledMoreThanADayLabel">Tato funkce je ve fázi beta. Máš s aplikací problémy? <annotation type="app_settings_link">Pomoz nám se zlepšit</annotation></string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Máš s aplikací problémy? <annotation type="app_settings_link">Pomoz nám se zlepšit</annotation></string>
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Když povolíš funkci App Tracking Protection, může u některých aplikací dojít k problémům. <annotation type="learn_why_link">Zjisti proč</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">U aplikací se známými problémy je ochrana vypnutá. Můžeš ji u&lt;br /&gt;nich zapnout, ale aplikace pak nemusí fungovat podle očekávání. <annotation type="learn_why_link">Zjisti proč</annotation></string>
 

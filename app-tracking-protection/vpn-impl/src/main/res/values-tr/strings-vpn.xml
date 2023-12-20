@@ -219,7 +219,6 @@
         <item quantity="one">Uygulama</item>
         <item quantity="other">Uygulama</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Bu özellik beta aşamasındadır. Bir uygulama ile ilgili sorun mu fark ettiniz? <annotation type="app_settings_link">Lütfen sorunu bize bildirin.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>Uygulama İzleme Koruması devre dışı</b> Uygulama İzleme Koruması uygulamalarınızda bir soruna mı neden oldu? <annotation type="report_issues_link">Sorunları Bildirin</annotation></string>
     <string name="atp_ActivityDisabledBySystemLabel"><b>Android, Uygulama İzleme Korumasını devre dışı bıraktı</b>. Bunun tekrar olmasını önlemek ister misiniz? <annotation type="re_enable_link">Yeniden etkinleştir</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>Uygulama İzleme Koruması devre dışı.</b>\nCihazınızdaki bir VPN uygulaması bu özelliği devre dışı bırakmış olabilir. Yeniden etkinleştirmek için yukarıdaki düğmeyi kullanın.</string>
@@ -414,7 +413,7 @@
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Koruma Devre Dışı</string>
     <string name="atp_ExcludedAppsFilterMenuAllLabel">Tümü</string>
     <string name="atp_ActivityViewAppsLabel">Uygulamaları Görüntüle</string>
-    <string name="atp_ActivityEnabledMoreThanADayLabel">Bu özellik beta aşamasındadır. Bir uygulamayla ilgili sorun mu yaşıyorsunuz? <annotation type="app_settings_link">Geliştirmemize Yardımcı Olun</annotation></string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Bir uygulamayla ilgili sorun mu yaşıyorsunuz? <annotation type="app_settings_link">Geliştirmemize yardımcı olun</annotation></string>
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Uygulama İzleme Koruması etkinleştirildiğinde bazı uygulamalar sorun yaşayabilir. <annotation type="learn_why_link">Nedenini Öğrenin</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Bilinen sorunları olan uygulamalar için koruma devre dışı bırakılır. Bu uygulamaları etkinleştirebilirsiniz, ancak beklendiği gibi çalışmayabilirler. <annotation type="learn_why_link">Nedenini öğrenin</annotation></string>
 

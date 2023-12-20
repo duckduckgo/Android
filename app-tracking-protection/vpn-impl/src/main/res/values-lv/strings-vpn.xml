@@ -225,7 +225,6 @@
         <item quantity="one">lietotne</item>
         <item quantity="other">lietotnes</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Šī funkcija ir beta versijā. Pamanīji problēmu ar kādu lietotni? <annotation type="app_settings_link">Lūdzu, ziņo par to.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>Lietotņu pretizsekošanas aizsardzība ir atspējota</b>\nVai Lietotņu pretizsekošanas aizsardzība ir radījusi kādu problēmu ar tavām lietotnēm? <annotation type="report_issues_link">Ziņo par problēmām</annotation></string>
     <string name="atp_ActivityDisabledBySystemLabel"><b>Android atspējoja lietotņu pretizsekošanas aizsardzību</b>. Vai vēlies, lai tas vairs neatkārtotos? <annotation type="re_enable_link">Iespējot no jauna</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>Lietotņu pretizsekošanas aizsardzība ir atspējota.</b>\nIespējams, to ir atspējojusi kāda VPN lietotne tavā ierīcē. Izmanto augstāk redzamo slēdzi, lai to no jauna iespējotu.</string>
@@ -424,7 +423,7 @@
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Aizsardzība atspējota</string>
     <string name="atp_ExcludedAppsFilterMenuAllLabel">Viss</string>
     <string name="atp_ActivityViewAppsLabel">Skatīt lietotnes</string>
-    <string name="atp_ActivityEnabledMoreThanADayLabel">Šī funkcija ir beta versijā. Problēmas ar kādu lietotni? <annotation type="app_settings_link">Palīdzi mums veikt uzlabojumus</annotation></string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Problēmas ar kādu lietotni? <annotation type="app_settings_link">Palīdzi mums veikt uzlabojumus</annotation></string>
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Dažām lietotnēm var rasties problēmas, ja ir iespējota lietotņu pretizsekošanas aizsardzība.\n<annotation type="learn_why_link">Uzzini, kāpēc</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Aizsardzība ir atspējota lietotnēm ar zināmām problēmām. Vari šīs lietotnes iespējot, taču tās var nedarboties, kā paredzēts. <annotation type="learn_why_link">Uzzini, kāpēc</annotation></string>
 
