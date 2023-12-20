@@ -278,7 +278,7 @@ sealed class BookmarkScreenViewHolders(itemView: View, viewModel: BookmarksViewM
         fun update(bookmark: SavedSite.Bookmark) {
             val twoListItem = binding.root
 
-            twoListItem.setBackgroundColor(context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorSurface))
+            twoListItem.setBackgroundColor(context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorBackground))
 
             twoListItem.setLeadingIconContentDescription(
                 context.getString(
@@ -385,7 +385,7 @@ sealed class BookmarkScreenViewHolders(itemView: View, viewModel: BookmarksViewM
         fun update(bookmarkFolder: BookmarkFolder) {
             val listItem = binding.root
 
-            listItem.setBackgroundColor(context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorSurface))
+            listItem.setBackgroundColor(context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorBackground))
 
             listItem.setPrimaryText(bookmarkFolder.name)
 
