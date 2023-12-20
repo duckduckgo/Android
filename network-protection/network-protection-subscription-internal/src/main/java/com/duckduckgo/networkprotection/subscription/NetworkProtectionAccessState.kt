@@ -32,11 +32,9 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitli
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.VerifySubscription
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
 import com.duckduckgo.networkprotection.subscription.ui.NetpVerifySubscriptionParams
-import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesBinding.Priority.HIGHEST
 import javax.inject.Inject
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
 @ContributesBinding(
@@ -47,13 +45,13 @@ class NetworkProtectionAccessState @Inject constructor(
     private val netPWaitlistRepository: NetPWaitlistRepository,
     private val networkProtectionState: NetworkProtectionState,
     private val appBuildConfig: AppBuildConfig,
-    private val subscriptions: Subscriptions,
     private val dispatcherProvider: DispatcherProvider,
+    private val netpSubscriptionManager: NetpSubscriptionManager,
 ) : NetworkProtectionWaitlist {
 
     override suspend fun getState(): NetPWaitlistState = withContext(dispatcherProvider.io()) {
         if (isTreated()) {
-            return@withContext if (!hasValidNetPEntitlements()) {
+            return@withContext if (!netpSubscriptionManager.hasValidEntitlement()) {
                 NotUnlocked
             } else if (netPWaitlistRepository.getAuthenticationToken() == null) {
                 VerifySubscription
@@ -62,10 +60,6 @@ class NetworkProtectionAccessState @Inject constructor(
             }
         }
         return@withContext NotUnlocked
-    }
-
-    private fun hasValidNetPEntitlements(): Boolean {
-        return runBlocking { subscriptions.hasEntitlement(NETP_ENTITLEMENT) }
     }
 
     override suspend fun getScreenForCurrentState(): ActivityParams {
@@ -77,13 +71,10 @@ class NetworkProtectionAccessState @Inject constructor(
                     NetPWaitlistInvitedScreenNoParams
                 }
             }
+
             JoinedWaitlist, NotUnlocked, PendingInviteCode, VerifySubscription -> NetpVerifySubscriptionParams
         }
     }
 
     private fun isTreated(): Boolean = appBuildConfig.isDebug
-
-    companion object {
-        private const val NETP_ENTITLEMENT = "Dummy"
-    }
 }
