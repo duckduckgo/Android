@@ -783,4 +783,9 @@
     <string name="imageCaptureCameraPermissionDeniedMessage">I siti possono utilizzare la fotocamera solo se consenti a DuckDuckGo di richiederne l\'accesso.</string>
     <string name="imageCaptureCameraPermissionDeniedPositiveButton">Apri Impostazioni</string>
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Annulla</string>
+
+    <!-- Autofill -->
+    <string name="settingsAutofillLoginsSetting">Password</string>
+    <string name="autofillLoginSavedSnackbarMessage">Password salvata</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Password aggiornata</string>
 </resources>

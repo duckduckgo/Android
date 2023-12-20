@@ -787,4 +787,9 @@
     <string name="imageCaptureCameraPermissionDeniedMessage">Site-urile îți pot utiliza camera numai dacă permiți ca DuckDuckGo să solicite accesul.</string>
     <string name="imageCaptureCameraPermissionDeniedPositiveButton">Deschide Setări</string>
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Anulare</string>
+
+    <!-- Autofill -->
+    <string name="settingsAutofillLoginsSetting">Parole</string>
+    <string name="autofillLoginSavedSnackbarMessage">Parolă salvată</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Parolă actualizată</string>
 </resources>

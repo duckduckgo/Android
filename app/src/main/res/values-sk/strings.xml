@@ -791,4 +791,9 @@
     <string name="imageCaptureCameraPermissionDeniedMessage">Lokality môžu používať váš fotoaparát len vtedy, ak povolíte aplikácii DuckDuckGo žiadať o prístup.</string>
     <string name="imageCaptureCameraPermissionDeniedPositiveButton">Otvoriť nastavenia</string>
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Zrušiť</string>
+
+    <!-- Autofill -->
+    <string name="settingsAutofillLoginsSetting">Heslo</string>
+    <string name="autofillLoginSavedSnackbarMessage">Uložené heslo</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Aktualizácia hesla</string>
 </resources>

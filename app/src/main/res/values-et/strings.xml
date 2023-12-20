@@ -783,4 +783,9 @@
     <string name="imageCaptureCameraPermissionDeniedMessage">Saidid saavad sinu kaamerat kasutada ainult siis, kui lubad DuckDuckGo’l küsida sellele juurdepääsu.</string>
     <string name="imageCaptureCameraPermissionDeniedPositiveButton">Ava sätted</string>
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Loobu</string>
+
+    <!-- Autofill -->
+    <string name="settingsAutofillLoginsSetting">Paroolid</string>
+    <string name="autofillLoginSavedSnackbarMessage">Parool salvestatud</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Parool uuendatud</string>
 </resources>

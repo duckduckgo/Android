@@ -782,4 +782,9 @@
     <string name="imageCaptureCameraPermissionDeniedMessage">Sites can only use your camera if you allow DuckDuckGo to ask for access.</string>
     <string name="imageCaptureCameraPermissionDeniedPositiveButton">Open Settings</string>
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Cancel</string>
+
+    <!-- Autofill -->
+    <string name="settingsAutofillLoginsSetting">Passwords</string>
+    <string name="autofillLoginSavedSnackbarMessage">Password saved</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Password updated</string>
 </resources>

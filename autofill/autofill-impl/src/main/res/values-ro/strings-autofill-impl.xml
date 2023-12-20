@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-
     <string name="managementDisabledModeCta"><b>Configurează în Setări</b></string>
 
     <string name="saveLoginDialogButtonSave">Salvează parola</string>
@@ -62,6 +61,7 @@
 
     <string name="autofillDeleteLoginDialogCancel">Anulare</string>
     <string name="autofillDeleteLoginDialogDelete">Ștergere</string>
+
 
     <string name="autofillManagementUsernameCopied">Numele de utilizator a fost copiat</string>
     <string name="autofillManagementPasswordCopied">Parolă copiată</string>
@@ -112,5 +112,25 @@
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogTitle">Dacă ieșiți acum, Duck Address nu va fi salvată</string>
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogPositiveButton">Continuă configurarea</string>
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Ieși din configurare</string>
+
+    <string name="autofillManagementScreenTitle">Parole</string>
+    <string name="credentialManagementNoLoginsSavedTitle">Nici o parolă nu a fost salvată încă</string>
+    <string name="credentialManagementAutofillToggleLabel">Salvează și completează automat parolele</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Parolele sunt stocate în siguranță pe dispozitivul tău.</string>
+    <string name="saveLoginDialogSubtitle">Parolele sunt stocate în siguranță pe dispozitivul tău.</string>
+    <string name="autofillManagementAddLogin">Adaugă parola</string>
+    <string name="credentialManagementEditLoginTitleHint">Titlu</string>
+    <string name="autofillDeleteLoginDialogTitle">Sigur dorești să ștergi această parolă?</string>
+    <string name="autofillManagementDeletedConfirmation">Parolă ștearsă</string>
+    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Ultima actualizare %1$s</string>
+    <string name="autofillDisableAutofillPromptTitle">Dorești să continui să salvezi parolele?</string>
+    <string name="deviceNotSupportedSubtitle">Pentru a stoca parolele în siguranță, trebuie să le criptăm și să le stocăm pe dispozitivul tău. Deoarece dispozitivul tău nu acceptă stocarea criptată, salvarea și completarea automată a parolelor nu este disponibilă.</string>
+    <string name="autofill_password_generation_offer_message">Parolele sunt stocate în siguranță pe dispozitivul tău.</string>
+    <string name="autofillManagementSearchLogins">Caută parole</string>
+    <string name="biometric_prompt_title">Parole blocate</string>
+    <string name="autofill_auth_text_for_access">Deblochează dispozitivul pentru a accesa parolele</string>
+    <string name="managementDisabledModeTitle">Securizează-ți dispozitivul pentru a salva parolele</string>
+    <string name="managementDisabledModeSubtitle">Este necesar un model de blocare a dispozitivului, un cod PIN sau date biometrice pentru a-ți proteja parolele.</string>
+    <string name="credentialManagementEditTitle">Editează parola</string>
 
 </resources>

@@ -791,4 +791,9 @@
     <string name="imageCaptureCameraPermissionDeniedMessage">Svetainės gali naudoti jūsų kamerą tik tada, jei leisite „DuckDuckGo“ prašyti prieigos.</string>
     <string name="imageCaptureCameraPermissionDeniedPositiveButton">Atidaryti nustatymus</string>
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Atšaukti</string>
+
+    <!-- Autofill -->
+    <string name="settingsAutofillLoginsSetting">Slaptažodžiai</string>
+    <string name="autofillLoginSavedSnackbarMessage">Slaptažodis išsaugotas</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Slaptažodis atnaujintas</string>
 </resources>

@@ -783,4 +783,9 @@
     <string name="imageCaptureCameraPermissionDeniedMessage">Οι ιστότοποι μπορούν να χρησιμοποιούν την κάμερά σας μόνο εάν επιτρέψετε στο DuckDuckGo να αιτηθεί πρόσβαση.</string>
     <string name="imageCaptureCameraPermissionDeniedPositiveButton">Άνοιγμα ρυθμίσεων</string>
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Ακύρωση</string>
+
+    <!-- Autofill -->
+    <string name="settingsAutofillLoginsSetting">Κωδικοί πρόσβασης</string>
+    <string name="autofillLoginSavedSnackbarMessage">Αποθηκευμένος κωδικός πρόσβασης</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Ο κωδικός πρόσβασης ενημερώθηκε</string>
 </resources>

@@ -791,4 +791,9 @@
     <string name="imageCaptureCameraPermissionDeniedMessage">Stranice mogu koristiti tvoju kameru samo ako dopustiš DuckDuckGou da zatraži pristup.</string>
     <string name="imageCaptureCameraPermissionDeniedPositiveButton">Otvori postavke</string>
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Odustani</string>
+
+    <!-- Autofill -->
+    <string name="settingsAutofillLoginsSetting">Lozinke</string>
+    <string name="autofillLoginSavedSnackbarMessage">Lozinka je spremljena</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Lozinka je ažurirana</string>
 </resources>
