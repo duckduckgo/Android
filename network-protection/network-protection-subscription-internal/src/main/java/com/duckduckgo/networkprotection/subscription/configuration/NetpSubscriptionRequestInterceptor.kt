@@ -21,7 +21,7 @@ import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.impl.BuildConfig
 import com.duckduckgo.networkprotection.impl.configuration.NetpRequestInterceptor
-import com.duckduckgo.subscriptions.api.Subscriptions
+import com.duckduckgo.networkprotection.subscription.NetpSubscriptionManager
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesBinding.Priority.HIGHEST
 import javax.inject.Inject
@@ -36,7 +36,7 @@ import okhttp3.Response
 )
 class NetpSubscriptionRequestInterceptor @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
-    private val subscriptions: Subscriptions,
+    private val netpSubscriptionManager: NetpSubscriptionManager,
 ) : NetpRequestInterceptor {
 
     override fun intercept(chain: Chain): Response {
@@ -47,7 +47,7 @@ class NetpSubscriptionRequestInterceptor @Inject constructor(
             newRequest.addHeader(
                 name = "Authorization",
                 // this runBlocking is fine as we're already in a background thread
-                value = "bearer ddg:${runBlocking { subscriptions.getAccessToken() }}",
+                value = "bearer ddg:${runBlocking { netpSubscriptionManager.getToken() }}",
             )
 
             if (appBuildConfig.isInternalBuild()) {
