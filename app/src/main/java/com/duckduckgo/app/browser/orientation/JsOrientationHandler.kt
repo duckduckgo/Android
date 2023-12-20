@@ -55,8 +55,10 @@ class JsOrientationHandler {
 
     companion object {
         const val EMPTY = """{}"""
-        const val NOT_FULL_SCREEN_ERROR = """{"failure":{"name":"InvalidStateError","message":"The page needs to be fullscreen in order to call screen.orientation.lock()"}}"""
-        const val TYPE_ERROR = """{"failure":{"name":"TypeError","message":"Failed to execute 'lock' on 'ScreenOrientation': The provided value '%s' is not a valid enum value of type OrientationLockType."}}"""
+        const val NOT_FULL_SCREEN_ERROR = """{"failure":{"name":"InvalidStateError","message":
+            "The page needs to be fullscreen in order to call screen.orientation.lock()"}}"""
+        const val TYPE_ERROR = """{"failure":{"name":"TypeError","message":
+            "Failed to execute 'lock' on 'ScreenOrientation': The provided value '%s' is not a valid enum value of type OrientationLockType."}}"""
         const val NO_ACTIVITY_ERROR = """{"failure":{"name":"InvalidStateError","message":"The page is not tied to an activity"}}"""
     }
 }
