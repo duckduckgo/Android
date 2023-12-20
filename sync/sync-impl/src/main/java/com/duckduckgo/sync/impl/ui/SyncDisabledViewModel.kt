@@ -42,7 +42,7 @@ class SyncDisabledViewModel(
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
-        val warningMessage: Int? = null,
+        val message: Int? = null,
     )
 
     private val mutableViewState = MutableStateFlow(ViewState())
@@ -52,7 +52,7 @@ class SyncDisabledViewModel(
     override fun onResume(owner: LifecycleOwner) {
         super.onResume(owner)
         syncStateMonitor.syncState().map { state ->
-            mutableViewState.emit(mutableViewState.value.copy(warningMessage = getMessage(state)))
+            mutableViewState.emit(mutableViewState.value.copy(message = getMessage(state)))
         }.flowOn(dispatcherProvider.io()).launchIn(viewModelScope)
     }
 

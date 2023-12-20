@@ -31,22 +31,24 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 interface SyncNotificationBuilder {
-    fun buildSyncPausedNotification(context: Context): Notification
+    fun buildSyncPausedNotification(context: Context, addNavigationIntent: Boolean = true): Notification
 }
 
 @ContributesBinding(AppScope::class)
 class AppCredentialsSyncNotificationBuilder @Inject constructor(
     private val globalGlobalActivityStarter: GlobalActivityStarter,
 ) : SyncNotificationBuilder {
-    override fun buildSyncPausedNotification(context: Context): Notification {
-        return NotificationCompat.Builder(context, SYNC_NOTIFICATION_CHANNEL_ID)
+    override fun buildSyncPausedNotification(context: Context, addNavigationIntent: Boolean): Notification {
+        val notificationBuilder = NotificationCompat.Builder(context, SYNC_NOTIFICATION_CHANNEL_ID)
             .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
             .setStyle(NotificationCompat.DecoratedCustomViewStyle())
-            .setContentIntent(getPendingIntent(context))
             .setCustomContentView(RemoteViews(context.packageName, R.layout.notification_sync_paused))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setCategory(NotificationCompat.CATEGORY_STATUS)
-            .build()
+        if (addNavigationIntent) {
+            notificationBuilder.setContentIntent(getPendingIntent(context))
+        }
+        return notificationBuilder.build()
     }
 
     private fun getPendingIntent(context: Context): PendingIntent? = TaskStackBuilder.create(context).run {

@@ -134,9 +134,10 @@ class SyncRemoteFeatureToggle @Inject constructor(
     }
 
     private fun triggerNotification() {
+        val showSync = showSync()
         notificationManager.notify(
             SYNC_PAUSED_NOTIFICATION_ID,
-            syncNotificationBuilder.buildSyncPausedNotification(context),
+            syncNotificationBuilder.buildSyncPausedNotification(context, addNavigationIntent = showSync),
         )
     }
     private fun cancelNotification() {

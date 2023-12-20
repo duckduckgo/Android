@@ -107,8 +107,7 @@
         app:leadingIcon="@drawable/ic_camera_photos_24"
         app:leadingIconBackground="circular"
         app:primaryText="@string/sync_show_qr_code_item"
-        app:primaryTextTruncated="true"
-        app:secondaryText=""/>
+        app:primaryTextTruncated="true"/>
 
     <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:layout_width="match_parent"

@@ -78,8 +78,8 @@ class SyncDisabledView @JvmOverloads constructor(
     }
 
     private fun render(viewState: ViewState) {
-        this.isVisible = viewState.warningMessage != null
-        val message = viewState.warningMessage ?: return
+        this.isVisible = viewState.message != null
+        val message = viewState.message ?: return
         binding.syndDisabledWarning.setText(context.getString(message))
     }
 }

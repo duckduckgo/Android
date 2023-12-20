@@ -56,157 +56,157 @@ class SyncDisabledViewModelTest {
     )
 
     @Test
-    fun whenUnauthenticatedUserDataSyncingDisabledThenWarningMessageIsDisplayed() = runTest {
+    fun whenUnauthenticatedUserDataSyncingDisabledThenMessageIsDisplayed() = runTest {
         givenAllowDataSyncing(enabled = false)
         syncStateFlow.emit(OFF)
         testee.onResume(mock())
 
         testee.viewState().test {
-            val warningMessage = awaitItem().warningMessage
-            assertEquals(syncDataDisabledSignedOutUser.disabled, warningMessage)
+            val message = awaitItem().message
+            assertEquals(syncDataDisabledSignedOutUser.disabled, message)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun whenUnauthenticatedUserDataSyncingEnabledOnNewerVersionThenWarningMessageIsDisplayed() = runTest {
+    fun whenUnauthenticatedUserDataSyncingEnabledOnNewerVersionThenMessageIsDisplayed() = runTest {
         givenAllowDataSyncing(enabledOnNewerVersion = true)
         syncStateFlow.emit(OFF)
         testee.onResume(mock())
 
         testee.viewState().test {
-            val warningMessage = awaitItem().warningMessage
-            assertEquals(syncDataDisabledSignedOutUser.enabledOnNewerVersion, warningMessage)
+            val message = awaitItem().message
+            assertEquals(syncDataDisabledSignedOutUser.enabledOnNewerVersion, message)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun whenAuthenticatedUserDataSyncingDisabledThenWarningMessageIsDisplayed() = runTest {
+    fun whenAuthenticatedUserDataSyncingDisabledThenMessageIsDisplayed() = runTest {
         givenAllowDataSyncing(enabled = false)
         syncStateFlow.emit(READY)
         testee.onResume(mock())
 
         testee.viewState().test {
-            val warningMessage = awaitItem().warningMessage
-            assertEquals(syncDataDisabledSignedInUser.disabled, warningMessage)
+            val message = awaitItem().message
+            assertEquals(syncDataDisabledSignedInUser.disabled, message)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun whenAuthenticatedUserDataSyncingEnabledOnNewerVersionThenWarningMessageIsDisplayed() = runTest {
+    fun whenAuthenticatedUserDataSyncingEnabledOnNewerVersionThenMessageIsDisplayed() = runTest {
         givenAllowDataSyncing(enabledOnNewerVersion = true)
         syncStateFlow.emit(READY)
         testee.onResume(mock())
 
         testee.viewState().test {
-            val warningMessage = awaitItem().warningMessage
-            assertEquals(syncDataDisabledSignedInUser.enabledOnNewerVersion, warningMessage)
+            val message = awaitItem().message
+            assertEquals(syncDataDisabledSignedInUser.enabledOnNewerVersion, message)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun whenUnauthenticatedSetupFlowsDisabledThenWarningMessageIsDisplayed() = runTest {
+    fun whenUnauthenticatedSetupFlowsDisabledThenMessageIsDisplayed() = runTest {
         givenAllowSetupFlows(enabled = false)
         syncStateFlow.emit(OFF)
         testee.onResume(mock())
 
         testee.viewState().test {
-            val warningMessage = awaitItem().warningMessage
-            assertEquals(setupFlowsDisabledSignedOutUser.disabled, warningMessage)
+            val message = awaitItem().message
+            assertEquals(setupFlowsDisabledSignedOutUser.disabled, message)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun whenUnauthenticatedSetupFlowsEnabledOnNewerVersionThenWarningMessageIsDisplayed() = runTest {
+    fun whenUnauthenticatedSetupFlowsEnabledOnNewerVersionThenMessageIsDisplayed() = runTest {
         givenAllowSetupFlows(enabledOnNewerVersion = true)
         syncStateFlow.emit(OFF)
         testee.onResume(mock())
 
         testee.viewState().test {
-            val warningMessage = awaitItem().warningMessage
-            assertEquals(setupFlowsDisabledSignedOutUser.enabledOnNewerVersion, warningMessage)
+            val message = awaitItem().message
+            assertEquals(setupFlowsDisabledSignedOutUser.enabledOnNewerVersion, message)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun whenAuthenticatedSetupFlowsDisabledThenWarningMessageIsDisplayed() = runTest {
+    fun whenAuthenticatedSetupFlowsDisabledThenMessageIsDisplayed() = runTest {
         givenAllowSetupFlows(enabled = false)
         syncStateFlow.emit(READY)
         testee.onResume(mock())
 
         testee.viewState().test {
-            val warningMessage = awaitItem().warningMessage
-            assertNull(warningMessage)
+            val message = awaitItem().message
+            assertNull(message)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun whenAuthenticatedSetupFlowsEnabledOnNewerVersionThenWarningMessageIsDisplayed() = runTest {
+    fun whenAuthenticatedSetupFlowsEnabledOnNewerVersionThenMessageIsDisplayed() = runTest {
         givenAllowSetupFlows(enabledOnNewerVersion = true)
         syncStateFlow.emit(READY)
         testee.onResume(mock())
 
         testee.viewState().test {
-            val warningMessage = awaitItem().warningMessage
-            assertNull(warningMessage)
+            val message = awaitItem().message
+            assertNull(message)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun whenUnauthenticatedCreateAccountDisabledThenWarningMessageIsDisplayed() = runTest {
+    fun whenUnauthenticatedCreateAccountDisabledThenMessageIsDisplayed() = runTest {
         givenCreateAccountFlows(enabled = false)
         syncStateFlow.emit(OFF)
         testee.onResume(mock())
 
         testee.viewState().test {
-            val warningMessage = awaitItem().warningMessage
-            assertEquals(createAccountDisabledSignedOutUser.disabled, warningMessage)
+            val message = awaitItem().message
+            assertEquals(createAccountDisabledSignedOutUser.disabled, message)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun whenUnauthenticatedCreateAccountEnabledOnNewerVersionThenWarningMessageIsDisplayed() = runTest {
+    fun whenUnauthenticatedCreateAccountEnabledOnNewerVersionThenMessageIsDisplayed() = runTest {
         givenCreateAccountFlows(enabledOnNewerVersion = true)
         syncStateFlow.emit(OFF)
         testee.onResume(mock())
 
         testee.viewState().test {
-            val warningMessage = awaitItem().warningMessage
-            assertEquals(createAccountDisabledSignedOutUser.enabledOnNewerVersion, warningMessage)
+            val message = awaitItem().message
+            assertEquals(createAccountDisabledSignedOutUser.enabledOnNewerVersion, message)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun whenAuthenticatedCreateAccountDisabledThenWarningMessageIsDisplayed() = runTest {
+    fun whenAuthenticatedCreateAccountDisabledThenMessageIsDisplayed() = runTest {
         givenCreateAccountFlows(enabled = false)
         syncStateFlow.emit(READY)
         testee.onResume(mock())
 
         testee.viewState().test {
-            val warningMessage = awaitItem().warningMessage
-            assertNull(warningMessage)
+            val message = awaitItem().message
+            assertNull(message)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun whenAuthenticatedCreateAccountEnabledOnNewerVersionThenWarningMessageIsDisplayed() = runTest {
+    fun whenAuthenticatedCreateAccountEnabledOnNewerVersionThenMessageIsDisplayed() = runTest {
         givenCreateAccountFlows(enabledOnNewerVersion = true)
         syncStateFlow.emit(READY)
         testee.onResume(mock())
 
         testee.viewState().test {
-            val warningMessage = awaitItem().warningMessage
-            assertNull(warningMessage)
+            val message = awaitItem().message
+            assertNull(message)
             cancelAndIgnoreRemainingEvents()
         }
     }
