@@ -37,6 +37,7 @@ import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.anrs.api.CrashLogger.Crash
 import com.duckduckgo.app.accessibility.AccessibilityManager
+import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.browser.WebViewErrorResponse.BAD_URL
 import com.duckduckgo.app.browser.WebViewErrorResponse.CONNECTION
 import com.duckduckgo.app.browser.WebViewErrorResponse.SSL_PROTOCOL_ERROR
@@ -106,6 +107,7 @@ class BrowserWebViewClientTest {
     private val pixel: Pixel = mock()
     private val crashLogger: CrashLogger = mock()
     private val jsPlugins = FakePluginPoint()
+    private val accessibilitySettingsDataStore: AccessibilitySettingsDataStore = mock()
 
     @UiThreadTest
     @Before
@@ -133,6 +135,7 @@ class BrowserWebViewClientTest {
             pixel,
             crashLogger,
             jsPlugins,
+            accessibilitySettingsDataStore,
         )
         testee.webViewClientListener = listener
         whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
@@ -700,11 +703,11 @@ class BrowserWebViewClientTest {
         var countFinished = 0
         var countStarted = 0
 
-        override fun onPageStarted(webView: WebView, url: String?, site: Site?) {
+        override fun onPageStarted(webView: WebView, url: String?, site: Site?, isForcedZoomEnabled: Boolean) {
             countStarted++
         }
 
-        override fun onPageFinished(webView: WebView, url: String?, site: Site?) {
+        override fun onPageFinished(webView: WebView, url: String?, site: Site?, isForcedZoomEnabled: Boolean) {
             countFinished++
         }
     }
