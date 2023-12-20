@@ -40,11 +40,13 @@ dependencies {
     implementation AndroidX.appCompat
     implementation AndroidX.lifecycle.runtime.ktx
     implementation AndroidX.lifecycle.viewModelKtx
+    implementation AndroidX.work.runtimeKtx
     implementation Google.android.material
     implementation Google.dagger
     implementation KotlinX.coroutines.core
     implementation Square.retrofit2.retrofit
     implementation Square.retrofit2.converter.moshi
+    implementation "androidx.work:work-multiprocess:_"
     implementation "com.squareup.logcat:logcat:_"
 
     // Testing dependencies
