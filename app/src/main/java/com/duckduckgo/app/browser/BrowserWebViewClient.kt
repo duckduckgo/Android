@@ -171,9 +171,11 @@ class BrowserWebViewClient @Inject constructor(
                 is SpecialUrlDetector.UrlType.SearchQuery -> false
                 is SpecialUrlDetector.UrlType.Web -> {
                     if (requestRewriter.shouldRewriteRequest(url)) {
-                        val newUri = requestRewriter.rewriteRequestWithCustomQueryParams(url)
-                        webView.loadUrl(newUri.toString())
-                        return true
+                        webViewClientListener?.let { listener ->
+                            val newUri = requestRewriter.rewriteRequestWithCustomQueryParams(url)
+                            loadUrl(listener, webView, newUri.toString())
+                            return true
+                        }
                     }
                     if (isForMainFrame) {
                         webViewClientListener?.willOverrideUrl(url.toString())

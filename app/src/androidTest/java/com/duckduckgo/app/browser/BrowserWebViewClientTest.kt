@@ -683,6 +683,40 @@ class BrowserWebViewClientTest {
         verify(testee.webViewClientListener)!!.onReceivedError(SSL_PROTOCOL_ERROR, requestUrl)
     }
 
+    @Test
+    fun whenRewriteRequestWithCustomQueryParamsAndNotOpenedInNewTabThenLoadRewrittenUrl() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        val urlType = SpecialUrlDetector.UrlType.Web(EXAMPLE_URL)
+        val rewrittenUrl = "https://rewritten-example.com"
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+        whenever(requestRewriter.shouldRewriteRequest(any())).thenReturn(true)
+        whenever(requestRewriter.rewriteRequestWithCustomQueryParams(any())).thenReturn(rewrittenUrl.toUri())
+        whenever(listener.linkOpenedInNewTab()).thenReturn(false)
+
+        assertTrue(testee.shouldOverrideUrlLoading(mockWebView, webResourceRequest))
+
+        verify(listener).linkOpenedInNewTab()
+        verify(mockWebView, times(0)).post(any())
+        verify(mockWebView).loadUrl(rewrittenUrl)
+    }
+
+    @Test
+    fun whenRewriteRequestWithCustomQueryParamsAndOpenedInNewTabThenLoadRewrittenUrlInPost() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        val urlType = SpecialUrlDetector.UrlType.Web(EXAMPLE_URL)
+        val rewrittenUrl = "https://rewritten-example.com"
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+        whenever(requestRewriter.shouldRewriteRequest(any())).thenReturn(true)
+        whenever(requestRewriter.rewriteRequestWithCustomQueryParams(any())).thenReturn(rewrittenUrl.toUri())
+        whenever(listener.linkOpenedInNewTab()).thenReturn(true)
+
+        assertTrue(testee.shouldOverrideUrlLoading(mockWebView, webResourceRequest))
+
+        verify(listener).linkOpenedInNewTab()
+        verify(mockWebView).post(any())
+        verify(mockWebView).loadUrl(rewrittenUrl)
+    }
+
     private class TestWebView(context: Context) : WebView(context) {
         override fun getOriginalUrl(): String {
             return EXAMPLE_URL
