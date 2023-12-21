@@ -54,10 +54,9 @@ class NetworkProtectionAccessState @Inject constructor(
     override suspend fun getState(): NetPWaitlistState = withContext(dispatcherProvider.io()) {
         if (isTreated()) {
             val hasValidEntitlementResult = netpSubscriptionManager.hasValidEntitlement()
-            return@withContext if (!hasValidEntitlementResult.isSuccess || !hasValidEntitlementResult.getOrDefault(false)) {
-                if (hasValidEntitlementResult.isSuccess) {
-                    handleVPNAccessState(hasValidEntitlementResult.getOrDefault(false))
-                }
+            return@withContext if (hasValidEntitlementResult.isSuccess && !hasValidEntitlementResult.getOrDefault(false)) {
+                // if entitlement check succeeded and no entitlement, reset state and hide access.
+                handleRevokedVPNState()
                 NotUnlocked
             } else if (netPWaitlistRepository.getAuthenticationToken() == null) {
                 VerifySubscription
@@ -68,14 +67,10 @@ class NetworkProtectionAccessState @Inject constructor(
         return@withContext NotUnlocked
     }
 
-    private suspend fun handleVPNAccessState(hasValidEntitlement: Boolean) {
+    private suspend fun handleRevokedVPNState() {
         if (networkProtectionState.isEnabled()) {
-            if (hasValidEntitlement) {
-                networkProtectionRepository.vpnAccessRevoked = false
-            } else {
-                networkProtectionRepository.vpnAccessRevoked = true
-                networkProtectionState.stop()
-            }
+            networkProtectionRepository.vpnAccessRevoked = true
+            networkProtectionState.stop()
         }
     }
 
