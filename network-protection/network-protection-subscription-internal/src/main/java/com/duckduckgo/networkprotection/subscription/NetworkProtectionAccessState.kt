@@ -30,6 +30,7 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitli
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.NotUnlocked
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.PendingInviteCode
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.VerifySubscription
+import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
 import com.duckduckgo.networkprotection.subscription.ui.NetpVerifySubscriptionParams
 import com.squareup.anvil.annotations.ContributesBinding
@@ -47,12 +48,16 @@ class NetworkProtectionAccessState @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val dispatcherProvider: DispatcherProvider,
     private val netpSubscriptionManager: NetpSubscriptionManager,
+    private val networkProtectionRepository: NetworkProtectionRepository,
 ) : NetworkProtectionWaitlist {
 
     override suspend fun getState(): NetPWaitlistState = withContext(dispatcherProvider.io()) {
         if (isTreated()) {
             val hasValidEntitlementResult = netpSubscriptionManager.hasValidEntitlement()
             return@withContext if (!hasValidEntitlementResult.isSuccess || !hasValidEntitlementResult.getOrDefault(false)) {
+                if (hasValidEntitlementResult.isSuccess) {
+                    handleVPNAccessState(hasValidEntitlementResult.getOrDefault(false))
+                }
                 NotUnlocked
             } else if (netPWaitlistRepository.getAuthenticationToken() == null) {
                 VerifySubscription
@@ -61,6 +66,17 @@ class NetworkProtectionAccessState @Inject constructor(
             }
         }
         return@withContext NotUnlocked
+    }
+
+    private suspend fun handleVPNAccessState(hasValidEntitlement: Boolean) {
+        if (networkProtectionState.isEnabled()) {
+            if (hasValidEntitlement) {
+                networkProtectionRepository.vpnAccessRevoked = false
+            } else {
+                networkProtectionRepository.vpnAccessRevoked = true
+                networkProtectionState.stop()
+            }
+        }
     }
 
     override suspend fun getScreenForCurrentState(): ActivityParams {
