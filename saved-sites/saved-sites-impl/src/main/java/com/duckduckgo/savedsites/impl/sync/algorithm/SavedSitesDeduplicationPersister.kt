@@ -20,7 +20,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
-import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.impl.sync.SyncSavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesDuplicateResult.Duplicate
 import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesDuplicateResult.NotDuplicate
@@ -38,8 +37,10 @@ class SavedSitesDeduplicationPersister @Inject constructor(
 ) : SavedSitesSyncPersisterStrategy {
     override fun processBookmarkFolder(
         folder: BookmarkFolder,
+        children: List<String>,
     ) {
         // in deduplication we replace local folder with remote folder (id, name, parentId, add children to existent ones)
+        // we don't replace the children here, because they might be children already present before the deduplication
         when (val result = duplicateFinder.findFolderDuplicate(folder)) {
             is Duplicate -> {
                 if (folder.isDeleted()) {
@@ -62,6 +63,15 @@ class SavedSitesDeduplicationPersister @Inject constructor(
         }
     }
 
+    override fun processFavouritesFolder(
+        favouriteFolder: String,
+        children: List<String>,
+    ) {
+        // deduplicating favourites means adding remote favourites to local folder
+        // and ensuring the folder will be sent in the next sync operation if there were local favourites
+        syncSavedSitesRepository.addToFavouriteFolder(favouriteFolder, children)
+    }
+
     override fun processBookmark(
         bookmark: Bookmark,
         folderId: String,
@@ -73,33 +83,12 @@ class SavedSitesDeduplicationPersister @Inject constructor(
             when (val result = duplicateFinder.findBookmarkDuplicate(bookmark)) {
                 is Duplicate -> {
                     Timber.d("Sync-Bookmarks-Persister: child ${bookmark.id} has a local duplicate in ${result.id}, replacing")
-                    savedSitesRepository.replaceBookmark(bookmark, result.id)
+                    syncSavedSitesRepository.replaceBookmark(bookmark, result.id)
                 }
 
                 is NotDuplicate -> {
                     Timber.d("Sync-Bookmarks-Persister: child ${bookmark.id} not present locally, inserting")
                     savedSitesRepository.insert(bookmark)
-                }
-            }
-        }
-    }
-
-    override fun processFavourite(
-        favourite: Favorite,
-        favoriteFolder: String,
-    ) {
-        if (favourite.isDeleted()) {
-            Timber.d("Sync-Bookmarks-Persister: favourite ${favourite.id} is removed and not present locally, nothing to do")
-        } else {
-            when (val result = duplicateFinder.findFavouriteDuplicate(favourite, favoriteFolder)) {
-                is SavedSitesDuplicateResult.Duplicate -> {
-                    Timber.d("Sync-Bookmarks-Persister: child ${favourite.id} exists locally as ${result.id}, replacing")
-                    syncSavedSitesRepository.replaceFavourite(favourite, result.id, favoriteFolder)
-                }
-
-                is SavedSitesDuplicateResult.NotDuplicate -> {
-                    Timber.d("Sync-Bookmarks-Persister: child ${favourite.id} not present locally, inserting")
-                    syncSavedSitesRepository.insert(favourite, favoriteFolder)
                 }
             }
         }

@@ -16,7 +16,9 @@
 
 package com.duckduckgo.savedsites.impl.sync
 
+import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
+import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 
 interface SyncSavedSitesRepository {
@@ -34,7 +36,10 @@ interface SyncSavedSitesRepository {
      * @param favoriteFolder the folder to search
      * @return [Favorite] if found or null if not found
      */
-    fun getFavorite(url: String, favoriteFolder: String): Favorite?
+    fun getFavorite(
+        url: String,
+        favoriteFolder: String,
+    ): Favorite?
 
     /**
      * Returns a [Favorite] given a domain on specific Folder
@@ -42,7 +47,10 @@ interface SyncSavedSitesRepository {
      * @param favoriteFolder the folder to search
      * @return [Favorite] if found or null if not found
      */
-    fun getFavoriteById(id: String, favoriteFolder: String): Favorite?
+    fun getFavoriteById(
+        id: String,
+        favoriteFolder: String,
+    ): Favorite?
 
     /**
      * Inserts a new [Favorite]
@@ -64,40 +72,117 @@ interface SyncSavedSitesRepository {
      * @param favoriteFolder which folder to insert
      * @return [SavedSite] inserted
      */
-    fun insert(savedSite: SavedSite, favoriteFolder: String): SavedSite
-
-    /**
-     * Deletes a [SavedSite]
-     * @param favoriteFolder which folder to delete from
-     * @param savedSite to be deleted
-     */
-    fun delete(savedSite: SavedSite, favoriteFolder: String)
-
-    /**
-     * Updates the content of a [Favorite]
-     * @param favoriteFolder which folder to update
-     * @param savedSite to be updated
-     */
-    fun updateFavourite(favorite: Favorite, favoriteFolder: String)
-
-    /**
-     * Updates the position of [Favorite]
-     * @param favoriteFolder which folder to update
-     * @param favorites with all [Favorite]
-     */
-    fun updateWithPosition(favorites: List<Favorite>, favoriteFolder: String)
-
-    /**
-     * Replaces an existing [Favorite]
-     * Used when syncing data from the backend
-     * There are scenarios when a duplicate remote favourite has to be replace the local one
-     * @param favorite the favourite to replace locally
-     * @param favoriteFolder which folder to update
-     * @param localId the local Id to be replaced
-     */
-    fun replaceFavourite(
-        favorite: Favorite,
-        localId: String,
+    fun insert(
+        savedSite: SavedSite,
         favoriteFolder: String,
+    ): SavedSite
+
+    /**
+     * Replaces the existing [BookmarkFolder]
+     * We remove all children stored locally and add the ones present in the [children] list
+     * If ony of [children] was present in another folder, we take this opportunity
+     * to remove it from that folder.
+     * Doing it this way also updates the bookmark order to the correct one.
+     */
+    fun replaceBookmarkFolder(
+        folder: BookmarkFolder,
+        children: List<String>,
     )
+
+    /**
+     * Adds children to the existing [favouriteFolder]
+     * Contrary to [replaceFavouriteFolder], we don't delete the children stored locally
+     */
+    fun addToFavouriteFolder(
+        favouriteFolder: String,
+        children: List<String>,
+    )
+
+    /**
+     * Replaces the existing [favouriteFolder]
+     * Contrary to [replaceBookmarkFolder], we don't delete the children from previous bookmark folder
+     * This is because Favourites are special, and a bookmark is allowed to be in multiple favourite folders
+     * and one bookmark folder
+     * This also updates the bookmark order to the correct one
+     */
+    fun replaceFavouriteFolder(
+        favouriteFolder: String,
+        children: List<String>,
+    )
+
+    /**
+     * Returns all [Bookmark] and [BookmarkFolder] inside a folder, also deleted objects
+     * @param folderId the id of the folder.
+     * @return [Pair] of [Bookmark] and [BookmarkFolder] inside a folder
+     */
+    fun getAllFolderContentSync(folderId: String): Pair<List<Bookmark>, List<BookmarkFolder>>
+
+    /**
+     * Replaces an existing [Bookmark]
+     * Used when syncing data from the backend
+     * There are scenarios when a duplicate remote bookmark has to be replace the local one
+     * @param bookmark the bookmark to replace locally
+     * @param localId the id of the local bookmark to be replaced
+     */
+    fun replaceBookmark(
+        bookmark: Bookmark,
+        localId: String,
+    )
+
+    /**
+     * Returns the list of [BookmarkFolder] modified after [since]
+     * @param since timestamp of modification for filtering
+     * @return [List] of [BookmarkFolder]
+     */
+    fun getFoldersModifiedSince(since: String): List<BookmarkFolder>
+
+    /**
+     * Returns the list of [Bookmark] modified after [since]
+     * @param since timestamp of modification for filtering
+     * @return [List] of [Bookmark]
+     */
+    fun getBookmarksModifiedSince(since: String): List<Bookmark>
+
+    /**
+     * Returns the object needed for the sync request an existing [BookmarkFolder]
+     * that represents the difference between remote and local state
+     * @param folderId id of the folder to get the diff from
+     */
+    fun getFolderDiff(folderId: String): SyncFolderChildren
+
+    /**
+     * Stores the client children state for each folder before sending it to the Sync BE
+     * @param folders list of folders to be stored
+     */
+    fun addRequestMetadata(folders: List<SyncSavedSitesRequestEntry>)
+
+    /**
+     * Stores the BE children state for each folder after receiving it
+     * @param entities list of entities received in the BE response
+     */
+    fun addResponseMetadata(entities: List<SyncSavedSitesResponseEntry>)
+
+    /**
+     * Deletes all existing metadata
+     * This is called when Sync is disabled so all previous metadata is removed
+     */
+    fun removeMetadata()
+
+    /**
+     * Finds all the orphans (entities that don't belong to a folder)
+     * and attached them to bookmarks root
+     */
+    fun fixOrphans(): Boolean
+
+    /**
+     * Deletes all entities with deleted = 1
+     * This makes the deletion permanent
+     */
+    fun pruneDeleted()
+
+    /**
+     * Sets entities that were present in the device before a deduplication so
+     * they are available for the next sync operation
+     */
+    fun setLocalEntitiesForNextSync(startTimestamp: String)
 }

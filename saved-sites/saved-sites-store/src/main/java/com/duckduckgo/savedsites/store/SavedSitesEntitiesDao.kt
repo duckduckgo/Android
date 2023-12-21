@@ -89,6 +89,13 @@ interface SavedSitesEntitiesDao {
         newId: String,
     )
 
+    @Transaction
+    fun updateModified(entities: List<String>, lastModified: String = DatabaseDateFormatter.iso8601()) {
+        entities.forEach {
+            updateModified(it, lastModified)
+        }
+    }
+
     @Query("update entities set lastModified = :lastModified where entityId = :entityId")
     fun updateModified(
         entityId: String,
