@@ -20,6 +20,7 @@ import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.sync.api.engine.*
 import com.duckduckgo.sync.api.engine.ModifiedSince.FirstSync
+import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_CREATION
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_LOGIN
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.APP_OPEN
@@ -63,6 +64,7 @@ internal class SyncEngineTest {
     fun before() {
         syncEngine = RealSyncEngine(syncApiClient, syncScheduler, syncStateRepository, syncPixels, syncStore, providerPlugins, persisterPlugins)
         whenever(syncStore.isSignedIn()).thenReturn(true)
+        whenever(syncStore.syncingDataEnabled).thenReturn(true)
     }
 
     @Test
@@ -118,6 +120,20 @@ internal class SyncEngineTest {
         verify(syncStateRepository).store(any())
         verify(syncApiClient).patch(any())
         verify(syncStateRepository).updateSyncState(SUCCESS)
+    }
+
+    @Test
+    fun whenSyncingDataIsDisabledThenNoSyncOperationIsTriggered() {
+        whenever(syncStore.isSignedIn()).thenReturn(true)
+        whenever(syncStore.syncingDataEnabled).thenReturn(false)
+
+        SyncTrigger.values().forEach { syncTrigger ->
+            syncEngine.triggerSync(syncTrigger)
+        }
+
+        verifyNoInteractions(syncApiClient)
+        verifyNoInteractions(syncScheduler)
+        verifyNoInteractions(syncStateRepository)
     }
 
     @Test

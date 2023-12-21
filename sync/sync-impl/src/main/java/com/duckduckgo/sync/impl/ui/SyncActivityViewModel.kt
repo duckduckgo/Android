@@ -34,6 +34,7 @@ import com.duckduckgo.sync.impl.RecoveryCodePDF
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.SyncFeatureToggle
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskDeleteAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskEditDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskRemoveDevice
@@ -41,7 +42,6 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroCreateAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowRecoveryCode
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.LoadingItem
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.SyncedDevice
 import java.io.File
@@ -66,6 +66,7 @@ class SyncActivityViewModel @Inject constructor(
     private val syncStateMonitor: SyncStateMonitor,
     private val syncEngine: SyncEngine,
     private val dispatchers: DispatcherProvider,
+    private val syncFeatureToggle: SyncFeatureToggle,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -109,6 +110,7 @@ class SyncActivityViewModel @Inject constructor(
             showAccount = syncAccountRepository.isSignedIn(),
             loginQRCode = qrBitmap,
             syncedDevices = syncedDevices,
+            disabledSetupFlows = disabledSetupFlows(),
         )
     }
 
@@ -128,7 +130,13 @@ class SyncActivityViewModel @Inject constructor(
         val showAccount: Boolean = false,
         val loginQRCode: Bitmap? = null,
         val syncedDevices: List<SyncDeviceListItem> = emptyList(),
+        val disabledSetupFlows: List<SetupFlows> = emptyList(),
     )
+
+    sealed class SetupFlows {
+        data object SignInFlow : SetupFlows()
+        data object CreateAccountFlow : SetupFlows()
+    }
 
     sealed class Command {
         object SyncWithAnotherDevice : Command()
@@ -320,7 +328,15 @@ class SyncActivityViewModel @Inject constructor(
         }
     }
 
-    private fun signedOutState(): ViewState = ViewState()
+    private fun disabledSetupFlows(): List<SetupFlows> {
+        if (!syncFeatureToggle.allowSetupFlows()) return listOf(SetupFlows.SignInFlow, SetupFlows.CreateAccountFlow)
+        if (!syncFeatureToggle.allowCreateAccount()) return listOf(SetupFlows.CreateAccountFlow)
+        return emptyList()
+    }
+
+    private fun signedOutState(): ViewState = ViewState(
+        disabledSetupFlows = disabledSetupFlows(),
+    )
     private fun ViewState.setDevices(devices: List<SyncDeviceListItem>) = copy(syncedDevices = devices)
     private fun ViewState.hideDeviceListItemLoading() = copy(syncedDevices = syncedDevices.filterNot { it is LoadingItem })
     private fun ViewState.showDeviceListItemLoading() = copy(syncedDevices = syncedDevices + LoadingItem)
