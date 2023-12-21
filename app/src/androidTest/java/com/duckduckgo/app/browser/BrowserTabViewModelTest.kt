@@ -4502,11 +4502,11 @@ class BrowserTabViewModelTest {
         loadUrl(url)
         whenever(mockSitePermissionsManager.getPermissionsQueryResponse(eq(url), any(), any())).thenReturn(SitePermissionQueryResponse.Granted)
         testee.onPermissionsQuery("myFeature", "myMethod", "myId", JSONObject("""{ "name":"somePermission"}"""))
-        assertCommandIssued<Command.OnPermissionsQueryResponse> {
-            assertEquals("granted", this.jsCallbackData.params.getString("state"))
-            assertEquals("myFeature", this.jsCallbackData.featureName)
-            assertEquals("myMethod", this.jsCallbackData.method)
-            assertEquals("myId", this.jsCallbackData.id)
+        assertCommandIssued<Command.SendResponseToJs> {
+            assertEquals("granted", this.data.params.getString("state"))
+            assertEquals("myFeature", this.data.featureName)
+            assertEquals("myMethod", this.data.method)
+            assertEquals("myId", this.data.id)
         }
     }
 

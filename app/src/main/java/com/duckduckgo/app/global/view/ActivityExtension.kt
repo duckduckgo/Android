@@ -57,7 +57,6 @@ fun Context.fadeTransitionConfig(): Bundle? {
     return config.toBundle()
 }
 
-@Synchronized
 fun FragmentActivity.toggleFullScreen() {
     if (isFullScreen()) {
         // If we are exiting full screen, reset the orientation
@@ -72,7 +71,6 @@ fun FragmentActivity.toggleFullScreen() {
     window.decorView.systemUiVisibility = newUiOptions
 }
 
-@Synchronized
 fun FragmentActivity.isFullScreen(): Boolean {
     return window.decorView.systemUiVisibility.and(View.SYSTEM_UI_FLAG_FULLSCREEN) == View.SYSTEM_UI_FLAG_FULLSCREEN
 }
@@ -82,7 +80,6 @@ fun FragmentActivity.isImmersiveModeEnabled(): Boolean {
     return uiOptions or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY == uiOptions
 }
 
-@Synchronized
 fun FragmentActivity.requestJsOrientationChange(newOrientation: JavaScriptScreenOrientation): Boolean {
     if (!isFullScreen()) {
         return false

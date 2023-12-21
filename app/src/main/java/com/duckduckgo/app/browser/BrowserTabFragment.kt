@@ -711,6 +711,8 @@ class BrowserTabFragment :
             contentScopeScripts.onResponse(it)
         }
 
+    private val jsOrientationHandler = JsOrientationHandler()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         removeDaxDialogFromActivity()
@@ -1312,7 +1314,10 @@ class BrowserTabFragment :
             )
 
             is Command.WebViewError -> showError(it.errorType, it.url)
-            is Command.OnPermissionsQueryResponse -> contentScopeScripts.onResponse(it.jsCallbackData)
+            is Command.SendResponseToJs -> contentScopeScripts.onResponse(it.data)
+            is Command.WebShareRequest -> webShareRequest.launch(it.data)
+            is Command.ScreenLock -> screenLock(it.data)
+            is Command.ScreenUnlock -> screenUnlock()
             else -> {
                 // NO OP
             }
@@ -2150,15 +2155,7 @@ class BrowserTabFragment :
                 it,
                 object : JsMessageCallback() {
                     override fun process(featureName: String, method: String, id: String?, data: JSONObject?) {
-                        when (method) {
-                            "webShare" -> if (id != null && data != null) { webShare(featureName, method, id, data) }
-                            "permissionsQuery" -> if (id != null && data != null) { viewModel.onPermissionsQuery(featureName, method, id, data) }
-                            "screenLock" -> if (id != null && data != null) { screenLock(featureName, method, id, data) }
-                            "screenUnlock" -> screenUnlock()
-                            else -> {
-                                // NOOP
-                            }
-                        }
+                        viewModel.processJsCallbackMessage(featureName, method, id, data)
                     }
                 },
             )
@@ -2167,12 +2164,8 @@ class BrowserTabFragment :
         WebView.setWebContentsDebuggingEnabled(webContentDebugging.isEnabled())
     }
 
-    private fun webShare(featureName: String, method: String, id: String, data: JSONObject) {
-        webShareRequest.launch(JsCallbackData(data, featureName, method, id))
-    }
-
-    private fun screenLock(featureName: String, method: String, id: String, data: JSONObject) {
-        val returnData = JsOrientationHandler().updateOrientation(JsCallbackData(data, featureName, method, id), activity)
+    private fun screenLock(data: JsCallbackData) {
+        val returnData = jsOrientationHandler.updateOrientation(data, activity)
         contentScopeScripts.onResponse(returnData)
     }
 

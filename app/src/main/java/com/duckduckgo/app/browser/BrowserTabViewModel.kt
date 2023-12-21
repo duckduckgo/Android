@@ -503,7 +503,10 @@ class BrowserTabViewModel @Inject constructor(
             val url: String,
         ) : Command()
 
-        class OnPermissionsQueryResponse(val jsCallbackData: JsCallbackData) : Command()
+        data class SendResponseToJs(val data: JsCallbackData) : Command()
+        data class WebShareRequest(val data: JsCallbackData) : Command()
+        data class ScreenLock(val data: JsCallbackData) : Command()
+        object ScreenUnlock : Command()
     }
 
     sealed class NavigationCommand : Command() {
@@ -3068,6 +3071,24 @@ class BrowserTabViewModel @Inject constructor(
         )
     }
 
+    fun processJsCallbackMessage(featureName: String, method: String, id: String?, data: JSONObject?) {
+        when (method) {
+            "webShare" -> if (id != null && data != null) { webShare(featureName, method, id, data) }
+            "permissionsQuery" -> if (id != null && data != null) { onPermissionsQuery(featureName, method, id, data) }
+            "screenLock" -> if (id != null && data != null) { screenLock(featureName, method, id, data) }
+            "screenUnlock" -> screenUnlock()
+            else -> {
+                // NOOP
+            }
+        }
+    }
+
+    private fun webShare(featureName: String, method: String, id: String, data: JSONObject) {
+        viewModelScope.launch(dispatchers.main()) {
+            command.value = WebShareRequest(JsCallbackData(data, featureName, method, id))
+        }
+    }
+
     fun onPermissionsQuery(featureName: String, method: String, id: String, data: JSONObject) {
         val response = if (url == null) {
             getDataForPermissionState(featureName, method, id, SitePermissionQueryResponse.Denied)
@@ -3077,7 +3098,19 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         viewModelScope.launch(dispatchers.main()) {
-            command.value = OnPermissionsQueryResponse(response)
+            command.value = SendResponseToJs(response)
+        }
+    }
+
+    private fun screenLock(featureName: String, method: String, id: String, data: JSONObject) {
+        viewModelScope.launch(dispatchers.main()) {
+            command.value = ScreenLock(JsCallbackData(data, featureName, method, id))
+        }
+    }
+
+    private fun screenUnlock() {
+        viewModelScope.launch(dispatchers.main()) {
+            command.value = ScreenUnlock
         }
     }
 
