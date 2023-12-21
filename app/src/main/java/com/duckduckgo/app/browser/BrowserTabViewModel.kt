@@ -3076,7 +3076,7 @@ class BrowserTabViewModel @Inject constructor(
     fun processJsCallbackMessage(featureName: String, method: String, id: String?, data: JSONObject?) {
         when (method) {
             "webShare" -> if (id != null && data != null) { webShare(featureName, method, id, data) }
-            "permissionsQuery" -> if (id != null && data != null) { onPermissionsQuery(featureName, method, id, data) }
+            "permissionsQuery" -> if (id != null && data != null) { permissionsQuery(featureName, method, id, data) }
             "screenLock" -> if (id != null && data != null) { screenLock(featureName, method, id, data) }
             "screenUnlock" -> screenUnlock()
             else -> {
@@ -3091,11 +3091,11 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun onPermissionsQuery(featureName: String, method: String, id: String, data: JSONObject) {
+    private fun permissionsQuery(featureName: String, method: String, id: String, data: JSONObject) {
         val response = if (url == null) {
             getDataForPermissionState(featureName, method, id, SitePermissionQueryResponse.Denied)
         } else {
-            val permissionState = sitePermissionsManager.getPermissionsQueryResponse(url!!, tabId, data.getString("name"))
+            val permissionState = sitePermissionsManager.getPermissionsQueryResponse(url!!, tabId, data.optString("name"))
             getDataForPermissionState(featureName, method, id, permissionState)
         }
 

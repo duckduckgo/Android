@@ -3802,8 +3802,8 @@ private class JsOrientationHandler {
         } else if (!activity.isFullScreen()) {
             NOT_FULL_SCREEN_ERROR
         } else {
-            val requestedOrientation = data.params.getString("orientation")
-            val matchedOrientation = JsToNativeScreenOrientationMap.values().find { it.jsValue == requestedOrientation }
+            val requestedOrientation = data.params.optString("orientation")
+            val matchedOrientation = JsToNativeScreenOrientationMap.entries.find { it.jsValue == requestedOrientation }
 
             if (matchedOrientation == null) {
                 String.format(TYPE_ERROR, requestedOrientation)
