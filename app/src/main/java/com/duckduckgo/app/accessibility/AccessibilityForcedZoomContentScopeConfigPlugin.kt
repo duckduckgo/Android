@@ -14,26 +14,21 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.contentscopescripts.impl
+package com.duckduckgo.app.accessibility
 
-import android.webkit.WebView
-import com.duckduckgo.app.global.model.Site
-import com.duckduckgo.browser.api.JsInjectorPlugin
+import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
+import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
-class ContentScopeScriptsJsInjectorPlugin @Inject constructor(
-    private val coreContentScopeScripts: CoreContentScopeScripts,
-) : JsInjectorPlugin {
-    override fun onPageStarted(webView: WebView, url: String?, site: Site?) {
-        if (coreContentScopeScripts.isEnabled()) {
-            webView.evaluateJavascript("javascript:${coreContentScopeScripts.getScript(site)}", null)
-        }
-    }
+class AccessibilityForcedZoomContentScopeConfigPlugin @Inject constructor(
+    private val accessibilitySettingsDataStore: AccessibilitySettingsDataStore,
+) : ContentScopeConfigPlugin {
+    override fun config(): String = ""
 
-    override fun onPageFinished(webView: WebView, url: String?, site: Site?) {
-        // NOOP
+    override fun preferences(): String? {
+        return "\"forcedZoomEnabled\":${accessibilitySettingsDataStore.forceZoom}"
     }
 }

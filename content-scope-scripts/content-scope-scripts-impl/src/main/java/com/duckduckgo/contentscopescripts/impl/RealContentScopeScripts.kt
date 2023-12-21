@@ -35,7 +35,7 @@ import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 
 interface CoreContentScopeScripts {
-    fun getScript(site: Site?, isForcedZoomEnabled: Boolean): String
+    fun getScript(site: Site?): String
     fun isEnabled(): Boolean
 
     val secret: String
@@ -71,7 +71,7 @@ class RealContentScopeScripts @Inject constructor(
     override val javascriptInterface: String = getSecret()
     override val callbackName: String = getSecret()
 
-    override fun getScript(site: Site?, isForcedZoomEnabled: Boolean): String {
+    override fun getScript(site: Site?): String {
         var updateJS = false
 
         val pluginParameters = getPluginParameters()
@@ -92,7 +92,7 @@ class RealContentScopeScripts @Inject constructor(
             updateJS = true
         }
 
-        val userPreferencesJson = getUserPreferencesJson(pluginParameters.preferences, site, isForcedZoomEnabled)
+        val userPreferencesJson = getUserPreferencesJson(pluginParameters.preferences, site)
         if (cachedUserPreferencesJson != userPreferencesJson) {
             cachedUserPreferencesJson = userPreferencesJson
             updateJS = true
@@ -176,10 +176,10 @@ class RealContentScopeScripts @Inject constructor(
         return jsonAdapter.toJson(unprotectedTemporaryExceptions)
     }
 
-    private fun getUserPreferencesJson(userPreferences: String, site: Site?, isForcedZoomEnabled: Boolean): String {
+    private fun getUserPreferencesJson(userPreferences: String, site: Site?): String {
         val isDesktopMode = site?.isDesktopMode ?: false
         val defaultParameters = "${getVersionNumberKeyValuePair()},${getPlatformKeyValuePair()},${getSessionKeyValuePair()}," +
-            "${getDesktopModeKeyValuePair(isDesktopMode)},${getForcedZoomKeyValuePair(isForcedZoomEnabled)},$messagingParameters"
+            "${getDesktopModeKeyValuePair(isDesktopMode)},$messagingParameters"
         if (userPreferences.isEmpty()) {
             return "{$defaultParameters}"
         }
@@ -189,7 +189,6 @@ class RealContentScopeScripts @Inject constructor(
     private fun getVersionNumberKeyValuePair() = "\"versionNumber\":${appBuildConfig.versionCode}"
     private fun getPlatformKeyValuePair() = "\"platform\":{\"name\":\"android\"}"
     private fun getDesktopModeKeyValuePair(isDesktopMode: Boolean) = "\"desktopModeEnabled\":$isDesktopMode"
-    private fun getForcedZoomKeyValuePair(isForcedZoom: Boolean) = "\"forcedZoomEnabled\":$isForcedZoom"
     private fun getSessionKeyValuePair() = "\"sessionKey\":\"${fingerprintProtectionManager.getSeed()}\""
 
     private fun getContentScopeJson(config: String, unprotectedTemporaryExceptions: List<FeatureException>): String = (
