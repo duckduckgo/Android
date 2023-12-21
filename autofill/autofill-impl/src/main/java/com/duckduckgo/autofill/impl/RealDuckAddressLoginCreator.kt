@@ -22,6 +22,7 @@ import com.duckduckgo.autofill.api.credential.saving.DuckAddressLoginCreator
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.autofill.api.store.AutofillStore
+import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -37,6 +38,7 @@ class RealDuckAddressLoginCreator @Inject constructor(
     private val autofillCapabilityChecker: AutofillCapabilityChecker,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
+    private val neverSavedSiteRepository: NeverSavedSiteRepository,
 ) : DuckAddressLoginCreator {
 
     override fun createLoginForPrivateDuckAddress(
@@ -45,8 +47,7 @@ class RealDuckAddressLoginCreator @Inject constructor(
         originalUrl: String,
     ) {
         appCoroutineScope.launch(dispatchers.io()) {
-            // this could be triggered from email autofill, which might happen even if saving passwords is disabled so need to guard here
-            if (!autofillCapabilityChecker.canSaveCredentialsFromWebView(originalUrl)) {
+            if (!canCreateLoginForThisSite(originalUrl)) {
                 return@launch
             }
 
@@ -63,6 +64,20 @@ class RealDuckAddressLoginCreator @Inject constructor(
                 }
             }
         }
+    }
+
+    private suspend fun canCreateLoginForThisSite(originalUrl: String): Boolean {
+        // this could be triggered from email autofill, which might happen even if saving passwords is disabled so need to guard here
+        if (!autofillCapabilityChecker.canSaveCredentialsFromWebView(originalUrl)) {
+            return false
+        }
+
+        // if the user said to never save for this site, we don't want to auto-save a login for a private duck address on it
+        if (neverSavedSiteRepository.isInNeverSaveList(originalUrl)) {
+            return false
+        }
+
+        return true
     }
 
     private suspend fun updateUsernameIfDifferent(

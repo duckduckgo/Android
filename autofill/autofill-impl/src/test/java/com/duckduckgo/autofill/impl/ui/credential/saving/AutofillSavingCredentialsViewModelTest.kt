@@ -16,11 +16,14 @@
 
 package com.duckduckgo.autofill.impl.ui.credential.saving
 
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.store.AutofillStore
+import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
@@ -30,11 +33,24 @@ class AutofillSavingCredentialsViewModelTest {
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val mockStore: AutofillStore = mock()
-    private val testee = AutofillSavingCredentialsViewModel(coroutineTestRule.testDispatcherProvider).also { it.autofillStore = mockStore }
+    private val pixel: Pixel = mock()
+    private val neverSavedSiteRepository: NeverSavedSiteRepository = mock()
+    private val testee = AutofillSavingCredentialsViewModel(
+        neverSavedSiteRepository = neverSavedSiteRepository,
+        pixel = pixel,
+        dispatchers = coroutineTestRule.testDispatcherProvider,
+    ).also { it.autofillStore = mockStore }
 
     @Test
     fun whenUserPromptedToSaveThenFlagSet() = runTest {
         testee.userPromptedToSaveCredentials()
         verify(mockStore).hasEverBeenPromptedToSaveLogin = true
+    }
+
+    @Test
+    fun whenUserSpecifiesNeverToSaveCurrentSiteThenSitePersisted() = runTest {
+        val url = "https://example.com"
+        testee.addSiteToNeverSaveList(url)
+        verify(neverSavedSiteRepository).addToNeverSaveList(eq(url))
     }
 }
