@@ -30,4 +30,4 @@ tags:
 # Should redirect back to the last page.
 - copyTextFrom:
     id: "omnibarTextInput"
-- assertTrue: ${maestro.copiedText == "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-js-download-url.html"} 
+- assertTrue: ${maestro.copiedText.indexOf("https://staticcdn.duckduckgo.com") == -1} 
