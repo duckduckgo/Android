@@ -122,6 +122,26 @@ interface SecureStorage {
      * If [canAccessSecureStorage] is false when this is invoked, nothing will be done.
      */
     suspend fun deleteWebsiteLoginDetailsWithCredentials(id: Long)
+
+    /**
+     * Adds a [domain] to the list of sites for which we'll never ask to save credentials for.
+     */
+    suspend fun addToNeverSaveList(domain: String)
+
+    /**
+     * Checks if a [domain] is in the list of sites for which we'll never ask to save credentials for.
+     */
+    suspend fun isInNeverSaveList(domain: String): Boolean
+
+    /**
+     * Clears the list of sites for which we'll never ask to save credentials for.
+     */
+    suspend fun clearNeverSaveList()
+
+    /**
+     * Returns the number of sites for which we'll never ask to save credentials for.
+     */
+    suspend fun neverSaveListCount(): Flow<Int>
 }
 
 @ContributesBinding(AppScope::class)
@@ -216,6 +236,30 @@ class RealSecureStorage @Inject constructor(
         withContext(dispatchers.io()) {
             secureStorageRepository?.deleteWebsiteLoginCredentials(id)
         }
+
+    override suspend fun addToNeverSaveList(domain: String) {
+        withContext(dispatchers.io()) {
+            secureStorageRepository?.addToNeverSaveList(domain)
+        }
+    }
+
+    override suspend fun clearNeverSaveList() {
+        withContext(dispatchers.io()) {
+            secureStorageRepository?.clearNeverSaveList()
+        }
+    }
+
+    override suspend fun neverSaveListCount(): Flow<Int> {
+        return withContext(dispatchers.io()) {
+            secureStorageRepository?.neverSaveListCount() ?: flowOf(0)
+        }
+    }
+
+    override suspend fun isInNeverSaveList(domain: String): Boolean {
+        return withContext(dispatchers.io()) {
+            secureStorageRepository?.isInNeverSaveList(domain) ?: false
+        }
+    }
 
     private fun WebsiteLoginDetailsWithCredentials.toDataEntity(): WebsiteLoginCredentialsEntity {
         val encryptedPassword = encryptData(password)

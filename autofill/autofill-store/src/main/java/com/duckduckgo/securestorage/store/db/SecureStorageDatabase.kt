@@ -22,27 +22,36 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
-    version = 3,
-    entities = [WebsiteLoginCredentialsEntity::class],
+    version = 4,
+    entities = [
+        WebsiteLoginCredentialsEntity::class,
+        NeverSavedSiteEntity::class,
+    ],
 )
 abstract class SecureStorageDatabase : RoomDatabase() {
     abstract fun websiteLoginCredentialsDao(): WebsiteLoginCredentialsDao
+    abstract fun neverSavedSitesDao(): NeverSavedSitesDao
 }
 
-val MIGRATION_1_2 = object : Migration(1, 2) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("ALTER TABLE `website_login_credentials` ADD COLUMN `notes` TEXT")
-        database.execSQL("ALTER TABLE `website_login_credentials` ADD COLUMN `domainTitle` TEXT")
-        database.execSQL("ALTER TABLE `website_login_credentials` ADD COLUMN `lastUpdatedInMillis` INTEGER")
-    }
-}
-
-val MIGRATION_2_3 = object : Migration(2, 3) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("UPDATE `website_login_credentials` SET `notes` = null")
-        database.execSQL("ALTER TABLE `website_login_credentials` ADD COLUMN `notesIv` TEXT")
-        database.execSQL("ALTER TABLE `website_login_credentials` RENAME COLUMN `iv` to `passwordIv`")
-    }
-}
-
-val ALL_MIGRATIONS = arrayOf(MIGRATION_1_2, MIGRATION_2_3)
+val ALL_MIGRATIONS = arrayOf(
+    object : Migration(1, 2) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE `website_login_credentials` ADD COLUMN `notes` TEXT")
+            db.execSQL("ALTER TABLE `website_login_credentials` ADD COLUMN `domainTitle` TEXT")
+            db.execSQL("ALTER TABLE `website_login_credentials` ADD COLUMN `lastUpdatedInMillis` INTEGER")
+        }
+    },
+    object : Migration(2, 3) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("UPDATE `website_login_credentials` SET `notes` = null")
+            db.execSQL("ALTER TABLE `website_login_credentials` ADD COLUMN `notesIv` TEXT")
+            db.execSQL("ALTER TABLE `website_login_credentials` RENAME COLUMN `iv` to `passwordIv`")
+        }
+    },
+    object : Migration(3, 4) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("CREATE TABLE IF NOT EXISTS `never_saved_sites` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `domain` TEXT)")
+            db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_never_saved_sites_domain` ON `never_saved_sites` (`domain`)")
+        }
+    },
+)
