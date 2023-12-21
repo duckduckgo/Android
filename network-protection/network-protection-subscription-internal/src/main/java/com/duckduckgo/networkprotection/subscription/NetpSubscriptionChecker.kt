@@ -107,17 +107,28 @@ class NetpSubscriptionCheckWorker(
 
     override suspend fun doWork(): Result {
         logcat { "Sub check: checking entitlement" }
-        if (!netpSubscriptionManager.hasValidEntitlement() && networkProtectionState.isEnabled()) {
-            logcat { "Sub check: disabling" }
-            netpRepository.vpnAccessRevoked = true
-            networkProtectionState.stop()
-        } else {
-            netpRepository.vpnAccessRevoked = false
-            if (!networkProtectionState.isEnabled()) {
-                logcat { "Sub check: cancelling scheduled checker" }
-                workManager.cancelAllWorkByTag(NetpSubscriptionChecker.TAG_WORKER_NETP_SUBS_CHECK)
+        if (networkProtectionState.isEnabled()) {
+            netpSubscriptionManager.hasValidEntitlement().also {
+                if (it.isSuccess) {
+                    val hasEntitlement = it.getOrDefault(false)
+                    if (!hasEntitlement) {
+                        logcat { "Sub check: disabling" }
+                        netpRepository.vpnAccessRevoked = true
+                        networkProtectionState.stop()
+                    } else {
+                        netpRepository.vpnAccessRevoked = false
+                    }
+                } else {
+                    logcat { "Sub check: failed checking entitlement" }
+                    // Call has failed we want to be able to run the check again.
+                    return Result.failure()
+                }
             }
+        } else {
+            logcat { "Sub check: cancelling scheduled checker" }
+            workManager.cancelAllWorkByTag(NetpSubscriptionChecker.TAG_WORKER_NETP_SUBS_CHECK)
         }
+
         return Result.success()
     }
 }

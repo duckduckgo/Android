@@ -51,7 +51,8 @@ class NetworkProtectionAccessState @Inject constructor(
 
     override suspend fun getState(): NetPWaitlistState = withContext(dispatcherProvider.io()) {
         if (isTreated()) {
-            return@withContext if (!netpSubscriptionManager.hasValidEntitlement()) {
+            val hasValidEntitlementResult = netpSubscriptionManager.hasValidEntitlement()
+            return@withContext if (!hasValidEntitlementResult.isSuccess || !hasValidEntitlementResult.getOrDefault(false)) {
                 NotUnlocked
             } else if (netPWaitlistRepository.getAuthenticationToken() == null) {
                 VerifySubscription
