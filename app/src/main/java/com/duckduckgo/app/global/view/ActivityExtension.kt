@@ -29,7 +29,6 @@ import androidx.core.app.ActivityOptionsCompat
 import androidx.fragment.app.FragmentActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
-import com.duckduckgo.app.browser.orientation.JavaScriptScreenOrientation
 import timber.log.Timber
 
 fun FragmentActivity.launchExternalActivity(intent: Intent) {
@@ -78,13 +77,4 @@ fun FragmentActivity.isFullScreen(): Boolean {
 fun FragmentActivity.isImmersiveModeEnabled(): Boolean {
     val uiOptions = window.decorView.systemUiVisibility
     return uiOptions or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY == uiOptions
-}
-
-fun FragmentActivity.requestJsOrientationChange(newOrientation: JavaScriptScreenOrientation): Boolean {
-    if (!isFullScreen()) {
-        return false
-    }
-
-    requestedOrientation = newOrientation.nativeValue
-    return true
 }

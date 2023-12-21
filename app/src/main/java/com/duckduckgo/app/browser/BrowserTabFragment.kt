@@ -22,6 +22,7 @@ import android.app.Activity.RESULT_OK
 import android.app.ActivityOptions
 import android.app.PendingIntent
 import android.content.*
+import android.content.pm.ActivityInfo
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
@@ -129,8 +130,6 @@ import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromAutocomplete
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
 import com.duckduckgo.app.browser.omnibar.animations.TrackersAnimatorListener
-import com.duckduckgo.app.browser.orientation.JavaScriptScreenOrientation
-import com.duckduckgo.app.browser.orientation.JsOrientationHandler
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.remotemessage.SharePromoLinkRMFBroadCastReceiver
 import com.duckduckgo.app.browser.remotemessage.asMessage
@@ -158,10 +157,10 @@ import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.app.global.view.disableAnimation
 import com.duckduckgo.app.global.view.enableAnimation
 import com.duckduckgo.app.global.view.isDifferent
+import com.duckduckgo.app.global.view.isFullScreen
 import com.duckduckgo.app.global.view.isImmersiveModeEnabled
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.renderIfChanged
-import com.duckduckgo.app.global.view.requestJsOrientationChange
 import com.duckduckgo.app.global.view.toggleFullScreen
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.pixels.AppPixelName
@@ -711,6 +710,8 @@ class BrowserTabFragment :
             contentScopeScripts.onResponse(it)
         }
 
+    // Instantiating a private class that contains an implementation detail of BrowserTabFragment but is separated for tidiness
+    // see discussion in https://github.com/duckduckgo/Android/pull/4027#discussion_r1433373625
     private val jsOrientationHandler = JsOrientationHandler()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -2165,12 +2166,12 @@ class BrowserTabFragment :
     }
 
     private fun screenLock(data: JsCallbackData) {
-        val returnData = jsOrientationHandler.updateOrientation(data, activity)
+        val returnData = jsOrientationHandler.updateOrientation(data, this)
         contentScopeScripts.onResponse(returnData)
     }
 
     private fun screenUnlock() {
-        activity?.requestJsOrientationChange(JavaScriptScreenOrientation.ANY)
+        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     }
 
     private fun configureWebViewForAutofill(it: DuckDuckGoWebView) {
@@ -3784,5 +3785,59 @@ class BrowserTabFragment :
     override fun permissionsGrantedOnWhereby() {
         val roomParameters = "?skipMediaPermissionPrompt"
         webView?.loadUrl("${webView?.url.orEmpty()}$roomParameters")
+    }
+}
+
+private class JsOrientationHandler {
+
+    /**
+     * Updates the activity's orientation based on provided JS data
+     *
+     * @return response data
+     */
+    fun updateOrientation(data: JsCallbackData, browserTabFragment: BrowserTabFragment): JsCallbackData {
+        val activity = browserTabFragment.activity
+        val response = if (activity == null) {
+            NO_ACTIVITY_ERROR
+        } else if (!activity.isFullScreen()) {
+            NOT_FULL_SCREEN_ERROR
+        } else {
+            val requestedOrientation = data.params.getString("orientation")
+            val matchedOrientation = JsToNativeScreenOrientationMap.values().find { it.jsValue == requestedOrientation }
+
+            if (matchedOrientation == null) {
+                String.format(TYPE_ERROR, requestedOrientation)
+            } else {
+                activity.requestedOrientation = matchedOrientation.nativeValue
+                EMPTY
+            }
+        }
+
+        return JsCallbackData(
+            JSONObject(response),
+            data.featureName,
+            data.method,
+            data.id,
+        )
+    }
+
+    private enum class JsToNativeScreenOrientationMap(val jsValue: String, val nativeValue: Int) {
+        ANY("any", ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED),
+        NATURAL("natural", ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED),
+        LANDSCAPE("landscape", ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE),
+        PORTRAIT("portrait", ActivityInfo.SCREEN_ORIENTATION_PORTRAIT),
+        PORTRAIT_PRIMARY("portrait-primary", ActivityInfo.SCREEN_ORIENTATION_PORTRAIT),
+        PORTRAIT_SECONDARY("portrait-secondary", ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT),
+        LANDSCAPE_PRIMARY("landscape-primary", ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE),
+        LANDSCAPE_SECONDARY("landscape-secondary", ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE),
+    }
+
+    companion object {
+        const val EMPTY = """{}"""
+        const val NOT_FULL_SCREEN_ERROR = """{"failure":{"name":"InvalidStateError","message":
+            "The page needs to be fullscreen in order to call screen.orientation.lock()"}}"""
+        const val TYPE_ERROR = """{"failure":{"name":"TypeError","message":
+            "Failed to execute 'lock' on 'ScreenOrientation': The provided value '%s' is not a valid enum value of type OrientationLockType."}}"""
+        const val NO_ACTIVITY_ERROR = """{"failure":{"name":"InvalidStateError","message":"The page is not tied to an activity"}}"""
     }
 }
