@@ -18,6 +18,8 @@ package com.duckduckgo.experiments.impl
 
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.experiments.impl.ExperimentFiltersManagerImpl.ExperimentFilterType.ANDROID_VERSION
+import com.duckduckgo.experiments.impl.ExperimentFiltersManagerImpl.ExperimentFilterType.LOCALE
 import com.duckduckgo.experiments.impl.store.ExperimentVariantEntity
 import com.squareup.anvil.annotations.ContributesBinding
 import java.util.Locale
@@ -36,19 +38,21 @@ class ExperimentFiltersManagerImpl @Inject constructor(
             return { isSerpRegionToggleCountry() }
         }
 
-        var matchesLocaleFilter = true
-        var matchesAndroidVersionFilter = true
+        val filters: MutableMap<ExperimentFilterType, Boolean> = mutableMapOf(
+            LOCALE to true,
+            ANDROID_VERSION to true,
+        )
 
         if (entity.localeFilter.isNotEmpty()) {
             val userLocale = Locale.getDefault()
-            matchesLocaleFilter = entity.localeFilter.contains(userLocale.toString())
+            filters[LOCALE] = entity.localeFilter.contains(userLocale.toString())
         }
         if (entity.androidVersionFilter.isNotEmpty()) {
             val userAndroidVersion = appBuildConfig.sdkInt.toString()
-            matchesAndroidVersionFilter = entity.androidVersionFilter.contains(userAndroidVersion)
+            filters[ANDROID_VERSION] = entity.androidVersionFilter.contains(userAndroidVersion)
         }
 
-        return { matchesLocaleFilter && matchesAndroidVersionFilter }
+        return { filters.filter { !it.value }.isEmpty() }
     }
 
     private val serpRegionToggleTargetCountries = listOf(
@@ -70,5 +74,10 @@ class ExperimentFiltersManagerImpl @Inject constructor(
     private fun isSerpRegionToggleCountry(): Boolean {
         val locale = Locale.getDefault()
         return serpRegionToggleTargetCountries.contains(locale.country)
+    }
+
+    enum class ExperimentFilterType {
+        LOCALE,
+        ANDROID_VERSION,
     }
 }
