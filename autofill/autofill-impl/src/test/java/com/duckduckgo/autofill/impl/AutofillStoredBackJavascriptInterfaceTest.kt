@@ -113,7 +113,9 @@ class AutofillStoredBackJavascriptInterfaceTest {
         testee.autoSavedLoginsMonitor = testSavedLoginsMonitor
 
         whenever(currentUrlProvider.currentUrl(testWebView)).thenReturn("https://example.com")
-        whenever(requestParser.parseAutofillDataRequest(any())).thenReturn(AutofillDataRequest(CREDENTIALS, USERNAME, USER_INITIATED, null))
+        whenever(requestParser.parseAutofillDataRequest(any())).thenReturn(
+            Result.success(AutofillDataRequest(CREDENTIALS, USERNAME, USER_INITIATED, null)),
+        )
         whenever(autofillResponseWriter.generateEmptyResponseGetAutofillData()).thenReturn("")
         whenever(autofillResponseWriter.generateResponseGetAutofillData(any())).thenReturn("")
     }
@@ -308,13 +310,21 @@ class AutofillStoredBackJavascriptInterfaceTest {
         assertNull(testCallback.credentialsToSave)
     }
 
+    @Test
+    fun whenStoreFormDataCalledAndParsingErrorThenExceptionIsContained() = runTest {
+        configureRequestParserToReturnSaveCredentialRequestType(username = "username", password = "password")
+        whenever(requestParser.parseStoreFormDataRequest(any())).thenReturn(Result.failure(RuntimeException("Parsing error")))
+        testee.storeFormData("")
+        assertNull(testCallback.credentialsToSave)
+    }
+
     private suspend fun configureRequestParserToReturnSaveCredentialRequestType(
         username: String?,
         password: String?,
     ) {
         val credentials = AutofillStoreFormDataCredentialsRequest(username = username, password = password)
         val topLevelRequest = AutofillStoreFormDataRequest(credentials)
-        whenever(requestParser.parseStoreFormDataRequest(any())).thenReturn(topLevelRequest)
+        whenever(requestParser.parseStoreFormDataRequest(any())).thenReturn(Result.success(topLevelRequest))
         whenever(passwordEventResolver.decideActions(anyOrNull(), any())).thenReturn(listOf(Actions.PromptToSave))
     }
 
@@ -334,13 +344,13 @@ class AutofillStoredBackJavascriptInterfaceTest {
 
     private suspend fun setupRequestForSubTypeUsername() {
         whenever(requestParser.parseAutofillDataRequest(any())).thenReturn(
-            AutofillDataRequest(CREDENTIALS, USERNAME, USER_INITIATED, null),
+            Result.success(AutofillDataRequest(CREDENTIALS, USERNAME, USER_INITIATED, null)),
         )
     }
 
     private suspend fun setupRequestForSubTypePassword() {
         whenever(requestParser.parseAutofillDataRequest(any())).thenReturn(
-            AutofillDataRequest(CREDENTIALS, PASSWORD, USER_INITIATED, null),
+            Result.success(AutofillDataRequest(CREDENTIALS, PASSWORD, USER_INITIATED, null)),
         )
     }
 
