@@ -31,7 +31,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @ContributesMultibinding(VpnScope::class)
-class NetAccessRevokedNotificationScheduler @Inject constructor(
+class NetpAccessRevokedNotificationScheduler @Inject constructor(
     private val context: Context,
     private val notificationManager: NotificationManagerCompat,
     private val networkProtectionRepository: NetworkProtectionRepository,
@@ -47,7 +47,6 @@ class NetAccessRevokedNotificationScheduler @Inject constructor(
     }
 
     override fun onVpnStartFailed(coroutineScope: CoroutineScope) {
-        super.onVpnStartFailed(coroutineScope)
         if (networkProtectionRepository.vpnAccessRevoked) {
             notificationManager.notify(
                 NetPDisabledNotificationScheduler.NETP_REMINDER_NOTIFICATION_ID,
