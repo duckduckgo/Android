@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2022 Asil
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -17,10 +17,10 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="appName" translatable="false">DuckDuckGo</string>
-    <string name="appDescription" translatable="false">DuckDuckGo</string>
-    <string name="duckDuckGoLogoDescription">„DuckDuckGo“ logotipas</string>
-    <string name="duckDuckGoPrivacySimplified">Privatumas, paprasčiau</string>
+    <string name="appName" translatable="false">Asil</string>
+    <string name="appDescription" translatable="false">Asil</string>
+    <string name="asilLogoDescription">„Asil“ logotipas</string>
+    <string name="asilPrivacySimplified">Privatumas, paprasčiau</string>
     <string name="yes">Taip</string>
     <string name="no">Ne</string>
     <string name="open">Atviras</string>
@@ -28,8 +28,8 @@
     <string name="search">Paieška</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingDefaultBrowserDescription">Jei visada norite ieškoti ir naršyti naudojant „DuckDuckGo“, apsilankykite nustatymuose.</string>
-    <string name="onboardingDefaultBrowserTitle">Nustatykite „DuckDuckGo“ savo numatytuoju puslapiu</string>
+    <string name="onboardingDefaultBrowserDescription">Jei visada norite ieškoti ir naršyti naudojant „Asil“, apsilankykite nustatymuose.</string>
+    <string name="onboardingDefaultBrowserTitle">Nustatykite „Asil“ savo numatytuoju puslapiu</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Nepavyko paleisti numatytųjų programos nustatymų ekrano</string>
@@ -37,7 +37,7 @@
     <string name="defaultBrowserMaybeLater">Galbūt vėliau</string>
     <string name="defaultBrowserLetsDoIt">Nustatyti kaip numatytąją naršyklę</string>
     <string name="defaultBrowserDescriptionNoDefault">Kiekvieną kartą be jaudulio atverkite nuorodas.</string>
-    <string name="defaultBrowserInstructions">Pasirinkite „DuckDuckGo“ ir bakstelėkite <font color="#678fff"> „Always“ (visada) </font>.</string>
+    <string name="defaultBrowserInstructions">Pasirinkite „Asil“ ir bakstelėkite <font color="#678fff"> „Always“ (visada) </font>.</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Naršyklės meniu</string>
@@ -90,11 +90,11 @@
     <!-- Opening external apps -->
     <string name="openExternalApp">Atidaryti išorinę programą</string>
     <string name="launchingExternalApp">Atidaryti kitoje programoje</string>
-    <string name="confirmOpenExternalApp">Ar norite išeiti iš „DuckDuckGo“ ir peržiūrėti šį turinį?</string>
+    <string name="confirmOpenExternalApp">Ar norite išeiti iš „Asil“ ir peržiūrėti šį turinį?</string>
     <string name="unableToOpenLink">Nepavyko atverti šio tipo nuorodos</string>
 
     <!-- Tabs -->
-    <string name="homeTab" translatable="false">DuckDuckGo</string>
+    <string name="homeTab" translatable="false">Asil</string>
     <string name="tabActivityTitle">Kortelės</string>
     <string name="tabsMenuItem">Kortelės</string>
     <string name="newTabMenuItem">Nauja kortelė</string>
@@ -122,12 +122,12 @@
     <string name="settingsHeadingAppearance">Išvaizda</string>
     <string name="settingsHeadingCustomize">Tinkinti</string>
     <string name="settingsHeadingAbout">Apie</string>
-    <string name="settingsAboutDuckduckgo">Apie „DuckDuckGo“</string>
+    <string name="settingsAboutAsil">Apie „Asil“</string>
     <string name="settingsVersion">Versija</string>
     <string name="leaveFeedback">Bendrinti atsiliepimą</string>
     <string name="settingsEmailProtectionTitle">El. pašto apsauga</string>
     <string name="settingsEmailProtectionSubtitle">Blokuokite el. laiškų sekimo priemones ir paslėpkite savo adresą</string>
-    <string name="settingsHeadingMore">Daugiau iš „DuckDuckGo“</string>
+    <string name="settingsHeadingMore">Daugiau iš „Asil“</string>
     <string name="settingsLightTheme">Šviesi</string>
     <string name="settingsTheme">Tema</string>
     <string name="settingsDarkTheme">Tamsi</string>
@@ -142,8 +142,8 @@
     <string name="settingsSubtitleNotificationsDisabled">Išjungta</string>
     <string name="settingsSubtitleNotificationsEnabled">Įjungta</string>
     <string name="settingsDefaultBrowserTitle">Numatytoji naršyklė</string>
-    <string name="settingsDefaultBrowserSetDescription">„DuckDuckGo“ yra jūsų numatytoji naršyklė</string>
-    <string name="settingsDefaultBrowserNotSetDescription">Nustatykite „DuckDuckGo“ kaip savo numatytąją naršyklę</string>
+    <string name="settingsDefaultBrowserSetDescription">„Asil“ yra jūsų numatytoji naršyklė</string>
+    <string name="settingsDefaultBrowserNotSetDescription">Nustatykite „Asil“ kaip savo numatytąją naršyklę</string>
     <string name="settingsPrivateSearchTitle">privati paieška</string>
     <string name="settingsPrivateSearchDescription">Įjungta pagal numatytuosius nustatymus</string>
     <string name="settingsWebTrackingProtectionTitle">Apsauga nuo žiniatinklio sekimo</string>
@@ -156,7 +156,7 @@
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">privati paieška</string>
     <string name="privateSearchTitle">„Private Search“ įjungta</string>
-    <string name="privateSearchDescription">„DuckDuckGo Private Search“ yra jūsų numatytoji paieškos sistema, todėl galite ieškoti žiniatinklyje nesekami.</string>
+    <string name="privateSearchDescription">„Asil Private Search“ yra jūsų numatytoji paieškos sistema, todėl galite ieškoti žiniatinklyje nesekami.</string>
     <string name="privateSearchHeadingSearchSettings">Paieškos nustatymai</string>
     <string name="privateSearchAutocompleteToggle">Rodyti automatinio užbaigimo pasiūlymus</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Daugiau paieškos nustatymų</string>
@@ -167,7 +167,7 @@
     <string name="webTrackingProtectionActivityTitle">Apsauga nuo žiniatinklio sekimo</string>
     <string name="webTrackingProtectionLearnMoreTitle">Apsauga nuo žiniatinklio sekimo</string>
     <string name="webTrackingProtectionTitle">Žiniatinklio sekimo apsauga įjungta</string>
-    <string name="webTrackingProtectionDescription"><![CDATA[„DuckDuckGo“ niekada jūsų neseka ir stengiamės kuo geriau apsaugoti jūsų privatumą. Nuolat prižiūrime ir tobuliname apsaugos sluoksnius, kad neatsiliktume nuo naujų sekimo metodų ir užtikrintume daugybę apsaugos priemonių, kurių kitos naršyklės nesiūlo. <u><a href=\"\">Sužinokite daugiau</a><u/>]]></string>
+    <string name="webTrackingProtectionDescription"><![CDATA[„Asil“ niekada jūsų neseka ir stengiamės kuo geriau apsaugoti jūsų privatumą. Nuolat prižiūrime ir tobuliname apsaugos sluoksnius, kad neatsiliktume nuo naujų sekimo metodų ir užtikrintume daugybę apsaugos priemonių, kurių kitos naršyklės nesiūlo. <u><a href=\"\">Sužinokite daugiau</a><u/>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Apsauga nuo slapukų iškylančiųjų langų</string>
@@ -202,9 +202,9 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Išeinant iš programos, po 1 val. neveikimo</string>
 
     <!-- About Activity -->
-    <string name="aboutActivityTitle">Apie „DuckDuckGo“</string>
+    <string name="aboutActivityTitle">Apie „Asil“</string>
     <string name="aboutHeader">Sveiki prisijungę prie „Duck“!</string>
-    <string name="aboutDescription">„DuckDuckGo“ yra nepriklausoma interneto privatumo bendrovė, įkurta 2008 metais ir skirta visiems, kurie pavargo nuo sekimo internete ir nori lengvo sprendimo. Esame įrodymas, kad galite gauti tikrą privatumo apsaugą internete be kompromisų.\n\n„DuckDuckGo“ naršyklėje yra funkcijų, kurių tikitės iš pagrindinės naršyklės, pavyzdžiui, žymės, skirtukai, slaptažodžiai ir kt., taip pat daugiau nei <annotation type="privacy_protection_link"> tuzinas galingų privatumo apsaugos priemonių,</annotation> kurios nesiūlomos daugumoje populiarių naršyklių. Šis unikalus išsamus privatumo apsaugos rinkinys padeda apsaugoti jūsų veiklą internete – nuo paieškos iki naršymo, el. pašto ir kt.\n\nMūsų privatumo apsaugos priemonės veikia nereikalaudamos nieko žinoti apie technines detales ar naudotis sudėtingais nustatymais. Tereikia visuose įrenginiuose perjungti naršyklę į „DuckDuckGo“ ir privatumas bus užtikrintas pagal numatytuosius nustatymus.\n\nTačiau jei norite daugiau informacijos apie tai, kaip veikia „DuckDuckGo“ privatumo apsaugos priemonės, žiūrėkite mūsų <annotation type="learn_more_link">pagalbos puslapius</annotation>.</string>
+    <string name="aboutDescription">„Asil“ yra nepriklausoma interneto privatumo bendrovė, įkurta 2008 metais ir skirta visiems, kurie pavargo nuo sekimo internete ir nori lengvo sprendimo. Esame įrodymas, kad galite gauti tikrą privatumo apsaugą internete be kompromisų.\n\n„Asil“ naršyklėje yra funkcijų, kurių tikitės iš pagrindinės naršyklės, pavyzdžiui, žymės, skirtukai, slaptažodžiai ir kt., taip pat daugiau nei <annotation type="privacy_protection_link"> tuzinas galingų privatumo apsaugos priemonių,</annotation> kurios nesiūlomos daugumoje populiarių naršyklių. Šis unikalus išsamus privatumo apsaugos rinkinys padeda apsaugoti jūsų veiklą internete – nuo paieškos iki naršymo, el. pašto ir kt.\n\nMūsų privatumo apsaugos priemonės veikia nereikalaudamos nieko žinoti apie technines detales ar naudotis sudėtingais nustatymais. Tereikia visuose įrenginiuose perjungti naršyklę į „Asil“ ir privatumas bus užtikrintas pagal numatytuosius nustatymus.\n\nTačiau jei norite daugiau informacijos apie tai, kaip veikia „Asil“ privatumo apsaugos priemonės, žiūrėkite mūsų <annotation type="learn_more_link">pagalbos puslapius</annotation>.</string>
     <string name="no_suggestions">Pasiūlymų nėra</string>
 
     <!-- Broken Site Activity -->
@@ -265,7 +265,7 @@
     <string name="removeAll">Pašalinti visus</string>
 
     <!-- Widget -->
-    <string name="searchWidgetTextHint">Ieškoti „DuckDuckGo“</string>
+    <string name="searchWidgetTextHint">Ieškoti „Asil“</string>
 
     <!-- Favorites widget -->
     <string name="addFavoriteMenuTitleHighlighted">👋 Pridėti mėgstamą</string>
@@ -292,7 +292,7 @@
     <string name="surveyCtaLaunchButton">Dalyvauti apklausoje</string>
     <string name="surveyCtaDismissButton">Ne, dėkoju</string>
     <string name="surveyActivityTitle">Naudotojų apklausa</string>
-    <string name="surveyTitle">„DuckDuckGo“ apklausa</string>
+    <string name="surveyTitle">„Asil“ apklausa</string>
     <string name="surveyDismissContentDescription">Išjungti apklausą</string>
     <string name="surveyLoadingErrorTitle">Ak, ne!</string>
     <string name="surveyLoadingErrorText">Mūsų apklausa šiuo metu neįkeliama.\nBandykite dar kartą vėliau.</string>
@@ -307,14 +307,14 @@
     <string name="addWidgetInstruction1Label">1</string>
     <string name="addWidgetInstruction1">Ilgai spauskite ant pagrindinio ekrano, paskui atidarykite valdiklių meniu.</string>
     <string name="addWidgetInstruction2Label">2</string>
-    <string name="addWidgetInstruction2">Raskite „DuckDuckGo“ valdiklį.</string>
+    <string name="addWidgetInstruction2">Raskite „Asil“ valdiklį.</string>
     <string name="addWidgetInstruction3Label">3</string>
     <string name="addWidgetInstruction3">Nuvilkite valdiklį į pagrindinį ekraną.</string>
     <string name="addWidgetInstructionsButtonGoHome">Pereikite į pagrindinį ekraną</string>
     <string name="addWidgetInstructionsButtonClose">Uždaryti</string>
 
     <!-- App Enjoyment / Rating / Feedback -->
-    <string name="appEnjoymentDialogTitle">Jums patinka „DuckDuckGo?</string>
+    <string name="appEnjoymentDialogTitle">Jums patinka „Asil?</string>
     <string name="appEnjoymentDialogMessage">Norėtume sužinoti jūsų nuomonę.</string>
     <string name="appEnjoymentDialogPositiveButton">Man patinka</string>
     <string name="appEnjoymentDialogNegativeButton">Reikia patobulinti</string>
@@ -336,15 +336,15 @@
 
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Duomenų valymas nustatytas į rankinį</string>
-    <string name="clearNotificationDescription">Tinkinkite „DuckDuckGo“ automatiškai išvalyti naršymo duomenis po kiekvieno seanso.</string>
+    <string name="clearNotificationDescription">Tinkinkite „Asil“ automatiškai išvalyti naršymo duomenis po kiekvieno seanso.</string>
 
     <!-- Privacy Protection Notification -->
     <string name="privacyProtectionNotificationDefaultTitle">Mes saugome jūsų privatumą</string>
     <string name="privacyProtectionNotificationReportTitle">Jūsų privatumo ataskaita</string>
-    <string name="privacyProtectionNotificationDefaultDescription">Naudodamiesi „DuckDuckGo“ saugote savo duomenų privatumą blokuodami sekiklius ir šifruodami ryšius.</string>
-    <string name="privacyProtectionNotificationUpgadeDescription" instruction="Placeholder is a the number of connections we have protected">Apsaugokite duomenis naudojant „DuckDuckGo“, apsaugodami %1$d nešifruotus ryšius „DuckDuckGo“.</string>
-    <string name="privacyProtectionNotificationTrackerDescription" instruction="Placeholder is the numer of trackers blocked">Naudojant „DuckDuckGo“ apsaugojote duomenis blokuodami %1$d sekiklius (-ių).</string>
-    <string name="privacyProtectionNotificationBothDescription" instruction="%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections">Naudojant „DuckDuckGo“ apsaugojote duomenis blokuodami %1$d sekiklius (-ių) ir apsaugodami %2$d nešifruotus (-ų) ryšius (-ių).</string>
+    <string name="privacyProtectionNotificationDefaultDescription">Naudodamiesi „Asil“ saugote savo duomenų privatumą blokuodami sekiklius ir šifruodami ryšius.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription" instruction="Placeholder is a the number of connections we have protected">Apsaugokite duomenis naudojant „Asil“, apsaugodami %1$d nešifruotus ryšius „Asil“.</string>
+    <string name="privacyProtectionNotificationTrackerDescription" instruction="Placeholder is the numer of trackers blocked">Naudojant „Asil“ apsaugojote duomenis blokuodami %1$d sekiklius (-ių).</string>
+    <string name="privacyProtectionNotificationBothDescription" instruction="%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections">Naudojant „Asil“ apsaugojote duomenis blokuodami %1$d sekiklius (-ių) ir apsaugodami %2$d nešifruotus (-ų) ryšius (-ių).</string>
     <string name="privacyProtectionNotificationLaunchButton">Tęsti naršymą</string>
 
     <!-- Authentication -->
@@ -356,7 +356,7 @@
     <string name="authenticationDialogPasswordHint">Slaptažodis</string>
 
     <!-- User-facing label for when a user selects text and might want to search for that text -->
-    <string name="systemTextSearchMessage">Ieškoti „DuckDuckGo“</string>
+    <string name="systemTextSearchMessage">Ieškoti „Asil“</string>
 
     <!-- App feedback disambiguation -->
     <string name="feedbackActivityTitle">Bendrinti atsiliepimą</string>
@@ -375,8 +375,8 @@
     <string name="websiteNotLoadingTitleShort">Problemos kraunantis svetainei</string>
     <string name="websiteNotLoadingSubtitle">Kuri svetainė neveikia?</string>
 
-    <string name="searchNotGoodEnoughTitleLong">„DuckDuckGo“ paieška nepakankamai gera</string>
-    <string name="searchNotGoodEnoughTitleShort">Problemos paieškai naudojant „DuckDuckGo“</string>
+    <string name="searchNotGoodEnoughTitleLong">„Asil“ paieška nepakankamai gera</string>
+    <string name="searchNotGoodEnoughTitleShort">Problemos paieškai naudojant „Asil“</string>
     <string name="searchNotGoodEnoughSubtitle">Kokią paieškos funkciją galime pridėti arba patobulinti?</string>
     <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Programavimas / techninė paieška</string>
     <string name="searchNotGoodEnoughSubReasonGoogleLayout">Išdėstymas turėtų būti panašesnis į „Google“</string>
@@ -437,8 +437,8 @@
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Iš šio įrenginio</string>
     <string name="systemSearchAppNotFound">Nepavyko rasti programos</string>
-    <string name="systemSearchOnboardingText">Dėkojame, kad pasirinkote „DuckDuckGo“!\nDabar, kai naudojate mūsų paieškos funkciją ar programėlę, jūsų paieškos yra apsaugotos.</string>
-    <string name="systemSearchOnboardingFeaturesIntroText">„DuckDuckGo“ programėlė taip pat:</string>
+    <string name="systemSearchOnboardingText">Dėkojame, kad pasirinkote „Asil“!\nDabar, kai naudojate mūsų paieškos funkciją ar programėlę, jūsų paieškos yra apsaugotos.</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">„Asil“ programėlė taip pat:</string>
     <string name="systemSearchOnboardingFeatureOneText">Blokuoja nesaugias stebėjimo priemones.</string>
     <string name="systemSearchOnboardingFeatureTwoText">Priverstinis tinklalapių šifravimas.</string>
     <string name="systemSearchOnboardingFeatureThreeText">Išvalo duomenis vienu bakstelėjimu.</string>
@@ -462,12 +462,12 @@
     <string name="daxDialogAppTpRetentionSecondaryButtonText">Ne dabar</string>
 
     <!-- New Onboarding Experience -->
-    <string name="onboardingWelcomeTitle">"Sveiki atvykę į „DuckDuckGo“!"</string>
+    <string name="onboardingWelcomeTitle">"Sveiki atvykę į „Asil“!"</string>
     <string name="onboardingDaxText"><![CDATA[Internetas gali būti bauginantis.<br/><br/>Nesijaudinkite! Ieškoti ir naršyti privačiai yra lengviau, nei manote.]]></string>
     <string name="onboardingLetsDoItButton">Pasiekime tai!</string>
     <string name="daxIntroCtaText"><![CDATA[Toliau pabandykite apsilankyti viename mėgstamiausių tinklalapių! <br/><br/>Užblokuosiu sekimo įrenginius, kad jie negalėtų jūsų šnipinėti. Jei įmanoma, atnaujinsiu jūsų ryšio saugumą. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[Atlikta!<br/><br/>Įsidėmėkite: kiekvieną kartą, kai naršote su manimi, bauginantis skelbimas praranda galią. 👍]]></string>
-    <string name="daxSerpCtaText">Jūsų „DuckDuckGo“ paieškos yra anoniminės. Visada. 🙌</string>
+    <string name="daxSerpCtaText">Jūsų „Asil“ paieškos yra anoniminės. Visada. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one"><![CDATA[ ir <b>%1$d kitas</b> bandė tave stebėti. <br/><br/>Užblokavau juos!<br/><br/> ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
         <item quantity="few"><![CDATA[ ir <b>%1$d kiti</b> bandė tave stebėti. <br/><br/>Užblokavau juos!<br/><br/> ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
@@ -485,7 +485,7 @@
     <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Įspėjimas! Kadangi %1$s priklauso %2$s, negaliu neleisti jiems matyti tavo veiklos.&lt;br/&gt;&lt;br/&gt;Tačiau naršyk kartu su manimi ir aš sumažinsiu informacijos, kurią %3$s žino apie tave, kiekį užblokuodamas stebėjimo priemones kitose svetainėse.</string>
 
     <!-- Onboarding DDG Feature Options -->
-    <string name="onboardingFeatureOptionsTitle">Kas jus atvedė į „DuckDuckGo“?</string>
+    <string name="onboardingFeatureOptionsTitle">Kas jus atvedė į „Asil“?</string>
     <string name="onboardingFeatureOptionsContinue">Tęsti</string>
     <string name="onboardingFeatureOptionsSkip">Praleisti šį žingsnį</string>
     <!-- smartling.character_limit = 28 -->
@@ -586,7 +586,7 @@
     <string name="dosErrorMessage">Prisijungimas nutrauktas. Ši svetainė gali pakenkti jūsų įrenginiui.</string>
 
     <!-- Precise Location -->
-    <string name="preciseLocationSystemDialogTitle">Įgalinti įrenginio vietą „DuckDuckGo“ privatumo naršyklėje?</string>
+    <string name="preciseLocationSystemDialogTitle">Įgalinti įrenginio vietą „Asil“ privatumo naršyklėje?</string>
     <string name="preciseLocationSystemDialogSubtitle" instruction="%1$s and %2$s are both the name of the website requesting the location">%1$s prašo jūsų įrenginio vietos. Pirmiausia turėsite leisti programai siųsti jūsų įrenginio vietą, tuomet %2$s gali prašyti leidimo.</string>
     <string name="preciseLocationSystemDialogAllow">Įjungti</string>
     <string name="preciseLocationSystemDialogDeny">Galbūt vėliau</string>
@@ -598,7 +598,7 @@
     <string name="preciseLocationSiteDialogAllowOnce">Tik šiam seansui</string>
     <string name="preciseLocationSiteDialogDenyAlways">Visada atsisakyti</string>
     <string name="preciseLocationSiteDialogDenyOnce">Atsisakyti šiam seansui</string>
-    <string name="preciseLocationFeatureDescription">Svetainės, kuriose lankotės, gali prašyti jūsų įrenginio vietos. Jos negalės jo pasiekti, kol duosite leidimą. „DuckDuckGo“ jūsų vietą naudoja tik anonimiškai, kad pateiktų vietinės paieškos rezultatus.</string>
+    <string name="preciseLocationFeatureDescription">Svetainės, kuriose lankotės, gali prašyti jūsų įrenginio vietos. Jos negalės jo pasiekti, kol duosite leidimą. „Asil“ jūsų vietą naudoja tik anonimiškai, kad pateiktų vietinės paieškos rezultatus.</string>
     <string name="preciseLocationToggleText">Svetainės gali prašyti mano vietos</string>
     <string name="preciseLocationEmptyListHint">Jokios svetainės nesuteikė leidimo pasiekti vietą</string>
     <string name="preciseLocationNoSystemPermission">Norėdami tvarkyti vietos prieigos leidimus, kuriuos suteikėte atskiroms svetainėms, „Android“ nustatymuose šiai programai įjunkite vietą.</string>
@@ -614,7 +614,7 @@
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Visuotinė privatumo kontrolė (VPK)</string>
-    <string name="globalPrivacyControlDescription"><![CDATA[„DuckDuckGo“ automatiškai blokuoja daugelį stebėjimo priemonių. Pasirinkę visuotinę privatumo kontrolę (VPK), taip pat galite paprašyti dalyvaujančių svetainių apriboti jūsų asmeninių duomenų prekybą ir bendrinimą su kitomis įmonėmis. <u><a href=\"\">Sužinoti daugiau</a><u/>]]></string>
+    <string name="globalPrivacyControlDescription"><![CDATA[„Asil“ automatiškai blokuoja daugelį stebėjimo priemonių. Pasirinkę visuotinę privatumo kontrolę (VPK), taip pat galite paprašyti dalyvaujančių svetainių apriboti jūsų asmeninių duomenų prekybą ir bendrinimą su kitomis įmonėmis. <u><a href=\"\">Sužinoti daugiau</a><u/>]]></string>
     <string name="globalPrivacyControlSetting">Visuotinė privatumo kontrolė (VPK)</string>
     <string name="globalPrivacyControlToggle">Visuotinė privatumo kontrolė (VPK)</string>
     <string name="disabled">Išjungta</string>
@@ -677,14 +677,14 @@
     <string name="settingsAccessibility">Pritaikymas neįgaliems</string>
     <string name="accessibilityActivityTitle">Pritaikymas neįgaliems</string>
     <string name="accessibilityFontSizeTitle">Teksto dydis</string>
-    <string name="accessibilityFontSizeHint">Slinkite slinkiklį, kol bus patogu skaityti. „DuckDuckGo“ rodomos svetainės prisitaikys pagal šį nustatymą.</string>
+    <string name="accessibilityFontSizeHint">Slinkite slinkiklį, kol bus patogu skaityti. „Asil“ rodomos svetainės prisitaikys pagal šį nustatymą.</string>
     <string name="accessibilityForceZoomTitle">Įjunkite rankinį puslapio priartinimą</string>
     <string name="accessibilityForceZoomSubtitle">Suimkite ir priartinkite bet kurioje svetainėje, net ir tose, kur neleistų</string>
     <string name="accessibilityTextSizeOverrideTitle">Tvarkyti teksto dydį</string>
-    <string name="accessibilityTextSizeOverrideSubtitle">„DuckDuckGo“ tekstas peržiūrimose svetainėse prisitaikys atitinkamai pagal žemiau pateiktą nustatymą</string>
+    <string name="accessibilityTextSizeOverrideSubtitle">„Asil“ tekstas peržiūrimose svetainėse prisitaikys atitinkamai pagal žemiau pateiktą nustatymą</string>
 
     <!-- Privacy Policy -->
-    <string name="settingsPrivacyPolicyDuckduckgo">Privatumo politika</string>
+    <string name="settingsPrivacyPolicyAsil">Privatumo politika</string>
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded" instruction="Placeholder is the name of the widget">%1$s valdiklis pridėtas prie pagrindinio ekrano</string>
@@ -692,7 +692,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Naršykite privačiai su mūsų „Mac“ skirta programa</string>
-    <string name="macos_settings_title">„DuckDuckGo“ programa „Mac“</string>
+    <string name="macos_settings_title">„Asil“ programa „Mac“</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Atsisiuntimai</string>
@@ -754,7 +754,7 @@
     <string name="downloadsNotifyMeSubtitle">Gaukite pranešimą, kai atsisiuntimas bus baigtas.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">„DuckDuckGo“ programa „Windows“</string>
+    <string name="windows_settings_title">„Asil“ programa „Windows“</string>
     <string name="windows_settings_description">Naršykite privačiai naudodami mūsų programą, skirtą „Windows“</string>
     <string name="windows_settings_description_ready">Galima atsisiųsti</string>
     <string name="windows_settings_description_list">Jūs jau sąraše!</string>
@@ -779,7 +779,7 @@
     <string name="deleteSavedSiteConfirmationDialogDelete">Trinti</string>
 
     <!-- Private voice search -->
-    <string name="accessibilityVoiceSearchSubtitle">Adreso juostoje pridėkite privačios paieškos balsu parinktį. Garso įrašai nesaugomi ir jais su niekuo nesidalijama, įskaitant „DuckDuckGo“.</string>
+    <string name="accessibilityVoiceSearchSubtitle">Adreso juostoje pridėkite privačios paieškos balsu parinktį. Garso įrašai nesaugomi ir jais su niekuo nesidalijama, įskaitant „Asil“.</string>
     <string name="accessibilityVoiceSearchTitle">Privati paieška balsu</string>
 
     <!-- Uploading an image from the camera or choosing to use existing image -->
@@ -787,8 +787,8 @@
     <string name="imageCaptureCameraGalleryDisambiguationTitle">Įkelti vaizdą</string>
     <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Pasirinkti failą</string>
     <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Padaryti nuotrauką</string>
-    <string name="imageCaptureCameraPermissionDeniedTitle">Leisti „DuckDuckGo“ prašyti prieigos prie kameros šiame įrenginyje</string>
-    <string name="imageCaptureCameraPermissionDeniedMessage">Svetainės gali naudoti jūsų kamerą tik tada, jei leisite „DuckDuckGo“ prašyti prieigos.</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Leisti „Asil“ prašyti prieigos prie kameros šiame įrenginyje</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Svetainės gali naudoti jūsų kamerą tik tada, jei leisite „Asil“ prašyti prieigos.</string>
     <string name="imageCaptureCameraPermissionDeniedPositiveButton">Atidaryti nustatymus</string>
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Atšaukti</string>
 

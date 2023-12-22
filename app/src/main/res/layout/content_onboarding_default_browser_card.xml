@@ -35,7 +35,7 @@
             android:layout_marginStart="20dp"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
-            android:contentDescription="@string/duckDuckGoLogoDescription"
+            android:contentDescription="@string/asilLogoDescription"
             android:src="@drawable/logo_medium"
             card_view:layout_constraintBottom_toBottomOf="parent"
             card_view:layout_constraintStart_toStartOf="parent"

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2022 Asil
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -17,10 +17,10 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="appName" translatable="false">DuckDuckGo</string>
-    <string name="appDescription" translatable="false">DuckDuckGo</string>
-    <string name="duckDuckGoLogoDescription">Logotip DuckDuckGo</string>
-    <string name="duckDuckGoPrivacySimplified">Zasebnost, poenostavljeno</string>
+    <string name="appName" translatable="false">Asil</string>
+    <string name="appDescription" translatable="false">Asil</string>
+    <string name="asilLogoDescription">Logotip Asil</string>
+    <string name="asilPrivacySimplified">Zasebnost, poenostavljeno</string>
     <string name="yes">Da</string>
     <string name="no">Ne</string>
     <string name="open">Odpri</string>
@@ -28,8 +28,8 @@
     <string name="search">Iskanje</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingDefaultBrowserDescription">Vsakič obiščite Nastavitve za iskanje in brskanje z DuckDuckGo.</string>
-    <string name="onboardingDefaultBrowserTitle">Nastavi aplikacijo DuckDuckGo kot privzeto</string>
+    <string name="onboardingDefaultBrowserDescription">Vsakič obiščite Nastavitve za iskanje in brskanje z Asil.</string>
+    <string name="onboardingDefaultBrowserTitle">Nastavi aplikacijo Asil kot privzeto</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Zaslona privzetih nastavitev aplikacije ni mogoče zagnati</string>
@@ -37,7 +37,7 @@
     <string name="defaultBrowserMaybeLater">Mogoče kasneje</string>
     <string name="defaultBrowserLetsDoIt">Nastavite za privzeti brskalnik</string>
     <string name="defaultBrowserDescriptionNoDefault">Bodite pomirjeni, ko odpirate povezave.</string>
-    <string name="defaultBrowserInstructions">Izberite aplikacijo DuckDuckGo in tapnite <font color="#678fff">Vedno</font>.</string>
+    <string name="defaultBrowserInstructions">Izberite aplikacijo Asil in tapnite <font color="#678fff">Vedno</font>.</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Meni brskalnika</string>
@@ -90,11 +90,11 @@
     <!-- Opening external apps -->
     <string name="openExternalApp">Odpri zunanjo aplikacijo</string>
     <string name="launchingExternalApp">Odpri v drugi aplikaciji</string>
-    <string name="confirmOpenExternalApp">Želite zapustiti DuckDuckGo in si ogledati to vsebino?</string>
+    <string name="confirmOpenExternalApp">Želite zapustiti Asil in si ogledati to vsebino?</string>
     <string name="unableToOpenLink">Te vrste povezave ni mogoče odpreti</string>
 
     <!-- Tabs -->
-    <string name="homeTab" translatable="false">DuckDuckGo</string>
+    <string name="homeTab" translatable="false">Asil</string>
     <string name="tabActivityTitle">Zavihki</string>
     <string name="tabsMenuItem">Zavihki</string>
     <string name="newTabMenuItem">Nov zavihek</string>
@@ -122,12 +122,12 @@
     <string name="settingsHeadingAppearance">Izgled</string>
     <string name="settingsHeadingCustomize">Prilagodi</string>
     <string name="settingsHeadingAbout">O nas</string>
-    <string name="settingsAboutDuckduckgo">O DuckDuckGo</string>
+    <string name="settingsAboutAsil">O Asil</string>
     <string name="settingsVersion">Različica</string>
     <string name="leaveFeedback">Delite povratne informacije</string>
     <string name="settingsEmailProtectionTitle">Zaščita e-pošte</string>
     <string name="settingsEmailProtectionSubtitle">Blokirajte sledilnike e-pošte in skrijte svoj naslov</string>
-    <string name="settingsHeadingMore">Več od iskalnika DuckDuckGo</string>
+    <string name="settingsHeadingMore">Več od iskalnika Asil</string>
     <string name="settingsLightTheme">Luč</string>
     <string name="settingsTheme">Videz</string>
     <string name="settingsDarkTheme">Temna</string>
@@ -142,8 +142,8 @@
     <string name="settingsSubtitleNotificationsDisabled">Onemogočeno</string>
     <string name="settingsSubtitleNotificationsEnabled">Omogočeno</string>
     <string name="settingsDefaultBrowserTitle">Privzet brskalnik</string>
-    <string name="settingsDefaultBrowserSetDescription">DuckDuckGo je vaš privzeti brskalnik</string>
-    <string name="settingsDefaultBrowserNotSetDescription">Nastavite DuckDuckGo kot privzet brskalnik</string>
+    <string name="settingsDefaultBrowserSetDescription">Asil je vaš privzeti brskalnik</string>
+    <string name="settingsDefaultBrowserNotSetDescription">Nastavite Asil kot privzet brskalnik</string>
     <string name="settingsPrivateSearchTitle">zasebno iskanje</string>
     <string name="settingsPrivateSearchDescription">Privzeto omogočeno</string>
     <string name="settingsWebTrackingProtectionTitle">Zaščita pred spletnim sledenjem</string>
@@ -156,7 +156,7 @@
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">zasebno iskanje</string>
     <string name="privateSearchTitle">Zasebno iskanje je omogočeno</string>
-    <string name="privateSearchDescription">DuckDuckGo Private Search je vaš privzeti iskalnik, zato lahko po spletu iščete, ne da bi vam kdo sledil.</string>
+    <string name="privateSearchDescription">Asil Private Search je vaš privzeti iskalnik, zato lahko po spletu iščete, ne da bi vam kdo sledil.</string>
     <string name="privateSearchHeadingSearchSettings">Nastavitve iskanja</string>
     <string name="privateSearchAutocompleteToggle">Pokaži predloge za samodokončanje</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Več nastavitev iskanja</string>
@@ -167,7 +167,7 @@
     <string name="webTrackingProtectionActivityTitle">Zaščita pred spletnim sledenjem</string>
     <string name="webTrackingProtectionLearnMoreTitle">Zaščita pred spletnim sledenjem</string>
     <string name="webTrackingProtectionTitle">Zaščita spletnega sledenja je omogočena</string>
-    <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo vam nikoli ne sledi in si prizadeva čim bolj zaščititi vašo zasebnost. Nenehno vzdržujemo in razvijamo ravni zaščite, da lahko sledimo novim načinom sledenja in zagotavljamo številne zaščite, ki jih drugi brskalniki privzeto ne ponujajo. <u><a href=\"\">Več o tem</a><u/>]]></string>
+    <string name="webTrackingProtectionDescription"><![CDATA[Asil vam nikoli ne sledi in si prizadeva čim bolj zaščititi vašo zasebnost. Nenehno vzdržujemo in razvijamo ravni zaščite, da lahko sledimo novim načinom sledenja in zagotavljamo številne zaščite, ki jih drugi brskalniki privzeto ne ponujajo. <u><a href=\"\">Več o tem</a><u/>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Zaščita pred pojavnimi okni piškotkov</string>
@@ -202,9 +202,9 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Izhod iz aplikacije, neaktivnost 1 ura</string>
 
     <!-- About Activity -->
-    <string name="aboutActivityTitle">O DuckDuckGo</string>
+    <string name="aboutActivityTitle">O Asil</string>
     <string name="aboutHeader">Dobrodošli na strani Duck!</string>
-    <string name="aboutDescription">DuckDuckGo je neodvisno podjetje za zasebnost v internetu, ustanovljeno leta 2008, in je namenjeno vsem, ki so naveličani sledenja v spletu in si želijo preproste rešitve. Dokazujemo, da je v spletu mogoče zagotoviti pravo zaščito zasebnosti brez sklepanja kompromisov.\n\nBrskalnik DuckDuckGo ima funkcije, ki jih pričakujete od priljubljenega brskalnika, kot so zaznamki, zavihki, gesla in drugo, ter več kot <annotation type="privacy_protection_link">deset zmogljivih zaščit zasebnosti</annotation>, ki jih večina priljubljenih brskalnikov ne ponuja privzeto. Ta edinstveni celovit sklop zaščite zasebnosti pomaga zaščititi vaše spletne dejavnosti, od iskanja do brskanja, pošiljanja e-pošte in še več.\n\nNaša zaščita zasebnosti deluje, ne da bi se vam bilo treba spoznati na tehnične podrobnosti ali se ukvarjati z zapletenimi nastavitvami. Vse, kar morate storiti, je, da brskalnik preklopite na DuckDuckGo v vseh napravah in zasebnost bo privzeta.\n\nČe pa želite pogledati v mehanizem delovanja, lahko več informacij o delovanju zaščite zasebnosti DuckDuckGo najdete na naših <annotation type="learn_more_link">straneh s pomočjo</annotation>.</string>
+    <string name="aboutDescription">Asil je neodvisno podjetje za zasebnost v internetu, ustanovljeno leta 2008, in je namenjeno vsem, ki so naveličani sledenja v spletu in si želijo preproste rešitve. Dokazujemo, da je v spletu mogoče zagotoviti pravo zaščito zasebnosti brez sklepanja kompromisov.\n\nBrskalnik Asil ima funkcije, ki jih pričakujete od priljubljenega brskalnika, kot so zaznamki, zavihki, gesla in drugo, ter več kot <annotation type="privacy_protection_link">deset zmogljivih zaščit zasebnosti</annotation>, ki jih večina priljubljenih brskalnikov ne ponuja privzeto. Ta edinstveni celovit sklop zaščite zasebnosti pomaga zaščititi vaše spletne dejavnosti, od iskanja do brskanja, pošiljanja e-pošte in še več.\n\nNaša zaščita zasebnosti deluje, ne da bi se vam bilo treba spoznati na tehnične podrobnosti ali se ukvarjati z zapletenimi nastavitvami. Vse, kar morate storiti, je, da brskalnik preklopite na Asil v vseh napravah in zasebnost bo privzeta.\n\nČe pa želite pogledati v mehanizem delovanja, lahko več informacij o delovanju zaščite zasebnosti Asil najdete na naših <annotation type="learn_more_link">straneh s pomočjo</annotation>.</string>
     <string name="no_suggestions">Ni predlogov</string>
 
     <!-- Broken Site Activity -->
@@ -265,7 +265,7 @@
     <string name="removeAll">Odstrani vse</string>
 
     <!-- Widget -->
-    <string name="searchWidgetTextHint">Poišči DuckDuckGo</string>
+    <string name="searchWidgetTextHint">Poišči Asil</string>
 
     <!-- Favorites widget -->
     <string name="addFavoriteMenuTitleHighlighted">👋 Dodaj priljubljeno</string>
@@ -292,7 +292,7 @@
     <string name="surveyCtaLaunchButton">Izpolnite anketo</string>
     <string name="surveyCtaDismissButton">Ne, hvala</string>
     <string name="surveyActivityTitle">Uporabniška anketa</string>
-    <string name="surveyTitle">Anketa DuckDuckGo</string>
+    <string name="surveyTitle">Anketa Asil</string>
     <string name="surveyDismissContentDescription">Opustite anketo</string>
     <string name="surveyLoadingErrorTitle">O, ne!</string>
     <string name="surveyLoadingErrorText">Naša anketa se trenutno ne nalaga.\nPoskusite ponovno pozneje.</string>
@@ -307,14 +307,14 @@
     <string name="addWidgetInstruction1Label">1</string>
     <string name="addWidgetInstruction1">Dolgo pritisnite domači zaslon, nato odprite meni gradnikov.</string>
     <string name="addWidgetInstruction2Label">2</string>
-    <string name="addWidgetInstruction2">Najdite gradnik DuckDuckGo.</string>
+    <string name="addWidgetInstruction2">Najdite gradnik Asil.</string>
     <string name="addWidgetInstruction3Label">3</string>
     <string name="addWidgetInstruction3">Povlecite gradnik na domači zaslon.</string>
     <string name="addWidgetInstructionsButtonGoHome">Pojdite na domači zaslon</string>
     <string name="addWidgetInstructionsButtonClose">Zapri</string>
 
     <!-- App Enjoyment / Rating / Feedback -->
-    <string name="appEnjoymentDialogTitle">Uživate z DuckDuckGo?</string>
+    <string name="appEnjoymentDialogTitle">Uživate z Asil?</string>
     <string name="appEnjoymentDialogMessage">Zanima nas, kaj si mislite.</string>
     <string name="appEnjoymentDialogPositiveButton">Všeč mi je</string>
     <string name="appEnjoymentDialogNegativeButton">Potrebna je obdelava</string>
@@ -336,15 +336,15 @@
 
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Brisanje podatkov je nastavljeno na ročno</string>
-    <string name="clearNotificationDescription">Prilagodite DuckDuckGo na samodejno brisanje podatkov brskanja po vsaki seji.</string>
+    <string name="clearNotificationDescription">Prilagodite Asil na samodejno brisanje podatkov brskanja po vsaki seji.</string>
 
     <!-- Privacy Protection Notification -->
     <string name="privacyProtectionNotificationDefaultTitle">Varujemo vašo zasebnost</string>
     <string name="privacyProtectionNotificationReportTitle">Poročilo o vaši zasebnosti</string>
-    <string name="privacyProtectionNotificationDefaultDescription">Uporaba aplikacije DuckDuckGo ščiti vaše podatke z blokiranjem sledilnikov in šifriranjem povezav.</string>
-    <string name="privacyProtectionNotificationUpgadeDescription" instruction="Placeholder is a the number of connections we have protected">Svoje podatke ste med uporabo DuckDuckGo zaščitili z zavarovanjem %1$d nešifriranih povezav.</string>
-    <string name="privacyProtectionNotificationTrackerDescription" instruction="Placeholder is the numer of trackers blocked">Svoje podatke ste med uporabo DuckDuckGo zaščitili z blokiranjem %1$d sledilnikov.</string>
-    <string name="privacyProtectionNotificationBothDescription" instruction="%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections">Svoje podatke ste med uporabo DuckDuckGo zaščitili z blokiranjem %1$d sledilnikov in zavarovanjem %2$d nešifriranih povezav.</string>
+    <string name="privacyProtectionNotificationDefaultDescription">Uporaba aplikacije Asil ščiti vaše podatke z blokiranjem sledilnikov in šifriranjem povezav.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription" instruction="Placeholder is a the number of connections we have protected">Svoje podatke ste med uporabo Asil zaščitili z zavarovanjem %1$d nešifriranih povezav.</string>
+    <string name="privacyProtectionNotificationTrackerDescription" instruction="Placeholder is the numer of trackers blocked">Svoje podatke ste med uporabo Asil zaščitili z blokiranjem %1$d sledilnikov.</string>
+    <string name="privacyProtectionNotificationBothDescription" instruction="%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections">Svoje podatke ste med uporabo Asil zaščitili z blokiranjem %1$d sledilnikov in zavarovanjem %2$d nešifriranih povezav.</string>
     <string name="privacyProtectionNotificationLaunchButton">Nadaljuj brskanje</string>
 
     <!-- Authentication -->
@@ -356,7 +356,7 @@
     <string name="authenticationDialogPasswordHint">Geslo</string>
 
     <!-- User-facing label for when a user selects text and might want to search for that text -->
-    <string name="systemTextSearchMessage">Poišči DuckDuckGo</string>
+    <string name="systemTextSearchMessage">Poišči Asil</string>
 
     <!-- App feedback disambiguation -->
     <string name="feedbackActivityTitle">Delite povratne informacije</string>
@@ -375,8 +375,8 @@
     <string name="websiteNotLoadingTitleShort">Težave z nalaganjem spletnega mesta</string>
     <string name="websiteNotLoadingSubtitle">Katera spletna stran je poškodovana?</string>
 
-    <string name="searchNotGoodEnoughTitleLong">Iskanje DuckDuckGo ni dovolj dobro</string>
-    <string name="searchNotGoodEnoughTitleShort">Težave z iskanjem DuckDuckGo</string>
+    <string name="searchNotGoodEnoughTitleLong">Iskanje Asil ni dovolj dobro</string>
+    <string name="searchNotGoodEnoughTitleShort">Težave z iskanjem Asil</string>
     <string name="searchNotGoodEnoughSubtitle">Katero funkcijo iskanja lahko dodamo ali izboljšamo?</string>
     <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Programsko/tehnično iskanje</string>
     <string name="searchNotGoodEnoughSubReasonGoogleLayout">Postavitev bi morala biti bolj podobna Googlu</string>
@@ -437,8 +437,8 @@
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Iz te naprave</string>
     <string name="systemSearchAppNotFound">Prošnje ni bilo mogoče najti</string>
-    <string name="systemSearchOnboardingText">Hvala, ker ste izbrali DuckDuckGo!\nZdaj, ko uporabljate naše iskalnike ali aplikacijo, so vaša iskanja zaščitena.</string>
-    <string name="systemSearchOnboardingFeaturesIntroText">Tudi aplikacija DuckDuckGo:</string>
+    <string name="systemSearchOnboardingText">Hvala, ker ste izbrali Asil!\nZdaj, ko uporabljate naše iskalnike ali aplikacijo, so vaša iskanja zaščitena.</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">Tudi aplikacija Asil:</string>
     <string name="systemSearchOnboardingFeatureOneText">Blokira nevarne sledilce.</string>
     <string name="systemSearchOnboardingFeatureTwoText">Prisilno šifriranje na spletiščih.</string>
     <string name="systemSearchOnboardingFeatureThreeText">Izbriše podatke z enim dotikom.</string>
@@ -462,12 +462,12 @@
     <string name="daxDialogAppTpRetentionSecondaryButtonText">Ne zdaj</string>
 
     <!-- New Onboarding Experience -->
-    <string name="onboardingWelcomeTitle">"Dobrodošli v aplikaciji DUCKDUCKGO"</string>
+    <string name="onboardingWelcomeTitle">"Dobrodošli v aplikaciji Asil"</string>
     <string name="onboardingDaxText"><![CDATA[<br/><br/>Brez skrbi! Internet je lahko grozljiv. Iskanje in brskanje na zaseben način je lažje, kot si mislite.]]></string>
     <string name="onboardingLetsDoItButton">Dajmo se ga lotiti!</string>
     <string name="daxIntroCtaText"><![CDATA[Nato obiščite eno od svojih najljubših spletišč! <br/><br/>Blokiral bom sledilce, da vas ne bi vohunili. Prav tako bom nadgradil varnost vaše povezave. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[Uspelo vam bo!<br/><br/>Ne pozabite: vsakič, ko brskate z mano, grozljiv oglas izgubi krila. 👍]]></string>
-    <string name="daxSerpCtaText">Vaša iskanja v DuckDuckGo so anonimna. Vselej. 🙌</string>
+    <string name="daxSerpCtaText">Vaša iskanja v Asil so anonimna. Vselej. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one"><![CDATA[ in <b>%1$d drugi</b> so vas skušali zaslediti tukaj. <br/><br/>Blokiral sem jih!<br/><br/> ☝️Preverite lahko naslovno vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletišče.️]]></item>
         <item quantity="two"><![CDATA[ in <b>%1$d drugi</b> so vas skušali zaslediti tukaj. <br/><br/>Blokiral sem jih!<br/><br/> ☝️Preverite lahko naslovno vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletišče.️]]></item>
@@ -485,7 +485,7 @@
     <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Glavo gor! Ker je %1$s lastnik %2$s, mu ne moremo preprečiti, da bi videl vašo aktivnost tukaj.&lt;br/&gt;&lt;br/&gt;Toda brskaj z nami in lahko zmanjšamo količina tistega, kar %3$s ve o tebi na splošno, tako da blokiramo njihove sledilce na mnogih drugih spletnih mestih.</string>
 
     <!-- Onboarding DDG Feature Options -->
-    <string name="onboardingFeatureOptionsTitle">Zakaj ste izbrali DuckDuckGo?</string>
+    <string name="onboardingFeatureOptionsTitle">Zakaj ste izbrali Asil?</string>
     <string name="onboardingFeatureOptionsContinue">Nadaljuj</string>
     <string name="onboardingFeatureOptionsSkip">Preskoči ta korak</string>
     <!-- smartling.character_limit = 28 -->
@@ -586,7 +586,7 @@
     <string name="dosErrorMessage">Povezava prekinjena. To spletno mesto lahko škoduje vaši napravi.</string>
 
     <!-- Precise Location -->
-    <string name="preciseLocationSystemDialogTitle">Želite omogočiti lokacijo naprave za zasebnost brskalnika DuckDuckGo?</string>
+    <string name="preciseLocationSystemDialogTitle">Želite omogočiti lokacijo naprave za zasebnost brskalnika Asil?</string>
     <string name="preciseLocationSystemDialogSubtitle" instruction="%1$s and %2$s are both the name of the website requesting the location">%1$s zahteva lokacijo vaše naprave. Najprej boste morali aplikaciji dovoliti, da pošlje lokacijo vaše naprave, nato lahko %2$s zahteva dovoljenje.</string>
     <string name="preciseLocationSystemDialogAllow">Omogoči</string>
     <string name="preciseLocationSystemDialogDeny">Mogoče kasneje</string>
@@ -598,7 +598,7 @@
     <string name="preciseLocationSiteDialogAllowOnce">Samo za to sejo</string>
     <string name="preciseLocationSiteDialogDenyAlways">Vedno zavrni</string>
     <string name="preciseLocationSiteDialogDenyOnce">Zavrni za to sejo</string>
-    <string name="preciseLocationFeatureDescription">Obiskana spletna mesta bodo morda želela vedeti lokacijo tvoje naprave. Do nje ne bodo mogli dostopati, dokler ne podeliš izrecnega dovoljenja. DuckDuckGo uporablja tvojo lokacijo samo anonimno za prikaz rezultatov lokalnega iskanja.</string>
+    <string name="preciseLocationFeatureDescription">Obiskana spletna mesta bodo morda želela vedeti lokacijo tvoje naprave. Do nje ne bodo mogli dostopati, dokler ne podeliš izrecnega dovoljenja. Asil uporablja tvojo lokacijo samo anonimno za prikaz rezultatov lokalnega iskanja.</string>
     <string name="preciseLocationToggleText">Spletna mesta lahko zahtevajo mojo lokacijo</string>
     <string name="preciseLocationEmptyListHint">Nobeno spletno mesto nima dovoljenja za dostop do lokacije</string>
     <string name="preciseLocationNoSystemPermission">Če želite upravljati dovoljenja za dostop do lokacije, ki ste jih podelili posameznim spletnim mestom, omogočite lokacijo za to aplikacijo v nastavitvah za Android.</string>
@@ -614,7 +614,7 @@
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Globalni nadzor zasebnosti (GPC)</string>
-    <string name="globalPrivacyControlDescription"><![CDATA[DuckDuckGo samodejno blokira številne sledilce. Z globalnim nadzorom zasebnosti (GPC) lahko tudi od sodelujočih spletnih mest zahtevate, da omejijo prodajo ali skupno rabo vaših osebnih podatkov z drugimi podjetji. <u><a href=\"\">Več</a><u/>]]></string>
+    <string name="globalPrivacyControlDescription"><![CDATA[Asil samodejno blokira številne sledilce. Z globalnim nadzorom zasebnosti (GPC) lahko tudi od sodelujočih spletnih mest zahtevate, da omejijo prodajo ali skupno rabo vaših osebnih podatkov z drugimi podjetji. <u><a href=\"\">Več</a><u/>]]></string>
     <string name="globalPrivacyControlSetting">Globalni nadzor zasebnosti (GPC)</string>
     <string name="globalPrivacyControlToggle">Globalni nadzor zasebnosti (GPC)</string>
     <string name="disabled">Onemogočeno</string>
@@ -677,14 +677,14 @@
     <string name="settingsAccessibility">Dostopnost</string>
     <string name="accessibilityActivityTitle">Dostopnost</string>
     <string name="accessibilityFontSizeTitle">Velikost besedila</string>
-    <string name="accessibilityFontSizeHint">Povlecite drsnik, da boste besedilo lahko udobno brali. Spletna mesta, ki se prikazujejo v brskalniku DuckDuckGo, se temu prilagodijo.</string>
+    <string name="accessibilityFontSizeHint">Povlecite drsnik, da boste besedilo lahko udobno brali. Spletna mesta, ki se prikazujejo v brskalniku Asil, se temu prilagodijo.</string>
     <string name="accessibilityForceZoomTitle">Uveljavi ročno povečavo strani</string>
     <string name="accessibilityForceZoomSubtitle">Stisnite in povečajte katero koli spletno mesto, tudi tisto, ki bi to sicer preprečilo</string>
     <string name="accessibilityTextSizeOverrideTitle">Upravljaj velikost besedila</string>
-    <string name="accessibilityTextSizeOverrideSubtitle">Spletna mesta, ki se prikazujejo v brskalniku DuckDuckGo, se prilagodijo spodnjim nastavitvam</string>
+    <string name="accessibilityTextSizeOverrideSubtitle">Spletna mesta, ki se prikazujejo v brskalniku Asil, se prilagodijo spodnjim nastavitvam</string>
 
     <!-- Privacy Policy -->
-    <string name="settingsPrivacyPolicyDuckduckgo">Pravilnik o zasebnosti</string>
+    <string name="settingsPrivacyPolicyAsil">Pravilnik o zasebnosti</string>
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded" instruction="Placeholder is the name of the widget">Pripomoček %1$s je bil dodan na domači zaslon</string>
@@ -692,7 +692,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Brskajte zasebno z našo aplikacijo za računalnike Mac</string>
-    <string name="macos_settings_title">Aplikacija DuckDuckGo za računalnike Mac</string>
+    <string name="macos_settings_title">Aplikacija Asil za računalnike Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Prenosi</string>
@@ -754,7 +754,7 @@
     <string name="downloadsNotifyMeSubtitle">Prejmite obvestilo, ko so prenosi končani.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">Aplikacija DuckDuckGo za sistem Windows</string>
+    <string name="windows_settings_title">Aplikacija Asil za sistem Windows</string>
     <string name="windows_settings_description">Brskajte zasebno z našo aplikacijo za sistem Windows</string>
     <string name="windows_settings_description_ready">Na voljo za prenos</string>
     <string name="windows_settings_description_list">Na seznamu ste!</string>
@@ -779,7 +779,7 @@
     <string name="deleteSavedSiteConfirmationDialogDelete">Izbriši</string>
 
     <!-- Private voice search -->
-    <string name="accessibilityVoiceSearchSubtitle">Dodajte možnost zasebnega glasovnega iskanja v naslovno vrstico. Zvok ni shranjen ali posredovan nikomur niti DuckDuckGo.</string>
+    <string name="accessibilityVoiceSearchSubtitle">Dodajte možnost zasebnega glasovnega iskanja v naslovno vrstico. Zvok ni shranjen ali posredovan nikomur niti Asil.</string>
     <string name="accessibilityVoiceSearchTitle">Zasebno glasovno iskanje</string>
 
     <!-- Uploading an image from the camera or choosing to use existing image -->
@@ -787,8 +787,8 @@
     <string name="imageCaptureCameraGalleryDisambiguationTitle">Naložite sliko</string>
     <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Izberite datoteko</string>
     <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Posnemite fotografijo</string>
-    <string name="imageCaptureCameraPermissionDeniedTitle">Dovolite, da lahko spletno mesto DuckDuckGo zahteva dostop do kamere v tej napravi</string>
-    <string name="imageCaptureCameraPermissionDeniedMessage">Spletna mesta lahko uporabljajo vašo kamero le, če dovolite, da DuckDuckGo zaprosi za dostop.</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Dovolite, da lahko spletno mesto Asil zahteva dostop do kamere v tej napravi</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Spletna mesta lahko uporabljajo vašo kamero le, če dovolite, da Asil zaprosi za dostop.</string>
     <string name="imageCaptureCameraPermissionDeniedPositiveButton">Odpri nastavitve</string>
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Prekliči</string>
 

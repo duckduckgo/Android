@@ -58,7 +58,7 @@
                     android:layout_gravity="top|center"
                     android:layout_marginTop="@dimen/homeTabDdgLogoTopMargin"
                     android:alpha="0"
-                    android:contentDescription="@string/duckDuckGoLogoDescription"
+                    android:contentDescription="@string/asilLogoDescription"
                     android:maxWidth="180dp"
                     android:maxHeight="180dp"
                     app:srcCompat="@drawable/logo_full"

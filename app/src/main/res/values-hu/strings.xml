@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2022 Asil
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -17,10 +17,10 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="appName" translatable="false">DuckDuckGo</string>
-    <string name="appDescription" translatable="false">DuckDuckGo</string>
-    <string name="duckDuckGoLogoDescription">DuckDuckGo logó</string>
-    <string name="duckDuckGoPrivacySimplified">Adatvédelem, leegyszerűsítve</string>
+    <string name="appName" translatable="false">Asil</string>
+    <string name="appDescription" translatable="false">Asil</string>
+    <string name="asilLogoDescription">Asil logó</string>
+    <string name="asilPrivacySimplified">Adatvédelem, leegyszerűsítve</string>
     <string name="yes">Igen</string>
     <string name="no">Nem</string>
     <string name="open">Megnyitás</string>
@@ -28,7 +28,7 @@
     <string name="search">Keresés</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingDefaultBrowserDescription">A Beállítások oldalon bármikor kereshetsz és böngészhetsz a DuckDuckGo segítségével.</string>
+    <string name="onboardingDefaultBrowserDescription">A Beállítások oldalon bármikor kereshetsz és böngészhetsz a Asil segítségével.</string>
     <string name="onboardingDefaultBrowserTitle">Tedd a DuckDuckGót az alapértelmezett keresőoldaladdá</string>
 
     <!-- Default Browser -->
@@ -90,11 +90,11 @@
     <!-- Opening external apps -->
     <string name="openExternalApp">Külső alkalmazás megnyitása</string>
     <string name="launchingExternalApp">Megnyitás másik alkalmazásban</string>
-    <string name="confirmOpenExternalApp">Szeretnél kilépni a DuckDuckGo programból a tartalom megtekintéséhez?</string>
+    <string name="confirmOpenExternalApp">Szeretnél kilépni a Asil programból a tartalom megtekintéséhez?</string>
     <string name="unableToOpenLink">Az ilyen típusú hivatkozás megnyitása nem sikerült</string>
 
     <!-- Tabs -->
-    <string name="homeTab" translatable="false">DuckDuckGo</string>
+    <string name="homeTab" translatable="false">Asil</string>
     <string name="tabActivityTitle">Lapok</string>
     <string name="tabsMenuItem">Lapok</string>
     <string name="newTabMenuItem">Új lap</string>
@@ -122,7 +122,7 @@
     <string name="settingsHeadingAppearance">Megjelenés</string>
     <string name="settingsHeadingCustomize">Testreszabás</string>
     <string name="settingsHeadingAbout">További információ</string>
-    <string name="settingsAboutDuckduckgo">A DuckDuckGo névjegye</string>
+    <string name="settingsAboutAsil">A Asil névjegye</string>
     <string name="settingsVersion">Változat</string>
     <string name="leaveFeedback">Visszajelzés megosztása</string>
     <string name="settingsEmailProtectionTitle">E-mail védelem</string>
@@ -142,8 +142,8 @@
     <string name="settingsSubtitleNotificationsDisabled">Letiltva</string>
     <string name="settingsSubtitleNotificationsEnabled">Engedélyezve</string>
     <string name="settingsDefaultBrowserTitle">Alapértelmezett böngésző</string>
-    <string name="settingsDefaultBrowserSetDescription">A DuckDuckGo az alapértelmezett böngésző</string>
-    <string name="settingsDefaultBrowserNotSetDescription">Legyen a DuckDuckGo az alapértelmezett böngésző</string>
+    <string name="settingsDefaultBrowserSetDescription">A Asil az alapértelmezett böngésző</string>
+    <string name="settingsDefaultBrowserNotSetDescription">Legyen a Asil az alapértelmezett böngésző</string>
     <string name="settingsPrivateSearchTitle">privát keresés</string>
     <string name="settingsPrivateSearchDescription">Alapértelmezés szerint engedélyezve</string>
     <string name="settingsWebTrackingProtectionTitle">Webes követés elleni védelem</string>
@@ -156,7 +156,7 @@
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">privát keresés</string>
     <string name="privateSearchTitle">A Private Search engedélyezve van</string>
-    <string name="privateSearchDescription">A DuckDuckGo Private Search az alapértelmezett keresőmotor, így nyomon követés nélkül kereshetsz az interneten.</string>
+    <string name="privateSearchDescription">A Asil Private Search az alapértelmezett keresőmotor, így nyomon követés nélkül kereshetsz az interneten.</string>
     <string name="privateSearchHeadingSearchSettings">Keresési beállítások</string>
     <string name="privateSearchAutocompleteToggle">Automatikus kiegészítési javaslatok megjelenítése</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">További keresési beállítások</string>
@@ -167,7 +167,7 @@
     <string name="webTrackingProtectionActivityTitle">Webes követés elleni védelem</string>
     <string name="webTrackingProtectionLearnMoreTitle">Webes követés elleni védelem</string>
     <string name="webTrackingProtectionTitle">A webes követés elleni védelem engedélyezve van</string>
-    <string name="webTrackingProtectionDescription"><![CDATA[A DuckDuckGo soha nem követ, és igyekszünk a lehető legjobban védeni az adataid. Folyamatosan karbantartjuk és fejlesztjük a védelmi rétegeket, hogy lépést tartsunk az új követési módszerekkel, és számos olyan védelmet biztosítsunk, amelyet más böngészők nem kínálnak alapértelmezés szerint. <u><a href=\"\">További részletek</a><u/>]]></string>
+    <string name="webTrackingProtectionDescription"><![CDATA[A Asil soha nem követ, és igyekszünk a lehető legjobban védeni az adataid. Folyamatosan karbantartjuk és fejlesztjük a védelmi rétegeket, hogy lépést tartsunk az új követési módszerekkel, és számos olyan védelmet biztosítsunk, amelyet más böngészők nem kínálnak alapértelmezés szerint. <u><a href=\"\">További részletek</a><u/>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Felugró sütiablak elleni védelem</string>
@@ -204,7 +204,7 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">A DuckDuckGóról</string>
     <string name="aboutHeader">Isten hozott a Kacsa oldalon!</string>
-    <string name="aboutDescription">A 2008-ban alapított független internetes adatvédelmi cég, a DuckDuckGo egyszerű megoldást kínál azoknak, akiknek elegük van abból, hogy állandóan nyomon követik őket az interneten. Mi vagyunk annak a bizonyítéka, hogy kompromisszumok nélkül is lehet valódi online adatvédelmet biztosítani.\n\nA DuckDuckGo böngésző rendelkezik a böngészőktől elvárt funkciókkal, mint például könyvjelzők, lapok, jelszavak és egyéb funkciók, valamint több mint <annotation type="privacy_protection_link">egy tucat olyan hatékony adatvédelmi megoldással,</annotation> amelyet a legtöbb népszerű böngésző nem kínál alapértelmezés szerint. Ezek az egyedülállóan átfogó adatvédelmi megoldások segítenek megvédeni online tevékenységeid, legyen szó keresésről, böngészésről, e-mailezésről vagy sok minden másról.\n\nAdatvédelmi megoldásaink anélkül működnek, hogy bármit is tudnod kellene a technikai részletekről vagy bonyolult beállításokkal kellene foglalkoznod. Mindössze annyit kell tenned, hogy minden eszközödön a DuckDuckGo böngészőre váltasz, és máris igénybe veheted az alapértelmezés szerinti adatvédelmet.\n\nHa azonban szeretnél bepillantani a motorháztető alá is, a <annotation type="learn_more_link">súgóoldalainkon</annotation> további információkat találhatsz a DuckDuckGo adatvédelmi megoldásainak működéséről.</string>
+    <string name="aboutDescription">A 2008-ban alapított független internetes adatvédelmi cég, a Asil egyszerű megoldást kínál azoknak, akiknek elegük van abból, hogy állandóan nyomon követik őket az interneten. Mi vagyunk annak a bizonyítéka, hogy kompromisszumok nélkül is lehet valódi online adatvédelmet biztosítani.\n\nA Asil böngésző rendelkezik a böngészőktől elvárt funkciókkal, mint például könyvjelzők, lapok, jelszavak és egyéb funkciók, valamint több mint <annotation type="privacy_protection_link">egy tucat olyan hatékony adatvédelmi megoldással,</annotation> amelyet a legtöbb népszerű böngésző nem kínál alapértelmezés szerint. Ezek az egyedülállóan átfogó adatvédelmi megoldások segítenek megvédeni online tevékenységeid, legyen szó keresésről, böngészésről, e-mailezésről vagy sok minden másról.\n\nAdatvédelmi megoldásaink anélkül működnek, hogy bármit is tudnod kellene a technikai részletekről vagy bonyolult beállításokkal kellene foglalkoznod. Mindössze annyit kell tenned, hogy minden eszközödön a Asil böngészőre váltasz, és máris igénybe veheted az alapértelmezés szerinti adatvédelmet.\n\nHa azonban szeretnél bepillantani a motorháztető alá is, a <annotation type="learn_more_link">súgóoldalainkon</annotation> további információkat találhatsz a Asil adatvédelmi megoldásainak működéséről.</string>
     <string name="no_suggestions">Nincs javaslat</string>
 
     <!-- Broken Site Activity -->
@@ -265,7 +265,7 @@
     <string name="removeAll">Összes eltávolítása</string>
 
     <!-- Widget -->
-    <string name="searchWidgetTextHint">Keresés a DuckDuckGo alkalmazásban</string>
+    <string name="searchWidgetTextHint">Keresés a Asil alkalmazásban</string>
 
     <!-- Favorites widget -->
     <string name="addFavoriteMenuTitleHighlighted">👋 Kedvenc hozzáadása</string>
@@ -292,7 +292,7 @@
     <string name="surveyCtaLaunchButton">Kérdőív kitöltése</string>
     <string name="surveyCtaDismissButton">Nem, köszönöm</string>
     <string name="surveyActivityTitle">Felhasználói kérdőív</string>
-    <string name="surveyTitle">DuckDuckGo kérdőív</string>
+    <string name="surveyTitle">Asil kérdőív</string>
     <string name="surveyDismissContentDescription">Kérdőív elutasítása</string>
     <string name="surveyLoadingErrorTitle">Jaj, ne!</string>
     <string name="surveyLoadingErrorText">A kérdőívünk jelenleg nem töltődik be.\nKérjük, próbáld meg később.</string>
@@ -307,14 +307,14 @@
     <string name="addWidgetInstruction1Label">1</string>
     <string name="addWidgetInstruction1">Nyomd meg hosszan a kezdőképernyőt, majd nyisd meg a minialkalmazás menüt.</string>
     <string name="addWidgetInstruction2Label">2</string>
-    <string name="addWidgetInstruction2">Keresd meg a DuckDuckGo minialkalmazást.</string>
+    <string name="addWidgetInstruction2">Keresd meg a Asil minialkalmazást.</string>
     <string name="addWidgetInstruction3Label">3</string>
     <string name="addWidgetInstruction3">Húzd a minialkalmazást a kezdőképernyődre.</string>
     <string name="addWidgetInstructionsButtonGoHome">Ugrás a kezdőképernyőre</string>
     <string name="addWidgetInstructionsButtonClose">Bezárás</string>
 
     <!-- App Enjoyment / Rating / Feedback -->
-    <string name="appEnjoymentDialogTitle">Tetszik a DuckDuckGo?</string>
+    <string name="appEnjoymentDialogTitle">Tetszik a Asil?</string>
     <string name="appEnjoymentDialogMessage">Szeretnénk hallani a véleményed.</string>
     <string name="appEnjoymentDialogPositiveButton">Tetszik</string>
     <string name="appEnjoymentDialogNegativeButton">Még javításra szorul</string>
@@ -336,15 +336,15 @@
 
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Adattörlés manuálisra állítva</string>
-    <string name="clearNotificationDescription">A DuckDuckGo testreszabása a böngészési adatok automatikus törlésére minden munkamenet után.</string>
+    <string name="clearNotificationDescription">A Asil testreszabása a böngészési adatok automatikus törlésére minden munkamenet után.</string>
 
     <!-- Privacy Protection Notification -->
     <string name="privacyProtectionNotificationDefaultTitle">Védjük az adataidat</string>
     <string name="privacyProtectionNotificationReportTitle">Adatvédelmi jelentésed</string>
-    <string name="privacyProtectionNotificationDefaultDescription">A DuckDuckGo alkalmazás a nyomkövetők letiltásával és a kapcsolatok titkosításával védi adataidat.</string>
-    <string name="privacyProtectionNotificationUpgadeDescription" instruction="Placeholder is a the number of connections we have protected">A DuckDuckGo használata során %1$d titkosítatlan kapcsolat biztosításával védted az adataidat.</string>
-    <string name="privacyProtectionNotificationTrackerDescription" instruction="Placeholder is the numer of trackers blocked">A DuckDuckGo használata során %1$d nyomkövető letiltásával védted az adataidat.</string>
-    <string name="privacyProtectionNotificationBothDescription" instruction="%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections">A DuckDuckGo használata során %1$d nyomkövető letiltásával és %2$d titkosítatlan kapcsolat biztosításával védted az adataidat.</string>
+    <string name="privacyProtectionNotificationDefaultDescription">A Asil alkalmazás a nyomkövetők letiltásával és a kapcsolatok titkosításával védi adataidat.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription" instruction="Placeholder is a the number of connections we have protected">A Asil használata során %1$d titkosítatlan kapcsolat biztosításával védted az adataidat.</string>
+    <string name="privacyProtectionNotificationTrackerDescription" instruction="Placeholder is the numer of trackers blocked">A Asil használata során %1$d nyomkövető letiltásával védted az adataidat.</string>
+    <string name="privacyProtectionNotificationBothDescription" instruction="%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections">A Asil használata során %1$d nyomkövető letiltásával és %2$d titkosítatlan kapcsolat biztosításával védted az adataidat.</string>
     <string name="privacyProtectionNotificationLaunchButton">Böngészés folytatása</string>
 
     <!-- Authentication -->
@@ -356,7 +356,7 @@
     <string name="authenticationDialogPasswordHint">Jelszó</string>
 
     <!-- User-facing label for when a user selects text and might want to search for that text -->
-    <string name="systemTextSearchMessage">Keresés a DuckDuckGo alkalmazásban</string>
+    <string name="systemTextSearchMessage">Keresés a Asil alkalmazásban</string>
 
     <!-- App feedback disambiguation -->
     <string name="feedbackActivityTitle">Visszajelzés megosztása</string>
@@ -375,8 +375,8 @@
     <string name="websiteNotLoadingTitleShort">Weboldal betöltésével kapcsolatos problémák</string>
     <string name="websiteNotLoadingSubtitle">Melyik weboldal nem működik?</string>
 
-    <string name="searchNotGoodEnoughTitleLong">A DuckDuckGo keresés nem elég jó</string>
-    <string name="searchNotGoodEnoughTitleShort">DuckDuckGo keresési problémák</string>
+    <string name="searchNotGoodEnoughTitleLong">A Asil keresés nem elég jó</string>
+    <string name="searchNotGoodEnoughTitleShort">Asil keresési problémák</string>
     <string name="searchNotGoodEnoughSubtitle">Melyik keresési funkciót vezessük be vagy javítsuk?</string>
     <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Programozás/műszaki keresés</string>
     <string name="searchNotGoodEnoughSubReasonGoogleLayout">Az elrendezés hasonlítson jobban a Google elrendezéséhez</string>
@@ -437,8 +437,8 @@
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Ebből az eszközből</string>
     <string name="systemSearchAppNotFound">Az alkalmazás nem található</string>
-    <string name="systemSearchOnboardingText">Köszönjük, hogy a DuckDuckGo-t választottad!\nMost, amikor a mi keresésünket vagy az alkalmazásunkat használod, a kereséseid védettek.</string>
-    <string name="systemSearchOnboardingFeaturesIntroText">A DuckDuckGo alkalmazás is:</string>
+    <string name="systemSearchOnboardingText">Köszönjük, hogy a Asil-t választottad!\nMost, amikor a mi keresésünket vagy az alkalmazásunkat használod, a kereséseid védettek.</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">A Asil alkalmazás is:</string>
     <string name="systemSearchOnboardingFeatureOneText">Blokkolja a nem biztonságos nyomkövetőket.</string>
     <string name="systemSearchOnboardingFeatureTwoText">Kikényszeríti a webhelyeken a titkosítást.</string>
     <string name="systemSearchOnboardingFeatureThreeText">Egyetlen érintéssel törli az adatokat.</string>
@@ -462,12 +462,12 @@
     <string name="daxDialogAppTpRetentionSecondaryButtonText">Most nem</string>
 
     <!-- New Onboarding Experience -->
-    <string name="onboardingWelcomeTitle">"Üdvözlünk a DuckDuckGo-ban!"</string>
+    <string name="onboardingWelcomeTitle">"Üdvözlünk a Asil-ban!"</string>
     <string name="onboardingDaxText"><![CDATA[Az internet néha hátborzongató.<br/><br/>Ne aggódj! A magánjellegű keresés és böngészés könnyebb, mint gondolnád.]]></string>
     <string name="onboardingLetsDoItButton">Rajta, csináljuk!</string>
     <string name="daxIntroCtaText"><![CDATA[A következő lépésben látogasd meg az egyik kedvenc webhelyed! <br/><br/>Én blokkolom a nyomkövetőket, hogy ne tudjanak kémkedni. Ha lehet, a kapcsolat biztonságát is javítom. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[Megvan, ez az!<br/><br/>Ne feledd: minden alkalommal, amikor velem végzed a böngészést, egy hátborzongató hirdetés elveszíti az erejét. 👍]]></string>
-    <string name="daxSerpCtaText">A DuckDuckGo keresései névtelenek. Mindig. 🙌</string>
+    <string name="daxSerpCtaText">A Asil keresései névtelenek. Mindig. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one"><![CDATA[ és <b>%1$d másik</b> itt próbált meg követni. <br/><br/>Blokkoltam őket!<br/><br/> ☝️Ellenőrizheted a címsort, hogy megtudd, ki próbál meg követni, amikor új webhelyre látogatsz.]]></item>
         <item quantity="other"><![CDATA[ és <b>%1$d másik</b> itt próbált meg követni. <br/><br/>Blokkoltam őket!<br/><br/> ☝️Ellenőrizheted a címsort, hogy megtudd, ki próbál meg követni, amikor új webhelyre látogatsz.]]></item>
@@ -582,7 +582,7 @@
     <string name="dosErrorMessage">Kapcsolat megszakadt. Ez a weboldal káros lehet az eszközödre.</string>
 
     <!-- Precise Location -->
-    <string name="preciseLocationSystemDialogTitle">Engedélyezed az eszköz helyének elérését a DuckDuckGo adatvédelmi böngésző számára?</string>
+    <string name="preciseLocationSystemDialogTitle">Engedélyezed az eszköz helyének elérését a Asil adatvédelmi böngésző számára?</string>
     <string name="preciseLocationSystemDialogSubtitle" instruction="%1$s and %2$s are both the name of the website requesting the location">%1$s az eszközöd helyét kéri. Először engedélyezned kell az alkalmazás számára, hogy elküldje az eszközöd helyét, majd a %2$s engedélyt kérhet.</string>
     <string name="preciseLocationSystemDialogAllow">Engedélyezés</string>
     <string name="preciseLocationSystemDialogDeny">Talán később</string>
@@ -594,7 +594,7 @@
     <string name="preciseLocationSiteDialogAllowOnce">Csak erre a munkamenetre</string>
     <string name="preciseLocationSiteDialogDenyAlways">Mindig megtagad</string>
     <string name="preciseLocationSiteDialogDenyOnce">Megtagad erre a munkamenetre</string>
-    <string name="preciseLocationFeatureDescription">A felkeresett webhelyek hozzáférést kérhetnek az eszközöd helyadataihoz. Addig nem férhetnek hozzá, amíg kifejezetten nem adsz engedélyt. A DuckDuckGo csak névtelenül használja a helyadataidat a helyi keresési eredmények megadásához.</string>
+    <string name="preciseLocationFeatureDescription">A felkeresett webhelyek hozzáférést kérhetnek az eszközöd helyadataihoz. Addig nem férhetnek hozzá, amíg kifejezetten nem adsz engedélyt. A Asil csak névtelenül használja a helyadataidat a helyi keresési eredmények megadásához.</string>
     <string name="preciseLocationToggleText">A webhelyek kérhetik a tartózkodási helyemet</string>
     <string name="preciseLocationEmptyListHint">Egyetlen webhely sem kapott helyhozzáférési engedélyt</string>
     <string name="preciseLocationNoSystemPermission">Az egyes webhelyek számára megadott helyhozzáférési engedélyek kezeléséhez engedélyezd a helyet az alkalmazás számára az Android beállításokban.</string>
@@ -610,7 +610,7 @@
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Nemzetközi adatvédelmi szabályozás (Global Privacy Control, GPC)</string>
-    <string name="globalPrivacyControlDescription"><![CDATA[A DuckDuckGo számos nyomkövetőt automatikusan blokkol. A Global Privacy Control (GPC, Globális Adatvédelmi Ellenőrzés) segítségével arra is megkérheted a részt vevő webhelyeket, hogy korlátozzák személyes adataid eladását vagy megosztását más vállalatokkal. <u><a href=\"\">További részletek</a><u/>]]></string>
+    <string name="globalPrivacyControlDescription"><![CDATA[A Asil számos nyomkövetőt automatikusan blokkol. A Global Privacy Control (GPC, Globális Adatvédelmi Ellenőrzés) segítségével arra is megkérheted a részt vevő webhelyeket, hogy korlátozzák személyes adataid eladását vagy megosztását más vállalatokkal. <u><a href=\"\">További részletek</a><u/>]]></string>
     <string name="globalPrivacyControlSetting">Nemzetközi adatvédelmi szabályozás (Global Privacy Control, GPC)</string>
     <string name="globalPrivacyControlToggle">Nemzetközi adatvédelmi szabályozás (Global Privacy Control, GPC)</string>
     <string name="disabled">Letiltva</string>
@@ -669,14 +669,14 @@
     <string name="settingsAccessibility">Kisegítő lehetőségek</string>
     <string name="accessibilityActivityTitle">Kisegítő lehetőségek</string>
     <string name="accessibilityFontSizeTitle">Szövegméret</string>
-    <string name="accessibilityFontSizeHint">Húzd el addig a csúszkát, amíg ezt kényelmesen el nem tudod olvasni. A DuckDuckGo ennek használatával jeleníti meg a webhelyeket.</string>
+    <string name="accessibilityFontSizeHint">Húzd el addig a csúszkát, amíg ezt kényelmesen el nem tudod olvasni. A Asil ennek használatával jeleníti meg a webhelyeket.</string>
     <string name="accessibilityForceZoomTitle">Kézi oldalnagyítás kényszerítése</string>
     <string name="accessibilityForceZoomSubtitle">Használd bármelyik webhelyen a csippentést és nagyítást, még azokon is, amelyek ezt egyébként megakadályozzák</string>
     <string name="accessibilityTextSizeOverrideTitle">Szövegméret kezelése</string>
-    <string name="accessibilityTextSizeOverrideSubtitle">A DuckDuckGo alkalmazásban megtekintett webhelyek szövege az alábbi beállításhoz igazodik</string>
+    <string name="accessibilityTextSizeOverrideSubtitle">A Asil alkalmazásban megtekintett webhelyek szövege az alábbi beállításhoz igazodik</string>
 
     <!-- Privacy Policy -->
-    <string name="settingsPrivacyPolicyDuckduckgo">Adatvédelmi szabályzat</string>
+    <string name="settingsPrivacyPolicyAsil">Adatvédelmi szabályzat</string>
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded" instruction="Placeholder is the name of the widget">%1$s minialkalmazás hozzáadva a kezdőképernyőhöz</string>
@@ -684,7 +684,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Privát böngészés Maces alkalmazásunkkal</string>
-    <string name="macos_settings_title">DuckDuckGo Mac alkalmazás</string>
+    <string name="macos_settings_title">Asil Mac alkalmazás</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Letöltések</string>
@@ -746,7 +746,7 @@
     <string name="downloadsNotifyMeSubtitle">Értesítés a letöltések befejeződésekor.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">DuckDuckGo Windows alkalmazás</string>
+    <string name="windows_settings_title">Asil Windows alkalmazás</string>
     <string name="windows_settings_description">Privát böngészés windowsos alkalmazásunkkal</string>
     <string name="windows_settings_description_ready">Letöltés elérhető</string>
     <string name="windows_settings_description_list">Rajta vagy a listán!</string>
@@ -779,8 +779,8 @@
     <string name="imageCaptureCameraGalleryDisambiguationTitle">Kép feltöltése</string>
     <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Fájl kiválasztása</string>
     <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Fénykép készítése</string>
-    <string name="imageCaptureCameraPermissionDeniedTitle">Engedélyezés, hogy a DuckDuckGo hozzáférést kérjen a kamerához ezen az eszközön</string>
-    <string name="imageCaptureCameraPermissionDeniedMessage">A webhelyek csak akkor használhatják a kamerát, ha engedélyezed, hogy a DuckDuckGo hozzáférést kérjen.</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Engedélyezés, hogy a Asil hozzáférést kérjen a kamerához ezen az eszközön</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">A webhelyek csak akkor használhatják a kamerát, ha engedélyezed, hogy a Asil hozzáférést kérjen.</string>
     <string name="imageCaptureCameraPermissionDeniedPositiveButton">Beállítások megnyitása</string>
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Mégsem</string>
 

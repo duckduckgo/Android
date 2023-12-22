@@ -45,9 +45,9 @@ import com.duckduckgo.mobile.android.R.attr
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetPWaitlistInvitedScreenNoParams
 import com.google.android.material.snackbar.Snackbar
-import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(AboutScreenNoParams::class)
@@ -210,7 +210,7 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
             this,
             WebViewActivityWithParams(
                 url = PRIVACY_POLICY_WEB_LINK,
-                screenTitle = getString(R.string.settingsPrivacyPolicyDuckduckgo),
+                screenTitle = getString(R.string.settingsPrivacyPolicyAsil),
             ),
         )
     }
@@ -220,7 +220,7 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
             this,
             WebViewActivityWithParams(
                 url = PRIVACY_PROTECTIONS_WEB_LINK,
-                screenTitle = getString(R.string.settingsAboutDuckduckgo),
+                screenTitle = getString(R.string.settingsAboutAsil),
             ),
         )
     }
