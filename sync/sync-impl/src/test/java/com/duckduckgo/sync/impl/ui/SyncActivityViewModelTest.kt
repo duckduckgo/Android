@@ -150,7 +150,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenSyncWithAnoterDeviceThenEmitCommandSyncWithAnotherDevice() = runTest {
+    fun whenSyncWithAnotherDeviceThenEmitCommandSyncWithAnotherDevice() = runTest {
         testee.onSyncWithAnotherDevice()
 
         testee.commands().test {

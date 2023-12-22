@@ -29,6 +29,7 @@ import com.duckduckgo.sync.impl.R.string
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.LoginSuccess
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ReadTextCode
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ShowMessage
@@ -48,6 +49,7 @@ class SyncConnectViewModel @Inject constructor(
     private val syncAccountRepository: SyncAccountRepository,
     private val qrEncoder: QREncoder,
     private val clipboard: Clipboard,
+    private val syncPixels: SyncPixels,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -66,6 +68,7 @@ class SyncConnectViewModel @Inject constructor(
                 delay(POLLING_INTERVAL)
                 when (syncAccountRepository.pollConnectionKeys()) {
                     is Success -> {
+                        syncPixels.fireSignupConnectPixel()
                         command.send(LoginSuccess)
                         polling = false
                     }
@@ -131,13 +134,17 @@ class SyncConnectViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             when (syncAccountRepository.processCode(qrCode)) {
                 is Error -> command.send(Command.Error)
-                is Success -> command.send(LoginSuccess)
+                is Success -> {
+                    syncPixels.fireLoginPixel()
+                    command.send(LoginSuccess)
+                }
             }
         }
     }
 
     fun onLoginSuccess() {
         viewModelScope.launch {
+            syncPixels.fireLoginPixel()
             command.send(LoginSuccess)
         }
     }
