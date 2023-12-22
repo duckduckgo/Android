@@ -19,13 +19,15 @@ package com.duckduckgo.networkprotection.subscription
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.api.Subscriptions
+import com.duckduckgo.subscriptions.api.Subscriptions.EntitlementStatus.Found
+import com.duckduckgo.subscriptions.api.Subscriptions.EntitlementStatus.NotFound
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
 
 interface NetpSubscriptionManager {
     suspend fun getToken(): String?
-    suspend fun hasValidEntitlement(): Boolean
+    suspend fun hasValidEntitlement(): Result<Boolean>
 }
 
 @ContributesBinding(AppScope::class)
@@ -37,8 +39,14 @@ class RealNetpSubscriptionManager @Inject constructor(
         subscriptions.getAccessToken()
     }
 
-    override suspend fun hasValidEntitlement(): Boolean = withContext(dispatcherProvider.io()) {
-        subscriptions.hasEntitlement(NETP_ENTITLEMENT)
+    override suspend fun hasValidEntitlement(): Result<Boolean> = withContext(dispatcherProvider.io()) {
+        subscriptions.getEntitlementStatus(NETP_ENTITLEMENT).run {
+            if (isSuccess) {
+                Result.success(getOrDefault(NotFound) == Found)
+            } else {
+                Result.failure(this.exceptionOrNull() ?: RuntimeException())
+            }
+        }
     }
 
     companion object {
