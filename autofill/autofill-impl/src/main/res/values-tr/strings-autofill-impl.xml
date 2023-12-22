@@ -116,7 +116,7 @@
     <string name="autofillManagementScreenTitle">Şifreler</string>
     <string name="credentialManagementNoLoginsSavedTitle">Henüz şifre kaydedilmedi</string>
     <string name="credentialManagementAutofillToggleLabel">Şifreleri kaydedin ve otomatik doldurun</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Şifreler cihazınızda güvenli bir şekilde saklanır.</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Şifreler cihazınızda güvenli bir şekilde saklanır</string>
     <string name="saveLoginDialogSubtitle">Şifreler cihazınızda güvenli bir şekilde saklanır.</string>
     <string name="autofillManagementAddLogin">Şifre Ekle</string>
     <string name="credentialManagementEditLoginTitleHint">Title</string>

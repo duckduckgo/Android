@@ -116,7 +116,7 @@
     <string name="autofillManagementScreenTitle">Κωδικοί πρόσβασης</string>
     <string name="credentialManagementNoLoginsSavedTitle">Δεν έχουν αποθηκευτεί ακόμα κωδικοί πρόσβασης</string>
     <string name="credentialManagementAutofillToggleLabel">Αποθήκευση και αυτόματη συμπλήρωση κωδικών πρόσβασης</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Οι κωδικοί πρόσβασης αποθηκεύονται με ασφάλεια στη συσκευή σας.</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Οι κωδικοί πρόσβασης αποθηκεύονται με ασφάλεια στη συσκευή σας</string>
     <string name="saveLoginDialogSubtitle">Οι κωδικοί πρόσβασης αποθηκεύονται με ασφάλεια στη συσκευή σας.</string>
     <string name="autofillManagementAddLogin">Προσθήκη κωδικού πρόσβασης</string>
     <string name="credentialManagementEditLoginTitleHint">Τίτλος</string>

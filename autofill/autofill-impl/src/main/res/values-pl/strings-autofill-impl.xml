@@ -116,7 +116,7 @@
     <string name="autofillManagementScreenTitle">Hasła</string>
     <string name="credentialManagementNoLoginsSavedTitle">Nie zapisano jeszcze żadnych haseł</string>
     <string name="credentialManagementAutofillToggleLabel">Zapisuj i automatycznie uzupełniaj hasła</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Hasła są bezpiecznie przechowywane na Twoim urządzeniu.</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Hasła są bezpiecznie przechowywane na Twoim urządzeniu</string>
     <string name="saveLoginDialogSubtitle">Hasła są bezpiecznie przechowywane na Twoim urządzeniu.</string>
     <string name="autofillManagementAddLogin">Dodaj hasło</string>
     <string name="credentialManagementEditLoginTitleHint">Tytuł</string>

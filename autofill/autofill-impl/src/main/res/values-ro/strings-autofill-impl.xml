@@ -116,7 +116,7 @@
     <string name="autofillManagementScreenTitle">Parole</string>
     <string name="credentialManagementNoLoginsSavedTitle">Nici o parolă nu a fost salvată încă</string>
     <string name="credentialManagementAutofillToggleLabel">Salvează și completează automat parolele</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Parolele sunt stocate în siguranță pe dispozitivul tău.</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Parolele sunt stocate în siguranță pe dispozitivul tău</string>
     <string name="saveLoginDialogSubtitle">Parolele sunt stocate în siguranță pe dispozitivul tău.</string>
     <string name="autofillManagementAddLogin">Adaugă parola</string>
     <string name="credentialManagementEditLoginTitleHint">Titlu</string>

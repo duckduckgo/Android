@@ -116,7 +116,7 @@
     <string name="autofillManagementScreenTitle">Wachtwoorden</string>
     <string name="credentialManagementNoLoginsSavedTitle">Nog geen wachtwoorden opgeslagen</string>
     <string name="credentialManagementAutofillToggleLabel">Wachtwoorden opslaan en automatisch invullen</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Wachtwoorden worden veilig opgeslagen op je apparaat.</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Wachtwoorden worden veilig opgeslagen op je apparaat</string>
     <string name="saveLoginDialogSubtitle">Wachtwoorden worden veilig opgeslagen op je apparaat.</string>
     <string name="autofillManagementAddLogin">Wachtwoord toevoegen</string>
     <string name="credentialManagementEditLoginTitleHint">Titel</string>

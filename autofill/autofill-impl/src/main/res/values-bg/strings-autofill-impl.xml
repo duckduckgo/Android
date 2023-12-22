@@ -116,7 +116,7 @@
     <string name="autofillManagementScreenTitle">Пароли</string>
     <string name="credentialManagementNoLoginsSavedTitle">Все още няма запазени пароли</string>
     <string name="credentialManagementAutofillToggleLabel">Запазване и автоматично попълване на паролите</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Паролите се съхраняват сигурно на Вашето устройство.</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Паролите се съхраняват сигурно на Вашето устройство</string>
     <string name="saveLoginDialogSubtitle">Паролите се съхраняват сигурно на Вашето устройство.</string>
     <string name="autofillManagementAddLogin">Добавяне на парола</string>
     <string name="credentialManagementEditLoginTitleHint">Заглавие</string>

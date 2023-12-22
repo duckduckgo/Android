@@ -116,7 +116,7 @@
     <string name="autofillManagementScreenTitle">Paroolid</string>
     <string name="credentialManagementNoLoginsSavedTitle">Paroole ei ole veel salvestatud</string>
     <string name="credentialManagementAutofillToggleLabel">Paroolide salvestamine ja automaatne sisestamine</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Paroolid salvestatakse turvaliselt sinu seadmesse.</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Paroole hoitakse turvaliselt sinu seadmes</string>
     <string name="saveLoginDialogSubtitle">Paroolid salvestatakse turvaliselt sinu seadmesse.</string>
     <string name="autofillManagementAddLogin">Parooli lisamine</string>
     <string name="credentialManagementEditLoginTitleHint">Pealkiri</string>

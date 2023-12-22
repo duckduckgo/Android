@@ -116,7 +116,7 @@
     <string name="autofillManagementScreenTitle">Jelszavak</string>
     <string name="credentialManagementNoLoginsSavedTitle">Még nincsenek mentett jelszavak</string>
     <string name="credentialManagementAutofillToggleLabel">Jelszavak mentése és automatikus kitöltése</string>
-    <string name="credentialManagementAutofillToggleSubtitle">A jelszavakat az eszközöd biztonságosan tárolja.</string>
+    <string name="credentialManagementAutofillToggleSubtitle">A jelszavakat az eszközöd biztonságosan tárolja</string>
     <string name="saveLoginDialogSubtitle">A jelszavakat az eszközöd biztonságosan tárolja.</string>
     <string name="autofillManagementAddLogin">Jelszó hozzáadása</string>
     <string name="credentialManagementEditLoginTitleHint">Cím</string>

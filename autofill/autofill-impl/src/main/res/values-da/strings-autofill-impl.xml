@@ -116,7 +116,7 @@
     <string name="autofillManagementScreenTitle">Adgangskoder</string>
     <string name="credentialManagementNoLoginsSavedTitle">Ingen adgangskoder gemt endnu</string>
     <string name="credentialManagementAutofillToggleLabel">Gem og udfyld adgangskoder automatisk</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Adgangskoder gemmes sikkert på din enhed.</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Adgangskoder gemmes sikkert på din enhed</string>
     <string name="saveLoginDialogSubtitle">Adgangskoder gemmes sikkert på din enhed.</string>
     <string name="autofillManagementAddLogin">Tilføj adgangskode</string>
     <string name="credentialManagementEditLoginTitleHint">Titel</string>

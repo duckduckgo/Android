@@ -116,7 +116,7 @@
     <string name="autofillManagementScreenTitle">Paroles</string>
     <string name="credentialManagementNoLoginsSavedTitle">Vēl nav saglabāta neviena parole</string>
     <string name="credentialManagementAutofillToggleLabel">Saglabāt un automātiski aizpildīt paroles</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Paroles tiek droši glabātas tavā ierīcē.</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Paroles tiek droši glabātas tavā ierīcē</string>
     <string name="saveLoginDialogSubtitle">Paroles tiek droši glabātas tavā ierīcē.</string>
     <string name="autofillManagementAddLogin">Pievienot paroli</string>
     <string name="credentialManagementEditLoginTitleHint">Nosaukums</string>

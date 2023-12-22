@@ -116,7 +116,7 @@
     <string name="autofillManagementScreenTitle">Hesla</string>
     <string name="credentialManagementNoLoginsSavedTitle">Zatím nemáš uložená žádná hesla</string>
     <string name="credentialManagementAutofillToggleLabel">Ukládání a automatické vyplňování hesel</string>
-    <string name="credentialManagementAutofillToggleSubtitle">Hesla se bezpečně ukládají do tvého zařízení.</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Hesla se bezpečně ukládají do tvého zařízení</string>
     <string name="saveLoginDialogSubtitle">Hesla se bezpečně ukládají do tvého zařízení.</string>
     <string name="autofillManagementAddLogin">Přidat heslo</string>
     <string name="credentialManagementEditLoginTitleHint">Název</string>
