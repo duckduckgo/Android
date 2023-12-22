@@ -120,7 +120,6 @@ class NetpSubscriptionCheckWorker(
                     }
                 } else {
                     logcat { "Sub check: failed checking entitlement" }
-                    // Call has failed we want to be able to run the check again.
                     return Result.failure()
                 }
             }
