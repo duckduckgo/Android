@@ -55,7 +55,7 @@ class ConnectionClassManager @Inject constructor(
 
             if (initiateStateChange) {
                 sampleCounter += 1
-                if (getConnectionQuality() != currentConnectionQuality.get()) {
+                if (getConnectionQuality() != nextConnectionQuality.get()) {
                     initiateStateChange = false
                     sampleCounter = 1
                 }
@@ -71,6 +71,7 @@ class ConnectionClassManager @Inject constructor(
                 currentConnectionQuality.get().isUnknown()
             ) {
                 initiateStateChange = true
+                nextConnectionQuality.set(getConnectionQuality())
             }
         } finally {
             mutex.unlock()
