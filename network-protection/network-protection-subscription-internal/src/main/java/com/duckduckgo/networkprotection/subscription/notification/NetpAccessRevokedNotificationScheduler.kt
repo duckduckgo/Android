@@ -37,6 +37,7 @@ class NetpAccessRevokedNotificationScheduler @Inject constructor(
     private val networkProtectionRepository: NetworkProtectionRepository,
     private val networkProtectionState: NetworkProtectionState,
     private val dispatcherProvider: DispatcherProvider,
+    private val netpAccessRevokedNotificationBuilder: NetpAccessRevokedNotificationBuilder,
 ) : VpnServiceCallbacks {
     override fun onVpnStarted(coroutineScope: CoroutineScope) {}
 
@@ -50,7 +51,7 @@ class NetpAccessRevokedNotificationScheduler @Inject constructor(
         if (networkProtectionRepository.vpnAccessRevoked) {
             notificationManager.notify(
                 NetPDisabledNotificationScheduler.NETP_REMINDER_NOTIFICATION_ID,
-                buildVpnAccessRevokedNotification(context),
+                netpAccessRevokedNotificationBuilder.buildVpnAccessRevokedNotification(context),
             )
             coroutineScope.launch(dispatcherProvider.io()) {
                 // This is to clear the registered features and remove NetP
