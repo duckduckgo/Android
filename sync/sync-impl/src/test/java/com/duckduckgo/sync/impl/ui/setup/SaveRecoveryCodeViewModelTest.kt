@@ -19,12 +19,10 @@ package com.duckduckgo.sync.impl.ui.setup
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.sync.TestSyncFixtures
 import com.duckduckgo.sync.TestSyncFixtures.accountCreatedFailInvalid
 import com.duckduckgo.sync.TestSyncFixtures.jsonRecoveryKeyEncoded
 import com.duckduckgo.sync.TestSyncFixtures.pdfFile
 import com.duckduckgo.sync.impl.Clipboard
-import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.RecoveryCodePDF
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncAccountRepository
@@ -50,13 +48,11 @@ class SaveRecoveryCodeViewModelTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    private val qrEncoder: QREncoder = mock()
     private val recoveryPDF: RecoveryCodePDF = mock()
     private val syncAccountRepository: SyncAccountRepository = mock()
     private val clipboard: Clipboard = mock()
 
     private val testee = SaveRecoveryCodeViewModel(
-        qrEncoder,
         recoveryPDF,
         syncAccountRepository,
         clipboard,
@@ -68,8 +64,6 @@ class SaveRecoveryCodeViewModelTest {
         whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
         whenever(syncAccountRepository.createAccount()).thenReturn(Result.Success(true))
         whenever(syncAccountRepository.getRecoveryCode()).thenReturn(jsonRecoveryKeyEncoded)
-        val bitmap = TestSyncFixtures.qrBitmap()
-        whenever(qrEncoder.encodeAsBitmap(eq(jsonRecoveryKeyEncoded), any(), any())).thenReturn(bitmap)
 
         testee.viewState().test {
             val viewState = awaitItem()
@@ -82,8 +76,6 @@ class SaveRecoveryCodeViewModelTest {
     fun whenUserSignedInThenShowViewState() = runTest {
         whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
         whenever(syncAccountRepository.getRecoveryCode()).thenReturn(jsonRecoveryKeyEncoded)
-        val bitmap = TestSyncFixtures.qrBitmap()
-        whenever(qrEncoder.encodeAsBitmap(eq(jsonRecoveryKeyEncoded), any(), any())).thenReturn(bitmap)
 
         testee.viewState().test {
             val viewState = awaitItem()
