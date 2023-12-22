@@ -17,6 +17,7 @@
 package com.duckduckgo.networkprotection.subscription
 
 import android.content.Context
+import androidx.work.BackoffPolicy
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
@@ -73,6 +74,7 @@ class NetpSubscriptionChecker @Inject constructor(
                 .setConstraints(
                     Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build(),
                 )
+                .setBackoffCriteria(BackoffPolicy.LINEAR, 10, MINUTES)
                 .build().run {
                     workManager.enqueueUniquePeriodicWork(
                         TAG_WORKER_NETP_SUBS_CHECK,
