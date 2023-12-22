@@ -239,7 +239,11 @@ open class TestToggle(
 }
 
 class TestSharedPrefsProvider(val context: Context) : SharedPrefsProvider {
-    override fun getSharedPrefs(fileName: String): SharedPreferences? {
+    override fun getEncryptedSharedPrefs(fileName: String): SharedPreferences? {
+        return context.getSharedPreferences(fileName, Context.MODE_PRIVATE)
+    }
+
+    override fun getSharedPrefs(fileName: String): SharedPreferences {
         return context.getSharedPreferences(fileName, Context.MODE_PRIVATE)
     }
 }
