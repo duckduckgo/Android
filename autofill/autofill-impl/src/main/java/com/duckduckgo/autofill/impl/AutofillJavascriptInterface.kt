@@ -144,7 +144,12 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
                 return@launch
             }
 
-            val request = requestParser.parseAutofillDataRequest(requestString)
+            val parseResult = requestParser.parseAutofillDataRequest(requestString)
+            val request = parseResult.getOrElse {
+                Timber.w(it, "Unable to parse getAutofillData request")
+                return@launch
+            }
+
             val triggerType = convertTriggerType(request.trigger)
 
             if (request.mainType != CREDENTIALS) {
@@ -270,7 +275,11 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
                 return@launch
             }
 
-            val request = requestParser.parseStoreFormDataRequest(data)
+            val parseResult = requestParser.parseStoreFormDataRequest(data)
+            val request = parseResult.getOrElse {
+                Timber.w(it, "Unable to parse storeFormData request")
+                return@launch
+            }
 
             if (!request.isValid()) {
                 Timber.w("Invalid data from storeFormData")
