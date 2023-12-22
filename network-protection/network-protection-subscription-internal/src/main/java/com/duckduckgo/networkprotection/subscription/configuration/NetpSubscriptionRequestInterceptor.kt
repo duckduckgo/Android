@@ -21,6 +21,7 @@ import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.impl.BuildConfig
 import com.duckduckgo.networkprotection.impl.configuration.NetpRequestInterceptor
+import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.duckduckgo.networkprotection.subscription.NetpSubscriptionManager
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesBinding.Priority.HIGHEST
@@ -37,12 +38,13 @@ import okhttp3.Response
 class NetpSubscriptionRequestInterceptor @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val netpSubscriptionManager: NetpSubscriptionManager,
+    private val networkProtectionRepository: NetworkProtectionRepository,
 ) : NetpRequestInterceptor {
 
     override fun intercept(chain: Chain): Response {
         val url = chain.request().url
         val newRequest = chain.request().newBuilder()
-        if (ENDPOINTS_PATTERN_MATCHER.any { url.toString().endsWith(it) }) {
+        return if (ENDPOINTS_PATTERN_MATCHER.any { url.toString().endsWith(it) }) {
             logcat { "Adding Authorization Bearer token to request $url" }
             newRequest.addHeader(
                 name = "Authorization",
@@ -56,11 +58,15 @@ class NetpSubscriptionRequestInterceptor @Inject constructor(
                     value = BuildConfig.NETP_DEBUG_SERVER_TOKEN,
                 )
             }
-        }
 
-        return chain.proceed(
-            newRequest.build().also { logcat { "headers: ${it.headers}" } },
-        )
+            chain.proceed(
+                newRequest.build().also { logcat { "headers: ${it.headers}" } },
+            ).also {
+                networkProtectionRepository.vpnAccessRevoked = it.code == 403
+            }
+        } else {
+            chain.proceed(newRequest.build())
+        }
     }
 
     companion object {

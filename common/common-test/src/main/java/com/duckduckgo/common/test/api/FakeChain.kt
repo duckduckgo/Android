@@ -19,7 +19,10 @@ package com.duckduckgo.common.test.api
 import java.util.concurrent.TimeUnit
 import okhttp3.*
 
-class FakeChain(private val url: String) : Interceptor.Chain {
+class FakeChain(
+    private val url: String,
+    private val expectedResponseCode: Int? = null,
+) : Interceptor.Chain {
     override fun call(): Call {
         TODO("Not yet implemented")
     }
@@ -37,7 +40,7 @@ class FakeChain(private val url: String) : Interceptor.Chain {
             .request(request)
             .headers(request.headers) // echo the headers
             .protocol(Protocol.HTTP_2)
-            .code(200)
+            .code(expectedResponseCode ?: 200)
             .message("")
             .build()
     }

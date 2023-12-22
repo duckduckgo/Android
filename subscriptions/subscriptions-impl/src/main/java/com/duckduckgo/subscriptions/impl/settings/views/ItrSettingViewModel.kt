@@ -23,7 +23,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.subscriptions.impl.SubscriptionsManager
+import com.duckduckgo.subscriptions.api.Subscriptions
+import com.duckduckgo.subscriptions.api.Subscriptions.EntitlementStatus.Found
+import com.duckduckgo.subscriptions.api.Subscriptions.EntitlementStatus.NotFound
 import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingViewModel.Command.OpenItr
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
@@ -36,7 +38,7 @@ import kotlinx.coroutines.launch
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 class ItrSettingViewModel(
-    private val subscriptionsManager: SubscriptionsManager,
+    private val subscriptions: Subscriptions,
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel(), DefaultLifecycleObserver {
 
@@ -58,8 +60,10 @@ class ItrSettingViewModel(
     override fun onResume(owner: LifecycleOwner) {
         super.onResume(owner)
         viewModelScope.launch(dispatcherProvider.io()) {
-            subscriptionsManager.hasSubscription.collect {
-                _viewState.emit(viewState.value.copy(hasSubscription = it))
+            subscriptions.getEntitlementStatus(ITR_PRODUCT_NAME).also {
+                if (it.isSuccess) {
+                    _viewState.emit(viewState.value.copy(hasSubscription = it.getOrDefault(NotFound) == Found))
+                }
             }
         }
     }
@@ -72,16 +76,20 @@ class ItrSettingViewModel(
 
     @Suppress("UNCHECKED_CAST")
     class Factory @Inject constructor(
-        private val subscriptionsManager: SubscriptionsManager,
+        private val subscriptions: Subscriptions,
         private val dispatcherProvider: DispatcherProvider,
     ) : ViewModelProvider.NewInstanceFactory() {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return with(modelClass) {
                 when {
-                    isAssignableFrom(ItrSettingViewModel::class.java) -> ItrSettingViewModel(subscriptionsManager, dispatcherProvider)
+                    isAssignableFrom(ItrSettingViewModel::class.java) -> ItrSettingViewModel(subscriptions, dispatcherProvider)
                     else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
                 }
             } as T
         }
+    }
+
+    companion object {
+        private const val ITR_PRODUCT_NAME = "Identity Theft Restoration"
     }
 }
