@@ -19,10 +19,10 @@ package com.duckduckgo.experiments.api
 data class VariantConfig(
     val variantKey: String,
     val weight: Double? = 0.0,
-    val filters: VariantFilters? = null,
+    val filters: VariantFilters = VariantFilters(),
 )
 
 data class VariantFilters(
-    val locale: List<String>? = null,
-    val androidVersion: List<String>? = null,
+    val locale: List<String> = emptyList(),
+    val androidVersion: List<String> = emptyList(),
 )
