@@ -55,7 +55,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
     lateinit var vpnLifecycleObserverPluginPoint: PluginPoint<VpnProcessLifecycleObserver>
 
     @Inject
-    lateinit var activityLifecycleCallbacks: PluginPoint<com.duckduckgo.app.global.ActivityLifecycleCallbacks>
+    lateinit var activityLifecycleCallbacks: PluginPoint<com.duckduckgo.browser.api.ActivityLifecycleCallbacks>
 
     @Inject
     @AppCoroutineScope

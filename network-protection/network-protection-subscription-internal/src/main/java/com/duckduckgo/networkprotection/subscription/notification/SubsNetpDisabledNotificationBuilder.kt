@@ -33,11 +33,12 @@ import javax.inject.Inject
 class SubsNetpDisabledNotificationBuilder @Inject constructor(
     private val realNetPDisabledNotificationBuilder: RealNetPDisabledNotificationBuilder,
     private val netpRepository: NetworkProtectionRepository,
+    private val netpAccessRevokedNotificationBuilder: NetpAccessRevokedNotificationBuilder,
 ) : NetPDisabledNotificationBuilder {
 
     override fun buildDisabledNotification(context: Context): Notification {
         return if (netpRepository.vpnAccessRevoked) {
-            buildVpnAccessRevokedNotification(context)
+            netpAccessRevokedNotificationBuilder.buildVpnAccessRevokedNotification(context)
         } else {
             realNetPDisabledNotificationBuilder.buildDisabledNotification(context)
         }
