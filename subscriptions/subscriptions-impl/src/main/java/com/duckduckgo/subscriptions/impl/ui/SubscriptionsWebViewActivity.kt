@@ -110,7 +110,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupInternalToolbar(toolbar)
 
-        title = params?.screenTitle ?: "Buy Subscription"
+        title = params?.screenTitle ?: getString(string.buySubscriptionTitle)
         binding.webview.let {
             subscriptionJsMessaging.register(
                 it,
