@@ -4544,10 +4544,10 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnShowFileChooserWithImageSpecificTypeThenExistingFileChooserCommandSent() {
+    fun whenOnShowFileChooserWithImageSpecificTypeThenImageOrCameraChooserCommandSent() {
         val params = buildFileChooserParams(arrayOf("image/png"))
         testee.showFileChooser(mockFileChooserCallback, params)
-        assertCommandIssued<Command.ShowFileChooser>()
+        assertCommandIssued<Command.ShowExistingImageOrCameraChooser>()
     }
 
     @Test
