@@ -1877,7 +1877,7 @@ class BrowserTabViewModel @Inject constructor(
         filePathCallback: ValueCallback<Array<Uri>>,
         fileChooserParams: FileChooserParams,
     ) {
-        if (fileChooserParams.acceptTypes.contains("image/*") && cameraHardwareChecker.hasCameraHardware()) {
+        if (fileChooserParams.acceptTypes.any { it.startsWith("image/") } && cameraHardwareChecker.hasCameraHardware()) {
             command.value = ShowExistingImageOrCameraChooser(filePathCallback, fileChooserParams)
         } else {
             command.value = ShowFileChooser(filePathCallback, fileChooserParams)
