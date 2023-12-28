@@ -4558,6 +4558,41 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenOnShowFileChooserWithFileExtensionTypesThenFileChooserCommandSentWithUpdatedValues() {
+        val fileExtensionTypes = arrayOf(".doc", ".docx", ".pdf")
+        val expectedMimeTypes =
+            arrayOf("application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/pdf")
+        val params = buildFileChooserParams(fileExtensionTypes)
+
+        testee.showFileChooser(mockFileChooserCallback, params)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val issuedCommand = commandCaptor.allValues.find { it is Command.ShowFileChooser }
+        assertNotNull(issuedCommand)
+        assertArrayEquals(
+            expectedMimeTypes,
+            (issuedCommand as Command.ShowFileChooser).fileChooserParams.acceptMimeTypes.toTypedArray(),
+        )
+    }
+
+    @Test
+    fun whenOnShowFileChooserWithFileExtensionTypesAndImageMimeTypeThenImageOrCameraChooserCommandSentWithUpdatedValues() {
+        val fileExtensionTypes = arrayOf("image/jpeg", "image/pjpeg", ".jpeg", ".jpg")
+        val expectedMimeTypes = arrayOf("image/jpeg", "image/pjpeg")
+        val params = buildFileChooserParams(fileExtensionTypes)
+
+        testee.showFileChooser(mockFileChooserCallback, params)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val issuedCommand = commandCaptor.allValues.find { it is Command.ShowExistingImageOrCameraChooser }
+        assertNotNull(issuedCommand)
+        assertArrayEquals(
+            expectedMimeTypes,
+            (issuedCommand as Command.ShowExistingImageOrCameraChooser).fileChooserParams.acceptMimeTypes.toTypedArray(),
+        )
+    }
+
+    @Test
     fun whenWebViewRefreshedThenBrowserErrorStateIsOmitted() {
         testee.onWebViewRefreshed()
 
