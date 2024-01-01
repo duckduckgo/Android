@@ -313,20 +313,20 @@ class BrowserWebViewClient @Inject constructor(
         }
     }
 
-    @WorkerThread
-    override fun shouldInterceptRequest(
-        webView: WebView,
-        request: WebResourceRequest,
-    ): WebResourceResponse? {
-        return runBlocking {
-            val documentUrl = withContext(dispatcherProvider.main()) { webView.url }
-            withContext(dispatcherProvider.main()) {
-                loginDetector.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, request))
-            }
-            Timber.v("Intercepting resource ${request.url} type:${request.method} on page $documentUrl")
-            requestInterceptor.shouldIntercept(request, webView, documentUrl, webViewClientListener)
-        }
-    }
+    // @WorkerThread
+    // override fun shouldInterceptRequest(
+    //     webView: WebView,
+    //     request: WebResourceRequest,
+    // ): WebResourceResponse? {
+    //     return runBlocking {
+    //         val documentUrl = withContext(dispatcherProvider.main()) { webView.url }
+    //         withContext(dispatcherProvider.main()) {
+    //             loginDetector.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, request))
+    //         }
+    //         Timber.v("Intercepting resource ${request.url} type:${request.method} on page $documentUrl")
+    //         requestInterceptor.shouldIntercept(request, webView, documentUrl, webViewClientListener)
+    //     }
+    // }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onRenderProcessGone(

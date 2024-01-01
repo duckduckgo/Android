@@ -25,6 +25,7 @@ import android.content.*
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
+import android.content.res.AssetManager
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.*
@@ -34,6 +35,7 @@ import android.text.Editable
 import android.view.*
 import android.view.View.*
 import android.view.inputmethod.EditorInfo
+import android.webkit.ConsoleMessage
 import android.webkit.PermissionRequest
 import android.webkit.URLUtil
 import android.webkit.ValueCallback
@@ -261,6 +263,9 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.cancellable
 import org.json.JSONObject
 import timber.log.Timber
+import java.io.BufferedReader
+import java.io.IOException
+import java.io.InputStreamReader
 
 @InjectWith(FragmentScope::class)
 class BrowserTabFragment :
@@ -2158,9 +2163,38 @@ class BrowserTabFragment :
                 },
             )
         }
+        webView!!.webChromeClient = object : WebChromeClient() {
+            override fun onConsoleMessage(consoleMessage: ConsoleMessage): Boolean {
+                println("Console message: ${consoleMessage.message()}")
+                return true
+            }
+        }
+        val jsFileName = "safe_gaze.js"
+        val javascriptCode = readAssetFile(requireContext().assets, jsFileName)
 
-        WebView.setWebContentsDebuggingEnabled(webContentDebugging.isEnabled())
+        webView!!.evaluateJavascript(javascriptCode){ value ->
+            println("Js value is -> $value")
+        }
+        WebView.setWebContentsDebuggingEnabled(true)
     }
+
+    private fun readAssetFile(assetManager: AssetManager, fileName: String): String {
+        val stringBuilder = StringBuilder()
+        try {
+            val inputStream = assetManager.open(fileName)
+            val bufferedReader = BufferedReader(InputStreamReader(inputStream))
+
+            var line: String?
+            while (bufferedReader.readLine().also { line = it } != null) {
+                stringBuilder.append(line).append('\n')
+            }
+        } catch (e: IOException) {
+            println("Exception is -> ${e.localizedMessage}")
+            e.printStackTrace()
+        }
+        return stringBuilder.toString()
+    }
+
 
     private fun webShare(featureName: String, method: String, id: String, data: JSONObject) {
         webShareRequest.launch(JsCallbackData(data, featureName, method, id))
