@@ -27,6 +27,7 @@ import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.content.res.AssetManager
 import android.content.res.Configuration
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.*
 import android.print.PrintAttributes
@@ -35,7 +36,6 @@ import android.text.Editable
 import android.view.*
 import android.view.View.*
 import android.view.inputmethod.EditorInfo
-import android.webkit.ConsoleMessage
 import android.webkit.PermissionRequest
 import android.webkit.URLUtil
 import android.webkit.ValueCallback
@@ -46,6 +46,7 @@ import android.webkit.WebView
 import android.webkit.WebView.FindListener
 import android.webkit.WebView.HitTestResult
 import android.webkit.WebView.HitTestResult.*
+import android.webkit.WebViewClient
 import android.widget.Button
 import android.widget.EditText
 import android.widget.FrameLayout
@@ -287,10 +288,10 @@ class BrowserTabFragment :
     lateinit var dispatchers: DispatcherProvider
 
     @Inject
-    lateinit var webViewClient: BrowserWebViewClient
+    lateinit var browserWebViewClient: BrowserWebViewClient
 
     @Inject
-    lateinit var webChromeClient: BrowserChromeClient
+    lateinit var browserWebChromeClient: BrowserChromeClient
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
@@ -509,13 +510,13 @@ class BrowserTabFragment :
     private val browserActivity
         get() = activity as? BrowserActivity
 
-    private val tabsButton: TabSwitcherButton?
+    private val tabsButton: TabSwitcherButton
         get() = omnibar.tabsMenu
 
-    private val fireMenuButton: ViewGroup?
+    private val fireMenuButton: ViewGroup
         get() = omnibar.fireIconMenu
 
-    private val menuButton: ViewGroup?
+    private val menuButton: ViewGroup
         get() = omnibar.browserMenu
 
     private var webView: DuckDuckGoWebView? = null
@@ -764,7 +765,7 @@ class BrowserTabFragment :
         configurePrivacyShield()
         configureWebView()
         configureSwipeRefresh()
-        viewModel.registerWebViewListener(webViewClient, webChromeClient)
+        viewModel.registerWebViewListener(browserWebViewClient, browserWebChromeClient)
         configureOmnibarTextInput()
         configureFindInPage()
         configureAutoComplete()
@@ -1050,9 +1051,9 @@ class BrowserTabFragment :
         webView?.hide()
         errorView.errorMessage.text = getString(errorType.errorId, url).html(requireContext())
         if (appTheme.isLightModeEnabled()) {
-            errorView.yetiIcon?.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_yeti_light)
+            errorView.yetiIcon.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_yeti_light)
         } else {
-            errorView.yetiIcon?.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_yeti_dark)
+            errorView.yetiIcon.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_yeti_dark)
         }
         errorView.errorLayout.show()
     }
@@ -2088,30 +2089,31 @@ class BrowserTabFragment :
         viewModel.onUserSubmittedQuery(query)
     }
 
-    @SuppressLint("SetJavaScriptEnabled")
+    @SuppressLint("SetJavaScriptEnabled", "ClickableViewAccessibility")
     private fun configureWebView() {
         webView = layoutInflater.inflate(
             R.layout.include_duckduckgo_browser_webview,
             binding.webViewContainer,
             true,
         ).findViewById(R.id.browserWebView) as DuckDuckGoWebView
-
         webView?.let {
-            it.webViewClient = webViewClient
-            it.webChromeClient = webChromeClient
+            it.webViewClient = browserWebViewClient
+            it.webChromeClient = browserWebChromeClient
 
             it.settings.apply {
                 userAgentString = userAgentProvider.userAgent()
                 javaScriptEnabled = true
                 domStorageEnabled = true
+                allowContentAccess = true
                 loadWithOverviewMode = true
                 useWideViewPort = true
                 builtInZoomControls = true
                 displayZoomControls = false
-                mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
+                mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
                 javaScriptCanOpenWindowsAutomatically = appBuildConfig.isTest // only allow when running tests
+                allowUniversalAccessFromFileURLs = true
                 setSupportMultipleWindows(true)
-                disableWebSql(this)
+                //disableWebSql(this)
                 setSupportZoom(true)
                 configureDarkThemeSupport(this)
                 if (accessibilitySettingsDataStore.overrideSystemFontSize) {
@@ -2132,7 +2134,7 @@ class BrowserTabFragment :
             }
 
             it.setEnableSwipeRefreshCallback { enable ->
-                binding.swipeRefreshContainer?.isEnabled = enable
+                binding.swipeRefreshContainer.isEnabled = enable
             }
 
             registerForContextMenu(it)
@@ -2163,19 +2165,22 @@ class BrowserTabFragment :
                 },
             )
         }
-        webView!!.webChromeClient = object : WebChromeClient() {
-            override fun onConsoleMessage(consoleMessage: ConsoleMessage): Boolean {
-                println("Console message: ${consoleMessage.message()}")
-                return true
+        webView?.apply {
+            webViewClient = object : WebViewClient() {
+                override fun onPageStarted(
+                    view: WebView?,
+                    url: String?,
+                    favicon: Bitmap?
+                ) {
+                    val jsCode = readAssetFile(requireContext().assets, "safe_gaze.js")
+                    evaluateJavascript("javascript:(function() { $jsCode })()", null)
+                }
+                // override fun onPageFinished(view: WebView?, url: String?) {
+                //     val jsCode = readAssetFile(requireContext().assets, "safe_gaze.js")
+                //     evaluateJavascript("javascript:(function() { $jsCode })()", null)
+                // }
             }
         }
-        val jsFileName = "safe_gaze.js"
-        val javascriptCode = readAssetFile(requireContext().assets, jsFileName)
-
-        webView!!.evaluateJavascript(javascriptCode){ value ->
-            println("Js value is -> $value")
-        }
-        WebView.setWebContentsDebuggingEnabled(true)
     }
 
     private fun readAssetFile(assetManager: AssetManager, fileName: String): String {
@@ -3069,9 +3074,9 @@ class BrowserTabFragment :
         }
 
         fun updateToolbarActionsVisibility(viewState: BrowserViewState) {
-            tabsButton?.isVisible = viewState.showTabsButton
-            fireMenuButton?.isVisible = viewState.fireButton is HighlightableButton.Visible
-            menuButton?.isVisible = viewState.showMenuButton is HighlightableButton.Visible
+            tabsButton.isVisible = viewState.showTabsButton
+            fireMenuButton.isVisible = viewState.fireButton is HighlightableButton.Visible
+            menuButton.isVisible = viewState.showMenuButton is HighlightableButton.Visible
 
             val targetView = if (viewState.showMenuButton.isHighlighted()) {
                 omnibar.browserMenuImageView
@@ -3104,8 +3109,8 @@ class BrowserTabFragment :
         }
 
         private fun decorateToolbarWithButtons() {
-            fireMenuButton?.show()
-            fireMenuButton?.setOnClickListener {
+            fireMenuButton.show()
+            fireMenuButton.setOnClickListener {
                 browserActivity?.launchFire()
                 pixel.fire(
                     AppPixelName.MENU_ACTION_FIRE_PRESSED.pixelName,
@@ -3113,7 +3118,7 @@ class BrowserTabFragment :
                 )
             }
 
-            tabsButton?.show()
+            tabsButton.show()
         }
 
         private fun createPopupMenu() {
@@ -3210,31 +3215,31 @@ class BrowserTabFragment :
         }
 
         private fun configureShowTabSwitcherListener() {
-            tabsButton?.setOnClickListener {
+            tabsButton.setOnClickListener {
                 launch { viewModel.userLaunchingTabSwitcher() }
             }
         }
 
         private fun configureLongClickOpensNewTabListener() {
-            tabsButton?.setOnLongClickListener {
+            tabsButton.setOnLongClickListener {
                 launch { viewModel.userRequestedOpeningNewTab() }
                 return@setOnLongClickListener true
             }
         }
 
         fun animateTabsCount() {
-            tabsButton?.animateCount()
+            tabsButton.animateCount()
         }
 
         fun renderTabIcon(tabs: List<TabEntity>) {
             context?.let {
-                tabsButton?.count = tabs.count()
-                tabsButton?.hasUnread = tabs.firstOrNull { !it.viewed } != null
+                tabsButton.count = tabs.count()
+                tabsButton.hasUnread = tabs.firstOrNull { !it.viewed } != null
             }
         }
 
         fun incrementTabs() {
-            tabsButton?.increment {
+            tabsButton.increment {
                 addTabsObserver()
             }
         }
@@ -3473,15 +3478,15 @@ class BrowserTabFragment :
 
         private fun renderToolbarMenus(viewState: BrowserViewState) {
             if (viewState.browserShowing) {
-                omnibar.daxIcon?.isVisible = viewState.showDaxIcon
-                omnibar.shieldIcon?.isInvisible = !viewState.showPrivacyShield || viewState.showDaxIcon
-                omnibar.clearTextButton?.isVisible = viewState.showClearButton
-                omnibar.searchIcon?.isVisible = viewState.showSearchIcon
+                omnibar.daxIcon.isVisible = viewState.showDaxIcon
+                omnibar.shieldIcon.isInvisible = !viewState.showPrivacyShield || viewState.showDaxIcon
+                omnibar.clearTextButton.isVisible = viewState.showClearButton
+                omnibar.searchIcon.isVisible = viewState.showSearchIcon
             } else {
                 omnibar.daxIcon.isVisible = false
-                omnibar.shieldIcon?.isVisible = false
-                omnibar.clearTextButton?.isVisible = viewState.showClearButton
-                omnibar.searchIcon?.isVisible = true
+                omnibar.shieldIcon.isVisible = false
+                omnibar.clearTextButton.isVisible = viewState.showClearButton
+                omnibar.searchIcon.isVisible = true
             }
 
             omnibar.spacer.isVisible = viewState.showClearButton && lastSeenBrowserViewState?.showVoiceSearch ?: false
@@ -3733,7 +3738,7 @@ class BrowserTabFragment :
             if (findInPage.findInPageContainer.visibility != VISIBLE) {
                 findInPage.findInPageContainer.show()
                 findInPage.findInPageInput.postDelayed(KEYBOARD_DELAY) {
-                    findInPage.findInPageInput?.showKeyboard()
+                    findInPage.findInPageInput.showKeyboard()
                 }
             }
 
