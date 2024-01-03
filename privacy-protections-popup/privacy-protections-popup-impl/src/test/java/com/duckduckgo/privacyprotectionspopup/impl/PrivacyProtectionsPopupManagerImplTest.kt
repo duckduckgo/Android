@@ -24,6 +24,8 @@ import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.extractDomain
+import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DISABLE_PROTECTIONS_CLICKED
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DISMISSED
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DISMISS_CLICKED
@@ -56,7 +58,7 @@ class PrivacyProtectionsPopupManagerImplTest {
     @get:Rule
     val coroutineRule = CoroutineTestRule()
 
-    private val featureAvailability = FakePrivacyProtectionsPopupFeatureAvailability()
+    private val featureFlag = FakePrivacyProtectionsPopupFeature()
 
     private val protectionsStateProvider = FakeProtectionsStateProvider()
 
@@ -72,7 +74,7 @@ class PrivacyProtectionsPopupManagerImplTest {
 
     private val subject = PrivacyProtectionsPopupManagerImpl(
         appCoroutineScope = coroutineRule.testScope,
-        featureAvailability = featureAvailability,
+        featureFlag = featureFlag,
         protectionsStateProvider = protectionsStateProvider,
         timeProvider = timeProvider,
         popupDismissDomainRepository = popupDismissDomainRepository,
@@ -118,7 +120,7 @@ class PrivacyProtectionsPopupManagerImplTest {
 
     @Test
     fun whenFeatureIsDisabledThenPopupIsNotShown() = runTest {
-        featureAvailability.featureAvailable = false
+        featureFlag.enabled = false
         subject.viewState.test {
             subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
             subject.onPageRefreshTriggeredByUser()
@@ -377,11 +379,15 @@ class PrivacyProtectionsPopupManagerImplTest {
     }
 }
 
-private class FakePrivacyProtectionsPopupFeatureAvailability : PrivacyProtectionsPopupFeatureAvailability {
+private class FakePrivacyProtectionsPopupFeature : PrivacyProtectionsPopupFeature {
 
-    var featureAvailable = true
+    var enabled = true
 
-    override suspend fun isAvailable(): Boolean = featureAvailable
+    override fun self(): Toggle = object : Toggle {
+        override fun isEnabled(): Boolean = enabled
+        override fun setEnabled(state: State) = throw UnsupportedOperationException()
+        override fun getRawStoredState(): State? = throw UnsupportedOperationException()
+    }
 }
 
 private class FakeProtectionsStateProvider : ProtectionsStateProvider {

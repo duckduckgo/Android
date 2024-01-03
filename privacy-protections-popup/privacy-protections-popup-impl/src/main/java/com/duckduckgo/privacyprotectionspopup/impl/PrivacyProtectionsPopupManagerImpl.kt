@@ -59,7 +59,7 @@ import org.threeten.bp.Instant
 @ContributesBinding(FragmentScope::class)
 class PrivacyProtectionsPopupManagerImpl @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val featureAvailability: PrivacyProtectionsPopupFeatureAvailability,
+    private val featureFlag: PrivacyProtectionsPopupFeature,
     private val protectionsStateProvider: ProtectionsStateProvider,
     private val timeProvider: TimeProvider,
     private val popupDismissDomainRepository: PopupDismissDomainRepository,
@@ -160,7 +160,7 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun startDataLoading() {
         dataLoadingJob = appCoroutineScope.launch {
-            val featureAvailable = featureAvailability.isAvailable()
+            val featureAvailable = featureFlag.isEnabled()
             state.update { it.copy(featureAvailable = featureAvailable) }
 
             if (!featureAvailable) return@launch
