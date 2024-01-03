@@ -34,6 +34,7 @@ dependencies {
     implementation project(':browser-api')
     implementation project(':privacy-config-api')
     implementation project(':feature-toggles-api')
+    implementation project(':app-build-config-api')
 
     implementation KotlinX.coroutines.android
     implementation AndroidX.core.ktx
@@ -43,6 +44,7 @@ dependencies {
     ksp AndroidX.room.compiler
 
     implementation "com.squareup.logcat:logcat:_"
+    implementation Square.moshi
 
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
