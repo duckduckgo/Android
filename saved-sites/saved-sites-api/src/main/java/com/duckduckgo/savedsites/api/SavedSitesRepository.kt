@@ -309,17 +309,6 @@ interface SavedSitesRepository {
     fun pruneDeleted()
 
     /**
-     * Returns list of [String] of [Entity] id modified before [date] in ISO format
-     * @return [List] of [String]
-     */
-    fun getEntitiesModifiedBefore(date: String): List<String>
-
-    /**
-     * Updates entity [entityId] to a modified date of [modifiedSince]
-     */
-    fun updateModifiedSince(entityId: String, modifiedSince: String)
-
-    /**
      * Deletes and re-inserts a folder relation
      */
     fun updateFolderRelation(folder: BookmarkFolder)
