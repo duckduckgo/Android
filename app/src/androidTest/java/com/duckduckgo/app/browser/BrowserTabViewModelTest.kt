@@ -4593,6 +4593,34 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenOnShowFileChooserWithImageWildcardedTypeOnlyAndCaptureEnabledThenShowImageCameraCommandSent() {
+        val params = buildFileChooserParams(acceptTypes = arrayOf("image/*"), captureEnabled = true)
+
+        testee.showFileChooser(mockFileChooserCallback, params)
+
+        assertCommandIssued<Command.ShowImageCamera>()
+    }
+
+    @Test
+    fun whenOnShowFileChooserWithVideoWildcardedTypeOnlyAndCaptureEnabledThenShowFileChooserCommandSent() {
+        val params = buildFileChooserParams(acceptTypes = arrayOf("video/*"), captureEnabled = true)
+
+        testee.showFileChooser(mockFileChooserCallback, params)
+
+        assertCommandIssued<Command.ShowFileChooser>()
+    }
+
+    @Test
+    fun whenOnShowFileChooserWithImageWildcardedTypeOnlyAndCaptureEnabledButCameraHardwareUnavailableThenShowFileChooserCommandSent() {
+        whenever(cameraHardwareChecker.hasCameraHardware()).thenReturn(false)
+        val params = buildFileChooserParams(acceptTypes = arrayOf("image/*"), captureEnabled = true)
+
+        testee.showFileChooser(mockFileChooserCallback, params)
+
+        assertCommandIssued<Command.ShowFileChooser>()
+    }
+
+    @Test
     fun whenWebViewRefreshedThenBrowserErrorStateIsOmitted() {
         testee.onWebViewRefreshed()
 
@@ -4878,11 +4906,11 @@ class BrowserTabViewModelTest {
         return nav
     }
 
-    private fun buildFileChooserParams(acceptTypes: Array<String>): FileChooserParams {
+    private fun buildFileChooserParams(acceptTypes: Array<String>, captureEnabled: Boolean = false): FileChooserParams {
         return object : FileChooserParams() {
             override fun getAcceptTypes(): Array<String> = acceptTypes
             override fun getMode(): Int = 0
-            override fun isCaptureEnabled(): Boolean = false
+            override fun isCaptureEnabled(): Boolean = captureEnabled
             override fun getTitle(): CharSequence? = null
             override fun getFilenameHint(): String? = null
             override fun createIntent(): Intent = Intent()

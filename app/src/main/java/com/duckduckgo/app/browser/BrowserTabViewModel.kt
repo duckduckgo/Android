@@ -409,6 +409,9 @@ class BrowserTabViewModel @Inject constructor(
             val filePathCallback: ValueCallback<Array<Uri>>,
             val fileChooserParams: FileChooserRequestedParams,
         ) : Command()
+        class ShowImageCamera(
+            val filePathCallback: ValueCallback<Array<Uri>>,
+        ) : Command()
 
         class HandleNonHttpAppLink(
             val nonHttpAppLink: NonHttpAppLink,
@@ -1882,13 +1885,24 @@ class BrowserTabViewModel @Inject constructor(
         filePathCallback: ValueCallback<Array<Uri>>,
         fileChooserParams: FileChooserParams,
     ) {
-        val mimeTypes = convertAcceptTypesToMimeTypes(fileChooserParams.acceptTypes)
+        val acceptTypes = fileChooserParams.acceptTypes
+        val acceptsOnlyImage = acceptsOnly("image/", acceptTypes)
+        val cameraHardwareAvailable = cameraHardwareChecker.hasCameraHardware()
+
+        val mimeTypes = convertAcceptTypesToMimeTypes(acceptTypes)
         val fileChooserRequestedParams = FileChooserRequestedParams(fileChooserParams.mode, mimeTypes)
-        if (fileChooserParams.acceptTypes.any { it.startsWith("image/") } && cameraHardwareChecker.hasCameraHardware()) {
-            command.value = ShowExistingImageOrCameraChooser(filePathCallback, fileChooserRequestedParams)
-        } else {
-            command.value = ShowFileChooser(filePathCallback, fileChooserRequestedParams)
+
+        command.value = when {
+            fileChooserParams.isCaptureEnabled && acceptsOnlyImage && cameraHardwareAvailable ->
+                ShowImageCamera(filePathCallback)
+            (fileChooserParams.acceptTypes.any { it.startsWith("image/") } && cameraHardwareAvailable) ->
+                ShowExistingImageOrCameraChooser(filePathCallback, fileChooserRequestedParams)
+            else -> ShowFileChooser(filePathCallback, fileChooserRequestedParams)
         }
+    }
+
+    private fun acceptsOnly(type: String, acceptTypes: Array<String>): Boolean {
+        return acceptTypes.filter { it.startsWith(type) }.size == acceptTypes.size
     }
 
     private fun convertAcceptTypesToMimeTypes(acceptTypes: Array<String>): List<String> {
