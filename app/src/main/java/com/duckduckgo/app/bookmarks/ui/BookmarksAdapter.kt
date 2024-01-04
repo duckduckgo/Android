@@ -17,6 +17,7 @@
 package com.duckduckgo.app.bookmarks.ui
 
 import android.content.Context
+import android.graphics.Canvas
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
@@ -27,6 +28,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.duckduckgo.app.bookmarks.ui.BookmarkScreenViewHolders.BookmarkFoldersViewHolder
 import com.duckduckgo.app.bookmarks.ui.BookmarkScreenViewHolders.BookmarksViewHolder
 import com.duckduckgo.app.browser.R
@@ -443,7 +445,7 @@ class BookmarkItemTouchHelperCallback(
     }
     override fun getMovementFlags(
         recyclerView: RecyclerView,
-        viewHolder: RecyclerView.ViewHolder,
+        viewHolder: ViewHolder,
     ): Int {
         val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN
         return makeMovementFlags(dragFlags, 0)
@@ -451,15 +453,15 @@ class BookmarkItemTouchHelperCallback(
 
     override fun onMove(
         recyclerView: RecyclerView,
-        viewHolder: RecyclerView.ViewHolder,
-        target: RecyclerView.ViewHolder,
+        viewHolder: ViewHolder,
+        target: ViewHolder,
     ): Boolean {
         adapter.onItemMove(viewHolder.bindingAdapterPosition, target.bindingAdapterPosition)
         return true
     }
 
     override fun onSelectedChanged(
-        viewHolder: RecyclerView.ViewHolder?,
+        viewHolder: ViewHolder?,
         actionState: Int,
     ) {
         super.onSelectedChanged(viewHolder, actionState)
@@ -468,12 +470,31 @@ class BookmarkItemTouchHelperCallback(
         }
     }
 
-    override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
+    override fun clearView(recyclerView: RecyclerView, viewHolder: ViewHolder) {
         super.clearView(recyclerView, viewHolder)
         adapter.persistReorderedItems()
     }
 
-    override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+    override fun onSwiped(viewHolder: ViewHolder, direction: Int) {
         // Not handled
+    }
+
+    override fun onChildDraw(
+        canvas: Canvas,
+        recyclerView: RecyclerView,
+        viewHolder: ViewHolder,
+        dX: Float,
+        dY: Float,
+        actionState: Int,
+        isCurrentlyActive: Boolean,
+    ) {
+        super.onChildDraw(canvas, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+        if (isCurrentlyActive) {
+            if (actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
+                viewHolder.itemView.elevation = 16f
+            }
+        } else {
+            viewHolder.itemView.elevation = 0f
+        }
     }
 }

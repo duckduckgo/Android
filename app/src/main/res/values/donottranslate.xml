@@ -51,8 +51,8 @@
     <string name="searchBookmarks">Search Bookmarks</string>
     <string name="deleteFolder" instruction="%1$s is the folder name">"Delete %1$s?"</string>
     <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Delete %1$s bookmark?"</string>
-    <string name="bookmarkAddedInBookmarks">Bookmark added in Bookmarks</string>
-    <string name="addToFavorites">Add to favorites</string>
+    <string name="bookmarkAddedInBookmarks">Bookmark added in %1s</string>
+    <string name="addToFavorites">Add to Favorites</string>
     <string name="editBookmark">Edit Bookmark</string>
     <string name="importBookmarksDescription">If your bookmarks are saved in another browser, you\ncan import them into DuckDuckGo.</string>
     <string name="importBookmarks">Import Bookmarks</string>

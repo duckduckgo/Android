@@ -27,11 +27,15 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.content.res.Configuration
+import android.graphics.Typeface
 import android.net.Uri
 import android.os.*
 import android.print.PrintAttributes
 import android.print.PrintManager
 import android.text.Editable
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.StyleSpan
 import android.view.*
 import android.view.View.*
 import android.view.inputmethod.EditorInfo
@@ -75,6 +79,7 @@ import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
+import com.duckduckgo.app.bookmarks.ui.BookmarksBottomSheetDialog
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment
 import com.duckduckgo.app.brokensite.BrokenSiteActivity
 import com.duckduckgo.app.browser.BrowserTabViewModel.AccessibilityViewState
@@ -242,6 +247,7 @@ import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.remote.messaging.api.RemoteMessage
+import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
@@ -486,6 +492,8 @@ class BrowserTabFragment :
     private lateinit var quickAccessItems: IncludeQuickAccessItemsBinding
 
     private lateinit var webViewContainer: FrameLayout
+
+    private var bookmarksBottomSheetDialog: BookmarksBottomSheetDialog.Builder? = null
 
     private val findInPage
         get() = omnibar.findInPage
@@ -2429,22 +2437,49 @@ class BrowserTabFragment :
     }
 
     private fun savedSiteAdded(savedSiteChangedViewState: SavedSiteChangedViewState) {
-        val dialog: ActionBottomSheetDialog.Builder = ActionBottomSheetDialog.Builder(requireContext())
-            .setTitle(getString(string.bookmarkAddedInBookmarks))
-            .setPrimaryItem(getString(string.addToFavorites), icon = com.duckduckgo.mobile.android.R.drawable.ic_favorite_16)
-            .setSecondaryItem(getString(string.editBookmark), icon = com.duckduckgo.mobile.android.R.drawable.ic_edit_16)
+        val dismissHandler = Handler(Looper.getMainLooper())
+        val dismissRunnable = Runnable {
+            bookmarksBottomSheetDialog?.dialog?.dismiss()
+        }
+        val title = getBookmarksBottomSheetTitle(savedSiteChangedViewState.bookmarkFolder)
+
+        bookmarksBottomSheetDialog = BookmarksBottomSheetDialog.Builder(requireContext())
+            .setTitle(title)
+            .setPrimaryItem(getString(string.addToFavorites), icon = com.duckduckgo.mobile.android.R.drawable.ic_favorite_24)
+            .setSecondaryItem(getString(string.editBookmark), icon = com.duckduckgo.mobile.android.R.drawable.ic_edit_24)
             .addEventListener(
-                object : ActionBottomSheetDialog.EventListener() {
+                object : BookmarksBottomSheetDialog.EventListener() {
                     override fun onPrimaryItemClicked() {
                         viewModel.onFavoriteMenuClicked()
+                        dismissHandler.removeCallbacks(dismissRunnable)
                     }
 
                     override fun onSecondaryItemClicked() {
-                        editSavedSite(savedSiteChangedViewState)
+                        if (savedSiteChangedViewState.savedSite is Bookmark) {
+                            editSavedSite(
+                                savedSiteChangedViewState.copy(
+                                    savedSite = savedSiteChangedViewState.savedSite.copy(isFavorite = viewModel.browserViewState.value?.favorite != null),
+                                ),
+                            )
+                            dismissHandler.removeCallbacks(dismissRunnable)
+                        }
                     }
                 },
             )
-        dialog.show()
+        bookmarksBottomSheetDialog?.show()
+
+        dismissHandler.postDelayed(dismissRunnable, 3500)
+    }
+
+    private fun getBookmarksBottomSheetTitle(bookmarkFolder: BookmarkFolder?): SpannableString {
+        val folderName = bookmarkFolder?.name ?: ""
+        val fullText = getString(string.bookmarkAddedInBookmarks, folderName)
+        val spannableString = SpannableString(fullText)
+
+        val boldStart = fullText.indexOf(folderName)
+        val boldEnd = boldStart + folderName.length
+        spannableString.setSpan(StyleSpan(Typeface.BOLD), boldStart, boldEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        return spannableString
     }
 
     private fun editSavedSite(savedSiteChangedViewState: SavedSiteChangedViewState) {
@@ -3417,6 +3452,10 @@ class BrowserTabFragment :
                 renderFullscreenMode(viewState)
                 renderVoiceSearch(viewState)
                 omnibar.spacer.isVisible = viewState.showVoiceSearch && lastSeenBrowserViewState?.showClearButton ?: false
+
+                bookmarksBottomSheetDialog?.dialog?.toggleSwitch(viewState.favorite != null)
+                val bookmark = viewModel.browserViewState.value?.bookmark?.copy(isFavorite = viewState.favorite != null)
+                viewModel.browserViewState.value = viewModel.browserViewState.value?.copy(bookmark = bookmark)
             }
         }
 
