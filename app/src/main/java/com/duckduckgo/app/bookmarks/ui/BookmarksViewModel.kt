@@ -312,7 +312,7 @@ class BookmarksViewModel @Inject constructor(
     }
 
     fun updateBookmarks(bookmarksAndFolders: List<Any>) {
-        viewModelScope.launch(dispatcherProvider.io() + NonCancellable) {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
             val operations = mutableListOf<() -> Unit>()
 
             for (item in bookmarksAndFolders) {
