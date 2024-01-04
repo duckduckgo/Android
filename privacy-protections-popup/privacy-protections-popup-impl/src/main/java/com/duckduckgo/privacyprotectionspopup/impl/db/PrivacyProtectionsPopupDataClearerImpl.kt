@@ -16,22 +16,17 @@
 
 package com.duckduckgo.privacyprotectionspopup.impl.db
 
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupDataClearer
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-import kotlinx.coroutines.withContext
 
 @ContributesBinding(AppScope::class)
 class PrivacyProtectionsPopupDataClearerImpl @Inject constructor(
-    private val database: PrivacyProtectionsPopupDatabase,
-    private val dispatcher: DispatcherProvider,
+    private val popupDismissDomainsRepository: PopupDismissDomainRepository,
 ) : PrivacyProtectionsPopupDataClearer {
 
     override suspend fun clearPersonalData() {
-        withContext(dispatcher.io()) {
-            database.clearAllTables()
-        }
+        popupDismissDomainsRepository.removeAllEntries()
     }
 }

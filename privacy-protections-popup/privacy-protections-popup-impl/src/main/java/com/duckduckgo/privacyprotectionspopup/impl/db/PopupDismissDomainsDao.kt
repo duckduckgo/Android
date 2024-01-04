@@ -34,4 +34,7 @@ abstract class PopupDismissDomainsDao {
 
     @Query("DELETE FROM popup_dismiss_domains WHERE dismissedAt < :time")
     abstract suspend fun removeEntriesOlderThan(time: Instant)
+
+    @Query("DELETE FROM popup_dismiss_domains")
+    abstract suspend fun removeAllEntries()
 }
