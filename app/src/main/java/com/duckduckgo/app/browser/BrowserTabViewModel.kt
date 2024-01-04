@@ -27,9 +27,9 @@ import android.view.ContextMenu
 import android.view.MenuItem
 import android.view.View
 import android.webkit.GeolocationPermissions
+import android.webkit.MimeTypeMap
 import android.webkit.PermissionRequest
 import android.webkit.ValueCallback
-import android.webkit.WebChromeClient
 import android.webkit.WebChromeClient.FileChooserParams
 import android.webkit.WebView
 import androidx.annotation.AnyThread
@@ -341,6 +341,11 @@ class BrowserTabViewModel @Inject constructor(
         val callback: GeolocationPermissions.Callback,
     )
 
+    data class FileChooserRequestedParams(
+        val filePickingMode: Int,
+        val acceptMimeTypes: List<String>,
+    )
+
     sealed class Command {
         class OpenInNewTab(
             val query: String,
@@ -398,11 +403,11 @@ class BrowserTabViewModel @Inject constructor(
         object DismissFindInPage : Command()
         class ShowFileChooser(
             val filePathCallback: ValueCallback<Array<Uri>>,
-            val fileChooserParams: WebChromeClient.FileChooserParams,
+            val fileChooserParams: FileChooserRequestedParams,
         ) : Command()
         class ShowExistingImageOrCameraChooser(
             val filePathCallback: ValueCallback<Array<Uri>>,
-            val fileChooserParams: WebChromeClient.FileChooserParams,
+            val fileChooserParams: FileChooserRequestedParams,
         ) : Command()
 
         class HandleNonHttpAppLink(
@@ -1877,11 +1882,30 @@ class BrowserTabViewModel @Inject constructor(
         filePathCallback: ValueCallback<Array<Uri>>,
         fileChooserParams: FileChooserParams,
     ) {
+        val mimeTypes = convertAcceptTypesToMimeTypes(fileChooserParams.acceptTypes)
+        val fileChooserRequestedParams = FileChooserRequestedParams(fileChooserParams.mode, mimeTypes)
         if (fileChooserParams.acceptTypes.any { it.startsWith("image/") } && cameraHardwareChecker.hasCameraHardware()) {
-            command.value = ShowExistingImageOrCameraChooser(filePathCallback, fileChooserParams)
+            command.value = ShowExistingImageOrCameraChooser(filePathCallback, fileChooserRequestedParams)
         } else {
-            command.value = ShowFileChooser(filePathCallback, fileChooserParams)
+            command.value = ShowFileChooser(filePathCallback, fileChooserRequestedParams)
         }
+    }
+
+    private fun convertAcceptTypesToMimeTypes(acceptTypes: Array<String>): List<String> {
+        val mimeTypeMap = MimeTypeMap.getSingleton()
+        val mimeTypes = mutableSetOf<String>()
+        acceptTypes.forEach { type ->
+            // Attempt to convert any identified file extensions into corresponding MIME types.
+            val fileExtension = MimeTypeMap.getFileExtensionFromUrl(type)
+            if (fileExtension.isNotEmpty()) {
+                mimeTypeMap.getMimeTypeFromExtension(type.substring(1))?.let {
+                    mimeTypes.add(it)
+                }
+            } else {
+                mimeTypes.add(type)
+            }
+        }
+        return mimeTypes.toList()
     }
 
     private fun currentGlobalLayoutState(): GlobalLayoutViewState = globalLayoutState.value!!

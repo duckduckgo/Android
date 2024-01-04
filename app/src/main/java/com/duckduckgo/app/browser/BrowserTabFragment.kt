@@ -37,7 +37,6 @@ import android.view.inputmethod.EditorInfo
 import android.webkit.PermissionRequest
 import android.webkit.URLUtil
 import android.webkit.ValueCallback
-import android.webkit.WebChromeClient
 import android.webkit.WebChromeClient.FileChooserParams
 import android.webkit.WebSettings
 import android.webkit.WebView
@@ -83,6 +82,7 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.BrowserViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.ShowBackNavigationHistory
 import com.duckduckgo.app.browser.BrowserTabViewModel.CtaViewState
+import com.duckduckgo.app.browser.BrowserTabViewModel.FileChooserRequestedParams
 import com.duckduckgo.app.browser.BrowserTabViewModel.FindInPageViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.HighlightableButton
@@ -2745,10 +2745,10 @@ class BrowserTabFragment :
         showDialogHidingPrevious(downloadConfirmationFragment, DOWNLOAD_CONFIRMATION_TAG)
     }
 
-    private fun launchFilePicker(filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: WebChromeClient.FileChooserParams) {
+    private fun launchFilePicker(filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: FileChooserRequestedParams) {
         pendingUploadTask = filePathCallback
-        val canChooseMultipleFiles = fileChooserParams.mode == FileChooserParams.MODE_OPEN_MULTIPLE
-        val intent = fileChooserIntentBuilder.intent(fileChooserParams.acceptTypes, canChooseMultipleFiles)
+        val canChooseMultipleFiles = fileChooserParams.filePickingMode == FileChooserParams.MODE_OPEN_MULTIPLE
+        val intent = fileChooserIntentBuilder.intent(fileChooserParams.acceptMimeTypes.toTypedArray(), canChooseMultipleFiles)
         startActivityForResult(intent, REQUEST_CODE_CHOOSE_FILE)
     }
 
@@ -2758,7 +2758,7 @@ class BrowserTabFragment :
     }
 
     private fun launchImageOrCameraChooser(
-        fileChooserParams: FileChooserParams,
+        fileChooserParams: FileChooserRequestedParams,
         filePathCallback: ValueCallback<Array<Uri>>,
     ) {
         context?.let {
