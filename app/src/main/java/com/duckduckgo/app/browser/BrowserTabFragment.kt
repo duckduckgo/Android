@@ -98,8 +98,8 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.OmnibarViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.PrivacyShieldViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.SavedSiteChangedViewState
 import com.duckduckgo.app.browser.DownloadConfirmationFragment.DownloadConfirmationDialogListener
-import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.R.string
+import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
@@ -2450,7 +2450,9 @@ class BrowserTabFragment :
                         if (savedSiteChangedViewState.savedSite is Bookmark) {
                             editSavedSite(
                                 savedSiteChangedViewState.copy(
-                                    savedSite = savedSiteChangedViewState.savedSite.copy(isFavorite = viewModel.browserViewState.value?.favorite != null),
+                                    savedSite = savedSiteChangedViewState.savedSite.copy(
+                                        isFavorite = viewModel.browserViewState.value?.favorite != null,
+                                    ),
                                 ),
                             )
                             dismissHandler.removeCallbacks(dismissRunnable)
