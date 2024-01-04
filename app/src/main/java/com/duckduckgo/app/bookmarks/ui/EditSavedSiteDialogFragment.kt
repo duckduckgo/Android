@@ -24,6 +24,7 @@ import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFr
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.common.ui.view.listitem.DaxListItem.ImageBackground.Circular
+import com.duckduckgo.common.ui.view.quietlySetIsChecked
 import com.duckduckgo.common.ui.view.text.DaxTextInput
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.extensions.html
@@ -64,20 +65,18 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
             binding.savedSiteLocationContainer.visibility = View.VISIBLE
             binding.addToFavoritesBottomDivider.visibility = View.VISIBLE
             isFavorite = (savedSite as Bookmark).isFavorite
-            if (isFavorite) {
-                binding.addToFavoritesItem.setLeadingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_favorite_solid_16)
-            } else {
-                binding.addToFavoritesItem.setLeadingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_favorite_16)
+            binding.addToFavoritesPrimaryItem.setLeadingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_favorite_24)
+            binding.addToFavoritesPrimaryItem.setLeadingIconBackgroundType(Circular)
+            binding.addToFavoritesSwitch.quietlySetIsChecked(
+                isFavorite,
+            ) { _, isChecked ->
+                isFavorite = isChecked
+                favoriteChanged = savedSite.isFavorite != isFavorite
+                setConfirmationVisibility()
             }
-            binding.addToFavoritesItem.setLeadingIconBackgroundType(Circular)
-            binding.addToFavoritesItem.setClickListener {
-                if (isFavorite) {
-                    binding.addToFavoritesItem.setLeadingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_favorite_16)
-                    isFavorite = false
-                } else {
-                    binding.addToFavoritesItem.setLeadingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_favorite_solid_16)
-                    isFavorite = true
-                }
+            binding.addToFavoritesPrimaryItem.setClickListener {
+                isFavorite = !isFavorite
+                binding.addToFavoritesSwitch.isChecked = isFavorite
                 favoriteChanged = savedSite.isFavorite != isFavorite
                 setConfirmationVisibility()
             }

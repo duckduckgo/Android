@@ -80,13 +80,27 @@
         android:layout_height="wrap_content"
         android:visibility="gone"/>
 
-    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+    <FrameLayout
         android:id="@+id/addToFavoritesItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="8dp"
-        app:primaryText="@string/addToFavorites"
         app:layout_constraintTop_toBottomOf="@id/addToFavoritesBottomDivider"
-        android:visibility="gone"/>
+        android:visibility="gone">
+
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/addToFavoritesPrimaryItem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/addToFavorites"
+            app:leadingIconBackground="circular"/>
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/addToFavoritesSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginEnd="16dp"/>
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
