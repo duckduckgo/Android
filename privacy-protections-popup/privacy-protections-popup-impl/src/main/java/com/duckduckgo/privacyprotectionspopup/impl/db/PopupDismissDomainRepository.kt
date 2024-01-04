@@ -27,6 +27,7 @@ interface PopupDismissDomainRepository {
     fun getPopupDismissTime(domain: String): Flow<Instant?>
     suspend fun setPopupDismissTime(domain: String, time: Instant)
     suspend fun removeEntriesOlderThan(time: Instant)
+    suspend fun removeAllEntries()
 }
 
 @ContributesBinding(AppScope::class)
@@ -46,5 +47,9 @@ class PopupDismissDomainRepositoryImpl @Inject constructor(
 
     override suspend fun removeEntriesOlderThan(time: Instant) {
         dao.removeEntriesOlderThan(time)
+    }
+
+    override suspend fun removeAllEntries() {
+        dao.removeAllEntries()
     }
 }

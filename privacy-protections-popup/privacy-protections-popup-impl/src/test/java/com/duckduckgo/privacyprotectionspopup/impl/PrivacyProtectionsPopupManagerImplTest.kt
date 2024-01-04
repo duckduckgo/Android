@@ -427,6 +427,9 @@ private class FakePopupDismissDomainRepository : PopupDismissDomainRepository {
 
     override suspend fun removeEntriesOlderThan(time: Instant) =
         throw UnsupportedOperationException()
+
+    override suspend fun removeAllEntries() =
+        throw UnsupportedOperationException()
 }
 
 private class FakeToggleUsageTimestampRepository : ToggleUsageTimestampRepository {
