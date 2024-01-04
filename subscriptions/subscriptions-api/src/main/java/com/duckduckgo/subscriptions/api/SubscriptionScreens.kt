@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,10 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-}
+package com.duckduckgo.subscriptions.api
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 
-dependencies {
-    implementation project(path: ':navigation-api')
-}
-
-android {
-    namespace 'com.duckduckgo.subscriptions.api'
+sealed class SubscriptionScreens {
+    data object SubscriptionScreenNoParams : ActivityParams
 }

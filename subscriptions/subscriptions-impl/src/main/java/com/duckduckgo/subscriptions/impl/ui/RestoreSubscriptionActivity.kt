@@ -118,7 +118,7 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
                     override fun onPositiveButtonClicked() {
                         globalActivityStarter.start(
                             this@RestoreSubscriptionActivity,
-                            SubscriptionsWebViewActivityWithParams(url = BUY_URL, "Buy Subscription"),
+                            SubscriptionsWebViewActivityWithParams(url = BUY_URL, screenTitle = getString(string.buySubscriptionTitle)),
                         )
                     }
                 },

@@ -46,6 +46,7 @@ import com.duckduckgo.mobile.android.R
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.navigation.api.getActivityParams
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionScreenNoParams
 import com.duckduckgo.subscriptions.impl.R.string
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ACTIVATE_URL
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BUY_URL
@@ -76,6 +77,7 @@ data class SubscriptionsWebViewActivityWithParams(
 ) : ActivityParams
 
 @InjectWith(ActivityScope::class)
+@ContributeToActivityStarter(SubscriptionScreenNoParams::class)
 @ContributeToActivityStarter(SubscriptionsWebViewActivityWithParams::class)
 class SubscriptionsWebViewActivity : DuckDuckGoActivity() {
 
@@ -103,17 +105,22 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
 
         val params = intent.getActivityParams(SubscriptionsWebViewActivityWithParams::class.java)
-        url = params?.url
+        url = params?.url ?: BUY_URL
 
         setContentView(binding.root)
         setupInternalToolbar(toolbar)
 
-        title = params?.screenTitle.orEmpty()
+        title = params?.screenTitle ?: getString(string.buySubscriptionTitle)
         binding.webview.let {
             subscriptionJsMessaging.register(
                 it,
                 object : JsMessageCallback() {
-                    override fun process(featureName: String, method: String, id: String?, data: JSONObject?) {
+                    override fun process(
+                        featureName: String,
+                        method: String,
+                        id: String?,
+                        data: JSONObject?,
+                    ) {
                         viewModel.processJsCallbackMessage(featureName, method, id, data)
                     }
                 },
@@ -199,20 +206,24 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity() {
                 binding.webview.gone()
                 binding.progress.show()
             }
+
             is PurchaseStateView.Inactive -> {
                 binding.webview.show()
                 binding.progress.gone()
             }
+
             is PurchaseStateView.Success -> {
                 binding.webview.show()
                 binding.progress.gone()
                 onPurchaseSuccess(purchaseState.subscriptionEventData)
             }
+
             is PurchaseStateView.Recovered -> {
                 binding.webview.show()
                 binding.progress.gone()
                 onPurchaseRecovered()
             }
+
             is PurchaseStateView.Failure -> {
                 binding.webview.show()
                 binding.progress.gone()

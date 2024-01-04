@@ -14,40 +14,42 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.networkprotection.impl.configuration
+package com.duckduckgo.networkprotection.subscription.configuration
 
-import com.duckduckgo.app.global.api.ApiInterceptorPlugin
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.impl.BuildConfig
-import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
-import com.squareup.anvil.annotations.ContributesMultibinding
+import com.duckduckgo.networkprotection.impl.configuration.NetpRequestInterceptor
+import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
+import com.duckduckgo.networkprotection.subscription.NetpSubscriptionManager
+import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesBinding.Priority.HIGHEST
 import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
 import logcat.logcat
-import okhttp3.Interceptor
+import okhttp3.Interceptor.Chain
 import okhttp3.Response
 
-@ContributesMultibinding(
-    scope = AppScope::class,
-    boundType = ApiInterceptorPlugin::class,
+@ContributesBinding(
+    AppScope::class,
+    priority = HIGHEST, // binding for internal-testing build wins
 )
-class WgVpnControllerRequestInterceptor @Inject constructor(
-    private val netpWaitlistRepository: NetPWaitlistRepository,
+class NetpSubscriptionRequestInterceptor @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
-) : Interceptor, ApiInterceptorPlugin {
-    override fun getInterceptor(): Interceptor = this
+    private val netpSubscriptionManager: NetpSubscriptionManager,
+    private val networkProtectionRepository: NetworkProtectionRepository,
+) : NetpRequestInterceptor {
 
-    override fun intercept(chain: Interceptor.Chain): Response {
+    override fun intercept(chain: Chain): Response {
         val url = chain.request().url
         val newRequest = chain.request().newBuilder()
-        if (ENDPOINTS_PATTERN_MATCHER.any { url.toString().endsWith(it) }) {
+        return if (ENDPOINTS_PATTERN_MATCHER.any { url.toString().endsWith(it) }) {
             logcat { "Adding Authorization Bearer token to request $url" }
             newRequest.addHeader(
                 name = "Authorization",
                 // this runBlocking is fine as we're already in a background thread
-                value = "bearer ${runBlocking { netpWaitlistRepository.getAuthenticationToken() }}",
+                value = "bearer ddg:${runBlocking { netpSubscriptionManager.getToken() }}",
             )
 
             if (appBuildConfig.isInternalBuild()) {
@@ -56,11 +58,15 @@ class WgVpnControllerRequestInterceptor @Inject constructor(
                     value = BuildConfig.NETP_DEBUG_SERVER_TOKEN,
                 )
             }
-        }
 
-        return chain.proceed(
-            newRequest.build().also { logcat { "headers: ${it.headers}" } },
-        )
+            chain.proceed(
+                newRequest.build().also { logcat { "headers: ${it.headers}" } },
+            ).also {
+                networkProtectionRepository.vpnAccessRevoked = it.code == 403
+            }
+        } else {
+            chain.proceed(newRequest.build())
+        }
     }
 
     companion object {
