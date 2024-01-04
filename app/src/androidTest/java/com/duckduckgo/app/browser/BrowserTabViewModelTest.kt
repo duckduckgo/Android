@@ -673,7 +673,7 @@ class BrowserTabViewModelTest {
         val folderId = "folder1"
         val bookmark =
             Bookmark(id = UUID.randomUUID().toString(), title = "A title", url = "www.example.com", parentId = folderId, lastModified = "timestamp")
-        testee.onBookmarkEdited(bookmark, folderId)
+        testee.onBookmarkEdited(bookmark, folderId, false)
         verify(mockSavedSitesRepository).updateBookmark(bookmark, folderId)
     }
 
