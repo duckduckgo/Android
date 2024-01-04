@@ -95,7 +95,7 @@
             app:primaryText="@string/addToFavorites"
             app:leadingIconBackground="circular"/>
 
-        <androidx.appcompat.widget.SwitchCompat
+        <com.duckduckgo.common.ui.view.SwitchView
             android:id="@+id/addToFavoritesSwitch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

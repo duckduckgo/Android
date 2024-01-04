@@ -46,7 +46,7 @@
             app:primaryText="Primary Item"
             app:leadingIconBackground="circular"/>
 
-        <androidx.appcompat.widget.SwitchCompat
+        <com.duckduckgo.common.ui.view.SwitchView
             android:id="@+id/bookmarksBottomSheetSwitch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
