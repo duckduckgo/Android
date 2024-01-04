@@ -71,7 +71,9 @@ class BookmarksBottomSheetDialog(builder: Builder) : BottomSheetDialog(builder.c
         }
 
         binding.bookmarksBottomSheetDialogPrimaryItem.setPrimaryText(builder.primaryItemText)
-        builder.primaryItemIcon?.let { binding.bookmarksBottomSheetDialogPrimaryItem.setLeadingIconDrawable(ContextCompat.getDrawable(context, it)!!) }
+        builder.primaryItemIcon?.let {
+            binding.bookmarksBottomSheetDialogPrimaryItem.setLeadingIconDrawable(ContextCompat.getDrawable(context, it)!!)
+        }
         builder.primaryItemTextColor?.let { binding.bookmarksBottomSheetDialogPrimaryItem.setPrimaryTextColor(it) }
 
         binding.bookmarksBottomSheetDialogSecondaryItem.setPrimaryText(builder.secondaryItemText)
