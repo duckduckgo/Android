@@ -2179,7 +2179,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun onSavedSiteDeleted(savedSite: SavedSite) {
-        onDeleteSavedSiteRequested(savedSite)
+        onDeleteFavoriteRequested(savedSite)
     }
 
     fun onEditSavedSiteRequested(savedSite: SavedSite) {
