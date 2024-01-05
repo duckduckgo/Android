@@ -45,6 +45,7 @@ class FavoritesQuickAccessAdapter(
     private val onMoveListener: (RecyclerView.ViewHolder) -> Unit,
     private val onItemSelected: (QuickAccessFavorite) -> Unit,
     private val onEditClicked: (QuickAccessFavorite) -> Unit,
+    private val onRemoveFavoriteClicked: (QuickAccessFavorite) -> Unit,
     private val onDeleteClicked: (QuickAccessFavorite) -> Unit,
 ) : ListAdapter<QuickAccessFavorite, QuickAccessViewHolder>(QuickAccessAdapterDiffCallback()) {
 
@@ -62,6 +63,7 @@ class FavoritesQuickAccessAdapter(
         private val onMoveListener: (RecyclerView.ViewHolder) -> Unit,
         private val onItemSelected: (QuickAccessFavorite) -> Unit,
         private val onEditClicked: (QuickAccessFavorite) -> Unit,
+        private val onRemoveFavoriteClicked: (QuickAccessFavorite) -> Unit,
         private val onDeleteClicked: (QuickAccessFavorite) -> Unit,
     ) : RecyclerView.ViewHolder(binding.root), DragDropViewHolderListener {
 
@@ -153,10 +155,11 @@ class FavoritesQuickAccessAdapter(
             anchor: View,
             item: QuickAccessFavorite,
         ) {
-            val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_edit_delete_menu)
+            val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_edit_remove_favorite_delete_menu)
             val view = popupMenu.contentView
             popupMenu.apply {
                 onMenuItemClicked(view.findViewById(R.id.edit)) { onEditClicked(item) }
+                onMenuItemClicked(view.findViewById(R.id.removeFromFavorites)) { onRemoveFavoriteClicked(item) }
                 onMenuItemClicked(view.findViewById(R.id.delete)) { onDeleteClicked(item) }
             }
             popupMenu.showAnchoredToView(binding.root, anchor)
@@ -219,6 +222,7 @@ class FavoritesQuickAccessAdapter(
             onMoveListener,
             onItemSelected,
             onEditClicked,
+            onRemoveFavoriteClicked,
             onDeleteClicked,
         )
     }

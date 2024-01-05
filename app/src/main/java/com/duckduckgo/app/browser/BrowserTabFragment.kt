@@ -34,6 +34,7 @@ import android.print.PrintManager
 import android.text.Editable
 import android.text.Spannable
 import android.text.SpannableString
+import android.text.Spanned
 import android.text.style.StyleSpan
 import android.view.*
 import android.view.View.*
@@ -62,6 +63,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
+import androidx.core.text.toSpannable
 import androidx.core.view.*
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
@@ -248,7 +250,6 @@ import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
-import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
@@ -1155,7 +1156,18 @@ class BrowserTabFragment :
             is Command.LaunchNewTab -> browserActivity?.launchNewTab()
             is Command.ShowSavedSiteAddedConfirmation -> savedSiteAdded(it.savedSiteChangedViewState)
             is Command.ShowEditSavedSiteDialog -> editSavedSite(it.savedSiteChangedViewState)
-            is Command.DeleteSavedSiteConfirmation -> confirmDeleteSavedSite(it.savedSite)
+            is Command.DeleteFavoriteConfirmation -> confirmDeleteSavedSite(
+                it.savedSite,
+                getString(string.favoriteDeleteConfirmationMessage).toSpannable(),
+            ) {
+                viewModel.onDeleteFavoriteSnackbarDismissed(it)
+            }
+            is Command.DeleteSavedSiteConfirmation -> confirmDeleteSavedSite(
+                it.savedSite,
+                getString(string.bookmarkDeleteConfirmationMessage, it.savedSite.title).html(requireContext()),
+            ) {
+                viewModel.onDeleteSavedSiteSnackbarDismissed(it)
+            }
             is Command.ShowFireproofWebSiteConfirmation -> fireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.DeleteFireproofConfirmation -> removeFireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.ShowPrivacyProtectionEnabledConfirmation -> privacyProtectionEnabledConfirmation(it.domain)
@@ -2009,6 +2021,7 @@ class BrowserTabFragment :
                 viewModel.onUserSubmittedQuery(it.favorite.url)
             },
             { viewModel.onEditSavedSiteRequested(it.favorite) },
+            { viewModel.onDeleteFavoriteRequested(it.favorite) },
             { viewModel.onDeleteSavedSiteRequested(it.favorite) },
         )
     }
@@ -2487,11 +2500,7 @@ class BrowserTabFragment :
         addBookmarkDialog.deleteBookmarkListener = viewModel
     }
 
-    private fun confirmDeleteSavedSite(savedSite: SavedSite) {
-        val message = when (savedSite) {
-            is Favorite -> getString(R.string.favoriteDeleteConfirmationMessage)
-            is Bookmark -> getString(R.string.bookmarkDeleteConfirmationMessage, savedSite.title).html(requireContext())
-        }
+    private fun confirmDeleteSavedSite(savedSite: SavedSite, message: Spanned, onDeleteSnackbarDismissed: (SavedSite) -> Unit) {
         binding.rootView.makeSnackbarWithNoBottomInset(
             message,
             Snackbar.LENGTH_LONG,
@@ -2505,7 +2514,7 @@ class BrowserTabFragment :
                         event: Int,
                     ) {
                         if (event != DISMISS_EVENT_ACTION) {
-                            viewModel.onDeleteSavedSiteSnackbarDismissed(savedSite)
+                            onDeleteSnackbarDismissed(savedSite)
                         }
                     }
                 },

@@ -363,10 +363,18 @@ class RealSavedSitesRepository(
         }
     }
 
-    override fun delete(savedSite: SavedSite) {
+    override fun delete(savedSite: SavedSite, deleteBookmark: Boolean) {
         when (savedSite) {
             is Bookmark -> deleteBookmark(savedSite)
-            is Favorite -> deleteFavorite(savedSite)
+            is Favorite -> {
+                if (deleteBookmark) {
+                    getBookmark(savedSite.url)?.let {
+                        deleteBookmark(it)
+                    }
+                } else {
+                    deleteFavorite(savedSite)
+                }
+            }
         }
     }
 

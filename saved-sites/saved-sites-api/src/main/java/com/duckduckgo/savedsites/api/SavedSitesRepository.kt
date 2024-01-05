@@ -207,7 +207,7 @@ interface SavedSitesRepository {
      * Deletes a [SavedSite]
      * @param savedSite to be deleted
      */
-    fun delete(savedSite: SavedSite)
+    fun delete(savedSite: SavedSite, deleteBookmark: Boolean = false)
 
     /**
      * Updates the content of a [Favorite]
