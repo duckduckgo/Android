@@ -16,10 +16,14 @@
 
 package com.duckduckgo.mobile.android.vpn.ui.notification
 
+import android.Manifest.permission
 import android.content.ComponentName
 import android.content.Context
 import android.content.pm.PackageManager
+import android.os.Build.VERSION
+import android.os.Build.VERSION_CODES
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
@@ -179,10 +183,20 @@ class AppTPReminderNotificationScheduler @Inject constructor(
         vpnReminderNotificationContentPluginPoint.getHighestPriorityPluginForType(DISABLED)?.let {
             it.getContent()?.let { content ->
                 logcat { "Showing disabled notification from $it" }
-                notificationManager.notify(
-                    TrackerBlockingVpnService.VPN_REMINDER_NOTIFICATION_ID,
-                    vpnReminderNotificationBuilder.buildReminderNotification(content),
-                )
+
+                if (VERSION.SDK_INT >= VERSION_CODES.TIRAMISU) {
+                    if (ContextCompat.checkSelfPermission(context, permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+                        notificationManager.notify(
+                            TrackerBlockingVpnService.VPN_REMINDER_NOTIFICATION_ID,
+                            vpnReminderNotificationBuilder.buildReminderNotification(content),
+                        )
+                    }
+                } else {
+                    notificationManager.notify(
+                        TrackerBlockingVpnService.VPN_REMINDER_NOTIFICATION_ID,
+                        vpnReminderNotificationBuilder.buildReminderNotification(content),
+                    )
+                }
             }
         }
     }

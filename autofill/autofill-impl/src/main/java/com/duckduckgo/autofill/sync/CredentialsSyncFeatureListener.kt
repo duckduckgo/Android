@@ -16,8 +16,13 @@
 
 package com.duckduckgo.autofill.sync
 
+import android.Manifest.permission
 import android.content.Context
+import android.content.pm.PackageManager.PERMISSION_GRANTED
+import android.os.Build.VERSION
+import android.os.Build.VERSION_CODES
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.engine.FeatureSyncError
 import com.duckduckgo.sync.api.engine.FeatureSyncError.COLLECTION_LIMIT_REACHED
@@ -65,10 +70,19 @@ class AppCredentialsSyncFeatureListener @Inject constructor(
     }
 
     private fun triggerNotification() {
-        notificationManager.notify(
-            SYNC_PAUSED_CREDENTIALS_NOTIFICATION_ID,
-            notificationBuilder.buildRateLimitNotification(context),
-        )
+        if (VERSION.SDK_INT >= VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(context, permission.POST_NOTIFICATIONS) == PERMISSION_GRANTED) {
+                notificationManager.notify(
+                    SYNC_PAUSED_CREDENTIALS_NOTIFICATION_ID,
+                    notificationBuilder.buildRateLimitNotification(context),
+                )
+            }
+        } else {
+            notificationManager.notify(
+                SYNC_PAUSED_CREDENTIALS_NOTIFICATION_ID,
+                notificationBuilder.buildRateLimitNotification(context),
+            )
+        }
     }
 
     private fun cancelNotification() {
