@@ -36,7 +36,6 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.anrs.api.CrashLogger.Crash
-import com.duckduckgo.app.accessibility.AccessibilityManager
 import com.duckduckgo.app.browser.WebViewErrorResponse.BAD_URL
 import com.duckduckgo.app.browser.WebViewErrorResponse.CONNECTION
 import com.duckduckgo.app.browser.WebViewErrorResponse.SSL_PROTOCOL_ERROR
@@ -91,7 +90,6 @@ class BrowserWebViewClientTest {
     private val cookieManager: CookieManager = mock()
     private val loginDetector: DOMLoginDetector = mock()
     private val dosDetector: DosDetector = DosDetector()
-    private val accessibilitySettings: AccessibilityManager = mock()
     private val trustedCertificateStore: TrustedCertificateStore = mock()
     private val webViewHttpAuthStore: WebViewHttpAuthStore = mock()
     private val thirdPartyCookieManager: ThirdPartyCookieManager = mock()
@@ -124,7 +122,6 @@ class BrowserWebViewClientTest {
             TestScope(),
             coroutinesTestRule.testDispatcherProvider,
             browserAutofillConfigurator,
-            accessibilitySettings,
             ampLinks,
             printInjector,
             internalTestUserChecker,
@@ -278,14 +275,6 @@ class BrowserWebViewClientTest {
     fun whenOnPageFinishedCalledThenFlushCookies() {
         testee.onPageFinished(webView, null)
         verify(cookieManager).flush()
-    }
-
-    @UiThreadTest
-    @Test
-    fun whenOnPageFinishedThenNotifyAccessibilityManager() {
-        testee.onPageFinished(webView, "http://example.com")
-
-        verify(accessibilitySettings).onPageFinished(webView, "http://example.com")
     }
 
     @UiThreadTest

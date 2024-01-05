@@ -29,7 +29,6 @@ import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anrs.api.CrashLogger
-import com.duckduckgo.app.accessibility.AccessibilityManager
 import com.duckduckgo.app.browser.WebViewErrorResponse.BAD_URL
 import com.duckduckgo.app.browser.WebViewErrorResponse.CONNECTION
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
@@ -72,7 +71,6 @@ class BrowserWebViewClient @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val browserAutofillConfigurator: BrowserAutofill.Configurator,
-    private val accessibilityManager: AccessibilityManager,
     private val ampLinks: AmpLinks,
     private val printInjector: PrintInjector,
     private val internalTestUserChecker: InternalTestUserChecker,
@@ -294,7 +292,6 @@ class BrowserWebViewClient @Inject constructor(
         jsPlugins.getPlugins().forEach {
             it.onPageFinished(webView, url, webViewClientListener?.getSite())
         }
-        accessibilityManager.onPageFinished(webView, url)
         url?.let {
             // We call this for any url but it will only be processed for an internal tester verification url
             internalTestUserChecker.verifyVerificationCompleted(it)
