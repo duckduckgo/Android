@@ -327,7 +327,7 @@ class SystemSearchViewModelTest {
         testee.onDeleteQuickAccessItemRequested(quickAccessItem)
 
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        assertEquals(Command.DeleteSavedSiteConfirmation(quickAccessItem.favorite), commandCaptor.lastValue)
+        assertEquals(Command.DeleteFavoriteConfirmation(quickAccessItem.favorite), commandCaptor.lastValue)
     }
 
     @Test
@@ -390,7 +390,7 @@ class SystemSearchViewModelTest {
     fun whenQuickAccessDeletedThenRepositoryDeletesSavedSite() = runTest {
         val savedSite = Favorite("favorite1", "title", "http://example.com", "timestamp", 0)
 
-        testee.deleteSavedSiteSnackbarDismissed(savedSite)
+        testee.deleteFavoriteSnackbarDismissed(savedSite)
 
         verify(mocksavedSitesRepository).delete(savedSite)
     }

@@ -708,7 +708,7 @@ class BrowserTabViewModelTest {
         val bookmark =
             Bookmark(id = UUID.randomUUID().toString(), title = "A title", url = "www.example.com", lastModified = "timestamp")
 
-        testee.onDeleteSavedSiteSnackbarDismissed(bookmark)
+        testee.onDeleteFavoriteSnackbarDismissed(bookmark)
 
         verify(mockFaviconManager).deletePersistedFavicon(bookmark.url)
         verify(mockSavedSitesRepository).delete(bookmark)
@@ -759,7 +759,7 @@ class BrowserTabViewModelTest {
     fun whenDeleteQuickAccessItemCalledWithFavoriteThenRepositoryUpdated() = runTest {
         val savedSite = Favorite(UUID.randomUUID().toString(), "title", "http://example.com", lastModified = "timestamp", 0)
 
-        testee.onDeleteSavedSiteSnackbarDismissed(savedSite)
+        testee.onDeleteFavoriteSnackbarDismissed(savedSite)
 
         verify(mockSavedSitesRepository).delete(savedSite)
     }
@@ -768,7 +768,7 @@ class BrowserTabViewModelTest {
     fun whenDeleteQuickAccessItemCalledWithBookmarkThenRepositoryUpdated() = runTest {
         val savedSite = Bookmark(UUID.randomUUID().toString(), "title", "http://example.com", lastModified = "timestamp")
 
-        testee.onDeleteSavedSiteSnackbarDismissed(savedSite)
+        testee.onDeleteFavoriteSnackbarDismissed(savedSite)
 
         verify(mockSavedSitesRepository).delete(savedSite)
     }
@@ -3796,8 +3796,8 @@ class BrowserTabViewModelTest {
         loadUrl("www.example.com", isBrowserShowing = true)
         testee.onFavoriteMenuClicked()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        assertTrue(commandCaptor.lastValue is Command.DeleteSavedSiteConfirmation)
-        val command = commandCaptor.lastValue as Command.DeleteSavedSiteConfirmation
+        assertTrue(commandCaptor.lastValue is Command.DeleteFavoriteConfirmation)
+        val command = commandCaptor.lastValue as Command.DeleteFavoriteConfirmation
         assertEquals("www.example.com", command.savedSite.url)
         assertEquals("title", command.savedSite.title)
     }
