@@ -1254,6 +1254,7 @@ class BrowserTabFragment :
             is Command.CopyLink -> clipboardManager.setPrimaryClip(ClipData.newPlainText(null, it.url))
             is Command.ShowFileChooser -> launchFilePicker(it.filePathCallback, it.fileChooserParams)
             is Command.ShowExistingImageOrCameraChooser -> launchImageOrCameraChooser(it.fileChooserParams, it.filePathCallback)
+            is Command.ShowImageCamera -> launchCameraCapture(it.filePathCallback)
 
             is Command.AddHomeShortcut -> {
                 context?.let { context ->
