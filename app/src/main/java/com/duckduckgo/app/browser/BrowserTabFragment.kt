@@ -65,6 +65,7 @@ import androidx.fragment.app.commitNow
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.transaction
 import androidx.lifecycle.*
+import androidx.lifecycle.Lifecycle.State.RESUMED
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -690,7 +691,7 @@ class BrowserTabFragment :
     private val homeBackgroundLogo by lazy { HomeBackgroundLogo(newBrowserTab.ddgLogo) }
 
     private val ctaViewStateObserver = Observer<CtaViewState> {
-        it?.let { renderer.renderCtaViewState(it) }
+        renderer.renderCtaViewState(it)
     }
 
     private var alertDialog: DaxAlertDialog? = null
@@ -2287,16 +2288,32 @@ class BrowserTabFragment :
         requiredUrl: String? = null,
     ) {
         // want to ensure lifecycle is at least resumed before attempting to show dialog
-        lifecycleScope.launchWhenResumed {
-            hideDialogWithTag(tag)
+        lifecycleScope.launch {
+            repeatOnLifecycle(RESUMED) {
+                hideDialogWithTag(tag)
 
-            val currentUrl = webView?.url
-            val urlMatch = requiredUrl == null || requiredUrl == currentUrl
-            if (isActiveTab && urlMatch) {
-                Timber.i("Showing dialog (%s), hidden=%s, requiredUrl=%s, currentUrl=%s, tabId=%s", tag, isHidden, requiredUrl, currentUrl, tabId)
-                dialog.show(childFragmentManager, tag)
-            } else {
-                Timber.w("Not showing dialog (%s), hidden=%s, requiredUrl=%s, currentUrl=%s, tabId=%s", tag, isHidden, requiredUrl, currentUrl, tabId)
+                val currentUrl = webView?.url
+                val urlMatch = requiredUrl == null || requiredUrl == currentUrl
+                if (isActiveTab && urlMatch) {
+                    Timber.i(
+                        "Showing dialog (%s), hidden=%s, requiredUrl=%s, currentUrl=%s, tabId=%s",
+                        tag,
+                        isHidden,
+                        requiredUrl,
+                        currentUrl,
+                        tabId,
+                    )
+                    dialog.show(childFragmentManager, tag)
+                } else {
+                    Timber.w(
+                        "Not showing dialog (%s), hidden=%s, requiredUrl=%s, currentUrl=%s, tabId=%s",
+                        tag,
+                        isHidden,
+                        requiredUrl,
+                        currentUrl,
+                        tabId,
+                    )
+                }
             }
         }
     }

@@ -57,7 +57,7 @@ class AllowListViewModel @Inject constructor(
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     private val entries: LiveData<List<UserAllowListedDomain>> = dao.all()
-    private val observer = Observer<List<UserAllowListedDomain>> { onUserAllowListChanged(it!!) }
+    private val observer = Observer<List<UserAllowListedDomain>> { onUserAllowListChanged(it) }
 
     init {
         viewState.value = ViewState()

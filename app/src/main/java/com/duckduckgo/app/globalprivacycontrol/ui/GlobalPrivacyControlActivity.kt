@@ -98,24 +98,22 @@ class GlobalPrivacyControlActivity : DuckDuckGoActivity() {
     private fun observeViewModel() {
         viewModel.viewState.observe(
             this,
-            { viewState ->
-                viewState?.let {
-                    binding.globalPrivacyControlToggle.quietlySetIsChecked(it.globalPrivacyControlEnabled, globalPrivacyControlToggleListener)
-                    binding.globalPrivacyControlToggle.isEnabled = it.globalPrivacyControlFeatureEnabled
-                }
-            },
-        )
+        ) { viewState ->
+            viewState?.let {
+                binding.globalPrivacyControlToggle.quietlySetIsChecked(it.globalPrivacyControlEnabled, globalPrivacyControlToggleListener)
+                binding.globalPrivacyControlToggle.isEnabled = it.globalPrivacyControlFeatureEnabled
+            }
+        }
 
         viewModel.command.observe(
             this,
-            { command ->
-                command?.let {
-                    when (it) {
-                        is GlobalPrivacyControlViewModel.Command.OpenLearnMore -> openLearnMoreSite(it)
-                    }
+        ) { command ->
+            command.let {
+                when (it) {
+                    is GlobalPrivacyControlViewModel.Command.OpenLearnMore -> openLearnMoreSite(it)
                 }
-            },
-        )
+            }
+        }
     }
 
     private fun openLearnMoreSite(command: GlobalPrivacyControlViewModel.Command.OpenLearnMore) {

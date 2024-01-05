@@ -58,7 +58,7 @@ class FireproofWebsitesViewModel @Inject constructor(
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     private val fireproofWebsites: LiveData<List<FireproofWebsiteEntity>> = fireproofWebsiteRepository.getFireproofWebsites()
-    private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> { onPreservedCookiesEntitiesChanged(it!!) }
+    private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> { onPreservedCookiesEntitiesChanged(it) }
 
     init {
         _viewState.value = ViewState(

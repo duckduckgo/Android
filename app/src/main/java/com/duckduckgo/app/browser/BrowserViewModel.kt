@@ -96,35 +96,32 @@ class BrowserViewModel @Inject constructor(
     var selectedTab: LiveData<TabEntity> = tabRepository.liveSelectedTab
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
-    private var dataClearingObserver = Observer<ApplicationClearDataState> {
-        it?.let { state ->
-            when (state) {
-                ApplicationClearDataState.INITIALIZING -> {
-                    Timber.i("App clear state initializing")
-                    viewState.value = currentViewState.copy(hideWebContent = true)
-                }
-                ApplicationClearDataState.FINISHED -> {
-                    Timber.i("App clear state finished")
-                    viewState.value = currentViewState.copy(hideWebContent = false)
-                }
+    private var dataClearingObserver = Observer<ApplicationClearDataState> { state ->
+        when (state) {
+            ApplicationClearDataState.INITIALIZING -> {
+                Timber.i("App clear state initializing")
+                viewState.value = currentViewState.copy(hideWebContent = true)
+            }
+
+            ApplicationClearDataState.FINISHED -> {
+                Timber.i("App clear state finished")
+                viewState.value = currentViewState.copy(hideWebContent = false)
             }
         }
     }
 
-    private val appEnjoymentObserver = Observer<AppEnjoymentPromptOptions> {
-        it?.let { promptType ->
-            when (promptType) {
-                is AppEnjoymentPromptOptions.ShowEnjoymentPrompt -> {
-                    command.value = Command.ShowAppEnjoymentPrompt(promptType.promptCount)
-                }
-                is AppEnjoymentPromptOptions.ShowRatingPrompt -> {
-                    command.value = Command.ShowAppRatingPrompt(promptType.promptCount)
-                }
-                is AppEnjoymentPromptOptions.ShowFeedbackPrompt -> {
-                    command.value = Command.ShowAppFeedbackPrompt(promptType.promptCount)
-                }
-                else -> {}
+    private val appEnjoymentObserver = Observer<AppEnjoymentPromptOptions> { promptType ->
+        when (promptType) {
+            is AppEnjoymentPromptOptions.ShowEnjoymentPrompt -> {
+                command.value = Command.ShowAppEnjoymentPrompt(promptType.promptCount)
             }
+            is AppEnjoymentPromptOptions.ShowRatingPrompt -> {
+                command.value = Command.ShowAppRatingPrompt(promptType.promptCount)
+            }
+            is AppEnjoymentPromptOptions.ShowFeedbackPrompt -> {
+                command.value = Command.ShowAppFeedbackPrompt(promptType.promptCount)
+            }
+            else -> {}
         }
     }
 
