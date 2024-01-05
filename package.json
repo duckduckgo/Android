@@ -16,7 +16,7 @@
   "dependencies": {
     "@duckduckgo/autoconsent": "^6.4.0",
     "@duckduckgo/autofill": "github:duckduckgo/duckduckgo-autofill#10.0.2",
-    "@duckduckgo/content-scope-scripts": "github:duckduckgo/content-scope-scripts#4.56.0",
+    "@duckduckgo/content-scope-scripts": "github:duckduckgo/content-scope-scripts#4.58.0",
     "@duckduckgo/privacy-dashboard": "github:duckduckgo/privacy-dashboard#3.0.0",
     "@duckduckgo/privacy-reference-tests": "github:duckduckgo/privacy-reference-tests#1703196979"
   }
