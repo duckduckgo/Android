@@ -1027,6 +1027,7 @@ class BrowserTabFragment :
         dismissAppLinkSnackBar()
         errorSnackbar.dismiss()
         newBrowserTab.newTabLayout.show()
+        binding.browserLayout.gone()
         webViewContainer.gone()
         omnibar.appBarLayout.setExpanded(true)
         webView?.onPause()
@@ -1036,6 +1037,7 @@ class BrowserTabFragment :
 
     private fun showBrowser() {
         newBrowserTab.newTabLayout.gone()
+        binding.browserLayout.show()
         webViewContainer.show()
         webView?.show()
         webView?.onResume()
