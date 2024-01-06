@@ -18,6 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="autoconsentTitle">Apsauga nuo slapukų iškylančiųjų langų</string>
-    <string name="autoconsentDescription"><![CDATA[Kai „DuckDuckGo“ jūsų lankomose svetainėse aptinka slapukų iškylančiuosius langus, galime automatiškai nustatyti jūsų slapukų nuostatas, kad sumažintume slapukų skaičių, sustiprintume privatumą ir uždarytume iškylančiuosius langus. <u><a href=\"\">Sužinokite daugiau</a><u/>]]></string>
-    <string name="autoconsentToggle">Leiskite „DuckDuckGo“ tvarkyti slapukų iškylančiuosius langus</string>
+    <string name="autoconsentDescription"><![CDATA[Kai „Asil Browser“ jūsų lankomose svetainėse aptinka slapukų iškylančiuosius langus, galime automatiškai nustatyti jūsų slapukų nuostatas, kad sumažintume slapukų skaičių, sustiprintume privatumą ir uždarytume iškylančiuosius langus. <u><a href=\"\">Sužinokite daugiau</a><u/>]]></string>
+    <string name="autoconsentToggle">Leiskite „Asil Browser“ tvarkyti slapukų iškylančiuosius langus</string>
 </resources>

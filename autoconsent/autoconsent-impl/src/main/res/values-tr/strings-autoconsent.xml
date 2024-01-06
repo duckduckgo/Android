@@ -18,6 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="autoconsentTitle">Çerez Açılır Pencere Engelleyici</string>
-    <string name="autoconsentDescription"><![CDATA[DuckDuckGo, ziyaret ettiğiniz sitelerde çerez açılır pencereleri algılarsa çerez tercihlerinizi çerezleri en aza indirecek ve gizliliği en üst düzeye çıkaracak şekilde otomatik olarak ayarlayabilir ve ardından açılır pencereleri kapatabiliriz. <u><a href=\"\">Daha fazla bilgi edin</a><u/>]]></string>
-    <string name="autoconsentToggle">DuckDuckGo\'nun çerez açılır pencereleri için gereken işlemi yapmasına izin verin</string>
+    <string name="autoconsentDescription"><![CDATA[Asil Browser, ziyaret ettiğiniz sitelerde çerez açılır pencereleri algılarsa çerez tercihlerinizi çerezleri en aza indirecek ve gizliliği en üst düzeye çıkaracak şekilde otomatik olarak ayarlayabilir ve ardından açılır pencereleri kapatabiliriz. <u><a href=\"\">Daha fazla bilgi edin</a><u/>]]></string>
+    <string name="autoconsentToggle">Asil Browser\'nun çerez açılır pencereleri için gereken işlemi yapmasına izin verin</string>
 </resources>

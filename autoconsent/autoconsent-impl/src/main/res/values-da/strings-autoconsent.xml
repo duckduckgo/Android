@@ -18,6 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="autoconsentTitle">Beskyttelse mod pop op-beskeder om cookies</string>
-    <string name="autoconsentDescription"><![CDATA[Når DuckDuckGo registrerer pop op-beskeder om cookies på websteder, du besøger, kan vi automatisk indstille dine cookiepræferencer til at minimere cookies og maksimere privatlivets fred og derefter lukke pop op-vinduerne. <u><a href=\"\">Lær mere</a><u/>]]></string>
-    <string name="autoconsentToggle">Lad DuckDuckGo håndtere pop op-beskeder om cookies</string>
+    <string name="autoconsentDescription"><![CDATA[Når Asil Browser registrerer pop op-beskeder om cookies på websteder, du besøger, kan vi automatisk indstille dine cookiepræferencer til at minimere cookies og maksimere privatlivets fred og derefter lukke pop op-vinduerne. <u><a href=\"\">Lær mere</a><u/>]]></string>
+    <string name="autoconsentToggle">Lad Asil Browser håndtere pop op-beskeder om cookies</string>
 </resources>

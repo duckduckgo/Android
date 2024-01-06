@@ -18,6 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="autoconsentTitle">Защита от всплывающих окон куки</string>
-    <string name="autoconsentDescription"><![CDATA[Если DuckDuckGo обнаружит на сайте всплывающее окно выбора куки-файлов, мы можем автоматически выбрать минимум куки, максимально защитив ваши данные, а затем закроем окно. <u><a href=\"\">Подробнее...</a><u/>]]></string>
-    <string name="autoconsentToggle">Разрешить DuckDuckGo взять на себя окна выбора куки-файлов</string>
+    <string name="autoconsentDescription"><![CDATA[Если Asil Browser обнаружит на сайте всплывающее окно выбора куки-файлов, мы можем автоматически выбрать минимум куки, максимально защитив ваши данные, а затем закроем окно. <u><a href=\"\">Подробнее...</a><u/>]]></string>
+    <string name="autoconsentToggle">Разрешить Asil Browser взять на себя окна выбора куки-файлов</string>
 </resources>

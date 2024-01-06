@@ -18,6 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="autoconsentTitle">Beskyttelse mot popup-vinduer om informasjonskapsler</string>
-    <string name="autoconsentDescription"><![CDATA[Når DuckDuckGo oppdager popup-vinduer om informasjonskapsler på nettsteder du besøker, kan vi automatisk angi innstillingene for å minimere informasjonskapslene og maksimere personvernet, og deretter lukke popup-vinduene. <u><a href=\"\">Finn ut mer</a><u/>]]></string>
-    <string name="autoconsentToggle">La DuckDuckGo håndtere popup-vinduer om informasjonskapsler</string>
+    <string name="autoconsentDescription"><![CDATA[Når Asil Browser oppdager popup-vinduer om informasjonskapsler på nettsteder du besøker, kan vi automatisk angi innstillingene for å minimere informasjonskapslene og maksimere personvernet, og deretter lukke popup-vinduene. <u><a href=\"\">Finn ut mer</a><u/>]]></string>
+    <string name="autoconsentToggle">La Asil Browser håndtere popup-vinduer om informasjonskapsler</string>
 </resources>
