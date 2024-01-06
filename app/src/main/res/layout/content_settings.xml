@@ -52,12 +52,6 @@
             android:layout_height="wrap_content" />
 
         <include
-            android:id="@+id/contentSettingsMore"
-            layout="@layout/content_settings_other"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <include
             android:id="@+id/contentSettingsInternal"
             layout="@layout/content_settings_internal"
             android:layout_width="match_parent"

@@ -104,9 +104,6 @@ class SettingsActivity : DuckDuckGoActivity() {
     private val viewsSettings
         get() = binding.includeSettings.contentSettingsSettings
 
-    private val viewsMore
-        get() = binding.includeSettings.contentSettingsMore
-
     private val viewsInternal
         get() = binding.includeSettings.contentSettingsInternal
 
@@ -150,11 +147,6 @@ class SettingsActivity : DuckDuckGoActivity() {
             appearanceSetting.setClickListener { viewModel.onAppearanceSettingClicked() }
             accessibilitySetting.setClickListener { viewModel.onAccessibilitySettingClicked() }
             aboutSetting.setClickListener { viewModel.onAboutSettingClicked() }
-        }
-
-        with(viewsMore) {
-            macOsSetting.setClickListener { viewModel.onMacOsSettingClicked() }
-            windowsSetting.setClickListener { viewModel.windowsSettingClicked() }
         }
     }
 
