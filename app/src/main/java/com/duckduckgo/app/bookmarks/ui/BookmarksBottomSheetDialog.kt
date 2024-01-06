@@ -63,6 +63,7 @@ class BookmarksBottomSheetDialog(builder: Builder) : BottomSheetDialog(builder.c
         binding.bookmarksBottomSheetDialogSecondaryItem.setOnClickListener {
             builder.listener.onSecondaryItemClicked()
             setOnDismissListener(null)
+            dismiss()
         }
 
         builder.titleText?.let {
