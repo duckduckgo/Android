@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2023 DuckDuckGo
+  ~ Copyright (c) 2024 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -14,13 +14,13 @@
   ~ limitations under the License.
   -->
 
-<vector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt"
-    android:viewportWidth="24"
-    android:viewportHeight="24"
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
-    android:height="24dp">
-    <path
-        android:pathData="M4 5C4 4.44772 4.44772 4 5 4H19C19.5523 4 20 4.44772 20 5C20 5.55228 19.5523 6 19 6H5C4.44772 6 4 5.55228 4 5ZM4 12C4 11.4477 4.44772 11 5 11H19C19.5523 11 20 11.4477 20 12C20 12.5523 19.5523 13 19 13H5C4.44772 13 4 12.5523 4 12ZM4 19C4 18.4477 4.44772 18 5 18H19C19.5523 18 20 18.4477 20 19C20 19.5523 19.5523 20 19 20H5C4.44772 20 4 19.5523 4 19Z"
-        android:fillType="evenOdd"
-        android:fillColor="?attr/daxColorPrimaryIcon" />
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+  <path
+      android:pathData="M3,4a1,1 0,0 1,1 -1h16a1,1 0,1 1,0 2L4,5a1,1 0,0 1,-1 -1ZM3,12a1,1 0,0 1,1 -1h16a1,1 0,1 1,0 2L4,13a1,1 0,0 1,-1 -1ZM3,20a1,1 0,0 1,1 -1h16a1,1 0,1 1,0 2L4,21a1,1 0,0 1,-1 -1Z"
+      android:fillColor="?attr/daxColorPrimaryIcon"
+      android:fillType="evenOdd"/>
 </vector>

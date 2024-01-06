@@ -32,7 +32,7 @@
         android:id="@+id/addRemoveFavorite"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="Add To Favorites" />
+        app:primaryText="@string/addToFavorites" />
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
         android:id="@+id/delete"
