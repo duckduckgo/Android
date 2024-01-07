@@ -2098,6 +2098,7 @@ class BrowserTabFragment :
             binding.webViewContainer,
             true,
         ).findViewById(R.id.browserWebView) as DuckDuckGoWebView
+
         webView?.let {
             it.webViewClient = browserWebViewClient
             it.webChromeClient = browserWebChromeClient
@@ -2106,16 +2107,14 @@ class BrowserTabFragment :
                 userAgentString = userAgentProvider.userAgent()
                 javaScriptEnabled = true
                 domStorageEnabled = true
-                allowContentAccess = true
                 loadWithOverviewMode = true
                 useWideViewPort = true
                 builtInZoomControls = true
                 displayZoomControls = false
-                mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+                mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
                 javaScriptCanOpenWindowsAutomatically = appBuildConfig.isTest // only allow when running tests
-                allowUniversalAccessFromFileURLs = true
                 setSupportMultipleWindows(true)
-                //disableWebSql(this)
+                disableWebSql(this)
                 setSupportZoom(true)
                 configureDarkThemeSupport(this)
                 if (accessibilitySettingsDataStore.overrideSystemFontSize) {
@@ -2167,22 +2166,19 @@ class BrowserTabFragment :
                 },
             )
         }
-        webView?.apply {
-            webViewClient = object : WebViewClient() {
-                override fun onPageStarted(
-                    view: WebView?,
-                    url: String?,
-                    favicon: Bitmap?
-                ) {
-                    val jsCode = readAssetFile(requireContext().assets, "safe_gaze.js")
-                    evaluateJavascript("javascript:(function() { $jsCode })()", null)
-                }
-                // override fun onPageFinished(view: WebView?, url: String?) {
-                //     val jsCode = readAssetFile(requireContext().assets, "safe_gaze.js")
-                //     evaluateJavascript("javascript:(function() { $jsCode })()", null)
-                // }
-            }
-        }
+        // webView?.apply {
+        //     webViewClient = object : WebViewClient() {
+        //         override fun onPageStarted(
+        //             view: WebView?,
+        //             url: String?,
+        //             favicon: Bitmap?
+        //         ) {
+        //             val jsCode = readAssetFile(requireContext().assets, "safe_gaze.js")
+        //             evaluateJavascript("javascript:(function() { $jsCode })()", null)
+        //         }
+        //     }
+        // }
+        WebView.setWebContentsDebuggingEnabled(webContentDebugging.isEnabled())
     }
 
     private fun readAssetFile(assetManager: AssetManager, fileName: String): String {

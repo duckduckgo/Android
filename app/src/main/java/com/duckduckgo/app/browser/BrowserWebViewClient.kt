@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.browser
 
+import android.content.Context
+import android.content.res.AssetManager
 import android.graphics.Bitmap
 import android.net.Uri
 import android.net.http.SslError
@@ -58,6 +60,9 @@ import java.net.URI
 import javax.inject.Inject
 import kotlinx.coroutines.*
 import timber.log.Timber
+import java.io.BufferedReader
+import java.io.IOException
+import java.io.InputStreamReader
 
 class BrowserWebViewClient @Inject constructor(
     private val webViewHttpAuthStore: WebViewHttpAuthStore,
@@ -81,6 +86,7 @@ class BrowserWebViewClient @Inject constructor(
     private val pixel: Pixel,
     private val crashLogger: CrashLogger,
     private val jsPlugins: PluginPoint<JsInjectorPlugin>,
+    private val context: Context
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -262,7 +268,8 @@ class BrowserWebViewClient @Inject constructor(
         favicon: Bitmap?,
     ) {
         Timber.v("onPageStarted webViewUrl: ${webView.url} URL: $url")
-
+        val jsCode = readAssetFile(context.assets, "safe_gaze.js")
+        webView.evaluateJavascript("javascript:(function() { $jsCode })()", null)
         url?.let {
             autoconsent.injectAutoconsent(webView, url)
             adClickManager.detectAdDomain(url)
@@ -307,26 +314,43 @@ class BrowserWebViewClient @Inject constructor(
         printInjector.injectPrint(webView)
     }
 
+    private fun readAssetFile(assetManager: AssetManager, fileName: String): String {
+        val stringBuilder = StringBuilder()
+        try {
+            val inputStream = assetManager.open(fileName)
+            val bufferedReader = BufferedReader(InputStreamReader(inputStream))
+
+            var line: String?
+            while (bufferedReader.readLine().also { line = it } != null) {
+                stringBuilder.append(line).append('\n')
+            }
+        } catch (e: IOException) {
+            println("Exception is -> ${e.localizedMessage}")
+            e.printStackTrace()
+        }
+        return stringBuilder.toString()
+    }
+
     private fun flushCookies() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             cookieManagerProvider.get()?.flush()
         }
     }
 
-    // @WorkerThread
-    // override fun shouldInterceptRequest(
-    //     webView: WebView,
-    //     request: WebResourceRequest,
-    // ): WebResourceResponse? {
-    //     return runBlocking {
-    //         val documentUrl = withContext(dispatcherProvider.main()) { webView.url }
-    //         withContext(dispatcherProvider.main()) {
-    //             loginDetector.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, request))
-    //         }
-    //         Timber.v("Intercepting resource ${request.url} type:${request.method} on page $documentUrl")
-    //         requestInterceptor.shouldIntercept(request, webView, documentUrl, webViewClientListener)
-    //     }
-    // }
+    @WorkerThread
+    override fun shouldInterceptRequest(
+        webView: WebView,
+        request: WebResourceRequest,
+    ): WebResourceResponse? {
+        return runBlocking {
+            val documentUrl = withContext(dispatcherProvider.main()) { webView.url }
+            withContext(dispatcherProvider.main()) {
+                loginDetector.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, request))
+            }
+            Timber.v("Intercepting resource ${request.url} type:${request.method} on page $documentUrl")
+            requestInterceptor.shouldIntercept(request, webView, documentUrl, webViewClientListener)
+        }
+    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onRenderProcessGone(
