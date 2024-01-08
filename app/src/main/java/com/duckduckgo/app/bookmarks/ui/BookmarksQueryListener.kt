@@ -20,6 +20,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
+import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import java.util.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -37,8 +38,9 @@ class BookmarksQueryListener(
             viewModel.viewState.value = viewModel.viewState.value?.copy(
                 searchQuery = newText,
             )
+            val favorites = viewModel.viewState.value?.favorites
             viewModel.viewState.value?.bookmarks?.let { bookmarks ->
-                val filteredBookmarks = filterBookmarks(newText, bookmarks)
+                val filteredBookmarks = filterBookmarks(newText, bookmarks, favorites)
                 bookmarksAdapter.setItems(filteredBookmarks, false, true)
             }
         }
@@ -51,6 +53,7 @@ class BookmarksQueryListener(
     private fun filterBookmarks(
         query: String,
         bookmarks: List<Any>,
+        favorites: List<Favorite>?,
     ): List<BookmarksAdapter.BookmarksItemTypes> {
         val lowercaseQuery = query.lowercase(Locale.getDefault())
         return bookmarks.filter {
@@ -67,7 +70,10 @@ class BookmarksQueryListener(
             }
         }.map {
             when (it) {
-                is Bookmark -> BookmarksAdapter.BookmarkItem(it)
+                is Bookmark -> {
+                    val isFavorite = favorites?.any { favorite -> favorite.id == it.id } ?: false
+                    BookmarksAdapter.BookmarkItem(it.copy(isFavorite = isFavorite))
+                }
                 is BookmarkFolder -> BookmarksAdapter.BookmarkFolderItem(it)
                 else -> throw IllegalStateException("Unknown bookmarks item type")
             }
