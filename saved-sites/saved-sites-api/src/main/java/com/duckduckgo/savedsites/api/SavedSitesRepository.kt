@@ -311,5 +311,5 @@ interface SavedSitesRepository {
     /**
      * Deletes and re-inserts a folder relation
      */
-    fun updateFolderRelation(folder: BookmarkFolder)
+    fun updateFolderRelation(folderId: String, entities: List<String>)
 }
