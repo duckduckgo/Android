@@ -43,15 +43,15 @@
             android:id="@+id/bookmarksBottomSheetDialogPrimaryItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:primaryText="Primary Item"
-            app:leadingIconBackground="circular"/>
+            app:leadingIconBackground="circular"
+            app:primaryText="Primary Item" />
 
         <com.duckduckgo.common.ui.view.SwitchView
             android:id="@+id/bookmarksBottomSheetSwitch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end|center_vertical"
-            android:layout_marginEnd="16dp"/>
+            android:layout_marginEnd="16dp" />
     </FrameLayout>
 
 
@@ -59,7 +59,7 @@
         android:id="@+id/bookmarksBottomSheetDialogSecondaryItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="Secondary Item"
-        app:leadingIconBackground="circular"/>
+        app:leadingIconBackground="circular"
+        app:primaryText="Secondary Item" />
 
 </LinearLayout>

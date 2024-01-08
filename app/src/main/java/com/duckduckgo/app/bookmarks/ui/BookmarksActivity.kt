@@ -131,20 +131,17 @@ class BookmarksActivity : DuckDuckGoActivity() {
     }
 
     private fun updateDragHandles(showDragHandles: Boolean) {
-        val adapter = contentBookmarksBinding.recycler.adapter as? BookmarksAdapter
-        adapter?.let {
-            for (i in 0 until it.itemCount) {
-                when (val viewHolder = contentBookmarksBinding.recycler.findViewHolderForAdapterPosition(i) as? BookmarkScreenViewHolders) {
-                    is BookmarksViewHolder -> {
-                        val bookmarkItem = it.bookmarkItems[i] as BookmarkItem
-                        viewHolder.showDragHandle(showDragHandles, bookmarkItem.bookmark)
-                    }
-                    is BookmarkFoldersViewHolder -> {
-                        val folderItem = it.bookmarkItems[i] as BookmarkFolderItem
-                        viewHolder.showDragHandle(showDragHandles, folderItem.bookmarkFolder)
-                    }
-                    else -> {}
+        for (i in 0 until bookmarksAdapter.itemCount) {
+            when (val viewHolder = contentBookmarksBinding.recycler.findViewHolderForAdapterPosition(i) as? BookmarkScreenViewHolders) {
+                is BookmarksViewHolder -> {
+                    val bookmarkItem = bookmarksAdapter.bookmarkItems[i] as BookmarkItem
+                    viewHolder.showDragHandle(showDragHandles, bookmarkItem.bookmark)
                 }
+                is BookmarkFoldersViewHolder -> {
+                    val folderItem = bookmarksAdapter.bookmarkItems[i] as BookmarkFolderItem
+                    viewHolder.showDragHandle(showDragHandles, folderItem.bookmarkFolder)
+                }
+                else -> {}
             }
         }
     }
@@ -196,8 +193,6 @@ class BookmarksActivity : DuckDuckGoActivity() {
         val callback = BookmarkItemTouchHelperCallback(bookmarksAdapter)
         val itemTouchHelper = ItemTouchHelper(callback)
         itemTouchHelper.attachToRecyclerView(contentBookmarksBinding.recycler)
-
-        contentBookmarksBinding.recycler.itemAnimator = null
     }
 
     private fun observeViewModel() {

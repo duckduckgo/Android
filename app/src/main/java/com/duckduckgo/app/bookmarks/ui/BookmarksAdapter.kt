@@ -264,16 +264,12 @@ sealed class BookmarkScreenViewHolders(itemView: View, viewModel: BookmarksViewM
         fun showDragHandle(show: Boolean, bookmark: SavedSite.Bookmark) {
             if (show) {
                 binding.root.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_menu_hamburger_24)
-                binding.root.setTrailingIconClickListener(null)
+                binding.root.setTrailingIconClickListener {}
             } else {
                 binding.root.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_menu_vertical_24)
-                setTrailingIconClickListener(bookmark)
-            }
-        }
-
-        private fun setTrailingIconClickListener(bookmark: SavedSite.Bookmark) {
-            binding.root.setTrailingIconClickListener { anchor ->
-                showOverFlowMenu(anchor, bookmark)
+                binding.root.setTrailingIconClickListener { anchor ->
+                    showOverFlowMenu(anchor, bookmark)
+                }
             }
         }
 
@@ -371,16 +367,12 @@ sealed class BookmarkScreenViewHolders(itemView: View, viewModel: BookmarksViewM
         fun showDragHandle(show: Boolean, bookmarkFolder: BookmarkFolder) {
             if (show) {
                 binding.root.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_menu_hamburger_24)
-                binding.root.setTrailingIconClickListener(null)
+                binding.root.setTrailingIconClickListener {}
             } else {
                 binding.root.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_menu_vertical_24)
-                setTrailingIconClickListener(bookmarkFolder)
-            }
-        }
-
-        private fun setTrailingIconClickListener(bookmarkFolder: BookmarkFolder) {
-            binding.root.setTrailingIconClickListener {
-                showOverFlowMenu(binding.root, bookmarkFolder)
+                binding.root.setTrailingIconClickListener {
+                    showOverFlowMenu(binding.root, bookmarkFolder)
+                }
             }
         }
 
