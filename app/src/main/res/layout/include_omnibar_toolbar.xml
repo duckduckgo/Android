@@ -80,8 +80,9 @@
 
                     <FrameLayout
                         android:id="@+id/omnibarIconContainer"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        app:layout_constraintDimensionRatio="1:1"
                         android:layout_marginStart="6dp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"

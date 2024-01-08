@@ -100,7 +100,7 @@
                 android:layout_marginTop="38dp"
                 android:layout_marginEnd="@dimen/keyline_5"
                 android:text="@string/windows_share_title"
-                app:buttonSize="large"
+                app:customButtonSize="large"
                 app:layout_constraintBottom_toTopOf="@id/lookingForMacVersionButton"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -114,7 +114,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/keyline_4"
                 android:text="@string/windows_mac_link"
-                app:buttonSize="small"
+                app:customButtonSize="small"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />

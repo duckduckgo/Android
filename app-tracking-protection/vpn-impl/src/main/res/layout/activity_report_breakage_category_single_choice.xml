@@ -101,8 +101,8 @@
 
     <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
             android:id="@+id/ctaNextFormSubmit"
-            app:buttonSize="large"
-            android:layout_width="match_parent"
+        android:layout_width="match_parent"
+        app:customButtonSize="large"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/keyline_4"
             android:layout_marginEnd="@dimen/keyline_4"

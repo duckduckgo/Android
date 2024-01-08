@@ -118,7 +118,7 @@
                     android:layout_marginBottom="@dimen/keyline_2"
                     android:layout_gravity="start"
                     android:text="Primary"
-                    app:buttonSize="small" />
+                    app:customButtonSize="small" />
 
             </LinearLayout>
 

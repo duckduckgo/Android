@@ -71,13 +71,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_5"
-            app:buttonSize="large" />
+            app:customButtonSize="large" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
             android:id="@+id/notNowButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_1"
-            app:buttonSize="large" />
+            app:customButtonSize="large" />
     </LinearLayout>
 </LinearLayout>

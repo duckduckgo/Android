@@ -17,9 +17,9 @@
 <resources>
 
     <declare-styleable name="DaxButton">
-        <attr name="buttonSize" format="enum">
-            <enum name="small" value="0"/>
-            <enum name="large" value="1"/>
+        <attr name="customButtonSize" format="enum">
+            <enum name="small" value="0" />
+            <enum name="large" value="1" />
         </attr>
     </declare-styleable>
 

@@ -62,7 +62,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:text="@string/defaultBrowserLetsDoIt"
-        app:buttonSize="large"
+        app:customButtonSize="large"
         app:layout_constraintBottom_toTopOf="@+id/continueButton"
         app:layout_constraintEnd_toEndOf="@+id/browserProtectionSubtitle"
         app:layout_constraintStart_toStartOf="@+id/browserProtectionSubtitle"
@@ -73,10 +73,11 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="@string/defaultBrowserMaybeLater"
-        app:buttonSize="large" app:layout_constraintBottom_toBottomOf="parent"
+        app:customButtonSize="large"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/launchSettingsButton"
         app:layout_constraintStart_toStartOf="@+id/launchSettingsButton"
-        app:layout_constraintTop_toBottomOf="@+id/launchSettingsButton"/>
+        app:layout_constraintTop_toBottomOf="@+id/launchSettingsButton" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
