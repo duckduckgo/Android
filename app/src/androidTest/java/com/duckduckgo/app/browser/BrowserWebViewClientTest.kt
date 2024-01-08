@@ -18,11 +18,14 @@ package com.duckduckgo.app.browser
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.webkit.CookieManager
 import android.webkit.HttpAuthHandler
 import android.webkit.RenderProcessGoneDetail
+import android.webkit.WebBackForwardList
+import android.webkit.WebHistoryItem
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
@@ -39,12 +42,14 @@ import com.duckduckgo.anrs.api.CrashLogger.Crash
 import com.duckduckgo.app.browser.WebViewErrorResponse.BAD_URL
 import com.duckduckgo.app.browser.WebViewErrorResponse.CONNECTION
 import com.duckduckgo.app.browser.WebViewErrorResponse.SSL_PROTOCOL_ERROR
+import com.duckduckgo.app.browser.WebViewPixelName.WEB_PAGE_LOADED
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
 import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
+import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -52,7 +57,9 @@ import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.browser.api.JsInjectorPlugin
+import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.privacy.config.api.AmpLinks
@@ -67,6 +74,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -105,6 +114,8 @@ class BrowserWebViewClientTest {
     private val pixel: Pixel = mock()
     private val crashLogger: CrashLogger = mock()
     private val jsPlugins = FakePluginPoint()
+    private val webViewVersionProvider: WebViewVersionProvider = mock()
+    private val currentTimeProvider: CurrentTimeProvider = mock()
     private val userAgentProvider: UserAgentProvider = mock()
 
     @UiThreadTest
@@ -132,11 +143,14 @@ class BrowserWebViewClientTest {
             pixel,
             crashLogger,
             jsPlugins,
+            webViewVersionProvider,
+            currentTimeProvider,
             userAgentProvider,
         )
         testee.webViewClientListener = listener
         whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
         whenever(cookieManagerProvider.get()).thenReturn(cookieManager)
+        whenever(currentTimeProvider.getTimeInMillis()).thenReturn(0)
     }
 
     @UiThreadTest
@@ -716,6 +730,70 @@ class BrowserWebViewClientTest {
         verify(mockWebView).loadUrl(rewrittenUrl)
     }
 
+    @Test
+    fun whenPageFinishesBeforeStartingThenPixelIsNotFired() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        testee.onPageFinished(mockWebView, "test")
+        verify(pixel, never()).fire(eq(WEB_PAGE_LOADED), any(), any())
+    }
+
+    @Test
+    fun whenPageFinishesAfterStartingThenPixelIsFired() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.progress).thenReturn(100)
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+        verify(pixel).fire(eq(WEB_PAGE_LOADED), any(), any())
+    }
+
+    @Test
+    fun whenPageFinishesAfterStartingAndPageAboutBlankThenPixelIsNotFired() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.progress).thenReturn(100)
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+        testee.onPageStarted(mockWebView, "about:blank", null)
+        testee.onPageFinished(mockWebView, "about:blank")
+        verify(pixel, never()).fire(eq(WEB_PAGE_LOADED), any(), any())
+    }
+
+    @Test
+    fun whenPageFinishesAfterStartingAndProgressIsNot100ThenPixelIsNotFired() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+        verify(pixel, never()).fire(eq(WEB_PAGE_LOADED), any(), any())
+    }
+
+    @Test
+    fun whenPageFinishesTotalPageLoadTimeIsLoaded() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.progress).thenReturn(100)
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
+        whenever(currentTimeProvider.getTimeInMillis()).thenReturn(10)
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+        val argumentCaptor = argumentCaptor<Map<String, String>>()
+        verify(pixel).fire(eq(WEB_PAGE_LOADED), argumentCaptor.capture(), any())
+        assertTrue(argumentCaptor.firstValue["elapsed_time"].equals("10"))
+    }
+
+    @Test
+    fun whenPageStartedMoreThanOneStartTimeIsNotUpdated() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.progress).thenReturn(100)
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
+        whenever(currentTimeProvider.getTimeInMillis()).thenReturn(5)
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
+        whenever(currentTimeProvider.getTimeInMillis()).thenReturn(10)
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+        val argumentCaptor = argumentCaptor<Map<String, String>>()
+        verify(pixel).fire(eq(WEB_PAGE_LOADED), argumentCaptor.capture(), any())
+        assertTrue(argumentCaptor.firstValue["elapsed_time"].equals("10"))
+    }
+
+
     private class TestWebView(context: Context) : WebView(context) {
         override fun getOriginalUrl(): String {
             return EXAMPLE_URL
@@ -741,6 +819,43 @@ class BrowserWebViewClientTest {
             countFinished++
         }
     }
+
+    private class TestBackForwardList : WebBackForwardList() {
+
+        private val fakeHistory: MutableList<WebHistoryItem> = mutableListOf()
+        private var fakeCurrentIndex = -1
+
+        fun addPageToHistory(webHistoryItem: WebHistoryItem) {
+            fakeHistory.add(webHistoryItem)
+            fakeCurrentIndex++
+        }
+
+        override fun getSize() = fakeHistory.size
+
+        override fun getItemAtIndex(index: Int): WebHistoryItem = fakeHistory[index]
+
+        override fun getCurrentItem(): WebHistoryItem? = null
+
+        override fun getCurrentIndex(): Int = fakeCurrentIndex
+
+        override fun clone(): WebBackForwardList = throw NotImplementedError()
+    }
+
+    private class TestHistoryItem(
+        private val url: String,
+    ) : WebHistoryItem() {
+
+        override fun getUrl(): String = url
+
+        override fun getOriginalUrl(): String = url
+
+        override fun getTitle(): String = url
+
+        override fun getFavicon(): Bitmap = throw NotImplementedError()
+
+        override fun clone(): WebHistoryItem = throw NotImplementedError()
+    }
+
 
     companion object {
         const val EXAMPLE_URL = "example.com"

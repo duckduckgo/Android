@@ -21,6 +21,7 @@ import android.net.Uri
 import android.net.http.SslError
 import android.net.http.SslError.*
 import android.os.Build
+import android.os.SystemClock
 import android.webkit.*
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
@@ -32,6 +33,7 @@ import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.browser.WebViewErrorResponse.BAD_URL
 import com.duckduckgo.app.browser.WebViewErrorResponse.CONNECTION
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
+import com.duckduckgo.app.browser.WebViewPixelName.WEB_PAGE_LOADED
 import com.duckduckgo.app.browser.WebViewPixelName.WEB_RENDERER_GONE_CRASH
 import com.duckduckgo.app.browser.WebViewPixelName.WEB_RENDERER_GONE_KILLED
 import com.duckduckgo.app.browser.certificates.rootstore.CertificateValidationState
@@ -49,6 +51,8 @@ import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.browser.api.JsInjectorPlugin
+import com.duckduckgo.browser.api.WebViewVersionProvider
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
@@ -59,6 +63,10 @@ import javax.inject.Inject
 import kotlinx.coroutines.*
 import timber.log.Timber
 
+private const val ELAPSED_TIME = "elapsed_time"
+private const val DEVICE_MODEL = "device_model"
+private const val WEBVIEW_VERSION = "webview_version"
+private const val ABOUT_BLANK = "about:blank"
 class BrowserWebViewClient @Inject constructor(
     private val webViewHttpAuthStore: WebViewHttpAuthStore,
     private val trustedCertificateStore: TrustedCertificateStore,
@@ -80,11 +88,14 @@ class BrowserWebViewClient @Inject constructor(
     private val pixel: Pixel,
     private val crashLogger: CrashLogger,
     private val jsPlugins: PluginPoint<JsInjectorPlugin>,
+    private val webViewVersionProvider: WebViewVersionProvider,
+    private val currentTimeProvider: CurrentTimeProvider,
     private val userAgentProvider: UserAgentProvider,
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
     private var lastPageStarted: String? = null
+    private var start: Long? = null
 
     /**
      * This is the new method of url overriding available from API 24 onwards
@@ -266,6 +277,7 @@ class BrowserWebViewClient @Inject constructor(
         Timber.v("onPageStarted webViewUrl: ${webView.url} URL: $url")
 
         url?.let {
+            beginTrace(it)
             userAgentProvider.setHintHeader(webView.settings)
             autoconsent.injectAutoconsent(webView, url)
             adClickManager.detectAdDomain(url)
@@ -307,6 +319,10 @@ class BrowserWebViewClient @Inject constructor(
         }
         flushCookies()
         printInjector.injectPrint(webView)
+
+        url?.let {
+            endTrace(it, webView)
+        }
     }
 
     private fun flushCookies() {
@@ -493,11 +509,37 @@ class BrowserWebViewClient @Inject constructor(
             else -> "ERROR_OTHER"
         }
     }
+
+    private fun beginTrace(url: String) {
+        // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
+        if (url != "about:blank" && start == null) {
+            start = currentTimeProvider.getTimeInMillis()
+        }
+    }
+
+    private fun endTrace(url: String, webView: WebView) {
+        start?.let { safeStart ->
+            if (url != ABOUT_BLANK && webView.progress == 100) {
+                val end = currentTimeProvider.getTimeInMillis()
+                // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
+                pixel.fire(
+                    WEB_PAGE_LOADED,
+                    mapOf(
+                        ELAPSED_TIME to (end - safeStart).toString(),
+                        DEVICE_MODEL to Build.MODEL,
+                        WEBVIEW_VERSION to webViewVersionProvider.getFullVersion(),
+                    )
+                )
+                start = null
+            }
+        }
+    }
 }
 
 enum class WebViewPixelName(override val pixelName: String) : Pixel.PixelName {
     WEB_RENDERER_GONE_CRASH("m_web_view_renderer_gone_crash"),
     WEB_RENDERER_GONE_KILLED("m_web_view_renderer_gone_killed"),
+    WEB_PAGE_LOADED("m_web_view_page_loaded"),
 }
 
 enum class WebViewErrorResponse(@StringRes val errorId: Int) {
