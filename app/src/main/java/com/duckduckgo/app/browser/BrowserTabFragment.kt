@@ -27,7 +27,6 @@ import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.content.res.AssetManager
 import android.content.res.Configuration
-import android.graphics.Bitmap
 import android.net.Uri
 import android.os.*
 import android.print.PrintAttributes
@@ -46,7 +45,6 @@ import android.webkit.WebView
 import android.webkit.WebView.FindListener
 import android.webkit.WebView.HitTestResult
 import android.webkit.WebView.HitTestResult.*
-import android.webkit.WebViewClient
 import android.widget.Button
 import android.widget.EditText
 import android.widget.FrameLayout
@@ -167,7 +165,6 @@ import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.ui.SurveyActivity
 import com.duckduckgo.app.survey.ui.SurveyActivity.Companion.SurveySource
@@ -513,8 +510,8 @@ class BrowserTabFragment :
     private val tabsButton: TabSwitcherButton
         get() = omnibar.tabsMenu
 
-    private val fireMenuButton: ViewGroup
-        get() = omnibar.fireIconMenu
+    // private val fireMenuButton: ViewGroup
+    //     get() = omnibar.fireIconMenu
 
     private val menuButton: ViewGroup
         get() = omnibar.browserMenu
@@ -3073,13 +3070,14 @@ class BrowserTabFragment :
 
         fun updateToolbarActionsVisibility(viewState: BrowserViewState) {
             tabsButton.isVisible = viewState.showTabsButton
-            fireMenuButton.isVisible = viewState.fireButton is HighlightableButton.Visible
+            // fireMenuButton.isVisible = viewState.fireButton is HighlightableButton.Visible
             menuButton.isVisible = viewState.showMenuButton is HighlightableButton.Visible
 
             val targetView = if (viewState.showMenuButton.isHighlighted()) {
                 omnibar.browserMenuImageView
             } else if (viewState.fireButton.isHighlighted()) {
-                omnibar.fireIconImageView
+                // omnibar.fireIconImageView
+                null
             } else {
                 null
             }
@@ -3107,14 +3105,14 @@ class BrowserTabFragment :
         }
 
         private fun decorateToolbarWithButtons() {
-            fireMenuButton.show()
-            fireMenuButton.setOnClickListener {
-                browserActivity?.launchFire()
-                pixel.fire(
-                    AppPixelName.MENU_ACTION_FIRE_PRESSED.pixelName,
-                    mapOf(FIRE_BUTTON_STATE to pulseAnimation.isActive.toString()),
-                )
-            }
+            // fireMenuButton.show()
+            // fireMenuButton.setOnClickListener {
+            //     browserActivity?.launchFire()
+            //     pixel.fire(
+            //         AppPixelName.MENU_ACTION_FIRE_PRESSED.pixelName,
+            //         mapOf(FIRE_BUTTON_STATE to pulseAnimation.isActive.toString()),
+            //     )
+            // }
 
             tabsButton.show()
         }
