@@ -27,6 +27,7 @@ import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DISABLE_PROTECTIONS_CLICKED
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DISMISSED
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DISMISS_CLICKED
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.PRIVACY_DASHBOARD_CLICKED
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupViewState
 import com.duckduckgo.privacyprotectionspopup.impl.PrivacyProtectionsPopupManagerImpl.PopupDismissed.DismissedAt
 import com.duckduckgo.privacyprotectionspopup.impl.PrivacyProtectionsPopupManagerImpl.PopupDismissed.NotDismissed
@@ -111,6 +112,10 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
                         userAllowListRepository.addDomainToUserAllowList(domain)
                     }
                 }
+                dismissPopup()
+            }
+
+            PRIVACY_DASHBOARD_CLICKED -> {
                 dismissPopup()
             }
         }

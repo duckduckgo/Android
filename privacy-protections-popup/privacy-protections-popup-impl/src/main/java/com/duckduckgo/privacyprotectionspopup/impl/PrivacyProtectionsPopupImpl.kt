@@ -32,6 +32,7 @@ import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DISABLE_PROTECTIONS_CLICKED
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DISMISSED
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DISMISS_CLICKED
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.PRIVACY_DASHBOARD_CLICKED
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupViewState
 import com.duckduckgo.privacyprotectionspopup.impl.databinding.PopupPrivacyDashboardBinding
 import com.google.android.material.shape.ShapeAppearanceModel
@@ -72,6 +73,15 @@ class PrivacyProtectionsPopupImpl(
 
         popupContent.dismissButton.setOnClickListener { _events.tryEmit(DISMISS_CLICKED) }
         popupContent.disableButton.setOnClickListener { _events.tryEmit(DISABLE_PROTECTIONS_CLICKED) }
+        popupContent.anchorOverlay.setOnClickListener {
+            anchor.performClick()
+            _events.tryEmit(PRIVACY_DASHBOARD_CLICKED)
+        }
+        popupContent.omnibarOverlay.setOnClickListener { _events.tryEmit(DISMISSED) }
+
+        popupContent.anchorOverlay.layoutParams = popupContent.anchorOverlay.layoutParams.apply {
+            height = anchor.measuredHeight
+        }
 
         popupWindow = PopupWindow(
             popupContent.root,
@@ -126,8 +136,8 @@ class PrivacyProtectionsPopupImpl(
         // Adjust anchor position for extra margin that CardView needs in order draw its shadow
         val horizontalOffsetPx = -popupContent.paddingStart
 
-        // Adjust anchor position for the CardView's edge treatment (arrow-like shape on top of the card)
-        val verticalOffsetPx = POPUP_WINDOW_VERTICAL_OFFSET_DP.toPx().toInt()
+        // Align top of the popup layout with the top of the anchor
+        val verticalOffsetPx = -anchor.measuredHeight
 
         // Calculate width because PopupWindow doesn't handle WRAP_CONTENT as expected
         val popupContentWidth = popupContent
@@ -163,7 +173,6 @@ class PrivacyProtectionsPopupImpl(
     private companion object {
         const val POPUP_DEFAULT_ELEVATION_DP = 8f
         const val EDGE_TREATMENT_DISTANCE_FROM_EDGE = 10f
-        const val POPUP_WINDOW_VERTICAL_OFFSET_DP = -12f
     }
 }
 

@@ -36,4 +36,5 @@ enum class PrivacyProtectionsPopupUiEvent {
      * Event indicating that the 'Disable Protections' button was clicked.
      */
     DISABLE_PROTECTIONS_CLICKED,
+    PRIVACY_DASHBOARD_CLICKED,
 }
