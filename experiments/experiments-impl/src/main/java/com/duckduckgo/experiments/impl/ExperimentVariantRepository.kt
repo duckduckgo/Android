@@ -47,8 +47,8 @@ class ExperimentVariantRepositoryImpl @Inject constructor(
                 ExperimentVariantEntity(
                     key = it.variantKey,
                     weight = it.weight,
-                    localeFilter = it.filters.locale,
-                    androidVersionFilter = it.filters.androidVersion,
+                    localeFilter = it.filters?.locale.orEmpty(),
+                    androidVersionFilter = it.filters?.androidVersion.orEmpty(),
                 ),
             )
         }
