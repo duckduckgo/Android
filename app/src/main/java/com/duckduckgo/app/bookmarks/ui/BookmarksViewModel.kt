@@ -310,28 +310,10 @@ class BookmarksViewModel @Inject constructor(
         command.value = OpenSavedSite(savedSiteUrl)
     }
 
-    fun updateBookmarks(bookmarksAndFolders: List<Any>) {
-        appCoroutineScope.launch(dispatcherProvider.io()) {
-            val operations = mutableListOf<() -> Unit>()
-
-            for (item in bookmarksAndFolders) {
-                when (item) {
-                    is Bookmark -> {
-                        operations.add { savedSitesRepository.delete(item) }
-                        operations.add { savedSitesRepository.insert(item) }
-                        if (item.isFavorite) {
-                            operations.add { savedSitesRepository.insertFavorite(item.id, item.url, item.title, item.lastModified) }
-                        }
-                    }
-                    is BookmarkFolder -> {
-                        operations.add { savedSitesRepository.updateFolderRelation(item) }
-                    }
-                }
-            }
-
-            appDatabase.runInTransaction {
-                operations.forEach { it.invoke() }
-            }
+    fun updateBookmarks(bookmarksAndFolders: List<String>, parentId: String) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            Timber.d("Bookmarks: parentId: $parentId, updateBookmarks $bookmarksAndFolders")
+            savedSitesRepository.updateFolderRelation(parentId, bookmarksAndFolders)
         }
     }
 

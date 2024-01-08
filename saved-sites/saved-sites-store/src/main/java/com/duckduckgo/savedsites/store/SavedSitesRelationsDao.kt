@@ -23,6 +23,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
+import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.savedsites.api.models.*
 import com.duckduckgo.savedsites.api.models.SavedSitesNames.BOOKMARKS_ROOT
 import com.duckduckgo.savedsites.api.models.SavedSitesNames.FAVORITES_DESKTOP_ROOT
@@ -182,15 +183,16 @@ interface SavedSitesRelationsDao {
 
     @Transaction
     fun replaceBookmarkFolder(
-        folder: BookmarkFolder,
+        folder: String,
         children: List<String>,
     ) {
-        delete(folderId = folder.id)
+        delete(folderId = folder)
         children.forEach {
             // before inserting the new relation, we remove old relations from this entity, but not the ones from favourites root
             deleteOldRelationsByEntity(it)
-            insert(Relation(folderId = folder.id, entityId = it))
+            insert(Relation(folderId = folder, entityId = it))
         }
+        updateModified(folder)
     }
 
     @Transaction
@@ -203,4 +205,10 @@ interface SavedSitesRelationsDao {
             insert(Relation(folderId = favouriteFolder, entityId = it))
         }
     }
+
+    @Query("update entities set lastModified = :lastModified where entityId = :entityId")
+    fun updateModified(
+        entityId: String,
+        lastModified: String = DatabaseDateFormatter.iso8601(),
+    )
 }
