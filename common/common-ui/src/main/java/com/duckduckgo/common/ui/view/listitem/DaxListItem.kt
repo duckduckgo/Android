@@ -166,8 +166,8 @@ abstract class DaxListItem(
     }
 
     /** Sets the item overflow menu click listener */
-    fun setTrailingIconClickListener(onClick: ((View) -> Unit)?) {
-        trailingIconContainer.setOnClickListener { onClick?.let { onClick -> onClick(trailingIcon) } }
+    fun setTrailingIconClickListener(onClick: (View) -> Unit) {
+        trailingIconContainer.setOnClickListener { onClick(trailingIcon) }
     }
 
     /** Sets the Switch Visible */
