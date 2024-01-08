@@ -519,10 +519,11 @@ class RealSavedSitesRepository(
         savedSitesEntitiesDao.updateModified(folder.parentId)
     }
 
-    override fun updateFolderRelation(folder: BookmarkFolder) {
-        savedSitesRelationsDao.deleteRelationByEntity(folder.id)
-        savedSitesRelationsDao.insert(Relation(folderId = folder.parentId, entityId = folder.id))
-        savedSitesEntitiesDao.updateModified(folder.parentId)
+    override fun updateFolderRelation(
+        folderId: String,
+        entities: List<String>,
+    ) {
+        savedSitesRelationsDao.replaceBookmarkFolder(folderId, entities)
     }
 
     override fun getFolder(folderId: String): BookmarkFolder? {

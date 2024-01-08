@@ -43,6 +43,7 @@ import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.mobile.android.databinding.RowTwoLineItemBinding
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
+import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import java.util.Collections
 import kotlinx.coroutines.launch
 
@@ -181,14 +182,21 @@ class BookmarksAdapter(
     }
 
     fun persistReorderedItems() {
+        var parentId = SavedSitesNames.BOOKMARKS_ROOT
         val reorderedBookmarks = bookmarkItems.mapNotNull { item ->
             when (item) {
-                is BookmarkItem -> item.bookmark as Any
-                is BookmarkFolderItem -> item.bookmarkFolder as Any
-                else -> null
+                is BookmarkItem -> {
+                    parentId = item.bookmark.parentId
+                    item.bookmark.id
+                }
+                is BookmarkFolderItem -> {
+                    parentId = item.bookmarkFolder.parentId
+                    item.bookmarkFolder.id
+                }
+                else -> ""
             }
         }
-        viewModel.updateBookmarks(reorderedBookmarks)
+        viewModel.updateBookmarks(reorderedBookmarks, parentId)
     }
 
     class DiffCallback(
