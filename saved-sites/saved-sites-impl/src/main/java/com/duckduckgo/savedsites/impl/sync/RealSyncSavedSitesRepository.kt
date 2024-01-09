@@ -18,15 +18,28 @@ package com.duckduckgo.savedsites.impl.sync
 
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.savedsites.api.models.*
+import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.impl.sync.store.SavedSitesSyncMetadataDao
+import com.duckduckgo.savedsites.impl.sync.store.SavedSitesSyncMetadataEntity
 import com.duckduckgo.savedsites.store.*
+import com.duckduckgo.savedsites.store.EntityType.BOOKMARK
+import com.duckduckgo.savedsites.store.EntityType.FOLDER
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
 import java.util.*
+import org.threeten.bp.OffsetDateTime
 import timber.log.*
 
 class RealSyncSavedSitesRepository(
     private val savedSitesEntitiesDao: SavedSitesEntitiesDao,
     private val savedSitesRelationsDao: SavedSitesRelationsDao,
+    private val savedSitesSyncMetadataDao: SavedSitesSyncMetadataDao,
 ) : SyncSavedSitesRepository {
+
+    private val stringListType = Types.newParameterizedType(List::class.java, String::class.java)
+    private val stringListAdapter: JsonAdapter<List<String>> = Moshi.Builder().build().adapter(stringListType)
 
     override fun getFavoritesSync(favoriteFolder: String): List<Favorite> {
         return savedSitesEntitiesDao.entitiesInFolderSync(favoriteFolder).mapToFavorites()
@@ -118,66 +131,300 @@ class RealSyncSavedSitesRepository(
         }
     }
 
-    override fun delete(
-        savedSite: SavedSite,
-        favoriteFolder: String,
+    override fun replaceBookmarkFolder(
+        folder: BookmarkFolder,
+        children: List<String>,
     ) {
-        when (savedSite) {
-            is SavedSite.Bookmark -> { /* no-op */
+        Timber.d("Sync-Bookmarks: replacing ${folder.id} with children $children")
+        savedSitesRelationsDao.replaceBookmarkFolder(folder, children)
+        savedSitesEntitiesDao.update(
+            Entity(
+                entityId = folder.id,
+                title = folder.name,
+                url = "",
+                type = FOLDER,
+                lastModified = folder.lastModified ?: DatabaseDateFormatter.iso8601(),
+            ),
+        )
+    }
+
+    override fun addToFavouriteFolder(
+        favouriteFolder: String,
+        children: List<String>,
+    ) {
+        Timber.d("Sync-Bookmarks: adding $children to $favouriteFolder")
+        val relations = children.map {
+            Relation(folderId = favouriteFolder, entityId = it)
+        }
+        savedSitesRelationsDao.insertList(relations)
+        savedSitesEntitiesDao.updateModified(favouriteFolder)
+    }
+
+    override fun replaceFavouriteFolder(
+        favouriteFolder: String,
+        children: List<String>,
+    ) {
+        Timber.d("Sync-Bookmarks: replacing $favouriteFolder with children $children")
+        savedSitesRelationsDao.replaceFavouriteFolder(favouriteFolder, children)
+    }
+
+    override fun getAllFolderContentSync(folderId: String): Pair<List<Bookmark>, List<BookmarkFolder>> {
+        val entities = savedSitesEntitiesDao.allEntitiesInFolderSync(folderId)
+        val bookmarks = mutableListOf<Bookmark>()
+        val folders = mutableListOf<BookmarkFolder>()
+        entities.forEach { entity ->
+            mapEntity(entity, folderId, bookmarks, folders)
+        }
+        return Pair(bookmarks.distinct(), folders.distinct())
+    }
+
+    private fun mapEntity(
+        entity: Entity,
+        folderId: String,
+        bookmarks: MutableList<Bookmark>,
+        folders: MutableList<BookmarkFolder>,
+    ) {
+        if (entity.type == FOLDER) {
+            val numFolders = savedSitesRelationsDao.countEntitiesInFolder(entity.entityId, FOLDER)
+            val numBookmarks = savedSitesRelationsDao.countEntitiesInFolder(entity.entityId, BOOKMARK)
+            folders.add(BookmarkFolder(entity.entityId, entity.title, folderId, numBookmarks, numFolders, entity.lastModified, entity.deletedFlag()))
+        } else {
+            bookmarks.add(
+                Bookmark(
+                    id = entity.entityId,
+                    title = entity.title,
+                    url = entity.url.orEmpty(),
+                    parentId = folderId,
+                    lastModified = entity.lastModified,
+                ),
+            )
+        }
+    }
+
+    override fun replaceBookmark(
+        bookmark: Bookmark,
+        localId: String,
+    ) {
+        savedSitesEntitiesDao.updateId(localId, bookmark.id)
+        savedSitesRelationsDao.updateEntityId(localId, bookmark.id)
+        savedSitesEntitiesDao.update(
+            Entity(
+                bookmark.id,
+                bookmark.title,
+                bookmark.url,
+                BOOKMARK,
+                bookmark.lastModified ?: DatabaseDateFormatter.iso8601(),
+            ),
+        )
+
+        savedSitesEntitiesDao.updateModified(bookmark.parentId, bookmark.lastModified ?: DatabaseDateFormatter.iso8601())
+    }
+
+    override fun getFoldersModifiedSince(since: String): List<BookmarkFolder> {
+        val folders = savedSitesEntitiesDao.allEntitiesByTypeSync(FOLDER).filter { it.modifiedAfter(since) }
+        Timber.d("Sync-Bookmarks: folders modified since $since are ${folders.map { it.entityId }}")
+        return folders.map { mapBookmarkFolder(it) }
+    }
+
+    private fun mapBookmarkFolder(entity: Entity): BookmarkFolder {
+        val relation = savedSitesRelationsDao.relationByEntityId(entity.entityId)
+        val numFolders = savedSitesRelationsDao.countEntitiesInFolder(entity.entityId, FOLDER)
+        val numBookmarks = savedSitesRelationsDao.countEntitiesInFolder(entity.entityId, BOOKMARK)
+        val lastModified = entity.lastModified ?: null
+        return BookmarkFolder(
+            entity.entityId,
+            entity.title,
+            relation?.folderId ?: "",
+            numFolders = numFolders,
+            numBookmarks = numBookmarks,
+            lastModified = lastModified,
+            deleted = entity.deletedFlag(),
+        )
+    }
+
+    private fun mapToBookmark(entity: Entity): Bookmark? {
+        val relation = savedSitesRelationsDao.relationByEntityId(entity.entityId)
+        return if (relation != null) {
+            entity.mapToBookmark(relation.folderId)
+        } else {
+            // bookmark was deleted, we can make the parent id up
+            entity.mapToBookmark(SavedSitesNames.BOOKMARKS_ROOT)
+        }
+    }
+
+    override fun getBookmarksModifiedSince(since: String): List<Bookmark> {
+        val bookmarks = savedSitesEntitiesDao.allEntitiesByTypeSync(BOOKMARK).filter { it.modifiedAfter(since) }
+        Timber.d("Sync-Bookmarks: bookmarks modified since $since are ${bookmarks.map { it.entityId }}")
+        return bookmarks.map { mapToBookmark(it)!! }
+    }
+
+    private fun getBookmarkById(id: String): Bookmark? {
+        val bookmark = savedSitesEntitiesDao.entityById(id)
+        return if (bookmark != null) {
+            savedSitesRelationsDao.relationByEntityId(bookmark.entityId)?.let {
+                bookmark.mapToBookmark(it.folderId)
+            }
+        } else {
+            null
+        }
+    }
+
+    override fun getFolderDiff(folderId: String): SyncFolderChildren {
+        val entities = savedSitesEntitiesDao.allEntitiesInFolderSync(folderId)
+        val deletedChildren = entities.filter { it.deleted }.map { it.entityId }
+        val childrenLocal = entities.filterNot { it.deleted }.map { it.entityId }
+
+        val metadata = savedSitesSyncMetadataDao.get(folderId)
+            // no response stored for this folder, add children in insert modifier too
+            ?: return SyncFolderChildren(current = childrenLocal, insert = childrenLocal, remove = deletedChildren)
+
+        if (metadata.childrenResponse == null) {
+            // no response stored for this folder, add children in insert modifier too
+            return SyncFolderChildren(current = childrenLocal, insert = childrenLocal, remove = deletedChildren)
+        }
+        val childrenResponse = stringListAdapter.fromJson(metadata.childrenResponse!!)
+            ?: // can't parse response, treat is as new
+            return SyncFolderChildren(current = childrenLocal, insert = childrenLocal, remove = deletedChildren)
+
+        if (childrenResponse == childrenLocal) {
+            // both lists are the same, nothing has changed
+            return SyncFolderChildren(current = childrenLocal, insert = emptyList(), remove = deletedChildren)
+        }
+
+        val notInResponse = childrenLocal.minus(childrenResponse.toSet()) // to be added to insert
+        val notInLocal = childrenResponse.minus(childrenLocal.toSet()) // to be added to deleted
+        val deleted = deletedChildren.plus(notInLocal).distinct()
+        return SyncFolderChildren(current = childrenLocal, insert = notInResponse, remove = deleted)
+    }
+
+    private fun confirmPendingFolderRequests() {
+        Timber.d("Sync-Bookmarks-Metadata: updating children metadata column with values from request column")
+        savedSitesSyncMetadataDao.confirmAllChildrenRequests()
+    }
+
+    override fun addRequestMetadata(folders: List<SyncSavedSitesRequestEntry>) {
+        val children = folders.filter { it.folder != null }.map {
+            val storedMetadata = savedSitesSyncMetadataDao.get(it.id)
+            storedMetadata?.copy(childrenRequest = stringListAdapter.toJson(it.folder?.children?.current))
+                ?: SavedSitesSyncMetadataEntity(it.id, null, stringListAdapter.toJson(it.folder?.children?.current))
+        }
+        Timber.d("Sync-Bookmarks-Metadata: adding children request metadata for folders: $children")
+        savedSitesSyncMetadataDao.addOrUpdate(children)
+    }
+
+    // for all folders in the payload that are not deleted
+    // add children to children column
+    // for all items in the metadata table
+    // copy request columns to children
+    override fun addResponseMetadata(entities: List<SyncSavedSitesResponseEntry>) {
+        if (entities.isEmpty()) {
+            confirmPendingFolderRequests()
+        } else {
+            val allFolders = entities.filter { it.isFolder() }
+            val folders = allFolders.filter { it.deleted == null }
+            if (folders.isEmpty()) {
+                Timber.d("Sync-Bookmarks-Metadata: no folders received in the response, nothing to add")
+                confirmPendingFolderRequests()
+            } else {
+                val children = folders.map {
+                    val response = stringListAdapter.toJson(it.folder?.children)
+                    Timber.d("Sync-Bookmarks-Metadata: new children response $response for ${it.id}")
+                    SavedSitesSyncMetadataEntity(it.id, response, null)
+                }
+                Timber.d("Sync-Bookmarks-Metadata: storing children response metadata for: $children")
+                savedSitesSyncMetadataDao.addResponseMetadata(children)
             }
 
-            is Favorite -> deleteFavorite(savedSite, favoriteFolder)
+            val deletedFolders = allFolders.filter { it.deleted != null }.map { it.id }
+            if (deletedFolders.isNotEmpty()) {
+                Timber.d("Sync-Bookmarks-Metadata: deleting metadata for deleted folders $deletedFolders")
+                savedSitesSyncMetadataDao.deleteMetadata(deletedFolders)
+            }
         }
     }
 
-    private fun deleteFavorite(
-        favorite: Favorite,
-        favoriteFolder: String,
-    ) {
-        savedSitesRelationsDao.deleteRelationByEntity(favorite.id, favoriteFolder)
-        savedSitesEntitiesDao.updateModified(favoriteFolder)
+    override fun removeMetadata() {
+        savedSitesSyncMetadataDao.removeAll()
     }
 
-    override fun updateFavourite(
-        favorite: Favorite,
-        favoriteFolder: String,
-    ) {
-        savedSitesEntitiesDao.entityById(favorite.id)?.let { entity ->
-            savedSitesEntitiesDao.update(Entity(entity.entityId, favorite.title, favorite.url, EntityType.BOOKMARK))
-
-            // following code is to update position on a specific folder
-            // revisit this when implementing sync, should consider the folder
-            val favorites = savedSitesEntitiesDao.entitiesInFolderSync(favoriteFolder).mapIndexed { index, entity ->
-                entity.mapToFavorite(index)
-            }.toMutableList()
-
-            val currentFavorite = favorites.find { it.id == favorite.id }
-            val currentIndex = favorites.indexOf(currentFavorite)
-            if (currentIndex < 0) return
-            favorites.removeAt(currentIndex)
-            favorites.add(favorite.position, favorite)
-
-            updateWithPosition(favorites, favoriteFolder)
+    override fun fixOrphans(): Boolean {
+        val orphans = savedSitesRelationsDao.getOrphans()
+        return if (orphans.isNotEmpty()) {
+            Timber.d("Sync-Bookmarks: Found ${orphans.size} orphans, $orphans attaching them to bookmarks root")
+            orphans.map { Relation(folderId = SavedSitesNames.BOOKMARKS_ROOT, entityId = it.entityId) }.also {
+                savedSitesRelationsDao.insertList(it)
+            }
+            true
+        } else {
+            Timber.d("Sync-Bookmarks: Orphans not present")
+            false
         }
     }
 
-    override fun updateWithPosition(
-        favorites: List<Favorite>,
-        favoriteFolder: String,
-    ) {
-        savedSitesRelationsDao.delete(favoriteFolder)
-        val relations = favorites.map { Relation(folderId = favoriteFolder, entityId = it.id) }
-        savedSitesRelationsDao.insertList(relations)
-        savedSitesEntitiesDao.updateModified(favoriteFolder)
+    override fun pruneDeleted() {
+        Timber.d("Sync-Bookmarks: pruning soft deleted entities and metadata")
+        savedSitesEntitiesDao.allDeleted().forEach {
+            savedSitesRelationsDao.deleteRelationByEntity(it.entityId)
+            savedSitesEntitiesDao.deletePermanently(it)
+            savedSitesSyncMetadataDao.remove(it.entityId)
+        }
     }
 
-    override fun replaceFavourite(
-        favorite: Favorite,
-        localId: String,
-        favoriteFolder: String,
-    ) {
-        savedSitesEntitiesDao.updateId(localId, favorite.id)
-        savedSitesRelationsDao.updateEntityId(localId, favorite.id)
-        updateFavourite(favorite, favoriteFolder)
+    // entities that were present before deduplication need to be sent in the next sync operation
+    // we do that by setting the lastModified to startTimestamp + 1 second
+    // we want to make sure all parents from those entities are also sent
+    // we will find all the parents of the entities until we find bookmarks root
+    // if one of those folders
+    // if not present -> keep going up until the first parent folder is in the response table
+    // for bookmarks -> is parent folder in metadata table? -> mark bookmark and parent
+    // if not present -> keep going up until the first parent folder is in the response table
+    override fun setLocalEntitiesForNextSync(startTimestamp: String) {
+        Timber.d("Sync-Bookmarks: looking for folders that need modifiedSince updated after a Deduplication")
+        val entitiesToUpdate = mutableListOf<String>()
+        val modifiedSince = OffsetDateTime.now().plusSeconds(1)
+        getEntitiesModifiedBefore(startTimestamp).forEach {
+            traverseParents(it, entitiesToUpdate)
+        }
+
+        Timber.d("Sync-Bookmarks: updating $entitiesToUpdate modifiedSince to $modifiedSince")
+        savedSitesEntitiesDao.updateModified(entitiesToUpdate.toList(), DatabaseDateFormatter.iso8601(modifiedSince))
+    }
+
+    private fun traverseParents(entity: String, entitiesToUpdate: MutableList<String>) {
+        // find parent of each entity
+        entitiesToUpdate.add(entity)
+        val parents = savedSitesRelationsDao.relationsByEntityId(entity)
+        parents.forEach {
+            traverseParents(it.folderId, entitiesToUpdate)
+        }
+    }
+
+    private fun getEntitiesModifiedBefore(date: String): List<String> {
+        val entities = savedSitesEntitiesDao.entities()
+            .filter { it.modifiedBefore(date) }
+            .filterNot { it.lastModified.isNullOrEmpty() }
+            .map { it.entityId }
+        Timber.d("Sync-Bookmarks: entities modified before $date are $entities")
+        return entities
+    }
+
+    private fun Entity.modifiedBefore(since: String): Boolean {
+        return if (this.lastModified == null) {
+            false
+        } else {
+            val entityModified = OffsetDateTime.parse(this.lastModified)
+            val beforeModified = OffsetDateTime.parse(since)
+            entityModified.isBefore(beforeModified)
+        }
+    }
+
+    private fun Entity.modifiedAfter(since: String): Boolean {
+        return if (this.lastModified == null) {
+            false
+        } else {
+            val entityModified = OffsetDateTime.parse(this.lastModified)
+            val sinceModified = OffsetDateTime.parse(since)
+            entityModified.isAfter(sinceModified)
+        }
     }
 }

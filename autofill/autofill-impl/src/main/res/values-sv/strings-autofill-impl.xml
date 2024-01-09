@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-
     <string name="managementDisabledModeCta"><b>Konfigurera i Inställningar</b></string>
 
     <string name="saveLoginDialogButtonSave">Spara lösenord</string>
@@ -62,6 +61,7 @@
 
     <string name="autofillDeleteLoginDialogCancel">Avbryt</string>
     <string name="autofillDeleteLoginDialogDelete">Ta bort</string>
+
 
     <string name="autofillManagementUsernameCopied">Användarnamn kopierat</string>
     <string name="autofillManagementPasswordCopied">Lösenord kopierat</string>
@@ -112,5 +112,25 @@
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogTitle">Om du avslutar nu kommer din Duck Address inte att sparas</string>
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogPositiveButton">Fortsätt inställningen</string>
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Avsluta inställningen</string>
+
+    <string name="autofillManagementScreenTitle">Lösenord</string>
+    <string name="credentialManagementNoLoginsSavedTitle">Inga lösenord sparade ännu</string>
+    <string name="credentialManagementAutofillToggleLabel">Spara och fyll i lösenord automatiskt</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Lösenord lagras säkert på din enhet</string>
+    <string name="saveLoginDialogSubtitle">Lösenord lagras säkert på din enhet.</string>
+    <string name="autofillManagementAddLogin">Lägg till lösenord</string>
+    <string name="credentialManagementEditLoginTitleHint">Rubrik</string>
+    <string name="autofillDeleteLoginDialogTitle">Är du säker på att du vill radera detta lösenord?</string>
+    <string name="autofillManagementDeletedConfirmation">Lösenordet har raderats</string>
+    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Uppdaterades senast %1$s</string>
+    <string name="autofillDisableAutofillPromptTitle">Vill du fortsätta spara lösenord?</string>
+    <string name="deviceNotSupportedSubtitle">Vi måste kryptera och spara dina lösenord för att lagra dem säkert på din enhet. Eftersom din enhet inte stöder krypterad lagring går det inte att spara eller automatiskt fylla i lösenord.</string>
+    <string name="autofill_password_generation_offer_message">Lösenord lagras säkert på din enhet.</string>
+    <string name="autofillManagementSearchLogins">Sök lösenord</string>
+    <string name="biometric_prompt_title">Lösenord låsta</string>
+    <string name="autofill_auth_text_for_access">Lås upp enheten för att komma åt lösenord</string>
+    <string name="managementDisabledModeTitle">Säkra din enhet för att spara lösenord</string>
+    <string name="managementDisabledModeSubtitle">För att skydda dina lösenord krävs ett enhetslåsmönster, en PIN-kod eller biometri.</string>
+    <string name="credentialManagementEditTitle">Redigera lösenord</string>
 
 </resources>

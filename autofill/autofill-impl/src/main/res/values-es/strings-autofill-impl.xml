@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-
     <string name="managementDisabledModeCta"><b>Configurar en Ajustes</b></string>
 
     <string name="saveLoginDialogButtonSave">Guardar contraseña</string>
@@ -62,6 +61,7 @@
 
     <string name="autofillDeleteLoginDialogCancel">Cancelar</string>
     <string name="autofillDeleteLoginDialogDelete">Eliminar</string>
+
 
     <string name="autofillManagementUsernameCopied">Nombre de usuario copiado</string>
     <string name="autofillManagementPasswordCopied">Contraseña copiada</string>
@@ -112,5 +112,25 @@
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogTitle">Si sales ahora, no se guardará tu Duck Address</string>
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogPositiveButton">Continuar con la configuración</string>
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Salir de Configuración</string>
+
+    <string name="autofillManagementScreenTitle">Contraseñas</string>
+    <string name="credentialManagementNoLoginsSavedTitle">Aún no hay contraseñas guardadas</string>
+    <string name="credentialManagementAutofillToggleLabel">Guardar y autocompletar contraseñas</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Las contraseñas se almacenan de forma segura en tu dispositivo</string>
+    <string name="saveLoginDialogSubtitle">Las contraseñas se almacenan de forma segura en tu dispositivo.</string>
+    <string name="autofillManagementAddLogin">Añadir contraseña</string>
+    <string name="credentialManagementEditLoginTitleHint">Título</string>
+    <string name="autofillDeleteLoginDialogTitle">¿Seguro de que quieres borrar esta contraseña?</string>
+    <string name="autofillManagementDeletedConfirmation">Contraseña borrada</string>
+    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Última actualización %1$s</string>
+    <string name="autofillDisableAutofillPromptTitle">¿Quieres seguir guardando contraseñas?</string>
+    <string name="deviceNotSupportedSubtitle">Para almacenar las contraseñas de forma segura, necesitamos cifrarlas y almacenarlas en tu dispositivo. Debido a que tu dispositivo no admite almacenamiento cifrado, no es posible guardar ni autocompletar contraseñas.</string>
+    <string name="autofill_password_generation_offer_message">Las contraseñas se almacenan de forma segura en tu dispositivo.</string>
+    <string name="autofillManagementSearchLogins">Buscar contraseñas</string>
+    <string name="biometric_prompt_title">Contraseñas bloqueadas</string>
+    <string name="autofill_auth_text_for_access">Desbloquear dispositivo para acceder a contraseñas</string>
+    <string name="managementDisabledModeTitle">Protege tu dispositivo para guardar contraseñas</string>
+    <string name="managementDisabledModeSubtitle">Se requiere un patrón de bloqueo del dispositivo, un PIN o datos biométricos para proteger tus contraseñas.</string>
+    <string name="credentialManagementEditTitle">Editar contraseña</string>
 
 </resources>

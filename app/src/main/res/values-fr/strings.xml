@@ -783,4 +783,9 @@
     <string name="imageCaptureCameraPermissionDeniedMessage">Les sites ne peuvent utiliser votre appareil photo que si vous autorisez DuckDuckGo à demander l\'accès.</string>
     <string name="imageCaptureCameraPermissionDeniedPositiveButton">Ouvrir les paramètres</string>
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Annuler</string>
+
+    <!-- Autofill -->
+    <string name="settingsAutofillLoginsSetting">Mots de passe</string>
+    <string name="autofillLoginSavedSnackbarMessage">Le mot de passe a été enregistré</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Le mot de passe a été modifié</string>
 </resources>

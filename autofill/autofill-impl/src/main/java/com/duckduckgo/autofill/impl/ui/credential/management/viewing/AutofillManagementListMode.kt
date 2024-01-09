@@ -27,6 +27,7 @@ import androidx.core.view.MenuProvider
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updateMargins
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.Lifecycle.State
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -43,6 +44,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementR
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.ContextMenuAction.Delete
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.ContextMenuAction.Edit
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchResetNeverSaveListConfirmation
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.CredentialGrouper
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.InitialExtractor
 import com.duckduckgo.autofill.impl.ui.credential.management.suggestion.SuggestionListBuilder
@@ -59,7 +61,6 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.R as CommonR
 import javax.inject.Inject
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @InjectWith(FragmentScope::class)
 class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill_management_list_mode) {
@@ -93,6 +94,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
     private lateinit var adapter: AutofillManagementRecyclerAdapter
 
     private var searchMenuItem: MenuItem? = null
+    private var resetNeverSavedSitesMenuItem: MenuItem? = null
 
     private val globalAutofillToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
         if (!lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) return@OnCheckedChangeListener
@@ -128,17 +130,24 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
                 ) {
                     menuInflater.inflate(R.menu.autofill_list_mode_menu, menu)
                     searchMenuItem = menu.findItem(R.id.searchLogins)
+                    resetNeverSavedSitesMenuItem = menu.findItem(R.id.resetNeverSavedSites)
                     initializeSearchBar()
                 }
 
                 override fun onPrepareMenu(menu: Menu) {
                     searchMenuItem?.isVisible = !(viewModel.viewState.value.logins.isNullOrEmpty())
+                    resetNeverSavedSitesMenuItem?.isVisible = viewModel.neverSavedSitesViewState.value.showOptionToReset
                 }
 
                 override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                     return when (menuItem.itemId) {
                         R.id.addLoginManually -> {
                             viewModel.onCreateNewCredentials()
+                            true
+                        }
+
+                        R.id.resetNeverSavedSites -> {
+                            viewModel.onResetNeverSavedSitesInitialSelection()
                             true
                         }
 
@@ -196,26 +205,35 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
                 }
             }
         }
+        observeListModeViewModelCommands()
+
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.commands.collect { commands ->
-                    commands.forEach { processCommand(it) }
+                viewModel.neverSavedSitesViewState.collect {
+                    // we can just invalidate the menu as [onPrepareMenu] will handle the new visibility for resetting never saved sites menu item
+                    parentActivity()?.invalidateOptionsMenu()
                 }
             }
         }
 
-        viewModel.observeCredentials()
+        viewModel.onViewCreated()
     }
 
-    private fun processCommand(command: AutofillSettingsViewModel.Command) {
-        var processed = true
+    private fun observeListModeViewModelCommands() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(State.STARTED) {
+                viewModel.commandsListView.collect { commands ->
+                    commands.forEach { processCommand(it) }
+                }
+            }
+        }
+    }
+
+    private fun processCommand(command: AutofillSettingsViewModel.ListModeCommand) {
         when (command) {
-            else -> processed = false
+            LaunchResetNeverSaveListConfirmation -> launchResetNeverSavedSitesConfirmation()
         }
-        if (processed) {
-            Timber.v("Processed command $command")
-            viewModel.commandProcessed(command)
-        }
+        viewModel.commandProcessed(command)
     }
 
     private suspend fun credentialsListUpdated(
@@ -284,6 +302,34 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
                     object : TextAlertDialogBuilder.EventListener() {
                         override fun onPositiveButtonClicked() {
                             viewModel.onDeleteCredentials(loginCredentials)
+                        }
+                    },
+                )
+                .show()
+        }
+    }
+
+    private fun launchResetNeverSavedSitesConfirmation() {
+        this.context?.let {
+            TextAlertDialogBuilder(it)
+                .setTitle(R.string.credentialManagementClearNeverForThisSiteDialogTitle)
+                .setMessage(R.string.credentialManagementInstructionNeverForThisSite)
+                .setDestructiveButtons(true)
+                .setPositiveButton(R.string.credentialManagementClearNeverForThisSiteDialogPositiveButton)
+                .setNegativeButton(R.string.credentialManagementClearNeverForThisSiteDialogNegativeButton)
+                .setCancellable(true)
+                .addEventListener(
+                    object : TextAlertDialogBuilder.EventListener() {
+                        override fun onPositiveButtonClicked() {
+                            viewModel.onUserConfirmationToClearNeverSavedSites()
+                        }
+
+                        override fun onNegativeButtonClicked() {
+                            viewModel.onUserCancelledFromClearNeverSavedSitesPrompt()
+                        }
+
+                        override fun onDialogCancelled() {
+                            viewModel.onUserCancelledFromClearNeverSavedSitesPrompt()
                         }
                     },
                 )

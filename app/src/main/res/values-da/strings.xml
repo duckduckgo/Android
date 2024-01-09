@@ -783,4 +783,9 @@
     <string name="imageCaptureCameraPermissionDeniedMessage">Websteder kan kun bruge dit kamera, hvis du giver DuckDuckGo tilladelse til at bede om adgang.</string>
     <string name="imageCaptureCameraPermissionDeniedPositiveButton">Åbn indstillinger</string>
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Annuller</string>
+
+    <!-- Autofill -->
+    <string name="settingsAutofillLoginsSetting">Adgangskoder</string>
+    <string name="autofillLoginSavedSnackbarMessage">Adgangskode gemt</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Adgangskode opdateret</string>
 </resources>

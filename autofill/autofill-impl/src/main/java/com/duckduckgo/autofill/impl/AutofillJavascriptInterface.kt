@@ -44,6 +44,7 @@ import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillTriggerTyp
 import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillTriggerType.USER_INITIATED
 import com.duckduckgo.autofill.impl.jsbridge.response.AutofillResponseWriter
 import com.duckduckgo.autofill.impl.sharedcreds.ShareableCredentials
+import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
 import com.duckduckgo.autofill.impl.systemautofill.SystemAutofillServiceSuppressor
 import com.duckduckgo.autofill.impl.ui.credential.passwordgeneration.Actions
 import com.duckduckgo.autofill.impl.ui.credential.passwordgeneration.Actions.DeleteAutoLogin
@@ -112,6 +113,7 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
     private val recentInstallChecker: EmailProtectionInContextRecentInstallChecker,
     private val loginDeduplicator: AutofillLoginDeduplicator,
     private val systemAutofillServiceSuppressor: SystemAutofillServiceSuppressor,
+    private val neverSavedSiteRepository: NeverSavedSiteRepository,
 ) : AutofillJavascriptInterface {
 
     override var callback: Callback? = null
@@ -142,7 +144,12 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
                 return@launch
             }
 
-            val request = requestParser.parseAutofillDataRequest(requestString)
+            val parseResult = requestParser.parseAutofillDataRequest(requestString)
+            val request = parseResult.getOrElse {
+                Timber.w(it, "Unable to parse getAutofillData request")
+                return@launch
+            }
+
             val triggerType = convertTriggerType(request.trigger)
 
             if (request.mainType != CREDENTIALS) {
@@ -263,7 +270,16 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
                 return@launch
             }
 
-            val request = requestParser.parseStoreFormDataRequest(data)
+            if (neverSavedSiteRepository.isInNeverSaveList(currentUrl)) {
+                Timber.v("BrowserAutofill: storeFormData called but site is in never save list")
+                return@launch
+            }
+
+            val parseResult = requestParser.parseStoreFormDataRequest(data)
+            val request = parseResult.getOrElse {
+                Timber.w(it, "Unable to parse storeFormData request")
+                return@launch
+            }
 
             if (!request.isValid()) {
                 Timber.w("Invalid data from storeFormData")

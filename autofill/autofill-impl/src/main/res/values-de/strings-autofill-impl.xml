@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-
     <string name="managementDisabledModeCta"><b>In den Einstellungen einrichten</b></string>
 
     <string name="saveLoginDialogButtonSave">Passwort speichern</string>
@@ -62,6 +61,7 @@
 
     <string name="autofillDeleteLoginDialogCancel">Abbrechen</string>
     <string name="autofillDeleteLoginDialogDelete">Löschen</string>
+
 
     <string name="autofillManagementUsernameCopied">Benutzername kopiert</string>
     <string name="autofillManagementPasswordCopied">Passwort kopiert</string>
@@ -112,5 +112,25 @@
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogTitle">Wenn du jetzt beendest, wird deine Duck Address nicht gespeichert</string>
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogPositiveButton">Einrichtung fortsetzen</string>
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Einrichtung beenden</string>
+
+    <string name="autofillManagementScreenTitle">Passwörter</string>
+    <string name="credentialManagementNoLoginsSavedTitle">Noch keine Passwörter gespeichert</string>
+    <string name="credentialManagementAutofillToggleLabel">Passwörter speichern und automatisch ausfüllen</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Passwörter werden sicher auf deinem Gerät gespeichert</string>
+    <string name="saveLoginDialogSubtitle">Passwörter werden sicher auf deinem Gerät gespeichert.</string>
+    <string name="autofillManagementAddLogin">Passwort hinzufügen</string>
+    <string name="credentialManagementEditLoginTitleHint">Titel</string>
+    <string name="autofillDeleteLoginDialogTitle">Möchtest du dieses Passwort wirklich löschen?</string>
+    <string name="autofillManagementDeletedConfirmation">Passwort gelöscht</string>
+    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Zuletzt aktualisiert %1$s</string>
+    <string name="autofillDisableAutofillPromptTitle">Möchtest du weiterhin Passwörter speichern?</string>
+    <string name="deviceNotSupportedSubtitle">Um Passwörter sicher zu speichern, müssen sie auf deinem Gerät verschlüsselt und gespeichert werden. Da dein Gerät keine verschlüsselte Speicherung unterstützt, ist das Speichern und automatische Ausfüllen von Passwörtern nicht möglich.</string>
+    <string name="autofill_password_generation_offer_message">Passwörter werden sicher auf deinem Gerät gespeichert.</string>
+    <string name="autofillManagementSearchLogins">Passwörter suchen</string>
+    <string name="biometric_prompt_title">Passwörter gesperrt</string>
+    <string name="autofill_auth_text_for_access">Gerät entsperren, um auf Passwörter zuzugreifen</string>
+    <string name="managementDisabledModeTitle">Sichere dein Gerät, um Passwörter zu speichern</string>
+    <string name="managementDisabledModeSubtitle">Es sind ein Muster, eine PIN oder biometrische Daten erforderlich, um deine Passwörter zu schützen.</string>
+    <string name="credentialManagementEditTitle">Passwort bearbeiten</string>
 
 </resources>

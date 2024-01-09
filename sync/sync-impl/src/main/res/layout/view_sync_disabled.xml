@@ -22,6 +22,10 @@
     android:paddingBottom="@dimen/keyline_4"
     android:orientation="vertical">
 
+    <com.duckduckgo.sync.impl.ui.SyncDisabledView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
     <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

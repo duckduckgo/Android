@@ -783,4 +783,9 @@
     <string name="imageCaptureCameraPermissionDeniedMessage">Os sites só podem utilizar a tua câmara se autorizares o DuckDuckGo a pedir acesso.</string>
     <string name="imageCaptureCameraPermissionDeniedPositiveButton">Abrir Definições</string>
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Cancelar</string>
+
+    <!-- Autofill -->
+    <string name="settingsAutofillLoginsSetting">Palavras-passe</string>
+    <string name="autofillLoginSavedSnackbarMessage">Palavra-passe guardada</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Palavra-passe atualizada</string>
 </resources>

@@ -29,7 +29,7 @@ class RealSecureStorageRepositoryFactory @Inject constructor(
     override fun get(): SecureStorageRepository? {
         val db = secureStorageDatabaseFactory.getDatabase()
         return if (db != null) {
-            RealSecureStorageRepository(db.websiteLoginCredentialsDao())
+            RealSecureStorageRepository(db.websiteLoginCredentialsDao(), db.neverSavedSitesDao())
         } else {
             null
         }

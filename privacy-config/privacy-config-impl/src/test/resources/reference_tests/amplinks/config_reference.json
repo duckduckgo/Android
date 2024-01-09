@@ -28,7 +28,8 @@
                     "_amp",
                     "amp_",
                     "?amp"
-                ]
+                ],
+                "deepExtractionEnabled": true
             }
         }
     },

@@ -25,8 +25,8 @@ import javax.inject.Inject
 import kotlinx.coroutines.withContext
 
 interface AutofillRequestParser {
-    suspend fun parseAutofillDataRequest(request: String): AutofillDataRequest
-    suspend fun parseStoreFormDataRequest(request: String): AutofillStoreFormDataRequest
+    suspend fun parseAutofillDataRequest(request: String): Result<AutofillDataRequest>
+    suspend fun parseStoreFormDataRequest(request: String): Result<AutofillStoreFormDataRequest>
 }
 
 @ContributesBinding(AppScope::class)
@@ -38,15 +38,31 @@ class AutofillJsonRequestParser @Inject constructor(
     private val autofillDataRequestParser by lazy { moshi.adapter(AutofillDataRequest::class.java) }
     private val autofillStoreFormDataRequestParser by lazy { moshi.adapter(AutofillStoreFormDataRequest::class.java) }
 
-    override suspend fun parseAutofillDataRequest(request: String): AutofillDataRequest {
+    override suspend fun parseAutofillDataRequest(request: String): Result<AutofillDataRequest> {
         return withContext(dispatchers.io()) {
-            autofillDataRequestParser.fromJson(request) ?: throw IllegalArgumentException("Failed to parse autofill request")
+            val result = kotlin.runCatching {
+                autofillDataRequestParser.fromJson(request)
+            }.getOrNull()
+
+            return@withContext if (result == null) {
+                Result.failure(IllegalArgumentException("Failed to parse autofill JSON for AutofillDataRequest"))
+            } else {
+                Result.success(result)
+            }
         }
     }
 
-    override suspend fun parseStoreFormDataRequest(request: String): AutofillStoreFormDataRequest {
+    override suspend fun parseStoreFormDataRequest(request: String): Result<AutofillStoreFormDataRequest> {
         return withContext(dispatchers.io()) {
-            autofillStoreFormDataRequestParser.fromJson(request) ?: throw IllegalArgumentException("Failed to parse autofill request")
+            val result = kotlin.runCatching {
+                autofillStoreFormDataRequestParser.fromJson(request)
+            }.getOrNull()
+
+            return@withContext if (result == null) {
+                Result.failure(IllegalArgumentException("Failed to parse autofill JSON for AutofillStoreFormDataRequest"))
+            } else {
+                Result.success(result)
+            }
         }
     }
 }

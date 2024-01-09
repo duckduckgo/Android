@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-
     <string name="managementDisabledModeCta"><b>Nastaviť v Nastaveniach</b></string>
 
     <string name="saveLoginDialogButtonSave">Uložiť heslo</string>
@@ -62,6 +61,7 @@
 
     <string name="autofillDeleteLoginDialogCancel">Zrušiť</string>
     <string name="autofillDeleteLoginDialogDelete">Odstrániť</string>
+
 
     <string name="autofillManagementUsernameCopied">Meno používateľa bolo skopírované</string>
     <string name="autofillManagementPasswordCopied">Heslo bolo skopírované</string>
@@ -112,5 +112,25 @@
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogTitle">Ak teraz skončíte, vaša adresa Duck sa neuloží.</string>
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogPositiveButton">Pokračovať v nastavovaní</string>
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Odísť z nastavení</string>
+
+    <string name="autofillManagementScreenTitle">Heslá</string>
+    <string name="credentialManagementNoLoginsSavedTitle">Zatiaľ nie sú uložené žiadne heslá</string>
+    <string name="credentialManagementAutofillToggleLabel">Ukladať a automaticky dopĺňať heslá</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Heslá sú zabezpečeným spôsobom uložené vo vašom zariadení</string>
+    <string name="saveLoginDialogSubtitle">Heslá sú zabezpečeným spôsobom uložené vo vašom zariadení.</string>
+    <string name="autofillManagementAddLogin">Pridať heslo</string>
+    <string name="credentialManagementEditLoginTitleHint">Názov</string>
+    <string name="autofillDeleteLoginDialogTitle">Naozaj chcete odstrániť toto heslo?</string>
+    <string name="autofillManagementDeletedConfirmation">Heslo bolo odstránené</string>
+    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Naposledy aktualizované %1$s</string>
+    <string name="autofillDisableAutofillPromptTitle">Chcete pokračovať v ukladaní hesiel?</string>
+    <string name="deviceNotSupportedSubtitle">Na uloženie hesiel zabezpečeným spôsobom ich musíme zašifrovať a uložiť vo vašom zariadení. Keďže vaše zariadenie nepodporuje šifrované ukladanie, ukladanie a automatické vypĺňanie hesiel nie je dostupné.</string>
+    <string name="autofill_password_generation_offer_message">Heslá sú zabezpečeným spôsobom uložené vo vašom zariadení.</string>
+    <string name="autofillManagementSearchLogins">Vyhľadávanie hesiel</string>
+    <string name="biometric_prompt_title">Uzamknuté heslá</string>
+    <string name="autofill_auth_text_for_access">Ak chcete získať prístup k heslám, odomknite zariadenie</string>
+    <string name="managementDisabledModeTitle">Zabezpečte svoje zariadenie na uloženie hesiel</string>
+    <string name="managementDisabledModeSubtitle">Na ochranu vašich prihlasovacích údajov sa vyžaduje vzor uzamknutia zariadenia, kód PIN alebo biometrické údaje.</string>
+    <string name="credentialManagementEditTitle">Upraviť heslo</string>
 
 </resources>

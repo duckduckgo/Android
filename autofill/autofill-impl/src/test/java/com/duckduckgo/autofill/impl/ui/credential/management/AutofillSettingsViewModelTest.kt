@@ -26,8 +26,12 @@ import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_ENABLED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_CONFIRMED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_DISMISSED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_DISPLAYED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.MENU_ACTION_AUTOFILL_PRESSED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.SETTINGS_AUTOFILL_MANAGEMENT_OPENED
+import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ExitCredentialMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ExitListMode
@@ -79,6 +83,7 @@ class AutofillSettingsViewModelTest {
     private val faviconManager: FaviconManager = mock()
     private val webUrlIdentifier: WebUrlIdentifier = mock()
     private val duckAddressIdentifier: DuckAddressIdentifier = RealDuckAddressIdentifier()
+    private val neverSavedSiteRepository: NeverSavedSiteRepository = mock()
     private val testee = AutofillSettingsViewModel(
         autofillStore = mockStore,
         clipboardInteractor = clipboardInteractor,
@@ -92,6 +97,7 @@ class AutofillSettingsViewModelTest {
         duckAddressStatusRepository = duckAddressStatusRepository,
         duckAddressIdentifier = duckAddressIdentifier,
         syncEngine = mock(),
+        neverSavedSiteRepository = neverSavedSiteRepository,
     )
 
     @Before
@@ -100,6 +106,7 @@ class AutofillSettingsViewModelTest {
 
         runTest {
             whenever(mockStore.getAllCredentials()).thenReturn(emptyFlow())
+            whenever(neverSavedSiteRepository.neverSaveListCount()).thenReturn(emptyFlow())
         }
     }
 
@@ -558,7 +565,7 @@ class AutofillSettingsViewModelTest {
         whenever(mockStore.autofillEnabled).thenReturn(false)
         configureDeviceToHaveValidAuthentication(true)
 
-        testee.observeCredentials()
+        testee.onViewCreated()
         testee.viewState.test {
             assertEquals(false, this.awaitItem().autofillEnabled)
             cancelAndIgnoreRemainingEvents()
@@ -570,7 +577,7 @@ class AutofillSettingsViewModelTest {
         whenever(mockStore.autofillEnabled).thenReturn(true)
         configureDeviceToHaveValidAuthentication(true)
 
-        testee.observeCredentials()
+        testee.onViewCreated()
         testee.viewState.test {
             assertEquals(true, this.awaitItem().autofillEnabled)
             cancelAndIgnoreRemainingEvents()
@@ -581,7 +588,7 @@ class AutofillSettingsViewModelTest {
     fun whenSearchQueryChangesEmptyThenShouldShowEnableToggle() = runTest {
         testee.onSearchQueryChanged("")
 
-        testee.observeCredentials()
+        testee.onViewCreated()
         testee.viewState.test {
             assertEquals(true, this.awaitItem().showAutofillEnabledToggle)
             cancelAndIgnoreRemainingEvents()
@@ -592,7 +599,7 @@ class AutofillSettingsViewModelTest {
     fun whenSearchQueryChangesNonEmptyThenShouldNotShowEnableToggle() = runTest {
         testee.onSearchQueryChanged("foo")
 
-        testee.observeCredentials()
+        testee.onViewCreated()
         testee.viewState.test {
             assertEquals(false, this.awaitItem().showAutofillEnabledToggle)
             cancelAndIgnoreRemainingEvents()
@@ -629,6 +636,30 @@ class AutofillSettingsViewModelTest {
         val directLinkToCredentials = false
         testee.sendLaunchPixel(launchedFromBrowser, directLinkToCredentials)
         verify(pixel).fire(eq(SETTINGS_AUTOFILL_MANAGEMENT_OPENED), any(), any())
+    }
+
+    @Test
+    fun whenUserFirstChoosesToResetNeverSavedSiteListThenCorrectPixelFired() = runTest {
+        testee.onResetNeverSavedSitesInitialSelection()
+        verify(pixel).fire(AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_DISPLAYED)
+    }
+
+    @Test
+    fun whenUserConfirmsTheyWantToResetNeverSavedSiteListThenRepositoryCleared() = runTest {
+        testee.onUserConfirmationToClearNeverSavedSites()
+        verify(neverSavedSiteRepository).clearNeverSaveList()
+    }
+
+    @Test
+    fun whenUserConfirmsTheyWantToResetNeverSavedSiteListThenCorrectPixelFired() = runTest {
+        testee.onUserConfirmationToClearNeverSavedSites()
+        verify(pixel).fire(AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_CONFIRMED)
+    }
+
+    @Test
+    fun whenUserDismissesPromptToResetNeverSavedSiteListThenCorrectPixelFired() = runTest {
+        testee.onUserCancelledFromClearNeverSavedSitesPrompt()
+        verify(pixel).fire(AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_DISMISSED)
     }
 
     private suspend fun configureStoreToHaveThisManyCredentialsStored(value: Int) {

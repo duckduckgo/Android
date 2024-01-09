@@ -791,4 +791,9 @@
     <string name="imageCaptureCameraPermissionDeniedMessage">Spletna mesta lahko uporabljajo vašo kamero le, če dovolite, da DuckDuckGo zaprosi za dostop.</string>
     <string name="imageCaptureCameraPermissionDeniedPositiveButton">Odpri nastavitve</string>
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Prekliči</string>
+
+    <!-- Autofill -->
+    <string name="settingsAutofillLoginsSetting">Gesla</string>
+    <string name="autofillLoginSavedSnackbarMessage">Geslo je shranjeno</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Geslo je posodobljeno</string>
 </resources>

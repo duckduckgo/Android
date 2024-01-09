@@ -17,19 +17,12 @@
 package com.duckduckgo.networkprotection.impl.fakes
 
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
-import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ReconnectStatus
-import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ReconnectStatus.NotReconnecting
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ServerDetails
 
 class FakeNetworkProtectionRepository : NetworkProtectionRepository {
-    private var _reconnectStatus: ReconnectStatus? = null
     private var _serverDetails: ServerDetails? = null
+    private var _vpnAccessRevoked: Boolean = false
 
-    override var reconnectStatus: ReconnectStatus
-        get() = _reconnectStatus ?: NotReconnecting
-        set(value) {
-            _reconnectStatus = value
-        }
     override var privateKey: String?
         get() = null
         set(_) {}
@@ -48,4 +41,10 @@ class FakeNetworkProtectionRepository : NetworkProtectionRepository {
     override var clientInterface: NetworkProtectionRepository.ClientInterface?
         get() = null
         set(_) {}
+
+    override var vpnAccessRevoked: Boolean
+        get() = _vpnAccessRevoked
+        set(value) {
+            _vpnAccessRevoked = value
+        }
 }

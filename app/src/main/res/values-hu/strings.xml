@@ -783,4 +783,9 @@
     <string name="imageCaptureCameraPermissionDeniedMessage">A webhelyek csak akkor használhatják a kamerát, ha engedélyezed, hogy a DuckDuckGo hozzáférést kérjen.</string>
     <string name="imageCaptureCameraPermissionDeniedPositiveButton">Beállítások megnyitása</string>
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Mégsem</string>
+
+    <!-- Autofill -->
+    <string name="settingsAutofillLoginsSetting">Jelszavak</string>
+    <string name="autofillLoginSavedSnackbarMessage">Jelszó mentve</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Jelszó frissítve</string>
 </resources>

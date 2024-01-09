@@ -116,6 +116,6 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
 
         override val allowedDomains: List<String> = emptyList()
         override val featureName: String = "webCompat"
-        override val methods: List<String> = listOf("webShare", "permissionsQuery")
+        override val methods: List<String> = listOf("webShare", "permissionsQuery", "screenLock", "screenUnlock")
     }
 }

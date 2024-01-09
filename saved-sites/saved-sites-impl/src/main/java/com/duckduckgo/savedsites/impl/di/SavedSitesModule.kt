@@ -17,6 +17,7 @@
 package com.duckduckgo.savedsites.impl.di
 
 import android.content.Context
+import androidx.room.Room
 import com.duckduckgo.app.di.*
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
@@ -33,6 +34,9 @@ import com.duckduckgo.savedsites.impl.service.RealSavedSitesManager
 import com.duckduckgo.savedsites.impl.service.RealSavedSitesParser
 import com.duckduckgo.savedsites.impl.service.SavedSitesParser
 import com.duckduckgo.savedsites.impl.sync.*
+import com.duckduckgo.savedsites.impl.sync.store.ALL_MIGRATIONS
+import com.duckduckgo.savedsites.impl.sync.store.SavedSitesSyncMetadataDao
+import com.duckduckgo.savedsites.impl.sync.store.SavedSitesSyncMetadataDatabase
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 import com.duckduckgo.savedsites.store.SavedSitesSettingsSharedPrefStore
@@ -102,8 +106,9 @@ class SavedSitesModule {
     fun providesSyncSavedSitesRepository(
         savedSitesEntitiesDao: SavedSitesEntitiesDao,
         savedSitesRelationsDao: SavedSitesRelationsDao,
+        savedSitesSyncMetadataDao: SavedSitesSyncMetadataDao,
     ): SyncSavedSitesRepository {
-        return RealSyncSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao)
+        return RealSyncSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao, savedSitesSyncMetadataDao)
     }
 
     @Provides
@@ -114,5 +119,20 @@ class SavedSitesModule {
         dispatcherProvider: DispatcherProvider,
     ): SavedSitesSettingsStore {
         return SavedSitesSettingsSharedPrefStore(context, appCoroutineScope, dispatcherProvider)
+    }
+
+    @SingleInstanceIn(AppScope::class)
+    @Provides
+    fun provideSavedSitesDatabase(context: Context): SavedSitesSyncMetadataDatabase {
+        return Room.databaseBuilder(context, SavedSitesSyncMetadataDatabase::class.java, "saved_sites_metadata.db")
+            .fallbackToDestructiveMigration()
+            .addMigrations(*ALL_MIGRATIONS)
+            .build()
+    }
+
+    @SingleInstanceIn(AppScope::class)
+    @Provides
+    fun provideSavedSitesSyncMetadataDao(database: SavedSitesSyncMetadataDatabase): SavedSitesSyncMetadataDao {
+        return database.syncMetadataDao()
     }
 }

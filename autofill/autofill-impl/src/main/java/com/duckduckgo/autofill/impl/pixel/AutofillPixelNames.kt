@@ -80,6 +80,11 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
 
     EMAIL_PROTECTION_IN_CONTEXT_MODAL_EXIT_EARLY_CANCEL("m_email_incontext_modal_exit_early_continue"),
     EMAIL_PROTECTION_IN_CONTEXT_MODAL_EXIT_EARLY_CONFIRM("m_email_incontext_modal_exit_early"),
+
+    AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_USER_SELECTED_FROM_SAVE_DIALOG("m_autofill_logins_save_login_exclude_site_confirmed"),
+    AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_DISPLAYED("m_autofill_settings_reset_excluded_displayed"),
+    AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_CONFIRMED("m_autofill_settings_reset_excluded_confirmed"),
+    AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_DISMISSED("m_autofill_settings_reset_excluded_dismissed"),
 }
 
 object AutofillPixelParameters {

@@ -17,14 +17,12 @@
 package com.duckduckgo.sync.impl.ui.setup
 
 import android.content.Context
-import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.Clipboard
-import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.RecoveryCodePDF
 import com.duckduckgo.sync.impl.Result.Error
@@ -48,7 +46,6 @@ import kotlinx.coroutines.launch
 
 @ContributesViewModel(ActivityScope::class)
 class SaveRecoveryCodeViewModel @Inject constructor(
-    private val qrEncoder: QREncoder,
     private val recoveryCodePDF: RecoveryCodePDF,
     private val syncAccountRepository: SyncAccountRepository,
     private val clipboard: Clipboard,
@@ -62,9 +59,7 @@ class SaveRecoveryCodeViewModel @Inject constructor(
     private fun createAccount() = viewModelScope.launch(dispatchers.io()) {
         if (syncAccountRepository.isSignedIn()) {
             syncAccountRepository.getRecoveryCode()?.let {
-                val bitmap = qrEncoder.encodeAsBitmap(it, R.dimen.qrSizeSmall, R.dimen.qrSizeSmall)
                 val newState = SignedIn(
-                    loginQRCode = bitmap,
                     b64RecoveryCode = it,
                 )
                 viewState.emit(ViewState(newState))
@@ -78,8 +73,7 @@ class SaveRecoveryCodeViewModel @Inject constructor(
 
                 is Success -> {
                     syncAccountRepository.getRecoveryCode()?.let {
-                        val bitmap = qrEncoder.encodeAsBitmap(it, R.dimen.qrSizeSmall, R.dimen.qrSizeSmall)
-                        viewState.emit(ViewState(SignedIn(bitmap, it)))
+                        viewState.emit(ViewState(SignedIn(it)))
                     } ?: command.send(Command.Error)
                 }
             }
@@ -95,7 +89,6 @@ class SaveRecoveryCodeViewModel @Inject constructor(
     sealed class ViewMode {
         object CreatingAccount : ViewMode()
         data class SignedIn(
-            val loginQRCode: Bitmap,
             val b64RecoveryCode: String,
         ) : ViewMode()
     }

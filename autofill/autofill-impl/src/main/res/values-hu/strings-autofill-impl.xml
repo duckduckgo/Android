@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-
     <string name="managementDisabledModeCta"><b>Beállítás a Beállításokban</b></string>
 
     <string name="saveLoginDialogButtonSave">Jelszó mentése</string>
@@ -62,6 +61,7 @@
 
     <string name="autofillDeleteLoginDialogCancel">Mégsem</string>
     <string name="autofillDeleteLoginDialogDelete">Törlés</string>
+
 
     <string name="autofillManagementUsernameCopied">Felhasználónév másolva</string>
     <string name="autofillManagementPasswordCopied">Jelszó másolva</string>
@@ -112,5 +112,25 @@
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogTitle">Ha most kilépsz, a Duck-címed nem lesz mentve</string>
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogPositiveButton">Beállítás folytatása</string>
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Kilépés a beállításokból</string>
+
+    <string name="autofillManagementScreenTitle">Jelszavak</string>
+    <string name="credentialManagementNoLoginsSavedTitle">Még nincsenek mentett jelszavak</string>
+    <string name="credentialManagementAutofillToggleLabel">Jelszavak mentése és automatikus kitöltése</string>
+    <string name="credentialManagementAutofillToggleSubtitle">A jelszavakat az eszközöd biztonságosan tárolja</string>
+    <string name="saveLoginDialogSubtitle">A jelszavakat az eszközöd biztonságosan tárolja.</string>
+    <string name="autofillManagementAddLogin">Jelszó hozzáadása</string>
+    <string name="credentialManagementEditLoginTitleHint">Cím</string>
+    <string name="autofillDeleteLoginDialogTitle">Biztosan törlöd ezt a jelszót?</string>
+    <string name="autofillManagementDeletedConfirmation">Jelszó törölve</string>
+    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Utolsó frissítés: %1$s</string>
+    <string name="autofillDisableAutofillPromptTitle">Továbbra is szeretnéd menteni a jelszavakat?</string>
+    <string name="deviceNotSupportedSubtitle">A jelszavak biztonságos tárolásához az eszközödön kell titkosítanunk és tárolnunk azokat. Mivel az eszközöd nem támogatja a titkosított tárhelyet, a jelszavak mentése és automatikus kitöltése nem érhető el.</string>
+    <string name="autofill_password_generation_offer_message">A jelszavakat az eszközöd biztonságosan tárolja.</string>
+    <string name="autofillManagementSearchLogins">Jelszavak keresése</string>
+    <string name="biometric_prompt_title">Jelszavak zárolva</string>
+    <string name="autofill_auth_text_for_access">Oldd fel az eszközt a jelszavakhoz való hozzáféréshez</string>
+    <string name="managementDisabledModeTitle">Zárd le az eszközt a jelszavak mentéséhez</string>
+    <string name="managementDisabledModeSubtitle">A jelszavak védelméhez az eszköz zárolási mintája, PIN-kód vagy biometrikus adatok szükségesek.</string>
+    <string name="credentialManagementEditTitle">Jelszó szerkesztése</string>
 
 </resources>

@@ -25,6 +25,7 @@ import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_CREATION
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_LOGIN
 import com.duckduckgo.sync.crypto.*
 import com.duckduckgo.sync.impl.Result.Error
+import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.pixels.*
 import com.duckduckgo.sync.store.*
 import com.duckduckgo.sync.store.SyncStore
@@ -198,6 +199,7 @@ class AppSyncAccountRepository @Inject constructor(
         if (result is Error) {
             syncPixels.fireSyncAccountErrorPixel(result)
         }
+
         return result
     }
 

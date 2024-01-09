@@ -30,4 +30,10 @@
         android:title="@string/autofillManagementAddLogin"
         app:showAsAction="always" />
 
+    <item
+        android:id="@+id/resetNeverSavedSites"
+        android:title="@string/credentialManagementClearNeverForThisSiteList"
+        android:visible="false"
+        app:showAsAction="never" />
+
 </menu>

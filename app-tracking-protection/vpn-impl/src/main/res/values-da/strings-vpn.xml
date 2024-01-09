@@ -219,7 +219,6 @@
         <item quantity="one">app</item>
         <item quantity="other">apps</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Denne funktion er i betatest. Har du bemærket et problem med en app? <annotation type="app_settings_link">Rapportér et problem.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection er deaktiveret</b>\nHar App Tracking Protection forårsaget et problem med dine apps? <annotation type="report_issues_link">Rapportér problem</annotation></string>
     <string name="atp_ActivityDisabledBySystemLabel"><b>Android deaktiverede App Tracking Protection</b>. Vil du forhindre, at dette sker igen? <annotation type="re_enable_link">Genaktiver</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>App Tracking Protection er deaktiveret.</b>\nEn VPN-app på din enhed kan have deaktiveret den. Brug til/fra-knappen ovenfor til at genaktivere.</string>
@@ -414,7 +413,7 @@
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Beskyttelse deaktiveret</string>
     <string name="atp_ExcludedAppsFilterMenuAllLabel">Alle</string>
     <string name="atp_ActivityViewAppsLabel">Se apps</string>
-    <string name="atp_ActivityEnabledMoreThanADayLabel">Denne funktion er i betatest. Har du problemer med en app? <annotation type="app_settings_link">Hjælp os med at forbedre</annotation></string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Har du problemer med en app? <annotation type="app_settings_link">Hjælp os med at forbedre</annotation></string>
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Der kan opstå problemer med nogle apps, når App Tracking Protection er aktiveret.\n<annotation type="learn_why_link">Læs hvorfor</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Beskyttelse er deaktiveret for apps med kendte problemer. Du kan aktivere disse apps, men de fungerer muligvis ikke som forventet. <annotation type="learn_why_link">Læs hvorfor</annotation></string>
 

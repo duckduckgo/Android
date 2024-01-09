@@ -787,4 +787,9 @@
     <string name="imageCaptureCameraPermissionDeniedMessage">Vietnes var izmantot tavu kameru tikai tad, ja tu atļauj DuckDuckGo prasīt piekļuvi.</string>
     <string name="imageCaptureCameraPermissionDeniedPositiveButton">Atvērt iestatījumus</string>
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Atcelt</string>
+
+    <!-- Autofill -->
+    <string name="settingsAutofillLoginsSetting">Paroles</string>
+    <string name="autofillLoginSavedSnackbarMessage">Parole saglabāta</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Parole atjaunināta</string>
 </resources>

@@ -27,7 +27,6 @@ import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelPa
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter.APP_VERSION
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter.ATB
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.voice.impl.VoiceSearchPixelNames
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import okhttp3.Interceptor
@@ -76,7 +75,6 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
         return listOf(
             AppPixelName.EMAIL_COPIED_TO_CLIPBOARD.pixelName to PixelParameter.removeAll(),
             StatisticsPixelName.BROWSER_DAILY_ACTIVE_FEATURE_STATE.pixelName to PixelParameter.removeAll(),
-            VoiceSearchPixelNames.VOICE_SEARCH_ERROR.pixelName to PixelParameter.removeAll(),
         )
     }
 }

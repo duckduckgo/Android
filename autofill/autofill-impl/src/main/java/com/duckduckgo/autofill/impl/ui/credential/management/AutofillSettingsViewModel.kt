@@ -28,8 +28,12 @@ import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_ENABLED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_CONFIRMED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_DISMISSED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_DISPLAYED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.MENU_ACTION_AUTOFILL_PRESSED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.SETTINGS_AUTOFILL_MANAGEMENT_OPENED
+import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ExitCredentialMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ExitDisabledMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ExitListMode
@@ -59,6 +63,8 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsVie
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.NotADuckAddress
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.NotManageable
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.SettingActivationStatus
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchResetNeverSaveListConfirmation
+import com.duckduckgo.autofill.impl.ui.credential.management.neversaved.NeverSavedSitesViewState
 import com.duckduckgo.autofill.impl.ui.credential.management.searching.CredentialListFilter
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.duckaddress.DuckAddressIdentifier
 import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository
@@ -95,16 +101,23 @@ class AutofillSettingsViewModel @Inject constructor(
     private val emailManager: EmailManager,
     private val duckAddressIdentifier: DuckAddressIdentifier,
     private val syncEngine: SyncEngine,
+    private val neverSavedSiteRepository: NeverSavedSiteRepository,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
     val viewState: StateFlow<ViewState> = _viewState
+
+    private val _neverSavedSitesViewState = MutableStateFlow(NeverSavedSitesViewState())
+    val neverSavedSitesViewState: StateFlow<NeverSavedSitesViewState> = _neverSavedSitesViewState
 
     private val _commands = MutableStateFlow<List<Command>>(emptyList())
     val commands: StateFlow<List<Command>> = _commands
 
     private val _commandsCredentialView = MutableStateFlow<List<CredentialModeCommand>>(emptyList())
     val commandsCredentialView: StateFlow<List<CredentialModeCommand>> = _commandsCredentialView
+
+    private val _commandsListView = MutableStateFlow<List<ListModeCommand>>(emptyList())
+    val commandsListView: StateFlow<List<ListModeCommand>> = _commandsListView
 
     // after unlocking, we want to initialise the view once (next unlock, the view stack will already exist)
     private var initialStateAlreadyPresented: Boolean = false
@@ -311,6 +324,13 @@ class AutofillSettingsViewModel @Inject constructor(
         }
     }
 
+    private fun addCommand(command: ListModeCommand) {
+        commandsListView.value.let { commands ->
+            val updatedList = commands + command
+            _commandsListView.value = updatedList
+        }
+    }
+
     fun commandProcessed(command: Command) {
         commands.value.let { currentCommands ->
             val updatedList = currentCommands.filterNot { it.id == command.id }
@@ -325,7 +345,14 @@ class AutofillSettingsViewModel @Inject constructor(
         }
     }
 
-    fun observeCredentials() {
+    fun commandProcessed(command: ListModeCommand) {
+        commandsListView.value.let { currentCommands ->
+            val updatedList = currentCommands.filterNot { it.id == command.id }
+            _commandsListView.value = updatedList
+        }
+    }
+
+    fun onViewCreated() {
         if (combineJob != null) return
         combineJob = viewModelScope.launch(dispatchers.io()) {
             _viewState.value = _viewState.value.copy(autofillEnabled = autofillStore.autofillEnabled)
@@ -337,6 +364,12 @@ class AutofillSettingsViewModel @Inject constructor(
                 _viewState.value = _viewState.value.copy(
                     logins = credentials,
                 )
+            }
+        }
+
+        viewModelScope.launch(dispatchers.io()) {
+            neverSavedSiteRepository.neverSaveListCount().collect { count ->
+                _neverSavedSitesViewState.value = NeverSavedSitesViewState(showOptionToReset = count > 0)
             }
         }
     }
@@ -529,7 +562,10 @@ class AutofillSettingsViewModel @Inject constructor(
      *
      * There are multiple ways to launch this screen, which should map to existing pixels where they exist.
      */
-    fun sendLaunchPixel(launchedFromBrowser: Boolean, directLinkToCredentials: Boolean) {
+    fun sendLaunchPixel(
+        launchedFromBrowser: Boolean,
+        directLinkToCredentials: Boolean,
+    ) {
         // no existing pixel for this scenario; don't want it to inflate other existing pixels
         if (directLinkToCredentials) return
 
@@ -541,6 +577,22 @@ class AutofillSettingsViewModel @Inject constructor(
         }
 
         pixel.fire(pixelName)
+    }
+
+    fun onUserConfirmationToClearNeverSavedSites() {
+        viewModelScope.launch(dispatchers.io()) {
+            neverSavedSiteRepository.clearNeverSaveList()
+            pixel.fire(AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_CONFIRMED)
+        }
+    }
+
+    fun onUserCancelledFromClearNeverSavedSitesPrompt() {
+        pixel.fire(AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_DISMISSED)
+    }
+
+    fun onResetNeverSavedSitesInitialSelection() {
+        addCommand(LaunchResetNeverSaveListConfirmation)
+        pixel.fire(AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_DISPLAYED)
     }
 
     data class ViewState(
@@ -610,6 +662,10 @@ class AutofillSettingsViewModel @Inject constructor(
     sealed class CredentialModeCommand(val id: String = UUID.randomUUID().toString()) {
         data class ShowEditCredentialMode(val credentials: LoginCredentials) : CredentialModeCommand()
         object ShowManualCredentialMode : CredentialModeCommand()
+    }
+
+    sealed class ListModeCommand(val id: String = UUID.randomUUID().toString()) {
+        data object LaunchResetNeverSaveListConfirmation : ListModeCommand()
     }
 
     sealed class DuckAddressStatus {

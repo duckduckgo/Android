@@ -231,7 +231,6 @@
         <item quantity="few">Aplikacije</item>
         <item quantity="other">Aplikacij</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Ta funkcija je v različici beta. Če opazite težavo z aplikacijo, <annotation type="app_settings_link">nam pošljite sporočilo.</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>Zaščita pred sledenjem aplikacijam je onemogočena</b>\nAli je zaščita pred sledenjem aplikacijam povzročila težave z vašimi aplikacijami? <annotation type="report_issues_link">Odgovori o vprašanjih </annotation></string>
     <string name="atp_ActivityDisabledBySystemLabel"><b>Android je onemogočil zaščito sledenja aplikaciji</b>. Želite preprečiti, da bi se to ponovilo? <annotation type="re_enable_link">Omogoči znova</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>Zaščita pred sledenjem aplikacijam je onemogočena.</b>\nMorda jo je onemogočila aplikacija VPN v napravi. Če jo želite znova omogočiti, uporabite zgornje stikalo.</string>
@@ -434,7 +433,7 @@
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Zaščita ni omogočena</string>
     <string name="atp_ExcludedAppsFilterMenuAllLabel">Vse</string>
     <string name="atp_ActivityViewAppsLabel">Prikaži aplikacije</string>
-    <string name="atp_ActivityEnabledMoreThanADayLabel">Ta funkcija je v različici beta. Imate težave z aplikacijo? <annotation type="app_settings_link">Pomagajte nam jo izboljšati</annotation></string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Imate težave z aplikacijo? <annotation type="app_settings_link">Pomagajte nam jo izboljšati</annotation></string>
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Pri nekaterih aplikacijah se lahko pojavijo težave, ko je omogočena zaščita pred sledenjem aplikaciji.\n<annotation type="learn_why_link">Več o tem</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Zaščita je onemogočena za aplikacije z znanimi težavami. Te aplikacije lahko omogočite, vendar morda ne bodo delovale po pričakovanjih. <annotation type="learn_why_link">Več o tem</annotation></string>
 

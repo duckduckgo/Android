@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-
     <string name="managementDisabledModeCta"><b>Configura nas Definições</b></string>
 
     <string name="saveLoginDialogButtonSave">Guardar palavra-passe</string>
@@ -62,6 +61,7 @@
 
     <string name="autofillDeleteLoginDialogCancel">Cancelar</string>
     <string name="autofillDeleteLoginDialogDelete">Eliminar</string>
+
 
     <string name="autofillManagementUsernameCopied">Nome de utilizador copiado</string>
     <string name="autofillManagementPasswordCopied">Palavra-passe copiada</string>
@@ -112,5 +112,25 @@
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogTitle">Se saíres agora, o teu Duck Address não será guardado</string>
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogPositiveButton">Continuar configuração</string>
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Sair da instalação</string>
+
+    <string name="autofillManagementScreenTitle">Palavras-passe</string>
+    <string name="credentialManagementNoLoginsSavedTitle">Ainda não há palavras-passe guardadas</string>
+    <string name="credentialManagementAutofillToggleLabel">Guardar e preencher palavras-passe automaticamente</string>
+    <string name="credentialManagementAutofillToggleSubtitle">As palavras-passe são armazenadas com segurança no teu dispositivo</string>
+    <string name="saveLoginDialogSubtitle">As palavras-passe são armazenadas com segurança no teu dispositivo.</string>
+    <string name="autofillManagementAddLogin">Adicionar palavra-passe</string>
+    <string name="credentialManagementEditLoginTitleHint">Título</string>
+    <string name="autofillDeleteLoginDialogTitle">Tens a certeza de que pretendes eliminar esta palavra-passe?</string>
+    <string name="autofillManagementDeletedConfirmation">Palavra-passe eliminada</string>
+    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Última atualização a %1$s</string>
+    <string name="autofillDisableAutofillPromptTitle">Pretendes continuar a guardar palavras-passe?</string>
+    <string name="deviceNotSupportedSubtitle">Para armazenar palavras-passe com segurança, é necessário encriptar e armazená-las no teu dispositivo. Uma vez que o teu dispositivo não suporta armazenamento encriptado, as opções de guardar e preencher automaticamente palavras-passe estão indisponíveis.</string>
+    <string name="autofill_password_generation_offer_message">As palavras-passe são armazenadas com segurança no teu dispositivo.</string>
+    <string name="autofillManagementSearchLogins">Pesquisar palavras-passe</string>
+    <string name="biometric_prompt_title">Palavras-passe bloqueadas</string>
+    <string name="autofill_auth_text_for_access">Desbloquear dispositivo para aceder às palavras-passe</string>
+    <string name="managementDisabledModeTitle">Proteger o dispositivo para guardar palavras-passe</string>
+    <string name="managementDisabledModeSubtitle">É necessário um padrão de bloqueio de dispositivo, PIN ou biometria para proteger as tuas palavras-passe.</string>
+    <string name="credentialManagementEditTitle">Editar palavra-passe</string>
 
 </resources>

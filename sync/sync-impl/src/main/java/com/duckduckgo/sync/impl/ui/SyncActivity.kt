@@ -53,6 +53,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDF
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowRecoveryCode
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowTextCode
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.SyncWithAnotherDevice
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.setup.ConnectFlowContract
 import com.duckduckgo.sync.impl.ui.setup.LoginContract
@@ -320,6 +321,13 @@ class SyncActivity : DuckDuckGoActivity() {
             if (viewState.loginQRCode != null) {
                 binding.viewSyncEnabled.qrCodeImageView.show()
                 binding.viewSyncEnabled.qrCodeImageView.setImageBitmap(viewState.loginQRCode)
+                binding.viewSyncEnabled.scanQrCodeItem.isEnabled = !viewState.disabledSetupFlows.contains(SetupFlows.SignInFlow)
+            }
+        } else {
+            with(binding.viewSyncDisabled) {
+                syncSetupWithAnotherDevice.isEnabled = !viewState.disabledSetupFlows.contains(SetupFlows.CreateAccountFlow)
+                syncSetupSyncThisDevice.isEnabled = !viewState.disabledSetupFlows.contains(SetupFlows.CreateAccountFlow)
+                syncSetupRecoverData.isEnabled = !viewState.disabledSetupFlows.contains(SetupFlows.SignInFlow)
             }
         }
 

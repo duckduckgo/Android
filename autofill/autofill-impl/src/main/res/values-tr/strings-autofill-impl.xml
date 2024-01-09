@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-
     <string name="managementDisabledModeCta"><b>Ayarlarda Ayarlama</b></string>
 
     <string name="saveLoginDialogButtonSave">Şifreyi Kaydet</string>
@@ -62,6 +61,7 @@
 
     <string name="autofillDeleteLoginDialogCancel">Vazgeç</string>
     <string name="autofillDeleteLoginDialogDelete">Sil</string>
+
 
     <string name="autofillManagementUsernameCopied">Kullanıcı adı kopyalandı</string>
     <string name="autofillManagementPasswordCopied">Şifre kopyalandı</string>
@@ -112,5 +112,25 @@
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogTitle">Şimdi çıkış yaparsanız Duck Address kaydedilmez.</string>
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogPositiveButton">Kuruluma Devam Et</string>
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Kurulumdan Çık</string>
+
+    <string name="autofillManagementScreenTitle">Şifreler</string>
+    <string name="credentialManagementNoLoginsSavedTitle">Henüz şifre kaydedilmedi</string>
+    <string name="credentialManagementAutofillToggleLabel">Şifreleri kaydedin ve otomatik doldurun</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Şifreler cihazınızda güvenli bir şekilde saklanır</string>
+    <string name="saveLoginDialogSubtitle">Şifreler cihazınızda güvenli bir şekilde saklanır.</string>
+    <string name="autofillManagementAddLogin">Şifre Ekle</string>
+    <string name="credentialManagementEditLoginTitleHint">Title</string>
+    <string name="autofillDeleteLoginDialogTitle">Bu şifreyi silmek istediğinizden emin misiniz?</string>
+    <string name="autofillManagementDeletedConfirmation">Şifre silindi</string>
+    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Son güncelleme %1$s</string>
+    <string name="autofillDisableAutofillPromptTitle">Şifreleri kaydetmeye devam etmek istiyor musunuz?</string>
+    <string name="deviceNotSupportedSubtitle">Şifreleri güvenli bir şekilde saklamak için bunları şifrelememiz ve cihazınızda depolamamız gerekir. Cihazınız şifreli depolamayı desteklemediğinden, şifreleri kaydetmek ve otomatik doldurmak mümkün değildir.</string>
+    <string name="autofill_password_generation_offer_message">Şifreler cihazınızda güvenli bir şekilde saklanır.</string>
+    <string name="autofillManagementSearchLogins">Şifreleri ara</string>
+    <string name="biometric_prompt_title">Şifreler Kilitli</string>
+    <string name="autofill_auth_text_for_access">Şifrelere erişmek için cihazın kilidini açın</string>
+    <string name="managementDisabledModeTitle">Şifreleri kaydetmek için cihazınızın güvenliğini sağlayın</string>
+    <string name="managementDisabledModeSubtitle">Şifrelerinizin güvenliğini sağlamak için bir cihaz kilidi deseni, PIN veya biyometrik veri gereklidir.</string>
+    <string name="credentialManagementEditTitle">Şifreyi Düzenle</string>
 
 </resources>

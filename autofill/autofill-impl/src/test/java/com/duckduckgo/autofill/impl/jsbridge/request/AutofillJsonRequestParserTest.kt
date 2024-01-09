@@ -75,10 +75,22 @@ class AutofillJsonRequestParserTest {
         assertNull(parsed.credentials)
     }
 
+    @Test
+    fun whenStoreFormDataRequestIsEmptyThenExceptionThrown() = runTest {
+        val result = testee.parseStoreFormDataRequest("")
+        assertTrue(result.isFailure)
+    }
+
+    @Test
+    fun whenStoreFormDataRequestIsMalformedJSONThenExceptionThrown() = runTest {
+        val result = testee.parseStoreFormDataRequest("invalid json")
+        assertTrue(result.isFailure)
+    }
+
     private suspend fun String.parseStoreFormDataJson(): AutofillStoreFormDataRequest {
         val json = this.loadJsonFile()
         assertNotNull("Failed to load specified JSON file: $this")
-        return testee.parseStoreFormDataRequest(json)
+        return testee.parseStoreFormDataRequest(json).getOrThrow()
     }
 
     private fun String.loadJsonFile(): String {

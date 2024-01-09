@@ -32,4 +32,9 @@ sealed class BrowserScreens {
      * Use this model to launch the Bookmarks screen
      */
     object BookmarksScreenNoParams : GlobalActivityStarter.ActivityParams
+
+    /**
+     * Use this model to launch the Settings screen
+     */
+    object SettingsScreenNoParams : GlobalActivityStarter.ActivityParams
 }

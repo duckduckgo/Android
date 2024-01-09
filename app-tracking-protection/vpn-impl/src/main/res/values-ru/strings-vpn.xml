@@ -231,7 +231,6 @@
         <item quantity="many">приложениях</item>
         <item quantity="other">приложения</item>
     </plurals>
-    <string name="atp_ActivityEnabledLabel">Это бета-версия функции. Заметили проблему с приложением? <annotation type="app_settings_link">Сообщите нам!</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>Функция App Tracking Protection отключена</b> \nИз-за нее возникли сбои в приложениях? <annotation type="report_issues_link">Сообщить о проблемах</annotation></string>
     <string name="atp_ActivityDisabledBySystemLabel"><b>Система Android отключила функцию блокировки отслеживания приложениями</b>. Не делать этого впредь? <annotation type="re_enable_link">Включить снова</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>Защита от слежки отключена.</b>\nВозможно, ее отключило приложение VPN. Включите защиту снова с помощью переключателя выше.</string>
@@ -434,7 +433,7 @@
     <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Защита отключена</string>
     <string name="atp_ExcludedAppsFilterMenuAllLabel">Всё</string>
     <string name="atp_ActivityViewAppsLabel">Просмотреть приложения</string>
-    <string name="atp_ActivityEnabledMoreThanADayLabel">Это бета-версия функции. Проблемы с приложением? <annotation type="app_settings_link">Давайте устраним их вместе!</annotation></string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Проблемы с приложением? <annotation type="app_settings_link">Давайте устраним их вместе!</annotation></string>
     <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Активация блокировки отслеживания приложениями может нарушить работу некоторых программ.\n<annotation type="learn_why_link">С чем это связано...</annotation></string>
     <string name="atp_ExcludedAppsDisabledLearnWhyLabel">Защита отключена для сбоивших приложений. Ее можно включить снова, но при этом приложения могут работать некорректно. <annotation type="learn_why_link">С чем это связано...</annotation></string>
 

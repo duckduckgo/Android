@@ -19,10 +19,6 @@ package com.duckduckgo.networkprotection.impl.store
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.impl.state.NetPFeatureRemover
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ClientInterface
-import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ReconnectStatus
-import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ReconnectStatus.NotReconnecting
-import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ReconnectStatus.Reconnecting
-import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ReconnectStatus.ReconnectingFailed
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ServerDetails
 import com.duckduckgo.networkprotection.store.NetworkProtectionPrefs
 import com.squareup.anvil.annotations.ContributesBinding
@@ -30,12 +26,12 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 interface NetworkProtectionRepository {
-    var reconnectStatus: ReconnectStatus
     var privateKey: String?
     val lastPrivateKeyUpdateTimeInMillis: Long
     var enabledTimeInMillis: Long
     var serverDetails: ServerDetails?
     var clientInterface: ClientInterface?
+    var vpnAccessRevoked: Boolean
 
     enum class ReconnectStatus {
         NotReconnecting,
@@ -128,20 +124,10 @@ class RealNetworkProtectionRepository @Inject constructor(
         networkProtectionPrefs.clear()
     }
 
-    override var reconnectStatus: ReconnectStatus
-        get() = when (networkProtectionPrefs.getInt(KEY_WG_RECONNECT_STATUS, 0)) {
-            -1 -> ReconnectingFailed
-            1 -> Reconnecting
-            else -> NotReconnecting
-        }
+    override var vpnAccessRevoked: Boolean
+        get() = networkProtectionPrefs.getBoolean(KEY_VPN_ACCESS_REVOKED, false)
         set(value) {
-            when (value) {
-                Reconnecting -> 1
-                ReconnectingFailed -> -1
-                NotReconnecting -> 0
-            }.also {
-                networkProtectionPrefs.putInt(KEY_WG_RECONNECT_STATUS, it)
-            }
+            networkProtectionPrefs.putBoolean(KEY_VPN_ACCESS_REVOKED, value)
         }
 
     companion object {
@@ -151,7 +137,7 @@ class RealNetworkProtectionRepository @Inject constructor(
         private const val KEY_WG_SERVER_IP = "wg_server_ip"
         private const val KEY_WG_SERVER_LOCATION = "wg_server_location"
         private const val KEY_WG_SERVER_ENABLE_TIME = "wg_server_enable_time"
-        private const val KEY_WG_RECONNECT_STATUS = "wg_reconnect_status"
         private const val KEY_WG_CLIENT_IFACE_TUNNEL_IP = "wg_client_iface_tunnel_ip"
+        private const val KEY_VPN_ACCESS_REVOKED = "key_vpn_access_revoked"
     }
 }

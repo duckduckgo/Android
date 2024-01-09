@@ -383,7 +383,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
                 addDnsServer("10.0.0.1")
                 // just so that we can connect to our BE
                 // TODO should we protect all comms with our controller BE? other VPNs do that
-                safelyAddDisallowedApps(listOf("com.duckduckgo.mobile.android", "com.duckduckgo.mobile.android.debug"))
+                safelyAddDisallowedApps(listOf(this@TrackerBlockingVpnService.packageName))
                 setBlocking(true)
                 setMtu(1280)
                 prepare(this@TrackerBlockingVpnService)
@@ -501,9 +501,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         return tunInterface
     }
 
-    /**
-     * @return the DNS configured in the Android System
-     */
     private fun checkAndReturnDns(originalDns: Set<InetAddress>): Set<InetAddress> {
         // private extension function, this is purposely here to limit visibility
         fun Set<InetAddress>.containsIpv4(): Boolean {
@@ -513,16 +510,12 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             return false
         }
 
-        val dns = mutableSetOf<InetAddress>().apply {
-            addAll(originalDns)
-        }
-
-        if (!dns.containsIpv4()) {
+        if (!originalDns.containsIpv4()) {
             // never allow IPv6-only DNS
             logcat(WARN) { "VPN log: No IPv4 DNS found" }
         }
 
-        return dns.toSet()
+        return originalDns
     }
 
     private fun Builder.safelyAddDisallowedApps(apps: List<String>) {

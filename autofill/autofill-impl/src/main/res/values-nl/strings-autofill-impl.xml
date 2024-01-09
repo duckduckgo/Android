@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-
     <string name="managementDisabledModeCta"><b>Instellen in Instellingen</b></string>
 
     <string name="saveLoginDialogButtonSave">Wachtwoord opslaan</string>
@@ -62,6 +61,7 @@
 
     <string name="autofillDeleteLoginDialogCancel">Annuleren</string>
     <string name="autofillDeleteLoginDialogDelete">Verwijderen</string>
+
 
     <string name="autofillManagementUsernameCopied">Gebruikersnaam gekopieerd</string>
     <string name="autofillManagementPasswordCopied">Wachtwoord gekopieerd</string>
@@ -112,5 +112,25 @@
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogTitle">Als je nu afsluit, wordt je Duck Address niet opgeslagen</string>
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogPositiveButton">Doorgaan met instellen</string>
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Instellen beëindigen</string>
+
+    <string name="autofillManagementScreenTitle">Wachtwoorden</string>
+    <string name="credentialManagementNoLoginsSavedTitle">Nog geen wachtwoorden opgeslagen</string>
+    <string name="credentialManagementAutofillToggleLabel">Wachtwoorden opslaan en automatisch invullen</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Wachtwoorden worden veilig opgeslagen op je apparaat</string>
+    <string name="saveLoginDialogSubtitle">Wachtwoorden worden veilig opgeslagen op je apparaat.</string>
+    <string name="autofillManagementAddLogin">Wachtwoord toevoegen</string>
+    <string name="credentialManagementEditLoginTitleHint">Titel</string>
+    <string name="autofillDeleteLoginDialogTitle">Weet je zeker dat je dit wachtwoord wilt verwijderen?</string>
+    <string name="autofillManagementDeletedConfirmation">Wachtwoord verwijderd</string>
+    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Laatst bijgewerkt op %1$s</string>
+    <string name="autofillDisableAutofillPromptTitle">Wil je wachtwoorden blijven opslaan?</string>
+    <string name="deviceNotSupportedSubtitle">Om wachtwoorden veilig op te slaan, moeten we ze versleutelen en opslaan op je apparaat. Omdat je apparaat geen versleutelde opslag ondersteunt, kunnen wachtwoorden niet worden opgeslagen en automatisch worden aangevuld.</string>
+    <string name="autofill_password_generation_offer_message">Wachtwoorden worden veilig opgeslagen op je apparaat.</string>
+    <string name="autofillManagementSearchLogins">Wachtwoorden zoeken</string>
+    <string name="biometric_prompt_title">Wachtwoorden vergrendeld</string>
+    <string name="autofill_auth_text_for_access">Ontgrendel het apparaat om toegang te krijgen tot wachtwoorden</string>
+    <string name="managementDisabledModeTitle">Beveilig je apparaat om wachtwoorden op te slaan</string>
+    <string name="managementDisabledModeSubtitle">Je hebt een vergrendelingspatroon, pincode of biometrische gegevens nodig om je aanmeldgegevens te beschermen.</string>
+    <string name="credentialManagementEditTitle">Wachtwoord bewerken</string>
 
 </resources>

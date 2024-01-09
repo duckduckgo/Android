@@ -102,6 +102,7 @@ class AppSyncDeviceIdsTest {
 
     private fun getFakeSyncStore(): SyncStore {
         return object : SyncStore {
+            override var syncingDataEnabled = true
             override var userId: String? = "testUserId"
             override var deviceName: String? = "testDeviceName"
             override var deviceId: String? = "deviceId"
@@ -132,6 +133,7 @@ class AppSyncDeviceIdsTest {
 
     private fun getFakeEmptySyncStore(): SyncStore {
         return object : SyncStore {
+            override var syncingDataEnabled = true
             override var userId: String? = null
             override var deviceName: String? = null
             override var deviceId: String? = null

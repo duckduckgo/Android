@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-
     <string name="managementDisabledModeCta"><b>Määritä Asetuksissa</b></string>
 
     <string name="saveLoginDialogButtonSave">Tallenna salasana</string>
@@ -62,6 +61,7 @@
 
     <string name="autofillDeleteLoginDialogCancel">Peruuta</string>
     <string name="autofillDeleteLoginDialogDelete">Poista</string>
+
 
     <string name="autofillManagementUsernameCopied">Käyttäjätunnus kopioitu</string>
     <string name="autofillManagementPasswordCopied">Salasana kopioitu</string>
@@ -112,5 +112,25 @@
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogTitle">Jos poistut nyt, Duck Address -osoitettasi ei tallenneta</string>
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogPositiveButton">Jatka asennusta</string>
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Poistu asennuksesta</string>
+
+    <string name="autofillManagementScreenTitle">Salasanat</string>
+    <string name="credentialManagementNoLoginsSavedTitle">Salasanoja ei ole vielä tallennettu</string>
+    <string name="credentialManagementAutofillToggleLabel">Tallenna ja täytä salasanat automaattisesti</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Salasanat tallennetaan laitteellesi turvallisesti</string>
+    <string name="saveLoginDialogSubtitle">Salasanat tallennetaan laitteellesi turvallisesti.</string>
+    <string name="autofillManagementAddLogin">Lisää salasana</string>
+    <string name="credentialManagementEditLoginTitleHint">Otsikko</string>
+    <string name="autofillDeleteLoginDialogTitle">Haluatko varmasti poistaa tämän salasanan?</string>
+    <string name="autofillManagementDeletedConfirmation">Salasana poistettu</string>
+    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Viimeksi päivitetty %1$s</string>
+    <string name="autofillDisableAutofillPromptTitle">Haluatko jatkaa salasanojen tallentamista?</string>
+    <string name="deviceNotSupportedSubtitle">Jotta salasanat voidaan tallentaa turvallisesti, meidän on salattava ja tallennettava ne laitteellesi. Koska laitteesi ei tue salattua tallennusta, salasanojen tallentaminen ja automaattinen täyttäminen ei ole mahdollista.</string>
+    <string name="autofill_password_generation_offer_message">Salasanat tallennetaan laitteellesi turvallisesti.</string>
+    <string name="autofillManagementSearchLogins">Etsi salasanoja</string>
+    <string name="biometric_prompt_title">Salasanat lukittu</string>
+    <string name="autofill_auth_text_for_access">Avaa laitteen lukitus päästäksesi salasanoihin</string>
+    <string name="managementDisabledModeTitle">Suojaa laitteesi salasanojen tallentamiseksi</string>
+    <string name="managementDisabledModeSubtitle">Salasanojen suojaamiseen tarvitaan laitteen lukituskuvio, PIN-koodi tai biometriset tiedot.</string>
+    <string name="credentialManagementEditTitle">Muokkaa salasanaa</string>
 
 </resources>

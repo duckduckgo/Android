@@ -24,6 +24,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command.FinishSetupFlow
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.ViewMode.CreatingAccount
 import javax.inject.*
@@ -38,6 +39,7 @@ import kotlinx.coroutines.launch
 @ContributesViewModel(ActivityScope::class)
 class SyncCreateAccountViewModel @Inject constructor(
     private val syncAccountRepository: SyncAccountRepository,
+    private val syncPixels: SyncPixels,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
 
@@ -74,6 +76,7 @@ class SyncCreateAccountViewModel @Inject constructor(
                 }
 
                 is Success -> {
+                    syncPixels.fireSignupDirectPixel()
                     command.send(FinishSetupFlow)
                 }
             }

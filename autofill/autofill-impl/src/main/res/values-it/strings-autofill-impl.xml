@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-
     <string name="managementDisabledModeCta"><b>Configura in Impostazioni</b></string>
 
     <string name="saveLoginDialogButtonSave">Salva password</string>
@@ -62,6 +61,7 @@
 
     <string name="autofillDeleteLoginDialogCancel">Annulla</string>
     <string name="autofillDeleteLoginDialogDelete">Cancella</string>
+
 
     <string name="autofillManagementUsernameCopied">Nome utente copiato</string>
     <string name="autofillManagementPasswordCopied">Password copiata</string>
@@ -112,5 +112,25 @@
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogTitle">Se esci ora, il tuo Duck Address non verrà salvato</string>
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogPositiveButton">Prosegui la configurazione</string>
     <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Esci dalla configurazione</string>
+
+    <string name="autofillManagementScreenTitle">Password</string>
+    <string name="credentialManagementNoLoginsSavedTitle">Nessuna password ancora salvata</string>
+    <string name="credentialManagementAutofillToggleLabel">Salva e compila automaticamente le password</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Le password sono archiviate in modo sicuro sul tuo dispositivo</string>
+    <string name="saveLoginDialogSubtitle">Le password sono archiviate in modo sicuro sul tuo dispositivo.</string>
+    <string name="autofillManagementAddLogin">Aggiungi password</string>
+    <string name="credentialManagementEditLoginTitleHint">Titolo</string>
+    <string name="autofillDeleteLoginDialogTitle">Eliminare questa password?</string>
+    <string name="autofillManagementDeletedConfirmation">Password eliminata</string>
+    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Ultimo aggiornamento %1$s</string>
+    <string name="autofillDisableAutofillPromptTitle">Continuare a salvare le password?</string>
+    <string name="deviceNotSupportedSubtitle">Per archiviare le password in modo sicuro, dobbiamo crittografarle e archiviarle sul tuo dispositivo. Poiché il dispositivo non supporta l\'archiviazione crittografata, il salvataggio e la compilazione automatica delle password non è disponibile.</string>
+    <string name="autofill_password_generation_offer_message">Le password sono archiviate in modo sicuro sul tuo dispositivo.</string>
+    <string name="autofillManagementSearchLogins">Cerca password</string>
+    <string name="biometric_prompt_title">Password bloccate</string>
+    <string name="autofill_auth_text_for_access">Sblocca il dispositivo per accedere alle password</string>
+    <string name="managementDisabledModeTitle">Proteggi il tuo dispositivo per salvare le password</string>
+    <string name="managementDisabledModeSubtitle">Per proteggere le password sono necessari una sequenza di blocco del dispositivo, un PIN o dati biometrici.</string>
+    <string name="credentialManagementEditTitle">Modifica password</string>
 
 </resources>

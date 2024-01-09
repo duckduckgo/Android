@@ -36,12 +36,15 @@ import com.duckduckgo.sync.impl.RecoveryCodePDF
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.SyncFeatureToggle
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroCreateAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroRecoverSyncData
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.CreateAccountFlow
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.SignInFlow
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.SyncedDevice
 import java.lang.String.format
 import kotlin.reflect.KClass
@@ -74,6 +77,7 @@ class SyncActivityViewModelTest {
     private val syncAccountRepository: SyncAccountRepository = mock()
     private val syncStateMonitor: SyncStateMonitor = mock()
     private val syncEngine: SyncEngine = mock()
+    private val syncFeatureToggle: SyncFeatureToggle = mock()
 
     private val stateFlow = MutableStateFlow(SyncState.READY)
 
@@ -88,6 +92,7 @@ class SyncActivityViewModelTest {
             syncStateMonitor = syncStateMonitor,
             syncEngine = syncEngine,
             recoveryCodePDF = recoveryPDF,
+            syncFeatureToggle = syncFeatureToggle,
         )
 
         whenever(syncStateMonitor.syncState()).thenReturn(emptyFlow())
@@ -145,7 +150,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenSyncWithAnoterDeviceThenEmitCommandSyncWithAnotherDevice() = runTest {
+    fun whenSyncWithAnotherDeviceThenEmitCommandSyncWithAnotherDevice() = runTest {
         testee.onSyncWithAnotherDevice()
 
         testee.commands().test {
@@ -479,6 +484,60 @@ class SyncActivityViewModelTest {
             assertEquals(initialState.showAccount, true)
             stateFlow.value = IN_PROGRESS
             expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUserSignedAndSetupFlowsDisabledThenAllSetupFlowsDisabledViewState() = runTest {
+        whenever(syncFeatureToggle.allowSetupFlows()).thenReturn(false)
+        whenever(syncFeatureToggle.allowCreateAccount()).thenReturn(false)
+        givenAuthenticatedUser()
+
+        testee.viewState().test {
+            val viewState = expectMostRecentItem()
+            assertTrue(viewState.disabledSetupFlows.contains(SignInFlow))
+            assertTrue(viewState.disabledSetupFlows.contains(CreateAccountFlow))
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUserSignedAndCreateAccountDisabledThenOnlySignInFlowDisabledViewState() = runTest {
+        whenever(syncFeatureToggle.allowSetupFlows()).thenReturn(true)
+        whenever(syncFeatureToggle.allowCreateAccount()).thenReturn(false)
+        givenAuthenticatedUser()
+
+        testee.viewState().test {
+            val viewState = expectMostRecentItem()
+            assertFalse(viewState.disabledSetupFlows.contains(SignInFlow))
+            assertTrue(viewState.disabledSetupFlows.contains(CreateAccountFlow))
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSetupFlowsDisabledThenAllSetupFlowsDisabledViewState() = runTest {
+        whenever(syncFeatureToggle.allowSetupFlows()).thenReturn(false)
+        whenever(syncFeatureToggle.allowCreateAccount()).thenReturn(true)
+
+        testee.viewState().test {
+            val viewState = expectMostRecentItem()
+            assertTrue(viewState.disabledSetupFlows.contains(SignInFlow))
+            assertTrue(viewState.disabledSetupFlows.contains(CreateAccountFlow))
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenCreateAccountDisabledThenOnlySignInFlowDisabledViewState() = runTest {
+        whenever(syncFeatureToggle.allowSetupFlows()).thenReturn(true)
+        whenever(syncFeatureToggle.allowCreateAccount()).thenReturn(false)
+
+        testee.viewState().test {
+            val viewState = expectMostRecentItem()
+            assertFalse(viewState.disabledSetupFlows.contains(SignInFlow))
+            assertTrue(viewState.disabledSetupFlows.contains(CreateAccountFlow))
             cancelAndIgnoreRemainingEvents()
         }
     }
