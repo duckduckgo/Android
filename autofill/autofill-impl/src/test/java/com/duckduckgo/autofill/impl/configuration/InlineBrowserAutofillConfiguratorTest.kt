@@ -17,7 +17,6 @@
 package com.duckduckgo.autofill.impl.configuration
 
 import android.webkit.WebView
-import com.duckduckgo.app.autofill.JavascriptInjector
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.TestScope
@@ -38,21 +37,21 @@ class InlineBrowserAutofillConfiguratorTest {
     private lateinit var inlineBrowserAutofillConfigurator: InlineBrowserAutofillConfigurator
 
     private val autofillRuntimeConfigProvider: AutofillRuntimeConfigProvider = mock()
-    private val javascriptInjector: JavascriptInjector = mock()
     private val webView: WebView = mock()
     private val autofillCapabilityChecker: AutofillCapabilityChecker = mock()
+    private val autofillJavascriptLoader: AutofillJavascriptLoader = mock()
 
     @Before
     fun before() = runTest {
-        whenever(javascriptInjector.getFunctionsJS()).thenReturn("")
+        whenever(autofillJavascriptLoader.getAutofillJavascript()).thenReturn("")
         whenever(autofillRuntimeConfigProvider.getRuntimeConfiguration(any(), any())).thenReturn("")
 
         inlineBrowserAutofillConfigurator = InlineBrowserAutofillConfigurator(
             autofillRuntimeConfigProvider,
-            javascriptInjector,
             TestScope(),
             coroutineRule.testDispatcherProvider,
             autofillCapabilityChecker,
+            autofillJavascriptLoader,
         )
     }
 

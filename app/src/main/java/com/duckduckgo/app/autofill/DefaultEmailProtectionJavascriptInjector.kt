@@ -21,25 +21,13 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import java.io.BufferedReader
 import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
-class FileBasedJavascriptInjector @Inject constructor() : JavascriptInjector {
-    private lateinit var functions: String
+class DefaultEmailProtectionJavascriptInjector @Inject constructor() : EmailProtectionJavascriptInjector {
     private lateinit var aliasFunctions: String
     private lateinit var signOutFunctions: String
-
-    override fun getFunctionsJS(): String {
-        if (!this::functions.isInitialized) {
-            // this can be enabled to see more verbose output from the autofill JS; useful for debugging autofill-related issues
-            val debugMode = false
-
-            functions = loadJs(if (debugMode) "autofill-debug.js" else "autofill.js")
-        }
-        return functions
-    }
 
     override fun getAliasFunctions(
         context: Context,
@@ -58,11 +46,5 @@ class FileBasedJavascriptInjector @Inject constructor() : JavascriptInjector {
             signOutFunctions = context.resources.openRawResource(R.raw.signout_autofill).bufferedReader().use { it.readText() }
         }
         return signOutFunctions
-    }
-
-    private fun loadJs(resourceName: String): String = readResource(resourceName).use { it?.readText() }.orEmpty()
-
-    private fun readResource(resourceName: String): BufferedReader? {
-        return javaClass.classLoader?.getResource(resourceName)?.openStream()?.bufferedReader()
     }
 }
