@@ -74,7 +74,7 @@
 
     <!-- Connect screen -->
     <string name="connect_screen_title">Scan QR Code</string>
-    <string name="connect_screen_scan_qr_hint">Go to <b>Settings > Sync &amp; Back Up</b> in the DuckDuckGo Browser on a another device and select  ”Sync with Another Device.”</string>
+    <string name="connect_screen_scan_qr_hint">Go to <b>Settings > Sync &amp; Back Up</b> in the DuckDuckGo Browser on another device and select  ”Sync with Another Device.”</string>
     <string name="connect_screen_enter_code_cta">Or Manually Enter Code</string>
     <string name="connect_screen_connect_qr_hint_title">Mobile-to-Mobile?</string>
     <string name="connect_screen_connect_qr_hint_content">Scan this code with another device to sync.”</string>
