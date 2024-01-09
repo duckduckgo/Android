@@ -74,10 +74,10 @@
 
     <!-- Connect screen -->
     <string name="connect_screen_title">Scan QR Code</string>
-    <string name="connect_screen_scan_qr_hint">Go to <b>Settings > Sync &amp; Back Up</b> in the DuckDuckGo Browser on another device and select  ”Sync with Another Device.”</string>
+    <string name="connect_screen_scan_qr_hint">Go to <b>Settings > Sync &amp; Back Up</b> in the DuckDuckGo Browser on another device and select \"Sync with Another Device.\"</string>
     <string name="connect_screen_enter_code_cta">Or Manually Enter Code</string>
     <string name="connect_screen_connect_qr_hint_title">Mobile-to-Mobile?</string>
-    <string name="connect_screen_connect_qr_hint_content">Scan this code with another device to sync.”</string>
+    <string name="connect_screen_connect_qr_hint_content">Scan this code with another device to sync.</string>
     <string name="connect_screen_share_code">Copy Code</string>
 
     <!-- Enter Code screen -->
@@ -142,7 +142,7 @@
     <string name="sync_device_menu_option_edit">Edit</string>
     <string name="sync_device_menu_option_remove">Remove Device</string>
     <string name="sync_show_code_copy">Copy Code</string>
-    <string name="sync_show_code_copy_hint">Use this code after choosing "Manually Enter Code" during sync setup on a second device</string>
+    <string name="sync_show_code_copy_hint">Use this code after choosing \"Manually Enter Code\" during sync setup on a second device</string>
     <string name="sync_code_copied_message">Recovery Code Copied</string>
     <string name="sync_camera_permission_required">Camera Permission is Required</string>
     <string name="sync_camera_unavailable">Camera Unavailable</string>
