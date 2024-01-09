@@ -98,6 +98,7 @@ import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -214,6 +215,7 @@ class BrowserTabViewModel @Inject constructor(
     private val sitePermissionsManager: SitePermissionsManager,
     private val syncEngine: SyncEngine,
     private val cameraHardwareChecker: CameraHardwareChecker,
+    private val androidBrowserConfig: AndroidBrowserConfigFeature,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -508,7 +510,10 @@ class BrowserTabViewModel @Inject constructor(
             val url: String,
         ) : Command()
 
-        class OnPermissionsQueryResponse(val jsCallbackData: JsCallbackData) : Command()
+        data class SendResponseToJs(val data: JsCallbackData) : Command()
+        data class WebShareRequest(val data: JsCallbackData) : Command()
+        data class ScreenLock(val data: JsCallbackData) : Command()
+        object ScreenUnlock : Command()
     }
 
     sealed class NavigationCommand : Command() {
@@ -3092,16 +3097,54 @@ class BrowserTabViewModel @Inject constructor(
         )
     }
 
-    fun onPermissionsQuery(featureName: String, method: String, id: String, data: JSONObject) {
+    fun processJsCallbackMessage(featureName: String, method: String, id: String?, data: JSONObject?) {
+        when (method) {
+            "webShare" -> if (id != null && data != null) { webShare(featureName, method, id, data) }
+            "permissionsQuery" -> if (id != null && data != null) { permissionsQuery(featureName, method, id, data) }
+            "screenLock" -> if (id != null && data != null) { screenLock(featureName, method, id, data) }
+            "screenUnlock" -> screenUnlock()
+            else -> {
+                // NOOP
+            }
+        }
+    }
+
+    private fun webShare(featureName: String, method: String, id: String, data: JSONObject) {
+        viewModelScope.launch(dispatchers.main()) {
+            command.value = WebShareRequest(JsCallbackData(data, featureName, method, id))
+        }
+    }
+
+    private fun permissionsQuery(featureName: String, method: String, id: String, data: JSONObject) {
         val response = if (url == null) {
             getDataForPermissionState(featureName, method, id, SitePermissionQueryResponse.Denied)
         } else {
-            val permissionState = sitePermissionsManager.getPermissionsQueryResponse(url!!, tabId, data.getString("name"))
+            val permissionState = sitePermissionsManager.getPermissionsQueryResponse(url!!, tabId, data.optString("name"))
             getDataForPermissionState(featureName, method, id, permissionState)
         }
 
         viewModelScope.launch(dispatchers.main()) {
-            command.value = OnPermissionsQueryResponse(response)
+            command.value = SendResponseToJs(response)
+        }
+    }
+
+    private fun screenLock(featureName: String, method: String, id: String, data: JSONObject) {
+        viewModelScope.launch(dispatchers.main()) {
+            if (androidBrowserConfig.screenLock().isEnabled()) {
+                withContext(dispatchers.main()) {
+                    command.value = ScreenLock(JsCallbackData(data, featureName, method, id))
+                }
+            }
+        }
+    }
+
+    private fun screenUnlock() {
+        viewModelScope.launch(dispatchers.main()) {
+            if (androidBrowserConfig.screenLock().isEnabled()) {
+                withContext(dispatchers.main()) {
+                    command.value = ScreenUnlock
+                }
+            }
         }
     }
 

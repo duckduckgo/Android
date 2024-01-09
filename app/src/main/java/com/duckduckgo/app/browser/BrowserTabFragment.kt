@@ -22,6 +22,7 @@ import android.app.Activity.RESULT_OK
 import android.app.ActivityOptions
 import android.app.PendingIntent
 import android.content.*
+import android.content.pm.ActivityInfo
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
@@ -156,6 +157,7 @@ import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.app.global.view.disableAnimation
 import com.duckduckgo.app.global.view.enableAnimation
 import com.duckduckgo.app.global.view.isDifferent
+import com.duckduckgo.app.global.view.isFullScreen
 import com.duckduckgo.app.global.view.isImmersiveModeEnabled
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.renderIfChanged
@@ -707,6 +709,10 @@ class BrowserTabFragment :
         registerForActivityResult(WebShareChooser()) {
             contentScopeScripts.onResponse(it)
         }
+
+    // Instantiating a private class that contains an implementation detail of BrowserTabFragment but is separated for tidiness
+    // see discussion in https://github.com/duckduckgo/Android/pull/4027#discussion_r1433373625
+    private val jsOrientationHandler = JsOrientationHandler()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -1311,7 +1317,10 @@ class BrowserTabFragment :
             )
 
             is Command.WebViewError -> showError(it.errorType, it.url)
-            is Command.OnPermissionsQueryResponse -> contentScopeScripts.onResponse(it.jsCallbackData)
+            is Command.SendResponseToJs -> contentScopeScripts.onResponse(it.data)
+            is Command.WebShareRequest -> webShareRequest.launch(it.data)
+            is Command.ScreenLock -> screenLock(it.data)
+            is Command.ScreenUnlock -> screenUnlock()
             else -> {
                 // NO OP
             }
@@ -2149,13 +2158,7 @@ class BrowserTabFragment :
                 it,
                 object : JsMessageCallback() {
                     override fun process(featureName: String, method: String, id: String?, data: JSONObject?) {
-                        when (method) {
-                            "webShare" -> if (id != null && data != null) { webShare(featureName, method, id, data) }
-                            "permissionsQuery" -> if (id != null && data != null) { viewModel.onPermissionsQuery(featureName, method, id, data) }
-                            else -> {
-                                // NOOP
-                            }
-                        }
+                        viewModel.processJsCallbackMessage(featureName, method, id, data)
                     }
                 },
             )
@@ -2164,8 +2167,13 @@ class BrowserTabFragment :
         WebView.setWebContentsDebuggingEnabled(webContentDebugging.isEnabled())
     }
 
-    private fun webShare(featureName: String, method: String, id: String, data: JSONObject) {
-        webShareRequest.launch(JsCallbackData(data, featureName, method, id))
+    private fun screenLock(data: JsCallbackData) {
+        val returnData = jsOrientationHandler.updateOrientation(data, this)
+        contentScopeScripts.onResponse(returnData)
+    }
+
+    private fun screenUnlock() {
+        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     }
 
     private fun configureWebViewForAutofill(it: DuckDuckGoWebView) {
@@ -3779,5 +3787,59 @@ class BrowserTabFragment :
     override fun permissionsGrantedOnWhereby() {
         val roomParameters = "?skipMediaPermissionPrompt"
         webView?.loadUrl("${webView?.url.orEmpty()}$roomParameters")
+    }
+}
+
+private class JsOrientationHandler {
+
+    /**
+     * Updates the activity's orientation based on provided JS data
+     *
+     * @return response data
+     */
+    fun updateOrientation(data: JsCallbackData, browserTabFragment: BrowserTabFragment): JsCallbackData {
+        val activity = browserTabFragment.activity
+        val response = if (activity == null) {
+            NO_ACTIVITY_ERROR
+        } else if (!activity.isFullScreen()) {
+            NOT_FULL_SCREEN_ERROR
+        } else {
+            val requestedOrientation = data.params.optString("orientation")
+            val matchedOrientation = JsToNativeScreenOrientationMap.entries.find { it.jsValue == requestedOrientation }
+
+            if (matchedOrientation == null) {
+                String.format(TYPE_ERROR, requestedOrientation)
+            } else {
+                activity.requestedOrientation = matchedOrientation.nativeValue
+                EMPTY
+            }
+        }
+
+        return JsCallbackData(
+            JSONObject(response),
+            data.featureName,
+            data.method,
+            data.id,
+        )
+    }
+
+    private enum class JsToNativeScreenOrientationMap(val jsValue: String, val nativeValue: Int) {
+        ANY("any", ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED),
+        NATURAL("natural", ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED),
+        LANDSCAPE("landscape", ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE),
+        PORTRAIT("portrait", ActivityInfo.SCREEN_ORIENTATION_PORTRAIT),
+        PORTRAIT_PRIMARY("portrait-primary", ActivityInfo.SCREEN_ORIENTATION_PORTRAIT),
+        PORTRAIT_SECONDARY("portrait-secondary", ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT),
+        LANDSCAPE_PRIMARY("landscape-primary", ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE),
+        LANDSCAPE_SECONDARY("landscape-secondary", ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE),
+    }
+
+    companion object {
+        const val EMPTY = """{}"""
+        const val NOT_FULL_SCREEN_ERROR = """{"failure":{"name":"InvalidStateError","message":
+            "The page needs to be fullscreen in order to call screen.orientation.lock()"}}"""
+        const val TYPE_ERROR = """{"failure":{"name":"TypeError","message":
+            "Failed to execute 'lock' on 'ScreenOrientation': The provided value '%s' is not a valid enum value of type OrientationLockType."}}"""
+        const val NO_ACTIVITY_ERROR = """{"failure":{"name":"InvalidStateError","message":"The page is not tied to an activity"}}"""
     }
 }

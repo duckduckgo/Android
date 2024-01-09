@@ -103,6 +103,7 @@ import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.privacy.model.TestEntity
@@ -135,6 +136,7 @@ import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.privacy.config.api.*
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
@@ -401,6 +403,10 @@ class BrowserTabViewModelTest {
 
     private val cameraHardwareChecker: CameraHardwareChecker = mock()
 
+    private val androidBrowserConfig: AndroidBrowserConfigFeature = mock()
+
+    private val mockToggle: Toggle = mock()
+
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
@@ -425,6 +431,7 @@ class BrowserTabViewModelTest {
         whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(bookmarksListFlow.consumeAsFlow())
         whenever(mockRemoteMessagingRepository.messageFlow()).thenReturn(remoteMessageFlow.consumeAsFlow())
         whenever(mockSettingsDataStore.automaticFireproofSetting).thenReturn(AutomaticFireproofSetting.ASK_EVERY_TIME)
+        whenever(androidBrowserConfig.screenLock()).thenReturn(mockToggle)
 
         remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
 
@@ -523,6 +530,7 @@ class BrowserTabViewModelTest {
             device = mockDeviceInfo,
             sitePermissionsManager = mockSitePermissionsManager,
             cameraHardwareChecker = cameraHardwareChecker,
+            androidBrowserConfig = androidBrowserConfig,
         )
 
         testee.loadData("abc", null, false, false)
@@ -4497,20 +4505,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnPermissionsQueryThenSendCommand() = runTest {
-        val url = "someUrl"
-        loadUrl(url)
-        whenever(mockSitePermissionsManager.getPermissionsQueryResponse(eq(url), any(), any())).thenReturn(SitePermissionQueryResponse.Granted)
-        testee.onPermissionsQuery("myFeature", "myMethod", "myId", JSONObject("""{ "name":"somePermission"}"""))
-        assertCommandIssued<Command.OnPermissionsQueryResponse> {
-            assertEquals("granted", this.jsCallbackData.params.getString("state"))
-            assertEquals("myFeature", this.jsCallbackData.featureName)
-            assertEquals("myMethod", this.jsCallbackData.method)
-            assertEquals("myId", this.jsCallbackData.id)
-        }
-    }
-
-    @Test
     fun whenNewTabOpenedAndFavouritesPresentThenSyncTriggered() = runTest {
         val favoriteSite = Favorite(id = UUID.randomUUID().toString(), title = "", url = "www.example.com", position = 0, lastModified = "timestamp")
         favoriteListFlow.send(listOf(favoriteSite))
@@ -4613,6 +4607,66 @@ class BrowserTabViewModelTest {
         assertEquals(BAD_URL, browserViewState().browserError)
         testee.resetBrowserError()
         assertEquals(OMITTED, browserViewState().browserError)
+    }
+
+    @Test
+    fun whenProcessJsCallbackMessageWebShareSendCommand() = runTest {
+        val url = "someUrl"
+        loadUrl(url)
+        testee.processJsCallbackMessage("myFeature", "webShare", "myId", JSONObject("""{ "my":"object"}"""))
+        assertCommandIssued<Command.WebShareRequest> {
+            assertEquals("object", this.data.params.getString("my"))
+            assertEquals("myFeature", this.data.featureName)
+            assertEquals("webShare", this.data.method)
+            assertEquals("myId", this.data.id)
+        }
+    }
+
+    @Test
+    fun whenProcessJsCallbackMessagePermissionsQuerySendCommand() = runTest {
+        val url = "someUrl"
+        loadUrl(url)
+        whenever(mockSitePermissionsManager.getPermissionsQueryResponse(eq(url), any(), any())).thenReturn(SitePermissionQueryResponse.Granted)
+        testee.processJsCallbackMessage("myFeature", "permissionsQuery", "myId", JSONObject("""{ "name":"somePermission"}"""))
+        assertCommandIssued<Command.SendResponseToJs> {
+            assertEquals("granted", this.data.params.getString("state"))
+            assertEquals("myFeature", this.data.featureName)
+            assertEquals("permissionsQuery", this.data.method)
+            assertEquals("myId", this.data.id)
+        }
+    }
+
+    @Test
+    fun whenProcessJsCallbackMessageScreenLockNotEnabledDoNotSendCommand() = runTest {
+        whenever(mockToggle.isEnabled()).thenReturn(false)
+        testee.processJsCallbackMessage("myFeature", "screenLock", "myId", JSONObject("""{ "my":"object"}"""))
+        assertCommandNotIssued<Command.ScreenLock>()
+    }
+
+    @Test
+    fun whenProcessJsCallbackMessageScreenLockEnabledSendCommand() = runTest {
+        whenever(mockToggle.isEnabled()).thenReturn(true)
+        testee.processJsCallbackMessage("myFeature", "screenLock", "myId", JSONObject("""{ "my":"object"}"""))
+        assertCommandIssued<Command.ScreenLock> {
+            assertEquals("object", this.data.params.getString("my"))
+            assertEquals("myFeature", this.data.featureName)
+            assertEquals("screenLock", this.data.method)
+            assertEquals("myId", this.data.id)
+        }
+    }
+
+    @Test
+    fun whenProcessJsCallbackMessageScreenUnlockNotEnabledDoNotSendCommand() = runTest {
+        whenever(mockToggle.isEnabled()).thenReturn(false)
+        testee.processJsCallbackMessage("myFeature", "screenUnlock", "myId", JSONObject("""{ "my":"object"}"""))
+        assertCommandNotIssued<Command.ScreenUnlock>()
+    }
+
+    @Test
+    fun whenProcessJsCallbackMessageScreenUnlockEnabledSendCommand() = runTest {
+        whenever(mockToggle.isEnabled()).thenReturn(true)
+        testee.processJsCallbackMessage("myFeature", "screenUnlock", "myId", JSONObject("""{ "my":"object"}"""))
+        assertCommandIssued<Command.ScreenUnlock>()
     }
 
     private fun aCredential(): LoginCredentials {
