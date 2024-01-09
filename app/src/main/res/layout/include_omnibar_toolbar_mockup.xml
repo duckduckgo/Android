@@ -39,7 +39,7 @@
             android:paddingStart="6dp"
             android:paddingEnd="6dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/fireIconMenuMockup"
+            app:layout_constraintEnd_toStartOf="@id/tabsMenuMockup"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -65,30 +65,6 @@
 
         </FrameLayout>
 
-        <FrameLayout
-            android:id="@+id/fireIconMenuMockup"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginStart="2dp"
-            android:paddingStart="4dp"
-            android:paddingEnd="4dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/tabsMenuMockup"
-            app:layout_constraintStart_toEndOf="@id/omniBarContainerMockup"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:visibility="visible">
-
-            <ImageView
-                android:id="@+id/fireIconImageViewMockup"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/browserPopupMenu"
-                android:padding="@dimen/toolbarIconPadding"
-                android:src="@drawable/ic_fire"/>
-        </FrameLayout>
-
         <com.duckduckgo.app.browser.TabSwitcherButton
             android:id="@+id/tabsMenuMockup"
             android:layout_width="wrap_content"
@@ -98,7 +74,7 @@
             android:padding="@dimen/toolbarIconPadding"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/browserMenuMockup"
-            app:layout_constraintStart_toEndOf="@id/fireIconMenuMockup"
+            app:layout_constraintStart_toEndOf="@id/omniBarContainerMockup"
             app:layout_constraintTop_toTopOf="parent"/>
 
         <FrameLayout
