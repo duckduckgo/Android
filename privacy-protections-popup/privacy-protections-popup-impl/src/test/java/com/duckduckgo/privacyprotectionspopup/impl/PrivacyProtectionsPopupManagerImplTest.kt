@@ -31,7 +31,7 @@ import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DISMISS_CLICKED
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupViewState
 import com.duckduckgo.privacyprotectionspopup.impl.db.PopupDismissDomainRepository
-import com.duckduckgo.privacyprotectionspopup.impl.db.ToggleUsageTimestampRepository
+import com.duckduckgo.privacyprotectionspopup.impl.store.PrivacyProtectionsPopupDataStore
 import java.time.Duration
 import java.time.Instant
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -68,7 +68,7 @@ class PrivacyProtectionsPopupManagerImplTest {
 
     private val userAllowListRepository = FakeUserAllowlistRepository()
 
-    private val toggleUsageTimestampRepository = FakeToggleUsageTimestampRepository()
+    private val dataStore = FakePrivacyProtectionsPopupDataStore()
 
     private val duckDuckGoUrlDetector = FakeDuckDuckGoUrlDetector()
 
@@ -79,14 +79,14 @@ class PrivacyProtectionsPopupManagerImplTest {
         timeProvider = timeProvider,
         popupDismissDomainRepository = popupDismissDomainRepository,
         userAllowListRepository = userAllowListRepository,
-        toggleUsageTimestampRepository = toggleUsageTimestampRepository,
+        dataStore = dataStore,
         duckDuckGoUrlDetector = duckDuckGoUrlDetector,
     )
 
     @Test
     fun whenRefreshIsTriggeredThenEmitsUpdateToShowPopup() = runTest {
         val toggleUsedAt = timeProvider.time - Duration.ofDays(32)
-        toggleUsageTimestampRepository.setToggleUsageTimestamp(toggleUsedAt)
+        dataStore.setToggleUsageTimestamp(toggleUsedAt)
 
         subject.viewState.test {
             assertFalse(awaitItem().visible)
@@ -331,7 +331,7 @@ class PrivacyProtectionsPopupManagerImplTest {
     @Test
     fun whenToggleWasUsedInLast2WeeksThenPopupIsNotShownOnRefresh() = runTest {
         val toggleUsedAt = timeProvider.time - Duration.ofDays(10)
-        toggleUsageTimestampRepository.setToggleUsageTimestamp(toggleUsedAt)
+        dataStore.setToggleUsageTimestamp(toggleUsedAt)
 
         subject.viewState.test {
             subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
@@ -344,7 +344,7 @@ class PrivacyProtectionsPopupManagerImplTest {
     @Test
     fun whenToggleWasNotUsedInLast2WeeksThenPopupIsShownOnRefresh() = runTest {
         val toggleUsedAt = timeProvider.time - Duration.ofDays(32)
-        toggleUsageTimestampRepository.setToggleUsageTimestamp(toggleUsedAt)
+        dataStore.setToggleUsageTimestamp(toggleUsedAt)
 
         subject.viewState.test {
             subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
@@ -432,7 +432,7 @@ private class FakePopupDismissDomainRepository : PopupDismissDomainRepository {
         throw UnsupportedOperationException()
 }
 
-private class FakeToggleUsageTimestampRepository : ToggleUsageTimestampRepository {
+private class FakePrivacyProtectionsPopupDataStore : PrivacyProtectionsPopupDataStore {
 
     private val timestamp = MutableStateFlow<Instant?>(value = null)
 

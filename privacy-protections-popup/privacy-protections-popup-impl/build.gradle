@@ -42,6 +42,7 @@ dependencies {
     implementation Google.dagger
     implementation AndroidX.room.ktx
     ksp AndroidX.room.compiler
+    api AndroidX.dataStore.preferences
 
     implementation "com.squareup.logcat:logcat:_"
     implementation Square.moshi

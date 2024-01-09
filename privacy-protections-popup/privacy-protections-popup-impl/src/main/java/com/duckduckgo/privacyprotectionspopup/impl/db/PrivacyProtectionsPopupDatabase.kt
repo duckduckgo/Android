@@ -27,13 +27,11 @@ import java.time.Instant
     version = 1,
     entities = [
         PopupDismissDomain::class,
-        ToggleUsageTimestamp::class,
     ],
 )
 @TypeConverters(Converters::class)
 abstract class PrivacyProtectionsPopupDatabase : RoomDatabase() {
     abstract fun popupDismissDomainDao(): PopupDismissDomainsDao
-    abstract fun toggleUsageTimestampDao(): ToggleUsageTimestampDao
 }
 
 class Converters {
