@@ -66,14 +66,18 @@ class RealSavedSitesRepository(
             .flowOn(dispatcherProvider.io())
     }
 
-    override fun getFolderContentSync(folderId: String): Pair<List<Bookmark>, List<BookmarkFolder>> {
+    override fun getFolderContentSync(folderId: String): List<Any> {
         val entities = savedSitesEntitiesDao.entitiesInFolderSync(folderId)
-        val bookmarks = mutableListOf<Bookmark>()
-        val folders = mutableListOf<BookmarkFolder>()
+        val combinedList = mutableListOf<Any>()
+
         entities.forEach { entity ->
-            mapEntity(entity, folderId, bookmarks, folders)
+            if (entity.type == FOLDER) {
+                combinedList.add(entity.mapToBookmarkFolder(folderId))
+            } else {
+                combinedList.add(entity.mapToBookmark(folderId))
+            }
         }
-        return Pair(bookmarks.distinct(), folders.distinct())
+        return combinedList
     }
 
     private fun mapEntity(

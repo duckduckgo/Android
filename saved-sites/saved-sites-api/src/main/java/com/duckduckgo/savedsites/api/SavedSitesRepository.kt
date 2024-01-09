@@ -44,7 +44,7 @@ interface SavedSitesRepository {
      * @param folderId the id of the folder.
      * @return [Pair] of [Bookmark] and [BookmarkFolder] inside a folder
      */
-    fun getFolderContentSync(folderId: String): Pair<List<Bookmark>, List<BookmarkFolder>>
+    fun getFolderContentSync(folderId: String): List<Any>
 
     /**
      * Returns complete list of [BookmarkFolderItem] inside a folder. This method traverses all folders.

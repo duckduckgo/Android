@@ -22,6 +22,8 @@ import androidx.annotation.VisibleForTesting
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.savedsites.api.models.BookmarkFolder
+import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.api.models.TreeNode
 import com.duckduckgo.savedsites.api.service.ExportSavedSitesResult
@@ -86,17 +88,18 @@ class RealSavedSitesExporter(
         parentId: String,
         currentDepth: Int,
     ) {
-        val folderContent = savedSitesRepository.getFolderContentSync(parentId)
-        folderContent.second.forEach { bookmarkFolder ->
-            val childNode = TreeNode(FolderTreeItem(bookmarkFolder.id, bookmarkFolder.name, bookmarkFolder.parentId, null, currentDepth))
-            parentNode.add(childNode)
-            populateNode(childNode, bookmarkFolder.id, currentDepth + 1)
-        }
-
-        folderContent.first.forEach { bookmark ->
-            bookmark.title?.let { title ->
-                val childNode = TreeNode(FolderTreeItem(bookmark.id, title, bookmark.parentId, bookmark.url, currentDepth))
-                parentNode.add(childNode)
+        val combinedContent = savedSitesRepository.getFolderContentSync(parentId)
+        combinedContent.forEach { item ->
+            when (item) {
+                is BookmarkFolder -> {
+                    val childNode = TreeNode(FolderTreeItem(item.id, item.name, item.parentId, null, currentDepth))
+                    parentNode.add(childNode)
+                    populateNode(childNode, item.id, currentDepth + 1)
+                }
+                is Bookmark -> {
+                    val childNode = TreeNode(FolderTreeItem(item.id, item.title, item.parentId, item.url, currentDepth))
+                    parentNode.add(childNode)
+                }
             }
         }
     }
