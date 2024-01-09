@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="utf-8"?>
+<!--
   ~ Copyright (c) 2018 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -46,29 +47,6 @@
                 android:name="com.duckduckgo.mobile.android.vpn.ui.report.DeviceShieldFragment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <ImageView
-                    android:id="@+id/ddgLogo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="top|center"
-                    android:layout_marginTop="@dimen/homeTabDdgLogoTopMargin"
-                    android:alpha="0"
-                    android:contentDescription="@string/asilLogoDescription"
-                    android:maxWidth="180dp"
-                    android:maxHeight="180dp"
-                    app:srcCompat="@drawable/logo_full"
-                    android:visibility="gone" />
-
-                <com.duckduckgo.common.ui.view.MessageCta
-                    android:id="@+id/messageCta"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-            </FrameLayout>
 
             <include layout="@layout/include_quick_access_items" />
 

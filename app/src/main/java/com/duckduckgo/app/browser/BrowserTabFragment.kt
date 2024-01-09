@@ -132,7 +132,6 @@ import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelpe
 import com.duckduckgo.app.browser.omnibar.animations.TrackersAnimatorListener
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.remotemessage.SharePromoLinkRMFBroadCastReceiver
-import com.duckduckgo.app.browser.remotemessage.asMessage
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
@@ -689,8 +688,6 @@ class BrowserTabFragment :
             showDialogHidingPrevious(dialog, CredentialAutofillPickerDialog.TAG, originalUrl)
         }
     }
-
-    private val homeBackgroundLogo by lazy { HomeBackgroundLogo(newBrowserTab.ddgLogo) }
 
     private val ctaViewStateObserver = Observer<CtaViewState> {
         it?.let { renderer.renderCtaViewState(it) }
@@ -2674,8 +2671,6 @@ class BrowserTabFragment :
      */
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-
-        newBrowserTab.ddgLogo.setImageResource(com.duckduckgo.mobile.android.R.drawable.logo_full)
         if (newBrowserTab.ctaContainer.isNotEmpty()) {
             renderer.renderHomeCta()
         }
@@ -3528,7 +3523,6 @@ class BrowserTabFragment :
                     else -> {
                         hideHomeCta()
                         hideDaxCta()
-                        newBrowserTab.messageCta.gone()
                         showHomeBackground(viewState.favorites)
                     }
                 }
@@ -3539,25 +3533,11 @@ class BrowserTabFragment :
             message: RemoteMessage,
             newMessage: Boolean,
         ) {
-            val shouldRender = newMessage || newBrowserTab.messageCta.isGone
+            val shouldRender = newMessage
 
             if (shouldRender) {
                 Timber.i("RMF: render $message")
-                newBrowserTab.messageCta.show()
                 viewModel.onMessageShown()
-                newBrowserTab.messageCta.setMessage(message.asMessage())
-                newBrowserTab.messageCta.onCloseButtonClicked {
-                    viewModel.onMessageCloseButtonClicked()
-                }
-                newBrowserTab.messageCta.onPrimaryActionClicked {
-                    viewModel.onMessagePrimaryButtonClicked()
-                }
-                newBrowserTab.messageCta.onSecondaryActionClicked {
-                    viewModel.onMessageSecondaryButtonClicked()
-                }
-                newBrowserTab.messageCta.onPromoActionClicked {
-                    viewModel.onMessageActionButtonClicked()
-                }
             }
         }
 
@@ -3571,7 +3551,6 @@ class BrowserTabFragment :
                 is BubbleCta -> showBubbleCta(configuration)
                 is DialogCta -> showDaxDialogCta(configuration)
             }
-            newBrowserTab.messageCta.gone()
         }
 
         fun recreateDaxDialogCta() {
@@ -3677,20 +3656,16 @@ class BrowserTabFragment :
             hideLogo: Boolean = false,
         ) {
             if (favorites.isEmpty()) {
-                if (hideLogo) homeBackgroundLogo.hideLogo() else homeBackgroundLogo.showLogo()
                 quickAccessItems.quickAccessRecyclerView.gone()
             } else {
-                homeBackgroundLogo.hideLogo()
                 quickAccessAdapter.submitList(favorites)
                 quickAccessItems.quickAccessRecyclerView.show()
                 viewModel.onNewTabFavouritesShown()
             }
-
             newBrowserTab.newTabQuickAccessItemsLayout.show()
         }
 
         private fun hideHomeBackground() {
-            homeBackgroundLogo.hideLogo()
             newBrowserTab.newTabQuickAccessItemsLayout.gone()
         }
 
