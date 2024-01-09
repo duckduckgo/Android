@@ -20,12 +20,6 @@
     tools:ignore="AlwaysShowAction">
 
     <item
-        android:id="@+id/fire"
-        android:icon="@drawable/ic_fire"
-        android:title="@string/fireMenu"
-        app:showAsAction="always" />
-
-    <item
         android:id="@+id/newTab"
         android:icon="@drawable/ic_add_24"
         android:title="@string/newTabMenuItem"

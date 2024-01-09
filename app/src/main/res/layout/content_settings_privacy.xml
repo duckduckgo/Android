@@ -69,21 +69,4 @@
         app:primaryTextTruncated="false"
         app:secondaryText="@string/atp_SettingsDeviceShieldDisabled" />
 
-    <com.duckduckgo.common.ui.view.listitem.CheckListItem
-        android:id="@+id/emailSetting"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/settingsEmailProtectionTitle"
-        app:primaryTextTruncated="false"
-        app:secondaryText="@string/settingsEmailProtectionSubtitle"
-        app:showBetaPill="true" />
-
-    <com.duckduckgo.common.ui.view.listitem.CheckListItem
-        android:id="@+id/netpPSetting"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/netpSettingsTitle"
-        app:secondaryText="@string/atp_SettingsDeviceShieldDisabled"
-        app:showBetaPill="true" />
-
 </LinearLayout>

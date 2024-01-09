@@ -35,8 +35,6 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.downloads.DownloadsActivity
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.view.ClearDataAction
-import com.duckduckgo.app.global.view.FireDialog
-import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -194,7 +192,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.fire -> onFire()
             R.id.newTab, R.id.newTabOverflow -> onNewTabRequested()
             R.id.closeAllTabs -> closeAllTabs()
             R.id.downloads -> showDownloads()
@@ -207,21 +204,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         val closeAllTabsMenuItem = menu?.findItem(R.id.closeAllTabs)
         closeAllTabsMenuItem?.isVisible = viewModel.tabs.value?.isNotEmpty() == true
         return super.onPrepareOptionsMenu(menu)
-    }
-
-    private fun onFire() {
-        pixel.fire(AppPixelName.FORGET_ALL_PRESSED_TABSWITCHING)
-        val dialog = FireDialog(
-            context = this,
-            clearPersonalDataAction = clearPersonalDataAction,
-            ctaViewModel = ctaViewModel,
-            pixel = pixel,
-            settingsDataStore = settingsDataStore,
-            userEventsStore = userEventsStore,
-            appCoroutineScope = appCoroutineScope,
-            dispatcherProvider = dispatcherProvider,
-        )
-        dialog.show()
     }
 
     override fun onNewTabRequested() {

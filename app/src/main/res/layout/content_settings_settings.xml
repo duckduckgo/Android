@@ -38,22 +38,10 @@
         app:primaryText="@string/settingsAutofillLoginsSetting" />
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-        android:id="@+id/syncSetting"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/settingsSyncSetting" />
-
-    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/homeScreenWidgetSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryText="@string/settingsAddHomeScreenWidget" />
-
-    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-        android:id="@+id/fireButtonSetting"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/settingsFireButton" />
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/permissionsSetting"
@@ -72,11 +60,5 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryText="@string/settingsAccessibility" />
-
-    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-        android:id="@+id/aboutSetting"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/settingsHeadingAbout" />
 
 </LinearLayout>
