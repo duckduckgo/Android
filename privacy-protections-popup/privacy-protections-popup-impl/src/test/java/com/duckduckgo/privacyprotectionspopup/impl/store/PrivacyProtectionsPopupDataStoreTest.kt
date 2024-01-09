@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacyprotectionspopup.impl.db
+package com.duckduckgo.privacyprotectionspopup.impl.store
 
-import androidx.room.Room
+import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -24,40 +28,28 @@ import java.time.Instant
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
-import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
-class ToggleUsageTimestampRepositoryTest {
+class PrivacyProtectionsPopupDataStoreTest {
 
     @get:Rule
     val coroutineRule = CoroutineTestRule()
 
-    private lateinit var database: PrivacyProtectionsPopupDatabase
-    private lateinit var subject: ToggleUsageTimestampRepository
+    private val context: Context get() = ApplicationProvider.getApplicationContext()
 
-    @Before
-    fun setUp() {
-        database = Room
-            .inMemoryDatabaseBuilder(
-                context = ApplicationProvider.getApplicationContext(),
-                PrivacyProtectionsPopupDatabase::class.java,
-            )
-            .build()
+    private val testDataStore: DataStore<Preferences> =
+        PreferenceDataStoreFactory.create(
+            scope = coroutineRule.testScope,
+            produceFile = { context.preferencesDataStoreFile("privacy_protections_popup") },
+        )
 
-        subject = ToggleUsageTimestampRepositoryImpl(database.toggleUsageTimestampDao())
-    }
-
-    @After
-    fun tearDown() {
-        database.close()
-    }
+    private val subject: PrivacyProtectionsPopupDataStore = PrivacyProtectionsPopupDataStoreImpl(testDataStore)
 
     @Test
     fun whenDatabaseIsEmptyThenReturnsNullDismissTimestamp() = runTest {

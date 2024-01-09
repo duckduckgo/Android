@@ -33,7 +33,7 @@ import com.duckduckgo.privacyprotectionspopup.impl.PrivacyProtectionsPopupManage
 import com.duckduckgo.privacyprotectionspopup.impl.PrivacyProtectionsPopupManagerImpl.ToggleUsed.NotUsed
 import com.duckduckgo.privacyprotectionspopup.impl.PrivacyProtectionsPopupManagerImpl.ToggleUsed.UsedAt
 import com.duckduckgo.privacyprotectionspopup.impl.db.PopupDismissDomainRepository
-import com.duckduckgo.privacyprotectionspopup.impl.db.ToggleUsageTimestampRepository
+import com.duckduckgo.privacyprotectionspopup.impl.store.PrivacyProtectionsPopupDataStore
 import com.squareup.anvil.annotations.ContributesBinding
 import java.time.Duration
 import java.time.Instant
@@ -64,7 +64,7 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
     private val timeProvider: TimeProvider,
     private val popupDismissDomainRepository: PopupDismissDomainRepository,
     private val userAllowListRepository: UserAllowListRepository,
-    private val toggleUsageTimestampRepository: ToggleUsageTimestampRepository,
+    private val dataStore: PrivacyProtectionsPopupDataStore,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
 ) : PrivacyProtectionsPopupManager {
 
@@ -194,7 +194,7 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
                 }
                 .launchIn(this)
 
-            toggleUsageTimestampRepository
+            dataStore
                 .getToggleUsageTimestamp()
                 .map { timestamp -> if (timestamp != null) UsedAt(timestamp) else NotUsed }
                 .onEach { toggleUsed ->
