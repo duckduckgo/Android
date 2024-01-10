@@ -28,6 +28,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.bookmarks.ui.BookmarksAdapter.BookmarkFolderItem
@@ -156,6 +157,8 @@ class BookmarksActivity : DuckDuckGoActivity() {
         val callback = BookmarkItemTouchHelperCallback(bookmarksAdapter)
         val itemTouchHelper = ItemTouchHelper(callback)
         itemTouchHelper.attachToRecyclerView(contentBookmarksBinding.recycler)
+
+        (contentBookmarksBinding.recycler.itemAnimator as? SimpleItemAnimator)?.supportsChangeAnimations = false
     }
 
     private fun observeViewModel() {
@@ -298,7 +301,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         searchMenuItem = menu.findItem(R.id.action_search)
         exportMenuItem = menu.findItem(R.id.bookmark_export)
-        if (viewModel.viewState.value?.bookmarks?.isEmpty() == true || getParentFolderId() != SavedSitesNames.BOOKMARKS_ROOT) {
+        if (viewModel.viewState.value?.bookmarks?.isEmpty() == true) {
             val textColorAttr = commonR.attr.daxColorTextDisabled
             val spannable = SpannableString(getString(R.string.exportBookmarksMenu))
             spannable.setSpan(ForegroundColorSpan(binding.root.context.getColorFromAttr(textColorAttr)), 0, spannable.length, 0)
