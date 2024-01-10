@@ -21,6 +21,7 @@ import com.duckduckgo.savedsites.api.*
 import com.duckduckgo.savedsites.api.models.*
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.api.models.SavedSitesNames.BOOKMARKS_ROOT
 import com.duckduckgo.savedsites.api.models.SavedSitesNames.FAVORITES_DESKTOP_ROOT
 import com.duckduckgo.savedsites.api.models.SavedSitesNames.FAVORITES_MOBILE_ROOT
 import com.duckduckgo.savedsites.api.models.SavedSitesNames.FAVORITES_ROOT
@@ -117,6 +118,11 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
                 )
                 processIds.add(favoriteFolder)
             }
+        }
+
+        // Bookmarks Root
+        if (allResponseIds.contains(BOOKMARKS_ROOT)) {
+            processBookmarksRootFolder(bookmarks.entries)
         }
 
         // there are two types of orphans
@@ -234,6 +240,18 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
             REMOTE_WINS -> remoteWinsStrategy.processFavouritesFolder(favoriteFolder, favourites)
             LOCAL_WINS -> localWinsStrategy.processFavouritesFolder(favoriteFolder, favourites)
             TIMESTAMP -> timestampStrategy.processFavouritesFolder(favoriteFolder, favourites)
+        }
+    }
+
+    private fun processBookmarksRootFolder(entries: List<SyncSavedSitesResponseEntry>) {
+        Timber.i("Sync-Bookmarks: processing bookmarks root folder")
+        val rootEntry = entries.find { it.id == BOOKMARKS_ROOT } ?: return
+        val rootContent = rootEntry.folder?.children ?: emptyList()
+        if (rootContent.isNotEmpty()) {
+            val rootFolder = savedSitesRepository.getFolder(BOOKMARKS_ROOT)
+            if (rootFolder != null) {
+                syncSavedSitesRepository.replaceBookmarkFolder(rootFolder, rootContent)
+            }
         }
     }
 
