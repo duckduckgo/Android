@@ -50,7 +50,7 @@ constructor(
 
     @Synchronized
     private fun encryptedPreferences(): SharedPreferences? {
-        return sharedPrefsProv.getSharedPrefs(FILENAME)
+        return sharedPrefsProv.getEncryptedSharedPrefs(FILENAME)
     }
 
     override var userId: String?
