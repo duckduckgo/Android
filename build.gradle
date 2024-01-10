@@ -9,7 +9,7 @@ buildscript {
         ksp_version = '1.9.20-1.0.14'
         gradle_plugin = '8.1.2'
         min_sdk = 23
-        target_sdk = 33
+        target_sdk = 34
         compile_sdk = 34
         fladle_version = '0.17.4'
         kotlinter_version = '3.12.0'
