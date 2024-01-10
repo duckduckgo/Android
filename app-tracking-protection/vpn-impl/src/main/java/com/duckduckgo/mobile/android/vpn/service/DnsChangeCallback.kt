@@ -1,0 +1,72 @@
+/*
+ * Copyright (c) 2024 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.mobile.android.vpn.service
+
+import android.content.Context
+import android.net.ConnectivityManager.NetworkCallback
+import android.net.LinkProperties
+import android.net.Network
+import android.os.Build
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.mobile.android.vpn.network.util.getActiveNetwork
+import java.net.InetAddress
+import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import logcat.logcat
+
+class DnsChangeCallback @Inject constructor(
+    private val appBuildConfig: AppBuildConfig,
+    private val context: Context,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
+) : NetworkCallback() {
+
+    private var lastDns: List<InetAddress>? = null
+
+    override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
+        logcat { "onLinkPropertiesChanged: $linkProperties" }
+        coroutineScope.launch(dispatcherProvider.io()) {
+            val dns = linkProperties.dnsServers
+            val activeNetwork = context.getActiveNetwork()
+            // we only care about changes in the active network
+            if (activeNetwork != null && activeNetwork != network) return@launch
+
+            if (appBuildConfig.sdkInt >= Build.VERSION_CODES.O && !same(lastDns, dns)) {
+                logcat {
+                    """
+                    onLinkPropertiesChanged: DNS changed
+                      DNS cur=$dns
+                      DNS prv=$lastDns
+                    """.trimIndent()
+                }
+                lastDns = dns
+                TrackerBlockingVpnService.restartVpnService(context)
+            }
+        }
+    }
+
+    private fun same(last: List<InetAddress>?, current: List<InetAddress>?): Boolean {
+        if (last == null || current == null) return false
+        if (last.size != current.size) return false
+        if (current.containsAll(last)) return true
+        // for (i in current.indices) if (last[i] != current[i]) return false
+        return false
+    }
+}

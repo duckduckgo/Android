@@ -24,8 +24,16 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.content.pm.PackageManager
+import android.net.ConnectivityManager
+import android.net.ConnectivityManager.NetworkCallback
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import android.net.VpnService
-import android.os.*
+import android.os.Binder
+import android.os.Build
+import android.os.IBinder
+import android.os.Parcel
+import android.os.ParcelFileDescriptor
 import android.system.OsConstants.AF_INET6
 import androidx.core.content.ContextCompat
 import com.duckduckgo.anrs.api.CrashLogger
@@ -65,7 +73,15 @@ import java.util.concurrent.Executors
 import javax.inject.Inject
 import kotlin.properties.Delegates
 import kotlin.system.exitProcess
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.LogPriority.WARN
 import logcat.asLog
@@ -136,13 +152,21 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
 
     @Inject lateinit var crashLogger: CrashLogger
 
+    @Inject lateinit var dnsChangeCallback: DnsChangeCallback
+
     private val alwaysOnStateJob = ConflatedJob()
 
     private val serviceDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 
-    private var vpnNetworkStack: VpnNetworkStack by VpnNetworkStackDelegate(provider = {
-        runBlocking { vpnNetworkStackProvider.provideNetworkStack() }
-    },)
+    private val connectivityManager by lazy {
+        getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
+    }
+
+    private var vpnNetworkStack: VpnNetworkStack by VpnNetworkStackDelegate(
+        provider = {
+            runBlocking { vpnNetworkStackProvider.provideNetworkStack() }
+        },
+    )
 
     private val vpnStateServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(
@@ -279,6 +303,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             vpnNetworkStack.onCreateVpnWithErrorReporting()
             logcat { "VPN log: NEW network ${vpnNetworkStack.name}" }
         }
+        connectivityManager?.safeUnregisterNetworkCallback(dnsChangeCallback)
 
         vpnServiceStateStatsDao.insert(createVpnState(state = ENABLING))
 
@@ -315,7 +340,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         }
         activeTun = nullTun
 
-        vpnNetworkStack.onPrepareVpn().getOrNull().also {
+        val tunnelConfig = vpnNetworkStack.onPrepareVpn().getOrNull().also {
             if (it != null) {
                 activeTun = createTunnelInterface(it)
                 activeTun?.let { tun ->
@@ -363,6 +388,19 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
 
         // lastly set the VPN state to enabled
         vpnServiceStateStatsDao.insert(createVpnState(state = ENABLED))
+
+        tunnelConfig?.let { config ->
+            // TODO this is temporary hack until we know this approach works for moto g. If it does we'll spend time making it better/more permanent
+            if (config.dns.map { it.hostAddress }.contains("10.11.12.1")) {
+                // noop
+            } else if (config.dns.isNotEmpty()) {
+                val request = NetworkRequest.Builder().apply {
+                    addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
+                    addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+                }.build()
+                connectivityManager?.safeRegisterNetworkCallback(request, dnsChangeCallback)
+            }
+        }
 
         alwaysOnStateJob += launch { monitorVpnAlwaysOnState() }
         if (isAlwaysOnTriggered) {
@@ -563,8 +601,29 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             runCatching { unbindService(vpnStateServiceConnection).also { vpnStateServiceReference = null } }
         }
 
+        connectivityManager?.safeUnregisterNetworkCallback(dnsChangeCallback)
+
         stopForeground(true)
         stopSelf()
+    }
+
+    private fun ConnectivityManager.safeRegisterNetworkCallback(
+        networkRequest: NetworkRequest,
+        networkCallback: NetworkCallback,
+    ) {
+        kotlin.runCatching {
+            registerNetworkCallback(networkRequest, networkCallback)
+        }.onFailure {
+            logcat(ERROR) { it.asLog() }
+        }
+    }
+
+    private fun ConnectivityManager.safeUnregisterNetworkCallback(networkCallback: NetworkCallback) {
+        kotlin.runCatching {
+            unregisterNetworkCallback(networkCallback)
+        }.onFailure {
+            logcat(ERROR) { it.asLog() }
+        }
     }
 
     private fun sendStopPixels(reason: VpnStopReason) {
