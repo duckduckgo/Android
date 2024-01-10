@@ -17,7 +17,6 @@
 package com.duckduckgo.experiments.impl
 
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.backup.agent.api.BackupAgentManager
 import com.duckduckgo.experiments.api.VariantConfig
 import com.duckduckgo.experiments.impl.store.ExperimentVariantEntity
 import java.util.Locale
@@ -39,7 +38,6 @@ class ExperimentationVariantManagerTest {
     private val appBuildConfig: AppBuildConfig = mock()
     private val activeVariants = mutableListOf<Variant>()
     private val mockExperimentVariantRepository: ExperimentVariantRepository = mock()
-    private val mockBackupAgentManager: BackupAgentManager = mock()
 
     @Before
     fun setup() {
@@ -50,7 +48,6 @@ class ExperimentationVariantManagerTest {
             mockRandomizer,
             appBuildConfig,
             mockExperimentVariantRepository,
-            mockBackupAgentManager,
         )
     }
 
@@ -103,19 +100,6 @@ class ExperimentationVariantManagerTest {
 
         verify(mockExperimentVariantRepository).updateVariant(any())
         verify(mockRandomizer).random(any())
-    }
-
-    @Test
-    fun givenReturnUserVariantWhenVariantsConfigUpdatedThenNewVariantNoAllocated() {
-        val reinstallVariant = "reinstall"
-        val variantsConfig = listOf(VariantConfig("variant1", 1.0), VariantConfig("variant2", 1.0))
-        whenever(mockExperimentVariantRepository.getUserVariant()).thenReturn(reinstallVariant)
-        whenever(mockBackupAgentManager.isReinstallUser(reinstallVariant)).thenReturn(true)
-
-        testee.saveVariants(variantsConfig)
-
-        verify(mockExperimentVariantRepository, never()).updateVariant(any())
-        verify(mockRandomizer, never()).random(any())
     }
 
     @Test
