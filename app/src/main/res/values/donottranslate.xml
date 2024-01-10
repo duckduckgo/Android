@@ -47,7 +47,6 @@
     <string name="sitePermissionsSettingsDRM">DRM</string>
 
     <!-- Bookmarks -->
-    <string name="rearrangeBookmarks">Rearrange Bookmarks</string>
     <string name="searchBookmarks">Search Bookmarks</string>
     <string name="deleteFolder" instruction="%1$s is the folder name">"Delete %1$s?"</string>
     <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Delete %1$s bookmark?"</string>
