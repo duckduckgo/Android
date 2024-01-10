@@ -323,7 +323,7 @@ class BrowserWebViewClient @Inject constructor(
         webView: WebView,
         request: WebResourceRequest,
     ): WebResourceResponse? {
-        val webResourceResponse = runBlocking {
+        /*val webResourceResponse = runBlocking {
             val documentUrl = withContext(dispatcherProvider.main()) { webView.url }
             withContext(dispatcherProvider.main()) {
                 loginDetector.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, request))
@@ -341,6 +341,14 @@ class BrowserWebViewClient @Inject constructor(
             }
         } else {
             return webResourceResponse
+        }*/
+        return runBlocking {
+            val documentUrl = withContext(dispatcherProvider.main()) { webView.url }
+            withContext(dispatcherProvider.main()) {
+                loginDetector.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, request))
+            }
+            Timber.v("Intercepting resource ${request.url} type:${request.method} on page $documentUrl")
+            requestInterceptor.shouldIntercept(request, webView, documentUrl, webViewClientListener)
         }
     }
 
