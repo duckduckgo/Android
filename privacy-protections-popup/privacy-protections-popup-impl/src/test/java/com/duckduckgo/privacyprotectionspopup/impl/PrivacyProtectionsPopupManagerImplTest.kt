@@ -29,6 +29,7 @@ import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DISABLE_PROTECTIONS_CLICKED
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DISMISSED
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DISMISS_CLICKED
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DONT_SHOW_AGAIN_CLICKED
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupViewState
 import com.duckduckgo.privacyprotectionspopup.impl.db.PopupDismissDomainRepository
 import com.duckduckgo.privacyprotectionspopup.impl.store.PrivacyProtectionsPopupDataStore
@@ -89,11 +90,11 @@ class PrivacyProtectionsPopupManagerImplTest {
         dataStore.setToggleUsageTimestamp(toggleUsedAt)
 
         subject.viewState.test {
-            assertFalse(awaitItem().visible)
+            assertEquals(PrivacyProtectionsPopupViewState.Gone, awaitItem())
             subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
             expectNoEvents()
             subject.onPageRefreshTriggeredByUser()
-            assertTrue(awaitItem().visible)
+            assertTrue(awaitItem() is PrivacyProtectionsPopupViewState.Visible)
             expectNoEvents()
         }
     }
@@ -217,15 +218,15 @@ class PrivacyProtectionsPopupManagerImplTest {
     @Test
     fun whenDisableProtectionsClickedEventIsHandledThenPopupIsDismissed() = runTest {
         subject.viewState.test {
-            assertFalse(awaitItem().visible)
+            assertEquals(PrivacyProtectionsPopupViewState.Gone, awaitItem())
             subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
             subject.onPageRefreshTriggeredByUser()
 
-            assertTrue(awaitItem().visible)
+            assertTrue(awaitItem() is PrivacyProtectionsPopupViewState.Visible)
 
             subject.onUiEvent(DISABLE_PROTECTIONS_CLICKED)
 
-            assertFalse(awaitItem().visible)
+            assertEquals(PrivacyProtectionsPopupViewState.Gone, awaitItem())
             assertStoredPopupDismissTimestamp(url = "https://www.example.com", expectedTimestamp = timeProvider.time)
         }
     }
@@ -369,8 +370,79 @@ class PrivacyProtectionsPopupManagerImplTest {
         }
     }
 
+    @Test
+    fun whenPopupIsShownThenTriggerCountIsIncremented() = runTest {
+        subject.viewState.test {
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
+
+            assertPopupVisible(visible = true)
+            assertEquals(1, dataStore.getPopupTriggerCount().first())
+
+            subject.onUiEvent(DISMISSED)
+
+            assertPopupVisible(visible = false)
+
+            subject.onPageLoaded(url = "https://www.example2.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
+
+            assertPopupVisible(visible = true)
+            assertEquals(2, dataStore.getPopupTriggerCount().first())
+        }
+    }
+
+    @Test
+    fun whenPopupTriggerCountIsZeroThenDoNotShowAgainOptionIsNotAvailable() = runTest {
+        dataStore.setPopupTriggerCount(0)
+
+        subject.viewState.test {
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
+
+            assertEquals(PrivacyProtectionsPopupViewState.Visible(doNotShowAgainOptionAvailable = false), expectMostRecentItem())
+        }
+    }
+
+    @Test
+    fun whenPopupTriggerCountIsGreaterThanZeroThenDoNotShowAgainOptionIsAvailable() = runTest {
+        dataStore.setPopupTriggerCount(1)
+
+        subject.viewState.test {
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
+
+            assertEquals(PrivacyProtectionsPopupViewState.Visible(doNotShowAgainOptionAvailable = true), expectMostRecentItem())
+        }
+    }
+
+    @Test
+    fun whenDoNotShowAgainIsClickedThenPopupIsNotShownAgain() = runTest {
+        dataStore.setPopupTriggerCount(1)
+
+        subject.viewState.test {
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
+
+            assertEquals(PrivacyProtectionsPopupViewState.Visible(doNotShowAgainOptionAvailable = true), expectMostRecentItem())
+
+            subject.onUiEvent(DONT_SHOW_AGAIN_CLICKED)
+
+            assertPopupVisible(visible = false)
+            assertTrue(dataStore.getDoNotShowAgainClicked().first())
+
+            subject.onPageLoaded(url = "https://www.example2.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
+
+            expectNoEvents()
+        }
+    }
+
     private fun ReceiveTurbine<PrivacyProtectionsPopupViewState>.assertPopupVisible(visible: Boolean) {
-        assertEquals(visible, expectMostRecentItem().visible)
+        if (visible) {
+            assertTrue(expectMostRecentItem() is PrivacyProtectionsPopupViewState.Visible)
+        } else {
+            assertEquals(PrivacyProtectionsPopupViewState.Gone, expectMostRecentItem())
+        }
     }
 
     private suspend fun assertStoredPopupDismissTimestamp(url: String, expectedTimestamp: Instant?) {
@@ -435,11 +507,25 @@ private class FakePopupDismissDomainRepository : PopupDismissDomainRepository {
 private class FakePrivacyProtectionsPopupDataStore : PrivacyProtectionsPopupDataStore {
 
     private val timestamp = MutableStateFlow<Instant?>(value = null)
+    private val triggerCount = MutableStateFlow(value = 0)
+    private val doNotShowAgainClicked = MutableStateFlow(value = false)
 
     override fun getToggleUsageTimestamp(): Flow<Instant?> = timestamp
 
     override suspend fun setToggleUsageTimestamp(timestamp: Instant) {
         this.timestamp.value = timestamp
+    }
+
+    override fun getPopupTriggerCount(): Flow<Int> = triggerCount
+
+    override suspend fun setPopupTriggerCount(count: Int) {
+        triggerCount.value = count
+    }
+
+    override fun getDoNotShowAgainClicked(): Flow<Boolean> = doNotShowAgainClicked
+
+    override suspend fun setDoNotShowAgainClicked(clicked: Boolean) {
+        doNotShowAgainClicked.value = clicked
     }
 }
 

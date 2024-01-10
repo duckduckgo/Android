@@ -18,9 +18,13 @@ package com.duckduckgo.privacyprotectionspopup.impl.store
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.privacyprotectionspopup.impl.store.PrivacyProtectionsPopupDataStoreImpl.Keys.DO_NOT_SHOW_AGAIN_CLICKED
+import com.duckduckgo.privacyprotectionspopup.impl.store.PrivacyProtectionsPopupDataStoreImpl.Keys.POPUP_TRIGGER_COUNT
 import com.duckduckgo.privacyprotectionspopup.impl.store.PrivacyProtectionsPopupDataStoreImpl.Keys.TOGGLE_USAGE_TIMESTAMP
 import com.squareup.anvil.annotations.ContributesBinding
 import java.time.Instant
@@ -32,6 +36,10 @@ import kotlinx.coroutines.flow.map
 interface PrivacyProtectionsPopupDataStore {
     fun getToggleUsageTimestamp(): Flow<Instant?>
     suspend fun setToggleUsageTimestamp(timestamp: Instant)
+    fun getPopupTriggerCount(): Flow<Int>
+    suspend fun setPopupTriggerCount(count: Int)
+    fun getDoNotShowAgainClicked(): Flow<Boolean>
+    suspend fun setDoNotShowAgainClicked(clicked: Boolean)
 }
 
 @ContributesBinding(AppScope::class)
@@ -53,7 +61,27 @@ class PrivacyProtectionsPopupDataStoreImpl @Inject constructor(
         }
     }
 
+    override fun getPopupTriggerCount(): Flow<Int> =
+        store.data
+            .map { prefs -> prefs[POPUP_TRIGGER_COUNT] ?: 0 }
+            .distinctUntilChanged()
+
+    override suspend fun setPopupTriggerCount(count: Int) {
+        store.edit { prefs -> prefs[POPUP_TRIGGER_COUNT] = count }
+    }
+
+    override fun getDoNotShowAgainClicked(): Flow<Boolean> =
+        store.data
+            .map { prefs -> prefs[DO_NOT_SHOW_AGAIN_CLICKED] == true }
+            .distinctUntilChanged()
+
+    override suspend fun setDoNotShowAgainClicked(clicked: Boolean) {
+        store.edit { prefs -> prefs[DO_NOT_SHOW_AGAIN_CLICKED] = clicked }
+    }
+
     private object Keys {
         val TOGGLE_USAGE_TIMESTAMP = longPreferencesKey(name = "toggle_usage_timestamp")
+        val POPUP_TRIGGER_COUNT = intPreferencesKey(name = "popup_trigger_count")
+        val DO_NOT_SHOW_AGAIN_CLICKED = booleanPreferencesKey(name = "dont_show_again_clicked")
     }
 }

@@ -255,6 +255,7 @@ import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreen
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopup
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupFactory
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupViewState
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
@@ -3420,7 +3421,8 @@ class BrowserTabFragment :
                 if (isHidden) {
                     return@launch
                 }
-                val privacyProtectionsPopupVisible = lastSeenBrowserViewState?.privacyProtectionsPopupViewState?.visible == true
+                val privacyProtectionsPopupVisible = lastSeenBrowserViewState
+                    ?.privacyProtectionsPopupViewState is PrivacyProtectionsPopupViewState.Visible
                 if (lastSeenOmnibarViewState?.isEditing != true && !privacyProtectionsPopupVisible) {
                     val site = viewModel.siteLiveData.value
                     val events = site?.orderedTrackerBlockedEntities()
