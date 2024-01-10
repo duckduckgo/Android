@@ -35,12 +35,18 @@ class BackupServiceSharedPreferences @Inject constructor(
     private val backupPixelPreferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME_BACKUP_PIXEL, Context.MODE_PRIVATE) }
 
     override fun clearBackupPreferences() {
-        backupServicePreferences.edit().clear().apply()
-        backupPixelPreferences.edit().clear().apply()
+        if (backupServicePreferences.contains(KEY_ATB)) {
+            backupServicePreferences.edit().clear().apply()
+        }
+        if (backupPixelPreferences.contains(KEY_PIXEL_SENT)) {
+            backupPixelPreferences.edit().clear().apply()
+        }
     }
 
     companion object {
         private const val FILENAME_BACKUP_SERVICE = "com.duckduckgo.app.statistics.backup"
+        private const val KEY_ATB = "com.duckduckgo.app.statistics.backup.atb"
         private const val FILENAME_BACKUP_PIXEL = "com.duckduckgo.app.statistics.backup.pixel"
+        private const val KEY_PIXEL_SENT = "com.duckduckgo.app.statistics.backup.pixel.sent"
     }
 }
