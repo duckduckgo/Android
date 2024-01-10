@@ -21,6 +21,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Environment
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
@@ -55,7 +56,7 @@ class FileDownloadNotificationActionReceiver @Inject constructor(
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
         Timber.v("Registering file download notification action receiver")
-        context.registerReceiver(this, IntentFilter(INTENT_DOWNLOADS_NOTIFICATION_ACTION))
+        ContextCompat.registerReceiver(context, this, IntentFilter(INTENT_DOWNLOADS_NOTIFICATION_ACTION), ContextCompat.RECEIVER_NOT_EXPORTED)
 
         // When the app process is killed and restarted, this onCreate method is called and we take the opportunity
         // to clean up the pending downloads that were in progress and will be no longer downloading.

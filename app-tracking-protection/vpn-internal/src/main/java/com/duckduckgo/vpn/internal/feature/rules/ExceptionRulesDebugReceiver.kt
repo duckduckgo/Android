@@ -20,6 +20,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import androidx.core.content.ContextCompat
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
@@ -48,7 +49,7 @@ class ExceptionRulesDebugReceiver(
 
     init {
         kotlin.runCatching { context.unregisterReceiver(this) }
-        context.registerReceiver(this, IntentFilter(intentAction))
+        ContextCompat.registerReceiver(context, this, IntentFilter(intentAction), ContextCompat.RECEIVER_NOT_EXPORTED)
     }
 
     override fun onReceive(

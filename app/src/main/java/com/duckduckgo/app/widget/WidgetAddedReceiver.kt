@@ -22,6 +22,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
@@ -46,7 +47,7 @@ class WidgetAddedReceiver @Inject constructor(
 
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
-        context.registerReceiver(this, IntentFilter(ACTION_ADD_WIDGET))
+        ContextCompat.registerReceiver(context, this, IntentFilter(ACTION_ADD_WIDGET), ContextCompat.RECEIVER_NOT_EXPORTED)
     }
 
     override fun onDestroy(owner: LifecycleOwner) {

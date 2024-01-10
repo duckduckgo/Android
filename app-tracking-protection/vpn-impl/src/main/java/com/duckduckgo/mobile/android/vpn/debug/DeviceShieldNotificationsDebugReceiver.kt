@@ -21,6 +21,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
@@ -49,7 +50,7 @@ class DeviceShieldNotificationsDebugReceiver(
 ) : BroadcastReceiver() {
 
     init {
-        context.registerReceiver(this, IntentFilter(intentAction))
+        ContextCompat.registerReceiver(context, this, IntentFilter(intentAction), ContextCompat.RECEIVER_NOT_EXPORTED)
     }
 
     override fun onReceive(

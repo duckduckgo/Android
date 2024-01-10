@@ -20,6 +20,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import androidx.core.content.ContextCompat
 
 /**
  * Abstract class to create generic receivers for internal features accessible through
@@ -44,7 +45,7 @@ abstract class InternalFeatureReceiver(
 
     fun register() {
         unregister()
-        context.registerReceiver(this, IntentFilter(intentAction()))
+        ContextCompat.registerReceiver(context, this, IntentFilter(intentAction()), ContextCompat.RECEIVER_NOT_EXPORTED)
     }
 
     fun unregister() {

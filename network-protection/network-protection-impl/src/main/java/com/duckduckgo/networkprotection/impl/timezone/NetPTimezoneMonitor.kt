@@ -20,6 +20,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import androidx.core.content.ContextCompat
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
@@ -76,7 +77,7 @@ class NetPTimezoneMonitor @Inject constructor(
         IntentFilter().apply {
             addAction(Intent.ACTION_TIMEZONE_CHANGED)
         }.run {
-            context.registerReceiver(this@NetPTimezoneMonitor, this)
+            ContextCompat.registerReceiver(context, this@NetPTimezoneMonitor, this, ContextCompat.RECEIVER_NOT_EXPORTED)
         }
     }
 

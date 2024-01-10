@@ -20,6 +20,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import androidx.core.content.ContextCompat
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
@@ -66,7 +67,7 @@ class SendTrackerDebugReceiver @Inject constructor(
         }
 
         logcat { "Debug receiver SendTrackerDebugReceiver registered" }
-        context.registerReceiver(this, IntentFilter(INTENT_ACTION))
+        ContextCompat.registerReceiver(context, this, IntentFilter(INTENT_ACTION), ContextCompat.RECEIVER_NOT_EXPORTED)
     }
 
     private fun unregister() {

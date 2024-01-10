@@ -20,6 +20,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import androidx.core.content.ContextCompat
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
@@ -56,7 +57,7 @@ class RestartReceiver @Inject constructor(
         if (appBuildConfig.isInternalBuild()) {
             logcat { "Starting vpn-service receiver" }
             unregister()
-            context.registerReceiver(this, IntentFilter("vpn-service"))
+            ContextCompat.registerReceiver(context, this, IntentFilter("vpn-service"), ContextCompat.RECEIVER_NOT_EXPORTED)
         }
     }
 

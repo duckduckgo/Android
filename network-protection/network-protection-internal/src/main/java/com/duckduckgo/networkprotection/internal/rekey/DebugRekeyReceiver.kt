@@ -21,6 +21,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import androidx.core.content.ContextCompat
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.ProcessName
 import com.duckduckgo.di.scopes.VpnScope
@@ -61,6 +62,7 @@ class DebugRekeyReceiver @Inject constructor(
                     rekeyer.forceRekey()
                 }
             }
+
             else -> {
                 logcat(LogPriority.WARN) { "Unknown action" }
                 pendingResult?.finish()
@@ -72,7 +74,10 @@ class DebugRekeyReceiver @Inject constructor(
         register()
     }
 
-    override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStateMonitor.VpnStopReason) {
+    override fun onVpnStopped(
+        coroutineScope: CoroutineScope,
+        vpnStopReason: VpnStateMonitor.VpnStopReason,
+    ) {
         logcat { "Unregistering debug re-keying receiver" }
         unregister()
     }
@@ -81,11 +86,13 @@ class DebugRekeyReceiver @Inject constructor(
     private fun register() {
         unregister()
         logcat { "Registering debug re-keying receiver" }
-        context.registerReceiver(
+        ContextCompat.registerReceiver(
+            context,
             this,
             IntentFilter().apply {
                 addAction(ACTION_FORCE_REKEY)
             },
+            ContextCompat.RECEIVER_NOT_EXPORTED,
         )
     }
 
