@@ -20,6 +20,7 @@ import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
+import android.provider.MediaStore
 import androidx.activity.result.ActivityResultCaller
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
@@ -28,14 +29,15 @@ import androidx.core.content.ContextCompat
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import kotlin.reflect.KFunction2
 
 interface ExternalCameraSystemPermissionsHelper {
     fun hasCameraPermissionsGranted(): Boolean
     fun registerPermissionLaunchers(
         caller: ActivityResultCaller,
-        onResultPermissionRequest: (Boolean) -> Unit,
+        onResultPermissionRequest: KFunction2<Boolean, String, Unit>,
     )
-    fun requestPermission(permission: String)
+    fun requestPermission(permission: String, input: String)
     fun isPermissionsRejectedForever(activity: Activity): Boolean
 }
 
@@ -46,22 +48,24 @@ class RealExternalCameraSystemPermissionsHelperImpl @Inject constructor(
 
     private lateinit var permissionLauncher: ActivityResultLauncher<String>
     private var currentPermissionRequested: String? = null
+    private var mediaStoreType: String = MediaStore.ACTION_IMAGE_CAPTURE
 
     override fun hasCameraPermissionsGranted(): Boolean =
         ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
 
     override fun registerPermissionLaunchers(
         caller: ActivityResultCaller,
-        onResultPermissionRequest: (Boolean) -> Unit,
+        onResultPermissionRequest: KFunction2<Boolean, String, Unit>,
     ) {
         permissionLauncher = caller.registerForActivityResult(RequestPermission()) {
-            onResultPermissionRequest.invoke(it)
+            onResultPermissionRequest.invoke(it, mediaStoreType)
         }
     }
 
-    override fun requestPermission(permission: String) {
+    override fun requestPermission(permission: String, input: String) {
         if (this::permissionLauncher.isInitialized) {
             currentPermissionRequested = permission
+            mediaStoreType = input
             permissionLauncher.launch(permission)
         } else {
             throw IllegalAccessException("registerPermissionLaunchers() needs to be called before requestPermission()")

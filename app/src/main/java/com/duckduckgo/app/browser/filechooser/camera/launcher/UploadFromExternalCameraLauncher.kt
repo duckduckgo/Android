@@ -53,7 +53,7 @@ interface UploadFromExternalCameraLauncher {
      * Launches the external camera app to capture an image.
      * Before calling launch, you must register a callback to receive the result, using [registerForResult].
      */
-    fun launch()
+    fun launch(input: String)
 
     /**
      * Registers a callback to receive the result of the camera capture.
@@ -108,22 +108,22 @@ class PermissionAwareExternalCameraLauncher @Inject constructor(
 ) : UploadFromExternalCameraLauncher {
 
     private lateinit var callback: (CameraImageCaptureResult) -> Unit
-    private lateinit var launcher: ActivityResultLauncher<Unit?>
+    private lateinit var launcher: ActivityResultLauncher<String?>
 
-    override fun launch() {
+    override fun launch(input: String) {
         if (permissionHelper.hasCameraPermissionsGranted()) {
             Timber.d("camera permission already granted. launching camera now")
-            launchCamera()
+            launchCamera(input)
         } else {
             // ask for permission
             Timber.d("no camera permission yet, need to request camera permission before launching camera")
-            permissionHelper.requestPermission(Manifest.permission.CAMERA)
+            permissionHelper.requestPermission(Manifest.permission.CAMERA, input)
         }
     }
 
-    private fun launchCamera() {
+    private fun launchCamera(input: String) {
         try {
-            launcher.launch(null)
+            launcher.launch(input)
         } catch (e: Exception) {
             Timber.w(e, "exception launching camera")
             callback.invoke(CameraImageCaptureResult.ErrorAccessingCamera)
@@ -174,10 +174,10 @@ class PermissionAwareExternalCameraLauncher @Inject constructor(
         permissionHelper.registerPermissionLaunchers(caller, this::onResultSystemPermissionRequest)
     }
 
-    private fun onResultSystemPermissionRequest(granted: Boolean) {
+    private fun onResultSystemPermissionRequest(granted: Boolean, input: String) {
         Timber.d("camera permission request received. granted=%s", granted)
         if (granted) {
-            launchCamera()
+            launchCamera(input)
         } else {
             callback(CameraImageCaptureResult.CouldNotCapturePermissionDenied)
         }

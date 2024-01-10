@@ -23,31 +23,37 @@ import android.provider.MediaStore
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.core.content.FileProvider
 import java.io.File
-import java.lang.IllegalStateException
 
-class CameraCaptureResultHandler : ActivityResultContract<Unit?, File?>() {
+class CameraCaptureResultHandler : ActivityResultContract<String?, File?>() {
 
     private var interimImageLocation: File? = null
 
     override fun createIntent(
         context: Context,
-        input: Unit?,
+        input: String?,
     ): Intent {
-        val destinationForCapturedImage = destinationImageCaptureFile(context) ?: throw IllegalStateException("Unable to save images from camera")
+        val destinationForCapturedImage =
+            destinationImageCaptureFile(context, input) ?: throw IllegalStateException("Unable to save images from camera")
 
-        return Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { intent ->
-            destinationForCapturedImage.also { newFile ->
-                val safeUri = FileProvider.getUriForFile(context, "${context.packageName}.$PROVIDER_SUFFIX", newFile)
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, safeUri)
+        return Intent(input ?: MediaStore.ACTION_IMAGE_CAPTURE)
+            .also { intent ->
+                destinationForCapturedImage.also { newFile ->
+                    val safeUri = FileProvider.getUriForFile(context, "${context.packageName}.$PROVIDER_SUFFIX", newFile)
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, safeUri)
+                }
             }
-        }
     }
 
-    private fun destinationImageCaptureFile(context: Context): File? {
+    private fun destinationImageCaptureFile(context: Context, input: String?): File? {
         val topLevelDirectory: File = context.externalCacheDir ?: return null
         val cameraDataDir = File(topLevelDirectory, SUBDIRECTORY)
         cameraDataDir.mkdirs()
-        val newFileName = "${System.currentTimeMillis()}.$IMAGE_FILE_EXTENSION"
+        val fileExtension = when (input) {
+            MediaStore.ACTION_IMAGE_CAPTURE -> IMAGE_FILE_EXTENSION
+            MediaStore.ACTION_VIDEO_CAPTURE -> VIDEO_FILE_EXTENSION
+            else -> ""
+        }
+        val newFileName = "${System.currentTimeMillis()}.$fileExtension"
         return File(cameraDataDir, newFileName).also {
             interimImageLocation = it
         }
@@ -68,5 +74,6 @@ class CameraCaptureResultHandler : ActivityResultContract<Unit?, File?>() {
         private const val SUBDIRECTORY = "browser-uploads"
         private const val PROVIDER_SUFFIX = "provider"
         private const val IMAGE_FILE_EXTENSION = "jpg"
+        private const val VIDEO_FILE_EXTENSION = "mp4"
     }
 }

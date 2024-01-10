@@ -32,6 +32,7 @@ import android.net.Uri
 import android.os.*
 import android.print.PrintAttributes
 import android.print.PrintManager
+import android.provider.MediaStore
 import android.text.Editable
 import android.text.Spannable
 import android.text.SpannableString
@@ -1246,7 +1247,8 @@ class BrowserTabFragment :
             is Command.CopyLink -> clipboardManager.setPrimaryClip(ClipData.newPlainText(null, it.url))
             is Command.ShowFileChooser -> launchFilePicker(it.filePathCallback, it.fileChooserParams)
             is Command.ShowExistingImageOrCameraChooser -> launchImageOrCameraChooser(it.fileChooserParams, it.filePathCallback)
-            is Command.ShowImageCamera -> launchCameraCapture(it.filePathCallback)
+            is Command.ShowImageCamera -> launchCameraCapture(it.filePathCallback, MediaStore.ACTION_IMAGE_CAPTURE)
+            is Command.ShowVideoCamera -> launchCameraCapture(it.filePathCallback, MediaStore.ACTION_VIDEO_CAPTURE)
 
             is Command.AddHomeShortcut -> {
                 context?.let { context ->
@@ -2815,9 +2817,9 @@ class BrowserTabFragment :
         startActivityForResult(intent, REQUEST_CODE_CHOOSE_FILE)
     }
 
-    private fun launchCameraCapture(filePathCallback: ValueCallback<Array<Uri>>) {
+    private fun launchCameraCapture(filePathCallback: ValueCallback<Array<Uri>>, input: String) {
         pendingUploadTask = filePathCallback
-        externalCameraLauncher.launch()
+        externalCameraLauncher.launch(input)
     }
 
     private fun launchImageOrCameraChooser(
@@ -2842,7 +2844,7 @@ class BrowserTabFragment :
                         }
 
                         override fun onSecondaryItemClicked() {
-                            launchCameraCapture(filePathCallback)
+                            launchCameraCapture(filePathCallback, MediaStore.ACTION_IMAGE_CAPTURE)
                         }
 
                         override fun onBottomSheetDismissed() {

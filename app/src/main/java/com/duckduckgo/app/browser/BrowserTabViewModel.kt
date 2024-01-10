@@ -415,6 +415,9 @@ class BrowserTabViewModel @Inject constructor(
         class ShowImageCamera(
             val filePathCallback: ValueCallback<Array<Uri>>,
         ) : Command()
+        class ShowVideoCamera(
+            val filePathCallback: ValueCallback<Array<Uri>>,
+        ) : Command()
 
         class HandleNonHttpAppLink(
             val nonHttpAppLink: NonHttpAppLink,
@@ -1894,6 +1897,7 @@ class BrowserTabViewModel @Inject constructor(
     ) {
         val acceptTypes = fileChooserParams.acceptTypes
         val acceptsOnlyImage = acceptsOnly("image/", acceptTypes)
+        val acceptsOnlyVideo = acceptsOnly("video/", acceptTypes)
         val cameraHardwareAvailable = cameraHardwareChecker.hasCameraHardware()
 
         val mimeTypes = convertAcceptTypesToMimeTypes(acceptTypes)
@@ -1902,6 +1906,8 @@ class BrowserTabViewModel @Inject constructor(
         command.value = when {
             fileChooserParams.isCaptureEnabled && acceptsOnlyImage && cameraHardwareAvailable ->
                 ShowImageCamera(filePathCallback)
+            fileChooserParams.isCaptureEnabled && acceptsOnlyVideo && cameraHardwareAvailable ->
+                ShowVideoCamera(filePathCallback)
             (fileChooserParams.acceptTypes.any { it.startsWith("image/") } && cameraHardwareAvailable) ->
                 ShowExistingImageOrCameraChooser(filePathCallback, fileChooserRequestedParams)
             else -> ShowFileChooser(filePathCallback, fileChooserRequestedParams)
