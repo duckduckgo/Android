@@ -29,7 +29,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -73,5 +75,29 @@ class PrivacyProtectionsPopupDataStoreTest {
 
         val storedTimestamp = subject.getToggleUsageTimestamp().first()
         assertEquals(Instant.parse("2023-11-10T10:15:30.000Z"), storedTimestamp)
+    }
+
+    @Test
+    fun whenPopupTriggerCountIsNotInitializedThenReturnsZero() = runTest {
+        assertEquals(0, subject.getPopupTriggerCount().first())
+    }
+
+    @Test
+    fun whenPopupTriggerCountIsStoredThenReturnsCorrectValue() = runTest {
+        val count = 123
+        subject.setPopupTriggerCount(count)
+        val storedCount = subject.getPopupTriggerCount().first()
+        assertEquals(count, storedCount)
+    }
+
+    @Test
+    fun whenDoNotShowAgainIsNotInitializedThenReturnsFalse() = runTest {
+        assertFalse(subject.getDoNotShowAgainClicked().first())
+    }
+
+    @Test
+    fun whenDoNotShowAgainIsStoredThenReturnsCorrectValue() = runTest {
+        subject.setDoNotShowAgainClicked(clicked = true)
+        assertTrue(subject.getDoNotShowAgainClicked().first())
     }
 }

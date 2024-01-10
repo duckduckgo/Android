@@ -18,6 +18,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
     android:clipChildren="false"
     android:clipToPadding="false"
     android:paddingStart="16dp"
@@ -92,11 +93,27 @@
                 android:layout_marginTop="@dimen/keyline_4"
                 android:layout_marginEnd="@dimen/keyline_2"
                 android:text="@string/privacy_protections_popup_button_dismiss"
+                android:visibility="gone"
                 app:buttonSize="small"
                 app:layout_constraintEnd_toStartOf="@id/disableButton"
                 app:layout_constraintHorizontal_bias="1"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/bodyText" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonGhost
+                android:id="@+id/dontShowAgainButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_2"
+                android:text="@string/privacy_protections_popup_button_dont_show_again"
+                android:visibility="gone"
+                app:buttonSize="small"
+                app:layout_constraintEnd_toStartOf="@id/disableButton"
+                app:layout_constraintHorizontal_bias="1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/bodyText"
+                tools:visibility="visible" />
 
             <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                 android:id="@+id/disableButton"

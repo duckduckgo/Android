@@ -23,6 +23,7 @@ import android.view.ViewGroup.LayoutParams
 import android.widget.PopupWindow
 import androidx.core.view.doOnDetach
 import androidx.core.view.doOnLayout
+import androidx.core.view.isVisible
 import androidx.core.view.updatePaddingRelative
 import com.duckduckgo.common.ui.view.shape.DaxBubbleEdgeTreatment
 import com.duckduckgo.common.ui.view.toPx
@@ -32,6 +33,7 @@ import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DISABLE_PROTECTIONS_CLICKED
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DISMISSED
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DISMISS_CLICKED
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DONT_SHOW_AGAIN_CLICKED
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.PRIVACY_DASHBOARD_CLICKED
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupViewState
 import com.duckduckgo.privacyprotectionspopup.impl.databinding.PopupPrivacyDashboardBinding
@@ -46,25 +48,29 @@ class PrivacyProtectionsPopupImpl(
 
     private val context: Context get() = anchor.context
     private val _events = MutableSharedFlow<PrivacyProtectionsPopupUiEvent>(extraBufferCapacity = 1)
-    private var visible = false
+    private var state: PrivacyProtectionsPopupViewState = PrivacyProtectionsPopupViewState.Gone
     private var popupWindow: PopupWindow? = null
 
     override fun setViewState(viewState: PrivacyProtectionsPopupViewState) {
-        if (viewState.visible != visible) {
-            visible = viewState.visible
+        if (viewState != state) {
+            state = viewState
 
-            if (visible) {
-                showPopup()
-            } else {
-                dismissPopup()
+            when (viewState) {
+                is PrivacyProtectionsPopupViewState.Visible -> {
+                    showPopup(viewState)
+                }
+
+                PrivacyProtectionsPopupViewState.Gone -> {
+                    dismissPopup()
+                }
             }
         }
     }
 
     override val events: Flow<PrivacyProtectionsPopupUiEvent> = _events.asSharedFlow()
 
-    private fun showPopup() = anchor.doOnLayout {
-        val popupContent = createPopupContentView()
+    private fun showPopup(viewState: PrivacyProtectionsPopupViewState.Visible) = anchor.doOnLayout {
+        val popupContent = createPopupContentView(viewState.doNotShowAgainOptionAvailable)
         val popupWindowSpec = createPopupWindowSpec(popupContent = popupContent.root)
 
         popupWindowSpec.overrideContentPaddingStartPx?.let { contentPaddingStartPx ->
@@ -72,6 +78,7 @@ class PrivacyProtectionsPopupImpl(
         }
 
         popupContent.dismissButton.setOnClickListener { _events.tryEmit(DISMISS_CLICKED) }
+        popupContent.dontShowAgainButton.setOnClickListener { _events.tryEmit(DONT_SHOW_AGAIN_CLICKED) }
         popupContent.disableButton.setOnClickListener { _events.tryEmit(DISABLE_PROTECTIONS_CLICKED) }
         popupContent.anchorOverlay.setOnClickListener {
             anchor.performClick()
@@ -105,8 +112,11 @@ class PrivacyProtectionsPopupImpl(
         popupWindow = null
     }
 
-    private fun createPopupContentView(): PopupPrivacyDashboardBinding {
+    private fun createPopupContentView(doNotShowAgainAvailable: Boolean): PopupPrivacyDashboardBinding {
         val popupContent = PopupPrivacyDashboardBinding.inflate(LayoutInflater.from(context))
+
+        popupContent.dontShowAgainButton.isVisible = doNotShowAgainAvailable
+        popupContent.dismissButton.isVisible = !doNotShowAgainAvailable
 
         // Override CardView's default elevation with popup/dialog elevation
         popupContent.cardView.cardElevation = POPUP_DEFAULT_ELEVATION_DP.toPx()

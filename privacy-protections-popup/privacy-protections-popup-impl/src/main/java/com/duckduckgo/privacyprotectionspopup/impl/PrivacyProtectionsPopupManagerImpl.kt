@@ -27,6 +27,7 @@ import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DISABLE_PROTECTIONS_CLICKED
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DISMISSED
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DISMISS_CLICKED
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DONT_SHOW_AGAIN_CLICKED
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.PRIVACY_DASHBOARD_CLICKED
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupViewState
 import com.duckduckgo.privacyprotectionspopup.impl.PrivacyProtectionsPopupManagerImpl.PopupDismissed.DismissedAt
@@ -46,6 +47,7 @@ import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
@@ -78,20 +80,22 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
             hasBrowserError = false,
             popupDismissed = null,
             toggleUsed = null,
-            shouldShowPopup = false,
+            popupTriggerCount = 0,
+            doNotShowAgainClicked = null,
+            viewState = PrivacyProtectionsPopupViewState.Gone,
         ),
     )
 
     private var dataLoadingJob: Job? = null
 
     override val viewState = state
-        .map { PrivacyProtectionsPopupViewState(visible = it.shouldShowPopup) }
+        .map { state -> state.viewState }
         .onStart { startDataLoading() }
         .onCompletion { stopDataLoading() }
         .stateIn(
             scope = appCoroutineScope,
             started = SharingStarted.WhileSubscribed(),
-            initialValue = PrivacyProtectionsPopupViewState(visible = false),
+            initialValue = PrivacyProtectionsPopupViewState.Gone,
         )
 
     override fun onUiEvent(event: PrivacyProtectionsPopupUiEvent) {
@@ -118,11 +122,39 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
             PRIVACY_DASHBOARD_CLICKED -> {
                 dismissPopup()
             }
+
+            DONT_SHOW_AGAIN_CLICKED -> {
+                appCoroutineScope.launch {
+                    dataStore.setDoNotShowAgainClicked(clicked = true)
+                }
+                dismissPopup()
+            }
         }
     }
 
     override fun onPageRefreshTriggeredByUser() {
-        state.update { it.copy(shouldShowPopup = canShowPopup(state = it)) }
+        var popupTriggered = false
+
+        state.update { oldState ->
+            val shouldShowPopup = canShowPopup(state = oldState)
+
+            popupTriggered = shouldShowPopup && oldState.viewState is PrivacyProtectionsPopupViewState.Gone
+
+            oldState.copy(
+                viewState = if (shouldShowPopup) {
+                    PrivacyProtectionsPopupViewState.Visible(doNotShowAgainOptionAvailable = oldState.popupTriggerCount > 0)
+                } else {
+                    PrivacyProtectionsPopupViewState.Gone
+                },
+            )
+        }
+
+        if (popupTriggered) {
+            appCoroutineScope.launch {
+                val count = dataStore.getPopupTriggerCount().first()
+                dataStore.setPopupTriggerCount(count + 1)
+            }
+        }
     }
 
     override fun onPageLoaded(
@@ -151,7 +183,7 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
     }
 
     private fun dismissPopup() {
-        state.update { it.copy(shouldShowPopup = false) }
+        state.update { it.copy(viewState = PrivacyProtectionsPopupViewState.Gone) }
 
         val popupDismissedAt = timeProvider.getCurrentTime()
 
@@ -206,6 +238,20 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
                     state.update { it.copy(toggleUsed = toggleUsed) }
                 }
                 .launchIn(this)
+
+            dataStore
+                .getPopupTriggerCount()
+                .onEach { popupTriggerCount ->
+                    state.update { it.copy(popupTriggerCount = popupTriggerCount) }
+                }
+                .launchIn(this)
+
+            dataStore
+                .getDoNotShowAgainClicked()
+                .onEach { doNotShowAgainClicked ->
+                    state.update { it.copy(doNotShowAgainClicked = doNotShowAgainClicked) }
+                }
+                .launchIn(this)
         }
     }
 
@@ -222,7 +268,9 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
         val hasBrowserError: Boolean,
         val popupDismissed: PopupDismissed?,
         val toggleUsed: ToggleUsed?,
-        val shouldShowPopup: Boolean,
+        val popupTriggerCount: Int,
+        val doNotShowAgainClicked: Boolean?,
+        val viewState: PrivacyProtectionsPopupViewState,
     )
 
     private sealed class PopupDismissed {
@@ -262,7 +310,8 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
             !hasHttpErrorCodes &&
             !hasBrowserError &&
             popupDismissed == false &&
-            toggleUsed == false
+            toggleUsed == false &&
+            doNotShowAgainClicked == false
     }
 
     companion object {
