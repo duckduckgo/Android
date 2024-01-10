@@ -30,8 +30,6 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.bookmarks.ui.BookmarkScreenViewHolders.BookmarkFoldersViewHolder
-import com.duckduckgo.app.bookmarks.ui.BookmarkScreenViewHolders.BookmarksViewHolder
 import com.duckduckgo.app.bookmarks.ui.BookmarksAdapter.BookmarkFolderItem
 import com.duckduckgo.app.bookmarks.ui.BookmarksAdapter.BookmarkItem
 import com.duckduckgo.app.bookmarks.ui.BookmarksAdapter.BookmarksItemTypes
@@ -40,8 +38,6 @@ import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity.C
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.EditBookmarkFolderDialogFragment
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.R.plurals
-import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.databinding.ActivityBookmarksBinding
 import com.duckduckgo.app.browser.databinding.ContentBookmarksBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
@@ -74,13 +70,12 @@ class BookmarksActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var faviconManager: FaviconManager
 
-    lateinit var bookmarksAdapter: BookmarksAdapter
-    lateinit var searchListener: BookmarksQueryListener
+    private lateinit var bookmarksAdapter: BookmarksAdapter
+    private lateinit var searchListener: BookmarksQueryListener
 
     private var deleteDialog: AlertDialog? = null
     private var searchMenuItem: MenuItem? = null
     private var exportMenuItem: MenuItem? = null
-    private var isOverflowMenuVisible = true
 
     private val viewModel: BookmarksViewModel by bindViewModel()
 
@@ -112,38 +107,6 @@ class BookmarksActivity : DuckDuckGoActivity() {
         observeViewModel()
 
         viewModel.fetchBookmarksAndFolders(getParentFolderId())
-    }
-
-    fun enterReorderingMode() {
-        supportActionBar?.title = getString(string.rearrangeBookmarks)
-        bookmarksAdapter.enterReorderingMode()
-        updateDragHandles(true)
-        isOverflowMenuVisible = false
-        invalidateMenu()
-    }
-
-    fun exitReorderingMode() {
-        supportActionBar?.title = getParentFolderName()
-        bookmarksAdapter.exitReorderingMode()
-        updateDragHandles(false)
-        isOverflowMenuVisible = true
-        invalidateMenu()
-    }
-
-    private fun updateDragHandles(showDragHandles: Boolean) {
-        for (i in 0 until bookmarksAdapter.itemCount) {
-            when (val viewHolder = contentBookmarksBinding.recycler.findViewHolderForAdapterPosition(i) as? BookmarkScreenViewHolders) {
-                is BookmarksViewHolder -> {
-                    val bookmarkItem = bookmarksAdapter.bookmarkItems[i] as BookmarkItem
-                    viewHolder.showDragHandle(showDragHandles, bookmarkItem.bookmark)
-                }
-                is BookmarkFoldersViewHolder -> {
-                    val folderItem = bookmarksAdapter.bookmarkItems[i] as BookmarkFolderItem
-                    viewHolder.showDragHandle(showDragHandles, folderItem.bookmarkFolder)
-                }
-                else -> {}
-            }
-        }
     }
 
     private fun configureToolbar() {
@@ -206,22 +169,18 @@ class BookmarksActivity : DuckDuckGoActivity() {
                                 bookmark.copy(isFavorite = isFavorite),
                             )
                         }
-
                         is BookmarkFolder -> {
                             BookmarkFolderItem(
                                 bookmark,
                             )
                         }
-
                         else -> null
                     }
                 }
-
                 var items: List<BookmarksItemTypes> = emptyList()
                 if (updatedBookmarks != null) {
                     items = updatedBookmarks
                 }
-
                 bookmarksAdapter.setItems(
                     items,
                     updatedBookmarks != null && updatedBookmarks.isEmpty() && getParentFolderId() == SavedSitesNames.BOOKMARKS_ROOT,
@@ -305,9 +264,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        if (isOverflowMenuVisible) {
-            menuInflater.inflate(R.menu.bookmark_activity_menu, menu)
-        }
+        menuInflater.inflate(R.menu.bookmark_activity_menu, menu)
         return true
     }
 
@@ -341,9 +298,9 @@ class BookmarksActivity : DuckDuckGoActivity() {
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         searchMenuItem = menu.findItem(R.id.action_search)
         exportMenuItem = menu.findItem(R.id.bookmark_export)
-        if (viewModel.viewState.value?.bookmarks?.isEmpty() == true) {
+        if (viewModel.viewState.value?.bookmarks?.isEmpty() == true || getParentFolderId() != SavedSitesNames.BOOKMARKS_ROOT) {
             val textColorAttr = commonR.attr.daxColorTextDisabled
-            val spannable = SpannableString(getString(string.exportBookmarksMenu))
+            val spannable = SpannableString(getString(R.string.exportBookmarksMenu))
             spannable.setSpan(ForegroundColorSpan(binding.root.context.getColorFromAttr(textColorAttr)), 0, spannable.length, 0)
             exportMenuItem?.title = spannable
             exportMenuItem?.isEnabled = false
@@ -373,9 +330,6 @@ class BookmarksActivity : DuckDuckGoActivity() {
     override fun onBackPressed() {
         if (searchBar.isVisible) {
             hideSearchBar()
-        } else if (bookmarksAdapter.isReorderingModeEnabled) {
-            exitReorderingMode()
-            bookmarksAdapter.isReorderingModeEnabled = false
         } else {
             super.onBackPressed()
         }
@@ -481,7 +435,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
 
     private fun deleteBookmarkFolder(bookmarkFolder: BookmarkFolder) {
         TextAlertDialogBuilder(this)
-            .setTitle(getString(string.deleteFolder, bookmarkFolder.name))
+            .setTitle(getString(R.string.deleteFolder, bookmarkFolder.name))
             .setMessage(getMessageString(bookmarkFolder))
             .setDestructiveButtons(true)
             .setPositiveButton(R.string.delete)
@@ -499,7 +453,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
     private fun getMessageString(bookmarkFolder: BookmarkFolder): String {
         val totalItems = bookmarkFolder.numBookmarks + bookmarkFolder.numFolders
         return resources.getQuantityString(
-            plurals.bookmarkFolderDeleteMessage,
+            R.plurals.bookmarkFolderDeleteMessage,
             totalItems,
             totalItems,
         )
@@ -553,7 +507,6 @@ class BookmarksActivity : DuckDuckGoActivity() {
         private const val EDIT_BOOKMARK_FOLDER_FRAGMENT_TAG = "EDIT_BOOKMARK_FOLDER"
 
         private const val KEY_BOOKMARK_FOLDER_NAME = "KEY_BOOKMARK_FOLDER_NAME"
-        private const val ROOT_FOLDER_ID = 0L
 
         private const val IMPORT_BOOKMARKS_REQUEST_CODE = 111
         private const val EXPORT_BOOKMARKS_REQUEST_CODE = 112
