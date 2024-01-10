@@ -90,8 +90,8 @@
 
                         <ImageView
                             android:id="@+id/daxIcon"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
+                            android:layout_width="35dp"
+                            android:layout_height="35dp"
                             android:gravity="center"
                             android:importantForAccessibility="no"
                             android:padding="4dp"
