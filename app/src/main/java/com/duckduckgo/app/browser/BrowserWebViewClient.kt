@@ -280,7 +280,10 @@ class BrowserWebViewClient @Inject constructor(
         Timber.v("onPageStarted webViewUrl: ${webView.url} URL: $url")
 
         url?.let {
-            beginTrace(it)
+            // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
+            if (it != "about:blank" && start == null) {
+                start = currentTimeProvider.getTimeInMillis()
+            }
             userAgentProvider.setHintHeader(webView.settings)
             autoconsent.injectAutoconsent(webView, url)
             adClickManager.detectAdDomain(url)
@@ -324,7 +327,14 @@ class BrowserWebViewClient @Inject constructor(
         printInjector.injectPrint(webView)
 
         url?.let {
-            endTrace(it, webView)
+            start?.let { safeStart ->
+                val progress = webView.progress
+                // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
+                if (url != ABOUT_BLANK && progress == 100) {
+                    shouldSendPageLoadedPixel(it, safeStart, currentTimeProvider.getTimeInMillis())
+                    start = null
+                }
+            }
         }
     }
 
@@ -511,24 +521,6 @@ class BrowserWebViewClient @Inject constructor(
             SAFE_BROWSING_THREAT_UNKNOWN -> "SAFE_BROWSING_THREAT_UNKNOWN"
             SAFE_BROWSING_THREAT_UNWANTED_SOFTWARE -> "SAFE_BROWSING_THREAT_UNWANTED_SOFTWARE"
             else -> "ERROR_OTHER"
-        }
-    }
-
-    private fun beginTrace(url: String) {
-        // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
-        if (url != "about:blank" && start == null) {
-            start = currentTimeProvider.getTimeInMillis()
-        }
-    }
-
-    private fun endTrace(url: String, webView: WebView) {
-        start?.let { safeStart ->
-            val progress = webView.progress
-            // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
-            if (url != ABOUT_BLANK && progress == 100) {
-                shouldSendPageLoadedPixel(url, safeStart, currentTimeProvider.getTimeInMillis())
-                start = null
-            }
         }
     }
 }
