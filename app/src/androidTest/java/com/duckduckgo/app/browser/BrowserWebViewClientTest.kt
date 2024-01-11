@@ -802,6 +802,25 @@ class BrowserWebViewClientTest {
         assertTrue(argumentCaptor.firstValue.elapsedTime == 10L)
     }
 
+    @Test
+    fun whenPageLoadErrorThenDiscardStartTime() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.progress).thenReturn(100)
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+        testee.onPageStarted(mockWebView, WIKIPEDIA_URL, null)
+        whenever(webResourceError.description).thenReturn("net::ERR_NAME_NOT_RESOLVED")
+        whenever(webResourceError.errorCode).thenReturn(ERROR_HOST_LOOKUP)
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        testee.onReceivedError(mockWebView, webResourceRequest, webResourceError)
+        whenever(currentTimeProvider.getTimeInMillis()).thenReturn(5)
+        testee.onPageStarted(mockWebView, WIKIPEDIA_URL, null)
+        whenever(currentTimeProvider.getTimeInMillis()).thenReturn(10)
+        testee.onPageFinished(mockWebView, WIKIPEDIA_URL)
+        val argumentCaptor = argumentCaptor<PageLoadedPixelEntity>()
+        verify(pageLoadedPixelDao).add(argumentCaptor.capture())
+        assertTrue(argumentCaptor.firstValue.elapsedTime == 5L)
+    }
+
 
     private class TestWebView(context: Context) : WebView(context) {
         override fun getOriginalUrl(): String {

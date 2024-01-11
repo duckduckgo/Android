@@ -454,6 +454,7 @@ class BrowserWebViewClient @Inject constructor(
         error?.let {
             val parsedError = parseErrorResponse(it)
             if (parsedError != OMITTED && request?.isForMainFrame == true) {
+                start = null
                 webViewClientListener?.onReceivedError(parsedError, request.url.toString())
             }
             if (request?.isForMainFrame == true) {
