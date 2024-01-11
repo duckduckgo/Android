@@ -90,8 +90,8 @@ class BookmarksViewModel @Inject constructor(
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
-    val hiddenIds = MutableStateFlow(HiddenBookmarksIds())
-    data class HiddenBookmarksIds(val favorites: List<String> = emptyList(), val bookmarks: List<String> = emptyList())
+    private val hiddenIds = MutableStateFlow(HiddenBookmarksIds())
+    data class HiddenBookmarksIds(val items: List<String> = emptyList())
 
     init {
         viewState.value = ViewState()
@@ -154,8 +154,7 @@ class BookmarksViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             hiddenIds.emit(
                 hiddenIds.value.copy(
-                    favorites = hiddenIds.value.favorites - savedSite.id,
-                    bookmarks = hiddenIds.value.bookmarks - savedSite.id,
+                    items = hiddenIds.value.items - savedSite.id,
                 ),
             )
         }
@@ -193,14 +192,14 @@ class BookmarksViewModel @Inject constructor(
                 .combine(hiddenIds) { savedSites, hiddenIds ->
                     val filteredBookmarks = savedSites.bookmarks.filter {
                         when (it) {
-                            is Bookmark -> it.id !in hiddenIds.bookmarks
-                            is BookmarkFolder -> it.id !in hiddenIds.bookmarks
+                            is Bookmark -> it.id !in hiddenIds.items
+                            is BookmarkFolder -> it.id !in hiddenIds.items
                             else -> false
                         }
                     }
                     savedSites.copy(
                         bookmarks = filteredBookmarks,
-                        favorites = savedSites.favorites.filter { it.id !in hiddenIds.favorites },
+                        favorites = savedSites.favorites.filter { it.id !in hiddenIds.items },
                     )
                 }.collect {
                     withContext(dispatcherProvider.main()) {
@@ -257,7 +256,7 @@ class BookmarksViewModel @Inject constructor(
 
     fun undoDelete(bookmarkFolder: BookmarkFolder) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            hiddenIds.emit(hiddenIds.value.copy(bookmarks = hiddenIds.value.bookmarks - bookmarkFolder.id))
+            hiddenIds.emit(hiddenIds.value.copy(items = hiddenIds.value.items - bookmarkFolder.id))
         }
     }
 
@@ -273,25 +272,17 @@ class BookmarksViewModel @Inject constructor(
 
     private fun hide(savedSite: SavedSite) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            when (savedSite) {
-                is Bookmark -> {
-                    hiddenIds.emit(
-                        hiddenIds.value.copy(
-                            bookmarks = hiddenIds.value.bookmarks + savedSite.id,
-                            favorites = hiddenIds.value.favorites + savedSite.id,
-                        ),
-                    )
-                }
-                is Favorite -> {
-                    hiddenIds.emit(hiddenIds.value.copy(favorites = hiddenIds.value.favorites + savedSite.id))
-                }
-            }
+            hiddenIds.emit(
+                hiddenIds.value.copy(
+                    items = hiddenIds.value.items + savedSite.id,
+                ),
+            )
         }
     }
 
     fun hide(bookmarkFolder: BookmarkFolder) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            hiddenIds.emit(hiddenIds.value.copy(bookmarks = hiddenIds.value.bookmarks + bookmarkFolder.id))
+            hiddenIds.emit(hiddenIds.value.copy(items = hiddenIds.value.items + bookmarkFolder.id))
         }
         command.postValue(ConfirmDeleteBookmarkFolder(bookmarkFolder))
     }
