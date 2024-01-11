@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser
+package com.duckduckgo.app.browser.pageloadpixel
 
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
-import com.duckduckgo.app.PageLoadedPixelEntity
 
 @Dao
 abstract class PageLoadedPixelDao {
 
     @Insert
-    abstract fun add(exceptionEntity: PageLoadedPixelEntity)
+    abstract fun add(pageLoadedPixelEntity: PageLoadedPixelEntity)
 
     @Query("SELECT * FROM page_loaded_pixel_entity")
     abstract fun all(): List<PageLoadedPixelEntity>

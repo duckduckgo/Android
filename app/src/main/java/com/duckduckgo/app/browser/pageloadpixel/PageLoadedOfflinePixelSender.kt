@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser
+package com.duckduckgo.app.browser.pageloadpixel
 
-import com.duckduckgo.app.browser.WebViewPixelName.WEB_PAGE_LOADED
+import com.duckduckgo.app.browser.WebViewPixelName
 import com.duckduckgo.app.statistics.api.OfflinePixel
 import com.duckduckgo.app.statistics.api.PixelSender
 import com.duckduckgo.di.scopes.AppScope
@@ -26,6 +26,8 @@ import javax.inject.Inject
 
 private const val ELAPSED_TIME = "elapsed_time"
 private const val WEBVIEW_VERSION = "webview_version"
+
+// This is used to ensure the app version we send is the one from the moment the page was loaded, and not then the pixel is fired later on
 private const val APP_VERSION = "app_version_when_page_loaded"
 
 @ContributesMultibinding(AppScope::class)
@@ -38,7 +40,7 @@ class PageLoadedOfflinePixelSender @Inject constructor(
             val pendingPixels = pageLoadedPixelDao.all()
             pendingPixels.map {
                 return@defer pixelSender.sendPixel(
-                    WEB_PAGE_LOADED.pixelName,
+                    WebViewPixelName.WEB_PAGE_LOADED.pixelName,
                     mapOf(
                         APP_VERSION to it.appVersion,
                         ELAPSED_TIME to it.elapsedTime.toString(),

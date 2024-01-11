@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app
+package com.duckduckgo.app.browser.pageloadpixel
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

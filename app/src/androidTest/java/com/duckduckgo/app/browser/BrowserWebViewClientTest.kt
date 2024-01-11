@@ -39,11 +39,9 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.anrs.api.CrashLogger.Crash
-import com.duckduckgo.app.PageLoadedPixelEntity
 import com.duckduckgo.app.browser.WebViewErrorResponse.BAD_URL
 import com.duckduckgo.app.browser.WebViewErrorResponse.CONNECTION
 import com.duckduckgo.app.browser.WebViewErrorResponse.SSL_PROTOCOL_ERROR
-import com.duckduckgo.app.browser.WebViewPixelName.WEB_PAGE_LOADED
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
@@ -51,6 +49,7 @@ import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
 import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
+import com.duckduckgo.app.browser.pageloadpixel.PageLoadedHandler
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -69,7 +68,6 @@ import com.duckduckgo.user.agent.api.UserAgentProvider
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -78,7 +76,6 @@ import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
-import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -120,7 +117,7 @@ class BrowserWebViewClientTest {
     private val webViewVersionProvider: WebViewVersionProvider = mock()
     private val currentTimeProvider: CurrentTimeProvider = mock()
     private val deviceInfo: DeviceInfo = mock()
-    private val pageLoadedPixelDao: PageLoadedPixelDao = mock()
+    private val pageLoadedHandler: PageLoadedHandler = mock()
     private val userAgentProvider: UserAgentProvider = mock()
 
     @UiThreadTest
@@ -146,12 +143,10 @@ class BrowserWebViewClientTest {
             adClickManager,
             autoconsent,
             pixel,
-            pageLoadedPixelDao,
             crashLogger,
             jsPlugins,
-            webViewVersionProvider,
             currentTimeProvider,
-            deviceInfo,
+            pageLoadedHandler,
             userAgentProvider,
         )
         testee.webViewClientListener = listener
@@ -742,8 +737,8 @@ class BrowserWebViewClientTest {
     @Test
     fun whenPageFinishesBeforeStartingThenPixelIsNotFired() {
         val mockWebView = getImmediatelyInvokedMockWebView()
-        testee.onPageFinished(mockWebView, WIKIPEDIA_URL)
-        verify(pageLoadedPixelDao, never()).add(any())
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+        verify(pageLoadedHandler, never()).invoke(any(), any(), any())
     }
 
     @Test
@@ -751,12 +746,14 @@ class BrowserWebViewClientTest {
         val mockWebView = getImmediatelyInvokedMockWebView()
         whenever(mockWebView.progress).thenReturn(100)
         whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
-        testee.onPageStarted(mockWebView, WIKIPEDIA_URL, null)
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
         whenever(currentTimeProvider.getTimeInMillis()).thenReturn(10)
-        testee.onPageFinished(mockWebView, WIKIPEDIA_URL)
-        val argumentCaptor = argumentCaptor<PageLoadedPixelEntity>()
-        verify(pageLoadedPixelDao).add(argumentCaptor.capture())
-        assertTrue(argumentCaptor.firstValue.elapsedTime == 10L)
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+        val startArgumentCaptor = argumentCaptor<Long>()
+        val endArgumentCaptor = argumentCaptor<Long>()
+        verify(pageLoadedHandler).invoke(any(), startArgumentCaptor.capture(), endArgumentCaptor.capture())
+        assertEquals(0L, startArgumentCaptor.firstValue)
+        assertEquals(10L, endArgumentCaptor.firstValue)
     }
 
     @Test
@@ -766,32 +763,33 @@ class BrowserWebViewClientTest {
         whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
         testee.onPageStarted(mockWebView, "about:blank", null)
         testee.onPageFinished(mockWebView, "about:blank")
-        verify(pageLoadedPixelDao, never()).add(any())
+        verify(pageLoadedHandler, never()).invoke(any(), any(), any())
     }
 
     @Test
     fun whenPageFinishesAfterStartingAndProgressIsNot100ThenPixelIsNotAdded() {
         val mockWebView = getImmediatelyInvokedMockWebView()
-        testee.onPageStarted(mockWebView, WIKIPEDIA_URL, null)
-        testee.onPageFinished(mockWebView, WIKIPEDIA_URL)
-        verify(pageLoadedPixelDao, never()).add(any())
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+        verify(pageLoadedHandler, never()).invoke(any(), any(), any())
     }
-
-
 
     @Test
     fun whenPageStartedMoreThanOnceThenStartTimeIsNotUpdated() {
         val mockWebView = getImmediatelyInvokedMockWebView()
         whenever(mockWebView.progress).thenReturn(100)
         whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
-        testee.onPageStarted(mockWebView, WIKIPEDIA_URL, null)
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
         whenever(currentTimeProvider.getTimeInMillis()).thenReturn(5)
-        testee.onPageStarted(mockWebView, WIKIPEDIA_URL, null)
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
         whenever(currentTimeProvider.getTimeInMillis()).thenReturn(10)
-        testee.onPageFinished(mockWebView, WIKIPEDIA_URL)
-        val argumentCaptor = argumentCaptor<PageLoadedPixelEntity>()
-        verify(pageLoadedPixelDao).add(argumentCaptor.capture())
-        assertTrue(argumentCaptor.firstValue.elapsedTime == 10L)
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+
+        val startArgumentCaptor = argumentCaptor<Long>()
+        val endArgumentCaptor = argumentCaptor<Long>()
+        verify(pageLoadedHandler).invoke(any(), startArgumentCaptor.capture(), endArgumentCaptor.capture())
+        assertEquals(0L, startArgumentCaptor.firstValue)
+        assertEquals(10L, endArgumentCaptor.firstValue)
     }
 
     @Test
@@ -799,20 +797,21 @@ class BrowserWebViewClientTest {
         val mockWebView = getImmediatelyInvokedMockWebView()
         whenever(mockWebView.progress).thenReturn(100)
         whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
-        testee.onPageStarted(mockWebView, WIKIPEDIA_URL, null)
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
         whenever(webResourceError.description).thenReturn("net::ERR_NAME_NOT_RESOLVED")
         whenever(webResourceError.errorCode).thenReturn(ERROR_HOST_LOOKUP)
         whenever(webResourceRequest.isForMainFrame).thenReturn(true)
         testee.onReceivedError(mockWebView, webResourceRequest, webResourceError)
         whenever(currentTimeProvider.getTimeInMillis()).thenReturn(5)
-        testee.onPageStarted(mockWebView, WIKIPEDIA_URL, null)
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
         whenever(currentTimeProvider.getTimeInMillis()).thenReturn(10)
-        testee.onPageFinished(mockWebView, WIKIPEDIA_URL)
-        val argumentCaptor = argumentCaptor<PageLoadedPixelEntity>()
-        verify(pageLoadedPixelDao).add(argumentCaptor.capture())
-        assertTrue(argumentCaptor.firstValue.elapsedTime == 5L)
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+        val startArgumentCaptor = argumentCaptor<Long>()
+        val endArgumentCaptor = argumentCaptor<Long>()
+        verify(pageLoadedHandler).invoke(any(), startArgumentCaptor.capture(), endArgumentCaptor.capture())
+        assertEquals(5L, startArgumentCaptor.firstValue)
+        assertEquals(10L, endArgumentCaptor.firstValue)
     }
-
 
     private class TestWebView(context: Context) : WebView(context) {
         override fun getOriginalUrl(): String {
@@ -876,9 +875,7 @@ class BrowserWebViewClientTest {
         override fun clone(): WebHistoryItem = throw NotImplementedError()
     }
 
-
     companion object {
         const val EXAMPLE_URL = "example.com"
-        const val WIKIPEDIA_URL = "wikipedia.org"
     }
 }
