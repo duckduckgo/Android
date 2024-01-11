@@ -30,6 +30,8 @@ import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anrs.api.CrashLogger
+import com.duckduckgo.app.PageLoadedPixelEntity
+import com.duckduckgo.app.anrs.store.ExceptionEntity
 import com.duckduckgo.app.browser.WebViewErrorResponse.BAD_URL
 import com.duckduckgo.app.browser.WebViewErrorResponse.CONNECTION
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
@@ -46,6 +48,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.statistics.api.PixelSender
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.BrowserAutofill
@@ -54,19 +57,30 @@ import com.duckduckgo.browser.api.JsInjectorPlugin
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.UriString
+import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.privacy.config.api.AmpLinks
+import io.reactivex.schedulers.Schedulers
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import java.net.URI
 import javax.inject.Inject
 import kotlinx.coroutines.*
 import timber.log.Timber
 
-private const val ELAPSED_TIME = "elapsed_time"
-private const val DEVICE_MODEL = "device_model"
-private const val WEBVIEW_VERSION = "webview_version"
 private const val ABOUT_BLANK = "about:blank"
+private val sites = listOf(
+    "bbc.com",
+    "ebay.com",
+    "espn.com",
+    "nytimes.com",
+    "reddit.com",
+    "twitch.tv",
+    "twitter.com",
+    "wikipedia.org",
+    "weather.com",
+    )
 class BrowserWebViewClient @Inject constructor(
     private val webViewHttpAuthStore: WebViewHttpAuthStore,
     private val trustedCertificateStore: TrustedCertificateStore,
@@ -86,10 +100,12 @@ class BrowserWebViewClient @Inject constructor(
     private val adClickManager: AdClickManager,
     private val autoconsent: Autoconsent,
     private val pixel: Pixel,
+    private val pageLoadedPixelDao: PageLoadedPixelDao,
     private val crashLogger: CrashLogger,
     private val jsPlugins: PluginPoint<JsInjectorPlugin>,
     private val webViewVersionProvider: WebViewVersionProvider,
     private val currentTimeProvider: CurrentTimeProvider,
+    private val deviceInfo: DeviceInfo,
     private val userAgentProvider: UserAgentProvider,
 ) : WebViewClient() {
 
@@ -519,22 +535,28 @@ class BrowserWebViewClient @Inject constructor(
 
     private fun endTrace(url: String, webView: WebView) {
         start?.let { safeStart ->
-            if (url != ABOUT_BLANK && webView.progress == 100) {
-                val end = currentTimeProvider.getTimeInMillis()
+            val progress = webView.progress
+            appCoroutineScope.launch(dispatcherProvider.io()) {
                 // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
-                pixel.fire(
-                    WEB_PAGE_LOADED,
-                    mapOf(
-                        ELAPSED_TIME to (end - safeStart).toString(),
-                        DEVICE_MODEL to Build.MODEL,
-                        WEBVIEW_VERSION to webViewVersionProvider.getFullVersion(),
-                    )
-                )
-                start = null
+                if (url != ABOUT_BLANK && progress == 100) {
+                    if (sites.any { UriString.sameOrSubdomain(url, it) }) {
+                        val end = currentTimeProvider.getTimeInMillis()
+                        pageLoadedPixelDao.add(
+                            PageLoadedPixelEntity(
+                                elapsedTime = end - safeStart,
+                                webviewVersion = webViewVersionProvider.getMajorVersion(),
+                                appVersion = deviceInfo.appVersion
+                            )
+                        )
+                    }
+                    start = null
+                }
             }
         }
     }
 }
+
+
 
 enum class WebViewPixelName(override val pixelName: String) : Pixel.PixelName {
     WEB_RENDERER_GONE_CRASH("m_web_view_renderer_gone_crash"),

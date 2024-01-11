@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.di
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.pm.PackageManager
+import androidx.room.Room
 import androidx.work.WorkManager
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.*
@@ -47,6 +48,7 @@ import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.*
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
+import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.install.AppInstallStore
@@ -295,5 +297,11 @@ class BrowserModule {
         authCookiesAllowedDomainsRepository: AuthCookiesAllowedDomainsRepository,
     ): ThirdPartyCookieManager {
         return AppThirdPartyCookieManager(cookieManagerProvider, authCookiesAllowedDomainsRepository)
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun providePageLoadedPixelDao(appDatabase: AppDatabase): PageLoadedPixelDao {
+        return appDatabase.pageLoadedPixelDao()
     }
 }
