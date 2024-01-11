@@ -27,6 +27,7 @@ import javax.inject.Inject
 private const val ELAPSED_TIME = "elapsed_time"
 private const val WEBVIEW_VERSION = "webview_version"
 private const val APP_VERSION = "app_version_when_page_loaded"
+
 @ContributesMultibinding(AppScope::class)
 class PageLoadedOfflinePixelSender @Inject constructor(
     private val pageLoadedPixelDao: PageLoadedPixelDao,

@@ -19,10 +19,16 @@ package com.duckduckgo.app.browser
 import android.graphics.Bitmap
 import android.net.Uri
 import android.net.http.SslError
-import android.net.http.SslError.*
+import android.net.http.SslError.SSL_UNTRUSTED
 import android.os.Build
-import android.os.SystemClock
-import android.webkit.*
+import android.webkit.HttpAuthHandler
+import android.webkit.RenderProcessGoneDetail
+import android.webkit.SslErrorHandler
+import android.webkit.WebResourceError
+import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.annotation.UiThread
@@ -31,11 +37,9 @@ import androidx.core.net.toUri
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.PageLoadedPixelEntity
-import com.duckduckgo.app.anrs.store.ExceptionEntity
 import com.duckduckgo.app.browser.WebViewErrorResponse.BAD_URL
 import com.duckduckgo.app.browser.WebViewErrorResponse.CONNECTION
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
-import com.duckduckgo.app.browser.WebViewPixelName.WEB_PAGE_LOADED
 import com.duckduckgo.app.browser.WebViewPixelName.WEB_RENDERER_GONE_CRASH
 import com.duckduckgo.app.browser.WebViewPixelName.WEB_RENDERER_GONE_KILLED
 import com.duckduckgo.app.browser.certificates.rootstore.CertificateValidationState
@@ -48,7 +52,6 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.statistics.api.PixelSender
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.BrowserAutofill
@@ -62,7 +65,6 @@ import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.privacy.config.api.AmpLinks
-import io.reactivex.schedulers.Schedulers
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import java.net.URI
 import javax.inject.Inject
@@ -80,7 +82,7 @@ private val sites = listOf(
     "twitter.com",
     "wikipedia.org",
     "weather.com",
-    )
+)
 class BrowserWebViewClient @Inject constructor(
     private val webViewHttpAuthStore: WebViewHttpAuthStore,
     private val trustedCertificateStore: TrustedCertificateStore,
@@ -546,8 +548,8 @@ class BrowserWebViewClient @Inject constructor(
                             PageLoadedPixelEntity(
                                 elapsedTime = end - safeStart,
                                 webviewVersion = webViewVersionProvider.getMajorVersion(),
-                                appVersion = deviceInfo.appVersion
-                            )
+                                appVersion = deviceInfo.appVersion,
+                            ),
                         )
                     }
                     start = null
@@ -556,8 +558,6 @@ class BrowserWebViewClient @Inject constructor(
         }
     }
 }
-
-
 
 enum class WebViewPixelName(override val pixelName: String) : Pixel.PixelName {
     WEB_RENDERER_GONE_CRASH("m_web_view_renderer_gone_crash"),

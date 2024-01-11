@@ -622,8 +622,10 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
 
     private val MIGRATION_49_TO_50: Migration = object : Migration(49, 50) {
         override fun migrate(database: SupportSQLiteDatabase) {
-            database.execSQL("CREATE TABLE IF NOT EXISTS `page_loaded_pixel_entity` (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
-                "appVersion TEXT NOT NULL, elapsedTime INTEGER NOT NULL, webviewVersion TEXT NOT NULL)")
+            database.execSQL(
+                "CREATE TABLE IF NOT EXISTS `page_loaded_pixel_entity` (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                    "appVersion TEXT NOT NULL, elapsedTime INTEGER NOT NULL, webviewVersion TEXT NOT NULL)",
+            )
         }
     }
 
@@ -701,7 +703,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             MIGRATION_46_TO_47,
             MIGRATION_47_TO_48,
             MIGRATION_48_TO_49,
-            MIGRATION_49_TO_50
+            MIGRATION_49_TO_50,
         )
 
     @Deprecated(
