@@ -17,7 +17,6 @@
 package com.duckduckgo.savedsites.impl.sync
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesSyncPersisterAlgorithm
 import com.duckduckgo.sync.api.engine.SyncChangesResponse
 import com.duckduckgo.sync.api.engine.SyncDataValidationResult
@@ -37,7 +36,6 @@ import timber.log.Timber
 
 @ContributesMultibinding(scope = AppScope::class, boundType = SyncableDataPersister::class)
 class SavedSitesSyncPersister @Inject constructor(
-    private val savedSitesRepository: SavedSitesRepository,
     private val savedSitesSyncStore: SavedSitesSyncStore,
     private val savedSitesSyncRepository: SyncSavedSitesRepository,
     private val algorithm: SavedSitesSyncPersisterAlgorithm,
@@ -59,6 +57,7 @@ class SavedSitesSyncPersister @Inject constructor(
             savedSitesSyncState.onSuccess(changes)
             val result = process(changes, conflictResolution)
             Timber.d("Sync-Bookmarks: merging bookmarks finished with $result")
+
             result
         } else {
             Success(false)
@@ -92,7 +91,7 @@ class SavedSitesSyncPersister @Inject constructor(
 
             else -> {
                 // this is a 304 from the BE, we don't acknowledge the response
-                Success(false)
+                Success()
             }
         }
 

@@ -41,3 +41,21 @@ enum class SyncAttemptState {
     SUCCESS,
     FAIL,
 }
+
+@Entity(
+    tableName = "sync_api_errors",
+)
+data class SyncApiError(
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    val feature: String,
+    val errorType: SyncApiErrorType,
+    val count: Int,
+    val date: String = "", // YYYY-MM-dd format
+)
+
+enum class SyncApiErrorType {
+    OBJECT_LIMIT_EXCEEDED,
+    REQUEST_SIZE_LIMIT_EXCEEDED,
+    VALIDATION_ERROR,
+    TOO_MANY_REQUESTS,
+}

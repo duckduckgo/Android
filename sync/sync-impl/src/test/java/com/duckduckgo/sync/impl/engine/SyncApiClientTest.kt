@@ -25,7 +25,7 @@ import com.duckduckgo.sync.api.engine.SyncableType.CREDENTIALS
 import com.duckduckgo.sync.impl.API_CODE
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncApi
-import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.error.SyncApiErrorRecorder
 import com.duckduckgo.sync.store.SyncStore
 import junit.framework.Assert.assertEquals
 import junit.framework.Assert.assertTrue
@@ -35,13 +35,14 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 internal class SyncApiClientTest {
 
     private val syncStore: SyncStore = mock()
     private val syncApi: SyncApi = mock()
-    private val syncPixels: SyncPixels = mock()
+    private val syncApiErrorRecorder: SyncApiErrorRecorder = mock()
     private lateinit var apiClient: AppSyncApiClient
 
     private val patchAllError = Result.Error(-1, "Patch All Error")
@@ -50,7 +51,7 @@ internal class SyncApiClientTest {
 
     @Before
     fun before() {
-        apiClient = AppSyncApiClient(syncStore, syncApi, syncPixels)
+        apiClient = AppSyncApiClient(syncStore, syncApi, syncApiErrorRecorder)
     }
 
     @Test
@@ -60,6 +61,7 @@ internal class SyncApiClientTest {
         val result = apiClient.patch(SyncChangesRequest.empty())
 
         assertEquals(result, Result.Error(reason = "Token Empty"))
+        verifyNoInteractions(syncApiErrorRecorder)
     }
 
     @Test
@@ -69,6 +71,7 @@ internal class SyncApiClientTest {
         val result = apiClient.patch(SyncChangesRequest.empty())
 
         assertEquals(result, Result.Error(reason = "Changes Empty"))
+        verifyNoInteractions(syncApiErrorRecorder)
     }
 
     @Test
@@ -80,10 +83,11 @@ internal class SyncApiClientTest {
 
         val result = apiClient.patch(bookmarksChanges)
         assertTrue(result is Result.Success)
+        verifyNoInteractions(syncApiErrorRecorder)
     }
 
     @Test
-    fun whenPatchAndBookmarkChangesThenApiFails() {
+    fun whenPatchAndBookmarkChangesThenApiFailsAndApiErrorIsRecorded() {
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "data_sync_sent_bookmarks.json")
         val bookmarksChanges = SyncChangesRequest(BOOKMARKS, updatesJSON, FirstSync)
         whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
@@ -91,6 +95,7 @@ internal class SyncApiClientTest {
 
         val result = apiClient.patch(bookmarksChanges)
         assertTrue(result is Result.Error)
+        verify(syncApiErrorRecorder).record(BOOKMARKS, patchAllError)
     }
 
     @Test
@@ -109,6 +114,7 @@ internal class SyncApiClientTest {
         val result = apiClient.get(BOOKMARKS, "")
 
         assertEquals(result, Result.Error(reason = "Token Empty"))
+        verifyNoInteractions(syncApiErrorRecorder)
     }
 
     @Test
@@ -118,43 +124,46 @@ internal class SyncApiClientTest {
         val result = apiClient.get(CREDENTIALS, "")
 
         assertEquals(result, Result.Error(reason = "Token Empty"))
+        verifyNoInteractions(syncApiErrorRecorder)
     }
 
     @Test
-    fun whenGetBookmarksAndApiFailsThenResultIsError() {
+    fun whenGetBookmarksAndApiFailsThenResultIsErrorAndErrorIsRecorded() {
         whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
         whenever(syncApi.getBookmarks(any(), any())).thenReturn(getAllError)
 
         val result = apiClient.get(BOOKMARKS, "")
         assertTrue(result is Result.Error)
+        verify(syncApiErrorRecorder).record(BOOKMARKS, getAllError)
     }
 
     @Test
-    fun whenGetCredentialsAndApiFailsThenResultIsError() {
+    fun whenGetCredentialsAndApiFailsThenResultIsErrorAndErrorIsRecorded() {
         whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
         whenever(syncApi.getCredentials(any(), any())).thenReturn(getAllError)
 
         val result = apiClient.get(CREDENTIALS, "")
         assertTrue(result is Result.Error)
+        verify(syncApiErrorRecorder).record(CREDENTIALS, getAllError)
     }
 
     @Test
-    fun whenGetBookmarksAndApiCountLimitFailsThenResultIsError() {
+    fun whenGetBookmarksAndApiCountLimitFailsThenResultIsErrorAndErrorIsRecorded() {
         whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
         whenever(syncApi.getBookmarks(any(), any())).thenReturn(getCountLimitError)
 
         val result = apiClient.get(BOOKMARKS, "")
-        verify(syncPixels).fireCountLimitPixel(BOOKMARKS.toString())
         assertTrue(result is Result.Error)
+        verify(syncApiErrorRecorder).record(BOOKMARKS, getCountLimitError)
     }
 
     @Test
-    fun whenGetCredentialsAndApiCountLimitFailsThenResultIsError() {
+    fun whenGetCredentialsAndApiCountLimitFailsThenResultIsErrorAndErrorIsRecorded() {
         whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
         whenever(syncApi.getCredentials(any(), any())).thenReturn(getCountLimitError)
 
         val result = apiClient.get(CREDENTIALS, "")
-        verify(syncPixels).fireCountLimitPixel(CREDENTIALS.toString())
         assertTrue(result is Result.Error)
+        verify(syncApiErrorRecorder).record(CREDENTIALS, getCountLimitError)
     }
 }

@@ -80,6 +80,7 @@ sealed class SyncMergeResult {
 
     data class Success(
         val orphans: Boolean = false,
+        val timestampConflict: Boolean = false,
     ) : SyncMergeResult()
 
     data class Error(

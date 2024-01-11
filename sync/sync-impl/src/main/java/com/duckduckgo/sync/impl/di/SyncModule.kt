@@ -27,6 +27,8 @@ import com.duckduckgo.sync.impl.AppQREncoder
 import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.engine.AppSyncStateRepository
 import com.duckduckgo.sync.impl.engine.SyncStateRepository
+import com.duckduckgo.sync.impl.error.RealSyncApiErrorRepository
+import com.duckduckgo.sync.impl.error.SyncApiErrorRepository
 import com.duckduckgo.sync.impl.internal.AppSyncInternalEnvDataStore
 import com.duckduckgo.sync.impl.internal.SyncInternalEnvDataStore
 import com.duckduckgo.sync.impl.stats.RealSyncStatsRepository
@@ -100,10 +102,16 @@ object SyncStoreModule {
     }
 
     @Provides
+    fun provideSyncApiErrorRepository(syncDatabase: SyncDatabase): SyncApiErrorRepository {
+        return RealSyncApiErrorRepository(syncDatabase.syncApiErrorsDao())
+    }
+
+    @Provides
     @SingleInstanceIn(AppScope::class)
     fun provideSyncStatsRepository(
         syncStateRepository: SyncStateRepository,
+        syncApiErrorRepository: SyncApiErrorRepository,
     ): SyncStatsRepository {
-        return RealSyncStatsRepository(syncStateRepository)
+        return RealSyncStatsRepository(syncStateRepository, syncApiErrorRepository)
     }
 }

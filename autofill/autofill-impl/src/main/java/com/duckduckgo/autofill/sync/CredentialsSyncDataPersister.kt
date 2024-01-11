@@ -122,7 +122,10 @@ class CredentialsSyncDataPersister @Inject constructor(
             Timber.d("Sync-autofill-Persist: merging completed, no entries to merge")
             Success(false)
         } else {
-            strategies[conflictResolution]?.processEntries(credentials, credentialsSyncStore.clientModifiedSince)
+            strategies[conflictResolution]?.processEntries(
+                credentials,
+                credentialsSyncStore.clientModifiedSince,
+            )
                 ?: SyncMergeResult.Error(
                     reason = "Merge Strategy not found",
                 )
