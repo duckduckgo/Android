@@ -21,6 +21,7 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_DECLINE_PR
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_DECLINE_PROMPT_TO_DISABLE_AUTOFILL_SHOWN
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_ENABLED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_OVERLAPPING_DIALOG
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_PASSWORD_GENERATION_ACCEPTED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_PASSWORD_GENERATION_PROMPT_DISMISSED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_PASSWORD_GENERATION_PROMPT_SHOWN
@@ -118,6 +119,8 @@ class AutofillPixelInterceptor @Inject constructor(
 
             MENU_ACTION_AUTOFILL_PRESSED,
             SETTINGS_AUTOFILL_MANAGEMENT_OPENED,
+
+            AUTOFILL_OVERLAPPING_DIALOG,
         )
     }
 }
