@@ -23,6 +23,7 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.BookmarkFolderItem
 import com.duckduckgo.savedsites.api.models.FolderBranch
+import com.duckduckgo.savedsites.api.models.FolderTreeItem
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
@@ -66,15 +67,17 @@ class RealSavedSitesRepository(
             .flowOn(dispatcherProvider.io())
     }
 
-    override fun getFolderContentSync(folderId: String): List<Any> {
+    override fun getFolderTreeItems(folderId: String): List<FolderTreeItem> {
         val entities = savedSitesEntitiesDao.entitiesInFolderSync(folderId)
-        val combinedList = mutableListOf<Any>()
+        val combinedList = mutableListOf<FolderTreeItem>()
 
         entities.forEach { entity ->
             if (entity.type == FOLDER) {
-                combinedList.add(entity.mapToBookmarkFolder(folderId))
+                val item = entity.mapToBookmarkFolder(folderId)
+                combinedList.add(FolderTreeItem(item.id, item.name, item.parentId, null))
             } else {
-                combinedList.add(entity.mapToBookmark(folderId))
+                val item = entity.mapToBookmark(folderId)
+                combinedList.add(FolderTreeItem(item.id, item.title, item.parentId, item.url))
             }
         }
         return combinedList
