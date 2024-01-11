@@ -747,35 +747,7 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenPageFinishesAfterStartingThenPixelIsFired() {
-        val mockWebView = getImmediatelyInvokedMockWebView()
-        whenever(mockWebView.progress).thenReturn(100)
-        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
-        testee.onPageStarted(mockWebView, WIKIPEDIA_URL, null)
-        testee.onPageFinished(mockWebView, WIKIPEDIA_URL)
-        verify(pageLoadedPixelDao).add(any())
-    }
-
-    @Test
-    fun whenPageFinishesAfterStartingAndPageAboutBlankThenPixelIsNotFired() {
-        val mockWebView = getImmediatelyInvokedMockWebView()
-        whenever(mockWebView.progress).thenReturn(100)
-        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
-        testee.onPageStarted(mockWebView, "about:blank", null)
-        testee.onPageFinished(mockWebView, "about:blank")
-        verify(pageLoadedPixelDao, never()).add(any())
-    }
-
-    @Test
-    fun whenPageFinishesAfterStartingAndProgressIsNot100ThenPixelIsNotFired() {
-        val mockWebView = getImmediatelyInvokedMockWebView()
-        testee.onPageStarted(mockWebView, WIKIPEDIA_URL, null)
-        testee.onPageFinished(mockWebView, WIKIPEDIA_URL)
-        verify(pageLoadedPixelDao, never()).add(any())
-    }
-
-    @Test
-    fun whenPageFinishesTotalPageLoadTimeIsLoaded() {
+    fun whenPageFinishesThenPixelIsAddedWithTotalPageLoadTime() {
         val mockWebView = getImmediatelyInvokedMockWebView()
         whenever(mockWebView.progress).thenReturn(100)
         whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
@@ -788,7 +760,27 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenPageStartedMoreThanOneStartTimeIsNotUpdated() {
+    fun whenPageFinishesAfterStartingAndPageAboutBlankThenPixelIsNotAdded() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.progress).thenReturn(100)
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+        testee.onPageStarted(mockWebView, "about:blank", null)
+        testee.onPageFinished(mockWebView, "about:blank")
+        verify(pageLoadedPixelDao, never()).add(any())
+    }
+
+    @Test
+    fun whenPageFinishesAfterStartingAndProgressIsNot100ThenPixelIsNotAdded() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        testee.onPageStarted(mockWebView, WIKIPEDIA_URL, null)
+        testee.onPageFinished(mockWebView, WIKIPEDIA_URL)
+        verify(pageLoadedPixelDao, never()).add(any())
+    }
+
+
+
+    @Test
+    fun whenPageStartedMoreThanOnceThenStartTimeIsNotUpdated() {
         val mockWebView = getImmediatelyInvokedMockWebView()
         whenever(mockWebView.progress).thenReturn(100)
         whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
