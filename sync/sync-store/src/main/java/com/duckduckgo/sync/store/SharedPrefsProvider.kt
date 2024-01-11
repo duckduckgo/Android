@@ -38,7 +38,7 @@ class EncryptedSharedPrefsProvider(
                 EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
                 EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
             )
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             null
         }
     }
