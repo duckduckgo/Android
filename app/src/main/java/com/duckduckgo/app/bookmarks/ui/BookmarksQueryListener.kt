@@ -17,9 +17,10 @@
 package com.duckduckgo.app.bookmarks.ui
 
 import androidx.lifecycle.viewModelScope
+import com.duckduckgo.app.bookmarks.ui.BookmarksAdapter.BookmarkFolderItem
+import com.duckduckgo.app.bookmarks.ui.BookmarksAdapter.BookmarkItem
+import com.duckduckgo.app.bookmarks.ui.BookmarksAdapter.BookmarksItemTypes
 import com.duckduckgo.common.utils.ConflatedJob
-import com.duckduckgo.savedsites.api.models.BookmarkFolder
-import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import java.util.*
 import kotlinx.coroutines.delay
@@ -39,7 +40,7 @@ class BookmarksQueryListener(
                 searchQuery = newText,
             )
             val favorites = viewModel.viewState.value?.favorites
-            viewModel.viewState.value?.bookmarks?.let { bookmarks ->
+            viewModel.viewState.value?.bookmarkItems?.let { bookmarks ->
                 val filteredBookmarks = filterBookmarks(newText, bookmarks, favorites)
                 bookmarksAdapter.setItems(filteredBookmarks, false, true)
             }
@@ -52,29 +53,29 @@ class BookmarksQueryListener(
 
     private fun filterBookmarks(
         query: String,
-        bookmarks: List<Any>,
+        bookmarks: List<BookmarksItemTypes>,
         favorites: List<Favorite>?,
-    ): List<BookmarksAdapter.BookmarksItemTypes> {
+    ): List<BookmarksItemTypes> {
         val lowercaseQuery = query.lowercase(Locale.getDefault())
         return bookmarks.filter {
             when (it) {
-                is Bookmark -> {
-                    val lowercaseTitle = it.title.lowercase(Locale.getDefault())
-                    lowercaseTitle.contains(lowercaseQuery) || it.url.contains(lowercaseQuery)
+                is BookmarkItem -> {
+                    val lowercaseTitle = it.bookmark.title.lowercase(Locale.getDefault())
+                    lowercaseTitle.contains(lowercaseQuery) || it.bookmark.url.contains(lowercaseQuery)
                 }
-                is BookmarkFolder -> {
-                    val lowercaseTitle = it.name.lowercase(Locale.getDefault())
+                is BookmarkFolderItem -> {
+                    val lowercaseTitle = it.bookmarkFolder.name.lowercase(Locale.getDefault())
                     lowercaseTitle.contains(lowercaseQuery)
                 }
                 else -> false
             }
         }.map {
             when (it) {
-                is Bookmark -> {
-                    val isFavorite = favorites?.any { favorite -> favorite.id == it.id } ?: false
-                    BookmarksAdapter.BookmarkItem(it.copy(isFavorite = isFavorite))
+                is BookmarkItem -> {
+                    val isFavorite = favorites?.any { favorite -> favorite.id == it.bookmark.id } ?: false
+                    BookmarkItem(it.bookmark.copy(isFavorite = isFavorite))
                 }
-                is BookmarkFolder -> BookmarksAdapter.BookmarkFolderItem(it)
+                is BookmarkFolderItem -> it
                 else -> throw IllegalStateException("Unknown bookmarks item type")
             }
         }

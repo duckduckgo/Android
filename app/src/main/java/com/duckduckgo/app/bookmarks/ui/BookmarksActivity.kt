@@ -31,9 +31,6 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.bookmarks.ui.BookmarksAdapter.BookmarkFolderItem
-import com.duckduckgo.app.bookmarks.ui.BookmarksAdapter.BookmarkItem
-import com.duckduckgo.app.bookmarks.ui.BookmarksAdapter.BookmarksItemTypes
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFragment
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity.Companion.KEY_BOOKMARK_FOLDER_ID
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.EditBookmarkFolderDialogFragment
@@ -164,29 +161,10 @@ class BookmarksActivity : DuckDuckGoActivity() {
     private fun observeViewModel() {
         viewModel.viewState.observe(this) { viewState ->
             viewState?.let { state ->
-                val updatedBookmarks = state.bookmarks?.mapNotNull { bookmark ->
-                    when (bookmark) {
-                        is SavedSite.Bookmark -> {
-                            val isFavorite = state.favorites.any { favorite -> favorite.id == bookmark.id }
-                            BookmarkItem(
-                                bookmark.copy(isFavorite = isFavorite),
-                            )
-                        }
-                        is BookmarkFolder -> {
-                            BookmarkFolderItem(
-                                bookmark,
-                            )
-                        }
-                        else -> null
-                    }
-                }
-                var items: List<BookmarksItemTypes> = emptyList()
-                if (updatedBookmarks != null) {
-                    items = updatedBookmarks
-                }
+                val items = state.bookmarkItems ?: emptyList()
                 bookmarksAdapter.setItems(
                     items,
-                    updatedBookmarks != null && updatedBookmarks.isEmpty() && getParentFolderId() == SavedSitesNames.BOOKMARKS_ROOT,
+                    state.bookmarkItems != null && state.bookmarkItems.isEmpty() && getParentFolderId() == SavedSitesNames.BOOKMARKS_ROOT,
                     false,
                 )
                 setSearchMenuItemVisibility()
@@ -301,7 +279,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         searchMenuItem = menu.findItem(R.id.action_search)
         exportMenuItem = menu.findItem(R.id.bookmark_export)
-        if (viewModel.viewState.value?.bookmarks?.isEmpty() == true) {
+        if (viewModel.viewState.value?.bookmarkItems?.isEmpty() == true) {
             val textColorAttr = commonR.attr.daxColorTextDisabled
             val spannable = SpannableString(getString(R.string.exportBookmarksMenu))
             spannable.setSpan(ForegroundColorSpan(binding.root.context.getColorFromAttr(textColorAttr)), 0, spannable.length, 0)

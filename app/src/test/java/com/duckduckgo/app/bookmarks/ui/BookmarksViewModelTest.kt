@@ -71,7 +71,14 @@ class BookmarksViewModelTest {
     private val pixel: Pixel = mock()
 
     private val bookmark =
-        Bookmark(id = "bookmark1", title = "title", url = "www.example.com", parentId = SavedSitesNames.BOOKMARKS_ROOT, "timestamp")
+        Bookmark(
+            id = "bookmark1",
+            title = "title",
+            url = "www.example.com",
+            parentId = SavedSitesNames.BOOKMARKS_ROOT,
+            "timestamp",
+            isFavorite = true,
+        )
     private val favorite = Favorite(id = "bookmark1", title = "title", url = "www.example.com", position = 0, lastModified = "timestamp")
     private val bookmarkFolder = BookmarkFolder(id = "folder1", name = "folder", parentId = SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp")
     private val bookmarkFolderItem = BookmarkFolderItem(0, bookmarkFolder, true)
@@ -224,11 +231,14 @@ class BookmarksViewModelTest {
 
         verify(viewStateObserver, times(3)).onChanged(viewStateCaptor.capture())
 
-        assertEquals(null, viewStateCaptor.allValues[0].bookmarks)
+        assertEquals(null, viewStateCaptor.allValues[0].bookmarkItems)
         assertEquals(false, viewStateCaptor.allValues[0].enableSearch)
 
         assertEquals(listOf(favorite), viewStateCaptor.allValues[1].favorites)
-        assertEquals(listOf(bookmark, bookmarkFolder, bookmarkFolder, bookmarkFolder), viewStateCaptor.allValues[1].bookmarks)
+        assertEquals(bookmark, (viewStateCaptor.allValues[1].bookmarkItems!![0] as BookmarksAdapter.BookmarkItem).bookmark)
+        assertEquals(bookmarkFolder, (viewStateCaptor.allValues[1].bookmarkItems!![1] as BookmarksAdapter.BookmarkFolderItem).bookmarkFolder)
+        assertEquals(bookmarkFolder, (viewStateCaptor.allValues[1].bookmarkItems!![2] as BookmarksAdapter.BookmarkFolderItem).bookmarkFolder)
+        assertEquals(bookmarkFolder, (viewStateCaptor.allValues[1].bookmarkItems!![3] as BookmarksAdapter.BookmarkFolderItem).bookmarkFolder)
         assertEquals(false, viewStateCaptor.allValues[1].enableSearch)
     }
 
@@ -246,11 +256,15 @@ class BookmarksViewModelTest {
 
         verify(viewStateObserver, times(3)).onChanged(viewStateCaptor.capture())
 
-        assertEquals(null, viewStateCaptor.allValues[0].bookmarks)
+        assertEquals(null, viewStateCaptor.allValues[0].bookmarkItems)
         assertEquals(false, viewStateCaptor.allValues[0].enableSearch)
 
         assertEquals(listOf(favorite), viewStateCaptor.allValues[2].favorites)
-        assertEquals(listOf(bookmark, bookmark, bookmark, bookmarkFolder, bookmarkFolder), viewStateCaptor.allValues[2].bookmarks)
+        assertEquals(bookmark, (viewStateCaptor.allValues[2].bookmarkItems!![0] as BookmarksAdapter.BookmarkItem).bookmark)
+        assertEquals(bookmark, (viewStateCaptor.allValues[2].bookmarkItems!![1] as BookmarksAdapter.BookmarkItem).bookmark)
+        assertEquals(bookmark, (viewStateCaptor.allValues[2].bookmarkItems!![2] as BookmarksAdapter.BookmarkItem).bookmark)
+        assertEquals(bookmarkFolder, (viewStateCaptor.allValues[2].bookmarkItems!![3] as BookmarksAdapter.BookmarkFolderItem).bookmarkFolder)
+        assertEquals(bookmarkFolder, (viewStateCaptor.allValues[2].bookmarkItems!![4] as BookmarksAdapter.BookmarkFolderItem).bookmarkFolder)
         assertEquals(true, viewStateCaptor.allValues[2].enableSearch)
     }
 

@@ -19,6 +19,9 @@ package com.duckduckgo.app.bookmarks.ui
 import android.net.Uri
 import androidx.lifecycle.*
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.bookmarks.ui.BookmarksAdapter.BookmarkFolderItem
+import com.duckduckgo.app.bookmarks.ui.BookmarksAdapter.BookmarkItem
+import com.duckduckgo.app.bookmarks.ui.BookmarksAdapter.BookmarksItemTypes
 import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.*
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.DeleteBookmarkListener
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.EditSavedSiteListener
@@ -63,7 +66,7 @@ class BookmarksViewModel @Inject constructor(
 
     data class ViewState(
         val enableSearch: Boolean = false,
-        val bookmarks: List<Any>? = null,
+        val bookmarkItems: List<BookmarksItemTypes>? = null,
         val favorites: List<Favorite> = emptyList(),
         val searchQuery: String = "",
     )
@@ -295,12 +298,23 @@ class BookmarksViewModel @Inject constructor(
 
     private fun onSavedSitesItemsChanged(
         favorites: List<Favorite>,
-        bookmarks: List<Any>,
+        bookmarksAndFolders: List<Any>,
     ) {
+        val bookmarkItems = bookmarksAndFolders.mapNotNull { bookmark ->
+            when (bookmark) {
+                is Bookmark -> {
+                    val isFavorite = favorites.any { favorite -> favorite.id == bookmark.id }
+                    BookmarkItem(bookmark.copy(isFavorite = isFavorite))
+                }
+                is BookmarkFolder -> BookmarkFolderItem(bookmark)
+                else -> null
+            }
+        }
+
         viewState.value = viewState.value?.copy(
             favorites = favorites,
-            bookmarks = bookmarks,
-            enableSearch = bookmarks.size >= MIN_ITEMS_FOR_SEARCH,
+            bookmarkItems = bookmarkItems,
+            enableSearch = bookmarkItems.size >= MIN_ITEMS_FOR_SEARCH,
         )
     }
 
