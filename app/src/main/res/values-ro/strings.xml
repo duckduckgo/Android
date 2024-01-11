@@ -792,4 +792,23 @@
     <string name="settingsAutofillLoginsSetting">Parole</string>
     <string name="autofillLoginSavedSnackbarMessage">Parolă salvată</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Parolă actualizată</string>
+
+    <!-- Bookmarks -->
+    <string name="searchBookmarks">Caută marcaje</string>
+    <string name="deleteFolder" instruction="%1$s is the folder name">"Ștergi %1$s?"</string>
+    <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Ștergi marcajul %1$s?"</string>
+    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Marcaj adăugat în %1$s</string>
+    <string name="addToFavorites">Adaugă la preferințe</string>
+    <string name="editBookmark">Editează marcaj</string>
+    <string name="importBookmarksDescription">Dacă marcajele tale sunt salvate într-un alt browser, \nle poți importa în DuckDuckGo.</string>
+    <string name="importBookmarks">Importă marcaje</string>
+    <string name="noResultsFor" instruction="%1$s is the search term">Nu există rezultate pentru „%1$s”</string>
+    <string name="removeFromFavorites">Elimină din favorite</string>
+    <string name="addToFavoritesMenu">Adaugă la preferințe</string>
+    <plurals name="bookmarkFolderDeleteMessage">
+        <item quantity="one">Sigur vrei să ștergi acest folder și %1$d element?</item>
+        <item quantity="few">Sigur vrei să ștergi acest folder și %1$d elemente?</item>
+        <item quantity="other">Sigur vrei să ștergi acest folder și %1$d elemente?</item>
+    </plurals>
+    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Sigur dorești să ștergi marcajul pentru &lt;b&gt;%1$s&lt;/b&gt;?</string>
 </resources>
