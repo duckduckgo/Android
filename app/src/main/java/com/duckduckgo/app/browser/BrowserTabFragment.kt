@@ -2483,7 +2483,7 @@ class BrowserTabFragment :
             )
         bookmarksBottomSheetDialog?.show()
 
-        dismissHandler.postDelayed(dismissRunnable, 3500)
+        dismissHandler.postDelayed(dismissRunnable, BOOKMARKS_BOTTOM_SHEET_DURATION)
     }
 
     private fun getBookmarksBottomSheetTitle(bookmarkFolder: BookmarkFolder?): SpannableString {
@@ -3057,6 +3057,8 @@ class BrowserTabFragment :
         private const val QUICK_ACCESS_GRID_MAX_COLUMNS = 6
 
         private const val COOKIES_ANIMATION_DELAY = 400L
+
+        private const val BOOKMARKS_BOTTOM_SHEET_DURATION = 3500L
 
         fun newInstance(
             tabId: String,
