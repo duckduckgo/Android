@@ -32,6 +32,7 @@ import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DONT_SHOW_AGAIN_CLICKED
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupViewState
 import com.duckduckgo.privacyprotectionspopup.impl.db.PopupDismissDomainRepository
+import com.duckduckgo.privacyprotectionspopup.impl.store.PrivacyProtectionsPopupData
 import com.duckduckgo.privacyprotectionspopup.impl.store.PrivacyProtectionsPopupDataStore
 import java.time.Duration
 import java.time.Instant
@@ -76,7 +77,11 @@ class PrivacyProtectionsPopupManagerImplTest {
     private val subject = PrivacyProtectionsPopupManagerImpl(
         appCoroutineScope = coroutineRule.testScope,
         featureFlag = featureFlag,
-        protectionsStateProvider = protectionsStateProvider,
+        dataProvider = PrivacyProtectionsPopupManagerDataProviderImpl(
+            protectionsStateProvider = protectionsStateProvider,
+            popupDismissDomainRepository = popupDismissDomainRepository,
+            dataStore = dataStore,
+        ),
         timeProvider = timeProvider,
         popupDismissDomainRepository = popupDismissDomainRepository,
         userAllowListRepository = userAllowListRepository,
@@ -377,7 +382,7 @@ class PrivacyProtectionsPopupManagerImplTest {
             subject.onPageRefreshTriggeredByUser()
 
             assertPopupVisible(visible = true)
-            assertEquals(1, dataStore.getPopupTriggerCount().first())
+            assertEquals(1, dataStore.getPopupTriggerCount())
 
             subject.onUiEvent(DISMISSED)
 
@@ -387,7 +392,7 @@ class PrivacyProtectionsPopupManagerImplTest {
             subject.onPageRefreshTriggeredByUser()
 
             assertPopupVisible(visible = true)
-            assertEquals(2, dataStore.getPopupTriggerCount().first())
+            assertEquals(2, dataStore.getPopupTriggerCount())
         }
     }
 
@@ -428,7 +433,7 @@ class PrivacyProtectionsPopupManagerImplTest {
             subject.onUiEvent(DONT_SHOW_AGAIN_CLICKED)
 
             assertPopupVisible(visible = false)
-            assertTrue(dataStore.getDoNotShowAgainClicked().first())
+            assertTrue(dataStore.getDoNotShowAgainClicked())
 
             subject.onPageLoaded(url = "https://www.example2.com", httpErrorCodes = emptyList(), hasBrowserError = false)
             subject.onPageRefreshTriggeredByUser()
@@ -506,26 +511,33 @@ private class FakePopupDismissDomainRepository : PopupDismissDomainRepository {
 
 private class FakePrivacyProtectionsPopupDataStore : PrivacyProtectionsPopupDataStore {
 
-    private val timestamp = MutableStateFlow<Instant?>(value = null)
-    private val triggerCount = MutableStateFlow(value = 0)
-    private val doNotShowAgainClicked = MutableStateFlow(value = false)
+    override val data = MutableStateFlow(
+        PrivacyProtectionsPopupData(
+            toggleUsedAt = null,
+            popupTriggerCount = 0,
+            doNotShowAgainClicked = false,
+        ),
+    )
 
-    override fun getToggleUsageTimestamp(): Flow<Instant?> = timestamp
+    override suspend fun getToggleUsageTimestamp(): Instant? =
+        data.first().toggleUsedAt
 
     override suspend fun setToggleUsageTimestamp(timestamp: Instant) {
-        this.timestamp.value = timestamp
+        data.update { it.copy(toggleUsedAt = timestamp) }
     }
 
-    override fun getPopupTriggerCount(): Flow<Int> = triggerCount
+    override suspend fun getPopupTriggerCount(): Int =
+        data.first().popupTriggerCount
 
     override suspend fun setPopupTriggerCount(count: Int) {
-        triggerCount.value = count
+        data.update { it.copy(popupTriggerCount = count) }
     }
 
-    override fun getDoNotShowAgainClicked(): Flow<Boolean> = doNotShowAgainClicked
+    override suspend fun getDoNotShowAgainClicked(): Boolean =
+        data.first().doNotShowAgainClicked
 
     override suspend fun setDoNotShowAgainClicked(clicked: Boolean) {
-        doNotShowAgainClicked.value = clicked
+        data.update { it.copy(doNotShowAgainClicked = clicked) }
     }
 }
 

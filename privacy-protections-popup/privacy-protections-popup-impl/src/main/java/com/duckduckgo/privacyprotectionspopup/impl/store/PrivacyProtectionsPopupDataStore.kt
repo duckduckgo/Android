@@ -31,49 +31,58 @@ import java.time.Instant
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 interface PrivacyProtectionsPopupDataStore {
-    fun getToggleUsageTimestamp(): Flow<Instant?>
+    val data: Flow<PrivacyProtectionsPopupData>
+
+    suspend fun getToggleUsageTimestamp(): Instant?
     suspend fun setToggleUsageTimestamp(timestamp: Instant)
-    fun getPopupTriggerCount(): Flow<Int>
+    suspend fun getPopupTriggerCount(): Int
     suspend fun setPopupTriggerCount(count: Int)
-    fun getDoNotShowAgainClicked(): Flow<Boolean>
+    suspend fun getDoNotShowAgainClicked(): Boolean
     suspend fun setDoNotShowAgainClicked(clicked: Boolean)
 }
+
+data class PrivacyProtectionsPopupData(
+    val toggleUsedAt: Instant?,
+    val popupTriggerCount: Int,
+    val doNotShowAgainClicked: Boolean,
+)
 
 @ContributesBinding(AppScope::class)
 class PrivacyProtectionsPopupDataStoreImpl @Inject constructor(
     @PrivacyProtectionsPopup private val store: DataStore<Preferences>,
 ) : PrivacyProtectionsPopupDataStore {
 
-    override fun getToggleUsageTimestamp(): Flow<Instant?> =
-        store.data
+    override val data: Flow<PrivacyProtectionsPopupData>
+        get() = store.data
             .map { prefs ->
-                prefs[TOGGLE_USAGE_TIMESTAMP]
-                    ?.let { Instant.ofEpochMilli(it) }
+                PrivacyProtectionsPopupData(
+                    toggleUsedAt = prefs[TOGGLE_USAGE_TIMESTAMP]?.let { Instant.ofEpochMilli(it) },
+                    popupTriggerCount = prefs[POPUP_TRIGGER_COUNT] ?: 0,
+                    doNotShowAgainClicked = prefs[DO_NOT_SHOW_AGAIN_CLICKED] == true,
+                )
             }
             .distinctUntilChanged()
 
+    override suspend fun getToggleUsageTimestamp(): Instant? =
+        data.first().toggleUsedAt
+
     override suspend fun setToggleUsageTimestamp(timestamp: Instant) {
-        store.edit { prefs ->
-            prefs[TOGGLE_USAGE_TIMESTAMP] = timestamp.toEpochMilli()
-        }
+        store.edit { prefs -> prefs[TOGGLE_USAGE_TIMESTAMP] = timestamp.toEpochMilli() }
     }
 
-    override fun getPopupTriggerCount(): Flow<Int> =
-        store.data
-            .map { prefs -> prefs[POPUP_TRIGGER_COUNT] ?: 0 }
-            .distinctUntilChanged()
+    override suspend fun getPopupTriggerCount(): Int =
+        data.first().popupTriggerCount
 
     override suspend fun setPopupTriggerCount(count: Int) {
         store.edit { prefs -> prefs[POPUP_TRIGGER_COUNT] = count }
     }
 
-    override fun getDoNotShowAgainClicked(): Flow<Boolean> =
-        store.data
-            .map { prefs -> prefs[DO_NOT_SHOW_AGAIN_CLICKED] == true }
-            .distinctUntilChanged()
+    override suspend fun getDoNotShowAgainClicked(): Boolean =
+        data.first().doNotShowAgainClicked
 
     override suspend fun setDoNotShowAgainClicked(clicked: Boolean) {
         store.edit { prefs -> prefs[DO_NOT_SHOW_AGAIN_CLICKED] = clicked }
