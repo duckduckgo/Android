@@ -787,4 +787,22 @@
     <string name="settingsAutofillLoginsSetting">Passwords</string>
     <string name="autofillLoginSavedSnackbarMessage">Password saved</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Password updated</string>
+
+    <!-- Bookmarks -->
+    <string name="searchBookmarks">Search Bookmarks</string>
+    <string name="deleteFolder" instruction="%1$s is the folder name">"Delete %1$s?"</string>
+    <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Delete %1$s bookmark?"</string>
+    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Bookmark added in %1$s</string>
+    <string name="addToFavorites">Add to Favorites</string>
+    <string name="editBookmark">Edit Bookmark</string>
+    <string name="importBookmarksDescription">If your bookmarks are saved in another browser, you\ncan import them into DuckDuckGo.</string>
+    <string name="importBookmarks">Import Bookmarks</string>
+    <string name="noResultsFor" instruction="%1$s is the search term">No results for \'%1$s\'</string>
+    <string name="removeFromFavorites">Remove From Favorites</string>
+    <string name="addToFavoritesMenu">Add to Favorites</string>
+    <plurals name="bookmarkFolderDeleteMessage">
+        <item quantity="one" instruction="%1$d is the number of items inside the folder">Are you sure you want to delete this folder and %1$d item?</item>
+        <item quantity="other" instruction="%1$d is the number of items inside the folder">Are you sure you want to delete this folder and %1$d items?</item>
+    </plurals>
+    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Are you sure you want to delete your bookmark for &lt;b>%1$s&lt;/b>?</string>
 </resources>
