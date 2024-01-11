@@ -31,7 +31,6 @@ dependencies {
     implementation project(path: ':common-utils')
     implementation project(path: ':experiments-api')
     implementation project(path: ':statistics')
-    implementation project(path: ':backup-agent-api')
     implementation project(path: ':app-build-config-api')
 
     // Room

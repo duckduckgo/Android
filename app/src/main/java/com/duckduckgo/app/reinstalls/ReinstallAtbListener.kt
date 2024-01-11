@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,26 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.backup.agent.impl
+package com.duckduckgo.app.reinstalls
 
-import com.duckduckgo.backup.agent.api.BackupAgentManager
+import com.duckduckgo.app.statistics.AtbInitializerListener
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
+import dagger.SingleInstanceIn
 import javax.inject.Inject
 
-@ContributesBinding(AppScope::class)
-class BackupAgentManagerImpl @Inject constructor() : BackupAgentManager {
-
-    override fun isReinstallUser(variantKey: String?): Boolean {
-        return variantKey == REINSTALL_VARIANT
+@SingleInstanceIn(AppScope::class)
+@ContributesMultibinding(AppScope::class)
+class ReinstallAtbListener @Inject constructor(
+    private val backupDataStore: BackupServiceDataStore,
+) : AtbInitializerListener {
+    override suspend fun beforeAtbInit() {
+        backupDataStore.clearBackupPreferences()
     }
 
+    override fun beforeAtbInitTimeoutMillis(): Long = MAX_REINSTALL_WAIT_TIME_MS
+
     companion object {
-        const val REINSTALL_VARIANT = "ru"
+        private const val MAX_REINSTALL_WAIT_TIME_MS = 1_500L
     }
 }
