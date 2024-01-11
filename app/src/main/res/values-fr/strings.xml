@@ -788,4 +788,22 @@
     <string name="settingsAutofillLoginsSetting">Mots de passe</string>
     <string name="autofillLoginSavedSnackbarMessage">Le mot de passe a été enregistré</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Le mot de passe a été modifié</string>
+
+    <!-- Bookmarks -->
+    <string name="searchBookmarks">Rechercher des favoris</string>
+    <string name="deleteFolder" instruction="%1$s is the folder name">"Supprimer %1$s ?"</string>
+    <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Supprimer le favori %1$s ?"</string>
+    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Favori ajouté dans %1$s</string>
+    <string name="addToFavorites">Ajouter aux favoris</string>
+    <string name="editBookmark">Modifier le signet</string>
+    <string name="importBookmarksDescription">Si vos favoris sont enregistrés dans un autre navigateur, vous\npouvez les importer dans DuckDuckGo.</string>
+    <string name="importBookmarks">Importer des favoris</string>
+    <string name="noResultsFor" instruction="%1$s is the search term">Aucun résultat pour « %1$s »</string>
+    <string name="removeFromFavorites">Supprimer des favoris</string>
+    <string name="addToFavoritesMenu">Ajouter aux favoris</string>
+    <plurals name="bookmarkFolderDeleteMessage">
+        <item quantity="one">Voulez-vous vraiment supprimer ce dossier et %1$d élément ?</item>
+        <item quantity="other">Voulez-vous vraiment supprimer ce dossier et %1$d éléments ?</item>
+    </plurals>
+    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Voulez-vous vraiment supprimer votre favori pour &lt;b&gt;%1$s&lt;/b&gt; ?</string>
 </resources>
