@@ -22,8 +22,7 @@ import androidx.annotation.VisibleForTesting
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.savedsites.api.SavedSitesRepository
-import com.duckduckgo.savedsites.api.models.BookmarkFolder
-import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
+import com.duckduckgo.savedsites.api.models.FolderTreeItem
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.api.models.TreeNode
 import com.duckduckgo.savedsites.api.service.ExportSavedSitesResult
@@ -77,40 +76,29 @@ class RealSavedSitesExporter(
     }
 
     @VisibleForTesting
-    suspend fun getTreeFolderStructure(): TreeNode<FolderTreeItem> {
-        val node = TreeNode(FolderTreeItem(SavedSitesNames.BOOKMARKS_ROOT, RealSavedSitesParser.BOOKMARKS_FOLDER, "", null, 0))
+    fun getTreeFolderStructure(): TreeNode<FolderTreeItem> {
+        val node = TreeNode(FolderTreeItem(SavedSitesNames.BOOKMARKS_ROOT, RealSavedSitesParser.BOOKMARKS_FOLDER, "", null))
         populateNode(node, SavedSitesNames.BOOKMARKS_ROOT, 1)
         return node
     }
 
-    private suspend fun populateNode(
+    private fun populateNode(
         parentNode: TreeNode<FolderTreeItem>,
         parentId: String,
         currentDepth: Int,
     ) {
-        val combinedContent = savedSitesRepository.getFolderContentSync(parentId)
+        val combinedContent = savedSitesRepository.getFolderTreeItems(parentId)
         combinedContent.forEach { item ->
-            when (item) {
-                is BookmarkFolder -> {
-                    val childNode = TreeNode(FolderTreeItem(item.id, item.name, item.parentId, null, currentDepth))
-                    parentNode.add(childNode)
-                    populateNode(childNode, item.id, currentDepth + 1)
-                }
-                is Bookmark -> {
-                    val childNode = TreeNode(FolderTreeItem(item.id, item.title, item.parentId, item.url, currentDepth))
-                    parentNode.add(childNode)
-                }
+            if (item.url == null) {
+                val childNode = TreeNode(item.copy(depth = currentDepth))
+                parentNode.add(childNode)
+                populateNode(childNode, item.id, currentDepth + 1)
+            } else {
+                val childNode = TreeNode(item.copy(depth = currentDepth))
+                parentNode.add(childNode)
             }
         }
     }
 }
-
-data class FolderTreeItem(
-    val id: String,
-    val name: String,
-    val parentId: String,
-    val url: String?,
-    val depth: Int,
-)
 
 typealias FolderTree = TreeNode<FolderTreeItem>

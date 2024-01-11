@@ -92,7 +92,7 @@ class SavedSitesRepositoryTest {
 
     @Test
     fun whenNoDataThenFolderContentisEmpty() = runTest {
-        assert(repository.getFolderContentSync(SavedSitesNames.BOOKMARKS_ROOT).isEmpty())
+        assert(repository.getFolderTreeItems(SavedSitesNames.BOOKMARKS_ROOT).isEmpty())
     }
 
     @Test
@@ -104,7 +104,7 @@ class SavedSitesRepositoryTest {
         val relation = givenFolderWithContent(SavedSitesNames.BOOKMARKS_ROOT, entities)
         savedSitesRelationsDao.insertList(relation)
 
-        assert(repository.getFolderContentSync(SavedSitesNames.BOOKMARKS_ROOT).size == totalBookmarks)
+        assert(repository.getFolderTreeItems(SavedSitesNames.BOOKMARKS_ROOT).size == totalBookmarks)
     }
 
     @Test
@@ -121,8 +121,10 @@ class SavedSitesRepositoryTest {
         val relation = givenFolderWithContent(SavedSitesNames.BOOKMARKS_ROOT, entities.plus(folders))
         savedSitesRelationsDao.insertList(relation)
 
-        repository.getFolderContentSync(SavedSitesNames.BOOKMARKS_ROOT).let { result ->
+        repository.getFolderTreeItems(SavedSitesNames.BOOKMARKS_ROOT).let { result ->
             assert(result.size == totalBookmarks + totalFolders)
+            assert(result.filter { it.url != null }.size == totalBookmarks)
+            assert(result.filter { it.url == null }.size == totalFolders)
         }
     }
 
@@ -140,7 +142,7 @@ class SavedSitesRepositoryTest {
         val relation = givenFolderWithContent(SavedSitesNames.BOOKMARKS_ROOT, entities.plus(folders))
         savedSitesRelationsDao.insertList(relation)
 
-        assert(repository.getFolderContentSync("12").isEmpty())
+        assert(repository.getFolderTreeItems("12").isEmpty())
     }
 
     @Test
@@ -470,9 +472,9 @@ class SavedSitesRepositoryTest {
     @Test
     fun whenBookmarkAddedToRootThenGetFolderReturnsRootFolder() = runTest {
         val bookmark = repository.insertBookmark(title = "name", url = "foo.com")
-        repository.getFolderContentSync(bookmark.parentId).let { result ->
+        repository.getFolderTreeItems(bookmark.parentId).let { result ->
             Assert.assertTrue(result.size == 1)
-            Assert.assertTrue((result.first() as Bookmark).id == bookmark.id)
+            Assert.assertTrue(result.first().id == bookmark.id)
         }
     }
 
@@ -514,7 +516,7 @@ class SavedSitesRepositoryTest {
         val bookmarkTwo = repository.insertBookmark(title = "two", url = "footwo.com")
         repository.updateBookmark(bookmarkTwo.copy(parentId = folder.id), bookmarkTwo.parentId)
 
-        repository.getFolderContentSync(folder.id).let { result ->
+        repository.getFolderTreeItems(folder.id).let { result ->
             Assert.assertTrue(result.size == 2)
         }
     }
@@ -535,9 +537,11 @@ class SavedSitesRepositoryTest {
 
         repository.insert(BookmarkFolder(id = "folder3", name = "folder2", lastModified = "timestamp", parentId = "folder2"))
 
-        repository.getFolderContentSync(folder.id).let { result ->
+        repository.getFolderTreeItems(folder.id).let { result ->
             Assert.assertTrue(result.size == 3)
-            Assert.assertEquals((result[2] as BookmarkFolder).id, "folder3")
+            Assert.assertTrue(result.filter { it.url != null }.size == 2)
+            Assert.assertTrue(result.filter { it.url == null }.size == 1)
+            Assert.assertEquals(result[2].id, "folder3")
         }
     }
 
@@ -549,11 +553,11 @@ class SavedSitesRepositoryTest {
         val folderTwo =
             repository.insert(BookmarkFolder(id = "folder2", name = "folder2", lastModified = "timestamp", parentId = SavedSitesNames.BOOKMARKS_ROOT))
 
-        assertEquals(bookmark, repository.getFolderContentSync(SavedSitesNames.BOOKMARKS_ROOT).first())
+        assertEquals(bookmark.id, repository.getFolderTreeItems(SavedSitesNames.BOOKMARKS_ROOT).first().id)
 
         val updatedBookmark = bookmark.copy(parentId = folderTwo.id)
         repository.updateBookmark(updatedBookmark, bookmark.parentId)
-        assertTrue(repository.getFolderContentSync(SavedSitesNames.BOOKMARKS_ROOT).filterNot { it is BookmarkFolder }.isEmpty())
+        assertTrue(repository.getFolderTreeItems(SavedSitesNames.BOOKMARKS_ROOT).filterNot { it.url == null }.isEmpty())
     }
 
     @Test
@@ -818,14 +822,12 @@ class SavedSitesRepositoryTest {
 
         givenFolderWithEntities(parentFolder.id, totalBookmarks, totalFolders)
 
-        assert(repository.getFolderContentSync(parentFolder.id).size == 13)
+        assert(repository.getFolderTreeItems(SavedSitesNames.BOOKMARKS_ROOT).size == 1)
+        assert(repository.getFolderTreeItems(parentFolder.id).size == 13)
 
-        repository.getFolderContentSync(SavedSitesNames.BOOKMARKS_ROOT).let { result ->
-
-            val folder = result.first() as BookmarkFolder
-
-            assert(folder.numBookmarks == 10)
-            assert(folder.numFolders == 3)
+        repository.getFolderTreeItems(parentFolder.id).let { result ->
+            assert(result.filter { it.url != null }.size == 10)
+            assert(result.filter { it.url == null }.size == 3)
         }
     }
 

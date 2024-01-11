@@ -94,3 +94,14 @@ object SavedSitesNames {
     const val BOOKMARKS_NAME = "Bookmarks"
     const val BOOMARKS_ROOT_ID = 0L
 }
+
+/**
+ * Used to build up a folder tree of [Bookmark]s and [BookmarkFolder]s
+ */
+data class FolderTreeItem(
+    val id: String,
+    val name: String,
+    val parentId: String,
+    val url: String?,
+    val depth: Int = 0,
+)
