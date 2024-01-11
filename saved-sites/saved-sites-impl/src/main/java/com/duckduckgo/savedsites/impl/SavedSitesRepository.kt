@@ -83,29 +83,6 @@ class RealSavedSitesRepository(
     private fun mapEntity(
         entity: Entity,
         folderId: String,
-        bookmarks: MutableList<Bookmark>,
-        folders: MutableList<BookmarkFolder>,
-    ) {
-        if (entity.type == FOLDER) {
-            val numFolders = savedSitesRelationsDao.countEntitiesInFolder(entity.entityId, FOLDER)
-            val numBookmarks = savedSitesRelationsDao.countEntitiesInFolder(entity.entityId, BOOKMARK)
-            folders.add(BookmarkFolder(entity.entityId, entity.title, folderId, numBookmarks, numFolders, entity.lastModified, entity.deletedFlag()))
-        } else {
-            bookmarks.add(
-                Bookmark(
-                    id = entity.entityId,
-                    title = entity.title,
-                    url = entity.url.orEmpty(),
-                    parentId = folderId,
-                    lastModified = entity.lastModified,
-                ),
-            )
-        }
-    }
-
-    private fun mapEntity(
-        entity: Entity,
-        folderId: String,
         bookmarks: MutableList<Any>,
     ) {
         if (entity.type == FOLDER) {
