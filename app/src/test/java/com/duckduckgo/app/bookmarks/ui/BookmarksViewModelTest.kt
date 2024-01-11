@@ -19,7 +19,6 @@ package com.duckduckgo.app.bookmarks.ui
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -70,7 +69,6 @@ class BookmarksViewModelTest {
     private val savedSitesManager: SavedSitesManager = mock()
     private val syncEngine: SyncEngine = mock()
     private val pixel: Pixel = mock()
-    private val appDatabase: AppDatabase = mock()
 
     private val bookmark =
         Bookmark(id = "bookmark1", title = "title", url = "www.example.com", parentId = SavedSitesNames.BOOKMARKS_ROOT, "timestamp")
@@ -87,7 +85,6 @@ class BookmarksViewModelTest {
             syncEngine,
             coroutineRule.testDispatcherProvider,
             coroutineRule.testScope,
-            appDatabase,
         )
         model.viewState.observeForever(viewStateObserver)
         model.command.observeForever(commandObserver)

@@ -27,7 +27,6 @@ import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.EditBookmarkFolderDialogF
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.SingleLiveEvent
-import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -60,7 +59,6 @@ class BookmarksViewModel @Inject constructor(
     private val syncEngine: SyncEngine,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val appDatabase: AppDatabase,
 ) : EditSavedSiteListener, AddBookmarkFolderListener, EditBookmarkFolderListener, DeleteBookmarkListener, ViewModel() {
 
     data class ViewState(
