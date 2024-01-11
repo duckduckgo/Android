@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2021 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <!-- Sync Disabled messages -->
+    <string name="sync_flows_disabled"><b>Синхронизирането и архивирането не е достъпно</b>\nСъжаляваме, но функцията за синхронизиране и архивиране в момента не е достъпна. Моля, опитайте отново по-късно.</string>
+    <string name="sync_flows_disabled_new_version"><b>Синхронизирането и архивирането не е достъпно</b>\nСъжаляваме, но функцията за синхронизиране и архивиране вече не се предлага в тази версия на приложението. Моля, актуализирайте DuckDuckGo до най-новата версия, за да продължите.</string>
+    <string name="sync_create_account_disabled"><b>Синхронизирането и архивирането не е достъпно</b>\nСъжаляваме, но функцията за синхронизиране и архивиране в момента не е достъпна. Моля, опитайте отново по-късно.</string>
+    <string name="sync_create_account_disabled_new_version"><b>Синхронизирането и архивирането не е достъпно</b>\nСъжаляваме, но функцията за синхронизиране и архивиране вече не се предлага в тази версия на приложението. Моля, актуализирайте DuckDuckGo до най-новата версия, за да продължите.</string>
+    <string name="sync_disabled_authenticated_user"><b>Синхронизирането и архивирането е спряно</b>\nСъжаляваме, но функцията за синхронизиране и архивиране в момента не е достъпна. Моля, опитайте отново по-късно.</string>
+    <string name="sync_disabled_authenticated_user_new_version"><b>Синхронизирането и архивирането е спряно</b>\nСъжаляваме, но функцията за синхронизиране и архивиране вече не се предлага в тази версия на приложението. Моля, актуализирайте DuckDuckGo до най-новата версия, за да продължите.</string>
+    <string name="sync_paused_notification"><b>Синхронизирането и архивирането е спряно</b>\nСъжаляваме, но функцията за синхронизиране и архивиране в момента не е достъпна. Моля, опитайте отново по-късно.</string>
+
+    <!-- Settings screen -->
+    <string name="sync_screen_title">Синхронизиране и архивиране</string>
+    <string name="sync_setup_begin_syncing">Стартиране на синхронизиране</string>
+    <string name="sync_setup_with_another_device_cta_title">Синхронизиране с друго устройство</string>
+    <string name="sync_setup_with_another_device_cta_subtitle">Сигурно синхронизиране на отметките и паролите между отделни устройства.</string>
+    <string name="sync_off_hint">Данните Ви са изцяло криптирани и DuckDuckGo няма достъп до ключа за криптиране.</string>
+    <string name="sync_setup_single_device_title">Настройка на едно устройство</string>
+    <string name="sync_setup_single_recover_data_cta_title">Възстановяване на синхронизирани данни</string>
+    <string name="sync_setup_single_sync_this_device_cta_title">Синхронизиране и архивиране на това устройство</string>
+
+    <string name="sync_off_encrypted_hint">Данните Ви са изцяло криптирани и DuckDuckGo няма достъп до ключа за декриптиране.</string>
+
+    <!-- Setup screen -->
+    <string name="sync_enable_sync_title">Настройка на Синхронизиране и архивиране!</string>
+    <string name="sync_enable_sync_content">Вашите отметки и пароли се подготвят за синхронизиране. Това ще отнеме само няколко секунди.</string>
+    <string name="sync_enable_options">Опции</string>
+    <string name="sync_enable_option_favicons_title">Извличане на икони на отметки</string>
+    <string name="sync_enable_option_favicons_subtitle">Автоматично изтегляне на икони за синхронизираните отметки.</string>
+    <string name="sync_enable_connecting">Свързване…</string>
+    <string name="sync_intro_enable_title">Синхронизиране и архивиране на това устройство</string>
+    <string name="sync_intro_enable_content">Създава криптирано резервно копие на Вашите отметки и пароли на защитения сървър на DuckDuckGo, което може да бъде синхронизирано с други Ваши устройства. Ключът за криптиране се съхранява само на Вашето устройство и DuckDuckGo няма достъп до него.…</string>
+    <string name="sync_intro_enable_footer">Можете да синхронизирате с други устройства по-късно.</string>
+    <string name="sync_intro_enable_cta">Включване на Синхронизиране и архивиране</string>
+    <string name="sync_intro_recover_title">Възстановяване на синхронизирани данни</string>
+    <string name="sync_intro_recover_content">За възстановяване на синхронизираните данни е необходим Кодът за възстановяване, който сте запазили при първата настройка на функцията за синхронизиране. Този код може да е запазен като PDF файл на устройството, което първоначално сте използвали за настройка на функцията за синхронизиране.</string>
+    <string name="sync_intro_recover_cta">Първи стъпки</string>
+
+    <!-- Recover data screen -->
+    <string name="login_screen_title">Сканиране на QR код</string>
+    <string name="login_screen_enter_code_cta">Или въведете кода ръчно</string>
+    <string name="login_screen_barcode_hint">Насочете камерата към QR кода за синхронизиране</string>
+    <string name="login_screen_cant_scan">Не можете да сканирате? <font color="#7295F6">Споделяне на текстов код</font></string>
+
+    <!-- Connect screen -->
+    <string name="connect_screen_title">Сканиране на QR код</string>
+    <string name="connect_screen_scan_qr_hint">Влезте в <b>Настройки &gt; Синхронизиране и архивиране</b> в браузъра DuckDuckGo на друго устройство и изберете „Синхронизиране с друго устройство“.</string>
+    <string name="connect_screen_enter_code_cta">Или въведете кода ръчно</string>
+    <string name="connect_screen_connect_qr_hint_title">От мобилно към мобилно устройство?</string>
+    <string name="connect_screen_connect_qr_hint_content">Сканирайте този код с друго устройство, за да синхронизирате.</string>
+    <string name="connect_screen_share_code">Копиране на кода</string>
+
+    <!-- Enter Code screen -->
+    <string name="enter_code_screen_title">Ръчно въвеждане на код</string>
+    <string name="sync_enter_code_hint">Влезте в <b>Настройки &gt; Синхронизиране и архивиране &gt; Синхронизиране с друго устройство</b> и изберете <b>Преглед на текстов код</b> в приложението DuckDuckGo на друго синхронизирано устройство, след това поставете кода тук, за да синхронизирате това устройство.</string>
+    <string name="sync_enter_code_verifying">Проверка на кода</string>
+    <string name="sync_enter_code_invalid">⚠️ Невалиден код</string>
+    <string name="sync_enter_code_paste">Поставяне на код</string>
+
+    <!-- Recovery PDF screen -->
+    <string name="sync_recovery_code_title">Запазване на Код за възстановяване</string>
+    <string name="sync_save_recovery_code_item_hint">Ако загубите достъп до устройствата си, ще трябва да използвате този код, за да възстановите синхронизираните данни.</string>
+    <string name="sync_recovery_code_skip_button">Следващ</string>
+    <string name="sync_recovery_code_primary_button">Запазване като PDF</string>
+    <string name="sync_recovery_code_secondary_button">Копиране на кода</string>
+    <string name="sync_code_box_description">Всеки, който има достъп до този код, може да получи достъп до синхронизираните Ви данни, затова го съхранявайте на сигурно място.</string>
+
+    <!-- Device synced screen -->
+    <string name="sync_connected_device_title">Данните Ви са синхронизирани!</string>
+    <string name="sync_connected_device_primary_button">Готово</string>
+
+    <string name="show_qr_screen_title">Показване на QR код</string>
+
+    <string name="show_code_screen_title">Код</string>
+    <string name="enter_code_screen_cta">Въвеждане на текстов код</string>
+    <string name="sync_login_device_hint">За да възстановите данните си, сканирайте QR кода, който се намира в PDF файла за възстановяване или на друго синхронизирано устройство.</string>
+
+    <string name="synced_devices_section_title">Синхронизирани устройства</string>
+    <string name="sync_new_device_section_title">Синхронизиране на ново устройство</string>
+    <string name="sync_new_device_hint">Влезте в Настройки &gt; Синхронизиране и архивиране в приложението DuckDuckGo на друго устройство и сканирайте, за да се свържете веднага.</string>
+    <string name="sync_show_text_code_item">Показване на текстов код</string>
+    <string name="sync_show_qr_code_item">Сканиране на QR код</string>
+    <string name="sync_save_recovery_code_item">Запазване на PDF за възстановяване</string>
+    <string name="sync_delete_account_item">Изключване и изтриване на данните от сървъра…</string>
+    <string name="sync_disable_sync_item">Изключване на Синхронизиране и архивиране…</string>
+    <string name="sync_enable_sync_next_button">Следващ</string>
+    <string name="sync_recovery_code_content">Ако загубите достъп до устройствата си, ще трябва да използвате този код, за да възстановите синхронизираните данни.</string>
+    <string name="sync_recovery_code_hint">Всеки, който има достъп до този код, може да получи достъп до синхронизираните Ви данни, затова го съхранявайте на сигурно място.</string>
+
+    <string name="turn_off_sync_dialog_title">Изключване на синхронизирането?</string>
+    <string name="turn_off_sync_dialog_content">Това устройство вече няма да има достъп до синхронизираните Ви данни</string>
+    <string name="turn_off_sync_dialog_primary_button">Изключване</string>
+    <string name="turn_off_sync_dialog_secondary_button">Отмени</string>
+    <string name="sync_permission_required_store_recovery_code">За запазване на PDF за възстановяване се изисква разрешение за съхранение</string>
+    <string name="sync_share_title">Споделяне с…</string>
+    <string name="sync_pdf_title">Код за възстановяване на синхронизирането</string>
+    <string name="sync_pdf_description">Кодът за възстановяване Ви позволява да синхронизирате отметките на няколко устройства и да възстановявате синхронизираните данни, ако загубите достъп до устройство.</string>
+    <string name="sync_code_box_title">Съхранявайте тази информация на сигурно място.</string>
+    <string name="sync_instructions_title">Как става това?</string>
+    <string name="sync_instructions_step1">Отворете DuckDuckGo на друго устройство и влезте в Настройки &gt; Синхронизация.</string>
+    <string name="sync_instructions_step2">Сканирайте QR кода или копирайте и поставете текстовия код в друго приложение на DuckDuckGo.</string>
+    <string name="sync_instructions_step3">Синхронизацията ще бъде активирана и отново ще имате достъп до всички свои данни.</string>
+    <string name="remove_device_dialog_title">Премахване на устройство?</string>
+    <string name="remove_device_dialog_content" instruction="Placeholder is a device name">„%1$s“ вече няма да има достъп до синхронизираните Ви данни.</string>
+    <string name="remove_device_dialog_primary_button">Премахване</string>
+    <string name="remove_device_dialog_secondary_button">Отмени</string>
+    <string name="edit_device_dialog_title">Редактиране</string>
+    <string name="edit_device_dialog_hint">Име на устройството</string>
+    <string name="edit_device_dialog_primary_button">ОК</string>
+    <string name="edit_device_dialog_secondary_button">Отмени</string>
+    <string name="sync_device_this_device_hint">Това устройство</string>
+    <string name="sync_device_menu_option_edit">Редактиране</string>
+    <string name="sync_device_menu_option_remove">Премахване на устройство</string>
+    <string name="sync_show_code_copy">Копиране на кода</string>
+    <string name="sync_show_code_copy_hint">Използвайте този код, след като изберете „Ръчно въвеждане на код“ по време на настройката за синхронизиране на второ устройство</string>
+    <string name="sync_code_copied_message">Кодът за възстановяване е копиран</string>
+    <string name="sync_camera_permission_required">Изисква се разрешение за камерата</string>
+    <string name="sync_camera_unavailable">Камерата не е достъпна</string>
+    <string name="sync_camera_permission_required_description">Моля, влезте в настройките на устройството и дайте на това приложение разрешение за достъп до камерата.</string>
+    <string name="sync_go_to_settings">Влезте в Настройки</string>
+    <string name="sync_general_error">Възникна някаква грешка</string>
+    <string name="sync_notification_channel_name">Синхронизиране</string>
+    <string name="sync_notify_me_title">Известията са деактивирани</string>
+    <string name="sync_notify_me_description">Получаване на известие, ако възникне грешка при Синхронизиране и архивиране.</string>
+    <string name="sync_rollout_banner_text">Функцията Синхронизиране и архивиране се въвежда постепенно и може все още да не е достъпна в DuckDuckGo на останалите Ви устройства</string>
+</resources>
