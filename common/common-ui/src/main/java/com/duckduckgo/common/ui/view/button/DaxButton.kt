@@ -41,8 +41,8 @@ open class DaxButton @JvmOverloads constructor(
                 0,
             )
 
-        val buttonSize = if (typedArray.hasValue(R.styleable.DaxButton_buttonSize)) {
-            Size.from(typedArray.getInt(R.styleable.DaxButton_buttonSize, 0))
+        val buttonSize = if (typedArray.hasValue(R.styleable.DaxButton_customButtonSize)) {
+            Size.from(typedArray.getInt(R.styleable.DaxButton_customButtonSize, 0))
         } else {
             Small
         }

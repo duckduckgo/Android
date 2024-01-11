@@ -391,6 +391,12 @@ dependencies {
     implementation "com.github.bumptech.glide:okhttp3-integration:_"
     ksp "com.github.bumptech.glide:ksp:_"
 
+    // MLKit
+    implementation "com.google.mlkit:object-detection:_"
+
+    //tensorflow-lite
+    implementation "org.tensorflow:tensorflow-lite-task-vision:_"
+
     // Lottie
     implementation "com.airbnb.android:lottie:_"
 

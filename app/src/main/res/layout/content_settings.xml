@@ -36,18 +36,24 @@
             android:layout_marginTop="@dimen/keyline_4" />
 
         <LinearLayout
-                  android:id="@+id/settingsSectionPro"
-                  android:layout_width="match_parent"
-                  android:layout_height="match_parent"
-                  android:orientation="vertical" >
+            android:id="@+id/settingsSectionPro"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
         </LinearLayout>
 
         <include
             android:id="@+id/contentSettingsSettings"
             layout="@layout/content_settings_settings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <include
+            android:id="@+id/contentSettingsMore"
+            layout="@layout/content_settings_other"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 

@@ -75,7 +75,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/daxDialogButtonSpacing"
         android:text="@string/onboardingLetsDoItButton"
-        app:buttonSize="large"
+        app:customButtonSize="large"
         app:layout_constraintEnd_toEndOf="@id/cardView"
         app:layout_constraintStart_toStartOf="@id/cardView"
         app:layout_constraintTop_toBottomOf="@id/cardView" />

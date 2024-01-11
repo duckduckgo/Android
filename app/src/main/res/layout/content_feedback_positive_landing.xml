@@ -69,7 +69,7 @@
             android:layout_marginEnd="@dimen/keyline_4"
             android:layout_marginBottom="6dp"
             android:text="@string/rateTheApp"
-            app:buttonSize="large"
+            app:customButtonSize="large"
             app:layout_constraintBottom_toTopOf="@id/shareFeedbackButton"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
@@ -82,7 +82,7 @@
             android:layout_marginEnd="@dimen/keyline_4"
             android:layout_marginBottom="6dp"
             android:text="@string/feedbackShareDetails"
-            app:buttonSize="large"
+            app:customButtonSize="large"
             app:layout_constraintBottom_toTopOf="@id/cancelButton"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
@@ -95,7 +95,7 @@
             android:layout_marginEnd="@dimen/keyline_4"
             android:layout_marginBottom="18dp"
             android:text="@string/declineFurtherFeedback"
-            app:buttonSize="large"
+            app:customButtonSize="large"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />

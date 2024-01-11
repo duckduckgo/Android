@@ -76,7 +76,7 @@
 
         <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
             android:id="@+id/goToSettingsButton"
-            app:buttonSize="large"
+            app:customButtonSize="large"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_5"
@@ -85,7 +85,7 @@
 
         <com.duckduckgo.common.ui.view.button.DaxButtonGhost
             android:id="@+id/notNowButton"
-            app:buttonSize="large"
+            app:customButtonSize="large"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_1"

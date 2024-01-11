@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser
 import android.content.Context
 import android.content.res.AssetManager
 import android.graphics.Bitmap
+import android.graphics.Bitmap.CompressFormat.PNG
 import android.net.Uri
 import android.net.http.SslError
 import android.net.http.SslError.*
@@ -29,6 +30,7 @@ import androidx.annotation.StringRes
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
+import com.bumptech.glide.Glide
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.accessibility.AccessibilityManager
@@ -48,6 +50,7 @@ import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.safe_gaze.SafeGazeJsInterface
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.safegaze.ondeviceobjectdetection.ObjectDetectionHelper
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.BrowserAutofill
@@ -57,10 +60,12 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.privacy.config.api.AmpLinks
-import java.net.URI
-import javax.inject.Inject
 import kotlinx.coroutines.*
 import timber.log.Timber
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.net.URI
+import javax.inject.Inject
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
@@ -343,6 +348,25 @@ class BrowserWebViewClient @Inject constructor(
         webView: WebView,
         request: WebResourceRequest,
     ): WebResourceResponse? {
+        /*val webResourceResponse = runBlocking {
+            val documentUrl = withContext(dispatcherProvider.main()) { webView.url }
+            withContext(dispatcherProvider.main()) {
+                loginDetector.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, request))
+            }
+            Timber.v("Intercepting resource ${request.url} type:${request.method} on page $documentUrl")
+            requestInterceptor.shouldIntercept(request, webView, documentUrl, webViewClientListener)
+        }
+        //return webResourceResponse
+
+        if (isImageUrl(request.url.toString())) {
+            checkForFacesAndMask(webView, request.url)?.let {
+                return it
+            } ?: kotlin.run {
+                return webResourceResponse
+            }
+        } else {
+            return webResourceResponse
+        }*/
         return runBlocking {
             val documentUrl = withContext(dispatcherProvider.main()) { webView.url }
             withContext(dispatcherProvider.main()) {
@@ -350,6 +374,49 @@ class BrowserWebViewClient @Inject constructor(
             }
             Timber.v("Intercepting resource ${request.url} type:${request.method} on page $documentUrl")
             requestInterceptor.shouldIntercept(request, webView, documentUrl, webViewClientListener)
+        }
+    }
+
+    private fun isImageUrl(url: String): Boolean {
+        val keywords = listOf<String>("images", "jpg", "png", "jpeg", "webp", "svg")
+        for (keyword in keywords) {
+            if (url.contains(keyword, true)) return true
+        }
+        return false
+    }
+
+    private fun checkForFacesAndMask(
+        webView: WebView,
+        url: Uri
+    ): WebResourceResponse? {
+        try {
+            val bitmap: Bitmap = Glide
+                .with(webView.context)
+                .asBitmap()
+                .load(url)
+                .submit()
+                .get()
+
+            val isImageContainsHuman = ObjectDetectionHelper(webView.context).isImageContainsHuman(bitmap)
+
+            if (isImageContainsHuman) {
+                val changedBitmap: Bitmap = Glide
+                    .with(webView.context)
+                    .asBitmap()
+                    .load("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTYQxPL5nl4tqOAYUdFb28nY82mPkqvJDkQrg&usqp=CAU")
+                    .submit()
+                    .get()
+                val byteArrayOutputStream = ByteArrayOutputStream()
+                changedBitmap.compress(PNG, 90, byteArrayOutputStream)
+                val inputStream = ByteArrayInputStream(byteArrayOutputStream.toByteArray())
+
+                return WebResourceResponse("image/png", "utf-8", inputStream)
+            } else {
+                return null
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return null
         }
     }
 

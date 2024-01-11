@@ -34,7 +34,7 @@
 
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
             android:id="@+id/textAlertDialogWithImageButton"
-            app:buttonSize="large"
+            app:customButtonSize="large"
             android:text="Text Alert Dialog With Image"
             android:layout_marginTop="16dp"
             android:layout_width="match_parent"
@@ -42,7 +42,7 @@
 
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
             android:id="@+id/textAlertDialogButton"
-            app:buttonSize="large"
+            app:customButtonSize="large"
             android:text="Text Alert Dialog"
             android:layout_marginTop="16dp"
             android:layout_width="match_parent"
@@ -50,7 +50,7 @@
 
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
             android:id="@+id/textAlertDestructiveDialogButton"
-            app:buttonSize="large"
+            app:customButtonSize="large"
             android:text="Text Alert Destructive Dialog"
             android:layout_marginTop="16dp"
             android:layout_width="match_parent"
@@ -58,22 +58,22 @@
 
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
             android:id="@+id/textAlertDialogCancellable"
-            app:buttonSize="large"
+            app:customButtonSize="large"
             android:text="Text Alert Dialog Cancellable"
             android:layout_marginTop="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
-                android:id="@+id/textAlertDialogOneButton"
-                app:buttonSize="large"
-                android:text="Text Alert Dialog With One Button"
+            android:id="@+id/textAlertDialogOneButton"
+            android:text="Text Alert Dialog With One Button"
+            app:customButtonSize="large"
                 android:layout_marginTop="16dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
-            app:buttonSize="large"
+            app:customButtonSize="large"
             android:id="@+id/stackedAlertDialogWithImageButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -82,7 +82,7 @@
 
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
             android:id="@+id/stackedAlertDialogWithButtons"
-            app:buttonSize="large"
+            app:customButtonSize="large"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
@@ -90,14 +90,14 @@
 
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
             android:id="@+id/stackedAlertDestructiveDialogWithButtons"
-            app:buttonSize="large"
+            app:customButtonSize="large"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="Stacked Text Alert Destructive Dialog With 4 buttons" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
-            app:buttonSize="large"
+            app:customButtonSize="large"
             android:id="@+id/radioButtonAlertDialog"
             android:text="Single Choice Alert Dialog"
             android:layout_marginTop="16dp"
@@ -106,7 +106,7 @@
 
 
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
-            app:buttonSize="large"
+            app:customButtonSize="large"
             android:id="@+id/radioButtonDestructiveAlertDialog"
             android:text="Single Choice Destructive Alert Dialog"
             android:layout_marginTop="16dp"
@@ -123,7 +123,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
-            app:buttonSize="large"
+            app:customButtonSize="large"
             android:id="@+id/actionBottomSheetButton"
             android:text="Action Bottom Sheet"
             android:layout_marginTop="16dp"
@@ -131,7 +131,7 @@
             android:layout_height="wrap_content" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
-            app:buttonSize="large"
+            app:customButtonSize="large"
             android:id="@+id/actionBottomSheetButtonWithTitle"
             android:text="Action Bottom Sheet with title and icons"
             android:layout_marginTop="16dp"
@@ -139,7 +139,7 @@
             android:layout_height="wrap_content" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
-            app:buttonSize="large"
+            app:customButtonSize="large"
             android:id="@+id/promoBottomSheetButton"
             android:text="Promo Bottom Sheet"
             android:layout_marginTop="16dp"
@@ -147,7 +147,7 @@
             android:layout_height="wrap_content" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
-            app:buttonSize="large"
+            app:customButtonSize="large"
             android:id="@+id/promoBottomSheetButtonWithTitle"
             android:text="Promo Bottom Sheet with title"
             android:layout_marginTop="16dp"
@@ -155,7 +155,7 @@
             android:layout_height="wrap_content" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
-            app:buttonSize="large"
+            app:customButtonSize="large"
             android:id="@+id/promoBottomSheetButtonWithImage"
             android:text="Promo Bottom Sheet with image"
             android:layout_marginTop="16dp"
@@ -171,7 +171,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
-            app:buttonSize="large"
+            app:customButtonSize="large"
             android:id="@+id/animated_button"
             android:text="Dialog with animated text"
             android:layout_marginTop="16dp"
@@ -179,7 +179,7 @@
             android:layout_height="wrap_content" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
-            app:buttonSize="large"
+            app:customButtonSize="large"
             android:id="@+id/not_dimmed_button"
             android:text="Dialog not dimmed"
             android:layout_marginTop="16dp"
@@ -187,7 +187,7 @@
             android:layout_height="wrap_content" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
-            app:buttonSize="large"
+            app:customButtonSize="large"
             android:id="@+id/dismissible_button"
             android:text="Dialog that can be dismissed without an action"
             android:layout_marginTop="16dp"
@@ -195,7 +195,7 @@
             android:layout_height="wrap_content" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
-            app:buttonSize="large"
+            app:customButtonSize="large"
             android:id="@+id/no_hide_button"
             android:text="Dialog without hide button"
             android:layout_marginTop="16dp"
@@ -203,7 +203,7 @@
             android:layout_height="wrap_content" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
-            app:buttonSize="large"
+            app:customButtonSize="large"
             android:id="@+id/custom_typing_button"
             android:text="Dialog with custom typing delay"
             android:layout_marginTop="16dp"
@@ -211,7 +211,7 @@
             android:layout_height="wrap_content" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
-            app:buttonSize="large"
+            app:customButtonSize="large"
             android:id="@+id/cookie_content"
             android:text="Cookie Consent dialog with animation"
             android:layout_marginTop="16dp"

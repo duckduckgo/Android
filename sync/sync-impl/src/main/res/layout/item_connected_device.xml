@@ -39,6 +39,6 @@
         android:layout_width="0dp"
         android:layout_weight="1"
         android:layout_height="wrap_content"
-        app:buttonSize="small"
+        app:customButtonSize="small"
         android:text="Logout"/>
 </LinearLayout>

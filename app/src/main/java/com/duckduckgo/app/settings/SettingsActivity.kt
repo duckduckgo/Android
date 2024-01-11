@@ -22,6 +22,7 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -39,6 +40,10 @@ import com.duckduckgo.app.permissions.PermissionsScreenNoParams
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
 import com.duckduckgo.app.settings.SettingsViewModel.Command
+import com.duckduckgo.app.settings.SettingsViewModel.NetPEntryState
+import com.duckduckgo.app.settings.SettingsViewModel.NetPEntryState.Hidden
+import com.duckduckgo.app.settings.SettingsViewModel.NetPEntryState.Pending
+import com.duckduckgo.app.settings.SettingsViewModel.NetPEntryState.ShowState
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.webtrackingprotection.WebTrackingProtectionScreenNoParams
 import com.duckduckgo.app.widget.AddWidgetLauncher
@@ -49,6 +54,7 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.listitem.CheckListItem
 import com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.DaggerMap
@@ -62,11 +68,11 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.settings.api.ProSettingsPlugin
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.duckduckgo.windows.api.ui.WindowsScreenWithEmptyParams
-import javax.inject.Inject
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class SettingsActivity : DuckDuckGoActivity() {
@@ -98,6 +104,9 @@ class SettingsActivity : DuckDuckGoActivity() {
     private val viewsSettings
         get() = binding.includeSettings.contentSettingsSettings
 
+    private val viewsMore
+        get() = binding.includeSettings.contentSettingsMore
+
     private val viewsInternal
         get() = binding.includeSettings.contentSettingsInternal
 
@@ -127,15 +136,25 @@ class SettingsActivity : DuckDuckGoActivity() {
             privateSearchSetting.setClickListener { viewModel.onPrivateSearchSettingClicked() }
             webTrackingProtectionSetting.setClickListener { viewModel.onWebTrackingProtectionSettingClicked() }
             cookiePopupProtectionSetting.setClickListener { viewModel.onCookiePopupProtectionSettingClicked() }
+            emailSetting.setClickListener { viewModel.onEmailProtectionSettingClicked() }
             vpnSetting.setClickListener { viewModel.onAppTPSettingClicked() }
+            netpPSetting.setClickListener { viewModel.onNetPSettingClicked() }
         }
 
         with(viewsSettings) {
             homeScreenWidgetSetting.setClickListener { viewModel.userRequestedToAddHomeScreenWidget() }
             autofillLoginsSetting.setClickListener { viewModel.onAutofillSettingsClick() }
+            syncSetting.setClickListener { viewModel.onSyncSettingClicked() }
+            fireButtonSetting.setClickListener { viewModel.onFireButtonSettingClicked() }
             permissionsSetting.setClickListener { viewModel.onPermissionsSettingClicked() }
             appearanceSetting.setClickListener { viewModel.onAppearanceSettingClicked() }
             accessibilitySetting.setClickListener { viewModel.onAccessibilitySettingClicked() }
+            aboutSetting.setClickListener { viewModel.onAboutSettingClicked() }
+        }
+
+        with(viewsMore) {
+            macOsSetting.setClickListener { viewModel.onMacOsSettingClicked() }
+            windowsSetting.setClickListener { viewModel.windowsSettingClicked() }
         }
     }
 
@@ -175,7 +194,10 @@ class SettingsActivity : DuckDuckGoActivity() {
                         it.appTrackingProtectionEnabled,
                         it.appTrackingProtectionOnboardingShown,
                     )
+                    updateNetPSettings(it.networkProtectionEntryState)
+                    updateEmailSubtitle(it.emailAddress)
                     updateAutofill(it.showAutofill)
+                    updateSyncSetting(visible = it.showSyncSetting)
                     updateAutoconsent(it.isAutoconsentEnabled)
                 }
             }.launchIn(lifecycleScope)
@@ -191,6 +213,23 @@ class SettingsActivity : DuckDuckGoActivity() {
             View.VISIBLE
         } else {
             View.GONE
+        }
+    }
+
+    private fun updateEmailSubtitle(emailAddress: String?) {
+        viewsPrivacy.emailSetting.gone()
+        /*if (emailAddress.isNullOrEmpty()) {
+            viewsPrivacy.emailSetting.setSecondaryText(getString(R.string.settingsEmailProtectionSubtitle))
+            viewsPrivacy.emailSetting.setItemStatus(CheckListItem.CheckItemStatus.DISABLED)
+        } else {
+            viewsPrivacy.emailSetting.setSecondaryText(emailAddress)
+            viewsPrivacy.emailSetting.setItemStatus(CheckListItem.CheckItemStatus.ENABLED)
+        }*/
+    }
+
+    private fun updateSyncSetting(visible: Boolean) {
+        with(viewsSettings.syncSetting) {
+            isVisible = visible
         }
     }
 
@@ -261,6 +300,24 @@ class SettingsActivity : DuckDuckGoActivity() {
                 } else {
                     vpnSetting.setSecondaryText(getString(R.string.atp_SettingsDeviceShieldNeverEnabled))
                     vpnSetting.setItemStatus(CheckListItem.CheckItemStatus.DISABLED)
+                }
+            }
+        }
+    }
+
+    private fun updateNetPSettings(networkProtectionEntryState: NetPEntryState) {
+        with(viewsPrivacy) {
+            when (networkProtectionEntryState) {
+                Hidden -> netpPSetting.gone()
+                Pending -> {
+                    netpPSetting.show()
+                    netpPSetting.setSecondaryText(getString(R.string.netpSettingsNeverEnabled))
+                    netpPSetting.setItemStatus(CheckListItem.CheckItemStatus.DISABLED)
+                }
+                is ShowState -> {
+                    netpPSetting.show()
+                    netpPSetting.setSecondaryText(getString(networkProtectionEntryState.subtitle))
+                    netpPSetting.setItemStatus(networkProtectionEntryState.icon)
                 }
             }
         }

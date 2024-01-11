@@ -100,14 +100,14 @@
                     android:id="@+id/primaryCta"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:buttonSize="large"
+                    app:customButtonSize="large"
                     android:layout_marginTop="@dimen/daxDialogButtonSpacing" />
 
                 <com.duckduckgo.common.ui.view.button.DaxButtonGhost
                     android:id="@+id/secondaryCta"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:buttonSize="large"
+                    app:customButtonSize="large"
                     android:layout_marginTop="@dimen/keyline_1"/>
 
             </LinearLayout>

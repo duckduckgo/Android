@@ -103,7 +103,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/keyline_6"
                 android:text="@string/netpWaitlistGetStartedCta"
-                app:buttonSize="large"
+                app:customButtonSize="large"
             />
 
             <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
@@ -112,7 +112,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/keyline_6"
                 android:text="@string/netpEnterCode"
-                app:buttonSize="large"
+                app:customButtonSize="large"
             />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
