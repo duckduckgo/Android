@@ -44,6 +44,11 @@ class SavedSitesSyncPersister @Inject constructor(
     private val savedSitesFormFactorSyncMigration: SavedSitesFormFactorSyncMigration,
     private val savedSitesSyncState: SavedSitesSyncFeatureListener,
 ) : SyncableDataPersister {
+    override fun onSyncEnabled() {
+        if (isLocalDataDirty()) {
+            onSyncDisabled()
+        }
+    }
 
     override fun onSuccess(
         changes: SyncChangesResponse,
@@ -96,6 +101,10 @@ class SavedSitesSyncPersister @Inject constructor(
         }
 
         return result
+    }
+
+    private fun isLocalDataDirty(): Boolean {
+        return savedSitesSyncStore.serverModifiedSince != "0"
     }
 
     private fun validateChanges(changes: SyncChangesResponse): SyncDataValidationResult<SyncBookmarkEntries> {

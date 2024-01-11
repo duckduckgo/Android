@@ -17,6 +17,11 @@
 package com.duckduckgo.sync.api.engine
 
 interface SyncableDataPersister {
+    /**
+     * Sync has been enabled
+     * This is an opportunity for Features to do some local initialization if needed
+     */
+    fun onSyncEnabled()
 
     /**
      * Changes from Sync Client have been received

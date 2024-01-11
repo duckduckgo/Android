@@ -46,6 +46,12 @@ class CredentialsSyncDataPersister @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val credentialsSyncFeatureListener: CredentialsSyncFeatureListener,
 ) : SyncableDataPersister {
+    override fun onSyncEnabled() {
+        if (isLocalDataDirty()) {
+            onSyncDisabled()
+        }
+    }
+
     override fun onSuccess(
         changes: SyncChangesResponse,
         conflictResolution: SyncConflictResolution,
@@ -132,6 +138,10 @@ class CredentialsSyncDataPersister @Inject constructor(
         credentialsSyncStore.startTimeStamp = "0"
         credentialsSyncStore.clientModifiedSince = "0"
         credentialsSyncFeatureListener.onSyncDisabled()
+    }
+
+    private fun isLocalDataDirty(): Boolean {
+        return credentialsSyncStore.serverModifiedSince != "0"
     }
 
     private class Adapters {
