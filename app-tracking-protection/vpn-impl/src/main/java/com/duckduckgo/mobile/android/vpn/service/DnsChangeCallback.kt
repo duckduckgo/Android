@@ -17,9 +17,12 @@
 package com.duckduckgo.mobile.android.vpn.service
 
 import android.content.Context
+import android.net.ConnectivityManager
 import android.net.ConnectivityManager.NetworkCallback
 import android.net.LinkProperties
 import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import android.os.Build
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -29,6 +32,8 @@ import java.net.InetAddress
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import logcat.LogPriority.ERROR
+import logcat.asLog
 import logcat.logcat
 
 class DnsChangeCallback @Inject constructor(
@@ -38,6 +43,9 @@ class DnsChangeCallback @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
 ) : NetworkCallback() {
 
+    private val connectivityManager by lazy {
+        context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
+    }
     private var lastDns: List<InetAddress>? = null
 
     override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
@@ -59,6 +67,26 @@ class DnsChangeCallback @Inject constructor(
                 lastDns = dns
                 TrackerBlockingVpnService.restartVpnService(context)
             }
+        }
+    }
+
+    internal fun register() {
+        kotlin.runCatching {
+            val request = NetworkRequest.Builder().apply {
+                addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
+                addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+            }.build()
+            connectivityManager?.registerNetworkCallback(request, this)
+        }.onFailure {
+            logcat(ERROR) { it.asLog() }
+        }
+    }
+
+    internal fun unregister() {
+        kotlin.runCatching {
+            connectivityManager?.unregisterNetworkCallback(this)
+        }.onFailure {
+            logcat(ERROR) { it.asLog() }
         }
     }
 

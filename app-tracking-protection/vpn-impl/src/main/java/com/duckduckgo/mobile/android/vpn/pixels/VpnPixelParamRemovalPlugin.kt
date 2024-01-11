@@ -30,6 +30,7 @@ class VpnPixelParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             NETP_PIXEL_PREFIX to PixelParameter.removeAtb(),
             VPN_PIXEL_PREFIX to PixelParameter.removeAtb(),
             "m_atp_unprotected_apps_bucket_" to PixelParameter.removeAll(),
+            "m_vpn_ev_moto_g_fix_" to PixelParameter.removeAll(),
         )
     }
 

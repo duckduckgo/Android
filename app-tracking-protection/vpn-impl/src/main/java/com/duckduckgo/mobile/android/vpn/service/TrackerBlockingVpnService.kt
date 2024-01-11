@@ -24,10 +24,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.content.pm.PackageManager
-import android.net.ConnectivityManager
-import android.net.ConnectivityManager.NetworkCallback
-import android.net.NetworkCapabilities
-import android.net.NetworkRequest
 import android.net.VpnService
 import android.os.Binder
 import android.os.Build
@@ -157,10 +153,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
     private val alwaysOnStateJob = ConflatedJob()
 
     private val serviceDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
-
-    private val connectivityManager by lazy {
-        getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
-    }
 
     private var vpnNetworkStack: VpnNetworkStack by VpnNetworkStackDelegate(
         provider = {
@@ -303,7 +295,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             vpnNetworkStack.onCreateVpnWithErrorReporting()
             logcat { "VPN log: NEW network ${vpnNetworkStack.name}" }
         }
-        connectivityManager?.safeUnregisterNetworkCallback(dnsChangeCallback)
+        dnsChangeCallback.unregister()
 
         vpnServiceStateStatsDao.insert(createVpnState(state = ENABLING))
 
@@ -389,16 +381,16 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         // lastly set the VPN state to enabled
         vpnServiceStateStatsDao.insert(createVpnState(state = ENABLED))
 
+        // This is something temporary while we confirm whether we're able to fix the moto g issues with appTP
+        // see https://app.asana.com/0/488551667048375/1203410036713941/f for more info
         tunnelConfig?.let { config ->
             // TODO this is temporary hack until we know this approach works for moto g. If it does we'll spend time making it better/more permanent
             if (config.dns.map { it.hostAddress }.contains("10.11.12.1")) {
-                // noop
+                // noop whenever NetP is enabled
             } else if (config.dns.isNotEmpty()) {
-                val request = NetworkRequest.Builder().apply {
-                    addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
-                    addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
-                }.build()
-                connectivityManager?.safeRegisterNetworkCallback(request, dnsChangeCallback)
+                // just temporary pixel to know quantify how many users would be impacted
+                deviceShieldPixels.reportMotoGFix()
+                dnsChangeCallback.register()
             }
         }
 
@@ -601,29 +593,10 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             runCatching { unbindService(vpnStateServiceConnection).also { vpnStateServiceReference = null } }
         }
 
-        connectivityManager?.safeUnregisterNetworkCallback(dnsChangeCallback)
+        dnsChangeCallback.unregister()
 
         stopForeground(true)
         stopSelf()
-    }
-
-    private fun ConnectivityManager.safeRegisterNetworkCallback(
-        networkRequest: NetworkRequest,
-        networkCallback: NetworkCallback,
-    ) {
-        kotlin.runCatching {
-            registerNetworkCallback(networkRequest, networkCallback)
-        }.onFailure {
-            logcat(ERROR) { it.asLog() }
-        }
-    }
-
-    private fun ConnectivityManager.safeUnregisterNetworkCallback(networkCallback: NetworkCallback) {
-        kotlin.runCatching {
-            unregisterNetworkCallback(networkCallback)
-        }.onFailure {
-            logcat(ERROR) { it.asLog() }
-        }
     }
 
     private fun sendStopPixels(reason: VpnStopReason) {
