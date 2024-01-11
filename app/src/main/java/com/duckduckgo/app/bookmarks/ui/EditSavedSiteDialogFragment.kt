@@ -52,7 +52,7 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
 
     var listener: EditSavedSiteListener? = null
     var deleteBookmarkListener: DeleteBookmarkListener? = null
-    var isFavorite = false
+    private var isFavorite = false
 
     override fun configureUI() {
         validateBundleArguments()
@@ -64,9 +64,12 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
             setToolbarTitle(getString(R.string.bookmarkDialogTitleEdit))
             binding.savedSiteLocationContainer.visibility = View.VISIBLE
             binding.addToFavoritesBottomDivider.visibility = View.VISIBLE
-            isFavorite = (savedSite as Bookmark).isFavorite
+
             binding.addToFavoritesPrimaryItem.setLeadingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_favorite_24)
             binding.addToFavoritesPrimaryItem.setLeadingIconBackgroundType(Circular)
+
+            isFavorite = (savedSite as Bookmark).isFavorite
+
             binding.addToFavoritesSwitch.quietlySetIsChecked(
                 isFavorite,
             ) { _, isChecked ->
