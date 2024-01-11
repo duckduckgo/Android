@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2021 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <!-- Sync Disabled messages -->
+    <string name="sync_flows_disabled"><b>Sincronização e cópia de segurança indisponíveis</b>\nLamentamos, mas a sincronização e a cópia de segurança não estão disponíveis de momento. Tenta novamente mais tarde.</string>
+    <string name="sync_flows_disabled_new_version"><b>Sincronização e cópia de segurança indisponíveis</b>\nLamentamos, mas a sincronização e a cópia de segurança já não estão disponíveis nesta versão da aplicação. Atualiza o DuckDuckGo para a versão mais recente para continuar.</string>
+    <string name="sync_create_account_disabled"><b>Sincronização e cópia de segurança indisponíveis</b>\nLamentamos, mas a sincronização e a cópia de segurança não estão disponíveis de momento. Tenta novamente mais tarde.</string>
+    <string name="sync_create_account_disabled_new_version"><b>Sincronização e cópia de segurança indisponíveis</b>\nLamentamos, mas a sincronização e a cópia de segurança já não estão disponíveis nesta versão da aplicação. Atualiza o DuckDuckGo para a versão mais recente para continuar.</string>
+    <string name="sync_disabled_authenticated_user"><b>Sincronização e cópia de segurança em pausa</b>\nLamentamos, mas a sincronização e a cópia de segurança não estão disponíveis de momento. Tenta novamente mais tarde.</string>
+    <string name="sync_disabled_authenticated_user_new_version"><b>Sincronização &amp; Cópia de segurança em pausa</b>\nLamentamos, mas a sincronização e a cópia de segurança já não estão disponíveis nesta versão da aplicação. Atualiza o DuckDuckGo para a versão mais recente para continuar.</string>
+    <string name="sync_paused_notification"><b>Sincronização e cópia de segurança em pausa</b>\nLamentamos, mas a sincronização e a cópia de segurança não estão disponíveis de momento. Tenta novamente mais tarde.</string>
+
+    <!-- Settings screen -->
+    <string name="sync_screen_title">Sincronização e cópia de segurança</string>
+    <string name="sync_setup_begin_syncing">Iniciar a sincronização</string>
+    <string name="sync_setup_with_another_device_cta_title">Sincronizar com outro dispositivo</string>
+    <string name="sync_setup_with_another_device_cta_subtitle">Sincroniza os marcadores e palavras-passe entre os teus dispositivos em segurança.</string>
+    <string name="sync_off_hint">Os teus dados são encriptados de ponta a ponta e o DuckDuckGo não tem acesso à chave de encriptação.</string>
+    <string name="sync_setup_single_device_title">Configuração de dispositivo único</string>
+    <string name="sync_setup_single_recover_data_cta_title">Recuperar dados sincronizados</string>
+    <string name="sync_setup_single_sync_this_device_cta_title">Sincronizar e fazer cópia de segurança deste dispositivo</string>
+
+    <string name="sync_off_encrypted_hint">Os teus dados são encriptados de ponta a ponta e o DuckDuckGo não tem acesso à chave de desencriptação.</string>
+
+    <!-- Setup screen -->
+    <string name="sync_enable_sync_title">A configurar a sincronização e a cópia de segurança!</string>
+    <string name="sync_enable_sync_content">Os teus marcadores e palavras-passe estão a ser preparados para sincronização. Deve demorar apenas alguns segundos.</string>
+    <string name="sync_enable_options">Opções</string>
+    <string name="sync_enable_option_favicons_title">A obter ícones dos marcadores</string>
+    <string name="sync_enable_option_favicons_subtitle">Transferir automaticamente ícones para marcadores sincronizados.</string>
+    <string name="sync_enable_connecting">A ligar…</string>
+    <string name="sync_intro_enable_title">Sincronizar e fazer cópia de segurança deste dispositivo</string>
+    <string name="sync_intro_enable_content">Cria uma cópia de segurança encriptada dos teus marcadores e palavras-passe no servidor seguro do DuckDuckGo, que pode ser sincronizada com os teus restantes dispositivos. \n\n A chave de encriptação é armazenada apenas no teu dispositivo. O DuckDuckGo não consegue aceder à chave.…</string>
+    <string name="sync_intro_enable_footer">Podes sincronizar com outros dispositivos mais tarde.</string>
+    <string name="sync_intro_enable_cta">Ativar a sincronização e cópia de segurança</string>
+    <string name="sync_intro_recover_title">Recuperar dados sincronizados</string>
+    <string name="sync_intro_recover_content">Para restaurares os teus dados sincronizados, precisas do código de recuperação que guardaste quando configuraste a sincronização. Este código pode ter sido guardado como um PDF no dispositivo usado para configurar a sincronização.</string>
+    <string name="sync_intro_recover_cta">Comece</string>
+
+    <!-- Recover data screen -->
+    <string name="login_screen_title">Ler código QR</string>
+    <string name="login_screen_enter_code_cta">Ou introduz manualmente o código</string>
+    <string name="login_screen_barcode_hint">Aponta a câmara para o código QR para sincronizar</string>
+    <string name="login_screen_cant_scan">Não consegues ler? <font color="#7295F6">Partilhar código de texto</font></string>
+
+    <!-- Connect screen -->
+    <string name="connect_screen_title">Ler código QR</string>
+    <string name="connect_screen_scan_qr_hint">Acede a <b>Definições &gt; Sincronização e cópia de segurança</b> no navegador DuckDuckGo noutro dispositivo e seleciona \"Sincronizar com outro dispositivo.\"</string>
+    <string name="connect_screen_enter_code_cta">Ou introduz manualmente o código</string>
+    <string name="connect_screen_connect_qr_hint_title">Entre dispositivos móveis?</string>
+    <string name="connect_screen_connect_qr_hint_content">Lê este código com outro dispositivo para sincronizar.</string>
+    <string name="connect_screen_share_code">Copiar código</string>
+
+    <!-- Enter Code screen -->
+    <string name="enter_code_screen_title">Introduzir manualmente o código</string>
+    <string name="sync_enter_code_hint">Acede a <b>Definições &gt; Sincronização e cópia de segurança &gt; Sincronização com outro dispositivo</b> e seleciona <b>Ver código de texto</b> na aplicação DuckDuckGo noutro dispositivo sincronizado e cola o código aqui para sincronizar este dispositivo.</string>
+    <string name="sync_enter_code_verifying">A verificar o código</string>
+    <string name="sync_enter_code_invalid">⚠️ Código inválido</string>
+    <string name="sync_enter_code_paste">Colar código</string>
+
+    <!-- Recovery PDF screen -->
+    <string name="sync_recovery_code_title">Guardar código de recuperação</string>
+    <string name="sync_save_recovery_code_item_hint">Se perderes o acesso aos teus dispositivos, precisas deste código para recuperar os dados sincronizados.</string>
+    <string name="sync_recovery_code_skip_button">Seguinte</string>
+    <string name="sync_recovery_code_primary_button">Guardar como PDF</string>
+    <string name="sync_recovery_code_secondary_button">Copiar código</string>
+    <string name="sync_code_box_description">Qualquer pessoa com acesso a este código pode aceder aos teus dados sincronizados, por isso, guarda o código num local seguro.</string>
+
+    <!-- Device synced screen -->
+    <string name="sync_connected_device_title">Os teus dados estão sincronizados!</string>
+    <string name="sync_connected_device_primary_button">Feito</string>
+
+    <string name="show_qr_screen_title">Mostrar código QR</string>
+
+    <string name="show_code_screen_title">Código</string>
+    <string name="enter_code_screen_cta">Introduz o código de texto</string>
+    <string name="sync_login_device_hint">Lê o código QR no teu PDF de recuperação ou noutro dispositivo sincronizado para recuperares os teus dados.</string>
+
+    <string name="synced_devices_section_title">Dispositivos sincronizados</string>
+    <string name="sync_new_device_section_title">Sincronizar dispositivo novo</string>
+    <string name="sync_new_device_hint">Acede a Definições &gt; Sincronização e cópia de segurança na aplicação DuckDuckGo num dispositivo diferente e lê para ligares instantaneamente.</string>
+    <string name="sync_show_text_code_item">Mostrar código de texto</string>
+    <string name="sync_show_qr_code_item">Ler código QR</string>
+    <string name="sync_save_recovery_code_item">Guardar PDF de recuperação</string>
+    <string name="sync_delete_account_item">Desativar e eliminar dados do servidor…</string>
+    <string name="sync_disable_sync_item">Desativar a sincronização e cópia de segurança…</string>
+    <string name="sync_enable_sync_next_button">Seguinte</string>
+    <string name="sync_recovery_code_content">Se perderes o acesso aos teus dispositivos, precisas deste código para recuperar os dados sincronizados.</string>
+    <string name="sync_recovery_code_hint">Qualquer pessoa com acesso a este código pode aceder aos teus dados sincronizados, por isso, guarda o código num local seguro.</string>
+
+    <string name="turn_off_sync_dialog_title">Desativar a sincronização?</string>
+    <string name="turn_off_sync_dialog_content">Este dispositivo já não pode aceder aos dados sincronizados</string>
+    <string name="turn_off_sync_dialog_primary_button">Desativar</string>
+    <string name="turn_off_sync_dialog_secondary_button">Cancelar</string>
+    <string name="sync_permission_required_store_recovery_code">É necessária a permissão de armazenamento para guardar o PDF de recuperação</string>
+    <string name="sync_share_title">Partilhar com...</string>
+    <string name="sync_pdf_title">Sincronizar código de recuperação</string>
+    <string name="sync_pdf_description">O código de recuperação permite sincronizar os teus marcadores em vários dispositivos e recuperar os dados sincronizados se perderes o acesso a um dispositivo.</string>
+    <string name="sync_code_box_title">Guarda estas informações em segurança.</string>
+    <string name="sync_instructions_title">Como funciona?</string>
+    <string name="sync_instructions_step1">Abre o DuckDuckGo noutro dispositivo e acede a Sincronização em Definições.</string>
+    <string name="sync_instructions_step2">Lê o código QR ou copia e cola o código de texto noutra aplicação DuckDuckGo.</string>
+    <string name="sync_instructions_step3">A sincronização será ativada e terás novamente acesso a todos os teus dados.</string>
+    <string name="remove_device_dialog_title">Remover dispositivo?</string>
+    <string name="remove_device_dialog_content" instruction="Placeholder is a device name">\"%1$s\" deixará de poder aceder aos teus dados sincronizados.</string>
+    <string name="remove_device_dialog_primary_button">Remover</string>
+    <string name="remove_device_dialog_secondary_button">Cancelar</string>
+    <string name="edit_device_dialog_title">Editar</string>
+    <string name="edit_device_dialog_hint">Nome do dispositivo</string>
+    <string name="edit_device_dialog_primary_button">OK</string>
+    <string name="edit_device_dialog_secondary_button">Cancelar</string>
+    <string name="sync_device_this_device_hint">Este dispositivo</string>
+    <string name="sync_device_menu_option_edit">Editar</string>
+    <string name="sync_device_menu_option_remove">Remover dispositivo</string>
+    <string name="sync_show_code_copy">Copiar código</string>
+    <string name="sync_show_code_copy_hint">Usa este código após selecionares \"Introduzir manualmente o código\" durante a configuração da sincronização num segundo dispositivo</string>
+    <string name="sync_code_copied_message">Código de recuperação copiado</string>
+    <string name="sync_camera_permission_required">É necessária a permissão para usar a câmara</string>
+    <string name="sync_camera_unavailable">Câmara indisponível</string>
+    <string name="sync_camera_permission_required_description">Acede às definições do dispositivo e concede permissão a esta aplicação para aceder à câmara.</string>
+    <string name="sync_go_to_settings">Aceder às Definições</string>
+    <string name="sync_general_error">Ocorreu um erro</string>
+    <string name="sync_notification_channel_name">Sincronizar</string>
+    <string name="sync_notify_me_title">As notificações estão desativadas</string>
+    <string name="sync_notify_me_description">Recebe uma notificação se a sincronização e a cópia de segurança encontrarem um erro.</string>
+    <string name="sync_rollout_banner_text">A sincronização e cópia de segurança estão a ser disponibilizadas gradualmente e podem ainda não estar disponíveis no DuckDuckGo nos teus outros dispositivos</string>
+</resources>
