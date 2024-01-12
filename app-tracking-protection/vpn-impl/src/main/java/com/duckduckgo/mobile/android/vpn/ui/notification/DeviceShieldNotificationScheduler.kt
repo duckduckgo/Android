@@ -16,7 +16,10 @@
 
 package com.duckduckgo.mobile.android.vpn.ui.notification
 
+import android.Manifest.permission
 import android.content.Context
+import android.content.pm.PackageManager
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.work.*
@@ -185,18 +188,20 @@ class DeviceShieldDailyNotificationWorker(
     }
 
     private suspend fun showNotification() {
-        val deviceShieldNotification = deviceShieldNotificationFactory.createDailyDeviceShieldNotification().also {
-            notificationPressedHandler.notificationVariant = it.notificationVariant
-        }
+        if (ActivityCompat.checkSelfPermission(context, permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+            val deviceShieldNotification = deviceShieldNotificationFactory.createDailyDeviceShieldNotification().also {
+                notificationPressedHandler.notificationVariant = it.notificationVariant
+            }
 
-        if (!deviceShieldNotification.hidden) {
-            val notification =
-                deviceShieldAlertNotificationBuilder.buildStatusNotification(context, deviceShieldNotification, notificationPressedHandler)
-            deviceShieldPixels.didShowDailyNotification(deviceShieldNotification.notificationVariant)
-            notificationManager.notify(DeviceShieldNotificationScheduler.VPN_DAILY_NOTIFICATION_ID, notification)
-            logcat { "Vpn Daily notification is now shown" }
-        } else {
-            logcat { "Vpn Daily notification won't be shown because there is no data to show" }
+            if (!deviceShieldNotification.hidden) {
+                val notification =
+                    deviceShieldAlertNotificationBuilder.buildStatusNotification(context, deviceShieldNotification, notificationPressedHandler)
+                deviceShieldPixels.didShowDailyNotification(deviceShieldNotification.notificationVariant)
+                notificationManager.notify(DeviceShieldNotificationScheduler.VPN_DAILY_NOTIFICATION_ID, notification)
+                logcat { "Vpn Daily notification is now shown" }
+            } else {
+                logcat { "Vpn Daily notification won't be shown because there is no data to show" }
+            }
         }
     }
 }
@@ -223,20 +228,21 @@ class DeviceShieldWeeklyNotificationWorker(
 
     override suspend fun doWork(): Result {
         logcat { "Vpn Weekly notification worker is now awake" }
+        if (ActivityCompat.checkSelfPermission(context, permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+            val deviceShieldNotification = deviceShieldNotificationFactory.createWeeklyDeviceShieldNotification().also {
+                notificationPressedHandler.notificationVariant = it.notificationVariant
+            }
 
-        val deviceShieldNotification = deviceShieldNotificationFactory.createWeeklyDeviceShieldNotification().also {
-            notificationPressedHandler.notificationVariant = it.notificationVariant
-        }
-
-        if (!deviceShieldNotification.hidden) {
-            logcat { "Vpn Daily notification won't be shown because there is no data to show" }
-            val notification = deviceShieldAlertNotificationBuilder.buildStatusNotification(
-                context,
-                deviceShieldNotification,
-                notificationPressedHandler,
-            )
-            deviceShieldPixels.didShowWeeklyNotification(deviceShieldNotification.notificationVariant)
-            notificationManager.notify(Companion.VPN_WEEKLY_NOTIFICATION_ID, notification)
+            if (!deviceShieldNotification.hidden) {
+                logcat { "Vpn Daily notification won't be shown because there is no data to show" }
+                val notification = deviceShieldAlertNotificationBuilder.buildStatusNotification(
+                    context,
+                    deviceShieldNotification,
+                    notificationPressedHandler,
+                )
+                deviceShieldPixels.didShowWeeklyNotification(deviceShieldNotification.notificationVariant)
+                notificationManager.notify(Companion.VPN_WEEKLY_NOTIFICATION_ID, notification)
+            }
         }
 
         return Result.success()

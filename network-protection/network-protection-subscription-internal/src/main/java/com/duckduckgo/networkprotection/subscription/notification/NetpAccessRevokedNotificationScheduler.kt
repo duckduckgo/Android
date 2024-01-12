@@ -19,6 +19,7 @@ package com.duckduckgo.networkprotection.subscription.notification
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.notification.checkPermissionAndNotify
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
@@ -49,7 +50,8 @@ class NetpAccessRevokedNotificationScheduler @Inject constructor(
 
     override fun onVpnStartFailed(coroutineScope: CoroutineScope) {
         if (networkProtectionRepository.vpnAccessRevoked) {
-            notificationManager.notify(
+            notificationManager.checkPermissionAndNotify(
+                context,
                 NetPDisabledNotificationScheduler.NETP_REMINDER_NOTIFICATION_ID,
                 netpAccessRevokedNotificationBuilder.buildVpnAccessRevokedNotification(context),
             )

@@ -26,6 +26,8 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.registerNotExportedReceiver
+import com.duckduckgo.common.utils.notification.checkPermissionAndNotify
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.ui.notification.*
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -49,7 +51,7 @@ class DeviceShieldNotificationsDebugReceiver(
 ) : BroadcastReceiver() {
 
     init {
-        context.registerReceiver(this, IntentFilter(intentAction))
+        context.registerNotExportedReceiver(this, IntentFilter(intentAction))
     }
 
     override fun onReceive(
@@ -116,7 +118,7 @@ class DeviceShieldNotificationsDebugReceiverRegister @Inject constructor(
                 }
 
                 notification?.let {
-                    notificationManagerCompat.notify(DeviceShieldNotificationScheduler.VPN_WEEKLY_NOTIFICATION_ID, it)
+                    notificationManagerCompat.checkPermissionAndNotify(context, DeviceShieldNotificationScheduler.VPN_WEEKLY_NOTIFICATION_ID, it)
                 }
             }
         }

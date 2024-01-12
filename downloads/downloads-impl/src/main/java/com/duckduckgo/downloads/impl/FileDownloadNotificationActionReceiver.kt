@@ -26,6 +26,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.registerNotExportedReceiver
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.downloads.api.*
 import com.duckduckgo.downloads.impl.pixels.DownloadsPixelName
@@ -55,7 +56,7 @@ class FileDownloadNotificationActionReceiver @Inject constructor(
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
         Timber.v("Registering file download notification action receiver")
-        context.registerReceiver(this, IntentFilter(INTENT_DOWNLOADS_NOTIFICATION_ACTION))
+        context.registerNotExportedReceiver(this, IntentFilter(INTENT_DOWNLOADS_NOTIFICATION_ACTION))
 
         // When the app process is killed and restarted, this onCreate method is called and we take the opportunity
         // to clean up the pending downloads that were in progress and will be no longer downloading.
