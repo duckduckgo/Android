@@ -1,5 +1,8 @@
 appId: com.duckduckgo.mobile.android
+name: "Autofill: Manually add credentials"
 ---
+# Pre-requisite: the user is viewing the password manager screen with no saved passwords, on an autofill-eligible device
+
 - runScript: 3_script.js
 
 - repeat:

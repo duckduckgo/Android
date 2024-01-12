@@ -252,7 +252,7 @@ class AutofillSettingsViewModel @Inject constructor(
             return
         }
 
-        if (!deviceAuthenticator.hasValidDeviceAuthentication()) {
+        if (deviceAuthenticator.isAuthenticationRequiredForAutofill() && !deviceAuthenticator.hasValidDeviceAuthentication()) {
             Timber.d("Can't show device auth as there is no valid device authentication")
             disabled()
             return
