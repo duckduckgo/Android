@@ -188,6 +188,20 @@ class SavedSitesRepositoryTest {
     }
 
     @Test
+    fun whenFavoriteIsAddedAndThenRemovedAndDeleteBookmarkIsTrueThenNothingIsRetrieved() {
+        givenEmptyDBState()
+
+        val favorite = repository.insertFavorite("favourite1", "https://favorite.com", "favorite", "timestamp")
+
+        assert(repository.getFavorite("https://favorite.com") != null)
+
+        repository.delete(favorite, true)
+
+        assert(repository.getFavorite("https://favorite.com") == null)
+        assert(repository.getBookmark("https://favorite.com") == null)
+    }
+
+    @Test
     fun whenBookmarkIsAddedAndThenRemovedThenNothingIsRetrieved() {
         givenEmptyDBState()
 
@@ -1198,5 +1212,51 @@ class SavedSitesRepositoryTest {
     private fun givenEmptyDBState() {
         savedSitesRelationsDao.insertList(givenFolderWithContent(SavedSitesNames.BOOKMARKS_ROOT, emptyList()))
         savedSitesRelationsDao.insertList(givenFolderWithContent(SavedSitesNames.FAVORITES_ROOT, emptyList()))
+    }
+
+    @Test
+    fun whenReplaceBookmarkFolderCalledThenFolderRelationsAreUpdatedCorrectly() = runTest {
+        val folderId = "folderId"
+        val initialEntities = listOf("123", "345")
+        val updatedEntities = listOf("567", "789")
+
+        repository.insert(BookmarkFolder(id = folderId, name = "folder1", lastModified = "timestamp", parentId = SavedSitesNames.BOOKMARKS_ROOT))
+        initialEntities.forEach { entityId ->
+            savedSitesEntitiesDao.insert(Entity(entityId, "title", "www.example.com", type = BOOKMARK, lastModified = "timestamp"))
+            savedSitesRelationsDao.insert(Relation(folderId = folderId, entityId = entityId))
+        }
+
+        savedSitesRelationsDao.replaceBookmarkFolder(folderId, updatedEntities)
+
+        val relations = savedSitesRelationsDao.relationsByFolderId(folderId)
+        assertEquals(updatedEntities.size, relations.size)
+        assertEquals(relations[0].entityId, updatedEntities[0])
+        assertEquals(relations[1].entityId, updatedEntities[1])
+    }
+
+    @Test
+    fun whenUpdateBookmarkWithUpdateFavoriteTrueAndBookmarkIsFavoriteThenFavoriteIsInserted() = runTest {
+        givenEmptyDBState()
+
+        val bookmark = Bookmark("bookmark1", "title", "www.example.com", "timestamp", SavedSitesNames.BOOKMARKS_ROOT, isFavorite = true)
+        repository.insert(bookmark)
+
+        repository.updateBookmark(bookmark, SavedSitesNames.BOOKMARKS_ROOT, updateFavorite = true)
+
+        assertNotNull(repository.getFavorite(bookmark.url))
+    }
+
+    @Test
+    fun whenUpdateBookmarkWithUpdateFavoriteTrueAndBookmarkIsNotFavoriteThenFavoriteIsDeleted() = runTest {
+        givenEmptyDBState()
+
+        val bookmark = Bookmark("bookmark1", "title", "www.example.com", "timestamp", SavedSitesNames.BOOKMARKS_ROOT, isFavorite = false)
+        val favorite = Favorite("favorite1", "title", "www.example.com", "timestamp", 0)
+        repository.insert(bookmark)
+        repository.insertFavorite(favorite.title, favorite.url, favorite.title, favorite.lastModified)
+
+        repository.updateBookmark(bookmark, SavedSitesNames.BOOKMARKS_ROOT, updateFavorite = true)
+
+        assertNull(repository.getFavorite(bookmark.url))
     }
 }
