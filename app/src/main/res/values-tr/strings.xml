@@ -788,4 +788,22 @@
     <string name="settingsAutofillLoginsSetting">Şifreler</string>
     <string name="autofillLoginSavedSnackbarMessage">Şifre kaydedildi</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Şifre güncellendi</string>
+
+    <!-- Bookmarks -->
+    <string name="searchBookmarks">Yer İmlerini Ara</string>
+    <string name="deleteFolder" instruction="%1$s is the folder name">"%1$s silinsin mi?"</string>
+    <string name="deleteBookmark" instruction="%1$s is the bookmark name">"%1$s yer imi silinsin mi?"</string>
+    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Yer imi %1$s klasörüne eklendi</string>
+    <string name="addToFavorites">Favorilere Ekle</string>
+    <string name="editBookmark">Yer İşaretini Düzenle</string>
+    <string name="importBookmarksDescription">Yer imleriniz başka bir tarayıcıda kayıtlıysa, bunları DuckDuckGo\'ya aktarabilirsiniz.</string>
+    <string name="importBookmarks">Yer İmlerini İçe Aktar</string>
+    <string name="noResultsFor" instruction="%1$s is the search term">\'%1$s\' için sonuç yok</string>
+    <string name="removeFromFavorites">Favorilerden Kaldır</string>
+    <string name="addToFavoritesMenu">Favorilere Ekle</string>
+    <plurals name="bookmarkFolderDeleteMessage">
+        <item quantity="one">Bu klasörü ve %1$d ögeyi silmek istediğinizden emin misiniz?</item>
+        <item quantity="other">Bu klasörü ve %1$d ögeyi silmek istediğinizden emin misiniz?</item>
+    </plurals>
+    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">&lt;b&gt;%1$s&lt;/b&gt; yer iminizi silmek istediğinizden emin misiniz?</string>
 </resources>
