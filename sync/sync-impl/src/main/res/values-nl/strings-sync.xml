@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2021 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <!-- Sync Disabled messages -->
+    <string name="sync_flows_disabled"><b>\'Synchronisatie en back-up\' niet beschikbaar</b>\n\'Synchronisatie en back-up\' is momenteel niet beschikbaar. Probeer het later opnieuw.</string>
+    <string name="sync_flows_disabled_new_version"><b>\'Synchronisatie en back-up\' niet beschikbaar</b>\n\'Synchronisatie en back-up\' is helaas niet langer beschikbaar in deze app-versie. Werk DuckDuckGo bij naar de nieuwste versie om door te gaan.</string>
+    <string name="sync_create_account_disabled"><b>\'Synchronisatie en back-up\' niet beschikbaar</b>\n\'Synchronisatie en back-up\' is momenteel niet beschikbaar. Probeer het later opnieuw.</string>
+    <string name="sync_create_account_disabled_new_version"><b>\'Synchronisatie en back-up\' niet beschikbaar</b>\n\'Synchronisatie en back-up\' is helaas niet langer beschikbaar in deze app-versie. Werk DuckDuckGo bij naar de nieuwste versie om door te gaan.</string>
+    <string name="sync_disabled_authenticated_user"><b>\'Synchronisatie en back-up\' is onderbroken</b>\n\'Synchronisatie en back-up\' is momenteel niet beschikbaar. Probeer het later opnieuw.</string>
+    <string name="sync_disabled_authenticated_user_new_version"><b>\'Synchronisatie en back-up\' is onderbroken</b>\n\'Synchronisatie en back-up\' is helaas niet langer beschikbaar in deze app-versie. Werk DuckDuckGo bij naar de nieuwste versie om door te gaan.</string>
+    <string name="sync_paused_notification"><b>\'Synchronisatie en back-up\' is onderbroken</b>\n\'Synchronisatie en back-up\' is momenteel niet beschikbaar. Probeer het later opnieuw.</string>
+
+    <!-- Settings screen -->
+    <string name="sync_screen_title">Synchronisatie en back-up</string>
+    <string name="sync_setup_begin_syncing">Synchroniseren starten</string>
+    <string name="sync_setup_with_another_device_cta_title">Synchroniseren met een ander apparaat</string>
+    <string name="sync_setup_with_another_device_cta_subtitle">Synchroniseer bladwijzers en wachtwoorden veilig tussen je apparaten.</string>
+    <string name="sync_off_hint">Je gegevens zijn volledig versleuteld en DuckDuckGo heeft geen toegang tot de versleutelingscode.</string>
+    <string name="sync_setup_single_device_title">Configuratie van één apparaat</string>
+    <string name="sync_setup_single_recover_data_cta_title">Gesynchroniseerde gegevens herstellen</string>
+    <string name="sync_setup_single_sync_this_device_cta_title">Dit apparaat synchroniseren en back-up maken</string>
+
+    <string name="sync_off_encrypted_hint">Je gegevens zijn volledig versleuteld en DuckDuckGo heeft geen toegang tot de ontsleutelingscode.</string>
+
+    <!-- Setup screen -->
+    <string name="sync_enable_sync_title">\'Synchronisatie en back-up\' instellen!</string>
+    <string name="sync_enable_sync_content">Je bladwijzers en wachtwoorden worden voorbereid voor synchronisatie. Dit hoeft niet zo lang te duren.</string>
+    <string name="sync_enable_options">Opties</string>
+    <string name="sync_enable_option_favicons_title">Bladwijzerpictogrammen ophalen</string>
+    <string name="sync_enable_option_favicons_subtitle">Download automatisch pictogrammen voor gesynchroniseerde bladwijzers.</string>
+    <string name="sync_enable_connecting">Er wordt verbinding gemaakt ...</string>
+    <string name="sync_intro_enable_title">Dit apparaat synchroniseren en back-up maken</string>
+    <string name="sync_intro_enable_content">Hiermee maak je een versleutelde back-up van je bladwijzers en wachtwoorden op de beveiligde server van DuckDuckGo. Deze back-up kan met je andere apparaten worden gesynchroniseerd. \n\n De versleutelingscode wordt alleen op je apparaat opgeslagen. DuckDuckGo heeft er geen toegang toe ...</string>
+    <string name="sync_intro_enable_footer">Je kunt later synchroniseren met je andere apparaten.</string>
+    <string name="sync_intro_enable_cta">\'Synchronisatie en back-up\' inschakelen</string>
+    <string name="sync_intro_recover_title">Gesynchroniseerde gegevens herstellen</string>
+    <string name="sync_intro_recover_content">Om je gesynchroniseerde gegevens te herstellen, heb je de herstelcode nodig die je hebt opgeslagen tijdens het instellen van \'Synchronisatie\'. Deze code is mogelijk als PDF opgeslagen op het apparaat dat je gebruikte om \'Synchronisatie\' in te stellen.</string>
+    <string name="sync_intro_recover_cta">Aan de slag</string>
+
+    <!-- Recover data screen -->
+    <string name="login_screen_title">QR-code scannen</string>
+    <string name="login_screen_enter_code_cta">Of voer handmatig de code in</string>
+    <string name="login_screen_barcode_hint">Richt de camera op QR-code om te synchroniseren</string>
+    <string name="login_screen_cant_scan">Kun je niet scannen? <font color="#7295F6">Tekstcode delen</font></string>
+
+    <!-- Connect screen -->
+    <string name="connect_screen_title">QR-code scannen</string>
+    <string name="connect_screen_scan_qr_hint">Ga naar <b>\'Instellingen\' › \'Synchronisatie en back-up\'</b> in de DuckDuckGo-browser op een ander apparaat en selecteer \'Synchroniseren met een ander apparaat\'.</string>
+    <string name="connect_screen_enter_code_cta">Of voer handmatig de code in</string>
+    <string name="connect_screen_connect_qr_hint_title">Mobiel-naar-mobiel?</string>
+    <string name="connect_screen_connect_qr_hint_content">Scan deze code met een ander apparaat om te synchroniseren.</string>
+    <string name="connect_screen_share_code">Code kopiëren</string>
+
+    <!-- Enter Code screen -->
+    <string name="enter_code_screen_title">Code handmatig invoeren</string>
+    <string name="sync_enter_code_hint">Ga naar <b>\'Instellingen\' &gt; \'Synchronisatie en back-up\' &gt; \'Synchroniseren met een ander apparaat\'</b> en selecteer <b>Tekstcode weergeven</b> in de DuckDuckGo-app op een ander gesynchroniseerd apparaat. Plak de code hier om dit apparaat te synchroniseren.</string>
+    <string name="sync_enter_code_verifying">Code verifiëren</string>
+    <string name="sync_enter_code_invalid">⚠️ Ongeldige code</string>
+    <string name="sync_enter_code_paste">Code plakken</string>
+
+    <!-- Recovery PDF screen -->
+    <string name="sync_recovery_code_title">Herstelcode opslaan</string>
+    <string name="sync_save_recovery_code_item_hint">Als je geen toegang meer hebt tot je apparaten, heb je deze code nodig om je gesynchroniseerde gegevens te herstellen.</string>
+    <string name="sync_recovery_code_skip_button">Volgende</string>
+    <string name="sync_recovery_code_primary_button">Opslaan als PDF</string>
+    <string name="sync_recovery_code_secondary_button">Code kopiëren</string>
+    <string name="sync_code_box_description">Iedereen met toegang tot deze code kan bij je gesynchroniseerde gegevens. Bewaar de code daarom op een veilige plek.</string>
+
+    <!-- Device synced screen -->
+    <string name="sync_connected_device_title">Je gegevens zijn gesynchroniseerd!</string>
+    <string name="sync_connected_device_primary_button">Klaar</string>
+
+    <string name="show_qr_screen_title">QR-code weergeven</string>
+
+    <string name="show_code_screen_title">Code</string>
+    <string name="enter_code_screen_cta">Voer de tekstcode in</string>
+    <string name="sync_login_device_hint">Scan de QR-code in het PDF-bestand of op een ander gesynchroniseerd apparaat om je gegevens te herstellen.</string>
+
+    <string name="synced_devices_section_title">Gesynchroniseerde apparaten</string>
+    <string name="sync_new_device_section_title">Nieuw apparaat synchroniseren</string>
+    <string name="sync_new_device_hint">Ga naar \'Instellingen\' › \'Synchronisatie en back-up\' in de DuckDuckGo-app op een ander apparaat en scan om direct verbinding te maken.</string>
+    <string name="sync_show_text_code_item">Tekstcode weergeven</string>
+    <string name="sync_show_qr_code_item">QR-code scannen</string>
+    <string name="sync_save_recovery_code_item">PDF voor herstel opslaan</string>
+    <string name="sync_delete_account_item">Servergegevens uitschakelen en verwijderen ...</string>
+    <string name="sync_disable_sync_item">\'Synchronisatie en back-up\' uitschakelen ...</string>
+    <string name="sync_enable_sync_next_button">Volgende</string>
+    <string name="sync_recovery_code_content">Als je geen toegang meer hebt tot je apparaten, heb je deze code nodig om je gesynchroniseerde gegevens te herstellen.</string>
+    <string name="sync_recovery_code_hint">Iedereen met toegang tot deze code kan bij je gesynchroniseerde gegevens. Bewaar de code daarom op een veilige plek.</string>
+
+    <string name="turn_off_sync_dialog_title">Synchronisatie uitschakelen?</string>
+    <string name="turn_off_sync_dialog_content">Dit apparaat heeft geen toegang meer tot je gesynchroniseerde gegevens</string>
+    <string name="turn_off_sync_dialog_primary_button">Uitschakelen</string>
+    <string name="turn_off_sync_dialog_secondary_button">Annuleren</string>
+    <string name="sync_permission_required_store_recovery_code">We hebben toegang tot je opslag nodig om het PDF-bestand met herstelgegevens op te slaan</string>
+    <string name="sync_share_title">Delen met...</string>
+    <string name="sync_pdf_title">Herstelcode synchroniseren</string>
+    <string name="sync_pdf_description">Met de herstelcode kun je je bladwijzers synchroniseren op meerdere apparaten en je gesynchroniseerde gegevens herstellen als je geen toegang meer hebt tot een apparaat.</string>
+    <string name="sync_code_box_title">Bewaar deze informatie veilig.</string>
+    <string name="sync_instructions_title">Hoe werkt dit?</string>
+    <string name="sync_instructions_step1">Open DuckDuckGo op een ander apparaat en ga naar \'Synchroniseren\' in \'Instellingen\'.</string>
+    <string name="sync_instructions_step2">Scan de QR-code of kopieer en plak de tekstcode in een andere DuckDuckGo-app.</string>
+    <string name="sync_instructions_step3">Synchronisatie wordt geactiveerd en je hebt weer toegang tot al je gegevens.</string>
+    <string name="remove_device_dialog_title">Apparaat verwijderen?</string>
+    <string name="remove_device_dialog_content" instruction="Placeholder is a device name">\'%1$s\' heeft geen toegang meer tot je gesynchroniseerde gegevens.</string>
+    <string name="remove_device_dialog_primary_button">Verwijderen</string>
+    <string name="remove_device_dialog_secondary_button">Annuleren</string>
+    <string name="edit_device_dialog_title">Bewerken</string>
+    <string name="edit_device_dialog_hint">Naam apparaat</string>
+    <string name="edit_device_dialog_primary_button">OK</string>
+    <string name="edit_device_dialog_secondary_button">Annuleren</string>
+    <string name="sync_device_this_device_hint">Dit apparaat</string>
+    <string name="sync_device_menu_option_edit">Bewerken</string>
+    <string name="sync_device_menu_option_remove">Apparaat verwijderen</string>
+    <string name="sync_show_code_copy">Code kopiëren</string>
+    <string name="sync_show_code_copy_hint">Gebruik deze code nadat je \'Code handmatig invoeren\' hebt gekozen tijdens het synchroniseren op een tweede apparaat</string>
+    <string name="sync_code_copied_message">Herstelcode gekopieerd</string>
+    <string name="sync_camera_permission_required">Cameramachtiging is vereist</string>
+    <string name="sync_camera_unavailable">Camera niet beschikbaar</string>
+    <string name="sync_camera_permission_required_description">Ga naar je apparaatinstellingen om deze app toegang te geven tot je camera.</string>
+    <string name="sync_go_to_settings">Ga naar Instellingen</string>
+    <string name="sync_general_error">Er is iets misgegaan</string>
+    <string name="sync_notification_channel_name">Synchroniseren</string>
+    <string name="sync_notify_me_title">Meldingen zijn uitgeschakeld</string>
+    <string name="sync_notify_me_description">Ontvang een melding als \'Synchronisatie en back-up\' op een fout stuit.</string>
+    <string name="sync_rollout_banner_text">\'Synchronisatie en back-up\' wordt geleidelijk uitgerold en is mogelijk nog niet beschikbaar in DuckDuckGo op je andere apparaten</string>
+</resources>
