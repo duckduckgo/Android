@@ -321,13 +321,23 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun whenQuickAccessItemDeleteRequestedThenShowDeleteConfirmation() {
+    fun whenQuickAccessItemDeleteRequestedThenShowDeleteFavoriteConfirmation() {
         val quickAccessItem = QuickAccessFavorite(Favorite("favorite1", "title", "http://example.com", "timestamp", 0))
 
         testee.onDeleteQuickAccessItemRequested(quickAccessItem)
 
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertEquals(Command.DeleteFavoriteConfirmation(quickAccessItem.favorite), commandCaptor.lastValue)
+    }
+
+    @Test
+    fun whenSavedSiteDeleteRequestedThenShowDeleteSavedSiteConfirmation() {
+        val quickAccessItem = QuickAccessFavorite(Favorite("favorite1", "title", "http://example.com", "timestamp", 0))
+
+        testee.onDeleteSavedSiteRequested(quickAccessItem)
+
+        verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertEquals(Command.DeleteSavedSiteConfirmation(quickAccessItem.favorite), commandCaptor.lastValue)
     }
 
     @Test
