@@ -22,6 +22,10 @@ import androidx.core.content.edit
 interface AuthDataStore {
     var accessToken: String?
     var authToken: String?
+    var email: String?
+    var externalId: String?
+    var expiresOrRenewsAt: Long?
+    var platform: String?
     fun canUseEncryption(): Boolean
 }
 
@@ -60,11 +64,63 @@ class AuthEncryptedDataStore(
             }
         }
 
+    override var email: String?
+        get() = encryptedPreferences?.getString(KEY_EMAIL, null)
+        set(value) {
+            encryptedPreferences?.edit(commit = true) {
+                if (value == null) {
+                    remove(KEY_EMAIL)
+                } else {
+                    putString(KEY_EMAIL, value)
+                }
+            }
+        }
+
+    override var platform: String?
+        get() = encryptedPreferences?.getString(KEY_PLATFORM, null)
+        set(value) {
+            encryptedPreferences?.edit(commit = true) {
+                if (value == null) {
+                    remove(KEY_PLATFORM)
+                } else {
+                    putString(KEY_PLATFORM, value)
+                }
+            }
+        }
+
+    override var externalId: String?
+        get() = encryptedPreferences?.getString(KEY_EXTERNAL_ID, null)
+        set(value) {
+            encryptedPreferences?.edit(commit = true) {
+                if (value == null) {
+                    remove(KEY_EXTERNAL_ID)
+                } else {
+                    putString(KEY_EXTERNAL_ID, value)
+                }
+            }
+        }
+
+    override var expiresOrRenewsAt: Long?
+        get() = encryptedPreferences?.getLong(KEY_EXPIRES_OR_RENEWS_AT, 0L)
+        set(value) {
+            encryptedPreferences?.edit(commit = true) {
+                if (value == null) {
+                    remove(KEY_EXPIRES_OR_RENEWS_AT)
+                } else {
+                    putLong(KEY_EXPIRES_OR_RENEWS_AT, value)
+                }
+            }
+        }
+
     override fun canUseEncryption(): Boolean = encryptedPreferences != null
 
     companion object {
         const val FILENAME = "com.duckduckgo.subscriptions.store"
         const val KEY_ACCESS_TOKEN = "KEY_ACCESS_TOKEN"
         const val KEY_AUTH_TOKEN = "KEY_AUTH_TOKEN"
+        const val KEY_PLATFORM = "KEY_PLATFORM"
+        const val KEY_EMAIL = "KEY_EMAIL"
+        const val KEY_EXTERNAL_ID = "KEY_EXTERNAL_ID"
+        const val KEY_EXPIRES_OR_RENEWS_AT = "KEY_EXPIRES_OR_RENEWS_AT"
     }
 }

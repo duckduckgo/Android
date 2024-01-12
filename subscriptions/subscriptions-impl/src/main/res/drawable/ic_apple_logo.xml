@@ -1,0 +1,44 @@
+<!--
+  ~ Copyright (c) 2024 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="56dp"
+    android:height="56dp"
+    android:viewportWidth="56"
+    android:viewportHeight="56">
+  <group>
+    <clip-path
+        android:pathData="M0,0h56v56h-56z"/>
+    <path
+        android:pathData="M44.664,0.035H11.329C5.086,0.035 0.031,5.09 0.031,11.333V44.674C0.031,50.91 5.086,55.965 11.329,55.965H44.671C50.907,55.965 55.968,50.91 55.968,44.667V11.333C55.961,5.09 50.907,0.035 44.664,0.035Z">
+      <aapt:attr name="android:fillColor">
+        <gradient
+            android:startX="27.997"
+            android:startY="0.035"
+            android:endX="27.997"
+            android:endY="55.965"
+            android:type="linear">
+          <item android:offset="0" android:color="#FF0ED4FC"/>
+          <item android:offset="1" android:color="#FF0C57EF"/>
+        </gradient>
+      </aapt:attr>
+    </path>
+    <path
+        android:pathData="M27.759,12.885L28.891,10.927C29.59,9.704 31.15,9.291 32.373,9.991C33.597,10.69 34.009,12.249 33.31,13.472L22.396,32.363H30.29C32.848,32.363 34.282,35.369 33.17,37.452H10.029C8.617,37.452 7.484,36.32 7.484,34.907C7.484,33.495 8.617,32.363 10.029,32.363H16.517L24.823,17.968L22.229,13.465C21.53,12.242 21.942,10.697 23.166,9.984C24.389,9.284 25.934,9.697 26.647,10.92L27.759,12.885ZM17.943,40.074L15.496,44.318C14.797,45.541 13.238,45.954 12.014,45.255C10.791,44.555 10.378,42.996 11.078,41.773L12.895,38.627C14.951,37.991 16.622,38.48 17.943,40.074ZM39.015,32.377H45.636C47.048,32.377 48.18,33.509 48.18,34.921C48.18,36.334 47.048,37.466 45.636,37.466H41.958L44.44,41.773C45.139,42.996 44.727,44.541 43.503,45.255C42.28,45.954 40.735,45.541 40.021,44.318C35.841,37.068 32.702,31.642 30.618,28.028C28.486,24.351 30.01,20.659 31.513,19.408C33.184,22.274 35.68,26.602 39.015,32.377Z"
+        android:fillColor="#ffffff"/>
+  </group>
+</vector>

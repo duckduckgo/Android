@@ -29,6 +29,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.FinishSignOut
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPortal
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Yearly
 import java.text.SimpleDateFormat
@@ -58,6 +59,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
         val date: String? = null,
         val duration: SubscriptionDuration? = null,
         val status: SubscriptionStatus? = null,
+        val platform: String? = null,
     )
 
     override fun onResume(owner: LifecycleOwner) {
@@ -67,8 +69,15 @@ class SubscriptionSettingsViewModel @Inject constructor(
                 val formatter = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
                 val date = formatter.format(Date(subs.expiresOrRenewsAt))
                 val type = if (subs.productId == MONTHLY_PLAN) Monthly else Yearly
-                _viewState.emit(viewState.value.copy(date = date, duration = type, status = subs.status))
+                _viewState.emit(viewState.value.copy(date = date, duration = type, status = subs.status, platform = subs.platform))
             }
+        }
+    }
+
+    fun goToStripe() {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            val url = subscriptionsManager.getPortalUrl() ?: return@launch
+            command.send(GoToPortal(url))
         }
     }
 
@@ -86,5 +95,6 @@ class SubscriptionSettingsViewModel @Inject constructor(
 
     sealed class Command {
         data object FinishSignOut : Command()
+        data class GoToPortal(val url: String) : Command()
     }
 }

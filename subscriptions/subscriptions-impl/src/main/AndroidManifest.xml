@@ -43,5 +43,12 @@
                 android:label="Activate Subscription"
                 android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
                 android:screenOrientation="portrait" />
+
+        <activity
+                android:name=".ui.ChangePlanActivity"
+                android:exported="false"
+                android:label="@string/changePlanTitle"
+                android:parentActivityName=".ui.SubscriptionSettingsActivity"
+                android:screenOrientation="portrait" />
     </application>
 </manifest>
