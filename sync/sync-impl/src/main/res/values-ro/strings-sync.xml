@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2021 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <!-- Sync Disabled messages -->
+    <string name="sync_flows_disabled"><b>Sincronizare și backup indisponibilă</b>\nNe pare rău, dar Sincronizare și backup nu este disponibilă în prezent. Încearcă din nou mai târziu.</string>
+    <string name="sync_flows_disabled_new_version"><b>Sincronizare și backup indisponibil</b>\nNe pare rău, dar Sincronizare și backup nu mai este disponibil în această versiune a aplicației. Actualizează DuckDuckGo la cea mai recentă versiune pentru a continua.</string>
+    <string name="sync_create_account_disabled"><b>Sincronizare și backup indisponibil</b>\nNe pare rău, dar Sincronizare și backup nu este disponibil în prezent. Încearcă din nou mai târziu.</string>
+    <string name="sync_create_account_disabled_new_version"><b>Sincronizare și backup indisponibil</b>\nNe pare rău, dar Sincronizare și backup nu mai este disponibil în această versiune a aplicației. Actualizează DuckDuckGo la cea mai recentă versiune pentru a continua.</string>
+    <string name="sync_disabled_authenticated_user"><b>Sincronizare și backup întreruptă temporar</b>\nNe pare rău, dar Sincronizare și backup este momentan indisponibilă. Încearcă din nou mai târziu.</string>
+    <string name="sync_disabled_authenticated_user_new_version"><b>Sincronizare și backup întreruptă temporar</b>\nNe pare rău, dar Sincronizare și backup nu mai este disponibilă în această versiune a aplicației. Actualizează DuckDuckGo la cea mai recentă versiune pentru a continua.</string>
+    <string name="sync_paused_notification"><b>Sincronizare și backup întrerupt temporar</b>\nNe pare rău, dar Sincronizare și backup este momentan indisponibil. Încearcă din nou mai târziu.</string>
+
+    <!-- Settings screen -->
+    <string name="sync_screen_title">Sincronizare și copiere de rezervă</string>
+    <string name="sync_setup_begin_syncing">Începe sincronizarea</string>
+    <string name="sync_setup_with_another_device_cta_title">Sincronizează cu un alt dispozitiv</string>
+    <string name="sync_setup_with_another_device_cta_subtitle">Sincronizează în siguranță marcajele și parolele între dispozitivele tale.</string>
+    <string name="sync_off_hint">Datele tale sunt criptate integral, iar DuckDuckGo nu are acces la cheia de criptare.</string>
+    <string name="sync_setup_single_device_title">Configurare pe un singur dispozitiv</string>
+    <string name="sync_setup_single_recover_data_cta_title">Recuperează datele sincronizate</string>
+    <string name="sync_setup_single_sync_this_device_cta_title">Sincronizează și fă backup pentru acest dispozitiv</string>
+
+    <string name="sync_off_encrypted_hint">Datele tale sunt criptate integral, iar DuckDuckGo nu are acces la cheia de decriptare.</string>
+
+    <!-- Setup screen -->
+    <string name="sync_enable_sync_title">Se configurează Sincronizare și backup!</string>
+    <string name="sync_enable_sync_content">Marcajele și parolele tale sunt pregătite pentru sincronizare. Acest lucru ar trebui să dureze doar un moment.</string>
+    <string name="sync_enable_options">Opțiuni</string>
+    <string name="sync_enable_option_favicons_title">Preia pictogramele pentru marcaje</string>
+    <string name="sync_enable_option_favicons_subtitle">Descarcă  automat pictograme pentru marcajele sincronizate.</string>
+    <string name="sync_enable_connecting">Se conectează…</string>
+    <string name="sync_intro_enable_title">Sincronizează și fă backup pentru acest dispozitiv</string>
+    <string name="sync_intro_enable_content">Aceasta creează o copie de backup criptată a marcajelor și a parolelor tale pe serverul securizat DuckDuckGo, care poate fi sincronizată cu celelalte dispozitive. \n\n Cheia de criptare este stocată doar pe dispozitivul tău, DuckDuckGo nu o poate accesa...</string>
+    <string name="sync_intro_enable_footer">Poți sincroniza mai târziu cu celelalte dispozitive ale tale.</string>
+    <string name="sync_intro_enable_cta">Activează Sincronizare și backup</string>
+    <string name="sync_intro_recover_title">Recuperează datele sincronizate</string>
+    <string name="sync_intro_recover_content">Pentru a restabili datele sincronizate, vei avea nevoie de codul de recuperare pe care l-ai salvat atunci când ai configurat prima dată Sincronizarea. Este posibil ca acest cod să fi fost salvat ca PDF pe dispozitivul pe care l-ai folosit inițial pentru a configura Sincronizarea.</string>
+    <string name="sync_intro_recover_cta">Să începem</string>
+
+    <!-- Recover data screen -->
+    <string name="login_screen_title">Scanează codul QR</string>
+    <string name="login_screen_enter_code_cta">Sau completează manual codul</string>
+    <string name="login_screen_barcode_hint">Îndreaptă camera spre codul QR pentru a sincroniza</string>
+    <string name="login_screen_cant_scan">Nu se poate scana? <font color="#7295F6">Partajează codul text</font></string>
+
+    <!-- Connect screen -->
+    <string name="connect_screen_title">Scanează codul QR</string>
+    <string name="connect_screen_scan_qr_hint">Mergi la <b>Setări &gt; Sincronizare și backup</b> în browserul DuckDuckGo pe un alt dispozitiv și selectează „Sincronizează cu un alt dispozitiv”.</string>
+    <string name="connect_screen_enter_code_cta">Sau completează manual codul</string>
+    <string name="connect_screen_connect_qr_hint_title">De la mobil la mobil?</string>
+    <string name="connect_screen_connect_qr_hint_content">Scanează acest cod cu un alt dispozitiv pentru a sincroniza.</string>
+    <string name="connect_screen_share_code">Copiază codul</string>
+
+    <!-- Enter Code screen -->
+    <string name="enter_code_screen_title">Completează manual codul</string>
+    <string name="sync_enter_code_hint">Accesează Setări <b>&gt; Sincronizare și backup &gt; Sincronizează cu un alt dispozitiv</b> și selectează <b>Vezi codul text</b> în aplicația DuckDuckGo pe un alt dispozitiv sincronizat și lipește codul aici pentru a sincroniza acest dispozitiv.</string>
+    <string name="sync_enter_code_verifying">Se verifică codul</string>
+    <string name="sync_enter_code_invalid">⚠️ Cod nevalid</string>
+    <string name="sync_enter_code_paste">Lipește codul</string>
+
+    <!-- Recovery PDF screen -->
+    <string name="sync_recovery_code_title">Salvează codul de recuperare</string>
+    <string name="sync_save_recovery_code_item_hint">Dacă pierzi accesul la dispozitivele tale, vei avea nevoie de acest cod pentru a-ți recupera datele sincronizate.</string>
+    <string name="sync_recovery_code_skip_button">Următorul</string>
+    <string name="sync_recovery_code_primary_button">Salvează ca PDF</string>
+    <string name="sync_recovery_code_secondary_button">Copiază codul</string>
+    <string name="sync_code_box_description">Oricine are acces la acest cod poate accesa datele sincronizate, așa că te rugăm să îl păstrezi într-un loc sigur.</string>
+
+    <!-- Device synced screen -->
+    <string name="sync_connected_device_title">Datele tale sunt sincronizate!</string>
+    <string name="sync_connected_device_primary_button">Terminat</string>
+
+    <string name="show_qr_screen_title">Afișează codul QR</string>
+
+    <string name="show_code_screen_title">Cod</string>
+    <string name="enter_code_screen_cta">Completează codul text</string>
+    <string name="sync_login_device_hint">Scanează codul QR de pe PDF-ul de recuperare sau de pe un alt dispozitiv sincronizat pentru a-ți recupera datele.</string>
+
+    <string name="synced_devices_section_title">Dispozitive sincronizate</string>
+    <string name="sync_new_device_section_title">Sincronizează dispozitivul nou</string>
+    <string name="sync_new_device_hint">Accesează Setări &gt; Sincronizare și backup în aplicația DuckDuckGo pe un alt dispozitiv și scanează pentru a te conecta instantaneu.</string>
+    <string name="sync_show_text_code_item">Afișează codul text</string>
+    <string name="sync_show_qr_code_item">Scanează codul QR</string>
+    <string name="sync_save_recovery_code_item">Salvează PDF de recuperare</string>
+    <string name="sync_delete_account_item">Oprește și șterge datele de pe server...</string>
+    <string name="sync_disable_sync_item">Dezactivează Sincronizare și backup...</string>
+    <string name="sync_enable_sync_next_button">Următorul</string>
+    <string name="sync_recovery_code_content">Dacă pierzi accesul la dispozitivele tale, vei avea nevoie de acest cod pentru a-ți recupera datele sincronizate.</string>
+    <string name="sync_recovery_code_hint">Oricine are acces la acest cod poate accesa datele sincronizate, așa că te rugăm să îl păstrezi într-un loc sigur.</string>
+
+    <string name="turn_off_sync_dialog_title">Oprești sincronizarea?</string>
+    <string name="turn_off_sync_dialog_content">Acest dispozitiv nu va mai putea accesa datele tale sincronizate</string>
+    <string name="turn_off_sync_dialog_primary_button">Oprește</string>
+    <string name="turn_off_sync_dialog_secondary_button">Anulare</string>
+    <string name="sync_permission_required_store_recovery_code">Salvarea PDF-ului de recuperare necesită permisiunea de stocare</string>
+    <string name="sync_share_title">Distribuie către...</string>
+    <string name="sync_pdf_title">Codul de recuperare a sincronizării</string>
+    <string name="sync_pdf_description">Codul de recuperare îți permite să sincronizezi marcajele pe mai multe dispozitive și să recuperezi datele sincronizate dacă pierzi accesul la un dispozitiv.</string>
+    <string name="sync_code_box_title">Păstrează aceste informații în siguranță.</string>
+    <string name="sync_instructions_title">Cum funcționează?</string>
+    <string name="sync_instructions_step1">Deschide DuckDuckGo pe un alt dispozitiv și mergi la Sincronizare în Setări.</string>
+    <string name="sync_instructions_step2">Scanează codul QR sau copiază și lipește codul text într-o altă aplicație DuckDuckGo.</string>
+    <string name="sync_instructions_step3">Sincronizarea va fi activată și vei avea din nou acces la toate datele tale.</string>
+    <string name="remove_device_dialog_title">Elimini dispozitivul?</string>
+    <string name="remove_device_dialog_content" instruction="Placeholder is a device name">%1$s„%%@” nu va mai putea accesa datele tale sincronizate.</string>
+    <string name="remove_device_dialog_primary_button">Elimină</string>
+    <string name="remove_device_dialog_secondary_button">Anulare</string>
+    <string name="edit_device_dialog_title">Editează</string>
+    <string name="edit_device_dialog_hint">Numele dispozitivului</string>
+    <string name="edit_device_dialog_primary_button">OK</string>
+    <string name="edit_device_dialog_secondary_button">Anulare</string>
+    <string name="sync_device_this_device_hint">Acest dispozitiv</string>
+    <string name="sync_device_menu_option_edit">Editează</string>
+    <string name="sync_device_menu_option_remove">Elimină dispozitivul</string>
+    <string name="sync_show_code_copy">Copiază codul</string>
+    <string name="sync_show_code_copy_hint">Utilizează acest cod după ce ai ales „Completează manual codul” în timpul configurării sincronizării pe un al doilea dispozitiv</string>
+    <string name="sync_code_copied_message">Codul de recuperare a fost copiat</string>
+    <string name="sync_camera_permission_required">Este necesară permisiunea pentru cameră</string>
+    <string name="sync_camera_unavailable">Cameră indisponibilă</string>
+    <string name="sync_camera_permission_required_description">Accesează setările dispozitivului tău și acordă permisiunea ca această aplicație să îți acceseze camera.</string>
+    <string name="sync_go_to_settings">Mergi la Setări</string>
+    <string name="sync_general_error">Ceva nu a funcționat corect</string>
+    <string name="sync_notification_channel_name">Sincronizare</string>
+    <string name="sync_notify_me_title">Notificările sunt dezactivate</string>
+    <string name="sync_notify_me_description">Primește o notificare în cazul în care Sincronizare și backup întâmpină o eroare.</string>
+    <string name="sync_rollout_banner_text">Sincronizare și backup se implementează treptat și este posibil să nu fie încă disponibilă în DuckDuckGo pe celelalte dispozitive ale tale</string>
+</resources>
