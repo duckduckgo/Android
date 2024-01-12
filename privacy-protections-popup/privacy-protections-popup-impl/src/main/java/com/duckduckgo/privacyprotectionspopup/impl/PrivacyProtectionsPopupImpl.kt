@@ -20,6 +20,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup.LayoutParams
+import android.widget.Button
 import android.widget.PopupWindow
 import androidx.core.view.doOnDetach
 import androidx.core.view.doOnLayout
@@ -36,6 +37,9 @@ import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DONT_SHOW_AGAIN_CLICKED
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.PRIVACY_DASHBOARD_CLICKED
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupViewState
+import com.duckduckgo.privacyprotectionspopup.impl.R.*
+import com.duckduckgo.privacyprotectionspopup.impl.databinding.PopupButtonsHorizontalBinding
+import com.duckduckgo.privacyprotectionspopup.impl.databinding.PopupButtonsVerticalBinding
 import com.duckduckgo.privacyprotectionspopup.impl.databinding.PopupPrivacyDashboardBinding
 import com.google.android.material.shape.ShapeAppearanceModel
 import kotlinx.coroutines.flow.Flow
@@ -77,9 +81,9 @@ class PrivacyProtectionsPopupImpl(
             popupContent.root.updatePaddingRelative(start = contentPaddingStartPx)
         }
 
-        popupContent.dismissButton.setOnClickListener { _events.tryEmit(DISMISS_CLICKED) }
-        popupContent.dontShowAgainButton.setOnClickListener { _events.tryEmit(DONT_SHOW_AGAIN_CLICKED) }
-        popupContent.disableButton.setOnClickListener { _events.tryEmit(DISABLE_PROTECTIONS_CLICKED) }
+        popupContent.buttons.dismiss.setOnClickListener { _events.tryEmit(DISMISS_CLICKED) }
+        popupContent.buttons.doNotShowAgain.setOnClickListener { _events.tryEmit(DONT_SHOW_AGAIN_CLICKED) }
+        popupContent.buttons.disableProtections.setOnClickListener { _events.tryEmit(DISABLE_PROTECTIONS_CLICKED) }
         popupContent.anchorOverlay.setOnClickListener {
             anchor.performClick()
             _events.tryEmit(PRIVACY_DASHBOARD_CLICKED)
@@ -112,11 +116,9 @@ class PrivacyProtectionsPopupImpl(
         popupWindow = null
     }
 
-    private fun createPopupContentView(doNotShowAgainAvailable: Boolean): PopupPrivacyDashboardBinding {
+    private fun createPopupContentView(doNotShowAgainAvailable: Boolean): PopupViewHolder {
         val popupContent = PopupPrivacyDashboardBinding.inflate(LayoutInflater.from(context))
-
-        popupContent.dontShowAgainButton.isVisible = doNotShowAgainAvailable
-        popupContent.dismissButton.isVisible = !doNotShowAgainAvailable
+        val buttonsViewHolder = inflateButtons(popupContent, doNotShowAgainAvailable)
 
         // Override CardView's default elevation with popup/dialog elevation
         popupContent.cardView.cardElevation = POPUP_DEFAULT_ELEVATION_DP.toPx()
@@ -133,7 +135,52 @@ class PrivacyProtectionsPopupImpl(
 
         popupContent.shieldIconHighlight.startAnimation(buildShieldIconHighlightAnimation())
 
-        return popupContent
+        return PopupViewHolder(
+            root = popupContent.root,
+            anchorOverlay = popupContent.anchorOverlay,
+            omnibarOverlay = popupContent.omnibarOverlay,
+            buttons = buttonsViewHolder,
+        )
+    }
+
+    private fun inflateButtons(popupContent: PopupPrivacyDashboardBinding, doNotShowAgainAvailable: Boolean): PopupButtonsViewHolder {
+        val popupExternalMarginsWidth = 2 * anchor.locationInWindow.x
+        val popupInternalPaddingWidth = popupContent.cardViewContent.paddingStart + popupContent.cardViewContent.paddingEnd
+        val availableWidth = context.screenWidth - popupExternalMarginsWidth - popupInternalPaddingWidth
+
+        val horizontalButtons = PopupButtonsHorizontalBinding
+            .inflate(LayoutInflater.from(context), popupContent.buttonsContainer, false)
+            .apply {
+                dontShowAgainButton.isVisible = doNotShowAgainAvailable
+                dismissButton.isVisible = !doNotShowAgainAvailable
+            }
+
+        val horizontalButtonsWidth = horizontalButtons.root
+            .apply { measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED) }
+            .measuredWidth
+
+        return if (horizontalButtonsWidth <= availableWidth) {
+            popupContent.buttonsContainer.addView(horizontalButtons.root)
+            PopupButtonsViewHolder(
+                dismiss = horizontalButtons.dismissButton,
+                doNotShowAgain = horizontalButtons.dontShowAgainButton,
+                disableProtections = horizontalButtons.disableButton,
+            )
+        } else {
+            val verticalButtons = PopupButtonsVerticalBinding
+                .inflate(LayoutInflater.from(context), popupContent.buttonsContainer, true)
+                .apply {
+                    dontShowAgainButton.isVisible = doNotShowAgainAvailable
+                    dismissButton.isVisible = !doNotShowAgainAvailable
+                }
+            popupContent.buttonsContainer.layoutParams = popupContent.buttonsContainer.layoutParams.apply { width = 0 }
+            popupContent.bodyText.setText(string.privacy_protections_popup_body_short)
+            PopupButtonsViewHolder(
+                dismiss = verticalButtons.dismissButton,
+                doNotShowAgain = verticalButtons.dontShowAgainButton,
+                disableProtections = verticalButtons.disableButton,
+            )
+        }
     }
 
     private fun createPopupWindowSpec(popupContent: View): PopupWindowSpec {
@@ -156,13 +203,11 @@ class PrivacyProtectionsPopupImpl(
             .apply { measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED) }
             .measuredWidth
 
-        val screenWidth = context.resources.displayMetrics.widthPixels
-
         // If we reduce the start padding, then the max width is increased so that paddings appear symmetrical
         val maxPopupWindowWidth = if (overrideContentPaddingStartPx == null) {
-            screenWidth
+            context.screenWidth
         } else {
-            screenWidth + popupContent.paddingEnd - overrideContentPaddingStartPx
+            context.screenWidth + popupContent.paddingEnd - overrideContentPaddingStartPx
         }
 
         val popupWidth = popupContentWidth.coerceAtMost(maxPopupWindowWidth)
@@ -174,6 +219,19 @@ class PrivacyProtectionsPopupImpl(
             overrideContentPaddingStartPx = overrideContentPaddingStartPx,
         )
     }
+
+    private class PopupViewHolder(
+        val root: View,
+        val anchorOverlay: View,
+        val omnibarOverlay: View,
+        val buttons: PopupButtonsViewHolder,
+    )
+
+    private class PopupButtonsViewHolder(
+        val dismiss: Button,
+        val doNotShowAgain: Button,
+        val disableProtections: Button,
+    )
 
     private data class PopupWindowSpec(
         val width: Int,
@@ -194,3 +252,6 @@ private val View.xLocationOnScreen: Int
         getLocationOnScreen(location)
         return location[0]
     }
+
+private val Context.screenWidth: Int
+    get() = resources.displayMetrics.widthPixels

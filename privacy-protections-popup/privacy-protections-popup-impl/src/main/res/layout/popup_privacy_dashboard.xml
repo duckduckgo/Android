@@ -61,6 +61,7 @@
         app:layout_constraintTop_toBottomOf="@+id/anchor_overlay">
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cardViewContent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingStart="@dimen/keyline_4"
@@ -86,43 +87,14 @@
                 app:layout_constraintTop_toBottomOf="@id/titleText"
                 app:typography="body2" />
 
-            <com.duckduckgo.common.ui.view.button.DaxButtonGhost
-                android:id="@+id/dismissButton"
+            <FrameLayout
+                android:id="@+id/buttonsContainer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/keyline_4"
-                android:layout_marginEnd="@dimen/keyline_2"
-                android:text="@string/privacy_protections_popup_button_dismiss"
-                android:visibility="gone"
-                app:buttonSize="small"
-                app:layout_constraintEnd_toStartOf="@id/disableButton"
-                app:layout_constraintHorizontal_bias="1"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/bodyText" />
-
-            <com.duckduckgo.common.ui.view.button.DaxButtonGhost
-                android:id="@+id/dontShowAgainButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/keyline_4"
-                android:layout_marginEnd="@dimen/keyline_2"
-                android:text="@string/privacy_protections_popup_button_dont_show_again"
-                android:visibility="gone"
-                app:buttonSize="small"
-                app:layout_constraintEnd_toStartOf="@id/disableButton"
-                app:layout_constraintHorizontal_bias="1"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/bodyText"
-                tools:visibility="visible" />
-
-            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
-                android:id="@+id/disableButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/keyline_4"
-                android:text="@string/privacy_protections_popup_button_disable"
-                app:buttonSize="small"
+                android:layout_marginTop="@dimen/keyline_2"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/bodyText" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
