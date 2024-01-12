@@ -20,9 +20,9 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import androidx.core.content.ContextCompat
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.registerNotExportedReceiver
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
@@ -67,7 +67,7 @@ class SendTrackerDebugReceiver @Inject constructor(
         }
 
         logcat { "Debug receiver SendTrackerDebugReceiver registered" }
-        ContextCompat.registerReceiver(context, this, IntentFilter(INTENT_ACTION), ContextCompat.RECEIVER_NOT_EXPORTED)
+        context.registerNotExportedReceiver(this, IntentFilter(INTENT_ACTION))
     }
 
     private fun unregister() {

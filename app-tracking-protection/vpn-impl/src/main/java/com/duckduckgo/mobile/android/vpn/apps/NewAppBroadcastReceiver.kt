@@ -22,8 +22,8 @@ import android.content.Intent
 import android.content.IntentFilter
 import androidx.annotation.MainThread
 import androidx.annotation.WorkerThread
-import androidx.core.content.ContextCompat
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.registerExportedReceiver
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
@@ -82,7 +82,7 @@ class NewAppBroadcastReceiver @Inject constructor(
             addAction(Intent.ACTION_PACKAGE_ADDED)
             addDataScheme("package")
         }.run {
-            ContextCompat.registerReceiver(applicationContext, this@NewAppBroadcastReceiver, this, ContextCompat.RECEIVER_EXPORTED)
+            applicationContext.registerExportedReceiver(this@NewAppBroadcastReceiver, this)
         }
     }
 

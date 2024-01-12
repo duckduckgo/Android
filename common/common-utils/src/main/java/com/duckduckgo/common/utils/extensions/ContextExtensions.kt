@@ -16,9 +16,12 @@
 
 package com.duckduckgo.common.utils.extensions
 
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.IntentFilter
 import android.os.PowerManager
 import android.provider.Settings
+import androidx.core.content.ContextCompat
 import timber.log.Timber
 
 fun Context.isPrivateDnsActive(): Boolean {
@@ -45,4 +48,18 @@ fun Context.isIgnoringBatteryOptimizations(): Boolean {
             powerManager.isIgnoringBatteryOptimizations(packageName)
         } ?: false
     }.getOrDefault(false)
+}
+
+fun Context.registerNotExportedReceiver(
+    receiver: BroadcastReceiver,
+    intentFilter: IntentFilter,
+) {
+    ContextCompat.registerReceiver(this, receiver, intentFilter, ContextCompat.RECEIVER_NOT_EXPORTED)
+}
+
+fun Context.registerExportedReceiver(
+    receiver: BroadcastReceiver,
+    intentFilter: IntentFilter,
+) {
+    ContextCompat.registerReceiver(this, receiver, intentFilter, ContextCompat.RECEIVER_EXPORTED)
 }

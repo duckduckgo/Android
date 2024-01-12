@@ -21,12 +21,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Environment
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.registerNotExportedReceiver
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.downloads.api.*
 import com.duckduckgo.downloads.impl.pixels.DownloadsPixelName
@@ -56,7 +56,7 @@ class FileDownloadNotificationActionReceiver @Inject constructor(
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
         Timber.v("Registering file download notification action receiver")
-        ContextCompat.registerReceiver(context, this, IntentFilter(INTENT_DOWNLOADS_NOTIFICATION_ACTION), ContextCompat.RECEIVER_NOT_EXPORTED)
+        context.registerNotExportedReceiver(this, IntentFilter(INTENT_DOWNLOADS_NOTIFICATION_ACTION))
 
         // When the app process is killed and restarted, this onCreate method is called and we take the opportunity
         // to clean up the pending downloads that were in progress and will be no longer downloading.

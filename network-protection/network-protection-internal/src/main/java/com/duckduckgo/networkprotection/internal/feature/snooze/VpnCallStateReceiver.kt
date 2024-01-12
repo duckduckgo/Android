@@ -20,7 +20,6 @@ import android.annotation.SuppressLint
 import android.content.*
 import android.telephony.PhoneStateListener
 import android.telephony.TelephonyManager
-import androidx.core.content.ContextCompat
 import androidx.core.content.edit
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -28,6 +27,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.ProcessName
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.registerNotExportedReceiver
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ReceiverScope
 import com.duckduckgo.mobile.android.vpn.Vpn
@@ -161,14 +161,12 @@ class VpnCallStateReceiver @Inject constructor(
     private fun register() {
         unregister()
         logcat { "Registering vpn call state receiver" }
-        ContextCompat.registerReceiver(
-            context,
+        context.registerNotExportedReceiver(
             this,
             IntentFilter().apply {
                 addAction(ACTION_REGISTER_STATE_CALL_LISTENER)
                 addAction(ACTION_UNREGISTER_STATE_CALL_LISTENER)
             },
-            ContextCompat.RECEIVER_NOT_EXPORTED,
         )
     }
 

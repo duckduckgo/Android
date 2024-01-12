@@ -19,15 +19,14 @@ package com.duckduckgo.app.dev.settings.privacy
 import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
-import android.content.Context.RECEIVER_NOT_EXPORTED
 import android.content.Intent
 import android.content.IntentFilter
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.trackerdetection.api.TrackerDataDownloader
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.utils.extensions.registerNotExportedReceiver
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -41,7 +40,7 @@ class TrackerDataDevReceiver(
     private val receiver: (Intent) -> Unit,
 ) : BroadcastReceiver() {
     init {
-        ContextCompat.registerReceiver(context, this, IntentFilter(intentAction), ContextCompat.RECEIVER_NOT_EXPORTED)
+        context.registerNotExportedReceiver(this, IntentFilter(intentAction))
     }
 
     override fun onReceive(

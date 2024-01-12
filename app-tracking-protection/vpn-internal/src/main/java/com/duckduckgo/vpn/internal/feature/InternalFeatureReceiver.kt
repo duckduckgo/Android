@@ -20,7 +20,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import androidx.core.content.ContextCompat
+import com.duckduckgo.common.utils.extensions.registerNotExportedReceiver
 
 /**
  * Abstract class to create generic receivers for internal features accessible through
@@ -45,7 +45,7 @@ abstract class InternalFeatureReceiver(
 
     fun register() {
         unregister()
-        ContextCompat.registerReceiver(context, this, IntentFilter(intentAction()), ContextCompat.RECEIVER_NOT_EXPORTED)
+        context.registerNotExportedReceiver(this, IntentFilter(intentAction()))
     }
 
     fun unregister() {

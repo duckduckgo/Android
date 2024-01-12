@@ -21,12 +21,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.registerNotExportedReceiver
 import com.duckduckgo.common.utils.notification.checkPermissionAndNotify
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.ui.notification.*
@@ -51,7 +51,7 @@ class DeviceShieldNotificationsDebugReceiver(
 ) : BroadcastReceiver() {
 
     init {
-        ContextCompat.registerReceiver(context, this, IntentFilter(intentAction), ContextCompat.RECEIVER_NOT_EXPORTED)
+        context.registerNotExportedReceiver(this, IntentFilter(intentAction))
     }
 
     override fun onReceive(
