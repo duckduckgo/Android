@@ -66,6 +66,10 @@ class VariantManagerImpl @Inject constructor(
             return
         }
 
+        if (currentVariantKey == REINSTALL_VARIANT) {
+            return
+        }
+
         if (currentVariantKey == null) {
             allocateNewVariant(activeVariants)
             return
@@ -140,6 +144,8 @@ class VariantManagerImpl @Inject constructor(
 
         // this will be returned when there are no other active experiments
         private val DEFAULT_VARIANT = Variant(key = "", filterBy = { noFilter() })
+
+        private const val REINSTALL_VARIANT = "ru"
 
         private val serpRegionToggleTargetCountries = listOf(
             "AU",
