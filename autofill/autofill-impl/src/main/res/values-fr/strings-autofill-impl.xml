@@ -133,4 +133,6 @@
     <string name="managementDisabledModeSubtitle">Un schéma de verrouillage de l\'appareil, un code PIN ou des données biométriques sont nécessaires pour protéger vos mots de passe.</string>
     <string name="credentialManagementEditTitle">Modifier le mot de passe</string>
 
+    <string name="credentials_limit_warning"><b>Synchronisation suspendue</b>\nLimite d\'identifiants dépassée. Supprimez-en quelques-uns pour reprendre la synchronisation.\n\n<annotation type="manage_logins">Gérer les identifiants</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>La synchronisation des mots de passe est suspendue</b>\nVous avez dépassé la limite de synchronisation des mots de passe. Veuillez en supprimer quelques-uns pour pouvoir sauvegarder vos mots de passe.</string>
 </resources>
