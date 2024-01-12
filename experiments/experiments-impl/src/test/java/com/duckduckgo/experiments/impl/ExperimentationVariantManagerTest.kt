@@ -103,6 +103,19 @@ class ExperimentationVariantManagerTest {
     }
 
     @Test
+    fun givenReturnUserVariantWhenVariantsConfigUpdatedThenNewVariantNoAllocated() {
+        val variantsConfig = listOf(VariantConfig("variant1", 1.0), VariantConfig("variant2", 1.0))
+        val testVariantEntity = ExperimentVariantEntity("variant1", 1.0)
+        whenever(mockExperimentVariantRepository.getActiveVariants()).thenReturn(listOf(testVariantEntity))
+        whenever(mockExperimentVariantRepository.getUserVariant()).thenReturn("ru")
+
+        testee.saveVariants(variantsConfig)
+
+        verify(mockExperimentVariantRepository, never()).updateVariant(any())
+        verify(mockRandomizer, never()).random(any())
+    }
+
+    @Test
     fun whenNoVariantsAvailableThenDefaultVariantIsAssigned() {
         whenever(mockExperimentVariantRepository.getActiveVariants()).thenReturn(emptyList())
         whenever(mockExperimentVariantRepository.getUserVariant()).thenReturn(null)
