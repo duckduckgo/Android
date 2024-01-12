@@ -32,7 +32,7 @@ import javax.inject.Inject
 import kotlin.reflect.KFunction2
 
 interface ExternalCameraSystemPermissionsHelper {
-    fun hasCameraPermissionsGranted(): Boolean
+    fun hasCameraPermissionsGranted(input: String): Boolean
     fun registerPermissionLaunchers(
         caller: ActivityResultCaller,
         onResultPermissionRequest: KFunction2<Boolean, String, Unit>,
@@ -50,8 +50,15 @@ class RealExternalCameraSystemPermissionsHelperImpl @Inject constructor(
     private var currentPermissionRequested: String? = null
     private var mediaStoreType: String = MediaStore.ACTION_IMAGE_CAPTURE
 
-    override fun hasCameraPermissionsGranted(): Boolean =
-        ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+    override fun hasCameraPermissionsGranted(input: String): Boolean {
+        return when (input) {
+            MediaStore.ACTION_IMAGE_CAPTURE, MediaStore.ACTION_VIDEO_CAPTURE ->
+                ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+            MediaStore.Audio.Media.RECORD_SOUND_ACTION ->
+                ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+            else -> false
+        }
+    }
 
     override fun registerPermissionLaunchers(
         caller: ActivityResultCaller,

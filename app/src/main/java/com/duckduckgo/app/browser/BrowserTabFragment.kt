@@ -745,16 +745,16 @@ class BrowserTabFragment :
         externalCameraLauncher.registerForResult(this) {
             when (it) {
                 is ImageCaptured -> pendingUploadTask?.onReceiveValue(arrayOf(Uri.fromFile(it.file)))
-                CouldNotCapturePermissionDenied -> {
+                is CouldNotCapturePermissionDenied -> {
                     pendingUploadTask?.onReceiveValue(null)
                     activity?.let { activity ->
-                        externalCameraLauncher.showPermissionRationaleDialog(activity)
+                        externalCameraLauncher.showPermissionRationaleDialog(activity, it.input)
                     }
                 }
                 NoImageCaptured -> pendingUploadTask?.onReceiveValue(null)
-                ErrorAccessingCamera -> {
+                is ErrorAccessingCamera -> {
                     pendingUploadTask?.onReceiveValue(null)
-                    Snackbar.make(binding.root, R.string.imageCaptureCameraUnavailable, BaseTransientBottomBar.LENGTH_SHORT).show()
+                    Snackbar.make(binding.root, it.messageId, BaseTransientBottomBar.LENGTH_SHORT).show()
                 }
             }
             pendingUploadTask = null
@@ -1246,9 +1246,10 @@ class BrowserTabFragment :
             is Command.SharePromoLinkRMF -> launchSharePromoRMFPageChooser(it.url, it.shareTitle)
             is Command.CopyLink -> clipboardManager.setPrimaryClip(ClipData.newPlainText(null, it.url))
             is Command.ShowFileChooser -> launchFilePicker(it.filePathCallback, it.fileChooserParams)
-            is Command.ShowExistingImageOrCameraChooser -> launchImageOrCameraChooser(it.fileChooserParams, it.filePathCallback)
-            is Command.ShowImageCamera -> launchCameraCapture(it.filePathCallback, MediaStore.ACTION_IMAGE_CAPTURE)
-            is Command.ShowVideoCamera -> launchCameraCapture(it.filePathCallback, MediaStore.ACTION_VIDEO_CAPTURE)
+            is Command.ShowExistingImageOrCameraChooser -> launchImageOrCameraChooser(it.fileChooserParams, it.filePathCallback, it.inputAction)
+            is Command.ShowImageCamera -> launchCameraCapture(it.filePathCallback, it.fileChooserParams, MediaStore.ACTION_IMAGE_CAPTURE)
+            is Command.ShowVideoCamera -> launchCameraCapture(it.filePathCallback, it.fileChooserParams, MediaStore.ACTION_VIDEO_CAPTURE)
+            is Command.ShowSoundRecorder -> launchCameraCapture(it.filePathCallback, it.fileChooserParams, MediaStore.Audio.Media.RECORD_SOUND_ACTION)
 
             is Command.AddHomeShortcut -> {
                 context?.let { context ->
@@ -2817,14 +2818,20 @@ class BrowserTabFragment :
         startActivityForResult(intent, REQUEST_CODE_CHOOSE_FILE)
     }
 
-    private fun launchCameraCapture(filePathCallback: ValueCallback<Array<Uri>>, input: String) {
+    private fun launchCameraCapture(filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: FileChooserRequestedParams, inputAction: String) {
+        if (Intent(inputAction).resolveActivity(requireContext().packageManager) == null) {
+            launchFilePicker(filePathCallback, fileChooserParams)
+            return
+        }
+
         pendingUploadTask = filePathCallback
-        externalCameraLauncher.launch(input)
+        externalCameraLauncher.launch(inputAction)
     }
 
     private fun launchImageOrCameraChooser(
         fileChooserParams: FileChooserRequestedParams,
         filePathCallback: ValueCallback<Array<Uri>>,
+        inputAction: String,
     ) {
         context?.let {
             val cameraString = getString(R.string.imageCaptureCameraGalleryDisambiguationCameraOption)
@@ -2844,7 +2851,7 @@ class BrowserTabFragment :
                         }
 
                         override fun onSecondaryItemClicked() {
-                            launchCameraCapture(filePathCallback, MediaStore.ACTION_IMAGE_CAPTURE)
+                            launchCameraCapture(filePathCallback, fileChooserParams, inputAction)
                         }
 
                         override fun onBottomSheetDismissed() {

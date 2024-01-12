@@ -17,17 +17,17 @@
 package com.duckduckgo.app.browser.filechooser.camera.postprocess
 
 import android.content.Context
+import android.net.Uri
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
 import java.io.File
-import java.io.FileInputStream
 import java.io.FileOutputStream
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
 
 interface CameraCaptureImageMover {
-    suspend fun moveInternal(interimFile: File): File
+    suspend fun moveInternal(interimFile: Uri): File?
 }
 
 @ContributesBinding(FragmentScope::class)
@@ -36,16 +36,17 @@ class RealCameraCaptureImageMover @Inject constructor(
     private val dispatchers: DispatcherProvider,
 ) : CameraCaptureImageMover {
 
-    override suspend fun moveInternal(interimFile: File): File {
+    override suspend fun moveInternal(contentUri: Uri): File? {
         return withContext(dispatchers.io()) {
             val newDestinationDirectory = File(context.cacheDir, SUBDIRECTORY_NAME)
             newDestinationDirectory.mkdirs()
-            val newDestinationFile = File(newDestinationDirectory, interimFile.name)
 
-            FileInputStream(interimFile).use { inputStream ->
+            val filename = contentUri.lastPathSegment ?: return@withContext null
+
+            val newDestinationFile = File(newDestinationDirectory, filename)
+            context.contentResolver.openInputStream(contentUri)?.use { inputStream ->
                 FileOutputStream(newDestinationFile).use { outputStream ->
                     inputStream.copyTo(outputStream)
-                    interimFile.delete()
                 }
             }
 

@@ -22,6 +22,7 @@ import android.net.Uri
 import android.net.http.SslCertificate
 import android.os.Message
 import android.print.PrintAttributes
+import android.provider.MediaStore
 import android.util.Patterns
 import android.view.ContextMenu
 import android.view.MenuItem
@@ -411,12 +412,19 @@ class BrowserTabViewModel @Inject constructor(
         class ShowExistingImageOrCameraChooser(
             val filePathCallback: ValueCallback<Array<Uri>>,
             val fileChooserParams: FileChooserRequestedParams,
+            val inputAction: String,
         ) : Command()
         class ShowImageCamera(
             val filePathCallback: ValueCallback<Array<Uri>>,
+            val fileChooserParams: FileChooserRequestedParams,
         ) : Command()
         class ShowVideoCamera(
             val filePathCallback: ValueCallback<Array<Uri>>,
+            val fileChooserParams: FileChooserRequestedParams,
+        ) : Command()
+        class ShowSoundRecorder(
+            val filePathCallback: ValueCallback<Array<Uri>>,
+            val fileChooserParams: FileChooserRequestedParams,
         ) : Command()
 
         class HandleNonHttpAppLink(
@@ -1895,22 +1903,29 @@ class BrowserTabViewModel @Inject constructor(
         filePathCallback: ValueCallback<Array<Uri>>,
         fileChooserParams: FileChooserParams,
     ) {
-        val acceptTypes = fileChooserParams.acceptTypes
-        val acceptsOnlyImage = acceptsOnly("image/", acceptTypes)
-        val acceptsOnlyVideo = acceptsOnly("video/", acceptTypes)
+        val mimeTypes = convertAcceptTypesToMimeTypes(fileChooserParams.acceptTypes)
+        val fileChooserRequestedParams = FileChooserRequestedParams(fileChooserParams.mode, mimeTypes)
         val cameraHardwareAvailable = cameraHardwareChecker.hasCameraHardware()
 
-        val mimeTypes = convertAcceptTypesToMimeTypes(acceptTypes)
-        val fileChooserRequestedParams = FileChooserRequestedParams(fileChooserParams.mode, mimeTypes)
-
         command.value = when {
-            fileChooserParams.isCaptureEnabled && acceptsOnlyImage && cameraHardwareAvailable ->
-                ShowImageCamera(filePathCallback)
-            fileChooserParams.isCaptureEnabled && acceptsOnlyVideo && cameraHardwareAvailable ->
-                ShowVideoCamera(filePathCallback)
-            (fileChooserParams.acceptTypes.any { it.startsWith("image/") } && cameraHardwareAvailable) ->
-                ShowExistingImageOrCameraChooser(filePathCallback, fileChooserRequestedParams)
-            else -> ShowFileChooser(filePathCallback, fileChooserRequestedParams)
+            fileChooserParams.isCaptureEnabled -> {
+                when {
+                    acceptsOnly("image/", fileChooserParams.acceptTypes) && cameraHardwareAvailable ->
+                        ShowImageCamera(filePathCallback, fileChooserRequestedParams)
+                    acceptsOnly("video/", fileChooserParams.acceptTypes) && cameraHardwareAvailable ->
+                        ShowVideoCamera(filePathCallback, fileChooserRequestedParams)
+                    acceptsOnly("audio/", fileChooserParams.acceptTypes) ->
+                        ShowSoundRecorder(filePathCallback, fileChooserRequestedParams)
+                    else ->
+                        ShowFileChooser(filePathCallback, fileChooserRequestedParams)
+                }
+            }
+            fileChooserParams.acceptTypes.any { it.startsWith("image/") && cameraHardwareAvailable } ->
+                ShowExistingImageOrCameraChooser(filePathCallback, fileChooserRequestedParams, MediaStore.ACTION_IMAGE_CAPTURE)
+            fileChooserParams.acceptTypes.any { it.startsWith("video/") && cameraHardwareAvailable } ->
+                ShowExistingImageOrCameraChooser(filePathCallback, fileChooserRequestedParams, MediaStore.ACTION_VIDEO_CAPTURE)
+            else ->
+                ShowFileChooser(filePathCallback, fileChooserRequestedParams)
         }
     }
 
