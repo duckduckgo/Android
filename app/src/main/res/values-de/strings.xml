@@ -788,4 +788,22 @@
     <string name="settingsAutofillLoginsSetting">Passwörter</string>
     <string name="autofillLoginSavedSnackbarMessage">Passwort gespeichert</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Passwort aktualisiert</string>
+
+    <!-- Bookmarks -->
+    <string name="searchBookmarks">Lesezeichen durchsuchen</string>
+    <string name="deleteFolder" instruction="%1$s is the folder name">"%1$s löschen?"</string>
+    <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Lesezeichen %1$s löschen?"</string>
+    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Lesezeichen zu %1$s hinzugefügt</string>
+    <string name="addToFavorites">Zu Favoriten hinzufügen</string>
+    <string name="editBookmark">Lesezeichen bearbeiten</string>
+    <string name="importBookmarksDescription">Wenn deine Lesezeichen in einem anderen Browser gespeichert sind,\nkannst du sie in DuckDuckGo importieren.</string>
+    <string name="importBookmarks">Lesezeichen importieren</string>
+    <string name="noResultsFor" instruction="%1$s is the search term">Keine Ergebnisse für „%1$s“</string>
+    <string name="removeFromFavorites">Aus Favoriten entfernen</string>
+    <string name="addToFavoritesMenu">Zu Favoriten hinzufügen</string>
+    <plurals name="bookmarkFolderDeleteMessage">
+        <item quantity="one">Möchtest du diesen Ordner mit %1$d Element wirklich löschen?</item>
+        <item quantity="other">Möchtest du diesen Ordner mit %1$d Elementen wirklich löschen?</item>
+    </plurals>
+    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Bist du sicher, dass du das Lesezeichen &lt;b&gt;%1$s&lt;/b&gt; löschen möchtest?</string>
 </resources>

@@ -788,4 +788,22 @@
     <string name="settingsAutofillLoginsSetting">Lösenord</string>
     <string name="autofillLoginSavedSnackbarMessage">Lösenord sparat</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Lösenordet har uppdaterats</string>
+
+    <!-- Bookmarks -->
+    <string name="searchBookmarks">Sök bokmärken</string>
+    <string name="deleteFolder" instruction="%1$s is the folder name">"Radera %1$s?"</string>
+    <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Ta bort bokmärket %1$s?"</string>
+    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Bokmärke har lagts till i %1$s</string>
+    <string name="addToFavorites">Lägg till i favoriter</string>
+    <string name="editBookmark">Redigera bokmärke</string>
+    <string name="importBookmarksDescription">Går det att importera bokmärken som sparats i en \nannan webbläsare till DuckDuckGo?</string>
+    <string name="importBookmarks">Importera bokmärken</string>
+    <string name="noResultsFor" instruction="%1$s is the search term">Inga resultat för ”%1$s”</string>
+    <string name="removeFromFavorites">Ta bort från favoriter</string>
+    <string name="addToFavoritesMenu">Lägg till i favoriter</string>
+    <plurals name="bookmarkFolderDeleteMessage">
+        <item quantity="one">Är du säker på att du vill ta bort den här mappen och %1$d objekt?</item>
+        <item quantity="other">Är du säker på att du vill ta bort den här mappen och %1$d objekt?</item>
+    </plurals>
+    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Är du säker på att du vill ta bort bokmärket för &lt;b&gt;%1$s&lt;/b&gt;?</string>
 </resources>

@@ -788,4 +788,22 @@
     <string name="settingsAutofillLoginsSetting">Password</string>
     <string name="autofillLoginSavedSnackbarMessage">Password salvata</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Password aggiornata</string>
+
+    <!-- Bookmarks -->
+    <string name="searchBookmarks">Cerca segnalibri</string>
+    <string name="deleteFolder" instruction="%1$s is the folder name">"Eliminare %1$s?"</string>
+    <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Eliminare segnalibro %1$s?"</string>
+    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Segnalibro aggiunto in %1$s</string>
+    <string name="addToFavorites">Aggiungi ai Preferiti</string>
+    <string name="editBookmark">Modifica segnalibro</string>
+    <string name="importBookmarksDescription">Se i segnalibri vengono salvati in un altro browser,\nè possibile importarli in DuckDuckGo.</string>
+    <string name="importBookmarks">Importa segnalibri</string>
+    <string name="noResultsFor" instruction="%1$s is the search term">Nessun risultato per \"%1$s\"</string>
+    <string name="removeFromFavorites">Rimuovi dai preferiti</string>
+    <string name="addToFavoritesMenu">Aggiungi ai Preferiti</string>
+    <plurals name="bookmarkFolderDeleteMessage">
+        <item quantity="one">Vuoi davvero eliminare questa cartella e %1$d elemento?</item>
+        <item quantity="other">Vuoi davvero eliminare questa cartella e %1$d elementi?</item>
+    </plurals>
+    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Eliminare il tuo segnalibro per &lt;b&gt;%1$s&lt;/b&gt;?</string>
 </resources>

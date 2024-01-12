@@ -796,4 +796,24 @@
     <string name="settingsAutofillLoginsSetting">Slaptažodžiai</string>
     <string name="autofillLoginSavedSnackbarMessage">Slaptažodis išsaugotas</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Slaptažodis atnaujintas</string>
+
+    <!-- Bookmarks -->
+    <string name="searchBookmarks">Ieškoti žymių</string>
+    <string name="deleteFolder" instruction="%1$s is the folder name">"Ištrinti %1$s?"</string>
+    <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Ištrinti %1$s žymę?"</string>
+    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Žymė įtraukta į %1$s</string>
+    <string name="addToFavorites">Pridėti prie mėgstamų</string>
+    <string name="editBookmark">Redaguoti žymę</string>
+    <string name="importBookmarksDescription">Jei žymės yra išsaugotos kitoje naršyklėje,\ngalite jas importuoti į „DuckDuckGo“.</string>
+    <string name="importBookmarks">Importuoti žymes</string>
+    <string name="noResultsFor" instruction="%1$s is the search term">Rezultatų pagal paiešką „%1$s“ nerasta</string>
+    <string name="removeFromFavorites">Pašalinti iš adresyno</string>
+    <string name="addToFavoritesMenu">Pridėti prie mėgstamų</string>
+    <plurals name="bookmarkFolderDeleteMessage">
+        <item quantity="one">Ar tikrai norite ištrinti šį aplanką ir %1$d elementą?</item>
+        <item quantity="few">Ar tikrai norite ištrinti šį aplanką ir %1$d elementus?</item>
+        <item quantity="many">Ar tikrai norite ištrinti šį aplanką ir %1$d elemento?</item>
+        <item quantity="other">Ar tikrai norite ištrinti šį aplanką ir %1$d elementų?</item>
+    </plurals>
+    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Ar tikrai norite ištrinti &lt;b&gt;%1$s&lt;/b&gt; žymę?</string>
 </resources>

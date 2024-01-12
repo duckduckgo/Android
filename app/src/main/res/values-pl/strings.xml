@@ -796,4 +796,24 @@
     <string name="settingsAutofillLoginsSetting">Hasła</string>
     <string name="autofillLoginSavedSnackbarMessage">Hasło zapisane</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Zaktualizowano hasło</string>
+
+    <!-- Bookmarks -->
+    <string name="searchBookmarks">Wyszukaj zakładki</string>
+    <string name="deleteFolder" instruction="%1$s is the folder name">"Usunąć %1$s?"</string>
+    <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Usunąć zakładkę %1$s?"</string>
+    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Dodano zakładkę w %1$s</string>
+    <string name="addToFavorites">Dodaj do ulubionych</string>
+    <string name="editBookmark">Edytuj zakładkę</string>
+    <string name="importBookmarksDescription">Jeśli zakładki są zapisane w innej przeglądarce, możesz\nzaimportować je do DuckDuckGo.</string>
+    <string name="importBookmarks">Importuj zakładki</string>
+    <string name="noResultsFor" instruction="%1$s is the search term">Nie znaleziono wyników dla frazy „%1$s”</string>
+    <string name="removeFromFavorites">Usuń z ulubionych</string>
+    <string name="addToFavoritesMenu">Dodaj do ulubionych</string>
+    <plurals name="bookmarkFolderDeleteMessage">
+        <item quantity="one">Czy na pewno chcesz usunąć ten folder i %1$d element?</item>
+        <item quantity="few">Czy na pewno chcesz usunąć ten folder i %1$d elementy?</item>
+        <item quantity="many">Czy na pewno chcesz usunąć ten folder i %1$d elementów?</item>
+        <item quantity="other">Czy na pewno chcesz usunąć ten folder i %1$d elementu?</item>
+    </plurals>
+    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Czy na pewno chcesz usunąć zakładkę &lt;b&gt;%1$s&lt;/b&gt;?</string>
 </resources>

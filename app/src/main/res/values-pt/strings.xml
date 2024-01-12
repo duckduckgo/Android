@@ -788,4 +788,22 @@
     <string name="settingsAutofillLoginsSetting">Palavras-passe</string>
     <string name="autofillLoginSavedSnackbarMessage">Palavra-passe guardada</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Palavra-passe atualizada</string>
+
+    <!-- Bookmarks -->
+    <string name="searchBookmarks">Pesquisar marcadores</string>
+    <string name="deleteFolder" instruction="%1$s is the folder name">"Eliminar %1$s?"</string>
+    <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Eliminar marcador %1$s?"</string>
+    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Marcador adicionado em %1$s</string>
+    <string name="addToFavorites">Adicionar aos favoritos</string>
+    <string name="editBookmark">Editar marcador</string>
+    <string name="importBookmarksDescription">Se os teus marcadores estão guardados noutro navegador, podes\nimportá-los para o DuckDuckGo.</string>
+    <string name="importBookmarks">Importar marcadores</string>
+    <string name="noResultsFor" instruction="%1$s is the search term">Nenhum resultado para \"%1$s\"</string>
+    <string name="removeFromFavorites">Remover dos favoritos</string>
+    <string name="addToFavoritesMenu">Adicionar aos favoritos</string>
+    <plurals name="bookmarkFolderDeleteMessage">
+        <item quantity="one">Tem a certeza de que quer eliminar esta pasta e %1$d item?</item>
+        <item quantity="other">Tem a certeza de que quer eliminar esta pasta e %1$d itens?</item>
+    </plurals>
+    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Tens a certeza de que queres eliminar o marcador para &lt;b&gt;%1$s&lt;/b&gt;?</string>
 </resources>

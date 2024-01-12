@@ -788,4 +788,22 @@
     <string name="settingsAutofillLoginsSetting">Пароли</string>
     <string name="autofillLoginSavedSnackbarMessage">Паролата е запазена</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Паролата е актуализирана</string>
+
+    <!-- Bookmarks -->
+    <string name="searchBookmarks">Търсене на отметки</string>
+    <string name="deleteFolder" instruction="%1$s is the folder name">"Изтриване на %1$s?"</string>
+    <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Изтриване на %1$s отметки?"</string>
+    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Отметката е добавена в %1$s</string>
+    <string name="addToFavorites">Добавяне към любими</string>
+    <string name="editBookmark">Редактиране на отметка</string>
+    <string name="importBookmarksDescription">Ако имате запазени отметки в друг браузър, можете\nда ги импортирате в DuckDuckGo.</string>
+    <string name="importBookmarks">Импортиране на отметки</string>
+    <string name="noResultsFor" instruction="%1$s is the search term">Няма резултати за \'%1$s\'</string>
+    <string name="removeFromFavorites">Премахване от любими</string>
+    <string name="addToFavoritesMenu">Добавяне към любими</string>
+    <plurals name="bookmarkFolderDeleteMessage">
+        <item quantity="one">Сигурни ли сте, че искате да изтриете тази папка и %1$d елемент?</item>
+        <item quantity="other">Сигурни ли сте, че искате да изтриете тази папка и %1$d елемента?</item>
+    </plurals>
+    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Сигурни ли сте, че искате да изтриете отметката за &lt;b&gt;%1$s&lt;/b&gt;?</string>
 </resources>

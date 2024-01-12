@@ -796,4 +796,24 @@
     <string name="settingsAutofillLoginsSetting">Gesla</string>
     <string name="autofillLoginSavedSnackbarMessage">Geslo je shranjeno</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Geslo je posodobljeno</string>
+
+    <!-- Bookmarks -->
+    <string name="searchBookmarks">Iskanje zaznamkov</string>
+    <string name="deleteFolder" instruction="%1$s is the folder name">"Želite izbrisati mapo %1$s?"</string>
+    <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Želite izbrisati zaznamek %1$s?"</string>
+    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Zaznamek je dodan v mapo %1$s</string>
+    <string name="addToFavorites">Dodaj med priljubljene</string>
+    <string name="editBookmark">Uredi zaznamek</string>
+    <string name="importBookmarksDescription">Če so zaznamki shranjeni v drugem brskalniku, jih lahko\nuvozite v DuckDuckGo.</string>
+    <string name="importBookmarks">Uvoz zaznamkov</string>
+    <string name="noResultsFor" instruction="%1$s is the search term">Ni rezultatov za »%1$s«</string>
+    <string name="removeFromFavorites">Odstranitev iz priljubljenih</string>
+    <string name="addToFavoritesMenu">Dodaj med priljubljene</string>
+    <plurals name="bookmarkFolderDeleteMessage">
+        <item quantity="one">Ali ste prepričani, da želite izbrisati to mapo in %1$d element?</item>
+        <item quantity="two">Ali ste prepričani, da želite izbrisati to mapo in %1$d elementa?</item>
+        <item quantity="few">Ali ste prepričani, da želite izbrisati to mapo in %1$d elemente?</item>
+        <item quantity="other">Ali ste prepričani, da želite izbrisati to mapo in %1$d elementov?</item>
+    </plurals>
+    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Ali ste prepričani, da želite izbrisati zaznamek za &lt;b&gt;%1$s&lt;/b&gt;?</string>
 </resources>
