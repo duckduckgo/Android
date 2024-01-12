@@ -387,12 +387,21 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun whenQuickAccessDeletedThenRepositoryDeletesSavedSite() = runTest {
+    fun whenQuickAccessDeletedThenRepositoryDeletesFavorite() = runTest {
         val savedSite = Favorite("favorite1", "title", "http://example.com", "timestamp", 0)
 
         testee.deleteFavoriteSnackbarDismissed(savedSite)
 
         verify(mocksavedSitesRepository).delete(savedSite)
+    }
+
+    @Test
+    fun whenAssociatedBookmarkDeletedThenRepositoryDeletesBookmark() = runTest {
+        val savedSite = Favorite("favorite1", "title", "http://example.com", "timestamp", 0)
+
+        testee.deleteSavedSiteSnackbarDismissed(savedSite)
+
+        verify(mocksavedSitesRepository).delete(savedSite, true)
     }
 
     @Test
