@@ -774,6 +774,15 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenDeleteSavedSiteCalledThenRepositoryUpdated() = runTest {
+        val savedSite = Favorite(UUID.randomUUID().toString(), "title", "http://example.com", lastModified = "timestamp", 0)
+
+        testee.onDeleteSavedSiteSnackbarDismissed(savedSite)
+
+        verify(mockSavedSitesRepository).delete(savedSite, true)
+    }
+
+    @Test
     fun whenQuickAccessListChangedThenRepositoryUpdated() {
         val savedSite = Favorite(UUID.randomUUID().toString(), "title", "http://example.com", lastModified = "timestamp", 0)
         val savedSites = listOf(QuickAccessFavorite(savedSite))
