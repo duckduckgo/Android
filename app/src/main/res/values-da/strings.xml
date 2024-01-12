@@ -788,4 +788,22 @@
     <string name="settingsAutofillLoginsSetting">Adgangskoder</string>
     <string name="autofillLoginSavedSnackbarMessage">Adgangskode gemt</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Adgangskode opdateret</string>
+
+    <!-- Bookmarks -->
+    <string name="searchBookmarks">Søg i bogmærker</string>
+    <string name="deleteFolder" instruction="%1$s is the folder name">"Slet %1$s?"</string>
+    <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Slet bogmærket %1$s?"</string>
+    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Bogmærke tilføjet i %1$s.</string>
+    <string name="addToFavorites">Tilføj til favoritter</string>
+    <string name="editBookmark">Rediger bogmærke</string>
+    <string name="importBookmarksDescription">Hvis dine bogmærker er gemt i en anden browser, kan du\nimportere dem til DuckDuckGo.</string>
+    <string name="importBookmarks">Importer bogmærker</string>
+    <string name="noResultsFor" instruction="%1$s is the search term">Ingen resultater for \"%1$s\"</string>
+    <string name="removeFromFavorites">Fjern fra favoritter</string>
+    <string name="addToFavoritesMenu">Tilføj til favoritter</string>
+    <plurals name="bookmarkFolderDeleteMessage">
+        <item quantity="one">Er du sikker på, at du vil slette denne mappe og %1$d element?</item>
+        <item quantity="other">Er du sikker på, at du vil slette denne mappe og %1$d elementer?</item>
+    </plurals>
+    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Er du sikker på, at du vil slette dit bogmærke &lt;b&gt;%1$s&lt;/b&gt;?</string>
 </resources>
