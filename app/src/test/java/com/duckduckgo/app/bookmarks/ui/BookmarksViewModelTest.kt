@@ -307,7 +307,7 @@ class BookmarksViewModelTest {
     }
 
     @Test
-    fun whenDeleteBookmarkFolderUndoThenReposistoryNotUpdated() = runTest {
+    fun whenDeleteBookmarkFolderUndoThenRepositoryNotUpdated() = runTest {
         val parentFolder = BookmarkFolder("folder1", "Parent Folder", SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp")
         val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1", 0, 0, "timestamp")
         val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2", "timestamp")
@@ -363,5 +363,37 @@ class BookmarksViewModelTest {
 
         verify(commandObserver).onChanged(commandCaptor.capture())
         assertEquals(savedSiteUrl, (commandCaptor.value as BookmarksViewModel.Command.OpenSavedSite).savedSiteUrl)
+    }
+
+    @Test
+    fun whenUpdateBookmarksCalledThenUpdateFolderRelation() {
+        val parentId = "folderId"
+        val bookmarksAndFolders = listOf("bookmark1", "folder1")
+
+        testee.updateBookmarks(bookmarksAndFolders, parentId)
+
+        verify(savedSitesRepository).updateFolderRelation(parentId, bookmarksAndFolders)
+    }
+
+    @Test
+    fun whenAddFavoriteCalledThenInsertFavorite() {
+        testee.addFavorite(bookmark)
+
+        verify(savedSitesRepository).insertFavorite(bookmark.id, bookmark.url, bookmark.title, bookmark.lastModified)
+    }
+
+    @Test
+    fun whenRemoveFavoriteCalledThenDeleteFavorite() {
+        testee.removeFavorite(bookmark)
+
+        verify(savedSitesRepository).delete(
+            Favorite(
+                id = bookmark.id,
+                title = bookmark.title,
+                url = bookmark.url,
+                lastModified = bookmark.lastModified,
+                position = 0,
+            ),
+        )
     }
 }
