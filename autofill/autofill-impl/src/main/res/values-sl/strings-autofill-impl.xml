@@ -133,4 +133,6 @@
     <string name="managementDisabledModeSubtitle">Za zaščito gesel je potreben vzorec za zaklepanje naprave, koda PIN ali biometrični podatki.</string>
     <string name="credentialManagementEditTitle">Uredite geslo</string>
 
+    <string name="credentials_limit_warning"><b>Sinhronizacija je začasno zaustavljena</b>\nOmejitev prijav je presežena. Izbrišite jih nekaj, če želite nadaljevati sinhronizacijo.\n\n<annotation type="manage_logins">Upravljanje prijav</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Sinhronizacija gesel je začasno zaustavljena</b>\nPresegli ste omejitev za sinhronizacijo gesel. Poskusite izbrisati nekaj gesel. Dokler ta težava ne bo odpravljena, vaša gesla ne bodo varnostno kopirana.</string>
 </resources>
