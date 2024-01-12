@@ -32,6 +32,7 @@ dependencies {
     implementation project(':user-agent-api')
     implementation project(':feature-toggles-api')
     implementation project(':privacy-config-api')
+    implementation project(':app-build-config-api')
     implementation project(':statistics')
 
     implementation AndroidX.appCompat
@@ -40,6 +41,9 @@ dependencies {
     implementation JakeWharton.timber
     implementation Google.dagger
     implementation AndroidX.core.ktx
+    implementation AndroidX.webkit
+    implementation Square.retrofit2.converter.moshi
+    implementation "com.squareup.moshi:moshi-kotlin:_"
 
     // Testing dependencies
     testImplementation project(':feature-toggles-test')
