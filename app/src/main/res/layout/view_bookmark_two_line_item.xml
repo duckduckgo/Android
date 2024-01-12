@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2024 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/keyline_4"
         android:breakStrategy="balanced"
-        app:layout_constraintEnd_toStartOf="@id/betaPill"
+        app:layout_constraintEnd_toStartOf="@id/favoriteStar"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toEndOf="@+id/leadingIconBackground"
@@ -60,16 +60,16 @@
         tools:text="Primary Text" />
 
     <ImageView
-        android:id="@+id/betaPill"
+        android:id="@+id/favoriteStar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_beta_pill"
+        android:src="@drawable/ic_favorite_multicolor_24"
+        android:paddingStart="16dp"
         android:layout_marginStart="@dimen/keyline_2"
-        app:layout_constraintBottom_toBottomOf="@id/primaryText"
-        app:layout_constraintEnd_toStartOf="@id/trailingBarrier"
-        app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintStart_toEndOf="@id/primaryText"
-        app:layout_constraintTop_toTopOf="@id/primaryText" />
+        android:layout_marginEnd="4dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/trailingIconContainer"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/secondaryText"

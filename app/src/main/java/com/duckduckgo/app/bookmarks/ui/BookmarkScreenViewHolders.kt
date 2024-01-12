@@ -25,6 +25,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.RowBookmarkTwoLineItemBinding
 import com.duckduckgo.app.browser.databinding.ViewSavedSiteEmptyHintBinding
 import com.duckduckgo.app.browser.databinding.ViewSavedSiteEmptySearchHintBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
@@ -73,7 +74,7 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
 
     class BookmarksViewHolder(
         private val layoutInflater: LayoutInflater,
-        private val binding: RowTwoLineItemBinding,
+        private val binding: RowBookmarkTwoLineItemBinding,
         private val viewModel: BookmarksViewModel,
         private val lifecycleOwner: LifecycleOwner,
         private val faviconManager: FaviconManager,
@@ -120,7 +121,7 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
                 viewModel.onSelected(bookmark)
             }
             isFavorite = bookmark.isFavorite
-            listItem.setPillVisible(isFavorite)
+            listItem.setFavoriteStarVisible(isFavorite)
 
             this.bookmark = bookmark
         }

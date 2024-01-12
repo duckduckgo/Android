@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.bookmarks.ui.BookmarkScreenViewHolders.BookmarkFoldersViewHolder
 import com.duckduckgo.app.bookmarks.ui.BookmarkScreenViewHolders.BookmarksViewHolder
+import com.duckduckgo.app.browser.databinding.RowBookmarkTwoLineItemBinding
 import com.duckduckgo.app.browser.databinding.ViewSavedSiteEmptyHintBinding
 import com.duckduckgo.app.browser.databinding.ViewSavedSiteEmptySearchHintBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
@@ -89,7 +90,7 @@ class BookmarksAdapter(
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             BOOKMARK_TYPE -> {
-                val binding = RowTwoLineItemBinding.inflate(inflater, parent, false)
+                val binding = RowBookmarkTwoLineItemBinding.inflate(inflater, parent, false)
                 return BookmarksViewHolder(
                     layoutInflater,
                     binding,
