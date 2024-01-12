@@ -1,7 +1,7 @@
 appId: com.duckduckgo.mobile.android
 name: "ReleaseTest: Deleting a favorite does not delete bookmark"
 tags:
-    - releaseTest
+  - releaseTest
 ---
 - launchApp:
     clearState: true
@@ -18,14 +18,25 @@ tags:
     text: ".*keep browsing.*"
 - tapOn:
     text: "got it"
-# Add favorite from menu button
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
 - assertVisible:
-    text: "add favorite"
+    text: "add bookmark"
 - tapOn:
-    text: "add favorite"
-# Navigate to bookmarks screen
+    text: "add bookmark"
+# Add favorite from edit saved site
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+- assertVisible:
+    text: "edit bookmark"
+- tapOn:
+    text: "edit bookmark"
+- assertVisible:
+    text: "add to favorites"
+- tapOn:
+    text: "add to favorites"
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/action_confirm_changes"
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
 - assertVisible:
@@ -37,13 +48,9 @@ tags:
     id: "com.duckduckgo.mobile.android:id/trailingIcon"
     index: 0
 - assertVisible:
-    text: "Delete"
+    text: "remove from favorites"
 - tapOn:
-    text: "delete"
+    text: "remove from favorites"
 # When a favorite is removed, it still stays as Bookmark
 - assertVisible:
-    text: "No favorites added yet"
-- assertNotVisible:
-    text: "No bookmarks added yet"
-# Undo Snackbar should be visible
-- assertVisible: "Undo"
+    text: "Privacy Test Pages - Home"
