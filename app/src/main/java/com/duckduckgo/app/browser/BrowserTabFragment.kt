@@ -27,11 +27,16 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.content.res.Configuration
+import android.graphics.Typeface
 import android.net.Uri
 import android.os.*
 import android.print.PrintAttributes
 import android.print.PrintManager
 import android.text.Editable
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.StyleSpan
 import android.view.*
 import android.view.View.*
 import android.view.inputmethod.EditorInfo
@@ -59,6 +64,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
+import androidx.core.text.toSpannable
 import androidx.core.view.*
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
@@ -75,6 +81,7 @@ import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
+import com.duckduckgo.app.bookmarks.ui.BookmarksBottomSheetDialog
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment
 import com.duckduckgo.app.brokensite.BrokenSiteActivity
 import com.duckduckgo.app.browser.BrowserTabViewModel.AccessibilityViewState
@@ -94,6 +101,7 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.OmnibarViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.PrivacyShieldViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.SavedSiteChangedViewState
 import com.duckduckgo.app.browser.DownloadConfirmationFragment.DownloadConfirmationDialogListener
+import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
@@ -241,9 +249,9 @@ import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.remote.messaging.api.RemoteMessage
+import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
-import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
@@ -485,6 +493,8 @@ class BrowserTabFragment :
     private lateinit var quickAccessItems: IncludeQuickAccessItemsBinding
 
     private lateinit var webViewContainer: FrameLayout
+
+    private var bookmarksBottomSheetDialog: BookmarksBottomSheetDialog.Builder? = null
 
     private val findInPage
         get() = omnibar.findInPage
@@ -1152,7 +1162,18 @@ class BrowserTabFragment :
             is Command.LaunchNewTab -> browserActivity?.launchNewTab()
             is Command.ShowSavedSiteAddedConfirmation -> savedSiteAdded(it.savedSiteChangedViewState)
             is Command.ShowEditSavedSiteDialog -> editSavedSite(it.savedSiteChangedViewState)
-            is Command.DeleteSavedSiteConfirmation -> confirmDeleteSavedSite(it.savedSite)
+            is Command.DeleteFavoriteConfirmation -> confirmDeleteSavedSite(
+                it.savedSite,
+                getString(string.favoriteDeleteConfirmationMessage).toSpannable(),
+            ) {
+                viewModel.onDeleteFavoriteSnackbarDismissed(it)
+            }
+            is Command.DeleteSavedSiteConfirmation -> confirmDeleteSavedSite(
+                it.savedSite,
+                getString(string.bookmarkDeleteConfirmationMessage, it.savedSite.title).html(requireContext()),
+            ) {
+                viewModel.onDeleteSavedSiteSnackbarDismissed(it)
+            }
             is Command.ShowFireproofWebSiteConfirmation -> fireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.DeleteFireproofConfirmation -> removeFireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.ShowPrivacyProtectionEnabledConfirmation -> privacyProtectionEnabledConfirmation(it.domain)
@@ -2009,6 +2030,7 @@ class BrowserTabFragment :
                 viewModel.onUserSubmittedQuery(it.favorite.url)
             },
             { viewModel.onEditSavedSiteRequested(it.favorite) },
+            { viewModel.onDeleteFavoriteRequested(it.favorite) },
             { viewModel.onDeleteSavedSiteRequested(it.favorite) },
         )
     }
@@ -2428,15 +2450,51 @@ class BrowserTabFragment :
     }
 
     private fun savedSiteAdded(savedSiteChangedViewState: SavedSiteChangedViewState) {
-        val snackbarMessage = when (savedSiteChangedViewState.savedSite) {
-            is Bookmark -> R.string.bookmarkAddedMessage
-            is Favorite -> R.string.favoriteAddedMessage
+        val dismissHandler = Handler(Looper.getMainLooper())
+        val dismissRunnable = Runnable {
+            bookmarksBottomSheetDialog?.dialog?.dismiss()
         }
-        binding.browserLayout.makeSnackbarWithNoBottomInset(snackbarMessage, Snackbar.LENGTH_LONG)
-            .setAction(R.string.edit) {
-                editSavedSite(savedSiteChangedViewState)
-            }
-            .show()
+        val title = getBookmarksBottomSheetTitle(savedSiteChangedViewState.bookmarkFolder)
+
+        bookmarksBottomSheetDialog = BookmarksBottomSheetDialog.Builder(requireContext())
+            .setTitle(title)
+            .setPrimaryItem(getString(string.addToFavorites), icon = com.duckduckgo.mobile.android.R.drawable.ic_favorite_24)
+            .setSecondaryItem(getString(string.editBookmark), icon = com.duckduckgo.mobile.android.R.drawable.ic_edit_24)
+            .addEventListener(
+                object : BookmarksBottomSheetDialog.EventListener() {
+                    override fun onPrimaryItemClicked() {
+                        viewModel.onFavoriteMenuClicked()
+                        dismissHandler.removeCallbacks(dismissRunnable)
+                    }
+
+                    override fun onSecondaryItemClicked() {
+                        if (savedSiteChangedViewState.savedSite is Bookmark) {
+                            editSavedSite(
+                                savedSiteChangedViewState.copy(
+                                    savedSite = savedSiteChangedViewState.savedSite.copy(
+                                        isFavorite = viewModel.browserViewState.value?.favorite != null,
+                                    ),
+                                ),
+                            )
+                            dismissHandler.removeCallbacks(dismissRunnable)
+                        }
+                    }
+                },
+            )
+        bookmarksBottomSheetDialog?.show()
+
+        dismissHandler.postDelayed(dismissRunnable, BOOKMARKS_BOTTOM_SHEET_DURATION)
+    }
+
+    private fun getBookmarksBottomSheetTitle(bookmarkFolder: BookmarkFolder?): SpannableString {
+        val folderName = bookmarkFolder?.name ?: ""
+        val fullText = getString(string.bookmarkAddedInBookmarks, folderName)
+        val spannableString = SpannableString(fullText)
+
+        val boldStart = fullText.indexOf(folderName)
+        val boldEnd = boldStart + folderName.length
+        spannableString.setSpan(StyleSpan(Typeface.BOLD), boldStart, boldEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        return spannableString
     }
 
     private fun editSavedSite(savedSiteChangedViewState: SavedSiteChangedViewState) {
@@ -2450,11 +2508,7 @@ class BrowserTabFragment :
         addBookmarkDialog.deleteBookmarkListener = viewModel
     }
 
-    private fun confirmDeleteSavedSite(savedSite: SavedSite) {
-        val message = when (savedSite) {
-            is Favorite -> getString(R.string.favoriteDeleteConfirmationMessage)
-            is Bookmark -> getString(R.string.bookmarkDeleteConfirmationMessage, savedSite.title).html(requireContext())
-        }
+    private fun confirmDeleteSavedSite(savedSite: SavedSite, message: Spanned, onDeleteSnackbarDismissed: (SavedSite) -> Unit) {
         binding.rootView.makeSnackbarWithNoBottomInset(
             message,
             Snackbar.LENGTH_LONG,
@@ -2468,7 +2522,7 @@ class BrowserTabFragment :
                         event: Int,
                     ) {
                         if (event != DISMISS_EVENT_ACTION) {
-                            viewModel.onDeleteSavedSiteSnackbarDismissed(savedSite)
+                            onDeleteSnackbarDismissed(savedSite)
                         }
                     }
                 },
@@ -3004,6 +3058,8 @@ class BrowserTabFragment :
 
         private const val COOKIES_ANIMATION_DELAY = 400L
 
+        private const val BOOKMARKS_BOTTOM_SHEET_DURATION = 3500L
+
         fun newInstance(
             tabId: String,
             query: String? = null,
@@ -3127,9 +3183,6 @@ class BrowserTabFragment :
                 }
                 onMenuItemClicked(menuBinding.addBookmarksMenuItem) {
                     viewModel.onBookmarkMenuClicked()
-                }
-                onMenuItemClicked(menuBinding.addFavoriteMenuItem) {
-                    viewModel.onFavoriteMenuClicked()
                 }
                 onMenuItemClicked(menuBinding.findInPageMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_FIND_IN_PAGE_PRESSED)
@@ -3412,6 +3465,10 @@ class BrowserTabFragment :
                 renderFullscreenMode(viewState)
                 renderVoiceSearch(viewState)
                 omnibar.spacer.isVisible = viewState.showVoiceSearch && lastSeenBrowserViewState?.showClearButton ?: false
+
+                bookmarksBottomSheetDialog?.dialog?.toggleSwitch(viewState.favorite != null)
+                val bookmark = viewModel.browserViewState.value?.bookmark?.copy(isFavorite = viewState.favorite != null)
+                viewModel.browserViewState.value = viewModel.browserViewState.value?.copy(bookmark = bookmark)
             }
         }
 

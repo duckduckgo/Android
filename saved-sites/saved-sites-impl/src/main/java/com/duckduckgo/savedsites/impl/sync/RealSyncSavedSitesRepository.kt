@@ -136,7 +136,7 @@ class RealSyncSavedSitesRepository(
         children: List<String>,
     ) {
         Timber.d("Sync-Bookmarks: replacing ${folder.id} with children $children")
-        savedSitesRelationsDao.replaceBookmarkFolder(folder, children)
+        savedSitesRelationsDao.replaceBookmarkFolder(folder.id, children)
         savedSitesEntitiesDao.update(
             Entity(
                 entityId = folder.id,

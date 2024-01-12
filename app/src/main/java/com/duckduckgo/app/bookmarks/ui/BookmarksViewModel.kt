@@ -19,6 +19,9 @@ package com.duckduckgo.app.bookmarks.ui
 import android.net.Uri
 import androidx.lifecycle.*
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.bookmarks.ui.BookmarksAdapter.BookmarkFolderItem
+import com.duckduckgo.app.bookmarks.ui.BookmarksAdapter.BookmarkItem
+import com.duckduckgo.app.bookmarks.ui.BookmarksAdapter.BookmarksItemTypes
 import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.*
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.DeleteBookmarkListener
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.EditSavedSiteListener
@@ -63,9 +66,9 @@ class BookmarksViewModel @Inject constructor(
 
     data class ViewState(
         val enableSearch: Boolean = false,
-        val bookmarks: List<Bookmark> = emptyList(),
+        val bookmarkItems: List<BookmarksItemTypes>? = null,
         val favorites: List<Favorite> = emptyList(),
-        val bookmarkFolders: List<BookmarkFolder> = emptyList(),
+        val searchQuery: String = "",
     )
 
     sealed class Command {
@@ -76,19 +79,19 @@ class BookmarksViewModel @Inject constructor(
         class ShowEditBookmarkFolder(val bookmarkFolder: BookmarkFolder) : Command()
         class DeleteBookmarkFolder(val bookmarkFolder: BookmarkFolder) : Command()
         class ConfirmDeleteBookmarkFolder(val bookmarkFolder: BookmarkFolder) : Command()
-
         data class ImportedSavedSites(val importSavedSitesResult: ImportSavedSitesResult) : Command()
         data class ExportedSavedSites(val exportSavedSitesResult: ExportSavedSitesResult) : Command()
+        data object LaunchBookmarkImport : Command()
     }
 
     companion object {
-        private const val MIN_ITEMS_FOR_SEARCH = 1
+        private const val MIN_ITEMS_FOR_SEARCH = 5
     }
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
-    val hiddenIds = MutableStateFlow(HiddenBookmarksIds())
-    data class HiddenBookmarksIds(val favorites: List<String> = emptyList(), val bookmarks: List<String> = emptyList())
+    private val hiddenIds = MutableStateFlow(HiddenBookmarksIds())
+    data class HiddenBookmarksIds(val items: List<String> = emptyList())
 
     init {
         viewState.value = ViewState()
@@ -106,10 +109,11 @@ class BookmarksViewModel @Inject constructor(
     override fun onBookmarkEdited(
         bookmark: Bookmark,
         oldFolderId: String,
+        updateFavorite: Boolean,
     ) {
         viewModelScope.launch(dispatcherProvider.io()) {
             Timber.d("Bookmark: $bookmark from $oldFolderId")
-            savedSitesRepository.updateBookmark(bookmark, oldFolderId)
+            savedSitesRepository.updateBookmark(bookmark, oldFolderId, updateFavorite)
         }
     }
 
@@ -150,11 +154,14 @@ class BookmarksViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             hiddenIds.emit(
                 hiddenIds.value.copy(
-                    favorites = hiddenIds.value.favorites - savedSite.id,
-                    bookmarks = hiddenIds.value.bookmarks - savedSite.id,
+                    items = hiddenIds.value.items - savedSite.id,
                 ),
             )
         }
+    }
+
+    fun launchBookmarkImport() {
+        command.value = LaunchBookmarkImport
     }
 
     fun importBookmarks(uri: Uri) {
@@ -183,14 +190,20 @@ class BookmarksViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             savedSitesRepository.getSavedSites(parentId)
                 .combine(hiddenIds) { savedSites, hiddenIds ->
+                    val filteredBookmarks = savedSites.bookmarks.filter {
+                        when (it) {
+                            is Bookmark -> it.id !in hiddenIds.items
+                            is BookmarkFolder -> it.id !in hiddenIds.items
+                            else -> false
+                        }
+                    }
                     savedSites.copy(
-                        bookmarks = savedSites.bookmarks.filter { it.id !in hiddenIds.bookmarks },
-                        favorites = savedSites.favorites.filter { it.id !in hiddenIds.favorites },
-                        folders = savedSites.folders.filter { it.id !in hiddenIds.bookmarks },
+                        bookmarks = filteredBookmarks,
+                        favorites = savedSites.favorites.filter { it.id !in hiddenIds.items },
                     )
                 }.collect {
                     withContext(dispatcherProvider.main()) {
-                        onSavedSitesItemsChanged(it.favorites, it.bookmarks, it.folders)
+                        onSavedSitesItemsChanged(it.favorites, it.bookmarks)
                     }
                 }
         }
@@ -204,7 +217,7 @@ class BookmarksViewModel @Inject constructor(
                 .filter { it.id != SavedSitesNames.BOOKMARKS_ROOT }
             val bookmarks = savedSitesRepository.getBookmarksTree()
             withContext(dispatcherProvider.main()) {
-                onSavedSitesItemsChanged(favorites, bookmarks, folders)
+                onSavedSitesItemsChanged(favorites, bookmarks + folders)
             }
         }
     }
@@ -243,7 +256,7 @@ class BookmarksViewModel @Inject constructor(
 
     fun undoDelete(bookmarkFolder: BookmarkFolder) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            hiddenIds.emit(hiddenIds.value.copy(bookmarks = hiddenIds.value.bookmarks - bookmarkFolder.id))
+            hiddenIds.emit(hiddenIds.value.copy(items = hiddenIds.value.items - bookmarkFolder.id))
         }
     }
 
@@ -259,43 +272,71 @@ class BookmarksViewModel @Inject constructor(
 
     private fun hide(savedSite: SavedSite) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            when (savedSite) {
-                is Bookmark -> {
-                    hiddenIds.emit(
-                        hiddenIds.value.copy(
-                            bookmarks = hiddenIds.value.bookmarks + savedSite.id,
-                            favorites = hiddenIds.value.favorites + savedSite.id,
-                        ),
-                    )
-                }
-                is Favorite -> {
-                    hiddenIds.emit(hiddenIds.value.copy(favorites = hiddenIds.value.favorites + savedSite.id))
-                }
-            }
+            hiddenIds.emit(
+                hiddenIds.value.copy(
+                    items = hiddenIds.value.items + savedSite.id,
+                ),
+            )
         }
     }
 
     fun hide(bookmarkFolder: BookmarkFolder) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            hiddenIds.emit(hiddenIds.value.copy(bookmarks = hiddenIds.value.bookmarks + bookmarkFolder.id))
+            hiddenIds.emit(hiddenIds.value.copy(items = hiddenIds.value.items + bookmarkFolder.id))
         }
         command.postValue(ConfirmDeleteBookmarkFolder(bookmarkFolder))
     }
 
     private fun onSavedSitesItemsChanged(
         favorites: List<Favorite>,
-        bookmarks: List<Bookmark>,
-        bookmarkFolders: List<BookmarkFolder>,
+        bookmarksAndFolders: List<Any>,
     ) {
+        val bookmarkItems = bookmarksAndFolders.mapNotNull { bookmark ->
+            when (bookmark) {
+                is Bookmark -> {
+                    val isFavorite = favorites.any { favorite -> favorite.id == bookmark.id }
+                    BookmarkItem(bookmark.copy(isFavorite = isFavorite))
+                }
+                is BookmarkFolder -> BookmarkFolderItem(bookmark)
+                else -> null
+            }
+        }
+
         viewState.value = viewState.value?.copy(
             favorites = favorites,
-            bookmarks = bookmarks,
-            bookmarkFolders = bookmarkFolders,
-            enableSearch = bookmarks.size + bookmarkFolders.size >= MIN_ITEMS_FOR_SEARCH,
+            bookmarkItems = bookmarkItems,
+            enableSearch = bookmarkItems.size >= MIN_ITEMS_FOR_SEARCH,
         )
     }
 
     fun onBookmarkFoldersActivityResult(savedSiteUrl: String) {
         command.value = OpenSavedSite(savedSiteUrl)
+    }
+
+    fun updateBookmarks(bookmarksAndFolders: List<String>, parentId: String) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            Timber.d("Bookmarks: parentId: $parentId, updateBookmarks $bookmarksAndFolders")
+            savedSitesRepository.updateFolderRelation(parentId, bookmarksAndFolders)
+        }
+    }
+
+    fun addFavorite(bookmark: Bookmark) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            savedSitesRepository.insertFavorite(bookmark.id, bookmark.url, bookmark.title, bookmark.lastModified)
+        }
+    }
+
+    fun removeFavorite(bookmark: Bookmark) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            savedSitesRepository.delete(
+                Favorite(
+                    id = bookmark.id,
+                    title = bookmark.title,
+                    url = bookmark.url,
+                    lastModified = bookmark.lastModified,
+                    position = 0,
+                ),
+            )
+        }
     }
 }

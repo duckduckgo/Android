@@ -21,12 +21,14 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
+import android.text.Spanned
 import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
+import androidx.core.text.toSpannable
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -35,6 +37,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.databinding.ActivitySystemSearchBinding
 import com.duckduckgo.app.browser.databinding.IncludeQuickAccessItemsBinding
@@ -235,6 +238,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             { viewModel.onQuickAccessItemClicked(it) },
             { viewModel.onEditQuickAccessItemRequested(it) },
             { viewModel.onDeleteQuickAccessItemRequested(it) },
+            { viewModel.onDeleteSavedSiteRequested(it) },
         )
         itemTouchHelper = ItemTouchHelper(
             QuickAccessDragTouchItemListener(
@@ -388,6 +392,10 @@ class SystemSearchActivity : DuckDuckGoActivity() {
                 showEditSavedSiteDialog(command.savedSite)
             }
 
+            is DeleteFavoriteConfirmation -> {
+                confirmDeleteFavorite(command.savedSite)
+            }
+
             is DeleteSavedSiteConfirmation -> {
                 confirmDeleteSavedSite(command.savedSite)
             }
@@ -403,8 +411,19 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         omnibarTextInput.setSelection(query.length)
     }
 
+    private fun confirmDeleteFavorite(savedSite: SavedSite) {
+        confirmDelete(savedSite, getString(string.favoriteDeleteConfirmationMessage).toSpannable()) {
+            viewModel.deleteFavoriteSnackbarDismissed(it)
+        }
+    }
+
     private fun confirmDeleteSavedSite(savedSite: SavedSite) {
-        val message = getString(R.string.bookmarkDeleteConfirmationMessage, savedSite.title).html(this)
+        confirmDelete(savedSite, getString(string.bookmarkDeleteConfirmationMessage, savedSite.title).html(this)) {
+            viewModel.deleteSavedSiteSnackbarDismissed(it)
+        }
+    }
+
+    private fun confirmDelete(savedSite: SavedSite, message: Spanned, onDeleteSnackbarDismissed: (SavedSite) -> Unit) {
         Snackbar.make(
             binding.root,
             message,
@@ -419,7 +438,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
                         event: Int,
                     ) {
                         if (event != DISMISS_EVENT_ACTION) {
-                            viewModel.deleteSavedSiteSnackbarDismissed(savedSite)
+                            onDeleteSnackbarDismissed(savedSite)
                         }
                     }
                 },

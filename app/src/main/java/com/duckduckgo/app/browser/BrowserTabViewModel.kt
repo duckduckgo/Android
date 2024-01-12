@@ -376,6 +376,7 @@ class BrowserTabViewModel @Inject constructor(
         class ShowSavedSiteAddedConfirmation(val savedSiteChangedViewState: SavedSiteChangedViewState) : Command()
         class ShowEditSavedSiteDialog(val savedSiteChangedViewState: SavedSiteChangedViewState) : Command()
         class DeleteSavedSiteConfirmation(val savedSite: SavedSite) : Command()
+        class DeleteFavoriteConfirmation(val savedSite: SavedSite) : Command()
 
         class ShowFireproofWebSiteConfirmation(val fireproofWebsiteEntity: FireproofWebsiteEntity) : Command()
         class DeleteFireproofConfirmation(val fireproofWebsiteEntity: FireproofWebsiteEntity) : Command()
@@ -724,7 +725,8 @@ class BrowserTabViewModel @Inject constructor(
             }
             .map { bookmarks ->
                 val bookmark = bookmarks.firstOrNull { it.url == url }
-                browserViewState.value = currentBrowserViewState().copy(bookmark = bookmark)
+                val isFavorite = currentBrowserViewState().favorite != null
+                browserViewState.value = currentBrowserViewState().copy(bookmark = bookmark?.copy(isFavorite = isFavorite))
             }
             .flowOn(dispatchers.main())
             .launchIn(viewModelScope)
@@ -1425,7 +1427,7 @@ class BrowserTabViewModel @Inject constructor(
         val favorite = getFavorite(url)
         withContext(dispatchers.main()) {
             browserViewState.value = currentBrowserViewState().copy(
-                bookmark = bookmark,
+                bookmark = bookmark?.copy(isFavorite = favorite != null),
                 favorite = favorite,
             )
         }
@@ -2021,7 +2023,7 @@ class BrowserTabViewModel @Inject constructor(
             val favorite = currentBrowserViewState().favorite
             if (favorite != null) {
                 pixel.fire(AppPixelName.MENU_ACTION_REMOVE_FAVORITE_PRESSED.pixelName)
-                onDeleteSavedSiteRequested(favorite)
+                onDeleteFavoriteRequested(favorite)
             } else {
                 val buttonHighlighted = currentBrowserViewState().addFavorite.isHighlighted()
                 pixel.fire(
@@ -2069,9 +2071,6 @@ class BrowserTabViewModel @Inject constructor(
                             favorites = hiddenIds.value.favorites - favorite.id,
                         ),
                     )
-                }
-                withContext(dispatchers.main()) {
-                    command.value = ShowSavedSiteAddedConfirmation(SavedSiteChangedViewState(it, null))
                 }
             }
         }
@@ -2172,9 +2171,10 @@ class BrowserTabViewModel @Inject constructor(
     override fun onBookmarkEdited(
         bookmark: Bookmark,
         oldFolderId: String,
+        updateFavorite: Boolean,
     ) {
         viewModelScope.launch(dispatchers.io()) {
-            savedSitesRepository.updateBookmark(bookmark, oldFolderId)
+            savedSitesRepository.updateBookmark(bookmark, oldFolderId, updateFavorite)
         }
     }
 
@@ -2863,24 +2863,32 @@ class BrowserTabViewModel @Inject constructor(
         fileDownloader.enqueueDownload(pendingFileDownload)
     }
 
-    fun onDeleteSavedSiteSnackbarDismissed(savedSite: SavedSite) {
+    fun onDeleteFavoriteSnackbarDismissed(savedSite: SavedSite) {
         delete(savedSite)
     }
 
-    private fun delete(savedSite: SavedSite) {
+    fun onDeleteSavedSiteSnackbarDismissed(savedSite: SavedSite) {
+        delete(savedSite, true)
+    }
+
+    private fun delete(savedSite: SavedSite, deleteBookmark: Boolean = false) {
         appCoroutineScope.launch(dispatchers.io()) {
-            if (savedSite is Bookmark) {
+            if (savedSite is Bookmark || deleteBookmark) {
                 faviconManager.deletePersistedFavicon(savedSite.url)
             }
-            savedSitesRepository.delete(savedSite)
+            savedSitesRepository.delete(savedSite, deleteBookmark)
         }
     }
 
-    fun onDeleteSavedSiteRequested(savedSite: SavedSite) {
-        hide(savedSite)
+    fun onDeleteFavoriteRequested(savedSite: SavedSite) {
+        hide(savedSite, DeleteFavoriteConfirmation(savedSite))
     }
 
-    private fun hide(savedSite: SavedSite) {
+    fun onDeleteSavedSiteRequested(savedSite: SavedSite) {
+        hide(savedSite, DeleteSavedSiteConfirmation(savedSite))
+    }
+
+    private fun hide(savedSite: SavedSite, deleteCommand: Command) {
         viewModelScope.launch(dispatchers.io()) {
             when (savedSite) {
                 is Bookmark -> {
@@ -2897,7 +2905,7 @@ class BrowserTabViewModel @Inject constructor(
                 }
             }
             withContext(dispatchers.main()) {
-                command.value = DeleteSavedSiteConfirmation(savedSite)
+                command.value = deleteCommand
             }
         }
     }

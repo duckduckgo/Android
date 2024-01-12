@@ -207,7 +207,7 @@ interface SavedSitesRepository {
      * Deletes a [SavedSite]
      * @param savedSite to be deleted
      */
-    fun delete(savedSite: SavedSite)
+    fun delete(savedSite: SavedSite, deleteBookmark: Boolean = false)
 
     /**
      * Updates the content of a [Favorite]
@@ -219,10 +219,12 @@ interface SavedSitesRepository {
      * Updates the content of a [Bookmark]
      * @param savedSite to be updated
      * @param fromFolderId id of the previous bookmark folder
+     * @param updateFavorite specifies whether the bookmark's favorite state has changed, default value is false
      */
     fun updateBookmark(
         bookmark: Bookmark,
         fromFolderId: String,
+        updateFavorite: Boolean = false,
     )
 
     /**
@@ -305,4 +307,9 @@ interface SavedSitesRepository {
      * This makes the deletion permanent
      */
     fun pruneDeleted()
+
+    /**
+     * Deletes and re-inserts a folder relation
+     */
+    fun updateFolderRelation(folderId: String, entities: List<String>)
 }

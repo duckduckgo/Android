@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2018 DuckDuckGo
+  ~ Copyright (c) 2024 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -14,15 +14,13 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/emptyGridViewContainer"
-    style="@style/Widget.DuckDuckGo.SearchWidgetEmptyFavoritesHintContainer"
-    tools:ignore="DeprecatedWidgetInXml">
-
-    <TextView
-        android:id="@+id/noFavoritesText"
-        style="@style/Widget.DuckDuckGo.SearchWidgetEmptyFavoritesHint"
-        android:text="@string/searchWidgetEmtpyFavoritesHint" />
-
-</LinearLayout>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+  <path
+      android:pathData="M3,4a1,1 0,0 1,1 -1h16a1,1 0,1 1,0 2L4,5a1,1 0,0 1,-1 -1ZM3,12a1,1 0,0 1,1 -1h16a1,1 0,1 1,0 2L4,13a1,1 0,0 1,-1 -1ZM3,20a1,1 0,0 1,1 -1h16a1,1 0,1 1,0 2L4,21a1,1 0,0 1,-1 -1Z"
+      android:fillColor="?attr/daxColorPrimaryIcon"
+      android:fillType="evenOdd"/>
+</vector>

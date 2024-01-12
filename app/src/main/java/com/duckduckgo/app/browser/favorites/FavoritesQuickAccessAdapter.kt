@@ -26,7 +26,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.duckduckgo.app.bookmarks.ui.FavoritesAdapter
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ViewQuickAccessItemBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
@@ -46,6 +45,7 @@ class FavoritesQuickAccessAdapter(
     private val onMoveListener: (RecyclerView.ViewHolder) -> Unit,
     private val onItemSelected: (QuickAccessFavorite) -> Unit,
     private val onEditClicked: (QuickAccessFavorite) -> Unit,
+    private val onRemoveFavoriteClicked: (QuickAccessFavorite) -> Unit,
     private val onDeleteClicked: (QuickAccessFavorite) -> Unit,
 ) : ListAdapter<QuickAccessFavorite, QuickAccessViewHolder>(QuickAccessAdapterDiffCallback()) {
 
@@ -53,7 +53,7 @@ class FavoritesQuickAccessAdapter(
         const val QUICK_ACCESS_ITEM_MAX_SIZE_DP = 90
     }
 
-    data class QuickAccessFavorite(val favorite: SavedSite.Favorite) : FavoritesAdapter.FavoriteItemTypes
+    data class QuickAccessFavorite(val favorite: SavedSite.Favorite)
 
     class QuickAccessViewHolder(
         private val inflater: LayoutInflater,
@@ -63,6 +63,7 @@ class FavoritesQuickAccessAdapter(
         private val onMoveListener: (RecyclerView.ViewHolder) -> Unit,
         private val onItemSelected: (QuickAccessFavorite) -> Unit,
         private val onEditClicked: (QuickAccessFavorite) -> Unit,
+        private val onRemoveFavoriteClicked: (QuickAccessFavorite) -> Unit,
         private val onDeleteClicked: (QuickAccessFavorite) -> Unit,
     ) : RecyclerView.ViewHolder(binding.root), DragDropViewHolderListener {
 
@@ -154,10 +155,11 @@ class FavoritesQuickAccessAdapter(
             anchor: View,
             item: QuickAccessFavorite,
         ) {
-            val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_edit_delete_menu)
+            val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_edit_remove_favorite_delete_menu)
             val view = popupMenu.contentView
             popupMenu.apply {
                 onMenuItemClicked(view.findViewById(R.id.edit)) { onEditClicked(item) }
+                onMenuItemClicked(view.findViewById(R.id.removeFromFavorites)) { onRemoveFavoriteClicked(item) }
                 onMenuItemClicked(view.findViewById(R.id.delete)) { onDeleteClicked(item) }
             }
             popupMenu.showAnchoredToView(binding.root, anchor)
@@ -220,6 +222,7 @@ class FavoritesQuickAccessAdapter(
             onMoveListener,
             onItemSelected,
             onEditClicked,
+            onRemoveFavoriteClicked,
             onDeleteClicked,
         )
     }

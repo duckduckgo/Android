@@ -23,6 +23,8 @@ import android.view.View
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.view.TextChangedWatcher
+import com.duckduckgo.common.ui.view.listitem.DaxListItem.ImageBackground.Circular
+import com.duckduckgo.common.ui.view.quietlySetIsChecked
 import com.duckduckgo.common.ui.view.text.DaxTextInput
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.extensions.html
@@ -38,6 +40,7 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
         fun onBookmarkEdited(
             bookmark: Bookmark,
             oldFolderId: String,
+            updateFavorite: Boolean,
         )
     }
 
@@ -49,15 +52,38 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
 
     var listener: EditSavedSiteListener? = null
     var deleteBookmarkListener: DeleteBookmarkListener? = null
+    private var isFavorite = false
 
     override fun configureUI() {
         validateBundleArguments()
+        val savedSite = getSavedSite()
 
-        if (getSavedSite() is Favorite) {
+        if (savedSite is Favorite) {
             setToolbarTitle(getString(R.string.favoriteDialogTitleEdit))
         } else {
             setToolbarTitle(getString(R.string.bookmarkDialogTitleEdit))
             binding.savedSiteLocationContainer.visibility = View.VISIBLE
+            binding.addToFavoritesBottomDivider.visibility = View.VISIBLE
+
+            binding.addToFavoritesPrimaryItem.setLeadingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_favorite_24)
+            binding.addToFavoritesPrimaryItem.setLeadingIconBackgroundType(Circular)
+
+            isFavorite = (savedSite as Bookmark).isFavorite
+
+            binding.addToFavoritesSwitch.quietlySetIsChecked(
+                isFavorite,
+            ) { _, isChecked ->
+                isFavorite = isChecked
+                favoriteChanged = savedSite.isFavorite != isFavorite
+                setConfirmationVisibility()
+            }
+            binding.addToFavoritesPrimaryItem.setClickListener {
+                isFavorite = !isFavorite
+                binding.addToFavoritesSwitch.isChecked = isFavorite
+                favoriteChanged = savedSite.isFavorite != isFavorite
+                setConfirmationVisibility()
+            }
+            binding.addToFavoritesItem.visibility = View.VISIBLE
         }
         configureMenuItems()
 
@@ -95,8 +121,13 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
         when (savedSite) {
             is Bookmark -> {
                 val parentId = arguments?.getString(AddBookmarkFolderDialogFragment.KEY_PARENT_FOLDER_ID) ?: SavedSitesNames.BOOKMARKS_ROOT
-                val updatedBookmark = savedSite.copy(title = updatedTitle, url = updatedUrl, parentId = parentId)
-                listener?.onBookmarkEdited(updatedBookmark, savedSite.parentId)
+                val updatedBookmark = savedSite.copy(
+                    title = updatedTitle,
+                    url = updatedUrl,
+                    parentId = parentId,
+                    isFavorite = if (favoriteChanged) !savedSite.isFavorite else savedSite.isFavorite,
+                )
+                listener?.onBookmarkEdited(updatedBookmark, savedSite.parentId, favoriteChanged)
             }
 
             is Favorite -> {
@@ -147,13 +178,12 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
 
     override fun deleteConfirmationTitle(): String {
         val isFavorite = (getSavedSite() as? Favorite != null)
-        val titleId = if (isFavorite) R.string.deleteFavoriteConfirmationDialogTitle else R.string.deleteBookmarkConfirmationDialogTitle
-        return getString(titleId)
+        return if (isFavorite) getString(R.string.deleteFavoriteConfirmationDialogTitle) else getString(R.string.deleteBookmark, getExistingTitle())
     }
 
     override fun deleteConfirmationMessage(): Spanned? {
         val isFavorite = (getSavedSite() as? Favorite != null)
-        val messageId = if (isFavorite) R.string.deleteFavoriteConfirmationDialogDescription else R.string.deleteBookmarkConfirmationDialogDescription
+        val messageId = if (isFavorite) R.string.deleteFavoriteConfirmationDialogDescription else R.string.deleteBookmarkConfirmationDescription
         return getString(messageId, getExistingTitle()).html(requireContext())
     }
 
