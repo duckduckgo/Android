@@ -18,6 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="autoconsentTitle">Felugró sütiablak elleni védelem</string>
-    <string name="autoconsentDescription"><![CDATA[Amikor a DuckDuckGo a meglátogatott webhelyeken sütik elfogadására szolgáló felugró ablakokat észlel, a sütik minimalizálása és az adatvédelem maximalizálása érdekében automatikusan megadhatjuk a sütikre vonatkozó beállításaidat, és bezárhatjuk a felugró ablakokat. <u><a href=\"\">További részletek</a><u/>]]></string>
-    <string name="autoconsentToggle">A DuckDuckGo kezelje a felugró sütiablakokat</string>
+    <string name="autoconsentDescription"><![CDATA[Amikor a Asil Browser a meglátogatott webhelyeken sütik elfogadására szolgáló felugró ablakokat észlel, a sütik minimalizálása és az adatvédelem maximalizálása érdekében automatikusan megadhatjuk a sütikre vonatkozó beállításaidat, és bezárhatjuk a felugró ablakokat. <u><a href=\"\">További részletek</a><u/>]]></string>
+    <string name="autoconsentToggle">A Asil Browser kezelje a felugró sütiablakokat</string>
 </resources>

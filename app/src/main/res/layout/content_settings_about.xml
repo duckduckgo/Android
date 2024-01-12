@@ -37,13 +37,13 @@
         android:id="@+id/about"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/settingsAboutDuckduckgo"/>
+        app:primaryText="@string/settingsAboutAsil" />
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/privacyPolicy"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/settingsPrivacyPolicyDuckduckgo"/>
+        app:primaryText="@string/settingsPrivacyPolicyAsil" />
 
     <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
         android:id="@+id/version"

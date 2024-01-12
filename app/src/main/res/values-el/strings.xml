@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2022 Asil
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -17,10 +17,10 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="appName" translatable="false">DuckDuckGo</string>
-    <string name="appDescription" translatable="false">DuckDuckGo</string>
-    <string name="duckDuckGoLogoDescription">Λογότυπο DuckDuckGo</string>
-    <string name="duckDuckGoPrivacySimplified">Η ιδιωτικότητα απλοποιημένη</string>
+    <string name="appName" translatable="false">Asil</string>
+    <string name="appDescription" translatable="false">Asil</string>
+    <string name="asilLogoDescription">Λογότυπο Asil</string>
+    <string name="asilPrivacySimplified">Η ιδιωτικότητα απλοποιημένη</string>
     <string name="yes">Ναι</string>
     <string name="no">Όχι</string>
     <string name="open">Άνοιγμα</string>
@@ -28,8 +28,8 @@
     <string name="search">Αναζήτηση</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingDefaultBrowserDescription">Επισκεφθείτε τις Ρυθμίσεις για να εκτελείτε κάθε φορά αναζήτηση και περιήγηση με το DuckDuckGo.</string>
-    <string name="onboardingDefaultBrowserTitle">Κάντε το DuckDuckGo το δικό σας προεπιλεγμένο πρόγραμμα περιήγησης</string>
+    <string name="onboardingDefaultBrowserDescription">Επισκεφθείτε τις Ρυθμίσεις για να εκτελείτε κάθε φορά αναζήτηση και περιήγηση με το Asil.</string>
+    <string name="onboardingDefaultBrowserTitle">Κάντε το Asil το δικό σας προεπιλεγμένο πρόγραμμα περιήγησης</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Αδυναμία εκκίνησης προεπιλεγμένης οθόνης ρυθμίσεων εφαρμογής</string>
@@ -37,7 +37,7 @@
     <string name="defaultBrowserMaybeLater">Ίσως αργότερα</string>
     <string name="defaultBrowserLetsDoIt">Ορισμός ως προεπιλεγμένο πρόγραμμα περιήγησης</string>
     <string name="defaultBrowserDescriptionNoDefault">Ανοίξτε συνδέσμους με ηρεμία και ασφάλεια, κάθε φορά.</string>
-    <string name="defaultBrowserInstructions">Επιλέξτε DuckDuckGo και πιέστε <font color="#678fff"> Always </font>.</string>
+    <string name="defaultBrowserInstructions">Επιλέξτε Asil και πιέστε <font color="#678fff"> Always </font>.</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Μενού προγράμματος περιήγησης</string>
@@ -90,11 +90,11 @@
     <!-- Opening external apps -->
     <string name="openExternalApp">Άνοιγμα εξωτερικής εφαρμογής</string>
     <string name="launchingExternalApp">Άνοιγμα σε άλλη εφαρμογή</string>
-    <string name="confirmOpenExternalApp">Θα θέλατε να επιτρέψετε στο DuckDuckGo να προβάλει αυτό το περιεχόμενο;</string>
+    <string name="confirmOpenExternalApp">Θα θέλατε να επιτρέψετε στο Asil να προβάλει αυτό το περιεχόμενο;</string>
     <string name="unableToOpenLink">Αδυναμία ανοίγματος αυτού του τύπου συνδέσμου</string>
 
     <!-- Tabs -->
-    <string name="homeTab" translatable="false">DuckDuckGo</string>
+    <string name="homeTab" translatable="false">Asil</string>
     <string name="tabActivityTitle">Καρτέλες</string>
     <string name="tabsMenuItem">Καρτέλες</string>
     <string name="newTabMenuItem">Νέα καρτέλα</string>
@@ -122,12 +122,12 @@
     <string name="settingsHeadingAppearance">Εμφάνιση</string>
     <string name="settingsHeadingCustomize">Προσαρμογή</string>
     <string name="settingsHeadingAbout">Σχετικά</string>
-    <string name="settingsAboutDuckduckgo">Πληροφορίες για το DuckDuckGo</string>
+    <string name="settingsAboutAsil">Πληροφορίες για το Asil</string>
     <string name="settingsVersion">Έκδοση</string>
     <string name="leaveFeedback">Κοινοποίηση σχολίου</string>
     <string name="settingsEmailProtectionTitle">Προστασία email</string>
     <string name="settingsEmailProtectionSubtitle">Αποκλείστε εφαρμογές παρακολούθησης email και αποκρύψτε τη διεύθυνσή σας</string>
-    <string name="settingsHeadingMore">Περισσότερα από το DuckDuckGo</string>
+    <string name="settingsHeadingMore">Περισσότερα από το Asil</string>
     <string name="settingsLightTheme">Φωτεινό</string>
     <string name="settingsTheme">Θέμα</string>
     <string name="settingsDarkTheme">Σκοτεινό</string>
@@ -142,8 +142,8 @@
     <string name="settingsSubtitleNotificationsDisabled">Απενεργοποιήθηκε</string>
     <string name="settingsSubtitleNotificationsEnabled">Ενεργοποιήθηκε</string>
     <string name="settingsDefaultBrowserTitle">Προεπιλεγμένο πρόγραμμα περιήγησης</string>
-    <string name="settingsDefaultBrowserSetDescription">Το DuckDuckGo αποτελεί το προεπιλεγμένο πρόγραμμα περιήγησής σας</string>
-    <string name="settingsDefaultBrowserNotSetDescription">Ορίστε το DuckDuckGo ως το προεπιλεγμένο πρόγραμμα περιήγησής σας</string>
+    <string name="settingsDefaultBrowserSetDescription">Το Asil αποτελεί το προεπιλεγμένο πρόγραμμα περιήγησής σας</string>
+    <string name="settingsDefaultBrowserNotSetDescription">Ορίστε το Asil ως το προεπιλεγμένο πρόγραμμα περιήγησής σας</string>
     <string name="settingsPrivateSearchTitle">ιδιωτική αναζήτηση</string>
     <string name="settingsPrivateSearchDescription">Ενεργοποιημένο βάσει προεπιλογής</string>
     <string name="settingsWebTrackingProtectionTitle">Προστασία παρακολούθησης ιστού</string>
@@ -156,7 +156,7 @@
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">ιδιωτική αναζήτηση</string>
     <string name="privateSearchTitle">Η λειτουργία Private Search είναι ενεργοποιημένη</string>
-    <string name="privateSearchDescription">Το DuckDuckGo Private Search αποτελεί την προεπιλεγμένη μηχανή αναζήτησης, ώστε να μπορείτε να πραγματοποιείτε αναζήτηση στο διαδίκτυο χωρίς να σας παρακολουθούν.</string>
+    <string name="privateSearchDescription">Το Asil Private Search αποτελεί την προεπιλεγμένη μηχανή αναζήτησης, ώστε να μπορείτε να πραγματοποιείτε αναζήτηση στο διαδίκτυο χωρίς να σας παρακολουθούν.</string>
     <string name="privateSearchHeadingSearchSettings">Ρυθμίσεις αναζήτησης</string>
     <string name="privateSearchAutocompleteToggle">Εμφάνιση προτάσεων αυτόματης συμπλήρωσης</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Περισσότερες ρυθμίσεις αναζήτησης</string>
@@ -167,7 +167,7 @@
     <string name="webTrackingProtectionActivityTitle">Προστασία παρακολούθησης ιστού</string>
     <string name="webTrackingProtectionLearnMoreTitle">Προστασία παρακολούθησης ιστού</string>
     <string name="webTrackingProtectionTitle">Η προστασία παρακολούθησης ιστού είναι ενεργοποιημένη</string>
-    <string name="webTrackingProtectionDescription"><![CDATA[Το DuckDuckGo δεν σας παρακολουθεί ποτέ και στόχος μας είναι να προστατεύουμε το απόρρητό σας όσο το δυνατόν περισσότερο. Διατηρούμε και αναπτύσσουμε συνεχώς επίπεδα προστασίας για να συμβαδίζουμε με τις νέες μεθόδους παρακολούθησης και να παρέχουμε πολλές προστασίες που δεν προσφέρονται ως προεπιλογή από άλλα προγράμματα περιήγησης. <u><a href=\"\">Μάθετε περισσότερα</a><u/>]]></string>
+    <string name="webTrackingProtectionDescription"><![CDATA[Το Asil δεν σας παρακολουθεί ποτέ και στόχος μας είναι να προστατεύουμε το απόρρητό σας όσο το δυνατόν περισσότερο. Διατηρούμε και αναπτύσσουμε συνεχώς επίπεδα προστασίας για να συμβαδίζουμε με τις νέες μεθόδους παρακολούθησης και να παρέχουμε πολλές προστασίες που δεν προσφέρονται ως προεπιλογή από άλλα προγράμματα περιήγησης. <u><a href=\"\">Μάθετε περισσότερα</a><u/>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Προστασία αναδυόμενων παραθύρων για cookies</string>
@@ -202,9 +202,9 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Έξοδος εφαρμογής, ανενεργή για 1 ώρα</string>
 
     <!-- About Activity -->
-    <string name="aboutActivityTitle">Σχετικά με το DuckDuckGo</string>
+    <string name="aboutActivityTitle">Σχετικά με το Asil</string>
     <string name="aboutHeader">Καλωσορίσατε στην πλευρά της Πάπιας!</string>
-    <string name="aboutDescription">Το DuckDuckGo αποτελεί την ανεξάρτητη εταιρεία προστασίας προσωπικών δεδομένων στο διαδίκτυο που ιδρύθηκε το 2008 για όσους έχουν βαρεθεί να παρακολουθούνται στο διαδίκτυο και επιθυμούν μια εύκολη λύση. Αποτελούμε τρανή απόδειξη ότι μπορείτε να αποκτήσετε πραγματική προστασία του απορρήτου σας στο διαδίκτυο χωρίς συμβιβασμούς.\n\nΤο πρόγραμμα περιήγησης DuckDuckGo διαθέτει τις λειτουργίες που περιμένετε από ένα πρόγραμμα περιήγησης, όπως σελιδοδείκτες, καρτέλες, κωδικούς πρόσβασης και πολλά άλλα, καθώς και πάνω από <annotation type="privacy_protection_link">δώδεκα ισχυρές λειτουργίες προστασίας απορρήτου</annotation> που δεν προσφέρονται από τα περισσότερα δημοφιλή προγράμματα περιήγησης βάσει προεπιλογής. Αυτό το μοναδικά ολοκληρωμένο σύνολο προστασίας του απορρήτου συμβάλλει στην προστασία των διαδικτυακών δραστηριοτήτων σας, από αναζήτηση έως περιήγηση, αποστολή email και πολλά άλλα.\n\nΗ προστασία απορρήτου μας λειτουργεί χωρίς να χρειάζεται να γνωρίζετε τις τεχνικές λεπτομέρειες ή να ασχολείστε με περίπλοκες ρυθμίσεις. Το μόνο που έχετε να κάνετε είναι να αλλάξετε το πρόγραμμα περιήγησής σας σε DuckDuckGo σε όλες τις συσκευές σας και θα έχετε ιδιωτικότητα βάσει προεπιλογής.\n\nΑλλά αν θέλετε να ρίξετε μια αναλυτική ματιά, μπορείτε να βρείτε περισσότερες πληροφορίες σχετικά με το πώς λειτουργούν οι προστασίες απορρήτου του DuckDuckGo στις σελίδες της ενότητας <annotation type="learn_more_link">Βοήθεια</annotation></string>
+    <string name="aboutDescription">Το Asil αποτελεί την ανεξάρτητη εταιρεία προστασίας προσωπικών δεδομένων στο διαδίκτυο που ιδρύθηκε το 2008 για όσους έχουν βαρεθεί να παρακολουθούνται στο διαδίκτυο και επιθυμούν μια εύκολη λύση. Αποτελούμε τρανή απόδειξη ότι μπορείτε να αποκτήσετε πραγματική προστασία του απορρήτου σας στο διαδίκτυο χωρίς συμβιβασμούς.\n\nΤο πρόγραμμα περιήγησης Asil διαθέτει τις λειτουργίες που περιμένετε από ένα πρόγραμμα περιήγησης, όπως σελιδοδείκτες, καρτέλες, κωδικούς πρόσβασης και πολλά άλλα, καθώς και πάνω από <annotation type="privacy_protection_link">δώδεκα ισχυρές λειτουργίες προστασίας απορρήτου</annotation> που δεν προσφέρονται από τα περισσότερα δημοφιλή προγράμματα περιήγησης βάσει προεπιλογής. Αυτό το μοναδικά ολοκληρωμένο σύνολο προστασίας του απορρήτου συμβάλλει στην προστασία των διαδικτυακών δραστηριοτήτων σας, από αναζήτηση έως περιήγηση, αποστολή email και πολλά άλλα.\n\nΗ προστασία απορρήτου μας λειτουργεί χωρίς να χρειάζεται να γνωρίζετε τις τεχνικές λεπτομέρειες ή να ασχολείστε με περίπλοκες ρυθμίσεις. Το μόνο που έχετε να κάνετε είναι να αλλάξετε το πρόγραμμα περιήγησής σας σε Asil σε όλες τις συσκευές σας και θα έχετε ιδιωτικότητα βάσει προεπιλογής.\n\nΑλλά αν θέλετε να ρίξετε μια αναλυτική ματιά, μπορείτε να βρείτε περισσότερες πληροφορίες σχετικά με το πώς λειτουργούν οι προστασίες απορρήτου του Asil στις σελίδες της ενότητας <annotation type="learn_more_link">Βοήθεια</annotation></string>
     <string name="no_suggestions">Δεν υπάρχουν προτάσεις</string>
 
     <!-- Broken Site Activity -->
@@ -265,7 +265,7 @@
     <string name="removeAll">Αφαίρεση όλων</string>
 
     <!-- Widget -->
-    <string name="searchWidgetTextHint">Αναζήτηση DuckDuckGo</string>
+    <string name="searchWidgetTextHint">Αναζήτηση Asil</string>
 
     <!-- Favorites widget -->
     <string name="addFavoriteMenuTitleHighlighted">👋 Προσθήκη στα Αγαπημένα</string>
@@ -292,7 +292,7 @@
     <string name="surveyCtaLaunchButton">Πάρτε μέρος στην έρευνα</string>
     <string name="surveyCtaDismissButton">Όχι, ευχαριστώ</string>
     <string name="surveyActivityTitle">Έρευνα χρηστών</string>
-    <string name="surveyTitle">Έρευνα DuckDuckGo</string>
+    <string name="surveyTitle">Έρευνα Asil</string>
     <string name="surveyDismissContentDescription">Απόρριψη έρευνας</string>
     <string name="surveyLoadingErrorTitle">Ωχ, όχι!</string>
     <string name="surveyLoadingErrorText">Η έρευνά μας δεν φορτώνει αυτήν τη στιγμή.\nΠροσπαθήστε ξανά αργότερα.</string>
@@ -307,14 +307,14 @@
     <string name="addWidgetInstruction1Label">1</string>
     <string name="addWidgetInstruction1">Πατήστε παρατεταμένα στην αρχική οθόνη και ανοίξτε το μενού γραφικών στοιχείων.</string>
     <string name="addWidgetInstruction2Label">2</string>
-    <string name="addWidgetInstruction2">Εύρεση του γραφικού στοιχείου DuckDuckGo.</string>
+    <string name="addWidgetInstruction2">Εύρεση του γραφικού στοιχείου Asil.</string>
     <string name="addWidgetInstruction3Label">3</string>
     <string name="addWidgetInstruction3">Σύρετε το γραφικό στοιχείο στην αρχική οθόνη σας.</string>
     <string name="addWidgetInstructionsButtonGoHome">Μετάβαση στην αρχική οθόνη</string>
     <string name="addWidgetInstructionsButtonClose">Κλείσιμο</string>
 
     <!-- App Enjoyment / Rating / Feedback -->
-    <string name="appEnjoymentDialogTitle">Απολαμβάνετε το DuckDuckGo;</string>
+    <string name="appEnjoymentDialogTitle">Απολαμβάνετε το Asil;</string>
     <string name="appEnjoymentDialogMessage">Θα θέλαμε να μάθουμε τη γνώμη σας.</string>
     <string name="appEnjoymentDialogPositiveButton">Μου αρέσει</string>
     <string name="appEnjoymentDialogNegativeButton">Χρειάζεται βελτιώσεις</string>
@@ -336,15 +336,15 @@
 
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Η εκκαθάριση δεδομένων έχει οριστεί ως χειροκίνητη</string>
-    <string name="clearNotificationDescription">Προσαρμόστε το DuckDuckGo για αυτόματη εκκαθάριση των δεδομένων περιήγησης μετά από κάθε περίοδο λειτουργίας.</string>
+    <string name="clearNotificationDescription">Προσαρμόστε το Asil για αυτόματη εκκαθάριση των δεδομένων περιήγησης μετά από κάθε περίοδο λειτουργίας.</string>
 
     <!-- Privacy Protection Notification -->
     <string name="privacyProtectionNotificationDefaultTitle">Προστατεύουμε την ιδιωτικότητά σας</string>
     <string name="privacyProtectionNotificationReportTitle">Η αναφορά ιδιωτικότητάς σας</string>
-    <string name="privacyProtectionNotificationDefaultDescription">Η χρήση της εφαρμογής DuckDuckGo προστατεύει τα δεδομένα σας αποκλείοντας παρακολουθήσεις και κρυπτογραφώντας συνδέσεις.</string>
-    <string name="privacyProtectionNotificationUpgadeDescription" instruction="Placeholder is a the number of connections we have protected">Προστατεύσατε τα δεδομένα σας διασφαλίζοντας %1$d μη κρυπτογραφημένες συνδέσεις κατά τη χρήση του DuckDuckGo.</string>
-    <string name="privacyProtectionNotificationTrackerDescription" instruction="Placeholder is the numer of trackers blocked">Προστατεύσατε τα δεδομένα σας αποκλείοντας %1$d παρακολουθήσεις κατά τη χρήση του DuckDuckGo.</string>
-    <string name="privacyProtectionNotificationBothDescription" instruction="%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections">Προστατεύσατε τα δεδομένα σας αποκλείοντας %1$d παρακολουθήσεις και διασφαλίζοντας %2$d μη κρυπτογραφημένες συνδέσεις κατά τη χρήση του DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationDefaultDescription">Η χρήση της εφαρμογής Asil προστατεύει τα δεδομένα σας αποκλείοντας παρακολουθήσεις και κρυπτογραφώντας συνδέσεις.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription" instruction="Placeholder is a the number of connections we have protected">Προστατεύσατε τα δεδομένα σας διασφαλίζοντας %1$d μη κρυπτογραφημένες συνδέσεις κατά τη χρήση του Asil.</string>
+    <string name="privacyProtectionNotificationTrackerDescription" instruction="Placeholder is the numer of trackers blocked">Προστατεύσατε τα δεδομένα σας αποκλείοντας %1$d παρακολουθήσεις κατά τη χρήση του Asil.</string>
+    <string name="privacyProtectionNotificationBothDescription" instruction="%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections">Προστατεύσατε τα δεδομένα σας αποκλείοντας %1$d παρακολουθήσεις και διασφαλίζοντας %2$d μη κρυπτογραφημένες συνδέσεις κατά τη χρήση του Asil.</string>
     <string name="privacyProtectionNotificationLaunchButton">Συνέχιση περιήγησης</string>
 
     <!-- Authentication -->
@@ -356,7 +356,7 @@
     <string name="authenticationDialogPasswordHint">Κωδικός πρόσβασης</string>
 
     <!-- User-facing label for when a user selects text and might want to search for that text -->
-    <string name="systemTextSearchMessage">Αναζήτηση DuckDuckGo</string>
+    <string name="systemTextSearchMessage">Αναζήτηση Asil</string>
 
     <!-- App feedback disambiguation -->
     <string name="feedbackActivityTitle">Κοινοποίηση σχολίου</string>
@@ -375,8 +375,8 @@
     <string name="websiteNotLoadingTitleShort">Προβλήματα φόρτωσης ιστότοπων</string>
     <string name="websiteNotLoadingSubtitle">Ποιος ιστότοπος είναι κατεστραμμένος;</string>
 
-    <string name="searchNotGoodEnoughTitleLong">Η αναζήτηση DuckDuckGo δεν είναι αρκετά καλή</string>
-    <string name="searchNotGoodEnoughTitleShort">Προβλήματα αναζήτησης DuckDuckGo</string>
+    <string name="searchNotGoodEnoughTitleLong">Η αναζήτηση Asil δεν είναι αρκετά καλή</string>
+    <string name="searchNotGoodEnoughTitleShort">Προβλήματα αναζήτησης Asil</string>
     <string name="searchNotGoodEnoughSubtitle">Ποια δυνατότητα αναζήτησης μπορούμε να προσθέσουμε ή να βελτιώσουμε;</string>
     <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Προγραμματισμός/τεχνική αναζήτηση</string>
     <string name="searchNotGoodEnoughSubReasonGoogleLayout">Η διάταξη θα πρέπει να μοιάζει περισσότερο με το Google</string>
@@ -437,8 +437,8 @@
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Από αυτή τη συσκευή</string>
     <string name="systemSearchAppNotFound">Η εφαρμογή δεν βρέθηκε</string>
-    <string name="systemSearchOnboardingText">Ευχαριστώ που επιλέξατε το DuckDuckGo!\nΤώρα, όταν χρησιμοποιείτε την αναζήτηση ή την εφαρμογή μας, οι αναζητήσεις σας προστατεύονται.</string>
-    <string name="systemSearchOnboardingFeaturesIntroText">Η εφαρμογή DuckDuckGo επίσης:</string>
+    <string name="systemSearchOnboardingText">Ευχαριστώ που επιλέξατε το Asil!\nΤώρα, όταν χρησιμοποιείτε την αναζήτηση ή την εφαρμογή μας, οι αναζητήσεις σας προστατεύονται.</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">Η εφαρμογή Asil επίσης:</string>
     <string name="systemSearchOnboardingFeatureOneText">Αποκλείει μη ασφαλείς παρακολουθήσεις.</string>
     <string name="systemSearchOnboardingFeatureTwoText">Επιβάλλει την κρυπτογράφηση στους ιστότοπους.</string>
     <string name="systemSearchOnboardingFeatureThreeText">Καθαρίζει τα δεδομένα με ένα άγγιγμα.</string>
@@ -462,12 +462,12 @@
     <string name="daxDialogAppTpRetentionSecondaryButtonText">Όχι τώρα</string>
 
     <!-- New Onboarding Experience -->
-    <string name="onboardingWelcomeTitle">"Καλώς ορίσατε στον DuckDuckGo!"</string>
+    <string name="onboardingWelcomeTitle">"Καλώς ορίσατε στον Asil!"</string>
     <string name="onboardingDaxText"><![CDATA[Το Διαδίκτυο μπορεί να είναι κάπως ανατριχιαστικό.<br/><br/>Μην ανησυχείτε! Η ιδιωτική έρευνα και φυλλομέτρηση είναι ευκολότερες από όσο νομίζετε.]]></string>
     <string name="onboardingLetsDoItButton">Ας ξεκινήσουμε!</string>
     <string name="daxIntroCtaText"><![CDATA[Στη συνέχεια, δοκιμάστε να επισκεφτείτε έναν από τους αγαπημένους σας ιστότοπους! <br/><br/>Θα εμποδίσω τους ιχνηλάτες ώστε να μην μπορούν να σας κατασκοπεύουν. Επίσης, θα αναβαθμίσω την ασφάλεια της σύνδεσής σας αν είναι δυνατόν. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[Το έχετε! <br/><br/>Να θυμάστε: κάθε φορά που περιηγείστε μαζί μου μια ανατριχιαστική διαφήμιση χάνει τα φτερά της. 👍]]></string>
-    <string name="daxSerpCtaText">Οι αναζητήσεις σας στο DuckDuckGo είναι ανώνυμες. Πάντα. 🙌</string>
+    <string name="daxSerpCtaText">Οι αναζητήσεις σας στο Asil είναι ανώνυμες. Πάντα. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one"><![CDATA[ και <b>%1$d άλλος</b> προσπαθούσαν να σας παρακολουθήσουν εδώ. <br/><br/>Τους εμπόδισα!<br/><br/> ☝️Μπορείτε να ελέγξετε τη γραμμή διευθύνσεων για να δείτε ποιος προσπαθεί να σας παρακολουθήσει όταν επισκέπτεστε έναν νέο ιστότοπο.️]]></item>
         <item quantity="other"><![CDATA[ και <b>%1$d άλλοι</b> προσπαθούσαν να σας παρακολουθήσουν εδώ. <br/><br/>Τους εμπόδισα!<br/><br/> ☝️Μπορείτε να ελέγξετε τη γραμμή διευθύνσεων URL για να δείτε ποιος προσπαθεί να σας παρακολουθήσει όταν επισκέπτεστε έναν νέο ιστότοπο.️]]></item>
@@ -481,7 +481,7 @@
     <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Προσοχή! Επειδή το %1$s κατέχει %2$s, δεν μπορώ να τους εμποδίσω από το να δουν τη δραστηριότητά σας εδώ.&lt;br/&gt;&lt;br/&gt;Αλλά περιηγηθείτε μαζί μου και μπορώ να περιορίσω τι θα γνωρίζει το %3$s για εσάς συνολικά, αποκλείοντας τις εφαρμογές παρακολούθησής τους σε πλήθος άλλων ιστότοπων.</string>
 
     <!-- Onboarding DDG Feature Options -->
-    <string name="onboardingFeatureOptionsTitle">Τι σας φέρνει στο DuckDuckGo;</string>
+    <string name="onboardingFeatureOptionsTitle">Τι σας φέρνει στο Asil;</string>
     <string name="onboardingFeatureOptionsContinue">Συνέχεια</string>
     <string name="onboardingFeatureOptionsSkip">Παράλειψη του βήματος αυτού</string>
     <!-- smartling.character_limit = 28 -->
@@ -582,7 +582,7 @@
     <string name="dosErrorMessage">Η σύνδεση ματαιώθηκε. Ο ιστότοπος αυτός μπορεί να είναι επιβλαβής για τη συσκευή σας.</string>
 
     <!-- Precise Location -->
-    <string name="preciseLocationSystemDialogTitle">Ενεργοποίηση της τοποθεσίας συσκευής για το DuckDuckGo Privacy Browser;</string>
+    <string name="preciseLocationSystemDialogTitle">Ενεργοποίηση της τοποθεσίας συσκευής για το Asil Privacy Browser;</string>
     <string name="preciseLocationSystemDialogSubtitle" instruction="%1$s and %2$s are both the name of the website requesting the location">Η εφαρμογή %1$s ζητάει την τοποθεσία της συσκευής σας. Αρχικά, θα πρέπει να επιτρέψετε στην εφαρμογή να στείλει την τοποθεσία της συσκευής σας και έπειτα η εφαρμογή %2$s μπορεί να ζητήσει άδεια.</string>
     <string name="preciseLocationSystemDialogAllow">Ενεργοποίηση</string>
     <string name="preciseLocationSystemDialogDeny">Ίσως αργότερα</string>
@@ -594,7 +594,7 @@
     <string name="preciseLocationSiteDialogAllowOnce">Μόνο γι\' αυτή τη σύνδεση</string>
     <string name="preciseLocationSiteDialogDenyAlways">Άρνηση για πάντα</string>
     <string name="preciseLocationSiteDialogDenyOnce">Άρνηση γι\' αυτή τη σύνδεση</string>
-    <string name="preciseLocationFeatureDescription">Οι ιστότοποι που επισκέπτεστε ίσως ζητήσουν να μάθουν την τοποθεσία της συσκευής σας. Δεν θα μπορούν να έχουν πρόσβαση έως ότου τους εκχωρήσετε ρητά άδεια. Το DuckDuckGo χρησιμοποιεί την τοποθεσία σας μόνο ανώνυμα για να παρέχει τοπικά αποτελέσματα αναζήτησης.</string>
+    <string name="preciseLocationFeatureDescription">Οι ιστότοποι που επισκέπτεστε ίσως ζητήσουν να μάθουν την τοποθεσία της συσκευής σας. Δεν θα μπορούν να έχουν πρόσβαση έως ότου τους εκχωρήσετε ρητά άδεια. Το Asil χρησιμοποιεί την τοποθεσία σας μόνο ανώνυμα για να παρέχει τοπικά αποτελέσματα αναζήτησης.</string>
     <string name="preciseLocationToggleText">Οι ιστότοποι μπορούν να ζητήσουν την τοποθεσία μου</string>
     <string name="preciseLocationEmptyListHint">Δεν εκχωρήθηκε σε κανέναν ιστότοπο δικαίωμα πρόσβασης στην τοποθεσία</string>
     <string name="preciseLocationNoSystemPermission">Για να διαχειριστείτε τα δικαιώματα πρόσβασης τοποθεσίας που έχετε εκχωρήσει σε μεμονωμένους ιστότοπους, ενεργοποιήστε την τοποθεσία γι\' αυτή την εφαρμογή από τις Ρυθμίσεις Android.</string>
@@ -610,7 +610,7 @@
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Παγκόσμιος έλεγχος απορρήτου (GPC)</string>
-    <string name="globalPrivacyControlDescription"><![CDATA[Το DuckDuckGo αποκλείει αυτόματα πολλές εφαρμογές παρακολούθησης. Με τον Παγκόσμιο έλεγχο απορρήτου (GPC), μπορείτε επίσης να ζητήσετε από τους ιστότοπους που συμμετέχουν να περιορίσουν την πώληση ή την κοινοποίηση των προσωπικών δεδομένων σας σε άλλες εταιρείες. <u><a href=\"\">Μάθετε περισσότερα</a><u/>]]></string>
+    <string name="globalPrivacyControlDescription"><![CDATA[Το Asil αποκλείει αυτόματα πολλές εφαρμογές παρακολούθησης. Με τον Παγκόσμιο έλεγχο απορρήτου (GPC), μπορείτε επίσης να ζητήσετε από τους ιστότοπους που συμμετέχουν να περιορίσουν την πώληση ή την κοινοποίηση των προσωπικών δεδομένων σας σε άλλες εταιρείες. <u><a href=\"\">Μάθετε περισσότερα</a><u/>]]></string>
     <string name="globalPrivacyControlSetting">Παγκόσμιος έλεγχος απορρήτου (GPC)</string>
     <string name="globalPrivacyControlToggle">Παγκόσμιος έλεγχος απορρήτου (GPC)</string>
     <string name="disabled">Απενεργοποιήθηκε</string>
@@ -669,14 +669,14 @@
     <string name="settingsAccessibility">Προσβασιμότητα</string>
     <string name="accessibilityActivityTitle">Προσβασιμότητα</string>
     <string name="accessibilityFontSizeTitle">Μέγεθος κειμένου</string>
-    <string name="accessibilityFontSizeHint">Μετακινήστε το ρυθμιστικό μέχρι να μπορείτε να διαβάσετε αυτό το κείμενο άνετα. Οι ιστότοποι που βλέπετε στο DuckDuckGo θα προσαρμοστούν σε αυτό.</string>
+    <string name="accessibilityFontSizeHint">Μετακινήστε το ρυθμιστικό μέχρι να μπορείτε να διαβάσετε αυτό το κείμενο άνετα. Οι ιστότοποι που βλέπετε στο Asil θα προσαρμοστούν σε αυτό.</string>
     <string name="accessibilityForceZoomTitle">Επιβολή μη αυτόματης εστίασης στη σελίδα</string>
     <string name="accessibilityForceZoomSubtitle">Μεγεθύνετε χρησιμοποιώντας τα δάχτυλα σε οποιονδήποτε ιστότοπο, ακόμα και σε αυτούς που διαφορετικά θα το απέτρεπαν</string>
     <string name="accessibilityTextSizeOverrideTitle">Διαχείριση μεγέθους κειμένου</string>
-    <string name="accessibilityTextSizeOverrideSubtitle">Τα κείμενα στους ιστότοπους που βλέπετε στο DuckDuckGo θα προσαρμοστούν ώστε να ταιριάζουν στην πιο κάτω ρύθμιση</string>
+    <string name="accessibilityTextSizeOverrideSubtitle">Τα κείμενα στους ιστότοπους που βλέπετε στο Asil θα προσαρμοστούν ώστε να ταιριάζουν στην πιο κάτω ρύθμιση</string>
 
     <!-- Privacy Policy -->
-    <string name="settingsPrivacyPolicyDuckduckgo">Πολιτική προστασίας προσωπικών δεδομένων</string>
+    <string name="settingsPrivacyPolicyAsil">Πολιτική προστασίας προσωπικών δεδομένων</string>
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded" instruction="Placeholder is the name of the widget">Προστέθηκε μικροεφαρμογή %1$s στην αρχική οθόνη</string>
@@ -684,7 +684,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Περιηγηθείτε ιδιωτικά με την εφαρμογή μας για Mac</string>
-    <string name="macos_settings_title">Εφαρμογή DuckDuckGo Mac</string>
+    <string name="macos_settings_title">Εφαρμογή Asil Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Λήψεις</string>
@@ -746,7 +746,7 @@
     <string name="downloadsNotifyMeSubtitle">Λάβετε ειδοποίηση όταν ολοκληρωθούν οι λήψεις.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">Εφαρμογή DuckDuckGo Windows</string>
+    <string name="windows_settings_title">Εφαρμογή Asil Windows</string>
     <string name="windows_settings_description">Περιηγηθείτε ιδιωτικά με την εφαρμογή μας για Windows</string>
     <string name="windows_settings_description_ready">Διαθέσιμη λήψη</string>
     <string name="windows_settings_description_list">Είστε στη λίστα!</string>
@@ -771,7 +771,7 @@
     <string name="deleteSavedSiteConfirmationDialogDelete">Διαγραφή</string>
 
     <!-- Private voice search -->
-    <string name="accessibilityVoiceSearchSubtitle">Προσθήκη της επιλογής Ιδιωτική φωνητική αναζήτηση στη γραμμή διευθύνσεων. Ο ήχος δεν αποθηκεύεται ούτε κοινοποιείται σε οποιονδήποτε, συμπεριλαμβανομένου του DuckDuckGo.</string>
+    <string name="accessibilityVoiceSearchSubtitle">Προσθήκη της επιλογής Ιδιωτική φωνητική αναζήτηση στη γραμμή διευθύνσεων. Ο ήχος δεν αποθηκεύεται ούτε κοινοποιείται σε οποιονδήποτε, συμπεριλαμβανομένου του Asil.</string>
     <string name="accessibilityVoiceSearchTitle">Ιδιωτική φωνητική αναζήτηση</string>
 
     <!-- Uploading an image from the camera or choosing to use existing image -->
@@ -779,8 +779,8 @@
     <string name="imageCaptureCameraGalleryDisambiguationTitle">Μεταφορτώστε μια εικόνα</string>
     <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Επιλέξτε αρχείο</string>
     <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Τραβήξτε φωτογραφία</string>
-    <string name="imageCaptureCameraPermissionDeniedTitle">Επιτρέψτε στο DuckDuckGo να αιτηθεί πρόσβαση στην κάμερα της συσκευής αυτής</string>
-    <string name="imageCaptureCameraPermissionDeniedMessage">Οι ιστότοποι μπορούν να χρησιμοποιούν την κάμερά σας μόνο εάν επιτρέψετε στο DuckDuckGo να αιτηθεί πρόσβαση.</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Επιτρέψτε στο Asil να αιτηθεί πρόσβαση στην κάμερα της συσκευής αυτής</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Οι ιστότοποι μπορούν να χρησιμοποιούν την κάμερά σας μόνο εάν επιτρέψετε στο Asil να αιτηθεί πρόσβαση.</string>
     <string name="imageCaptureCameraPermissionDeniedPositiveButton">Άνοιγμα ρυθμίσεων</string>
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Ακύρωση</string>
 

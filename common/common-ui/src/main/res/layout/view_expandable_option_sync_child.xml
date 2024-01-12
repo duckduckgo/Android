@@ -19,6 +19,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_4"
         android:text="Primary"
-        app:buttonSize="large" />
+        app:customButtonSize="large" />
 
 </LinearLayout>

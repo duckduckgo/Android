@@ -69,7 +69,7 @@
         android:id="@+id/continueButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:buttonSize="large"
+        app:customButtonSize="large"
         android:text="@string/defaultBrowserMaybeLater"
         android:layout_marginStart="@dimen/keyline_5"
         android:layout_marginEnd="@dimen/keyline_5"
@@ -81,7 +81,7 @@
     <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
         android:id="@+id/launchSettingsButton"
         android:layout_width="0dp"
-        app:buttonSize="large"
+        app:customButtonSize="large"
         android:layout_marginStart="@dimen/keyline_5"
         android:layout_marginEnd="@dimen/keyline_5"
         android:layout_marginBottom="@dimen/keyline_1"

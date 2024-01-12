@@ -18,6 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="autoconsentTitle">Sīkfailu uznirstošo logu aizsardzība</string>
-    <string name="autoconsentDescription"><![CDATA[Ja DuckDuckGo tevis apmeklētajās vietnēs atklāj sīkfailu piekrišanas uznirstošos logus, mēs varam automātiski iestatīt tavas sīkfailu preferences, lai samazinātu sīkfailus un uzlabotu privātumu, un pēc tam aizvērt šos uznirstošos logus. <u><a href=\"\">Uzzināt vairāk</a><u/>]]></string>
-    <string name="autoconsentToggle">Ļauj DuckDuckGo apstrādāt sīkfailu uznirstošos logus</string>
+    <string name="autoconsentDescription"><![CDATA[Ja Asil Browser tevis apmeklētajās vietnēs atklāj sīkfailu piekrišanas uznirstošos logus, mēs varam automātiski iestatīt tavas sīkfailu preferences, lai samazinātu sīkfailus un uzlabotu privātumu, un pēc tam aizvērt šos uznirstošos logus. <u><a href=\"\">Uzzināt vairāk</a><u/>]]></string>
+    <string name="autoconsentToggle">Ļauj Asil Browser apstrādāt sīkfailu uznirstošos logus</string>
 </resources>

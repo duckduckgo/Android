@@ -40,7 +40,7 @@
             android:layout_width="150dp"
             android:layout_height="150dp"
             android:layout_gravity="center"
-            android:contentDescription="@string/duckDuckGoLogoDescription"
+            android:contentDescription="@string/asilLogoDescription"
             app:srcCompat="@drawable/logo_full" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
@@ -86,7 +86,7 @@
             android:id="@+id/aboutPrivacyPolicy"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:primaryText="@string/settingsPrivacyPolicyDuckduckgo" />
+            app:primaryText="@string/settingsPrivacyPolicyAsil" />
 
         <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
             android:id="@+id/aboutVersion"

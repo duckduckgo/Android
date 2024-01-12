@@ -18,6 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="autoconsentTitle">Evästeiden ponnahdusikkuna -suojaus</string>
-    <string name="autoconsentDescription"><![CDATA[Kun DuckDuckGo havaitsee evästeiden ponnahdusikkunoita sivustoilla, joilla käyt, voimme automaattisesti määrittää evästeasetuksesi evästeiden minimoimiseksi ja yksityisyyden maksimoimiseksi ja sulkea sitten ponnahdusikkunat. <u><a href=\"\">Lue lisää</a><u/>]]></string>
-    <string name="autoconsentToggle">Anna DuckDuckGo hoitaa evästeiden ponnahdusikkunat</string>
+    <string name="autoconsentDescription"><![CDATA[Kun Asil Browser havaitsee evästeiden ponnahdusikkunoita sivustoilla, joilla käyt, voimme automaattisesti määrittää evästeasetuksesi evästeiden minimoimiseksi ja yksityisyyden maksimoimiseksi ja sulkea sitten ponnahdusikkunat. <u><a href=\"\">Lue lisää</a><u/>]]></string>
+    <string name="autoconsentToggle">Anna Asil Browser hoitaa evästeiden ponnahdusikkunat</string>
 </resources>

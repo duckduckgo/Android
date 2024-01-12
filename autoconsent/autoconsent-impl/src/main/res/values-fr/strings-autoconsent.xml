@@ -18,6 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="autoconsentTitle">Protection contre les fenêtres contextuelles des cookies</string>
-    <string name="autoconsentDescription"><![CDATA[Lorsque DuckDuckGo détecte les fenêtres contextuelles des cookies sur les sites que vous visitez, vos préférences peuvent être configurées automatiquement de façon à ce que les cookies soient réduits au minimum et la confidentialité maximisée, puis les fenêtres contextuelles sont fermées. <u><a href=\"\">En savoir plus</a><u/>]]></string>
-    <string name="autoconsentToggle">Laisser DuckDuckGo gérer les fenêtres contextuelles des cookies</string>
+    <string name="autoconsentDescription"><![CDATA[Lorsque Asil Browser détecte les fenêtres contextuelles des cookies sur les sites que vous visitez, vos préférences peuvent être configurées automatiquement de façon à ce que les cookies soient réduits au minimum et la confidentialité maximisée, puis les fenêtres contextuelles sont fermées. <u><a href=\"\">En savoir plus</a><u/>]]></string>
+    <string name="autoconsentToggle">Laisser Asil Browser gérer les fenêtres contextuelles des cookies</string>
 </resources>

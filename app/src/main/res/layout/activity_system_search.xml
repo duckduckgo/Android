@@ -57,8 +57,8 @@
 
                     <ImageView
                         android:id="@+id/logo"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
                         android:importantForAccessibility="no"
                         android:padding="4dp"
                         app:srcCompat="@drawable/ic_ddg_logo"

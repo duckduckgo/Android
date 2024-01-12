@@ -50,7 +50,7 @@
         android:id="@+id/onboarding_next_cta"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:buttonSize="large"
+        app:customButtonSize="large"
         android:layout_marginStart="@dimen/keyline_5"
         android:layout_marginEnd="@dimen/keyline_5"
         android:layout_marginBottom="@dimen/keyline_4"

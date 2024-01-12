@@ -18,6 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="autoconsentTitle">Küpsiste hüpikakna kaitse</string>
-    <string name="autoconsentDescription"><![CDATA[Kui DuckDuckGo tuvastab külastatavatel veebisaitidel küpsiste hüpikaknad, saame automaatselt seadistada sinu küpsiste eelistused selliselt, et minimeeritaks küpsised ja maksimeeritaks privaatsust, ning seejärel hüpikaknad sulgeda.  <u><a href=\"\">Lisateave</a><u/>]]></string>
-    <string name="autoconsentToggle">Lase DuckDuckGol küpsiste hüpikaknaid hallata</string>
+    <string name="autoconsentDescription"><![CDATA[Kui Asil Browser tuvastab külastatavatel veebisaitidel küpsiste hüpikaknad, saame automaatselt seadistada sinu küpsiste eelistused selliselt, et minimeeritaks küpsised ja maksimeeritaks privaatsust, ning seejärel hüpikaknad sulgeda.  <u><a href=\"\">Lisateave</a><u/>]]></string>
+    <string name="autoconsentToggle">Lase Asil Browser küpsiste hüpikaknaid hallata</string>
 </resources>

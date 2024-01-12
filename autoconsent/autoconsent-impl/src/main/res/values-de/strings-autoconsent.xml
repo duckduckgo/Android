@@ -18,6 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="autoconsentTitle">Cookie-Pop-up-Schutz</string>
-    <string name="autoconsentDescription"><![CDATA[Wenn DuckDuckGo Cookie-Pop-ups auf den von dir besuchten Websites erkennt, können wir deine Cookie-Einstellungen automatisch so festlegen, dass Cookies minimiert werden und der Datenschutz maximiert wird, und dann die Pop-ups schließen. <u><a href=\"\">Mehr erfahren</a><u/>]]></string>
-    <string name="autoconsentToggle">Lass Cookie-Pop-ups von DuckDuckGo verwalten</string>
+    <string name="autoconsentDescription"><![CDATA[Wenn Asil Browser Cookie-Pop-ups auf den von dir besuchten Websites erkennt, können wir deine Cookie-Einstellungen automatisch so festlegen, dass Cookies minimiert werden und der Datenschutz maximiert wird, und dann die Pop-ups schließen. <u><a href=\"\">Mehr erfahren</a><u/>]]></string>
+    <string name="autoconsentToggle">Lass Cookie-Pop-ups von Asil Browser verwalten</string>
 </resources>

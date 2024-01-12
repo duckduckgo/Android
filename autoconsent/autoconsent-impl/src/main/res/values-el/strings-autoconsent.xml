@@ -18,6 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="autoconsentTitle">Προστασία αναδυόμενων παραθύρων για cookies</string>
-    <string name="autoconsentDescription"><![CDATA[Όταν το DuckDuckGo εντοπίζει αναδυόμενα παράθυρα για cookies σε ιστότοπους που επισκέπτεστε, μπορούμε να ρυθμίσουμε αυτόματα τις προτιμήσεις σας για τα cookies ώστε να ελαχιστοποιήσετε τα cookies και να μεγιστοποιήσετε το απόρρητο. Έπειτα μπορείτε να κλείσετε τα αναδυόμενα παράθυρα. <u><a href=\"\">Μάθετε περισσότερα</a><u/>]]></string>
-    <string name="autoconsentToggle">Επιτρέψτε στο DuckDuckGo να διαχειρίζεται τα αναδυόμενα παράθυρα για cookies</string>
+    <string name="autoconsentDescription"><![CDATA[Όταν το Asil Browser εντοπίζει αναδυόμενα παράθυρα για cookies σε ιστότοπους που επισκέπτεστε, μπορούμε να ρυθμίσουμε αυτόματα τις προτιμήσεις σας για τα cookies ώστε να ελαχιστοποιήσετε τα cookies και να μεγιστοποιήσετε το απόρρητο. Έπειτα μπορείτε να κλείσετε τα αναδυόμενα παράθυρα. <u><a href=\"\">Μάθετε περισσότερα</a><u/>]]></string>
+    <string name="autoconsentToggle">Επιτρέψτε στο Asil Browser να διαχειρίζεται τα αναδυόμενα παράθυρα για cookies</string>
 </resources>

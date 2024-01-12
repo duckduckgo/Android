@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2022 Asil
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -17,10 +17,10 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="appName" translatable="false">DuckDuckGo</string>
-    <string name="appDescription" translatable="false">DuckDuckGo</string>
-    <string name="duckDuckGoLogoDescription">DuckDuckGos logotyp</string>
-    <string name="duckDuckGoPrivacySimplified">Personlig integritet, förenklad</string>
+    <string name="appName" translatable="false">Asil</string>
+    <string name="appDescription" translatable="false">Asil</string>
+    <string name="asilLogoDescription">Asils logotyp</string>
+    <string name="asilPrivacySimplified">Personlig integritet, förenklad</string>
     <string name="yes">Ja</string>
     <string name="no">Nej</string>
     <string name="open">Öppna</string>
@@ -28,8 +28,8 @@
     <string name="search">Sökning</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingDefaultBrowserDescription">Gå till Inställningar för att söka och bläddra med DuckDuckGo varje gång.</string>
-    <string name="onboardingDefaultBrowserTitle">Ställ in DuckDuckGo som standard</string>
+    <string name="onboardingDefaultBrowserDescription">Gå till Inställningar för att söka och bläddra med Asil varje gång.</string>
+    <string name="onboardingDefaultBrowserTitle">Ställ in Asil som standard</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Kan inte starta standardinställningssidan för appar</string>
@@ -37,7 +37,7 @@
     <string name="defaultBrowserMaybeLater">Kanske senare</string>
     <string name="defaultBrowserLetsDoIt">Ställ in som standardwebbläsare</string>
     <string name="defaultBrowserDescriptionNoDefault">Sluta oroa dig varje gång du öppnar länkar.</string>
-    <string name="defaultBrowserInstructions">Välj DuckDuckGo och tryck på <font color="#678fff">Alltid</font>.</string>
+    <string name="defaultBrowserInstructions">Välj Asil och tryck på <font color="#678fff">Alltid</font>.</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Webbläsarmeny</string>
@@ -90,11 +90,11 @@
     <!-- Opening external apps -->
     <string name="openExternalApp">Öppna extern app</string>
     <string name="launchingExternalApp">Öppna i annan app</string>
-    <string name="confirmOpenExternalApp">Vill du lämna DuckDuckGo för att se detta innehåll?</string>
+    <string name="confirmOpenExternalApp">Vill du lämna Asil för att se detta innehåll?</string>
     <string name="unableToOpenLink">Kunde inte öppna den här länktypen</string>
 
     <!-- Tabs -->
-    <string name="homeTab" translatable="false">DuckDuckGo</string>
+    <string name="homeTab" translatable="false">Asil</string>
     <string name="tabActivityTitle">Flikar</string>
     <string name="tabsMenuItem">Flikar</string>
     <string name="newTabMenuItem">Ny flik</string>
@@ -122,12 +122,12 @@
     <string name="settingsHeadingAppearance">Utseende</string>
     <string name="settingsHeadingCustomize">Anpassa</string>
     <string name="settingsHeadingAbout">Om</string>
-    <string name="settingsAboutDuckduckgo">Om DuckDuckGo</string>
+    <string name="settingsAboutAsil">Om Asil</string>
     <string name="settingsVersion">Version</string>
     <string name="leaveFeedback">Berätta vad du tycker</string>
     <string name="settingsEmailProtectionTitle">E-postskydd</string>
     <string name="settingsEmailProtectionSubtitle">Blockera e-postspårare och dölj din adress</string>
-    <string name="settingsHeadingMore">Mer från DuckDuckGo</string>
+    <string name="settingsHeadingMore">Mer från Asil</string>
     <string name="settingsLightTheme">Ljus</string>
     <string name="settingsTheme">Tema</string>
     <string name="settingsDarkTheme">Mörk</string>
@@ -142,8 +142,8 @@
     <string name="settingsSubtitleNotificationsDisabled">Inaktiverad</string>
     <string name="settingsSubtitleNotificationsEnabled">Aktiverad</string>
     <string name="settingsDefaultBrowserTitle">Standardwebbläsare</string>
-    <string name="settingsDefaultBrowserSetDescription">DuckDuckGo är din standardwebbläsare</string>
-    <string name="settingsDefaultBrowserNotSetDescription">Gör DuckDuckGo till din standardwebbläsare</string>
+    <string name="settingsDefaultBrowserSetDescription">Asil är din standardwebbläsare</string>
+    <string name="settingsDefaultBrowserNotSetDescription">Gör Asil till din standardwebbläsare</string>
     <string name="settingsPrivateSearchTitle">Privatsökning</string>
     <string name="settingsPrivateSearchDescription">Aktiverat som standard</string>
     <string name="settingsWebTrackingProtectionTitle">Web Tracking Protection</string>
@@ -156,7 +156,7 @@
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Privatsökning</string>
     <string name="privateSearchTitle">Private Search är aktiverad</string>
-    <string name="privateSearchDescription">DuckDuckGo Private Search är din standardsökmotor, så att du kan söka på webben utan att bli spårad.</string>
+    <string name="privateSearchDescription">Asil Private Search är din standardsökmotor, så att du kan söka på webben utan att bli spårad.</string>
     <string name="privateSearchHeadingSearchSettings">Sökinställningar</string>
     <string name="privateSearchAutocompleteToggle">Visa Autoslutför förslag</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Fler sökinställningar</string>
@@ -167,7 +167,7 @@
     <string name="webTrackingProtectionActivityTitle">Web Tracking Protection</string>
     <string name="webTrackingProtectionLearnMoreTitle">Web Tracking Protection</string>
     <string name="webTrackingProtectionTitle">Skydd för webbspårning är aktiverat</string>
-    <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo spårar dig aldrig och vi strävar efter att ge din integritet maximalt skydd. Vi underhåller och utvecklar kontinuerligt skyddslager för att hålla jämna steg med nya spårningsmetoder och för att ge ett antal skydd som andra webbläsare inte erbjuder som standard. <u><a href=\"\">Mer information</a><u/>]]></string>
+    <string name="webTrackingProtectionDescription"><![CDATA[Asil spårar dig aldrig och vi strävar efter att ge din integritet maximalt skydd. Vi underhåller och utvecklar kontinuerligt skyddslager för att hålla jämna steg med nya spårningsmetoder och för att ge ett antal skydd som andra webbläsare inte erbjuder som standard. <u><a href=\"\">Mer information</a><u/>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Skydd mot popup-fönster för cookies</string>
@@ -202,9 +202,9 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Avsluta app, inaktiv i 1 timme</string>
 
     <!-- About Activity -->
-    <string name="aboutActivityTitle">Om DuckDuckGo</string>
+    <string name="aboutActivityTitle">Om Asil</string>
     <string name="aboutHeader">Välkommen till Duck-sidan!</string>
-    <string name="aboutDescription">DuckDuckGo är det oberoende integritetsskyddsföretaget som grundades 2008 för alla som är trötta på att bli spårade online och vill ha en enkel lösning. Vi är beviset på att man kan få riktigt integritetsskydd på nätet utan att kompromissa.\n\nWebbläsaren DuckDuckGo har de funktioner man förväntar sig av en pålitlig webbläsare, som bokmärken, flikar, lösenord och mycket annat. Den har även <annotation type="privacy_protection_link">ett tiotal kraftfulla integritetsskydd</annotation> som inte erbjuds som standard i de flesta vanliga webbläsare. Den här omfattande uppsättningen av integritetsskydd hjälper dig att skydda dina onlineaktiviteter, från sökning och surfning till e-post och mycket mer.\n\nVårt integritetsskydd fungerar utan att du behöver känna till de tekniska detaljerna eller ta itu med komplicerade inställningar. Det enda du behöver göra är att byta webbläsare till DuckDuckGo på alla dina enheter för att få integritet som standard.\n\nMen om du vill ta en titt under huven, så finns det mer information om hur integritetsskyddet hos DuckDuckGo fungerar på våra <annotation type="learn_more_link">hjälpsidor</annotation>.</string>
+    <string name="aboutDescription">Asil är det oberoende integritetsskyddsföretaget som grundades 2008 för alla som är trötta på att bli spårade online och vill ha en enkel lösning. Vi är beviset på att man kan få riktigt integritetsskydd på nätet utan att kompromissa.\n\nWebbläsaren Asil har de funktioner man förväntar sig av en pålitlig webbläsare, som bokmärken, flikar, lösenord och mycket annat. Den har även <annotation type="privacy_protection_link">ett tiotal kraftfulla integritetsskydd</annotation> som inte erbjuds som standard i de flesta vanliga webbläsare. Den här omfattande uppsättningen av integritetsskydd hjälper dig att skydda dina onlineaktiviteter, från sökning och surfning till e-post och mycket mer.\n\nVårt integritetsskydd fungerar utan att du behöver känna till de tekniska detaljerna eller ta itu med komplicerade inställningar. Det enda du behöver göra är att byta webbläsare till Asil på alla dina enheter för att få integritet som standard.\n\nMen om du vill ta en titt under huven, så finns det mer information om hur integritetsskyddet hos Asil fungerar på våra <annotation type="learn_more_link">hjälpsidor</annotation>.</string>
     <string name="no_suggestions">Inga förslag</string>
 
     <!-- Broken Site Activity -->
@@ -265,7 +265,7 @@
     <string name="removeAll">Ta bort alla</string>
 
     <!-- Widget -->
-    <string name="searchWidgetTextHint">Sök DuckDuckGo</string>
+    <string name="searchWidgetTextHint">Sök Asil</string>
 
     <!-- Favorites widget -->
     <string name="addFavoriteMenuTitleHighlighted">👋 Lägg till favorit</string>
@@ -292,7 +292,7 @@
     <string name="surveyCtaLaunchButton">Delta i undersökningen</string>
     <string name="surveyCtaDismissButton">Nej tack</string>
     <string name="surveyActivityTitle">Användarundersökning</string>
-    <string name="surveyTitle">DuckDuckGo-undersökning</string>
+    <string name="surveyTitle">Asil-undersökning</string>
     <string name="surveyDismissContentDescription">Avvisa undersökning</string>
     <string name="surveyLoadingErrorTitle">Åh nej!</string>
     <string name="surveyLoadingErrorText">Vår undersökning kan inte läsas in just nu.\nFörsök igen senare.</string>
@@ -307,14 +307,14 @@
     <string name="addWidgetInstruction1Label">1</string>
     <string name="addWidgetInstruction1">Tryck några sekunder på startsidan och öppna sedan menyn för widgeten.</string>
     <string name="addWidgetInstruction2Label">2</string>
-    <string name="addWidgetInstruction2">Hitta DuckDuckGo-widgeten.</string>
+    <string name="addWidgetInstruction2">Hitta Asil-widgeten.</string>
     <string name="addWidgetInstruction3Label">3</string>
     <string name="addWidgetInstruction3">Dra widgeten till startsidan.</string>
     <string name="addWidgetInstructionsButtonGoHome">Gå till startsidan</string>
     <string name="addWidgetInstructionsButtonClose">Stäng</string>
 
     <!-- App Enjoyment / Rating / Feedback -->
-    <string name="appEnjoymentDialogTitle">Gillar du DuckDuckGo?</string>
+    <string name="appEnjoymentDialogTitle">Gillar du Asil?</string>
     <string name="appEnjoymentDialogMessage">Vi skulle väldigt gärna vilja veta vad du tycker.</string>
     <string name="appEnjoymentDialogPositiveButton">Jag gillar den</string>
     <string name="appEnjoymentDialogNegativeButton">Den behöver förbättras</string>
@@ -336,15 +336,15 @@
 
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Datarensning inställd på manuell</string>
-    <string name="clearNotificationDescription">Anpassa DuckDuckGo för att automatiskt rensa webbläsardata efter varje session.</string>
+    <string name="clearNotificationDescription">Anpassa Asil för att automatiskt rensa webbläsardata efter varje session.</string>
 
     <!-- Privacy Protection Notification -->
     <string name="privacyProtectionNotificationDefaultTitle">Vi skyddar din integritet</string>
     <string name="privacyProtectionNotificationReportTitle">Din sekretessrapport</string>
-    <string name="privacyProtectionNotificationDefaultDescription">Genom att använda DuckDuckGo-appen skyddar du dina data genom att blockera spårare och kryptera anslutningar.</string>
-    <string name="privacyProtectionNotificationUpgadeDescription" instruction="Placeholder is a the number of connections we have protected">Du skyddade dina data genom att säkra %1$d okrypterade anslutningar medan du använde DuckDuckGo.</string>
-    <string name="privacyProtectionNotificationTrackerDescription" instruction="Placeholder is the numer of trackers blocked">Du skyddade dina data genom att blockera %1$d spårare när du använde DuckDuckGo.</string>
-    <string name="privacyProtectionNotificationBothDescription" instruction="%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections">Du skyddade dina data genom att blockera %1$d spårare och säkra %2$d okrypterade anslutningar medan du använde DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationDefaultDescription">Genom att använda Asil-appen skyddar du dina data genom att blockera spårare och kryptera anslutningar.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription" instruction="Placeholder is a the number of connections we have protected">Du skyddade dina data genom att säkra %1$d okrypterade anslutningar medan du använde Asil.</string>
+    <string name="privacyProtectionNotificationTrackerDescription" instruction="Placeholder is the numer of trackers blocked">Du skyddade dina data genom att blockera %1$d spårare när du använde Asil.</string>
+    <string name="privacyProtectionNotificationBothDescription" instruction="%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections">Du skyddade dina data genom att blockera %1$d spårare och säkra %2$d okrypterade anslutningar medan du använde Asil.</string>
     <string name="privacyProtectionNotificationLaunchButton">Återuppta bläddring</string>
 
     <!-- Authentication -->
@@ -356,7 +356,7 @@
     <string name="authenticationDialogPasswordHint">Lösenord</string>
 
     <!-- User-facing label for when a user selects text and might want to search for that text -->
-    <string name="systemTextSearchMessage">Sök DuckDuckGo</string>
+    <string name="systemTextSearchMessage">Sök Asil</string>
 
     <!-- App feedback disambiguation -->
     <string name="feedbackActivityTitle">Berätta vad du tycker</string>
@@ -375,8 +375,8 @@
     <string name="websiteNotLoadingTitleShort">Problem med webbplatser som inte laddas korrekt</string>
     <string name="websiteNotLoadingSubtitle">Vilken webbplats är skadad?</string>
 
-    <string name="searchNotGoodEnoughTitleLong">DuckDuckGo-sökning är inte tillräckligt bra</string>
-    <string name="searchNotGoodEnoughTitleShort">Problem med DuckDuckGo-sökning</string>
+    <string name="searchNotGoodEnoughTitleLong">Asil-sökning är inte tillräckligt bra</string>
+    <string name="searchNotGoodEnoughTitleShort">Problem med Asil-sökning</string>
     <string name="searchNotGoodEnoughSubtitle">Vilken sökfunktion kan vi lägga till eller förbättra?</string>
     <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Programmering/teknisk sökning</string>
     <string name="searchNotGoodEnoughSubReasonGoogleLayout">Layouten borde vara mer lik Googles</string>
@@ -437,8 +437,8 @@
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Från den här enheten</string>
     <string name="systemSearchAppNotFound">Appen kunde inte hittas</string>
-    <string name="systemSearchOnboardingText">Tack för att du valde DuckDuckGo!\nNär du använder vår sökning eller app är dina sökningar skyddade.</string>
-    <string name="systemSearchOnboardingFeaturesIntroText">Annat som DuckDuckGo-appen gör:</string>
+    <string name="systemSearchOnboardingText">Tack för att du valde Asil!\nNär du använder vår sökning eller app är dina sökningar skyddade.</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">Annat som Asil-appen gör:</string>
     <string name="systemSearchOnboardingFeatureOneText">Blockerar osäkra spårare.</string>
     <string name="systemSearchOnboardingFeatureTwoText">Tvingar kryptering på webbplatser.</string>
     <string name="systemSearchOnboardingFeatureThreeText">Rensar data med ett tryck.</string>
@@ -462,12 +462,12 @@
     <string name="daxDialogAppTpRetentionSecondaryButtonText">Inte nu</string>
 
     <!-- New Onboarding Experience -->
-    <string name="onboardingWelcomeTitle">"Välkommen till DuckDuckGo!"</string>
+    <string name="onboardingWelcomeTitle">"Välkommen till Asil!"</string>
     <string name="onboardingDaxText"><![CDATA[Internet kan vara lite läskigt.<br/><br/>Oroa dig inte! Att söka och surfa privat är lättare än du tror.]]></string>
     <string name="onboardingLetsDoItButton">Vi kör!</string>
     <string name="daxIntroCtaText"><![CDATA[Prova sedan att besöka en av dina favoritwebbplatser! <br/><br/>Jag blockerar spårare så att de inte kan spionera på dig. Jag uppgraderar även säkerheten för din uppkoppling om det är möjligt. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[Du klarar det här!<br/><br/>Kom ihåg: varje gång du surfar med mig förlorar en läskig annons sina vingar. 👍]]></string>
-    <string name="daxSerpCtaText">Dina DuckDuckGo-sökningar är anonyma. Alltid. 🙌</string>
+    <string name="daxSerpCtaText">Dina Asil-sökningar är anonyma. Alltid. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one"><![CDATA[ och <b>%1$d annan</b> försökte spåra dig här. <br/><br/>Jag blockerade dem!<br/><br/> ☝️Du kan kontrollera adressfältet för att se vem som försöker spåra dig när du besöker en ny webbplats.️]]></item>
         <item quantity="other"><![CDATA[ och <b>%1$d andra</b> försökte spåra dig här. <br/><br/>Jag blockerade dem!<br/><br/> ☝️Du kan kontrollera adressfältet för att se vem som försöker spåra dig när du besöker en ny webbplats.️]]></item>
@@ -481,7 +481,7 @@
     <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Bra att veta! Eftersom %1$s äger %2$s kan jag inte hindra dem från att se din aktivitet här.&lt;br/&gt;&lt;br/&gt;Men om du surfar med hjälp av mig kan jag se till att %3$s får veta mindre om dig genom att blockera deras spårare på många andra webbplatser.</string>
 
     <!-- Onboarding DDG Feature Options -->
-    <string name="onboardingFeatureOptionsTitle">Varför valde du DuckDuckGo?</string>
+    <string name="onboardingFeatureOptionsTitle">Varför valde du Asil?</string>
     <string name="onboardingFeatureOptionsContinue">Fortsätt</string>
     <string name="onboardingFeatureOptionsSkip">Hoppa över det här steget</string>
     <!-- smartling.character_limit = 28 -->
@@ -582,7 +582,7 @@
     <string name="dosErrorMessage">Anslutningen avbröts. Denna webbplats kan vara skadlig för din enhet.</string>
 
     <!-- Precise Location -->
-    <string name="preciseLocationSystemDialogTitle">Aktivera åtkomst till enhetens platsinf\bormation för DuckDuckGo Privacy Browser?</string>
+    <string name="preciseLocationSystemDialogTitle">Aktivera åtkomst till enhetens platsinf\bormation för Asil Privacy Browser?</string>
     <string name="preciseLocationSystemDialogSubtitle" instruction="%1$s and %2$s are both the name of the website requesting the location">%1$s begär åtkomst till din enhets platsinf\bormation. Du måste tillåta att appen skickar din enhets platsinf\bormation innan %2$s kan be om åtkomst.</string>
     <string name="preciseLocationSystemDialogAllow">Aktivera</string>
     <string name="preciseLocationSystemDialogDeny">Kanske senare</string>
@@ -594,7 +594,7 @@
     <string name="preciseLocationSiteDialogAllowOnce">Endast för denna session</string>
     <string name="preciseLocationSiteDialogDenyAlways">Neka alltid</string>
     <string name="preciseLocationSiteDialogDenyOnce">Neka för denna session</string>
-    <string name="preciseLocationFeatureDescription">Webbplatser du besöker kan begära åtkomst till din enhets platsinf\bormation. De får inte åtkomst till din enhets platsinf\bormation förrän du uttryckligen beviljat detta. DuckDuckGo använder enbart din enhets platsinf\bormation anonymt för att tillhandahålla lokala sökresultat.</string>
+    <string name="preciseLocationFeatureDescription">Webbplatser du besöker kan begära åtkomst till din enhets platsinf\bormation. De får inte åtkomst till din enhets platsinf\bormation förrän du uttryckligen beviljat detta. Asil använder enbart din enhets platsinf\bormation anonymt för att tillhandahålla lokala sökresultat.</string>
     <string name="preciseLocationToggleText">Webbplatser kan be om åtkomst till min platsinf\bormation</string>
     <string name="preciseLocationEmptyListHint">Inga webbplatser har fått åtkomst till platsinf\bormationen</string>
     <string name="preciseLocationNoSystemPermission">Aktivera åtkomst till platsinformation för denna app i Android-inställningarna för att hantera enskilda webbplatsers åtkomst till platsinformation.</string>
@@ -610,7 +610,7 @@
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
-    <string name="globalPrivacyControlDescription"><![CDATA[DuckDuckGo blockerar många spårare automatiskt. Med Global Privacy Control (GPC) kan du dessutom be deltagande webbplatser att begränsa försäljning eller delning av dina personuppgifter till andra företag. <u><a href=\"\">Läs mer</a><u/>]]></string>
+    <string name="globalPrivacyControlDescription"><![CDATA[Asil blockerar många spårare automatiskt. Med Global Privacy Control (GPC) kan du dessutom be deltagande webbplatser att begränsa försäljning eller delning av dina personuppgifter till andra företag. <u><a href=\"\">Läs mer</a><u/>]]></string>
     <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
     <string name="disabled">Inaktiverad</string>
@@ -669,14 +669,14 @@
     <string name="settingsAccessibility">Tillgänglighet</string>
     <string name="accessibilityActivityTitle">Tillgänglighet</string>
     <string name="accessibilityFontSizeTitle">Textstorlek</string>
-    <string name="accessibilityFontSizeHint">Dra reglaget tills du kan läsa det här bekvämt. Webbplatser som du visar i DuckDuckGo anpassas efter din inställning.</string>
+    <string name="accessibilityFontSizeHint">Dra reglaget tills du kan läsa det här bekvämt. Webbplatser som du visar i Asil anpassas efter din inställning.</string>
     <string name="accessibilityForceZoomTitle">Tvinga manuell zoomning av sidan</string>
     <string name="accessibilityForceZoomSubtitle">Nyp och zooma på vilken webbplats som helst, även de som normalt inte tillåter det</string>
     <string name="accessibilityTextSizeOverrideTitle">Hantera textstorlek</string>
-    <string name="accessibilityTextSizeOverrideSubtitle">Text på webbplatser du tittar på i DuckDuckGo justeras för att matcha inställningen nedan</string>
+    <string name="accessibilityTextSizeOverrideSubtitle">Text på webbplatser du tittar på i Asil justeras för att matcha inställningen nedan</string>
 
     <!-- Privacy Policy -->
-    <string name="settingsPrivacyPolicyDuckduckgo">Integritetspolicy</string>
+    <string name="settingsPrivacyPolicyAsil">Integritetspolicy</string>
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded" instruction="Placeholder is the name of the widget">Widgeten %1$s har lagts till på startsidan</string>
@@ -746,7 +746,7 @@
     <string name="downloadsNotifyMeSubtitle">Få ett meddelande när nerladdningar är klara.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">DuckDuckGo-app för Windows</string>
+    <string name="windows_settings_title">Asil-app för Windows</string>
     <string name="windows_settings_description">Surfa privat med vår app för Windows</string>
     <string name="windows_settings_description_ready">Nedladdning tillgänglig</string>
     <string name="windows_settings_description_list">Du står på listan!</string>
@@ -771,7 +771,7 @@
     <string name="deleteSavedSiteConfirmationDialogDelete">Ta bort</string>
 
     <!-- Private voice search -->
-    <string name="accessibilityVoiceSearchSubtitle">Lägg till alternativet privat röstsökning i adressfältet Ljud lagras inte och delas inte med någon, inte ens DuckDuckGo.</string>
+    <string name="accessibilityVoiceSearchSubtitle">Lägg till alternativet privat röstsökning i adressfältet Ljud lagras inte och delas inte med någon, inte ens Asil.</string>
     <string name="accessibilityVoiceSearchTitle">Privat röstsökning</string>
 
     <!-- Uploading an image from the camera or choosing to use existing image -->
@@ -779,8 +779,8 @@
     <string name="imageCaptureCameraGalleryDisambiguationTitle">Ladda upp en bild</string>
     <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Välj fil</string>
     <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Ta foto</string>
-    <string name="imageCaptureCameraPermissionDeniedTitle">Tillåt DuckDuckGo att be om kameraåtkomst på den här enheten</string>
-    <string name="imageCaptureCameraPermissionDeniedMessage">Webbplatser kan endast använda din kamera om du tillåter DuckDuckGo att be om åtkomst.</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Tillåt Asil att be om kameraåtkomst på den här enheten</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Webbplatser kan endast använda din kamera om du tillåter Asil att be om åtkomst.</string>
     <string name="imageCaptureCameraPermissionDeniedPositiveButton">Öppna inställningar</string>
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Avbryt</string>
 

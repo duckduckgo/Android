@@ -18,6 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="autoconsentTitle">Ochrana proti automatickému otváraniu okien o súboroch cookie</string>
-    <string name="autoconsentDescription"><![CDATA[Keď DuckDuckGo zistí na vami navštívených lokalitách kontextové okná týkajúce sa súhlasu so súbormi cookie, môžeme automaticky nastaviť vaše možnosti súborov cookie tak, aby ste minimalizovali využívanie súborov cookie a maximalizovali ochranu súkromia, a potom môžeme kontextové okná zavrieť. <u><a href=\"\">Zistiť viac</a><u/>]]></string>
-    <string name="autoconsentToggle">Nechajte, aby sa DuckDuckGo postaral o vyskakovacie okná o súboroch cookie</string>
+    <string name="autoconsentDescription"><![CDATA[Keď Asil Browser zistí na vami navštívených lokalitách kontextové okná týkajúce sa súhlasu so súbormi cookie, môžeme automaticky nastaviť vaše možnosti súborov cookie tak, aby ste minimalizovali využívanie súborov cookie a maximalizovali ochranu súkromia, a potom môžeme kontextové okná zavrieť. <u><a href=\"\">Zistiť viac</a><u/>]]></string>
+    <string name="autoconsentToggle">Nechajte, aby sa Asil Browser postaral o vyskakovacie okná o súboroch cookie</string>
 </resources>

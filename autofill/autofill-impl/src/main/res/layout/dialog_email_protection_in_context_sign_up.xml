@@ -101,7 +101,7 @@
             <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                 android:id="@+id/protectMyEmailButton"
                 android:layout_width="0dp"
-                app:buttonSize="large"
+                app:customButtonSize="large"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/keyline_5"
                 android:text="@string/autofillEmailProtectionInContextSignUpDialogProtectEmailButtonText"
@@ -113,7 +113,7 @@
                 android:id="@+id/doNotShowAgainButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:buttonSize="large"
+                app:customButtonSize="large"
                 android:text="@string/autofillEmailProtectionInContextSignUpDialogDoNotShowAgainButtonText"
                 app:layout_constraintEnd_toEndOf="@id/protectMyEmailButton"
                 app:layout_constraintStart_toStartOf="@id/protectMyEmailButton"

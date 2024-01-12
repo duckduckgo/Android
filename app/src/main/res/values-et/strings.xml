@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2022 Asil
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -17,10 +17,10 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="appName" translatable="false">DuckDuckGo</string>
-    <string name="appDescription" translatable="false">DuckDuckGo</string>
-    <string name="duckDuckGoLogoDescription">DuckDuckGo logo</string>
-    <string name="duckDuckGoPrivacySimplified">Privaatsus, lihtsustatud</string>
+    <string name="appName" translatable="false">Asil</string>
+    <string name="appDescription" translatable="false">Asil</string>
+    <string name="asilLogoDescription">Asil logo</string>
+    <string name="asilPrivacySimplified">Privaatsus, lihtsustatud</string>
     <string name="yes">Jah</string>
     <string name="no">Ei</string>
     <string name="open">Avatud</string>
@@ -28,8 +28,8 @@
     <string name="search">Otsing</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingDefaultBrowserDescription">Avage sätted, et DuckDuckGo abil iga kord otsida ja sirvida.</string>
-    <string name="onboardingDefaultBrowserTitle">Muuda DuckDuckGo oma vaikimisi brauseriks</string>
+    <string name="onboardingDefaultBrowserDescription">Avage sätted, et Asil abil iga kord otsida ja sirvida.</string>
+    <string name="onboardingDefaultBrowserTitle">Muuda Asil oma vaikimisi brauseriks</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Rakenduse vaikeseadete ekraani ei saa käivitada</string>
@@ -37,7 +37,7 @@
     <string name="defaultBrowserMaybeLater">Võib-olla hiljem</string>
     <string name="defaultBrowserLetsDoIt">Määrake vaikebrauseriks</string>
     <string name="defaultBrowserDescriptionNoDefault">Avage linke igal ajal, rahuliku meelega.</string>
-    <string name="defaultBrowserInstructions">Valige DuckDuckGo ja koputage valikut <font color="#678fff">Alati</font>.</string>
+    <string name="defaultBrowserInstructions">Valige Asil ja koputage valikut <font color="#678fff">Alati</font>.</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Brauseri menüü</string>
@@ -90,11 +90,11 @@
     <!-- Opening external apps -->
     <string name="openExternalApp">Ava väline rakendus</string>
     <string name="launchingExternalApp">Ava teises rakenduses</string>
-    <string name="confirmOpenExternalApp">Kas soovite selle sisu vaatamiseks lahkuda DuckDuckGo\'st?</string>
+    <string name="confirmOpenExternalApp">Kas soovite selle sisu vaatamiseks lahkuda Asil\'st?</string>
     <string name="unableToOpenLink">Seda tüüpi linki ei saa avada</string>
 
     <!-- Tabs -->
-    <string name="homeTab" translatable="false">DuckDuckGo</string>
+    <string name="homeTab" translatable="false">Asil</string>
     <string name="tabActivityTitle">Vahelehed</string>
     <string name="tabsMenuItem">Vahelehed</string>
     <string name="newTabMenuItem">Uus vaheleht</string>
@@ -122,12 +122,12 @@
     <string name="settingsHeadingAppearance">Välimus</string>
     <string name="settingsHeadingCustomize">Kohanda</string>
     <string name="settingsHeadingAbout">Teave</string>
-    <string name="settingsAboutDuckduckgo">DuckDuckGo teave</string>
+    <string name="settingsAboutAsil">Asil teave</string>
     <string name="settingsVersion">Versioon</string>
     <string name="leaveFeedback">Jaga tagasisidet</string>
     <string name="settingsEmailProtectionTitle">E-posti kaitse</string>
     <string name="settingsEmailProtectionSubtitle">Blokeeri meilijälgurid ja peida oma aadress</string>
-    <string name="settingsHeadingMore">Veel DuckDuckGo\'lt</string>
+    <string name="settingsHeadingMore">Veel Asil\'lt</string>
     <string name="settingsLightTheme">Hele</string>
     <string name="settingsTheme">Teema</string>
     <string name="settingsDarkTheme">Tume</string>
@@ -142,8 +142,8 @@
     <string name="settingsSubtitleNotificationsDisabled">Keelatud</string>
     <string name="settingsSubtitleNotificationsEnabled">Lubatud</string>
     <string name="settingsDefaultBrowserTitle">Vaikebrauser</string>
-    <string name="settingsDefaultBrowserSetDescription">DuckDuckGo on sinu vaikebrauser</string>
-    <string name="settingsDefaultBrowserNotSetDescription">Tee DuckDuckGo oma vaikebrauseriks</string>
+    <string name="settingsDefaultBrowserSetDescription">Asil on sinu vaikebrauser</string>
+    <string name="settingsDefaultBrowserNotSetDescription">Tee Asil oma vaikebrauseriks</string>
     <string name="settingsPrivateSearchTitle">Privaatne otsing</string>
     <string name="settingsPrivateSearchDescription">Vaikimisi sisse lülitatud</string>
     <string name="settingsWebTrackingProtectionTitle">Veebijälgimise kaitse</string>
@@ -156,7 +156,7 @@
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Privaatne otsing</string>
     <string name="privateSearchTitle">Private Search on lubatud</string>
-    <string name="privateSearchDescription">DuckDuckGo Private Search on sinu vaikeotsimootor, mille abil saad veebis otsida ilma, et sind jälgitaks.</string>
+    <string name="privateSearchDescription">Asil Private Search on sinu vaikeotsimootor, mille abil saad veebis otsida ilma, et sind jälgitaks.</string>
     <string name="privateSearchHeadingSearchSettings">Otsingu seaded</string>
     <string name="privateSearchAutocompleteToggle">Automaatselt täidetavad ettepanekud</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Rohkem otsingu seadeid</string>
@@ -167,7 +167,7 @@
     <string name="webTrackingProtectionActivityTitle">Veebijälgimise kaitse</string>
     <string name="webTrackingProtectionLearnMoreTitle">Veebijälgimise kaitse</string>
     <string name="webTrackingProtectionTitle">Veebijälgimise kaitse on lubatud</string>
-    <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo ei jälgi sind kunagi ja meie eesmärk on kaitsta sinu privaatsust nii palju kui võimalik. Me haldame ja arendame pidevalt kaitsekihte, et pidada sammu uute jälgimismeetoditega ja pakkuda palju kaitsemeetmeid, mida teised brauserid vaikimisi ei paku. <u><a href=\"\">Lisateave</a><u/>]]></string>
+    <string name="webTrackingProtectionDescription"><![CDATA[Asil ei jälgi sind kunagi ja meie eesmärk on kaitsta sinu privaatsust nii palju kui võimalik. Me haldame ja arendame pidevalt kaitsekihte, et pidada sammu uute jälgimismeetoditega ja pakkuda palju kaitsemeetmeid, mida teised brauserid vaikimisi ei paku. <u><a href=\"\">Lisateave</a><u/>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Küpsiste hüpikakna kaitse</string>
@@ -202,9 +202,9 @@
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Rakendusest väljumisel, 1-tunnise passiivsuse järel</string>
 
     <!-- About Activity -->
-    <string name="aboutActivityTitle">DuckDuckGo\'st</string>
+    <string name="aboutActivityTitle">Asil\'st</string>
     <string name="aboutHeader">Tere tulemast Pardipoolele!</string>
-    <string name="aboutDescription">DuckDuckGo on 2008. aastal asutatud sõltumatu internetiprivaatsuse ettevõte igaühele, kellel on kõrini varjatud jälgimisest internetis ja kes soovib lihtsat lahendust selle vältimiseks. Me oleme tõestuseks, et internetis on võimalik saada tõelist privaatsuskaitset ilma kompromisse tegemata.\n\nDuckDuckGo brauseril on kõik funktsioonid, mida sa brauserilt ootad, nagu järjehoidjad, vahekaardid, paroolid ja palju muud, lisaks sellele aga ka üle <annotation type="privacy_protection_link">tosina võimsa privaatsuskaitse funktsiooni</annotation>, mida enamik populaarsemaid brausereid vaikimisi ei paku. See ainulaadselt terviklik privaatsuskaitse aitab kaitsta sinu tegevust internetis alates otsingutest kuni sirvimiseni, meilide saatmiseni ja palju muuni.\n\nMeie privaatsuskaitse toimib ilma, et peaks teadma midagi tehnilistest nüanssidest või tegelema keeruliste seadistustega. Ainus, mis sa pead tegema, on vahetada oma brauser kõigis seadmetes DuckDuckGo vastu – ja vaikeprivaatsus ongi tagatud.\n\nKui aga soovid piiluda kapoti alla, leiad lisateavet DuckDuckGo privaatsuskaitse tööpõhimõtete kohta meie <annotation type="learn_more_link">abilehtedelt</annotation></string>
+    <string name="aboutDescription">Asil on 2008. aastal asutatud sõltumatu internetiprivaatsuse ettevõte igaühele, kellel on kõrini varjatud jälgimisest internetis ja kes soovib lihtsat lahendust selle vältimiseks. Me oleme tõestuseks, et internetis on võimalik saada tõelist privaatsuskaitset ilma kompromisse tegemata.\n\nAsil brauseril on kõik funktsioonid, mida sa brauserilt ootad, nagu järjehoidjad, vahekaardid, paroolid ja palju muud, lisaks sellele aga ka üle <annotation type="privacy_protection_link">tosina võimsa privaatsuskaitse funktsiooni</annotation>, mida enamik populaarsemaid brausereid vaikimisi ei paku. See ainulaadselt terviklik privaatsuskaitse aitab kaitsta sinu tegevust internetis alates otsingutest kuni sirvimiseni, meilide saatmiseni ja palju muuni.\n\nMeie privaatsuskaitse toimib ilma, et peaks teadma midagi tehnilistest nüanssidest või tegelema keeruliste seadistustega. Ainus, mis sa pead tegema, on vahetada oma brauser kõigis seadmetes Asil vastu – ja vaikeprivaatsus ongi tagatud.\n\nKui aga soovid piiluda kapoti alla, leiad lisateavet Asil privaatsuskaitse tööpõhimõtete kohta meie <annotation type="learn_more_link">abilehtedelt</annotation></string>
     <string name="no_suggestions">Ettepanekud puuduvad</string>
 
     <!-- Broken Site Activity -->
@@ -265,7 +265,7 @@
     <string name="removeAll">Eemalda kõik</string>
 
     <!-- Widget -->
-    <string name="searchWidgetTextHint">DuckDuckGo otsing</string>
+    <string name="searchWidgetTextHint">Asil otsing</string>
 
     <!-- Favorites widget -->
     <string name="addFavoriteMenuTitleHighlighted">👋 Lisa lemmik</string>
@@ -292,7 +292,7 @@
     <string name="surveyCtaLaunchButton">Vastake küsitlusele</string>
     <string name="surveyCtaDismissButton">Ei, aitäh</string>
     <string name="surveyActivityTitle">Kasutajaküsitlus</string>
-    <string name="surveyTitle">DuckDuckGo küsitlus</string>
+    <string name="surveyTitle">Asil küsitlus</string>
     <string name="surveyDismissContentDescription">Loobu küsitlusest</string>
     <string name="surveyLoadingErrorTitle">Oh ei!</string>
     <string name="surveyLoadingErrorText">Meie küsitlust praegu laadida ei õnnestunud.\nPalun proovige hiljem uuesti.</string>
@@ -307,14 +307,14 @@
     <string name="addWidgetInstruction1Label">1</string>
     <string name="addWidgetInstruction1">Vajuta pikalt avakuval ja ava vidinate menüü.</string>
     <string name="addWidgetInstruction2Label">2</string>
-    <string name="addWidgetInstruction2">Leia vidin DuckDuckGo.</string>
+    <string name="addWidgetInstruction2">Leia vidin Asil.</string>
     <string name="addWidgetInstruction3Label">3</string>
     <string name="addWidgetInstruction3">Lohista vidin oma avakuvale.</string>
     <string name="addWidgetInstructionsButtonGoHome">Minge avakuvale</string>
     <string name="addWidgetInstructionsButtonClose">Sulge</string>
 
     <!-- App Enjoyment / Rating / Feedback -->
-    <string name="appEnjoymentDialogTitle">Kas teile meeldib DuckDuckGo?</string>
+    <string name="appEnjoymentDialogTitle">Kas teile meeldib Asil?</string>
     <string name="appEnjoymentDialogMessage">Meile meeldiks teada, mida sa arvad.</string>
     <string name="appEnjoymentDialogPositiveButton">Mulle meeldib see</string>
     <string name="appEnjoymentDialogNegativeButton">See vajab tööd</string>
@@ -336,15 +336,15 @@
 
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Seadistatud on andmete käsitsi kustutamine</string>
-    <string name="clearNotificationDescription">Kohandage DuckDuckGo sirvimisandmete automaatseks kustutamiseks pärast igat seanssi.</string>
+    <string name="clearNotificationDescription">Kohandage Asil sirvimisandmete automaatseks kustutamiseks pärast igat seanssi.</string>
 
     <!-- Privacy Protection Notification -->
     <string name="privacyProtectionNotificationDefaultTitle">Kaitseme teie privaatsust</string>
     <string name="privacyProtectionNotificationReportTitle">Teie privaatsusaruanne</string>
-    <string name="privacyProtectionNotificationDefaultDescription">Rakenduse DuckDuckGo kasutamine kaitseb teie andmeid, blokeerides jälgijaid ja krüpteerides ühendusi.</string>
-    <string name="privacyProtectionNotificationUpgadeDescription" instruction="Placeholder is a the number of connections we have protected">Kaitsesite oma andmeid, krüptides DuckDuckGo kasutamise ajal %1$d krüptimata ühendust.</string>
-    <string name="privacyProtectionNotificationTrackerDescription" instruction="Placeholder is the numer of trackers blocked">Kaitsesite oma andmeid, blokeerides DuckDuckGo kasutamise ajal %1$d jälitajat.</string>
-    <string name="privacyProtectionNotificationBothDescription" instruction="%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections">Kaitsesite oma andmeid, blokeerides DuckDuckGo kasutamise ajal %1$d jälitaja ja turvates %2$d krüptimata ühendust.</string>
+    <string name="privacyProtectionNotificationDefaultDescription">Rakenduse Asil kasutamine kaitseb teie andmeid, blokeerides jälgijaid ja krüpteerides ühendusi.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription" instruction="Placeholder is a the number of connections we have protected">Kaitsesite oma andmeid, krüptides Asil kasutamise ajal %1$d krüptimata ühendust.</string>
+    <string name="privacyProtectionNotificationTrackerDescription" instruction="Placeholder is the numer of trackers blocked">Kaitsesite oma andmeid, blokeerides Asil kasutamise ajal %1$d jälitajat.</string>
+    <string name="privacyProtectionNotificationBothDescription" instruction="%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections">Kaitsesite oma andmeid, blokeerides Asil kasutamise ajal %1$d jälitaja ja turvates %2$d krüptimata ühendust.</string>
     <string name="privacyProtectionNotificationLaunchButton">Jätka sirvimist</string>
 
     <!-- Authentication -->
@@ -356,7 +356,7 @@
     <string name="authenticationDialogPasswordHint">Parool</string>
 
     <!-- User-facing label for when a user selects text and might want to search for that text -->
-    <string name="systemTextSearchMessage">DuckDuckGo otsing</string>
+    <string name="systemTextSearchMessage">Asil otsing</string>
 
     <!-- App feedback disambiguation -->
     <string name="feedbackActivityTitle">Jaga tagasisidet</string>
@@ -375,8 +375,8 @@
     <string name="websiteNotLoadingTitleShort">Veebisaidi laadimisega seotud probleemid</string>
     <string name="websiteNotLoadingSubtitle">Milline veebisait on katki?</string>
 
-    <string name="searchNotGoodEnoughTitleLong">DuckDuckGo otsing pole piisavalt hea</string>
-    <string name="searchNotGoodEnoughTitleShort">DuckDuckGo otsingu probleemid</string>
+    <string name="searchNotGoodEnoughTitleLong">Asil otsing pole piisavalt hea</string>
+    <string name="searchNotGoodEnoughTitleShort">Asil otsingu probleemid</string>
     <string name="searchNotGoodEnoughSubtitle">Millist otsingufunktsiooni saame lisada või täiustada?</string>
     <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Programmeerimine / tehniline otsing</string>
     <string name="searchNotGoodEnoughSubReasonGoogleLayout">Paigutus peaks olema rohkem nagu Google</string>
@@ -437,8 +437,8 @@
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Sellest seadmest</string>
     <string name="systemSearchAppNotFound">Rakendust ei leitud</string>
-    <string name="systemSearchOnboardingText">Täname, et valisite DuckDuckGo!\nNüüd, kui kasutate meie otsingut või rakendust, on teie otsingud kaitstud.</string>
-    <string name="systemSearchOnboardingFeaturesIntroText">Peale selle DuckDuckGo rakendus:</string>
+    <string name="systemSearchOnboardingText">Täname, et valisite Asil!\nNüüd, kui kasutate meie otsingut või rakendust, on teie otsingud kaitstud.</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">Peale selle Asil rakendus:</string>
     <string name="systemSearchOnboardingFeatureOneText">Blokeerib ebaturvalised jälgijad.</string>
     <string name="systemSearchOnboardingFeatureTwoText">Sunnib krüpteerima veebisaite.</string>
     <string name="systemSearchOnboardingFeatureThreeText">Kustutab andmed ühe puudutusega.</string>
@@ -462,12 +462,12 @@
     <string name="daxDialogAppTpRetentionSecondaryButtonText">Mitte praegu</string>
 
     <!-- New Onboarding Experience -->
-    <string name="onboardingWelcomeTitle">"Tere tulemast DuckDuckGo kasutajaks!"</string>
+    <string name="onboardingWelcomeTitle">"Tere tulemast Asil kasutajaks!"</string>
     <string name="onboardingDaxText"><![CDATA[Internet võib olla üsna jube.<br/><br/>Ärge muretsege! Privaatselt otsimine ja sirvimine on lihtsam kui arvate.]]></string>
     <string name="onboardingLetsDoItButton">Teeme ära!</string>
     <string name="daxIntroCtaText"><![CDATA[Järgmisena proovige külastada ühte oma lemmiksaitidest! <br/><br/>Mina aga blokeerin jälgijaid, et nad ei saaks teid luurata. Täiustan võimalusel ka teie ühenduse turvalisust. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[Käpas! <br/><br/>Pea meeles: iga kord, kui minuga sirvid, kaotab jube reklaam tiivad. 👍]]></string>
-    <string name="daxSerpCtaText">Sinu DuckDuckGo\' otsingud on anonüümsed. Alati. 🙌</string>
+    <string name="daxSerpCtaText">Sinu Asil\' otsingud on anonüümsed. Alati. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one"><![CDATA[ ja <b>%1$d teine</b> üritasid sind siin jälitada. <br/><br/>Blokeerisin tema!<br/><br/> ☝️Võid vaadata aadressiriba, et näha, kes üritab sind jälgida, kui külastad uut saiti.️]]></item>
         <item quantity="other"><![CDATA[ ja <b>%1$d teised</b> üritasid sind siin jälitada. <br/><br/>Blokeerisin nad!<br/><br/> ☝️Võid vaadata aadressiriba, et näha, kes üritab sind jälgida, kui külastad uut saiti.️]]></item>
@@ -481,7 +481,7 @@
     <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Tähelepanu! Kuna %1$s on %2$s omanik, ei saa ma takistada teda jälgimast sinu tegevust siin.&lt;br/&gt;&lt;br/&gt;Kuid sirvi koos minuga ja ma saan vähendada seda, mida %3$s sinust üldiselt teab, blokeerides tema jälgijad paljudel teistel lehtedel.</string>
 
     <!-- Onboarding DDG Feature Options -->
-    <string name="onboardingFeatureOptionsTitle">Mis toob sind DuckDuckGo’sse?</string>
+    <string name="onboardingFeatureOptionsTitle">Mis toob sind Asil’sse?</string>
     <string name="onboardingFeatureOptionsContinue">Jätka</string>
     <string name="onboardingFeatureOptionsSkip">Jäta see samm vahele</string>
     <!-- smartling.character_limit = 28 -->
@@ -582,7 +582,7 @@
     <string name="dosErrorMessage">Ühendus on katkestatud. See veebileht võib kahjustada sinu seadet.</string>
 
     <!-- Precise Location -->
-    <string name="preciseLocationSystemDialogTitle">Kas lubada seadme asukoht DuckDuckGo privaatses brauseris?</string>
+    <string name="preciseLocationSystemDialogTitle">Kas lubada seadme asukoht Asil privaatses brauseris?</string>
     <string name="preciseLocationSystemDialogSubtitle" instruction="%1$s and %2$s are both the name of the website requesting the location">%1$s küsib sinu seadme asukohta. Kõigepealt pead lubama rakendusel saata oma seadme asukoht, seejärel saab %2$s küsida luba.</string>
     <string name="preciseLocationSystemDialogAllow">Luba</string>
     <string name="preciseLocationSystemDialogDeny">Võib-olla hiljem</string>
@@ -594,7 +594,7 @@
     <string name="preciseLocationSiteDialogAllowOnce">Ainult selle seansi jaoks</string>
     <string name="preciseLocationSiteDialogDenyAlways">Keela alati</string>
     <string name="preciseLocationSiteDialogDenyOnce">Keela selle seansi jaoks</string>
-    <string name="preciseLocationFeatureDescription">Saidid, mida sa külastad, võivad küsida sinu seadme asukohta. Nad ei saa sellele ligipääsu enne, kui oled andnud selgesõnalise loa. DuckDuckGo kasutab sinu asukohta alati anonüümselt, et edastada kohaliku otsingu tulemused.</string>
+    <string name="preciseLocationFeatureDescription">Saidid, mida sa külastad, võivad küsida sinu seadme asukohta. Nad ei saa sellele ligipääsu enne, kui oled andnud selgesõnalise loa. Asil kasutab sinu asukohta alati anonüümselt, et edastada kohaliku otsingu tulemused.</string>
     <string name="preciseLocationToggleText">Saidid võivad küsida minu asukohta</string>
     <string name="preciseLocationEmptyListHint">Ühelegi veebisaidile ei ole antud luba asukohale juurdepääsuks</string>
     <string name="preciseLocationNoSystemPermission">Haldamaks asukohale juurdepääsu lubasid, mille sa oled üksikutele saitidele andnud, luba asukoht selle rakenduse jaoks Androidi seadetes.</string>
@@ -610,7 +610,7 @@
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Üleilmne privaatsuskontroll (Global Privacy Control (GPC))</string>
-    <string name="globalPrivacyControlDescription"><![CDATA[DuckDuckGo blokeerib automaatselt paljud jälitajad. Üleilmse privaatsuskontrolli (GPC) abil saate paluda osalevatel veebisaitidel piirata teie isikuandmete müümist või jagamist teiste ettevõtetega. <u><a href=\"\">Loe edasi</a><u/>]]></string>
+    <string name="globalPrivacyControlDescription"><![CDATA[Asil blokeerib automaatselt paljud jälitajad. Üleilmse privaatsuskontrolli (GPC) abil saate paluda osalevatel veebisaitidel piirata teie isikuandmete müümist või jagamist teiste ettevõtetega. <u><a href=\"\">Loe edasi</a><u/>]]></string>
     <string name="globalPrivacyControlSetting">Üleilmne privaatsuskontroll (Global Privacy Control (GPC))</string>
     <string name="globalPrivacyControlToggle">Üleilmne privaatsuskontroll (Global Privacy Control (GPC))</string>
     <string name="disabled">Keelatud</string>
@@ -669,14 +669,14 @@
     <string name="settingsAccessibility">Hõlpsus</string>
     <string name="accessibilityActivityTitle">Hõlpsus</string>
     <string name="accessibilityFontSizeTitle">Teksti suurus</string>
-    <string name="accessibilityFontSizeHint">Lohista liugurit, kuni saad seda mugavalt lugeda. DuckDuckGo\'s kuvatavad veebisaidid kohanduvad sellega.</string>
+    <string name="accessibilityFontSizeHint">Lohista liugurit, kuni saad seda mugavalt lugeda. Asil\'s kuvatavad veebisaidid kohanduvad sellega.</string>
     <string name="accessibilityForceZoomTitle">Jõusta lehe käsitsi suumimine</string>
     <string name="accessibilityForceZoomSubtitle">Sõrmedega suumimine töötab kõigil veebisaitidel, ka neil, mis seda tavaliselt takistavad</string>
     <string name="accessibilityTextSizeOverrideTitle">Halda teksti suurust</string>
-    <string name="accessibilityTextSizeOverrideSubtitle">DuckDuckGo\'s kuvatavate veebisaitide teksti reguleeritakse alloleva sätte järgi</string>
+    <string name="accessibilityTextSizeOverrideSubtitle">Asil\'s kuvatavate veebisaitide teksti reguleeritakse alloleva sätte järgi</string>
 
     <!-- Privacy Policy -->
-    <string name="settingsPrivacyPolicyDuckduckgo">Privaatsuspoliitika</string>
+    <string name="settingsPrivacyPolicyAsil">Privaatsuspoliitika</string>
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded" instruction="Placeholder is the name of the widget">Vidin %1$s lisati avakuvale</string>
@@ -684,7 +684,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Sirvi privaatselt meie Maci rakendusega</string>
-    <string name="macos_settings_title">DuckDuckGo Maci rakendus</string>
+    <string name="macos_settings_title">Asil Maci rakendus</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Allalaadimised</string>
@@ -746,7 +746,7 @@
     <string name="downloadsNotifyMeSubtitle">Kui allalaadimine on lõpule jõudnud, saad teavituse.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">DuckDuckGo Windowsi rakendus</string>
+    <string name="windows_settings_title">Asil Windowsi rakendus</string>
     <string name="windows_settings_description">Sirvi privaatselt meie Windowsi rakendusega</string>
     <string name="windows_settings_description_ready">Saadaval on allalaadimine</string>
     <string name="windows_settings_description_list">Oled nimekirjas!</string>
@@ -771,7 +771,7 @@
     <string name="deleteSavedSiteConfirmationDialogDelete">Kustuta</string>
 
     <!-- Private voice search -->
-    <string name="accessibilityVoiceSearchSubtitle">Lisa aadressiribale privaatse häälotsingu valik. Heli ei salvestata ega jagata kellegagi, sealhulgas DuckDuckGoga.</string>
+    <string name="accessibilityVoiceSearchSubtitle">Lisa aadressiribale privaatse häälotsingu valik. Heli ei salvestata ega jagata kellegagi, sealhulgas Asilga.</string>
     <string name="accessibilityVoiceSearchTitle">Privaatne häälotsing</string>
 
     <!-- Uploading an image from the camera or choosing to use existing image -->
@@ -779,8 +779,8 @@
     <string name="imageCaptureCameraGalleryDisambiguationTitle">Laadi pilt üles</string>
     <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Vali fail</string>
     <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Tee pilt</string>
-    <string name="imageCaptureCameraPermissionDeniedTitle">Luba DuckDuckGo’l küsida juurdepääsu selle seadme kaamerale</string>
-    <string name="imageCaptureCameraPermissionDeniedMessage">Saidid saavad sinu kaamerat kasutada ainult siis, kui lubad DuckDuckGo’l küsida sellele juurdepääsu.</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Luba Asil’l küsida juurdepääsu selle seadme kaamerale</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Saidid saavad sinu kaamerat kasutada ainult siis, kui lubad Asil’l küsida sellele juurdepääsu.</string>
     <string name="imageCaptureCameraPermissionDeniedPositiveButton">Ava sätted</string>
     <string name="imageCaptureCameraPermissionDeniedNegativeButton">Loobu</string>
 

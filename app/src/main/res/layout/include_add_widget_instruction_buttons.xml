@@ -31,7 +31,7 @@
 
     <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
         android:id="@+id/closeButton"
-        app:buttonSize="large"
+        app:customButtonSize="large"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/keyline_2"
@@ -41,7 +41,7 @@
 
     <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
         android:id="@+id/homeButton"
-        app:buttonSize="large"
+        app:customButtonSize="large"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/addWidgetInstructionsButtonGoHome"

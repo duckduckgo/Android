@@ -18,6 +18,6 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="autoconsentTitle">Protecție pentru ferestre pop-up aferente modulelor cookie</string>
-    <string name="autoconsentDescription"><![CDATA[Când DuckDuckGo detectează ferestre pop-up aferente modulelor cookie pe site-urile pe care le vizitezi, îți putem seta automat preferințele privind modulele cookie pentru a minimiza modulele cookie și a maximiza confidențialitatea și, apoi, pentru a închide ferestrele pop-up. <u><a href=\"\">Află mai multe</a><u/>]]></string>
-    <string name="autoconsentToggle">Lasă DuckDuckGo să se ocupe de ferestrele pop-up aferente modulelor cookie</string>
+    <string name="autoconsentDescription"><![CDATA[Când Asil Browser detectează ferestre pop-up aferente modulelor cookie pe site-urile pe care le vizitezi, îți putem seta automat preferințele privind modulele cookie pentru a minimiza modulele cookie și a maximiza confidențialitatea și, apoi, pentru a închide ferestrele pop-up. <u><a href=\"\">Află mai multe</a><u/>]]></string>
+    <string name="autoconsentToggle">Lasă Asil Browser să se ocupe de ferestrele pop-up aferente modulelor cookie</string>
 </resources>
