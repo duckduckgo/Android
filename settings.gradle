@@ -70,3 +70,5 @@ buildCache {
         removeUnusedEntriesAfterDays = 7
     }
 }
+
+include ':macrobenchmark'

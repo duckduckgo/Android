@@ -41,6 +41,11 @@
         android:theme="@style/Theme.DuckDuckGo.Light"
         android:requestLegacyExternalStorage="true"
         tools:ignore="GoogleAppIndexingWarning">
+
+        <profileable
+            android:shell="true"
+            tools:targetApi="29" />
+
         <meta-data
             android:name="android.webkit.WebView.MetricsOptOut"
             android:value="true" />

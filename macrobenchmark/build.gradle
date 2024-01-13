@@ -1,0 +1,56 @@
+plugins {
+    id 'com.android.test'
+    id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    namespace 'com.duckduckgo.mobile.android.macrobenchmark'
+    compileSdk compile_sdk
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    kotlin {
+        jvmToolchain(17)
+    }
+
+    defaultConfig {
+        minSdk min_sdk
+        targetSdk target_sdk
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        // This benchmark buildType is used for benchmarking, and should function like your
+        // release build (for example, with minification on). It's signed with a debug key
+        // for easy local/CI testing.
+        benchmark {
+            debuggable = true
+            signingConfig = debug.signingConfig
+            matchingFallbacks = ["release"]
+        }
+    }
+
+    flavorDimensions += ["store"]
+    productFlavors {
+        play { dimension = "store" }
+    }
+
+    targetProjectPath = ":app"
+    experimentalProperties["android.experimental.self-instrumenting"] = true
+}
+
+dependencies {
+    implementation AndroidX.test.ext.junit
+    implementation "androidx.test.uiautomator:uiautomator:_"
+    implementation "androidx.benchmark:benchmark-macro-junit4:_"
+}
+
+androidComponents {
+    beforeVariants(selector().all()) {
+        enable = buildType == "benchmark"
+    }
+}
