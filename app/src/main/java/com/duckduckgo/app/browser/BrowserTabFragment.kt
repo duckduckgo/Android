@@ -48,6 +48,8 @@ import android.webkit.WebView.HitTestResult.*
 import android.widget.Button
 import android.widget.EditText
 import android.widget.FrameLayout
+import android.widget.LinearLayout
+import android.widget.PopupWindow
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
@@ -55,6 +57,7 @@ import androidx.activity.result.contract.ActivityResultContracts.StartActivityFo
 import androidx.annotation.AnyThread
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
+import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
@@ -277,6 +280,8 @@ class BrowserTabFragment :
     EmailProtectionUserPromptListener {
 
     private val supervisorJob = SupervisorJob()
+
+    private lateinit var popupWindow: PopupWindow
 
     override val coroutineContext: CoroutineContext
         get() = supervisorJob + dispatchers.main()
@@ -509,6 +514,9 @@ class BrowserTabFragment :
 
     private val tabsButton: TabSwitcherButton
         get() = omnibar.tabsMenu
+
+    private val safeGazeIcon: AppCompatImageView
+        get() = omnibar.safeGazeIcon
 
     // private val fireMenuButton: ViewGroup
     //     get() = omnibar.fireIconMenu
@@ -790,11 +798,39 @@ class BrowserTabFragment :
                 }
             },
         )
-
         childFragmentManager.findFragmentByTag(ADD_SAVED_SITE_FRAGMENT_TAG)?.let { dialog ->
             (dialog as EditSavedSiteDialogFragment).listener = viewModel
             dialog.deleteBookmarkListener = viewModel
         }
+        handleSafeGazePopUp()
+        safeGazeIcon.setOnClickListener {
+            val location = IntArray(2)
+            safeGazeIcon.getLocationOnScreen(location)
+            popupWindow.showAtLocation(
+                safeGazeIcon,
+                Gravity.NO_GRAVITY,
+                location[0],
+                location[1] + safeGazeIcon.height
+            )
+        }
+
+        popupWindow.setOnDismissListener {
+            println("Dismissed")
+        }
+    }
+
+    @SuppressLint("InflateParams")
+    private fun handleSafeGazePopUp(){
+        val popupView = LayoutInflater.from(requireContext()).inflate(R.layout.safe_gaze_pop_up, null)
+        val dropdownItemText = popupView.findViewById<TextView>(R.id.dropdownItemText)
+        dropdownItemText.text = "Dropdown Item"
+
+        popupWindow = PopupWindow(
+            popupView,
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            true
+        )
     }
 
     private fun getDaxDialogFromActivity(): Fragment? = activity?.supportFragmentManager?.findFragmentByTag(DAX_DIALOG_DIALOG_TAG)
@@ -2097,7 +2133,7 @@ class BrowserTabFragment :
         webView?.let {
             it.webViewClient = browserWebViewClient
             it.webChromeClient = browserWebChromeClient
-            it.addJavascriptInterface(SafeGazeJsInterface(), "SafeGazeInterface")
+            it.addJavascriptInterface(SafeGazeJsInterface(requireContext()), "SafeGazeInterface")
             it.settings.apply {
                 userAgentString = userAgentProvider.userAgent()
                 javaScriptEnabled = true

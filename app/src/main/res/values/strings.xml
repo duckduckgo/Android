@@ -787,4 +787,5 @@
     <string name="settingsAutofillLoginsSetting">Passwords</string>
     <string name="autofillLoginSavedSnackbarMessage">Password saved</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Password updated</string>
+    <string name="safe_gaze_arrow" translatable="false">safe_gaze_arrow</string>
 </resources>

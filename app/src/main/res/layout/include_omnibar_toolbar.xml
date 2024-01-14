@@ -43,7 +43,7 @@
                 app:contentInsetEnd="0dp"
                 app:contentInsetStart="0dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/tabsMenu"
+                app:layout_constraintEnd_toStartOf="@id/safe_gaze_icon"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu">
@@ -231,28 +231,16 @@
                 tools:progress="50"
                 tools:visibility="visible" />
 
-<!--            <FrameLayout-->
-<!--                android:id="@+id/fireIconMenu"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="match_parent"-->
-<!--                android:paddingStart="4dp"-->
-<!--                android:paddingEnd="4dp"-->
-<!--                app:layout_constraintBottom_toBottomOf="parent"-->
-<!--                app:layout_constraintEnd_toStartOf="@id/tabsMenu"-->
-<!--                app:layout_constraintStart_toEndOf="@id/toolbar"-->
-<!--                app:layout_constraintTop_toTopOf="parent"-->
-<!--                tools:visibility="visible">-->
-
-<!--                <ImageView-->
-<!--                    android:id="@+id/fireIconImageView"-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_gravity="center"-->
-<!--                    android:background="?attr/selectableItemBackgroundBorderless"-->
-<!--                    android:contentDescription="@string/browserPopupMenu"-->
-<!--                    android:padding="@dimen/toolbarIconPadding"-->
-<!--                    android:src="@drawable/ic_fire" />-->
-<!--            </FrameLayout>-->
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/safe_gaze_icon"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                app:layout_constraintTop_toTopOf="@+id/toolbar"
+                app:layout_constraintBottom_toBottomOf="@+id/toolbar"
+                app:layout_constraintEnd_toStartOf="@+id/tabsMenu"
+                app:layout_constraintStart_toEndOf="@+id/toolbar"
+                android:src="@mipmap/ic_launcher"
+                />
 
             <com.duckduckgo.app.browser.TabSwitcherButton
                 android:id="@+id/tabsMenu"
@@ -264,7 +252,7 @@
                 android:padding="@dimen/toolbarIconPadding"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/browserMenu"
-                app:layout_constraintStart_toEndOf="@id/toolbar"
+                app:layout_constraintStart_toEndOf="@id/safe_gaze_icon"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <FrameLayout
