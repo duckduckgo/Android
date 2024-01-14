@@ -1,0 +1,9 @@
+<!-- res/drawable/message_bubble_background.xml -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@android:id/background">
+        <shape android:shape="rectangle">
+            <solid android:color="#EFEFEF" />
+            <corners android:radius="8dp" />
+        </shape>
+    </item>
+</layer-list>

@@ -27,11 +27,13 @@ import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.content.res.AssetManager
 import android.content.res.Configuration
+import android.graphics.Rect
 import android.net.Uri
 import android.os.*
 import android.print.PrintAttributes
 import android.print.PrintManager
 import android.text.Editable
+import android.util.DisplayMetrics
 import android.view.*
 import android.view.View.*
 import android.view.inputmethod.EditorInfo
@@ -48,7 +50,7 @@ import android.webkit.WebView.HitTestResult.*
 import android.widget.Button
 import android.widget.EditText
 import android.widget.FrameLayout
-import android.widget.LinearLayout
+import android.widget.ImageView
 import android.widget.PopupWindow
 import android.widget.TextView
 import android.widget.Toast
@@ -58,6 +60,8 @@ import androidx.annotation.AnyThread
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.appcompat.widget.AppCompatImageView
+import androidx.appcompat.widget.SwitchCompat
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
@@ -224,6 +228,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
+import com.duckduckgo.common.utils.extensions.dpToPx
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -803,34 +808,87 @@ class BrowserTabFragment :
             dialog.deleteBookmarkListener = viewModel
         }
         handleSafeGazePopUp()
-        safeGazeIcon.setOnClickListener {
-            val location = IntArray(2)
-            safeGazeIcon.getLocationOnScreen(location)
-            popupWindow.showAtLocation(
-                safeGazeIcon,
-                Gravity.NO_GRAVITY,
-                location[0],
-                location[1] + safeGazeIcon.height
-            )
-        }
-
-        popupWindow.setOnDismissListener {
-            println("Dismissed")
-        }
     }
 
     @SuppressLint("InflateParams")
     private fun handleSafeGazePopUp(){
-        val popupView = LayoutInflater.from(requireContext()).inflate(R.layout.safe_gaze_pop_up, null)
-        val dropdownItemText = popupView.findViewById<TextView>(R.id.dropdownItemText)
-        dropdownItemText.text = "Dropdown Item"
+        val popupView = LayoutInflater.from(context).inflate(R.layout.safe_gaze_pop_up, null)
+        val popupWindow = PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        val toggle = popupView.findViewById<SwitchCompat>(R.id.asil_shield_toggle_button)
+        val sharedPref = requireContext().getSharedPreferences("safe_gaze_active", Context.MODE_PRIVATE)
+        val editor = sharedPref.edit()
+        if (sharedPref.getBoolean("safe_gaze_active", true)){
+            popupView.findViewById<TextView>(R.id.asil_shield_state_text_view).text = buildString {
+                this.append("Safe Gaze UP")
+            }
+            toggle.isChecked = true
+        }else{
+            popupView.findViewById<TextView>(R.id.asil_shield_state_text_view).text = buildString {
+                this.append("Safe Gaze DOWN")
+            }
+            toggle.isChecked = false
+        }
+        safeGazeIcon.setOnClickListener {
+            val iconRect = Rect()
+            safeGazeIcon.getGlobalVisibleRect(iconRect)
+            val x = iconRect.left
+            val y = iconRect.top
+            popupWindow.apply {
+                animationStyle = 2132017505
+                isFocusable = true
+            }
+            toggle.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked){
 
-        popupWindow = PopupWindow(
-            popupView,
-            LinearLayout.LayoutParams.WRAP_CONTENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT,
-            true
-        )
+                    editor.putBoolean("safe_gaze_active", true)
+                    popupView.findViewById<TextView>(R.id.asil_shield_state_text_view).text = buildString {
+                        this.append("Safe Gaze UP")
+                    }
+                } else{
+
+                    editor.putBoolean("safe_gaze_active", false)
+                    popupView.findViewById<TextView>(R.id.asil_shield_state_text_view).text = buildString {
+                        this.append("Safe Gaze DOWN")
+                    }
+                }
+                editor.apply()
+            }
+            safeGazeIcon.post {
+                val leftOverDevicePixel = getDeviceWidthInPixels(requireContext()) - x
+                val popUpLayingOut = 275.dpToPx(requireContext().resources.displayMetrics) - leftOverDevicePixel
+                val newPopUpPosition = (x - popUpLayingOut) - 50
+                popupWindow.showAtLocation(
+                    safeGazeIcon,
+                    Gravity.NO_GRAVITY,
+                    newPopUpPosition,
+                    (y + omnibar.toolbar.height) - 25
+                )
+                val pointerArrow =
+                    popupView.findViewById<ImageView>(R.id.pointer_arrow_safe_gaze_image_view)
+                val pointerArrowParams =
+                    pointerArrow.layoutParams as ConstraintLayout.LayoutParams
+                pointerArrowParams.rightMargin = leftOverDevicePixel - 113
+                pointerArrow.layoutParams = pointerArrowParams
+            }
+
+            val sharedPreferences = requireContext().getSharedPreferences("safe_gaze_preferences", Context.MODE_PRIVATE)
+            val totalCensoredText = "Total ${sharedPreferences.getInt("all_time_cencored_count", 0)} Sinful acts avoided since beginning"
+            popupView.findViewById<TextView>(R.id.count_text).text = sharedPreferences.getInt("session_cencored_count", 0).toString()
+            popupView.findViewById<TextView>(R.id.asil_shield_exp_text).text = buildString {
+                this.append("Sinful acts avoided")
+            }
+            popupView.findViewById<TextView>(R.id.site_broken_text_view).text = totalCensoredText
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    private fun getDeviceWidthInPixels(context: Context): Int {
+        val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        val displayMetrics = DisplayMetrics()
+
+        windowManager.defaultDisplay.getMetrics(displayMetrics)
+
+        return displayMetrics.widthPixels
     }
 
     private fun getDaxDialogFromActivity(): Fragment? = activity?.supportFragmentManager?.findFragmentByTag(DAX_DIALOG_DIALOG_TAG)

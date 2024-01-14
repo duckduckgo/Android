@@ -788,4 +788,9 @@
     <string name="autofillLoginSavedSnackbarMessage">Password saved</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Password updated</string>
     <string name="safe_gaze_arrow" translatable="false">safe_gaze_arrow</string>
+    <string name="pointer_arrow">Pointer Arrow</string>
+    <string name="safe_gaze_up">Safe Gaze UP</string>
+    <string name="ads_and_other_creepy_things_blocked">Ads and other creepy things blocked</string>
+    <string name="if_this_site_appears_broken_try_shields_down">If this site appears broken, try Shields down</string>
+    <string name="_0">0</string>
 </resources>
