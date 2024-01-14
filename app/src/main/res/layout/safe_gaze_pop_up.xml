@@ -58,6 +58,8 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@id/site_image_view"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginEnd="32dp"
                     android:textColor="#F6F6FF"
                     android:textSize="20sp"/>
             </androidx.constraintlayout.widget.ConstraintLayout>

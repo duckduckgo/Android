@@ -11,7 +11,6 @@ class SafeGazeJsInterface(context: Context) {
 
     @JavascriptInterface
     fun sendMessage(message: String) {
-        println("Message send from js side is -> $message")
         val currentCounter = getCounterValue()
         val newCounter = currentCounter + 1
         saveGlobalCounterValue(newCounter)
