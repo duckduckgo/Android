@@ -53,6 +53,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.privacy.config.api.AmpLinks
+import com.duckduckgo.user.agent.api.UserAgentProvider
 import java.net.URI
 import javax.inject.Inject
 import kotlinx.coroutines.*
@@ -79,6 +80,7 @@ class BrowserWebViewClient @Inject constructor(
     private val pixel: Pixel,
     private val crashLogger: CrashLogger,
     private val jsPlugins: PluginPoint<JsInjectorPlugin>,
+    private val userAgentProvider: UserAgentProvider,
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -264,6 +266,7 @@ class BrowserWebViewClient @Inject constructor(
         Timber.v("onPageStarted webViewUrl: ${webView.url} URL: $url")
 
         url?.let {
+            userAgentProvider.setHintHeader(webView.settings)
             autoconsent.injectAutoconsent(webView, url)
             adClickManager.detectAdDomain(url)
             requestInterceptor.onPageStarted(url)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,28 +14,18 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-}
+package com.duckduckgo.user.agent.impl
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.Toggle
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
-}
+@ContributesRemoteFeature(
+    scope = AppScope::class,
+    featureName = "clientBrandHint",
+)
 
-kotlin {
-    jvmToolchain(17)
-}
-
-dependencies {
-    implementation project(':common-utils')
-
-    implementation AndroidX.webkit
-}
-
-android {
-    namespace 'com.duckduckgo.user.agent.api'
+interface ClientBrandHintFeature {
+    @Toggle.DefaultValue(false)
+    fun self(): Toggle
 }
