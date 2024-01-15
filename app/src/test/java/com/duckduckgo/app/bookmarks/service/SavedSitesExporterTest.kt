@@ -27,6 +27,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.FolderBranch
+import com.duckduckgo.savedsites.api.models.FolderTreeItem
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
@@ -34,7 +35,6 @@ import com.duckduckgo.savedsites.api.models.TreeNode
 import com.duckduckgo.savedsites.api.service.ExportSavedSitesResult
 import com.duckduckgo.savedsites.impl.RealFavoritesDelegate
 import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
-import com.duckduckgo.savedsites.impl.service.FolderTreeItem
 import com.duckduckgo.savedsites.impl.service.RealSavedSitesExporter
 import com.duckduckgo.savedsites.impl.service.RealSavedSitesParser
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao

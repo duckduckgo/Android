@@ -25,13 +25,15 @@ import com.duckduckgo.app.sync.FakeDisplayModeSettingsRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.savedsites.api.models.BookmarkFolder
+import com.duckduckgo.savedsites.api.models.FolderTreeItem
 import com.duckduckgo.savedsites.api.models.SavedSite
+import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.api.models.TreeNode
 import com.duckduckgo.savedsites.impl.RealFavoritesDelegate
 import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
-import com.duckduckgo.savedsites.impl.service.FolderTreeItem
 import com.duckduckgo.savedsites.impl.service.RealSavedSitesParser
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
@@ -160,16 +162,16 @@ class SavedSitesParserTest {
         val inputStream = FileUtilities.loadResource(javaClass.classLoader!!, "bookmarks/bookmarks_firefox.html")
         val document = Jsoup.parse(inputStream, Charsets.UTF_8.name(), "duckduckgo.com")
 
-        val bookmarks = parser.parseHtml(document, repository)
+        val bookmarks = parser.parseHtml(document, repository).filterIsInstance<Bookmark>()
 
         Assert.assertEquals(17, bookmarks.size)
 
         val firstBookmark = bookmarks.first()
-        Assert.assertEquals("https://support.mozilla.org/en-US/products/firefox", firstBookmark.url)
+        Assert.assertEquals("https://support.mozilla.org/en-US/products/firefox", (firstBookmark as Bookmark).url)
         Assert.assertEquals("Get Help", firstBookmark.title)
 
         val lastBookmark = bookmarks.last()
-        Assert.assertEquals("https://www.mozilla.org/en-US/firefox/central/", lastBookmark.url)
+        Assert.assertEquals("https://www.mozilla.org/en-US/firefox/central/", (lastBookmark as Bookmark).url)
         Assert.assertEquals("Getting Started", lastBookmark.title)
     }
 
@@ -178,19 +180,19 @@ class SavedSitesParserTest {
         val inputStream = FileUtilities.loadResource(javaClass.classLoader!!, "bookmarks/bookmarks_brave.html")
         val document = Jsoup.parse(inputStream, Charsets.UTF_8.name(), "duckduckgo.com")
 
-        val bookmarks = parser.parseHtml(document, repository)
+        val bookmarks = parser.parseHtml(document, repository).filterIsInstance<Bookmark>()
 
         Assert.assertEquals(12, bookmarks.size)
 
         val firstBookmark = bookmarks.first()
         Assert.assertEquals(
             "https://www.theguardian.com/international",
-            firstBookmark.url,
+            (firstBookmark as Bookmark).url,
         )
         Assert.assertEquals("News, sport and opinion from the Guardian's global edition | The Guardian", firstBookmark.title)
 
         val lastBookmark = bookmarks.last()
-        Assert.assertEquals("https://www.macrumors.com/", lastBookmark.url)
+        Assert.assertEquals("https://www.macrumors.com/", (lastBookmark as Bookmark).url)
         Assert.assertEquals("MacRumors: Apple News and Rumors", lastBookmark.title)
     }
 
@@ -199,19 +201,19 @@ class SavedSitesParserTest {
         val inputStream = FileUtilities.loadResource(javaClass.classLoader!!, "bookmarks/bookmarks_chrome.html")
         val document = Jsoup.parse(inputStream, Charsets.UTF_8.name(), "duckduckgo.com")
 
-        val bookmarks = parser.parseHtml(document, repository)
+        val bookmarks = parser.parseHtml(document, repository).filterIsInstance<Bookmark>()
 
         Assert.assertEquals(12, bookmarks.size)
 
         val firstBookmark = bookmarks.first()
         Assert.assertEquals(
             "https://www.theguardian.com/international",
-            firstBookmark.url,
+            (firstBookmark as Bookmark).url,
         )
         Assert.assertEquals("News, sport and opinion from the Guardian's global edition | The Guardian", firstBookmark.title)
 
         val lastBookmark = bookmarks.last()
-        Assert.assertEquals("https://www.macrumors.com/", lastBookmark.url)
+        Assert.assertEquals("https://www.macrumors.com/", (lastBookmark as Bookmark).url)
         Assert.assertEquals("MacRumors: Apple News and Rumors", lastBookmark.title)
     }
 
@@ -220,21 +222,20 @@ class SavedSitesParserTest {
         val inputStream = FileUtilities.loadResource(javaClass.classLoader!!, "bookmarks/bookmarks_ddg_android.html")
         val document = Jsoup.parse(inputStream, Charsets.UTF_8.name(), "duckduckgo.com")
 
-        val bookmarks = parser.parseHtml(document, repository)
+        val bookmarks = parser.parseHtml(document, repository).filterNot { it is BookmarkFolder }
 
         Assert.assertEquals(13, bookmarks.size)
 
         val firstBookmark = bookmarks.first()
         Assert.assertEquals(
             "https://www.theguardian.com/international",
-            firstBookmark.url,
+            (firstBookmark as Bookmark).url,
         )
         Assert.assertEquals("News, sport and opinion from the Guardian's global edition | The Guardian", firstBookmark.title)
 
         val lastBookmark = bookmarks.last()
-        Assert.assertEquals("https://www.apple.com/uk/", lastBookmark.url)
+        Assert.assertEquals("https://www.apple.com/uk/", (lastBookmark as Favorite).url)
         Assert.assertEquals("Apple (United Kingdom)", lastBookmark.title)
-        Assert.assertTrue(lastBookmark is Favorite)
     }
 
     @Test
@@ -242,19 +243,19 @@ class SavedSitesParserTest {
         val inputStream = FileUtilities.loadResource(javaClass.classLoader!!, "bookmarks/bookmarks_ddg_macos.html")
         val document = Jsoup.parse(inputStream, Charsets.UTF_8.name(), "duckduckgo.com")
 
-        val bookmarks = parser.parseHtml(document, repository)
+        val bookmarks = parser.parseHtml(document, repository).filterIsInstance<Bookmark>()
 
         Assert.assertEquals(13, bookmarks.size)
 
         val firstBookmark = bookmarks.first()
         Assert.assertEquals(
             "https://www.theguardian.com/international",
-            firstBookmark.url,
+            (firstBookmark as Bookmark).url,
         )
         Assert.assertEquals("News, sport and opinion from the Guardian's global edition | The Guardian", firstBookmark.title)
 
         val lastBookmark = bookmarks.last()
-        Assert.assertEquals("https://www.apple.com/uk/", lastBookmark.url)
+        Assert.assertEquals("https://www.apple.com/uk/", (lastBookmark as Bookmark).url)
         Assert.assertEquals("Apple (United Kingdom)", lastBookmark.title)
     }
 
@@ -263,19 +264,19 @@ class SavedSitesParserTest {
         val inputStream = FileUtilities.loadResource(javaClass.classLoader!!, "bookmarks/bookmarks_safari.html")
         val document = Jsoup.parse(inputStream, Charsets.UTF_8.name(), "duckduckgo.com")
 
-        val bookmarks = parser.parseHtml(document, repository)
+        val bookmarks = parser.parseHtml(document, repository).filterIsInstance<Bookmark>()
 
         Assert.assertEquals(14, bookmarks.size)
 
         val firstBookmark = bookmarks.first()
         Assert.assertEquals(
             "https://www.apple.com/uk",
-            firstBookmark.url,
+            (firstBookmark as Bookmark).url,
         )
         Assert.assertEquals("Apple", firstBookmark.title)
 
         val lastBookmark = bookmarks.last()
-        Assert.assertEquals("https://www.macrumors.com/", lastBookmark.url)
+        Assert.assertEquals("https://www.macrumors.com/", (lastBookmark as Bookmark).url)
         Assert.assertEquals("MacRumors: Apple News and Rumors", lastBookmark.title)
     }
 

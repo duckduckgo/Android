@@ -23,6 +23,7 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.BookmarkFolderItem
 import com.duckduckgo.savedsites.api.models.FolderBranch
+import com.duckduckgo.savedsites.api.models.FolderTreeItem
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
@@ -66,37 +67,20 @@ class RealSavedSitesRepository(
             .flowOn(dispatcherProvider.io())
     }
 
-    override fun getFolderContentSync(folderId: String): Pair<List<Bookmark>, List<BookmarkFolder>> {
+    override fun getFolderTreeItems(folderId: String): List<FolderTreeItem> {
         val entities = savedSitesEntitiesDao.entitiesInFolderSync(folderId)
-        val bookmarks = mutableListOf<Bookmark>()
-        val folders = mutableListOf<BookmarkFolder>()
-        entities.forEach { entity ->
-            mapEntity(entity, folderId, bookmarks, folders)
-        }
-        return Pair(bookmarks.distinct(), folders.distinct())
-    }
+        val combinedList = mutableListOf<FolderTreeItem>()
 
-    private fun mapEntity(
-        entity: Entity,
-        folderId: String,
-        bookmarks: MutableList<Bookmark>,
-        folders: MutableList<BookmarkFolder>,
-    ) {
-        if (entity.type == FOLDER) {
-            val numFolders = savedSitesRelationsDao.countEntitiesInFolder(entity.entityId, FOLDER)
-            val numBookmarks = savedSitesRelationsDao.countEntitiesInFolder(entity.entityId, BOOKMARK)
-            folders.add(BookmarkFolder(entity.entityId, entity.title, folderId, numBookmarks, numFolders, entity.lastModified, entity.deletedFlag()))
-        } else {
-            bookmarks.add(
-                Bookmark(
-                    id = entity.entityId,
-                    title = entity.title,
-                    url = entity.url.orEmpty(),
-                    parentId = folderId,
-                    lastModified = entity.lastModified,
-                ),
-            )
+        entities.forEach { entity ->
+            if (entity.type == FOLDER) {
+                val item = entity.mapToBookmarkFolder(folderId)
+                combinedList.add(FolderTreeItem(item.id, item.name, item.parentId, null))
+            } else {
+                val item = entity.mapToBookmark(folderId)
+                combinedList.add(FolderTreeItem(item.id, item.title, item.parentId, item.url))
+            }
         }
+        return combinedList
     }
 
     private fun mapEntity(

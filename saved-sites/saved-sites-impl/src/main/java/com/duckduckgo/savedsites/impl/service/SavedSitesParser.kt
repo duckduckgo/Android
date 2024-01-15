@@ -34,7 +34,7 @@ interface SavedSitesParser {
     suspend fun parseHtml(
         document: Document,
         savedSitesRepository: SavedSitesRepository,
-    ): List<SavedSite>
+    ): List<Any>
 }
 
 class RealSavedSitesParser : SavedSitesParser {
@@ -125,7 +125,7 @@ class RealSavedSitesParser : SavedSitesParser {
     override suspend fun parseHtml(
         document: Document,
         savedSitesRepository: SavedSitesRepository,
-    ): List<SavedSite> {
+    ): List<Any> {
         val body = document.select("body").first() ?: return emptyList()
         val children = body.childNodes()
             .filterIsInstance<Element>()
@@ -143,9 +143,9 @@ class RealSavedSitesParser : SavedSitesParser {
         documentElement: Element,
         parentId: String,
         savedSitesRepository: SavedSitesRepository,
-        savedSites: MutableList<SavedSite>,
+        savedSites: MutableList<Any>,
         inFavorite: Boolean,
-    ): List<SavedSite> {
+    ): List<Any> {
         var favorites = 0
 
         documentElement.select("DL").first()?.let { itemBlock ->
@@ -177,7 +177,7 @@ class RealSavedSitesParser : SavedSitesParser {
                             if (existingFolder != null) {
                                 parseElement(element, existingFolder.id, savedSitesRepository, savedSites, false)
                             } else {
-                                savedSitesRepository.insert(bookmarkFolder)
+                                savedSites.add(bookmarkFolder)
                                 parseElement(element, bookmarkFolder.id, savedSitesRepository, savedSites, false)
                             }
                         }
