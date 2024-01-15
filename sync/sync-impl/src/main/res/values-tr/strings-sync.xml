@@ -69,7 +69,7 @@
 
     <!-- Enter Code screen -->
     <string name="enter_code_screen_title">Kodu Manuel Olarak Yaz</string>
-    <string name="sync_enter_code_hint"><b>Ayarlar &gt; Senkronizasyon ve Yedekleme &gt; Başka Bir Cihazla Senkronize Et</b>\'e gidin ve senkronize edilmiş başka bir cihazdaki DuckDuckGo Uygulamasında</b> Metin Kodunu Görüntüle<b>\'yi seçin ve bu cihazı senkronize etmek için kodu buraya yapıştırın.</string>
+    <string name="sync_enter_code_hint"><b>Ayarlar &gt; Senkronizasyon ve Yedekleme &gt; Başka Bir Cihazla Senkronize Et</b>\'e gidin ve senkronize edilmiş başka bir cihazdaki DuckDuckGo Uygulamasında<b> Metin Kodunu Görüntüle</b>\'yi seçin ve bu cihazı senkronize etmek için kodu buraya yapıştırın.</string>
     <string name="sync_enter_code_verifying">Kod doğrulanıyor</string>
     <string name="sync_enter_code_invalid">⚠️ Geçersiz Kod</string>
     <string name="sync_enter_code_paste">Kodu Yapıştır</string>
