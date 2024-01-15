@@ -83,6 +83,6 @@ class WebTrackingProtectionViewModel @Inject constructor(
     }
 
     companion object {
-        const val LEARN_MORE_URL = "https://asil.co/"
+        const val LEARN_MORE_URL = "https://asil.co/asil-help-pages/privacy/web-tracking-protections/"
     }
 }
