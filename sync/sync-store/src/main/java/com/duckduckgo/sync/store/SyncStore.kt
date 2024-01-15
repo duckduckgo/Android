@@ -50,7 +50,7 @@ constructor(
 
     @Synchronized
     private fun encryptedPreferences(): SharedPreferences? {
-        return sharedPrefsProv.getSharedPrefs(FILENAME)
+        return sharedPrefsProv.getEncryptedSharedPrefs(FILENAME)
     }
 
     override var userId: String?
@@ -165,7 +165,7 @@ constructor(
     }
 
     companion object {
-        private const val FILENAME = "com.duckduckgo.sync.store"
+        private const val FILENAME = "com.duckduckgo.sync.store.v1"
         private const val KEY_USER_ID = "KEY_USER_ID"
         private const val KEY_DEVICE_ID = "KEY_DEVICE_ID"
         private const val KEY_DEVICE_NAME = "KEY_DEVICE_NAME"

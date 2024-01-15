@@ -43,6 +43,12 @@ class SettingsSyncDataPersister @Inject constructor(
     val syncCrypto: SyncCrypto,
     private val dispatchers: DispatcherProvider,
 ) : SyncableDataPersister {
+    override fun onSyncEnabled() {
+        if (isLocalDataDirty()) {
+            onSyncDisabled()
+        }
+    }
+
     override fun onSuccess(
         changes: SyncChangesResponse,
         conflictResolution: SyncConflictResolution,
@@ -159,6 +165,10 @@ class SettingsSyncDataPersister @Inject constructor(
         syncSettingsSyncStore.startTimeStamp = "0"
         settingsSyncMetadataDao.removeAll()
         syncableSettings.getPlugins().forEach { it.onSyncDisabled() }
+    }
+
+    private fun isLocalDataDirty(): Boolean {
+        return syncSettingsSyncStore.serverModifiedSince != "0"
     }
 
     private class Adapters {

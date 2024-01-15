@@ -26,7 +26,7 @@ interface SharedPrefsProvider {
     fun getSharedPrefs(fileName: String): SharedPreferences
 }
 
-class EncryptedSharedPrefsProvider(
+class SyncSharedPrefsProvider(
     private val context: Context,
 ) : SharedPrefsProvider {
     override fun getEncryptedSharedPrefs(fileName: String): SharedPreferences? {

@@ -68,8 +68,14 @@ class RealSyncEngine @Inject constructor(
                 APP_OPEN -> performSync(trigger)
                 FEATURE_READ -> performSync(trigger)
                 DATA_CHANGE -> performSync(trigger)
-                ACCOUNT_CREATION -> sendLocalData()
-                ACCOUNT_LOGIN -> performSync(trigger)
+                ACCOUNT_CREATION -> {
+                    onSyncEnabled()
+                    sendLocalData()
+                }
+                ACCOUNT_LOGIN -> {
+                    onSyncEnabled()
+                    performSync(trigger)
+                }
             }
         } else {
             Timber.d("Sync-Engine: sync disabled, nothing to do")
@@ -228,6 +234,13 @@ class RealSyncEngine @Inject constructor(
                     syncPixels.firePersisterErrorPixel(remoteChanges.type.toString(), result)
                 }
             }
+        }
+    }
+
+    private fun onSyncEnabled() {
+        syncStateRepository.clearAll()
+        persisterPlugins.getPlugins().map {
+            it.onSyncEnabled()
         }
     }
 
