@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.pixels
 
+import com.duckduckgo.app.browser.WebViewPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.StatisticsPixelName
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -59,6 +60,7 @@ class OsVersionPixelInterceptor @Inject constructor(private val appBuildConfig: 
             DownloadsPixelName.DOWNLOAD_REQUEST_CANCELLED_BY_USER.pixelName,
             DownloadsPixelName.DOWNLOAD_REQUEST_RETRIED.pixelName,
             StatisticsPixelName.APPLICATION_CRASH_GLOBAL.pixelName,
+            WebViewPixelName.WEB_PAGE_LOADED.pixelName,
         )
     }
 }

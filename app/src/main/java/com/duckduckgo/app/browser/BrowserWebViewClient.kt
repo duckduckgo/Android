@@ -19,9 +19,16 @@ package com.duckduckgo.app.browser
 import android.graphics.Bitmap
 import android.net.Uri
 import android.net.http.SslError
-import android.net.http.SslError.*
+import android.net.http.SslError.SSL_UNTRUSTED
 import android.os.Build
-import android.webkit.*
+import android.webkit.HttpAuthHandler
+import android.webkit.RenderProcessGoneDetail
+import android.webkit.SslErrorHandler
+import android.webkit.WebResourceError
+import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.annotation.UiThread
@@ -42,6 +49,7 @@ import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
 import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
+import com.duckduckgo.app.browser.pageloadpixel.PageLoadedHandler
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -49,6 +57,7 @@ import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.browser.api.JsInjectorPlugin
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
@@ -58,6 +67,8 @@ import java.net.URI
 import javax.inject.Inject
 import kotlinx.coroutines.*
 import timber.log.Timber
+
+private const val ABOUT_BLANK = "about:blank"
 
 class BrowserWebViewClient @Inject constructor(
     private val webViewHttpAuthStore: WebViewHttpAuthStore,
@@ -80,11 +91,14 @@ class BrowserWebViewClient @Inject constructor(
     private val pixel: Pixel,
     private val crashLogger: CrashLogger,
     private val jsPlugins: PluginPoint<JsInjectorPlugin>,
+    private val currentTimeProvider: CurrentTimeProvider,
+    private val shouldSendPageLoadedPixel: PageLoadedHandler,
     private val userAgentProvider: UserAgentProvider,
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
     private var lastPageStarted: String? = null
+    private var start: Long? = null
 
     /**
      * This is the new method of url overriding available from API 24 onwards
@@ -266,6 +280,10 @@ class BrowserWebViewClient @Inject constructor(
         Timber.v("onPageStarted webViewUrl: ${webView.url} URL: $url")
 
         url?.let {
+            // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
+            if (it != "about:blank" && start == null) {
+                start = currentTimeProvider.getTimeInMillis()
+            }
             userAgentProvider.setHintHeader(webView.settings)
             autoconsent.injectAutoconsent(webView, url)
             adClickManager.detectAdDomain(url)
@@ -307,6 +325,17 @@ class BrowserWebViewClient @Inject constructor(
         }
         flushCookies()
         printInjector.injectPrint(webView)
+
+        url?.let {
+            start?.let { safeStart ->
+                val progress = webView.progress
+                // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
+                if (url != ABOUT_BLANK && progress == 100) {
+                    shouldSendPageLoadedPixel(it, safeStart, currentTimeProvider.getTimeInMillis())
+                    start = null
+                }
+            }
+        }
     }
 
     private fun flushCookies() {
@@ -422,6 +451,7 @@ class BrowserWebViewClient @Inject constructor(
         error?.let {
             val parsedError = parseErrorResponse(it)
             if (parsedError != OMITTED && request?.isForMainFrame == true) {
+                start = null
                 webViewClientListener?.onReceivedError(parsedError, request.url.toString())
             }
             if (request?.isForMainFrame == true) {
@@ -498,6 +528,7 @@ class BrowserWebViewClient @Inject constructor(
 enum class WebViewPixelName(override val pixelName: String) : Pixel.PixelName {
     WEB_RENDERER_GONE_CRASH("m_web_view_renderer_gone_crash"),
     WEB_RENDERER_GONE_KILLED("m_web_view_renderer_gone_killed"),
+    WEB_PAGE_LOADED("m_web_view_page_loaded"),
 }
 
 enum class WebViewErrorResponse(@StringRes val errorId: Int) {
