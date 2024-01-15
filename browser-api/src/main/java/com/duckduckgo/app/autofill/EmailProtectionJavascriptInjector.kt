@@ -18,8 +18,7 @@ package com.duckduckgo.app.autofill
 
 import android.content.Context
 
-interface JavascriptInjector {
-    fun getFunctionsJS(): String
+interface EmailProtectionJavascriptInjector {
 
     fun getAliasFunctions(
         context: Context,

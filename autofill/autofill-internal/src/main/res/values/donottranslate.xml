@@ -53,6 +53,12 @@
     <string name="autofillDevSettingsClearLoginsSubtitle" instruction="%1$d is number of saved logins">Number of saved logins: %1$d</string>
     <string name="autofillDevSettingsViewSavedLogins">View saved logins</string>
 
+    <string name="autofillDevSettingsConfigSectionTitle">Autofill.js Configuration</string>
+    <string name="autofillDevSettingsConfigDebugTitle" instruction="Placeholder will specify if using debug or production version">Configuration Type: %1$s</string>
+    <string name="autofillDevSettingsConfigDebugSubtitle">Tap to change</string>
+    <string name="autofillDevSettingsConfigDebugOptionProduction">Production</string>
+    <string name="autofillDevSettingsConfigDebugOptionDebug">Debug</string>
+
     <string name="autofillDevSettingsAddSampleLogins">Add a few sample logins</string>
     <string name="autofillDevSettingsAddSampleLoginsSubtitle">Adds a few logins for https://fill.dev</string>
     <string name="autofillDevSettingsAddSampleLoginsSameSubdomain">Add duplicate logins (same domain)</string>

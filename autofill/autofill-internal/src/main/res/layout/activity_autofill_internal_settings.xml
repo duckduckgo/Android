@@ -177,6 +177,23 @@
             app:primaryText="@string/autofillDevSettingsNeverSavedSitesCountTitle"
             />
 
+        <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+            android:id="@+id/autofillConfigSectionTitle"
+            android:layout_width="match_parent"
+            android:layout_marginTop="20dp"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/autofillDevSettingsConfigSectionTitle" />
+
+        <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+            android:id="@+id/changeAutofillJsConfigButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/autofillDevSettingsConfigDebugTitle"
+            app:secondaryText="@string/autofillDevSettingsConfigDebugSubtitle" />
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
