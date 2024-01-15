@@ -53,7 +53,7 @@ class PrivacyProtectionsPopupDomainsCleanupWorkerTest {
         val result = subject.doWork()
 
         verify(popupDismissDomainRepository, only())
-            .removeEntriesOlderThan(Instant.parse("2023-11-15T10:15:30.000Z"))
+            .removeEntriesOlderThan(Instant.parse("2023-10-30T10:15:30.000Z"))
 
         assertEquals(Result.success(), result)
     }
