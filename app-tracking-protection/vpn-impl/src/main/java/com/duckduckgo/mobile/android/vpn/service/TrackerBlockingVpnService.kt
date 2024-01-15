@@ -25,7 +25,11 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.net.VpnService
-import android.os.*
+import android.os.Binder
+import android.os.Build
+import android.os.IBinder
+import android.os.Parcel
+import android.os.ParcelFileDescriptor
 import android.system.OsConstants.AF_INET6
 import androidx.core.content.ContextCompat
 import com.duckduckgo.anrs.api.CrashLogger
@@ -65,7 +69,15 @@ import java.util.concurrent.Executors
 import javax.inject.Inject
 import kotlin.properties.Delegates
 import kotlin.system.exitProcess
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.LogPriority.WARN
 import logcat.asLog
@@ -136,13 +148,17 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
 
     @Inject lateinit var crashLogger: CrashLogger
 
+    @Inject lateinit var dnsChangeCallback: DnsChangeCallback
+
     private val alwaysOnStateJob = ConflatedJob()
 
     private val serviceDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 
-    private var vpnNetworkStack: VpnNetworkStack by VpnNetworkStackDelegate(provider = {
-        runBlocking { vpnNetworkStackProvider.provideNetworkStack() }
-    },)
+    private var vpnNetworkStack: VpnNetworkStack by VpnNetworkStackDelegate(
+        provider = {
+            runBlocking { vpnNetworkStackProvider.provideNetworkStack() }
+        },
+    )
 
     private val vpnStateServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(
@@ -279,6 +295,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             vpnNetworkStack.onCreateVpnWithErrorReporting()
             logcat { "VPN log: NEW network ${vpnNetworkStack.name}" }
         }
+        dnsChangeCallback.unregister()
 
         vpnServiceStateStatsDao.insert(createVpnState(state = ENABLING))
 
@@ -315,7 +332,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         }
         activeTun = nullTun
 
-        vpnNetworkStack.onPrepareVpn().getOrNull().also {
+        val tunnelConfig = vpnNetworkStack.onPrepareVpn().getOrNull().also {
             if (it != null) {
                 activeTun = createTunnelInterface(it)
                 activeTun?.let { tun ->
@@ -363,6 +380,19 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
 
         // lastly set the VPN state to enabled
         vpnServiceStateStatsDao.insert(createVpnState(state = ENABLED))
+
+        // This is something temporary while we confirm whether we're able to fix the moto g issues with appTP
+        // see https://app.asana.com/0/488551667048375/1203410036713941/f for more info
+        tunnelConfig?.let { config ->
+            // TODO this is temporary hack until we know this approach works for moto g. If it does we'll spend time making it better/more permanent
+            if (config.dns.map { it.hostAddress }.contains("10.11.12.1")) {
+                // noop whenever NetP is enabled
+            } else if (config.dns.isNotEmpty()) {
+                // just temporary pixel to know quantify how many users would be impacted
+                deviceShieldPixels.reportMotoGFix()
+                dnsChangeCallback.register()
+            }
+        }
 
         alwaysOnStateJob += launch { monitorVpnAlwaysOnState() }
         if (isAlwaysOnTriggered) {
@@ -562,6 +592,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         vpnStateServiceReference?.let {
             runCatching { unbindService(vpnStateServiceConnection).also { vpnStateServiceReference = null } }
         }
+
+        dnsChangeCallback.unregister()
 
         stopForeground(true)
         stopSelf()
