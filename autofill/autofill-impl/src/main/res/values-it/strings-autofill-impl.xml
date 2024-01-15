@@ -133,4 +133,6 @@
     <string name="managementDisabledModeSubtitle">Per proteggere le password sono necessari una sequenza di blocco del dispositivo, un PIN o dati biometrici.</string>
     <string name="credentialManagementEditTitle">Modifica password</string>
 
+    <string name="credentials_limit_warning"><b>Sincronizzazione interrotta</b>\nLimite di accessi superato. Eliminane alcuni per riprendere la sincronizzazione.\n\n<annotation type="manage_logins">Gestisci gli accessi</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>La sincronizzazione con password è sospesa</b>\nHai superato il limite di sincronizzazione con password. Prova a eliminare qualche password. Fino a quando il problema non verrà risolto, non sarà eseguito il backup delle password.</string>
 </resources>

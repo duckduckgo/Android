@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2021 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <!-- Sync Disabled messages -->
+    <string name="sync_flows_disabled"><b>Synkronointi ja varmuuskopiointi ei käytettävissä</b>\nSynkronointi ja varmuuskopiointi ei valitettavasti ole tällä hetkellä käytettävissä. Yritä myöhemmin uudelleen.</string>
+    <string name="sync_flows_disabled_new_version"><b>Synkronointi ja varmuuskopiointi ei käytettävissä</b>\nSynkronointi ja varmuuskopiointi ei valitettavasti ole enää käytettävissä tässä sovellusversiossa. Päivitä DuckDuckGo uusimpaan versioon jatkaaksesi.</string>
+    <string name="sync_create_account_disabled"><b>Synkronointi ja varmuuskopiointi ei käytettävissä</b>\nSynkronointi ja varmuuskopiointi ei valitettavasti ole tällä hetkellä käytettävissä. Yritä myöhemmin uudelleen.</string>
+    <string name="sync_create_account_disabled_new_version"><b>Synkronointi ja varmuuskopiointi ei käytettävissä</b>\nSynkronointi ja varmuuskopiointi ei valitettavasti ole enää käytettävissä tässä sovellusversiossa. Päivitä DuckDuckGo uusimpaan versioon jatkaaksesi.</string>
+    <string name="sync_disabled_authenticated_user"><b>Synkronointi ja varmuuskopiointi keskeytetty</b>\nSynkronointi ja varmuuskopiointi ei valitettavasti ole tällä hetkellä käytettävissä. Yritä myöhemmin uudelleen.</string>
+    <string name="sync_disabled_authenticated_user_new_version"><b>Synkronointi ja varmuuskopiointi keskeytetty</b>\nSynkronointi ja varmuuskopiointi ei valitettavasti ole enää käytettävissä tässä sovellusversiossa. Päivitä DuckDuckGo uusimpaan versioon jatkaaksesi.</string>
+    <string name="sync_paused_notification"><b>Synkronointi ja varmuuskopiointi keskeytetty</b>\nSynkronointi ja varmuuskopiointi ei valitettavasti ole tällä hetkellä käytettävissä. Yritä myöhemmin uudelleen.</string>
+
+    <!-- Settings screen -->
+    <string name="sync_screen_title">Synkronoi ja varmuuskopioi</string>
+    <string name="sync_setup_begin_syncing">Aloita synkronointi</string>
+    <string name="sync_setup_with_another_device_cta_title">Synkronoi toisen laitteen kanssa</string>
+    <string name="sync_setup_with_another_device_cta_subtitle">Synkronoi kirjanmerkit ja salasanat turvallisesti laitteittesi välillä.</string>
+    <string name="sync_off_hint">Tietosi on salattu päästä päähän, eikä DuckDuckGolla ole hallussaan salausavainta.</string>
+    <string name="sync_setup_single_device_title">Yhden laitteen asennus</string>
+    <string name="sync_setup_single_recover_data_cta_title">Palauta synkronoidut tiedot</string>
+    <string name="sync_setup_single_sync_this_device_cta_title">Synkronoi ja varmuuskopioi tämä laite</string>
+
+    <string name="sync_off_encrypted_hint">Tietosi on salattu päästä päähän, eikä DuckDuckGolla ole hallussaan salauksen purkuavainta.</string>
+
+    <!-- Setup screen -->
+    <string name="sync_enable_sync_title">Määritetään synkronointi ja varmuuskopiointi!</string>
+    <string name="sync_enable_sync_content">Kirjanmerkkejä ja salasanoja valmistellaan synkronointiin. Tähän menee vain pieni hetki.</string>
+    <string name="sync_enable_options">Valinnat</string>
+    <string name="sync_enable_option_favicons_title">Nouda kirjanmerkkikuvakkeet</string>
+    <string name="sync_enable_option_favicons_subtitle">Lataa synkronoitujen kirjanmerkkien kuvakkeet automaattisesti.</string>
+    <string name="sync_enable_connecting">Yhdistetään…</string>
+    <string name="sync_intro_enable_title">Synkronoi ja varmuuskopioi tämä laite</string>
+    <string name="sync_intro_enable_content">Tämä luo salatun varmuuskopion kirjanmerkeistäsi ja salasanoistasi DuckDuckGon suojatulle palvelimelle. Voit synkronoida varmuuskopion muiden laitteittesi kanssa.\n\n Salausavain tallennetaan vain laitteellesi. DuckDuckGo ei pääse siihen käsiksi.…</string>
+    <string name="sync_intro_enable_footer">Voit synkronoiden muiden laitteittesi kanssa myöhemmin.</string>
+    <string name="sync_intro_enable_cta">Ota käyttöön synkronointi ja varmuuskopiointi</string>
+    <string name="sync_intro_recover_title">Palauta synkronoidut tiedot</string>
+    <string name="sync_intro_recover_content">Jos haluat palauttaa synkronoidut tietosi, tarvitset palautuskoodin, jonka tallensit ottaessasi synkronoinnin käyttöön. Koodi on voitu tallentaa PDF-tiedostona laitteelle, jolla määritit synkronoinnin.</string>
+    <string name="sync_intro_recover_cta">Aloita</string>
+
+    <!-- Recover data screen -->
+    <string name="login_screen_title">Skannaa QR-koodi</string>
+    <string name="login_screen_enter_code_cta">Tai syötä koodi manuaalisesti</string>
+    <string name="login_screen_barcode_hint">Synkronoi osoittamalla kameralla QR-koodia</string>
+    <string name="login_screen_cant_scan">Etkö voi skannata? <font color="#7295F6">Jaa tekstikoodi</font></string>
+
+    <!-- Connect screen -->
+    <string name="connect_screen_title">Skannaa QR-koodi</string>
+    <string name="connect_screen_scan_qr_hint">Siirry kohtaan <b>Asetukset &gt; Synkronointi ja varmuuskopiointi</b> DuckDuckGo-selaimessa muulla laitteella ja valitse ”Synkronoi toisen laitteen kanssa.”</string>
+    <string name="connect_screen_enter_code_cta">Tai syötä koodi manuaalisesti</string>
+    <string name="connect_screen_connect_qr_hint_title">Mobile-to-Mobile?</string>
+    <string name="connect_screen_connect_qr_hint_content">Skannaa tämä koodi toisella laitteella synkronoidaksesi.</string>
+    <string name="connect_screen_share_code">Kopioi koodi</string>
+
+    <!-- Enter Code screen -->
+    <string name="enter_code_screen_title">Syötä koodi manuaalisesti</string>
+    <string name="sync_enter_code_hint">Siirry kohtaan <b>Asetukset &gt; Synkronoi ja varmuuskopioi &gt; Synkronoi toisen laitteen kanssa</b> ja valitse <b>Näytä tekstikoodi</b> DuckDuckGo-sovelluksessa toisella synkronoidulla laitteella. Liitä koodi tähän synkronoidaksesi tämän laitteen.</string>
+    <string name="sync_enter_code_verifying">Koodin tarkistaminen</string>
+    <string name="sync_enter_code_invalid">⚠️ Virheellinen koodi</string>
+    <string name="sync_enter_code_paste">Liitä koodi</string>
+
+    <!-- Recovery PDF screen -->
+    <string name="sync_recovery_code_title">Tallenna palautuskoodi</string>
+    <string name="sync_save_recovery_code_item_hint">Jos menetät pääsyn laitteillesi, tarvitset tämän koodin palauttaaksesi synkronoidut tiedot.</string>
+    <string name="sync_recovery_code_skip_button">Seuraava</string>
+    <string name="sync_recovery_code_primary_button">Tallenna PDF-tiedostona</string>
+    <string name="sync_recovery_code_secondary_button">Kopioi koodi</string>
+    <string name="sync_code_box_description">Kuka tahansa, jolla on hallussaan tämä koodi, pääsee käsiksi synkronoituihin tietoihisi, joten säilytä koodio turvallisessa paikassa.</string>
+
+    <!-- Device synced screen -->
+    <string name="sync_connected_device_title">Tietosi on synkronoitu!</string>
+    <string name="sync_connected_device_primary_button">Valmis</string>
+
+    <string name="show_qr_screen_title">Näytä QR-koodi</string>
+
+    <string name="show_code_screen_title">Koodi</string>
+    <string name="enter_code_screen_cta">Kirjoita tekstikoodi</string>
+    <string name="sync_login_device_hint">Skannaa palautuksen PDF-tiedostossa tai muussa synkronoidussa laitteessa oleva QR-koodi, niin voit palauttaa tietosi.</string>
+
+    <string name="synced_devices_section_title">Synkronoidut laitteet</string>
+    <string name="sync_new_device_section_title">Synkronoi uusi laite</string>
+    <string name="sync_new_device_hint">Siirry kohtaan Asetukset › Synkronointi ja varmuuskopiointi DuckDuckGo-sovelluksessa muulla laitteella, ja skannaa muodostaaksesi yhteyden välittömästi.</string>
+    <string name="sync_show_text_code_item">Näytä tekstikoodi</string>
+    <string name="sync_show_qr_code_item">Skannaa QR-koodi</string>
+    <string name="sync_save_recovery_code_item">Tallenna palautuksen PDF-tiedosto</string>
+    <string name="sync_delete_account_item">Sammuta ja poista palvelimen tiedot…</string>
+    <string name="sync_disable_sync_item">Poista synkronointi ja varmuuskopiointi käytöstä…</string>
+    <string name="sync_enable_sync_next_button">Seuraava</string>
+    <string name="sync_recovery_code_content">Jos menetät pääsyn laitteillesi, tarvitset tämän koodin palauttaaksesi synkronoidut tiedot.</string>
+    <string name="sync_recovery_code_hint">Kuka tahansa, jolla on hallussaan tämä koodi, pääsee käsiksi synkronoituihin tietoihisi, joten säilytä koodio turvallisessa paikassa.</string>
+
+    <string name="turn_off_sync_dialog_title">Poistetaanko synkronointi käytöstä?</string>
+    <string name="turn_off_sync_dialog_content">Tämä laite ei enää pääse käsiksi synkronoituihin tietoihisi</string>
+    <string name="turn_off_sync_dialog_primary_button">Kytke pois päältä</string>
+    <string name="turn_off_sync_dialog_secondary_button">Peruuta</string>
+    <string name="sync_permission_required_store_recovery_code">Palautuksen PDF-tiedoston tallennus edellyttää tallennusluvan</string>
+    <string name="sync_share_title">Jaa...</string>
+    <string name="sync_pdf_title">Synkronoi palautuskoodi</string>
+    <string name="sync_pdf_description">Palautuskoodin avulla voit synkronoida kirjanmerkkisi useiden laitteiden välillä ja palauttaa synkronoidut tiedot, jos menetät pääsyn laitteeseen.</string>
+    <string name="sync_code_box_title">Säilytä nämä tiedot turvallisessa paikassa.</string>
+    <string name="sync_instructions_title">Miten tämä toimii?</string>
+    <string name="sync_instructions_step1">Avaa DuckDuckGo toisella laitteella ja siirry kohtaan Synkronointi asetuksissa.</string>
+    <string name="sync_instructions_step2">Skannaa QR-koodi tai kopioi ja liitä tekstikoodi toiseen DuckDuckGo-sovellukseen.</string>
+    <string name="sync_instructions_step3">Synkronointi käynnistetään ja saat taas kaikki tietosi haltuusi.</string>
+    <string name="remove_device_dialog_title">Poistetaanko laite?</string>
+    <string name="remove_device_dialog_content" instruction="Placeholder is a device name">\"%1$s\" ei enää pääse käsiksi synkronoituihin tietoihisi.</string>
+    <string name="remove_device_dialog_primary_button">Poista</string>
+    <string name="remove_device_dialog_secondary_button">Peruuta</string>
+    <string name="edit_device_dialog_title">Muokkaa</string>
+    <string name="edit_device_dialog_hint">Laitteen nimi</string>
+    <string name="edit_device_dialog_primary_button">OK</string>
+    <string name="edit_device_dialog_secondary_button">Peruuta</string>
+    <string name="sync_device_this_device_hint">Tämä laite</string>
+    <string name="sync_device_menu_option_edit">Muokkaa</string>
+    <string name="sync_device_menu_option_remove">Poista laite</string>
+    <string name="sync_show_code_copy">Kopioi koodi</string>
+    <string name="sync_show_code_copy_hint">Käytä tätä koodia, kun olet valinnut \"Syötä koodi manuaalisesti\" toisen laitteen synkronoinnin määrityksen aikana</string>
+    <string name="sync_code_copied_message">Palautuskoodi kopioitu</string>
+    <string name="sync_camera_permission_required">Kameran käyttölupa tarvitaan</string>
+    <string name="sync_camera_unavailable">Kamera ei ole käytettävissä</string>
+    <string name="sync_camera_permission_required_description">Siirry laitteesi asetuksiin ja anna tälle sovellukselle kameran käyttölupa.</string>
+    <string name="sync_go_to_settings">Siirry kohtaan Asetukset</string>
+    <string name="sync_general_error">Jokin meni pieleen</string>
+    <string name="sync_notification_channel_name">Synkronoi</string>
+    <string name="sync_notify_me_title">Ilmoitukset on poistettu käytöstä</string>
+    <string name="sync_notify_me_description">Saat ilmoituksen, jos synkronointi ja varmuuskopiointi kohtaa virheen.</string>
+    <string name="sync_rollout_banner_text">Synkronointi ja varmuuskopiointi otetaan käyttöön vähitellen, eikä se välttämättä ole vielä käytettävissä DuckDuckGo-sovelluksessa muilla laitteillasi</string>
+</resources>

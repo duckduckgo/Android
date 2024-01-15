@@ -133,4 +133,6 @@
     <string name="managementDisabledModeSubtitle">É necessário um padrão de bloqueio de dispositivo, PIN ou biometria para proteger as tuas palavras-passe.</string>
     <string name="credentialManagementEditTitle">Editar palavra-passe</string>
 
+    <string name="credentials_limit_warning"><b>Sincronização em pausa</b>\nLimite de inícios de sessão excedido. Elimina alguns para retomar a sincronização.\n\n<annotation type="manage_logins">Gerir inícios de sessão</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>A sincronização de palavras-passe está em pausa</b>\nExcedeste o limite de sincronização de palavras-passe. Experimenta eliminar algumas palavras-passe. Não é possível fazer uma cópia de segurança das palavras-passe até este problema estar resolvido.</string>
 </resources>

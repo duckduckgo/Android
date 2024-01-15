@@ -133,4 +133,6 @@
     <string name="managementDisabledModeSubtitle">Se requiere un patrón de bloqueo del dispositivo, un PIN o datos biométricos para proteger tus contraseñas.</string>
     <string name="credentialManagementEditTitle">Editar contraseña</string>
 
+    <string name="credentials_limit_warning"><b>Sincronización en pausa</b>\nSe ha superado el límite de inicios de sesión. Elimina algunos para reanudar la sincronización.\n\n<annotation type="manage_logins">Gestionar inicios de sesión</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>La sincronización de contraseñas está en pausa</b>\nHas superado el límite de sincronización de contraseñas. Prueba a eliminar algunas contraseñas. No se realizará una copia de seguridad de las contraseñas hasta que se resuelva este problema.</string>
 </resources>

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2021 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <!-- Sync Disabled messages -->
+    <string name="sync_flows_disabled"><b>A szinkronizálás és a biztonságai másolatkészítés nem érhető el</b>\nA szinkronizálás és biztonsági másolatkészítés jelenleg sajnos nem érhető el. Próbálkozz újra később.</string>
+    <string name="sync_flows_disabled_new_version"><b>A szinkronizálás és a biztonsági másolatkészítés nem érhető el</b>\nA szinkronizálás és biztonsági másolatkészítés az alkalmazás ezen verziójában sajnos már nem érhető el. A folytatáshoz frissíts a DuckDuckGo a legújabb verziójára.</string>
+    <string name="sync_create_account_disabled"><b>A szinkronizálás és a biztonságai másolatkészítés nem érhető el</b>\nA szinkronizálás és biztonsági másolatkészítés jelenleg sajnos nem érhető el. Próbálkozz újra később.</string>
+    <string name="sync_create_account_disabled_new_version"><b>A szinkronizálás és a biztonsági másolatkészítés nem érhető el</b>\nA szinkronizálás és biztonsági másolatkészítés az alkalmazás ezen verziójában sajnos már nem érhető el. A folytatáshoz frissíts a DuckDuckGo a legújabb verziójára.</string>
+    <string name="sync_disabled_authenticated_user"><b>A szinkronizálás és a biztonságai másolatkészítés szünetel</b>\nA szinkronizálás és biztonsági másolatkészítés jelenleg sajnos nem érhető el. Próbálkozz újra később.</string>
+    <string name="sync_disabled_authenticated_user_new_version"><b>A szinkronizálás és a biztonsági másolatkészítés szünetel</b>\nA szinkronizálás és biztonsági másolatkészítés az alkalmazás ezen verziójában sajnos már nem érhető el. A folytatáshoz frissíts a DuckDuckGo a legújabb verziójára.</string>
+    <string name="sync_paused_notification"><b>A szinkronizálás és a biztonságai másolatkészítés szünetel</b>\nA szinkronizálás és biztonsági másolatkészítés jelenleg sajnos nem érhető el. Próbálkozz újra később.</string>
+
+    <!-- Settings screen -->
+    <string name="sync_screen_title">Szinkronizálás és biztonsági mentés</string>
+    <string name="sync_setup_begin_syncing">Szinkronizálás megkezdése</string>
+    <string name="sync_setup_with_another_device_cta_title">Szinkronizálás másik eszközzel</string>
+    <string name="sync_setup_with_another_device_cta_subtitle">Szinkronizáld biztonságosan a könyvjelzőket és jelszavakat az eszközök között.</string>
+    <string name="sync_off_hint">Az adataid végponttól végpontig titkosítva vannak, a DuckDuckGo pedig nem fér hozzá a titkosítási kulcshoz.</string>
+    <string name="sync_setup_single_device_title">Egyeszközös beállítás</string>
+    <string name="sync_setup_single_recover_data_cta_title">Szinkronizált adatok helyreállítása</string>
+    <string name="sync_setup_single_sync_this_device_cta_title">Az eszköz szinkronizálása és biztonsági mentése</string>
+
+    <string name="sync_off_encrypted_hint">Az adataid végponttól végpontig titkosítva vannak, a DuckDuckGo pedig nem fér hozzá a dekódolási kulcshoz.</string>
+
+    <!-- Setup screen -->
+    <string name="sync_enable_sync_title">Szinkronizálás és biztonsági mentés beállítása!</string>
+    <string name="sync_enable_sync_content">A rendszer előkészíti a könyvjelzők és jelszavak szinkronizálását. Ez csak néhány pillanatig tart.</string>
+    <string name="sync_enable_options">Opciók</string>
+    <string name="sync_enable_option_favicons_title">Könyvjelző ikonok lekérése</string>
+    <string name="sync_enable_option_favicons_subtitle">A szinkronizált könyvjelzők ikonjainak automatikus letöltése.</string>
+    <string name="sync_enable_connecting">Csatlakozás…</string>
+    <string name="sync_intro_enable_title">Az eszköz szinkronizálása és biztonsági mentése</string>
+    <string name="sync_intro_enable_content">Ez a DuckDuckGo biztonságos szerverén egy titkosított biztonsági másolatot készít a könyvjelzőidről és jelszavaidról, amelyet más eszközökkel szinkronizálhatsz. A titkosítási kulcsot csak az eszközöd tárolja, a DuckDuckGo nem fér hozzá…</string>
+    <string name="sync_intro_enable_footer">Később szinkronizálhatod más eszközeidet.</string>
+    <string name="sync_intro_enable_cta">Szinkronizálás és biztonsági mentés bekapcsolása</string>
+    <string name="sync_intro_recover_title">Szinkronizált adatok helyreállítása</string>
+    <string name="sync_intro_recover_content">A szinkronizált adatok visszaállításához szükség lesz a szinkronizálás első beállításakor mentett helyreállítási kódra. Lehetséges, hogy ez a kód PDF-fájlként lett mentve a szinkronizálás beállításához eredetileg használt eszközre.</string>
+    <string name="sync_intro_recover_cta">Első lépések</string>
+
+    <!-- Recover data screen -->
+    <string name="login_screen_title">QR-kód beolvasása</string>
+    <string name="login_screen_enter_code_cta">Vagy manuálisan add meg a kódot</string>
+    <string name="login_screen_barcode_hint">A szinkronizáláshoz irányítsd a kamerát a QR-kódra</string>
+    <string name="login_screen_cant_scan">Nem lehet beolvasni? <font color="#7295F6">Szöveges kód megosztása</font></string>
+
+    <!-- Connect screen -->
+    <string name="connect_screen_title">QR-kód beolvasása</string>
+    <string name="connect_screen_scan_qr_hint">Egy másik eszköz DuckDuckGo böngészőjében lépj a <b>Beállítások &gt; Szinkronizálás és biztonsági mentés</b> menüpontra, és válaszd ki a „Szinkronizálás másik eszközzel” lehetőséget.</string>
+    <string name="connect_screen_enter_code_cta">Vagy manuálisan add meg a kódot</string>
+    <string name="connect_screen_connect_qr_hint_title">Mobilról mobilra?</string>
+    <string name="connect_screen_connect_qr_hint_content">A szinkronizáláshoz olvasd be ezt a kódot egy másik eszközzel.</string>
+    <string name="connect_screen_share_code">Kód másolása</string>
+
+    <!-- Enter Code screen -->
+    <string name="enter_code_screen_title">Kód manuális megadása</string>
+    <string name="sync_enter_code_hint">Egy másik szinkronizált eszköz DuckDuckGo alkalmazásában lépj a <b>Beállítások &gt; Szinkronizálás és biztonsági mentés &gt; Szinkronizálás másik eszközzel</b> menüpontra, és válaszd ki a <b>Szövegkód megtekintése</b> opciót, és illeszd be ide a kódot az eszköz szinkronizálásához.</string>
+    <string name="sync_enter_code_verifying">Kód ellenőrzése</string>
+    <string name="sync_enter_code_invalid">⚠️ Érvénytelen kód</string>
+    <string name="sync_enter_code_paste">Kód beillesztése</string>
+
+    <!-- Recovery PDF screen -->
+    <string name="sync_recovery_code_title">Helyreállítási kód mentése</string>
+    <string name="sync_save_recovery_code_item_hint">Ha elveszted az eszközökhöz való hozzáférést, erre a kódra lesz szükséged a szinkronizált adatok helyreállításához.</string>
+    <string name="sync_recovery_code_skip_button">Következő</string>
+    <string name="sync_recovery_code_primary_button">Mentés PDF-ként</string>
+    <string name="sync_recovery_code_secondary_button">Kód másolása</string>
+    <string name="sync_code_box_description">Bárki, aki hozzáférhet ehhez a kódhoz, hozzáférhet a szinkronizált adatokhoz is, ezért tartsd biztonságos helyen.</string>
+
+    <!-- Device synced screen -->
+    <string name="sync_connected_device_title">Az adatszinkronizálás megtörtént.</string>
+    <string name="sync_connected_device_primary_button">Kész</string>
+
+    <string name="show_qr_screen_title">QR-kód megjelenítése</string>
+
+    <string name="show_code_screen_title">Kód</string>
+    <string name="enter_code_screen_cta">Szöveges kód megadása</string>
+    <string name="sync_login_device_hint">Az adatok helyreállításához olvasd be a helyreállítási PDF fájlban vagy a másik szinkronizált eszközön található QR-kódot.</string>
+
+    <string name="synced_devices_section_title">Szinkronizált eszközök</string>
+    <string name="sync_new_device_section_title">Új eszköz szinkronizálása</string>
+    <string name="sync_new_device_hint">Egy másik eszköz DuckDuckGo alkalmazásában lépj a Beállítások &gt; Szinkronizálás és biztonsági mentés menüpontra, és végezd el a beolvasását az azonnali csatlakozáshoz.</string>
+    <string name="sync_show_text_code_item">Szöveges kód megjelenítése</string>
+    <string name="sync_show_qr_code_item">QR-kód beolvasása</string>
+    <string name="sync_save_recovery_code_item">Helyreállítási PDF-fájl mentése</string>
+    <string name="sync_delete_account_item">Kikapcsolás és szerveradatok törlése…</string>
+    <string name="sync_disable_sync_item">Szinkronizálás és biztonsági mentés kikapcsolása…</string>
+    <string name="sync_enable_sync_next_button">Következő</string>
+    <string name="sync_recovery_code_content">Ha elveszted az eszközökhöz való hozzáférést, erre a kódra lesz szükséged a szinkronizált adatok helyreállításához.</string>
+    <string name="sync_recovery_code_hint">Bárki, aki hozzáférhet ehhez a kódhoz, hozzáférhet a szinkronizált adatokhoz is, ezért tartsd biztonságos helyen.</string>
+
+    <string name="turn_off_sync_dialog_title">Szinkronizálás kikapcsolása?</string>
+    <string name="turn_off_sync_dialog_content">Az eszköz többé nem férhet hozzá a szinkronizált adatokhoz</string>
+    <string name="turn_off_sync_dialog_primary_button">Kikapcsolás</string>
+    <string name="turn_off_sync_dialog_secondary_button">Mégsem</string>
+    <string name="sync_permission_required_store_recovery_code">A helyreállítási PDF mentéséhez tárolási engedély szükséges</string>
+    <string name="sync_share_title">Megosztás vele…</string>
+    <string name="sync_pdf_title">Helyreállítási kód szinkronizálása</string>
+    <string name="sync_pdf_description">A helyreállítási kód lehetővé teszi a könyvjelzők több eszközön történő szinkronizálását, illetve az eszközhöz való hozzáférés elvesztése esetén a szinkronizált adatok helyreállítását.</string>
+    <string name="sync_code_box_title">Tartsd biztonságban ezeket az információkat.</string>
+    <string name="sync_instructions_title">Hogy működik?</string>
+    <string name="sync_instructions_step1">Egy másik eszközön nyisd meg a DuckDuckGo alkalmazást, és válaszd a Beállítások menü Szinkronizálás elemét.</string>
+    <string name="sync_instructions_step2">Olvasd be a QR-kódot, vagy másold és illeszd be a szöveges kódot a másik DuckDuckGo alkalmazásba.</string>
+    <string name="sync_instructions_step3">A szinkronizálás aktiválódik, és ismét hozzáférhetsz minden adathoz.</string>
+    <string name="remove_device_dialog_title">Eszköz eltávolítása?</string>
+    <string name="remove_device_dialog_content" instruction="Placeholder is a device name">A(z) „%1$s” többé nem férhet hozzá a szinkronizált adatokhoz.</string>
+    <string name="remove_device_dialog_primary_button">Eltávolítás</string>
+    <string name="remove_device_dialog_secondary_button">Mégsem</string>
+    <string name="edit_device_dialog_title">Szerkesztés</string>
+    <string name="edit_device_dialog_hint">Eszköz neve</string>
+    <string name="edit_device_dialog_primary_button">OK</string>
+    <string name="edit_device_dialog_secondary_button">Mégsem</string>
+    <string name="sync_device_this_device_hint">Ez az eszköz</string>
+    <string name="sync_device_menu_option_edit">Szerkesztés</string>
+    <string name="sync_device_menu_option_remove">Eszköz eltávolítása</string>
+    <string name="sync_show_code_copy">Kód másolása</string>
+    <string name="sync_show_code_copy_hint">Használd ezt a kódot, miután a szinkronizálás másik eszközön történő beállítása során kiválasztottad a „Kód kézi megadása” lehetőséget</string>
+    <string name="sync_code_copied_message">Helyreállítási kód másolva</string>
+    <string name="sync_camera_permission_required">Kamera engedély szükséges</string>
+    <string name="sync_camera_unavailable">Kamera nem elérhető</string>
+    <string name="sync_camera_permission_required_description">Nyisd meg az eszköz beállításait, és engedélyezd ennek az alkalmazásnak a kamerához való hozzáférést.</string>
+    <string name="sync_go_to_settings">Lépj a Beállítások menübe</string>
+    <string name="sync_general_error">Hiba történt</string>
+    <string name="sync_notification_channel_name">Szinkronizálás</string>
+    <string name="sync_notify_me_title">Az értesítések le vannak tiltva</string>
+    <string name="sync_notify_me_description">Értesítést kaphatsz, ha a szinkronizálás és biztonsági mentés funkció hibát észlel.</string>
+    <string name="sync_rollout_banner_text">A szinkronizálás és biztonsági mentés funkció fokozatosan kerül bevezetésre, és előfordulhat, hogy a többi eszköz DuckDuckGo alkalmazásában még nem érhető el</string>
+</resources>

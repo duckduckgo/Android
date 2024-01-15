@@ -133,4 +133,6 @@
     <string name="managementDisabledModeSubtitle">Este necesar un model de blocare a dispozitivului, un cod PIN sau date biometrice pentru a-ți proteja parolele.</string>
     <string name="credentialManagementEditTitle">Editează parola</string>
 
+    <string name="credentials_limit_warning"><b>Sincronizare întreruptă</b>\nLimita de conectări a fost depășită. Șterge câteva pentru a relua sincronizarea.\n\n<annotation type="manage_logins">Gestionează conectările</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Sincronizarea parolelor este întreruptă</b>\nAi depășit limita de sincronizare a parolelor. Încearcă să ștergi câteva parole. Până la rezolvarea acestei probleme, nu se va efectua backupul pentru parolele tale.</string>
 </resources>

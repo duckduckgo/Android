@@ -133,4 +133,6 @@
     <string name="managementDisabledModeSubtitle">A jelszavak védelméhez az eszköz zárolási mintája, PIN-kód vagy biometrikus adatok szükségesek.</string>
     <string name="credentialManagementEditTitle">Jelszó szerkesztése</string>
 
+    <string name="credentials_limit_warning"><b>A szinkronizálás szünetel</b>\nTúllépted a bejelentkezések maximális számát. A szinkronizálás folytatásához törölj néhányat.\n\n<annotation type="manage_logins">Bejelentkezések kezelése</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>A jelszavak szinkronizálása szünetel</b>\nTúllépted a szinkronizálandó jelszavak maximális számát. Próbálj törölni néhány jelszót. Amíg ezt nem sikerül megoldani, a jelszavakról nem készül biztonsági másolat.</string>
 </resources>

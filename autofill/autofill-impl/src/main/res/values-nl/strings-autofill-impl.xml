@@ -133,4 +133,6 @@
     <string name="managementDisabledModeSubtitle">Je hebt een vergrendelingspatroon, pincode of biometrische gegevens nodig om je aanmeldgegevens te beschermen.</string>
     <string name="credentialManagementEditTitle">Wachtwoord bewerken</string>
 
+    <string name="credentials_limit_warning"><b>Synchronisatie onderbroken</b>\nDe limiet voor het aantal aanmeldingsgegevens is overschreden. Verwijder er een paar om de synchronisatie te hervatten.\n\n<annotation type="manage_logins">Aanmeldingsgegevens beheren</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>De synchronisatie van wachtwoorden is onderbroken</b>\nJe hebt de synchronisatielimiet voor wachtwoorden overschreden. Probeer enkele wachtwoorden te verwijderen. Er wordt geen back-up van je wachtwoorden gemaakt totdat dit probleem is opgelost.</string>
 </resources>

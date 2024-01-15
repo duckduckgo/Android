@@ -133,4 +133,6 @@
     <string name="managementDisabledModeSubtitle">A device lock pattern, PIN, or biometrics is required to protect your passwords.</string>
     <string name="credentialManagementEditTitle">Edit Password</string>
 
+    <string name="credentials_limit_warning"><b>Sync Paused</b>\nLogins limit exceeded. Delete some to resume syncing.\n\n<annotation type="manage_logins">Manage Logins</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Passwords Sync is Paused</b>\nYou have exceeded the passwords sync limit. Try deleting some passwords. Until this is resolved your passwords will not be backed up.</string>
 </resources>

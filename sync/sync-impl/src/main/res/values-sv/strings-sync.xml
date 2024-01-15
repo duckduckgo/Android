@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2021 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <!-- Sync Disabled messages -->
+    <string name="sync_flows_disabled"><b>Synkronisering och säkerhetskopiering inte tillgänglig</b>\nTyvärr är synkronisering och säkerhetskopiering inte tillgänglig för närvarande. Försök igen senare.</string>
+    <string name="sync_flows_disabled_new_version"><b>Synkronisering och säkerhetskopiering inte tillgängligt</b>\nSynkronisering och säkerhetskopiering är dessvärre inte längre tillgängligt i denna version av appen. Uppdatera DuckDuckGo till den senaste versionen för att fortsätta.</string>
+    <string name="sync_create_account_disabled"><b>Synkronisering och säkerhetskopiering inte tillgänglig</b>\nTyvärr är synkronisering och säkerhetskopiering inte tillgänglig för närvarande. Försök igen senare.</string>
+    <string name="sync_create_account_disabled_new_version"><b>Synkronisering och säkerhetskopiering inte tillgängligt</b>\nSynkronisering och säkerhetskopiering är dessvärre inte längre tillgängligt i denna version av appen. Uppdatera DuckDuckGo till den senaste versionen för att fortsätta.</string>
+    <string name="sync_disabled_authenticated_user"><b>Synkronisering och säkerhetskopiering har pausats</b>\nSynkronisering och säkerhetskopiering är dessvärre inte tillgängliga just nu. Försök igen senare.</string>
+    <string name="sync_disabled_authenticated_user_new_version"><b>Synkronisering och säkerhetskopiering pausad</b>\nTyvärr är synkronisering och säkerhetskopiering inte längre tillgänglig i denna appversion. Uppdatera DuckDuckGo till den senaste versionen för att fortsätta.</string>
+    <string name="sync_paused_notification"><b>Synkronisering och säkerhetskopiering pausad</b>\nTyvärr är synkronisering och säkerhetskopiering inte tillgänglig för närvarande. Försök igen senare.</string>
+
+    <!-- Settings screen -->
+    <string name="sync_screen_title">Synkronisering och säkerhetskopiering</string>
+    <string name="sync_setup_begin_syncing">Starta synkronisering</string>
+    <string name="sync_setup_with_another_device_cta_title">Synkronisera med en annan enhet</string>
+    <string name="sync_setup_with_another_device_cta_subtitle">Synkronisera bokmärken och lösenord mellan dina enheter på ett säkert sätt.</string>
+    <string name="sync_off_hint">Dina data krypteras under hela vägen och DuckDuckGo har inte tillgång till krypteringsnyckeln.</string>
+    <string name="sync_setup_single_device_title">Konfiguration för en enda enhet</string>
+    <string name="sync_setup_single_recover_data_cta_title">Återställ synkroniserade data</string>
+    <string name="sync_setup_single_sync_this_device_cta_title">Synkronisera och säkerhetskopiera denna enhet</string>
+
+    <string name="sync_off_encrypted_hint">Dina data krypteras under hela vägen och DuckDuckGo har inte tillgång till krypteringsnyckeln.</string>
+
+    <!-- Setup screen -->
+    <string name="sync_enable_sync_title">Konfigurerar synkronisering och säkerhetskopiering!</string>
+    <string name="sync_enable_sync_content">Dina bokmärken och lösenord förbereds för synkronisering. Detta bör bara ta ett ögonblick.</string>
+    <string name="sync_enable_options">Alternativ</string>
+    <string name="sync_enable_option_favicons_title">Hämta ikoner för bokmärken</string>
+    <string name="sync_enable_option_favicons_subtitle">Ladda automatiskt ner ikoner för synkroniserade bokmärken.</string>
+    <string name="sync_enable_connecting">Ansluter …</string>
+    <string name="sync_intro_enable_title">Synkronisera och säkerhetskopiera denna enhet</string>
+    <string name="sync_intro_enable_content">Detta skapar en krypterad säkerhetskopia av dina bokmärken och lösenord på DuckDuckGos säkra server, som kan synkroniseras med dina andra enheter. \n\n Krypteringsnyckeln lagras endast på din enhet. DuckDuckGo har inte åtkomst till den …</string>
+    <string name="sync_intro_enable_footer">Du kan synkronisera med dina andra enheter senare.</string>
+    <string name="sync_intro_enable_cta">Aktivera synkronisering och säkerhetskopiering</string>
+    <string name="sync_intro_recover_title">Återställ synkroniserade data</string>
+    <string name="sync_intro_recover_content">För att återställa dina synkroniserade data behöver du den återställningskod som du sparade när du konfigurerade synkronisering första gången. Koden kan ha sparats som en PDF-fil på den enhet du använde för att konfigurera synkronisering första gången.</string>
+    <string name="sync_intro_recover_cta">Kom igång</string>
+
+    <!-- Recover data screen -->
+    <string name="login_screen_title">Skanna QR-kod</string>
+    <string name="login_screen_enter_code_cta">Du kan också ange koden manuellt</string>
+    <string name="login_screen_barcode_hint">Rikta kameran mot QR-koden för att synkronisera</string>
+    <string name="login_screen_cant_scan">Kan du inte skanna? <font color="#7295F6">Dela textkod</font></string>
+
+    <!-- Connect screen -->
+    <string name="connect_screen_title">Skanna QR-kod</string>
+    <string name="connect_screen_scan_qr_hint">Gå till <b>Inställningar &gt; Synkronisering och säkerhetskopiering</b> i DuckDuckGo-webbläsaren på en annan enhet och välj Synkronisera med en annan enhet.</string>
+    <string name="connect_screen_enter_code_cta">Du kan också ange koden manuellt</string>
+    <string name="connect_screen_connect_qr_hint_title">Mobil-till-mobil?</string>
+    <string name="connect_screen_connect_qr_hint_content">Skanna denna kod med en annan enhet för att synkronisera.</string>
+    <string name="connect_screen_share_code">Kopiera kod</string>
+
+    <!-- Enter Code screen -->
+    <string name="enter_code_screen_title">Ange kod manuellt</string>
+    <string name="sync_enter_code_hint">Gå till <b>Inställningar &gt; Synkronisera och säkerhetskopiera &gt; Synkronisera med en annan enhet.</b> Välj <b>Visa textkod</b> i DuckDuckGo-appen på en annan synkroniserad enhet och klistra in koden här för att synkronisera denna enhet.</string>
+    <string name="sync_enter_code_verifying">Verifierar kod</string>
+    <string name="sync_enter_code_invalid">⚠️ Ogiltig kod</string>
+    <string name="sync_enter_code_paste">Klistra in kod</string>
+
+    <!-- Recovery PDF screen -->
+    <string name="sync_recovery_code_title">Spara återställningskoden</string>
+    <string name="sync_save_recovery_code_item_hint">Om du förlorar åtkomsten till dina enheter behöver du denna kod för att återställa dina synkroniserade data.</string>
+    <string name="sync_recovery_code_skip_button">Nästa</string>
+    <string name="sync_recovery_code_primary_button">Spara som PDF</string>
+    <string name="sync_recovery_code_secondary_button">Kopiera kod</string>
+    <string name="sync_code_box_description">Alla som har tillgång till denna kod kan komma åt dina synkroniserade data. Förvara därför koden på ett säkert ställe.</string>
+
+    <!-- Device synced screen -->
+    <string name="sync_connected_device_title">Dina data har synkroniserats!</string>
+    <string name="sync_connected_device_primary_button">Klart</string>
+
+    <string name="show_qr_screen_title">Visa QR-kod</string>
+
+    <string name="show_code_screen_title">Kod</string>
+    <string name="enter_code_screen_cta">Ange textkod</string>
+    <string name="sync_login_device_hint">Skanna QR-koden på din återställnings-PDF eller en annan synkroniserad enhet för att återställa dina data.</string>
+
+    <string name="synced_devices_section_title">Synkroniserade enheter</string>
+    <string name="sync_new_device_section_title">Synkronisera ny enhet</string>
+    <string name="sync_new_device_hint">Gå till Inställningar &gt; Synkronisering och säkerhetskopiering i DuckDuckGo-appen på en annan enhet och skanna för att omedelbart ansluta.</string>
+    <string name="sync_show_text_code_item">Visa textkod</string>
+    <string name="sync_show_qr_code_item">Skanna QR-kod</string>
+    <string name="sync_save_recovery_code_item">Spara återställnings-PDF</string>
+    <string name="sync_delete_account_item">Stäng av och radera serverdata …</string>
+    <string name="sync_disable_sync_item">Inaktivera synkronisering och säkerhetskopiering …</string>
+    <string name="sync_enable_sync_next_button">Nästa</string>
+    <string name="sync_recovery_code_content">Om du förlorar åtkomsten till dina enheter behöver du denna kod för att återställa dina synkroniserade data.</string>
+    <string name="sync_recovery_code_hint">Alla som har tillgång till denna kod kan komma åt dina synkroniserade data. Förvara därför koden på ett säkert ställe.</string>
+
+    <string name="turn_off_sync_dialog_title">Vill du inaktivera synkronisering?</string>
+    <string name="turn_off_sync_dialog_content">Denna enhet kommer inte längre att få tillgång till dina synkroniserade data</string>
+    <string name="turn_off_sync_dialog_primary_button">Inaktivera</string>
+    <string name="turn_off_sync_dialog_secondary_button">Avbryt</string>
+    <string name="sync_permission_required_store_recovery_code">Du måste ha åtkomst till lagring för att spara PDF för återställning</string>
+    <string name="sync_share_title">Dela med …</string>
+    <string name="sync_pdf_title">Återställningskod för synkronisering</string>
+    <string name="sync_pdf_description">Med återställningskoden kan du synkronisera dina bokmärken på flera enheter och återställa dina synkroniserade data om du förlorar åtkomst till en enhet.</string>
+    <string name="sync_code_box_title">Skydda denna information.</string>
+    <string name="sync_instructions_title">Hur fungerar detta?</string>
+    <string name="sync_instructions_step1">Öppna DuckDuckGo på en annan enhet och gå till Synkronisera i Inställningar.</string>
+    <string name="sync_instructions_step2">Skanna QR-koden eller kopiera och klistra in textkoden i en annan DuckDuckGo-app.</string>
+    <string name="sync_instructions_step3">Synkroniseringen aktiveras och du har åter tillgång till alla dina data.</string>
+    <string name="remove_device_dialog_title">Vill du ta bort enheten?</string>
+    <string name="remove_device_dialog_content" instruction="Placeholder is a device name">”%1$s” kommer inte längre att få tillgång till dina synkroniserade data.</string>
+    <string name="remove_device_dialog_primary_button">Ta bort</string>
+    <string name="remove_device_dialog_secondary_button">Avbryt</string>
+    <string name="edit_device_dialog_title">Redigera</string>
+    <string name="edit_device_dialog_hint">Enhetens namn</string>
+    <string name="edit_device_dialog_primary_button">OK</string>
+    <string name="edit_device_dialog_secondary_button">Avbryt</string>
+    <string name="sync_device_this_device_hint">Denna enhet</string>
+    <string name="sync_device_menu_option_edit">Redigera</string>
+    <string name="sync_device_menu_option_remove">Ta bort enhet</string>
+    <string name="sync_show_code_copy">Kopiera kod</string>
+    <string name="sync_show_code_copy_hint">Använd denna kod när du har valt Ange koden manuellt under konfigurering av synkronisering på en annan enhet</string>
+    <string name="sync_code_copied_message">Återställningskod kopierad</string>
+    <string name="sync_camera_permission_required">Åtkomst till kamera krävs</string>
+    <string name="sync_camera_unavailable">Kameran är inte tillgänglig</string>
+    <string name="sync_camera_permission_required_description">Gå till enhetens inställningar och ge denna app åtkomst till din kamera.</string>
+    <string name="sync_go_to_settings">Gå till inställningarna</string>
+    <string name="sync_general_error">Något gick fel</string>
+    <string name="sync_notification_channel_name">Synkronisering</string>
+    <string name="sync_notify_me_title">Meddelanden är inaktiverade</string>
+    <string name="sync_notify_me_description">Få ett meddelande om ett fel uppstår under synkronisering och säkerhetskopiering.</string>
+    <string name="sync_rollout_banner_text">Synkronisering och säkerhetskopiering lanseras lite i taget och det kan hända att funktionen ännu inte är tillgängligt i DuckDuckGo på dina andra enheter</string>
+</resources>

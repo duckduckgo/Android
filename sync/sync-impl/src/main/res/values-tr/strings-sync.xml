@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2021 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <!-- Sync Disabled messages -->
+    <string name="sync_flows_disabled"><b>Senkronizasyon ve Yedekleme Kullanılamıyor</b>\nÜzgünüz, Senkronizasyon ve Yedekleme şu anda kullanılamıyor. Lütfen daha sonra tekrar deneyin.</string>
+    <string name="sync_flows_disabled_new_version"><b>Senkronizasyon ve Yedekleme Kullanılamıyor</b>\nÜzgünüz, Senkronizasyon ve Yedekleme artık bu uygulama sürümünde kullanılamıyor. Devam etmek için lütfen DuckDuckGo\'yu en son sürüme güncelleyin.</string>
+    <string name="sync_create_account_disabled"><b>Senkronizasyon ve Yedekleme Kullanılamıyor</b>\nÜzgünüz, Senkronizasyon ve Yedekleme şu anda kullanılamıyor. Lütfen daha sonra tekrar deneyin.</string>
+    <string name="sync_create_account_disabled_new_version"><b>Senkronizasyon ve Yedekleme Kullanılamıyor</b>\nÜzgünüz, Senkronizasyon ve Yedekleme artık bu uygulama sürümünde kullanılamıyor. Devam etmek için lütfen DuckDuckGo\'yu en son sürüme güncelleyin.</string>
+    <string name="sync_disabled_authenticated_user"><b>Senkronizasyon ve Yedekleme Duraklatıldı</b>\nÜzgünüz, Senkronizasyon ve Yedekleme şu anda kullanılamıyor. Lütfen daha sonra tekrar deneyin.</string>
+    <string name="sync_disabled_authenticated_user_new_version"><b>Senkronizasyon ve Yedekleme Duraklatıldı</b>\nÜzgünüz, ancak Senkronizasyon ve Yedekleme artık bu uygulama sürümünde kullanılamıyor. Devam etmek için lütfen DuckDuckGo\'yu en son sürüme güncelleyin.</string>
+    <string name="sync_paused_notification"><b>Senkronizasyon ve Yedekleme Duraklatıldı</b>\nÜzgünüz, Senkronizasyon ve Yedekleme şu anda kullanılamıyor. Lütfen daha sonra tekrar deneyin.</string>
+
+    <!-- Settings screen -->
+    <string name="sync_screen_title">Senkronizasyon ve Yedekleme</string>
+    <string name="sync_setup_begin_syncing">Senkronizasyonu Başlat</string>
+    <string name="sync_setup_with_another_device_cta_title">Başka Bir Cihazla Senkronize Et</string>
+    <string name="sync_setup_with_another_device_cta_subtitle">Yer imlerini ve parolaları cihazlarınız arasında güvenli bir şekilde senkronize edin.</string>
+    <string name="sync_off_hint">Verileriniz uçtan uca şifrelenir ve DuckDuckGo\'nun şifreleme anahtarına erişimi yoktur.</string>
+    <string name="sync_setup_single_device_title">Tek Cihaz Kurulumu</string>
+    <string name="sync_setup_single_recover_data_cta_title">Senkronize Edilen Verileri Kurtar</string>
+    <string name="sync_setup_single_sync_this_device_cta_title">Bu Cihazı Senkronize Et ve Yedekle</string>
+
+    <string name="sync_off_encrypted_hint">Verileriniz uçtan uca şifrelenir ve DuckDuckGo\'nun şifre çözme anahtarına erişimi yoktur.</string>
+
+    <!-- Setup screen -->
+    <string name="sync_enable_sync_title">Senkronizasyon ve Yedeklemeyi Ayarlama</string>
+    <string name="sync_enable_sync_content">Yer imleriniz ve şifreler senkronize edilmek üzere hazırlanıyor. Bu sadece bir dakikanızı alacaktır.</string>
+    <string name="sync_enable_options">Seçenekler</string>
+    <string name="sync_enable_option_favicons_title">Yer İşareti Simgelerini Getir</string>
+    <string name="sync_enable_option_favicons_subtitle">Senkronize edilmiş yer imleri için simgeleri otomatik olarak indirin.</string>
+    <string name="sync_enable_connecting">Bağlantı kuruluyor...</string>
+    <string name="sync_intro_enable_title">Bu Cihazı Senkronize Et ve Yedekle</string>
+    <string name="sync_intro_enable_content">Bu, DuckDuckGo\'nun güvenli sunucusunda yer işaretlerinizin ve parolalarınızın diğer cihazlarınızla senkronize edilebilen şifreli bir yedeğini oluşturur. \n\n Şifreleme anahtarı yalnızca cihazınızda saklanır, DuckDuckGo buna erişemez....</string>
+    <string name="sync_intro_enable_footer">Daha sonra diğer cihazlarınızla senkronize edebilirsiniz.</string>
+    <string name="sync_intro_enable_cta">Senkronizasyon ve Yedekleme\'yi açın</string>
+    <string name="sync_intro_recover_title">Senkronize Edilen Verileri Kurtar</string>
+    <string name="sync_intro_recover_content">Senkronize edilmiş verilerinizi geri yüklemek için Senkronizasyonu ilk ayarlarken belirlediğiniz Kurtarma Koduna ihtiyacınız olacaktır. Bu kod, Senkronizasyonu yapmak üzere kullandığınız cihaza PDF olarak kaydedilmiş olabilir.</string>
+    <string name="sync_intro_recover_cta">Başlayın</string>
+
+    <!-- Recover data screen -->
+    <string name="login_screen_title">QR Kodunu Tara</string>
+    <string name="login_screen_enter_code_cta">Veya Kodu Manuel Olarak Yaz</string>
+    <string name="login_screen_barcode_hint">Senkronize etmek için kamerayı QR koduna doğrultun</string>
+    <string name="login_screen_cant_scan">Tarayamıyor musunuz? <font color="#7295F6">Metin Kodunu Paylaşın</font></string>
+
+    <!-- Connect screen -->
+    <string name="connect_screen_title">QR Kodunu Tara</string>
+    <string name="connect_screen_scan_qr_hint">Başka bir cihazdaki DuckDuckGo Tarayıcısında <b>Ayarlar &gt; Senkronizasyon ve Yedekleme</b>\'ye gidin ve \"Başka Bir Cihazla Senkronize Et\"i seçin.</string>
+    <string name="connect_screen_enter_code_cta">Veya Kodu Manuel Olarak Yazın</string>
+    <string name="connect_screen_connect_qr_hint_title">Mobilden Mobile mi?</string>
+    <string name="connect_screen_connect_qr_hint_content">Senkronize etmek için bu kodu başka bir cihazla tarayın.</string>
+    <string name="connect_screen_share_code">Kodu Kopyala</string>
+
+    <!-- Enter Code screen -->
+    <string name="enter_code_screen_title">Kodu Manuel Olarak Yaz</string>
+    <string name="sync_enter_code_hint"><b>Ayarlar &gt; Senkronizasyon ve Yedekleme &gt; Başka Bir Cihazla Senkronize Et</b>\'e gidin ve senkronize edilmiş başka bir cihazdaki DuckDuckGo Uygulamasında<b> Metin Kodunu Görüntüle</b>\'yi seçin ve bu cihazı senkronize etmek için kodu buraya yapıştırın.</string>
+    <string name="sync_enter_code_verifying">Kod doğrulanıyor</string>
+    <string name="sync_enter_code_invalid">⚠️ Geçersiz Kod</string>
+    <string name="sync_enter_code_paste">Kodu Yapıştır</string>
+
+    <!-- Recovery PDF screen -->
+    <string name="sync_recovery_code_title">Kurtarma Kodunu Kaydet</string>
+    <string name="sync_save_recovery_code_item_hint">Cihazlarınıza erişiminizi kaybederseniz, senkronize edilmiş verilerinizi kurtarmak için bu koda ihtiyacınız olacaktır.</string>
+    <string name="sync_recovery_code_skip_button">Sonraki</string>
+    <string name="sync_recovery_code_primary_button">PDF olarak kaydet</string>
+    <string name="sync_recovery_code_secondary_button">Kodu Kopyala</string>
+    <string name="sync_code_box_description">Bu koda erişimi olan herkes senkronize edilmiş verilerinize erişebileceği için lütfen bu kodu güvenli bir yerde saklayın.</string>
+
+    <!-- Device synced screen -->
+    <string name="sync_connected_device_title">Verileriniz Senkronize Edildi!</string>
+    <string name="sync_connected_device_primary_button">Bitti</string>
+
+    <string name="show_qr_screen_title">QR Kodunu Göster</string>
+
+    <string name="show_code_screen_title">Kod</string>
+    <string name="enter_code_screen_cta">Metin Kodunu Yaz</string>
+    <string name="sync_login_device_hint">Verilerinizi kurtarmak için Kurtarma PDF\'ndeki veya senkronize edilmiş başka bir cihazdaki QR kodunu tarayın.</string>
+
+    <string name="synced_devices_section_title">Senkronize Edilmiş Cihazlar</string>
+    <string name="sync_new_device_section_title">Yeni Cihazı Senkronize Et</string>
+    <string name="sync_new_device_hint">Farklı bir cihazdaki DuckDuckGo Uygulamasında Ayarlar &gt; Senkronizasyon ve Yedekleme bölümüne gidin ve anında bağlanmak için tarama yapın.</string>
+    <string name="sync_show_text_code_item">Metin Kodunu Göster</string>
+    <string name="sync_show_qr_code_item">QR Kodunu Tara</string>
+    <string name="sync_save_recovery_code_item">Kurtarma PDF\'ini Kaydet</string>
+    <string name="sync_delete_account_item">Sunucu Verilerini Kapat ve Sil…</string>
+    <string name="sync_disable_sync_item">Senkronizasyon ve Yedeklemeyi Kapat...</string>
+    <string name="sync_enable_sync_next_button">Sonraki</string>
+    <string name="sync_recovery_code_content">Cihazlarınıza erişiminizi kaybederseniz, senkronize edilmiş verilerinizi kurtarmak için bu koda ihtiyacınız olacaktır.</string>
+    <string name="sync_recovery_code_hint">Bu koda erişimi olan herkes senkronize edilmiş verilerinize erişebileceği için lütfen bu kodu güvenli bir yerde saklayın.</string>
+
+    <string name="turn_off_sync_dialog_title">Senkronizasyon kapatılsın mı?</string>
+    <string name="turn_off_sync_dialog_content">Bu Cihaz artık senkronize edilen verilerinize erişemeyecektir</string>
+    <string name="turn_off_sync_dialog_primary_button">Kapat</string>
+    <string name="turn_off_sync_dialog_secondary_button">Vazgeç</string>
+    <string name="sync_permission_required_store_recovery_code">Kurtarma PDF\'ini kaydetmek için depolama izni gereklidir</string>
+    <string name="sync_share_title">Paylaş…</string>
+    <string name="sync_pdf_title">Kurtarma Kodunu Senkronize Et</string>
+    <string name="sync_pdf_description">Kurtarma Kodu, yer imlerinizi birden fazla cihaz arasında senkronize etmenize ve bir cihaza erişiminizi kaybetmeniz durumunda senkronize edilmiş verilerinizi kurtarmanıza olanak tanır.</string>
+    <string name="sync_code_box_title">Bu bilgileri güvende tutun.</string>
+    <string name="sync_instructions_title">Bu nasıl çalışıyor?</string>
+    <string name="sync_instructions_step1">DuckDuckGo\'yu başka bir cihazda açın ve Ayarlar\'da Senkronizasyon\'a gidin.</string>
+    <string name="sync_instructions_step2">QR kodunu tarayın veya metin kodunu kopyalayıp başka bir DuckDuckGo uygulamasına yapıştırın.</string>
+    <string name="sync_instructions_step3">Senkronizasyon etkinleştirilir ve tüm verilerinize bir kez daha erişebileceksiniz.</string>
+    <string name="remove_device_dialog_title">Cihaz Kaldırılsın mı?</string>
+    <string name="remove_device_dialog_content" instruction="Placeholder is a device name">\"%1$s\" artık senkronize edilmiş verilerinize erişemeyecektir.</string>
+    <string name="remove_device_dialog_primary_button">Kaldır</string>
+    <string name="remove_device_dialog_secondary_button">Vazgeç</string>
+    <string name="edit_device_dialog_title">Düzenle</string>
+    <string name="edit_device_dialog_hint">Cihaz Adı</string>
+    <string name="edit_device_dialog_primary_button">Tamam</string>
+    <string name="edit_device_dialog_secondary_button">Vazgeç</string>
+    <string name="sync_device_this_device_hint">Bu Cihaz</string>
+    <string name="sync_device_menu_option_edit">Düzenle</string>
+    <string name="sync_device_menu_option_remove">Cihazı Kaldır</string>
+    <string name="sync_show_code_copy">Kodu Kopyala</string>
+    <string name="sync_show_code_copy_hint">İkinci bir cihazda senkronizasyon kurulumu sırasında \"Kodu Manuel Olarak Yaz\"ı seçtikten sonra bu kodu kullanın</string>
+    <string name="sync_code_copied_message">Kurtarma Kodu Kopyalandı</string>
+    <string name="sync_camera_permission_required">Kamera İzni Gereklidir</string>
+    <string name="sync_camera_unavailable">Kamera Kullanılamıyor</string>
+    <string name="sync_camera_permission_required_description">Lütfen cihazınızın ayarlarına gidin ve bu uygulamanın kameranıza erişmesine izin verin.</string>
+    <string name="sync_go_to_settings">Ayarlar\'a gidin</string>
+    <string name="sync_general_error">Bir hata oluştu</string>
+    <string name="sync_notification_channel_name">Senkronizasyon</string>
+    <string name="sync_notify_me_title">Bildirimler devre dışı bırakıldı</string>
+    <string name="sync_notify_me_description">Senkronizasyon ve Yedekleme\'nin bir hatayla karşılaşması durumunda bildirim alın.</string>
+    <string name="sync_rollout_banner_text">Senkronizasyon ve Yedekleme kademeli olarak kullanıma sunulmaktadır ve diğer cihazlarınızda DuckDuckGo\'da henüz mevcut olmayabilir</string>
+</resources>

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2021 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <!-- Sync Disabled messages -->
+    <string name="sync_flows_disabled"><b>Ο Συγχρονισμός και η δημιουργία αντιγράφων ασφάλειας δεν είναι διαθέσιμα</b>\nΔυστυχώς, η λειτουργία Συγχρονισμός και δημιουργία αντιγράφων ασφάλειας δεν είναι διαθέσιμη αυτήν τη στιγμή. Ξαναδοκιμάστε αργότερα.</string>
+    <string name="sync_flows_disabled_new_version"><b>Ο Συγχρονισμός και η δημιουργία αντιγράφων ασφάλειας δεν είναι διαθέσιμα</b>\nΔυστυχώς,η λειτουργία Συγχρονισμός και δημιουργία αντιγράφων ασφάλειας δεν είναι διαθέσιμη σε αυτήν την έκδοση της εφαρμογής. Ενημερώστε το DuckDuckGo στην πιο πρόσφατη έκδοση για να συνεχίσετε.</string>
+    <string name="sync_create_account_disabled"><b>Ο Συγχρονισμός και η δημιουργία αντιγράφων ασφάλειας δεν είναι διαθέσιμα</b>\nΔυστυχώς, η λειτουργία Συγχρονισμός και δημιουργία αντιγράφων ασφάλειας δεν είναι διαθέσιμη αυτήν τη στιγμή. Ξαναδοκιμάστε αργότερα.</string>
+    <string name="sync_create_account_disabled_new_version"><b>Ο Συγχρονισμός και η δημιουργία αντιγράφων ασφάλειας δεν είναι διαθέσιμα</b>\nΔυστυχώς,η λειτουργία Συγχρονισμός και δημιουργία αντιγράφων ασφάλειας δεν είναι διαθέσιμη σε αυτήν την έκδοση της εφαρμογής. Ενημερώστε το DuckDuckGo στην πιο πρόσφατη έκδοση για να συνεχίσετε.</string>
+    <string name="sync_disabled_authenticated_user"><b>Ο Συγχρονισμός και η δημιουργία αντιγράφων ασφάλειας τέθηκαν σε παύση</b>\nΔυστυχώς, η λειτουργία Συγχρονισμός και δημιουργία αντιγράφων ασφάλειας δεν είναι διαθέσιμη αυτήν τη στιγμή. Ξαναδοκιμάστε αργότερα.</string>
+    <string name="sync_disabled_authenticated_user_new_version"><b>Ο Συγχρονισμός και η δημιουργία αντιγράφων ασφάλειας τέθηκαν σε παύση</b>\nΔυστυχώς,η λειτουργία Συγχρονισμός και δημιουργία αντιγράφων ασφάλειας δεν είναι διαθέσιμη σε αυτήν την έκδοση της εφαρμογής. Ενημερώστε το DuckDuckGo στην πιο πρόσφατη έκδοση για να συνεχίσετε.</string>
+    <string name="sync_paused_notification"><b>Ο Συγχρονισμός και η δημιουργία αντιγράφων ασφάλειας τέθηκαν σε παύση</b>\nΔυστυχώς, η λειτουργία Συγχρονισμός και δημιουργία αντιγράφων ασφάλειας δεν είναι διαθέσιμη αυτήν τη στιγμή. Ξαναδοκιμάστε αργότερα.</string>
+
+    <!-- Settings screen -->
+    <string name="sync_screen_title">Συγχρονισμός και δημιουργία αντιγράφων ασφαλείας</string>
+    <string name="sync_setup_begin_syncing">Έναρξη συγχρονισμού</string>
+    <string name="sync_setup_with_another_device_cta_title">Συγχρονισμός με άλλη συσκευή</string>
+    <string name="sync_setup_with_another_device_cta_subtitle">Συγχρονίστε με ασφάλεια σελιδοδείκτες και κωδικούς πρόσβασης μεταξύ των συσκευών σας.</string>
+    <string name="sync_off_hint">Τα δεδομένα σας είναι κρυπτογραφημένα από άκρο σε άκρο και το DuckDuckGo δεν έχει πρόσβαση στο κλειδί κρυπτογράφησης.</string>
+    <string name="sync_setup_single_device_title">Εγκατάσταση μίας συσκευής</string>
+    <string name="sync_setup_single_recover_data_cta_title">Ανάκτηση συγχρονισμένων δεδομένων</string>
+    <string name="sync_setup_single_sync_this_device_cta_title">Συγχρονισμός και δημιουργία αντιγράφων ασφάλειας αυτής της συσκευής</string>
+
+    <string name="sync_off_encrypted_hint">Τα δεδομένα σας είναι κρυπτογραφημένα από άκρο σε άκρο και το DuckDuckGo δεν έχει πρόσβαση στο κλειδί αποκρυπτογράφησης.</string>
+
+    <!-- Setup screen -->
+    <string name="sync_enable_sync_title">Ρύθμιση Συγχρονισμού και δημιουργίας αντιγράφων ασφάλειας!</string>
+    <string name="sync_enable_sync_content">Οι σελιδοδείκτες και οι κωδικοί πρόσβασής σας προετοιμάζονται για συγχρονισμό. Αυτό θα πρέπει να διαρκέσει ελάχιστο χρόνο.</string>
+    <string name="sync_enable_options">Επιλογές</string>
+    <string name="sync_enable_option_favicons_title">Λήψη εικονιδίων σελιδοδείκτη</string>
+    <string name="sync_enable_option_favicons_subtitle">Αυτόματη λήψη εικονιδίων για τους συγχρονισμένους σελιδοδείκτες.</string>
+    <string name="sync_enable_connecting">Σύνδεση...</string>
+    <string name="sync_intro_enable_title">Συγχρονισμός και δημιουργία αντιγράφων ασφάλειας αυτής της συσκευής</string>
+    <string name="sync_intro_enable_content">Αυτό δημιουργεί ένα κρυπτογραφημένο αντίγραφο ασφάλειας των σελιδοδεικτών και των κωδικών πρόσβασής σας στον ασφαλή διακομιστή του DuckDuckGo, το οποίο μπορεί να συγχρονιστεί με τις άλλες συσκευές σας. Το κλειδί κρυπτογράφησης αποθηκεύεται μόνο στη συσκευή σας. Δεν μπορεί να έχει πρόσβαση σε αυτό το DuckDuckGo...</string>
+    <string name="sync_intro_enable_footer">Μπορείτε να προβείτε σε συγχρονισμό με τις άλλες συσκευές σας αργότερα.</string>
+    <string name="sync_intro_enable_cta">Ενεργοποίηση συγχρονισμού και δημιουργίας αντιγράφων ασφαλείας</string>
+    <string name="sync_intro_recover_title">Ανάκτηση συγχρονισμένων δεδομένων</string>
+    <string name="sync_intro_recover_content">Για να κάνετε επαναφορά των συγχρονισμένων δεδομένων σας, θα χρειαστείτε τον Κωδικό ανάκτησης που αποθηκεύσατε κατά την πρώτη ρύθμιση του Συγχρονισμού. Αυτός ο κωδικός ενδέχεται να έχει αποθηκευτεί ως PDF στη συσκευή που χρησιμοποιήσατε αρχικά για ρύθμιση του Συγχρονισμού.</string>
+    <string name="sync_intro_recover_cta">Ξεκινήστε</string>
+
+    <!-- Recover data screen -->
+    <string name="login_screen_title">Σάρωση κώδικα QR</string>
+    <string name="login_screen_enter_code_cta">Ή εισαγάγετε μη αυτόματα τον κωδικό</string>
+    <string name="login_screen_barcode_hint">Στρέψτε την κάμερα στον κωδικό QR για συγχρονισμό</string>
+    <string name="login_screen_cant_scan">Δεν είναι δυνατή η σάρωση; <font color="#7295F6">Κοινοποίηση κωδικού κειμένου</font></string>
+
+    <!-- Connect screen -->
+    <string name="connect_screen_title">Σάρωση κώδικα QR</string>
+    <string name="connect_screen_scan_qr_hint">Μεταβείτε στην ενότητα <b>Ρυθμίσεις › Συγχρονισμός και δημιουργία αντιγράφων ασφάλειας</b> στο πρόγραμμα περιήγησης DuckDuckGo σε άλλη συσκευή και επιλέξτε «Συγχρονισμός με άλλη συσκευή».</string>
+    <string name="connect_screen_enter_code_cta">Ή εισαγάγετε μη αυτόματα τον κωδικό</string>
+    <string name="connect_screen_connect_qr_hint_title">Από κινητό σε κινητό;</string>
+    <string name="connect_screen_connect_qr_hint_content">Σαρώστε αυτόν τον κωδικό με άλλη συσκευή για συγχρονισμό.</string>
+    <string name="connect_screen_share_code">Αντιγραφή κωδικού</string>
+
+    <!-- Enter Code screen -->
+    <string name="enter_code_screen_title">Μη αυτόματη εισαγωγή κωδικού</string>
+    <string name="sync_enter_code_hint">Μεταβείτε στις <b>Ρυθμίσεις &gt; Συγχρονισμός και δημιουργία αντιγράφων ασφάλειας &gt; Συγχρονισμός με άλλη συσκευή</b> και επιλέξτε <b>Προβολή κωδικού κειμένου</b> στην εφαρμογή DuckDuckGo σε μια άλλη συγχρονισμένη συσκευή και επικολλήστε τον κωδικό εδώ για συγχρονισμό αυτής της συσκευής.</string>
+    <string name="sync_enter_code_verifying">Επαλήθευση κωδικού</string>
+    <string name="sync_enter_code_invalid">⚠️ Μη έγκυρος κωδικός</string>
+    <string name="sync_enter_code_paste">Επικόλληση κωδικού</string>
+
+    <!-- Recovery PDF screen -->
+    <string name="sync_recovery_code_title">Αποθήκευση κωδικού ανάκτησης</string>
+    <string name="sync_save_recovery_code_item_hint">Σε περίπτωση που χάσετε την πρόσβαση στις συσκευές σας, θα χρειαστείτε αυτόν τον κωδικό για να ανακτήσετε τα συγχρονισμένα δεδομένα σας.</string>
+    <string name="sync_recovery_code_skip_button">Επόμενο</string>
+    <string name="sync_recovery_code_primary_button">Αποθήκευση ως PDF</string>
+    <string name="sync_recovery_code_secondary_button">Αντιγραφή κωδικού</string>
+    <string name="sync_code_box_description">Οποιοσδήποτε με πρόσβαση σε αυτόν τον κωδικό μπορεί να έχει πρόσβαση στα συγχρονισμένα δεδομένα σας. Γι\' αυτό φυλάξτε τον σε ασφαλές μέρος.</string>
+
+    <!-- Device synced screen -->
+    <string name="sync_connected_device_title">Τα δεδομένα σας είναι συγχρονισμένα!</string>
+    <string name="sync_connected_device_primary_button">Ολοκληρώθηκε</string>
+
+    <string name="show_qr_screen_title">Εμφάνιση Κωδικού QR</string>
+
+    <string name="show_code_screen_title">Κωδικός</string>
+    <string name="enter_code_screen_cta">Εισαγωγή κωδικού κειμένου</string>
+    <string name="sync_login_device_hint">Σαρώστε τον κωδικό QR στο PDF ανάκτησης ή σε άλλη συγχρονισμένη συσκευή για ανάκτηση των δεδομένων σας.</string>
+
+    <string name="synced_devices_section_title">Συγχρονισμένες συσκευές</string>
+    <string name="sync_new_device_section_title">Συγχρονισμός νέας συσκευής</string>
+    <string name="sync_new_device_hint">Μεταβείτε στις Ρυθμίσεις &gt; Συγχρονισμός και δημιουργία αντιγράφων ασφάλειας στην εφαρμογή DuckDuckGo σε μια διαφορετική συσκευή και σαρώστε για άμεση σύνδεση.</string>
+    <string name="sync_show_text_code_item">Εμφάνιση κωδικού κειμένου</string>
+    <string name="sync_show_qr_code_item">Σάρωση κώδικα QR</string>
+    <string name="sync_save_recovery_code_item">Αποθήκευση ανάκτησης PDF</string>
+    <string name="sync_delete_account_item">Απενεργοποίηση και διαγραφή δεδομένων διακομιστή…</string>
+    <string name="sync_disable_sync_item">Απενεργοποίηση Συγχρονισμού και δημιουργία αντιγράφων ασφάλειας...</string>
+    <string name="sync_enable_sync_next_button">Επόμενο</string>
+    <string name="sync_recovery_code_content">Σε περίπτωση που χάσετε την πρόσβαση στις συσκευές σας, θα χρειαστείτε αυτόν τον κωδικό για να ανακτήσετε τα συγχρονισμένα δεδομένα σας.</string>
+    <string name="sync_recovery_code_hint">Οποιοσδήποτε με πρόσβαση σε αυτόν τον κωδικό μπορεί να έχει πρόσβαση στα συγχρονισμένα δεδομένα σας. Γι\' αυτό φυλάξτε τον σε ασφαλές μέρος.</string>
+
+    <string name="turn_off_sync_dialog_title">Απενεργοποίηση συγχρονισμού;</string>
+    <string name="turn_off_sync_dialog_content">Αυτή η Συσκευή δεν θα μπορεί πλέον να έχει πρόσβαση στα συγχρονισμένα δεδομένα σας</string>
+    <string name="turn_off_sync_dialog_primary_button">Απενεργοποίηση</string>
+    <string name="turn_off_sync_dialog_secondary_button">Ακύρωση</string>
+    <string name="sync_permission_required_store_recovery_code">Η αποθήκευση του PDF ανάκτησης απαιτεί άδεια αποθήκευσης</string>
+    <string name="sync_share_title">Κοινή χρήση με...</string>
+    <string name="sync_pdf_title">Συγχρονισμός κωδικού ανάκτησης</string>
+    <string name="sync_pdf_description">Ο Κωδικός ανάκτησης σάς επιτρέπει να συγχρονίζετε τους σελιδοδείκτες σας σε πολλές συσκευές και να ανακτάτε τα συγχρονισμένα δεδομένα σας σε περίπτωση που χάσετε την πρόσβαση σε μια συσκευή.</string>
+    <string name="sync_code_box_title">Διατηρήστε αυτές τις πληροφορίες ασφαλείς.</string>
+    <string name="sync_instructions_title">Πώς λειτουργεί αυτό;</string>
+    <string name="sync_instructions_step1">Ανοίξτε το DuckDuckGo σε μια άλλη συσκευή και μεταβείτε στον Συγχρονισμό από τις Ρυθμίσεις.</string>
+    <string name="sync_instructions_step2">Σαρώστε τον Κωδικό QR ή αντιγράψτε και επικολλήστε τον κωδικό κειμένου σε μια άλλη εφαρμογή του DuckDuckGo.</string>
+    <string name="sync_instructions_step3">Ο Συγχρονισμός θα ενεργοποιηθεί και θα έχετε και πάλι πρόσβαση σε όλα τα δεδομένα σας.</string>
+    <string name="remove_device_dialog_title">Αφαίρεση συσκευής;</string>
+    <string name="remove_device_dialog_content" instruction="Placeholder is a device name">Το «%1$s» δεν θα μπορεί πλέον να έχει πρόσβαση στα συγχρονισμένα δεδομένα σας.</string>
+    <string name="remove_device_dialog_primary_button">Αφαίρεση</string>
+    <string name="remove_device_dialog_secondary_button">Ακύρωση</string>
+    <string name="edit_device_dialog_title">Επεξεργασία</string>
+    <string name="edit_device_dialog_hint">Όνομα συσκευής</string>
+    <string name="edit_device_dialog_primary_button">Εντάξει</string>
+    <string name="edit_device_dialog_secondary_button">Ακύρωση</string>
+    <string name="sync_device_this_device_hint">Αυτή η συσκευή</string>
+    <string name="sync_device_menu_option_edit">Επεξεργασία</string>
+    <string name="sync_device_menu_option_remove">Αφαίρεση συσκευής</string>
+    <string name="sync_show_code_copy">Αντιγραφή κωδικού</string>
+    <string name="sync_show_code_copy_hint">Χρησιμοποιήστε αυτόν τον κωδικό αφού επιλέξετε «Μη αυτόματη εισαγωγή κωδικού» κατά τη διάρκεια της ρύθμισης συγχρονισμού σε μια δεύτερη συσκευή</string>
+    <string name="sync_code_copied_message">Αντιγραφή κωδικού ανάκτησης</string>
+    <string name="sync_camera_permission_required">Απαιτείται άδεια κάμερας</string>
+    <string name="sync_camera_unavailable">Μη διαθέσιμη κάμερα</string>
+    <string name="sync_camera_permission_required_description">Μεταβείτε στις ρυθμίσεις της συσκευής σας και παρέχετε σε αυτήν την εφαρμογή άδεια πρόσβασης στην κάμερά σας.</string>
+    <string name="sync_go_to_settings">Μεταβείτε στις Ρυθμίσεις</string>
+    <string name="sync_general_error">Κάτι πήγε λάθος</string>
+    <string name="sync_notification_channel_name">Συγχρονισμός</string>
+    <string name="sync_notify_me_title">Οι ειδοποιήσεις είναι απενεργοποιημένες</string>
+    <string name="sync_notify_me_description">Ειδοποιηθείτε σε περίπτωση που η λειτουργία Συγχρονισμός και δημιουργία αντιγράφων ασφάλειας αντιμετωπίσει κάποιο σφάλμα.</string>
+    <string name="sync_rollout_banner_text">Η λειτουργία Συγχρονισμός και δημιουργία αντιγράφων ασφάλειας κυκλοφορεί σταδιακά και ενδέχεται να μην είναι ακόμα διαθέσιμη στο DuckDuckGo στις άλλες συσκευές σας</string>
+</resources>

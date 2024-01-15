@@ -14,6 +14,8 @@
   ~ limitations under the License.
   -->
 
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
 <resources>
     <!-- Setup screen -->
     <string name="sync_enable_option_favorites_title">Share Favorites</string>

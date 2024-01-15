@@ -133,4 +133,6 @@
     <string name="managementDisabledModeSubtitle">Slaptažodžiams apsaugoti reikia naudoti įrenginio užrakinimo šabloną, PIN kodą arba biometrinius duomenis.</string>
     <string name="credentialManagementEditTitle">Redaguoti slaptažodį</string>
 
+    <string name="credentials_limit_warning"><b>Sinchronizavimas pristabdytas</b>\nViršyta prisijungimų riba. Ištrinkite kai kuriuos, kad tęstumėte sinchronizavimą.\n\n<annotation type="manage_logins">Valdyti prisijungimus</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Slaptažodžių sinchronizavimas pristabdytas</b>\nJūs viršijote slaptažodžių sinchronizavimo ribą. Pabandykite ištrinti kai kuriuos slaptažodžius. Kol ši problema nebus išspręsta, nebus kuriamos atsarginės jūsų slaptažodžių kopijos.</string>
 </resources>

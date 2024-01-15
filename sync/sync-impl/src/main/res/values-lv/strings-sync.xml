@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2021 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <!-- Sync Disabled messages -->
+    <string name="sync_flows_disabled"><b>Sinhronizācija un dublēšana nav pieejama</b>\nDiemžēl sinhronizācija un dublēšana pašlaik nav pieejama. Lūdzu, mēģini vēlreiz vēlāk.</string>
+    <string name="sync_flows_disabled_new_version"><b>Sinhronizācija un dublēšana nav pieejama</b>\nDiemžēl sinhronizācija un dublēšana vairs nav pieejama šajā lietotnes versijā. Lai turpinātu, lūdzu, atjaunini DuckDuckGo uz jaunāko versiju.</string>
+    <string name="sync_create_account_disabled"><b>Sinhronizācija un dublēšana nav pieejama</b>\nDiemžēl sinhronizācija un dublēšana pašlaik nav pieejama. Lūdzu, mēģini vēlreiz vēlāk.</string>
+    <string name="sync_create_account_disabled_new_version"><b>Sinhronizācija un dublēšana nav pieejama</b>\nDiemžēl sinhronizācija un dublēšana vairs nav pieejama šajā lietotnes versijā. Lai turpinātu, lūdzu, atjaunini DuckDuckGo uz jaunāko versiju.</string>
+    <string name="sync_disabled_authenticated_user"><b>Sinhronizācija un dublēšana pātraukta</b>\nDiemžēl sinhronizācija un dublēšana pašlaik nav pieejama. Lūdzu, mēģini vēlreiz vēlāk.</string>
+    <string name="sync_disabled_authenticated_user_new_version"><b>Sinhronizācija un dublēšana pātraukta</b>\nDiemžēl sinhronizācija un dublēšana šajā lietotnes versijā vairs nav pieejama. Lai turpinātu, lūdzu, atjaunini DuckDuckGo uz jaunāko versiju.</string>
+    <string name="sync_paused_notification"><b>Sinhronizācija un dublēšana pātraukta</b>\nDiemžēl sinhronizācija un dublēšana pašlaik nav pieejama. Lūdzu, mēģini vēlreiz vēlāk.</string>
+
+    <!-- Settings screen -->
+    <string name="sync_screen_title">Sinhronizācija un dublēšana</string>
+    <string name="sync_setup_begin_syncing">Sinhronizācijas sākšana</string>
+    <string name="sync_setup_with_another_device_cta_title">Sinhronizēt ar citu ierīci</string>
+    <string name="sync_setup_with_another_device_cta_subtitle">Droši sinhronizē grāmatzīmes un paroles starp ierīcēm.</string>
+    <string name="sync_off_hint">Tavi dati tiek šifrēti no gala līdz galam, un DuckDuckGo nav piekļuves šifrēšanas atslēgai.</string>
+    <string name="sync_setup_single_device_title">Vienas ierīces iestatīšana</string>
+    <string name="sync_setup_single_recover_data_cta_title">Sinhronizēto datu atgūšana</string>
+    <string name="sync_setup_single_sync_this_device_cta_title">Šīs ierīces sinhronizācija un dublēšana</string>
+
+    <string name="sync_off_encrypted_hint">Tavi dati ir šifrēti no gala līdz galam, un DuckDuckGo nav piekļuves atšifrēšanas atslēgai.</string>
+
+    <!-- Setup screen -->
+    <string name="sync_enable_sync_title">Sinhronizācijas un dublēšanas iestatīšana!</string>
+    <string name="sync_enable_sync_content">Tavas grāmatzīmes un paroles tiek sagatavotas sinhronizēšanai. Tam vajadzētu aizņemt tikai neilgu brīdi.</string>
+    <string name="sync_enable_options">Opcijas</string>
+    <string name="sync_enable_option_favicons_title">Ienest grāmatzīmju ikonas</string>
+    <string name="sync_enable_option_favicons_subtitle">Automātiski lejupielādēt ikonas sinhronizētām grāmatzīmēm.</string>
+    <string name="sync_enable_connecting">Notiek savienojuma izveide…</string>
+    <string name="sync_intro_enable_title">Šīs ierīces sinhronizācija un dublēšana</string>
+    <string name="sync_intro_enable_content">Tādējādi DuckDuckGo drošajā serverī tiek izveidota šifrēta grāmatzīmju un paroļu dublējumkopija, ko var sinhronizēt ar citām ierīcēm. \n\n Šifrēšanas atslēga tiek saglabāta tikai tavā ierīcē, DuckDuckGo tai nevar piekļūt...</string>
+    <string name="sync_intro_enable_footer">Vēlāk vari sinhronizēt ar citām ierīcēm.</string>
+    <string name="sync_intro_enable_cta">Ieslēgt sinhronizāciju un dublēšanu</string>
+    <string name="sync_intro_recover_title">Sinhronizēto datu atgūšana</string>
+    <string name="sync_intro_recover_content">Lai atjaunotu sinhronizētos datus, ir nepieciešams atgūšanas kods, ko saglabāji, kad pirmo reizi iestatīji sinhronizāciju. Šis kods, iespējams, ir saglabāts PDF formātā ierīcē, kuru sākotnēji izmantoji sinhronizācijas iestatīšanai.</string>
+    <string name="sync_intro_recover_cta">Sākt darbu</string>
+
+    <!-- Recover data screen -->
+    <string name="login_screen_title">Kvadrātkoda skenēšana</string>
+    <string name="login_screen_enter_code_cta">Vai manuāli ievadi kodu</string>
+    <string name="login_screen_barcode_hint">Pavērs kameru pret kvadrātkodu, lai sinhronizētu</string>
+    <string name="login_screen_cant_scan">Nevari skenēt? <font color="#7295F6">Kopīgo teksta kodu</font></string>
+
+    <!-- Connect screen -->
+    <string name="connect_screen_title">Kvadrātkoda skenēšana</string>
+    <string name="connect_screen_scan_qr_hint">Dodies uz <b>Iestatījumi &gt; Sinhronizācija un dublēšana</b> DuckDuckGo pārlūkā citā ierīcē un izvēlies \"Sinhronizēt ar citu ierīci.\"</string>
+    <string name="connect_screen_enter_code_cta">Vai manuāli ievadi kodu</string>
+    <string name="connect_screen_connect_qr_hint_title">No mobilā uz mobilo?</string>
+    <string name="connect_screen_connect_qr_hint_content">Lai sinhronizētu, skenē šo kodu ar citu ierīci.</string>
+    <string name="connect_screen_share_code">Kopēt kodu</string>
+
+    <!-- Enter Code screen -->
+    <string name="enter_code_screen_title">Manuāla koda ievadīšana</string>
+    <string name="sync_enter_code_hint">Dodies uz <b>Iestatījumi &gt; Sinhronizācija un dublēšana &gt; Sinhronizācija ar citu ierīci</b> un izvēlies <b>Skatīt teksta kodu</b> DuckDuckGo lietotnē citā sinhronizētā ierīcē, un ielīmē kodu šeit, lai sinhronizētu šo ierīci.</string>
+    <string name="sync_enter_code_verifying">Pārbauda kodu</string>
+    <string name="sync_enter_code_invalid">⚠️ Nederīgs kods</string>
+    <string name="sync_enter_code_paste">Ielīmē kodu</string>
+
+    <!-- Recovery PDF screen -->
+    <string name="sync_recovery_code_title">Saglabāt atgūšanas kodu</string>
+    <string name="sync_save_recovery_code_item_hint">Ja zaudēsi piekļuvi savām ierīcēm, šis kods būs nepieciešams, lai atjaunotu sinhronizētos datus.</string>
+    <string name="sync_recovery_code_skip_button">Nākamais</string>
+    <string name="sync_recovery_code_primary_button">Saglabāt kā PDF</string>
+    <string name="sync_recovery_code_secondary_button">Kopēt kodu</string>
+    <string name="sync_code_box_description">Sinhronizētajiem datiem var piekļūt ikviens, kam ir šis kods, tāpēc glabā to drošā vietā.</string>
+
+    <!-- Device synced screen -->
+    <string name="sync_connected_device_title">Tavi dati ir sinhronizēti!</string>
+    <string name="sync_connected_device_primary_button">Gatavs</string>
+
+    <string name="show_qr_screen_title">Rādīt kvadrātkodu</string>
+
+    <string name="show_code_screen_title">Kods</string>
+    <string name="enter_code_screen_cta">Ievadi teksta kodu</string>
+    <string name="sync_login_device_hint">Skenē kvadrātkodu savā atgūšanas PDF failā vai citā sinhronizētā ierīcē, lai atgūtu datus.</string>
+
+    <string name="synced_devices_section_title">Sinhronizētās ierīces</string>
+    <string name="sync_new_device_section_title">Sinhronizēt jaunu ierīci</string>
+    <string name="sync_new_device_hint">Dodies uz Iestatījumi &gt; Sinhronizācija un dublēšana DuckDuckGo lietotnē citā ierīcē un skenē, lai uzreiz izveidotu savienojumu.</string>
+    <string name="sync_show_text_code_item">Rādīt teksta kodu</string>
+    <string name="sync_show_qr_code_item">Kvadrātkoda skenēšana</string>
+    <string name="sync_save_recovery_code_item">Saglabāt atgūšanas PDF</string>
+    <string name="sync_delete_account_item">Izslēgt un dzēst servera datus…</string>
+    <string name="sync_disable_sync_item">Izslēgt sinhronizāciju un dublēšanu…</string>
+    <string name="sync_enable_sync_next_button">Nākamais</string>
+    <string name="sync_recovery_code_content">Ja zaudēsi piekļuvi savām ierīcēm, šis kods būs nepieciešams, lai atjaunotu sinhronizētos datus.</string>
+    <string name="sync_recovery_code_hint">Sinhronizētajiem datiem var piekļūt ikviens, kam ir šis kods, tāpēc glabā to drošā vietā.</string>
+
+    <string name="turn_off_sync_dialog_title">Izslēgt sinhronizāciju?</string>
+    <string name="turn_off_sync_dialog_content">Šī ierīce vairs nevarēs piekļūt taviem sinhronizētajiem datiem</string>
+    <string name="turn_off_sync_dialog_primary_button">Izslēgt</string>
+    <string name="turn_off_sync_dialog_secondary_button">Atcelt</string>
+    <string name="sync_permission_required_store_recovery_code">Lai saglabātu atkopšanas PDF failu, ir nepieciešama krātuves atļauja</string>
+    <string name="sync_share_title">Kopīgot ar…</string>
+    <string name="sync_pdf_title">Sinhronizācijas atgūšanas kods</string>
+    <string name="sync_pdf_description">Atgūšanas kods ļauj sinhronizēt grāmatzīmes vairākās ierīcēs un atjaunot sinhronizētos datus, ja zaudē piekļuvi kādai ierīcei.</string>
+    <string name="sync_code_box_title">Glabā šo informāciju drošībā.</string>
+    <string name="sync_instructions_title">Kā tas darbojas?</string>
+    <string name="sync_instructions_step1">Atver DuckDuckGo citā ierīcē un iestatījumos atver sadaļu Sinhronizācija.</string>
+    <string name="sync_instructions_step2">Skenējiet kvadrātkodu vai nokopē un ielīmē teksta kodu citā DuckDuckGo lietotnē.</string>
+    <string name="sync_instructions_step3">Sinhronizācija tiks aktivizēta, un tev atkal būs pieejami visi tavi dati.</string>
+    <string name="remove_device_dialog_title">Noņemt ierīci?</string>
+    <string name="remove_device_dialog_content" instruction="Placeholder is a device name">\"%1$s\" vairs nevarēs piekļūt taviem sinhronizētajiem datiem.</string>
+    <string name="remove_device_dialog_primary_button">Noņemt</string>
+    <string name="remove_device_dialog_secondary_button">Atcelt</string>
+    <string name="edit_device_dialog_title">Rediģēt</string>
+    <string name="edit_device_dialog_hint">Ierīces nosaukums</string>
+    <string name="edit_device_dialog_primary_button">Labi</string>
+    <string name="edit_device_dialog_secondary_button">Atcelt</string>
+    <string name="sync_device_this_device_hint">Šī ierīce</string>
+    <string name="sync_device_menu_option_edit">Rediģēt</string>
+    <string name="sync_device_menu_option_remove">Noņemt ierīci</string>
+    <string name="sync_show_code_copy">Kopēt kodu</string>
+    <string name="sync_show_code_copy_hint">Izmanto šo kodu, kad sinhronizācijas iestatīšanas laikā otrajā ierīcē esi izvēlējies \"Manuāli ievadīt kodu\"</string>
+    <string name="sync_code_copied_message">Atgūšanas kods nokopēts</string>
+    <string name="sync_camera_permission_required">Nepieciešama kameras atļauja</string>
+    <string name="sync_camera_unavailable">Kamera nav pieejama</string>
+    <string name="sync_camera_permission_required_description">Lūdzu, dodies uz ierīces iestatījumiem un piešķir atļauju šai lietotnei piekļūt kamerai.</string>
+    <string name="sync_go_to_settings">Doties uz Iestatījumiem</string>
+    <string name="sync_general_error">Kaut kas notika nepareizi</string>
+    <string name="sync_notification_channel_name">Sinhronizēt</string>
+    <string name="sync_notify_me_title">Paziņojumi ir atspējoti</string>
+    <string name="sync_notify_me_description">Saņem paziņojumu, ja sinhronizācijas un dublēšanas laikā rodas kļūda.</string>
+    <string name="sync_rollout_banner_text">Sinhronizācija un dublēšana tiek ieviesta pakāpeniski, un tā var vēl nebūt pieejama DuckDuckGo citās ierīcēs</string>
+</resources>

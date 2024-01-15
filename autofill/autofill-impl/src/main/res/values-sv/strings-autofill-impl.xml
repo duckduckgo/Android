@@ -133,4 +133,6 @@
     <string name="managementDisabledModeSubtitle">För att skydda dina lösenord krävs ett enhetslåsmönster, en PIN-kod eller biometri.</string>
     <string name="credentialManagementEditTitle">Redigera lösenord</string>
 
+    <string name="credentials_limit_warning"><b>Synkronisering pausad</b>\nGränsen för antalet inloggningar har överskridits. Ta bort några för att återuppta synkronisering.\n\n<annotation type="manage_logins">Hantera inloggningar</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Synkronisering av lösenord pausad</b>\nDu har överskridit gränsen för antalet lösenords som kan synkroniseras. Ta bort några lösenord. Dina lösenord kommer inte att säkerhetskopieras förrän detta har åtgärdats.</string>
 </resources>

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2021 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <!-- Sync Disabled messages -->
+    <string name="sync_flows_disabled"><b>Sinkronizacija i sigurnosno kopiranje nisu dostupni</b>\nNažalost, sinkronizacija i sigurnosno kopiranje trenutačno nisu dostupni. Pokušaj ponovno nešto kasnije.</string>
+    <string name="sync_flows_disabled_new_version"><b>Sinkronizacija i sigurnosno kopiranje nisu dostupni</b>\nNažalost, sinkronizacija i sigurnosno kopiranje više nisu dostupni u ovoj verziji aplikacije. Za nastavak, ažuriraj DuckDuckGo na najnoviju verziju.</string>
+    <string name="sync_create_account_disabled"><b>Sinkronizacija i sigurnosno kopiranje nisu dostupni</b>\nNažalost, sinkronizacija i sigurnosno kopiranje trenutačno nisu dostupni. Pokušaj ponovno nešto kasnije.</string>
+    <string name="sync_create_account_disabled_new_version"><b>Sinkronizacija i sigurnosno kopiranje nisu dostupni</b>\nNažalost, sinkronizacija i sigurnosno kopiranje više nisu dostupni u ovoj verziji aplikacije. Za nastavak ažuriraj DuckDuckGo na najnoviju verziju.</string>
+    <string name="sync_disabled_authenticated_user"><b>Sinkronizacija i sigurnosno kopiranje pauzirani</b>\nŽao nam je, ali sinkronizacija i sigurnosno kopiranje trenutačno nisu dostupni. Pokušaj ponovno nešto kasnije.</string>
+    <string name="sync_disabled_authenticated_user_new_version"><b>Sinkronizacija i sigurnosno kopiranje pauzirani</b>\nŽao nam je, ali sinkronizacija i sigurnosno kopiranje više nisu dostupni u ovoj verziji aplikacije. Za nastavak ažuriraj DuckDuckGo na najnoviju verziju.</string>
+    <string name="sync_paused_notification"><b>Sinkronizacija i sigurnosno kopiranje su pauzirani</b>\nNažalost, sinkronizacija i sigurnosno kopiranje trenutačno nisu dostupni. Pokušaj ponovno nešto kasnije.</string>
+
+    <!-- Settings screen -->
+    <string name="sync_screen_title">Sinkronizacija i sigurnosno kopiranje</string>
+    <string name="sync_setup_begin_syncing">Započni sinkronizaciju</string>
+    <string name="sync_setup_with_another_device_cta_title">Sinkronizacija s drugim uređajem</string>
+    <string name="sync_setup_with_another_device_cta_subtitle">Sigurno sinkroniziraj oznake i lozinke između svojih uređaja.</string>
+    <string name="sync_off_hint">Tvoji su podaci šifrirani od početka do kraja, a DuckDuckGo nema pristup ključu za šifriranje.</string>
+    <string name="sync_setup_single_device_title">Postavljanje jednog uređaja</string>
+    <string name="sync_setup_single_recover_data_cta_title">Oporavak sinkroniziranih podataka</string>
+    <string name="sync_setup_single_sync_this_device_cta_title">Sinkroniziraj i izradi sigurnosnu kopiju ovog uređaja</string>
+
+    <string name="sync_off_encrypted_hint">Tvoji su podaci šifrirani od početka do kraja, a DuckDuckGo nema pristup ključu za šifriranje.</string>
+
+    <!-- Setup screen -->
+    <string name="sync_enable_sync_title">Postavljanje sinkronizacije i sigurnosnog kopiranja!</string>
+    <string name="sync_enable_sync_content">Tvoje oznake i lozinke se pripremaju za sinkronizaciju. Ovo bi trebalo trajati samo trenutak.</string>
+    <string name="sync_enable_options">Opcije</string>
+    <string name="sync_enable_option_favicons_title">Dohvaćanje ikona knjižnih oznaka</string>
+    <string name="sync_enable_option_favicons_subtitle">Automatski preuzmi ikone za sinkronizirane oznake.</string>
+    <string name="sync_enable_connecting">Povezivanje u tijeku...</string>
+    <string name="sync_intro_enable_title">Sinkroniziraj i izradi sigurnosnu kopiju ovog uređaja</string>
+    <string name="sync_intro_enable_content">Time se stvara šifrirana sigurnosna kopija tvojih oznaka i lozinki na sigurnom poslužitelju DuckDuckGo, koja se može sinkronizirati s tvojim drugim uređajima. \n\n Ključ za šifriranje pohranjen je samo na tvom uređaju, DuckDuckGo mu ne može pristupiti.…</string>
+    <string name="sync_intro_enable_footer">Kasnije možeš sinkronizirati s drugim uređajima.</string>
+    <string name="sync_intro_enable_cta">Uključi sinkronizaciju i sigurnosno kopiranje</string>
+    <string name="sync_intro_recover_title">Oporavak sinkroniziranih podataka</string>
+    <string name="sync_intro_recover_content">Za vraćanje sinkroniziranih podataka, trebat će ti šifra za oporavak koju si spremio prilikom prvog postavljanja sinkronizacije. Ta je šifra možda spremljena kao PDF na uređaju koji je izvorno korišten za postavljanje sinkronizacije.</string>
+    <string name="sync_intro_recover_cta">Započnite</string>
+
+    <!-- Recover data screen -->
+    <string name="login_screen_title">Skeniraj QR kôd</string>
+    <string name="login_screen_enter_code_cta">Ili ručno unesi šifru</string>
+    <string name="login_screen_barcode_hint">Usmjeri kameru prema QR kodu za sinkronizaciju</string>
+    <string name="login_screen_cant_scan">Ne možeš skenirati? <font color="#7295F6">Podijeli tekstualnu šifru</font></string>
+
+    <!-- Connect screen -->
+    <string name="connect_screen_title">Skeniraj QR kôd</string>
+    <string name="connect_screen_scan_qr_hint">Idi na <b>Postavke &gt; Sinkronizacija i sigurnosno kopiranje</b> u pregledniku DuckDuckGo na drugom uređaju i odaberi \"Sinkroniziraj s drugim uređajem\".</string>
+    <string name="connect_screen_enter_code_cta">Ili ručno unesi šifru</string>
+    <string name="connect_screen_connect_qr_hint_title">S mobilnog uređaja na mobilni uređaj?</string>
+    <string name="connect_screen_connect_qr_hint_content">Skeniraj ovaj kôd drugim uređajem za sinkronizaciju.</string>
+    <string name="connect_screen_share_code">Kopiraj šifru</string>
+
+    <!-- Enter Code screen -->
+    <string name="enter_code_screen_title">Ručno unesi šifru</string>
+    <string name="sync_enter_code_hint">Idi na <b>Postavke &gt; Sinkronizacija i sigurnosno kopiranje &gt; Sinkronizacija s drugim uređajem</b> i odaberi <b>Prikaz tekstne šifre</b> u aplikaciji DuckDuckGo na drugom sinkroniziranom uređaju i tamo zalijepi šifru za sinkroniziranje ovog uređaja.</string>
+    <string name="sync_enter_code_verifying">Potvrda šifre u tijeku</string>
+    <string name="sync_enter_code_invalid">⚠️ Šifra nije valjana</string>
+    <string name="sync_enter_code_paste">Zalijepi šifru</string>
+
+    <!-- Recovery PDF screen -->
+    <string name="sync_recovery_code_title">Spremi šifru za oporavak</string>
+    <string name="sync_save_recovery_code_item_hint">Ako izgubiš pristup svojim uređajima, trebat će ti ova šifra za oporavak sinkroniziranih podataka.</string>
+    <string name="sync_recovery_code_skip_button">Dalje</string>
+    <string name="sync_recovery_code_primary_button">Spremi kao PDF</string>
+    <string name="sync_recovery_code_secondary_button">Kopiraj šifru</string>
+    <string name="sync_code_box_description">Svatko s pristupom ovoj šifri može pristupiti tvojim sinkroniziranim podacima, stoga ih čuvaj na sigurnom mjestu.</string>
+
+    <!-- Device synced screen -->
+    <string name="sync_connected_device_title">Tvoji su podaci sinkronizirani!</string>
+    <string name="sync_connected_device_primary_button">Gotovo</string>
+
+    <string name="show_qr_screen_title">Pokaži QR kôd</string>
+
+    <string name="show_code_screen_title">Kôd</string>
+    <string name="enter_code_screen_cta">Unesite tekstnu šifru</string>
+    <string name="sync_login_device_hint">Skeniraj QR kôd na svom PDF-u za oporavak ili drugom sinkroniziranom uređaju za vraćanje svojih podataka.</string>
+
+    <string name="synced_devices_section_title">Sinkronizirani uređaji</string>
+    <string name="sync_new_device_section_title">Sinkroniziraj novi uređaj</string>
+    <string name="sync_new_device_hint">Idi na Postavke › Sinkronizacija i sigurnosno kopiranje u aplikaciji DuckDuckGo na drugom uređaju i skeniraj za trenutno povezivanje.</string>
+    <string name="sync_show_text_code_item">Pokaži tekstnu šifru</string>
+    <string name="sync_show_qr_code_item">Skeniraj QR kôd</string>
+    <string name="sync_save_recovery_code_item">Spremi PDF za oporavak</string>
+    <string name="sync_delete_account_item">Isključi i izbriši podatke poslužitelja…</string>
+    <string name="sync_disable_sync_item">Isključi sinkronizaciju i sigurnosno kopiranje…</string>
+    <string name="sync_enable_sync_next_button">Dalje</string>
+    <string name="sync_recovery_code_content">Ako izgubiš pristup svojim uređajima, trebat će ti ova šifra za oporavak sinkroniziranih podataka.</string>
+    <string name="sync_recovery_code_hint">Svatko s pristupom ovoj šifri može pristupiti tvojim sinkroniziranim podacima, stoga ih čuvaj na sigurnom mjestu.</string>
+
+    <string name="turn_off_sync_dialog_title">Želiš li isključiti sinkronizaciju?</string>
+    <string name="turn_off_sync_dialog_content">Ovaj uređaj više neće moći pristupiti tvojim sinkroniziranim podacima</string>
+    <string name="turn_off_sync_dialog_primary_button">Isključi</string>
+    <string name="turn_off_sync_dialog_secondary_button">Odustani</string>
+    <string name="sync_permission_required_store_recovery_code">Spremanje PDF za oporavak zahtijeva dopuštenje za pohranu</string>
+    <string name="sync_share_title">Podijeli s...</string>
+    <string name="sync_pdf_title">Šifra za oporavak sinkronizacije</string>
+    <string name="sync_pdf_description">Šifra za oporavak omogućuje ti sinkronizaciju oznaka na više uređaja i oporavak sinkroniziranih podataka ako izgubiš pristup uređaju.</string>
+    <string name="sync_code_box_title">Čuvaj ove podatke na sigurnom.</string>
+    <string name="sync_instructions_title">Kako to funkcionira?</string>
+    <string name="sync_instructions_step1">Otvori DuckDuckGo na drugom uređaju i idi na Sinkronizaciju u Postavkama.</string>
+    <string name="sync_instructions_step2">Skeniraj QR kod ili kopiraj i zalijepi tekstualnu šifru u drugu aplikaciju DuckDuckGo.</string>
+    <string name="sync_instructions_step3">Sinkronizacija će se aktivirati i opet ćeš imati pristup svim svojim podacima.</string>
+    <string name="remove_device_dialog_title">Želiš li ukloniti uređaj?</string>
+    <string name="remove_device_dialog_content" instruction="Placeholder is a device name">\"%1$s\" više neće moći pristupiti tvojim sinkroniziranim podacima.</string>
+    <string name="remove_device_dialog_primary_button">Ukloni</string>
+    <string name="remove_device_dialog_secondary_button">Odustani</string>
+    <string name="edit_device_dialog_title">Uredi</string>
+    <string name="edit_device_dialog_hint">Naziv uređaja</string>
+    <string name="edit_device_dialog_primary_button">U redu</string>
+    <string name="edit_device_dialog_secondary_button">Odustani</string>
+    <string name="sync_device_this_device_hint">Ovaj uređaj</string>
+    <string name="sync_device_menu_option_edit">Uredi</string>
+    <string name="sync_device_menu_option_remove">Ukloni uređaj</string>
+    <string name="sync_show_code_copy">Kopiraj šifru</string>
+    <string name="sync_show_code_copy_hint">Upotrijebi ovu šifru nakon odabira \"Ručni unos šifre\" tijekom postavljanja sinkronizacije na drugom uređaju</string>
+    <string name="sync_code_copied_message">Šifra za oporavak je kopirana</string>
+    <string name="sync_camera_permission_required">Potrebna je dozvola za kameru</string>
+    <string name="sync_camera_unavailable">Kamera nije dostupna</string>
+    <string name="sync_camera_permission_required_description">Idi na postavke svog uređaja i dopusti ovoj aplikaciji pristup tvojoj kameri.</string>
+    <string name="sync_go_to_settings">Idi na Postavke</string>
+    <string name="sync_general_error">Nešto nije bilo kako treba</string>
+    <string name="sync_notification_channel_name">Sinkronizacija</string>
+    <string name="sync_notify_me_title">Obavijesti su onemogućene</string>
+    <string name="sync_notify_me_description">Primi obavijest u slučaju da Sinkronizacija i sigurnosno kopiranje nailazi na pogrešku.</string>
+    <string name="sync_rollout_banner_text">Sinkronizacija i sigurnosno kopiranje postupno se uvode i možda još nisu dostupni unutar DuckDuckGoa na tvojim drugim uređajima</string>
+</resources>

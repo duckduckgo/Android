@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2021 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <!-- Sync Disabled messages -->
+    <string name="sync_flows_disabled"><b>Synchronizace a zálohování není k dispozici</b>\nOmlouváme se, ale funkce synchronizace a zálohování teď není dostupná. Zkus to znovu později.</string>
+    <string name="sync_flows_disabled_new_version"><b>Synchronizace a zálohování není k dispozici</b>\nOmlouváme se, ale funkce synchronizace a zálohování není v téhle verzi aplikace dostupná. Pro pokračování aktualizuj DuckDuckGo na nejnovější verzi.</string>
+    <string name="sync_create_account_disabled"><b>Synchronizace a zálohování není k dispozici</b>\nOmlouváme se, ale funkce synchronizace a zálohování teď není dostupná. Zkus to znovu později.</string>
+    <string name="sync_create_account_disabled_new_version"><b>Synchronizace a zálohování není k dispozici</b>\nOmlouváme se, ale funkce synchronizace a zálohování není v téhle verzi aplikace dostupná. Pro pokračování aktualizuj DuckDuckGo na nejnovější verzi.</string>
+    <string name="sync_disabled_authenticated_user"><b>Funkce synchronizace a zálohování je pozastavená</b>\nOmlouváme se, ale funkce synchronizace a zálohování teď není dostupná. Zkus to znovu později.</string>
+    <string name="sync_disabled_authenticated_user_new_version"><b>Funkce synchronizace a zálohování je pozastavená</b>\nOmlouváme se, ale funkce synchronizace a zálohování není v téhle verzi aplikace dostupná. Pro pokračování aktualizuj DuckDuckGo na nejnovější verzi.</string>
+    <string name="sync_paused_notification"><b>Funkce synchronizace a zálohování je pozastavená</b>\nOmlouváme se, ale funkce synchronizace a zálohování teď není dostupná. Zkus to znovu později.</string>
+
+    <!-- Settings screen -->
+    <string name="sync_screen_title">Synchronizace a zálohování</string>
+    <string name="sync_setup_begin_syncing">Zahájení synchronizace</string>
+    <string name="sync_setup_with_another_device_cta_title">Synchronizace s jiným zařízením</string>
+    <string name="sync_setup_with_another_device_cta_subtitle">Bezpečně synchronizuj záložky a hesla mezi svými zařízeními.</string>
+    <string name="sync_off_hint">U tvých dat se uplatňuje end-to-end šifrování a DuckDuckGo nemá přístup k šifrovacímu klíči.</string>
+    <string name="sync_setup_single_device_title">Nastavení jednoho zařízení</string>
+    <string name="sync_setup_single_recover_data_cta_title">Obnovit synchronizovaná data</string>
+    <string name="sync_setup_single_sync_this_device_cta_title">Synchronizace a záloha tohoto zařízení</string>
+
+    <string name="sync_off_encrypted_hint">U tvých dat se uplatňuje end-to-end šifrování a DuckDuckGo nemá přístup k dešifrovacímu klíči.</string>
+
+    <!-- Setup screen -->
+    <string name="sync_enable_sync_title">Nastavuje se synchronizace a zálohování</string>
+    <string name="sync_enable_sync_content">Tvoje záložky a hesla připravujeme na synchronizaci. Nemělo by to trvat dlouho.</string>
+    <string name="sync_enable_options">Možnosti</string>
+    <string name="sync_enable_option_favicons_title">Načíst ikony záložek</string>
+    <string name="sync_enable_option_favicons_subtitle">Automatické stahování ikon synchronizovaných záložek.</string>
+    <string name="sync_enable_connecting">Připojování...</string>
+    <string name="sync_intro_enable_title">Synchronizace a záloha tohoto zařízení</string>
+    <string name="sync_intro_enable_content">Na zabezpečeném serveru DuckDuckGo se vytvoří šifrovaná záloha záložek a hesel, kterou můžeš synchronizovat s ostatními zařízeními. \n\n Šifrovací klíč se ukládá jenom na tvé zařízení, DuckDuckGo k němu nemá přístup.</string>
+    <string name="sync_intro_enable_footer">Synchronizaci s dalšími zařízeními můžeš provést později.</string>
+    <string name="sync_intro_enable_cta">Zapnout synchronizaci a zálohování</string>
+    <string name="sync_intro_recover_title">Obnovit synchronizovaná data</string>
+    <string name="sync_intro_recover_content">K obnovení synchronizovaných dat budeš potřebovat kód pro obnovení, který máš uložený od prvního nastavení synchronizace. Je možné, že tenhle kód se uložil ve formátu PDF na zařízení původně použitém k nastavení synchronizace.</string>
+    <string name="sync_intro_recover_cta">Začínáme</string>
+
+    <!-- Recover data screen -->
+    <string name="login_screen_title">Skenování QR kódu</string>
+    <string name="login_screen_enter_code_cta">Nebo zadejte kód ručně</string>
+    <string name="login_screen_barcode_hint">Pro synchronizaci namiř fotoaparát na QR kód</string>
+    <string name="login_screen_cant_scan">Skenování nefunguje? <font color="#7295F6">Sdílet textový kód</font></string>
+
+    <!-- Connect screen -->
+    <string name="connect_screen_title">Skenování QR kódu</string>
+    <string name="connect_screen_scan_qr_hint">Přejdi v prohlížeči DuckDuckGo na jiném zařízení do <b>Nastavení &gt; Synchronizace a zálohování</b> a vyber možnost Synchronizovat s jiným zařízením.</string>
+    <string name="connect_screen_enter_code_cta">Nebo zadej kód ručně</string>
+    <string name="connect_screen_connect_qr_hint_title">Z mobilu na mobil?</string>
+    <string name="connect_screen_connect_qr_hint_content">Pro synchronizaci naskenuj tenhle kód pomocí jiného zařízení.</string>
+    <string name="connect_screen_share_code">Kopírovat kód</string>
+
+    <!-- Enter Code screen -->
+    <string name="enter_code_screen_title">Ruční zadání kódu</string>
+    <string name="sync_enter_code_hint">V aplikaci DuckDuckGo na synchronizovaném zařízení přejdi do <b>Nastavení &gt; Synchronizace a zálohování &gt; Synchronizovat s jiným zařízením</b> a vyber <b>Zobrazit textový kód</b>. Pro synchronizaci tohoto zařízení stačí už jen vložit kód.</string>
+    <string name="sync_enter_code_verifying">Ověřování kódu</string>
+    <string name="sync_enter_code_invalid">⚠️ Neplatný kód</string>
+    <string name="sync_enter_code_paste">Vložit kód</string>
+
+    <!-- Recovery PDF screen -->
+    <string name="sync_recovery_code_title">Uložit kód pro obnovení</string>
+    <string name="sync_save_recovery_code_item_hint">Pokud ztratíš přístup ke svým zařízením, budeš tenhle kód potřebovat k obnovení synchronizovaných dat.</string>
+    <string name="sync_recovery_code_skip_button">Další</string>
+    <string name="sync_recovery_code_primary_button">Uložit jako PDF</string>
+    <string name="sync_recovery_code_secondary_button">Kopírovat kód</string>
+    <string name="sync_code_box_description">Kdokoli s přístupem k tomuhle kódu může získat přístup ke tvým synchronizovaným datům, proto ho uchovávej na bezpečném místě.</string>
+
+    <!-- Device synced screen -->
+    <string name="sync_connected_device_title">Tvoje data už se zase synchronizují!</string>
+    <string name="sync_connected_device_primary_button">Hotovo</string>
+
+    <string name="show_qr_screen_title">Zobrazit QR kód</string>
+
+    <string name="show_code_screen_title">Kód</string>
+    <string name="enter_code_screen_cta">Zadej textový kód</string>
+    <string name="sync_login_device_hint">Naskenuj QR kód ze souboru PDF pro obnovení nebo jiného synchronizovaného zařízení a obnov svá data.</string>
+
+    <string name="synced_devices_section_title">Synchronizovaná zařízení</string>
+    <string name="sync_new_device_section_title">Synchronizace nového zařízení</string>
+    <string name="sync_new_device_hint">Přejdi v aplikaci DuckDuckGo na jiném zařízení do Nastavení &gt; Synchronizace a zálohování. Po naskenování se okamžitě připojíš.</string>
+    <string name="sync_show_text_code_item">Zobrazit textový kód</string>
+    <string name="sync_show_qr_code_item">Skenování QR kódu</string>
+    <string name="sync_save_recovery_code_item">Uložit PDF pro obnovení</string>
+    <string name="sync_delete_account_item">Vypnutí a mazání dat serveru...</string>
+    <string name="sync_disable_sync_item">Vypnutí synchronizace a zálohování…</string>
+    <string name="sync_enable_sync_next_button">Další</string>
+    <string name="sync_recovery_code_content">Pokud ztratíš přístup ke svým zařízením, budeš tenhle kód potřebovat k obnovení synchronizovaných dat.</string>
+    <string name="sync_recovery_code_hint">Kdokoli s přístupem k tomuhle kódu může získat přístup ke tvým synchronizovaným datům, proto ho uchovávej na bezpečném místě.</string>
+
+    <string name="turn_off_sync_dialog_title">Vypnout synchronizaci?</string>
+    <string name="turn_off_sync_dialog_content">Tohle zařízení už nebude mít přístup ke tvým synchronizovaným datům</string>
+    <string name="turn_off_sync_dialog_primary_button">Vypnout</string>
+    <string name="turn_off_sync_dialog_secondary_button">Zrušit</string>
+    <string name="sync_permission_required_store_recovery_code">Povol ukládání, aby se mohlo uložit PDF pro obnovení</string>
+    <string name="sync_share_title">Sdílet s...</string>
+    <string name="sync_pdf_title">Synchronizovat kód pro obnovení</string>
+    <string name="sync_pdf_description">Kód pro obnovení umožňuje synchronizovat záložky v různých zařízeních a obnovit synchronizovaná data v případě ztráty přístupu k zařízení.</string>
+    <string name="sync_code_box_title">Uchovávej tyhle informace v bezpečí.</string>
+    <string name="sync_instructions_title">Jak to funguje?</string>
+    <string name="sync_instructions_step1">Otevři DuckDuckGo na jiném zařízení a v Nastavení vyber možnost Synchronizace.</string>
+    <string name="sync_instructions_step2">V jiné aplikaci DuckDuckGo naskenuj QR kód nebo do ní zkopíruj a vlož textový kód.</string>
+    <string name="sync_instructions_step3">Dojde k synchronizaci a ty budeš mít zase přístup ke všem svým datům.</string>
+    <string name="remove_device_dialog_title">Smazat zařízení?</string>
+    <string name="remove_device_dialog_content" instruction="Placeholder is a device name">%1$s už nebude mít přístup k synchronizovaným datům.</string>
+    <string name="remove_device_dialog_primary_button">Odstranit</string>
+    <string name="remove_device_dialog_secondary_button">Zrušit</string>
+    <string name="edit_device_dialog_title">Upravit</string>
+    <string name="edit_device_dialog_hint">Název zařízení</string>
+    <string name="edit_device_dialog_primary_button">Dobře</string>
+    <string name="edit_device_dialog_secondary_button">Zrušit</string>
+    <string name="sync_device_this_device_hint">Tohle zařízení</string>
+    <string name="sync_device_menu_option_edit">Upravit</string>
+    <string name="sync_device_menu_option_remove">Smazat zařízení</string>
+    <string name="sync_show_code_copy">Kopírovat kód</string>
+    <string name="sync_show_code_copy_hint">Až se budeš pokoušet o synchronizaci na druhém zařízení, použij tenhle kód po výběru možnosti Ruční zadání kódu</string>
+    <string name="sync_code_copied_message">Kód pro obnovení je zkopírovaný</string>
+    <string name="sync_camera_permission_required">Je potřeba přístup k fotoaparátu</string>
+    <string name="sync_camera_unavailable">Fotoaparát není dostupný</string>
+    <string name="sync_camera_permission_required_description">Přejdi do nastavení zařízení a povol aplikaci přístup k fotoaparátu.</string>
+    <string name="sync_go_to_settings">Přejdi do Nastavení</string>
+    <string name="sync_general_error">Něco se pokazilo</string>
+    <string name="sync_notification_channel_name">Synchronizace</string>
+    <string name="sync_notify_me_title">Oznámení jsou vypnutá</string>
+    <string name="sync_notify_me_description">Nech si poslat upozornění v případě, že dojde k chybě při synchronizaci a zálohování.</string>
+    <string name="sync_rollout_banner_text">Synchronizaci a zálohování zpřístupňujeme postupně a na tvých dalších zařízeních nemusí být v aplikaci DuckDuckGo ještě k dispozici</string>
+</resources>

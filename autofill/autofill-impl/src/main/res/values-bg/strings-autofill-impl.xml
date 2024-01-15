@@ -133,4 +133,6 @@
     <string name="managementDisabledModeSubtitle">За защита на паролите е необходимо да зададете модел за заключване, ПИН код или биометрични данни.</string>
     <string name="credentialManagementEditTitle">Редактиране на парола</string>
 
+    <string name="credentials_limit_warning"><b>Синхронизирането е спряно</b>\nПревишихте лимита за данни за вход. Изтрийте някои от тях, за да възобновите синхронизирането.<annotation type="manage_logins">Управление на данните за вход</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Синхронизирането на пароли е спряно</b>\nПревишихте ограничението за синхронизиране на пароли. Опитайте да изтриете някои от паролите. Докато този проблем не бъде разрешен, паролите няма да бъдат архивирани.</string>
 </resources>

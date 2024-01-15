@@ -133,4 +133,6 @@
     <string name="managementDisabledModeSubtitle">Paroolide kaitsmiseks on vaja seadme lukustusmustrit, PIN-koodi või biomeetriat.</string>
     <string name="credentialManagementEditTitle">Parooli muutmine</string>
 
+    <string name="credentials_limit_warning"><b>Sünkroonimine peatatud</b>\nSisselogimisandmete limiit on täis. Kustuta mõni, et jätkata sünkroonimist.\n\n<annotation type="manage_logins">Halda sisselogimisandmeid</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Paroolide sünkroonimine on peatatud</b>\nOled paroolide sünkroonimise limiidi ületanud. Proovi mõned paroolid kustutada. Kuni see pole lahendatud, ei varundata sinu paroole.</string>
 </resources>

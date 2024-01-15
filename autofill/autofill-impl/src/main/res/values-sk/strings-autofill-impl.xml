@@ -133,4 +133,6 @@
     <string name="managementDisabledModeSubtitle">Na ochranu vašich prihlasovacích údajov sa vyžaduje vzor uzamknutia zariadenia, kód PIN alebo biometrické údaje.</string>
     <string name="credentialManagementEditTitle">Upraviť heslo</string>
 
+    <string name="credentials_limit_warning"><b>Synchronizácia bola pozastavená</b>\nBol dosiahnutý limit pre počet prihlásení. Ak chcete obnoviť synchronizáciu, odstráňte niektoré záložky.\n\n<annotation type="manage_logins">Správa prihlásení</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Synchronizácia hesiel bola pozastavená</b>\nPrekročili ste limit synchronizácie hesiel. Skúste niektoré heslá odstrániť. Kým to nevyriešite, vaše heslá sa nebudú zálohovať.</string>
 </resources>

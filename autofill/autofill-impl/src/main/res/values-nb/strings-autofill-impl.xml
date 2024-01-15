@@ -133,4 +133,6 @@
     <string name="managementDisabledModeSubtitle">Det kreves et låsemønster, en PIN-kode eller biometri for å beskytte passordene dine.</string>
     <string name="credentialManagementEditTitle">Rediger passordet</string>
 
+    <string name="credentials_limit_warning"><b>Synkronisering er satt på pause</b>\nGrensen for pålogginger er overskredet. Slett noen for å gjenoppta synkroniseringen.\n\n<annotation type="manage_logins">Administrer pålogginger</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Synkronisering av passord er satt på pause</b>\nDu har overskredet grensen for passordsynkronisering. Prøv å slette noen passord. Inntil dette er løst, blir ikke passordene sikkerhetskopiert.</string>
 </resources>
