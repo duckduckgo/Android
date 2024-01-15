@@ -29,7 +29,7 @@
     <!-- Settings screen -->
     <string name="sync_screen_title">Synchronizace a zálohování</string>
     <string name="sync_setup_begin_syncing">Zahájení synchronizace</string>
-    <string name="sync_setup_with_another_device_cta_title">Synchronizace s jiným zařízením</string>
+    <string name="sync_setup_with_another_device_cta_title">Synchronizovat s jiným zařízením</string>
     <string name="sync_setup_with_another_device_cta_subtitle">Bezpečně synchronizuj záložky a hesla mezi svými zařízeními.</string>
     <string name="sync_off_hint">U tvých dat se uplatňuje end-to-end šifrování a DuckDuckGo nemá přístup k šifrovacímu klíči.</string>
     <string name="sync_setup_single_device_title">Nastavení jednoho zařízení</string>
