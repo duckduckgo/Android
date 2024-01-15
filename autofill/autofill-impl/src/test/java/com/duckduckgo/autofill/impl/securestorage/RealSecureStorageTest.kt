@@ -251,6 +251,13 @@ class RealSecureStorageTest {
         }
     }
 
+    @Test
+    fun whenMassDeletingCredentialsBulkDeletionFunctionOnSecureStorageRepoUsed() = runTest {
+        val idsToDelete = listOf(1L, 2L, 3L)
+        testee.deleteWebSiteLoginDetailsWithCredentials(idsToDelete)
+        verify(secureStorageRepository).deleteWebsiteLoginCredentials(idsToDelete)
+    }
+
     private fun setUpNoSecureStorageRepository() {
         testee = RealSecureStorage(
             object : Factory {

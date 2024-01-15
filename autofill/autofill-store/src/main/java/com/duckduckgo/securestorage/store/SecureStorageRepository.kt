@@ -32,6 +32,8 @@ interface SecureStorageRepository {
 
     suspend fun addWebsiteLoginCredential(websiteLoginCredentials: WebsiteLoginCredentialsEntity): WebsiteLoginCredentialsEntity?
 
+    suspend fun addWebsiteLoginCredentials(list: List<WebsiteLoginCredentialsEntity>)
+
     suspend fun websiteLoginCredentialsForDomain(domain: String): Flow<List<WebsiteLoginCredentialsEntity>>
 
     suspend fun getWebsiteLoginCredentialsForId(id: Long): WebsiteLoginCredentialsEntity?
@@ -41,6 +43,8 @@ interface SecureStorageRepository {
     suspend fun updateWebsiteLoginCredentials(websiteLoginCredentials: WebsiteLoginCredentialsEntity): WebsiteLoginCredentialsEntity?
 
     suspend fun deleteWebsiteLoginCredentials(id: Long)
+
+    suspend fun deleteWebsiteLoginCredentials(ids: List<Long>)
 
     suspend fun addToNeverSaveList(domain: String)
 
@@ -55,9 +59,14 @@ class RealSecureStorageRepository(
     private val websiteLoginCredentialsDao: WebsiteLoginCredentialsDao,
     private val neverSavedSitesDao: NeverSavedSitesDao,
 ) : SecureStorageRepository {
+
     override suspend fun addWebsiteLoginCredential(websiteLoginCredentials: WebsiteLoginCredentialsEntity): WebsiteLoginCredentialsEntity? {
         val newCredentialId = websiteLoginCredentialsDao.insert(websiteLoginCredentials)
         return websiteLoginCredentialsDao.getWebsiteLoginCredentialsById(newCredentialId)
+    }
+
+    override suspend fun addWebsiteLoginCredentials(list: List<WebsiteLoginCredentialsEntity>) {
+        websiteLoginCredentialsDao.insert(list)
     }
 
     override suspend fun websiteLoginCredentialsForDomain(domain: String): Flow<List<WebsiteLoginCredentialsEntity>> {
@@ -82,6 +91,10 @@ class RealSecureStorageRepository(
 
     override suspend fun deleteWebsiteLoginCredentials(id: Long) {
         websiteLoginCredentialsDao.delete(id)
+    }
+
+    override suspend fun deleteWebsiteLoginCredentials(ids: List<Long>) {
+        websiteLoginCredentialsDao.delete(ids)
     }
 
     override suspend fun addToNeverSaveList(domain: String) {

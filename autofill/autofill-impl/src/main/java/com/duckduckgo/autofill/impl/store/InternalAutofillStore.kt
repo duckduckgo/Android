@@ -90,6 +90,11 @@ interface InternalAutofillStore : AutofillStore {
     suspend fun getCredentialCount(): Flow<Int>
 
     /**
+     * Deletes all saved credentials
+     */
+    suspend fun deleteAllCredentials(): List<LoginCredentials>
+
+    /**
      * Deletes the credential with the given ID
      * @return the deleted LoginCredentials, or null if the deletion couldn't be performed
      */
@@ -109,6 +114,14 @@ interface InternalAutofillStore : AutofillStore {
      * This is similar to a normal save, except it will preserve the original ID and last modified time
      */
     suspend fun reinsertCredentials(credentials: LoginCredentials)
+
+    /**
+     * Used to reinsert a list of credentials that were previously deleted
+     * This supports the ability to give user a brief opportunity to 'undo' a mass deletion
+     *
+     * This is similar to a normal save, except it will preserve the original ID and last modified time
+     */
+    suspend fun reinsertCredentials(credentials: List<LoginCredentials>)
 
     /**
      * Searches the saved login credentials for a match to the given URL, username and password

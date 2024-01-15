@@ -536,6 +536,10 @@ class SecureStoreBackedAutofillStoreTest {
             return credentialWithId
         }
 
+        override suspend fun addWebsiteLoginDetailsWithCredentials(credentials: List<WebsiteLoginDetailsWithCredentials>) {
+            credentials.forEach { addWebsiteLoginDetailsWithCredentials(it) }
+        }
+
         override suspend fun websiteLoginDetailsForDomain(domain: String): Flow<List<WebsiteLoginDetails>> {
             return flow {
                 emit(
@@ -585,6 +589,10 @@ class SecureStoreBackedAutofillStoreTest {
 
         override suspend fun deleteWebsiteLoginDetailsWithCredentials(id: Long) {
             credentials.removeAll { it.details.id == id }
+        }
+
+        override suspend fun deleteWebSiteLoginDetailsWithCredentials(ids: List<Long>) {
+            credentials.removeAll { ids.contains(it.details.id) }
         }
 
         override suspend fun addToNeverSaveList(domain: String) {
