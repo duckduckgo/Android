@@ -85,7 +85,7 @@ class PrivacyProtectionsPopupManagerImplTest {
 
     @Test
     fun whenRefreshIsTriggeredThenEmitsUpdateToShowPopup() = runTest {
-        val toggleUsedAt = timeProvider.time - Duration.ofDays(17)
+        val toggleUsedAt = timeProvider.time - Duration.ofDays(32)
         toggleUsageTimestampRepository.setToggleUsageTimestamp(toggleUsedAt)
 
         subject.viewState.test {
@@ -268,7 +268,7 @@ class PrivacyProtectionsPopupManagerImplTest {
             subject.onPageRefreshTriggeredByUser()
             subject.onUiEvent(DISMISSED)
             assertStoredPopupDismissTimestamp(url = "https://www.example.com", expectedTimestamp = timeProvider.time)
-            timeProvider.time += Duration.ofHours(24)
+            timeProvider.time += Duration.ofDays(2)
 
             subject.onPageRefreshTriggeredByUser()
 
@@ -343,7 +343,7 @@ class PrivacyProtectionsPopupManagerImplTest {
 
     @Test
     fun whenToggleWasNotUsedInLast2WeeksThenPopupIsShownOnRefresh() = runTest {
-        val toggleUsedAt = timeProvider.time - Duration.ofDays(15)
+        val toggleUsedAt = timeProvider.time - Duration.ofDays(32)
         toggleUsageTimestampRepository.setToggleUsageTimestamp(toggleUsedAt)
 
         subject.viewState.test {

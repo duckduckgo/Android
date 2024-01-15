@@ -261,7 +261,7 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
     }
 
     companion object {
-        private val DISMISS_REMEMBER_DURATION: Duration = Duration.ofDays(1)
-        val TOGGLE_USAGE_REMEMBER_DURATION: Duration = Duration.ofDays(14)
+        private val DISMISS_REMEMBER_DURATION: Duration = Duration.ofDays(2)
+        val TOGGLE_USAGE_REMEMBER_DURATION: Duration = Duration.ofDays(30)
     }
 }
