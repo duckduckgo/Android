@@ -85,6 +85,8 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
     AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_DISPLAYED("m_autofill_settings_reset_excluded_displayed"),
     AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_CONFIRMED("m_autofill_settings_reset_excluded_confirmed"),
     AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_DISMISSED("m_autofill_settings_reset_excluded_dismissed"),
+
+    AUTOFILL_OVERLAPPING_DIALOG("m_autofill_overlapping_dialog"),
 }
 
 object AutofillPixelParameters {

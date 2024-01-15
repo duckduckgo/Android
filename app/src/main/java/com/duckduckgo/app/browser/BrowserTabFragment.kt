@@ -205,6 +205,7 @@ import com.duckduckgo.autofill.api.EmailProtectionUserPromptListener
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector
 import com.duckduckgo.autofill.api.UseGeneratedPasswordDialog
 import com.duckduckgo.autofill.api.credential.saving.DuckAddressLoginCreator
+import com.duckduckgo.autofill.api.dialog.AutofillOverlappingDialogDetector
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.api.emailprotection.EmailInjector
@@ -435,6 +436,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var externalCameraLauncher: UploadFromExternalCameraLauncher
+
+    @Inject
+    lateinit var autofillOverlappingDialogDetector: AutofillOverlappingDialogDetector
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -2318,10 +2322,12 @@ class BrowserTabFragment :
     ) {
         // want to ensure lifecycle is at least resumed before attempting to show dialog
         lifecycleScope.launchWhenResumed {
-            hideDialogWithTag(tag)
-
             val currentUrl = webView?.url
             val urlMatch = requiredUrl == null || requiredUrl == currentUrl
+
+            autofillOverlappingDialogDetector.detectOverlappingDialogs(childFragmentManager, tag, urlMatch)
+            hideDialogWithTag(tag)
+
             if (isActiveTab && urlMatch) {
                 Timber.i("Showing dialog (%s), hidden=%s, requiredUrl=%s, currentUrl=%s, tabId=%s", tag, isHidden, requiredUrl, currentUrl, tabId)
                 dialog.show(childFragmentManager, tag)
