@@ -70,7 +70,6 @@ dependencies {
     testImplementation "androidx.test:runner:_"
     testImplementation Testing.robolectric
     testImplementation CashApp.turbine
-    testImplementation "org.threeten:threetenbp:_"
 
     androidTestImplementation project(path: ':common-test')
     testImplementation project(path: ':common-test')

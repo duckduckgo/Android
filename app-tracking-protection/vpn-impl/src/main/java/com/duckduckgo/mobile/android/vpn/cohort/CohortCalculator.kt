@@ -18,10 +18,10 @@ package com.duckduckgo.mobile.android.vpn.cohort
 
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
+import java.time.temporal.IsoFields
 import javax.inject.Inject
-import org.threeten.bp.LocalDate
-import org.threeten.bp.temporal.ChronoUnit
-import org.threeten.bp.temporal.IsoFields
 
 interface CohortCalculator {
     fun calculateCohortForDate(localDate: LocalDate, now: LocalDate = LocalDate.now()): String

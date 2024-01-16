@@ -28,10 +28,11 @@ dependencies {
     implementation KotlinX.coroutines.android
     implementation AndroidX.room.runtime
 
-    implementation "com.jakewharton.threetenabp:threetenabp:_"
-
     ksp AndroidX.room.compiler
 }
 android {
   namespace 'com.duckduckgo.app'
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
+    }
 }

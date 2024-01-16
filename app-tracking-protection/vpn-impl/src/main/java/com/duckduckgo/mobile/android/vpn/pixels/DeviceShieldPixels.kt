@@ -23,11 +23,11 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import java.time.Instant
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 import java.util.*
 import javax.inject.Inject
-import org.threeten.bp.Instant
-import org.threeten.bp.ZoneOffset
-import org.threeten.bp.format.DateTimeFormatter
 
 interface DeviceShieldPixels {
     /** This pixel will be unique on a given day, no matter how many times we call this fun */

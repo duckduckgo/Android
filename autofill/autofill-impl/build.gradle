@@ -61,9 +61,6 @@ dependencies {
 
     implementation "net.zetetic:android-database-sqlcipher:_"
 
-    implementation "com.jakewharton.threetenabp:threetenabp:_"
-    testImplementation "org.threeten:threetenbp:_"
-
     // Testing dependencies
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.junit4
@@ -97,5 +94,8 @@ android {
         }
     }
     namespace 'com.duckduckgo.autofill.impl'
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
+    }
 }
 

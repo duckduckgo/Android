@@ -24,6 +24,9 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 android {
     namespace 'com.duckduckgo.fingerprintprotection.store'
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
+    }
 }
 
 dependencies {
@@ -37,9 +40,6 @@ dependencies {
         // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
-
-    implementation "com.jakewharton.threetenabp:threetenabp:_"
-    testImplementation "org.threeten:threetenbp:_"
 
     implementation JakeWharton.timber
 

@@ -56,9 +56,6 @@ dependencies {
     implementation AndroidX.room.ktx
     ksp AndroidX.room.compiler
 
-    implementation "com.jakewharton.threetenabp:threetenabp:_"
-    testImplementation "org.threeten:threetenbp:_"
-
     // Testing dependencies
     testImplementation project(path: ':common-test')
     testImplementation AndroidX.core
@@ -91,5 +88,8 @@ android {
         }
     }
     namespace 'com.duckduckgo.saved.sites.impl'
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
+    }
 }
 

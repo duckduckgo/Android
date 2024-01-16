@@ -25,8 +25,8 @@ import com.duckduckgo.mobile.android.vpn.trackers.*
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
-import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.format.DateTimeFormatter
+import java.time.OffsetDateTime
+import java.time.format.DateTimeFormatter
 
 @Database(
     exportSchema = true,

@@ -65,6 +65,7 @@ android {
         viewBinding = true
     }
     compileOptions {
+        coreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
@@ -347,10 +348,6 @@ dependencies {
     implementation "io.reactivex.rxjava2:rxandroid:_"
     implementation JakeWharton.timber
 
-    // ThreeTenABP
-    implementation "com.jakewharton.threetenabp:threetenabp:_"
-    testImplementation "org.threeten:threetenbp:_"
-
     // RxRelay
     implementation "com.jakewharton.rxrelay2:rxrelay:_"
 
@@ -442,6 +439,8 @@ dependencies {
     androidTestImplementation project(':common-test')
     testImplementation project(':common-test')
     lintChecks project(":lint-rules")
+
+    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 
 tasks.register('fastlaneVersionCode') {

@@ -28,8 +28,8 @@ import com.duckduckgo.savedsites.store.EntityType.FOLDER
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
+import java.time.OffsetDateTime
 import java.util.*
-import org.threeten.bp.OffsetDateTime
 import timber.log.*
 
 class RealSyncSavedSitesRepository(
