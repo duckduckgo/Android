@@ -133,4 +133,6 @@
     <string name="managementDisabledModeSubtitle">Es sind ein Muster, eine PIN oder biometrische Daten erforderlich, um deine Passwörter zu schützen.</string>
     <string name="credentialManagementEditTitle">Passwort bearbeiten</string>
 
+    <string name="credentials_limit_warning"><b>Synchronisierung angehalten</b>\nAnmeldelimit überschritten. Lösche Lesezeichen, um die Synchronisierung fortzusetzen.\n\n<annotation type="manage_logins">Anmeldedaten verwalten</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Die Passwort-Synchronisierung wurde pausiert</b>\nDu hast das Limit für die Synchronisierung von Passwörtern überschritten. Versuche, einige Passwörter zu löschen. Bis dieses Problem behoben ist, werden deine Passwörter nicht gesichert.</string>
 </resources>

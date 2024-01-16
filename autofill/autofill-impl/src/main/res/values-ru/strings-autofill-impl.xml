@@ -133,4 +133,6 @@
     <string name="managementDisabledModeSubtitle">Для защиты паролей требуются биометрические данные, графический ключ или ПИН-код.</string>
     <string name="credentialManagementEditTitle">Редактирование пароля</string>
 
+    <string name="credentials_limit_warning"><b>Синхронизация приостановлена</b>\nПревышен лимит по количеству логинов. Удалите некоторые из них, чтобы возобновить синхронизацию.\n\n<annotation type="manage_logins">Управление логинами</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Синхронизация паролей приостановлена</b>\nВы превысили лимит синхронизации паролей. Удалите несколько из них. Пока вы не устраните эту проблему, резервная копия закладок создаваться не будет.</string>
 </resources>

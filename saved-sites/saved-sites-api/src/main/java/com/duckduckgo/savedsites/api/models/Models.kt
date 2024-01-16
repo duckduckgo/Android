@@ -23,8 +23,7 @@ import java.util.*
 
 data class SavedSites(
     val favorites: List<Favorite>,
-    val bookmarks: List<Bookmark>,
-    val folders: List<BookmarkFolder>,
+    val bookmarks: List<Any>,
 )
 
 sealed class SavedSite(
@@ -50,6 +49,7 @@ sealed class SavedSite(
         val parentId: String = SavedSitesNames.BOOKMARKS_ROOT,
         override val lastModified: String?,
         override val deleted: String? = null,
+        val isFavorite: Boolean = false,
     ) : SavedSite(id, title, url, lastModified)
 }
 
@@ -94,3 +94,14 @@ object SavedSitesNames {
     const val BOOKMARKS_NAME = "Bookmarks"
     const val BOOMARKS_ROOT_ID = 0L
 }
+
+/**
+ * Used to build up a folder tree of [Bookmark]s and [BookmarkFolder]s
+ */
+data class FolderTreeItem(
+    val id: String,
+    val name: String,
+    val parentId: String,
+    val url: String?,
+    val depth: Int = 0,
+)

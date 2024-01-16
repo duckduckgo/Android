@@ -23,6 +23,9 @@ import com.duckduckgo.sync.api.engine.SyncableDataPersister
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution
 
 class FakeSyncableDataPersister(private val orphans: Boolean = false) : SyncableDataPersister {
+    override fun onSyncEnabled() {
+        // no-op
+    }
 
     override fun onSuccess(
         changes: SyncChangesResponse,

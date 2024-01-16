@@ -133,4 +133,6 @@
     <string name="managementDisabledModeSubtitle">Salasanojen suojaamiseen tarvitaan laitteen lukituskuvio, PIN-koodi tai biometriset tiedot.</string>
     <string name="credentialManagementEditTitle">Muokkaa salasanaa</string>
 
+    <string name="credentials_limit_warning"><b>Synkronointi keskeytetty</b>\nKirjautumisten enimmäismäärä ylitetty. Poista jotain jatkaaksesi synkronointia.\n\n<annotation type="manage_logins">Hallitse kirjautumisia</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Salasanojen synkronointi on keskeytetty</b>\nOlet ylittänyt salasanojen synkronointirajan. Yritä poistaa joitakin salasanoja. Salasanojasi ei varmuuskopioida ennen kuin tämä ongelma on ratkaistu.</string>
 </resources>

@@ -17,17 +17,64 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:padding="@dimen/keyline_4">
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <com.duckduckgo.common.ui.view.text.DaxTextView
-        android:id="@+id/savedSiteEmptyHint"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        tools:text="Lorem ipsum dolor sit amet"
-        app:textType="secondary"
-        app:typography="body2" />
+        android:layout_gravity="center"
+        android:layout_marginTop="-56dp"
+        android:paddingStart="@dimen/keyline_4"
+        android:paddingEnd="@dimen/keyline_4">
+
+        <ImageView
+            android:id="@+id/savedSiteEmptyIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_bookmarks_import"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="@dimen/keyline_5" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/savedSiteEmptyHintTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/keyline_4"
+            app:layout_constraintTop_toBottomOf="@id/savedSiteEmptyIcon"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="Lorem ipsum dolor sit amet"
+            app:textType="secondary"
+            app:typography="h3" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/savedSiteEmptyHintDescription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingTop="@dimen/keyline_2"
+            android:paddingBottom="@dimen/keyline_6"
+            app:layout_constraintTop_toBottomOf="@id/savedSiteEmptyHintTitle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="Lorem ipsum dolor sit amet"
+            android:text="@string/importBookmarksDescription"
+            app:textType="secondary"
+            app:typography="body2" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/savedSiteEmptyImportButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/savedSiteEmptyHintDescription"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="Lorem ipsum dolor sit amet"
+            android:text="@string/importBookmarks" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </FrameLayout>

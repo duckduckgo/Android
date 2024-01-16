@@ -133,4 +133,6 @@
     <string name="managementDisabledModeSubtitle">Şifrelerinizin güvenliğini sağlamak için bir cihaz kilidi deseni, PIN veya biyometrik veri gereklidir.</string>
     <string name="credentialManagementEditTitle">Şifreyi Düzenle</string>
 
+    <string name="credentials_limit_warning"><b>Senkronizasyon Duraklatıldı</b>\nGiriş sınırı aşıldı. Senkronizasyona devam etmek için bazılarını silin.\n\n<annotation type="manage_logins">Girişleri Yönet</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Şifre Senkronizasyonu Duraklatıldı</b>\nŞifre senkronizasyon sınırını aştınız. Bazı şifreleri silmeyi deneyin. Bu sorun çözülene kadar şifreleriniz yedeklenmeyecektir.</string>
 </resources>

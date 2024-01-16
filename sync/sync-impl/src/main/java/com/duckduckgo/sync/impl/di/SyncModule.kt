@@ -31,9 +31,9 @@ import com.duckduckgo.sync.impl.internal.AppSyncInternalEnvDataStore
 import com.duckduckgo.sync.impl.internal.SyncInternalEnvDataStore
 import com.duckduckgo.sync.impl.stats.RealSyncStatsRepository
 import com.duckduckgo.sync.impl.stats.SyncStatsRepository
-import com.duckduckgo.sync.store.EncryptedSharedPrefsProvider
 import com.duckduckgo.sync.store.SharedPrefsProvider
 import com.duckduckgo.sync.store.SyncDatabase
+import com.duckduckgo.sync.store.SyncSharedPrefsProvider
 import com.duckduckgo.sync.store.SyncSharedPrefsStore
 import com.duckduckgo.sync.store.SyncStore
 import com.journeyapps.barcodescanner.BarcodeEncoder
@@ -68,7 +68,7 @@ object SyncStoreModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun provideSharedPrefsProvider(context: Context): SharedPrefsProvider {
-        return EncryptedSharedPrefsProvider(context)
+        return SyncSharedPrefsProvider(context)
     }
 
     @Provides

@@ -30,6 +30,7 @@ import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreenNoParam
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.store.AutofillStore
+import com.duckduckgo.autofill.impl.configuration.AutofillJavascriptEnvironmentConfiguration
 import com.duckduckgo.autofill.impl.email.incontext.store.EmailProtectionInContextDataStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
 import com.duckduckgo.autofill.internal.databinding.ActivityAutofillInternalSettingsBinding
@@ -79,6 +80,9 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var neverSavedSiteRepository: NeverSavedSiteRepository
 
+    @Inject
+    lateinit var autofillJavascriptEnvironmentConfiguration: AutofillJavascriptEnvironmentConfiguration
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -87,6 +91,7 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
         refreshInstallationDaySettings()
         refreshDaysSinceInstall()
         refreshRemoteConfigSettings()
+        refreshAutofillJsConfigSettings()
     }
 
     private fun refreshRemoteConfigSettings() {
@@ -109,10 +114,24 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
         }
     }
 
+    private fun refreshAutofillJsConfigSettings() {
+        lifecycleScope.launch(dispatchers.io()) {
+            val autofillJsConfigType = determineAutofillJsConfigType()
+            val displayString = getString(R.string.autofillDevSettingsConfigDebugTitle, autofillJsConfigType)
+
+            withContext(dispatchers.main()) {
+                binding.changeAutofillJsConfigButton.setPrimaryText(displayString)
+            }
+        }
+    }
+
+    private fun determineAutofillJsConfigType(): String = autofillJavascriptEnvironmentConfiguration.getConfigType().toString()
+
     private fun configureUiEventHandlers() {
         configureEmailProtectionUiEventHandlers()
         configureLoginsUiEventHandlers()
         configureNeverSavedSitesEventHandlers()
+        configureAutofillJsConfigEventHandlers()
     }
 
     private fun configureNeverSavedSitesEventHandlers() = with(binding) {
@@ -129,6 +148,32 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
                 neverSavedSiteRepository.addToNeverSaveList("foo.fill.dev")
                 neverSavedSiteRepository.addToNeverSaveList("fill.dev/?q=123")
             }
+        }
+    }
+
+    private fun configureAutofillJsConfigEventHandlers() = with(binding) {
+        val options = listOf(R.string.autofillDevSettingsConfigDebugOptionProduction, R.string.autofillDevSettingsConfigDebugOptionDebug)
+
+        changeAutofillJsConfigButton.setClickListener {
+            RadioListAlertDialogBuilder(this@AutofillInternalSettingsActivity)
+                .setTitle(R.string.autofillDevSettingsConfigSectionTitle)
+                .setOptions(options)
+                .setPositiveButton(R.string.autofillDevSettingsOverrideMaxInstallDialogOkButtonText)
+                .setNegativeButton(R.string.autofillDevSettingsOverrideMaxInstallDialogCancelButtonText)
+                .addEventListener(
+                    object : RadioListAlertDialogBuilder.EventListener() {
+                        override fun onPositiveButtonClicked(selectedItem: Int) {
+                            lifecycleScope.launch(dispatchers.io()) {
+                                when (selectedItem) {
+                                    1 -> autofillJavascriptEnvironmentConfiguration.useProductionConfig()
+                                    2 -> autofillJavascriptEnvironmentConfiguration.useDebugConfig()
+                                }
+                                refreshAutofillJsConfigSettings()
+                            }
+                        }
+                    },
+                )
+                .show()
         }
     }
 

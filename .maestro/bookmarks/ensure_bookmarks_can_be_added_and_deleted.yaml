@@ -1,7 +1,7 @@
 appId: com.duckduckgo.mobile.android
 name: "ReleaseTest: Bookmarks can be added and deleted"
 tags:
-    - releaseTest
+  - releaseTest
 ---
 - launchApp:
     clearState: true
@@ -30,8 +30,6 @@ tags:
     text: "bookmarks"
 - tapOn:
     text: "bookmarks"
-- assertVisible:
-    text: "No favorites added yet"
 - assertVisible:
     text: "Privacy Test Pages - Home"
 - tapOn:

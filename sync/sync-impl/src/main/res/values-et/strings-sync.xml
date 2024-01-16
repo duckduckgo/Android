@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2021 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <!-- Sync Disabled messages -->
+    <string name="sync_flows_disabled"><b>Sünkroonimine ja varundamine pole saadaval</b>\nKahjuks pole sünkroonimine ja varundamine praegu saadaval. Proovi hiljem uuesti.</string>
+    <string name="sync_flows_disabled_new_version"><b>Sünkroonimine ja varundus pole saadaval</b>\nVabandust, sünkroonimine ja varundus pole selles rakenduse versioonis enam saadaval. Jätkamiseks värskenda DuckDuckGo uusimale versioonile.</string>
+    <string name="sync_create_account_disabled"><b>Sünkroonimine ja varundus pole saadaval</b>\nVabandust, sünkroonimine ja varundus pole praegu saadaval. Proovi hiljem uuesti.</string>
+    <string name="sync_create_account_disabled_new_version"><b>Sünkroonimine ja varundus pole saadaval</b>\nVabandust, sünkroonimine ja varundus pole selles rakenduse versioonis enam saadaval. Jätkamiseks värskenda DuckDuckGo uusimale versioonile.</string>
+    <string name="sync_disabled_authenticated_user"><b>Sünkroonimine ja varundamine peatatud</b>\nKahjuks pole sünkroonimine ja varundamine praegu saadaval. Proovi hiljem uuesti.</string>
+    <string name="sync_disabled_authenticated_user_new_version"><b>Sünkroonimine ja varundamine peatatud</b>\nVabandust, kuid sünkroonimine ja varundamine pole selles rakenduse versioonis enam saadaval. Jätkamiseks värskenda DuckDuckGo uusimale versioonile.</string>
+    <string name="sync_paused_notification"><b>Sünkroonimine ja varundus on peatatud</b>\nVabandust, sünkroonimine ja varundus pole praegu saadaval. Proovi hiljem uuesti.</string>
+
+    <!-- Settings screen -->
+    <string name="sync_screen_title">Sünkroonimine ja varundamine</string>
+    <string name="sync_setup_begin_syncing">Alusta sünkroonimist</string>
+    <string name="sync_setup_with_another_device_cta_title">Sünkrooni teise seadmega</string>
+    <string name="sync_setup_with_another_device_cta_subtitle">Sünkrooni järjehoidjaid ja paroole turvaliselt oma seadmete vahel.</string>
+    <string name="sync_off_hint">Sinu andmed on otsast lõpuni krüptitud ja DuckDuckGo ei pääse krüpteerimisvõtmele ligi.</string>
+    <string name="sync_setup_single_device_title">Ühe seadme seadistamine</string>
+    <string name="sync_setup_single_recover_data_cta_title">Taasta sünkroonitud andmed</string>
+    <string name="sync_setup_single_sync_this_device_cta_title">Selle seadme sünkroonimine ja varundamine</string>
+
+    <string name="sync_off_encrypted_hint">Sinu andmed on otsast lõpuni krüptitud ja DuckDuckGo ei pääse dekrüpteerimisvõtmele ligi.</string>
+
+    <!-- Setup screen -->
+    <string name="sync_enable_sync_title">Sünkroonimise ja varundamise seadistamine!</string>
+    <string name="sync_enable_sync_content">Teie järjehoidjad ja paroolid valmistatakse sünkroonimiseks ette. See peaks võtma vaid hetke.</string>
+    <string name="sync_enable_options">Valikud</string>
+    <string name="sync_enable_option_favicons_title">Too järjehoidjaikoonid</string>
+    <string name="sync_enable_option_favicons_subtitle">Laadi automaatselt alla oma sünkroonitud järjehoidjate ikoonid.</string>
+    <string name="sync_enable_connecting">Ühendamine ...</string>
+    <string name="sync_intro_enable_title">Selle seadme sünkroonimine ja varundamine</string>
+    <string name="sync_intro_enable_content">See loob DuckDuckGo turvalises serveris krüptitud varukoopia sinu järjehoidjatest ja paroolidest, mida saab sünkroonida sinu teiste seadmetega. \n\n Krüptimisvõti salvestatakse ainult sinu seadmesse, DuckDuckGo ei pääse sellele juurde.</string>
+    <string name="sync_intro_enable_footer">Saad hiljem sünkroonida teiste seadmetega.</string>
+    <string name="sync_intro_enable_cta">Lülita sünkroonimine ja varundamine sisse</string>
+    <string name="sync_intro_recover_title">Taasta sünkroonitud andmed</string>
+    <string name="sync_intro_recover_content">Sünkroonitud andmete taastamiseks vajad taastamiskoodi, mille salvestasid sünkroonimise esmakordsel seadistamisel. See kood võis olla salvestatud PDF-vormingus seadmesse, milles sa sünkroonimise algselt seadistasid.</string>
+    <string name="sync_intro_recover_cta">Alustage</string>
+
+    <!-- Recover data screen -->
+    <string name="login_screen_title">QR-koodi skannimine</string>
+    <string name="login_screen_enter_code_cta">Või sisesta kood käsitsi</string>
+    <string name="login_screen_barcode_hint">Suuna kaamera sünkroonimiseks QR-koodile</string>
+    <string name="login_screen_cant_scan">Kas sa ei saa skannida? <font color="#7295F6">Jaga tekstikoodi</font></string>
+
+    <!-- Connect screen -->
+    <string name="connect_screen_title">QR-koodi skannimine</string>
+    <string name="connect_screen_scan_qr_hint">Ava teises seadmes DuckDuckGo brauseris <b>Seaded &gt; Sünkroonimine ja varundus</b> ning vali käsk „Sünkrooni teise seadmega“.</string>
+    <string name="connect_screen_enter_code_cta">Või sisesta kood käsitsi</string>
+    <string name="connect_screen_connect_qr_hint_title">Mobiililt mobiilile?</string>
+    <string name="connect_screen_connect_qr_hint_content">Sünkroonimiseks skanni see kood teise seadmega.</string>
+    <string name="connect_screen_share_code">Kopeeri kood</string>
+
+    <!-- Enter Code screen -->
+    <string name="enter_code_screen_title">Sisesta kood käsitsi</string>
+    <string name="sync_enter_code_hint">Ava teises sünkroonitud seadmes DuckDuckGo rakenduses <b>Seaded &gt; Sünkroonimine ja varundus &gt; Sünkrooni teise seadmega</b>, vali <b>Kuva tekstikood</b> tee ja kleebi kood selle seadme sünkroonimiseks siia.</string>
+    <string name="sync_enter_code_verifying">Koodi kontrollimine</string>
+    <string name="sync_enter_code_invalid">⚠️ Vale kood</string>
+    <string name="sync_enter_code_paste">Kleebi kood</string>
+
+    <!-- Recovery PDF screen -->
+    <string name="sync_recovery_code_title">Salvesta taastamiskood</string>
+    <string name="sync_save_recovery_code_item_hint">Kui kaotad juurdepääsu oma seadmetele, vajad seda koodi oma sünkroonitud andmete taastamiseks.</string>
+    <string name="sync_recovery_code_skip_button">Järgmine</string>
+    <string name="sync_recovery_code_primary_button">Salvesta PDF-ina</string>
+    <string name="sync_recovery_code_secondary_button">Kopeeri kood</string>
+    <string name="sync_code_box_description">Igaüks, kellel on juurdepääs sellele koodile, võib saada juurdepääsu sinu sünkroonitud andmetele, seega hoia seda turvalises kohas.</string>
+
+    <!-- Device synced screen -->
+    <string name="sync_connected_device_title">Sinu andmed on sünkroonitud!</string>
+    <string name="sync_connected_device_primary_button">Valmis</string>
+
+    <string name="show_qr_screen_title">Näita QR-koodi</string>
+
+    <string name="show_code_screen_title">Kood</string>
+    <string name="enter_code_screen_cta">Sisesta tekstikood</string>
+    <string name="sync_login_device_hint">Andmete taastamiseks skanni QR-koodi oma taastamise PDF-ist või mõnest teisest sünkroonitud seadmest.</string>
+
+    <string name="synced_devices_section_title">Sünkroonitud seadmed</string>
+    <string name="sync_new_device_section_title">Uue seadme sünkroonimine</string>
+    <string name="sync_new_device_hint">Ava teises seadmes DuckDuckGo rakenduses Seaded &gt; Sünkroonimine ja varundus ning skanni, et kohe ühendus luua.</string>
+    <string name="sync_show_text_code_item">Näita tekstikoodi</string>
+    <string name="sync_show_qr_code_item">QR-koodi skannimine</string>
+    <string name="sync_save_recovery_code_item">Salvesta taastamise PDF</string>
+    <string name="sync_delete_account_item">Lülita välja ja kustuta serveri andmed …</string>
+    <string name="sync_disable_sync_item">Lülita sünkroonimine ja varundamine välja …</string>
+    <string name="sync_enable_sync_next_button">Järgmine</string>
+    <string name="sync_recovery_code_content">Kui kaotad juurdepääsu oma seadmetele, vajad seda koodi oma sünkroonitud andmete taastamiseks.</string>
+    <string name="sync_recovery_code_hint">Igaüks, kellel on juurdepääs sellele koodile, võib saada juurdepääsu sinu sünkroonitud andmetele, seega hoia seda turvalises kohas.</string>
+
+    <string name="turn_off_sync_dialog_title">Kas lülitada sünkroonimine välja?</string>
+    <string name="turn_off_sync_dialog_content">See seade ei pääse enam sinu sünkroonitud andmetele ligi</string>
+    <string name="turn_off_sync_dialog_primary_button">Lülita välja</string>
+    <string name="turn_off_sync_dialog_secondary_button">Loobu</string>
+    <string name="sync_permission_required_store_recovery_code">Taaste-PDF-i salvestamiseks on vaja salvestusluba</string>
+    <string name="sync_share_title">Jaga…</string>
+    <string name="sync_pdf_title">Sünkroonimise taastamiskood</string>
+    <string name="sync_pdf_description">Taastamiskood võimaldab sünkroonida järjehoidjaid mitmes seadmes ja taastada sünkroonitud andmed, kui kaotad juurdepääsu seadmele.</string>
+    <string name="sync_code_box_title">Hoia seda teavet kindlas kohas.</string>
+    <string name="sync_instructions_title">Kuidas see toimib?</string>
+    <string name="sync_instructions_step1">Ava teises seadmes DuckDuckGo ning ava seadetes käsk Sünkrooni.</string>
+    <string name="sync_instructions_step2">Skanni QR-kood või kopeeri ja kleepi tekstikood teise DuckDuckGo rakendusse.</string>
+    <string name="sync_instructions_step3">Sünkroonimine aktiveeritakse ja sul on uuesti juurdepääs kõikidele oma andmetele.</string>
+    <string name="remove_device_dialog_title">Kas seade eemaldada?</string>
+    <string name="remove_device_dialog_content" instruction="Placeholder is a device name">%1$s ei pääse enam sinu sünkroonitud andmetele juurde.</string>
+    <string name="remove_device_dialog_primary_button">Eemaldage</string>
+    <string name="remove_device_dialog_secondary_button">Loobu</string>
+    <string name="edit_device_dialog_title">Redigeeri</string>
+    <string name="edit_device_dialog_hint">Seadme nimi</string>
+    <string name="edit_device_dialog_primary_button">OK</string>
+    <string name="edit_device_dialog_secondary_button">Loobu</string>
+    <string name="sync_device_this_device_hint">See seade</string>
+    <string name="sync_device_menu_option_edit">Redigeeri</string>
+    <string name="sync_device_menu_option_remove">Eemalda seade</string>
+    <string name="sync_show_code_copy">Kopeeri kood</string>
+    <string name="sync_show_code_copy_hint">Kasuta seda koodi pärast seda, kui oled teise seadme sünkroonimise seadistamise käigus valinud „Sisesta kood käsitsi”</string>
+    <string name="sync_code_copied_message">Taastamiskood kopeeritud</string>
+    <string name="sync_camera_permission_required">Kaamera luba on vajalik</string>
+    <string name="sync_camera_unavailable">Kaamera pole saadaval</string>
+    <string name="sync_camera_permission_required_description">Ava oma seadme seaded ja anna sellele rakendusele luba juurdepääsuks kaamerale.</string>
+    <string name="sync_go_to_settings">Ava Sätted</string>
+    <string name="sync_general_error">Midagi läks valesti</string>
+    <string name="sync_notification_channel_name">Sünkrooni</string>
+    <string name="sync_notify_me_title">Teavitused on välja lülitatud</string>
+    <string name="sync_notify_me_description">Saad teavituse, kui sünkroonimisel ja varundamisel tekib mõni tõrge.</string>
+    <string name="sync_rollout_banner_text">Sünkroonimine ja varundamine võetakse kasutusele järk-järgult ning see ei pruugi teiste seadmete DuckDuckGos veel saadaval olla</string>
+</resources>

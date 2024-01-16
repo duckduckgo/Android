@@ -20,8 +20,8 @@ import android.webkit.WebView
 import androidx.test.annotation.UiThreadTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.autofill.FileBasedJavascriptInjector
-import com.duckduckgo.app.autofill.JavascriptInjector
+import com.duckduckgo.app.autofill.DefaultEmailProtectionJavascriptInjector
+import com.duckduckgo.app.autofill.EmailProtectionJavascriptInjector
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetectorImpl
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.autofill.api.Autofill
@@ -41,7 +41,7 @@ class EmailInjectorJsTest {
     private val mockDispatcherProvider: DispatcherProvider = mock()
     private val mockAutofillFeature: AutofillFeature = mock()
     private val mockAutofill: Autofill = mock()
-    private val javascriptInjector: JavascriptInjector = FileBasedJavascriptInjector()
+    private val javascriptInjector: EmailProtectionJavascriptInjector = DefaultEmailProtectionJavascriptInjector()
 
     lateinit var testee: EmailInjectorJs
 

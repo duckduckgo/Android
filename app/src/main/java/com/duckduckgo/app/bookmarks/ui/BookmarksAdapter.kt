@@ -16,50 +16,53 @@
 
 package com.duckduckgo.app.bookmarks.ui
 
-import android.content.Context
-import android.net.Uri
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.bookmarks.ui.BookmarkScreenViewHolders.BookmarkFoldersViewHolder
+import com.duckduckgo.app.bookmarks.ui.BookmarkScreenViewHolders.BookmarksViewHolder
+import com.duckduckgo.app.browser.databinding.RowBookmarkTwoLineItemBinding
 import com.duckduckgo.app.browser.databinding.ViewSavedSiteEmptyHintBinding
+import com.duckduckgo.app.browser.databinding.ViewSavedSiteEmptySearchHintBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.common.ui.menu.PopupMenu
-import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.mobile.android.databinding.RowTwoLineItemBinding
+import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
-import kotlinx.coroutines.launch
+import com.duckduckgo.savedsites.api.models.SavedSitesNames
+import java.util.Collections
 
 class BookmarksAdapter(
     private val layoutInflater: LayoutInflater,
     private val viewModel: BookmarksViewModel,
     private val lifecycleOwner: LifecycleOwner,
     private val faviconManager: FaviconManager,
-    private val dispatchers: DispatcherProvider,
 ) : RecyclerView.Adapter<BookmarkScreenViewHolders>() {
 
     companion object {
         const val EMPTY_STATE_TYPE = 0
-        const val BOOKMARK_TYPE = 1
+        const val EMPTY_SEARCH_STATE_TYPE = 1
+        const val BOOKMARK_TYPE = 2
+        const val BOOKMARK_FOLDER_TYPE = 3
     }
 
-    private val bookmarkItems = mutableListOf<BookmarksItemTypes>()
+    val bookmarkItems = mutableListOf<BookmarksItemTypes>()
+    var isInSearchMode = false
+    var isReorderingModeEnabled = false
 
     interface BookmarksItemTypes
     object EmptyHint : BookmarksItemTypes
+    object EmptySearchHint : BookmarksItemTypes
     data class BookmarkItem(val bookmark: SavedSite.Bookmark) : BookmarksItemTypes
+    data class BookmarkFolderItem(val bookmarkFolder: BookmarkFolder) : BookmarksItemTypes
 
     fun setItems(
-        bookmarkItems: List<BookmarkItem>,
+        bookmarkItems: List<BookmarksItemTypes>,
         showEmptyHint: Boolean,
+        showEmptySearchHint: Boolean,
     ) {
-        val generatedList = generateNewList(bookmarkItems, showEmptyHint)
+        val generatedList = generateNewList(bookmarkItems, showEmptyHint, showEmptySearchHint)
         val diffCallback = DiffCallback(old = this.bookmarkItems, new = generatedList)
         val diffResult = DiffUtil.calculateDiff(diffCallback)
         this.bookmarkItems.clear().also { this.bookmarkItems.addAll(generatedList) }
@@ -69,7 +72,11 @@ class BookmarksAdapter(
     private fun generateNewList(
         value: List<BookmarksItemTypes>,
         showEmptyHint: Boolean,
+        showEmptySearchHint: Boolean,
     ): List<BookmarksItemTypes> {
+        if (showEmptySearchHint) {
+            return value.ifEmpty { listOf(EmptySearchHint) }
+        }
         if (!showEmptyHint) {
             return value
         }
@@ -83,8 +90,8 @@ class BookmarksAdapter(
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             BOOKMARK_TYPE -> {
-                val binding = RowTwoLineItemBinding.inflate(inflater, parent, false)
-                return BookmarkScreenViewHolders.BookmarksViewHolder(
+                val binding = RowBookmarkTwoLineItemBinding.inflate(inflater, parent, false)
+                return BookmarksViewHolder(
                     layoutInflater,
                     binding,
                     viewModel,
@@ -92,9 +99,21 @@ class BookmarksAdapter(
                     faviconManager,
                 )
             }
+            BOOKMARK_FOLDER_TYPE -> {
+                val binding = RowTwoLineItemBinding.inflate(inflater, parent, false)
+                return BookmarkFoldersViewHolder(
+                    layoutInflater,
+                    binding,
+                    viewModel,
+                )
+            }
             EMPTY_STATE_TYPE -> {
                 val binding = ViewSavedSiteEmptyHintBinding.inflate(inflater, parent, false)
-                BookmarkScreenViewHolders.EmptyHint(binding)
+                BookmarkScreenViewHolders.EmptyHint(binding, viewModel)
+            }
+            EMPTY_SEARCH_STATE_TYPE -> {
+                val binding = ViewSavedSiteEmptySearchHintBinding.inflate(inflater, parent, false)
+                BookmarkScreenViewHolders.EmptySearchHint(binding, viewModel, lifecycleOwner)
             }
             else -> throw IllegalArgumentException("viewType not found")
         }
@@ -105,10 +124,20 @@ class BookmarksAdapter(
         position: Int,
     ) {
         when (holder) {
-            is BookmarkScreenViewHolders.BookmarksViewHolder -> {
-                holder.update((this.bookmarkItems[position] as BookmarkItem).bookmark)
+            is BookmarksViewHolder -> {
+                val bookmark = (this.bookmarkItems[position] as BookmarkItem).bookmark
+                holder.update(bookmark)
+                holder.showDragHandle(isReorderingModeEnabled, bookmark)
+            }
+            is BookmarkFoldersViewHolder -> {
+                val bookmarkFolder = (this.bookmarkItems[position] as BookmarkFolderItem).bookmarkFolder
+                holder.update(bookmarkFolder)
+                holder.showDragHandle(isReorderingModeEnabled, bookmarkFolder)
             }
             is BookmarkScreenViewHolders.EmptyHint -> {
+                holder.bind()
+            }
+            is BookmarkScreenViewHolders.EmptySearchHint -> {
                 holder.bind()
             }
         }
@@ -117,6 +146,8 @@ class BookmarksAdapter(
     override fun getItemViewType(position: Int): Int {
         return when (this.bookmarkItems[position]) {
             is EmptyHint -> EMPTY_STATE_TYPE
+            is EmptySearchHint -> EMPTY_SEARCH_STATE_TYPE
+            is BookmarkFolderItem -> BOOKMARK_FOLDER_TYPE
             else -> BOOKMARK_TYPE
         }
     }
@@ -125,13 +156,44 @@ class BookmarksAdapter(
         return this.bookmarkItems.size
     }
 
+    fun onItemMove(fromPosition: Int, toPosition: Int) {
+        Collections.swap(bookmarkItems, fromPosition, toPosition)
+        notifyItemMoved(fromPosition, toPosition)
+    }
+
+    fun persistReorderedItems() {
+        var parentId = SavedSitesNames.BOOKMARKS_ROOT
+        val reorderedBookmarks = bookmarkItems.mapNotNull { item ->
+            when (item) {
+                is BookmarkItem -> {
+                    parentId = item.bookmark.parentId
+                    item.bookmark.id
+                }
+                is BookmarkFolderItem -> {
+                    parentId = item.bookmarkFolder.parentId
+                    item.bookmarkFolder.id
+                }
+                else -> ""
+            }
+        }
+        viewModel.updateBookmarks(reorderedBookmarks, parentId)
+    }
+
     class DiffCallback(
         private val old: List<BookmarksItemTypes>,
         private val new: List<BookmarksItemTypes>,
     ) : DiffUtil.Callback() {
 
         override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            return old[oldItemPosition] == new[newItemPosition]
+            val oldItem = old[oldItemPosition]
+            val newItem = new[newItemPosition]
+            return if (oldItem is BookmarkItem && newItem is BookmarkItem) {
+                oldItem.bookmark.id == newItem.bookmark.id
+            } else if (oldItem is BookmarkFolderItem && newItem is BookmarkFolderItem) {
+                oldItem.bookmarkFolder.id == newItem.bookmarkFolder.id
+            } else {
+                old[oldItemPosition] == new[newItemPosition]
+            }
         }
 
         override fun getOldListSize(): Int {
@@ -144,82 +206,6 @@ class BookmarksAdapter(
 
         override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
             return old[oldItemPosition] == new[newItemPosition]
-        }
-    }
-}
-
-sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder(itemView) {
-
-    class EmptyHint(private val binding: ViewSavedSiteEmptyHintBinding) : BookmarkScreenViewHolders(binding.root) {
-        fun bind() {
-            binding.savedSiteEmptyHint.setText(R.string.bookmarksEmptyHint)
-        }
-    }
-
-    class BookmarksViewHolder(
-        private val layoutInflater: LayoutInflater,
-        private val binding: RowTwoLineItemBinding,
-        private val viewModel: BookmarksViewModel,
-        private val lifecycleOwner: LifecycleOwner,
-        private val faviconManager: FaviconManager,
-    ) : BookmarkScreenViewHolders(binding.root) {
-
-        private val context: Context = binding.root.context
-
-        fun update(bookmark: SavedSite.Bookmark) {
-            val twoListItem = binding.root
-
-            twoListItem.setLeadingIconContentDescription(
-                context.getString(
-                    R.string.bookmarkOverflowContentDescription,
-                    bookmark.title,
-                ),
-            )
-            twoListItem.setPrimaryText(bookmark.title)
-            twoListItem.setSecondaryText(parseDisplayUrl(bookmark.url))
-
-            loadFavicon(bookmark.url, twoListItem.leadingIcon())
-
-            twoListItem.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_menu_vertical_24)
-            twoListItem.setTrailingIconClickListener { anchor ->
-                showOverFlowMenu(anchor, bookmark)
-            }
-
-            twoListItem.setClickListener {
-                viewModel.onSelected(bookmark)
-            }
-        }
-
-        private fun loadFavicon(url: String, image: ImageView) {
-            lifecycleOwner.lifecycleScope.launch {
-                faviconManager.loadToViewFromLocalWithPlaceholder(url = url, view = image)
-            }
-        }
-
-        private fun parseDisplayUrl(urlString: String): String {
-            val uri = Uri.parse(urlString)
-            return uri.baseHost ?: return urlString
-        }
-
-        private fun showOverFlowMenu(
-            anchor: View,
-            bookmark: SavedSite.Bookmark,
-        ) {
-            val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_edit_delete_menu)
-            val view = popupMenu.contentView
-            popupMenu.apply {
-                onMenuItemClicked(view.findViewById(R.id.edit)) { editBookmark(bookmark) }
-                onMenuItemClicked(view.findViewById(R.id.delete)) { deleteBookmark(bookmark) }
-            }
-            popupMenu.show(binding.root, anchor)
-        }
-
-        private fun editBookmark(bookmark: SavedSite.Bookmark) {
-            viewModel.onEditSavedSiteRequested(bookmark)
-        }
-
-        private fun deleteBookmark(bookmark: SavedSite.Bookmark) {
-            viewModel.onDeleteSavedSiteRequested(bookmark)
         }
     }
 }

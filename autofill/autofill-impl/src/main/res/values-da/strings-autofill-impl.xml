@@ -133,4 +133,6 @@
     <string name="managementDisabledModeSubtitle">Der kræves et låsemønster, en pinkode eller biometri for at beskytte dine adgangskoder.</string>
     <string name="credentialManagementEditTitle">Rediger adgangskode</string>
 
+    <string name="credentials_limit_warning"><b>Synkronisering sat på pause</b>\nGrænse for logins overskredet. Slet nogle for at genoptage synkroniseringen.\n\n<annotation type="manage_logins">Administrer logins</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Synkronisering af adgangskoder sat på pause</b>\nDu har overskredet grænsen for synkronisering af adgangskoder. Prøv at slette nogle adgangskoder. Dine adgangskoder vil ikke blive sikkerhedskopieret, før dette er løst.</string>
 </resources>

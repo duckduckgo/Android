@@ -18,7 +18,7 @@ package com.duckduckgo.app.email
 
 import android.webkit.WebView
 import androidx.annotation.UiThread
-import com.duckduckgo.app.autofill.JavascriptInjector
+import com.duckduckgo.app.autofill.EmailProtectionJavascriptInjector
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.email.EmailJavascriptInterface.Companion.JAVASCRIPT_INTERFACE_NAME
 import com.duckduckgo.autofill.api.Autofill
@@ -36,7 +36,7 @@ class EmailInjectorJs @Inject constructor(
     private val urlDetector: DuckDuckGoUrlDetector,
     private val dispatcherProvider: DispatcherProvider,
     private val autofillFeature: AutofillFeature,
-    private val javaScriptInjector: JavascriptInjector,
+    private val emailProtectionJavascriptInjector: EmailProtectionJavascriptInjector,
     private val autofill: Autofill,
 ) : EmailInjector {
 
@@ -68,7 +68,7 @@ class EmailInjectorJs @Inject constructor(
     ) {
         url?.let {
             if (isFeatureEnabled() && !autofill.isAnException(url)) {
-                webView.evaluateJavascript("javascript:${javaScriptInjector.getAliasFunctions(webView.context, alias)}", null)
+                webView.evaluateJavascript("javascript:${emailProtectionJavascriptInjector.getAliasFunctions(webView.context, alias)}", null)
             }
         }
     }
@@ -80,7 +80,7 @@ class EmailInjectorJs @Inject constructor(
     ) {
         url?.let {
             if (isFeatureEnabled() && isDuckDuckGoUrl(url) && !emailManager.isSignedIn()) {
-                webView.evaluateJavascript("javascript:${javaScriptInjector.getSignOutFunctions(webView.context)}", null)
+                webView.evaluateJavascript("javascript:${emailProtectionJavascriptInjector.getSignOutFunctions(webView.context)}", null)
             }
         }
     }

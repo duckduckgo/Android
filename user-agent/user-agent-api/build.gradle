@@ -15,11 +15,11 @@
  */
 
 plugins {
-    id 'java-library'
-    id 'kotlin'
+    id 'com.android.library'
+    id 'kotlin-android'
 }
 
-apply from: "$rootProject.projectDir/code-formatting.gradle"
+apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
@@ -31,5 +31,11 @@ kotlin {
 }
 
 dependencies {
-    
+    implementation project(':common-utils')
+
+    implementation AndroidX.webkit
+}
+
+android {
+    namespace 'com.duckduckgo.user.agent.api'
 }

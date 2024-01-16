@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2021 DuckDuckGo
+  ~ Copyright (c) 2024 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -24,132 +24,7 @@
     <string name="sync_internal_account_header">Account Settings</string>
     <string name="sync_internal_recovery_code">Recovery code</string>
     <string name="sync_internal_recovery_code_cta">Copy Recovery code</string>
-
     <string name="userIdSectionHeader">User ID</string>
     <string name="deviceIdSectionHeader">Device Id</string>
     <string name="deviceNameSectionHeader">Device Name</string>
-
-    <!-- Sync -->
-    <!-- Sync Disabled messages -->
-    <string name="sync_flows_disabled"><b>Service Unavailable</b>\nWe apologize, but the Sync &amp; Backup service is currently unavailable. Please try again later.</string>
-    <string name="sync_flows_disabled_new_version"><b>Service Unavailable</b>\nWe apologize, but the Sync &amp; Backup service is unavailable in this app version. Please update your app to the latest version.</string>
-    <string name="sync_create_account_disabled"><b>Service Unavailable</b>\nWe apologize, but enabling Sync &amp; Backup is currently unavailable. Please try again later.</string>
-    <string name="sync_create_account_disabled_new_version"><b>Service Unavailable</b>\nWe apologize, but enabling Sync &amp; Backup is unavailable in this app version. Please update your app to the latest version.</string>
-    <string name="sync_disabled_authenticated_user"><b>Sync Paused</b>\nWe apologize, but the Sync &amp; Backup service is currently unavailable.</string>
-    <string name="sync_disabled_authenticated_user_new_version"><b>Sync Paused</b>\nWe apologize, but the Sync &amp; Backup service is unavailable in this app version. Please update your app to resume syncing.</string>
-    <string name="sync_paused_notification"><b>Sync Paused</b>\nWe apologize, but the Sync &amp; Backup service is currently unavailable.</string>
-
-    <!-- Settings screen -->
-    <string name="sync_screen_title">Sync &amp; Backup</string>
-    <string name="sync_setup_begin_syncing">Begin Syncing</string>
-    <string name="sync_setup_with_another_device_cta_title">Sync with Another Device</string>
-    <string name="sync_setup_with_another_device_cta_subtitle">Securely sync bookmarks and passwords between your devices.</string>
-    <string name="sync_off_hint">Your data is end-to-end encrypted, and DuckDuckGo does not have access to the encryption key.</string>
-    <string name="sync_setup_single_device_title">Single-Device Setup</string>
-    <string name="sync_setup_single_recover_data_cta_title">Recover Synced Data</string>
-    <string name="sync_setup_single_sync_this_device_cta_title">Sync and Back Up This Device</string>
-
-    <string name="sync_off_encrypted_hint">Your data is end-to-end encrypted, and DuckDuckGo does not have access to the decryption key.</string>
-
-    <!-- Setup screen -->
-    <string name="sync_enable_sync_title">Setting Up Sync and Backup!</string>
-    <string name="sync_enable_sync_content">Your bookmarks and passwords are being prepared to sync. This should only take a moment.</string>
-    <string name="sync_enable_options">Options</string>
-    <string name="sync_enable_option_favicons_title">Fetch Bookmark Icons</string>
-    <string name="sync_enable_option_favicons_subtitle">Automatically download icons for synced bookmarks.</string>
-    <string name="sync_enable_connecting">Connecting…</string>
-    <string name="sync_intro_enable_title">Sync and Back Up This Device</string>
-    <string name="sync_intro_enable_content">This creates an encrypted backup of your bookmarks and passwords on DuckDuckGo’s secure server, which can be synced with your other devices. \n\n The encryption key is only stored on your device, DuckDuckGo cannot access it.…</string>
-    <string name="sync_intro_enable_footer">You can sync with your other devices later.</string>
-    <string name="sync_intro_enable_cta">Turn on Sync &amp; Backup</string>
-    <string name="sync_intro_recover_title">Recover Synced Data</string>
-    <string name="sync_intro_recover_content">To restore your synced data, you\'ll need the Recovery Code you saved when you first set up Sync. This code may have been saved as a PDF on the device you originally used to set up Sync.</string>
-    <string name="sync_intro_recover_cta">Get Started</string>
-
-    <!-- Recover data screen -->
-    <string name="login_screen_title">Scan QR Code</string>
-    <string name="login_screen_enter_code_cta">Or Manually Enter Code</string>
-    <string name="login_screen_barcode_hint">Point camera at QR code to sync</string>
-    <string name="login_screen_cant_scan">Can\'t Scan? <font color="#7295F6">Share Text Code</font></string>
-
-    <!-- Connect screen -->
-    <string name="connect_screen_title">Scan QR Code</string>
-    <string name="connect_screen_scan_qr_hint">Go to <b>Settings > Sync &amp; Back Up</b> in the DuckDuckGo Browser on a another device and select  ”Sync with Another Device.”</string>
-    <string name="connect_screen_enter_code_cta">Or Manually Enter Code</string>
-    <string name="connect_screen_connect_qr_hint_title">Mobile-to-Mobile?</string>
-    <string name="connect_screen_connect_qr_hint_content">Scan this code with another device to sync.”</string>
-    <string name="connect_screen_share_code">Copy Code</string>
-
-    <!-- Enter Code screen -->
-    <string name="enter_code_screen_title">Manually Enter Code</string>
-    <string name="sync_enter_code_hint">Go to <b>Settings > Sync &amp; Backup > Sync With Another Device</b> and select <b>View Text Code</b> in the DuckDuckGo App on another synced device and paste the code here to sync this device.</string>
-    <string name="sync_enter_code_verifying">Verifying code</string>
-    <string name="sync_enter_code_invalid">⚠️ Invalid Code</string>
-    <string name="sync_enter_code_paste">Paste Code</string>
-
-    <!-- Recovery PDF screen -->
-    <string name="sync_recovery_code_title">Save Recovery Code</string>
-    <string name="sync_save_recovery_code_item_hint">If you lose access to your devices, you will need this code to recover your synced data.</string>
-    <string name="sync_recovery_code_skip_button">Next</string>
-    <string name="sync_recovery_code_primary_button">Save as PDF</string>
-    <string name="sync_recovery_code_secondary_button">Copy Code</string>
-    <string name="sync_code_box_description">Anyone with access to this code can access your synced data, so please keep it in a safe place.</string>
-
-    <!-- Device synced screen -->
-    <string name="sync_connected_device_title">Your Data is Synced!</string>
-    <string name="sync_connected_device_primary_button">Done</string>
-
-    <string name="show_qr_screen_title">Show QR Code</string>
-
-    <string name="show_code_screen_title">Code</string>
-    <string name="enter_code_screen_cta">Enter Text Code</string>
-    <string name="sync_login_device_hint">Scan the QR code on your Recovery PDF, or another synced device, to recover your data.</string>
-
-    <string name="synced_devices_section_title">Synced Devices</string>
-    <string name="sync_new_device_section_title">Sync New Device</string>
-    <string name="sync_new_device_hint">Go to Settings > Sync &amp; Back Up in the DuckDuckGo App on a different device and scan to connect instantly.</string>
-    <string name="sync_show_text_code_item">Show Text Code</string>
-    <string name="sync_show_qr_code_item">Scan QR Code</string>
-    <string name="sync_save_recovery_code_item">Save Recovery PDF</string>
-    <string name="sync_delete_account_item">Turn Off and Delete Server Data…</string>
-    <string name="sync_disable_sync_item">Turn Off Sync &amp; Backup…</string>
-    <string name="sync_enable_sync_next_button">Next</string>
-    <string name="sync_recovery_code_content">If you lose access to your devices, you will need this code to recover your synced data.</string>
-    <string name="sync_recovery_code_hint">Anyone with access to this code can access your synced data, so please keep it in a safe place.</string>
-
-    <string name="turn_off_sync_dialog_title">Turn off sync?</string>
-    <string name="turn_off_sync_dialog_content">This Device will no longer be able to access your synced data</string>
-    <string name="turn_off_sync_dialog_primary_button">Turn Off</string>
-    <string name="turn_off_sync_dialog_secondary_button">Cancel</string>
-    <string name="sync_permission_required_store_recovery_code">Save recovery PDF requires storage permission</string>
-    <string name="sync_share_title">Share with…</string>
-    <string name="sync_pdf_title">Sync Recovery Code</string>
-    <string name="sync_pdf_description">The Recovery Code allows you to sync your bookmarks across multiple devices and recover your synced data if you lose access to a device.</string>
-    <string name="sync_code_box_title">Keep this information safe and secure.</string>
-    <string name="sync_instructions_title">How does this work?</string>
-    <string name="sync_instructions_step1">Open DuckDuckGo on another device and go to Sync in Settings.</string>
-    <string name="sync_instructions_step2">Scan the QR code or copy and paste the text code into another DuckDuckGo app.</string>
-    <string name="sync_instructions_step3">Sync will be activated and you\'ll once again have access to all of your data.</string>
-    <string name="remove_device_dialog_title">Remove device?</string>
-    <string name="remove_device_dialog_content" instruction="Placeholder is a device name">\"%1$s\" will no longer be able to access your synced data.</string>
-    <string name="remove_device_dialog_primary_button">Remove</string>
-    <string name="remove_device_dialog_secondary_button">Cancel</string>
-    <string name="edit_device_dialog_title">Edit</string>
-    <string name="edit_device_dialog_hint">Device Name</string>
-    <string name="edit_device_dialog_primary_button">OK</string>
-    <string name="edit_device_dialog_secondary_button">Cancel</string>
-    <string name="sync_device_this_device_hint">This device</string>
-    <string name="sync_device_menu_option_edit">Edit</string>
-    <string name="sync_device_menu_option_remove">Remove Device</string>
-    <string name="sync_show_code_copy">Copy Code</string>
-    <string name="sync_show_code_copy_hint">Use this code after choosing "Manually Enter Code" during sync setup on a second device</string>
-    <string name="sync_code_copied_message">Recovery Code Copied</string>
-    <string name="sync_camera_permission_required">Camera Permission is Required</string>
-    <string name="sync_camera_unavailable">Camera Unavailable</string>
-    <string name="sync_camera_permission_required_description">Please go to your device\'s settings and grant permission for this app to access your camera.</string>
-    <string name="sync_go_to_settings">Go to Settings</string>
-    <string name="sync_general_error">Something went wrong</string>
-    <string name="sync_notification_channel_name">Sync</string>
-    <string name="sync_notify_me_title">Notifications are disabled</string>
-    <string name="sync_notify_me_description">Get notified of Sync events</string>
 </resources>

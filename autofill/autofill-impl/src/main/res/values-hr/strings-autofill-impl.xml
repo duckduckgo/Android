@@ -133,4 +133,6 @@
     <string name="managementDisabledModeSubtitle">Uzorak za zaključavanje uređaja, PIN ili biometrija potrebni su za zaštitu tvojih lozinki.</string>
     <string name="credentialManagementEditTitle">Uredi lozinku</string>
 
+    <string name="credentials_limit_warning"><b>Sinkronizacija pauzirana</b>\nOgraničenje prijava premašeno. Izbriši neke za nastavak sinkronizacije.\n\n<annotation type="manage_logins">upravljanje prijavama</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Sinkronizacija lozinki je pauzirana</b>\nPremašeno je ograničenje sinkronizacije lozinki. Pokušaj izbrisati neke lozinke. Dok se to ne riješi, tvoje se lozinke neće sigurnosno kopirati.</string>
 </resources>

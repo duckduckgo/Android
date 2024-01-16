@@ -25,8 +25,4 @@
         style="@style/Widget.DuckDuckGo.SearchWidgetEmptyFavoritesHint"
         android:text="@string/searchWidgetEmtpyFavoritesHint" />
 
-    <TextView
-        android:id="@+id/addFavoriteText"
-        style="@style/Widget.DuckDuckGo.SearchWidgetEmptyFavoritesAction"
-        android:text="@string/searchWidgetEmtpyFavoritesCta" />
 </LinearLayout>

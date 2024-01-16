@@ -788,4 +788,22 @@
     <string name="settingsAutofillLoginsSetting">Jelszavak</string>
     <string name="autofillLoginSavedSnackbarMessage">Jelszó mentve</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Jelszó frissítve</string>
+
+    <!-- Bookmarks -->
+    <string name="searchBookmarks">Könyvjelzők keresése</string>
+    <string name="deleteFolder" instruction="%1$s is the folder name">"Törlöd a(z) %1$s mappát?"</string>
+    <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Törlöd a(z) %1$s könyvjelzőt?"</string>
+    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Könyvjelző hozzáadva a(z) %1$s mappához</string>
+    <string name="addToFavorites">Hozzáadás a kedvencekhez</string>
+    <string name="editBookmark">Könyvjelző szerkesztése</string>
+    <string name="importBookmarksDescription">Ha a könyvjelzőid egy másik böngészőben vannak mentve,\nimportálhatod azokat a DuckDuckGo alkalmazásba.</string>
+    <string name="importBookmarks">Könyvjelzők importálása</string>
+    <string name="noResultsFor" instruction="%1$s is the search term">Nincs találat erre: „%1$s”</string>
+    <string name="removeFromFavorites">Eltávolítás a kedvencek közül</string>
+    <string name="addToFavoritesMenu">Hozzáadás a kedvencekhez</string>
+    <plurals name="bookmarkFolderDeleteMessage">
+        <item quantity="one">Biztos, hogy törölni akarod ezt a mappát és annak %1$d elemét?</item>
+        <item quantity="other">Biztos, hogy törölni akarod ezt a mappát és annak %1$d elemét?</item>
+    </plurals>
+    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Biztosan törlöd a(z) &lt;b&gt;%1$s&lt;/b&gt; könyvjelzőjét?</string>
 </resources>

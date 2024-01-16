@@ -792,4 +792,23 @@
     <string name="settingsAutofillLoginsSetting">Paroles</string>
     <string name="autofillLoginSavedSnackbarMessage">Parole saglabāta</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Parole atjaunināta</string>
+
+    <!-- Bookmarks -->
+    <string name="searchBookmarks">Meklēt grāmatzīmes</string>
+    <string name="deleteFolder" instruction="%1$s is the folder name">"Dzēst %1$s?"</string>
+    <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Dzēst grāmatzīmi %1$s?"</string>
+    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Grāmatzīme pievienota mapē %1$s</string>
+    <string name="addToFavorites">Pievienot izlasei</string>
+    <string name="editBookmark">Rediģēt grāmatzīmi</string>
+    <string name="importBookmarksDescription">Ja tavas grāmatzīmes ir saglabātas citā pārlūkā,\nvari tās importēt DuckDuckGo.</string>
+    <string name="importBookmarks">Importēt grāmatzīmes</string>
+    <string name="noResultsFor" instruction="%1$s is the search term">Vaicājumam “%1$s” nav rezultātu</string>
+    <string name="removeFromFavorites">Noņemt no izlases</string>
+    <string name="addToFavoritesMenu">Pievienot izlasei</string>
+    <plurals name="bookmarkFolderDeleteMessage">
+        <item quantity="zero">Vai tiešām vēlies dzēst šo mapi un %1$d vienumus?</item>
+        <item quantity="one">Vai tiešām vēlies dzēst šo mapi un %1$d vienumu?</item>
+        <item quantity="other">Vai tiešām vēlies dzēst šo mapi un %1$d vienumus?</item>
+    </plurals>
+    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Vai tiešām vēlies dzēst savu &lt;b&gt;%1$s&lt;/b&gt; grāmatzīmi?</string>
 </resources>

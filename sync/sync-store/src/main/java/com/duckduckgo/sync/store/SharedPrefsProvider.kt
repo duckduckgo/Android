@@ -26,7 +26,7 @@ interface SharedPrefsProvider {
     fun getSharedPrefs(fileName: String): SharedPreferences
 }
 
-class EncryptedSharedPrefsProvider(
+class SyncSharedPrefsProvider(
     private val context: Context,
 ) : SharedPrefsProvider {
     override fun getEncryptedSharedPrefs(fileName: String): SharedPreferences? {
@@ -38,7 +38,7 @@ class EncryptedSharedPrefsProvider(
                 EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
                 EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
             )
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             null
         }
     }

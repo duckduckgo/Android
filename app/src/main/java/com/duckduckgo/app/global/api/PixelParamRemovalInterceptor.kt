@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.global.api
 
+import com.duckduckgo.app.browser.WebViewPixelName
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.StatisticsPixelName
@@ -75,6 +76,7 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
         return listOf(
             AppPixelName.EMAIL_COPIED_TO_CLIPBOARD.pixelName to PixelParameter.removeAll(),
             StatisticsPixelName.BROWSER_DAILY_ACTIVE_FEATURE_STATE.pixelName to PixelParameter.removeAll(),
+            WebViewPixelName.WEB_PAGE_LOADED.pixelName to PixelParameter.removeAll(),
         )
     }
 }

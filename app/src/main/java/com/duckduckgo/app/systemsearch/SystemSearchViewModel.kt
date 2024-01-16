@@ -93,6 +93,7 @@ class SystemSearchViewModel @Inject constructor(
         object LaunchDuckDuckGo : Command()
         data class LaunchBrowser(val query: String) : Command()
         data class LaunchEditDialog(val savedSite: SavedSite) : Command()
+        data class DeleteFavoriteConfirmation(val savedSite: SavedSite) : Command()
         data class DeleteSavedSiteConfirmation(val savedSite: SavedSite) : Command()
         data class LaunchDeviceApplication(val deviceApp: DeviceApp) : Command()
         data class ShowAppNotFoundMessage(val appName: String) : Command()
@@ -324,6 +325,11 @@ class SystemSearchViewModel @Inject constructor(
 
     fun onDeleteQuickAccessItemRequested(it: FavoritesQuickAccessAdapter.QuickAccessFavorite) {
         hideQuickAccessItem(it)
+        command.value = Command.DeleteFavoriteConfirmation(it.favorite)
+    }
+
+    fun onDeleteSavedSiteRequested(it: FavoritesQuickAccessAdapter.QuickAccessFavorite) {
+        hideQuickAccessItem(it)
         command.value = Command.DeleteSavedSiteConfirmation(it.favorite)
     }
 
@@ -341,13 +347,14 @@ class SystemSearchViewModel @Inject constructor(
     override fun onBookmarkEdited(
         bookmark: Bookmark,
         oldFolderId: String,
+        updateFavorite: Boolean,
     ) {
         viewModelScope.launch(dispatchers.io()) {
-            savedSitesRepository.updateBookmark(bookmark, oldFolderId)
+            savedSitesRepository.updateBookmark(bookmark, oldFolderId, updateFavorite)
         }
     }
 
-    fun deleteSavedSiteSnackbarDismissed(savedSite: SavedSite) {
+    fun deleteFavoriteSnackbarDismissed(savedSite: SavedSite) {
         when (savedSite) {
             is SavedSite.Favorite -> {
                 appCoroutineScope.launch(dispatchers.io()) {
@@ -356,6 +363,12 @@ class SystemSearchViewModel @Inject constructor(
             }
 
             else -> throw IllegalArgumentException("Illegal SavedSite to delete received")
+        }
+    }
+
+    fun deleteSavedSiteSnackbarDismissed(savedSite: SavedSite) {
+        appCoroutineScope.launch(dispatchers.io()) {
+            savedSitesRepository.delete(savedSite, true)
         }
     }
 

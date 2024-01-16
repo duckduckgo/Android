@@ -19,6 +19,7 @@ package com.duckduckgo.savedsites.api
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.BookmarkFolderItem
 import com.duckduckgo.savedsites.api.models.FolderBranch
+import com.duckduckgo.savedsites.api.models.FolderTreeItem
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
@@ -42,9 +43,9 @@ interface SavedSitesRepository {
     /**
      * Returns all [Bookmark] and [BookmarkFolder] inside a folder
      * @param folderId the id of the folder.
-     * @return [Pair] of [Bookmark] and [BookmarkFolder] inside a folder
+     * @return [FolderTreeItem]s inside a folder
      */
-    fun getFolderContentSync(folderId: String): Pair<List<Bookmark>, List<BookmarkFolder>>
+    fun getFolderTreeItems(folderId: String): List<FolderTreeItem>
 
     /**
      * Returns complete list of [BookmarkFolderItem] inside a folder. This method traverses all folders.
@@ -207,7 +208,7 @@ interface SavedSitesRepository {
      * Deletes a [SavedSite]
      * @param savedSite to be deleted
      */
-    fun delete(savedSite: SavedSite)
+    fun delete(savedSite: SavedSite, deleteBookmark: Boolean = false)
 
     /**
      * Updates the content of a [Favorite]
@@ -219,10 +220,12 @@ interface SavedSitesRepository {
      * Updates the content of a [Bookmark]
      * @param savedSite to be updated
      * @param fromFolderId id of the previous bookmark folder
+     * @param updateFavorite specifies whether the bookmark's favorite state has changed, default value is false
      */
     fun updateBookmark(
         bookmark: Bookmark,
         fromFolderId: String,
+        updateFavorite: Boolean = false,
     )
 
     /**
@@ -305,4 +308,9 @@ interface SavedSitesRepository {
      * This makes the deletion permanent
      */
     fun pruneDeleted()
+
+    /**
+     * Deletes and re-inserts a folder relation
+     */
+    fun updateFolderRelation(folderId: String, entities: List<String>)
 }
