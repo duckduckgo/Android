@@ -20,7 +20,6 @@ import android.net.Uri
 import com.duckduckgo.app.trackerdetection.model.Action.BLOCK
 import com.duckduckgo.app.trackerdetection.model.Action.IGNORE
 import com.duckduckgo.app.trackerdetection.model.TdsTracker
-import com.duckduckgo.common.utils.UriString.Companion.safeSameOrSubdomain
 import com.duckduckgo.common.utils.UriString.Companion.sameOrSubdomain
 
 class TdsClient(
@@ -50,7 +49,7 @@ class TdsClient(
         documentUrl: String,
         requestHeaders: Map<String, String>,
     ): Client.Result {
-        val tracker = trackers.firstOrNull { safeSameOrSubdomain(url, it.domain) } ?: return Client.Result(matches = false, isATracker = false)
+        val tracker = trackers.firstOrNull { sameOrSubdomain(url, it.domain) } ?: return Client.Result(matches = false, isATracker = false)
         val matches = matchesTrackerEntry(tracker, url.toString(), documentUrl, requestHeaders)
         return Client.Result(
             matches = matches.shouldBlock,
