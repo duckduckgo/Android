@@ -24,8 +24,10 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
+import logcat.asLog
+import logcat.logcat
 
 private const val HTTPS_WWW_REDDIT_COM = ".reddit.com"
 private const val REDDIT_SESSION_ = "reddit_session=;"
@@ -37,28 +39,20 @@ class RedditBlockWorkaround @Inject constructor(
 ) : MainProcessLifecycleObserver {
     override fun onResume(owner: LifecycleOwner) {
         owner.lifecycleScope.launch(dispatcherProvider.io()) {
-            runCatching { CookieManager.getInstance() }.getOrNull()?.let { cookieManager ->
-                val redditCookies = cookieManager.getCookie(HTTPS_WWW_REDDIT_COM)
-                val redditSessionCookies = redditCookies.split(";").filter { it.contains("reddit_session") }
-                if (redditSessionCookies.size > 1) {
-                    // remove potential fake cookie
-                    val finalCookie = redditSessionCookies.firstOrNull { it.substringAfter("=", missingDelimiterValue = "").isNotEmpty() }
-                    finalCookie?.let {
-                        cookieManager.setCookie(HTTPS_WWW_REDDIT_COM, it)
-                        cookieManager.flush()
-                    }
-                } else if (redditSessionCookies.size == 1) {
-                    if (!networkProtectionState.isEnabled()) {
-                        val finalCookie = redditSessionCookies.firstOrNull { it.substringAfter("=", missingDelimiterValue = "").isNotEmpty() } ?: ""
-                        cookieManager.setCookie(HTTPS_WWW_REDDIT_COM, finalCookie)
-                        cookieManager.flush()
-                    }
-                } else {
-                    if (networkProtectionState.isEnabled()) {
+            runCatching {
+                runCatching { CookieManager.getInstance() }.getOrNull()?.let { cookieManager ->
+                    val redditCookies = cookieManager.getCookie(HTTPS_WWW_REDDIT_COM) ?: ""
+                    val redditSessionCookies = redditCookies.split(";").filter { it.contains("reddit_session") }
+                    if (networkProtectionState.isEnabled() && redditSessionCookies.isEmpty()) {
+                        // if the VPN is enabled and there's no reddit_session cookie we just add a fake one
+                        // when the user logs into reddit, the fake reddit_session cookie is replaced automatically by the correct one
+                        // when the user logs out, the reddit_session cookie is cleared
                         cookieManager.setCookie(HTTPS_WWW_REDDIT_COM, REDDIT_SESSION_)
                         cookieManager.flush()
                     }
                 }
+            }.onFailure {
+                logcat { "Reddit workaround error: ${it.asLog()}" }
             }
         }
     }
