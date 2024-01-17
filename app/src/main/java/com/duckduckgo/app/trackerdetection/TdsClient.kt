@@ -20,6 +20,7 @@ import androidx.core.net.toUri
 import com.duckduckgo.app.trackerdetection.model.Action.BLOCK
 import com.duckduckgo.app.trackerdetection.model.Action.IGNORE
 import com.duckduckgo.app.trackerdetection.model.TdsTracker
+import com.duckduckgo.common.utils.UriString.Companion.safeSameOrSubdomain
 import com.duckduckgo.common.utils.UriString.Companion.sameOrSubdomain
 import java.net.URI
 
@@ -35,7 +36,7 @@ class TdsClient(
         requestHeaders: Map<String, String>,
     ): Client.Result {
         val cleanedUrl = removePortFromUrl(url)
-        val tracker = trackers.firstOrNull { sameOrSubdomain(cleanedUrl, it.domain) } ?: return Client.Result(matches = false, isATracker = false)
+        val tracker = trackers.firstOrNull { safeSameOrSubdomain(cleanedUrl, it.domain) } ?: return Client.Result(matches = false, isATracker = false)
         val matches = matchesTrackerEntry(tracker, cleanedUrl, documentUrl, requestHeaders)
         return Client.Result(
             matches = matches.shouldBlock,

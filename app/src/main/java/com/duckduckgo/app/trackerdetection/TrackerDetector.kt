@@ -26,6 +26,7 @@ import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.common.utils.UriString.Companion.safeSameOrSubdomain
 import com.duckduckgo.common.utils.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.ContentBlocking
@@ -116,6 +117,7 @@ class TrackerDetectorImpl @Inject constructor(
         firstUrl: String,
         secondUrl: String,
     ): Boolean =
+        //TODO (cbarreiro): Check if there's port here
         sameOrSubdomain(firstUrl, secondUrl) || sameOrSubdomain(secondUrl, firstUrl)
 
     private fun sameNetworkName(
