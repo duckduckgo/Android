@@ -27,7 +27,7 @@ import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
-import com.duckduckgo.common.utils.UriString.Companion.safeSameOrSubdomainBothSides
+import com.duckduckgo.common.utils.UriString.Companion.sameOrSubdomainPair
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
@@ -197,13 +197,13 @@ class TrackerDetectorImpl @Inject constructor(
         firstUrl: String,
         secondUrl: String,
     ): Boolean =
-        safeSameOrSubdomainBothSides(firstUrl, secondUrl)
+        sameOrSubdomainPair(firstUrl, secondUrl)
 
     private fun firstParty(
         firstUrl: Uri,
         secondUrl: String,
     ): Boolean =
-        safeSameOrSubdomainBothSides(firstUrl, secondUrl)
+        sameOrSubdomainPair(firstUrl, secondUrl)
 
     private fun sameNetworkName(
         url: String,
