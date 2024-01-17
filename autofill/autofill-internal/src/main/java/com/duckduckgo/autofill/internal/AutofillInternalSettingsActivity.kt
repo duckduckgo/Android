@@ -188,6 +188,18 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
             }
         }
 
+        binding.add100LoginsButton.setClickListener {
+            lifecycleScope.launch(dispatchers.io()) {
+                repeat(100) { sampleCredentials(domain = sampleUrlList.random(), username = "user-$it", password = "password-$it").save() }
+            }
+        }
+
+        binding.add1000LoginsButton.setClickListener {
+            lifecycleScope.launch(dispatchers.io()) {
+                repeat(1_000) { sampleCredentials(domain = sampleUrlList.random(), username = "user-$it", password = "password-$it").save() }
+            }
+        }
+
         binding.addSampleLoginsContainingDuplicatesSameDomainButton.setClickListener {
             lifecycleScope.launch(dispatchers.io()) {
                 repeat(3) { sampleCredentials(domain = "fill.dev", username = "user").save() }
@@ -382,5 +394,12 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
         fun intent(context: Context): Intent {
             return Intent(context, AutofillInternalSettingsActivity::class.java)
         }
+
+        private val sampleUrlList = listOf(
+            "fill.dev",
+            "duckduckgo.com",
+            "spreadprivacy.com",
+            "duck.com",
+        )
     }
 }

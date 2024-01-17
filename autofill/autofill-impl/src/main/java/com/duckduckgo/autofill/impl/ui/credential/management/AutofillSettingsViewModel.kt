@@ -41,6 +41,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsVie
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.InitialiseViewAfterUnlock
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.LaunchDeviceAuth
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.OfferUserUndoDeletion
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.OfferUserUndoMassDeletion
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowCredentialMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowDeviceUnsupportedMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowDisabledMode
@@ -63,6 +64,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsVie
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.NotADuckAddress
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.NotManageable
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.SettingActivationStatus
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchDeleteAllPasswordsConfirmation
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchResetNeverSaveListConfirmation
 import com.duckduckgo.autofill.impl.ui.credential.management.neversaved.NeverSavedSitesViewState
 import com.duckduckgo.autofill.impl.ui.credential.management.searching.CredentialListFilter
@@ -414,6 +416,12 @@ class AutofillSettingsViewModel @Inject constructor(
         }
     }
 
+    fun reinsertCredentials(credentials: List<LoginCredentials>) {
+        viewModelScope.launch(dispatchers.io()) {
+            autofillStore.reinsertCredentials(credentials)
+        }
+    }
+
     private fun LoginCredentials.shouldShowLinkButton(): Boolean {
         return webUrlIdentifier.isLikelyAUrl(domain)
     }
@@ -595,6 +603,24 @@ class AutofillSettingsViewModel @Inject constructor(
         pixel.fire(AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_DISPLAYED)
     }
 
+    fun onDeleteAllPasswordsInitialSelection() {
+        val numberToDelete = viewState.value.logins.orEmpty().size
+        if (numberToDelete > 0) {
+            addCommand(LaunchDeleteAllPasswordsConfirmation(numberToDelete))
+        }
+    }
+
+    fun onDeleteAllPasswordsConfirmed() {
+        viewModelScope.launch(dispatchers.io()) {
+            val removedCredentials = autofillStore.deleteAllCredentials()
+            Timber.i("Removed %d credentials", removedCredentials.size)
+
+            if (removedCredentials.isNotEmpty()) {
+                addCommand(OfferUserUndoMassDeletion(removedCredentials))
+            }
+        }
+    }
+
     data class ViewState(
         val autofillEnabled: Boolean = true,
         val showAutofillEnabledToggle: Boolean = true,
@@ -645,6 +671,7 @@ class AutofillSettingsViewModel @Inject constructor(
         class ShowUserPasswordCopied : Command()
 
         class OfferUserUndoDeletion(val credentials: LoginCredentials?) : Command()
+        class OfferUserUndoMassDeletion(val credentials: List<LoginCredentials>) : Command()
 
         object ShowListMode : Command()
         object ShowCredentialMode : Command()
@@ -666,6 +693,7 @@ class AutofillSettingsViewModel @Inject constructor(
 
     sealed class ListModeCommand(val id: String = UUID.randomUUID().toString()) {
         data object LaunchResetNeverSaveListConfirmation : ListModeCommand()
+        data class LaunchDeleteAllPasswordsConfirmation(val numberToDelete: Int) : ListModeCommand()
     }
 
     sealed class DuckAddressStatus {

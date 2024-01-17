@@ -16,4 +16,19 @@
 
 <resources>
 
+    <string name="credentialManagementDeleteAllPasswordsMenu">Delete All</string>
+    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Are you sure you want to delete %1$d password?</item>
+        <item quantity="other">Are you sure you want to delete %1$d passwords?</item>
+    </plurals>
+    <plurals name="credentialManagementDeleteAllPasswordsConfirmationMessage">
+        <item quantity="one">Before deleting ensure that you have an alternative method to access the websites or accounts associated with this password.</item>
+        <item quantity="other">Before deleting ensure that you have an alternative method to access the websites or accounts associated with these passwords.</item>
+    </plurals>
+
+    <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
+        <item quantity="one">%1$d password deleted</item>
+        <item quantity="other">%1$d passwords deleted</item>
+    </plurals>
+
 </resources>

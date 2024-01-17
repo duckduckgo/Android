@@ -44,6 +44,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementR
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.ContextMenuAction.Delete
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.ContextMenuAction.Edit
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchDeleteAllPasswordsConfirmation
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchResetNeverSaveListConfirmation
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.CredentialGrouper
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.InitialExtractor
@@ -95,6 +96,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
 
     private var searchMenuItem: MenuItem? = null
     private var resetNeverSavedSitesMenuItem: MenuItem? = null
+    private var deleteAllPasswordsMenuItem: MenuItem? = null
 
     private val globalAutofillToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
         if (!lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) return@OnCheckedChangeListener
@@ -131,11 +133,15 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
                     menuInflater.inflate(R.menu.autofill_list_mode_menu, menu)
                     searchMenuItem = menu.findItem(R.id.searchLogins)
                     resetNeverSavedSitesMenuItem = menu.findItem(R.id.resetNeverSavedSites)
+                    deleteAllPasswordsMenuItem = menu.findItem(R.id.deleteAllPasswords)
+
                     initializeSearchBar()
                 }
 
                 override fun onPrepareMenu(menu: Menu) {
-                    searchMenuItem?.isVisible = !(viewModel.viewState.value.logins.isNullOrEmpty())
+                    val loginsSaved = !viewModel.viewState.value.logins.isNullOrEmpty()
+                    searchMenuItem?.isVisible = loginsSaved
+                    deleteAllPasswordsMenuItem?.isVisible = loginsSaved
                     resetNeverSavedSitesMenuItem?.isVisible = viewModel.neverSavedSitesViewState.value.showOptionToReset
                 }
 
@@ -148,6 +154,11 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
 
                         R.id.resetNeverSavedSites -> {
                             viewModel.onResetNeverSavedSitesInitialSelection()
+                            true
+                        }
+
+                        R.id.deleteAllPasswords -> {
+                            viewModel.onDeleteAllPasswordsInitialSelection()
                             true
                         }
 
@@ -232,6 +243,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
     private fun processCommand(command: AutofillSettingsViewModel.ListModeCommand) {
         when (command) {
             LaunchResetNeverSaveListConfirmation -> launchResetNeverSavedSitesConfirmation()
+            is LaunchDeleteAllPasswordsConfirmation -> launchDeleteAllLoginsConfirmationDialog(command.numberToDelete)
         }
         viewModel.commandProcessed(command)
     }
@@ -302,6 +314,28 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
                     object : TextAlertDialogBuilder.EventListener() {
                         override fun onPositiveButtonClicked() {
                             viewModel.onDeleteCredentials(loginCredentials)
+                        }
+                    },
+                )
+                .show()
+        }
+    }
+
+    private fun launchDeleteAllLoginsConfirmationDialog(numberToDelete: Int) {
+        val titleRes = resources.getQuantityString(R.plurals.credentialManagementDeleteAllPasswordsConfirmationTitle, numberToDelete, numberToDelete)
+        val messageRes = resources.getQuantityString(R.plurals.credentialManagementDeleteAllPasswordsConfirmationMessage, numberToDelete)
+        this.context?.let {
+            TextAlertDialogBuilder(it)
+                .setTitle(titleRes)
+                .setMessage(messageRes)
+                .setDestructiveButtons(true)
+                .setPositiveButton(R.string.autofillDeleteLoginDialogDelete)
+                .setNegativeButton(R.string.autofillDeleteLoginDialogCancel)
+                .setCancellable(true)
+                .addEventListener(
+                    object : TextAlertDialogBuilder.EventListener() {
+                        override fun onPositiveButtonClicked() {
+                            viewModel.onDeleteAllPasswordsConfirmed()
                         }
                     },
                 )

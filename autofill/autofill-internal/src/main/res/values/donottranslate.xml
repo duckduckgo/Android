@@ -61,6 +61,10 @@
 
     <string name="autofillDevSettingsAddSampleLogins">Add a few sample logins</string>
     <string name="autofillDevSettingsAddSampleLoginsSubtitle">Adds a few logins for https://fill.dev</string>
+    <string name="autofillDevSettingsAddManySampleLogins">Add a lot of sample logins</string>
+    <string name="autofillDevSettingsAddManyLoginsSubtitle">Adds 100 sample logins</string>
+    <string name="autofillDevSettingsAddExtremeSampleLogins">Add an extreme amount of sample logins</string>
+    <string name="autofillDevSettingsAddExtremeSampleLoginsSubtitle">Adds 1,000 sample logins</string>
     <string name="autofillDevSettingsAddSampleLoginsSameSubdomain">Add duplicate logins (same domain)</string>
     <string name="autofillDevSettingsAddSampleLoginsSameSubdomainSubtitle">Adds multiple logins for https://fill.dev with same username and password</string>
     <string name="autofillDevSettingsAddSampleLoginsMultipleSubdomains">Add duplicate logins (across different subdomains)</string>

@@ -45,6 +45,20 @@
             app:secondaryText="@string/autofillDevSettingsAddSampleLoginsSubtitle" />
 
         <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+            android:id="@+id/add100LoginsButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/autofillDevSettingsAddManySampleLogins"
+            app:secondaryText="@string/autofillDevSettingsAddManyLoginsSubtitle" />
+
+        <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+            android:id="@+id/add1000LoginsButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/autofillDevSettingsAddExtremeSampleLogins"
+            app:secondaryText="@string/autofillDevSettingsAddExtremeSampleLoginsSubtitle" />
+
+        <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
             android:id="@+id/addSampleLoginsContainingDuplicatesSameDomainButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
