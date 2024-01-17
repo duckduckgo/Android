@@ -34,7 +34,7 @@ class TdsClient(
         documentUrl: String,
         requestHeaders: Map<String, String>,
     ): Client.Result {
-        val tracker = trackers.firstOrNull { safeSameOrSubdomain(url, it.domain) } ?: return Client.Result(matches = false, isATracker = false)
+        val tracker = trackers.firstOrNull { sameOrSubdomain(url, it.domain) } ?: return Client.Result(matches = false, isATracker = false)
         val matches = matchesTrackerEntry(tracker, url, documentUrl, requestHeaders)
         return Client.Result(
             matches = matches.shouldBlock,
