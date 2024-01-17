@@ -35,9 +35,8 @@ class TdsClient(
         documentUrl: String,
         requestHeaders: Map<String, String>,
     ): Client.Result {
-        val cleanedUrl = removePortFromUrl(url)
-        val tracker = trackers.firstOrNull { safeSameOrSubdomain(cleanedUrl, it.domain) } ?: return Client.Result(matches = false, isATracker = false)
-        val matches = matchesTrackerEntry(tracker, cleanedUrl, documentUrl, requestHeaders)
+        val tracker = trackers.firstOrNull { safeSameOrSubdomain(url, it.domain) } ?: return Client.Result(matches = false, isATracker = false)
+        val matches = matchesTrackerEntry(tracker, url, documentUrl, requestHeaders)
         return Client.Result(
             matches = matches.shouldBlock,
             entityName = tracker.ownerName,
@@ -108,15 +107,6 @@ class TdsClient(
                 true
             }
             else -> false
-        }
-    }
-
-    private fun removePortFromUrl(url: String): String {
-        return try {
-            val uri = url.toUri()
-            URI(uri.scheme, uri.host, uri.path, uri.fragment).toString()
-        } catch (e: Exception) {
-            url
         }
     }
 
