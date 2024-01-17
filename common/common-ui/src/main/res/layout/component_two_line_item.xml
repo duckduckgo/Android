@@ -234,7 +234,7 @@
             app:primaryText="Two Line Item"
             app:secondaryText="With custom Primary Text color"
             app:leadingIcon="@drawable/ic_globe_gray_16dp"
-            app:primaryTextColorOverlay="@color/red_text_color_selector"
+            app:primaryTextColorOverlay="@color/destructive_text_color_selector"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/twoLineSwitchListItemWithSwitchDisabledChecked"/>
@@ -246,7 +246,7 @@
             app:primaryText="Two Line Item"
             app:secondaryText="With custom Secondary Text color"
             app:leadingIcon="@drawable/ic_globe_gray_16dp"
-            app:secondaryTextColorOverlay="@color/red_text_color_selector"
+            app:secondaryTextColorOverlay="@color/destructive_text_color_selector"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/twoLineSwitchListItemWithPrimaryTextColorOverlay"/>

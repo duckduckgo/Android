@@ -152,7 +152,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/oneLineListItemDisabled"
         app:primaryText="Item with custom text color"
-        app:primaryTextColorOverlay="@color/red_text_color_selector" />
+        app:primaryTextColorOverlay="@color/destructive_text_color_selector" />
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/oneLineListItemWithLongText"

@@ -151,9 +151,9 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
                 }
             }
             if (isFavorite) {
-                view.findViewById<PopupMenuItemView>(R.id.addRemoveFavorite).label(context.getString(R.string.removeFromFavorites))
+                view.findViewById<PopupMenuItemView>(R.id.addRemoveFavorite).primaryText(context.getString(R.string.removeFromFavorites))
             } else {
-                view.findViewById<PopupMenuItemView>(R.id.addRemoveFavorite).label(context.getString(R.string.addToFavoritesMenu))
+                view.findViewById<PopupMenuItemView>(R.id.addRemoveFavorite).primaryText(context.getString(R.string.addToFavoritesMenu))
             }
             popupMenu.show(binding.root, anchor)
         }

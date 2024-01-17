@@ -19,6 +19,10 @@ package com.duckduckgo.common.ui.view
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.LinearLayout
+import androidx.core.content.ContextCompat
+import com.duckduckgo.common.ui.view.PopupMenuItemView.PopUpMenuItemType.DEFAULT
+import com.duckduckgo.common.ui.view.PopupMenuItemView.PopUpMenuItemType.DESTRUCTIVE
+import com.duckduckgo.common.ui.view.TypedArrayUtils.getColorStateList
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewPopupMenuItemBinding
@@ -44,23 +48,43 @@ constructor(
             R.styleable.PopupMenuItemView,
             0,
             0,
-        )
-        binding.label.text = attributes.getString(R.styleable.PopupMenuItemView_primaryText) ?: ""
-        updateContentDescription()
-        attributes.recycle()
+        ).apply {
+            if (hasValue(R.styleable.PopupMenuItemView_type)) {
+                val primaryTextType = when (getInt(R.styleable.PopupMenuItemView_type, 0)) {
+                    1 -> DESTRUCTIVE
+                    else -> DEFAULT
+                }
+                type(primaryTextType)
+            }
+            binding.label.text = getString(R.styleable.PopupMenuItemView_primaryText) ?: ""
+            updateContentDescription()
+            recycle()
+        }
     }
 
-    fun label(label: String) {
+    fun primaryText(label: String) {
         binding.label.text = label
         updateContentDescription()
     }
 
-    fun label(label: () -> String) {
+    fun primaryText(label: () -> String) {
         binding.label.text = label()
         updateContentDescription()
     }
 
+    fun type(type: PopUpMenuItemType = DEFAULT) {
+        when (type) {
+            DEFAULT -> binding.label.setTextColor(ContextCompat.getColorStateList(context, R.color.primary_text_color_selector))
+            DESTRUCTIVE -> binding.label.setTextColor(ContextCompat.getColorStateList(context, R.color.destructive_text_color_selector))
+        }
+    }
+
     private fun updateContentDescription() {
         binding.root.contentDescription = binding.label.text
+    }
+
+    enum class PopUpMenuItemType {
+        DEFAULT,
+        DESTRUCTIVE,
     }
 }

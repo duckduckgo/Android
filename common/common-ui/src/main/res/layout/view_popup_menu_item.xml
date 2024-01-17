@@ -15,20 +15,20 @@
   -->
 
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
-       xmlns:app="http://schemas.android.com/apk/res-auto"
-       xmlns:tools="http://schemas.android.com/tools"
-       tools:parentTag="android.widget.LinearLayout">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:parentTag="android.widget.LinearLayout">
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
-            android:id="@+id/label"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackground"
-            android:paddingEnd="@dimen/keyline_4"
-            android:paddingStart="@dimen/keyline_4"
-            android:gravity="center_vertical"
-            android:minWidth="@dimen/popupMenuItemWidth"
-            android:minHeight="@dimen/popupMenuItemHeight"
-            app:typography="body1"
-            tools:text="Text label" />
+        android:id="@+id/label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:gravity="center_vertical"
+        android:minWidth="@dimen/popupMenuItemWidth"
+        android:minHeight="@dimen/popupMenuItemHeight"
+        android:paddingStart="@dimen/keyline_4"
+        android:paddingEnd="@dimen/keyline_4"
+        app:typography="body1"
+        tools:text="Text label" />
 </merge>

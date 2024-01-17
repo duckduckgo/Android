@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2021 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,6 +24,10 @@
 
     <declare-styleable name="PopupMenuItemView">
         <attr name="primaryText" />
+        <attr name="type" format="enum">
+            <enum name="default" value="0" />
+            <enum name="destructive" value="1" />
+        </attr>
     </declare-styleable>
 
 

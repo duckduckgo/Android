@@ -159,7 +159,7 @@ class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
                     ghostButton.setTextColor(
                         ContextCompat.getColorStateList(
                             context,
-                            R.color.red_text_color_selector,
+                            R.color.destructive_text_color_selector,
                         ),
                     )
                     ghostButton
