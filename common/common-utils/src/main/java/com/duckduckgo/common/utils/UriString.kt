@@ -57,11 +57,29 @@ class UriString {
             return parentHost == childHost || childHost.endsWith(".$parentHost")
         }
 
+        fun safeSameOrSubdomain(
+            child: Uri,
+            parent: String,
+        ): Boolean {
+            val childHost = child.host ?: return false
+            val parentHost = safeHost(parent) ?: return false
+            return parentHost == childHost || childHost.endsWith(".$parentHost")
+        }
+
         fun safeSameOrSubdomainBothSides(
             child: String,
             parent: String,
         ): Boolean {
             val childHost = safeHost(child) ?: return false
+            val parentHost = safeHost(parent) ?: return false
+            return parentHost == childHost || (childHost.endsWith(".$parentHost") || parentHost.endsWith(".$childHost"))
+        }
+
+        fun safeSameOrSubdomainBothSides(
+            child: Uri,
+            parent: String,
+        ): Boolean {
+            val childHost = child.host ?: return false
             val parentHost = safeHost(parent) ?: return false
             return parentHost == childHost || (childHost.endsWith(".$parentHost") || parentHost.endsWith(".$childHost"))
         }

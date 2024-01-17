@@ -173,17 +173,18 @@ class TrackerDetectorImpl @Inject constructor(
         return TrackingEvent(documentUrl, url, result.categories, entity, result.surrogate, status, type)
     }
 
-    private fun removePortFromUrl(uri: Uri): String {
-        //TODO (cbarreiro): Return Uri/URI instead
-        return try {
-            URI(uri.scheme, uri.host, uri.path, uri.fragment).toString()
-        } catch (e: Exception) {
-            uri.toString()
+    private fun removePortFromUrl(uri: Uri): Uri {
+        return if (uri.port != -1) {
+            uri.buildUpon()
+                .authority(uri.host)
+                .build()
+
+        } else {
+            uri
         }
     }
 
     private fun removePortFromUrl(url: String): String {
-        //TODO (cbarreiro): Return Uri/URI instead
         return try {
             val uri = Uri.parse(url)
             URI(uri.scheme, uri.host, uri.path, uri.fragment).toString()
@@ -194,6 +195,12 @@ class TrackerDetectorImpl @Inject constructor(
 
     private fun firstParty(
         firstUrl: String,
+        secondUrl: String,
+    ): Boolean =
+        safeSameOrSubdomainBothSides(firstUrl, secondUrl)
+
+    private fun firstParty(
+        firstUrl: Uri,
         secondUrl: String,
     ): Boolean =
         safeSameOrSubdomainBothSides(firstUrl, secondUrl)

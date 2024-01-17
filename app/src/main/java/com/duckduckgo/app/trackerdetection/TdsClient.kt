@@ -16,13 +16,12 @@
 
 package com.duckduckgo.app.trackerdetection
 
-import androidx.core.net.toUri
+import android.net.Uri
 import com.duckduckgo.app.trackerdetection.model.Action.BLOCK
 import com.duckduckgo.app.trackerdetection.model.Action.IGNORE
 import com.duckduckgo.app.trackerdetection.model.TdsTracker
 import com.duckduckgo.common.utils.UriString.Companion.safeSameOrSubdomain
 import com.duckduckgo.common.utils.UriString.Companion.sameOrSubdomain
-import java.net.URI
 
 class TdsClient(
     override val name: Client.ClientName,
@@ -37,6 +36,22 @@ class TdsClient(
     ): Client.Result {
         val tracker = trackers.firstOrNull { safeSameOrSubdomain(url, it.domain) } ?: return Client.Result(matches = false, isATracker = false)
         val matches = matchesTrackerEntry(tracker, url, documentUrl, requestHeaders)
+        return Client.Result(
+            matches = matches.shouldBlock,
+            entityName = tracker.ownerName,
+            categories = tracker.categories,
+            surrogate = matches.surrogate,
+            isATracker = matches.isATracker,
+        )
+    }
+
+    override fun matches(
+        url: Uri,
+        documentUrl: String,
+        requestHeaders: Map<String, String>,
+    ): Client.Result {
+        val tracker = trackers.firstOrNull { safeSameOrSubdomain(url, it.domain) } ?: return Client.Result(matches = false, isATracker = false)
+        val matches = matchesTrackerEntry(tracker, url.toString(), documentUrl, requestHeaders)
         return Client.Result(
             matches = matches.shouldBlock,
             entityName = tracker.ownerName,

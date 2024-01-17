@@ -662,6 +662,7 @@ class TrackerDetectorTest {
         val client: Client = mock()
         whenever(client.name).thenReturn(name)
         whenever(client.matches(anyString(), anyString(), anyMap())).thenReturn(Client.Result(matches = true, isATracker = true))
+        whenever(client.matches(any<Uri>(), anyString(), anyMap())).thenReturn(Client.Result(matches = true, isATracker = true))
         return client
     }
 
@@ -669,6 +670,8 @@ class TrackerDetectorTest {
         val client: Client = mock()
         whenever(client.name).thenReturn(name)
         whenever(client.matches(anyString(), anyString(), anyMap()))
+            .thenReturn(Client.Result(matches = true, surrogate = "testId", isATracker = true))
+        whenever(client.matches(any<Uri>(), anyString(), anyMap()))
             .thenReturn(Client.Result(matches = true, surrogate = "testId", isATracker = true))
         return client
     }
