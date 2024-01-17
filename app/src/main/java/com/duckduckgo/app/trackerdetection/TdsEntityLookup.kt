@@ -61,7 +61,7 @@ class TdsEntityLookup @Inject constructor(
 
         // remove the first subdomain, and try again
         val parentDomain = uri.removeSubdomain() ?: return null
-        return entityForUrl(parentDomain)
+        return entityForUrl(parentDomain.toUri())
     }
 
     @WorkerThread
