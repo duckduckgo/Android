@@ -11,16 +11,31 @@ class SafeGazeJsInterface(context: Context) {
 
     @JavascriptInterface
     fun sendMessage(message: String) {
-        val currentCounter = getCounterValue()
-        val newCounter = currentCounter + 1
-        saveGlobalCounterValue(newCounter)
+        if (message.contains("page_refresh")){
+            preferences.edit().putInt("session_cencored_count", 0).apply()
+        }else{
+            val currentAllTimeCounter = getAllTimeCounter()
+            val currentSessionCounter = getSessionCounter()
+            val newAllTimeCounter = currentAllTimeCounter + 1
+            val newSessionCounter = currentSessionCounter + 1
+            saveSessionCounterValue(newSessionCounter)
+            saveAllTimeCounterValue(newAllTimeCounter)
+        }
     }
 
-    private fun saveGlobalCounterValue(value: Int) {
+    private fun saveAllTimeCounterValue(value: Int) {
         preferences.edit().putInt("all_time_cencored_count", value).apply()
     }
 
-    private fun getCounterValue(): Int {
+    private fun getAllTimeCounter(): Int {
         return preferences.getInt("all_time_cencored_count", 0)
+    }
+
+    private fun saveSessionCounterValue(value: Int) {
+        preferences.edit().putInt("session_cencored_count", value).apply()
+    }
+
+    private fun getSessionCounter(): Int {
+        return preferences.getInt("session_cencored_count", 0)
     }
 }

@@ -2256,18 +2256,6 @@ class BrowserTabFragment :
                 },
             )
         }
-        // webView?.apply {
-        //     webViewClient = object : WebViewClient() {
-        //         override fun onPageStarted(
-        //             view: WebView?,
-        //             url: String?,
-        //             favicon: Bitmap?
-        //         ) {
-        //             val jsCode = readAssetFile(requireContext().assets, "safe_gaze.js")
-        //             evaluateJavascript("javascript:(function() { $jsCode })()", null)
-        //         }
-        //     }
-        // }
         WebView.setWebContentsDebuggingEnabled(webContentDebugging.isEnabled())
     }
 
