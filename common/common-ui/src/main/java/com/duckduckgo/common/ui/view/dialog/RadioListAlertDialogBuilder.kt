@@ -36,6 +36,7 @@ class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
     abstract class EventListener {
         open fun onDialogShown() {}
         open fun onDialogDismissed() {}
+        open fun onDialogCancelled() {}
         open fun onRadioItemSelected(selectedItem: Int) {}
         open fun onPositiveButtonClicked(selectedItem: Int) {}
         open fun onNegativeButtonClicked() {}
@@ -127,6 +128,7 @@ class RadioListAlertDialogBuilder(val context: Context) : DaxAlertDialog {
             .apply {
                 setCancelable(false)
                 setOnDismissListener { listener.onDialogDismissed() }
+                setOnCancelListener { listener.onDialogCancelled() }
             }
 
         dialog = dialogBuilder.create()
