@@ -27,6 +27,7 @@ import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.common.utils.UriString.Companion.safeSameOrSubdomain
+import com.duckduckgo.common.utils.UriString.Companion.safeSameOrSubdomainBothSides
 import com.duckduckgo.common.utils.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.ContentBlocking
@@ -36,6 +37,7 @@ import dagger.SingleInstanceIn
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 import timber.log.Timber
+import java.net.URI
 
 interface TrackerDetector {
     fun addClient(client: Client)
@@ -74,14 +76,17 @@ class TrackerDetectorImpl @Inject constructor(
         checkFirstParty: Boolean,
         requestHeaders: Map<String, String>,
     ): TrackingEvent? {
-        if (checkFirstParty && firstParty(url, documentUrl)) {
+
+        val cleanedUrl = removePortFromUrl(url)
+
+        if (checkFirstParty && firstParty(cleanedUrl, documentUrl)) {
             Timber.v("$url is a first party url")
             return null
         }
 
         val result = clients
             .filter { it.name.type == BLOCKING }
-            .firstNotNullOfOrNull { it.matches(url, documentUrl, requestHeaders) } ?: Client.Result(matches = false, isATracker = false)
+            .firstNotNullOfOrNull { it.matches(cleanedUrl, documentUrl, requestHeaders) } ?: Client.Result(matches = false, isATracker = false)
 
         val sameEntity = sameNetworkName(url, documentUrl)
         val entity = if (result.entityName != null) entityLookup.entityForName(result.entityName) else entityLookup.entityForUrl(url)
@@ -113,12 +118,20 @@ class TrackerDetectorImpl @Inject constructor(
         return TrackingEvent(documentUrl, url, result.categories, entity, result.surrogate, status, type)
     }
 
+    private fun removePortFromUrl(url: String): String {
+        return try {
+            val uri = url.toUri()
+            URI(uri.scheme, uri.host, uri.path, uri.fragment).toString()
+        } catch (e: Exception) {
+            url
+        }
+    }
+
     private fun firstParty(
         firstUrl: String,
         secondUrl: String,
     ): Boolean =
-        //TODO (cbarreiro): Check if there's port here
-        sameOrSubdomain(firstUrl, secondUrl) || sameOrSubdomain(secondUrl, firstUrl)
+        safeSameOrSubdomainBothSides(firstUrl, secondUrl)
 
     private fun sameNetworkName(
         url: String,

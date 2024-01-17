@@ -57,6 +57,15 @@ class UriString {
             return parentHost == childHost || childHost.endsWith(".$parentHost")
         }
 
+        fun safeSameOrSubdomainBothSides(
+            child: String,
+            parent: String,
+        ): Boolean {
+            val childHost = safeHost(child) ?: return false
+            val parentHost = safeHost(parent) ?: return false
+            return parentHost == childHost || (childHost.endsWith(".$parentHost") || parentHost.endsWith(".$childHost"))
+        }
+
         fun isWebUrl(inputQuery: String): Boolean {
             if (inputQuery.contains(space)) return false
             val rawUri = Uri.parse(inputQuery)
