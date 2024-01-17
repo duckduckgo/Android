@@ -16,7 +16,7 @@
 
 package com.duckduckgo.privacyprotectionspopup.impl
 
-import org.threeten.bp.Instant
+import java.time.Instant
 
 class FakeTimeProvider : TimeProvider {
 
