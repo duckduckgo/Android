@@ -247,6 +247,22 @@ class WebViewRequestInterceptor(
         documentUrl: String?,
         webViewClientListener: WebViewClientListener?,
         checkFirstParty: Boolean = true,
+    ): TrackingEvent? {
+        val url = request.url
+        if (request.isForMainFrame || documentUrl == null) {
+            return null
+        }
+
+        val trackingEvent = trackerDetector.evaluate(url, documentUrl, checkFirstParty, request.requestHeaders) ?: return null
+        webViewClientListener?.trackerDetected(trackingEvent)
+        return trackingEvent
+    }
+
+    private fun trackingEvent(
+        request: WebResourceRequest,
+        documentUrl: String?,
+        webViewClientListener: WebViewClientListener?,
+        checkFirstParty: Boolean = true,
         url: String = request.url.toString(),
     ): TrackingEvent? {
         if (request.isForMainFrame || documentUrl == null) {
