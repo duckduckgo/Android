@@ -18,7 +18,7 @@ package com.duckduckgo.privacyprotectionspopup.impl.db
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import org.threeten.bp.Instant
+import java.time.Instant
 
 @Entity(tableName = "toggle_usage_timestamp")
 data class ToggleUsageTimestamp(
