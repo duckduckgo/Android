@@ -243,7 +243,7 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
     companion object {
         private const val PRIVACY_PROTECTION_ANNOTATION = "privacy_protection_link"
         private const val LEARN_MORE_ANNOTATION = "learn_more_link"
-        private const val PRIVACY_POLICY_WEB_LINK = "https://duckduckgo.com/privacy"
-        private const val PRIVACY_PROTECTIONS_WEB_LINK = "https://duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/"
+        private const val PRIVACY_POLICY_WEB_LINK = "https://asil.co/privacy"
+        private const val PRIVACY_PROTECTIONS_WEB_LINK = "https://asil.co/asil-help-pages/privacy/web-tracking-protections/"
     }
 }

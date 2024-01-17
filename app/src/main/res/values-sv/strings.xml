@@ -17,8 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="appName" translatable="false">Asil</string>
-    <string name="appDescription" translatable="false">Asil</string>
     <string name="asilLogoDescription">Asils logotyp</string>
     <string name="asilPrivacySimplified">Personlig integritet, förenklad</string>
     <string name="yes">Ja</string>
@@ -203,7 +201,7 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Om Asil</string>
-    <string name="aboutHeader">Välkommen till Duck-sidan!</string>
+    <string name="aboutHeader">Välkommen till Asil!</string>
     <string name="aboutDescription">Asil är det oberoende integritetsskyddsföretaget som grundades 2008 för alla som är trötta på att bli spårade online och vill ha en enkel lösning. Vi är beviset på att man kan få riktigt integritetsskydd på nätet utan att kompromissa.\n\nWebbläsaren Asil har de funktioner man förväntar sig av en pålitlig webbläsare, som bokmärken, flikar, lösenord och mycket annat. Den har även <annotation type="privacy_protection_link">ett tiotal kraftfulla integritetsskydd</annotation> som inte erbjuds som standard i de flesta vanliga webbläsare. Den här omfattande uppsättningen av integritetsskydd hjälper dig att skydda dina onlineaktiviteter, från sökning och surfning till e-post och mycket mer.\n\nVårt integritetsskydd fungerar utan att du behöver känna till de tekniska detaljerna eller ta itu med komplicerade inställningar. Det enda du behöver göra är att byta webbläsare till Asil på alla dina enheter för att få integritet som standard.\n\nMen om du vill ta en titt under huven, så finns det mer information om hur integritetsskyddet hos Asil fungerar på våra <annotation type="learn_more_link">hjälpsidor</annotation>.</string>
     <string name="no_suggestions">Inga förslag</string>
 

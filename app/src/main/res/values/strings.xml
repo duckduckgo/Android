@@ -202,7 +202,7 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">About Asil</string>
-    <string name="aboutHeader">Welcome to the Duck Side!</string>
+    <string name="aboutHeader">Welcome to the Asil!</string>
     <string name="aboutDescription">Asil is the independent Internet privacy company founded in 2008 for anyone who’s tired of being tracked online and wants an easy solution. We’re proof you can get real privacy protection online without tradeoffs.\n\nThe Asil browser comes with the features you expect from a go-to browser, like bookmarks, tabs, passwords, and more, plus over <annotation type="privacy_protection_link">a dozen powerful privacy protections</annotation> not offered in most popular browsers by default. This uniquely comprehensive set of privacy protections helps protect your online activities, from searching to browsing, emailing, and more.\n\nOur privacy protections work without having to know anything about the technical details or deal with complicated settings. All you have to do is switch your browser to Asil across all your devices and you get privacy by default.\n\nBut if you do want a peek under the hood, you can find more information about how Asil privacy protections work on our <annotation type="learn_more_link">help pages</annotation></string>
     <string name="no_suggestions">No Suggestions</string>
 
