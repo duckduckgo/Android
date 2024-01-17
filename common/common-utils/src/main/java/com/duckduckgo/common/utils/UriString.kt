@@ -44,7 +44,7 @@ class UriString {
             return parentHost == childHost || childHost.endsWith(".$parentHost")
         }
 
-        fun safeSameOrSubdomain(
+        fun sameOrSubdomain(
             child: Uri,
             parent: String,
         ): Boolean {
