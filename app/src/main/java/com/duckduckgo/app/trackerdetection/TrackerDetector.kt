@@ -27,9 +27,7 @@ import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
-import com.duckduckgo.common.utils.UriString.Companion.safeSameOrSubdomain
 import com.duckduckgo.common.utils.UriString.Companion.safeSameOrSubdomainBothSides
-import com.duckduckgo.common.utils.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
@@ -98,7 +96,7 @@ class TrackerDetectorImpl @Inject constructor(
             .firstNotNullOfOrNull { it.matches(cleanedUrl, documentUrl, requestHeaders) } ?: Client.Result(matches = false, isATracker = false)
 
         val sameEntity = sameNetworkName(url, documentUrl)
-        val entity = if (result.entityName != null) entityLookup.entityForName(result.entityName) else entityLookup.entityForUrl(urlString)
+        val entity = if (result.entityName != null) entityLookup.entityForName(result.entityName) else entityLookup.entityForUrl(url)
         val isSiteAContentBlockingException = contentBlocking.isAnException(documentUrl)
         val isDocumentInAllowedList = userAllowListDao.isDocumentAllowListed(documentUrl)
         val isInAdClickAllowList = adClickManager.isExemption(documentUrl, urlString)
