@@ -97,7 +97,7 @@ class TrackerDetectorImpl @Inject constructor(
             .filter { it.name.type == BLOCKING }
             .firstNotNullOfOrNull { it.matches(cleanedUrl, documentUrl, requestHeaders) } ?: Client.Result(matches = false, isATracker = false)
 
-        val sameEntity = sameNetworkName(urlString, documentUrl)
+        val sameEntity = sameNetworkName(url, documentUrl)
         val entity = if (result.entityName != null) entityLookup.entityForName(result.entityName) else entityLookup.entityForUrl(urlString)
         val isSiteAContentBlockingException = contentBlocking.isAnException(documentUrl)
         val isDocumentInAllowedList = userAllowListDao.isDocumentAllowListed(documentUrl)
@@ -202,6 +202,15 @@ class TrackerDetectorImpl @Inject constructor(
 
     private fun sameNetworkName(
         url: String,
+        documentUrl: String,
+    ): Boolean {
+        val firstNetwork = entityLookup.entityForUrl(url) ?: return false
+        val secondNetwork = entityLookup.entityForUrl(documentUrl) ?: return false
+        return firstNetwork.name == secondNetwork.name
+    }
+
+    private fun sameNetworkName(
+        url: Uri,
         documentUrl: String,
     ): Boolean {
         val firstNetwork = entityLookup.entityForUrl(url) ?: return false

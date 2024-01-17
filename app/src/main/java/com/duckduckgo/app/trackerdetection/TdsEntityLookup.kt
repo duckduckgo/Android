@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.trackerdetection
 
+import android.net.Uri
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
 import com.duckduckgo.app.global.uri.removeSubdomain
@@ -40,6 +41,19 @@ class TdsEntityLookup @Inject constructor(
     override fun entityForUrl(url: String): Entity? {
         val uri = url.toUri()
         val host = uri.baseHost ?: return null
+
+        // try searching for exact domain
+        val direct = lookUpEntityInDatabase(host)
+        if (direct != null) return direct
+
+        // remove the first subdomain, and try again
+        val parentDomain = uri.removeSubdomain() ?: return null
+        return entityForUrl(parentDomain)
+    }
+
+    @WorkerThread
+    override fun entityForUrl(uri: Uri): Entity? {
+        val host = uri.host ?: return null
 
         // try searching for exact domain
         val direct = lookUpEntityInDatabase(host)
