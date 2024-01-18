@@ -20,10 +20,11 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
     exportSchema = true,
-    version = 1,
+    version = 2,
     entities = [
         ExperimentVariantEntity::class,
     ],
@@ -35,8 +36,12 @@ import androidx.room.migration.Migration
 
 abstract class ExperimentsDatabase : RoomDatabase() {
     abstract fun experimentVariantsDao(): ExperimentVariantDao
+}
 
-    companion object {
-        val ALL_MIGRATIONS = emptyArray<Migration>()
+val MIGRATION_1_2 = object : Migration(1, 2) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE `experiment_variants` ADD COLUMN `androidVersionFilter` TEXT NOT NULL DEFAULT '[]'")
     }
 }
+
+val ALL_MIGRATIONS = arrayOf(MIGRATION_1_2)

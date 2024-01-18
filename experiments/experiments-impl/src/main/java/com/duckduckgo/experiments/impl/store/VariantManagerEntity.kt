@@ -28,6 +28,7 @@ data class ExperimentVariantEntity(
     @PrimaryKey val key: String,
     val weight: Double?,
     val localeFilter: List<String> = emptyList(),
+    val androidVersionFilter: List<String> = emptyList(),
 )
 
 class StringListConverter {

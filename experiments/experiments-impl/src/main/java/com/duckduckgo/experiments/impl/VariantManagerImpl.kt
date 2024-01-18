@@ -23,7 +23,6 @@ import com.duckduckgo.experiments.api.VariantConfig
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.experiments.impl.store.ExperimentVariantEntity
 import com.squareup.anvil.annotations.ContributesBinding
-import java.util.Locale
 import javax.inject.Inject
 import timber.log.Timber
 
@@ -33,6 +32,7 @@ class VariantManagerImpl @Inject constructor(
     private val indexRandomizer: IndexRandomizer,
     private val appBuildConfig: AppBuildConfig,
     private val experimentVariantRepository: ExperimentVariantRepository,
+    private val experimentFiltersManager: ExperimentFiltersManager,
 ) : VariantManager {
 
     override fun defaultVariantKey(): String {
@@ -93,23 +93,11 @@ class VariantManagerImpl @Inject constructor(
                 Variant(
                     key = entity.key,
                     weight = entity.weight ?: 0.0,
-                    filterBy = addFilters(entity),
+                    filterBy = experimentFiltersManager.addFilters(entity),
                 ),
             )
         }
         return activeVariants
-    }
-
-    private fun addFilters(entity: ExperimentVariantEntity): (AppBuildConfig) -> Boolean {
-        if (entity.key == "sc" || entity.key == "se") {
-            return { isSerpRegionToggleCountry() }
-        }
-        if (entity.localeFilter.isEmpty()) {
-            return { noFilter() }
-        }
-
-        val userLocale = Locale.getDefault()
-        return { entity.localeFilter.contains(userLocale.toString()) }
     }
 
     private fun matchesReferrerVariant(key: String): Boolean {
@@ -147,27 +135,6 @@ class VariantManagerImpl @Inject constructor(
 
         private const val REINSTALL_VARIANT = "ru"
 
-        private val serpRegionToggleTargetCountries = listOf(
-            "AU",
-            "AT",
-            "DK",
-            "FI",
-            "FR",
-            "DE",
-            "IT",
-            "IE",
-            "NZ",
-            "NO",
-            "ES",
-            "SE",
-            "GB",
-        )
-
         private fun noFilter(): Boolean = true
-
-        private fun isSerpRegionToggleCountry(): Boolean {
-            val locale = Locale.getDefault()
-            return serpRegionToggleTargetCountries.contains(locale.country)
-        }
     }
 }

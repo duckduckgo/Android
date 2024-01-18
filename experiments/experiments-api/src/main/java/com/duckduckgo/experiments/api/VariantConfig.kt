@@ -23,5 +23,6 @@ data class VariantConfig(
 )
 
 data class VariantFilters(
-    val locale: List<String>? = null,
+    val locale: List<String> = emptyList(),
+    val androidVersion: List<String> = emptyList(),
 )
