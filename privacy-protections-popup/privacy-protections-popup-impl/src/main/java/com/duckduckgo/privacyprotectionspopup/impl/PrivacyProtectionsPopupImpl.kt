@@ -121,6 +121,8 @@ class PrivacyProtectionsPopupImpl(
             .setTopEdge(edgeTreatment)
             .build()
 
+        popupContent.shieldIconHighlight.startAnimation(buildShieldIconHighlightAnimation())
+
         return popupContent
     }
 
@@ -137,7 +139,7 @@ class PrivacyProtectionsPopupImpl(
         val horizontalOffsetPx = -popupContent.paddingStart
 
         // Align top of the popup layout with the top of the anchor
-        val verticalOffsetPx = -anchor.measuredHeight
+        val verticalOffsetPx = -anchor.measuredHeight - popupContent.paddingTop
 
         // Calculate width because PopupWindow doesn't handle WRAP_CONTENT as expected
         val popupContentWidth = popupContent

@@ -196,6 +196,7 @@
     <color name="paleBrownishGray">#d0d0d0</color>
     <color name="brownishGrayTwo">#666666</color>
     <color name="cornflowerBlue">#678fff</color>
+    <color name="cornflowerBlue_10">#1A678fff</color>
     <color name="cornflowerDark">#5078e9</color>
     <color name="translucentDark">#b000</color>
     <color name="light_blue">#F2F5F9</color>
