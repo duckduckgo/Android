@@ -54,7 +54,7 @@ interface RequestInterceptor {
     suspend fun shouldIntercept(
         request: WebResourceRequest,
         webView: WebView,
-        documentUrl: Uri?,
+        documentUri: Uri?,
         webViewClientListener: WebViewClientListener?,
     ): WebResourceResponse?
 
@@ -163,12 +163,12 @@ class WebViewRequestInterceptor(
     override suspend fun shouldIntercept(
         request: WebResourceRequest,
         webView: WebView,
-        documentUrl: Uri?,
+        documentUri: Uri?,
         webViewClientListener: WebViewClientListener?,
     ): WebResourceResponse? {
         val url = request.url
 
-        if (requestFilterer.shouldFilterOutRequest(request, documentUrl.toString())) return WebResourceResponse(null, null, null)
+        if (requestFilterer.shouldFilterOutRequest(request, documentUri.toString())) return WebResourceResponse(null, null, null)
 
         adClickManager.detectAdClick(url?.toString(), request.isForMainFrame)
 
@@ -202,17 +202,17 @@ class WebViewRequestInterceptor(
             return WebResourceResponse(null, null, null)
         }
 
-        if (documentUrl == null) return null
+        if (documentUri == null) return null
 
-        if (TrustedSites.isTrusted(documentUrl)) {
+        if (TrustedSites.isTrusted(documentUri)) {
             return null
         }
 
         if (url != null && url.isHttp) {
-            webViewClientListener?.pageHasHttpResources(documentUrl)
+            webViewClientListener?.pageHasHttpResources(documentUri)
         }
 
-        return getWebResourceResponse(request, documentUrl, webViewClientListener)
+        return getWebResourceResponse(request, documentUri, webViewClientListener)
     }
 
     override suspend fun shouldInterceptFromServiceWorker(
@@ -338,22 +338,6 @@ class WebViewRequestInterceptor(
 
     private fun shouldUpgrade(request: WebResourceRequest) =
         request.isForMainFrame && request.url != null && httpsUpgrader.shouldUpgrade(request.url)
-
-    private fun trackingEvent(
-        request: WebResourceRequest,
-        documentUrl: String?,
-        webViewClientListener: WebViewClientListener?,
-        checkFirstParty: Boolean = true,
-    ): TrackingEvent? {
-        val url = request.url
-        if (request.isForMainFrame || documentUrl == null) {
-            return null
-        }
-
-        val trackingEvent = trackerDetector.evaluate(url, documentUrl, checkFirstParty, request.requestHeaders) ?: return null
-        webViewClientListener?.trackerDetected(trackingEvent)
-        return trackingEvent
-    }
 
     private fun trackingEvent(
         request: WebResourceRequest,
