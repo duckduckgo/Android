@@ -96,7 +96,15 @@ class VpnEnabledNotificationBuilder {
                 .addNotificationActions(context, vpnNotification.notificationActions)
                 .setChannelId(VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
                 .setCategory(NotificationCompat.CATEGORY_SERVICE)
+                .setDeleteIntentIfValid(vpnNotification.deleteIntent)
                 .build()
+        }
+
+        private fun NotificationCompat.Builder.setDeleteIntentIfValid(deleteIntent: PendingIntent?): NotificationCompat.Builder {
+            if (deleteIntent != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                this.setDeleteIntent(deleteIntent)
+            }
+            return this
         }
 
         private fun NotificationCompat.Builder.addNotificationActions(

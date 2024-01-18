@@ -61,6 +61,7 @@ class NetPEnabledNotificationContentPlugin @Inject constructor(
                 title = SpannableStringBuilder(title),
                 onNotificationPressIntent = onPressIntent,
                 notificationActions = NotificationActions.VPNActions,
+                deleteIntent = null,
             )
         } else {
             null
