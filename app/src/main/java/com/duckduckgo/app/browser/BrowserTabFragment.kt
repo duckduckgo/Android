@@ -3420,7 +3420,8 @@ class BrowserTabFragment :
                 if (isHidden) {
                     return@launch
                 }
-                if (lastSeenOmnibarViewState?.isEditing != true) {
+                val privacyProtectionsPopupVisible = lastSeenBrowserViewState?.privacyProtectionsPopupViewState?.visible == true
+                if (lastSeenOmnibarViewState?.isEditing != true && !privacyProtectionsPopupVisible) {
                     val site = viewModel.siteLiveData.value
                     val events = site?.orderedTrackerBlockedEntities()
                     activity?.let { activity ->
