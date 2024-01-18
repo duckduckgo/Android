@@ -1844,6 +1844,13 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    override fun pageHasHttpResources(page: Uri) {
+        if (site?.domainMatchesUrl(page) == true) {
+            site?.hasHttpResources = true
+            onSiteChanged()
+        }
+    }
+
     override fun onCertificateReceived(certificate: SslCertificate?) {
         site?.certificate = certificate
     }

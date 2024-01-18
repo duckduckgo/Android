@@ -347,7 +347,7 @@ class BrowserWebViewClient @Inject constructor(
         request: WebResourceRequest,
     ): WebResourceResponse? {
         return runBlocking {
-            val documentUrl = withContext(dispatcherProvider.main()) { webView.url }
+            val documentUrl = withContext(dispatcherProvider.main()) { webView.url }?.toUri()
             withContext(dispatcherProvider.main()) {
                 loginDetector.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, request))
             }
