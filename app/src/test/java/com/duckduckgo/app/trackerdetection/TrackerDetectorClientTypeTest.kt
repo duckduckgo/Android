@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.trackerdetection
 
+import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.privacy.db.UserAllowListDao
@@ -59,8 +60,10 @@ class TrackerDetectorClientTypeTest {
     fun before() {
         whenever(mockUserAllowListDao.contains(any())).thenReturn(false)
 
-        whenever(mockBlockingClient.matches(eq(Url.BLOCKED), any(), anyMap())).thenReturn(Client.Result(matches = true, isATracker = true))
-        whenever(mockBlockingClient.matches(eq(Url.UNLISTED), any(), anyMap())).thenReturn(Client.Result(matches = false, isATracker = false))
+        whenever(mockBlockingClient.matches(eq(Url.BLOCKED), any<Uri>(), anyMap())).thenReturn(Client.Result(matches = true, isATracker = true))
+        whenever(mockBlockingClient.matches(eq(Url.BLOCKED), any<String>(), anyMap())).thenReturn(Client.Result(matches = true, isATracker = true))
+        whenever(mockBlockingClient.matches(eq(Url.UNLISTED), any<Uri>(), anyMap())).thenReturn(Client.Result(matches = false, isATracker = false))
+        whenever(mockBlockingClient.matches(eq(Url.UNLISTED), any<String>(), anyMap())).thenReturn(Client.Result(matches = false, isATracker = false))
         whenever(mockBlockingClient.name).thenReturn(Client.ClientName.TDS)
         testee.addClient(mockBlockingClient)
     }

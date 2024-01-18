@@ -52,6 +52,7 @@ interface WebViewClientListener {
     fun titleReceived(newTitle: String)
     fun trackerDetected(event: TrackingEvent)
     fun pageHasHttpResources(page: String)
+    fun pageHasHttpResources(page: Uri)
     fun onCertificateReceived(certificate: SslCertificate?)
 
     fun sendEmailRequested(emailAddress: String)

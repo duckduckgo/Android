@@ -71,6 +71,15 @@ class UriString {
             return parentHost == childHost || (childHost.endsWith(".$parentHost") || parentHost.endsWith(".$childHost"))
         }
 
+        fun sameOrSubdomainPair(
+            first: Uri,
+            second: Uri,
+        ): Boolean {
+            val childHost = first.host ?: return false
+            val parentHost = second.host ?: return false
+            return parentHost == childHost || (childHost.endsWith(".$parentHost") || parentHost.endsWith(".$childHost"))
+        }
+
         fun isWebUrl(inputQuery: String): Boolean {
             if (inputQuery.contains(space)) return false
             val rawUri = Uri.parse(inputQuery)
