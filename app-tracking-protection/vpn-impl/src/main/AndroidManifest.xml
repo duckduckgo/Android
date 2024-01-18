@@ -152,6 +152,15 @@
             </intent-filter>
         </receiver>
 
+        <receiver
+            android:name=".service.notification.PersistentNotificationDismissedReceiver"
+            android:exported="false"
+            android:process=":vpn">
+            <intent-filter>
+                <action android:name="com.duckduckgo.vpn.ACTION_VPN_PERSISTENT_NOTIF_DISMISSED" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

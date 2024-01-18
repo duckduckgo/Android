@@ -47,6 +47,7 @@ class AppTPAndNetPEnabledNotificationContentPlugin @Inject constructor(
 ) : VpnEnabledNotificationContentPlugin {
 
     private val notificationPendingIntent by lazy { appTpEnabledNotificationIntentProvider.getOnPressNotificationIntent() }
+    private val deletePendingIntent by lazy { appTpEnabledNotificationIntentProvider.getDeleteNotificationIntent() }
 
     override fun getInitialContent(): VpnEnabledNotificationContent? {
         return if (isActive()) {
@@ -60,6 +61,7 @@ class AppTPAndNetPEnabledNotificationContentPlugin @Inject constructor(
                 title = SpannableStringBuilder(title),
                 onNotificationPressIntent = notificationPendingIntent,
                 notificationActions = NotificationActions.VPNActions,
+                deleteIntent = deletePendingIntent,
             )
         } else {
             null
@@ -110,6 +112,7 @@ class AppTPAndNetPEnabledNotificationContentPlugin @Inject constructor(
                     title = SpannableStringBuilder(notificationText),
                     onNotificationPressIntent = notificationPendingIntent,
                     notificationActions = NotificationActions.VPNActions,
+                    deleteIntent = deletePendingIntent,
                 )
             }
     }
