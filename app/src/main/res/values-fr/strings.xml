@@ -633,7 +633,7 @@
     <string name="autofillLoginUpdatedSnackbarMessage">Identifiant modifié</string>
     <string name="autofillDisableAutofillPromptTitle">Voulez-vous continuer à enregistrer les identifiants de connexion ?</string>
     <string name="autofillDisableAutofillPromptMessage">Cette fonction peut être désactivée à tout moment dans Paramètres.</string>
-    <string name="autofillDisableAutofillPromptPositiveButton">Encore des économies</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Continuer à les sauvegarder</string>
     <string name="autofillDisableAutofillPromptNegativeButton">Désactiver</string>
 
     <!-- Waitlist Notification -->
