@@ -61,6 +61,10 @@ interface SyncPixels {
     fun fireSyncAccountErrorPixel(
         result: Error,
     )
+
+    fun fireEncryptFailurePixel()
+
+    fun fireDecryptFailurePixel()
 }
 
 @ContributesBinding(AppScope::class)
@@ -80,7 +84,7 @@ class RealSyncPixels @Inject constructor(
         val payload = mapOf(
             SyncPixelParameters.COUNT to dailyStats.attempts,
             SyncPixelParameters.DATE to dailyStats.date,
-        ).plus(dailyStats.apiErrorStats)
+        ).plus(dailyStats.apiErrorStats).plus(dailyStats.operationErrorStats)
         tryToFireDailyPixel(SYNC_DAILY_PIXEL, payload)
     }
 
@@ -110,6 +114,14 @@ class RealSyncPixels @Inject constructor(
                 SyncPixelParameters.ERROR_REASON to result.reason,
             ),
         )
+    }
+
+    override fun fireEncryptFailurePixel() {
+        tryToFireDailyPixel(SyncPixelName.SYNC_ENCRYPT_FAILURE)
+    }
+
+    override fun fireDecryptFailurePixel() {
+        tryToFireDailyPixel(SyncPixelName.SYNC_DECRYPT_FAILURE)
     }
 
     private fun tryToFireDailyPixel(
@@ -148,6 +160,8 @@ enum class SyncPixelName(override val pixelName: String) : Pixel.PixelName {
     SYNC_SIGNUP_DIRECT("m_sync_signup_direct"),
     SYNC_SIGNUP_CONNECT("m_sync_signup_connect"),
     SYNC_ACCOUNT_FAILURE("m_sync_account_failure"),
+    SYNC_ENCRYPT_FAILURE("m_sync_encrypt_failure"),
+    SYNC_DECRYPT_FAILURE("m_sync_decrypt_failure"),
 }
 
 object SyncPixelParameters {
@@ -157,6 +171,8 @@ object SyncPixelParameters {
     const val REQUEST_SIZE_LIMIT_EXCEEDED_COUNT = "%s_request_size_limit_exceeded_count"
     const val VALIDATION_ERROR_COUNT = "%s_validation_error"
     const val TOO_MANY_REQUESTS = "%s_too_many_requests_count"
+    const val DATA_ENCRYPT_ERROR = "encrypt_error_count"
+    const val DATA_DECRYPT_ERROR = "decrypt_error_count"
     const val ERROR_CODE = "code"
     const val ERROR_REASON = "reason"
 }

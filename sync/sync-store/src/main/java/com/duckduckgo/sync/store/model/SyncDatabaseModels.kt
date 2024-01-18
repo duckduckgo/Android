@@ -59,3 +59,18 @@ enum class SyncApiErrorType {
     VALIDATION_ERROR,
     TOO_MANY_REQUESTS,
 }
+
+@Entity(
+    tableName = "sync_operation_errors",
+)
+data class SyncOperationError(
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    val errorType: SyncOperationErrorType,
+    val count: Int,
+    val date: String = "", // YYYY-MM-dd format
+)
+
+enum class SyncOperationErrorType {
+    DATA_ENCRYPT,
+    DATA_DECRYPT,
+}

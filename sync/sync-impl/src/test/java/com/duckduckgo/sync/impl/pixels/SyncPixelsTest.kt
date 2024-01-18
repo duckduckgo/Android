@@ -78,7 +78,7 @@ class SyncPixelsTest {
         val payload = mapOf(
             SyncPixelParameters.COUNT to dailyStats.attempts,
             SyncPixelParameters.DATE to dailyStats.date,
-        ).plus(dailyStats.apiErrorStats)
+        ).plus(dailyStats.apiErrorStats).plus(dailyStats.operationErrorStats)
 
         verify(pixel, times(1)).fire(SyncPixelName.SYNC_DAILY_PIXEL, payload)
     }
