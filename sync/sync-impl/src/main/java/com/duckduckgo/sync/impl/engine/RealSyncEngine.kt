@@ -183,7 +183,6 @@ class RealSyncEngine @Inject constructor(
     ) {
         return when (val result = syncApiClient.patch(changes)) {
             is Error -> {
-                syncPixels.fireSyncAttemptErrorPixel(changes.type.toString(), result)
                 val featureError = result.featureError() ?: return
                 persisterPlugins.getPlugins().forEach {
                     it.onError(SyncErrorResponse(changes.type, featureError))
@@ -203,7 +202,6 @@ class RealSyncEngine @Inject constructor(
     ) {
         when (val result = syncApiClient.get(changes.type, changes.modifiedSince.value)) {
             is Error -> {
-                syncPixels.fireSyncAttemptErrorPixel(changes.type.toString(), result)
             }
 
             is Success -> {
@@ -227,11 +225,15 @@ class RealSyncEngine @Inject constructor(
             when (val result = it.onSuccess(remoteChanges, conflictResolution)) {
                 is SyncMergeResult.Success -> {
                     if (result.orphans) {
-                        syncPixels.fireOrphanPresentPixel(remoteChanges.type.toString())
+                        Timber.d("Sync - Orphans present in this sync operation for feature ${remoteChanges.type.field}")
+                    }
+                    if (result.timestampConflict) {
+                        Timber.d("Sync - Timestamp conflict present in this sync operation for feature ${remoteChanges.type.field}")
+                        syncPixels.fireTimestampConflictPixel(remoteChanges.type.field)
                     }
                 }
                 is SyncMergeResult.Error -> {
-                    syncPixels.firePersisterErrorPixel(remoteChanges.type.toString(), result)
+                    Timber.d("Sync - Error while persisting data $result")
                 }
             }
         }

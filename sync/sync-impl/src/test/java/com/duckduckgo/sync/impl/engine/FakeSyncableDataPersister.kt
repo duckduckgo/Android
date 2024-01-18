@@ -22,7 +22,7 @@ import com.duckduckgo.sync.api.engine.SyncMergeResult
 import com.duckduckgo.sync.api.engine.SyncableDataPersister
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution
 
-class FakeSyncableDataPersister(private val orphans: Boolean = false) : SyncableDataPersister {
+class FakeSyncableDataPersister(private val orphans: Boolean = false, private val timestampConflict: Boolean = false) : SyncableDataPersister {
     override fun onSyncEnabled() {
         // no-op
     }
@@ -31,7 +31,7 @@ class FakeSyncableDataPersister(private val orphans: Boolean = false) : Syncable
         changes: SyncChangesResponse,
         conflictResolution: SyncConflictResolution,
     ): SyncMergeResult {
-        return SyncMergeResult.Success(orphans)
+        return SyncMergeResult.Success(orphans, timestampConflict)
     }
 
     override fun onError(error: SyncErrorResponse) {

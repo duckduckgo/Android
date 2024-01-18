@@ -19,7 +19,6 @@ package com.duckduckgo.sync.impl
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.SyncCrypto
 import com.duckduckgo.sync.crypto.SyncLib
-import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -28,12 +27,10 @@ import javax.inject.Inject
 class RealSyncCrypto @Inject constructor(
     private val nativeLib: SyncLib,
     private val syncStore: SyncStore,
-    private val syncPixels: SyncPixels,
 ) : SyncCrypto {
     override fun encrypt(text: String): String {
         val encryptResult = nativeLib.encryptData(text, syncStore.secretKey.orEmpty())
         return if (encryptResult.result != 0L) {
-            syncPixels.fireEncryptFailurePixel()
             ""
         } else {
             encryptResult.encryptedData
@@ -44,7 +41,6 @@ class RealSyncCrypto @Inject constructor(
         if (data.isEmpty()) return data
         val decryptResult = nativeLib.decryptData(data, syncStore.secretKey.orEmpty())
         return if (decryptResult.result != 0L) {
-            syncPixels.fireDecryptFailurePixel()
             ""
         } else {
             decryptResult.decryptedData

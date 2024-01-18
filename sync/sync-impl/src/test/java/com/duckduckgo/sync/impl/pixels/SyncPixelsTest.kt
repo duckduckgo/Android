@@ -16,8 +16,11 @@
 
 package com.duckduckgo.sync.impl.pixels
 
+import android.content.SharedPreferences
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
+import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.sync.impl.stats.DailyStats
 import com.duckduckgo.sync.impl.stats.SyncStatsRepository
 import com.duckduckgo.sync.store.SharedPrefsProvider
 import org.junit.Before
@@ -34,14 +37,15 @@ class SyncPixelsTest {
     private var syncStatsRepository: SyncStatsRepository = mock()
     private var sharedPrefsProv: SharedPrefsProvider = mock()
 
+    private lateinit var sharedPreferences: SharedPreferences
     private lateinit var testee: RealSyncPixels
 
     @Before
     fun setUp() {
-        val prefs = InMemorySharedPreferences()
+        sharedPreferences = InMemorySharedPreferences()
         whenever(
             sharedPrefsProv.getSharedPrefs(eq("com.duckduckgo.sync.pixels.v1")),
-        ).thenReturn(prefs)
+        ).thenReturn(sharedPreferences)
 
         testee = RealSyncPixels(
             pixel,
@@ -52,17 +56,31 @@ class SyncPixelsTest {
 
     @Test
     fun whenDailyPixelCalledThenPixelFired() {
+        val dailyStats = givenSomeDailyStats()
+
         testee.fireDailyPixel()
 
-        verify(pixel).fire(SyncPixelName.SYNC_DAILY_PIXEL)
+        val payload = mapOf(
+            SyncPixelParameters.COUNT to dailyStats.attempts,
+            SyncPixelParameters.DATE to dailyStats.date,
+        ).plus(dailyStats.apiErrorStats)
+
+        verify(pixel).fire(SyncPixelName.SYNC_DAILY_PIXEL, payload)
     }
 
     @Test
     fun whenDailyPixelCalledTwiceThenPixelFiredOnce() {
+        val dailyStats = givenSomeDailyStats()
+
         testee.fireDailyPixel()
         testee.fireDailyPixel()
 
-        verify(pixel).fire(SyncPixelName.SYNC_DAILY_PIXEL)
+        val payload = mapOf(
+            SyncPixelParameters.COUNT to dailyStats.attempts,
+            SyncPixelParameters.DATE to dailyStats.date,
+        ).plus(dailyStats.apiErrorStats)
+
+        verify(pixel, times(1)).fire(SyncPixelName.SYNC_DAILY_PIXEL, payload)
     }
 
     @Test
@@ -84,5 +102,13 @@ class SyncPixelsTest {
         testee.fireSignupConnectPixel()
 
         verify(pixel).fire(SyncPixelName.SYNC_SIGNUP_CONNECT)
+    }
+
+    private fun givenSomeDailyStats(): DailyStats {
+        val date = DatabaseDateFormatter.getUtcIsoLocalDate()
+        val dailyStats = DailyStats("1", date, emptyMap())
+        whenever(syncStatsRepository.getYesterdayDailyStats()).thenReturn(dailyStats)
+
+        return dailyStats
     }
 }

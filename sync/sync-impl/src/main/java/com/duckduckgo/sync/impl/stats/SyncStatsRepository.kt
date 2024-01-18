@@ -16,10 +16,10 @@
 
 package com.duckduckgo.sync.impl.stats
 
+import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.sync.impl.engine.SyncStateRepository
+import com.duckduckgo.sync.impl.error.SyncApiErrorRepository
 import com.duckduckgo.sync.store.model.SyncAttempt
-import com.duckduckgo.sync.store.model.SyncAttemptState.SUCCESS
-import java.math.RoundingMode
 import javax.inject.Inject
 
 /**
@@ -31,29 +31,25 @@ interface SyncStatsRepository {
      * Returns yesterday's [DailyStats]
      * @return [DailyStats]
      */
-    fun getDailyStats(): DailyStats
+    fun getYesterdayDailyStats(): DailyStats
 }
 
 data class DailyStats(
-    val attempts: Int,
-    val successRate: Double,
+    val attempts: String,
+    val date: String,
+    val apiErrorStats: Map<String, String> = emptyMap(),
 )
 
-class RealSyncStatsRepository @Inject constructor(private val syncStateRepository: SyncStateRepository) : SyncStatsRepository {
-    override fun getDailyStats(): DailyStats {
-        val attempts = syncStateRepository.attempts().filter {
+class RealSyncStatsRepository @Inject constructor(
+    private val syncStateRepository: SyncStateRepository,
+    private val syncApiErrorRepository: SyncApiErrorRepository,
+) : SyncStatsRepository {
+    override fun getYesterdayDailyStats(): DailyStats {
+        val yesterday = DatabaseDateFormatter.getUtcIsoLocalDate(1)
+        val count = syncStateRepository.attempts().filter {
             it.yesterday()
-        }
-        val successfulAttempts = attempts.filter { it.state == SUCCESS }.size
-        val totalAttempts = attempts.size
-
-        val successRate = if (totalAttempts > 0) {
-            successfulAttempts.toDouble() / totalAttempts.toDouble() * 100
-        } else {
-            0.0
-        }
-
-        val roundedUp = successRate.toBigDecimal().setScale(2, RoundingMode.UP).toDouble()
-        return DailyStats(totalAttempts, roundedUp)
+        }.size
+        val apiErrorMap = syncApiErrorRepository.getErrorsByDate(yesterday).associate { it.name to it.count }
+        return DailyStats(count.toString(), yesterday, apiErrorMap)
     }
 }

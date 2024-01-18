@@ -70,5 +70,14 @@ class DatabaseDateFormatter {
             val endTime = LocalDateTime.parse(end, FORMATTER_SECONDS)
             return Duration.between(startTime, endTime)
         }
+
+        fun getUtcIsoLocalDate(minusDays: Long = 0): String {
+            // returns YYYY-MM-dd
+            return if (minusDays > 0) {
+                LocalDate.now().minusDays(minusDays)
+            } else {
+                LocalDate.now()
+            }.format(DateTimeFormatter.ISO_LOCAL_DATE)
+        }
     }
 }
