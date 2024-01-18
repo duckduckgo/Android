@@ -184,7 +184,7 @@ class PrivacyProtectionsPopupImpl(
     }
 
     private fun createPopupWindowSpec(popupContent: View): PopupWindowSpec {
-        val distanceFromStartEdgeOfTheScreenPx = anchor.xLocationOnScreen
+        val distanceFromStartEdgeOfTheScreenPx = anchor.xLocationInWindow
 
         val overrideContentPaddingStartPx = if (distanceFromStartEdgeOfTheScreenPx - popupContent.paddingStart < 0) {
             distanceFromStartEdgeOfTheScreenPx
@@ -246,10 +246,10 @@ class PrivacyProtectionsPopupImpl(
     }
 }
 
-private val View.xLocationOnScreen: Int
+private val View.xLocationInWindow: Int
     get() {
         val location = IntArray(2)
-        getLocationOnScreen(location)
+        getLocationInWindow(location)
         return location[0]
     }
 
