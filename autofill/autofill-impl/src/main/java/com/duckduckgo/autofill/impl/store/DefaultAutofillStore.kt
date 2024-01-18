@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.api.store
+package com.duckduckgo.autofill.impl.store
 
-import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.api.store.AutofillStore
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
+import javax.inject.Inject
 
-/**
- * Public APIs for querying credentials stored in the autofill store
- */
-interface AutofillStore {
-
-    /**
-     * Find saved credentials for the given URL, returning an empty list where no matches are found
-     * @param rawUrl Can be a full, unmodified URL taken from the URL bar (containing subdomains, query params etc...)
-     */
-    suspend fun getCredentials(rawUrl: String): List<LoginCredentials>
-}
+@SingleInstanceIn(AppScope::class)
+@ContributesBinding(AppScope::class)
+class DefaultAutofillStore @Inject constructor(
+    private val autofillStore: InternalAutofillStore,
+) : AutofillStore by autofillStore

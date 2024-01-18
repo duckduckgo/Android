@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.autofill
+package com.duckduckgo.autofill.impl.email
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -26,9 +26,10 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.LAST_USED_DAY
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.AutofillEventListener
 import com.duckduckgo.autofill.api.EmailProtectionChooseEmailDialog
-import com.duckduckgo.autofill.api.EmailProtectionChooseEmailDialog.UseEmailResultType.*
+import com.duckduckgo.autofill.api.EmailProtectionChooseEmailDialog.UseEmailResultType.DoNotUseEmailProtection
+import com.duckduckgo.autofill.api.EmailProtectionChooseEmailDialog.UseEmailResultType.UsePersonalEmailAddress
+import com.duckduckgo.autofill.api.EmailProtectionChooseEmailDialog.UseEmailResultType.UsePrivateAliasAddress
 import com.duckduckgo.autofill.api.email.EmailManager
-import com.duckduckgo.autofill.impl.email.ResultHandlerEmailProtectionChooseEmail
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_TOOLTIP_DISMISSED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_USE_ADDRESS
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_USE_ALIAS

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.autofill
+package com.duckduckgo.autofill.impl.ui.credential.saving
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -24,9 +24,8 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.AutofillEventListener
 import com.duckduckgo.autofill.api.CredentialSavePickerDialog
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
-import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
-import com.duckduckgo.autofill.impl.ui.credential.saving.ResultHandlerSaveLoginCredentials
+import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.ui.credential.saving.declines.AutofillDeclineCounter
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
@@ -45,7 +44,7 @@ class ResultHandlerSaveLoginCredentialsTest {
 
     private val autofillFireproofDialogSuppressor: AutofillFireproofDialogSuppressor = mock()
     private val declineCounter: AutofillDeclineCounter = mock()
-    private val autofillStore: AutofillStore = mock()
+    private val autofillStore: InternalAutofillStore = mock()
     private val appBuildConfig: AppBuildConfig = mock()
 
     private val testee = ResultHandlerSaveLoginCredentials(

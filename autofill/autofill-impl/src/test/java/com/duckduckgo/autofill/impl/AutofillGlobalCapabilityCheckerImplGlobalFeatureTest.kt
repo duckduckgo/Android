@@ -18,8 +18,8 @@ package com.duckduckgo.autofill.impl
 
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.InternalTestUserChecker
-import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
+import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.runTest
@@ -42,7 +42,7 @@ class AutofillGlobalCapabilityCheckerImplGlobalFeatureTest(
 
     private val autofillFeature: AutofillFeature = mock()
     private val internalTestUserChecker: InternalTestUserChecker = mock()
-    private val autofillStore: AutofillStore = mock()
+    private val autofillStore: InternalAutofillStore = mock()
     private val deviceAuthenticator: DeviceAuthenticator = mock()
     private val exceptionChecker: com.duckduckgo.autofill.api.Autofill = mock()
 

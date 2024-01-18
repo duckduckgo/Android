@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.autofill
+package com.duckduckgo.autofill.impl.deviceauth
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 
 abstract class FakeAuthenticator : DeviceAuthenticator {
 

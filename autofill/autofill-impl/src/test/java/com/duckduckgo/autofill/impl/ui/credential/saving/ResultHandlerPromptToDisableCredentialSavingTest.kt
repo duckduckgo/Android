@@ -6,8 +6,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillEventListener
-import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
+import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.ui.credential.saving.declines.AutofillDeclineCounter
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -28,7 +28,7 @@ class ResultHandlerPromptToDisableCredentialSavingTest {
     private val pixel: Pixel = mock()
     private val dispatchers: DispatcherProvider = coroutineTestRule.testDispatcherProvider
     private val declineCounter: AutofillDeclineCounter = mock()
-    private val autofillStore: AutofillStore = mock()
+    private val autofillStore: InternalAutofillStore = mock()
     private val appCoroutineScope: CoroutineScope = coroutineTestRule.testScope
     private val context = getInstrumentation().targetContext
     private val callback: AutofillEventListener = mock()

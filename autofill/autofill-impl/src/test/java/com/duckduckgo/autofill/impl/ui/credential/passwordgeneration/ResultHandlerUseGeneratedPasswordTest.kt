@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.autofill
+package com.duckduckgo.autofill.impl.ui.credential.passwordgeneration
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -22,15 +22,14 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.autofill.api.AutofillEventListener
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector
+import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.NoMatch
 import com.duckduckgo.autofill.api.UseGeneratedPasswordDialog.Companion.KEY_ACCEPTED
 import com.duckduckgo.autofill.api.UseGeneratedPasswordDialog.Companion.KEY_PASSWORD
 import com.duckduckgo.autofill.api.UseGeneratedPasswordDialog.Companion.KEY_URL
 import com.duckduckgo.autofill.api.UseGeneratedPasswordDialog.Companion.KEY_USERNAME
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
-import com.duckduckgo.autofill.api.store.AutofillStore
-import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult.NoMatch
-import com.duckduckgo.autofill.impl.ui.credential.passwordgeneration.ResultHandlerUseGeneratedPassword
+import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -46,7 +45,7 @@ class ResultHandlerUseGeneratedPasswordTest {
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
-    private val autofillStore: AutofillStore = mock()
+    private val autofillStore: InternalAutofillStore = mock()
     private val autoSavedLoginsMonitor: AutomaticSavedLoginsMonitor = mock()
     private val existingCredentialMatchDetector: ExistingCredentialMatchDetector = mock()
     private val callback: AutofillEventListener = mock()
@@ -61,7 +60,13 @@ class ResultHandlerUseGeneratedPasswordTest {
 
     @Before
     fun setup() = runTest {
-        whenever(existingCredentialMatchDetector.determine(anyOrNull(), anyOrNull(), anyOrNull())).thenReturn(NoMatch)
+        whenever(
+            existingCredentialMatchDetector.determine(
+                anyOrNull(),
+                anyOrNull(),
+                anyOrNull(),
+            ),
+        ).thenReturn(NoMatch)
     }
 
     @Test

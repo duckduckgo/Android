@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.autofill
+package com.duckduckgo.autofill.impl.ui.credential.updating
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -26,9 +26,8 @@ import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType.Password
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
-import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
-import com.duckduckgo.autofill.impl.ui.credential.updating.ResultHandlerUpdateLoginCredentials
+import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
@@ -43,7 +42,7 @@ class ResultHandlerUpdateLoginCredentialsTest {
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
-    private val autofillStore: AutofillStore = mock()
+    private val autofillStore: InternalAutofillStore = mock()
     private val autofillDialogSuppressor: AutofillFireproofDialogSuppressor = mock()
     private val callback: AutofillEventListener = mock()
     private val appBuildConfig: AppBuildConfig = mock()
@@ -58,14 +57,19 @@ class ResultHandlerUpdateLoginCredentialsTest {
 
     @Test
     fun whenUpdateBundleMissingUrlThenNoAttemptToUpdateMade() = runTest {
-        val bundle = bundleForUpdateDialog(url = null, credentials = someLoginCredentials(), Password)
+        val bundle = bundleForUpdateDialog(
+            url = null,
+            credentials = someLoginCredentials(),
+            Password,
+        )
         testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
         verifyUpdateNeverCalled()
     }
 
     @Test
     fun whenUpdateBundleMissingCredentialsThenNoAttemptToSaveMade() = runTest {
-        val bundle = bundleForUpdateDialog(url = "example.com", credentials = null, Password)
+        val bundle =
+            bundleForUpdateDialog(url = "example.com", credentials = null, Password)
         testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
         verifyUpdateNeverCalled()
     }
@@ -75,7 +79,11 @@ class ResultHandlerUpdateLoginCredentialsTest {
         val loginCredentials = LoginCredentials(domain = "example.com", username = "foo", password = "bar")
         val bundle = bundleForUpdateDialog("example.com", loginCredentials, Password)
         testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
-        verify(autofillStore).updateCredentials(eq("example.com"), eq(loginCredentials), eq(Password))
+        verify(autofillStore).updateCredentials(
+            eq("example.com"),
+            eq(loginCredentials),
+            eq(Password),
+        )
         verifySaveNeverCalled()
     }
 

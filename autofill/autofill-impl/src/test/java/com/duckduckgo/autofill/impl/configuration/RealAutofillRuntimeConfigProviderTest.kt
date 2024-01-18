@@ -19,10 +19,10 @@ package com.duckduckgo.autofill.impl.configuration
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
-import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.email.incontext.availability.EmailProtectionInContextAvailabilityRules
 import com.duckduckgo.autofill.impl.jsbridge.response.AvailableInputTypeCredentials
 import com.duckduckgo.autofill.impl.sharedcreds.ShareableCredentials
+import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -39,7 +39,7 @@ class RealAutofillRuntimeConfigProviderTest {
     private lateinit var testee: RealAutofillRuntimeConfigProvider
 
     private val emailManager: EmailManager = mock()
-    private val autofillStore: AutofillStore = mock()
+    private val autofillStore: InternalAutofillStore = mock()
     private val runtimeConfigurationWriter: RuntimeConfigurationWriter = mock()
     private val shareableCredentials: ShareableCredentials = mock()
     private val autofillCapabilityChecker: AutofillCapabilityChecker = mock()

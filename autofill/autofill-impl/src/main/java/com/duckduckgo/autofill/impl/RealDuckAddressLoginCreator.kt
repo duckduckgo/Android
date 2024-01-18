@@ -21,7 +21,7 @@ import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.credential.saving.DuckAddressLoginCreator
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
-import com.duckduckgo.autofill.api.store.AutofillStore
+import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
@@ -33,7 +33,7 @@ import timber.log.Timber
 
 @ContributesBinding(FragmentScope::class)
 class RealDuckAddressLoginCreator @Inject constructor(
-    private val autofillStore: AutofillStore,
+    private val autofillStore: InternalAutofillStore,
     private val autoSavedLoginsMonitor: AutomaticSavedLoginsMonitor,
     private val autofillCapabilityChecker: AutofillCapabilityChecker,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
