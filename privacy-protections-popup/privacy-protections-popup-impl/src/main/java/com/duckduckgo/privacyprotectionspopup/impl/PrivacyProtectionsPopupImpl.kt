@@ -17,9 +17,11 @@
 package com.duckduckgo.privacyprotectionspopup.impl
 
 import android.content.Context
+import android.graphics.Point
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup.LayoutParams
+import android.view.ViewGroup.MarginLayoutParams
 import android.widget.Button
 import android.widget.PopupWindow
 import androidx.core.view.doOnDetach
@@ -92,6 +94,9 @@ class PrivacyProtectionsPopupImpl(
 
         popupContent.anchorOverlay.layoutParams = popupContent.anchorOverlay.layoutParams.apply {
             height = anchor.measuredHeight
+            if (this is MarginLayoutParams) {
+                marginStart = anchor.locationInWindow.x - popupContent.root.paddingStart
+            }
         }
 
         popupWindow = PopupWindow(
@@ -125,7 +130,7 @@ class PrivacyProtectionsPopupImpl(
 
         val cornderRadius = context.resources.getDimension(R.dimen.mediumShapeCornerRadius)
         val cornerSize = context.resources.getDimension(R.dimen.daxBubbleDialogEdge)
-        val distanceFromEdge = EDGE_TREATMENT_DISTANCE_FROM_EDGE.toPx()
+        val distanceFromEdge = EDGE_TREATMENT_DISTANCE_FROM_EDGE.toPx() - POPUP_HORIZONTAL_OFFSET_DP.toPx()
         val edgeTreatment = DaxBubbleEdgeTreatment(cornerSize, distanceFromEdge)
 
         popupContent.cardView.shapeAppearanceModel = ShapeAppearanceModel.builder()
@@ -144,7 +149,7 @@ class PrivacyProtectionsPopupImpl(
     }
 
     private fun inflateButtons(popupContent: PopupPrivacyDashboardBinding, doNotShowAgainAvailable: Boolean): PopupButtonsViewHolder {
-        val popupExternalMarginsWidth = 2 * anchor.locationInWindow.x
+        val popupExternalMarginsWidth = 2 * anchor.locationInWindow.x + POPUP_HORIZONTAL_OFFSET_DP.toPx()
         val popupInternalPaddingWidth = popupContent.cardViewContent.paddingStart + popupContent.cardViewContent.paddingEnd
         val availableWidth = context.screenWidth - popupExternalMarginsWidth - popupInternalPaddingWidth
 
@@ -184,7 +189,7 @@ class PrivacyProtectionsPopupImpl(
     }
 
     private fun createPopupWindowSpec(popupContent: View): PopupWindowSpec {
-        val distanceFromStartEdgeOfTheScreenPx = anchor.xLocationInWindow
+        val distanceFromStartEdgeOfTheScreenPx = anchor.locationInWindow.x + POPUP_HORIZONTAL_OFFSET_DP.toPx()
 
         val overrideContentPaddingStartPx = if (distanceFromStartEdgeOfTheScreenPx - popupContent.paddingStart < 0) {
             distanceFromStartEdgeOfTheScreenPx
@@ -193,7 +198,7 @@ class PrivacyProtectionsPopupImpl(
         }
 
         // Adjust anchor position for extra margin that CardView needs in order draw its shadow
-        val horizontalOffsetPx = -popupContent.paddingStart
+        val horizontalOffsetPx = POPUP_HORIZONTAL_OFFSET_DP.toPx() - popupContent.paddingStart
 
         // Align top of the popup layout with the top of the anchor
         val verticalOffsetPx = -anchor.measuredHeight - popupContent.paddingTop
@@ -210,7 +215,12 @@ class PrivacyProtectionsPopupImpl(
             context.screenWidth + popupContent.paddingEnd - overrideContentPaddingStartPx
         }
 
-        val popupWidth = popupContentWidth.coerceAtMost(maxPopupWindowWidth)
+        // Stretch the popup to the entire width when the screen is small
+        val popupWidth = if (popupContentWidth > 0.7 * maxPopupWindowWidth) {
+            maxPopupWindowWidth
+        } else {
+            popupContentWidth
+        }
 
         return PopupWindowSpec(
             width = popupWidth,
@@ -243,14 +253,17 @@ class PrivacyProtectionsPopupImpl(
     private companion object {
         const val POPUP_DEFAULT_ELEVATION_DP = 8f
         const val EDGE_TREATMENT_DISTANCE_FROM_EDGE = 10f
+
+        // Alignment of popup left edge vs. anchor left edge
+        const val POPUP_HORIZONTAL_OFFSET_DP = -4
     }
 }
 
-private val View.xLocationInWindow: Int
+private val View.locationInWindow: Point
     get() {
         val location = IntArray(2)
         getLocationInWindow(location)
-        return location[0]
+        return Point(location[0], location[1])
     }
 
 private val Context.screenWidth: Int
