@@ -21,12 +21,16 @@ import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.sync.api.engine.SyncableType
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters
+import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.DATA_PERSISTER_ERROR_PARAM
 import com.duckduckgo.sync.store.SyncDatabase
 import com.duckduckgo.sync.store.model.GENERIC_FEATURE
 import com.duckduckgo.sync.store.model.SyncOperationErrorType
+import com.duckduckgo.sync.store.model.SyncOperationErrorType.DATA_PERSISTER_ERROR
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 import org.junit.After
 import org.junit.Assert
 import org.junit.Rule
@@ -62,6 +66,20 @@ class SyncOperationErrorRepositoryTest {
         testee.addError(errorType)
 
         val error = dao.featureErrorByDate(GENERIC_FEATURE, errorType.name, date)
+
+        Assert.assertTrue(error != null)
+        Assert.assertTrue(error!!.count == 1)
+    }
+
+    @Test
+    fun whenFeatureErrorAddedAndNotPresentThenNewEntryAdded() {
+        val feature = SyncableType.BOOKMARKS
+        val errorType = SyncOperationErrorType.DATA_PERSISTER_ERROR
+        val date = DatabaseDateFormatter.getUtcIsoLocalDate()
+
+        testee.addError(feature.field, errorType)
+
+        val error = dao.featureErrorByDate(feature.field, errorType.name, date)
 
         Assert.assertTrue(error != null)
         Assert.assertTrue(error!!.count == 1)
@@ -114,6 +132,23 @@ class SyncOperationErrorRepositoryTest {
 
         val error = errors.first()
         Assert.assertTrue(error.name == SyncPixelParameters.DATA_ENCRYPT_ERROR)
+        Assert.assertTrue(error.count == "1")
+    }
+
+    @Test
+    fun whenFeatureErrorsStoredThenGettingErrorsReturnsData() {
+        val feature = SyncableType.BOOKMARKS
+        val errorType = SyncOperationErrorType.DATA_PERSISTER_ERROR
+        val today = DatabaseDateFormatter.getUtcIsoLocalDate()
+
+        testee.addError(feature.field, errorType)
+
+        val errors = testee.getErrorsByDate(today)
+        Assert.assertTrue(errors.isNotEmpty())
+
+        val error = errors.first()
+        val expectedErrorName = String.format(Locale.US, DATA_PERSISTER_ERROR_PARAM, feature.field)
+        Assert.assertTrue(error.name == expectedErrorName)
         Assert.assertTrue(error.count == "1")
     }
 }

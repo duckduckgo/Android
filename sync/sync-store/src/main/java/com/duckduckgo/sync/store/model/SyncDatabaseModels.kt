@@ -74,6 +74,8 @@ data class SyncOperationError(
 const val GENERIC_FEATURE = "Unknown"
 
 enum class SyncOperationErrorType {
+    DATA_PROVIDER_ERROR,
+    DATA_PERSISTER_ERROR,
     DATA_ENCRYPT,
     DATA_DECRYPT,
 }

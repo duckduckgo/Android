@@ -161,6 +161,8 @@ object SyncPixelParameters {
     const val TOO_MANY_REQUESTS = "%s_too_many_requests_count"
     const val DATA_ENCRYPT_ERROR = "encrypt_error_count"
     const val DATA_DECRYPT_ERROR = "decrypt_error_count"
+    const val DATA_PERSISTER_ERROR_PARAM = "%s_persister_error_count"
+    const val DATA_PROVIDER_ERROR_PARAM = "%s_provider_error_count"
     const val ERROR_CODE = "code"
     const val ERROR_REASON = "reason"
 }
