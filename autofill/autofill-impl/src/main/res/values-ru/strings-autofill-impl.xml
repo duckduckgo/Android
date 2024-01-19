@@ -135,4 +135,12 @@
 
     <string name="credentials_limit_warning"><b>Синхронизация приостановлена</b>\nПревышен лимит по количеству логинов. Удалите некоторые из них, чтобы возобновить синхронизацию.\n\n<annotation type="manage_logins">Управление логинами</annotation></string>
     <string name="credentials_limit_warning_notif"><b>Синхронизация паролей приостановлена</b>\nВы превысили лимит синхронизации паролей. Удалите несколько из них. Пока вы не устраните эту проблему, резервная копия закладок создаваться не будет.</string>
+
+    <string name="saveLoginDialogNeverForThisSite">Больше не спрашивать на этом сайте</string>
+    <string name="credentialManagementInstructionNeverForThisSite">Если вы очистите список исключений, при следующем входе на любой из этих сайтов система предложит вам сохранить пароль.</string>
+    <string name="credentialManagementClearNeverForThisSiteList">Сбросить список исключений</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogTitle">Сбросить список исключений?</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogPositiveButton">Сбросить</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Отменить</string>
+
 </resources>
