@@ -141,13 +141,13 @@ class PrivacyProtectionsPopupImpl(
         // Override CardView's default elevation with popup/dialog elevation
         popupContent.cardView.cardElevation = POPUP_DEFAULT_ELEVATION_DP.toPx()
 
-        val cornderRadius = context.resources.getDimension(R.dimen.mediumShapeCornerRadius)
+        val cornerRadius = context.resources.getDimension(R.dimen.mediumShapeCornerRadius)
         val cornerSize = context.resources.getDimension(R.dimen.daxBubbleDialogEdge)
         val distanceFromEdge = EDGE_TREATMENT_DISTANCE_FROM_EDGE.toPx() - POPUP_HORIZONTAL_OFFSET_DP.toPx()
         val edgeTreatment = DaxBubbleEdgeTreatment(cornerSize, distanceFromEdge)
 
         popupContent.cardView.shapeAppearanceModel = ShapeAppearanceModel.builder()
-            .setAllCornerSizes(cornderRadius)
+            .setAllCornerSizes(cornerRadius)
             .setTopEdge(edgeTreatment)
             .build()
 
