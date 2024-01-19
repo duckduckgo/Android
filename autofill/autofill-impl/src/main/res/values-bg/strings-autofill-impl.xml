@@ -135,4 +135,12 @@
 
     <string name="credentials_limit_warning"><b>Синхронизирането е спряно</b>\nПревишихте лимита за данни за вход. Изтрийте някои от тях, за да възобновите синхронизирането.<annotation type="manage_logins">Управление на данните за вход</annotation></string>
     <string name="credentials_limit_warning_notif"><b>Синхронизирането на пароли е спряно</b>\nПревишихте ограничението за синхронизиране на пароли. Опитайте да изтриете някои от паролите. Докато този проблем не бъде разрешен, паролите няма да бъдат архивирани.</string>
+
+    <string name="saveLoginDialogNeverForThisSite">Никога не питай за този сайт</string>
+    <string name="credentialManagementInstructionNeverForThisSite">Ако нулирате изключените сайтове, при следващото влизане в някой от тези сайтове ще бъдете подканени да запазите паролата за вход.</string>
+    <string name="credentialManagementClearNeverForThisSiteList">Нулиране на изключените сайтове</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogTitle">Нулиране на изключените сайтове?</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogPositiveButton">Нулиране</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Отмени</string>
+
 </resources>
