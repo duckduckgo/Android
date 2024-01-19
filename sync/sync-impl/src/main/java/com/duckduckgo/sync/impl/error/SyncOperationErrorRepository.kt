@@ -26,6 +26,8 @@ import com.duckduckgo.sync.store.model.SyncOperationErrorType.DATA_DECRYPT
 import com.duckduckgo.sync.store.model.SyncOperationErrorType.DATA_ENCRYPT
 import com.duckduckgo.sync.store.model.SyncOperationErrorType.DATA_PERSISTER_ERROR
 import com.duckduckgo.sync.store.model.SyncOperationErrorType.DATA_PROVIDER_ERROR
+import com.duckduckgo.sync.store.model.SyncOperationErrorType.ORPHANS_PRESENT
+import com.duckduckgo.sync.store.model.SyncOperationErrorType.TIMESTAMP_CONFLICT
 import java.util.Locale
 import javax.inject.Inject
 
@@ -81,6 +83,8 @@ class RealSyncOperationErrorRepository @Inject constructor(private val dao: Sync
                 DATA_ENCRYPT -> SyncPixelParameters.DATA_ENCRYPT_ERROR
                 DATA_PROVIDER_ERROR -> SyncPixelParameters.DATA_PROVIDER_ERROR_PARAM
                 DATA_PERSISTER_ERROR -> SyncPixelParameters.DATA_PERSISTER_ERROR_PARAM
+                TIMESTAMP_CONFLICT -> SyncPixelParameters.TIMESTAMP_CONFLICT
+                ORPHANS_PRESENT -> SyncPixelParameters.ORPHANS_PRESENT
             }
             val errorName = String.format(Locale.US, errorType, it.feature)
             SyncOperationErrorPixelData(errorName, it.count.toString())
