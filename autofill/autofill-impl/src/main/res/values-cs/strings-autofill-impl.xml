@@ -135,4 +135,12 @@
 
     <string name="credentials_limit_warning"><b>Synchronizace je pozastavená</b>\nJe překročený limit počtu přihlášení. Jestli chceš synchronizaci obnovit, některá odstraň.\n\n<annotation type="manage_logins">Spravovat přihlašovací údaje</annotation></string>
     <string name="credentials_limit_warning_notif"><b>Synchronizace hesel je pozastavená</b>\nDošlo k překročení limitu pro synchronizaci hesel. Zkus pár hesel smazat. Dokud tenhle problém nevyřešíš, hesla se nebudou zálohovat.</string>
+
+    <string name="saveLoginDialogNeverForThisSite">Na téhle stránce už se neptat</string>
+    <string name="credentialManagementInstructionNeverForThisSite">Pokud vyloučené weby resetuješ, při příštím přihlašování na některý z nich se ti zobrazí výzva k uložení hesla.</string>
+    <string name="credentialManagementClearNeverForThisSiteList">Obnovit vyloučené stránky</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogTitle">Obnovit vyloučené stránky?</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogPositiveButton">Obnovit</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Zrušit</string>
+
 </resources>
