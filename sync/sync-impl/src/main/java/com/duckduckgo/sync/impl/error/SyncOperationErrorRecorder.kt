@@ -52,6 +52,6 @@ class RealSyncOperationErrorRecorder @Inject constructor(
         errorType: SyncOperationErrorType,
     ) {
         Timber.d("Sync-Error: Recording Operation Error $errorType for $feature")
-        repository.addError(errorType)
+        repository.addError(feature, errorType)
     }
 }

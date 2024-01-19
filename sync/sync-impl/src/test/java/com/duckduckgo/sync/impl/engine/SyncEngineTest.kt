@@ -33,6 +33,7 @@ import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.engine.SyncOperation.DISCARD
 import com.duckduckgo.sync.impl.engine.SyncOperation.EXECUTE
+import com.duckduckgo.sync.impl.error.SyncOperationErrorRecorder
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.store.SyncStore
 import com.duckduckgo.sync.store.model.SyncAttempt
@@ -56,13 +57,23 @@ internal class SyncEngineTest {
     private val syncStateRepository: SyncStateRepository = mock()
     private val syncPixels: SyncPixels = mock()
     private val syncStore: SyncStore = mock()
+    private val syncOperationErrorRecorder: SyncOperationErrorRecorder = mock()
     private val providerPlugins: PluginPoint<SyncableDataProvider> = mock()
     private val persisterPlugins: PluginPoint<SyncableDataPersister> = mock()
     private lateinit var syncEngine: RealSyncEngine
 
     @Before
     fun before() {
-        syncEngine = RealSyncEngine(syncApiClient, syncScheduler, syncStateRepository, syncPixels, syncStore, providerPlugins, persisterPlugins)
+        syncEngine = RealSyncEngine(
+            syncApiClient,
+            syncScheduler,
+            syncStateRepository,
+            syncPixels,
+            syncStore,
+            syncOperationErrorRecorder,
+            providerPlugins,
+            persisterPlugins,
+        )
         whenever(syncStore.isSignedIn()).thenReturn(true)
         whenever(syncStore.syncingDataEnabled).thenReturn(true)
     }
@@ -490,7 +501,7 @@ internal class SyncEngineTest {
 
     private fun givenNoLocalChanges() {
         val fakePersisterPlugin = FakeSyncableDataPersister()
-        val fakeProviderPlugin = FakeSyncableDataProvider(SyncChangesRequest.empty())
+        val fakeProviderPlugin = FakeSyncableDataProvider(fakeChanges = SyncChangesRequest.empty())
         whenever(persisterPlugins.getPlugins()).thenReturn(listOf(fakePersisterPlugin))
         whenever(providerPlugins.getPlugins()).thenReturn(listOf(fakeProviderPlugin))
     }
@@ -499,20 +510,20 @@ internal class SyncEngineTest {
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "data_sync_sent_bookmarks.json")
         val localChanges = SyncChangesRequest(BOOKMARKS, updatesJSON, ModifiedSince.Timestamp("2021-01-01T00:00:00.000Z"))
         val fakePersisterPlugin = FakeSyncableDataPersister()
-        val fakeProviderPlugin = FakeSyncableDataProvider(localChanges)
+        val fakeProviderPlugin = FakeSyncableDataProvider(fakeChanges = localChanges)
         whenever(persisterPlugins.getPlugins()).thenReturn(listOf(fakePersisterPlugin)).thenReturn(listOf(FakeSyncableDataPersister()))
         whenever(providerPlugins.getPlugins()).thenReturn(listOf(fakeProviderPlugin))
-            .thenReturn(listOf(FakeSyncableDataProvider(SyncChangesRequest.empty())))
+            .thenReturn(listOf(FakeSyncableDataProvider(fakeChanges = SyncChangesRequest.empty())))
     }
 
     private fun givenLocalChangesWithTimestampConflict() {
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "data_sync_sent_bookmarks.json")
         val localChanges = SyncChangesRequest(BOOKMARKS, updatesJSON, ModifiedSince.Timestamp("2021-01-01T00:00:00.000Z"))
-        val fakeProviderPlugin = FakeSyncableDataProvider(localChanges)
+        val fakeProviderPlugin = FakeSyncableDataProvider(fakeChanges = localChanges)
         whenever(persisterPlugins.getPlugins()).thenReturn(listOf(FakeSyncableDataPersister(timestampConflict = true)))
             .thenReturn(listOf(FakeSyncableDataPersister(timestampConflict = true)))
         whenever(providerPlugins.getPlugins()).thenReturn(listOf(fakeProviderPlugin))
-            .thenReturn(listOf(FakeSyncableDataProvider(SyncChangesRequest.empty())))
+            .thenReturn(listOf(FakeSyncableDataProvider(fakeChanges = SyncChangesRequest.empty())))
     }
 
     private fun givenFirstSyncLocalChanges() {
@@ -522,9 +533,9 @@ internal class SyncEngineTest {
         val fakePersisterPlugin = FakeSyncableDataPersister()
         whenever(persisterPlugins.getPlugins()).thenReturn(listOf(fakePersisterPlugin)).thenReturn(listOf(FakeSyncableDataPersister()))
         whenever(providerPlugins.getPlugins())
-            .thenReturn(listOf(FakeSyncableDataProvider(firstSyncLocalChanges)))
-            .thenReturn(listOf(FakeSyncableDataProvider(localChanges)))
-            .thenReturn(listOf(FakeSyncableDataProvider(SyncChangesRequest.empty())))
+            .thenReturn(listOf(FakeSyncableDataProvider(fakeChanges = firstSyncLocalChanges)))
+            .thenReturn(listOf(FakeSyncableDataProvider(fakeChanges = localChanges)))
+            .thenReturn(listOf(FakeSyncableDataProvider(fakeChanges = SyncChangesRequest.empty())))
     }
 
     private fun givenGetError() {
