@@ -2744,6 +2744,7 @@ class BrowserTabFragment :
         configureQuickAccessGridLayout(quickAccessItems.quickAccessRecyclerView)
         configureQuickAccessGridLayout(binding.quickAccessSuggestionsRecyclerView)
         decorator.recreatePopupMenu()
+        privacyProtectionsPopup.onConfigurationChanged()
         viewModel.onConfigurationChanged()
     }
 

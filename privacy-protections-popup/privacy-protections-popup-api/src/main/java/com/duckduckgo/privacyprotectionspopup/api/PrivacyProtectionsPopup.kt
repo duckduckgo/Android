@@ -38,4 +38,5 @@ interface PrivacyProtectionsPopup {
      * Those events should be consumed by [PrivacyProtectionsPopupManager]
      */
     val events: Flow<PrivacyProtectionsPopupUiEvent>
+    fun onConfigurationChanged()
 }
