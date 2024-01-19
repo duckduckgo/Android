@@ -75,6 +75,19 @@ class PrivacyProtectionsPopupImpl(
 
     override val events: Flow<PrivacyProtectionsPopupUiEvent> = _events.asSharedFlow()
 
+    override fun onConfigurationChanged() {
+        when (val state = state) {
+            is PrivacyProtectionsPopupViewState.Visible -> {
+                dismissPopup()
+                showPopup(state)
+            }
+
+            PrivacyProtectionsPopupViewState.Gone -> {
+                // no-op
+            }
+        }
+    }
+
     private fun showPopup(viewState: PrivacyProtectionsPopupViewState.Visible) = anchor.doOnLayout {
         val popupContent = createPopupContentView(viewState.doNotShowAgainOptionAvailable)
         val popupWindowSpec = createPopupWindowSpec(popupContent = popupContent.root)
