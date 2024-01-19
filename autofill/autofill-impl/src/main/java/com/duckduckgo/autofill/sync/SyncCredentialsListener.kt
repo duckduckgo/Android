@@ -29,11 +29,19 @@ class SyncCredentialsListener @Inject constructor(
         credentialsSyncMetadata.onEntityChanged(id)
     }
 
+    fun onCredentialsAdded(ids: List<Long>) {
+        credentialsSyncMetadata.onEntitiesChanged(ids)
+    }
+
     fun onCredentialUpdated(id: Long) {
         credentialsSyncMetadata.onEntityChanged(id)
     }
 
     fun onCredentialRemoved(id: Long) {
         credentialsSyncMetadata.onEntityRemoved(id)
+    }
+
+    fun onCredentialRemoved(ids: List<Long>) {
+        credentialsSyncMetadata.onEntitiesRemoved(ids)
     }
 }

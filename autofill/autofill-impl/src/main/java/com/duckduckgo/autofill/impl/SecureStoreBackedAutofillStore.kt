@@ -198,6 +198,7 @@ class SecureStoreBackedAutofillStore @Inject constructor(
         val idsToDelete = savedCredentials.mapNotNull { it.details.id }
         secureStorage.deleteWebSiteLoginDetailsWithCredentials(idsToDelete)
         Timber.i("Deleted %d credentials", idsToDelete.size)
+        syncCredentialsListener.onCredentialRemoved(idsToDelete)
         return savedCredentials.map { it.toLoginCredentials() }
     }
 
@@ -283,8 +284,8 @@ class SecureStoreBackedAutofillStore @Inject constructor(
         withContext(dispatcherProvider.io()) {
             val mappedCredentials = credentials.map { it.prepareForReinsertion() }
             secureStorage.addWebsiteLoginDetailsWithCredentials(mappedCredentials).also {
-                // TODO: INFORM syncCredentialsListener
-                // syncCredentialsListener.onCredentialAdded(it.details.id!!)
+                val ids = mappedCredentials.mapNotNull { it.details.id }
+                syncCredentialsListener.onCredentialsAdded(ids)
             }
         }
     }
