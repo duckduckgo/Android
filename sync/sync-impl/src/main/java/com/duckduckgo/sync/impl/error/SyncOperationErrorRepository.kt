@@ -19,6 +19,7 @@ package com.duckduckgo.sync.impl.error
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters
 import com.duckduckgo.sync.store.dao.SyncOperationErrorDao
+import com.duckduckgo.sync.store.model.GENERIC_FEATURE
 import com.duckduckgo.sync.store.model.SyncOperationError
 import com.duckduckgo.sync.store.model.SyncOperationErrorType
 import com.duckduckgo.sync.store.model.SyncOperationErrorType.DATA_DECRYPT
@@ -26,6 +27,12 @@ import com.duckduckgo.sync.store.model.SyncOperationErrorType.DATA_ENCRYPT
 import javax.inject.Inject
 
 interface SyncOperationErrorRepository {
+
+    fun addError(
+        feature: String,
+        apiError: SyncOperationErrorType,
+    )
+
     fun addError(
         apiError: SyncOperationErrorType,
     )
@@ -40,14 +47,27 @@ data class SyncOperationErrorPixelData(
 
 class RealSyncOperationErrorRepository @Inject constructor(private val dao: SyncOperationErrorDao) : SyncOperationErrorRepository {
     override fun addError(
+        feature: String,
         apiError: SyncOperationErrorType,
     ) {
         val today = DatabaseDateFormatter.getUtcIsoLocalDate()
-        val todaysError = dao.errorByDate(apiError.name, today)
+        val todaysError = dao.featureErrorByDate(feature, apiError.name, today)
         if (todaysError == null) {
-            dao.insert(SyncOperationError(errorType = apiError, count = 1, date = today))
+            dao.insert(SyncOperationError(feature = feature, errorType = apiError, count = 1, date = today))
         } else {
-            dao.incrementCount(apiError.name, today)
+            dao.incrementCount(feature, apiError.name, today)
+        }
+    }
+
+    override fun addError(
+        apiError: SyncOperationErrorType,
+    ) {
+        val today = DatabaseDateFormatter.getUtcIsoLocalDate()
+        val todaysError = dao.featureErrorByDate(GENERIC_FEATURE, apiError.name, today)
+        if (todaysError == null) {
+            dao.insert(SyncOperationError(feature = GENERIC_FEATURE, errorType = apiError, count = 1, date = today))
+        } else {
+            dao.incrementCount(GENERIC_FEATURE, apiError.name, today)
         }
     }
 

@@ -23,6 +23,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters
 import com.duckduckgo.sync.store.SyncDatabase
+import com.duckduckgo.sync.store.model.GENERIC_FEATURE
 import com.duckduckgo.sync.store.model.SyncOperationErrorType
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -60,7 +61,7 @@ class SyncOperationErrorRepositoryTest {
 
         testee.addError(errorType)
 
-        val error = dao.errorByDate(errorType.name, date)
+        val error = dao.featureErrorByDate(GENERIC_FEATURE, errorType.name, date)
 
         Assert.assertTrue(error != null)
         Assert.assertTrue(error!!.count == 1)
@@ -74,7 +75,7 @@ class SyncOperationErrorRepositoryTest {
         testee.addError(errorType)
         testee.addError(errorType)
 
-        val error = dao.errorByDate(errorType.name, date)
+        val error = dao.featureErrorByDate(GENERIC_FEATURE, errorType.name, date)
 
         Assert.assertTrue(error != null)
         Assert.assertTrue(error!!.count == 2)

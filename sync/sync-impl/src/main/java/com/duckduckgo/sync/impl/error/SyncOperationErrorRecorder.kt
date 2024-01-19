@@ -28,6 +28,11 @@ interface SyncOperationErrorRecorder {
     fun record(
         errorType: SyncOperationErrorType,
     )
+
+    fun record(
+        feature: String,
+        errorType: SyncOperationErrorType,
+    )
 }
 
 @ContributesBinding(AppScope::class)
@@ -39,6 +44,14 @@ class RealSyncOperationErrorRecorder @Inject constructor(
         errorType: SyncOperationErrorType,
     ) {
         Timber.d("Sync-Error: Recording Operation Error $errorType")
+        repository.addError(errorType)
+    }
+
+    override fun record(
+        feature: String,
+        errorType: SyncOperationErrorType,
+    ) {
+        Timber.d("Sync-Error: Recording Operation Error $errorType for $feature")
         repository.addError(errorType)
     }
 }

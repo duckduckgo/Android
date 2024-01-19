@@ -40,7 +40,6 @@ import com.duckduckgo.sync.store.model.SyncOperationErrorType
     ],
 )
 @TypeConverters(SyncTypeConverters::class)
-
 abstract class SyncDatabase : RoomDatabase() {
 
     abstract fun syncAttemptsDao(): SyncAttemptDao

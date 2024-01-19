@@ -65,10 +65,13 @@ enum class SyncApiErrorType {
 )
 data class SyncOperationError(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    val feature: String = GENERIC_FEATURE,
     val errorType: SyncOperationErrorType,
     val count: Int,
     val date: String = "", // YYYY-MM-dd format
 )
+
+const val GENERIC_FEATURE = "Unknown"
 
 enum class SyncOperationErrorType {
     DATA_ENCRYPT,

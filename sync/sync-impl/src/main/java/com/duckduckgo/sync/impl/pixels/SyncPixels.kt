@@ -61,10 +61,6 @@ interface SyncPixels {
     fun fireSyncAccountErrorPixel(
         result: Error,
     )
-
-    fun fireEncryptFailurePixel()
-
-    fun fireDecryptFailurePixel()
 }
 
 @ContributesBinding(AppScope::class)
@@ -114,14 +110,6 @@ class RealSyncPixels @Inject constructor(
                 SyncPixelParameters.ERROR_REASON to result.reason,
             ),
         )
-    }
-
-    override fun fireEncryptFailurePixel() {
-        tryToFireDailyPixel(SyncPixelName.SYNC_ENCRYPT_FAILURE)
-    }
-
-    override fun fireDecryptFailurePixel() {
-        tryToFireDailyPixel(SyncPixelName.SYNC_DECRYPT_FAILURE)
     }
 
     private fun tryToFireDailyPixel(

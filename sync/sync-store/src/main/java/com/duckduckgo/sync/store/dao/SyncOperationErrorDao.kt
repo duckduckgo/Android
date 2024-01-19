@@ -30,11 +30,11 @@ interface SyncOperationErrorDao {
     @Query("SELECT * FROM sync_operation_errors WHERE date = :date")
     fun errorsByDate(date: String): List<SyncOperationError>
 
-    @Query("UPDATE sync_operation_errors SET count = count + 1 WHERE errorType = :error AND date = :date")
-    fun incrementCount(error: String, date: String)
+    @Query("UPDATE sync_operation_errors SET count = count + 1 WHERE feature = :feature AND errorType = :error AND date = :date")
+    fun incrementCount(feature: String, error: String, date: String)
 
-    @Query("SELECT * FROM sync_operation_errors WHERE errorType = :error AND date = :date LIMIT 1")
-    fun errorByDate(error: String, date: String): SyncOperationError?
+    @Query("SELECT * FROM sync_operation_errors WHERE feature = :feature AND errorType = :error AND date = :date LIMIT 1")
+    fun featureErrorByDate(feature: String, error: String, date: String): SyncOperationError?
 
     @Query("SELECT * FROM sync_operation_errors ORDER BY id DESC")
     fun allErrors(): List<SyncOperationError>
