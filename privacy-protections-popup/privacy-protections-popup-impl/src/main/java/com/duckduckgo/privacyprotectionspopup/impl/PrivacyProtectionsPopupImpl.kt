@@ -57,6 +57,8 @@ class PrivacyProtectionsPopupImpl(
     private var state: PrivacyProtectionsPopupViewState = PrivacyProtectionsPopupViewState.Gone
     private var popupWindow: PopupWindow? = null
 
+    override val events: Flow<PrivacyProtectionsPopupUiEvent> = _events.asSharedFlow()
+
     override fun setViewState(viewState: PrivacyProtectionsPopupViewState) {
         if (viewState != state) {
             state = viewState
@@ -72,8 +74,6 @@ class PrivacyProtectionsPopupImpl(
             }
         }
     }
-
-    override val events: Flow<PrivacyProtectionsPopupUiEvent> = _events.asSharedFlow()
 
     override fun onConfigurationChanged() {
         when (val state = state) {
