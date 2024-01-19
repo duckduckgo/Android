@@ -101,7 +101,7 @@
     <string name="autofillTooltipGenerateAddressDescription" instruction="&apos;hide address&apos; refers to using an alias so your real email address is not used">Bloquer les traqueurs d\'e-mails et masquer l\'adresse</string>
 
     <string name="autofillDisableAutofillPromptMessage">Cette fonction peut être désactivée à tout moment dans Paramètres.</string>
-    <string name="autofillDisableAutofillPromptPositiveButton">Encore des économies</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Continuer à les sauvegarder</string>
     <string name="autofillDisableAutofillPromptNegativeButton">Désactiver</string>
 
     <string name="autofillEmailProtectionInContextSignUpDialogTitle">Masquez votre adresse e-mail et bloquez les traqueurs</string>
@@ -135,4 +135,12 @@
 
     <string name="credentials_limit_warning"><b>Synchronisation suspendue</b>\nLimite d\'identifiants dépassée. Supprimez-en quelques-uns pour reprendre la synchronisation.\n\n<annotation type="manage_logins">Gérer les identifiants</annotation></string>
     <string name="credentials_limit_warning_notif"><b>La synchronisation des mots de passe est suspendue</b>\nVous avez dépassé la limite de synchronisation des mots de passe. Veuillez en supprimer quelques-uns pour pouvoir sauvegarder vos mots de passe.</string>
+
+    <string name="saveLoginDialogNeverForThisSite">Ne jamais demander pour ce site</string>
+    <string name="credentialManagementInstructionNeverForThisSite">Si vous réinitialisez les sites exclus, vous serez invité(e) à enregistrer votre mot de passe lors de votre prochaine connexion à l\'un de ces sites.</string>
+    <string name="credentialManagementClearNeverForThisSiteList">Réinitialiser les sites exclus</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogTitle">Réinitialiser les sites exclus ?</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogPositiveButton">Réinitialiser</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Annuler</string>
+
 </resources>
