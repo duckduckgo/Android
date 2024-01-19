@@ -1,8 +1,8 @@
-name: Update Privacy Reference Tests
+name: Update Content Scope Scripts
 
 on:
   schedule:
-    - cron: '0 1 * * *' # run at 1 AM UTC
+    - cron: '30 1 * * *' # run at 1 AM UTC
   workflow_dispatch:
 
 concurrency:
@@ -10,8 +10,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  update-ref-tests:
-    name: Update reference tests
+  update-content-scope-scripts:
+    name: Update Content Scope scripts
     runs-on: ubuntu-latest
 
     steps:
@@ -23,25 +23,18 @@ jobs:
       - name: Install npm-check-updates
         run: npm install -g npm-check-updates
 
-      - name: Install copy-files-from-to
-        run: npm install -g copy-files-from-to
-
       - name: Check for updates
         id: update-check
         continue-on-error: true
-        run: ncu @duckduckgo/privacy-reference-tests --errorLevel 2
+        run: ncu @duckduckgo/content-scope-scripts --errorLevel 2
 
-      - name: Update reference steps
+      - name: Update content scope scripts
         if: ${{ steps.update-check.outcome == 'failure' }}
-        run: ncu @duckduckgo/privacy-reference-tests -u
+        run: ncu @duckduckgo/content-scope-scripts -u
 
       - name: Install package
         if: ${{ steps.update-check.outcome == 'failure' }}
         run: npm update
-
-      - name: Copy files
-        if: ${{ steps.update-check.outcome == 'failure' }}
-        run: copy-files-from-to
 
       - name: Find latest release version of Content Scope scripts in package.json
         if: ${{ steps.update-check.outcome == 'failure' }}
@@ -49,7 +42,7 @@ jobs:
         uses: notiz-dev/github-action-json-property@release
         with:
           path: 'package.json'
-          prop_path: 'dependencies.@duckduckgo/privacy-reference-tests'
+          prop_path: 'dependencies.@duckduckgo/content-scope-scripts'
 
       - name: Extract release version
         if: ${{ steps.update-check.outcome == 'failure' }}
@@ -64,21 +57,21 @@ jobs:
         env:
           RELEASE_VERSION: ${{ steps.extract-release-version.outputs._1}}
         id: create-pr
-        uses: peter-evans/create-pull-request@v5
+        uses: peter-evans/create-pull-request@v5.0.2
         with:
           base: "develop"
-          title: Update reference tests to version ${{ steps.extract-release-version.outputs._1}}
+          title: Update content scope scripts to version ${{ steps.extract-release-version.outputs._1}}
           author: daxmobile <daxmobile@users.noreply.github.com>
           token: ${{ secrets.GT_DAXMOBILE }}
           commit-message: Update content scope scripts to version ${{ steps.extract-release-version.outputs._1}}
-          labels: reference tests, automated pr
-          branch: automated/update-ref-tests-dependencies-${{ steps.extract-release-version.outputs._1}}
+          labels: content scope scripts, automated pr
+          branch: automated/update-content-scope-scripts-dependencies-${{ steps.extract-release-version.outputs._1}}
           body: |
-            - Automated reference tests dependency update
-            
-            This PR updates the reference tests dependency to the latest available version and copies the necessary files.
-            If tests have failed, see https://app.asana.com/0/0/1203766026095653/f for further information on what to do next.
-            
+            - Automated content scope scripts dependency update
+
+            This PR updates the content scope scripts dependency to the latest available version and copies the necessary files.
+            If tests have failed, see https://app.asana.com/0/1202561462274611/1203986899650836/f for further information on what to do next.
+
             - [ ] All tests must pass
 
       - name: Create Asana task in Android App project
@@ -89,17 +82,17 @@ jobs:
           asana-pat: ${{ secrets.GH_ASANA_SECRET }}
           asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          asana-task-name: Update reference tests to version ${{ steps.extract-release-version.outputs._1}}
+          asana-task-name: Update content scope scripts to version ${{ steps.extract-release-version.outputs._1}}
           asana-task-description: |
-            Reference tests have been updated and a PR created.
-            
-            If tests failed check out https://app.asana.com/0/0/1203766026095653/f for further information on what to do next.
-            
+            Content scope scripts have been updated and a PR created.
+
+            If tests failed check out https://app.asana.com/0/1202561462274611/1203986899650836/f for further information on what to do next.
+
             See ${{ steps.create-pr.outputs.pull-request-url }}
           action: 'create-asana-task'
 
       - name: Add Asana task to Release Board project
-        if: ${{ steps.create-task.outputs.duplicate == 'false' }}
+        if: ${{ steps.update-check.outcome == 'failure' }}
         uses: duckduckgo/native-github-asana-sync@v1.0
         with:
           asana-pat: ${{ secrets.GH_ASANA_SECRET }}
@@ -109,7 +102,7 @@ jobs:
           action: 'add-task-asana-project'
 
       - name: Update PR description with Asana task
-        if: ${{ steps.create-task.outputs.duplicate == 'false' }}
+        if: ${{ steps.update-check.outcome == 'failure' }}
         uses: duckduckgo/native-github-asana-sync@v1.0
         with:
           github-pat: ${{ secrets.GT_DAXMOBILE }}
@@ -127,6 +120,6 @@ jobs:
           asana-pat: ${{ secrets.GH_ASANA_SECRET }}
           asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          asana-task-name: GH Workflow Failure - Update reference tests
-          asana-task-description: The update reference tests workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          asana-task-name: GH Workflow Failure - Update content scope scripts
+          asana-task-description: The update content scope scripts tests workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
           action: 'create-asana-task'

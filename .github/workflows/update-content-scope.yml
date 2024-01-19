@@ -15,74 +15,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          submodules: recursive
-
-      - name: Install npm-check-updates
-        run: npm install -g npm-check-updates
-
-      - name: Check for updates
-        id: update-check
-        continue-on-error: true
-        run: ncu @duckduckgo/content-scope-scripts --errorLevel 2
-
-      - name: Update content scope scripts
-        if: ${{ steps.update-check.outcome == 'failure' }}
-        run: ncu @duckduckgo/content-scope-scripts -u
-
-      - name: Install package
-        if: ${{ steps.update-check.outcome == 'failure' }}
-        run: npm update
-
-      - name: Find latest release version of Content Scope scripts in package.json
-        if: ${{ steps.update-check.outcome == 'failure' }}
-        id: find-latest-release
-        uses: notiz-dev/github-action-json-property@release
-        with:
-          path: 'package.json'
-          prop_path: 'dependencies.@duckduckgo/content-scope-scripts'
-
-      - name: Extract release version
-        if: ${{ steps.update-check.outcome == 'failure' }}
-        uses: rishabhgupta/split-by@v1
-        id: extract-release-version
-        with:
-          string: ${{steps.find-latest-release.outputs.prop}}
-          split-by: '#'
-
-      - name: Create Pull Request in Android repo
-        if: ${{ steps.update-check.outcome == 'failure' }}
-        env:
-          RELEASE_VERSION: ${{ steps.extract-release-version.outputs._1}}
-        id: create-pr
-        uses: peter-evans/create-pull-request@v5.0.2
-        with:
-          base: "develop"
-          title: Update content scope scripts to version ${{ steps.extract-release-version.outputs._1}}
-          author: daxmobile <daxmobile@users.noreply.github.com>
-          token: ${{ secrets.GT_DAXMOBILE }}
-          commit-message: Update content scope scripts to version ${{ steps.extract-release-version.outputs._1}}
-          labels: content scope scripts, automated pr
-          branch: automated/update-content-scope-scripts-dependencies-${{ steps.extract-release-version.outputs._1}}
-          body: |
-            - Automated content scope scripts dependency update
-
-            This PR updates the content scope scripts dependency to the latest available version and copies the necessary files.
-            If tests have failed, see https://app.asana.com/0/1202561462274611/1203986899650836/f for further information on what to do next.
-
-            - [ ] All tests must pass
-
       - name: Create Asana task in Android App project
-        if: ${{ steps.update-check.outcome == 'failure' }}
         id: create-task
-        uses: duckduckgo/native-github-asana-sync@v1.0
+        uses: duckduckgo/native-github-asana-sync@feature/david/prevent_duplicate_task_creation
         with:
           asana-pat: ${{ secrets.GH_ASANA_SECRET }}
-          asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          asana-task-name: Update content scope scripts to version ${{ steps.extract-release-version.outputs._1}}
+          asana-project: 1174433894299346
+          asana-section: 1202853880411179
+          asana-task-name: Update content scope scripts to version 10
           asana-task-description: |
             Content scope scripts have been updated and a PR created.
 
@@ -92,34 +32,11 @@ jobs:
           action: 'create-asana-task'
 
       - name: Add Asana task to Release Board project
-        if: ${{ steps.update-check.outcome == 'failure' }}
+        if: ${{ steps.create-task.outputs.updated == 'false' }}
         uses: duckduckgo/native-github-asana-sync@v1.0
         with:
           asana-pat: ${{ secrets.GH_ASANA_SECRET }}
-          asana-project: ${{ vars.GH_ANDROID_RELEASE_BOARD_PROJECT_ID }}
-          asana-section: ${{ vars.GH_ANDROID_RELEASE_BOARD_PR_SECTION_ID }}
+          asana-project: 1174433894299346
+          asana-section: 1202853880411179
           asana-task-id: ${{ steps.create-task.outputs.taskId }}
           action: 'add-task-asana-project'
-
-      - name: Update PR description with Asana task
-        if: ${{ steps.update-check.outcome == 'failure' }}
-        uses: duckduckgo/native-github-asana-sync@v1.0
-        with:
-          github-pat: ${{ secrets.GT_DAXMOBILE }}
-          github-pr: ${{ steps.create-pr.outputs.pull-request-number }}
-          github-repository: 'android'
-          github-org: 'duckduckgo'
-          asana-project: ${{ vars.GH_ANDROID_RELEASE_BOARD_PROJECT_ID }}
-          asana-task-id: ${{ steps.create-task.outputs.taskId }}
-          action: 'add-task-pr-description'
-
-      - name: Create Asana task when workflow failed
-        if: ${{ failure() }}
-        uses: duckduckgo/native-github-asana-sync@v1.0
-        with:
-          asana-pat: ${{ secrets.GH_ASANA_SECRET }}
-          asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          asana-task-name: GH Workflow Failure - Update content scope scripts
-          asana-task-description: The update content scope scripts tests workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
-          action: 'create-asana-task'
