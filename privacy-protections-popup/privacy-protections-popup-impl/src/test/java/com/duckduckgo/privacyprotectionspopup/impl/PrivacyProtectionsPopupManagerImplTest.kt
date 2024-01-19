@@ -31,6 +31,8 @@ import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DISMISS_CLICKED
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DONT_SHOW_AGAIN_CLICKED
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupViewState
+import com.duckduckgo.privacyprotectionspopup.impl.PrivacyProtectionsPopupExperimentVariant.CONTROL
+import com.duckduckgo.privacyprotectionspopup.impl.PrivacyProtectionsPopupExperimentVariant.TEST
 import com.duckduckgo.privacyprotectionspopup.impl.db.PopupDismissDomainRepository
 import com.duckduckgo.privacyprotectionspopup.impl.store.PrivacyProtectionsPopupData
 import com.duckduckgo.privacyprotectionspopup.impl.store.PrivacyProtectionsPopupDataStore
@@ -48,6 +50,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -74,6 +77,8 @@ class PrivacyProtectionsPopupManagerImplTest {
 
     private val duckDuckGoUrlDetector = FakeDuckDuckGoUrlDetector()
 
+    private val variantRandomizer = FakePrivacyProtectionsPopupExperimentVariantRandomizer()
+
     private val subject = PrivacyProtectionsPopupManagerImpl(
         appCoroutineScope = coroutineRule.testScope,
         featureFlag = featureFlag,
@@ -87,6 +92,7 @@ class PrivacyProtectionsPopupManagerImplTest {
         userAllowListRepository = userAllowListRepository,
         dataStore = dataStore,
         duckDuckGoUrlDetector = duckDuckGoUrlDetector,
+        variantRandomizer = variantRandomizer,
     )
 
     @Test
@@ -442,6 +448,31 @@ class PrivacyProtectionsPopupManagerImplTest {
         }
     }
 
+    @Test
+    fun whenPopupConditionsAreMetAndExperimentVariantIsControlThenPopupIsNotShown() = runTest {
+        dataStore.setExperimentVariant(CONTROL)
+        subject.viewState.test {
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
+
+            assertPopupVisible(visible = false)
+        }
+    }
+
+    @Test
+    fun whenPopupConditionsAreMetAndExperimentVariantIsNullThenInitializesVariantWithRandomValue() = runTest {
+        variantRandomizer.variant = CONTROL
+        assertNull(dataStore.getExperimentVariant())
+
+        subject.viewState.test {
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
+
+            assertPopupVisible(visible = false)
+            assertEquals(CONTROL, dataStore.getExperimentVariant())
+        }
+    }
+
     private fun ReceiveTurbine<PrivacyProtectionsPopupViewState>.assertPopupVisible(visible: Boolean) {
         if (visible) {
             assertTrue(expectMostRecentItem() is PrivacyProtectionsPopupViewState.Visible)
@@ -516,6 +547,7 @@ private class FakePrivacyProtectionsPopupDataStore : PrivacyProtectionsPopupData
             toggleUsedAt = null,
             popupTriggerCount = 0,
             doNotShowAgainClicked = false,
+            experimentVariant = null,
         ),
     )
 
@@ -539,6 +571,13 @@ private class FakePrivacyProtectionsPopupDataStore : PrivacyProtectionsPopupData
     override suspend fun setDoNotShowAgainClicked(clicked: Boolean) {
         data.update { it.copy(doNotShowAgainClicked = clicked) }
     }
+
+    override suspend fun getExperimentVariant(): PrivacyProtectionsPopupExperimentVariant? =
+        data.first().experimentVariant
+
+    override suspend fun setExperimentVariant(variant: PrivacyProtectionsPopupExperimentVariant) {
+        data.update { it.copy(experimentVariant = variant) }
+    }
 }
 
 private class FakeDuckDuckGoUrlDetector : DuckDuckGoUrlDetector {
@@ -550,4 +589,10 @@ private class FakeDuckDuckGoUrlDetector : DuckDuckGoUrlDetector {
     override fun extractQuery(uriString: String): String? = throw UnsupportedOperationException()
     override fun isDuckDuckGoVerticalUrl(uri: String): Boolean = throw UnsupportedOperationException()
     override fun extractVertical(uriString: String): String? = throw UnsupportedOperationException()
+}
+
+private class FakePrivacyProtectionsPopupExperimentVariantRandomizer : PrivacyProtectionsPopupExperimentVariantRandomizer {
+    var variant = TEST
+
+    override fun getRandomVariant(): PrivacyProtectionsPopupExperimentVariant = variant
 }

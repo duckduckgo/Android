@@ -35,6 +35,7 @@ data class PrivacyProtectionsPopupManagerData(
     val toggleUsedAt: Instant?,
     val popupTriggerCount: Int,
     val doNotShowAgainClicked: Boolean,
+    val experimentVariant: PrivacyProtectionsPopupExperimentVariant?,
 )
 
 @ContributesBinding(FragmentScope::class)
@@ -56,6 +57,7 @@ class PrivacyProtectionsPopupManagerDataProviderImpl @Inject constructor(
                 toggleUsedAt = popupData.toggleUsedAt,
                 popupTriggerCount = popupData.popupTriggerCount,
                 doNotShowAgainClicked = popupData.doNotShowAgainClicked,
+                experimentVariant = popupData.experimentVariant,
             )
         }
 }

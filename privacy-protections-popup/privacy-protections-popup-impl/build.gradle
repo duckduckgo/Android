@@ -47,6 +47,8 @@ dependencies {
     implementation "com.squareup.logcat:logcat:_"
     implementation Square.moshi
 
+    implementation "org.apache.commons:commons-math3:_"
+
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation project(path: ':common-test')
