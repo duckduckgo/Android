@@ -135,4 +135,12 @@
 
     <string name="credentials_limit_warning"><b>Sünkroonimine peatatud</b>\nSisselogimisandmete limiit on täis. Kustuta mõni, et jätkata sünkroonimist.\n\n<annotation type="manage_logins">Halda sisselogimisandmeid</annotation></string>
     <string name="credentials_limit_warning_notif"><b>Paroolide sünkroonimine on peatatud</b>\nOled paroolide sünkroonimise limiidi ületanud. Proovi mõned paroolid kustutada. Kuni see pole lahendatud, ei varundata sinu paroole.</string>
+
+    <string name="saveLoginDialogNeverForThisSite">Ära selle saidi kohta rohkem küsi</string>
+    <string name="credentialManagementInstructionNeverForThisSite">Kui lähtestad välistatud saidid, pakutakse sulle järgmisel korral, kui logid neile saitidele sisse, võimalust parool salvestada.</string>
+    <string name="credentialManagementClearNeverForThisSiteList">Lähtesta välistatud saidid</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogTitle">Kas lähtestada välistatud saidid?</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogPositiveButton">Lähtesta</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Loobu</string>
+
 </resources>
