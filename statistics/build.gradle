@@ -17,6 +17,7 @@
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
+    id 'com.google.devtools.ksp' version "$ksp_version"
     id 'com.squareup.anvil'
 }
 
@@ -50,6 +51,7 @@ dependencies {
 
     // Room
     implementation AndroidX.room.runtime
+    ksp AndroidX.room.compiler
 
     // WorkManager
     implementation AndroidX.work.runtimeKtx
@@ -71,6 +73,9 @@ dependencies {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
     testImplementation AndroidX.test.ext.junit
+    testImplementation AndroidX.archCore.testing
+    testImplementation AndroidX.room.testing
+    testImplementation AndroidX.room.rxJava2
 
     androidTestImplementation AndroidX.test.runner
     androidTestImplementation AndroidX.test.rules

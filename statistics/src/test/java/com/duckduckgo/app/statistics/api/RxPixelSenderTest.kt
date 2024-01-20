@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,17 @@ package com.duckduckgo.app.statistics.api
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.LifecycleOwner
+import androidx.room.Database
 import androidx.room.Room
+import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.statistics.api.RxPixelSenderTest.TestPixels.TEST
 import com.duckduckgo.app.statistics.config.StatisticsLibraryConfig
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.model.PixelEntity
+import com.duckduckgo.app.statistics.model.QueryParamsTypeConverter
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -39,9 +43,11 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.kotlin.*
 
+@RunWith(AndroidJUnit4::class)
 class RxPixelSenderTest {
 
     @get:Rule
@@ -62,14 +68,14 @@ class RxPixelSenderTest {
     @Mock
     val mockDeviceInfo: DeviceInfo = mock()
 
-    private lateinit var db: AppDatabase
+    private lateinit var db: TestAppDatabase
     private lateinit var pendingPixelDao: PendingPixelDao
     private lateinit var testee: RxPixelSender
     private val mockLifecycleOwner: LifecycleOwner = mock()
 
     @Before
     fun before() {
-        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
+        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, TestAppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
         pendingPixelDao = db.pixelDao()
@@ -333,4 +339,16 @@ class RxPixelSenderTest {
     enum class TestPixels(override val pixelName: String, val enqueue: Boolean = false) : Pixel.PixelName {
         TEST("test"),
     }
+}
+
+@Database(
+    exportSchema = false,
+    version = 1,
+    entities = [PixelEntity::class],
+)
+@TypeConverters(
+    QueryParamsTypeConverter::class,
+)
+private abstract class TestAppDatabase : RoomDatabase() {
+    abstract fun pixelDao(): PendingPixelDao
 }
