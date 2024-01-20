@@ -48,7 +48,6 @@ import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.browser.print.PrintInjector
-import com.duckduckgo.app.browser.safe_gaze.SafeGazeJsInterface
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.safegaze.ondeviceobjectdetection.ObjectDetectionHelper
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -274,8 +273,14 @@ class BrowserWebViewClient @Inject constructor(
         favicon: Bitmap?,
     ) {
         Timber.v("onPageStarted webViewUrl: ${webView.url} URL: $url")
-        val jsCode = readAssetFile(context.assets, "safe_gaze.js")
-        webView.evaluateJavascript("javascript:(function() { $jsCode })()", null)
+        val sharedPreferences = context.getSharedPreferences("safe_gaze_preferences", Context.MODE_PRIVATE)
+        val isSafeGazeActive = sharedPreferences.getBoolean("safe_gaze_active", false)
+        println("Safe gaze active value -> $isSafeGazeActive")
+        if (isSafeGazeActive){
+            println("Injected")
+            val jsCode = readAssetFile(context.assets, "safe_gaze.js")
+            webView.evaluateJavascript("javascript:(function() { $jsCode })()", null)
+        }
         url?.let {
             autoconsent.injectAutoconsent(webView, url)
             adClickManager.detectAdDomain(url)

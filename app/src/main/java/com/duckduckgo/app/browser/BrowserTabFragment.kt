@@ -815,7 +815,7 @@ class BrowserTabFragment :
         val popupView = LayoutInflater.from(context).inflate(R.layout.safe_gaze_pop_up, null)
         val popupWindow = PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         val toggle = popupView.findViewById<SwitchCompat>(R.id.asil_shield_toggle_button)
-        val sharedPref = requireContext().getSharedPreferences("safe_gaze_active", Context.MODE_PRIVATE)
+        val sharedPref = requireContext().getSharedPreferences("safe_gaze_preferences", Context.MODE_PRIVATE)
         val editor = sharedPref.edit()
         if (sharedPref.getBoolean("safe_gaze_active", true)){
             popupView.findViewById<TextView>(R.id.asil_shield_state_text_view).text = buildString {
@@ -829,7 +829,6 @@ class BrowserTabFragment :
             toggle.isChecked = false
         }
         safeGazeIcon.setOnClickListener {
-            println("Url -> $initialUrl")
             val iconRect = Rect()
             safeGazeIcon.getGlobalVisibleRect(iconRect)
             val x = iconRect.left
@@ -840,15 +839,15 @@ class BrowserTabFragment :
             }
             toggle.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked){
-
                     editor.putBoolean("safe_gaze_active", true)
                     popupView.findViewById<TextView>(R.id.asil_shield_state_text_view).text = buildString {
+                        viewModel.url?.let { it1 -> webView?.loadUrl(it1) }
                         this.append("Safe Gaze UP")
                     }
                 } else{
-
                     editor.putBoolean("safe_gaze_active", false)
                     popupView.findViewById<TextView>(R.id.asil_shield_state_text_view).text = buildString {
+                        viewModel.url?.let { it1 -> webView?.loadUrl(it1) }
                         this.append("Safe Gaze DOWN")
                     }
                 }
@@ -871,7 +870,7 @@ class BrowserTabFragment :
                 pointerArrowParams.rightMargin = leftOverDevicePixel - 113
                 pointerArrow.layoutParams = pointerArrowParams
             }
-            popupView.findViewById<TextView>(R.id.website_url_text_view).text = initialUrl
+            popupView.findViewById<TextView>(R.id.website_url_text_view).text = viewModel.url
             val sharedPreferences = requireContext().getSharedPreferences("safe_gaze_preferences", Context.MODE_PRIVATE)
             val totalCensoredText = "Total ${sharedPreferences.getInt("all_time_cencored_count", 0)} Sinful acts avoided since beginning"
             popupView.findViewById<TextView>(R.id.count_text).text = sharedPreferences.getInt("session_cencored_count", 0).toString()
