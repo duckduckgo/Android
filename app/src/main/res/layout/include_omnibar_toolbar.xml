@@ -239,7 +239,7 @@
                 app:layout_constraintBottom_toBottomOf="@+id/toolbar"
                 app:layout_constraintEnd_toStartOf="@+id/tabsMenu"
                 app:layout_constraintStart_toEndOf="@+id/toolbar"
-                android:src="@mipmap/ic_launcher"
+                android:src="@drawable/safe_gaze_icon"
                 />
 
             <com.duckduckgo.app.browser.TabSwitcherButton
