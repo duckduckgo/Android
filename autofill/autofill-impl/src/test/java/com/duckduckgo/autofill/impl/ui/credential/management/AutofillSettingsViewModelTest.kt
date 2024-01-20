@@ -20,6 +20,7 @@ import app.cash.turbine.test
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DEFAULT
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
@@ -611,7 +612,7 @@ class AutofillSettingsViewModelTest {
         val launchedFromBrowser = false
         val directLinkToCredentials = true
         testee.sendLaunchPixel(launchedFromBrowser, directLinkToCredentials)
-        verify(pixel, never()).fire(any<PixelName>(), any(), any())
+        verify(pixel, never()).fire(any<PixelName>(), any(), any(), eq(DEFAULT))
     }
 
     @Test
@@ -619,7 +620,7 @@ class AutofillSettingsViewModelTest {
         val launchedFromBrowser = true
         val directLinkToCredentials = true
         testee.sendLaunchPixel(launchedFromBrowser, directLinkToCredentials)
-        verify(pixel, never()).fire(any<PixelName>(), any(), any())
+        verify(pixel, never()).fire(any<PixelName>(), any(), any(), eq(DEFAULT))
     }
 
     @Test
@@ -627,7 +628,7 @@ class AutofillSettingsViewModelTest {
         val launchedFromBrowser = true
         val directLinkToCredentials = false
         testee.sendLaunchPixel(launchedFromBrowser, directLinkToCredentials)
-        verify(pixel).fire(eq(MENU_ACTION_AUTOFILL_PRESSED), any(), any())
+        verify(pixel).fire(eq(MENU_ACTION_AUTOFILL_PRESSED), any(), any(), eq(DEFAULT))
     }
 
     @Test
@@ -635,7 +636,7 @@ class AutofillSettingsViewModelTest {
         val launchedFromBrowser = false
         val directLinkToCredentials = false
         testee.sendLaunchPixel(launchedFromBrowser, directLinkToCredentials)
-        verify(pixel).fire(eq(SETTINGS_AUTOFILL_MANAGEMENT_OPENED), any(), any())
+        verify(pixel).fire(eq(SETTINGS_AUTOFILL_MANAGEMENT_OPENED), any(), any(), eq(DEFAULT))
     }
 
     @Test

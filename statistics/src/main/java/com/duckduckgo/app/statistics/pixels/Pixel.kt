@@ -18,6 +18,8 @@ package com.duckduckgo.app.statistics.pixels
 
 import android.annotation.SuppressLint
 import com.duckduckgo.app.statistics.api.PixelSender
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DEFAULT
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import io.reactivex.schedulers.Schedulers
@@ -84,16 +86,20 @@ interface Pixel {
         const val FIRE_ANIMATION_NONE = "fann"
     }
 
+    enum class PixelType { DEFAULT, DAILY, UNIQUE }
+
     fun fire(
         pixel: PixelName,
         parameters: Map<String, String> = emptyMap(),
         encodedParameters: Map<String, String> = emptyMap(),
+        type: PixelType = DEFAULT,
     )
 
     fun fire(
         pixelName: String,
         parameters: Map<String, String> = emptyMap(),
         encodedParameters: Map<String, String> = emptyMap(),
+        type: PixelType = DEFAULT,
     )
 
     fun enqueueFire(
@@ -117,8 +123,9 @@ class RxBasedPixel @Inject constructor(
         pixel: Pixel.PixelName,
         parameters: Map<String, String>,
         encodedParameters: Map<String, String>,
+        type: PixelType,
     ) {
-        fire(pixel.pixelName, parameters, encodedParameters)
+        fire(pixel.pixelName, parameters, encodedParameters, type)
     }
 
     @SuppressLint("CheckResult")
@@ -126,9 +133,10 @@ class RxBasedPixel @Inject constructor(
         pixelName: String,
         parameters: Map<String, String>,
         encodedParameters: Map<String, String>,
+        type: PixelType,
     ) {
         pixelSender
-            .sendPixel(pixelName, parameters, encodedParameters)
+            .sendPixel(pixelName, parameters, encodedParameters, type)
             .subscribeOn(Schedulers.io())
             .subscribe(
                 { Timber.v("Pixel sent: $pixelName with params: $parameters $encodedParameters") },

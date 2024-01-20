@@ -21,6 +21,7 @@ import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.config.StatisticsLibraryConfig
 import com.duckduckgo.app.statistics.model.PixelEntity
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType
 import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.common.utils.device.DeviceInfo
@@ -40,6 +41,7 @@ interface PixelSender : MainProcessLifecycleObserver {
         pixelName: String,
         parameters: Map<String, String>,
         encodedParameters: Map<String, String>,
+        type: PixelType,
     ): Completable
 
     fun enqueuePixel(
@@ -109,6 +111,7 @@ class RxPixelSender @Inject constructor(
         pixelName: String,
         parameters: Map<String, String>,
         encodedParameters: Map<String, String>,
+        type: PixelType,
     ): Completable {
         return api.fire(
             pixelName,
