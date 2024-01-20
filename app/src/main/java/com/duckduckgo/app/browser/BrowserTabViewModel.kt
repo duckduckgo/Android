@@ -398,11 +398,11 @@ class BrowserTabViewModel @Inject constructor(
         object DismissFindInPage : Command()
         class ShowFileChooser(
             val filePathCallback: ValueCallback<Array<Uri>>,
-            val fileChooserParams: WebChromeClient.FileChooserParams,
+            val fileChooserParams: FileChooserParams,
         ) : Command()
         class ShowExistingImageOrCameraChooser(
             val filePathCallback: ValueCallback<Array<Uri>>,
-            val fileChooserParams: WebChromeClient.FileChooserParams,
+            val fileChooserParams: FileChooserParams,
         ) : Command()
 
         class HandleNonHttpAppLink(
@@ -601,8 +601,8 @@ class BrowserTabViewModel @Inject constructor(
     private val favoritesOnboardingObserver = Observer<BrowserViewState> { state ->
         val shouldShowAnimation = state.browserShowing
         val menuButton = currentBrowserViewState().showMenuButton
-        if (menuButton is HighlightableButton.Visible && menuButton.highlighted != shouldShowAnimation) {
-            browserViewState.value = currentBrowserViewState().copy(showMenuButton = HighlightableButton.Visible(highlighted = shouldShowAnimation))
+        if (menuButton is Visible && menuButton.highlighted != shouldShowAnimation) {
+            browserViewState.value = currentBrowserViewState().copy(showMenuButton = Visible(highlighted = shouldShowAnimation))
         }
     }
 
@@ -1290,7 +1290,7 @@ class BrowserTabViewModel @Inject constructor(
         val currentBrowserViewState = currentBrowserViewState()
         val domain = site?.domain
         val addFavorite = if (!currentBrowserViewState.addFavorite.isEnabled()) {
-            HighlightableButton.Visible(enabled = true)
+            Visible(enabled = true)
         } else {
             currentBrowserViewState.addFavorite
         }
@@ -1421,20 +1421,20 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    private suspend fun getBookmark(url: String): SavedSite.Bookmark? {
+    private suspend fun getBookmark(url: String): Bookmark? {
         return withContext(dispatchers.io()) {
             savedSitesRepository.getBookmark(url)
         }
     }
 
-    private suspend fun getBookmarkFolder(bookmark: SavedSite.Bookmark?): BookmarkFolder? {
+    private suspend fun getBookmarkFolder(bookmark: Bookmark?): BookmarkFolder? {
         if (bookmark == null) return null
         return withContext(dispatchers.io()) {
             savedSitesRepository.getFolder(bookmark.parentId)
         }
     }
 
-    private suspend fun getFavorite(url: String): SavedSite.Favorite? {
+    private suspend fun getFavorite(url: String): Favorite? {
         return withContext(dispatchers.io()) {
             savedSitesRepository.getFavorite(url)
         }
@@ -1526,7 +1526,7 @@ class BrowserTabViewModel @Inject constructor(
         val currentBrowserViewState = currentBrowserViewState()
         browserViewState.value = currentBrowserViewState.copy(
             canSaveSite = false,
-            addFavorite = HighlightableButton.Visible(enabled = false),
+            addFavorite = Visible(enabled = false),
             addToHomeEnabled = false,
             canSharePage = false,
             showPrivacyShield = false,
@@ -1949,16 +1949,8 @@ class BrowserTabViewModel @Inject constructor(
             showPrivacyShield = showPrivacyShield,
             showSearchIcon = showSearchIcon,
             showTabsButton = showControls,
-            fireButton = if (showControls) {
-                HighlightableButton.Visible(highlighted = showPulseAnimation.value ?: false)
-            } else {
-                HighlightableButton.Gone
-            },
-            showMenuButton = if (showControls) {
-                HighlightableButton.Visible()
-            } else {
-                HighlightableButton.Gone
-            },
+            fireButton = Visible(highlighted = showPulseAnimation.value ?: false),
+            showMenuButton = Visible(),
             showClearButton = showClearButton,
             showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(
                 hasFocus = hasFocus,
@@ -2156,7 +2148,7 @@ class BrowserTabViewModel @Inject constructor(
     fun onEditSavedSiteRequested(savedSite: SavedSite) {
         viewModelScope.launch(dispatchers.io()) {
             val bookmarkFolder =
-                if (savedSite is SavedSite.Bookmark) {
+                if (savedSite is Bookmark) {
                     getBookmarkFolder(savedSite)
                 } else {
                     null
@@ -2443,8 +2435,8 @@ class BrowserTabViewModel @Inject constructor(
         if (menuHighlighted) {
             this.showFavoritesOnboarding = false
             browserViewState.value = currentBrowserViewState().copy(
-                showMenuButton = HighlightableButton.Visible(highlighted = false),
-                addFavorite = HighlightableButton.Visible(highlighted = true),
+                showMenuButton = Visible(highlighted = false),
+                addFavorite = Visible(highlighted = true),
             )
         }
     }
@@ -2454,7 +2446,7 @@ class BrowserTabViewModel @Inject constructor(
             Timber.i("favoritesOnboarding onBrowserMenuClosed")
             if (currentBrowserViewState().addFavorite.isHighlighted()) {
                 browserViewState.value = currentBrowserViewState().copy(
-                    addFavorite = HighlightableButton.Visible(highlighted = false),
+                    addFavorite = Visible(highlighted = false),
                 )
             }
         }
