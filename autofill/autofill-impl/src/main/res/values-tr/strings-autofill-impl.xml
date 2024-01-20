@@ -135,4 +135,12 @@
 
     <string name="credentials_limit_warning"><b>Senkronizasyon Duraklatıldı</b>\nGiriş sınırı aşıldı. Senkronizasyona devam etmek için bazılarını silin.\n\n<annotation type="manage_logins">Girişleri Yönet</annotation></string>
     <string name="credentials_limit_warning_notif"><b>Şifre Senkronizasyonu Duraklatıldı</b>\nŞifre senkronizasyon sınırını aştınız. Bazı şifreleri silmeyi deneyin. Bu sorun çözülene kadar şifreleriniz yedeklenmeyecektir.</string>
+
+    <string name="saveLoginDialogNeverForThisSite">Bu Site için Hiçbir Zaman Sorma</string>
+    <string name="credentialManagementInstructionNeverForThisSite">Hariç tutulan siteleri sıfırlarsanız, bu sitelerden herhangi birinde bir sonraki oturum açtığınızda şifrenizi kaydetmeniz istenecektir.</string>
+    <string name="credentialManagementClearNeverForThisSiteList">Hariç Tutulan Siteleri Sıfırla</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogTitle">Hariç Tutulan Siteler Sıfırlansın mı?</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogPositiveButton">Sıfırla</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Vazgeç</string>
+
 </resources>
