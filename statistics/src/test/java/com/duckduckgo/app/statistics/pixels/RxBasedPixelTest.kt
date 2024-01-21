@@ -17,10 +17,12 @@
 package com.duckduckgo.app.statistics.pixels
 
 import com.duckduckgo.app.statistics.api.PixelSender
+import com.duckduckgo.app.statistics.api.PixelSender.SendPixelResult.PIXEL_SENT
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DEFAULT
 import com.duckduckgo.app.statistics.pixels.RxBasedPixelTest.TestPixels.TEST
 import com.duckduckgo.common.test.InstantSchedulersRule
 import io.reactivex.Completable
+import io.reactivex.Single
 import java.util.concurrent.TimeoutException
 import org.junit.Rule
 import org.junit.Test
@@ -110,11 +112,11 @@ class RxBasedPixelTest {
     }
 
     private fun givenSendPixelSucceeds() {
-        whenever(mockPixelSender.sendPixel(any(), any(), any(), any())).thenReturn(Completable.complete())
+        whenever(mockPixelSender.sendPixel(any(), any(), any(), any())).thenReturn(Single.just(PIXEL_SENT))
     }
 
     private fun givenSendPixelFails() {
-        whenever(mockPixelSender.sendPixel(any(), any(), any(), any())).thenReturn(Completable.error(TimeoutException()))
+        whenever(mockPixelSender.sendPixel(any(), any(), any(), any())).thenReturn(Single.error(TimeoutException()))
     }
 
     enum class TestPixels(override val pixelName: String, val enqueue: Boolean = false) : Pixel.PixelName {

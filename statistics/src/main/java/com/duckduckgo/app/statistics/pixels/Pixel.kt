@@ -18,6 +18,8 @@ package com.duckduckgo.app.statistics.pixels
 
 import android.annotation.SuppressLint
 import com.duckduckgo.app.statistics.api.PixelSender
+import com.duckduckgo.app.statistics.api.PixelSender.SendPixelResult.PIXEL_IGNORED
+import com.duckduckgo.app.statistics.api.PixelSender.SendPixelResult.PIXEL_SENT
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DEFAULT
 import com.duckduckgo.di.scopes.AppScope
@@ -139,11 +141,16 @@ class RxBasedPixel @Inject constructor(
             .sendPixel(pixelName, parameters, encodedParameters, type)
             .subscribeOn(Schedulers.io())
             .subscribe(
-                { Timber.v("Pixel sent: $pixelName with params: $parameters $encodedParameters") },
+                { result ->
+                    when (result) {
+                        PIXEL_SENT -> Timber.v("Pixel sent: $pixelName with params: $parameters $encodedParameters, type: $type")
+                        PIXEL_IGNORED -> Timber.v("Pixel ignored: $pixelName, type: $type")
+                    }
+                },
                 {
                     Timber.w(
                         it,
-                        "Pixel failed: $pixelName with params: $parameters $encodedParameters",
+                        "Pixel failed: $pixelName with params: $parameters $encodedParameters, type: $type",
                     )
                 },
             )

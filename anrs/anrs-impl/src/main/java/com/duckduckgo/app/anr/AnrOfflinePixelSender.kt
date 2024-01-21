@@ -47,7 +47,7 @@ class AnrOfflinePixelSender @Inject constructor(
                     ),
                     mapOf(),
                     DEFAULT,
-                ).doOnComplete {
+                ).ignoreElement().doOnComplete {
                     anrRepository.removeMostRecentAnr()
                 }
             }

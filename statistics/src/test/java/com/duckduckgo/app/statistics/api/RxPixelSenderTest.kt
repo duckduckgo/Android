@@ -24,6 +24,8 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.statistics.api.PixelSender.SendPixelResult.PIXEL_IGNORED
+import com.duckduckgo.app.statistics.api.PixelSender.SendPixelResult.PIXEL_SENT
 import com.duckduckgo.app.statistics.api.RxPixelSenderTest.TestPixels.TEST
 import com.duckduckgo.app.statistics.config.StatisticsLibraryConfig
 import com.duckduckgo.app.statistics.model.Atb
@@ -117,7 +119,7 @@ class RxPixelSenderTest {
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
 
         testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), DEFAULT)
-            .test().assertComplete()
+            .test().assertValue(PIXEL_SENT)
 
         verify(api).fire(eq("test"), eq("phone"), eq("atbvariant"), any(), any(), any())
     }
@@ -128,7 +130,7 @@ class RxPixelSenderTest {
         givenFormFactor(DeviceInfo.FormFactor.TABLET)
 
         testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), DEFAULT)
-            .test().assertComplete()
+            .test().assertValue(PIXEL_SENT)
 
         verify(api).fire(eq("test"), eq("tablet"), eq(""), any(), any(), any())
     }
@@ -139,7 +141,7 @@ class RxPixelSenderTest {
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
 
         testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), DEFAULT)
-            .test().assertComplete()
+            .test().assertValue(PIXEL_SENT)
 
         verify(api).fire(eq("test"), eq("phone"), eq(""), any(), any(), any())
     }
@@ -155,7 +157,7 @@ class RxPixelSenderTest {
         val params = mapOf("param1" to "value1", "param2" to "value2")
         val expectedParams = mapOf("param1" to "value1", "param2" to "value2", "appVersion" to "1.0.0")
         testee.sendPixel(TEST.pixelName, params, emptyMap(), DEFAULT)
-            .test().assertComplete()
+            .test().assertValue(PIXEL_SENT)
 
         verify(api).fire("test", "phone", "atbvariant", expectedParams, emptyMap())
     }
@@ -169,7 +171,7 @@ class RxPixelSenderTest {
         givenAppVersion("1.0.0")
 
         testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), DEFAULT)
-            .test().assertComplete()
+            .test().assertValue(PIXEL_SENT)
 
         val expectedParams = mapOf("appVersion" to "1.0.0")
         verify(api).fire("test", "phone", "atbvariant", expectedParams, emptyMap())
@@ -311,7 +313,7 @@ class RxPixelSenderTest {
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
 
         testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), DAILY)
-            .test().assertComplete()
+            .test().assertValue(PIXEL_SENT)
 
         verify(api).fire(eq(TEST.pixelName), any(), any(), any(), any(), any())
         assertTrue(TEST.pixelName in pixelFiredRepository.dailyPixelsFiredToday)
@@ -334,7 +336,7 @@ class RxPixelSenderTest {
         pixelFiredRepository.dailyPixelsFiredToday += TEST.pixelName
 
         testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), DAILY)
-            .test().assertComplete()
+            .test().assertValue(PIXEL_IGNORED)
 
         verifyNoInteractions(api)
         assertTrue(TEST.pixelName in pixelFiredRepository.dailyPixelsFiredToday)
@@ -346,7 +348,7 @@ class RxPixelSenderTest {
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
 
         testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), UNIQUE)
-            .test().assertComplete()
+            .test().assertValue(PIXEL_SENT)
 
         verify(api).fire(eq(TEST.pixelName), any(), any(), any(), any(), any())
         assertTrue(TEST.pixelName in pixelFiredRepository.uniquePixelsFired)
@@ -369,7 +371,7 @@ class RxPixelSenderTest {
         pixelFiredRepository.uniquePixelsFired += TEST.pixelName
 
         testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), UNIQUE)
-            .test().assertComplete()
+            .test().assertValue(PIXEL_IGNORED)
 
         verifyNoInteractions(api)
         assertTrue(TEST.pixelName in pixelFiredRepository.uniquePixelsFired)

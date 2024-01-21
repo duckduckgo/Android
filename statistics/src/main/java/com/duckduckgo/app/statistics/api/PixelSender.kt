@@ -18,6 +18,7 @@ package com.duckduckgo.app.statistics.api
 
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.app.statistics.api.PixelSender.SendPixelResult
 import com.duckduckgo.app.statistics.config.StatisticsLibraryConfig
 import com.duckduckgo.app.statistics.model.PixelEntity
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -35,6 +36,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import io.reactivex.Completable
+import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
@@ -47,13 +49,18 @@ interface PixelSender : MainProcessLifecycleObserver {
         parameters: Map<String, String>,
         encodedParameters: Map<String, String>,
         type: PixelType,
-    ): Completable
+    ): Single<SendPixelResult>
 
     fun enqueuePixel(
         pixelName: String,
         parameters: Map<String, String>,
         encodedParameters: Map<String, String>,
     ): Completable
+
+    enum class SendPixelResult {
+        PIXEL_SENT,
+        PIXEL_IGNORED, // Daily or unique pixels may be ignored.
+    }
 }
 
 @ContributesBinding(
@@ -118,7 +125,7 @@ class RxPixelSender @Inject constructor(
         parameters: Map<String, String>,
         encodedParameters: Map<String, String>,
         type: PixelType,
-    ): Completable = Completable.fromAction {
+    ): Single<SendPixelResult> = Single.fromCallable {
         runBlocking {
             if (shouldFirePixel(pixelName, type)) {
                 api.fire(
@@ -130,6 +137,9 @@ class RxPixelSender @Inject constructor(
                     devMode = shouldFirePixelsAsDev,
                 ).blockingAwait()
                 storePixelFired(pixelName, type)
+                SendPixelResult.PIXEL_SENT
+            } else {
+                SendPixelResult.PIXEL_IGNORED
             }
         }
     }

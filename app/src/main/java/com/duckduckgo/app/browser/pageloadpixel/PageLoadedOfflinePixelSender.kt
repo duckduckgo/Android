@@ -51,7 +51,7 @@ class PageLoadedOfflinePixelSender @Inject constructor(
                     ),
                     mapOf(),
                     DEFAULT,
-                ).doOnComplete {
+                ).ignoreElement().doOnComplete {
                     pageLoadedPixelDao.deleteAll()
                 }
             }

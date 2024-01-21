@@ -55,7 +55,7 @@ class CrashOfflinePixelSender @Inject constructor(
                     )
 
                 val pixel =
-                    pixelSender.sendPixel(APPLICATION_CRASH_GLOBAL.pixelName, params, emptyMap(), DEFAULT).doOnComplete {
+                    pixelSender.sendPixel(APPLICATION_CRASH_GLOBAL.pixelName, params, emptyMap(), DEFAULT).ignoreElement().doOnComplete {
                         logcat { "Sent pixel with params: $params containing exception; deleting exception with id=${exception.hash}" }
                         uncaughtExceptionDao.delete(exception)
                     }
