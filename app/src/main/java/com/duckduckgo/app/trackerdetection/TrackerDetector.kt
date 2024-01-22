@@ -24,11 +24,10 @@ import com.duckduckgo.app.privacy.db.UserAllowListDao
 import com.duckduckgo.app.trackerdetection.Client.ClientType.BLOCKING
 import com.duckduckgo.app.trackerdetection.db.WebTrackerBlocked
 import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
+import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
-import com.duckduckgo.common.utils.UriString
-import com.duckduckgo.common.utils.UriString.Companion
 import com.duckduckgo.common.utils.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.common.utils.UriString.Companion.sameOrSubdomainPair
 import com.duckduckgo.di.scopes.AppScope
@@ -114,32 +113,9 @@ class TrackerDetectorImpl @Inject constructor(
 
         val sameEntity = sameNetworkName(url, documentUrl)
         val entity = if (result.entityName != null) entityLookup.entityForName(result.entityName) else entityLookup.entityForUrl(url)
-        val isSiteAContentBlockingException = contentBlocking.isAnException(documentUrl)
         val isDocumentInAllowedList = userAllowListDao.isDocumentAllowListed(documentUrl)
-        val isInAdClickAllowList = adClickManager.isExemption(documentUrl, urlString)
-        val isInTrackerAllowList = trackerAllowlist.isAnException(documentUrl, urlString)
-        val isATrackerAllowed = result.isATracker && !result.matches
-        val shouldBlock = result.matches && !isSiteAContentBlockingException && !isInTrackerAllowList && !isInAdClickAllowList && !sameEntity
 
-        val status = when {
-            sameEntity -> TrackerStatus.SAME_ENTITY_ALLOWED
-            isDocumentInAllowedList -> TrackerStatus.USER_ALLOWED
-            shouldBlock -> TrackerStatus.BLOCKED
-            isInAdClickAllowList -> TrackerStatus.AD_ALLOWED
-            isInTrackerAllowList || isATrackerAllowed -> TrackerStatus.SITE_BREAKAGE_ALLOWED
-            else -> TrackerStatus.ALLOWED
-        }
-
-        val type = if (isInAdClickAllowList) TrackerType.AD else TrackerType.OTHER
-
-        if (status == TrackerStatus.BLOCKED) {
-            val trackerCompany = entity?.displayName ?: "Undefined"
-            webTrackersBlockedDao.insert(WebTrackerBlocked(trackerUrl = urlString, trackerCompany = trackerCompany))
-        }
-
-        Timber.v("$documentUrl resource $url WAS identified as a tracker and status=$status")
-
-        return TrackingEvent(documentUrl, urlString, result.categories, entity, result.surrogate, status, type)
+        return evaluate(documentUrl, urlString, result, sameEntity, isDocumentInAllowedList, entity)
     }
 
     override fun evaluate(
@@ -164,32 +140,10 @@ class TrackerDetectorImpl @Inject constructor(
 
         val sameEntity = sameNetworkName(url, documentUrl)
         val entity = if (result.entityName != null) entityLookup.entityForName(result.entityName) else entityLookup.entityForUrl(url)
-        val isSiteAContentBlockingException = contentBlocking.isAnException(documentUrlString)
         val isDocumentInAllowedList = userAllowListDao.isDocumentAllowListed(documentUrl)
-        val isInAdClickAllowList = adClickManager.isExemption(documentUrlString, urlString)
-        val isInTrackerAllowList = trackerAllowlist.isAnException(documentUrlString, urlString)
-        val isATrackerAllowed = result.isATracker && !result.matches
-        val shouldBlock = result.matches && !isSiteAContentBlockingException && !isInTrackerAllowList && !isInAdClickAllowList && !sameEntity
 
-        val status = when {
-            sameEntity -> TrackerStatus.SAME_ENTITY_ALLOWED
-            isDocumentInAllowedList -> TrackerStatus.USER_ALLOWED
-            shouldBlock -> TrackerStatus.BLOCKED
-            isInAdClickAllowList -> TrackerStatus.AD_ALLOWED
-            isInTrackerAllowList || isATrackerAllowed -> TrackerStatus.SITE_BREAKAGE_ALLOWED
-            else -> TrackerStatus.ALLOWED
-        }
 
-        val type = if (isInAdClickAllowList) TrackerType.AD else TrackerType.OTHER
-
-        if (status == TrackerStatus.BLOCKED) {
-            val trackerCompany = entity?.displayName ?: "Undefined"
-            webTrackersBlockedDao.insert(WebTrackerBlocked(trackerUrl = urlString, trackerCompany = trackerCompany))
-        }
-
-        Timber.v("$documentUrl resource $url WAS identified as a tracker and status=$status")
-
-        return TrackingEvent(documentUrlString, urlString, result.categories, entity, result.surrogate, status, type)
+        return evaluate(documentUrlString, urlString, result, sameEntity, isDocumentInAllowedList, entity)
     }
 
     override fun evaluate(
@@ -213,32 +167,9 @@ class TrackerDetectorImpl @Inject constructor(
 
         val sameEntity = sameNetworkName(documentUrl, url)
         val entity = if (result.entityName != null) entityLookup.entityForName(result.entityName) else entityLookup.entityForUrl(url)
-        val isSiteAContentBlockingException = contentBlocking.isAnException(documentUrlString)
         val isDocumentInAllowedList = userAllowListDao.isDocumentAllowListed(documentUrl)
-        val isInAdClickAllowList = adClickManager.isExemption(documentUrlString, url)
-        val isInTrackerAllowList = trackerAllowlist.isAnException(documentUrlString, url)
-        val isATrackerAllowed = result.isATracker && !result.matches
-        val shouldBlock = result.matches && !isSiteAContentBlockingException && !isInTrackerAllowList && !isInAdClickAllowList && !sameEntity
 
-        val status = when {
-            sameEntity -> TrackerStatus.SAME_ENTITY_ALLOWED
-            isDocumentInAllowedList -> TrackerStatus.USER_ALLOWED
-            shouldBlock -> TrackerStatus.BLOCKED
-            isInAdClickAllowList -> TrackerStatus.AD_ALLOWED
-            isInTrackerAllowList || isATrackerAllowed -> TrackerStatus.SITE_BREAKAGE_ALLOWED
-            else -> TrackerStatus.ALLOWED
-        }
-
-        val type = if (isInAdClickAllowList) TrackerType.AD else TrackerType.OTHER
-
-        if (status == TrackerStatus.BLOCKED) {
-            val trackerCompany = entity?.displayName ?: "Undefined"
-            webTrackersBlockedDao.insert(WebTrackerBlocked(trackerUrl = url, trackerCompany = trackerCompany))
-        }
-
-        Timber.v("$documentUrl resource $url WAS identified as a tracker and status=$status")
-
-        return TrackingEvent(documentUrlString, url, result.categories, entity, result.surrogate, status, type)
+        return evaluate(documentUrlString, url, result, sameEntity, isDocumentInAllowedList,entity)
     }
 
     override fun evaluate(
@@ -284,6 +215,41 @@ class TrackerDetectorImpl @Inject constructor(
         Timber.v("$documentUrl resource $url WAS identified as a tracker and status=$status")
 
         return TrackingEvent(documentUrl, url, result.categories, entity, result.surrogate, status, type)
+    }
+
+    private fun evaluate(
+        documentUrlString: String,
+        urlString: String,
+        result: Client.Result,
+        sameEntity: Boolean,
+        isDocumentInAllowedList: Boolean,
+        entity: Entity?
+    ): TrackingEvent {
+        val isSiteAContentBlockingException = contentBlocking.isAnException(documentUrlString)
+        val isInAdClickAllowList = adClickManager.isExemption(documentUrlString, urlString)
+        val isInTrackerAllowList = trackerAllowlist.isAnException(documentUrlString, urlString)
+        val isATrackerAllowed = result.isATracker && !result.matches
+        val shouldBlock = result.matches && !isSiteAContentBlockingException && !isInTrackerAllowList && !isInAdClickAllowList && !sameEntity
+
+        val status = when {
+            sameEntity -> TrackerStatus.SAME_ENTITY_ALLOWED
+            isDocumentInAllowedList -> TrackerStatus.USER_ALLOWED
+            shouldBlock -> TrackerStatus.BLOCKED
+            isInAdClickAllowList -> TrackerStatus.AD_ALLOWED
+            isInTrackerAllowList || isATrackerAllowed -> TrackerStatus.SITE_BREAKAGE_ALLOWED
+            else -> TrackerStatus.ALLOWED
+        }
+
+        val type = if (isInAdClickAllowList) TrackerType.AD else TrackerType.OTHER
+
+        if (status == TrackerStatus.BLOCKED) {
+            val trackerCompany = entity?.displayName ?: "Undefined"
+            webTrackersBlockedDao.insert(WebTrackerBlocked(trackerUrl = urlString, trackerCompany = trackerCompany))
+        }
+
+        Timber.v("$documentUrlString resource $urlString WAS identified as a tracker and status=$status")
+
+        return TrackingEvent(documentUrlString, urlString, result.categories, entity, result.surrogate, status, type)
     }
 
     private fun removePortFromUrl(uri: Uri): Uri {
