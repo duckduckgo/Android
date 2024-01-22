@@ -27,21 +27,13 @@ tags:
     id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
 - tapOn:
     text: "bookmarks"
-# Add favorite from bookmarks screen
-- tapOn:
-    id: "com.duckduckgo.mobile.android:id/trailingIcon"
-    index: 0
-- tapOn:
-    text: "add to favorites"
-- assertVisible:
-    id: "com.duckduckgo.mobile.android:id/favoriteStar"
-# Remove favorite from bookmarks screen
+# Remove bookmark from bookmarks screen
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/trailingIcon"
     index: 0
 - tapOn:
     text: "delete"
-# Undo remove favorite from bookmarks screen
+# Undo remove bookmark from bookmarks screen
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/snackbar_action"
 - assertNotVisible:

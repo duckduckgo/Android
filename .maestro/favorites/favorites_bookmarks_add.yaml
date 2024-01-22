@@ -1,0 +1,37 @@
+appId: com.duckduckgo.mobile.android
+name: "ReleaseTest: Can undo a deleted favorite"
+tags:
+  - releaseTest
+---
+- launchApp:
+    clearState: true
+    stopApp: true
+
+- runFlow: ../shared/onboarding.yaml
+
+- tapOn:
+    text: "search or type URL"
+- inputText: "https://privacy-test-pages.site"
+- tapOn:
+    id: "com.google.android.inputmethod.latin:id/key_pos_ime_action"
+- assertVisible:
+    text: ".*keep browsing.*"
+- tapOn:
+    text: "got it"
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+- tapOn:
+    text: "add bookmark"
+# Navigate to bookmarks screen
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+- tapOn:
+    text: "bookmarks"
+# Add favorite from bookmarks screen
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/trailingIcon"
+    index: 0
+- tapOn:
+    text: "add to favorites"
+- assertVisible:
+    id: "com.duckduckgo.mobile.android:id/favoriteStar"
