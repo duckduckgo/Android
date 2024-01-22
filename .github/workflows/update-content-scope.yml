@@ -102,7 +102,19 @@ jobs:
           action: 'add-task-asana-project'
 
       - name: Update PR description with Asana task
-        if: ${{ steps.update-check.outcome == 'failure' }}
+        if: ${{ steps.create-task.outputs.duplicate == 'false' }}
+        uses: duckduckgo/native-github-asana-sync@v1.0
+        with:
+          github-pat: ${{ secrets.GT_DAXMOBILE }}
+          github-pr: ${{ steps.create-pr.outputs.pull-request-number }}
+          github-repository: 'android'
+          github-org: 'duckduckgo'
+          asana-project: ${{ vars.GH_ANDROID_RELEASE_BOARD_PROJECT_ID }}
+          asana-task-id: ${{ steps.create-task.outputs.taskId }}
+          action: 'add-task-pr-description'
+
+      - name: Update PR description with Asana task
+        if: ${{ steps.create-task.outputs.duplicate == 'false' }}
         uses: duckduckgo/native-github-asana-sync@v1.0
         with:
           github-pat: ${{ secrets.GT_DAXMOBILE }}
