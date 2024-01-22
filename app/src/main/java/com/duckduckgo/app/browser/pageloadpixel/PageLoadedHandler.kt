@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.browser.pageloadpixel
 
-import android.util.Log
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -56,7 +55,6 @@ class RealPageLoadedHandler @Inject constructor(
     override operator fun invoke(url: String, start: Long, end: Long) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             if (sites.any { UriString.sameOrSubdomain(url, it) }) {
-                Log.v("PageLoadedLog", (end-start).toString())
                 pageLoadedPixelDao.add(
                     PageLoadedPixelEntity(
                         elapsedTime = end - start,

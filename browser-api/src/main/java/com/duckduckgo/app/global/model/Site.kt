@@ -86,7 +86,7 @@ fun Site.domainMatchesUrl(matchingUrl: String): Boolean {
 }
 
 fun Site.domainMatchesUrl(matchingUrl: Uri): Boolean {
-    //TODO (cbarreiro) can we get rid of baseHost for the Uri as well?
+    // TODO (cbarreiro) can we get rid of baseHost for the Uri as well?
     return uri?.baseHost == matchingUrl.host
 }
 

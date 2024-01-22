@@ -35,10 +35,10 @@ import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import java.net.URI
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 import timber.log.Timber
-import java.net.URI
 
 interface TrackerDetector {
     fun addClient(client: Client)
@@ -98,7 +98,6 @@ class TrackerDetectorImpl @Inject constructor(
         checkFirstParty: Boolean,
         requestHeaders: Map<String, String>,
     ): TrackingEvent? {
-
         val cleanedUrl = removePortFromUrl(url)
         val urlString = url.toString()
 
@@ -124,7 +123,6 @@ class TrackerDetectorImpl @Inject constructor(
         checkFirstParty: Boolean,
         requestHeaders: Map<String, String>,
     ): TrackingEvent? {
-
         val cleanedUrl = removePortFromUrl(url)
         val urlString = url.toString()
         val documentUrlString = documentUrl.toString()
@@ -142,7 +140,6 @@ class TrackerDetectorImpl @Inject constructor(
         val entity = if (result.entityName != null) entityLookup.entityForName(result.entityName) else entityLookup.entityForUrl(url)
         val isDocumentInAllowedList = userAllowListDao.isDocumentAllowListed(documentUrl)
 
-
         return evaluate(documentUrlString, urlString, result, sameEntity, isDocumentInAllowedList, entity)
     }
 
@@ -152,7 +149,6 @@ class TrackerDetectorImpl @Inject constructor(
         checkFirstParty: Boolean,
         requestHeaders: Map<String, String>,
     ): TrackingEvent? {
-
         val cleanedUrl = removePortFromUrl(url)
         val documentUrlString = documentUrl.toString()
 
@@ -169,7 +165,7 @@ class TrackerDetectorImpl @Inject constructor(
         val entity = if (result.entityName != null) entityLookup.entityForName(result.entityName) else entityLookup.entityForUrl(url)
         val isDocumentInAllowedList = userAllowListDao.isDocumentAllowListed(documentUrl)
 
-        return evaluate(documentUrlString, url, result, sameEntity, isDocumentInAllowedList,entity)
+        return evaluate(documentUrlString, url, result, sameEntity, isDocumentInAllowedList, entity)
     }
 
     override fun evaluate(
@@ -223,7 +219,7 @@ class TrackerDetectorImpl @Inject constructor(
         result: Client.Result,
         sameEntity: Boolean,
         isDocumentInAllowedList: Boolean,
-        entity: Entity?
+        entity: Entity?,
     ): TrackingEvent {
         val isSiteAContentBlockingException = contentBlocking.isAnException(documentUrlString)
         val isInAdClickAllowList = adClickManager.isExemption(documentUrlString, urlString)
@@ -257,7 +253,6 @@ class TrackerDetectorImpl @Inject constructor(
             uri.buildUpon()
                 .authority(uri.host)
                 .build()
-
         } else {
             uri
         }

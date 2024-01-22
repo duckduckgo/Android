@@ -248,7 +248,6 @@ class TdsClientTest {
         assertFalse(testeeIgnoreRuleNone.matches("http://api.tracker.com/auth/script.js", DOCUMENT_URL, mapOf()).matches)
     }
 
-
     @Test
     fun whenUrlMatchesRuleWithExceptionsAndExceptionDomainMatchesDocumentThenMatchesIsFalseIrrespectiveOfAction2() {
         val exceptions = RuleExceptions(listOf("example.com"), null)
