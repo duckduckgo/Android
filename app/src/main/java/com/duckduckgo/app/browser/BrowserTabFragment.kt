@@ -2133,6 +2133,7 @@ class BrowserTabFragment :
             it.webChromeClient = webChromeClient
 
             it.settings.apply {
+                userAgentProvider.setHintHeader(this)
                 userAgentString = userAgentProvider.userAgent()
                 javaScriptEnabled = true
                 domStorageEnabled = true
