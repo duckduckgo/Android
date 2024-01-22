@@ -38,6 +38,7 @@ import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DEFAULT
 import com.duckduckgo.app.survey.api.SurveyRepository
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.model.Survey.Status.SCHEDULED
@@ -202,32 +203,32 @@ class CtaViewModelTest {
     @Test
     fun whenCtaShownAndCtaIsDaxAndCanNotSendPixelThenPixelIsNotFired() {
         testee.onCtaShown(DaxBubbleCta.DaxIntroCta(mockOnboardingStore, mockAppInstallStore))
-        verify(mockPixel, never()).fire(eq(SURVEY_CTA_SHOWN), any(), any())
+        verify(mockPixel, never()).fire(eq(SURVEY_CTA_SHOWN), any(), any(), eq(DEFAULT))
     }
 
     @Test
     fun whenCtaShownAndCtaIsDaxAndCanSendPixelThenPixelIsFired() {
         whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn("s:0")
         testee.onCtaShown(DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore))
-        verify(mockPixel, never()).fire(eq(SURVEY_CTA_SHOWN), any(), any())
+        verify(mockPixel, never()).fire(eq(SURVEY_CTA_SHOWN), any(), any(), eq(DEFAULT))
     }
 
     @Test
     fun whenCtaShownAndCtaIsNotDaxThenPixelIsFired() {
         testee.onCtaShown(HomePanelCta.Survey(Survey("abc", "http://example.com", 1, SCHEDULED)))
-        verify(mockPixel).fire(eq(SURVEY_CTA_SHOWN), any(), any())
+        verify(mockPixel).fire(eq(SURVEY_CTA_SHOWN), any(), any(), eq(DEFAULT))
     }
 
     @Test
     fun whenCtaLaunchedPixelIsFired() {
         testee.onUserClickCtaOkButton(HomePanelCta.Survey(Survey("abc", "http://example.com", 1, SCHEDULED)))
-        verify(mockPixel).fire(eq(SURVEY_CTA_LAUNCHED), any(), any())
+        verify(mockPixel).fire(eq(SURVEY_CTA_LAUNCHED), any(), any(), eq(DEFAULT))
     }
 
     @Test
     fun whenCtaDismissedPixelIsFired() = runTest {
         testee.onUserDismissedCta(HomePanelCta.Survey(Survey("abc", "http://example.com", 1, SCHEDULED)))
-        verify(mockPixel).fire(eq(SURVEY_CTA_DISMISSED), any(), any())
+        verify(mockPixel).fire(eq(SURVEY_CTA_DISMISSED), any(), any(), eq(DEFAULT))
     }
 
     @Test
@@ -262,7 +263,7 @@ class CtaViewModelTest {
     @Test
     fun whenHideTipsForeverThenPixelIsFired() = runTest {
         testee.hideTipsForever(HomePanelCta.AddWidgetAuto)
-        verify(mockPixel).fire(eq(ONBOARDING_DAX_ALL_CTA_HIDDEN), any(), any())
+        verify(mockPixel).fire(eq(ONBOARDING_DAX_ALL_CTA_HIDDEN), any(), any(), eq(DEFAULT))
     }
 
     @Test
