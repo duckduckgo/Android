@@ -35,8 +35,8 @@ jobs:
         if: ${{ steps.create-task.outputs.duplicate == 'false' }}
         uses: duckduckgo/native-github-asana-sync@v1.0
         with:
-          asana-pat: ${{ vars.GH_ASANA_PLAYGROUND_PAT }}
-          asana-project: ${{ vars.GH_ASANA_PLAYGROUND_PROJECT_ID }}
-          asana-section: ${{ vars.GH_ASANA_PLAYGROUND_SECTION_ID }}
+          asana-pat: ${{ secrets.GH_ASANA_SECRET }}
+          asana-project: ${{ vars.GH_ANDROID_RELEASE_BOARD_PROJECT_ID }}
+          asana-section: ${{ vars.GH_ANDROID_RELEASE_BOARD_PR_SECTION_ID }}
           asana-task-id: ${{ steps.create-task.outputs.taskId }}
           action: 'add-task-asana-project'
