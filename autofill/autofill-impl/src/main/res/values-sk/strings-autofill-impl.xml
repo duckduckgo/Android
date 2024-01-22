@@ -135,4 +135,12 @@
 
     <string name="credentials_limit_warning"><b>Synchronizácia bola pozastavená</b>\nBol dosiahnutý limit pre počet prihlásení. Ak chcete obnoviť synchronizáciu, odstráňte niektoré záložky.\n\n<annotation type="manage_logins">Správa prihlásení</annotation></string>
     <string name="credentials_limit_warning_notif"><b>Synchronizácia hesiel bola pozastavená</b>\nPrekročili ste limit synchronizácie hesiel. Skúste niektoré heslá odstrániť. Kým to nevyriešite, vaše heslá sa nebudú zálohovať.</string>
+
+    <string name="saveLoginDialogNeverForThisSite">Nikdy sa nepýtať na túto stránku</string>
+    <string name="credentialManagementInstructionNeverForThisSite">Ak obnovíte vylúčené lokality, pri ďalšom prihlásení na niektorú z týchto lokalít dostanete výzvu na uloženie svojho hesla.</string>
+    <string name="credentialManagementClearNeverForThisSiteList">Obnovenie vylúčených lokalít</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogTitle">Obnoviť vylúčené lokality?</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogPositiveButton">Obnoviť</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Zrušiť</string>
+
 </resources>
