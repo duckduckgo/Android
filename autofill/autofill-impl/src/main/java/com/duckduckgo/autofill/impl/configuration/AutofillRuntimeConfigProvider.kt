@@ -19,10 +19,10 @@ package com.duckduckgo.autofill.impl.configuration
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
-import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.email.incontext.availability.EmailProtectionInContextAvailabilityRules
 import com.duckduckgo.autofill.impl.jsbridge.response.AvailableInputTypeCredentials
 import com.duckduckgo.autofill.impl.sharedcreds.ShareableCredentials
+import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -39,7 +39,7 @@ interface AutofillRuntimeConfigProvider {
 @ContributesBinding(AppScope::class)
 class RealAutofillRuntimeConfigProvider @Inject constructor(
     private val emailManager: EmailManager,
-    private val autofillStore: AutofillStore,
+    private val autofillStore: InternalAutofillStore,
     private val runtimeConfigurationWriter: RuntimeConfigurationWriter,
     private val autofillCapabilityChecker: AutofillCapabilityChecker,
     private val shareableCredentials: ShareableCredentials,

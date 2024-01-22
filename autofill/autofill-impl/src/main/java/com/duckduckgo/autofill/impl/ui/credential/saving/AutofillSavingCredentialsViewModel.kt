@@ -20,8 +20,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_USER_SELECTED_FROM_SAVE_DIALOG
+import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
@@ -37,7 +37,7 @@ class AutofillSavingCredentialsViewModel @Inject constructor(
 ) : ViewModel() {
 
     @Inject
-    lateinit var autofillStore: AutofillStore
+    lateinit var autofillStore: InternalAutofillStore
 
     fun userPromptedToSaveCredentials() {
         viewModelScope.launch(dispatchers.io()) {

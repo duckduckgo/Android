@@ -18,7 +18,7 @@ package com.duckduckgo.autofill.impl.ui.credential.saving.declines
 
 import androidx.annotation.VisibleForTesting
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.autofill.api.store.AutofillStore
+import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -63,7 +63,7 @@ interface AutofillDeclineCounter {
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class AutofillDisablingDeclineCounter @Inject constructor(
-    private val autofillStore: AutofillStore,
+    private val autofillStore: InternalAutofillStore,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
 ) : AutofillDeclineCounter {

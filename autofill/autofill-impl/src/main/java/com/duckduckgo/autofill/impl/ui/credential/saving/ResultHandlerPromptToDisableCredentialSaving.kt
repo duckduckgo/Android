@@ -25,10 +25,10 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillEventListener
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
 import com.duckduckgo.autofill.api.CredentialSavePickerDialog
-import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
 import com.duckduckgo.autofill.impl.R.string
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
+import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.ui.credential.saving.declines.AutofillDeclineCounter
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -45,7 +45,7 @@ class ResultHandlerPromptToDisableCredentialSaving @Inject constructor(
     private val pixel: Pixel,
     private val dispatchers: DispatcherProvider,
     private val declineCounter: AutofillDeclineCounter,
-    private val autofillStore: AutofillStore,
+    private val autofillStore: InternalAutofillStore,
     @com.duckduckgo.app.di.AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : AutofillFragmentResultsPlugin {
 

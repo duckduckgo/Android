@@ -19,13 +19,13 @@ package com.duckduckgo.autofill.impl
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType.Password
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType.Username
+import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult
+import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.NoMatch
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
-import com.duckduckgo.autofill.api.store.AutofillStore
-import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult
-import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult.NoMatch
 import com.duckduckgo.autofill.impl.securestorage.SecureStorage
 import com.duckduckgo.autofill.impl.securestorage.WebsiteLoginDetails
 import com.duckduckgo.autofill.impl.securestorage.WebsiteLoginDetailsWithCredentials
+import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillUrlMatcher
 import com.duckduckgo.autofill.store.AutofillPrefsStore
 import com.duckduckgo.autofill.store.LastUpdatedTimeProvider
@@ -51,7 +51,7 @@ class SecureStoreBackedAutofillStore @Inject constructor(
     private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider(),
     private val autofillUrlMatcher: AutofillUrlMatcher,
     private val syncCredentialsListener: SyncCredentialsListener,
-) : AutofillStore {
+) : InternalAutofillStore {
 
     override val autofillAvailable: Boolean
         get() = secureStorage.canAccessSecureStorage()

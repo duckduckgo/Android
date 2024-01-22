@@ -18,8 +18,8 @@ package com.duckduckgo.autofill.impl
 
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.InternalTestUserChecker
-import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
+import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -36,7 +36,7 @@ interface AutofillGlobalCapabilityChecker {
 class AutofillGlobalCapabilityCheckerImpl @Inject constructor(
     private val autofillFeature: AutofillFeature,
     private val internalTestUserChecker: InternalTestUserChecker,
-    private val autofillStore: AutofillStore,
+    private val autofillStore: InternalAutofillStore,
     private val deviceAuthenticator: DeviceAuthenticator,
     private val autofill: com.duckduckgo.autofill.api.Autofill,
     private val dispatcherProvider: DispatcherProvider,

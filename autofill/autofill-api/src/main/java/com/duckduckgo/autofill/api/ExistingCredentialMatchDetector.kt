@@ -16,8 +16,6 @@
 
 package com.duckduckgo.autofill.api
 
-import com.duckduckgo.autofill.api.store.AutofillStore
-
 /**
  * Used to determine if the given credential details exist in the autofill storage
  *
@@ -25,5 +23,21 @@ import com.duckduckgo.autofill.api.store.AutofillStore
  * We can only show that prompt if we've first determined there is an existing partial match in need of an update.
  */
 interface ExistingCredentialMatchDetector {
-    suspend fun determine(currentUrl: String, username: String?, password: String?): AutofillStore.ContainsCredentialsResult
+
+    /**
+     * Determine if the given credential exists in the autofill storage.
+     * This isn't a binary, as there are different match types that can be returned as captured by [ContainsCredentialsResult]
+     */
+    suspend fun determine(currentUrl: String, username: String?, password: String?): ContainsCredentialsResult
+
+    /**
+     * Possible match types returned when searching for the presence of credentials
+     */
+    sealed interface ContainsCredentialsResult {
+        data object ExactMatch : ContainsCredentialsResult
+        data object UsernameMatch : ContainsCredentialsResult
+        data object UrlOnlyMatch : ContainsCredentialsResult
+        data object UsernameMissing : ContainsCredentialsResult
+        data object NoMatch : ContainsCredentialsResult
+    }
 }

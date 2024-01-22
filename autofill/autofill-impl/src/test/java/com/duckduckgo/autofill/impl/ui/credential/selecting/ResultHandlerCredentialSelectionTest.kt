@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.autofill
+package com.duckduckgo.autofill.impl.ui.credential.selecting
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -25,9 +25,9 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.AutofillEventListener
 import com.duckduckgo.autofill.api.CredentialAutofillPickerDialog
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector
+import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.NoMatch
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
-import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult.NoMatch
-import com.duckduckgo.autofill.impl.ui.credential.selecting.ResultHandlerCredentialSelection
+import com.duckduckgo.autofill.impl.deviceauth.FakeAuthenticator
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -51,7 +51,13 @@ class ResultHandlerCredentialSelectionTest {
 
     @Before
     fun setup() = runTest {
-        whenever(existingCredentialMatchDetector.determine(any(), any(), any())).thenReturn(NoMatch)
+        whenever(
+            existingCredentialMatchDetector.determine(
+                any(),
+                any(),
+                any(),
+            ),
+        ).thenReturn(NoMatch)
     }
 
     @Test

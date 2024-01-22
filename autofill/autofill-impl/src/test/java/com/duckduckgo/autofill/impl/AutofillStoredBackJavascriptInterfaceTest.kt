@@ -25,7 +25,6 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
-import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.AutofillStoredBackJavascriptInterface.UrlProvider
 import com.duckduckgo.autofill.impl.deduper.AutofillLoginDeduplicator
 import com.duckduckgo.autofill.impl.email.incontext.availability.EmailProtectionInContextRecentInstallChecker
@@ -41,6 +40,7 @@ import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillInputSubTy
 import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillTriggerType.USER_INITIATED
 import com.duckduckgo.autofill.impl.jsbridge.response.AutofillResponseWriter
 import com.duckduckgo.autofill.impl.sharedcreds.ShareableCredentials
+import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
 import com.duckduckgo.autofill.impl.systemautofill.SystemAutofillServiceSuppressor
 import com.duckduckgo.autofill.impl.ui.credential.passwordgeneration.Actions
@@ -63,7 +63,7 @@ class AutofillStoredBackJavascriptInterfaceTest {
     var coroutineRule = CoroutineTestRule()
 
     private val requestParser: AutofillRequestParser = mock()
-    private val autofillStore: AutofillStore = mock()
+    private val autofillStore: InternalAutofillStore = mock()
     private val autofillMessagePoster: AutofillMessagePoster = mock()
     private val autofillResponseWriter: AutofillResponseWriter = mock()
     private val currentUrlProvider: UrlProvider = mock()

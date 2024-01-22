@@ -16,7 +16,7 @@
 
 package com.duckduckgo.autofill.impl.ui.credential.saving.declines
 
-import com.duckduckgo.autofill.api.store.AutofillStore
+import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -39,7 +39,7 @@ class AutofillDisablingDeclineCounterTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    private val autofillStore: AutofillStore = mock()
+    private val autofillStore: InternalAutofillStore = mock()
     private lateinit var testee: AutofillDisablingDeclineCounter
 
     @Before
