@@ -22,7 +22,6 @@ import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
 import com.duckduckgo.common.ui.view.PopupMenuItemView.PopUpMenuItemType.DEFAULT
 import com.duckduckgo.common.ui.view.PopupMenuItemView.PopUpMenuItemType.DESTRUCTIVE
-import com.duckduckgo.common.ui.view.TypedArrayUtils.getColorStateList
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewPopupMenuItemBinding
@@ -43,31 +42,31 @@ constructor(
     }
 
     private fun initAttr(attrs: AttributeSet?) {
-        val attributes = context.obtainStyledAttributes(
+        context.obtainStyledAttributes(
             attrs,
             R.styleable.PopupMenuItemView,
             0,
             0,
         ).apply {
-            if (hasValue(R.styleable.PopupMenuItemView_type)) {
-                val primaryTextType = when (getInt(R.styleable.PopupMenuItemView_type, 0)) {
+            if (hasValue(R.styleable.PopupMenuItemView_labelType)) {
+                val primaryTextType = when (getInt(R.styleable.PopupMenuItemView_labelType, 0)) {
                     1 -> DESTRUCTIVE
                     else -> DEFAULT
                 }
                 type(primaryTextType)
             }
-            binding.label.text = getString(R.styleable.PopupMenuItemView_primaryText) ?: ""
+            binding.label.text = getString(R.styleable.PopupMenuItemView_label) ?: ""
             updateContentDescription()
             recycle()
         }
     }
 
-    fun primaryText(label: String) {
+    fun label(label: String) {
         binding.label.text = label
         updateContentDescription()
     }
 
-    fun primaryText(label: () -> String) {
+    fun label(label: () -> String) {
         binding.label.text = label()
         updateContentDescription()
     }

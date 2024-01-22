@@ -26,36 +26,36 @@
         android:id="@+id/noAppId"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/devSettingsScreenUserAgentNoAppId" />
+        app:label="@string/devSettingsScreenUserAgentNoAppId" />
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
         android:id="@+id/noVersion"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/devSettingsScreenUserAgentNoVersion" />
+        app:label="@string/devSettingsScreenUserAgentNoVersion" />
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
         android:id="@+id/chrome"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/devSettingsScreenUserAgentChrome" />
+        app:label="@string/devSettingsScreenUserAgentChrome" />
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
         android:id="@+id/duckDuckGo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/devSettingsScreenUserAgentDuckDuckGo" />
+        app:label="@string/devSettingsScreenUserAgentDuckDuckGo" />
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
         android:id="@+id/firefox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/devSettingsScreenUserAgentFirefox" />
+        app:label="@string/devSettingsScreenUserAgentFirefox" />
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
         android:id="@+id/webView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/devSettingsScreenUserAgentWebView" />
+        app:label="@string/devSettingsScreenUserAgentWebView" />
 
 </LinearLayout>

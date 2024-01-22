@@ -25,6 +25,6 @@
         android:id="@+id/remove"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/sync_device_menu_option_remove" />
+        app:label="@string/sync_device_menu_option_remove" />
 
 </LinearLayout>

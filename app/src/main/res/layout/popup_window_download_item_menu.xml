@@ -26,18 +26,18 @@
             android:id="@+id/share"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:primaryText="@string/downloadsItemMenuShare" />
+            app:label="@string/downloadsItemMenuShare" />
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
             android:id="@+id/delete"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:primaryText="@string/downloadsItemMenuDelete" />
+            app:label="@string/downloadsItemMenuDelete" />
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
             android:id="@+id/cancel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:primaryText="@string/downloadsItemMenuCancel" />
+            app:label="@string/downloadsItemMenuCancel" />
 
 </LinearLayout>
