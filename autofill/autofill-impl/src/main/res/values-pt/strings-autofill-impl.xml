@@ -135,4 +135,12 @@
 
     <string name="credentials_limit_warning"><b>Sincronização em pausa</b>\nLimite de inícios de sessão excedido. Elimina alguns para retomar a sincronização.\n\n<annotation type="manage_logins">Gerir inícios de sessão</annotation></string>
     <string name="credentials_limit_warning_notif"><b>A sincronização de palavras-passe está em pausa</b>\nExcedeste o limite de sincronização de palavras-passe. Experimenta eliminar algumas palavras-passe. Não é possível fazer uma cópia de segurança das palavras-passe até este problema estar resolvido.</string>
+
+    <string name="saveLoginDialogNeverForThisSite">Nunca pedir para este site</string>
+    <string name="credentialManagementInstructionNeverForThisSite">Se repuseres os sites excluídos, ser-te-á pedido que guardes a tua palavra-passe da próxima vez que iniciares sessão num destes sites.</string>
+    <string name="credentialManagementClearNeverForThisSiteList">Repor sites excluídos</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogTitle">Repor sites excluídos?</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogPositiveButton">Reset</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Cancelar</string>
+
 </resources>

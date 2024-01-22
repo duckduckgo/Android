@@ -135,4 +135,12 @@
 
     <string name="credentials_limit_warning"><b>Sinhronizacija je začasno zaustavljena</b>\nOmejitev prijav je presežena. Izbrišite jih nekaj, če želite nadaljevati sinhronizacijo.\n\n<annotation type="manage_logins">Upravljanje prijav</annotation></string>
     <string name="credentials_limit_warning_notif"><b>Sinhronizacija gesel je začasno zaustavljena</b>\nPresegli ste omejitev za sinhronizacijo gesel. Poskusite izbrisati nekaj gesel. Dokler ta težava ne bo odpravljena, vaša gesla ne bodo varnostno kopirana.</string>
+
+    <string name="saveLoginDialogNeverForThisSite">Nikoli ne vprašaj za to spletno mesto</string>
+    <string name="credentialManagementInstructionNeverForThisSite">Če ponastavite izključena spletna mesta, boste ob naslednji prijavi na katero koli od teh spletnih mest pozvani, da shranite svojo prijavo.</string>
+    <string name="credentialManagementClearNeverForThisSiteList">Ponastavi izključena spletna mesta</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogTitle">Želite ponastaviti izključena spletna mesta?</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogPositiveButton">Ponastavi</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Prekliči</string>
+
 </resources>

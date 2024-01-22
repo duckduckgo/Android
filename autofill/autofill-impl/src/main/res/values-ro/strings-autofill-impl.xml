@@ -135,4 +135,12 @@
 
     <string name="credentials_limit_warning"><b>Sincronizare întreruptă</b>\nLimita de conectări a fost depășită. Șterge câteva pentru a relua sincronizarea.\n\n<annotation type="manage_logins">Gestionează conectările</annotation></string>
     <string name="credentials_limit_warning_notif"><b>Sincronizarea parolelor este întreruptă</b>\nAi depășit limita de sincronizare a parolelor. Încearcă să ștergi câteva parole. Până la rezolvarea acestei probleme, nu se va efectua backupul pentru parolele tale.</string>
+
+    <string name="saveLoginDialogNeverForThisSite">Nu solicita niciodată pentru acest site</string>
+    <string name="credentialManagementInstructionNeverForThisSite">Dacă resetezi site-urile excluse, ți se va solicita să îți salvezi parola data viitoare când te conectezi la oricare dintre aceste site-uri.</string>
+    <string name="credentialManagementClearNeverForThisSiteList">Resetează site-urile excluse</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogTitle">Resetezi site-urile excluse?</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogPositiveButton">Resetează</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Anulare</string>
+
 </resources>

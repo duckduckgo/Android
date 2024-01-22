@@ -135,4 +135,12 @@
 
     <string name="credentials_limit_warning"><b>Sinhronizācija pārtraukta</b>\nPārsniegts pieteikšanās datu ierobežojums. Izdzēsiet dažus, lai atsāktu sinhronizāciju.\n\n<annotation type="manage_logins">Pārvaldīt pieteikšanās datus</annotation></string>
     <string name="credentials_limit_warning_notif"><b>Paroļu sinhronizācija ir pārtraukta</b>\nIr pārsniegts paroļu sinhronizācijas ierobežojums. Mēģini izdzēst dažas paroles. Kamēr šī problēma nebūs atrisināta, paroles netiks dublētas.</string>
+
+    <string name="saveLoginDialogNeverForThisSite">Nekad nejautāt par šo vietni</string>
+    <string name="credentialManagementInstructionNeverForThisSite">Ja atiestatīsi izslēgtās vietnes, tev tiks piedāvāts saglabāt savus pieteikšanās datus, kad nākamreiz tajās pierakstīsies.</string>
+    <string name="credentialManagementClearNeverForThisSiteList">Atiestatīt izslēgtās vietnes</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogTitle">Atiestatīt izslēgtās vietnes?</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogPositiveButton">Atiestatīt</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Atcelt</string>
+
 </resources>

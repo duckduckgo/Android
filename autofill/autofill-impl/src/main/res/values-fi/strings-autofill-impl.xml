@@ -135,4 +135,12 @@
 
     <string name="credentials_limit_warning"><b>Synkronointi keskeytetty</b>\nKirjautumisten enimmäismäärä ylitetty. Poista jotain jatkaaksesi synkronointia.\n\n<annotation type="manage_logins">Hallitse kirjautumisia</annotation></string>
     <string name="credentials_limit_warning_notif"><b>Salasanojen synkronointi on keskeytetty</b>\nOlet ylittänyt salasanojen synkronointirajan. Yritä poistaa joitakin salasanoja. Salasanojasi ei varmuuskopioida ennen kuin tämä ongelma on ratkaistu.</string>
+
+    <string name="saveLoginDialogNeverForThisSite">Älä kysy enää tällä sivustolla</string>
+    <string name="credentialManagementInstructionNeverForThisSite">Jos nollaat poissuljetut sivustot, sinua pyydetään tallentamaan salasanasi, kun seuraavan kerran kirjaudut sisään jollekin näistä sivustoista.</string>
+    <string name="credentialManagementClearNeverForThisSiteList">Nollaa poissuljetut sivustot</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogTitle">Nollataanko poissuljetut sivustot?</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogPositiveButton">Nollaa</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Peruuta</string>
+
 </resources>
