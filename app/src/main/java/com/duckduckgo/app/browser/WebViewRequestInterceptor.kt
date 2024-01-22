@@ -58,7 +58,6 @@ interface RequestInterceptor {
         webViewClientListener: WebViewClientListener?,
     ): WebResourceResponse?
 
-
     @WorkerThread
     suspend fun shouldInterceptFromServiceWorker(
         request: WebResourceRequest?,
