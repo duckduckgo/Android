@@ -1,5 +1,5 @@
 appId: com.duckduckgo.mobile.android
-name: "ReleaseTest: Can undo a deleted favorite"
+name: "ReleaseTest: Can undo a deleted bookmark"
 tags:
   - releaseTest
 ---
