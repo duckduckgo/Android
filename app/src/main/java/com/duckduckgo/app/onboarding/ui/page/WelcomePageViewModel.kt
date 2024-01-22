@@ -24,7 +24,6 @@ import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
@@ -91,7 +90,6 @@ class WelcomePageViewModel(
     }
 
     private fun notificationPermissionsRequested(): Flow<WelcomePageView.State> = flow {
-        delay(3000)
         if (notificationPermissionsFeatureToggles.noPermissionsPrompt().isEnabled()) {
             emit(WelcomePageView.State.ShowWelcomeAnimation)
         } else {
