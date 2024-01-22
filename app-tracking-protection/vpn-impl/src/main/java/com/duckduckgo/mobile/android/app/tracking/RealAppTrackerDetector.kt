@@ -16,9 +16,13 @@
 
 package com.duckduckgo.mobile.android.app.tracking
 
+import android.content.pm.PackageManager
 import android.util.LruCache
 import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.apps.VpnExclusionList
+import com.duckduckgo.mobile.android.vpn.apps.isSystemApp
 import com.duckduckgo.mobile.android.vpn.dao.VpnAppTrackerBlockingDao
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
@@ -30,6 +34,7 @@ import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerType
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
+import kotlinx.coroutines.runBlocking
 import logcat.logcat
 
 class RealAppTrackerDetector constructor(
@@ -37,17 +42,29 @@ class RealAppTrackerDetector constructor(
     private val appNameResolver: AppNameResolver,
     private val appTrackerRecorder: AppTrackerRecorder,
     private val vpnAppTrackerBlockingDao: VpnAppTrackerBlockingDao,
+    private val packageManager: PackageManager,
+    private val vpnFeaturesRegistry: VpnFeaturesRegistry,
 ) : AppTrackerDetector {
+
+    private fun isAppTpDisabled(): Boolean {
+        return runBlocking { !vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN) }
+    }
 
     // cache packageId -> app name
     private val appNamesCache = LruCache<String, AppNameResolver.OriginatingApp>(100)
 
     override fun evaluate(domain: String, uid: Int): AppTrackerDetector.AppTracker? {
-        // `null` means unknown package ID, do not block
+        // Check if AppTP is enabled first
+        if (isAppTpDisabled()) {
+            logcat { "App tracker detector is DISABLED" }
+            return null
+        }
+
+        // `null` package ID means unknown app, return null to not block
         val packageId = appNameResolver.getPackageIdForUid(uid) ?: return null
 
-        if (VpnExclusionList.isDdgApp(packageId)) {
-            logcat { "shouldAllowDomain: DDG app is always allowed" }
+        if (VpnExclusionList.isDdgApp(packageId) || packageId.isInExclusionList()) {
+            logcat { "shouldAllowDomain: $packageId is excluded, allowing packet" }
             return null
         }
 
@@ -92,23 +109,42 @@ class RealAppTrackerDetector constructor(
             return rule.packageNames.contains(packageId)
         } ?: false
     }
+
+    private fun String.isInExclusionList(): Boolean {
+        if (packageManager.getApplicationInfo(this, 0).isSystemApp()) {
+            // if system app is NOT overridden, it means it's in the exclusion list
+            if (!appTrackerRepository.getSystemAppOverrideList().map { it.packageId }.contains(this)) {
+                return true
+            }
+        }
+
+        return appTrackerRepository.getManualAppExclusionList().firstOrNull { it.packageId == this }?.let {
+            // if app is defined as "unprotected" by the user, then it is in exclusion list
+            return !it.isProtected
+            // else, app is in the exclusion list
+        } ?: appTrackerRepository.getAppExclusionList().map { it.packageId }.contains(this)
+    }
 }
 
-@ContributesTo(VpnScope::class)
+@ContributesTo(scope = VpnScope::class)
 @Module
 object AppTrackerDetectorModule {
     @Provides
-    fun provideAppTrackerDetector(
+    fun provideAppTrackerDetectorModule(
         appTrackerRepository: AppTrackerRepository,
         appNameResolver: AppNameResolver,
         appTrackerRecorder: AppTrackerRecorder,
         vpnDatabase: VpnDatabase,
+        packageManager: PackageManager,
+        vpnFeaturesRegistry: VpnFeaturesRegistry,
     ): AppTrackerDetector {
         return RealAppTrackerDetector(
             appTrackerRepository = appTrackerRepository,
             appNameResolver = appNameResolver,
             appTrackerRecorder = appTrackerRecorder,
             vpnAppTrackerBlockingDao = vpnDatabase.vpnAppTrackerBlockingDao(),
+            packageManager = packageManager,
+            vpnFeaturesRegistry = vpnFeaturesRegistry,
         )
     }
 }
