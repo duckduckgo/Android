@@ -84,7 +84,7 @@ jobs:
       - name: Create Asana task in Android App project
         if: ${{ steps.update-check.outcome == 'failure' }}
         id: create-task
-        uses: duckduckgo/native-github-asana-sync@v1.0
+        uses: duckduckgo/native-github-asana-sync@v1.1
         with:
           asana-pat: ${{ secrets.GH_ASANA_SECRET }}
           asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
