@@ -34,14 +34,10 @@ constructor(
 
     init {
         val cornderRadius = resources.getDimension(R.dimen.mediumShapeCornerRadius)
-        val cornerSize = resources.getDimension(R.dimen.daxBubbleDialogEdge)
-        val distanceFromEdge = resources.getDimension(R.dimen.daxBubbleDialogDistanceFromEdge)
-        val edgeTreatment = DaxBubbleEdgeTreatment(cornerSize, distanceFromEdge)
 
         setCardBackgroundColor(ColorStateList.valueOf(context.getColorFromAttr(R.attr.daxColorSurface)))
         shapeAppearanceModel = ShapeAppearanceModel.builder()
             .setAllCornerSizes(cornderRadius)
-            .setTopEdge(edgeTreatment)
             .build()
     }
 }

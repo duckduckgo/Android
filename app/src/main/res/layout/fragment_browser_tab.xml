@@ -23,6 +23,13 @@
 
     <include layout="@layout/include_omnibar_toolbar" />
 
+    <androidx.appcompat.widget.AppCompatImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:src="@drawable/background_mosque"
+        android:scaleType="centerCrop"/>
+
     <FrameLayout
         android:id="@+id/webViewFullScreenContainer"
         android:layout_width="match_parent"

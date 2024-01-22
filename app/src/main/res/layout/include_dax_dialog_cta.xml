@@ -24,21 +24,24 @@
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/logo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/keyline_5"
+        android:layout_width="78dp"
+        android:layout_height="78dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:elevation="1000dp"
         app:srcCompat="@drawable/ic_dax_icon" />
 
     <com.duckduckgo.common.ui.view.shape.DaxBubbleCardView
         android:id="@+id/cardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/keyline_4"
+        android:layout_marginHorizontal="@dimen/keyline_4"
+        android:layout_marginBottom="@dimen/keyline_4"
+        android:layout_marginTop="39dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/logo"
+        app:layout_constraintTop_toTopOf="@id/logo"
         app:layout_constraintWidth_max="600dp">
 
         <FrameLayout
@@ -51,6 +54,7 @@
                 android:id="@+id/hiddenTextCta"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginVertical="30dp"
                 android:paddingBottom="@dimen/keyline_1"
                 android:visibility="invisible"
                 app:typography="body1"
@@ -62,6 +66,7 @@
                 style="@style/Typography.DuckDuckGo.Body1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginVertical="30dp"
                 android:clickable="true"
                 android:focusable="true"
                 android:textColor="?attr/daxColorPrimaryText" />
