@@ -1,4 +1,4 @@
-appId: com.duckduckgo.mobile.android
+appId: com.duckduckgo.mobile.android.debug
 name: "ReleaseTest: Can undo a deleted favorite"
 tags:
   - releaseTest
@@ -19,41 +19,30 @@ tags:
 - tapOn:
     text: "got it"
 - tapOn:
-    id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
-- assertVisible:
-    text: "add bookmark"
+    id: "com.duckduckgo.mobile.android.debug:id/browserMenuImageView"
 - tapOn:
     text: "add bookmark"
-# Add favorite from edit saved site
-- tapOn:
-    id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
-- assertVisible:
-    text: "edit bookmark"
-- tapOn:
-    text: "edit bookmark"
-- assertVisible:
-    text: "add to favorites"
-- tapOn:
-    text: "add to favorites"
-- tapOn:
-    id: "com.duckduckgo.mobile.android:id/action_confirm_changes"
 # Navigate to bookmarks screen
 - tapOn:
-    id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
-- assertVisible:
-    text: "bookmarks"
+    id: "com.duckduckgo.mobile.android.debug:id/browserMenuImageView"
 - tapOn:
     text: "bookmarks"
-# Remove bookmark from bookmarks screen
+# Add favorite from bookmarks screen
 - tapOn:
-    id: "com.duckduckgo.mobile.android:id/trailingIcon"
+    id: "com.duckduckgo.mobile.android.debug:id/trailingIcon"
     index: 0
+- tapOn:
+    text: "add to favorites"
 - assertVisible:
-    text: "Delete"
+    id: "com.duckduckgo.mobile.android.debug:id/favoriteStar"
+# Remove favorite from bookmarks screen
+- tapOn:
+    id: "com.duckduckgo.mobile.android.debug:id/trailingIcon"
+    index: 0
 - tapOn:
     text: "delete"
-# Undo remove bookmark from bookmarks screen
+# Undo remove favorite from bookmarks screen
 - tapOn:
-    id: "com.duckduckgo.mobile.android:id/snackbar_action"
+    id: "com.duckduckgo.mobile.android.debug:id/snackbar_action"
 - assertNotVisible:
     text: "No bookmarks added yet"
