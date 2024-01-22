@@ -19,9 +19,9 @@ jobs:
         id: create-task
         uses: duckduckgo/native-github-asana-sync@feature/david/prevent_duplicate_task_creation
         with:
-          asana-pat: ${{ secrets.GH_ASANA_SECRET }}
-          asana-project: 1174433894299346
-          asana-section: 1202853880411179
+          asana-pat: ${{ vars.GH_ASANA_PLAYGROUND_PAT }}
+          asana-project: ${{ vars.GH_ASANA_PLAYGROUND_PROJECT_ID }}
+          asana-section: ${{ vars.GH_ASANA_PLAYGROUND_SECTION_ID }}
           asana-task-name: Update content scope scripts to version 10
           asana-task-description: |
             Content scope scripts have been updated and a PR created.
@@ -32,11 +32,11 @@ jobs:
           action: 'create-asana-task'
 
       - name: Add Asana task to Release Board project
-        if: ${{ steps.create-task.outputs.updated == 'false' }}
+        if: ${{ steps.create-task.outputs.duplicate == 'false' }}
         uses: duckduckgo/native-github-asana-sync@v1.0
         with:
-          asana-pat: ${{ secrets.GH_ASANA_SECRET }}
-          asana-project: 1174433894299346
-          asana-section: 1202853880411179
+          asana-pat: ${{ vars.GH_ASANA_PLAYGROUND_PAT }}
+          asana-project: ${{ vars.GH_ASANA_PLAYGROUND_PROJECT_ID }}
+          asana-section: ${{ vars.GH_ASANA_PLAYGROUND_SECTION_ID }}
           asana-task-id: ${{ steps.create-task.outputs.taskId }}
           action: 'add-task-asana-project'
