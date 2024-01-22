@@ -22,6 +22,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.registerNotExportedReceiver
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
@@ -66,7 +67,7 @@ class SendTrackerDebugReceiver @Inject constructor(
         }
 
         logcat { "Debug receiver SendTrackerDebugReceiver registered" }
-        context.registerReceiver(this, IntentFilter(INTENT_ACTION))
+        context.registerNotExportedReceiver(this, IntentFilter(INTENT_ACTION))
     }
 
     private fun unregister() {

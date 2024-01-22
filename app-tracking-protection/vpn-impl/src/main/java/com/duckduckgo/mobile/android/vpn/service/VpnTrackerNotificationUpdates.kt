@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.notification.checkPermissionAndNotify
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
@@ -71,6 +72,6 @@ class VpnTrackerNotificationUpdates @Inject constructor(
         vpnNotification: VpnEnabledNotificationContentPlugin.VpnEnabledNotificationContent,
     ) {
         val notification = VpnEnabledNotificationBuilder.buildVpnEnabledUpdateNotification(context, vpnNotification)
-        notificationManager.notify(TrackerBlockingVpnService.VPN_FOREGROUND_SERVICE_ID, notification)
+        notificationManager.checkPermissionAndNotify(context, TrackerBlockingVpnService.VPN_FOREGROUND_SERVICE_ID, notification)
     }
 }

@@ -27,6 +27,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.ProcessName
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.registerNotExportedReceiver
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ReceiverScope
 import com.duckduckgo.mobile.android.vpn.Vpn
@@ -75,7 +76,10 @@ class VpnCallStateReceiver @Inject constructor(
     private val _listener: PhoneStateListener =
         object : PhoneStateListener() {
             @Deprecated("Deprecated in Java")
-            override fun onCallStateChanged(state: Int, phoneNumber: String?) {
+            override fun onCallStateChanged(
+                state: Int,
+                phoneNumber: String?,
+            ) {
                 appCoroutineScope.launch(dispatcherProvider.io()) {
                     logcat { "Call state: $state" }
                     if (state == TelephonyManager.CALL_STATE_IDLE) {
@@ -128,12 +132,14 @@ class VpnCallStateReceiver @Inject constructor(
                     registerListener()
                 }
             }
+
             ACTION_UNREGISTER_STATE_CALL_LISTENER -> {
                 logcat { "ACTION_UNREGISTER_STATE_CALL_LISTENER" }
                 goAsync(pendingResult) {
                     unregisterListener()
                 }
             }
+
             else -> {
                 logcat { "Unknown action ${intent.action}" }
             }
@@ -155,7 +161,7 @@ class VpnCallStateReceiver @Inject constructor(
     private fun register() {
         unregister()
         logcat { "Registering vpn call state receiver" }
-        context.registerReceiver(
+        context.registerNotExportedReceiver(
             this,
             IntentFilter().apply {
                 addAction(ACTION_REGISTER_STATE_CALL_LISTENER)

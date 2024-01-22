@@ -23,6 +23,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.notification.checkPermissionAndNotify
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
@@ -135,7 +136,8 @@ class SyncRemoteFeatureToggle @Inject constructor(
 
     private fun triggerNotification() {
         val showSync = showSync()
-        notificationManager.notify(
+        notificationManager.checkPermissionAndNotify(
+            context,
             SYNC_PAUSED_NOTIFICATION_ID,
             syncNotificationBuilder.buildSyncPausedNotification(context, addNavigationIntent = showSync),
         )

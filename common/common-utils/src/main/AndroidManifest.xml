@@ -22,5 +22,6 @@
         android:targetPackage="com.duckduckgo.common.utils"
         android:label="Test for common"
         />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
 </manifest>
