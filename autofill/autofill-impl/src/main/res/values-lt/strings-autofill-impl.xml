@@ -135,4 +135,12 @@
 
     <string name="credentials_limit_warning"><b>Sinchronizavimas pristabdytas</b>\nViršyta prisijungimų riba. Ištrinkite kai kuriuos, kad tęstumėte sinchronizavimą.\n\n<annotation type="manage_logins">Valdyti prisijungimus</annotation></string>
     <string name="credentials_limit_warning_notif"><b>Slaptažodžių sinchronizavimas pristabdytas</b>\nJūs viršijote slaptažodžių sinchronizavimo ribą. Pabandykite ištrinti kai kuriuos slaptažodžius. Kol ši problema nebus išspręsta, nebus kuriamos atsarginės jūsų slaptažodžių kopijos.</string>
+
+    <string name="saveLoginDialogNeverForThisSite">Niekada neklauskite šioje svetainėje</string>
+    <string name="credentialManagementInstructionNeverForThisSite">Jei iš naujo nustatysite neįtrauktas svetaines, kitą kartą, kai prisijungsite prie bet kurios iš šių svetainių, būsite paraginti išsaugoti savo slaptažodį.</string>
+    <string name="credentialManagementClearNeverForThisSiteList">Iš naujo nustatyti neįtrauktas svetaines</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogTitle">Iš naujo nustatyti neįtrauktas svetaines?</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogPositiveButton">Nustatyti iš naujo</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Atšaukti</string>
+
 </resources>

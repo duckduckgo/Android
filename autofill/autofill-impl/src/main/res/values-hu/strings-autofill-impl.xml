@@ -135,4 +135,12 @@
 
     <string name="credentials_limit_warning"><b>A szinkronizálás szünetel</b>\nTúllépted a bejelentkezések maximális számát. A szinkronizálás folytatásához törölj néhányat.\n\n<annotation type="manage_logins">Bejelentkezések kezelése</annotation></string>
     <string name="credentials_limit_warning_notif"><b>A jelszavak szinkronizálása szünetel</b>\nTúllépted a szinkronizálandó jelszavak maximális számát. Próbálj törölni néhány jelszót. Amíg ezt nem sikerül megoldani, a jelszavakról nem készül biztonsági másolat.</string>
+
+    <string name="saveLoginDialogNeverForThisSite">Soha ne kérdezzen rá ennél a webhelynél</string>
+    <string name="credentialManagementInstructionNeverForThisSite">A kizárt webhelyek visszaállítása esetén a rendszer a jelszavad mentését kéri, amikor legközelebb bejelentkezel ezen webhelyek bármelyikére.</string>
+    <string name="credentialManagementClearNeverForThisSiteList">Kizárt webhelyek visszaállítása</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogTitle">Kizárt webhelyek visszaállítása?</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogPositiveButton">Visszaállítás</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Mégsem</string>
+
 </resources>

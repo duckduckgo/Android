@@ -135,4 +135,12 @@
 
     <string name="credentials_limit_warning"><b>Synkronisering pausad</b>\nGränsen för antalet inloggningar har överskridits. Ta bort några för att återuppta synkronisering.\n\n<annotation type="manage_logins">Hantera inloggningar</annotation></string>
     <string name="credentials_limit_warning_notif"><b>Synkronisering av lösenord pausad</b>\nDu har överskridit gränsen för antalet lösenords som kan synkroniseras. Ta bort några lösenord. Dina lösenord kommer inte att säkerhetskopieras förrän detta har åtgärdats.</string>
+
+    <string name="saveLoginDialogNeverForThisSite">Fråga aldrig för den här webbplatsen</string>
+    <string name="credentialManagementInstructionNeverForThisSite">Om du återställer exkluderade webbplatser kommer du att uppmanas att spara ditt lösenord nästa gång du loggar in på någon av dessa webbplatser.</string>
+    <string name="credentialManagementClearNeverForThisSiteList">Återställ exkluderade webbplatser</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogTitle">Återställ exkluderade webbplatser?</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogPositiveButton">Återställ</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Avbryt</string>
+
 </resources>

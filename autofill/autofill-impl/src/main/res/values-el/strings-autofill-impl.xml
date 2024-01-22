@@ -135,4 +135,12 @@
 
     <string name="credentials_limit_warning"><b>Ο Συγχρονισμός τέθηκε σε παύση</b>\nΥπέρβαση του ορίου συνδέσεων. Διαγραφή ορισμένων για συνέχιση του συγχρονισμού.\n\n<annotation type="manage_logins">Διαχείριση συνδέσεων</annotation></string>
     <string name="credentials_limit_warning_notif"><b>Ο Συγχρονισμός κωδικών πρόσβασης τέθηκε σε παύση</b>\nΈχετε υπερβεί το όριο συγχρονισμού κωδικών πρόσβασης. Προσπαθήστε να διαγράψετε κάποιους κωδικούς πρόσβασης. Μέχρι να επιλυθεί το πρόβλημα αυτό, δεν θα δημιουργηθούν αντίγραφα ασφάλειας για τους κωδικούς πρόσβασής σας.</string>
+
+    <string name="saveLoginDialogNeverForThisSite">Μην ζητάτε ποτέ αυτόν τον ιστότοπο</string>
+    <string name="credentialManagementInstructionNeverForThisSite">Εάν κάνετε επαναφορά των αποκλεισμένων ιστότοπων, θα σας ζητηθεί να αποθηκεύσετε τον κωδικό πρόσβασής σας την επόμενη φορά που θα συνδεθείτε σε οποιονδήποτε από τους ιστότοπους αυτούς.</string>
+    <string name="credentialManagementClearNeverForThisSiteList">Επαναφορά αποκλεισμένων ιστότοπων</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogTitle">Επαναφορά αποκλεισμένων ιστότοπων;</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogPositiveButton">Επαναφορά</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Ακύρωση</string>
+
 </resources>

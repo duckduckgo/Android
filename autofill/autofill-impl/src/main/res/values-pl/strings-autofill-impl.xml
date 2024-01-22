@@ -135,4 +135,12 @@
 
     <string name="credentials_limit_warning"><b>Synchronizacja wstrzymana</b>\nPrzekroczono limit logowań. Usuń niektóre, aby wznowić synchronizację.\n\n<annotation type="manage_logins">Zarządzaj loginami</annotation></string>
     <string name="credentials_limit_warning_notif"><b>Synchronizacja haseł wstrzymana</b>\nPrzekroczono limit synchronizacji haseł. Spróbuj usunąć niektóre hasła. Dopóki ten problem nie zostanie rozwiązany, nie będzie tworzona kopia zapasowa haseł.</string>
+
+    <string name="saveLoginDialogNeverForThisSite">Nigdy nie pytaj o tę witrynę</string>
+    <string name="credentialManagementInstructionNeverForThisSite">Jeśli zresetujesz wykluczone witryny, przy następnym logowaniu do dowolnej z nich pojawi się monit o zapisanie hasła.</string>
+    <string name="credentialManagementClearNeverForThisSiteList">Resetowanie wykluczonych witryn</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogTitle">Zresetować wykluczone witryny?</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogPositiveButton">Resetowanie</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Anuluj</string>
+
 </resources>

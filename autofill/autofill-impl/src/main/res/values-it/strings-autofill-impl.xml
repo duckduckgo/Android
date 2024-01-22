@@ -135,4 +135,12 @@
 
     <string name="credentials_limit_warning"><b>Sincronizzazione interrotta</b>\nLimite di accessi superato. Eliminane alcuni per riprendere la sincronizzazione.\n\n<annotation type="manage_logins">Gestisci gli accessi</annotation></string>
     <string name="credentials_limit_warning_notif"><b>La sincronizzazione con password è sospesa</b>\nHai superato il limite di sincronizzazione con password. Prova a eliminare qualche password. Fino a quando il problema non verrà risolto, non sarà eseguito il backup delle password.</string>
+
+    <string name="saveLoginDialogNeverForThisSite">Non chiedere mai per questo sito</string>
+    <string name="credentialManagementInstructionNeverForThisSite">Se ripristini i siti esclusi, ti verrà richiesto di salvare la password la prossima volta che accederai a uno di questi siti.</string>
+    <string name="credentialManagementClearNeverForThisSiteList">Ripristina siti esclusi</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogTitle">Ripristinare i siti esclusi?</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogPositiveButton">Ripristina</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Annulla</string>
+
 </resources>

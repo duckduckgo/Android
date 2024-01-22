@@ -135,4 +135,12 @@
 
     <string name="credentials_limit_warning"><b>Synchronisierung angehalten</b>\nAnmeldelimit überschritten. Lösche Lesezeichen, um die Synchronisierung fortzusetzen.\n\n<annotation type="manage_logins">Anmeldedaten verwalten</annotation></string>
     <string name="credentials_limit_warning_notif"><b>Die Passwort-Synchronisierung wurde pausiert</b>\nDu hast das Limit für die Synchronisierung von Passwörtern überschritten. Versuche, einige Passwörter zu löschen. Bis dieses Problem behoben ist, werden deine Passwörter nicht gesichert.</string>
+
+    <string name="saveLoginDialogNeverForThisSite">Für diese Website niemals fragen</string>
+    <string name="credentialManagementInstructionNeverForThisSite">Wenn du die ausgeschlossenen Websites zurücksetzt, wirst du aufgefordert, dein Passwort zu speichern, wenn du dich das nächste Mal auf einer dieser Websites anmeldest.</string>
+    <string name="credentialManagementClearNeverForThisSiteList">Ausgeschlossene Websites zurücksetzen</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogTitle">Ausgeschlossene Websites zurücksetzen?</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogPositiveButton">Zurücksetzen</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Abbrechen</string>
+
 </resources>

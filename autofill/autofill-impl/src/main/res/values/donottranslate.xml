@@ -15,11 +15,5 @@
   -->
 
 <resources>
-    <string name="saveLoginDialogNeverForThisSite">Never Ask for This Site</string>
-    <string name="credentialManagementInstructionNeverForThisSite">If you reset excluded sites, you will be prompted to save your password next time you sign in to any of these sites.</string>
-    <string name="credentialManagementClearNeverForThisSiteList">Reset Excluded Sites</string>
-    <string name="credentialManagementClearNeverForThisSiteDialogTitle">Reset Excluded Sites?</string>
-    <string name="credentialManagementClearNeverForThisSiteDialogPositiveButton">Reset</string>
-    <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Cancel</string>
 
 </resources>
