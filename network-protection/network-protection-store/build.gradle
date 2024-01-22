@@ -26,8 +26,6 @@ dependencies {
     implementation project(':vpn-api')
     implementation project(path: ':common-utils')
 
-    implementation "com.jakewharton.threetenabp:threetenabp:_"
-
     implementation AndroidX.core.ktx
 
     // Room
@@ -43,4 +41,7 @@ dependencies {
 
 android {
     namespace 'com.duckduckgo.networkprotection.store'
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
+    }
 }

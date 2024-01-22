@@ -247,6 +247,7 @@ class SyncServiceRemote @Inject constructor(
         updates: JSONObject,
     ): Result<JSONObject> {
         Timber.i("Sync-service: patch request $updates")
+
         val response = runCatching {
             val patchCall = syncService.patch("Bearer $token", updates)
             patchCall.execute()

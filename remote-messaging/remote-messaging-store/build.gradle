@@ -34,14 +34,15 @@ android {
         test.assets.srcDirs += files("$projectDir/schemas".toString())
     }
     namespace 'com.duckduckgo.remote.messaging.store'
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
+    }
 }
 
 dependencies {
     implementation AndroidX.room.ktx
     ksp AndroidX.room.compiler
-    implementation "com.jakewharton.threetenabp:threetenabp:_"
 
     testImplementation project(path: ':common-test')
-    testImplementation "org.threeten:threetenbp:_"
     testImplementation Testing.junit4
 }

@@ -19,9 +19,9 @@ package com.duckduckgo.experiments.impl.di
 import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.experiments.impl.store.ALL_MIGRATIONS
 import com.duckduckgo.experiments.impl.store.ExperimentVariantDao
 import com.duckduckgo.experiments.impl.store.ExperimentsDatabase
-import com.duckduckgo.experiments.impl.store.ExperimentsDatabase.Companion.ALL_MIGRATIONS
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -35,8 +35,8 @@ object ExperimentsModule {
     @SingleInstanceIn(AppScope::class)
     fun providesExperimentsDatabase(context: Context): ExperimentsDatabase {
         return Room.databaseBuilder(context, ExperimentsDatabase::class.java, "experiments.db")
-            .addMigrations(*ALL_MIGRATIONS)
             .fallbackToDestructiveMigration()
+            .addMigrations(*ALL_MIGRATIONS)
             .build()
     }
 

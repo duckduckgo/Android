@@ -31,12 +31,12 @@ import com.duckduckgo.networkprotection.impl.connectionclass.ConnectionQuality.U
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
+import java.time.Instant
 import java.util.concurrent.atomic.AtomicLong
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.*
 import logcat.logcat
-import org.threeten.bp.Instant
 
 @ContributesMultibinding(VpnScope::class)
 class VpnLatencySampler @Inject constructor(

@@ -32,6 +32,9 @@ android {
         }
     }
     namespace 'com.duckduckgo.saved.sites.store'
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
+    }
 }
 
 dependencies {
@@ -48,8 +51,6 @@ dependencies {
 
     implementation project(path: ':saved-sites-api')
     implementation project(path: ':common-utils')
-
-    implementation "com.jakewharton.threetenabp:threetenabp:_"
 
     testImplementation Testing.junit4
     testImplementation Testing.robolectric

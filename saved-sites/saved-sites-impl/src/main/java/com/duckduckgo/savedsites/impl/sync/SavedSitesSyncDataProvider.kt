@@ -41,6 +41,7 @@ class SavedSitesSyncDataProvider @Inject constructor(
     private val syncCrypto: SyncCrypto,
     private val savedSitesFormFactorSyncMigration: SavedSitesFormFactorSyncMigration,
 ) : SyncableDataProvider {
+    override fun getType(): SyncableType = BOOKMARKS
 
     override fun getChanges(): SyncChangesRequest {
         savedSitesSyncStore.startTimeStamp = DatabaseDateFormatter.iso8601()

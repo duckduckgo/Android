@@ -29,7 +29,7 @@
     <!-- Settings screen -->
     <string name="sync_screen_title">Sync &amp; Backup</string>
     <string name="sync_setup_begin_syncing">Begin Syncing</string>
-    <string name="sync_setup_with_another_device_cta_title">Sync with Another Device</string>
+    <string name="sync_setup_with_another_device_cta_title">Sync With Another Device</string>
     <string name="sync_setup_with_another_device_cta_subtitle">Securely sync bookmarks and passwords between your devices.</string>
     <string name="sync_off_hint">Your data is end-to-end encrypted, and DuckDuckGo does not have access to the encryption key.</string>
     <string name="sync_setup_single_device_title">Single-Device Setup</string>
@@ -61,7 +61,7 @@
 
     <!-- Connect screen -->
     <string name="connect_screen_title">Scan QR Code</string>
-    <string name="connect_screen_scan_qr_hint">Go to <b>Settings > Sync &amp; Back Up</b> in the DuckDuckGo Browser on another device and select \"Sync with Another Device.\"</string>
+    <string name="connect_screen_scan_qr_hint">Go to <b>Settings > Sync &amp; Back Up</b> in the DuckDuckGo Browser on another device and select \"Sync With Another Device.\"</string>
     <string name="connect_screen_enter_code_cta">Or Manually Enter Code</string>
     <string name="connect_screen_connect_qr_hint_title">Mobile-to-Mobile?</string>
     <string name="connect_screen_connect_qr_hint_content">Scan this code with another device to sync.</string>
@@ -83,7 +83,7 @@
     <string name="sync_code_box_description">Anyone with access to this code can access your synced data, so please keep it in a safe place.</string>
 
     <!-- Device synced screen -->
-    <string name="sync_connected_device_title">Your Data is Synced!</string>
+    <string name="sync_connected_device_title">Your data is synced!</string>
     <string name="sync_connected_device_primary_button">Done</string>
 
     <string name="show_qr_screen_title">Show QR Code</string>

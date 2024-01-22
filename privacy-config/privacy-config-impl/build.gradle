@@ -41,7 +41,6 @@ dependencies {
     implementation Google.android.material
     implementation AndroidX.constraintLayout
     implementation JakeWharton.timber
-    implementation "com.jakewharton.threetenabp:threetenabp:_"
 
     implementation KotlinX.coroutines.core
 
@@ -72,7 +71,6 @@ dependencies {
     testImplementation "androidx.test:runner:_"
     testImplementation Testing.robolectric
     testImplementation CashApp.turbine
-    testImplementation "org.threeten:threetenbp:_"
 
     androidTestImplementation project(path: ':common-test')
     testImplementation project(path: ':common-test')
@@ -88,5 +86,8 @@ android {
         }
     }
   namespace 'com.duckduckgo.privacy.config.impl'
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
+    }
 }
 

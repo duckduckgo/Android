@@ -60,9 +60,6 @@ dependencies {
     
     implementation AndroidX.core.ktx
 
-    implementation "com.jakewharton.threetenabp:threetenabp:_"
-    testImplementation "org.threeten:threetenbp:_"
-
     testImplementation Testing.junit4
     androidTestImplementation AndroidX.test.runner
     androidTestImplementation AndroidX.test.rules
@@ -73,4 +70,7 @@ android {
         generateDaggerFactories = true // default is false
     }
     namespace 'com.duckduckgo.app.statistics'
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
+    }
 }

@@ -24,9 +24,9 @@ import com.duckduckgo.adclick.impl.pixels.AdClickPixelParameters.AD_CLICK_PAGELO
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import java.time.Instant
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import org.threeten.bp.Instant
 
 interface AdClickPixels {
     fun fireAdClickActivePixel(exemption: Exemption?): Boolean

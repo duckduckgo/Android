@@ -20,8 +20,10 @@ import com.duckduckgo.sync.api.SyncCrypto
 import com.duckduckgo.sync.crypto.DecryptResult
 import com.duckduckgo.sync.crypto.EncryptResult
 import com.duckduckgo.sync.crypto.SyncLib
-import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.error.SyncOperationErrorRecorder
 import com.duckduckgo.sync.store.SyncStore
+import com.duckduckgo.sync.store.model.SyncOperationErrorType.DATA_DECRYPT
+import com.duckduckgo.sync.store.model.SyncOperationErrorType.DATA_ENCRYPT
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
 import org.junit.Before
@@ -36,64 +38,64 @@ class SyncCryptoTest {
 
     private val nativeLib: SyncLib = mock()
     private val syncStore: SyncStore = mock()
-    private val syncPixels: SyncPixels = mock()
+    private val recorder: SyncOperationErrorRecorder = mock()
 
     private lateinit var syncCrypto: SyncCrypto
 
     @Before
     fun setup() {
-        syncCrypto = RealSyncCrypto(nativeLib, syncStore, syncPixels)
+        syncCrypto = RealSyncCrypto(nativeLib, syncStore, recorder)
     }
 
-    @Test
-    fun whenEncryptFailsThenPixelIsSentAndResultIsEmpty() {
+    @Test(expected = java.lang.Exception::class)
+    fun whenEncryptFailsThenResultIsEmpty() {
         whenever(nativeLib.encryptData(any(), any())).thenReturn(EncryptResult(1, "not encrypted"))
 
         val result = syncCrypto.encrypt("something")
 
-        verify(syncPixels).fireEncryptFailurePixel()
+        verify(recorder).record(DATA_ENCRYPT)
 
         assertTrue(result.isEmpty())
     }
 
     @Test
-    fun whenEncryptSucceedsThenPixelIsNotSentAndResultIsEncrypted() {
+    fun whenEncryptSucceedsThenResultIsEncrypted() {
         whenever(nativeLib.encryptData(any(), any())).thenReturn(EncryptResult(0L, "not encrypted"))
 
         val result = syncCrypto.encrypt("something")
 
-        verifyNoInteractions(syncPixels)
+        verifyNoInteractions(recorder)
 
         assertFalse(result.isEmpty())
     }
 
-    @Test
-    fun whenDecryptFailsThenPixelIsSentAndResultIsEmpty() {
+    @Test(expected = java.lang.Exception::class)
+    fun whenDecryptFailsThenResultIsEmpty() {
         whenever(nativeLib.decryptData(any(), any())).thenReturn(DecryptResult(1, "not decrypted"))
 
         val result = syncCrypto.decrypt("something")
 
-        verify(syncPixels).fireDecryptFailurePixel()
+        verify(recorder).record(DATA_DECRYPT)
 
         assertTrue(result.isEmpty())
     }
 
     @Test
-    fun whenDecryptSucceedsThenPixelIsNotSentAndResultIsDecrypted() {
+    fun whenDecryptSucceedsThenResultIsDecrypted() {
         whenever(nativeLib.decryptData(any(), any())).thenReturn(DecryptResult(0L, "not decrypted"))
 
         val result = syncCrypto.decrypt("something")
 
-        verifyNoInteractions(syncPixels)
+        verifyNoInteractions(recorder)
 
         assertFalse(result.isEmpty())
     }
 
     @Test
-    fun whenDataToDecryptIsEmptyThenPixelIsNotSentAndResultIsEmpty() {
+    fun whenDataToDecryptIsEmptyThenResultIsEmpty() {
         val result = syncCrypto.decrypt("")
 
-        verifyNoInteractions(syncPixels)
+        verifyNoInteractions(recorder)
 
         assertTrue(result.isEmpty())
     }

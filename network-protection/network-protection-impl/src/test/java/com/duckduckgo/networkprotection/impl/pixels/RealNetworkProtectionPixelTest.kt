@@ -21,6 +21,7 @@ import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.duckduckgo.networkprotection.impl.cohort.NetpCohortStore
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_ENABLE_UNIQUE
+import java.time.LocalDate
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
@@ -29,7 +30,6 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import org.threeten.bp.LocalDate
 
 class RealNetworkProtectionPixelTest {
     @Mock

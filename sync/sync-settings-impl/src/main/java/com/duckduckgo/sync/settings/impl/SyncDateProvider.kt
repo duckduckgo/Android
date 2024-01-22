@@ -16,8 +16,8 @@
 
 package com.duckduckgo.sync.settings.impl
 
-import org.threeten.bp.*
-import org.threeten.bp.format.*
+import java.time.*
+import java.time.format.*
 
 class SyncDateProvider {
     companion object {

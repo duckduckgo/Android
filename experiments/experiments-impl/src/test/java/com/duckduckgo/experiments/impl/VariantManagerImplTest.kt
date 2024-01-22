@@ -18,8 +18,8 @@ package com.duckduckgo.experiments.impl
 
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.experiments.api.VariantConfig
+import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.experiments.impl.store.ExperimentVariantEntity
-import java.util.Locale
 import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -30,24 +30,27 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-class ExperimentationVariantManagerTest {
+class VariantManagerImplTest {
 
-    private lateinit var testee: VariantManagerImpl
+    private lateinit var testee: VariantManager
 
     private val mockRandomizer: IndexRandomizer = mock()
     private val appBuildConfig: AppBuildConfig = mock()
     private val activeVariants = mutableListOf<Variant>()
     private val mockExperimentVariantRepository: ExperimentVariantRepository = mock()
+    private val mockExperimentFiltersManager: ExperimentFiltersManager = mock()
 
     @Before
     fun setup() {
         // mock randomizer always returns the first active variant
         whenever(mockRandomizer.random(any())).thenReturn(0)
+        whenever(mockExperimentFiltersManager.addFilters(any())).thenReturn { true }
 
         testee = VariantManagerImpl(
             mockRandomizer,
             appBuildConfig,
             mockExperimentVariantRepository,
+            mockExperimentFiltersManager,
         )
     }
 
@@ -162,28 +165,6 @@ class ExperimentationVariantManagerTest {
     }
 
     @Test
-    fun whenVariantDoesNotComplyWithFiltersThenDefaultVariantIsPersisted() {
-        val locale = Locale("en", "US")
-        Locale.setDefault(locale)
-        addActiveVariantToConfig(localeFilter = listOf("de_DE"))
-
-        testee.getVariantKey()
-
-        verify(mockExperimentVariantRepository).updateVariant("")
-    }
-
-    @Test
-    fun whenVariantDoesComplyWithFiltersThenNewVariantKeyIsAllocatedAndPersisted() {
-        val locale = Locale("en", "US")
-        Locale.setDefault(locale)
-        addActiveVariantToConfig(localeFilter = listOf("en_US"))
-
-        testee.getVariantKey()
-
-        verify(mockExperimentVariantRepository).updateVariant("foo")
-    }
-
-    @Test
     fun whenReferrerVariantSetWithNoActiveVariantsThenReferrerVariantReturned() {
         val referrerVariantKey = "xx"
         mockUpdateScenario(referrerVariantKey)
@@ -220,8 +201,8 @@ class ExperimentationVariantManagerTest {
         assertEquals("xx", newVariant)
     }
 
-    private fun addActiveVariantToConfig(variantKey: String = "foo", weight: Double = 1.0, localeFilter: List<String> = emptyList()) {
-        val testVariantEntity = ExperimentVariantEntity(variantKey, weight, localeFilter)
+    private fun addActiveVariantToConfig(variantKey: String = "foo", weight: Double = 1.0) {
+        val testVariantEntity = ExperimentVariantEntity(variantKey, weight)
         whenever(mockExperimentVariantRepository.getActiveVariants()).thenReturn(listOf(testVariantEntity))
 
         testee.saveVariants(listOf(VariantConfig(variantKey)))

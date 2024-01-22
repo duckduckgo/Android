@@ -40,7 +40,6 @@ dependencies {
     implementation AndroidX.room.rxJava2
     implementation AndroidX.room.ktx
     implementation AndroidX.room.rxJava2
-    implementation "com.jakewharton.threetenabp:threetenabp:_"
 
     testImplementation project(':common-test')
     testImplementation Testing.junit4
@@ -48,7 +47,6 @@ dependencies {
     testImplementation AndroidX.test.ext.junit
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.robolectric
-    testImplementation "org.threeten:threetenbp:_"
 }
 
 android {
@@ -56,4 +54,7 @@ android {
         generateDaggerFactories = true // default is false
     }
   namespace 'com.duckduckgo.app.anr'
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
+    }
 }

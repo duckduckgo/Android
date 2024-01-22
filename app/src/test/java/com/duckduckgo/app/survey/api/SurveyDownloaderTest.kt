@@ -23,6 +23,7 @@ import com.duckduckgo.app.survey.model.Survey.Status.SCHEDULED
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.networkprotection.impl.cohort.NetpCohortStore
+import java.time.LocalDate
 import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody
 import okhttp3.ResponseBody.Companion.toResponseBody
@@ -31,7 +32,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.*
-import org.threeten.bp.LocalDate
 import retrofit2.Call
 import retrofit2.Response
 

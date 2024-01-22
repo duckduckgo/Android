@@ -22,9 +22,9 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import java.time.Instant
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import org.threeten.bp.Instant
 
 interface VpnStore {
     fun onboardingDidShow()

@@ -35,9 +35,6 @@ dependencies {
     implementation project(path: ':common-utils')
     implementation project(':broken-site-api')
 
-    implementation "com.jakewharton.threetenabp:threetenabp:_"
-    testImplementation "org.threeten:threetenbp:_"
-
     testImplementation Testing.junit4
 }
 android {
@@ -52,4 +49,7 @@ android {
         test.assets.srcDirs += files("$projectDir/schemas".toString())
     }
     namespace 'com.duckduckgo.brokensite.store'
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
+    }
 }
