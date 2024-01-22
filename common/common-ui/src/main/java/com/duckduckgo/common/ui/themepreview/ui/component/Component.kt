@@ -40,6 +40,7 @@ enum class Component {
     IMAGE,
     SEARCH_BAR,
     MENU_ITEM,
+    POPUP_MENU_ITEM,
     SECTION_HEADER_LIST_ITEM,
     SINGLE_LINE_LIST_ITEM,
     TWO_LINE_LIST_ITEM,
