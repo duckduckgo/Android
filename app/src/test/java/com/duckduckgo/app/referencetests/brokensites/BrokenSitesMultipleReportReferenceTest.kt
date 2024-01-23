@@ -36,6 +36,7 @@ import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyConfig
 import com.duckduckgo.privacy.config.api.PrivacyConfigData
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentPixelParamsProvider
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import java.net.URLEncoder
@@ -82,6 +83,11 @@ class BrokenSitesMultipleReportReferenceTest(private val testCase: MultipleRepor
 
     private val mockBrokenSiteLastSentReport: BrokenSiteLastSentReport = mock()
 
+    private val privacyProtectionsPopupExperimentPixelParamsProvider =
+        object : PrivacyProtectionsPopupExperimentPixelParamsProvider {
+            override suspend fun getPixelParams(): Map<String, String> = emptyMap()
+        }
+
     private lateinit var testee: BrokenSiteSubmitter
 
     companion object {
@@ -122,6 +128,7 @@ class BrokenSitesMultipleReportReferenceTest(private val testCase: MultipleRepor
             mock(),
             mock(),
             mockBrokenSiteLastSentReport,
+            privacyProtectionsPopupExperimentPixelParamsProvider,
         )
     }
 
