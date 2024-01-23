@@ -35,6 +35,8 @@ import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.UNIQUE
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.DASHBOARD
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
@@ -45,6 +47,7 @@ import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentPixelParamsProvider
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsToggleUsageListener
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
@@ -65,6 +68,7 @@ class BrokenSiteViewModel @Inject constructor(
     private val unprotectedTemporary: UnprotectedTemporary,
     private val userAllowListRepository: UserAllowListRepository,
     private val protectionsToggleUsageListener: PrivacyProtectionsToggleUsageListener,
+    private val privacyProtectionsPopupExperimentPixelParamsProvider: PrivacyProtectionsPopupExperimentPixelParamsProvider,
     moshi: Moshi,
 ) : ViewModel() {
     private val jsonStringListAdapter = moshi.adapter<List<String>>(
@@ -173,12 +177,15 @@ class BrokenSiteViewModel @Inject constructor(
         val domain = getDomain() ?: return
 
         viewModelScope.launch {
+            val pixelParams = privacyProtectionsPopupExperimentPixelParamsProvider.getPixelParams()
             if (protectionsEnabled) {
                 userAllowListRepository.removeDomainFromUserAllowList(domain)
-                pixel.fire(AppPixelName.BROKEN_SITE_ALLOWLIST_REMOVE)
+                pixel.fire(AppPixelName.BROKEN_SITE_ALLOWLIST_REMOVE, pixelParams, type = COUNT)
+                pixel.fire(AppPixelName.BROKEN_SITE_ALLOWLIST_REMOVE_UNIQUE, pixelParams, type = UNIQUE)
             } else {
                 userAllowListRepository.addDomainToUserAllowList(domain)
-                pixel.fire(AppPixelName.BROKEN_SITE_ALLOWLIST_ADD)
+                pixel.fire(AppPixelName.BROKEN_SITE_ALLOWLIST_ADD, pixelParams, type = COUNT)
+                pixel.fire(AppPixelName.BROKEN_SITE_ALLOWLIST_ADD_UNIQUE, pixelParams, type = UNIQUE)
             }
 
             protectionsToggleUsageListener.onPrivacyProtectionsToggleUsed()
