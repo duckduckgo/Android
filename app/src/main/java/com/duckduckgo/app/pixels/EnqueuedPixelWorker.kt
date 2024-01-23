@@ -21,6 +21,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.work.*
 import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
@@ -30,11 +31,14 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.WEBVIEW_FULL_VE
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.WEBVIEW_VERSION
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentPixelParamsProvider
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Provider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @ContributesMultibinding(
@@ -49,6 +53,8 @@ class EnqueuedPixelWorker @Inject constructor(
     private val webViewVersionProvider: WebViewVersionProvider,
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+    private val privacyProtectionsPopupExperimentPixelParamsProvider: PrivacyProtectionsPopupExperimentPixelParamsProvider,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : MainProcessLifecycleObserver {
 
     private var launchedByFireAction: Boolean = false
@@ -75,10 +81,13 @@ class EnqueuedPixelWorker @Inject constructor(
                 put(WEBVIEW_FULL_VERSION, webViewVersionProvider.getFullVersion())
             }
         }.toMap()
-        pixel.get().fire(
-            pixel = AppPixelName.APP_LAUNCH,
-            parameters = paramsMap,
-        )
+        appCoroutineScope.launch {
+            val popupExperimentParams = privacyProtectionsPopupExperimentPixelParamsProvider.getPixelParams()
+            pixel.get().fire(
+                pixel = AppPixelName.APP_LAUNCH,
+                parameters = paramsMap + popupExperimentParams,
+            )
+        }
     }
 
     private fun isLaunchByFireAction(): Boolean {
