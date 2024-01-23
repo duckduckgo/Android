@@ -1,5 +1,6 @@
+# Test Definition: https://app.asana.com/0/1205017362573508/1205017364481021
 appId: com.duckduckgo.mobile.android
-name: "ReleaseTest: Sync can create an account"
+name: "ReleaseTest: Users can create an account"
 tags:
   - syncTest
 ---

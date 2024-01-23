@@ -1,3 +1,4 @@
+# Expected state: Sync Settings screen
 appId: com.duckduckgo.mobile.android
 ---
 - tapOn: "Recover Synced Data"
@@ -6,10 +7,10 @@ appId: com.duckduckgo.mobile.android
 - tapOn: "Paste Code"
 - extendedWaitUntil:
     visible:
-          id: "com.duckduckgo.mobile.android:id/footer_next_button"
-          enabled: true
+      id: "com.duckduckgo.mobile.android:id/footer_next_button"
+      enabled: true
     timeout: 5000
 - tapOn: "Next"
 - tapOn: "Done"
 - assertVisible:
-        id: "com.duckduckgo.mobile.android:id/qrCodeImageView"
+    id: "com.duckduckgo.mobile.android:id/qrCodeImageView"
