@@ -24,6 +24,9 @@ import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.sync.api.engine.SyncableType
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.DATA_PERSISTER_ERROR_PARAM
+import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.DATA_PROVIDER_ERROR_PARAM
+import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.ORPHANS_PRESENT
+import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.TIMESTAMP_CONFLICT
 import com.duckduckgo.sync.store.SyncDatabase
 import com.duckduckgo.sync.store.model.GENERIC_FEATURE
 import com.duckduckgo.sync.store.model.SyncOperationErrorType
@@ -148,6 +151,57 @@ class SyncOperationErrorRepositoryTest {
 
         val error = errors.first()
         val expectedErrorName = String.format(Locale.US, DATA_PERSISTER_ERROR_PARAM, feature.field)
+        Assert.assertTrue(error.name == expectedErrorName)
+        Assert.assertTrue(error.count == "1")
+    }
+
+    @Test
+    fun whenProviderErrorsStoredThenGettingErrorsReturnsData() {
+        val feature = SyncableType.BOOKMARKS
+        val errorType = SyncOperationErrorType.DATA_PROVIDER_ERROR
+        val today = DatabaseDateFormatter.getUtcIsoLocalDate()
+
+        testee.addError(feature.field, errorType)
+
+        val errors = testee.getErrorsByDate(today)
+        Assert.assertTrue(errors.isNotEmpty())
+
+        val error = errors.first()
+        val expectedErrorName = String.format(Locale.US, DATA_PROVIDER_ERROR_PARAM, feature.field)
+        Assert.assertTrue(error.name == expectedErrorName)
+        Assert.assertTrue(error.count == "1")
+    }
+
+    @Test
+    fun whenTimestampErrorsStoredThenGettingErrorsReturnsData() {
+        val feature = SyncableType.BOOKMARKS
+        val errorType = SyncOperationErrorType.TIMESTAMP_CONFLICT
+        val today = DatabaseDateFormatter.getUtcIsoLocalDate()
+
+        testee.addError(feature.field, errorType)
+
+        val errors = testee.getErrorsByDate(today)
+        Assert.assertTrue(errors.isNotEmpty())
+
+        val error = errors.first()
+        val expectedErrorName = String.format(Locale.US, TIMESTAMP_CONFLICT, feature.field)
+        Assert.assertTrue(error.name == expectedErrorName)
+        Assert.assertTrue(error.count == "1")
+    }
+
+    @Test
+    fun whenOrphansErrorsStoredThenGettingErrorsReturnsData() {
+        val feature = SyncableType.BOOKMARKS
+        val errorType = SyncOperationErrorType.ORPHANS_PRESENT
+        val today = DatabaseDateFormatter.getUtcIsoLocalDate()
+
+        testee.addError(feature.field, errorType)
+
+        val errors = testee.getErrorsByDate(today)
+        Assert.assertTrue(errors.isNotEmpty())
+
+        val error = errors.first()
+        val expectedErrorName = String.format(Locale.US, ORPHANS_PRESENT, feature.field)
         Assert.assertTrue(error.name == expectedErrorName)
         Assert.assertTrue(error.count == "1")
     }

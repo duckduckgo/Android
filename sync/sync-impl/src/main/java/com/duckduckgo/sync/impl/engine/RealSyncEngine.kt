@@ -45,6 +45,8 @@ import com.duckduckgo.sync.store.model.SyncAttemptState.IN_PROGRESS
 import com.duckduckgo.sync.store.model.SyncAttemptState.SUCCESS
 import com.duckduckgo.sync.store.model.SyncOperationErrorType.DATA_PERSISTER_ERROR
 import com.duckduckgo.sync.store.model.SyncOperationErrorType.DATA_PROVIDER_ERROR
+import com.duckduckgo.sync.store.model.SyncOperationErrorType.ORPHANS_PRESENT
+import com.duckduckgo.sync.store.model.SyncOperationErrorType.TIMESTAMP_CONFLICT
 import com.squareup.anvil.annotations.ContributesBinding
 import java.time.Duration
 import java.time.OffsetDateTime
@@ -236,10 +238,11 @@ class RealSyncEngine @Inject constructor(
                     is SyncMergeResult.Success -> {
                         if (result.orphans) {
                             Timber.d("Sync - Orphans present in this sync operation for feature ${remoteChanges.type.field}")
+                            syncOperationErrorRecorder.record(remoteChanges.type.field, ORPHANS_PRESENT)
                         }
                         if (result.timestampConflict) {
                             Timber.d("Sync - Timestamp conflict present in this sync operation for feature ${remoteChanges.type.field}")
-                            syncPixels.fireTimestampConflictPixel(remoteChanges.type.field)
+                            syncOperationErrorRecorder.record(remoteChanges.type.field, TIMESTAMP_CONFLICT)
                         }
                     }
                     is SyncMergeResult.Error -> {

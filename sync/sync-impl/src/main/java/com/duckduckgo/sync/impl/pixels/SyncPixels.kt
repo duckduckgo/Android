@@ -163,6 +163,8 @@ object SyncPixelParameters {
     const val DATA_DECRYPT_ERROR = "decrypt_error_count"
     const val DATA_PERSISTER_ERROR_PARAM = "%s_persister_error_count"
     const val DATA_PROVIDER_ERROR_PARAM = "%s_provider_error_count"
+    const val TIMESTAMP_CONFLICT = "%s_local_timestamp_resolution_triggered"
+    const val ORPHANS_PRESENT = "%s_orphans_present"
     const val ERROR_CODE = "code"
     const val ERROR_REASON = "reason"
 }
