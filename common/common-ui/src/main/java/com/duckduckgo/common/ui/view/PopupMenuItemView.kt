@@ -20,8 +20,8 @@ import android.content.Context
 import android.util.AttributeSet
 import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
-import com.duckduckgo.common.ui.view.PopupMenuItemView.PopUpMenuItemType.DEFAULT
-import com.duckduckgo.common.ui.view.PopupMenuItemView.PopUpMenuItemType.DESTRUCTIVE
+import com.duckduckgo.common.ui.view.PopupMenuItemView.PopupMenuItemType.DESTRUCTIVE
+import com.duckduckgo.common.ui.view.PopupMenuItemView.PopupMenuItemType.PRIMARY
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewPopupMenuItemBinding
@@ -51,9 +51,9 @@ constructor(
             if (hasValue(R.styleable.PopupMenuItemView_labelType)) {
                 val primaryTextType = when (getInt(R.styleable.PopupMenuItemView_labelType, 0)) {
                     1 -> DESTRUCTIVE
-                    else -> DEFAULT
+                    else -> PRIMARY
                 }
-                type(primaryTextType)
+                labelType(primaryTextType)
             }
             binding.label.text = getString(R.styleable.PopupMenuItemView_label) ?: ""
             updateContentDescription()
@@ -71,9 +71,9 @@ constructor(
         updateContentDescription()
     }
 
-    fun type(type: PopUpMenuItemType = DEFAULT) {
+    fun labelType(type: PopupMenuItemType) {
         when (type) {
-            DEFAULT -> binding.label.setTextColor(ContextCompat.getColorStateList(context, R.color.primary_text_color_selector))
+            PRIMARY -> binding.label.setTextColor(ContextCompat.getColorStateList(context, R.color.primary_text_color_selector))
             DESTRUCTIVE -> binding.label.setTextColor(ContextCompat.getColorStateList(context, R.color.destructive_text_color_selector))
         }
     }
@@ -82,8 +82,8 @@ constructor(
         binding.root.contentDescription = binding.label.text
     }
 
-    enum class PopUpMenuItemType {
-        DEFAULT,
+    enum class PopupMenuItemType {
+        PRIMARY,
         DESTRUCTIVE,
     }
 }
