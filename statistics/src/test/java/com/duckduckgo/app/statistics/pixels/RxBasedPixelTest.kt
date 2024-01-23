@@ -18,7 +18,7 @@ package com.duckduckgo.app.statistics.pixels
 
 import com.duckduckgo.app.statistics.api.PixelSender
 import com.duckduckgo.app.statistics.api.PixelSender.SendPixelResult.PIXEL_SENT
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DEFAULT
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 import com.duckduckgo.app.statistics.pixels.RxBasedPixelTest.TestPixels.TEST
 import com.duckduckgo.common.test.InstantSchedulersRule
 import io.reactivex.Completable
@@ -48,7 +48,7 @@ class RxBasedPixelTest {
         val pixel = RxBasedPixel(mockPixelSender)
         pixel.fire(TEST)
 
-        verify(mockPixelSender).sendPixel("test", emptyMap(), emptyMap(), DEFAULT)
+        verify(mockPixelSender).sendPixel("test", emptyMap(), emptyMap(), COUNT)
     }
 
     @Test
@@ -58,7 +58,7 @@ class RxBasedPixelTest {
         val pixel = RxBasedPixel(mockPixelSender)
         pixel.fire(TEST)
 
-        verify(mockPixelSender).sendPixel("test", emptyMap(), emptyMap(), DEFAULT)
+        verify(mockPixelSender).sendPixel("test", emptyMap(), emptyMap(), COUNT)
     }
 
     @Test
@@ -69,7 +69,7 @@ class RxBasedPixelTest {
         val params = mapOf("param1" to "value1", "param2" to "value2")
 
         pixel.fire(TEST, params)
-        verify(mockPixelSender).sendPixel("test", params, emptyMap(), DEFAULT)
+        verify(mockPixelSender).sendPixel("test", params, emptyMap(), COUNT)
     }
 
     @Test

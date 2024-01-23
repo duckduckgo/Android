@@ -32,8 +32,8 @@ import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.model.PixelEntity
 import com.duckduckgo.app.statistics.model.QueryParamsTypeConverter
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DAILY
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DEFAULT
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.UNIQUE
 import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.statistics.store.PixelFiredRepository
@@ -118,7 +118,7 @@ class RxPixelSenderTest {
         givenVariant("variant")
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
 
-        testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), DEFAULT)
+        testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), COUNT)
             .test().assertValue(PIXEL_SENT)
 
         verify(api).fire(eq("test"), eq("phone"), eq("atbvariant"), any(), any(), any())
@@ -129,7 +129,7 @@ class RxPixelSenderTest {
         givenApiSendPixelSucceeds()
         givenFormFactor(DeviceInfo.FormFactor.TABLET)
 
-        testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), DEFAULT)
+        testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), COUNT)
             .test().assertValue(PIXEL_SENT)
 
         verify(api).fire(eq("test"), eq("tablet"), eq(""), any(), any(), any())
@@ -140,7 +140,7 @@ class RxPixelSenderTest {
         givenApiSendPixelSucceeds()
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
 
-        testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), DEFAULT)
+        testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), COUNT)
             .test().assertValue(PIXEL_SENT)
 
         verify(api).fire(eq("test"), eq("phone"), eq(""), any(), any(), any())
@@ -156,7 +156,7 @@ class RxPixelSenderTest {
 
         val params = mapOf("param1" to "value1", "param2" to "value2")
         val expectedParams = mapOf("param1" to "value1", "param2" to "value2", "appVersion" to "1.0.0")
-        testee.sendPixel(TEST.pixelName, params, emptyMap(), DEFAULT)
+        testee.sendPixel(TEST.pixelName, params, emptyMap(), COUNT)
             .test().assertValue(PIXEL_SENT)
 
         verify(api).fire("test", "phone", "atbvariant", expectedParams, emptyMap())
@@ -170,7 +170,7 @@ class RxPixelSenderTest {
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
         givenAppVersion("1.0.0")
 
-        testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), DEFAULT)
+        testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), COUNT)
             .test().assertValue(PIXEL_SENT)
 
         val expectedParams = mapOf("appVersion" to "1.0.0")

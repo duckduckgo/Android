@@ -22,7 +22,7 @@ import androidx.core.content.edit
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.adclick.impl.Exemption
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DEFAULT
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import java.time.Instant
 import java.util.concurrent.TimeUnit
@@ -248,7 +248,7 @@ class RealAdClickPixelsTest {
             pixel = eq(AdClickPixelName.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION),
             parameters = any(),
             encodedParameters = any(),
-            type = eq(DEFAULT),
+            type = eq(COUNT),
         )
     }
 
@@ -264,7 +264,7 @@ class RealAdClickPixelsTest {
             pixel = eq(AdClickPixelName.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION),
             parameters = eq(mapOf(AdClickPixelParameters.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION_COUNT to "1")),
             encodedParameters = any(),
-            type = eq(DEFAULT),
+            type = eq(COUNT),
         )
     }
 
@@ -283,7 +283,7 @@ class RealAdClickPixelsTest {
             pixel = eq(AdClickPixelName.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION),
             parameters = any(),
             encodedParameters = any(),
-            type = eq(DEFAULT),
+            type = eq(COUNT),
         )
     }
 
@@ -302,7 +302,7 @@ class RealAdClickPixelsTest {
             pixel = eq(AdClickPixelName.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION),
             parameters = eq(mapOf(AdClickPixelParameters.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION_COUNT to "1")),
             encodedParameters = any(),
-            type = eq(DEFAULT),
+            type = eq(COUNT),
         )
     }
 }

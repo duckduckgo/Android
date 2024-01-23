@@ -34,7 +34,7 @@ class StatisticsDatabaseModule {
             .databaseBuilder(
                 context = context,
                 klass = StatisticsDatabase::class.java,
-                name = "statistics.db",
+                name = "pixels.db",
             )
             .fallbackToDestructiveMigration()
             .build()

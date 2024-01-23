@@ -23,8 +23,8 @@ import com.duckduckgo.app.statistics.config.StatisticsLibraryConfig
 import com.duckduckgo.app.statistics.model.PixelEntity
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DAILY
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DEFAULT
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.UNIQUE
 import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.statistics.store.PixelFiredRepository
@@ -193,7 +193,7 @@ class RxPixelSender @Inject constructor(
         type: PixelType,
     ): Boolean =
         when (type) {
-            DEFAULT -> true
+            COUNT -> true
             DAILY -> !pixelFiredRepository.hasDailyPixelFiredToday(pixelName)
             UNIQUE -> !pixelFiredRepository.hasUniquePixelFired(pixelName)
         }
@@ -203,7 +203,7 @@ class RxPixelSender @Inject constructor(
         type: PixelType,
     ) {
         when (type) {
-            DEFAULT -> {} // no-op
+            COUNT -> {} // no-op
             DAILY -> pixelFiredRepository.storeDailyPixelFiredToday(pixelName)
             UNIQUE -> pixelFiredRepository.storeUniquePixelFired(pixelName)
         }

@@ -10,7 +10,7 @@ import com.duckduckgo.app.pixels.AppPixelName.BROKEN_SITE_REPORT
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DEFAULT
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -112,7 +112,7 @@ class BrokenSiteSubmitterTest {
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         val encodedParamsCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), encodedParamsCaptor.capture(), eq(DEFAULT))
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), encodedParamsCaptor.capture(), eq(COUNT))
         val params = paramsCaptor.firstValue
 
         assertEquals("false", params["protectionsState"])
@@ -129,7 +129,7 @@ class BrokenSiteSubmitterTest {
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         val encodedParamsCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), encodedParamsCaptor.capture(), eq(DEFAULT))
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), encodedParamsCaptor.capture(), eq(COUNT))
         val params = paramsCaptor.firstValue
 
         assertEquals("false", params["protectionsState"])
@@ -146,7 +146,7 @@ class BrokenSiteSubmitterTest {
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         val encodedParamsCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), encodedParamsCaptor.capture(), eq(DEFAULT))
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), encodedParamsCaptor.capture(), eq(COUNT))
         val params = paramsCaptor.firstValue
 
         assertEquals("false", params["protectionsState"])
@@ -165,7 +165,7 @@ class BrokenSiteSubmitterTest {
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         val encodedParamsCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), encodedParamsCaptor.capture(), eq(DEFAULT))
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), encodedParamsCaptor.capture(), eq(COUNT))
         val params = paramsCaptor.firstValue
 
         assertEquals("false", params["protectionsState"])
@@ -182,7 +182,7 @@ class BrokenSiteSubmitterTest {
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         val encodedParamsCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), encodedParamsCaptor.capture(), eq(DEFAULT))
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), encodedParamsCaptor.capture(), eq(COUNT))
         val params = paramsCaptor.firstValue
 
         assertEquals("true", params["protectionsState"])
@@ -198,7 +198,7 @@ class BrokenSiteSubmitterTest {
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         val encodedParamsCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), encodedParamsCaptor.capture(), eq(DEFAULT))
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), encodedParamsCaptor.capture(), eq(COUNT))
         val params = paramsCaptor.firstValue
 
         assertEquals(lastSentDay, params["lastSentDay"])
@@ -217,7 +217,7 @@ class BrokenSiteSubmitterTest {
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         val encodedParamsCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), encodedParamsCaptor.capture(), eq(DEFAULT))
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), encodedParamsCaptor.capture(), eq(COUNT))
         val params = paramsCaptor.firstValue
 
         assertEquals("", params["loginSite"])
@@ -235,7 +235,7 @@ class BrokenSiteSubmitterTest {
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         val encodedParamsCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), encodedParamsCaptor.capture(), eq(DEFAULT))
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), encodedParamsCaptor.capture(), eq(COUNT))
         val params = paramsCaptor.firstValue
 
         assertFalse(params.containsKey("loginSite"))
@@ -249,7 +249,7 @@ class BrokenSiteSubmitterTest {
         testee.submitBrokenSiteFeedback(brokenSite)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(DEFAULT))
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(COUNT))
         val params = paramsCaptor.firstValue
 
         assertEquals("menu", params["reportFlow"])
@@ -263,7 +263,7 @@ class BrokenSiteSubmitterTest {
         testee.submitBrokenSiteFeedback(brokenSite)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(DEFAULT))
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(COUNT))
         val params = paramsCaptor.firstValue
 
         assertEquals("dashboard", params["reportFlow"])
@@ -277,7 +277,7 @@ class BrokenSiteSubmitterTest {
         testee.submitBrokenSiteFeedback(brokenSite)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(DEFAULT))
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(COUNT))
         val params = paramsCaptor.firstValue
 
         assertFalse("reportFlow" in params)

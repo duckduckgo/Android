@@ -20,7 +20,7 @@ import android.util.Base64
 import com.duckduckgo.app.anrs.store.UncaughtExceptionDao
 import com.duckduckgo.app.statistics.api.OfflinePixel
 import com.duckduckgo.app.statistics.api.PixelSender
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DEFAULT
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 import com.duckduckgo.app.statistics.pixels.Pixel.StatisticsPixelName.APPLICATION_CRASH_GLOBAL
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -55,7 +55,7 @@ class CrashOfflinePixelSender @Inject constructor(
                     )
 
                 val pixel =
-                    pixelSender.sendPixel(APPLICATION_CRASH_GLOBAL.pixelName, params, emptyMap(), DEFAULT).ignoreElement().doOnComplete {
+                    pixelSender.sendPixel(APPLICATION_CRASH_GLOBAL.pixelName, params, emptyMap(), COUNT).ignoreElement().doOnComplete {
                         logcat { "Sent pixel with params: $params containing exception; deleting exception with id=${exception.hash}" }
                         uncaughtExceptionDao.delete(exception)
                     }

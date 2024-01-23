@@ -19,7 +19,7 @@ package com.duckduckgo.app.browser.pageloadpixel
 import com.duckduckgo.app.browser.WebViewPixelName
 import com.duckduckgo.app.statistics.api.OfflinePixel
 import com.duckduckgo.app.statistics.api.PixelSender
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DEFAULT
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import io.reactivex.Completable
@@ -50,7 +50,7 @@ class PageLoadedOfflinePixelSender @Inject constructor(
                         TRACKER_OPTIMIZATION_ENABLED to it.trackerOptimizationEnabled.toString(),
                     ),
                     mapOf(),
-                    DEFAULT,
+                    COUNT,
                 ).ignoreElement().doOnComplete {
                     pageLoadedPixelDao.deleteAll()
                 }

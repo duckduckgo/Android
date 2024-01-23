@@ -20,7 +20,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DEFAULT
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
@@ -68,7 +68,7 @@ class DefaultBrowserObserverTest {
 
         testee.onResume(mockOwner)
 
-        verify(mockPixel, never()).fire(eq(AppPixelName.DEFAULT_BROWSER_SET), any(), any(), eq(DEFAULT))
+        verify(mockPixel, never()).fire(eq(AppPixelName.DEFAULT_BROWSER_SET), any(), any(), eq(COUNT))
     }
 
     @Test
@@ -78,7 +78,7 @@ class DefaultBrowserObserverTest {
 
         testee.onResume(mockOwner)
 
-        verify(mockPixel, never()).fire(eq(AppPixelName.DEFAULT_BROWSER_SET), any(), any(), eq(DEFAULT))
+        verify(mockPixel, never()).fire(eq(AppPixelName.DEFAULT_BROWSER_SET), any(), any(), eq(COUNT))
     }
 
     @Test

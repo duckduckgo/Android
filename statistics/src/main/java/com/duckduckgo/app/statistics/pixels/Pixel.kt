@@ -21,7 +21,7 @@ import com.duckduckgo.app.statistics.api.PixelSender
 import com.duckduckgo.app.statistics.api.PixelSender.SendPixelResult.PIXEL_IGNORED
 import com.duckduckgo.app.statistics.api.PixelSender.SendPixelResult.PIXEL_SENT
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DEFAULT
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import io.reactivex.schedulers.Schedulers
@@ -88,20 +88,36 @@ interface Pixel {
         const val FIRE_ANIMATION_NONE = "fann"
     }
 
-    enum class PixelType { DEFAULT, DAILY, UNIQUE }
+    enum class PixelType {
+
+        /**
+         * Pixel is a every-occurrence pixel. Sent every time fire() is invoked.
+         */
+        COUNT,
+
+        /**
+         * Pixel is a first-in-day pixel. Subsequent attempts to fire such pixel on a given calendar day (UTC) will be ignored.
+         */
+        DAILY,
+
+        /**
+         * Pixel is a once-ever pixel. Subsequent attempts to fire such pixel will be ignored.
+         */
+        UNIQUE,
+    }
 
     fun fire(
         pixel: PixelName,
         parameters: Map<String, String> = emptyMap(),
         encodedParameters: Map<String, String> = emptyMap(),
-        type: PixelType = DEFAULT,
+        type: PixelType = COUNT,
     )
 
     fun fire(
         pixelName: String,
         parameters: Map<String, String> = emptyMap(),
         encodedParameters: Map<String, String> = emptyMap(),
-        type: PixelType = DEFAULT,
+        type: PixelType = COUNT,
     )
 
     fun enqueueFire(
@@ -143,14 +159,14 @@ class RxBasedPixel @Inject constructor(
             .subscribe(
                 { result ->
                     when (result) {
-                        PIXEL_SENT -> Timber.v("Pixel sent: $pixelName with params: $parameters $encodedParameters, type: $type")
-                        PIXEL_IGNORED -> Timber.v("Pixel ignored: $pixelName, type: $type")
+                        PIXEL_SENT -> Timber.v("Pixel sent: $pixelName with params: $parameters $encodedParameters")
+                        PIXEL_IGNORED -> Timber.v("Pixel ignored: $pixelName with params: $parameters $encodedParameters")
                     }
                 },
                 {
                     Timber.w(
                         it,
-                        "Pixel failed: $pixelName with params: $parameters $encodedParameters, type: $type",
+                        "Pixel failed: $pixelName with params: $parameters $encodedParameters",
                     )
                 },
             )
