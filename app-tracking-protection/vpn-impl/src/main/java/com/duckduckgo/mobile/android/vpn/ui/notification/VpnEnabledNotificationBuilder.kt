@@ -23,7 +23,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.mobile.android.vpn.R
@@ -61,14 +60,11 @@ class VpnEnabledNotificationBuilder {
         ): Notification {
             registerOngoingNotificationChannel(context)
 
-            val notificationLayout = RemoteViews(context.packageName, R.layout.notification_vpn_enabled)
-            notificationLayout.setTextViewText(R.id.deviceShieldNotificationHeader, vpnEnabledNotificationContent.title)
-
             return NotificationCompat.Builder(context, VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
-                .setStyle(NotificationCompat.DecoratedCustomViewStyle())
+                .setContentTitle(context.getString(R.string.atp_name))
+                .setStyle(NotificationCompat.BigTextStyle().bigText(vpnEnabledNotificationContent.title))
                 .setContentIntent(vpnEnabledNotificationContent.onNotificationPressIntent)
-                .setCustomContentView(notificationLayout)
                 .setOngoing(true)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setChannelId(VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
@@ -82,14 +78,11 @@ class VpnEnabledNotificationBuilder {
         ): Notification {
             registerOngoingNotificationChannel(context)
 
-            val notificationLayout = RemoteViews(context.packageName, R.layout.notification_vpn_enabled)
-            notificationLayout.setTextViewText(R.id.deviceShieldNotificationHeader, vpnNotification.title)
-
             return NotificationCompat.Builder(context, VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
-                .setStyle(NotificationCompat.DecoratedCustomViewStyle())
+                .setStyle(NotificationCompat.BigTextStyle().bigText(vpnNotification.text))
+                .setContentTitle(vpnNotification.title)
                 .setContentIntent(vpnNotification.onNotificationPressIntent)
-                .setCustomContentView(notificationLayout)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setSilent(true)
                 .setOngoing(true)

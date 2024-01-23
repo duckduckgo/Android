@@ -56,7 +56,7 @@ class NetPEnabledNotificationContentPlugin @Inject constructor(
 
     override fun getInitialContent(): VpnEnabledNotificationContent? {
         return if (isActive()) {
-            val title = networkProtectionState.serverLocation()?.run {
+            val text = networkProtectionState.serverLocation()?.run {
                 HtmlCompat.fromHtml(resources.getString(R.string.netpEnabledNotificationTitle, this), FROM_HTML_MODE_LEGACY)
             } ?: resources.getString(R.string.netpEnabledNotificationInitialTitle)
 
@@ -65,7 +65,8 @@ class NetPEnabledNotificationContentPlugin @Inject constructor(
              * the user dismissed it. This is applicable to Android 14 and up. More info: https://app.asana.com/0/0/1206344475728481/f
              */
             return VpnEnabledNotificationContent(
-                title = SpannableStringBuilder(title),
+                title = resources.getString(R.string.netp_name),
+                text = SpannableStringBuilder(text),
                 onNotificationPressIntent = onPressIntent,
                 notificationActions = NotificationActions.VPNActions,
                 deleteIntent = null,
