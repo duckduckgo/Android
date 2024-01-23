@@ -52,6 +52,7 @@ import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedHandler
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.BrowserAutofill
@@ -63,6 +64,7 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import junit.framework.TestCase.assertEquals
@@ -119,6 +121,7 @@ class BrowserWebViewClientTest {
     private val deviceInfo: DeviceInfo = mock()
     private val pageLoadedHandler: PageLoadedHandler = mock()
     private val userAgentProvider: UserAgentProvider = mock()
+    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature = mock()
 
     @UiThreadTest
     @Before
@@ -148,6 +151,7 @@ class BrowserWebViewClientTest {
             currentTimeProvider,
             pageLoadedHandler,
             userAgentProvider,
+            androidBrowserConfigFeature,
         )
         testee.webViewClientListener = listener
         whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
@@ -253,6 +257,9 @@ class BrowserWebViewClientTest {
     @Test
     fun whenShouldInterceptRequestThenEventSentToLoginDetector() {
         val webResourceRequest = mock<WebResourceRequest>()
+        val toggle: Toggle = mock()
+        whenever(androidBrowserConfigFeature.optimizeTrackerEvaluation()).thenReturn(toggle)
+        whenever(toggle.isEnabled()).thenReturn(true)
         testee.shouldInterceptRequest(webView, webResourceRequest)
         verify(loginDetector).onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, webResourceRequest))
     }

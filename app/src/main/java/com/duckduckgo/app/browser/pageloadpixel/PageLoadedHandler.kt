@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser.pageloadpixel
 
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.UriString
@@ -50,6 +51,7 @@ class RealPageLoadedHandler @Inject constructor(
     private val pageLoadedPixelDao: PageLoadedPixelDao,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    private val browserConfigFeature: AndroidBrowserConfigFeature,
 ) : PageLoadedHandler {
 
     override operator fun invoke(url: String, start: Long, end: Long) {
@@ -60,9 +62,13 @@ class RealPageLoadedHandler @Inject constructor(
                         elapsedTime = end - start,
                         webviewVersion = webViewVersionProvider.getMajorVersion(),
                         appVersion = deviceInfo.appVersion,
+                        trackerOptimizationEnabled = shouldOptimizeTrackerEvaluation(),
                     ),
                 )
             }
         }
     }
+
+    private fun shouldOptimizeTrackerEvaluation() =
+        browserConfigFeature.self().isEnabled() && browserConfigFeature.optimizeTrackerEvaluation().isEnabled()
 }
