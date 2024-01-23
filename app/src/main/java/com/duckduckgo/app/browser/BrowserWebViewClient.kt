@@ -62,7 +62,6 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.privacy.config.api.AmpLinks
-import com.duckduckgo.user.agent.api.UserAgentProvider
 import java.net.URI
 import javax.inject.Inject
 import kotlinx.coroutines.*
@@ -93,7 +92,6 @@ class BrowserWebViewClient @Inject constructor(
     private val jsPlugins: PluginPoint<JsInjectorPlugin>,
     private val currentTimeProvider: CurrentTimeProvider,
     private val shouldSendPageLoadedPixel: PageLoadedHandler,
-    private val userAgentProvider: UserAgentProvider,
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -284,7 +282,6 @@ class BrowserWebViewClient @Inject constructor(
             if (it != "about:blank" && start == null) {
                 start = currentTimeProvider.getTimeInMillis()
             }
-            userAgentProvider.setHintHeader(webView.settings)
             autoconsent.injectAutoconsent(webView, url)
             adClickManager.detectAdDomain(url)
             requestInterceptor.onPageStarted(url)

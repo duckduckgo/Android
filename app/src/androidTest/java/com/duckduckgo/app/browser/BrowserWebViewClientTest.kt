@@ -64,7 +64,6 @@ import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.privacy.config.api.AmpLinks
-import com.duckduckgo.user.agent.api.UserAgentProvider
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
@@ -118,7 +117,6 @@ class BrowserWebViewClientTest {
     private val currentTimeProvider: CurrentTimeProvider = mock()
     private val deviceInfo: DeviceInfo = mock()
     private val pageLoadedHandler: PageLoadedHandler = mock()
-    private val userAgentProvider: UserAgentProvider = mock()
 
     @UiThreadTest
     @Before
@@ -147,7 +145,6 @@ class BrowserWebViewClientTest {
             jsPlugins,
             currentTimeProvider,
             pageLoadedHandler,
-            userAgentProvider,
         )
         testee.webViewClientListener = listener
         whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
@@ -169,13 +166,6 @@ class BrowserWebViewClientTest {
     fun whenOnPageStartedCalledThenListenerInstructedToUpdateNavigationState() {
         testee.onPageStarted(webView, EXAMPLE_URL, null)
         verify(listener).navigationStateChanged(any())
-    }
-
-    @UiThreadTest
-    @Test
-    fun whenOnPageStartedCalledThenSetHintHeaderCalled() {
-        testee.onPageStarted(webView, EXAMPLE_URL, null)
-        verify(userAgentProvider).setHintHeader(any())
     }
 
     @UiThreadTest
