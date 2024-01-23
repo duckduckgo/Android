@@ -20,6 +20,9 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 
 enum class PrivacyDashboardPixels(override val pixelName: String, val enqueue: Boolean = false) : Pixel.PixelName {
     PRIVACY_DASHBOARD_OPENED("mp"),
+    PRIVACY_DASHBOARD_OPENED_UNIQUE("m_privacy_dashboard_launched_u"),
     PRIVACY_DASHBOARD_ALLOWLIST_ADD("mp_wla"),
+    PRIVACY_DASHBOARD_ALLOWLIST_ADD_UNIQUE("m_privacy_dashboard_allowlist_add_u"),
     PRIVACY_DASHBOARD_ALLOWLIST_REMOVE("mp_wlr"),
+    PRIVACY_DASHBOARD_ALLOWLIST_REMOVE_UNIQUE("m_privacy_dashboard_allowlist_remove_u"),
 }
