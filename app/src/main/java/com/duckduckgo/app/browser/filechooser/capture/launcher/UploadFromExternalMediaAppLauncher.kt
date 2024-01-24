@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.filechooser.camera.launcher
+package com.duckduckgo.app.browser.filechooser.capture.launcher
 
 import android.Manifest
 import android.app.Activity
@@ -26,11 +26,11 @@ import androidx.activity.result.ActivityResultCaller
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.StringRes
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.filechooser.camera.CameraCaptureResultHandler
-import com.duckduckgo.app.browser.filechooser.camera.launcher.UploadFromExternalCameraLauncher.CameraImageCaptureResult
-import com.duckduckgo.app.browser.filechooser.camera.permission.ExternalCameraSystemPermissionsHelper
-import com.duckduckgo.app.browser.filechooser.camera.postprocess.CameraCaptureDelayedDeleter
-import com.duckduckgo.app.browser.filechooser.camera.postprocess.CameraCaptureImageMover
+import com.duckduckgo.app.browser.filechooser.capture.MediaCaptureResultHandler
+import com.duckduckgo.app.browser.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher.MediaCaptureResult
+import com.duckduckgo.app.browser.filechooser.capture.permission.ExternalMediaSystemPermissionsHelper
+import com.duckduckgo.app.browser.filechooser.capture.postprocess.MediaCaptureDelayedDeleter
+import com.duckduckgo.app.browser.filechooser.capture.postprocess.MediaCaptureImageMover
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -43,137 +43,148 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 /**
- * Public API for launching the external camera app and capturing an image.
- * This launcher will internally handle necessary camera permissions.
+ * Public API for launching any external media capturing app (e.g camera, sound recorder) and capturing.
+ * This launcher will internally handle necessary permissions.
  *
  * [registerForResult] should be called once in [Activity.onCreate]
- * [launch] should be called when it is time to launch the camera app.
+ * [launch] should be called when it is time to launch the media capturing app.
  */
-interface UploadFromExternalCameraLauncher {
+interface UploadFromExternalMediaAppLauncher {
 
     /**
-     * Launches the external camera app to capture an image.
+     * Launches the external media capturing app with a given action.
      * Before calling launch, you must register a callback to receive the result, using [registerForResult].
+     *
+     * @param inputAction This is used to inform what type of media was requested.
      */
-    fun launch(input: String)
+    fun launch(inputAction: String)
 
     /**
-     * Registers a callback to receive the result of the camera capture.
+     * Registers a callback to receive the result of the capture.
      * This must be called before calling [launch].
      *
-     * @param onResult will be called with the captured image or another result type if the capture failed.
+     * @param onResult will be called with the captured content or another result type if the capture failed.
      */
     fun registerForResult(
         caller: ActivityResultCaller,
-        onResult: (CameraImageCaptureResult) -> Unit,
+        onResult: (MediaCaptureResult) -> Unit,
     )
 
-    fun showPermissionRationaleDialog(activity: Activity, input: String)
+    /**
+     * Shows the permission rationale dialog.
+     *
+     * @param inputAction This is used to inform what type of media was requested.
+     */
+    fun showPermissionRationaleDialog(activity: Activity, inputAction: String)
 
     /**
-     * Types of results that can be returned from the camera capture flow.
+     * Types of results that can be returned from the media capture flow (e.g camera, sound recorder).
      */
-    sealed interface CameraImageCaptureResult {
+    sealed interface MediaCaptureResult {
 
         /**
-         * The image was captured successfully.
-         * The included [file] is the location of the captured image.
+         * The media was captured successfully.
+         * The included [file] is the location of the captured media.
          *
          * Note, this file should be considered temporary and will be automatically deleted after a short period of time.
          */
-        data class ImageCaptured(val file: File) : CameraImageCaptureResult
+        data class MediaCaptured(val file: File) : MediaCaptureResult
 
         /**
-         * The user denied permission to access the camera.
+         * The user denied permission.
+         *
+         * @param inputAction This is used to inform what type of media was requested.
          */
-        data class CouldNotCapturePermissionDenied(val input: String) : CameraImageCaptureResult
+        data class CouldNotCapturePermissionDenied(val inputAction: String) : MediaCaptureResult
 
         /**
-         * No image was captured, most likely because the user cancelled the camera capture flow.
+         * No media was captured, most likely because the user cancelled the capture flow.
          */
-        data object NoImageCaptured : CameraImageCaptureResult
+        data object NoMediaCaptured : MediaCaptureResult
 
         /**
-         * No image was captured as unable to integrate with the system camera.
+         * No media was captured due to an error accessing the media app.
+         *
+         * @param messageId The message to be shown as error.
          */
-        data class ErrorAccessingCamera(@StringRes val messageId: Int) : CameraImageCaptureResult
+        data class ErrorAccessingMediaApp(@StringRes val messageId: Int) : MediaCaptureResult
     }
 }
 
 @ContributesBinding(FragmentScope::class)
-class PermissionAwareExternalCameraLauncher @Inject constructor(
-    private val permissionHelper: ExternalCameraSystemPermissionsHelper,
-    private val imageMover: CameraCaptureImageMover,
-    private val delayedDeleter: CameraCaptureDelayedDeleter,
+class PermissionAwareExternalMediaAppLauncher @Inject constructor(
+    private val permissionHelper: ExternalMediaSystemPermissionsHelper,
+    private val imageMover: MediaCaptureImageMover,
+    private val delayedDeleter: MediaCaptureDelayedDeleter,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
-) : UploadFromExternalCameraLauncher {
+) : UploadFromExternalMediaAppLauncher {
 
-    private lateinit var callback: (CameraImageCaptureResult) -> Unit
+    private lateinit var callback: (MediaCaptureResult) -> Unit
     private lateinit var launcher: ActivityResultLauncher<String?>
 
-    override fun launch(input: String) {
-        if (permissionHelper.hasCameraPermissionsGranted(input)) {
-            Timber.d("camera permission already granted. launching camera now")
-            launchCamera(input)
+    override fun launch(inputAction: String) {
+        if (permissionHelper.hasMediaPermissionsGranted(inputAction)) {
+            Timber.d("permission already granted for $inputAction. launching app now")
+            launchMediaApp(inputAction)
         } else {
             // ask for permission
-            Timber.d("no camera permission yet, need to request camera permission before launching camera -- $input")
-            when (input) {
+            Timber.d("no permission yet for $inputAction, need to request permission before launching")
+            when (inputAction) {
                 MediaStore.ACTION_IMAGE_CAPTURE, MediaStore.ACTION_VIDEO_CAPTURE ->
-                    permissionHelper.requestPermission(Manifest.permission.CAMERA, input)
+                    permissionHelper.requestPermission(Manifest.permission.CAMERA, inputAction)
                 MediaStore.Audio.Media.RECORD_SOUND_ACTION ->
-                    permissionHelper.requestPermission(Manifest.permission.RECORD_AUDIO, input)
+                    permissionHelper.requestPermission(Manifest.permission.RECORD_AUDIO, inputAction)
                 else ->
-                    Timber.d("Unknown permissions needed $input")
+                    Timber.d("Unknown permissions needed for $inputAction")
             }
         }
     }
 
-    private fun launchCamera(input: String) {
+    private fun launchMediaApp(inputAction: String) {
         try {
-            launcher.launch(input)
+            launcher.launch(inputAction)
         } catch (e: Exception) {
             Timber.w(e, "exception launching camera / sound recorder")
-            if (input == MediaStore.ACTION_IMAGE_CAPTURE || input == MediaStore.ACTION_VIDEO_CAPTURE) {
-                callback.invoke(CameraImageCaptureResult.ErrorAccessingCamera(R.string.imageCaptureCameraUnavailable))
-            } else if (input == MediaStore.Audio.Media.RECORD_SOUND_ACTION) {
-                callback.invoke(CameraImageCaptureResult.ErrorAccessingCamera(R.string.audioCaptureSoundRecorderUnavailable))
+            if (inputAction == MediaStore.ACTION_IMAGE_CAPTURE || inputAction == MediaStore.ACTION_VIDEO_CAPTURE) {
+                callback.invoke(MediaCaptureResult.ErrorAccessingMediaApp(R.string.imageCaptureCameraUnavailable))
+            } else if (inputAction == MediaStore.Audio.Media.RECORD_SOUND_ACTION) {
+                callback.invoke(MediaCaptureResult.ErrorAccessingMediaApp(R.string.audioCaptureSoundRecorderUnavailable))
             }
         }
     }
 
     override fun registerForResult(
         caller: ActivityResultCaller,
-        onResult: (CameraImageCaptureResult) -> Unit,
+        onResult: (MediaCaptureResult) -> Unit,
     ) {
         callback = onResult
         registerPermissionLauncher(caller)
-        launcher = caller.registerForActivityResult(CameraCaptureResultHandler()) { interimFile ->
+        launcher = caller.registerForActivityResult(MediaCaptureResultHandler()) { interimFile ->
             if (interimFile == null) {
-                onResult(CameraImageCaptureResult.NoImageCaptured)
+                onResult(MediaCaptureResult.NoMediaCaptured)
             } else {
                 appCoroutineScope.launch(dispatchers.io()) {
                     val finalImage = moveCapturedImageToFinalLocation(interimFile)
                     if (finalImage == null) {
-                        onResult(CameraImageCaptureResult.NoImageCaptured)
+                        onResult(MediaCaptureResult.NoMediaCaptured)
                     } else {
-                        onResult(CameraImageCaptureResult.ImageCaptured(finalImage))
+                        onResult(MediaCaptureResult.MediaCaptured(finalImage))
                     }
                 }
             }
         }
     }
 
-    override fun showPermissionRationaleDialog(activity: Activity, input: String) {
+    override fun showPermissionRationaleDialog(activity: Activity, inputAction: String) {
         if (permissionHelper.isPermissionsRejectedForever(activity)) {
-            if (input == MediaStore.ACTION_IMAGE_CAPTURE || input == MediaStore.ACTION_VIDEO_CAPTURE) {
+            if (inputAction == MediaStore.ACTION_IMAGE_CAPTURE || inputAction == MediaStore.ACTION_VIDEO_CAPTURE) {
                 showDialog(
                     activity,
                     R.string.imageCaptureCameraPermissionDeniedTitle,
                     R.string.imageCaptureCameraPermissionDeniedMessage,
                 )
-            } else if (input == MediaStore.Audio.Media.RECORD_SOUND_ACTION) {
+            } else if (inputAction == MediaStore.Audio.Media.RECORD_SOUND_ACTION) {
                 showDialog(
                     activity,
                     R.string.audioCaptureSoundRecorderPermissionDeniedTitle,
@@ -207,12 +218,12 @@ class PermissionAwareExternalCameraLauncher @Inject constructor(
         permissionHelper.registerPermissionLaunchers(caller, this::onResultSystemPermissionRequest)
     }
 
-    private fun onResultSystemPermissionRequest(granted: Boolean, input: String) {
-        Timber.d("camera permission request received. granted=%s", granted)
+    private fun onResultSystemPermissionRequest(granted: Boolean, inputAction: String) {
+        Timber.d("permission request received for $inputAction. granted=$granted")
         if (granted) {
-            launchCamera(input)
+            launchMediaApp(inputAction)
         } else {
-            callback(CameraImageCaptureResult.CouldNotCapturePermissionDenied(input))
+            callback(MediaCaptureResult.CouldNotCapturePermissionDenied(inputAction))
         }
     }
 

@@ -121,11 +121,11 @@ import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.Companio
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.browser.favorites.QuickAccessDragTouchItemListener
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
-import com.duckduckgo.app.browser.filechooser.camera.launcher.UploadFromExternalCameraLauncher
-import com.duckduckgo.app.browser.filechooser.camera.launcher.UploadFromExternalCameraLauncher.CameraImageCaptureResult.CouldNotCapturePermissionDenied
-import com.duckduckgo.app.browser.filechooser.camera.launcher.UploadFromExternalCameraLauncher.CameraImageCaptureResult.ErrorAccessingCamera
-import com.duckduckgo.app.browser.filechooser.camera.launcher.UploadFromExternalCameraLauncher.CameraImageCaptureResult.ImageCaptured
-import com.duckduckgo.app.browser.filechooser.camera.launcher.UploadFromExternalCameraLauncher.CameraImageCaptureResult.NoImageCaptured
+import com.duckduckgo.app.browser.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher
+import com.duckduckgo.app.browser.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher.MediaCaptureResult.CouldNotCapturePermissionDenied
+import com.duckduckgo.app.browser.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher.MediaCaptureResult.ErrorAccessingMediaApp
+import com.duckduckgo.app.browser.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher.MediaCaptureResult.MediaCaptured
+import com.duckduckgo.app.browser.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher.MediaCaptureResult.NoMediaCaptured
 import com.duckduckgo.app.browser.history.NavigationHistorySheet
 import com.duckduckgo.app.browser.history.NavigationHistorySheet.NavigationHistorySheetListener
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
@@ -435,7 +435,7 @@ class BrowserTabFragment :
     lateinit var jsMessageHelper: JsMessageHelper
 
     @Inject
-    lateinit var externalCameraLauncher: UploadFromExternalCameraLauncher
+    lateinit var externalCameraLauncher: UploadFromExternalMediaAppLauncher
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -744,15 +744,15 @@ class BrowserTabFragment :
         sitePermissionsDialogLauncher.registerPermissionLauncher(this)
         externalCameraLauncher.registerForResult(this) {
             when (it) {
-                is ImageCaptured -> pendingUploadTask?.onReceiveValue(arrayOf(Uri.fromFile(it.file)))
+                is MediaCaptured -> pendingUploadTask?.onReceiveValue(arrayOf(Uri.fromFile(it.file)))
                 is CouldNotCapturePermissionDenied -> {
                     pendingUploadTask?.onReceiveValue(null)
                     activity?.let { activity ->
-                        externalCameraLauncher.showPermissionRationaleDialog(activity, it.input)
+                        externalCameraLauncher.showPermissionRationaleDialog(activity, it.inputAction)
                     }
                 }
-                NoImageCaptured -> pendingUploadTask?.onReceiveValue(null)
-                is ErrorAccessingCamera -> {
+                NoMediaCaptured -> pendingUploadTask?.onReceiveValue(null)
+                is ErrorAccessingMediaApp -> {
                     pendingUploadTask?.onReceiveValue(null)
                     Snackbar.make(binding.root, it.messageId, BaseTransientBottomBar.LENGTH_SHORT).show()
                 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.filechooser.camera.postprocess
+package com.duckduckgo.app.browser.filechooser.capture.postprocess
 
 import android.content.Context
 import android.net.Uri
@@ -26,15 +26,15 @@ import java.io.FileOutputStream
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
 
-interface CameraCaptureImageMover {
-    suspend fun moveInternal(interimFile: Uri): File?
+interface MediaCaptureImageMover {
+    suspend fun moveInternal(contentUri: Uri): File?
 }
 
 @ContributesBinding(FragmentScope::class)
-class RealCameraCaptureImageMover @Inject constructor(
+class RealMediaCaptureImageMover @Inject constructor(
     private val context: Context,
     private val dispatchers: DispatcherProvider,
-) : CameraCaptureImageMover {
+) : MediaCaptureImageMover {
 
     override suspend fun moveInternal(contentUri: Uri): File? {
         return withContext(dispatchers.io()) {

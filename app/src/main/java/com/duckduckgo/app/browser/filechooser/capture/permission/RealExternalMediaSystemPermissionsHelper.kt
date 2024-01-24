@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.filechooser.camera.permission
+package com.duckduckgo.app.browser.filechooser.capture.permission
 
 import android.Manifest
 import android.app.Activity
@@ -31,27 +31,27 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlin.reflect.KFunction2
 
-interface ExternalCameraSystemPermissionsHelper {
-    fun hasCameraPermissionsGranted(input: String): Boolean
+interface ExternalMediaSystemPermissionsHelper {
+    fun hasMediaPermissionsGranted(inputAction: String): Boolean
     fun registerPermissionLaunchers(
         caller: ActivityResultCaller,
         onResultPermissionRequest: KFunction2<Boolean, String, Unit>,
     )
-    fun requestPermission(permission: String, input: String)
+    fun requestPermission(permission: String, inputAction: String)
     fun isPermissionsRejectedForever(activity: Activity): Boolean
 }
 
 @ContributesBinding(FragmentScope::class)
-class RealExternalCameraSystemPermissionsHelperImpl @Inject constructor(
+class RealExternalMediaSystemPermissionsHelperImpl @Inject constructor(
     private val context: Context,
-) : ExternalCameraSystemPermissionsHelper {
+) : ExternalMediaSystemPermissionsHelper {
 
     private lateinit var permissionLauncher: ActivityResultLauncher<String>
     private var currentPermissionRequested: String? = null
     private var mediaStoreType: String = MediaStore.ACTION_IMAGE_CAPTURE
 
-    override fun hasCameraPermissionsGranted(input: String): Boolean {
-        return when (input) {
+    override fun hasMediaPermissionsGranted(inputAction: String): Boolean {
+        return when (inputAction) {
             MediaStore.ACTION_IMAGE_CAPTURE, MediaStore.ACTION_VIDEO_CAPTURE ->
                 ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
             MediaStore.Audio.Media.RECORD_SOUND_ACTION ->
@@ -69,10 +69,10 @@ class RealExternalCameraSystemPermissionsHelperImpl @Inject constructor(
         }
     }
 
-    override fun requestPermission(permission: String, input: String) {
+    override fun requestPermission(permission: String, inputAction: String) {
         if (this::permissionLauncher.isInitialized) {
             currentPermissionRequested = permission
-            mediaStoreType = input
+            mediaStoreType = inputAction
             permissionLauncher.launch(permission)
         } else {
             throw IllegalAccessException("registerPermissionLaunchers() needs to be called before requestPermission()")

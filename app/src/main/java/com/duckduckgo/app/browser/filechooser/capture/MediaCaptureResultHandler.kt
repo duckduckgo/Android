@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.filechooser.camera
+package com.duckduckgo.app.browser.filechooser.capture
 
 import android.app.Activity
 import android.content.Context
@@ -25,7 +25,7 @@ import androidx.activity.result.contract.ActivityResultContract
 import androidx.core.content.FileProvider
 import java.io.File
 
-class CameraCaptureResultHandler : ActivityResultContract<String?, Uri?>() {
+class MediaCaptureResultHandler : ActivityResultContract<String?, Uri?>() {
 
     private var interimImageLocation: Uri? = null
 
@@ -35,10 +35,10 @@ class CameraCaptureResultHandler : ActivityResultContract<String?, Uri?>() {
     ): Intent {
         return when (input) {
             MediaStore.ACTION_IMAGE_CAPTURE, MediaStore.ACTION_VIDEO_CAPTURE -> {
-                val destinationForCapturedImage =
-                    destinationImageCaptureFile(context, input) ?: throw IllegalStateException("Unable to save images from camera")
+                val destinationForCapturedMedia =
+                    destinationMediaCaptureFile(context, input) ?: throw IllegalStateException("Unable to save images from camera")
                 Intent(input).also { intent ->
-                    destinationForCapturedImage.also { newFile ->
+                    destinationForCapturedMedia.also { newFile ->
                         val safeUri = FileProvider.getUriForFile(context, "${context.packageName}.$PROVIDER_SUFFIX", newFile)
                         interimImageLocation = safeUri
                         intent.putExtra(MediaStore.EXTRA_OUTPUT, safeUri)
@@ -49,10 +49,10 @@ class CameraCaptureResultHandler : ActivityResultContract<String?, Uri?>() {
         }
     }
 
-    private fun destinationImageCaptureFile(context: Context, input: String?): File? {
+    private fun destinationMediaCaptureFile(context: Context, input: String?): File? {
         val topLevelDirectory: File = context.externalCacheDir ?: return null
-        val cameraDataDir = File(topLevelDirectory, SUBDIRECTORY)
-        cameraDataDir.mkdirs()
+        val dataDir = File(topLevelDirectory, SUBDIRECTORY)
+        dataDir.mkdirs()
         val fileExtension = when (input) {
             MediaStore.ACTION_IMAGE_CAPTURE -> IMAGE_FILE_EXTENSION
             MediaStore.ACTION_VIDEO_CAPTURE -> VIDEO_FILE_EXTENSION
@@ -60,7 +60,7 @@ class CameraCaptureResultHandler : ActivityResultContract<String?, Uri?>() {
             else -> ""
         }
         val newFileName = "${System.currentTimeMillis()}.$fileExtension"
-        return File(cameraDataDir, newFileName)
+        return File(dataDir, newFileName)
     }
 
     override fun parseResult(
