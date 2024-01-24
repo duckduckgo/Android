@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.filechooser.camera.permission
+package com.duckduckgo.app.browser.filechooser.capture.permission
 
 import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
+import android.provider.MediaStore
 import androidx.activity.result.ActivityResultCaller
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
@@ -28,40 +29,50 @@ import androidx.core.content.ContextCompat
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import kotlin.reflect.KFunction2
 
-interface ExternalCameraSystemPermissionsHelper {
-    fun hasCameraPermissionsGranted(): Boolean
+interface ExternalMediaSystemPermissionsHelper {
+    fun hasMediaPermissionsGranted(inputAction: String): Boolean
     fun registerPermissionLaunchers(
         caller: ActivityResultCaller,
-        onResultPermissionRequest: (Boolean) -> Unit,
+        onResultPermissionRequest: KFunction2<Boolean, String, Unit>,
     )
-    fun requestPermission(permission: String)
+    fun requestPermission(permission: String, inputAction: String)
     fun isPermissionsRejectedForever(activity: Activity): Boolean
 }
 
 @ContributesBinding(FragmentScope::class)
-class RealExternalCameraSystemPermissionsHelperImpl @Inject constructor(
+class RealExternalMediaSystemPermissionsHelperImpl @Inject constructor(
     private val context: Context,
-) : ExternalCameraSystemPermissionsHelper {
+) : ExternalMediaSystemPermissionsHelper {
 
     private lateinit var permissionLauncher: ActivityResultLauncher<String>
     private var currentPermissionRequested: String? = null
+    private var mediaStoreType: String = MediaStore.ACTION_IMAGE_CAPTURE
 
-    override fun hasCameraPermissionsGranted(): Boolean =
-        ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
-
-    override fun registerPermissionLaunchers(
-        caller: ActivityResultCaller,
-        onResultPermissionRequest: (Boolean) -> Unit,
-    ) {
-        permissionLauncher = caller.registerForActivityResult(RequestPermission()) {
-            onResultPermissionRequest.invoke(it)
+    override fun hasMediaPermissionsGranted(inputAction: String): Boolean {
+        return when (inputAction) {
+            MediaStore.ACTION_IMAGE_CAPTURE, MediaStore.ACTION_VIDEO_CAPTURE ->
+                ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+            MediaStore.Audio.Media.RECORD_SOUND_ACTION ->
+                ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+            else -> false
         }
     }
 
-    override fun requestPermission(permission: String) {
+    override fun registerPermissionLaunchers(
+        caller: ActivityResultCaller,
+        onResultPermissionRequest: KFunction2<Boolean, String, Unit>,
+    ) {
+        permissionLauncher = caller.registerForActivityResult(RequestPermission()) {
+            onResultPermissionRequest.invoke(it, mediaStoreType)
+        }
+    }
+
+    override fun requestPermission(permission: String, inputAction: String) {
         if (this::permissionLauncher.isInitialized) {
             currentPermissionRequested = permission
+            mediaStoreType = inputAction
             permissionLauncher.launch(permission)
         } else {
             throw IllegalAccessException("registerPermissionLaunchers() needs to be called before requestPermission()")

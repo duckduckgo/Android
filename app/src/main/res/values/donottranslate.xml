@@ -46,4 +46,8 @@
     <!-- DRM -->
     <string name="sitePermissionsSettingsDRM">DRM</string>
 
+    <!-- Content capture for upload -->
+    <string name="audioCaptureSoundRecorderUnavailable">Could not access sound recorder</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedTitle">Allow DuckDuckGo to ask for sound recorder access on this device</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedMessage">Sites can only use the sound recorder if you allow DuckDuckGo to ask for access.</string>
 </resources>
