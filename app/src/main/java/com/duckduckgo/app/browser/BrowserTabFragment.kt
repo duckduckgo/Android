@@ -32,6 +32,7 @@ import android.net.Uri
 import android.os.*
 import android.print.PrintAttributes
 import android.print.PrintManager
+import android.provider.MediaStore
 import android.text.Editable
 import android.text.Spannable
 import android.text.SpannableString
@@ -120,11 +121,11 @@ import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.Companio
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.browser.favorites.QuickAccessDragTouchItemListener
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
-import com.duckduckgo.app.browser.filechooser.camera.launcher.UploadFromExternalCameraLauncher
-import com.duckduckgo.app.browser.filechooser.camera.launcher.UploadFromExternalCameraLauncher.CameraImageCaptureResult.CouldNotCapturePermissionDenied
-import com.duckduckgo.app.browser.filechooser.camera.launcher.UploadFromExternalCameraLauncher.CameraImageCaptureResult.ErrorAccessingCamera
-import com.duckduckgo.app.browser.filechooser.camera.launcher.UploadFromExternalCameraLauncher.CameraImageCaptureResult.ImageCaptured
-import com.duckduckgo.app.browser.filechooser.camera.launcher.UploadFromExternalCameraLauncher.CameraImageCaptureResult.NoImageCaptured
+import com.duckduckgo.app.browser.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher
+import com.duckduckgo.app.browser.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher.MediaCaptureResult.CouldNotCapturePermissionDenied
+import com.duckduckgo.app.browser.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher.MediaCaptureResult.ErrorAccessingMediaApp
+import com.duckduckgo.app.browser.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher.MediaCaptureResult.MediaCaptured
+import com.duckduckgo.app.browser.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher.MediaCaptureResult.NoMediaCaptured
 import com.duckduckgo.app.browser.history.NavigationHistorySheet
 import com.duckduckgo.app.browser.history.NavigationHistorySheet.NavigationHistorySheetListener
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
@@ -439,7 +440,7 @@ class BrowserTabFragment :
     lateinit var jsMessageHelper: JsMessageHelper
 
     @Inject
-    lateinit var externalCameraLauncher: UploadFromExternalCameraLauncher
+    lateinit var externalCameraLauncher: UploadFromExternalMediaAppLauncher
 
     @Inject
     lateinit var autofillOverlappingDialogDetector: AutofillOverlappingDialogDetector
@@ -751,17 +752,17 @@ class BrowserTabFragment :
         sitePermissionsDialogLauncher.registerPermissionLauncher(this)
         externalCameraLauncher.registerForResult(this) {
             when (it) {
-                is ImageCaptured -> pendingUploadTask?.onReceiveValue(arrayOf(Uri.fromFile(it.file)))
-                CouldNotCapturePermissionDenied -> {
+                is MediaCaptured -> pendingUploadTask?.onReceiveValue(arrayOf(Uri.fromFile(it.file)))
+                is CouldNotCapturePermissionDenied -> {
                     pendingUploadTask?.onReceiveValue(null)
                     activity?.let { activity ->
-                        externalCameraLauncher.showPermissionRationaleDialog(activity)
+                        externalCameraLauncher.showPermissionRationaleDialog(activity, it.inputAction)
                     }
                 }
-                NoImageCaptured -> pendingUploadTask?.onReceiveValue(null)
-                ErrorAccessingCamera -> {
+                is NoMediaCaptured -> pendingUploadTask?.onReceiveValue(null)
+                is ErrorAccessingMediaApp -> {
                     pendingUploadTask?.onReceiveValue(null)
-                    Snackbar.make(binding.root, R.string.imageCaptureCameraUnavailable, BaseTransientBottomBar.LENGTH_SHORT).show()
+                    Snackbar.make(binding.root, it.messageId, BaseTransientBottomBar.LENGTH_SHORT).show()
                 }
             }
             pendingUploadTask = null
@@ -1253,8 +1254,10 @@ class BrowserTabFragment :
             is Command.SharePromoLinkRMF -> launchSharePromoRMFPageChooser(it.url, it.shareTitle)
             is Command.CopyLink -> clipboardManager.setPrimaryClip(ClipData.newPlainText(null, it.url))
             is Command.ShowFileChooser -> launchFilePicker(it.filePathCallback, it.fileChooserParams)
-            is Command.ShowExistingImageOrCameraChooser -> launchImageOrCameraChooser(it.fileChooserParams, it.filePathCallback)
-            is Command.ShowImageCamera -> launchCameraCapture(it.filePathCallback)
+            is Command.ShowExistingImageOrCameraChooser -> launchImageOrCameraChooser(it.fileChooserParams, it.filePathCallback, it.inputAction)
+            is Command.ShowImageCamera -> launchCameraCapture(it.filePathCallback, it.fileChooserParams, MediaStore.ACTION_IMAGE_CAPTURE)
+            is Command.ShowVideoCamera -> launchCameraCapture(it.filePathCallback, it.fileChooserParams, MediaStore.ACTION_VIDEO_CAPTURE)
+            is Command.ShowSoundRecorder -> launchCameraCapture(it.filePathCallback, it.fileChooserParams, MediaStore.Audio.Media.RECORD_SOUND_ACTION)
 
             is Command.AddHomeShortcut -> {
                 context?.let { context ->
@@ -2826,14 +2829,20 @@ class BrowserTabFragment :
         startActivityForResult(intent, REQUEST_CODE_CHOOSE_FILE)
     }
 
-    private fun launchCameraCapture(filePathCallback: ValueCallback<Array<Uri>>) {
+    private fun launchCameraCapture(filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: FileChooserRequestedParams, inputAction: String) {
+        if (Intent(inputAction).resolveActivity(requireContext().packageManager) == null) {
+            launchFilePicker(filePathCallback, fileChooserParams)
+            return
+        }
+
         pendingUploadTask = filePathCallback
-        externalCameraLauncher.launch()
+        externalCameraLauncher.launch(inputAction)
     }
 
     private fun launchImageOrCameraChooser(
         fileChooserParams: FileChooserRequestedParams,
         filePathCallback: ValueCallback<Array<Uri>>,
+        inputAction: String,
     ) {
         context?.let {
             val cameraString = getString(R.string.imageCaptureCameraGalleryDisambiguationCameraOption)
@@ -2853,7 +2862,7 @@ class BrowserTabFragment :
                         }
 
                         override fun onSecondaryItemClicked() {
-                            launchCameraCapture(filePathCallback)
+                            launchCameraCapture(filePathCallback, fileChooserParams, inputAction)
                         }
 
                         override fun onBottomSheetDismissed() {

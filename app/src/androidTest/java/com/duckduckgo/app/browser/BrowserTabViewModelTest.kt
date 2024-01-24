@@ -4604,12 +4604,12 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnShowFileChooserWithVideoWildcardedTypeOnlyAndCaptureEnabledThenShowFileChooserCommandSent() {
+    fun whenOnShowFileChooserWithVideoWildcardedTypeOnlyAndCaptureEnabledThenShowVideoCameraCommandSent() {
         val params = buildFileChooserParams(acceptTypes = arrayOf("video/*"), captureEnabled = true)
 
         testee.showFileChooser(mockFileChooserCallback, params)
 
-        assertCommandIssued<Command.ShowFileChooser>()
+        assertCommandIssued<Command.ShowVideoCamera>()
     }
 
     @Test
@@ -4620,6 +4620,15 @@ class BrowserTabViewModelTest {
         testee.showFileChooser(mockFileChooserCallback, params)
 
         assertCommandIssued<Command.ShowFileChooser>()
+    }
+
+    @Test
+    fun whenOnShowFileChooserWithAudioWildcardedTypeOnlyAndCaptureEnabledThenShowSoundRecorderCommandSent() {
+        val params = buildFileChooserParams(acceptTypes = arrayOf("audio/*"), captureEnabled = true)
+
+        testee.showFileChooser(mockFileChooserCallback, params)
+
+        assertCommandIssued<Command.ShowSoundRecorder>()
     }
 
     @Test

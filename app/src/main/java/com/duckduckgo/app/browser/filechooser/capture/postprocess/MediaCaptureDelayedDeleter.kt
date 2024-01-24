@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.filechooser.camera.postprocess
+package com.duckduckgo.app.browser.filechooser.capture.postprocess
 
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
@@ -25,20 +25,20 @@ import java.io.File
 import java.util.concurrent.TimeUnit.SECONDS
 import javax.inject.Inject
 
-interface CameraCaptureDelayedDeleter {
+interface MediaCaptureDelayedDeleter {
     fun scheduleDeletion(file: File)
 }
 
 @ContributesBinding(FragmentScope::class)
-class WorkManagerCameraCaptureDelayedDeleter @Inject constructor(
+class WorkManagerMediaCaptureDelayedDeleter @Inject constructor(
     private val workManager: WorkManager,
-) : CameraCaptureDelayedDeleter {
+) : MediaCaptureDelayedDeleter {
 
     override fun scheduleDeletion(file: File) {
-        val workRequest = OneTimeWorkRequestBuilder<DeleteCameraCaptureWorker>()
+        val workRequest = OneTimeWorkRequestBuilder<DeleteMediaCaptureWorker>()
             .setInputData(
                 workDataOf(
-                    DeleteCameraCaptureWorker.KEY_FILE_URI to file.absolutePath,
+                    DeleteMediaCaptureWorker.KEY_FILE_URI to file.absolutePath,
                 ),
             )
             .setInitialDelay(INITIAL_DELAY_SECONDS, SECONDS)
