@@ -46,7 +46,7 @@ class VpnTrackerNotificationUpdates @Inject constructor(
     private val vpnNotificationStore: VpnNotificationStore,
 ) : VpnServiceCallbacks {
 
-    private val systemNotificationManager: NotificationManager by lazy { context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager }
+    private val systemNotificationManager: NotificationManager? by lazy { context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager }
     private val job = ConflatedJob()
     private var hasUpdatedInitialState = false
     private var currentPlugin: VpnEnabledNotificationContentPlugin? = null
@@ -77,7 +77,7 @@ class VpnTrackerNotificationUpdates @Inject constructor(
             val newPlugin = vpnEnabledNotificationContentPluginPoint.getHighestPriorityPlugin()
 
             // If there is a change in plugin, we want to show the updated content
-            if (currentPlugin != newPlugin) {
+            if (currentPlugin?.uuid != newPlugin?.uuid) {
                 currentPlugin = newPlugin
                 hasUpdatedInitialState = false
                 vpnNotificationStore.persistentNotifDimissedTimestamp = 0L
@@ -110,8 +110,8 @@ class VpnTrackerNotificationUpdates @Inject constructor(
 
     private fun isNotificationVisible(): Boolean {
         val notificationToUpdate =
-            systemNotificationManager.activeNotifications.filter { it.id == TrackerBlockingVpnService.VPN_FOREGROUND_SERVICE_ID }
-        return notificationToUpdate.isNotEmpty()
+            systemNotificationManager?.activeNotifications?.filter { it.id == TrackerBlockingVpnService.VPN_FOREGROUND_SERVICE_ID }
+        return !notificationToUpdate.isNullOrEmpty()
     }
 
     private fun hasRequiredTimeElapsed(): Boolean =

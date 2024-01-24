@@ -51,12 +51,19 @@ class NetPEnabledNotificationContentPlugin @Inject constructor(
 ) : VpnEnabledNotificationContentPlugin {
 
     private val onPressIntent by lazy { netPIntentProvider.getOnPressNotificationIntent() }
+
+    override val uuid: String = "d0c6aa7b-16dc-4d35-a4c6-35c6dfcb8309"
+
     override fun getInitialContent(): VpnEnabledNotificationContent? {
         return if (isActive()) {
             val title = networkProtectionState.serverLocation()?.run {
                 HtmlCompat.fromHtml(resources.getString(R.string.netpEnabledNotificationTitle, this), FROM_HTML_MODE_LEGACY)
             } ?: resources.getString(R.string.netpEnabledNotificationInitialTitle)
 
+            /**
+             * deleteIntent is set to null here since we decided that we don't need to reshow the notification for NetP on the event that
+             * the user dismissed it. This is applicable to Android 14 and up. More info: https://app.asana.com/0/0/1206344475728481/f
+             */
             return VpnEnabledNotificationContent(
                 title = SpannableStringBuilder(title),
                 onNotificationPressIntent = onPressIntent,

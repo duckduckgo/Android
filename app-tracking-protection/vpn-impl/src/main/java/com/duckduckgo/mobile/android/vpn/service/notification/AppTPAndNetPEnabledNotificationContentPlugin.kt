@@ -49,6 +49,8 @@ class AppTPAndNetPEnabledNotificationContentPlugin @Inject constructor(
     private val notificationPendingIntent by lazy { appTpEnabledNotificationIntentProvider.getOnPressNotificationIntent() }
     private val deletePendingIntent by lazy { appTpEnabledNotificationIntentProvider.getDeleteNotificationIntent() }
 
+    override val uuid: String = "1cc717cf-f046-40de-948c-fd8bc26300d4"
+
     override fun getInitialContent(): VpnEnabledNotificationContent? {
         return if (isActive()) {
             val title = networkProtectionState.serverLocation()?.run {

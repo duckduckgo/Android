@@ -23,6 +23,7 @@ import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPl
 import kotlinx.coroutines.flow.Flow
 
 interface VpnEnabledNotificationContentPlugin {
+    val uuid: String
 
     /**
      * This method will be called to show the first notification when the VPN is enabled.
