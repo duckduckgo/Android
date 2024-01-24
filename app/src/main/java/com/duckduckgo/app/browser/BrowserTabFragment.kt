@@ -751,7 +751,7 @@ class BrowserTabFragment :
                         externalCameraLauncher.showPermissionRationaleDialog(activity, it.inputAction)
                     }
                 }
-                NoMediaCaptured -> pendingUploadTask?.onReceiveValue(null)
+                is NoMediaCaptured -> pendingUploadTask?.onReceiveValue(null)
                 is ErrorAccessingMediaApp -> {
                     pendingUploadTask?.onReceiveValue(null)
                     Snackbar.make(binding.root, it.messageId, BaseTransientBottomBar.LENGTH_SHORT).show()
