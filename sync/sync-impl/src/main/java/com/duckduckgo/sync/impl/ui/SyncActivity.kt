@@ -50,6 +50,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasS
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroCreateAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroRecoverSyncData
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowRecoveryCode
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowTextCode
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.SyncWithAnotherDevice
@@ -238,7 +239,16 @@ class SyncActivity : DuckDuckGoActivity() {
             is AskEditDevice -> askEditDevice(it.device)
             is ShowTextCode -> startActivity(ShowCodeActivity.intent(this))
             is AddAnotherDevice -> loginFlow.launch(null)
+            is ShowError -> showError(it)
         }
+    }
+
+    private fun showError(it: ShowError) {
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.sync_dialog_error_title)
+            .setMessage(getString(it.message) + "\n" + it.reason)
+            .setPositiveButton(R.string.sync_dialog_error_ok)
+            .show()
     }
 
     private fun askEditDevice(device: ConnectedDevice) {

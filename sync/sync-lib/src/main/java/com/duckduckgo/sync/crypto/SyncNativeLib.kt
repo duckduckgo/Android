@@ -277,35 +277,39 @@ class SyncNativeLib constructor(context: Context) : SyncLib {
     private external fun getSealBytes(): Int
 }
 
+interface SyncCryptoResult {
+    val result: Int
+}
+
 class AccountKeys(
-    val result: Int,
+    override val result: Int,
     val primaryKey: String,
     val secretKey: String,
     val protectedSecretKey: String,
     val passwordHash: String,
     val userId: String,
     val password: String,
-)
+) : SyncCryptoResult
 
 class ConnectKeys(
-    val result: Int,
+    override val result: Int,
     val publicKey: String,
     val secretKey: String,
-)
+) : SyncCryptoResult
 
 class LoginKeys(
-    val result: Int,
+    override val result: Int,
     val passwordHash: String,
     val stretchedPrimaryKey: String,
     val primaryKey: String,
-)
+) : SyncCryptoResult
 
 class DecryptResult(
-    val result: Int,
+    override val result: Int,
     val decryptedData: String,
-)
+) : SyncCryptoResult
 
 class EncryptResult(
-    val result: Int,
+    override val result: Int,
     val encryptedData: String,
-)
+) : SyncCryptoResult

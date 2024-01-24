@@ -37,6 +37,7 @@ import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncFeatureToggle
+import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
@@ -78,6 +79,7 @@ class SyncActivityViewModelTest {
     private val syncStateMonitor: SyncStateMonitor = mock()
     private val syncEngine: SyncEngine = mock()
     private val syncFeatureToggle: SyncFeatureToggle = mock()
+    private val syncPixels: SyncPixels = mock()
 
     private val stateFlow = MutableStateFlow(SyncState.READY)
 
@@ -93,6 +95,7 @@ class SyncActivityViewModelTest {
             syncEngine = syncEngine,
             recoveryCodePDF = recoveryPDF,
             syncFeatureToggle = syncFeatureToggle,
+            syncPixels = syncPixels,
         )
 
         whenever(syncStateMonitor.syncState()).thenReturn(emptyFlow())
@@ -398,7 +401,7 @@ class SyncActivityViewModelTest {
 
     @Test
     fun whenUserClicksOnSaveRecoveryCodeThenEmitCheckIfUserHasPermissionCommand() = runTest {
-        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(jsonRecoveryKeyEncoded)
+        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(jsonRecoveryKeyEncoded))
         testee.commands().test {
             testee.onSaveRecoveryCodeClicked()
             val command = awaitItem()
@@ -409,7 +412,7 @@ class SyncActivityViewModelTest {
 
     @Test
     fun whenGenerateRecoveryCodeThenGenerateFileAndEmitSuccessCommand() = runTest {
-        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(jsonRecoveryKeyEncoded)
+        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(jsonRecoveryKeyEncoded))
         whenever(recoveryPDF.generateAndStoreRecoveryCodePDF(any(), eq(jsonRecoveryKeyEncoded))).thenReturn(TestSyncFixtures.pdfFile())
 
         testee.commands().test {
@@ -549,7 +552,7 @@ class SyncActivityViewModelTest {
     private fun givenAuthenticatedUser() {
         whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
         whenever(syncStateMonitor.syncState()).thenReturn(stateFlow.asStateFlow())
-        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(jsonRecoveryKeyEncoded)
+        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(jsonRecoveryKeyEncoded))
         whenever(syncAccountRepository.getThisConnectedDevice()).thenReturn(connectedDevice)
         whenever(syncAccountRepository.getConnectedDevices()).thenReturn(Success(listOf(connectedDevice)))
         whenever(qrEncoder.encodeAsBitmap(any(), any(), any())).thenReturn(qrBitmap())

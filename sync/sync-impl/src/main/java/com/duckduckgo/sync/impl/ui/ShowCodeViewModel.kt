@@ -23,6 +23,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.Clipboard
 import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.getOrNull
 import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -45,7 +46,7 @@ class ShowCodeViewModel @Inject constructor(
     private val viewState = MutableStateFlow(ViewState())
 
     fun viewState(): Flow<ViewState> = viewState.onStart {
-        val code = syncAccountRepository.getRecoveryCode()
+        val code = syncAccountRepository.getRecoveryCode().getOrNull()
         if (code == null) { // It shouldn't be null, but recovery code returns nullable.
             command.send(Command.Error)
         } else {
@@ -63,7 +64,7 @@ class ShowCodeViewModel @Inject constructor(
 
     fun onCopyCodeClicked() {
         viewModelScope.launch(dispatchers.io()) {
-            val recoveryCode = syncAccountRepository.getRecoveryCode() ?: return@launch
+            val recoveryCode = syncAccountRepository.getRecoveryCode().getOrNull() ?: return@launch
             clipboard.copyToClipboard(recoveryCode)
         }
     }

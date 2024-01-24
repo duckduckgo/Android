@@ -15,6 +15,20 @@
   -->
 
 <resources>
+    <!-- setup errors -->
+    <string name="sync_turn_off_error">Unable to turn Sync &amp; Backup off.</string>
+    <string name="sync_edit_device_error">Unable to update the device name.</string>
+    <string name="sync_remove_device_error">Unable to remove this device from Sync &amp; Backup.</string>
+    <string name="sync_delete_data_error">Unable to delete data on the server.</string>
+    <string name="sync_login_authenticated_device_error">To pair these devices, turn off Sync &amp; Backup on one device then tap "Sync with Another Device" on the other device.</string>
+    <string name="sync_connect_generic_error">Unable to connect to the server.</string>
+    <string name="sync_connect_login_error">Unable to Sync with another device.</string>
+    <string name="sync_create_account_generic_error">Unable to connect to the server.</string>
+    <string name="sync_invalid_code_error">Sorry, this code is invalid. Please make sure the correct code was entered or scanned.</string>
+    <string name="sync_recovery_pdf_error">Unable to create the recovery PDF.</string>
+    <string name="sync_dialog_error_ok">OK</string>
+    <string name="sync_dialog_error_title">Sync &amp; Backup</string>
+
     <!-- Internal Setting -->
     <string name="sync_internal_activity_label">Sync Setup Internal</string>
     <string name="sync_internal_environment_header">Environment Settings</string>

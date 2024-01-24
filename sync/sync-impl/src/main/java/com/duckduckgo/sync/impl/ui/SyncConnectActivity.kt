@@ -24,15 +24,18 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivityConnectSyncBinding
 import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code.CONNECT_CODE
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command
-import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.Error
+import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.FinishWithError
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.LoginSuccess
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ReadTextCode
+import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.setup.EnterCodeContract
@@ -104,12 +107,13 @@ class SyncConnectActivity : DuckDuckGoActivity() {
                 setResult(RESULT_OK)
                 finish()
             }
-            Error -> {
+            FinishWithError -> {
                 setResult(RESULT_CANCELED)
                 finish()
             }
 
             is ShowMessage -> Snackbar.make(binding.root, it.messageId, Snackbar.LENGTH_SHORT).show()
+            is ShowError -> showError(it)
         }
     }
 
@@ -120,6 +124,20 @@ class SyncConnectActivity : DuckDuckGoActivity() {
                 viewModel.onReadTextCodeClicked()
             }
         }
+    }
+
+    private fun showError(it: ShowError) {
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.sync_dialog_error_title)
+            .setMessage(getString(it.message) + "\n" + it.reason)
+            .setPositiveButton(R.string.sync_dialog_error_ok)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onErrorDialogDismissed()
+                    }
+                },
+            ).show()
     }
 
     companion object {
