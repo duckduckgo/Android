@@ -75,7 +75,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
 
         configureDependencyInjection()
         setupActivityLifecycleCallbacks()
-        configureUncaughtExceptionHandlerBrowser()
+        configureUncaughtExceptionHandler()
 
         // Deprecated, we need to move all these into AppLifecycleEventObserver
         ProcessLifecycleOwner.get().lifecycle.apply {
@@ -95,7 +95,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
             configureLogging()
             Timber.d("Init for secondary process $shortProcessName with pid=${android.os.Process.myPid()}")
             configureDependencyInjection()
-            configureUncaughtExceptionHandlerVpn()
+            configureUncaughtExceptionHandler()
 
             // ProcessLifecycleOwner doesn't know about secondary processes, so the callbacks are our own callbacks and limited to onCreate which
             // is good enough.
@@ -112,7 +112,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
         activityLifecycleCallbacks.getPlugins().forEach { registerActivityLifecycleCallbacks(it) }
     }
 
-    private fun configureUncaughtExceptionHandlerBrowser() {
+    private fun configureUncaughtExceptionHandler() {
         Thread.setDefaultUncaughtExceptionHandler(uncaughtExceptionHandler)
         RxJavaPlugins.setErrorHandler { throwable ->
             if (throwable is UndeliverableException) {
@@ -121,10 +121,6 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
                 uncaughtExceptionHandler.uncaughtException(Thread.currentThread(), throwable)
             }
         }
-    }
-
-    private fun configureUncaughtExceptionHandlerVpn() {
-        Thread.setDefaultUncaughtExceptionHandler(uncaughtExceptionHandler)
     }
 
     private fun configureLogging() {
