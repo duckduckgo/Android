@@ -22,6 +22,8 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentPixelParamsProvider
 import com.duckduckgo.privacyprotectionspopup.impl.PrivacyProtectionsPopupPixelName.DO_NOT_SHOW_AGAIN_CLICKED
 import com.duckduckgo.privacyprotectionspopup.impl.PrivacyProtectionsPopupPixelName.EXPERIMENT_VARIANT_ASSIGNED
+import com.duckduckgo.privacyprotectionspopup.impl.PrivacyProtectionsPopupPixelName.PAGE_REFRESH_ON_POSSIBLE_BREAKAGE
+import com.duckduckgo.privacyprotectionspopup.impl.PrivacyProtectionsPopupPixelName.PAGE_REFRESH_ON_POSSIBLE_BREAKAGE_DAILY
 import com.duckduckgo.privacyprotectionspopup.impl.PrivacyProtectionsPopupPixelName.POPUP_DISMISSED_VIA_BUTTON
 import com.duckduckgo.privacyprotectionspopup.impl.PrivacyProtectionsPopupPixelName.POPUP_DISMISSED_VIA_CLICK_OUTSIDE
 import com.duckduckgo.privacyprotectionspopup.impl.PrivacyProtectionsPopupPixelName.POPUP_TRIGGERED
@@ -44,6 +46,7 @@ interface PrivacyProtectionsPopupPixels {
     fun reportPopupDismissedViaButton()
     fun reportPopupDismissedViaClickOutside()
     fun reportDoNotShowAgainClicked()
+    fun reportPageRefreshOnPossibleBreakage()
 }
 
 @ContributesBinding(FragmentScope::class)
@@ -96,6 +99,13 @@ class PrivacyProtectionsPopupPixelsImpl @Inject constructor(
         appCoroutineScope.launch {
             val params = mapOf(PARAM_POPUP_TRIGGER_COUNT to dataStore.getPopupTriggerCount().toString())
             fire(DO_NOT_SHOW_AGAIN_CLICKED, params)
+        }
+    }
+
+    override fun reportPageRefreshOnPossibleBreakage() {
+        appCoroutineScope.launch {
+            fire(PAGE_REFRESH_ON_POSSIBLE_BREAKAGE)
+            fire(PAGE_REFRESH_ON_POSSIBLE_BREAKAGE_DAILY)
         }
     }
 

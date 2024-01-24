@@ -52,6 +52,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.launch
 
 @ContributesBinding(FragmentScope::class)
@@ -132,8 +133,8 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
         var popupTriggered = false
         var experimentVariantToStore: PrivacyProtectionsPopupExperimentVariant? = null
 
-        state.update { oldState ->
-            if (oldState.popupData == null) return@update oldState
+        val updatedState = state.updateAndGet { oldState ->
+            if (oldState.popupData == null) return@updateAndGet oldState
 
             val popupConditionsMet = arePopupConditionsMet(state = oldState)
 
@@ -173,6 +174,8 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
             }
             pixels.reportPopupTriggered()
         }
+
+        tryReportPageRefreshOnPossibleBreakage(updatedState)
     }
 
     override fun onPageLoaded(
@@ -214,10 +217,7 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun startDataLoading() {
         dataLoadingJob = appCoroutineScope.launch {
-            val featureAvailable = featureFlag.isEnabled()
-            state.update { it.copy(featureAvailable = featureAvailable) }
-
-            if (!featureAvailable) return@launch
+            state.update { it.copy(featureAvailable = featureFlag.isEnabled()) }
 
             state.map { it.domain }
                 .distinctUntilChanged()
@@ -269,6 +269,22 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
             !popupDismissed &&
             !toggleUsed &&
             !popupData.doNotShowAgainClicked
+    }
+
+    private fun tryReportPageRefreshOnPossibleBreakage(state: State) = with(state) {
+        if (popupData == null) return
+
+        val isDuckDuckGoDomain = domain?.let { duckDuckGoUrlDetector.isDuckDuckGoUrl(it.normalizeScheme()) }
+
+        if (
+            popupData.protectionsEnabled &&
+            domain != null &&
+            isDuckDuckGoDomain == false &&
+            !hasHttpErrorCodes &&
+            !hasBrowserError
+        ) {
+            pixels.reportPageRefreshOnPossibleBreakage()
+        }
     }
 
     companion object {

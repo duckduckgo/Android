@@ -594,6 +594,29 @@ class PrivacyProtectionsPopupManagerImplTest {
         }
     }
 
+    @Test
+    fun whenPageIsRefreshedAndConditionsAreMetThenPixelIsSent() = runTest {
+        subject.viewState.test {
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
+
+            verify(pixels).reportPageRefreshOnPossibleBreakage()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPageIsRefreshedAndFeatureIsDisabledAndThereIsNoExperimentVariantThenPixelIsNotSent() = runTest {
+        featureFlag.enabled = false
+        subject.viewState.test {
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
+
+            verify(pixels).reportPageRefreshOnPossibleBreakage()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     private fun ReceiveTurbine<PrivacyProtectionsPopupViewState>.assertPopupVisible(visible: Boolean) {
         if (visible) {
             assertTrue(expectMostRecentItem() is PrivacyProtectionsPopupViewState.Visible)

@@ -19,6 +19,7 @@ package com.duckduckgo.privacyprotectionspopup.impl
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DAILY
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.UNIQUE
 
 enum class PrivacyProtectionsPopupPixelName(
@@ -60,6 +61,14 @@ enum class PrivacyProtectionsPopupPixelName(
     DO_NOT_SHOW_AGAIN_CLICKED(
         pixelName = "m_privacy_protections_popup_do_not_show_again_clicked_u",
         type = UNIQUE,
+    ),
+    PAGE_REFRESH_ON_POSSIBLE_BREAKAGE(
+        pixelName = "m_privacy_protections_popup_page_refresh_on_possible_breakage_c",
+        type = COUNT,
+    ),
+    PAGE_REFRESH_ON_POSSIBLE_BREAKAGE_DAILY(
+        pixelName = "m_privacy_protections_popup_page_refresh_on_possible_breakage_d",
+        type = DAILY,
     ),
     ;
 

@@ -18,6 +18,7 @@ package com.duckduckgo.privacyprotectionspopup.impl
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DAILY
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.UNIQUE
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.privacyprotectionspopup.impl.PrivacyProtectionsPopupExperimentVariant.TEST
@@ -153,6 +154,25 @@ class PrivacyProtectionsPopupPixelsTest {
             pixel = PrivacyProtectionsPopupPixelName.POPUP_DISMISSED_VIA_CLICK_OUTSIDE,
             parameters = DEFAULT_PARAMS,
             type = COUNT,
+        )
+
+        verifyNoMoreInteractions(pixel)
+    }
+
+    @Test
+    fun whenPageIsRefreshedThenPixelIsSent() = runTest {
+        subject.reportPageRefreshOnPossibleBreakage()
+
+        verify(pixel).fire(
+            pixel = PrivacyProtectionsPopupPixelName.PAGE_REFRESH_ON_POSSIBLE_BREAKAGE,
+            parameters = DEFAULT_PARAMS,
+            type = COUNT,
+        )
+
+        verify(pixel).fire(
+            pixel = PrivacyProtectionsPopupPixelName.PAGE_REFRESH_ON_POSSIBLE_BREAKAGE_DAILY,
+            parameters = DEFAULT_PARAMS,
+            type = DAILY,
         )
 
         verifyNoMoreInteractions(pixel)
