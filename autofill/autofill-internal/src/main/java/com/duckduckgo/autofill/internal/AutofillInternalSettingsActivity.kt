@@ -232,7 +232,7 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
         }
 
         // keep the number of excluded sites (never saved) up-to-date
-        lifecycleScope.launch(dispatchers.io()) {
+        lifecycleScope.launch(dispatchers.main()) {
             repeatOnLifecycle(STARTED) {
                 neverSavedSiteRepository.neverSaveListCount().collect { count ->
                     binding.numberNeverSavedSitesCount.setSecondaryText(getString(R.string.autofillDevSettingsNeverSavedSitesCountSubtitle, count))

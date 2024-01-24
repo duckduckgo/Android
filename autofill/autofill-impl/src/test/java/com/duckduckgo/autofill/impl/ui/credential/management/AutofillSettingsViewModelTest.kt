@@ -49,6 +49,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsVie
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.CredentialMode.EditingExisting
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchDeleteAllPasswordsConfirmation
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.PromptUserToAuthenticateMassDeletion
 import com.duckduckgo.autofill.impl.ui.credential.management.searching.CredentialListFilter
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.duckaddress.DuckAddressIdentifier
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.duckaddress.RealDuckAddressIdentifier
@@ -694,16 +695,25 @@ class AutofillSettingsViewModelTest {
     fun whenDeleteAllPasswordsConfirmedButNoPasswordsSavedThenDoesNotIssueCommandToShowUndoSnackbar() = runTest {
         whenever(mockStore.deleteAllCredentials()).thenReturn(emptyList())
         testee.onDeleteAllPasswordsConfirmed()
-        testee.commands.test {
-            awaitItem().verifyDoesNotHaveCommandToShowUndoDeletionSnackbar()
+        testee.commandsListView.test {
+            awaitItem().verifyHasCommandToAuthenticateMassDeletion()
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
     fun whenDeleteAllPasswordsConfirmedWithPasswordsSavedThenDoesIssueCommandToShowUndoSnackbar() = runTest {
-        whenever(mockStore.deleteAllCredentials()).thenReturn(listOf(someCredentials()))
         testee.onDeleteAllPasswordsConfirmed()
+        testee.commandsListView.test {
+            awaitItem().verifyHasCommandToAuthenticateMassDeletion()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenAuthenticationSucceedsToMassDeletePasswordsThenDoesIssueCommandToShowUndoSnackbar() = runTest {
+        whenever(mockStore.deleteAllCredentials()).thenReturn(listOf(someCredentials()))
+        testee.onAuthenticatedToDeleteAllPasswords()
         testee.commands.test {
             awaitItem().verifyDoesHaveCommandToShowUndoDeletionSnackbar(1)
             cancelAndIgnoreRemainingEvents()
@@ -736,6 +746,12 @@ class AutofillSettingsViewModelTest {
         val confirmationCommand = this.firstOrNull { it is OfferUserUndoMassDeletion }
         assertNotNull(confirmationCommand)
         assertEquals(expectedNumberOfCredentialsToDelete, (confirmationCommand as OfferUserUndoMassDeletion).credentials.size)
+    }
+
+    private fun List<ListModeCommand>.verifyHasCommandToAuthenticateMassDeletion() {
+        val command = this.firstOrNull { it is PromptUserToAuthenticateMassDeletion }
+        assertNotNull(command)
+        assertTrue((command as PromptUserToAuthenticateMassDeletion).authConfiguration.requireUserAction)
     }
 
     private fun List<Command>.verifyDoesNotHaveCommandToShowUndoDeletionSnackbar() {

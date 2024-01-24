@@ -18,6 +18,7 @@ package com.duckduckgo.autofill.impl.deviceauth
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthConfiguration
 
 abstract class FakeAuthenticator : DeviceAuthenticator {
 
@@ -43,6 +44,7 @@ abstract class FakeAuthenticator : DeviceAuthenticator {
 
     override fun authenticate(
         fragment: Fragment,
+        config: AuthConfiguration,
         onResult: (DeviceAuthenticator.AuthResult) -> Unit,
     ) {
         authenticationCalled(onResult)
@@ -50,6 +52,7 @@ abstract class FakeAuthenticator : DeviceAuthenticator {
 
     override fun authenticate(
         fragmentActivity: FragmentActivity,
+        config: AuthConfiguration,
         onResult: (DeviceAuthenticator.AuthResult) -> Unit,
     ) {
         authenticationCalled(onResult)
