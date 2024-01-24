@@ -18,6 +18,7 @@ package com.duckduckgo.privacyprotectionspopup.impl
 
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.UNIQUE
 
 enum class PrivacyProtectionsPopupPixelName(
@@ -28,4 +29,41 @@ enum class PrivacyProtectionsPopupPixelName(
         pixelName = "m_privacy_protections_popup_experiment_variant_assigned_u",
         type = UNIQUE,
     ),
+    POPUP_TRIGGERED(
+        pixelName = "m_privacy_protections_popup_triggered_c",
+        type = COUNT,
+    ),
+    PROTECTIONS_DISABLED(
+        pixelName = "m_privacy_protections_popup_protections_disabled_c",
+        type = COUNT,
+    ),
+    PROTECTIONS_DISABLED_UNIQUE(
+        pixelName = "m_privacy_protections_popup_protections_disabled_u",
+        type = UNIQUE,
+    ),
+    PRIVACY_DASHBOARD_OPENED(
+        pixelName = "m_privacy_protections_popup_dashboard_opened_c",
+        type = COUNT,
+    ),
+    PRIVACY_DASHBOARD_OPENED_UNIQUE(
+        pixelName = "m_privacy_protections_popup_dashboard_opened_u",
+        type = UNIQUE,
+    ),
+    POPUP_DISMISSED_VIA_BUTTON(
+        pixelName = "m_privacy_protections_popup_dismissed_via_button_c",
+        type = COUNT,
+    ),
+    POPUP_DISMISSED_VIA_CLICK_OUTSIDE(
+        pixelName = "m_privacy_protections_popup_dismissed_via_click_outside_c",
+        type = COUNT,
+    ),
+    DO_NOT_SHOW_AGAIN_CLICKED(
+        pixelName = "m_privacy_protections_popup_do_not_show_again_clicked_u",
+        type = UNIQUE,
+    ),
+    ;
+
+    object Params {
+        const val PARAM_POPUP_TRIGGER_COUNT = "privacy_protections_popup_trigger_count"
+    }
 }

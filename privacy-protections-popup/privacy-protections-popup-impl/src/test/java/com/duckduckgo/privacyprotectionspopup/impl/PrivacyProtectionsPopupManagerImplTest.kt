@@ -30,6 +30,7 @@ import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DISMISSED
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DISMISS_CLICKED
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DONT_SHOW_AGAIN_CLICKED
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.PRIVACY_DASHBOARD_CLICKED
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupViewState
 import com.duckduckgo.privacyprotectionspopup.impl.PrivacyProtectionsPopupExperimentVariant.CONTROL
 import com.duckduckgo.privacyprotectionspopup.impl.PrivacyProtectionsPopupExperimentVariant.TEST
@@ -509,6 +510,87 @@ class PrivacyProtectionsPopupManagerImplTest {
             assertPopupVisible(visible = true)
 
             verify(pixels, never()).reportExperimentVariantAssigned()
+        }
+    }
+
+    @Test
+    fun whenPopupIsTriggeredThenPixelIsSent() = runTest {
+        subject.viewState.test {
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
+            assertPopupVisible(visible = true)
+
+            verify(pixels).reportPopupTriggered()
+        }
+    }
+
+    @Test
+    fun whenPrivacyProtectionsDisableButtonIsClickedThenPixelIsSent() = runTest {
+        subject.viewState.test {
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
+            assertPopupVisible(visible = true)
+
+            subject.onUiEvent(DISABLE_PROTECTIONS_CLICKED)
+
+            verify(pixels).reportProtectionsDisabled()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDismissButtonIsClickedThenPixelIsSent() = runTest {
+        subject.viewState.test {
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
+            assertPopupVisible(visible = true)
+
+            subject.onUiEvent(DISMISS_CLICKED)
+
+            verify(pixels).reportPopupDismissedViaButton()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPopupIsDismissedViaClickOutsideThenPixelIsSent() = runTest {
+        subject.viewState.test {
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
+            assertPopupVisible(visible = true)
+
+            subject.onUiEvent(DISMISSED)
+
+            verify(pixels).reportPopupDismissedViaClickOutside()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDoNotShowAgainButtonIsClickedThenPixelIsSent() = runTest {
+        subject.viewState.test {
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
+            assertPopupVisible(visible = true)
+
+            subject.onUiEvent(DONT_SHOW_AGAIN_CLICKED)
+
+            verify(pixels).reportDoNotShowAgainClicked()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPrivacyDashboardIsOpenedThenPixelIsSent() = runTest {
+        subject.viewState.test {
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
+            assertPopupVisible(visible = true)
+
+            subject.onUiEvent(PRIVACY_DASHBOARD_CLICKED)
+
+            verify(pixels).reportPrivacyDashboardOpened()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 

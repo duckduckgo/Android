@@ -95,25 +95,27 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
         when (event) {
             DISMISSED -> {
                 dismissPopup()
+                pixels.reportPopupDismissedViaClickOutside()
             }
 
             DISMISS_CLICKED -> {
-                // TODO pixel
                 dismissPopup()
+                pixels.reportPopupDismissedViaButton()
             }
 
             DISABLE_PROTECTIONS_CLICKED -> {
-                // TODO pixel
                 state.value.domain?.let { domain ->
                     appCoroutineScope.launch {
                         userAllowListRepository.addDomainToUserAllowList(domain)
                     }
                 }
                 dismissPopup()
+                pixels.reportProtectionsDisabled()
             }
 
             PRIVACY_DASHBOARD_CLICKED -> {
                 dismissPopup()
+                pixels.reportPrivacyDashboardOpened()
             }
 
             DONT_SHOW_AGAIN_CLICKED -> {
@@ -121,6 +123,7 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
                     dataStore.setDoNotShowAgainClicked(clicked = true)
                 }
                 dismissPopup()
+                pixels.reportDoNotShowAgainClicked()
             }
         }
     }
@@ -168,6 +171,7 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
                 val count = dataStore.getPopupTriggerCount()
                 dataStore.setPopupTriggerCount(count + 1)
             }
+            pixels.reportPopupTriggered()
         }
     }
 
