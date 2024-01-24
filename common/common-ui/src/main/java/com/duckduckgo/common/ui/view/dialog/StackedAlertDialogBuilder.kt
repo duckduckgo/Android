@@ -34,6 +34,7 @@ class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
     abstract class EventListener {
         open fun onDialogShown() {}
         open fun onDialogDismissed() {}
+        open fun onDialogCancelled() {}
         open fun onButtonClicked(position: Int) {}
     }
 
@@ -99,6 +100,7 @@ class StackedAlertDialogBuilder(val context: Context) : DaxAlertDialog {
             .apply {
                 setCancelable(false)
                 setOnDismissListener { listener.onDialogDismissed() }
+                setOnCancelListener { listener.onDialogCancelled() }
             }
 
         dialog = dialogBuilder.create()
