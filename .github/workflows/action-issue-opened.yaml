@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Create Asana task
-        uses: duckduckgo/native-github-asana-sync@v1.0
+        uses: duckduckgo/native-github-asana-sync@v1.1
         with:
           asana-pat: ${{ secrets.GH_ASANA_SECRET }}
           asana-project: '414730916066338'
