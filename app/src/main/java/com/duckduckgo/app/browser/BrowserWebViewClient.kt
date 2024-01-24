@@ -52,7 +52,7 @@ import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedHandler
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.app.pixels.remoteconfig.OptimizeTrackerEvaluationRCWrapper
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.BrowserAutofill
@@ -95,7 +95,7 @@ class BrowserWebViewClient @Inject constructor(
     private val currentTimeProvider: CurrentTimeProvider,
     private val shouldSendPageLoadedPixel: PageLoadedHandler,
     private val userAgentProvider: UserAgentProvider,
-    private val browserConfigFeature: AndroidBrowserConfigFeature,
+    private val optimizeTrackerEvaluationRCWrapper: OptimizeTrackerEvaluationRCWrapper,
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -357,7 +357,7 @@ class BrowserWebViewClient @Inject constructor(
                 loginDetector.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, request))
             }
             Timber.v("Intercepting resource ${request.url} type:${request.method} on page $documentUrl")
-            if (browserConfigFeature.self().isEnabled() && browserConfigFeature.optimizeTrackerEvaluation().isEnabled()) {
+            if (optimizeTrackerEvaluationRCWrapper.enabled) {
                 requestInterceptor.shouldIntercept(request, webView, documentUrl?.toUri(), webViewClientListener)
             } else {
                 requestInterceptor.shouldIntercept(request, webView, documentUrl, webViewClientListener)

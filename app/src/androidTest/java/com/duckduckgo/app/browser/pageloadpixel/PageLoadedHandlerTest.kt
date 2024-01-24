@@ -1,10 +1,9 @@
 package com.duckduckgo.app.browser.pageloadpixel
 
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.app.pixels.remoteconfig.OptimizeTrackerEvaluationRCWrapper
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.device.DeviceInfo
-import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.TestScope
 import org.junit.Assert
 import org.junit.Before
@@ -27,8 +26,10 @@ class PageLoadedHandlerTest {
     private val deviceInfo: DeviceInfo = mock()
     private val webViewVersionProvider: WebViewVersionProvider = mock()
     private val pageLoadedPixelDao: PageLoadedPixelDao = mock()
-    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature = mock()
-    private val toggle: Toggle = mock()
+    private val optimizeTrackerEvaluationRCWrapper = object : OptimizeTrackerEvaluationRCWrapper {
+        override val enabled: Boolean
+            get() = true
+    }
 
     private val testee = RealPageLoadedHandler(
         deviceInfo,
@@ -36,15 +37,13 @@ class PageLoadedHandlerTest {
         pageLoadedPixelDao,
         TestScope(),
         coroutinesTestRule.testDispatcherProvider,
-        androidBrowserConfigFeature,
+        optimizeTrackerEvaluationRCWrapper,
     )
 
     @Before
     fun before() {
         whenever(webViewVersionProvider.getMajorVersion()).thenReturn("1")
         whenever(deviceInfo.appVersion).thenReturn("1")
-        whenever(androidBrowserConfigFeature.optimizeTrackerEvaluation()).thenReturn(toggle)
-        whenever(toggle.isEnabled()).thenReturn(true)
     }
 
     @Test
