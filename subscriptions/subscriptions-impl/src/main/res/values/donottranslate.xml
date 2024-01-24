@@ -83,4 +83,8 @@
     <!-- ITR Settings-->
     <string name="itrSettingTitle">Identity Theft Restoration</string>
     <string name="itrSettingSubtitle">If your identity is stolen, we\'ll help restore it</string>
+
+    <!-- Change Plan -->
+    <string name="changePlanTitle">Change Plan or Billing</string>
+    <string name="changePlanDescription">Your subscription was purchased through the Apple App Store. To change your plan or billing settings, please go to Settings > Apple ID > Subscriptions on a device signed in to the same Apple ID used to purchase your subscription.</string>
 </resources>

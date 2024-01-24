@@ -63,6 +63,8 @@ class ItrSettingViewModel(
             subscriptions.getEntitlementStatus(ITR_PRODUCT_NAME).also {
                 if (it.isSuccess) {
                     _viewState.emit(viewState.value.copy(hasSubscription = it.getOrDefault(NotFound) == Found))
+                } else {
+                    _viewState.emit(viewState.value.copy(hasSubscription = false))
                 }
             }
         }
