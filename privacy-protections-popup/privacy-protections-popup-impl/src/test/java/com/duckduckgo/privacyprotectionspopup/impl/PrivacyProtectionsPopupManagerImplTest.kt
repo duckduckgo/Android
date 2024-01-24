@@ -34,8 +34,6 @@ import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupViewSta
 import com.duckduckgo.privacyprotectionspopup.impl.PrivacyProtectionsPopupExperimentVariant.CONTROL
 import com.duckduckgo.privacyprotectionspopup.impl.PrivacyProtectionsPopupExperimentVariant.TEST
 import com.duckduckgo.privacyprotectionspopup.impl.db.PopupDismissDomainRepository
-import com.duckduckgo.privacyprotectionspopup.impl.store.PrivacyProtectionsPopupData
-import com.duckduckgo.privacyprotectionspopup.impl.store.PrivacyProtectionsPopupDataStore
 import java.time.Duration
 import java.time.Instant
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -579,46 +577,6 @@ private class FakePopupDismissDomainRepository : PopupDismissDomainRepository {
 
     override suspend fun removeAllEntries() =
         throw UnsupportedOperationException()
-}
-
-private class FakePrivacyProtectionsPopupDataStore : PrivacyProtectionsPopupDataStore {
-
-    override val data = MutableStateFlow(
-        PrivacyProtectionsPopupData(
-            toggleUsedAt = null,
-            popupTriggerCount = 0,
-            doNotShowAgainClicked = false,
-            experimentVariant = null,
-        ),
-    )
-
-    override suspend fun getToggleUsageTimestamp(): Instant? =
-        data.first().toggleUsedAt
-
-    override suspend fun setToggleUsageTimestamp(timestamp: Instant) {
-        data.update { it.copy(toggleUsedAt = timestamp) }
-    }
-
-    override suspend fun getPopupTriggerCount(): Int =
-        data.first().popupTriggerCount
-
-    override suspend fun setPopupTriggerCount(count: Int) {
-        data.update { it.copy(popupTriggerCount = count) }
-    }
-
-    override suspend fun getDoNotShowAgainClicked(): Boolean =
-        data.first().doNotShowAgainClicked
-
-    override suspend fun setDoNotShowAgainClicked(clicked: Boolean) {
-        data.update { it.copy(doNotShowAgainClicked = clicked) }
-    }
-
-    override suspend fun getExperimentVariant(): PrivacyProtectionsPopupExperimentVariant? =
-        data.first().experimentVariant
-
-    override suspend fun setExperimentVariant(variant: PrivacyProtectionsPopupExperimentVariant) {
-        data.update { it.copy(experimentVariant = variant) }
-    }
 }
 
 private class FakeDuckDuckGoUrlDetector : DuckDuckGoUrlDetector {
