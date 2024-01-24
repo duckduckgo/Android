@@ -54,6 +54,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.launch
+import logcat.logcat
 
 @ContributesBinding(FragmentScope::class)
 class PrivacyProtectionsPopupManagerImpl @Inject constructor(
@@ -164,6 +165,9 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
             experimentVariantToStore?.let { variant ->
                 dataStore.setExperimentVariant(variant)
                 pixels.reportExperimentVariantAssigned()
+                logcat(tag = PrivacyProtectionsPopupManagerImpl::class.simpleName) {
+                    "Experiment variant assigned: $variant"
+                }
             }
 
             if (popupTriggered) {
