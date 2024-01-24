@@ -16,6 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.service.notification
 
+import android.app.PendingIntent
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -62,6 +63,13 @@ class AppTpEnabledNotificationContentPluginTest {
 
     @Mock
     private lateinit var networkProtectionState: NetworkProtectionState
+
+    private val intentProvider = object : AppTpEnabledNotificationContentPlugin.IntentProvider {
+        override fun getOnPressNotificationIntent(): PendingIntent? = null
+
+        override fun getDeleteNotificationIntent(): PendingIntent? = null
+    }
+
     private val resources = InstrumentationRegistry.getInstrumentation().targetContext.resources
     private lateinit var plugin: AppTpEnabledNotificationContentPlugin
 
@@ -79,7 +87,8 @@ class AppTpEnabledNotificationContentPluginTest {
             appTrackerBlockingStatsRepository,
             appTrackingProtection,
             networkProtectionState,
-        ) { null }
+            intentProvider,
+        )
     }
 
     @After

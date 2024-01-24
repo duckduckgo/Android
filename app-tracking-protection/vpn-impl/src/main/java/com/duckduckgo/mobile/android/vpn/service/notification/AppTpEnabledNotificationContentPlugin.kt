@@ -57,6 +57,8 @@ class AppTpEnabledNotificationContentPlugin @Inject constructor(
     private val notificationPendingIntent by lazy { appTpEnabledNotificationIntentProvider.getOnPressNotificationIntent() }
     private val deletePendingIntent by lazy { appTpEnabledNotificationIntentProvider.getDeleteNotificationIntent() }
 
+    override val uuid: String = "1e2a9c9f-2ccd-425a-b454-4ea30d62c0cc"
+
     override fun getInitialContent(): VpnEnabledNotificationContent? {
         return if (isActive()) {
             return VpnEnabledNotificationContent(
