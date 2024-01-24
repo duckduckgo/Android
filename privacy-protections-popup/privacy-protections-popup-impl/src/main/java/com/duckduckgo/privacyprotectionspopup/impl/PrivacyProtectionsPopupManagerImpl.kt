@@ -65,6 +65,7 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
     private val userAllowListRepository: UserAllowListRepository,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val variantRandomizer: PrivacyProtectionsPopupExperimentVariantRandomizer,
+    private val pixels: PrivacyProtectionsPopupPixels,
 ) : PrivacyProtectionsPopupManager {
 
     private val state = MutableStateFlow(
@@ -158,6 +159,7 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
         experimentVariantToStore?.let { variant ->
             appCoroutineScope.launch {
                 dataStore.setExperimentVariant(variant)
+                pixels.reportExperimentVariantAssigned()
             }
         }
 

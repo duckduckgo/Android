@@ -47,6 +47,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -55,6 +56,11 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.doAnswer
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
@@ -79,6 +85,8 @@ class PrivacyProtectionsPopupManagerImplTest {
 
     private val variantRandomizer = FakePrivacyProtectionsPopupExperimentVariantRandomizer()
 
+    private val pixels: PrivacyProtectionsPopupPixels = mock()
+
     private val subject = PrivacyProtectionsPopupManagerImpl(
         appCoroutineScope = coroutineRule.testScope,
         featureFlag = featureFlag,
@@ -93,6 +101,7 @@ class PrivacyProtectionsPopupManagerImplTest {
         dataStore = dataStore,
         duckDuckGoUrlDetector = duckDuckGoUrlDetector,
         variantRandomizer = variantRandomizer,
+        pixels = pixels,
     )
 
     @Test
@@ -470,6 +479,38 @@ class PrivacyProtectionsPopupManagerImplTest {
 
             assertPopupVisible(visible = false)
             assertEquals(CONTROL, dataStore.getExperimentVariant())
+        }
+    }
+
+    @Test
+    fun whenExperimentVariantIsAssignedThenPixelIsSent() = runTest {
+        variantRandomizer.variant = CONTROL
+        assertNull(dataStore.getExperimentVariant())
+        var variantIncludedInPixel: PrivacyProtectionsPopupExperimentVariant? = null
+        whenever(pixels.reportExperimentVariantAssigned()) doAnswer {
+            variantIncludedInPixel = runBlocking { dataStore.getExperimentVariant() }
+        }
+
+        subject.viewState.test {
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
+            cancelAndIgnoreRemainingEvents()
+
+            verify(pixels).reportExperimentVariantAssigned()
+            assertEquals(CONTROL, variantIncludedInPixel) // Verify that pixel is sent AFTER assigned variant is stored.
+        }
+    }
+
+    @Test
+    fun whenVariantIsAlreadyAssignedThenPixelIsNotSent() = runTest {
+        dataStore.setExperimentVariant(TEST)
+        subject.viewState.test {
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
+
+            assertPopupVisible(visible = true)
+
+            verify(pixels, never()).reportExperimentVariantAssigned()
         }
     }
 
