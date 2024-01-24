@@ -24,18 +24,18 @@
         android:id="@+id/allApps"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:label="@string/atp_ExcludedAppsFilterMenuAllLabel" />
+        app:primaryText="@string/atp_ExcludedAppsFilterMenuAllLabel" />
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
         android:id="@+id/protectedApps"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:label="@string/atp_ExcludedAppsFilterMenuProtectedLabel" />
+        app:primaryText="@string/atp_ExcludedAppsFilterMenuProtectedLabel" />
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
         android:id="@+id/unprotectedApps"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:label="@string/atp_ExcludedAppsFilterMenuUnprotectedLabel" />
+        app:primaryText="@string/atp_ExcludedAppsFilterMenuUnprotectedLabel" />
 
 </LinearLayout>

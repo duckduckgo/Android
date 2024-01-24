@@ -30,12 +30,12 @@
     <com.duckduckgo.common.ui.view.PopupMenuItemView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:label="Default Type" />
+        app:primaryText="Default Type" />
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:label="Destructive Type"
-        app:labelType="destructive" />
+        app:primaryText="Destructive Type"
+        app:primaryTextType="destructive" />
 
 </LinearLayout>

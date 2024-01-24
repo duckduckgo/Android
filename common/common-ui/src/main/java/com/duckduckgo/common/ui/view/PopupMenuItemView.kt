@@ -48,30 +48,30 @@ constructor(
             0,
             0,
         ).apply {
-            if (hasValue(R.styleable.PopupMenuItemView_labelType)) {
-                val primaryTextType = when (getInt(R.styleable.PopupMenuItemView_labelType, 0)) {
+            if (hasValue(R.styleable.PopupMenuItemView_primaryTextType)) {
+                val primaryTextType = when (getInt(R.styleable.PopupMenuItemView_primaryTextType, 0)) {
                     1 -> DESTRUCTIVE
                     else -> PRIMARY
                 }
-                labelType(primaryTextType)
+                setPrimaryTextType(primaryTextType)
             }
-            binding.label.text = getString(R.styleable.PopupMenuItemView_label) ?: ""
+            binding.label.text = getString(R.styleable.PopupMenuItemView_primaryText) ?: ""
             updateContentDescription()
             recycle()
         }
     }
 
-    fun label(label: String) {
+    fun setPrimaryText(label: String) {
         binding.label.text = label
         updateContentDescription()
     }
 
-    fun label(label: () -> String) {
+    fun setPrimaryText(label: () -> String) {
         binding.label.text = label()
         updateContentDescription()
     }
 
-    fun labelType(type: PopupMenuItemType) {
+    fun setPrimaryTextType(type: PopupMenuItemType) {
         when (type) {
             PRIMARY -> binding.label.setTextColor(ContextCompat.getColorStateList(context, R.color.primary_text_color_selector))
             DESTRUCTIVE -> binding.label.setTextColor(ContextCompat.getColorStateList(context, R.color.destructive_text_color_selector))

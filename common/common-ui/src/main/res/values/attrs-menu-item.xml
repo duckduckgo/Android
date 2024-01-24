@@ -16,12 +16,6 @@
 
 <resources>
 
-    <attr name="label" format="string"/>
-    <attr name="labelType">
-        <enum name="primary" value="0" />
-        <enum name="destructive" value="1" />
-    </attr>
-
     <!--Menu item view-->
     <declare-styleable name="MenuItemView">
         <attr name="iconDrawable" format="reference" />
@@ -29,8 +23,8 @@
     </declare-styleable>
 
     <declare-styleable name="PopupMenuItemView">
-        <attr name="label" />
-        <attr name="labelType" />
+        <attr name="primaryText" />
+        <attr name="primaryTextType" />
     </declare-styleable>
 
 </resources>

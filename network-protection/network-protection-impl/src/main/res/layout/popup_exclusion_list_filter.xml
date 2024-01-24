@@ -25,18 +25,18 @@
         android:id="@+id/exclusion_list_filter_all"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:label="@string/netpExclusionListFilterMenuAllLabel" />
+        app:primaryText="@string/netpExclusionListFilterMenuAllLabel" />
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
         android:id="@+id/exclusion_list_filter_protected"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:label="@string/netpExclusionListFilterMenuProtectedLabel" />
+        app:primaryText="@string/netpExclusionListFilterMenuProtectedLabel" />
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
         android:id="@+id/exclusion_list_filter_unprotected"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:label="@string/netpExclusionListFilterMenuUnprotectedLabel" />
+        app:primaryText="@string/netpExclusionListFilterMenuUnprotectedLabel" />
 
 </LinearLayout>

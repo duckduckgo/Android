@@ -26,18 +26,18 @@
         android:id="@+id/edit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:label="@string/edit" />
+        app:primaryText="@string/edit" />
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
         android:id="@+id/addRemoveFavorite"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:label="@string/addToFavorites" />
+        app:primaryText="@string/addToFavorites" />
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
         android:id="@+id/delete"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:label="@string/delete" />
+        app:primaryText="@string/delete" />
 
 </LinearLayout>
