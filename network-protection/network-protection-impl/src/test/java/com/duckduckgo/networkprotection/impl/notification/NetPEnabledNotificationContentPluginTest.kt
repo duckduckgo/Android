@@ -153,5 +153,5 @@ class NetPEnabledNotificationContentPluginTest {
 }
 
 private fun VpnEnabledNotificationContentPlugin.VpnEnabledNotificationContent.assertTitleEquals(expected: String) {
-    Assert.assertEquals(expected, this.title.toString())
+    Assert.assertEquals(expected, this.text.toString())
 }

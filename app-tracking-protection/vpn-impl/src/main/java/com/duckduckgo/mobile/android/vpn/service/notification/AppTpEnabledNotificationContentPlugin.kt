@@ -62,7 +62,8 @@ class AppTpEnabledNotificationContentPlugin @Inject constructor(
     override fun getInitialContent(): VpnEnabledNotificationContent? {
         return if (isActive()) {
             return VpnEnabledNotificationContent(
-                title = SpannableStringBuilder(resources.getString(R.string.atp_OnInitialNotification)),
+                title = context.getString(R.string.atp_name),
+                text = SpannableStringBuilder(resources.getString(R.string.atp_OnInitialNotification)),
                 onNotificationPressIntent = notificationPendingIntent,
                 notificationActions = NotificationActions.VPNFeatureActions(emptyList()),
                 deleteIntent = deletePendingIntent,
@@ -89,7 +90,8 @@ class AppTpEnabledNotificationContentPlugin @Inject constructor(
                     resources.getQuantityString(R.plurals.atp_OnNotification, trackingApps.size, trackingApps.size)
                 }
                 VpnEnabledNotificationContent(
-                    title = SpannableStringBuilder(HtmlCompat.fromHtml(notificationText, HtmlCompat.FROM_HTML_MODE_LEGACY)),
+                    title = context.getString(R.string.atp_name),
+                    text = SpannableStringBuilder(HtmlCompat.fromHtml(notificationText, HtmlCompat.FROM_HTML_MODE_LEGACY)),
                     notificationActions = NotificationActions.VPNFeatureActions(
                         listOf(
                             NotificationActionReportIssue.mangeRecentAppsNotificationAction(context),

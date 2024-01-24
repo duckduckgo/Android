@@ -87,10 +87,10 @@ class AlwaysOnLockDownDetector @Inject constructor(
     }
 
     private suspend fun showNotification() {
-        val title = SpannableStringBuilder(getNotificationText())
+        val text = SpannableStringBuilder(getNotificationText())
         val intent = getNotificationIntent()
 
-        val notification = DeviceShieldNotificationFactory.DeviceShieldNotification(title = title)
+        val notification = DeviceShieldNotificationFactory.DeviceShieldNotification(text = text)
         deviceShieldAlertNotificationBuilder.buildAlwaysOnLockdownNotification(
             context,
             notification,

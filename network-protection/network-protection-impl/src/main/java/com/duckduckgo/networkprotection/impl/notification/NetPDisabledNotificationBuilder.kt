@@ -23,7 +23,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.TaskStackBuilder
@@ -72,9 +71,9 @@ class RealNetPDisabledNotificationBuilder @Inject constructor(
 
         return NotificationCompat.Builder(context, NETP_ALERTS_CHANNEL_ID)
             .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
-            .setStyle(NotificationCompat.DecoratedCustomViewStyle())
+            .setStyle(NotificationCompat.BigTextStyle().bigText(context.getString(R.string.netpNotificationDisabled)))
+            .setContentTitle(context.getString(R.string.netp_name))
             .setContentIntent(getPendingIntent(context))
-            .setCustomContentView(RemoteViews(context.packageName, R.layout.notification_netp_disabled))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setCategory(NotificationCompat.CATEGORY_STATUS)
             .addAction(netPNotificationActions.getEnableNetpNotificationAction(context))
@@ -131,9 +130,9 @@ class RealNetPDisabledNotificationBuilder @Inject constructor(
 
         return NotificationCompat.Builder(context, NETP_ALERTS_CHANNEL_ID)
             .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
-            .setStyle(NotificationCompat.DecoratedCustomViewStyle())
+            .setStyle(NotificationCompat.BigTextStyle().bigText(context.getString(R.string.netpNotificationDisabledByVpn)))
+            .setContentTitle(context.getString(R.string.netp_name))
             .setContentIntent(getPendingIntent(context))
-            .setCustomContentView(RemoteViews(context.packageName, R.layout.notification_netp_disabled_by_vpn))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setCategory(NotificationCompat.CATEGORY_STATUS)
             .addAction(netPNotificationActions.getEnableNetpNotificationAction(context))

@@ -21,7 +21,6 @@ import android.app.NotificationChannel
 import android.app.NotificationManager.IMPORTANCE_DEFAULT
 import android.content.Context
 import android.os.Build
-import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.di.scopes.AppScope
@@ -60,13 +59,12 @@ class RealVpnReminderNotificationBuilder @Inject constructor(
         vpnNotification: VpnReminderNotificationContentPlugin.NotificationContent,
     ): Notification {
         registerAlertChannel(context)
-        val notificationLayout = RemoteViews(context.packageName, vpnNotification.customViewLayout)
 
         val builder = NotificationCompat.Builder(context, VPN_ALERTS_CHANNEL_ID)
             .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
-            .setStyle(NotificationCompat.DecoratedCustomViewStyle())
+            .setStyle(NotificationCompat.BigTextStyle().bigText(vpnNotification.title))
+            .setContentTitle(context.getString(R.string.atp_name))
             .setContentIntent(vpnNotification.onNotificationPressIntent)
-            .setCustomContentView(notificationLayout)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setCategory(NotificationCompat.CATEGORY_STATUS)
             .setSilent(vpnNotification.isSilent)
