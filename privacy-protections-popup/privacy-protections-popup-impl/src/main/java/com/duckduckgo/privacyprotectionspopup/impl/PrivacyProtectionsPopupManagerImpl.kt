@@ -160,22 +160,20 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
             )
         }
 
-        experimentVariantToStore?.let { variant ->
-            appCoroutineScope.launch {
+        appCoroutineScope.launch {
+            experimentVariantToStore?.let { variant ->
                 dataStore.setExperimentVariant(variant)
                 pixels.reportExperimentVariantAssigned()
             }
-        }
 
-        if (popupTriggered) {
-            appCoroutineScope.launch {
+            if (popupTriggered) {
                 val count = dataStore.getPopupTriggerCount()
                 dataStore.setPopupTriggerCount(count + 1)
+                pixels.reportPopupTriggered()
             }
-            pixels.reportPopupTriggered()
-        }
 
-        tryReportPageRefreshOnPossibleBreakage(updatedState)
+            tryReportPageRefreshOnPossibleBreakage(updatedState)
+        }
     }
 
     override fun onPageLoaded(
