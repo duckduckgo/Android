@@ -328,7 +328,7 @@
             android:layout_marginTop="@dimen/keyline_2"
             android:layout_marginBottom="@dimen/keyline_2"
             android:text="Text Appearance Body 1 set manually"
-            android:textColor="@color/red_text_color_selector"
+            android:textColor="@color/destructive_text_color_selector"
             tools:ignore="HardcodedText"/>
 
     </LinearLayout>
