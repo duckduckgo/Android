@@ -47,6 +47,7 @@ import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
 import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
+import com.duckduckgo.app.browser.mediaplayback.MediaPlayback
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedHandler
@@ -92,6 +93,7 @@ class BrowserWebViewClient @Inject constructor(
     private val jsPlugins: PluginPoint<JsInjectorPlugin>,
     private val currentTimeProvider: CurrentTimeProvider,
     private val shouldSendPageLoadedPixel: PageLoadedHandler,
+    private val mediaPlayback: MediaPlayback,
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -282,6 +284,7 @@ class BrowserWebViewClient @Inject constructor(
             if (it != "about:blank" && start == null) {
                 start = currentTimeProvider.getTimeInMillis()
             }
+            handleMediaPlayback(webView, it)
             autoconsent.injectAutoconsent(webView, url)
             adClickManager.detectAdDomain(url)
             requestInterceptor.onPageStarted(url)
@@ -300,6 +303,11 @@ class BrowserWebViewClient @Inject constructor(
             it.onPageStarted(webView, url, webViewClientListener?.getSite())
         }
         loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
+    }
+
+    private fun handleMediaPlayback(webView: WebView, url: String) {
+        // The default value for this flag is `true`.
+        webView.settings.mediaPlaybackRequiresUserGesture = !mediaPlayback.isAutoplayEnabledForUrl(url)
     }
 
     @UiThread

@@ -47,6 +47,7 @@ import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
 import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
+import com.duckduckgo.app.browser.mediaplayback.MediaPlayback
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedHandler
@@ -117,6 +118,7 @@ class BrowserWebViewClientTest {
     private val currentTimeProvider: CurrentTimeProvider = mock()
     private val deviceInfo: DeviceInfo = mock()
     private val pageLoadedHandler: PageLoadedHandler = mock()
+    private val mediaPlayback: MediaPlayback = mock()
 
     @UiThreadTest
     @Before
@@ -145,6 +147,7 @@ class BrowserWebViewClientTest {
             jsPlugins,
             currentTimeProvider,
             pageLoadedHandler,
+            mediaPlayback,
         )
         testee.webViewClientListener = listener
         whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
@@ -212,6 +215,22 @@ class BrowserWebViewClientTest {
     fun whenOnPageStartedCalledThenInjectAutoconsentCalled() {
         testee.onPageStarted(webView, EXAMPLE_URL, null)
         verify(autoconsent).injectAutoconsent(webView, EXAMPLE_URL)
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnPageStartedCalledForUrlWithAutoplayEnabledThenMediaPlaybackRequiresUserGestureIsFalse() {
+        whenever(mediaPlayback.isAutoplayEnabledForUrl(EXAMPLE_URL)).thenReturn(true)
+        testee.onPageStarted(webView, EXAMPLE_URL, null)
+        assertFalse(webView.settings.mediaPlaybackRequiresUserGesture)
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnPageStartedCalledForUrlWithAutoplayDisabledThenMediaPlaybackRequiresUserGestureIsTrue() {
+        whenever(mediaPlayback.isAutoplayEnabledForUrl(EXAMPLE_URL)).thenReturn(false)
+        testee.onPageStarted(webView, EXAMPLE_URL, null)
+        assertTrue(webView.settings.mediaPlaybackRequiresUserGesture)
     }
 
     @UiThreadTest
