@@ -21,10 +21,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:clipChildren="false"
     android:clipToPadding="false"
-    android:paddingStart="16dp"
-    android:paddingTop="4dp"
-    android:paddingEnd="16dp"
-    android:paddingBottom="16dp">
+    android:paddingStart="@dimen/keyline_4"
+    android:paddingTop="@dimen/keyline_1"
+    android:paddingEnd="@dimen/keyline_4"
+    android:paddingBottom="@dimen/keyline_4">
 
     <FrameLayout
         android:id="@+id/anchor_overlay"
@@ -54,7 +54,7 @@
         android:id="@+id/cardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="@dimen/keyline_1"
         app:cardBackgroundColor="?colorSurface"
         app:cardElevation="8dp"
         app:layout_constraintStart_toStartOf="parent"
