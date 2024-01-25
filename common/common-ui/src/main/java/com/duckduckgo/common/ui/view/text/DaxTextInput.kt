@@ -55,6 +55,7 @@ interface TextInput {
     var text: String
     var hint: String
     var isEditable: Boolean
+    var error: String?
 
     fun addTextChangedListener(textWatcher: TextWatcher)
     fun removeTextChangedListener(textWatcher: TextWatcher)
@@ -170,6 +171,12 @@ class DaxTextInput @JvmOverloads constructor(
         set(value) {
             binding.internalEditText.isEnabled = value
             handleIsEditableChangeForEndIcon(value)
+        }
+
+    override var error: String?
+        get() = binding.internalInputLayout.error.toString()
+        set(value) {
+            binding.internalInputLayout.error = value
         }
 
     fun showKeyboardDelayed() {
