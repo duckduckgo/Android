@@ -50,5 +50,12 @@
                 android:label="@string/changePlanTitle"
                 android:parentActivityName=".ui.SubscriptionSettingsActivity"
                 android:screenOrientation="portrait" />
+
+        <activity
+                android:name=".pir.PirActivity"
+                android:exported="false"
+                android:label="Privacy Pro"
+                android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
+                android:screenOrientation="portrait" />
     </application>
 </manifest>

@@ -173,12 +173,15 @@ class RealSubscriptionsManagerTest {
     }
 
     @Test
-    fun whenGetSubscriptionDataIfUserNotAuthenticatedThenReturnFailure() = runTest {
+    fun whenGetSubscriptionDataIfUserNotAuthenticatedThenReturnSuccessWithEmtpyFields() = runTest {
         givenUserIsNotAuthenticated()
 
         val value = subscriptionsManager.getSubscriptionData()
 
-        assertTrue(value is Failure)
+        assertTrue(value is Success)
+        assertNull((value as Success).email)
+        assertTrue(value.entitlements.isEmpty())
+        assertTrue(value.externalId.isBlank())
     }
 
     @Test
