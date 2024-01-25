@@ -18,11 +18,12 @@ package com.duckduckgo.subscriptions.impl.ui
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.os.Message
 import android.view.MenuItem
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
-import android.webkit.WebViewClient
-import android.widget.Toast
+import android.webkit.WebView
+import android.webkit.WebView.WebViewTransport
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.widget.Toolbar
@@ -31,6 +32,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.browser.SpecialUrlDetector
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
@@ -48,6 +50,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionScreenNoParams
 import com.duckduckgo.subscriptions.impl.R.string
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ACTIVATE_URL
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BUY_URL
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionsWebviewBinding
@@ -75,6 +78,7 @@ import org.json.JSONObject
 data class SubscriptionsWebViewActivityWithParams(
     val url: String,
     val screenTitle: String,
+    val defaultToolbar: Boolean,
 ) : ActivityParams
 
 @InjectWith(ActivityScope::class)
@@ -87,16 +91,25 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity() {
     lateinit var subscriptionJsMessaging: JsMessaging
 
     @Inject
+    @Named("Itr")
+    lateinit var itrJsMessaging: JsMessaging
+
+    @Inject
     lateinit var userAgent: UserAgentProvider
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var specialUrlDetector: SpecialUrlDetector
 
     private val viewModel: SubscriptionWebViewViewModel by bindViewModel()
 
     private val binding: ActivitySubscriptionsWebviewBinding by viewBinding()
 
     private var url: String? = null
+
+    private var defaultToolbar: Boolean = true
 
     private val toolbar
         get() = binding.includeToolbar.toolbar
@@ -107,7 +120,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity() {
 
         val params = intent.getActivityParams(SubscriptionsWebViewActivityWithParams::class.java)
         url = params?.url ?: BUY_URL
-
+        defaultToolbar = params?.defaultToolbar ?: true
         setContentView(binding.root)
         setupInternalToolbar(toolbar)
 
@@ -126,8 +139,35 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity() {
                     }
                 },
             )
-            it.webChromeClient = WebChromeClient()
-            it.webViewClient = WebViewClient()
+            itrJsMessaging.register(it, null)
+            it.webChromeClient = object : WebChromeClient() {
+                override fun onCreateWindow(
+                    view: WebView?,
+                    isDialog: Boolean,
+                    isUserGesture: Boolean,
+                    message: Message,
+                ): Boolean {
+                    val transport = message.obj as WebView.WebViewTransport
+                    transport.webView = it
+                    message.sendToTarget()
+                    return true
+                }
+
+                override fun onProgressChanged(
+                    view: WebView?,
+                    newProgress: Int,
+                ) {
+                    if (newProgress == 100) {
+                        if (binding.webview.canGoBack()) {
+                            toolbar.setNavigationIcon(R.drawable.ic_arrow_left_24)
+                        } else {
+                            toolbar.setNavigationIcon(R.drawable.ic_close_24)
+                        }
+                    }
+                    super.onProgressChanged(view, newProgress)
+                }
+            }
+            it.webViewClient = SubscriptionsWebViewClient(specialUrlDetector, this)
             it.settings.apply {
                 userAgentString = userAgent.userAgent(url)
                 javaScriptEnabled = true
@@ -137,7 +177,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity() {
                 builtInZoomControls = true
                 displayZoomControls = false
                 mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
-                setSupportMultipleWindows(true)
+                setSupportMultipleWindows(false)
                 databaseEnabled = false
                 setSupportZoom(true)
             }
@@ -162,12 +202,13 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity() {
     private fun setupInternalToolbar(toolbar: Toolbar) {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        if (url == BUY_URL) {
+        if (defaultToolbar) {
             supportActionBar?.setDisplayShowTitleEnabled(false)
             binding.includeToolbar.logoToolbar.show()
             binding.includeToolbar.titleToolbar.show()
             toolbar.setNavigationIcon(R.drawable.ic_close_24)
             toolbar.setTitle(null)
+            toolbar.setNavigationOnClickListener { onBackPressed() }
         } else {
             supportActionBar?.setDisplayShowTitleEnabled(true)
             toolbar.setNavigationIcon(R.drawable.ic_arrow_left_24)
@@ -190,7 +231,14 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity() {
     }
 
     private fun goToITR() {
-        Toast.makeText(this, "Go To ITR", Toast.LENGTH_SHORT).show()
+        globalActivityStarter.start(
+            this,
+            SubscriptionsWebViewActivityWithParams(
+                url = SubscriptionsConstants.ITR_URL,
+                screenTitle = "",
+                defaultToolbar = true,
+            ),
+        )
     }
 
     private fun goToPIR() {
