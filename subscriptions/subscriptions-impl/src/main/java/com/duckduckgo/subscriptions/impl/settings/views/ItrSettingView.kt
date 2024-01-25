@@ -20,7 +20,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.FrameLayout
-import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
@@ -31,11 +30,13 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.databinding.ViewItrSettingsBinding
 import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingViewModel.Command
 import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingViewModel.Command.OpenItr
 import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingViewModel.Factory
 import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingViewModel.ViewState
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -109,7 +110,14 @@ class ItrSettingView @JvmOverloads constructor(
     private fun processCommands(command: Command) {
         when (command) {
             is OpenItr -> {
-                Toast.makeText(context, "Open ITR", Toast.LENGTH_SHORT).show()
+                globalActivityStarter.start(
+                    context,
+                    SubscriptionsWebViewActivityWithParams(
+                        url = SubscriptionsConstants.ITR_URL,
+                        screenTitle = "",
+                        defaultToolbar = true,
+                    ),
+                )
             }
         }
     }

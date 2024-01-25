@@ -1616,7 +1616,7 @@ class BrowserTabFragment :
             val action: String?
 
             if (appLink.appIntent != null) {
-                val packageName = appLink.appIntent.component?.packageName ?: return
+                val packageName = appLink.appIntent!!.component?.packageName ?: return
                 message = getString(R.string.appLinkSnackBarMessage, getAppName(packageName))
                 action = getString(R.string.appLinkSnackBarAction)
             } else {
@@ -1669,15 +1669,15 @@ class BrowserTabFragment :
     @Suppress("NewApi") // we use appBuildConfig
     private fun openAppLink(appLink: SpecialUrlDetector.UrlType.AppLink) {
         if (appLink.appIntent != null) {
-            appLink.appIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            appLink.appIntent!!.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             try {
-                startActivityOrQuietlyFail(appLink.appIntent)
+                startActivityOrQuietlyFail(appLink.appIntent!!)
             } catch (e: SecurityException) {
                 showToast(R.string.unableToOpenLink)
             }
         } else if (appLink.excludedComponents != null && appBuildConfig.sdkInt >= Build.VERSION_CODES.N) {
             val title = getString(R.string.appLinkIntentChooserTitle)
-            val chooserIntent = getChooserIntent(appLink.uriString, title, appLink.excludedComponents)
+            val chooserIntent = getChooserIntent(appLink.uriString, title, appLink.excludedComponents!!)
             startActivityOrQuietlyFail(chooserIntent)
         }
         viewModel.clearPreviousUrl()

@@ -93,7 +93,8 @@ class AddDeviceActivity : DuckDuckGoActivity() {
             this,
             SubscriptionsWebViewActivityWithParams(
                 url = MANAGE_URL,
-                getString(R.string.manageEmail),
+                screenTitle = getString(R.string.manageEmail),
+                defaultToolbar = false,
             ),
         )
     }
@@ -104,6 +105,7 @@ class AddDeviceActivity : DuckDuckGoActivity() {
             SubscriptionsWebViewActivityWithParams(
                 url = ADD_EMAIL_URL,
                 getString(R.string.addEmailText),
+                defaultToolbar = false,
             ),
         )
     }
