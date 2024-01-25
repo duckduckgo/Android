@@ -52,6 +52,7 @@ import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedHandler
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.pixels.remoteconfig.OptimizeTrackerEvaluationRCWrapper
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.BrowserAutofill
@@ -92,6 +93,7 @@ class BrowserWebViewClient @Inject constructor(
     private val jsPlugins: PluginPoint<JsInjectorPlugin>,
     private val currentTimeProvider: CurrentTimeProvider,
     private val shouldSendPageLoadedPixel: PageLoadedHandler,
+    private val optimizeTrackerEvaluationRCWrapper: OptimizeTrackerEvaluationRCWrapper,
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -347,12 +349,16 @@ class BrowserWebViewClient @Inject constructor(
         request: WebResourceRequest,
     ): WebResourceResponse? {
         return runBlocking {
-            val documentUrl = withContext(dispatcherProvider.main()) { webView.url }?.toUri()
+            val documentUrl = withContext(dispatcherProvider.main()) { webView.url }
             withContext(dispatcherProvider.main()) {
                 loginDetector.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, request))
             }
             Timber.v("Intercepting resource ${request.url} type:${request.method} on page $documentUrl")
-            requestInterceptor.shouldIntercept(request, webView, documentUrl, webViewClientListener)
+            if (optimizeTrackerEvaluationRCWrapper.enabled) {
+                requestInterceptor.shouldIntercept(request, webView, documentUrl?.toUri(), webViewClientListener)
+            } else {
+                requestInterceptor.shouldIntercept(request, webView, documentUrl, webViewClientListener)
+            }
         }
     }
 
