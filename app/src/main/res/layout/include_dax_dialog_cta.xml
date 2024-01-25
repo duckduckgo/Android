@@ -40,6 +40,8 @@
         android:layout_marginBottom="@dimen/keyline_4"
         android:layout_marginTop="39dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:cardBackgroundColor="#38FFFFFF"
+        app:cardElevation="0dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/logo"
         app:layout_constraintWidth_max="600dp">
@@ -69,7 +71,8 @@
                 android:layout_marginVertical="30dp"
                 android:clickable="true"
                 android:focusable="true"
-                android:textColor="?attr/daxColorPrimaryText" />
+                android:textColor="@color/white"
+                tools:ignore="InvalidColorAttribute" />
 
         </FrameLayout>
     </com.duckduckgo.common.ui.view.shape.DaxBubbleCardView>
