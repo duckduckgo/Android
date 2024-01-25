@@ -39,5 +39,8 @@ interface PrivacyProtectionsPopup {
      */
     fun setViewState(viewState: PrivacyProtectionsPopupViewState)
 
+    /**
+     * Notifies the popup UI about configuration change and re-creates UI if necessary.
+     */
     fun onConfigurationChanged()
 }
