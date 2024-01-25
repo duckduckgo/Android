@@ -55,7 +55,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/headerImage" />
 
-    <com.google.android.material.textfield.TextInputLayout
+    <com.duckduckgo.common.ui.view.text.DaxTextInput
         android:id="@+id/redeemCode"
         style="@style/Widget.DuckDuckGo.TextInput"
         android:layout_width="match_parent"
@@ -64,24 +64,14 @@
         android:layout_marginTop="24dp"
         android:layout_marginEnd="24dp"
         android:hint="@string/netpWaitlistCodeInvite"
-        android:textColorHint="?attr/daxColorSecondaryText"
-        app:errorIconTint="?attr/daxColorDestructive"
-        app:errorTextColor="?attr/daxColorDestructive"
-        app:errorIconDrawable="@null"
-        app:boxStrokeErrorColor="?attr/daxColorDestructive"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/statusTitle">
+        app:layout_constraintTop_toBottomOf="@+id/statusTitle"
+        app:type="single_line"
+        app:capitalizeKeyboard="true"
+        android:imeOptions="actionGo">
 
-        <com.google.android.material.textfield.TextInputEditText
-            style="@style/Widget.DuckDuckGo.TextInputText"
-            android:maxLines="1"
-            android:imeOptions="actionGo"
-            android:inputType="textCapCharacters"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-    </com.google.android.material.textfield.TextInputLayout>
+    </com.duckduckgo.common.ui.view.text.DaxTextInput>
 
     <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
         android:id="@+id/redeemButton"

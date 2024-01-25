@@ -16,12 +16,14 @@
 
 package com.duckduckgo.common.ui.view.text
 
+import android.R.attr
 import android.content.Context
 import android.content.res.TypedArray
 import android.graphics.drawable.Drawable
 import android.os.Parcel
 import android.os.Parcelable
 import android.os.Parcelable.ClassLoaderCreator
+import android.text.InputType
 import android.text.TextUtils.TruncateAt
 import android.text.TextUtils.TruncateAt.END
 import android.text.TextWatcher
@@ -31,12 +33,14 @@ import android.util.SparseArray
 import android.view.View
 import android.view.View.OnFocusChangeListener
 import android.view.inputmethod.EditorInfo
+import android.widget.TextView.OnEditorActionListener
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.doOnNextLayout
 import androidx.core.view.postDelayed
 import androidx.core.view.updateLayoutParams
+import androidx.core.widget.doOnTextChanged
 import com.duckduckgo.common.ui.view.showKeyboard
 import com.duckduckgo.common.ui.view.text.DaxTextInput.Type.INPUT_TYPE_FORM_MODE
 import com.duckduckgo.common.ui.view.text.DaxTextInput.Type.INPUT_TYPE_MULTI_LINE
@@ -68,6 +72,9 @@ interface TextInput {
     fun removeEndIcon()
 
     fun onAction(actionHandler: (Action) -> Unit)
+
+    fun setOnEditorActionListener(listener: OnEditorActionListener)
+    fun doOnTextChanged(action: (CharSequence?, Int, Int, Int) -> Unit)
 
     sealed class Action {
         object PerformEndAction : Action()
@@ -115,10 +122,26 @@ class DaxTextInput @JvmOverloads constructor(
             truncated = getBoolean(R.styleable.DaxTextInput_singleLineTextTruncated, false)
             setSingleLineTextTruncation(truncated)
 
+            context.obtainStyledAttributes(attrs, intArrayOf(attr.imeOptions)).apply {
+                binding.internalEditText.imeOptions = getInt(0, EditorInfo.IME_NULL)
+                recycle()
+            }
+
+            if (getBoolean(R.styleable.DaxTextInput_capitalizeKeyboard, false)) {
+                binding.internalEditText.inputType = binding.internalEditText.inputType or InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS
+            }
+
             setFocusListener()
 
             recycle()
         }
+    }
+
+    override fun doOnTextChanged(action: (CharSequence?, Int, Int, Int) -> Unit) {
+        binding.internalEditText.doOnTextChanged(action)
+    }
+    override fun setOnEditorActionListener(listener: OnEditorActionListener) {
+        binding.internalEditText.setOnEditorActionListener(listener)
     }
 
     private fun setupInputMode(inputType: Type) {

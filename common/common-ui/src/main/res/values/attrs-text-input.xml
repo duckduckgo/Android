@@ -19,6 +19,7 @@
         <attr name="android:hint" />
         <attr name="android:text" />
         <attr name="android:minLines" />
+        <attr name="capitalizeKeyboard" format="boolean" />
         <attr name="clickable" format="boolean" />
         <attr name="editable" format="boolean" />
         <attr name="endIcon" format="reference" />
