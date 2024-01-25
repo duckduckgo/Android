@@ -16,8 +16,24 @@
 
 package com.duckduckgo.privacyprotectionspopup.api
 
+/**
+ * Enum class representing different UI events emitted by [PrivacyProtectionsPopup]
+ * and consumed by [PrivacyProtectionsPopupManager].
+ */
 enum class PrivacyProtectionsPopupUiEvent {
+    /**
+     * Event indicating that the popup was dismissed by the user without explicit
+     * interaction with the popup UI, e.g., by clicking outside of the popup.
+     */
     DISMISSED,
+
+    /**
+     * Event indicating that the dismiss button within the popup was clicked.
+     */
     DISMISS_CLICKED,
+
+    /**
+     * Event indicating that the 'Disable Protections' button was clicked.
+     */
     DISABLE_PROTECTIONS_CLICKED,
 }
