@@ -36,6 +36,18 @@ enum class PrivacyProtectionsPopupUiEvent {
      * Event indicating that the 'Disable Protections' button was clicked.
      */
     DISABLE_PROTECTIONS_CLICKED,
+
+    /**
+     * Event indicating that the 'Don't show again' button was clicked.
+     */
     DONT_SHOW_AGAIN_CLICKED,
+
+    /**
+     * Event indicating that the privacy dashboard icon (popup anchor view) was clicked.
+     *
+     * The click event is passed to the popup anchor view, so no extra handling is necessary
+     * to open the privacy dashboard. This is emitted to ensure the [PrivacyProtectionsPopupManager]
+     * state is updated and for measurement purposes.
+     */
     PRIVACY_DASHBOARD_CLICKED,
 }
