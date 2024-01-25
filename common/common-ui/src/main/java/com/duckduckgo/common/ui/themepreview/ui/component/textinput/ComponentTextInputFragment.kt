@@ -57,6 +57,7 @@ class ComponentTextInputFragment : Fragment() {
         binding.outlinedinputtext31.onAction { toastOnClick(it) }
         binding.outlinedinputtext32.onAction { toastOnClick(it) }
         binding.outlinedinputtext33.onAction { toastOnClick(it) }
+        binding.outlinedinputtext21.error = "This is an error"
     }
 
     private fun toastOnClick(action: Action) = when (action) {
