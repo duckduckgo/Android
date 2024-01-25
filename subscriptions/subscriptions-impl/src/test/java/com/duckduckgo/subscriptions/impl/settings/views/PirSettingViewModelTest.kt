@@ -61,12 +61,13 @@ class PirSettingViewModelTest {
     }
 
     @Test
-    fun whenOnResumeEntitlementCheckFailsEmitViewState() = runTest {
+    fun whenOnResumeEntitlementCheckFailsDoNotEmitViewState() = runTest {
         whenever(subscriptions.getEntitlementStatus("Data Broker Protection")).thenReturn(Result.failure(RuntimeException()))
 
-        viewModel.onResume(mock())
         viewModel.viewState.test {
             assertFalse(awaitItem().hasSubscription)
+            viewModel.onResume(mock())
+            expectNoEvents()
             cancelAndConsumeRemainingEvents()
         }
     }

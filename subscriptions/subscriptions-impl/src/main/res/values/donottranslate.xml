@@ -87,4 +87,10 @@
     <!-- Change Plan -->
     <string name="changePlanTitle">Change Plan or Billing</string>
     <string name="changePlanDescription">Your subscription was purchased through the Apple App Store. To change your plan or billing settings, please go to Settings > Apple ID > Subscriptions on a device signed in to the same Apple ID used to purchase your subscription.</string>
+
+    <!-- PIR Activity-->
+    <string name="pirTitle">Activate Privacy Pro on desktop to set up Personal Information Removal</string>
+    <string name="pirDescription">In the DuckDuckGo browser for desktop, go to <b>Settings > Privacy Pro</b> and click <b>I Have a Subscription</b> to get started.</string>
+    <string name="pirWindowsButton">Windows</string>
+    <string name="pirMacOsButton">macOS</string>
 </resources>

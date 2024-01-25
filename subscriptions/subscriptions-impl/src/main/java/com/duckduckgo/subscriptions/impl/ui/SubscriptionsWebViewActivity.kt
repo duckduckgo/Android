@@ -51,6 +51,7 @@ import com.duckduckgo.subscriptions.impl.R.string
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ACTIVATE_URL
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BUY_URL
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionsWebviewBinding
+import com.duckduckgo.subscriptions.impl.pir.PirActivity.Companion.PirScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.ui.AddDeviceActivity.Companion.AddDeviceScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionActivity.Companion.RestoreSubscriptionScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
@@ -98,7 +99,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity() {
     private var url: String? = null
 
     private val toolbar
-        get() = binding.toolbar
+        get() = binding.includeToolbar.toolbar
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -163,15 +164,15 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         if (url == BUY_URL) {
             supportActionBar?.setDisplayShowTitleEnabled(false)
-            binding.logoToolbar.show()
-            binding.titleToolbar.show()
+            binding.includeToolbar.logoToolbar.show()
+            binding.includeToolbar.titleToolbar.show()
             toolbar.setNavigationIcon(R.drawable.ic_close_24)
             toolbar.setTitle(null)
         } else {
             supportActionBar?.setDisplayShowTitleEnabled(true)
             toolbar.setNavigationIcon(R.drawable.ic_arrow_left_24)
-            binding.logoToolbar.hide()
-            binding.titleToolbar.hide()
+            binding.includeToolbar.logoToolbar.hide()
+            binding.includeToolbar.titleToolbar.hide()
         }
     }
 
@@ -193,7 +194,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity() {
     }
 
     private fun goToPIR() {
-        Toast.makeText(this, "Go To PIR", Toast.LENGTH_SHORT).show()
+        globalActivityStarter.start(this, PirScreenWithEmptyParams)
     }
 
     private fun goToNetP(params: ActivityParams) {
