@@ -61,7 +61,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome) 
         // displayed on top of the onboarding.
         if (view?.windowVisibility == View.VISIBLE) {
             // Nothing to do at this point with the result. Proceed with the welcome animation.
-            scheduleWelcomeAnimation(ANIMATION_DELAY_AFTER_NOTIFICATIONS_PERMISSIONS_HANDLED)
+            scheduleTypingAnimation()
         }
     }
 
@@ -74,7 +74,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome) 
     private val events = MutableSharedFlow<WelcomePageView.Event>(replay = 0, extraBufferCapacity = 1)
 
     private val welcomePageViewModel: WelcomePageViewModel by lazy {
-        ViewModelProvider(this, viewModelFactory).get(WelcomePageViewModel::class.java)
+        ViewModelProvider(this, viewModelFactory)[WelcomePageViewModel::class.java]
     }
 
     private val binding: ContentOnboardingWelcomeBinding by viewBinding()
@@ -86,7 +86,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome) 
         super.onViewCreated(view, savedInstanceState)
 
         configureDaxCta()
-        requestNotificationsPermissions()
+        scheduleWelcomeAnimation()
         setSkipAnimationListener()
 
         lifecycleScope.launch {
@@ -97,12 +97,28 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome) 
         }
     }
 
-    @SuppressLint("InlinedApi")
+    private fun scheduleWelcomeAnimation() {
+        welcomeAnimation = ViewCompat.animate(binding.welcomeContent as View)
+            .alpha(MIN_ALPHA)
+            .setDuration(ANIMATION_DURATION)
+            .setStartDelay(ANIMATION_DELAY)
+            .withEndAction {
+                requestNotificationsPermissions()
+            }
+    }
+
     private fun requestNotificationsPermissions() {
         if (appBuildConfig.sdkInt >= android.os.Build.VERSION_CODES.TIRAMISU) {
-            requestPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+            event(WelcomePageView.Event.OnNotificationPermissionsRequested)
         } else {
             scheduleWelcomeAnimation()
+        }
+    }
+
+    @SuppressLint("InlinedApi")
+    private fun showNotificationsPermissionsPrompt() {
+        if (appBuildConfig.sdkInt >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            requestPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
     }
 
@@ -112,9 +128,13 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome) 
             is WelcomePageView.State.ShowDefaultBrowserDialog -> {
                 showDefaultBrowserDialog(state.intent)
             }
+
             WelcomePageView.State.Finish -> {
                 onContinuePressed()
             }
+
+            WelcomePageView.State.ShowWelcomeAnimation -> scheduleTypingAnimation()
+            WelcomePageView.State.ShowNotificationsPermissionsPrompt -> showNotificationsPermissionsPrompt()
         }
     }
 
@@ -181,26 +201,20 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome) 
                 finishTypingAnimation()
             } else if (!welcomeAnimationFinished) {
                 welcomeAnimation?.cancel()
-                scheduleWelcomeAnimation(0L)
+                scheduleTypingAnimation()
             }
             welcomeAnimationFinished = true
         }
     }
 
-    private fun scheduleWelcomeAnimation(startDelay: Long = ANIMATION_DELAY) {
-        welcomeAnimation = ViewCompat.animate(binding.welcomeContent as View)
-            .alpha(MIN_ALPHA)
+    private fun scheduleTypingAnimation() {
+        typingAnimation = ViewCompat.animate(binding.daxDialogCta.daxCtaContainer)
+            .alpha(MAX_ALPHA)
             .setDuration(ANIMATION_DURATION)
-            .setStartDelay(startDelay)
             .withEndAction {
-                typingAnimation = ViewCompat.animate(binding.daxDialogCta.daxCtaContainer)
-                    .alpha(MAX_ALPHA)
-                    .setDuration(ANIMATION_DURATION)
-                    .withEndAction {
-                        welcomeAnimationFinished = true
-                        binding.daxDialogCta.dialogTextCta.startTypingAnimation(ctaText)
-                        setPrimaryCtaListenerAfterWelcomeAlphaAnimation()
-                    }
+                welcomeAnimationFinished = true
+                binding.daxDialogCta.dialogTextCta.startTypingAnimation(ctaText)
+                setPrimaryCtaListenerAfterWelcomeAlphaAnimation()
             }
     }
 
@@ -217,8 +231,8 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome) 
     companion object {
         private const val MIN_ALPHA = 0f
         private const val MAX_ALPHA = 1f
-        private const val ANIMATION_DURATION = 400L
-        private const val ANIMATION_DELAY = 1400L
+        private const val ANIMATION_DURATION = 1200L
+        private const val ANIMATION_DELAY = 1800L
         private const val ANIMATION_DELAY_AFTER_NOTIFICATIONS_PERMISSIONS_HANDLED = 800L
 
         private const val DEFAULT_BROWSER_ROLE_MANAGER_DIALOG = 101
