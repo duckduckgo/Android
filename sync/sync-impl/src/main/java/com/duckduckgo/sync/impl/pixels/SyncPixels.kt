@@ -21,7 +21,8 @@ import androidx.core.content.edit
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.Result.Error
-import com.duckduckgo.sync.impl.pixels.SyncPixelName.SYNC_DAILY_PIXEL
+import com.duckduckgo.sync.impl.pixels.SyncPixelName.SYNC_DAILY
+import com.duckduckgo.sync.impl.pixels.SyncPixelName.SYNC_DAILY_SUCCESS_RATE_PIXEL
 import com.duckduckgo.sync.impl.stats.SyncStatsRepository
 import com.duckduckgo.sync.store.SharedPrefsProvider
 import com.squareup.anvil.annotations.ContributesBinding
@@ -35,8 +36,15 @@ interface SyncPixels {
 
     /**
      * Fired once per day, for all users with sync enabled
+     * Sent during the first sync of the day
      */
     fun fireDailyPixel()
+
+    /**
+     * Fired once per day, for all users with sync enabled
+     * It carries the daily stats for errors and sync count
+     */
+    fun fireDailySuccessRatePixel()
 
     /**
      * Fired after a sync operation has found timestamp conflict
@@ -76,12 +84,16 @@ class RealSyncPixels @Inject constructor(
     }
 
     override fun fireDailyPixel() {
+        tryToFireDailyPixel(SYNC_DAILY)
+    }
+
+    override fun fireDailySuccessRatePixel() {
         val dailyStats = statsRepository.getYesterdayDailyStats()
         val payload = mapOf(
             SyncPixelParameters.COUNT to dailyStats.attempts,
             SyncPixelParameters.DATE to dailyStats.date,
         ).plus(dailyStats.apiErrorStats).plus(dailyStats.operationErrorStats)
-        tryToFireDailyPixel(SYNC_DAILY_PIXEL, payload)
+        tryToFireDailyPixel(SYNC_DAILY_SUCCESS_RATE_PIXEL, payload)
     }
 
     override fun fireTimestampConflictPixel(feature: String) {
@@ -142,14 +154,13 @@ class RealSyncPixels @Inject constructor(
 
 // https://app.asana.com/0/72649045549333/1205649300615861
 enum class SyncPixelName(override val pixelName: String) : Pixel.PixelName {
-    SYNC_DAILY_PIXEL("m_sync_success_rate_daily"),
+    SYNC_DAILY("m_sync_daily"),
+    SYNC_DAILY_SUCCESS_RATE_PIXEL("m_sync_success_rate_daily"),
     SYNC_TIMESTAMP_RESOLUTION_TRIGGERED("m_sync_%s_local_timestamp_resolution_triggered"),
     SYNC_LOGIN("m_sync_login"),
     SYNC_SIGNUP_DIRECT("m_sync_signup_direct"),
     SYNC_SIGNUP_CONNECT("m_sync_signup_connect"),
     SYNC_ACCOUNT_FAILURE("m_sync_account_failure"),
-    SYNC_ENCRYPT_FAILURE("m_sync_encrypt_failure"),
-    SYNC_DECRYPT_FAILURE("m_sync_decrypt_failure"),
 }
 
 object SyncPixelParameters {

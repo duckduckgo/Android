@@ -484,6 +484,7 @@ internal class SyncEngineTest {
         syncEngine.triggerSync(APP_OPEN)
 
         verify(syncApiClient).patch(any())
+        verify(syncPixels).fireDailySuccessRatePixel()
         verify(syncPixels).fireDailyPixel()
         verify(syncStateRepository).updateSyncState(SUCCESS)
     }
@@ -496,6 +497,7 @@ internal class SyncEngineTest {
         syncEngine.triggerSync(APP_OPEN)
 
         verify(syncApiClient).patch(any())
+        verify(syncPixels).fireDailySuccessRatePixel()
         verify(syncPixels).fireDailyPixel()
         verify(syncOperationErrorRecorder).record(BOOKMARKS.field, TIMESTAMP_CONFLICT)
         verify(syncStateRepository).updateSyncState(SUCCESS)
@@ -509,6 +511,7 @@ internal class SyncEngineTest {
         syncEngine.triggerSync(APP_OPEN)
 
         verify(syncApiClient).patch(any())
+        verify(syncPixels).fireDailySuccessRatePixel()
         verify(syncPixels).fireDailyPixel()
         verify(syncOperationErrorRecorder).record(BOOKMARKS.field, ORPHANS_PRESENT)
         verify(syncStateRepository).updateSyncState(SUCCESS)
