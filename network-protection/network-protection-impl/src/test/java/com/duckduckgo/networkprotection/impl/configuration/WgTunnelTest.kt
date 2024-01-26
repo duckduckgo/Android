@@ -40,7 +40,7 @@ class WgTunnelTest {
         PrivateKey = ${keys.privateKey.toBase64()}
         
         [Peer]
-        AllowedIPs = ${serverData.allowedIPs}
+        AllowedIPs = 0.0.0.0/0, ::/0
         Endpoint = ${serverData.publicEndpoint}
         Name = ${serverData.serverName}
         Location = ${serverData.location}

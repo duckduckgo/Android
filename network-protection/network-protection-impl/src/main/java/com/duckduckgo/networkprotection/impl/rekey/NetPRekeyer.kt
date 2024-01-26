@@ -27,7 +27,6 @@ import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnel
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
-import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesTo
 import com.wireguard.crypto.KeyPair
@@ -47,7 +46,6 @@ interface NetPRekeyer {
 
 @ContributesBinding(VpnScope::class)
 class RealNetPRekeyer @Inject constructor(
-    private val networkProtectionRepository: NetworkProtectionRepository,
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
     private val networkProtectionPixels: NetworkProtectionPixels,
     @ProcessName private val processName: String,
@@ -67,14 +65,14 @@ class RealNetPRekeyer @Inject constructor(
         logcat { "Rekeying client on $processName" }
         val forceOrFalseInProductionBuilds = forceRekey.getAndResetValue()
 
-        val millisSinceLastKeyUpdate = System.currentTimeMillis() - networkProtectionRepository.lastPrivateKeyUpdateTimeInMillis
+        val millisSinceLastKeyUpdate = System.currentTimeMillis() - wgTunnel.configCreatedAtTimestamp()
         if (!forceOrFalseInProductionBuilds && millisSinceLastKeyUpdate < TimeUnit.DAYS.toMillis(1)) {
             logcat { "Less than 24h passed, skip re-keying" }
             return
         }
 
         if (deviceLockedChecker.invoke() || forceOrFalseInProductionBuilds) {
-            val config = wgTunnel.establish(KeyPair())
+            val config = wgTunnel.establish(KeyPair(), updateConfig = false)
                 .onFailure {
                     logcat(LogPriority.ERROR) { "Failed registering the new key during re-keying: ${it.asLog()}" }
                 }.getOrNull() ?: return
@@ -82,7 +80,7 @@ class RealNetPRekeyer @Inject constructor(
             logcat { "Re-keying with public key: ${config.`interface`.keyPair.publicKey.toBase64()}" }
 
             if (vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)) {
-                networkProtectionRepository.wireguardConfig = config
+                wgTunnel.updateWgConfig(config)
                 logcat { "Restarting VPN after clearing client keys" }
                 networkProtectionPixels.reportRekeyCompleted()
                 vpnFeaturesRegistry.refreshFeature(NetPVpnFeature.NETP_VPN)

@@ -59,20 +59,12 @@ class WgVpnNetworkStack @Inject constructor(
     override fun onCreateVpn(): Result<Unit> = Result.success(Unit)
 
     override suspend fun onPrepareVpn(): Result<VpnTunnelConfig> {
-        suspend fun fetchWireguardConfigAndCacheIt(): Config {
-            logcat { "Fetching new wireguard config" }
-            return wgTunnelLazy.get().establish()
-                .onFailure { netpPixels.get().reportErrorInRegistration() }
-                .onSuccess { config ->
-                    // refresh WG config
-                    networkProtectionRepository.get().wireguardConfig = config
-                }
-                .getOrThrow()
-        }
         return try {
             netpPixels.get().reportEnableAttempt()
 
-            wgConfig = networkProtectionRepository.get().wireguardConfig ?: fetchWireguardConfigAndCacheIt()
+            wgConfig = wgTunnelLazy.get().establish()
+                .onFailure { netpPixels.get().reportErrorInRegistration() }
+                .getOrThrow()
             logcat { "Wireguard configuration:\n$wgConfig" }
 
             val privateDns = dnsProvider.getPrivateDns()
@@ -84,7 +76,7 @@ class WgVpnNetworkStack @Inject constructor(
                     // why? no use intercepting encrypted DNS traffic, plus we can't configure any DNS that doesn't support DoT, otherwise Android
                     // will enforce DoT and will stop passing any DNS traffic, resulting in no DNS resolution == connectivity is killed
                     dns = if (privateDns.isEmpty()) wgConfig!!.`interface`.dnsServers else emptySet(),
-                    routes = wgConfig!!.peers.first().allowedIps.map { it.address.hostAddress!! to it.mask }.toMap(),
+                    routes = wgConfig!!.`interface`.routes.associate { it.address.hostAddress!! to it.mask },
                     appExclusionList = wgConfig!!.`interface`.excludedApplications,
                 ),
             ).also { logcat { "Returning VPN configuration: ${it.getOrNull()}" } }
@@ -156,7 +148,7 @@ class WgVpnNetworkStack @Inject constructor(
 
         if (reason != RESTART) {
             logcat { "Deleting wireguard config..." }
-            networkProtectionRepository.get().wireguardConfig = null
+            wgTunnelLazy.get().clearWgConfig()
         }
 
         // Only update if enabledTimeInMillis stop has been initiated by the user

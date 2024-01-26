@@ -19,7 +19,7 @@ import java.lang.StringBuilder
  *
  * Instances of this class are immutable.
  */
-class Peer private constructor(builder: Builder) { // The collection is already immutable.
+class Peer private constructor(val builder: Builder) { // The collection is already immutable.
     /**
      * Returns the peer's set of allowed IPs.
      *

@@ -18,7 +18,7 @@ import java.util.*
  *
  * Instances of this class are immutable.
  */
-class Config private constructor(builder: Builder) {
+class Config private constructor(val builder: Builder) {
     /**
      * Returns the interface section of the configuration.
      *
