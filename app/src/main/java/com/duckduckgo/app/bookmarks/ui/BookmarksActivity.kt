@@ -31,6 +31,17 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.ConfirmDeleteBookmarkFolder
+import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.ConfirmDeleteSavedSite
+import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.DeleteBookmarkFolder
+import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.ExportedSavedSites
+import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.ImportedSavedSites
+import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.LaunchBookmarkImport
+import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.OpenBookmarkFolder
+import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.OpenSavedSite
+import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.ShowEditBookmarkFolder
+import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.ShowEditSavedSite
+import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.ShowFaviconsPrompt
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFragment
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity.Companion.KEY_BOOKMARK_FOLDER_ID
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.EditBookmarkFolderDialogFragment
@@ -39,6 +50,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityBookmarksBinding
 import com.duckduckgo.app.browser.databinding.ContentBookmarksBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.browser.favicon.setting.FaviconPromptSheet
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.SearchBar
@@ -176,18 +188,31 @@ class BookmarksActivity : DuckDuckGoActivity() {
             this,
         ) {
             when (it) {
-                is BookmarksViewModel.Command.ConfirmDeleteSavedSite -> confirmDeleteSavedSite(it.savedSite)
-                is BookmarksViewModel.Command.OpenSavedSite -> openSavedSite(it.savedSiteUrl)
-                is BookmarksViewModel.Command.ShowEditSavedSite -> showEditSavedSiteDialog(it.savedSite)
-                is BookmarksViewModel.Command.ImportedSavedSites -> showImportedSavedSites(it.importSavedSitesResult)
-                is BookmarksViewModel.Command.ExportedSavedSites -> showExportedSavedSites(it.exportSavedSitesResult)
-                is BookmarksViewModel.Command.OpenBookmarkFolder -> openBookmarkFolder(it.bookmarkFolder)
-                is BookmarksViewModel.Command.ShowEditBookmarkFolder -> editBookmarkFolder(it.bookmarkFolder)
-                is BookmarksViewModel.Command.DeleteBookmarkFolder -> deleteBookmarkFolder(it.bookmarkFolder)
-                is BookmarksViewModel.Command.ConfirmDeleteBookmarkFolder -> confirmDeleteBookmarkFolder(it.bookmarkFolder)
-                is BookmarksViewModel.Command.LaunchBookmarkImport -> launchBookmarkImport()
+                is ConfirmDeleteSavedSite -> confirmDeleteSavedSite(it.savedSite)
+                is OpenSavedSite -> openSavedSite(it.savedSiteUrl)
+                is ShowEditSavedSite -> showEditSavedSiteDialog(it.savedSite)
+                is ImportedSavedSites -> showImportedSavedSites(it.importSavedSitesResult)
+                is ExportedSavedSites -> showExportedSavedSites(it.exportSavedSitesResult)
+                is OpenBookmarkFolder -> openBookmarkFolder(it.bookmarkFolder)
+                is ShowEditBookmarkFolder -> editBookmarkFolder(it.bookmarkFolder)
+                is DeleteBookmarkFolder -> deleteBookmarkFolder(it.bookmarkFolder)
+                is ConfirmDeleteBookmarkFolder -> confirmDeleteBookmarkFolder(it.bookmarkFolder)
+                is LaunchBookmarkImport -> launchBookmarkImport()
+                is ShowFaviconsPrompt -> showFaviconsPrompt()
             }
         }
+    }
+
+    private fun showFaviconsPrompt() {
+        val faviconPrompt = FaviconPromptSheet.Builder(this)
+            .addEventListener(
+                object : FaviconPromptSheet.EventListener() {
+                    override fun onFaviconsFetchingPromptDismissed(fetchingEnabled: Boolean) {
+                        viewModel.onFaviconsFetchingEnabled(fetchingEnabled, getParentFolderId())
+                    }
+                },
+            )
+        faviconPrompt.show()
     }
 
     private fun launchBookmarkImport() {
@@ -466,6 +491,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
 
     companion object {
         const val SAVED_SITE_URL_EXTRA = "SAVED_SITE_URL_EXTRA"
+        private const val TAG_FAVICON_PROMPT_DIALOG = "TAG_FAVICON_PROMPT_DIALOG"
 
         fun intent(
             context: Context,

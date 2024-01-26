@@ -45,6 +45,7 @@ import com.duckduckgo.savedsites.api.service.ImportSavedSitesResult
 import com.duckduckgo.savedsites.api.service.SavedSitesManager
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
+import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -60,6 +61,7 @@ class BookmarksViewModel @Inject constructor(
     private val savedSitesManager: SavedSitesManager,
     private val pixel: Pixel,
     private val syncEngine: SyncEngine,
+    private val faviconsFetchingPrompt: FaviconsFetchingPrompt,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : EditSavedSiteListener, AddBookmarkFolderListener, EditBookmarkFolderListener, DeleteBookmarkListener, ViewModel() {
@@ -82,6 +84,7 @@ class BookmarksViewModel @Inject constructor(
         data class ImportedSavedSites(val importSavedSitesResult: ImportSavedSitesResult) : Command()
         data class ExportedSavedSites(val exportSavedSitesResult: ExportSavedSitesResult) : Command()
         data object LaunchBookmarkImport : Command()
+        data object ShowFaviconsPrompt : Command()
     }
 
     companion object {
@@ -91,6 +94,7 @@ class BookmarksViewModel @Inject constructor(
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
     private val hiddenIds = MutableStateFlow(HiddenBookmarksIds())
+
     data class HiddenBookmarksIds(val items: List<String> = emptyList())
 
     init {
@@ -188,6 +192,12 @@ class BookmarksViewModel @Inject constructor(
 
     fun fetchBookmarksAndFolders(parentId: String) {
         viewModelScope.launch(dispatcherProvider.io()) {
+            if (faviconsFetchingPrompt.shouldShow()) {
+                withContext(dispatcherProvider.main()) {
+                    command.value = ShowFaviconsPrompt
+                }
+            }
+
             savedSitesRepository.getSavedSites(parentId)
                 .combine(hiddenIds) { savedSites, hiddenIds ->
                     val filteredBookmarks = savedSites.bookmarks.filter {
@@ -297,6 +307,7 @@ class BookmarksViewModel @Inject constructor(
                     val isFavorite = favorites.any { favorite -> favorite.id == bookmark.id }
                     BookmarkItem(bookmark.copy(isFavorite = isFavorite))
                 }
+
                 is BookmarkFolder -> BookmarkFolderItem(bookmark)
                 else -> null
             }
@@ -313,7 +324,10 @@ class BookmarksViewModel @Inject constructor(
         command.value = OpenSavedSite(savedSiteUrl)
     }
 
-    fun updateBookmarks(bookmarksAndFolders: List<String>, parentId: String) {
+    fun updateBookmarks(
+        bookmarksAndFolders: List<String>,
+        parentId: String,
+    ) {
         viewModelScope.launch(dispatcherProvider.io()) {
             Timber.d("Bookmarks: parentId: $parentId, updateBookmarks $bookmarksAndFolders")
             savedSitesRepository.updateFolderRelation(parentId, bookmarksAndFolders)
@@ -338,5 +352,27 @@ class BookmarksViewModel @Inject constructor(
                 ),
             )
         }
+    }
+
+    fun onFaviconsFetchingEnabled(
+        fetchingEnabled: Boolean,
+        currentFolderId: String,
+    ) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            faviconsFetchingPrompt.onPromptAnswered(fetchingEnabled)
+        }
+        if (fetchingEnabled) {
+            refreshBookmarks(currentFolderId)
+        }
+    }
+
+    private fun refreshBookmarks(currentFolderId: String) {
+        val currentState = viewState.value!!
+        viewState.value = currentState.copy(
+            favorites = emptyList(),
+            bookmarkItems = emptyList(),
+            enableSearch = currentState.enableSearch,
+        )
+        fetchBookmarksAndFolders(currentFolderId)
     }
 }

@@ -115,6 +115,7 @@ import com.duckduckgo.app.browser.databinding.IncludeQuickAccessItemsBinding
 import com.duckduckgo.app.browser.databinding.PopupWindowBrowserMenuBinding
 import com.duckduckgo.app.browser.downloader.BlobConverterInjector
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.browser.favicon.setting.FaviconPromptSheet
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.Companion.QUICK_ACCESS_ITEM_MAX_SIZE_DP
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
@@ -1067,10 +1068,11 @@ class BrowserTabFragment :
     }
 
     private fun showHome() {
-        viewModel.clearPreviousAppLink()
+        viewModel.onHomeShown()
         dismissAppLinkSnackBar()
         errorSnackbar.dismiss()
         newBrowserTab.newTabLayout.show()
+        // show the favicons bottom sheet if needed
         binding.browserLayout.gone()
         webViewContainer.gone()
         omnibar.appBarLayout.setExpanded(true)
@@ -1379,6 +1381,7 @@ class BrowserTabFragment :
             is Command.WebShareRequest -> webShareRequest.launch(it.data)
             is Command.ScreenLock -> screenLock(it.data)
             is Command.ScreenUnlock -> screenUnlock()
+            is Command.ShowFaviconsPrompt -> showFaviconsPrompt()
             else -> {
                 // NO OP
             }
@@ -2234,6 +2237,18 @@ class BrowserTabFragment :
 
     private fun screenUnlock() {
         activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+    }
+
+    private fun showFaviconsPrompt() {
+        val faviconPrompt = FaviconPromptSheet.Builder(requireContext())
+            .addEventListener(
+                object : FaviconPromptSheet.EventListener() {
+                    override fun onFaviconsFetchingPromptDismissed(fetchingEnabled: Boolean) {
+                        viewModel.onFaviconsFetchingEnabled(fetchingEnabled)
+                    }
+                },
+            )
+        faviconPrompt.show()
     }
 
     private fun configureWebViewForAutofill(it: DuckDuckGoWebView) {
@@ -3744,6 +3759,7 @@ class BrowserTabFragment :
             configuration: HomePanelCta,
             favorites: List<QuickAccessFavorite>,
         ) {
+            Timber.d("Sync: showHomeCta $favorites")
             hideDaxCta()
             if (newBrowserTab.ctaContainer.isEmpty()) {
                 renderHomeCta()
