@@ -307,7 +307,7 @@ class BrowserWebViewClient @Inject constructor(
 
     private fun handleMediaPlayback(webView: WebView, url: String) {
         // The default value for this flag is `true`.
-        webView.settings.mediaPlaybackRequiresUserGesture = !mediaPlayback.isAutoplayEnabledForUrl(url)
+        webView.settings.mediaPlaybackRequiresUserGesture = mediaPlayback.doesMediaPlaybackRequireUserGestureForUrl(url)
     }
 
     @UiThread

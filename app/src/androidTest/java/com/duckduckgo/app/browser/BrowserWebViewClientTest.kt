@@ -219,16 +219,16 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenOnPageStartedCalledForUrlWithAutoplayEnabledThenMediaPlaybackRequiresUserGestureIsFalse() {
-        whenever(mediaPlayback.isAutoplayEnabledForUrl(EXAMPLE_URL)).thenReturn(true)
+    fun whenOnPageStartedCalledForUrlWithUserGestureNotRequiredForUrlThenMediaPlaybackRequiresUserGestureIsFalse() {
+        whenever(mediaPlayback.doesMediaPlaybackRequireUserGestureForUrl(EXAMPLE_URL)).thenReturn(false)
         testee.onPageStarted(webView, EXAMPLE_URL, null)
         assertFalse(webView.settings.mediaPlaybackRequiresUserGesture)
     }
 
     @UiThreadTest
     @Test
-    fun whenOnPageStartedCalledForUrlWithAutoplayDisabledThenMediaPlaybackRequiresUserGestureIsTrue() {
-        whenever(mediaPlayback.isAutoplayEnabledForUrl(EXAMPLE_URL)).thenReturn(false)
+    fun whenOnPageStartedCalledForUrlWithUserGestureRequiredForUrlThenMediaPlaybackRequiresUserGestureIsTrue() {
+        whenever(mediaPlayback.doesMediaPlaybackRequireUserGestureForUrl(EXAMPLE_URL)).thenReturn(true)
         testee.onPageStarted(webView, EXAMPLE_URL, null)
         assertTrue(webView.settings.mediaPlaybackRequiresUserGesture)
     }

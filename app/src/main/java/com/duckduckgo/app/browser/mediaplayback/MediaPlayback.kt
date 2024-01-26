@@ -24,7 +24,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 interface MediaPlayback {
-    fun isAutoplayEnabledForUrl(url: String): Boolean
+    fun doesMediaPlaybackRequireUserGestureForUrl(url: String): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -33,9 +33,8 @@ class RealMediaPlayback @Inject constructor(
     private val mediaPlaybackRepository: MediaPlaybackRepository,
 ) : MediaPlayback {
 
-    override fun isAutoplayEnabledForUrl(url: String): Boolean {
+    override fun doesMediaPlaybackRequireUserGestureForUrl(url: String): Boolean {
         val uri = url.toUri()
-        return mediaPlaybackFeature.self()
-            .isEnabled() && mediaPlaybackRepository.exceptions.firstOrNull { it.domain == uri.baseHost } != null
+        return !(mediaPlaybackFeature.self().isEnabled() && mediaPlaybackRepository.exceptions.any { it.domain == uri.baseHost })
     }
 }
