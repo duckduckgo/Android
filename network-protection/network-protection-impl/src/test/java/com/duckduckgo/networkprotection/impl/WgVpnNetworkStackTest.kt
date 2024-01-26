@@ -17,15 +17,20 @@
 package com.duckduckgo.networkprotection.impl
 
 import com.duckduckgo.mobile.android.vpn.network.FakeDnsProvider
+import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack.VpnTunnelConfig
+import com.duckduckgo.mobile.android.vpn.prefs.FakeVpnSharedPreferencesProvider
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.RESTART
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.SELF_STOP
 import com.duckduckgo.networkprotection.impl.config.NetPDefaultConfigProvider
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnel
-import com.duckduckgo.networkprotection.impl.configuration.WgTunnel.WgTunnelData
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
-import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ClientInterface
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ServerDetails
+import com.duckduckgo.networkprotection.impl.store.RealNetworkProtectionRepository
+import com.duckduckgo.networkprotection.store.RealNetworkProtectionPrefs
+import com.wireguard.config.Config
+import java.io.BufferedReader
+import java.io.StringReader
 import java.net.InetAddress
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -43,7 +48,6 @@ class WgVpnNetworkStackTest {
     @Mock
     private lateinit var wgTunnel: WgTunnel
 
-    @Mock
     private lateinit var networkProtectionRepository: NetworkProtectionRepository
 
     @Mock
@@ -52,9 +56,7 @@ class WgVpnNetworkStackTest {
     @Mock
     private lateinit var netpPixels: NetworkProtectionPixels
 
-    private lateinit var wgTunnelData: WgTunnelData
-
-    private fun WgTunnelData.success(): Result<WgTunnelData> {
+    private fun Config.success(): Result<Config> {
         return Result.success(this)
     }
 
@@ -74,15 +76,23 @@ class WgVpnNetworkStackTest {
         }
     }
 
-    private lateinit var wgVpnNetworkStack: WgVpnNetworkStack
-
-    @Before
-    fun setUp() {
-        MockitoAnnotations.openMocks(this)
-
-        privateDnsProvider = FakeDnsProvider()
-
-        wgTunnelData = WgTunnelData(
+    private val wgQuickConfig = """
+        [Interface]
+        Address = 10.237.97.63/32
+        DNS = 1.2.3.4
+        MTU = 1280
+        PrivateKey = yD1fKxCG/HFbxOy4YfR6zG86YQ1nOswlsv8n7uypb14=
+        
+        [Peer]
+        AllowedIPs = 0.0.0.0/0
+        Endpoint = 10.10.10.10:443
+        Name = euw.1
+        Location = Stockholm, Sweden
+        PublicKey = u4geRTVQHaZYwsQzb/LsJqEDpxU8Fqzb5VjxGeIHslM=
+    """.trimIndent()
+    private lateinit var wgConfig: Config
+    /*
+            wgTunnelData = WgTunnelData(
             serverName = "euw.1",
             userSpaceConfig = "testuserspaceconfig",
             serverIP = "10.10.10.10",
@@ -91,13 +101,27 @@ class WgVpnNetworkStackTest {
             gateway = "1.2.3.4",
         )
 
+     */
+
+    private lateinit var wgVpnNetworkStack: WgVpnNetworkStack
+
+    @Before
+    fun setUp() {
+        MockitoAnnotations.openMocks(this)
+
+        privateDnsProvider = FakeDnsProvider()
+        networkProtectionRepository = RealNetworkProtectionRepository(
+            RealNetworkProtectionPrefs(FakeVpnSharedPreferencesProvider()),
+        )
+
+        wgConfig = Config.parse(BufferedReader(StringReader(wgQuickConfig)))
+
         wgVpnNetworkStack = WgVpnNetworkStack(
             { wgProtocol },
             { wgTunnel },
             { networkProtectionRepository },
             currentTimeProvider,
             { netpPixels },
-            netPDefaultConfigProvider,
             privateDnsProvider,
             mock(),
         )
@@ -105,32 +129,25 @@ class WgVpnNetworkStackTest {
 
     @Test
     fun whenOnPrepareVpnThenReturnVpnTunnelConfigAndStoreServerDetails() = runTest {
-        whenever(wgTunnel.establish()).thenReturn(wgTunnelData.success())
+        whenever(wgTunnel.establish()).thenReturn(wgConfig.success())
 
         val actual = wgVpnNetworkStack.onPrepareVpn().getOrNull()
-        val expectedDns = (netPDefaultConfigProvider.fallbackDns() + InetAddress.getByName(wgTunnelData.gateway))
 
         assertNotNull(actual)
-        assertEquals(1280, actual!!.mtu)
-        assertEquals(emptyMap<InetAddress, Int>(), actual.addresses)
-        assertEquals(setOf("com.example.app"), actual.appExclusionList)
-        assertEquals(mapOf("10.11.12.1" to 32), actual.routes)
-        assertEquals(expectedDns.size, actual.dns.size)
-        assertTrue(actual.dns.any { it.hostAddress == "1.2.3.4" })
-        assertTrue(actual.dns.any { it.hostAddress == "127.0.0.1" })
+        assertEquals(wgConfig.toTunnelConfig(), actual)
 
-        verify(networkProtectionRepository).serverDetails = ServerDetails(
+        val expectedServerDetails = ServerDetails(
             serverName = "euw.1",
             ipAddress = "10.10.10.10",
             location = "Stockholm, Sweden",
         )
-        verify(networkProtectionRepository).clientInterface = ClientInterface(emptySet())
+        assertEquals(expectedServerDetails, networkProtectionRepository.serverDetails)
         verify(netpPixels).reportEnableAttempt()
     }
 
     @Test
     fun whenOnPrepareVpnAndPrivateDnsConfiguredThenReturnEmptyDnsList() = runTest {
-        whenever(wgTunnel.establish()).thenReturn(wgTunnelData.success())
+        whenever(wgTunnel.establish()).thenReturn(wgConfig.success())
         privateDnsProvider.mutablePrivateDns.add(InetAddress.getByName("1.1.1.1"))
 
         val actual = wgVpnNetworkStack.onPrepareVpn().getOrThrow()
@@ -143,8 +160,7 @@ class WgVpnNetworkStackTest {
 
     @Test
     fun whenOnStartVpnAndEnabledTimeHasBeenResetThenSetEnabledTimeInMillis() = runTest {
-        whenever(wgTunnel.establish()).thenReturn(wgTunnelData.success())
-        whenever(networkProtectionRepository.enabledTimeInMillis).thenReturn(-1L)
+        whenever(wgTunnel.establish()).thenReturn(wgConfig.success())
         whenever(currentTimeProvider.getTimeInMillis()).thenReturn(1672229650358L)
 
         wgVpnNetworkStack.onPrepareVpn()
@@ -154,7 +170,7 @@ class WgVpnNetworkStackTest {
             wgVpnNetworkStack.onStartVpn(mock()),
         )
 
-        verify(networkProtectionRepository).enabledTimeInMillis = 1672229650358L
+        assertEquals(1672229650358L, networkProtectionRepository.enabledTimeInMillis)
         verify(netpPixels).reportEnableAttempt()
         verify(netpPixels).reportEnableAttemptSuccess()
         verifyNoMoreInteractions(netpPixels)
@@ -162,8 +178,7 @@ class WgVpnNetworkStackTest {
 
     @Test
     fun whenOnStartVpnAndEnabledTimeHasBeenSetThenDoNotUpdateEnabledTime() = runTest {
-        whenever(wgTunnel.establish()).thenReturn(wgTunnelData.success())
-        whenever(networkProtectionRepository.enabledTimeInMillis).thenReturn(16722296505000L)
+        networkProtectionRepository.wireguardConfig = wgConfig
         whenever(currentTimeProvider.getTimeInMillis()).thenReturn(1672229650358L)
 
         wgVpnNetworkStack.onPrepareVpn()
@@ -173,16 +188,14 @@ class WgVpnNetworkStackTest {
             wgVpnNetworkStack.onStartVpn(mock()),
         )
 
-        verify(networkProtectionRepository).serverDetails = ServerDetails(
+        val expectedServerDetails = ServerDetails(
             serverName = "euw.1",
             ipAddress = "10.10.10.10",
             location = "Stockholm, Sweden",
         )
-        verify(networkProtectionRepository).clientInterface = ClientInterface(
-            emptySet(),
-        )
-        verify(networkProtectionRepository).enabledTimeInMillis
-        verifyNoMoreInteractions(networkProtectionRepository)
+        assertEquals(expectedServerDetails, networkProtectionRepository.serverDetails)
+
+        assertEquals(1672229650358L, networkProtectionRepository.enabledTimeInMillis)
 
         verify(netpPixels).reportEnableAttempt()
         verify(netpPixels).reportEnableAttemptSuccess()
@@ -194,7 +207,7 @@ class WgVpnNetworkStackTest {
         val result = wgVpnNetworkStack.onStartVpn(mock())
         assertTrue(result.isFailure)
 
-        verifyNoInteractions(networkProtectionRepository)
+        assertEquals(-1, networkProtectionRepository.enabledTimeInMillis)
         verify(netpPixels).reportErrorWgInvalidState()
         verify(netpPixels).reportEnableAttemptFailure()
         verifyNoMoreInteractions(netpPixels)
@@ -207,8 +220,8 @@ class WgVpnNetworkStackTest {
             wgVpnNetworkStack.onStopVpn(SELF_STOP()),
         )
 
-        verify(networkProtectionRepository).enabledTimeInMillis = -1
-        verify(networkProtectionRepository).serverDetails = null
+        assertEquals(-1, networkProtectionRepository.enabledTimeInMillis)
+        assertNull(networkProtectionRepository.serverDetails)
     }
 
     @Test
@@ -218,8 +231,7 @@ class WgVpnNetworkStackTest {
             wgVpnNetworkStack.onStopVpn(RESTART),
         )
 
-        verify(networkProtectionRepository).serverDetails = null
-        verifyNoMoreInteractions(networkProtectionRepository)
+        assertNull(networkProtectionRepository.serverDetails)
     }
 
     @Test
@@ -236,7 +248,7 @@ class WgVpnNetworkStackTest {
     @Test
     fun whenWgProtocolStartWgReturnsFailureThenOnStartVpnShouldReturnFailure() = runTest {
         whenever(wgProtocol.startWg(any(), any(), eq(null))).thenReturn(Result.failure(java.lang.IllegalStateException()))
-        whenever(wgTunnel.establish()).thenReturn(wgTunnelData.success())
+        whenever(wgTunnel.establish()).thenReturn(wgConfig.success())
 
         wgVpnNetworkStack.onPrepareVpn()
 
@@ -250,7 +262,7 @@ class WgVpnNetworkStackTest {
     @Test
     fun whenWgProtocolStartWgReturnsSuccessThenOnStartVpnShouldReturnSuccess() = runTest {
         whenever(wgProtocol.startWg(any(), any(), eq(null))).thenReturn(Result.success(Unit))
-        whenever(wgTunnel.establish()).thenReturn(wgTunnelData.success())
+        whenever(wgTunnel.establish()).thenReturn(wgConfig.success())
 
         wgVpnNetworkStack.onPrepareVpn()
 
@@ -259,5 +271,18 @@ class WgVpnNetworkStackTest {
         verify(netpPixels).reportEnableAttempt()
         verify(netpPixels).reportEnableAttemptSuccess()
         verifyNoMoreInteractions(netpPixels)
+    }
+
+    private fun Config.toTunnelConfig(): VpnTunnelConfig {
+        return VpnTunnelConfig(
+            mtu = this.`interface`?.mtu ?: 1280,
+            addresses = this.`interface`.addresses.associate { Pair(it.address, it.mask) },
+            // when Android private DNS are set, we return DO NOT configure any DNS.
+            // why? no use intercepting encrypted DNS traffic, plus we can't configure any DNS that doesn't support DoT, otherwise Android
+            // will enforce DoT and will stop passing any DNS traffic, resulting in no DNS resolution == connectivity is killed
+            dns = this.`interface`.dnsServers,
+            routes = this.peers.first().allowedIps.map { it.address.hostAddress!! to it.mask }.toMap(),
+            appExclusionList = this.`interface`.excludedApplications,
+        )
     }
 }

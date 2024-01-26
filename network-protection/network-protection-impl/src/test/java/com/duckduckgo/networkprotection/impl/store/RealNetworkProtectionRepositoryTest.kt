@@ -16,75 +16,102 @@
 
 package com.duckduckgo.networkprotection.impl.store
 
+import com.duckduckgo.mobile.android.vpn.prefs.FakeVpnSharedPreferencesProvider
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ServerDetails
 import com.duckduckgo.networkprotection.store.NetworkProtectionPrefs
+import com.duckduckgo.networkprotection.store.RealNetworkProtectionPrefs
+import com.wireguard.config.Config
+import com.wireguard.crypto.KeyPair
+import java.io.BufferedReader
+import java.io.StringReader
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
-import org.mockito.ArgumentMatchers.anyLong
-import org.mockito.Mock
 import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.eq
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 
 class RealNetworkProtectionRepositoryTest {
-    @Mock
     private lateinit var networkProtectionPrefs: NetworkProtectionPrefs
+    private val keys = KeyPair()
+
+    private val wgQuickConfig = """
+        [Interface]
+        Address = 1.1.1.2/32
+        DNS = 1.1.1.1
+        MTU = 1280
+        PrivateKey = ${keys.privateKey.toBase64()}
+        
+        [Peer]
+        AllowedIPs = 0.0.0.0/0, 0.0.0.0/5, 8.0.0.0/7
+        Endpoint = 1.1.1.1:443
+        Name = expected_server_name
+        Location = expected_location
+        PublicKey = ${keys.publicKey.toBase64()}
+    """.trimIndent()
+    private val config = Config.parse(BufferedReader(StringReader(wgQuickConfig)))
+
     private lateinit var testee: RealNetworkProtectionRepository
 
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
+        networkProtectionPrefs = RealNetworkProtectionPrefs(FakeVpnSharedPreferencesProvider())
         testee = RealNetworkProtectionRepository(networkProtectionPrefs)
-
-        whenever(networkProtectionPrefs.getString("wg_server_name", null)).thenReturn("expected_server_name")
-        whenever(networkProtectionPrefs.getString("wg_server_ip", null)).thenReturn("expected_ip")
-        whenever(networkProtectionPrefs.getString("wg_server_location", null)).thenReturn("expected_location")
-        whenever(networkProtectionPrefs.getString("wg_private_key", null)).thenReturn("expected_private_key")
-        whenever(networkProtectionPrefs.getLong("wg_server_enable_time", -1L)).thenReturn(123124312312L)
     }
 
     @Test
-    fun whenGettingPrivateKeyThenGetStringFromPrefs() {
-        assertEquals("expected_private_key", testee.privateKey)
+    fun whenNoConfigThenNullPrivateKey() {
+        assertNull(testee.privateKey)
     }
 
     @Test
-    fun whenSettingPrivateKeyWithValueThenPutStringInPrefsAndSetLastUpdate() {
-        testee.privateKey = "privateKey"
-
-        verify(networkProtectionPrefs).putString("wg_private_key", "privateKey")
-        verify(networkProtectionPrefs).putLong(eq("wg_private_key_last_update"), anyLong())
+    fun whenConfigThenExpectedPrivateKeu() {
+        testee.wireguardConfig = config
+        assertEquals(keys.privateKey.toBase64(), testee.privateKey)
     }
 
     @Test
-    fun whenSettingPrivateKeyNullThenClearPrivateKeyAndLastUpdate() {
-        testee.privateKey = null
-
-        verify(networkProtectionPrefs).putString("wg_private_key", null)
-        verify(networkProtectionPrefs).putLong("wg_private_key_last_update", -1L)
+    fun whenNoConfigThenPrivateKeyUpdateTimeInMillisIsNull() {
+        assertEquals(-1, testee.lastPrivateKeyUpdateTimeInMillis)
     }
 
     @Test
-    fun whenGettingEnabledTimeMillisThenGetLongFromPrefs() {
-        assertEquals(123124312312L, testee.enabledTimeInMillis)
+    fun whenConfigThenSetPrivateKeyUpdateTimeInMillis() {
+        testee.wireguardConfig = config
+
+        assertNotNull(testee.lastPrivateKeyUpdateTimeInMillis)
+    }
+
+    @Test
+    fun whenClearConfigThenNullAssociatedInfo() {
+        testee.wireguardConfig = config
+        testee.wireguardConfig = null
+
+        assertNull(testee.privateKey)
+        assertEquals(-1, testee.lastPrivateKeyUpdateTimeInMillis)
+    }
+
+    @Test
+    fun whenNoEnabledTimeMillisThenReturnDefaultValue() {
+        assertEquals(-1, testee.enabledTimeInMillis)
     }
 
     @Test
     fun whenSettingEnabledTimeMillisThenPutLongInPrefs() {
         testee.enabledTimeInMillis = 12243235423453L
 
-        verify(networkProtectionPrefs).putLong("wg_server_enable_time", 12243235423453L)
+        assertEquals(12243235423453L, networkProtectionPrefs.getLong("wg_server_enable_time", -1))
     }
 
     @Test
-    fun whenGettingServerDetailsThenGetServerDetailsFromPrefs() {
+    fun whenConfigThenGetServerDetails() {
+        testee.wireguardConfig = config
+
         assertEquals(
             ServerDetails(
                 serverName = "expected_server_name",
-                ipAddress = "expected_ip",
+                ipAddress = "1.1.1.1",
                 location = "expected_location",
             ),
             testee.serverDetails,
@@ -92,79 +119,15 @@ class RealNetworkProtectionRepositoryTest {
     }
 
     @Test
-    fun whenSettingServerDetailsThenPutLongInPrefs() {
-        testee.serverDetails = ServerDetails(
-            serverName = "expected_server_name",
-            ipAddress = "expected_ip",
-            location = "expected_location",
-        )
-
-        verify(networkProtectionPrefs).putString("wg_server_ip", "expected_ip")
-        verify(networkProtectionPrefs).putString("wg_server_location", "expected_location")
-    }
-
-    @Test
-    fun whenServerDetailsIsSetToNullThenSetIpAndLocationToNull() {
-        testee.serverDetails = null
-
-        verify(networkProtectionPrefs).putString("wg_server_ip", null)
-        verify(networkProtectionPrefs).putString("wg_server_location", null)
-    }
-
-    @Test
-    fun whenBothIpAndLocationAreNullThenServerDetailsReturnNull() {
-        whenever(networkProtectionPrefs.getString("wg_server_ip", null)).thenReturn(null)
-        whenever(networkProtectionPrefs.getString("wg_server_location", null)).thenReturn(null)
-
+    fun whenNoConfigThenGetNullServerDetails() {
         assertNull(testee.serverDetails)
     }
 
     @Test
-    fun whenIpIsNullThenServerDetailsIpIsNull() {
-        whenever(networkProtectionPrefs.getString("wg_server_ip", null)).thenReturn(null)
-
-        assertEquals(
-            ServerDetails(
-                serverName = "expected_server_name",
-                ipAddress = null,
-                location = "expected_location",
-            ),
-            testee.serverDetails,
-        )
-    }
-
-    @Test
-    fun whenLocationIsNullThenServerDetailsLocationIsNull() {
-        whenever(networkProtectionPrefs.getString("wg_server_location", null)).thenReturn(null)
-
-        assertEquals(
-            ServerDetails(
-                serverName = "expected_server_name",
-                ipAddress = "expected_ip",
-                location = null,
-            ),
-            testee.serverDetails,
-        )
-    }
-
-    @Test
-    fun whenServerNameIsNullThenServerDetailsNameIsNull() {
-        whenever(networkProtectionPrefs.getString("wg_server_name", null)).thenReturn(null)
-
-        assertEquals(
-            ServerDetails(
-                serverName = null,
-                ipAddress = "expected_ip",
-                location = "expected_location",
-            ),
-            testee.serverDetails,
-        )
-    }
-
-    @Test
     fun whenClearStoreThenClearStore() {
+        testee.wireguardConfig = config
         networkProtectionPrefs.clear()
 
-        verify(networkProtectionPrefs).clear()
+        assertNull(testee.wireguardConfig)
     }
 }

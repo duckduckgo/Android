@@ -21,10 +21,13 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature.NETP_VPN
-import com.duckduckgo.networkprotection.impl.configuration.WgServerApi
+import com.duckduckgo.networkprotection.impl.configuration.WgTunnel
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
-import java.lang.RuntimeException
+import com.wireguard.config.Config
+import com.wireguard.crypto.KeyPair
+import java.io.BufferedReader
+import java.io.StringReader
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -34,6 +37,7 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -50,12 +54,29 @@ class RealNetPRekeyerTest {
     private lateinit var networkProtectionPixels: NetworkProtectionPixels
 
     @Mock
-    private lateinit var wgServerApi: WgServerApi
-
-    @Mock
     private lateinit var appBuildConfig: AppBuildConfig
 
+    @Mock
+    private lateinit var wgTunnel: WgTunnel
+
     private var isDeviceLocked = false
+    private val keys = KeyPair()
+
+    private val wgQuickConfig = """
+        [Interface]
+        Address = 1.1.1.2
+        DNS = 1.1.1.1
+        MTU = 1280
+        PrivateKey = ${keys.privateKey.toBase64()}
+        
+        [Peer]
+        AllowedIPs = 0.0.0.0/0
+        Endpoint = 12.12.12.12:443
+        Name = name
+        Location = Furadouro
+        PublicKey = ${keys.publicKey.toBase64()}
+    """.trimIndent()
+    private val config = Config.parse(BufferedReader(StringReader(wgQuickConfig)))
 
     private lateinit var testee: RealNetPRekeyer
 
@@ -63,18 +84,13 @@ class RealNetPRekeyerTest {
     fun setUp() {
         MockitoAnnotations.openMocks(this)
 
+        // networkProtectionRepository = RealNetworkProtectionRepository(
+        //     RealNetworkProtectionPrefs(FakeVpnSharedPreferencesProvider()),
+        // )
+
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
         runBlocking {
-            whenever(wgServerApi.registerPublicKey(any())).thenReturn(
-                WgServerApi.WgServerData(
-                    serverName = "",
-                    publicKey = "key",
-                    publicEndpoint = "endpoint",
-                    address = "1.1.1.2",
-                    location = null,
-                    gateway = "1.1.1.1",
-                ),
-            )
+            whenever(wgTunnel.establish(any())).thenReturn(Result.success(config))
         }
 
         testee = RealNetPRekeyer(
@@ -82,7 +98,7 @@ class RealNetPRekeyerTest {
             vpnFeaturesRegistry,
             networkProtectionPixels,
             "name",
-            wgServerApi,
+            wgTunnel,
             appBuildConfig,
             { isDeviceLocked },
         )
@@ -102,7 +118,6 @@ class RealNetPRekeyerTest {
         whenever(vpnFeaturesRegistry.isFeatureRegistered(NETP_VPN)).thenReturn(true)
         whenever(networkProtectionRepository.lastPrivateKeyUpdateTimeInMillis)
             .thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
-        whenever(wgServerApi.registerPublicKey(any())).thenThrow(RuntimeException(""))
 
         testee.doRekey()
 
@@ -187,13 +202,13 @@ class RealNetPRekeyerTest {
     }
 
     private suspend fun assertNoRekey() {
-        verify(networkProtectionRepository, never()).privateKey = any()
+        verify(networkProtectionRepository, never()).wireguardConfig = eq(config)
         verify(vpnFeaturesRegistry, never()).refreshFeature(NETP_VPN)
         verify(networkProtectionPixels, never()).reportRekeyCompleted()
     }
 
     private suspend fun assertRekey() {
-        verify(networkProtectionRepository).privateKey = any()
+        verify(networkProtectionRepository).wireguardConfig = eq(config)
         verify(vpnFeaturesRegistry).refreshFeature(NETP_VPN)
         verify(networkProtectionPixels).reportRekeyCompleted()
     }
