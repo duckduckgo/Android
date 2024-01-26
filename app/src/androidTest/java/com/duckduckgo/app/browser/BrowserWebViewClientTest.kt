@@ -52,6 +52,7 @@ import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedHandler
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.pixels.remoteconfig.OptimizeTrackerEvaluationRCWrapper
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.BrowserAutofill
@@ -67,6 +68,7 @@ import com.duckduckgo.privacy.config.api.AmpLinks
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -117,6 +119,7 @@ class BrowserWebViewClientTest {
     private val currentTimeProvider: CurrentTimeProvider = mock()
     private val deviceInfo: DeviceInfo = mock()
     private val pageLoadedHandler: PageLoadedHandler = mock()
+    private val optimizeTrackerEvaluationRCWrapper = TestOptimizeTrackerEvaluationRCWrapper()
 
     @UiThreadTest
     @Before
@@ -145,6 +148,7 @@ class BrowserWebViewClientTest {
             jsPlugins,
             currentTimeProvider,
             pageLoadedHandler,
+            optimizeTrackerEvaluationRCWrapper,
         )
         testee.webViewClientListener = listener
         whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
@@ -245,6 +249,17 @@ class BrowserWebViewClientTest {
         val webResourceRequest = mock<WebResourceRequest>()
         testee.shouldInterceptRequest(webView, webResourceRequest)
         verify(loginDetector).onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, webResourceRequest))
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenShouldInterceptRequestAndOptimizeEnabledThenShouldInterceptWithUri() {
+        TestScope().launch {
+            val webResourceRequest = mock<WebResourceRequest>()
+            optimizeTrackerEvaluationRCWrapper.value = true
+            testee.shouldInterceptRequest(webView, webResourceRequest)
+            verify(requestInterceptor).shouldIntercept(any(), any(), any<Uri>(), any())
+        }
     }
 
     @Test
@@ -868,6 +883,13 @@ class BrowserWebViewClientTest {
         override fun getFavicon(): Bitmap = throw NotImplementedError()
 
         override fun clone(): WebHistoryItem = throw NotImplementedError()
+    }
+
+    private class TestOptimizeTrackerEvaluationRCWrapper : OptimizeTrackerEvaluationRCWrapper {
+
+        var value = false
+        override val enabled: Boolean
+            get() = value
     }
 
     companion object {

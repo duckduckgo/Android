@@ -1,5 +1,6 @@
 package com.duckduckgo.app.browser.pageloadpixel
 
+import com.duckduckgo.app.pixels.remoteconfig.OptimizeTrackerEvaluationRCWrapper
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.device.DeviceInfo
@@ -25,12 +26,18 @@ class PageLoadedHandlerTest {
     private val deviceInfo: DeviceInfo = mock()
     private val webViewVersionProvider: WebViewVersionProvider = mock()
     private val pageLoadedPixelDao: PageLoadedPixelDao = mock()
+    private val optimizeTrackerEvaluationRCWrapper = object : OptimizeTrackerEvaluationRCWrapper {
+        override val enabled: Boolean
+            get() = true
+    }
+
     private val testee = RealPageLoadedHandler(
         deviceInfo,
         webViewVersionProvider,
         pageLoadedPixelDao,
         TestScope(),
         coroutinesTestRule.testDispatcherProvider,
+        optimizeTrackerEvaluationRCWrapper,
     )
 
     @Before
@@ -45,6 +52,7 @@ class PageLoadedHandlerTest {
         val argumentCaptor = argumentCaptor<PageLoadedPixelEntity>()
         verify(pageLoadedPixelDao).add(argumentCaptor.capture())
         Assert.assertEquals(10L, argumentCaptor.firstValue.elapsedTime)
+        Assert.assertEquals(true, argumentCaptor.firstValue.trackerOptimizationEnabled)
     }
 
     @Test

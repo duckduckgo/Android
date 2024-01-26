@@ -14,16 +14,19 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.pageloadpixel
+package com.duckduckgo.app.pixels.remoteconfig
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
 
-@Entity(tableName = "page_loaded_pixel_entity")
-class PageLoadedPixelEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    val appVersion: String,
-    val elapsedTime: Long,
-    val webviewVersion: String,
-    val trackerOptimizationEnabled: Boolean,
-)
+interface OptimizeTrackerEvaluationRCWrapper {
+    val enabled: Boolean
+}
+
+@ContributesBinding(AppScope::class)
+class RealOptimizeTrackerEvaluationRCWrapper @Inject constructor(
+    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+) : OptimizeTrackerEvaluationRCWrapper {
+    override val enabled by lazy { androidBrowserConfigFeature.optimizeTrackerEvaluation().isEnabled() }
+}

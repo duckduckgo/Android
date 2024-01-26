@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.trackerdetection
 
+import android.net.Uri
+
 interface Client {
 
     enum class ClientType {
@@ -46,6 +48,24 @@ interface Client {
     fun matches(
         url: String,
         documentUrl: String,
+        requestHeaders: Map<String, String>,
+    ): Result
+
+    fun matches(
+        url: String,
+        documentUrl: Uri,
+        requestHeaders: Map<String, String>,
+    ): Result
+
+    fun matches(
+        url: Uri,
+        documentUrl: String,
+        requestHeaders: Map<String, String>,
+    ): Result
+
+    fun matches(
+        url: Uri,
+        documentUrl: Uri,
         requestHeaders: Map<String, String>,
     ): Result
 }
