@@ -66,6 +66,13 @@ class NetworkProtectionStateImpl @Inject constructor(
         }
     }
 
+    override fun clearVPNConfigurationAndRestart() {
+        coroutineScope.launch(dispatcherProvider.io()) {
+            networkProtectionRepository.wireguardConfig = null
+            restart()
+        }
+    }
+
     override suspend fun stop() {
         vpnFeaturesRegistry.unregisterFeature(NetPVpnFeature.NETP_VPN)
     }

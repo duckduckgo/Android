@@ -49,11 +49,9 @@ class WgVpnNetworkStack @Inject constructor(
     private val networkProtectionRepository: Lazy<NetworkProtectionRepository>,
     private val currentTimeProvider: CurrentTimeProvider,
     private val netpPixels: Lazy<NetworkProtectionPixels>,
-    // private val netPDefaultConfigProvider: NetPDefaultConfigProvider,
     private val dnsProvider: DnsProvider,
     private val crashLogger: CrashLogger,
 ) : VpnNetworkStack {
-    // private var wgTunnelData: WgTunnelData? = null
     private var wgConfig: Config? = null
 
     override val name: String = NetPVpnFeature.NETP_VPN.featureName
@@ -65,6 +63,10 @@ class WgVpnNetworkStack @Inject constructor(
             logcat { "Fetching new wireguard config" }
             return wgTunnelLazy.get().establish()
                 .onFailure { netpPixels.get().reportErrorInRegistration() }
+                .onSuccess { config ->
+                    // refresh WG config
+                    networkProtectionRepository.get().wireguardConfig = config
+                }
                 .getOrThrow()
         }
         return try {
@@ -72,9 +74,6 @@ class WgVpnNetworkStack @Inject constructor(
 
             wgConfig = networkProtectionRepository.get().wireguardConfig ?: fetchWireguardConfigAndCacheIt()
             logcat { "Wireguard configuration:\n$wgConfig" }
-
-            // refresh WG config
-            networkProtectionRepository.get().wireguardConfig = wgConfig
 
             val privateDns = dnsProvider.getPrivateDns()
             Result.success(

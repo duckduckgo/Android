@@ -46,6 +46,12 @@ interface NetworkProtectionState {
     fun restart()
 
     /**
+     * This method is the same as [restart] but it also clears the existing VPN reconfiguration, forcing a new registration
+     * process with the VPN backend
+     */
+    fun clearVPNConfigurationAndRestart()
+
+    /**
      * This method will stop the Network Protection feature by disabling it
      */
     suspend fun stop()

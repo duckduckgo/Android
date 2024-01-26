@@ -45,14 +45,14 @@ class RealWgTunnel @Inject constructor(
             @Suppress("NAME_SHADOWING")
             val keyPair = keyPair ?: KeyPair()
             val publicKey = keyPair.publicKey.toBase64()
-            val privateKeu = keyPair.privateKey.toBase64()
+            val privateKey = keyPair.privateKey.toBase64()
 
             // ensure we always return null on error
             val serverData = wgServerApi.registerPublicKey(publicKey) ?: return Result.failure(NullPointerException("serverData = null"))
             val config = Config.Builder()
                 .setInterface(
                     Interface.Builder()
-                        .parsePrivateKey(privateKeu)
+                        .parsePrivateKey(privateKey)
                         .parseAddresses(serverData.address)
                         .apply {
                             addDnsServer(InetAddress.getByName(serverData.gateway))
