@@ -20,7 +20,6 @@ import android.annotation.SuppressLint
 import android.content.*
 import android.util.*
 import android.widget.*
-import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.lifecycle.*
 import com.duckduckgo.anvil.annotations.*
 import com.duckduckgo.app.browser.databinding.ViewSyncFaviconsFetchingBinding
@@ -62,16 +61,9 @@ class FaviconFetchingSyncSetting @JvmOverloads constructor(
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
 
-        binding.syncFaviconsFetching.setOnCheckedChangeListener(
-            object : OnCheckedChangeListener {
-                override fun onCheckedChanged(
-                    buttonView: CompoundButton?,
-                    isChecked: Boolean,
-                ) {
-                    viewModel.onFaviconFetchingSettingChanged(isChecked)
-                }
-            },
-        )
+        binding.syncFaviconsFetching.setOnCheckedChangeListener { buttonView, isChecked ->
+            viewModel.onFaviconFetchingSettingChanged(isChecked)
+        }
 
         @SuppressLint("NoHardcodedCoroutineDispatcher")
         coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)

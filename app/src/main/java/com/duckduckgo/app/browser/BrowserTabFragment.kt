@@ -1072,7 +1072,6 @@ class BrowserTabFragment :
         dismissAppLinkSnackBar()
         errorSnackbar.dismiss()
         newBrowserTab.newTabLayout.show()
-        // show the favicons bottom sheet if needed
         binding.browserLayout.gone()
         webViewContainer.gone()
         omnibar.appBarLayout.setExpanded(true)
@@ -3759,7 +3758,6 @@ class BrowserTabFragment :
             configuration: HomePanelCta,
             favorites: List<QuickAccessFavorite>,
         ) {
-            Timber.d("Sync: showHomeCta $favorites")
             hideDaxCta()
             if (newBrowserTab.ctaContainer.isEmpty()) {
                 renderHomeCta()

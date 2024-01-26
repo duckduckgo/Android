@@ -491,7 +491,6 @@ class BookmarksActivity : DuckDuckGoActivity() {
 
     companion object {
         const val SAVED_SITE_URL_EXTRA = "SAVED_SITE_URL_EXTRA"
-        private const val TAG_FAVICON_PROMPT_DIALOG = "TAG_FAVICON_PROMPT_DIALOG"
 
         fun intent(
             context: Context,

@@ -362,11 +362,15 @@ class BookmarksViewModel @Inject constructor(
             faviconsFetchingPrompt.onPromptAnswered(fetchingEnabled)
         }
         if (fetchingEnabled) {
-            refreshBookmarks(currentFolderId)
+            forceFaviconsRefresh(currentFolderId)
         }
     }
 
-    private fun refreshBookmarks(currentFolderId: String) {
+    /**
+     * By sending an empty state and then the current folder we force the adapter to bind its elements
+     * We need to do this so the [FaviconManager] can load the favicons again
+     */
+    private fun forceFaviconsRefresh(currentFolderId: String) {
         val currentState = viewState.value!!
         viewState.value = currentState.copy(
             favorites = emptyList(),

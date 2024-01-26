@@ -474,10 +474,6 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         return intent.action == NEW_SEARCH_ACTION
     }
 
-    private fun launchedFromSystemVoiceSearchBox(intent: Intent): Boolean {
-        return intent.action == NEW_VOICE_SEARCH_ACTION
-    }
-
     private fun launchedFromAssist(intent: Intent): Boolean {
         return intent.action == Intent.ACTION_ASSIST
     }
@@ -504,7 +500,6 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         const val WIDGET_SEARCH_WITH_FAVS_EXTRA = "WIDGET_SEARCH_WITH_FAVS_EXTRA"
         const val WIDGET_SEARCH_LAUNCH_VOICE = "WIDGET_SEARCH_LAUNCH_VOICE"
         const val NEW_SEARCH_ACTION = "com.duckduckgo.mobile.android.NEW_SEARCH"
-        const val NEW_VOICE_SEARCH_ACTION = "com.duckduckgo.mobile.android.NEW_VOICE_SEARCH"
         private const val QUICK_ACCESS_GRID_MAX_COLUMNS = 6
 
         fun fromWidget(

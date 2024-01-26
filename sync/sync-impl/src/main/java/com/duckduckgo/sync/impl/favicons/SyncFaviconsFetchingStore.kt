@@ -29,11 +29,11 @@ class SyncFaviconFetchingStore(
 
     override var isFaviconsFetchingEnabled: Boolean
         get() = preferences.getBoolean(KEY_FAVICONS_FETCHING_ENABLED, false)
-        set(enabled) = preferences.edit { putBoolean(KEY_FAVICONS_FETCHING_ENABLED, enabled) }
+        set(enabled) = preferences.edit(commit = true) { putBoolean(KEY_FAVICONS_FETCHING_ENABLED, enabled) }
 
     override var promptShown: Boolean
         get() = preferences.getBoolean(KEY_FAVICONS_PROMPT_SHOWN, false)
-        set(enabled) = preferences.edit { putBoolean(KEY_FAVICONS_PROMPT_SHOWN, enabled) }
+        set(enabled) = preferences.edit(commit = true) { putBoolean(KEY_FAVICONS_PROMPT_SHOWN, enabled) }
 
     companion object {
         private const val FILENAME = "com.duckduckgo.favicons.store.v1"

@@ -542,7 +542,6 @@ class BrowserTabViewModel @Inject constructor(
         data class WebShareRequest(val data: JsCallbackData) : Command()
         data class ScreenLock(val data: JsCallbackData) : Command()
         object ScreenUnlock : Command()
-
         data object ShowFaviconsPrompt : Command()
     }
 
@@ -3274,7 +3273,6 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onHomeShown() {
-        Timber.d("Sync: onHomeShown, checking for favicons prompt")
         clearPreviousAppLink()
         viewModelScope.launch(dispatchers.io()) {
             if (faviconsFetchingPrompt.shouldShow() && currentCtaViewState().favorites.isNotEmpty()) {

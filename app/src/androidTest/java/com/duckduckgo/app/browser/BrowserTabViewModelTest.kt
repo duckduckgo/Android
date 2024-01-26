@@ -159,6 +159,7 @@ import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermission
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
+import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import dagger.Lazy
@@ -422,6 +423,8 @@ class BrowserTabViewModelTest {
         runBlocking { whenever(mock.getPixelParams()).thenReturn(emptyMap()) }
     }
 
+    private val mockFaviconFetchingPrompt: FaviconsFetchingPrompt = mock()
+
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
@@ -550,6 +553,7 @@ class BrowserTabViewModelTest {
             privacyProtectionsPopupManager = mockPrivacyProtectionsPopupManager,
             privacyProtectionsToggleUsageListener = mockPrivacyProtectionsToggleUsageListener,
             privacyProtectionsPopupExperimentExternalPixels = privacyProtectionsPopupExperimentExternalPixels,
+            faviconsFetchingPrompt = mockFaviconFetchingPrompt,
         )
 
         testee.loadData("abc", null, false, false)
@@ -4821,6 +4825,78 @@ class BrowserTabViewModelTest {
         verify(privacyProtectionsPopupExperimentExternalPixels).tryReportProtectionsToggledFromBrowserMenu(protectionsEnabled = true)
     }
 
+    @Test
+    fun whenHomeShownAndFaviconPromptShouldShowAndFavouritesIsNotEmptyThenShowFaviconsPromptCommandSent() = runTest {
+        whenever(mockFaviconFetchingPrompt.shouldShow()).thenReturn(true)
+        testee.ctaViewState.value =
+            ctaViewState().copy(
+                favorites = listOf(
+                    QuickAccessFavorite(
+                        Favorite(
+                            UUID.randomUUID().toString(),
+                            "title",
+                            "http://example.com",
+                            lastModified = "timestamp",
+                            1,
+                        ),
+                    ),
+                ),
+            )
+
+        testee.onHomeShown()
+
+        assertCommandIssued<Command.ShowFaviconsPrompt>()
+    }
+
+    @Test
+    fun whenHomeShownAndFaviconPromptShouldShowAndFavouritesIsEmptyThenShowFaviconsPromptCommandNotSent() = runTest {
+        whenever(mockFaviconFetchingPrompt.shouldShow()).thenReturn(true)
+        testee.ctaViewState.value =
+            ctaViewState().copy(
+                favorites = emptyList(),
+            )
+
+        testee.onHomeShown()
+
+        assertCommandNotIssued<Command.ShowFaviconsPrompt>()
+    }
+
+    @Test
+    fun whenHomeShownAndFaviconPromptShouldNotShowAndFavouritesIsNotEmptyThenShowFaviconsPromptCommandNotSent() = runTest {
+        whenever(mockFaviconFetchingPrompt.shouldShow()).thenReturn(false)
+        testee.ctaViewState.value =
+            ctaViewState().copy(
+                favorites = listOf(
+                    QuickAccessFavorite(
+                        Favorite(
+                            UUID.randomUUID().toString(),
+                            "title",
+                            "http://example.com",
+                            lastModified = "timestamp",
+                            1,
+                        ),
+                    ),
+                ),
+            )
+
+        testee.onHomeShown()
+
+        assertCommandNotIssued<Command.ShowFaviconsPrompt>()
+    }
+
+    @Test
+    fun whenHomeShownAndFaviconPromptShouldNotShowAndFavouritesEmptyThenShowFaviconsPromptCommandNotSent() = runTest {
+        whenever(mockFaviconFetchingPrompt.shouldShow()).thenReturn(false)
+        testee.ctaViewState.value =
+            ctaViewState().copy(
+                favorites = emptyList(),
+            )
+
+        testee.onHomeShown()
+
+        assertCommandNotIssued<Command.ShowFaviconsPrompt>()
+    }
+
     private fun aCredential(): LoginCredentials {
         return LoginCredentials(domain = null, username = null, password = null)
     }
@@ -5084,7 +5160,10 @@ class BrowserTabViewModelTest {
         return nav
     }
 
-    private fun buildFileChooserParams(acceptTypes: Array<String>, captureEnabled: Boolean = false): FileChooserParams {
+    private fun buildFileChooserParams(
+        acceptTypes: Array<String>,
+        captureEnabled: Boolean = false,
+    ): FileChooserParams {
         return object : FileChooserParams() {
             override fun getAcceptTypes(): Array<String> = acceptTypes
             override fun getMode(): Int = 0

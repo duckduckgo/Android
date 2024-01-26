@@ -39,25 +39,30 @@ class SyncFaviconsFetchingPrompt(
     // https://app.asana.com/0/1157893581871903/1206440765317539
     @WorkerThread
     override fun shouldShow(): Boolean {
-        return if (faviconsFetchingStore.promptShown) {
-            false
-        } else {
-            if (syncAccountRepository.isSignedIn()) {
-                val result = syncAccountRepository.getConnectedDevices()
-                Timber.d("Sync: Connected Devices $result")
-                when (result) {
-                    is Result.Error -> false
-                    is Success -> result.data.size >= MIN_CONNECTED_DEVICES_FOR_PROMPT
-                }
-            } else {
-                false
+        if (faviconsFetchingStore.promptShown) {
+            return false
+        }
+
+        if (faviconsFetchingStore.isFaviconsFetchingEnabled) {
+            return false
+        }
+
+        return if (syncAccountRepository.isSignedIn()) {
+            val result = syncAccountRepository.getConnectedDevices()
+            Timber.d("Sync: Connected Devices $result")
+            when (result) {
+                is Result.Error -> false
+                is Success -> result.data.size >= MIN_CONNECTED_DEVICES_FOR_PROMPT
             }
+        } else {
+            false
         }
     }
 
-    override fun onPromptAnswered(enabled: Boolean) {
+    override fun onPromptAnswered(fetchingEnabled: Boolean) {
+        Timber.d("Favicons: Feching en")
         faviconsFetchingStore.promptShown = true
-        faviconsFetchingStore.isFaviconsFetchingEnabled = enabled
+        faviconsFetchingStore.isFaviconsFetchingEnabled = fetchingEnabled
     }
 
     companion object {
