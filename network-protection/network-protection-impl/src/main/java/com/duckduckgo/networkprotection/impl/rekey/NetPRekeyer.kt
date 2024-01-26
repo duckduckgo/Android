@@ -25,7 +25,7 @@ import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
-import com.duckduckgo.networkprotection.impl.configuration.WgServerApi
+import com.duckduckgo.networkprotection.impl.configuration.WgTunnel
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.squareup.anvil.annotations.ContributesBinding
@@ -51,7 +51,7 @@ class RealNetPRekeyer @Inject constructor(
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
     private val networkProtectionPixels: NetworkProtectionPixels,
     @ProcessName private val processName: String,
-    private val wgServerApi: WgServerApi,
+    private val wgTunnel: WgTunnel,
     private val appBuildConfig: AppBuildConfig,
     @InternalApi private val deviceLockedChecker: DeviceLockedChecker,
 ) : NetPRekeyer {
@@ -74,21 +74,17 @@ class RealNetPRekeyer @Inject constructor(
         }
 
         if (deviceLockedChecker.invoke() || forceOrFalseInProductionBuilds) {
-            val newKey = runCatching {
-                val newKeys = KeyPair()
-                wgServerApi.registerPublicKey(newKeys.publicKey.toBase64())
+            val config = wgTunnel.establish(KeyPair())
+                .onFailure {
+                    logcat(LogPriority.ERROR) { "Failed registering the new key during re-keying: ${it.asLog()}" }
+                }.getOrNull() ?: return
 
-                newKeys
-            }.onFailure {
-                logcat(LogPriority.ERROR) { "Failed registering the new key during re-keying: ${it.asLog()}" }
-            }.getOrNull() ?: return
-
-            logcat { "Re-keying with public key: ${newKey.publicKey.toBase64()}" }
+            logcat { "Re-keying with public key: ${config.`interface`.keyPair.publicKey.toBase64()}" }
 
             if (vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)) {
+                networkProtectionRepository.wireguardConfig = config
                 logcat { "Restarting VPN after clearing client keys" }
                 networkProtectionPixels.reportRekeyCompleted()
-                networkProtectionRepository.privateKey = newKey.privateKey.toBase64()
                 vpnFeaturesRegistry.refreshFeature(NetPVpnFeature.NETP_VPN)
             } else {
                 logcat(LogPriority.ERROR) { "Re-key work should not happen" }

@@ -17,11 +17,13 @@
 package com.duckduckgo.networkprotection.impl.configuration
 
 import com.duckduckgo.di.scopes.VpnScope
-import com.duckduckgo.networkprotection.impl.configuration.WgTunnel.WgTunnelData
+import com.duckduckgo.networkprotection.impl.config.NetPDefaultConfigProvider
 import com.squareup.anvil.annotations.ContributesBinding
 import com.wireguard.config.Config
+import com.wireguard.config.InetNetwork
 import com.wireguard.config.Interface
 import com.wireguard.config.Peer
+import com.wireguard.crypto.KeyPair
 import java.net.InetAddress
 import javax.inject.Inject
 import logcat.LogPriority
@@ -29,36 +31,35 @@ import logcat.asLog
 import logcat.logcat
 
 interface WgTunnel {
-    suspend fun establish(): Result<WgTunnelData>
-    data class WgTunnelData(
-        val serverName: String,
-        val userSpaceConfig: String,
-        val serverLocation: String?,
-        val serverIP: String?,
-        val gateway: String,
-        val tunnelAddress: Map<InetAddress, Int>,
-    )
-}
-
-fun Map<InetAddress, Int>.toCidrString(): Set<String> {
-    return this.map { "${it.key.hostAddress}/${it.value}" }.toSet()
+    suspend fun establish(keyPair: KeyPair? = null): Result<Config>
 }
 
 @ContributesBinding(VpnScope::class)
 class RealWgTunnel @Inject constructor(
-    private val deviceKeys: DeviceKeys,
     private val wgServerApi: WgServerApi,
+    private val netPDefaultConfigProvider: NetPDefaultConfigProvider,
 ) : WgTunnel {
 
-    override suspend fun establish(): Result<WgTunnelData> {
+    override suspend fun establish(keyPair: KeyPair?): Result<Config> {
         return try {
+            @Suppress("NAME_SHADOWING")
+            val keyPair = keyPair ?: KeyPair()
+            val publicKey = keyPair.publicKey.toBase64()
+            val privateKeu = keyPair.privateKey.toBase64()
+
             // ensure we always return null on error
-            val serverData = wgServerApi.registerPublicKey(deviceKeys.publicKey) ?: return Result.failure(NullPointerException("serverData = null"))
-            val data = Config.Builder()
+            val serverData = wgServerApi.registerPublicKey(publicKey) ?: return Result.failure(NullPointerException("serverData = null"))
+            val config = Config.Builder()
                 .setInterface(
                     Interface.Builder()
-                        .parsePrivateKey(deviceKeys.privateKey)
+                        .parsePrivateKey(privateKeu)
                         .parseAddresses(serverData.address)
+                        .apply {
+                            addDnsServer(InetAddress.getByName(serverData.gateway))
+                            addDnsServers(netPDefaultConfigProvider.fallbackDns())
+                        }
+                        .excludeApplications(netPDefaultConfigProvider.exclusionList())
+                        .setMtu(netPDefaultConfigProvider.mtu())
                         .build(),
                 )
                 .addPeer(
@@ -66,19 +67,23 @@ class RealWgTunnel @Inject constructor(
                         .parsePublicKey(serverData.publicKey)
                         .parseAllowedIPs(serverData.allowedIPs)
                         .parseEndpoint(serverData.publicEndpoint)
+                        .setName(serverData.serverName)
+                        .setLocation(serverData.location.orEmpty())
+                        .addAllowedIps(
+                            netPDefaultConfigProvider.routes().map {
+                                InetNetwork.parse("${it.key}/${it.value}")
+                            },
+                        )
+                        .apply {
+                            // no allowIPs, add the internet
+                            if (allowedIps.isEmpty()) {
+                                addAllowedIp(InetNetwork.parse("0.0.0.0/0"))
+                            }
+                        }
                         .build(),
                 )
-                .build().run {
-                    WgTunnelData(
-                        serverName = serverData.serverName,
-                        userSpaceConfig = this.toWgUserspaceString(),
-                        serverLocation = serverData.location,
-                        serverIP = kotlin.runCatching { InetAddress.getByName(peers[0].endpoint?.host).hostAddress }.getOrNull(),
-                        gateway = serverData.gateway,
-                        tunnelAddress = getInterface().addresses.associate { Pair(it.address, it.mask) },
-                    )
-                }
-            Result.success(data)
+                .build()
+            Result.success(config)
         } catch (e: Throwable) {
             logcat(LogPriority.ERROR) { "Error getting WgTunnelData: ${e.asLog()}" }
             return Result.failure(e)

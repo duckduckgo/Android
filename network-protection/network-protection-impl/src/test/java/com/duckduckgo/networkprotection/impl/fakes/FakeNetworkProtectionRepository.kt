@@ -18,10 +18,14 @@ package com.duckduckgo.networkprotection.impl.fakes
 
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ServerDetails
+import com.wireguard.config.Config
 
 class FakeNetworkProtectionRepository : NetworkProtectionRepository {
     private var _serverDetails: ServerDetails? = null
     private var _vpnAccessRevoked: Boolean = false
+    override var wireguardConfig: Config?
+        get() = TODO("Not yet implemented")
+        set(value) {}
 
     override var privateKey: String?
         get() = null

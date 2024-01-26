@@ -38,6 +38,16 @@ class Peer private constructor(builder: Builder) { // The collection is already 
     val endpoint: InetEndpoint? = builder.endpoint
 
     /**
+     * @return the peers name, null if not configured
+     */
+    val name: String? = builder.name
+
+    /**
+     * @return the peers location, null if not configured
+     */
+    val location: String? = builder.location
+
+    /**
      * Returns the peer's persistent keepalive.
      *
      * @return the persistent keepalive, or `Optional.empty()` if none is configured
@@ -97,6 +107,8 @@ class Peer private constructor(builder: Builder) { // The collection is already 
         val sb = StringBuilder()
         if (allowedIps.isNotEmpty()) sb.append("AllowedIPs = ").append(join(allowedIps)).append('\n')
         endpoint?.let { ep: InetEndpoint? -> sb.append("Endpoint = ").append(ep).append('\n') }
+        name?.let { ep: String? -> sb.append("Name = ").append(ep).append('\n') }
+        location?.let { ep: String? -> sb.append("Location = ").append(ep).append('\n') }
         persistentKeepalive?.let { pk: Int? ->
             sb.append("PersistentKeepalive = ").append(pk).append('\n')
         }
@@ -136,6 +148,10 @@ class Peer private constructor(builder: Builder) { // The collection is already 
 
         // Defaults to not present.
         var endpoint: InetEndpoint? = null
+
+        var name: String? = null
+
+        var location: String? = null
 
         // Defaults to not present.
         var persistentKeepalive: Int? = null
@@ -245,6 +261,16 @@ class Peer private constructor(builder: Builder) { // The collection is already 
             return this
         }
 
+        fun setName(name: String): Builder {
+            this.name = name
+            return this
+        }
+
+        fun setLocation(location: String): Builder {
+            this.location = location
+            return this
+        }
+
         @Throws(BadConfigException::class)
         fun setPersistentKeepalive(persistentKeepalive: Int): Builder {
             if (persistentKeepalive < 0 || persistentKeepalive > MAX_PERSISTENT_KEEPALIVE) {
@@ -299,6 +325,8 @@ class Peer private constructor(builder: Builder) { // The collection is already 
                 when (attribute.key.lowercase()) {
                     "allowedips" -> builder.parseAllowedIPs(attribute.value)
                     "endpoint" -> builder.parseEndpoint(attribute.value)
+                    "name" -> builder.setName(attribute.value)
+                    "location" -> builder.setLocation(attribute.value)
                     "persistentkeepalive" -> builder.parsePersistentKeepalive(attribute.value)
                     "presharedkey" -> builder.parsePreSharedKey(attribute.value)
                     "publickey" -> builder.parsePublicKey(attribute.value)
