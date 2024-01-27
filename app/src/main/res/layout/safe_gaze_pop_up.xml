@@ -1,0 +1,186 @@
+<!-- res/layout/popup_layout.xml -->
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:id="@+id/popup_constraint_layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="275dp"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ImageView
+        android:id="@+id/pointer_arrow_safe_gaze_image_view"
+        android:layout_width="14dp"
+        android:layout_height="9dp"
+        android:src="@drawable/pointer_arrow"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/popupLayout"
+        android:contentDescription="@string/pointer_arrow" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/popupLayout"
+        android:layout_width="275dp"
+        android:layout_height="match_parent"
+        app:cardElevation="8dp"
+        app:cardBackgroundColor="#1F1F2A"
+        app:cardCornerRadius="10dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:background="@drawable/message_bubble_background">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="275dp"
+            android:layout_height="match_parent"
+            android:background="#1F1F2A">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/url_area"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="@+id/counter_card_view"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/counter_card_view"
+                android:layout_marginTop="15dp">
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/site_image_view"
+                    android:background="@android:color/transparent"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent" />
+
+                <TextView
+                    android:id="@+id/website_url_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/site_image_view"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginEnd="32dp"
+                    android:textColor="#F6F6FF"
+                    android:textSize="20sp"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/asil_shield_toggle_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/url_area"
+                android:layout_marginTop="20dp"
+                android:layout_gravity="center"
+                android:checked="true"
+                android:textAllCaps="false"
+                android:textSize="15sp"
+                android:thumb="@drawable/thumb_selector"
+                app:showText="false"
+                app:switchTextAppearance="@style/SwitchTextAppearance"
+                app:track="@drawable/track_selector" />
+
+            <TextView
+                android:id="@+id/asil_shield_state_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/asil_shield_toggle_button"
+                android:layout_marginVertical="10dp"
+                android:text="@string/safe_gaze_up"
+                android:textColor="#BABAC5"/>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/counter_card_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginHorizontal="10dp"
+                android:layout_marginVertical="10dp"
+                app:cardBackgroundColor="#171720"
+                app:cardCornerRadius="7dp"
+                app:layout_constraintTop_toBottomOf="@id/asil_shield_state_text_view">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingHorizontal="15dp">
+
+                    <TextView
+                        android:id="@+id/count_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/_0"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/asil_shield_exp_text"
+                        android:textColor="#BABAC5"
+                        android:layout_marginEnd="10dp"
+                        android:textSize="36sp" />
+
+                    <TextView
+                        android:id="@+id/asil_shield_exp_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/count_text"
+                        android:text="@string/ads_and_other_creepy_things_blocked"
+                        android:textColor="#BABAC5"
+                        android:textSize="13sp"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:id="@+id/site_broken_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/counter_card_view"
+                android:textSize="13sp"
+                android:textColor="#838390"
+                android:text="@string/if_this_site_appears_broken_try_shields_down"
+                android:paddingHorizontal="10dp"
+                android:gravity="center_horizontal"
+                android:foregroundGravity="center_horizontal"
+                android:paddingVertical="20dp"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
