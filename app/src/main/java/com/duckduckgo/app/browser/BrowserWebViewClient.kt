@@ -101,6 +101,7 @@ class BrowserWebViewClient @Inject constructor(
     var webViewClientListener: WebViewClientListener? = null
     private var lastPageStarted: String? = null
     private var start: Long? = null
+    private var initted: Boolean = false
 
     /**
      * This is the new method of url overriding available from API 24 onwards
@@ -302,6 +303,11 @@ class BrowserWebViewClient @Inject constructor(
         lastPageStarted = url
         browserAutofillConfigurator.configureAutofillForCurrentPage(webView, url)
         jsPlugins.getPlugins().forEach {
+            // TODO find a better place for this that's not on the first load of the webview (this would be buggy)
+            if (!this.initted) {
+                this.initted = true
+                it.onInit(webView, webViewClientListener?.getSite())
+            }
             it.onPageStarted(webView, url, webViewClientListener?.getSite())
         }
         loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))

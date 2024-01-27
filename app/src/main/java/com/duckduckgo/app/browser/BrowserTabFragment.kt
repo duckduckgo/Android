@@ -77,6 +77,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.webkit.WebViewCompat
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
@@ -2184,6 +2185,10 @@ class BrowserTabFragment :
                     textZoom = accessibilitySettingsDataStore.fontSize.toInt()
                 }
             }
+
+            // WebViewCompat.addDocumentStartJavaScript(it, "alert(1)", setOf("*"))
+            // WebViewCompat.addDocumentStartJavaScript(webView, "alert(2),${coreContentScopeScripts.getScript(site)}", setOf("*"))
+
 
             it.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
                 viewModel.requestFileDownload(url, contentDisposition, mimeType, true)
