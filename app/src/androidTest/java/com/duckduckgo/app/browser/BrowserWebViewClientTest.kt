@@ -61,7 +61,6 @@ import com.duckduckgo.app.browser.trafficquality.AndroidFeaturesHeaderPlugin
 import com.duckduckgo.app.browser.trafficquality.CustomHeaderAllowedChecker
 import com.duckduckgo.app.browser.trafficquality.remote.AndroidFeaturesHeaderProvider
 import com.duckduckgo.app.browser.uriloaded.UriLoadedManager
-import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
@@ -1193,6 +1192,8 @@ class BrowserWebViewClientTest {
     private class FakeJsInjectorPlugin : JsInjectorPlugin {
         var countFinished = 0
         var countStarted = 0
+        override fun onInit(webView: WebView) {
+        }
 
         override fun onPageStarted(
             webView: WebView,
@@ -1203,7 +1204,12 @@ class BrowserWebViewClientTest {
             countStarted++
         }
 
-        override fun onPageFinished(webView: WebView, url: String?, site: Site?) {
+        override fun onPageFinished(
+            webView: WebView,
+            url: String?,
+            isDesktopMode: Boolean?,
+            activeExperiments: List<Toggle>,
+        ) {
             countFinished++
         }
     }

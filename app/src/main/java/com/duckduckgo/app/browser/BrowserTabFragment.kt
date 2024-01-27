@@ -3006,6 +3006,8 @@ class BrowserTabFragment :
         webView?.let {
             it.isSafeWebViewEnabled = safeWebViewFeature.self().isEnabled()
             it.webViewClient = webViewClient
+            webViewClient.triggerJSInit(it)
+
             it.webChromeClient = webChromeClient
             it.clearSslPreferences()
 

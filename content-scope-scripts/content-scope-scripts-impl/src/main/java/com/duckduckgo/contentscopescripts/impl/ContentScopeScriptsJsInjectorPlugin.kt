@@ -17,7 +17,8 @@
 package com.duckduckgo.contentscopescripts.impl
 
 import android.webkit.WebView
-import com.duckduckgo.app.global.model.Site
+import androidx.webkit.ScriptHandler
+import androidx.webkit.WebViewCompat
 import com.duckduckgo.browser.api.JsInjectorPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -28,6 +29,34 @@ import javax.inject.Inject
 class ContentScopeScriptsJsInjectorPlugin @Inject constructor(
     private val coreContentScopeScripts: CoreContentScopeScripts,
 ) : JsInjectorPlugin {
+    private var script: ScriptHandler? = null
+    private var currentScriptString: String? = null
+
+    // TODO: Remove params
+    fun reloadJSIfNeeded(
+        webView: WebView,
+        isDesktopMode: Boolean?,
+        activeExperiments: List<Toggle>,
+    ) {
+        val scriptString = coreContentScopeScripts.getGpcScript(isDesktopMode, activeExperiments)
+        if (scriptString == currentScriptString) {
+            return
+        }
+        script?.let {
+            it.remove()
+            script = null
+        }
+        if (coreContentScopeScripts.isEnabled()) {
+            currentScriptString = scriptString
+            script = WebViewCompat.addDocumentStartJavaScript(webView, scriptString, setOf("*"))
+        }
+    }
+
+    override fun onInit(webView: WebView) {
+        // TODO: Check
+        reloadJSIfNeeded(webView, null, listOf())
+    }
+
     override fun onPageStarted(
         webView: WebView,
         url: String?,
@@ -39,7 +68,13 @@ class ContentScopeScriptsJsInjectorPlugin @Inject constructor(
         }
     }
 
-    override fun onPageFinished(webView: WebView, url: String?, site: Site?) {
-        // NOOP
+    override fun onPageFinished(
+        webView: WebView,
+        url: String?,
+        isDesktopMode: Boolean?,
+        activeExperiments: List<Toggle>,
+    ) {
+        // TODO: Check
+        reloadJSIfNeeded(webView, isDesktopMode, activeExperiments)
     }
 }

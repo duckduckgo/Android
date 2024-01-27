@@ -17,11 +17,15 @@
 package com.duckduckgo.browser.api
 
 import android.webkit.WebView
-import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.feature.toggles.api.Toggle
 
 /** Public interface to inject JS code to a website */
 interface JsInjectorPlugin {
+    /**
+     * On init of webview this is called and receives a [webView] instance.
+     */
+    fun onInit(webView: WebView)
+
     /**
      * This method is called during onPageStarted and receives a [webView] instance, the [url] of the website and the [site]
      */
@@ -35,5 +39,10 @@ interface JsInjectorPlugin {
     /**
      * This method is called during onPageFinished and receives a [webView] instance, the [url] of the website and the [site]
      */
-    fun onPageFinished(webView: WebView, url: String?, site: Site?)
+    fun onPageFinished(
+        webView: WebView,
+        url: String?,
+        isDesktopMode: Boolean?,
+        activeExperiments: List<Toggle>,
+    )
 }

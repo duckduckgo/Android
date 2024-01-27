@@ -53,6 +53,7 @@ dependencies {
 
     implementation AndroidX.appCompat
     implementation "com.squareup.logcat:logcat:_"
+    implementation AndroidX.webkit
     implementation KotlinX.coroutines.core
     implementation Google.android.material
 

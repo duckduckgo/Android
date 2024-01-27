@@ -30,6 +30,7 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi.Builder
 import com.squareup.moshi.Types
 import dagger.SingleInstanceIn
+import java.io.BufferedReader
 import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
@@ -40,6 +41,12 @@ interface CoreContentScopeScripts {
         isDesktopMode: Boolean?,
         activeExperiments: List<Toggle>,
     ): String
+
+    fun getGpcScript(
+        isDesktopMode: Boolean?,
+        activeExperiments: List<Toggle>,
+    ): String
+
     fun isEnabled(): Boolean
 
     val secret: String
@@ -70,6 +77,7 @@ class RealContentScopeScripts @Inject constructor(
     private var cachedUnprotectTemporaryExceptionsJson: String = emptyJsonList
 
     private lateinit var cachedContentScopeJS: String
+    private lateinit var cachedGlobalPrivacyConfigJS: String
 
     override val secret: String = getSecret()
     override val javascriptInterface: String = getSecret()
@@ -109,6 +117,42 @@ class RealContentScopeScripts @Inject constructor(
             cacheContentScopeJS()
         }
         return cachedContentScopeJS
+    }
+
+    override fun getGpcScript(
+        isDesktopMode: Boolean?,
+        activeExperiments: List<Toggle>,
+    ): String {
+        var updateJS = false
+
+        val pluginParameters = getPluginParameters()
+
+        if (cachedUnprotectTemporaryExceptions != unprotectedTemporary.unprotectedTemporaryExceptions) {
+            cacheUserUnprotectedTemporaryExceptions(unprotectedTemporary.unprotectedTemporaryExceptions)
+            updateJS = true
+        }
+
+        val contentScopeJson = getContentScopeJson(pluginParameters.config, cachedUnprotectTemporaryExceptions)
+        if (cachedContentScopeJson != contentScopeJson) {
+            cachedContentScopeJson = contentScopeJson
+            updateJS = true
+        }
+
+        if (cachedUserUnprotectedDomains != userAllowListRepository.domainsInUserAllowList()) {
+            cacheUserUnprotectedDomains(userAllowListRepository.domainsInUserAllowList())
+            updateJS = true
+        }
+
+        val userPreferencesJson = getUserPreferencesJson(pluginParameters.preferences, false, activeExperiments)
+        if (cachedUserPreferencesJson != userPreferencesJson) {
+            cachedUserPreferencesJson = userPreferencesJson
+            updateJS = true
+        }
+
+        if (!this::cachedGlobalPrivacyConfigJS.isInitialized || updateJS) {
+            cacheGlobalPrivacyConfigJS()
+        }
+        return cachedGlobalPrivacyConfigJS
     }
 
     override fun isEnabled(): Boolean {
@@ -167,6 +211,22 @@ class RealContentScopeScripts @Inject constructor(
             .replace(userUnprotectedDomains, cachedUserUnprotectedDomainsJson)
             .replace(userPreferences, cachedUserPreferencesJson)
             .replace(messagingParameters, "${getSecretKeyValuePair()},${getCallbackKeyValuePair()},${getInterfaceKeyValuePair()}")
+    }
+
+    private fun cacheGlobalPrivacyConfigJS() {
+        val globalPrivacyConfigJS = loadJs("gpc.js")
+
+        cachedGlobalPrivacyConfigJS = globalPrivacyConfigJS
+            .replace(contentScope, cachedContentScopeJson)
+            .replace(userUnprotectedDomains, cachedUserUnprotectedDomainsJson)
+            .replace(userPreferences, cachedUserPreferencesJson)
+            .replace(messagingParameters, "${getSecretKeyValuePair()},${getCallbackKeyValuePair()},${getInterfaceKeyValuePair()}")
+    }
+
+    private fun loadJs(resourceName: String): String = readResource(resourceName).use { it?.readText() }.orEmpty()
+
+    private fun readResource(resourceName: String): BufferedReader? {
+        return javaClass.classLoader?.getResource(resourceName)?.openStream()?.bufferedReader()
     }
 
     private fun getUserUnprotectedDomainsJson(userUnprotectedDomains: List<String>): String {
