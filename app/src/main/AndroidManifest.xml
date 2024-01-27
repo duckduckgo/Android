@@ -233,7 +233,7 @@
             android:exported="true"
             android:label="@string/appDescription"
             android:launchMode="singleTask"
-            android:windowSoftInputMode="adjustResize|stateHidden">
+            android:windowSoftInputMode="adjustPan|stateHidden">
 
             <!-- Allows app to become default browser -->
             <intent-filter>
