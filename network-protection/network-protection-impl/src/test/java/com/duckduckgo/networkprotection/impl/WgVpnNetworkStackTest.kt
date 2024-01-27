@@ -22,10 +22,10 @@ import com.duckduckgo.mobile.android.vpn.prefs.FakeVpnSharedPreferencesProvider
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.RESTART
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.SELF_STOP
 import com.duckduckgo.networkprotection.impl.config.NetPDefaultConfigProvider
+import com.duckduckgo.networkprotection.impl.configuration.ServerDetails
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnel
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
-import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ServerDetails
 import com.duckduckgo.networkprotection.impl.store.RealNetworkProtectionRepository
 import com.duckduckgo.networkprotection.store.RealNetworkProtectionPrefs
 import com.wireguard.config.Config
@@ -91,17 +91,6 @@ class WgVpnNetworkStackTest {
         PublicKey = u4geRTVQHaZYwsQzb/LsJqEDpxU8Fqzb5VjxGeIHslM=
     """.trimIndent()
     private lateinit var wgConfig: Config
-    /*
-            wgTunnelData = WgTunnelData(
-            serverName = "euw.1",
-            userSpaceConfig = "testuserspaceconfig",
-            serverIP = "10.10.10.10",
-            serverLocation = "Stockholm, Sweden",
-            tunnelAddress = emptyMap(),
-            gateway = "1.2.3.4",
-        )
-
-     */
 
     private lateinit var wgVpnNetworkStack: WgVpnNetworkStack
 
@@ -141,7 +130,6 @@ class WgVpnNetworkStackTest {
             ipAddress = "10.10.10.10",
             location = "Stockholm, Sweden",
         )
-        assertEquals(expectedServerDetails, networkProtectionRepository.serverDetails)
         verify(netpPixels).reportEnableAttempt()
     }
 
@@ -178,7 +166,7 @@ class WgVpnNetworkStackTest {
 
     @Test
     fun whenOnStartVpnAndEnabledTimeHasBeenSetThenDoNotUpdateEnabledTime() = runTest {
-        networkProtectionRepository.wireguardConfig = wgConfig
+        whenever(wgTunnel.establish()).thenReturn(Result.success(wgConfig))
         whenever(currentTimeProvider.getTimeInMillis()).thenReturn(1672229650358L)
 
         wgVpnNetworkStack.onPrepareVpn()
@@ -193,7 +181,7 @@ class WgVpnNetworkStackTest {
             ipAddress = "10.10.10.10",
             location = "Stockholm, Sweden",
         )
-        assertEquals(expectedServerDetails, networkProtectionRepository.serverDetails)
+        // assertEquals(expectedServerDetails, networkProtectionRepository.serverDetails)
 
         assertEquals(1672229650358L, networkProtectionRepository.enabledTimeInMillis)
 
@@ -221,7 +209,8 @@ class WgVpnNetworkStackTest {
         )
 
         assertEquals(-1, networkProtectionRepository.enabledTimeInMillis)
-        assertNull(networkProtectionRepository.serverDetails)
+        verify(wgTunnel).clearWgConfig()
+        // assertNull(networkProtectionRepository.serverDetails)
     }
 
     @Test
@@ -230,8 +219,7 @@ class WgVpnNetworkStackTest {
             Result.success(Unit),
             wgVpnNetworkStack.onStopVpn(RESTART),
         )
-
-        assertNull(networkProtectionRepository.serverDetails)
+        verify(wgTunnel, never()).clearWgConfig()
     }
 
     @Test
@@ -281,7 +269,7 @@ class WgVpnNetworkStackTest {
             // why? no use intercepting encrypted DNS traffic, plus we can't configure any DNS that doesn't support DoT, otherwise Android
             // will enforce DoT and will stop passing any DNS traffic, resulting in no DNS resolution == connectivity is killed
             dns = this.`interface`.dnsServers,
-            routes = this.peers.first().allowedIps.map { it.address.hostAddress!! to it.mask }.toMap(),
+            routes = this.`interface`.routes.associate { it.address.hostAddress!! to it.mask },
             appExclusionList = this.`interface`.excludedApplications,
         )
     }

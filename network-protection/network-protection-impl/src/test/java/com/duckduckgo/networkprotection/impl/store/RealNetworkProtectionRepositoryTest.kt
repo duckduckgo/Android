@@ -17,7 +17,6 @@
 package com.duckduckgo.networkprotection.impl.store
 
 import com.duckduckgo.mobile.android.vpn.prefs.FakeVpnSharedPreferencesProvider
-import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ServerDetails
 import com.duckduckgo.networkprotection.store.NetworkProtectionPrefs
 import com.duckduckgo.networkprotection.store.RealNetworkProtectionPrefs
 import com.wireguard.config.Config
@@ -25,8 +24,6 @@ import com.wireguard.crypto.KeyPair
 import java.io.BufferedReader
 import java.io.StringReader
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import org.mockito.MockitoAnnotations
@@ -61,38 +58,6 @@ class RealNetworkProtectionRepositoryTest {
     }
 
     @Test
-    fun whenNoConfigThenNullPrivateKey() {
-        assertNull(testee.privateKey)
-    }
-
-    @Test
-    fun whenConfigThenExpectedPrivateKeu() {
-        testee.wireguardConfig = config
-        assertEquals(keys.privateKey.toBase64(), testee.privateKey)
-    }
-
-    @Test
-    fun whenNoConfigThenPrivateKeyUpdateTimeInMillisIsNull() {
-        assertEquals(-1, testee.lastPrivateKeyUpdateTimeInMillis)
-    }
-
-    @Test
-    fun whenConfigThenSetPrivateKeyUpdateTimeInMillis() {
-        testee.wireguardConfig = config
-
-        assertNotNull(testee.lastPrivateKeyUpdateTimeInMillis)
-    }
-
-    @Test
-    fun whenClearConfigThenNullAssociatedInfo() {
-        testee.wireguardConfig = config
-        testee.wireguardConfig = null
-
-        assertNull(testee.privateKey)
-        assertEquals(-1, testee.lastPrivateKeyUpdateTimeInMillis)
-    }
-
-    @Test
     fun whenNoEnabledTimeMillisThenReturnDefaultValue() {
         assertEquals(-1, testee.enabledTimeInMillis)
     }
@@ -102,32 +67,5 @@ class RealNetworkProtectionRepositoryTest {
         testee.enabledTimeInMillis = 12243235423453L
 
         assertEquals(12243235423453L, networkProtectionPrefs.getLong("wg_server_enable_time", -1))
-    }
-
-    @Test
-    fun whenConfigThenGetServerDetails() {
-        testee.wireguardConfig = config
-
-        assertEquals(
-            ServerDetails(
-                serverName = "expected_server_name",
-                ipAddress = "1.1.1.1",
-                location = "expected_location",
-            ),
-            testee.serverDetails,
-        )
-    }
-
-    @Test
-    fun whenNoConfigThenGetNullServerDetails() {
-        assertNull(testee.serverDetails)
-    }
-
-    @Test
-    fun whenClearStoreThenClearStore() {
-        testee.wireguardConfig = config
-        networkProtectionPrefs.clear()
-
-        assertNull(testee.wireguardConfig)
     }
 }
