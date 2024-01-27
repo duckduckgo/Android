@@ -252,6 +252,17 @@ class BrowserWebViewClient @Inject constructor(
         }
     }
 
+    private fun handleSafeGaze(webView: WebView){
+        val sharedPreferences = context.getSharedPreferences("safe_gaze_preferences", Context.MODE_PRIVATE)
+        val isSafeGazeActive = sharedPreferences.getBoolean("safe_gaze_active", true)
+        println("Safe gaze active value -> $isSafeGazeActive")
+        if (isSafeGazeActive){
+            println("Injected")
+            val jsCode = readAssetFile(context.assets, "safe_gaze.js")
+            webView.evaluateJavascript("javascript:(function() { $jsCode })()", null)
+        }
+    }
+
     private fun loadUrl(
         listener: WebViewClientListener,
         webView: WebView,
@@ -273,14 +284,7 @@ class BrowserWebViewClient @Inject constructor(
         favicon: Bitmap?,
     ) {
         Timber.v("onPageStarted webViewUrl: ${webView.url} URL: $url")
-        val sharedPreferences = context.getSharedPreferences("safe_gaze_preferences", Context.MODE_PRIVATE)
-        val isSafeGazeActive = sharedPreferences.getBoolean("safe_gaze_active", false)
-        println("Safe gaze active value -> $isSafeGazeActive")
-        if (isSafeGazeActive){
-            println("Injected")
-            val jsCode = readAssetFile(context.assets, "safe_gaze.js")
-            webView.evaluateJavascript("javascript:(function() { $jsCode })()", null)
-        }
+        handleSafeGaze(webView)
         url?.let {
             autoconsent.injectAutoconsent(webView, url)
             adClickManager.detectAdDomain(url)
