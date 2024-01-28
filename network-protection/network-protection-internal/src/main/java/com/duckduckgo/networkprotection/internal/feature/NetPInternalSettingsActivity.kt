@@ -155,8 +155,8 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
                     } ?: binding.internalIp.gone()
                     wgConfig?.`interface`?.keyPair?.let { keys ->
                         "Device Public key: ${keys.publicKey.toBase64()}".run {
-                            if (wgTunnelConfig.configCreatedAtTimestamp() != -1L) {
-                                this + "\nLast updated ${formatter.format(wgTunnelConfig.configCreatedAtTimestamp())}"
+                            if (wgTunnelConfig.getWgConfigCreatedAt() != -1L) {
+                                this + "\nLast updated ${formatter.format(wgTunnelConfig.getWgConfigCreatedAt())}"
                             } else {
                                 this
                             }

@@ -65,14 +65,14 @@ class RealNetPRekeyer @Inject constructor(
         logcat { "Rekeying client on $processName" }
         val forceOrFalseInProductionBuilds = forceRekey.getAndResetValue()
 
-        val millisSinceLastKeyUpdate = System.currentTimeMillis() - wgTunnel.configCreatedAtTimestamp()
+        val millisSinceLastKeyUpdate = System.currentTimeMillis() - wgTunnel.getWgConfigCreatedAt()
         if (!forceOrFalseInProductionBuilds && millisSinceLastKeyUpdate < TimeUnit.DAYS.toMillis(1)) {
             logcat { "Less than 24h passed, skip re-keying" }
             return
         }
 
         if (deviceLockedChecker.invoke() || forceOrFalseInProductionBuilds) {
-            val config = wgTunnel.establish(KeyPair(), updateConfig = false)
+            val config = wgTunnel.newOrUpdateConfig(KeyPair(), updateConfig = false)
                 .onFailure {
                     logcat(LogPriority.ERROR) { "Failed registering the new key during re-keying: ${it.asLog()}" }
                 }.getOrNull() ?: return
@@ -80,7 +80,7 @@ class RealNetPRekeyer @Inject constructor(
             logcat { "Re-keying with public key: ${config.`interface`.keyPair.publicKey.toBase64()}" }
 
             if (vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)) {
-                wgTunnel.updateWgConfig(config)
+                wgTunnel.setWgConfig(config)
                 logcat { "Restarting VPN after clearing client keys" }
                 networkProtectionPixels.reportRekeyCompleted()
                 vpnFeaturesRegistry.refreshFeature(NetPVpnFeature.NETP_VPN)

@@ -62,7 +62,7 @@ class WgVpnNetworkStack @Inject constructor(
         return try {
             netpPixels.get().reportEnableAttempt()
 
-            wgConfig = wgTunnelLazy.get().establish()
+            wgConfig = wgTunnelLazy.get().newOrUpdateConfig()
                 .onFailure { netpPixels.get().reportErrorInRegistration() }
                 .getOrThrow()
             logcat { "Wireguard configuration:\n$wgConfig" }

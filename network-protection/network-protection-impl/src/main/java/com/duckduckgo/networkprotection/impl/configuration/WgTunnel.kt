@@ -45,25 +45,48 @@ import logcat.logcat
  */
 interface WgTunnel {
     /**
-     * Returns an updated
+     * Creates a new wireguard [Config] if it doesn't exists
+     * If it exists, updates it and returns it.
+     *
+     * @param keyPair is the private/public key [KeyPair] to be used in the wireguard [Config]
+     * @param updateConfig internally calls [setWgConfig] when set to `true`. Default value is `true`
      */
-    suspend fun establish(keyPair: KeyPair? = null, updateConfig: Boolean = true): Result<Config>
+    suspend fun newOrUpdateConfig(keyPair: KeyPair? = null, updateConfig: Boolean = true): Result<Config>
 
-    suspend fun updateWgConfig(config: Config)
+    /**
+     * Set the wireguard [Config] to the one provided in the parameter
+     * @param config wireguard Config created using [newOrUpdateConfig]
+     */
+    suspend fun setWgConfig(config: Config)
 
+    /**
+     * Clear the current wiregiard [Config]
+     */
     fun clearWgConfig()
 
-    suspend fun configCreatedAtTimestamp(): Long
+    /**
+     * @return returns the  [Config] creation timestamp in milliseconds
+     */
+    suspend fun getWgConfigCreatedAt(): Long
 }
 
 /**
  * This class exposes a read-only version of the WG config
  */
 interface WgTunnelConfig {
+    /**
+     * @return the currently stored [Config] or null
+     */
     suspend fun getWgConfig(): Config?
 
-    suspend fun configCreatedAtTimestamp(): Long
+    /**
+     * @return returns the  [Config] creation timestamp in milliseconds
+     */
+    suspend fun getWgConfigCreatedAt(): Long
 
+    /**
+     * Clear the current wiregiard [Config]
+     */
     fun clearWgConfig()
 }
 
@@ -78,7 +101,7 @@ class RealWgTunnelConfig @Inject constructor(
         return wgTunnelStore.wireguardConfig
     }
 
-    override suspend fun configCreatedAtTimestamp(): Long {
+    override suspend fun getWgConfigCreatedAt(): Long {
         return wgTunnelStore.lastPrivateKeyUpdateTimeInMillis
     }
 
@@ -97,7 +120,7 @@ class RealWgTunnel @Inject constructor(
     @InternalApi private val wgTunnelStore: WgTunnelStore,
 ) : WgTunnel {
 
-    override suspend fun establish(keyPair: KeyPair?, updateConfig: Boolean): Result<Config> {
+    override suspend fun newOrUpdateConfig(keyPair: KeyPair?, updateConfig: Boolean): Result<Config> {
         try {
             // return updated existing config or new one
             val config = wgTunnelStore.wireguardConfig?.let outerLet@{ wgConfig ->
@@ -137,7 +160,7 @@ class RealWgTunnel @Inject constructor(
 
             // update config
             if (updateConfig) {
-                updateWgConfig(config)
+                setWgConfig(config)
             }
 
             return Result.success(config)
@@ -147,7 +170,7 @@ class RealWgTunnel @Inject constructor(
         }
     }
 
-    override suspend fun updateWgConfig(config: Config) {
+    override suspend fun setWgConfig(config: Config) {
         wgTunnelStore.wireguardConfig = config
     }
 
@@ -190,7 +213,7 @@ class RealWgTunnel @Inject constructor(
         wgTunnelStore.wireguardConfig = null
     }
 
-    override suspend fun configCreatedAtTimestamp(): Long {
+    override suspend fun getWgConfigCreatedAt(): Long {
         return wgTunnelStore.lastPrivateKeyUpdateTimeInMillis
     }
 }
