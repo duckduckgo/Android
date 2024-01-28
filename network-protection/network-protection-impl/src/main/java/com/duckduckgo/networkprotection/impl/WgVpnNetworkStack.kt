@@ -27,6 +27,7 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.RESTART
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.SELF_STOP
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnel
+import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -46,6 +47,7 @@ import logcat.logcat
 class WgVpnNetworkStack @Inject constructor(
     private val wgProtocol: Lazy<WgProtocol>,
     private val wgTunnelLazy: Lazy<WgTunnel>,
+    private val wgTunnelConfigLazy: Lazy<WgTunnelConfig>,
     private val networkProtectionRepository: Lazy<NetworkProtectionRepository>,
     private val currentTimeProvider: CurrentTimeProvider,
     private val netpPixels: Lazy<NetworkProtectionPixels>,
@@ -62,7 +64,7 @@ class WgVpnNetworkStack @Inject constructor(
         return try {
             netpPixels.get().reportEnableAttempt()
 
-            wgConfig = wgTunnelLazy.get().newOrUpdateConfig()
+            wgConfig = wgTunnelLazy.get().createAndSetWgConfig()
                 .onFailure { netpPixels.get().reportErrorInRegistration() }
                 .getOrThrow()
             logcat { "Wireguard configuration:\n$wgConfig" }
@@ -148,7 +150,7 @@ class WgVpnNetworkStack @Inject constructor(
 
         if (reason != RESTART) {
             logcat { "Deleting wireguard config..." }
-            wgTunnelLazy.get().clearWgConfig()
+            wgTunnelConfigLazy.get().clearWgConfig()
         }
 
         // Only update if enabledTimeInMillis stop has been initiated by the user

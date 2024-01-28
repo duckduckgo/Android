@@ -26,6 +26,7 @@ import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnel
+import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesTo
@@ -50,6 +51,7 @@ class RealNetPRekeyer @Inject constructor(
     private val networkProtectionPixels: NetworkProtectionPixels,
     @ProcessName private val processName: String,
     private val wgTunnel: WgTunnel,
+    private val wgTunnelConfig: WgTunnelConfig,
     private val appBuildConfig: AppBuildConfig,
     @InternalApi private val deviceLockedChecker: DeviceLockedChecker,
 ) : NetPRekeyer {
@@ -65,22 +67,21 @@ class RealNetPRekeyer @Inject constructor(
         logcat { "Rekeying client on $processName" }
         val forceOrFalseInProductionBuilds = forceRekey.getAndResetValue()
 
-        val millisSinceLastKeyUpdate = System.currentTimeMillis() - wgTunnel.getWgConfigCreatedAt()
+        val millisSinceLastKeyUpdate = System.currentTimeMillis() - wgTunnelConfig.getWgConfigCreatedAt()
         if (!forceOrFalseInProductionBuilds && millisSinceLastKeyUpdate < TimeUnit.DAYS.toMillis(1)) {
             logcat { "Less than 24h passed, skip re-keying" }
             return
         }
 
         if (deviceLockedChecker.invoke() || forceOrFalseInProductionBuilds) {
-            val config = wgTunnel.newOrUpdateConfig(KeyPair(), updateConfig = false)
-                .onFailure {
-                    logcat(LogPriority.ERROR) { "Failed registering the new key during re-keying: ${it.asLog()}" }
-                }.getOrNull() ?: return
-
-            logcat { "Re-keying with public key: ${config.`interface`.keyPair.publicKey.toBase64()}" }
-
             if (vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)) {
-                wgTunnel.setWgConfig(config)
+                val config = wgTunnel.createAndSetWgConfig(KeyPair())
+                    .onFailure {
+                        logcat(LogPriority.ERROR) { "Failed registering the new key during re-keying: ${it.asLog()}" }
+                    }.getOrNull() ?: return
+
+                logcat { "Re-keying with public key: ${config.`interface`.keyPair.publicKey.toBase64()}" }
+
                 logcat { "Restarting VPN after clearing client keys" }
                 networkProtectionPixels.reportRekeyCompleted()
                 vpnFeaturesRegistry.refreshFeature(NetPVpnFeature.NETP_VPN)

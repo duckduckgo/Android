@@ -22,6 +22,7 @@ import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature.NETP_VPN
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnel
+import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.wireguard.config.Config
 import com.wireguard.crypto.KeyPair
@@ -36,7 +37,6 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
-import org.mockito.kotlin.eq
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -54,6 +54,9 @@ class RealNetPRekeyerTest {
 
     @Mock
     private lateinit var wgTunnel: WgTunnel
+
+    @Mock
+    private lateinit var wgTunnelConfig: WgTunnelConfig
 
     private var isDeviceLocked = false
     private val keys = KeyPair()
@@ -80,13 +83,10 @@ class RealNetPRekeyerTest {
     fun setUp() {
         MockitoAnnotations.openMocks(this)
 
-        // networkProtectionRepository = RealNetworkProtectionRepository(
-        //     RealNetworkProtectionPrefs(FakeVpnSharedPreferencesProvider()),
-        // )
-
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
         runBlocking {
-            whenever(wgTunnel.newOrUpdateConfig(any(), eq(false))).thenReturn(Result.success(config))
+            whenever(wgTunnel.createWgConfig(any())).thenReturn(Result.success(config))
+            whenever(wgTunnel.createAndSetWgConfig(any())).thenReturn(Result.success(config))
         }
 
         testee = RealNetPRekeyer(
@@ -94,6 +94,7 @@ class RealNetPRekeyerTest {
             networkProtectionPixels,
             "name",
             wgTunnel,
+            wgTunnelConfig,
             appBuildConfig,
             { isDeviceLocked },
         )
@@ -102,7 +103,7 @@ class RealNetPRekeyerTest {
     @Test
     fun `do not rekey in production if time since last rekey is less than 24h`() = runTest {
         whenever(vpnFeaturesRegistry.isFeatureRegistered(NETP_VPN)).thenReturn(true)
-        whenever(wgTunnel.getWgConfigCreatedAt())
+        whenever(wgTunnelConfig.getWgConfigCreatedAt())
             .thenReturn(System.currentTimeMillis() - TimeUnit.HOURS.toMillis(23))
         isDeviceLocked = true
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
@@ -115,7 +116,7 @@ class RealNetPRekeyerTest {
     @Test
     fun `do not rekey in internal if time since last rekey is less than 24h`() = runTest {
         whenever(vpnFeaturesRegistry.isFeatureRegistered(NETP_VPN)).thenReturn(true)
-        whenever(wgTunnel.getWgConfigCreatedAt())
+        whenever(wgTunnelConfig.getWgConfigCreatedAt())
             .thenReturn(System.currentTimeMillis() - TimeUnit.HOURS.toMillis(23))
         isDeviceLocked = true
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
@@ -128,7 +129,7 @@ class RealNetPRekeyerTest {
     @Test
     fun `do not rekey if registering new key fails`() = runTest {
         whenever(vpnFeaturesRegistry.isFeatureRegistered(NETP_VPN)).thenReturn(true)
-        whenever(wgTunnel.getWgConfigCreatedAt())
+        whenever(wgTunnelConfig.getWgConfigCreatedAt())
             .thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
 
         testee.doRekey()
@@ -139,7 +140,7 @@ class RealNetPRekeyerTest {
     @Test
     fun `do not rekey device is not locked`() = runTest {
         whenever(vpnFeaturesRegistry.isFeatureRegistered(NETP_VPN)).thenReturn(true)
-        whenever(wgTunnel.getWgConfigCreatedAt())
+        whenever(wgTunnelConfig.getWgConfigCreatedAt())
             .thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
         isDeviceLocked = false
 
@@ -151,7 +152,7 @@ class RealNetPRekeyerTest {
     @Test
     fun `do not rekey if not internal build and forced rekey`() = runTest {
         whenever(vpnFeaturesRegistry.isFeatureRegistered(NETP_VPN)).thenReturn(true)
-        whenever(wgTunnel.getWgConfigCreatedAt())
+        whenever(wgTunnelConfig.getWgConfigCreatedAt())
             .thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
         isDeviceLocked = true
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
@@ -164,7 +165,7 @@ class RealNetPRekeyerTest {
     @Test
     fun `do rekey if internal build and forced rekey`() = runTest {
         whenever(vpnFeaturesRegistry.isFeatureRegistered(NETP_VPN)).thenReturn(true)
-        whenever(wgTunnel.getWgConfigCreatedAt())
+        whenever(wgTunnelConfig.getWgConfigCreatedAt())
             .thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
         isDeviceLocked = true
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
@@ -177,7 +178,7 @@ class RealNetPRekeyerTest {
     @Test
     fun `do not rekey if internal build and forced rekey but vpn disabled`() = runTest {
         whenever(vpnFeaturesRegistry.isFeatureRegistered(NETP_VPN)).thenReturn(false)
-        whenever(wgTunnel.getWgConfigCreatedAt())
+        whenever(wgTunnelConfig.getWgConfigCreatedAt())
             .thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
         isDeviceLocked = true
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
@@ -190,7 +191,7 @@ class RealNetPRekeyerTest {
     @Test
     fun `do rekey if production build`() = runTest {
         whenever(vpnFeaturesRegistry.isFeatureRegistered(NETP_VPN)).thenReturn(true)
-        whenever(wgTunnel.getWgConfigCreatedAt())
+        whenever(wgTunnelConfig.getWgConfigCreatedAt())
             .thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
         isDeviceLocked = true
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
@@ -203,7 +204,7 @@ class RealNetPRekeyerTest {
     @Test
     fun `do not rekey if production build but vpn disabled`() = runTest {
         whenever(vpnFeaturesRegistry.isFeatureRegistered(NETP_VPN)).thenReturn(false)
-        whenever(wgTunnel.getWgConfigCreatedAt())
+        whenever(wgTunnelConfig.getWgConfigCreatedAt())
             .thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
         isDeviceLocked = true
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
@@ -214,13 +215,15 @@ class RealNetPRekeyerTest {
     }
 
     private suspend fun assertNoRekey() {
-        verify(wgTunnel, never()).setWgConfig(any())
+        verify(wgTunnel, never()).createWgConfig(any())
+        verify(wgTunnel, never()).createAndSetWgConfig(any())
         verify(vpnFeaturesRegistry, never()).refreshFeature(NETP_VPN)
         verify(networkProtectionPixels, never()).reportRekeyCompleted()
     }
 
     private suspend fun assertRekey() {
-        verify(wgTunnel).setWgConfig(any())
+        verify(wgTunnel, never()).createWgConfig(any())
+        verify(wgTunnel).createAndSetWgConfig(any())
         verify(vpnFeaturesRegistry).refreshFeature(NETP_VPN)
         verify(networkProtectionPixels).reportRekeyCompleted()
     }
