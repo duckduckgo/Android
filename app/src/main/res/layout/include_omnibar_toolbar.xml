@@ -43,7 +43,7 @@
                 app:contentInsetEnd="0dp"
                 app:contentInsetStart="0dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/safe_gaze_icon"
+                app:layout_constraintEnd_toStartOf="@id/asil_icon"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu">
@@ -238,16 +238,27 @@
                 app:layout_constraintTop_toTopOf="@+id/toolbar"
                 app:layout_constraintBottom_toBottomOf="@+id/toolbar"
                 app:layout_constraintEnd_toStartOf="@+id/tabsMenu"
-                app:layout_constraintStart_toEndOf="@+id/toolbar"
+                app:layout_constraintStart_toEndOf="@+id/asil_icon"
+                android:layout_marginStart="@dimen/keyline_1"
+                android:layout_marginEnd="@dimen/keyline_1"
                 android:src="@drawable/safe_gaze_icon"
+                />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/asil_icon"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                app:layout_constraintTop_toTopOf="@+id/toolbar"
+                app:layout_constraintBottom_toBottomOf="@+id/toolbar"
+                app:layout_constraintEnd_toStartOf="@+id/safe_gaze_icon"
+                app:layout_constraintStart_toEndOf="@+id/toolbar"
+                android:src="@drawable/ic_ddg_logo"
                 />
 
             <com.duckduckgo.app.browser.TabSwitcherButton
                 android:id="@+id/tabsMenu"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/keyline_2"
-                android:layout_marginEnd="@dimen/keyline_2"
                 android:background="?selectableItemBackgroundBorderless"
                 android:padding="@dimen/toolbarIconPadding"
                 app:layout_constraintBottom_toBottomOf="parent"
