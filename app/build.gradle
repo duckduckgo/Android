@@ -218,6 +218,9 @@ dependencies {
     implementation project(':privacy-dashboard-api')
     implementation project(':privacy-dashboard-impl')
 
+    implementation project(":privacy-protections-popup-api")
+    implementation project(":privacy-protections-popup-impl")
+
     implementation project(':remote-messaging-api')
     implementation project(':remote-messaging-impl')
     implementation project(':remote-messaging-store')

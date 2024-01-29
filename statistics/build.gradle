@@ -17,6 +17,7 @@
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
+    id 'com.google.devtools.ksp' version "$ksp_version"
     id 'com.squareup.anvil'
 }
 
@@ -49,7 +50,8 @@ dependencies {
     implementation Google.dagger
 
     // Room
-    implementation AndroidX.room.runtime
+    implementation AndroidX.room.ktx
+    ksp AndroidX.room.compiler
 
     // WorkManager
     implementation AndroidX.work.runtimeKtx
@@ -61,6 +63,20 @@ dependencies {
     implementation AndroidX.core.ktx
 
     testImplementation Testing.junit4
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation project(path: ':common-test')
+    testImplementation CashApp.turbine
+    testImplementation Testing.robolectric
+    testImplementation(KotlinX.coroutines.test) {
+        // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
+        // conflicts with mockito due to direct inclusion of byte buddy
+        exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
+    }
+    testImplementation AndroidX.test.ext.junit
+    testImplementation AndroidX.archCore.testing
+    testImplementation AndroidX.room.testing
+    testImplementation AndroidX.room.rxJava2
+
     androidTestImplementation AndroidX.test.runner
     androidTestImplementation AndroidX.test.rules
 }
