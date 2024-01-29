@@ -102,7 +102,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome) 
         if (appBuildConfig.sdkInt >= android.os.Build.VERSION_CODES.TIRAMISU) {
             event(WelcomePageView.Event.OnNotificationPermissionsRequested)
         } else {
-            scheduleTypingAnimation()
+            scheduleWelcomeAnimation()
         }
     }
 
