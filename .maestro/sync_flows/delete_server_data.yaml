@@ -2,7 +2,7 @@
 appId: com.duckduckgo.mobile.android
 name: "ReleaseTest: Users can remove all data"
 tags:
-  - syncTest
+  - releaseTest
 ---
 - launchApp:
     clearState: true

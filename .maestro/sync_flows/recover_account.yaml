@@ -3,7 +3,7 @@
 appId: com.duckduckgo.mobile.android
 name: "ReleaseTest: Users can recover an account / Device can be added to an account"
 tags:
-  - syncTest
+  - releaseTest
 ---
 - launchApp:
     clearState: true
