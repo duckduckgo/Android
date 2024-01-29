@@ -21,6 +21,7 @@ import com.duckduckgo.anrs.api.AnrRepository
 import com.duckduckgo.app.statistics.api.OfflinePixel
 import com.duckduckgo.app.statistics.api.PixelSender
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import io.reactivex.Completable
@@ -45,7 +46,8 @@ class AnrOfflinePixelSender @Inject constructor(
                         ANR_WEBVIEW_VERSION to it.webView,
                     ),
                     mapOf(),
-                ).doOnComplete {
+                    COUNT,
+                ).ignoreElement().doOnComplete {
                     anrRepository.removeMostRecentAnr()
                 }
             }

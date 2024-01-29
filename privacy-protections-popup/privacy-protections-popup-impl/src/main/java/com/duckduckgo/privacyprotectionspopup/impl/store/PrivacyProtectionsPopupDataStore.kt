@@ -18,42 +18,111 @@ package com.duckduckgo.privacyprotectionspopup.impl.store
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.privacyprotectionspopup.impl.PrivacyProtectionsPopupExperimentVariant
+import com.duckduckgo.privacyprotectionspopup.impl.store.PrivacyProtectionsPopupDataStoreImpl.Keys.DO_NOT_SHOW_AGAIN_CLICKED
+import com.duckduckgo.privacyprotectionspopup.impl.store.PrivacyProtectionsPopupDataStoreImpl.Keys.EXPERIMENT_VARIANT
+import com.duckduckgo.privacyprotectionspopup.impl.store.PrivacyProtectionsPopupDataStoreImpl.Keys.POPUP_TRIGGER_COUNT
 import com.duckduckgo.privacyprotectionspopup.impl.store.PrivacyProtectionsPopupDataStoreImpl.Keys.TOGGLE_USAGE_TIMESTAMP
+import com.duckduckgo.privacyprotectionspopup.impl.store.PrivacyProtectionsPopupDataStoreImpl.Values.EXPERIMENT_VARIANT_CONTROL
+import com.duckduckgo.privacyprotectionspopup.impl.store.PrivacyProtectionsPopupDataStoreImpl.Values.EXPERIMENT_VARIANT_TEST
 import com.squareup.anvil.annotations.ContributesBinding
 import java.time.Instant
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 interface PrivacyProtectionsPopupDataStore {
-    fun getToggleUsageTimestamp(): Flow<Instant?>
+    val data: Flow<PrivacyProtectionsPopupData>
+
+    suspend fun getToggleUsageTimestamp(): Instant?
     suspend fun setToggleUsageTimestamp(timestamp: Instant)
+    suspend fun getPopupTriggerCount(): Int
+    suspend fun setPopupTriggerCount(count: Int)
+    suspend fun getDoNotShowAgainClicked(): Boolean
+    suspend fun setDoNotShowAgainClicked(clicked: Boolean)
+    suspend fun getExperimentVariant(): PrivacyProtectionsPopupExperimentVariant?
+    suspend fun setExperimentVariant(variant: PrivacyProtectionsPopupExperimentVariant)
 }
+
+data class PrivacyProtectionsPopupData(
+    val toggleUsedAt: Instant?,
+    val popupTriggerCount: Int,
+    val doNotShowAgainClicked: Boolean,
+    val experimentVariant: PrivacyProtectionsPopupExperimentVariant?,
+)
 
 @ContributesBinding(AppScope::class)
 class PrivacyProtectionsPopupDataStoreImpl @Inject constructor(
     @PrivacyProtectionsPopup private val store: DataStore<Preferences>,
 ) : PrivacyProtectionsPopupDataStore {
 
-    override fun getToggleUsageTimestamp(): Flow<Instant?> =
-        store.data
+    override val data: Flow<PrivacyProtectionsPopupData>
+        get() = store.data
             .map { prefs ->
-                prefs[TOGGLE_USAGE_TIMESTAMP]
-                    ?.let { Instant.ofEpochMilli(it) }
+                PrivacyProtectionsPopupData(
+                    toggleUsedAt = prefs[TOGGLE_USAGE_TIMESTAMP]?.let { Instant.ofEpochMilli(it) },
+                    popupTriggerCount = prefs[POPUP_TRIGGER_COUNT] ?: 0,
+                    doNotShowAgainClicked = prefs[DO_NOT_SHOW_AGAIN_CLICKED] == true,
+                    experimentVariant = when (val variant = prefs[EXPERIMENT_VARIANT]) {
+                        EXPERIMENT_VARIANT_TEST -> PrivacyProtectionsPopupExperimentVariant.TEST
+                        EXPERIMENT_VARIANT_CONTROL -> PrivacyProtectionsPopupExperimentVariant.CONTROL
+                        null -> null
+                        else -> throw IllegalStateException(variant)
+                    },
+                )
             }
             .distinctUntilChanged()
 
+    override suspend fun getToggleUsageTimestamp(): Instant? =
+        data.first().toggleUsedAt
+
     override suspend fun setToggleUsageTimestamp(timestamp: Instant) {
+        store.edit { prefs -> prefs[TOGGLE_USAGE_TIMESTAMP] = timestamp.toEpochMilli() }
+    }
+
+    override suspend fun getPopupTriggerCount(): Int =
+        data.first().popupTriggerCount
+
+    override suspend fun setPopupTriggerCount(count: Int) {
+        store.edit { prefs -> prefs[POPUP_TRIGGER_COUNT] = count }
+    }
+
+    override suspend fun getDoNotShowAgainClicked(): Boolean =
+        data.first().doNotShowAgainClicked
+
+    override suspend fun setDoNotShowAgainClicked(clicked: Boolean) {
+        store.edit { prefs -> prefs[DO_NOT_SHOW_AGAIN_CLICKED] = clicked }
+    }
+
+    override suspend fun getExperimentVariant(): PrivacyProtectionsPopupExperimentVariant? =
+        data.first().experimentVariant
+
+    override suspend fun setExperimentVariant(variant: PrivacyProtectionsPopupExperimentVariant) {
         store.edit { prefs ->
-            prefs[TOGGLE_USAGE_TIMESTAMP] = timestamp.toEpochMilli()
+            prefs[EXPERIMENT_VARIANT] = when (variant) {
+                PrivacyProtectionsPopupExperimentVariant.CONTROL -> EXPERIMENT_VARIANT_CONTROL
+                PrivacyProtectionsPopupExperimentVariant.TEST -> EXPERIMENT_VARIANT_TEST
+            }
         }
     }
 
     private object Keys {
         val TOGGLE_USAGE_TIMESTAMP = longPreferencesKey(name = "toggle_usage_timestamp")
+        val POPUP_TRIGGER_COUNT = intPreferencesKey(name = "popup_trigger_count")
+        val DO_NOT_SHOW_AGAIN_CLICKED = booleanPreferencesKey(name = "dont_show_again_clicked")
+        val EXPERIMENT_VARIANT = stringPreferencesKey(name = "experiment_variant")
+    }
+
+    private object Values {
+        const val EXPERIMENT_VARIANT_TEST = "test"
+        const val EXPERIMENT_VARIANT_CONTROL = "control"
     }
 }
