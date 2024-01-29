@@ -36,6 +36,9 @@ interface CredentialsSyncMetadataDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(entity: CredentialsSyncMetadataEntity): Long
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(entities: List<CredentialsSyncMetadataEntity>)
+
     @Transaction
     fun initialize(entities: List<CredentialsSyncMetadataEntity>) {
         removeAll()

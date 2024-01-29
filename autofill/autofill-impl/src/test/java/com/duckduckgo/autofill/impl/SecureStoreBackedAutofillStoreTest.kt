@@ -484,7 +484,11 @@ class SecureStoreBackedAutofillStoreTest {
             autofillPrefsStore = autofillPrefsStore,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             autofillUrlMatcher = autofillUrlMatcher,
-            syncCredentialsListener = SyncCredentialsListener(CredentialsSyncMetadata(inMemoryAutofillDatabase().credentialsSyncDao())),
+            syncCredentialsListener = SyncCredentialsListener(
+                CredentialsSyncMetadata(inMemoryAutofillDatabase().credentialsSyncDao()),
+                coroutineTestRule.testDispatcherProvider,
+                coroutineTestRule.testScope,
+            ),
         )
     }
 
