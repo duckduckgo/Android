@@ -60,7 +60,7 @@ class SyncCryptoTest {
 
     @Test
     fun whenEncryptSucceedsThenResultIsEncrypted() {
-        whenever(nativeLib.encryptData(any(), any())).thenReturn(EncryptResult(0L, "not encrypted"))
+        whenever(nativeLib.encryptData(any(), any())).thenReturn(EncryptResult(0, "not encrypted"))
 
         val result = syncCrypto.encrypt("something")
 
@@ -82,7 +82,7 @@ class SyncCryptoTest {
 
     @Test
     fun whenDecryptSucceedsThenResultIsDecrypted() {
-        whenever(nativeLib.decryptData(any(), any())).thenReturn(DecryptResult(0L, "not decrypted"))
+        whenever(nativeLib.decryptData(any(), any())).thenReturn(DecryptResult(0, "not decrypted"))
 
         val result = syncCrypto.decrypt("something")
 

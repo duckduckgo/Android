@@ -39,7 +39,7 @@ class RealSyncCrypto @Inject constructor(
             throw it
         }
 
-        return if (encryptResult.result != 0L) {
+        return if (encryptResult.result != 0) {
             syncOperationErrorRecorder.record(SyncOperationErrorType.DATA_ENCRYPT)
             throw Exception("Failed to encrypt data")
         } else {
@@ -56,7 +56,7 @@ class RealSyncCrypto @Inject constructor(
             throw it
         }
 
-        return if (decryptResult.result != 0L) {
+        return if (decryptResult.result != 0) {
             syncOperationErrorRecorder.record(SyncOperationErrorType.DATA_DECRYPT)
             throw Exception("Failed to decrypt data")
         } else {

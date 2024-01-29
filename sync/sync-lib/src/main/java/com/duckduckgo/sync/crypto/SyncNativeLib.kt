@@ -77,7 +77,7 @@ class SyncNativeLib constructor(context: Context) : SyncLib {
         val protectedSecretKey = ByteArray(getProtectedSecretKeySize())
         val passwordHash = ByteArray(getPasswordHashSize())
 
-        val result: Long =
+        val result: Int =
             generateAccountKeys(
                 primaryKey,
                 secretKey,
@@ -103,7 +103,7 @@ class SyncNativeLib constructor(context: Context) : SyncLib {
         val passwordHash = ByteArray(getPasswordHashSize())
         val stretchedPrimaryKey = ByteArray(getStretchedPrimaryKeySize())
 
-        val result: Long = prepareForLogin(passwordHash, stretchedPrimaryKey, primarKeyByteArray)
+        val result: Int = prepareForLogin(passwordHash, stretchedPrimaryKey, primarKeyByteArray)
 
         return LoginKeys(
             result = result,
@@ -121,7 +121,7 @@ class SyncNativeLib constructor(context: Context) : SyncLib {
         val secretKeyByteArray = secretKey.decodeKey()
         val decryptedData = ByteArray(encryptedDataByteArray.size - getEncryptedExtraBytes())
 
-        val result: Long = decrypt(decryptedData, encryptedDataByteArray, secretKeyByteArray)
+        val result: Int = decrypt(decryptedData, encryptedDataByteArray, secretKeyByteArray)
 
         return DecryptResult(
             result = result,
@@ -133,7 +133,7 @@ class SyncNativeLib constructor(context: Context) : SyncLib {
         val publicKey = ByteArray(getPublicKeyBytes())
         val privateKey = ByteArray(getPrivateKeyBytes())
 
-        val result: Long =
+        val result: Int =
             prepareForConnect(
                 publicKey,
                 privateKey,
@@ -154,7 +154,7 @@ class SyncNativeLib constructor(context: Context) : SyncLib {
         val secretKeyByteArray = primaryKey.decodeKey()
         val encryptedDataByteArray = ByteArray(rawDataByteArray.size + getEncryptedExtraBytes())
 
-        val result: Long = encrypt(encryptedDataByteArray, rawDataByteArray, secretKeyByteArray)
+        val result: Int = encrypt(encryptedDataByteArray, rawDataByteArray, secretKeyByteArray)
 
         return EncryptResult(
             result = result,
@@ -170,7 +170,7 @@ class SyncNativeLib constructor(context: Context) : SyncLib {
         val secretKeyByteArray = primaryKey.decodeKey()
         val decryptedData = ByteArray(encryptedDataByteArray.size - getEncryptedExtraBytes())
 
-        val result: Long = decrypt(decryptedData, encryptedDataByteArray, secretKeyByteArray)
+        val result: Int = decrypt(decryptedData, encryptedDataByteArray, secretKeyByteArray)
 
         return DecryptResult(
             result = result,
@@ -228,30 +228,30 @@ class SyncNativeLib constructor(context: Context) : SyncLib {
         passwordHash: ByteArray,
         userId: String,
         password: String,
-    ): Long
+    ): Int
 
     private external fun prepareForConnect(
         publicKey: ByteArray,
         secretKey: ByteArray,
-    ): Long
+    ): Int
 
     private external fun prepareForLogin(
         passwordHash: ByteArray,
         stretchedPrimaryKey: ByteArray,
         primaryKey: ByteArray,
-    ): Long
+    ): Int
 
     private external fun encrypt(
         encryptedBytes: ByteArray,
         rawBytes: ByteArray,
         secretKey: ByteArray,
-    ): Long
+    ): Int
 
     private external fun decrypt(
         rawBytes: ByteArray,
         encryptedBytes: ByteArray,
         secretKey: ByteArray,
-    ): Long
+    ): Int
 
     private external fun seal(
         sealedBytes: ByteArray,
@@ -278,7 +278,7 @@ class SyncNativeLib constructor(context: Context) : SyncLib {
 }
 
 class AccountKeys(
-    val result: Long,
+    val result: Int,
     val primaryKey: String,
     val secretKey: String,
     val protectedSecretKey: String,
@@ -288,24 +288,24 @@ class AccountKeys(
 )
 
 class ConnectKeys(
-    val result: Long,
+    val result: Int,
     val publicKey: String,
     val secretKey: String,
 )
 
 class LoginKeys(
-    val result: Long,
+    val result: Int,
     val passwordHash: String,
     val stretchedPrimaryKey: String,
     val primaryKey: String,
 )
 
 class DecryptResult(
-    val result: Long,
+    val result: Int,
     val decryptedData: String,
 )
 
 class EncryptResult(
-    val result: Long,
+    val result: Int,
     val encryptedData: String,
 )

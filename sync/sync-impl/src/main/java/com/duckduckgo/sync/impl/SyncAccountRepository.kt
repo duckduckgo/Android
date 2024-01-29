@@ -77,8 +77,8 @@ class AppSyncAccountRepository @Inject constructor(
         val userId = syncDeviceIds.userId()
 
         val account: AccountKeys = nativeLib.generateAccountKeys(userId = userId)
-        if (account.result != 0L) {
-            return Error(code = account.result.toInt(), reason = "Create Account: keys failed").also {
+        if (account.result != 0) {
+            return Error(code = account.result, reason = "Create Account: keys failed").also {
                 syncPixels.fireSyncAccountErrorPixel(it)
             }
         }
@@ -323,8 +323,8 @@ class AppSyncAccountRepository @Inject constructor(
         primaryKey: String,
     ): Result<Boolean> {
         val preLogin: LoginKeys = nativeLib.prepareForLogin(primaryKey)
-        if (preLogin.result != 0L) {
-            return Error(code = preLogin.result.toInt(), reason = "Login account keys failed").also {
+        if (preLogin.result != 0) {
+            return Error(code = preLogin.result, reason = "Login account keys failed").also {
                 syncPixels.fireSyncAccountErrorPixel(it)
             }
         }
@@ -348,8 +348,8 @@ class AppSyncAccountRepository @Inject constructor(
 
             is Result.Success -> {
                 val decryptResult = nativeLib.decrypt(result.data.protected_encryption_key, preLogin.stretchedPrimaryKey)
-                if (decryptResult.result != 0L) {
-                    return Error(code = decryptResult.result.toInt(), reason = "Decrypt failed").also {
+                if (decryptResult.result != 0) {
+                    return Error(code = decryptResult.result, reason = "Decrypt failed").also {
                         syncPixels.fireSyncAccountErrorPixel(it)
                     }
                 }
