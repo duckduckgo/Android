@@ -24,6 +24,7 @@ import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.privacyprotectionspopup.impl.PrivacyProtectionsPopupExperimentVariant.CONTROL
 import java.time.Instant
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -98,5 +99,16 @@ class PrivacyProtectionsPopupDataStoreTest {
     fun whenDoNotShowAgainIsStoredThenReturnsCorrectValue() = runTest {
         subject.setDoNotShowAgainClicked(clicked = true)
         assertTrue(subject.getDoNotShowAgainClicked())
+    }
+
+    @Test
+    fun whenExperimentVariantIsNotInitializedThenReturnsNull() = runTest {
+        assertNull(subject.getExperimentVariant())
+    }
+
+    @Test
+    fun whenExperimentVariantIsStoredThenReturnsCorrectValue() = runTest {
+        subject.setExperimentVariant(CONTROL)
+        assertEquals(CONTROL, subject.getExperimentVariant())
     }
 }

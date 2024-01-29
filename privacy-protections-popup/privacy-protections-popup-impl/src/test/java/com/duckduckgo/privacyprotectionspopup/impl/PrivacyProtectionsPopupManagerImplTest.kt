@@ -30,10 +30,11 @@ import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DISMISSED
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DISMISS_CLICKED
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DONT_SHOW_AGAIN_CLICKED
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.PRIVACY_DASHBOARD_CLICKED
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupViewState
+import com.duckduckgo.privacyprotectionspopup.impl.PrivacyProtectionsPopupExperimentVariant.CONTROL
+import com.duckduckgo.privacyprotectionspopup.impl.PrivacyProtectionsPopupExperimentVariant.TEST
 import com.duckduckgo.privacyprotectionspopup.impl.db.PopupDismissDomainRepository
-import com.duckduckgo.privacyprotectionspopup.impl.store.PrivacyProtectionsPopupData
-import com.duckduckgo.privacyprotectionspopup.impl.store.PrivacyProtectionsPopupDataStore
 import java.time.Duration
 import java.time.Instant
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -45,13 +46,20 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.doAnswer
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
@@ -74,6 +82,10 @@ class PrivacyProtectionsPopupManagerImplTest {
 
     private val duckDuckGoUrlDetector = FakeDuckDuckGoUrlDetector()
 
+    private val variantRandomizer = FakePrivacyProtectionsPopupExperimentVariantRandomizer()
+
+    private val pixels: PrivacyProtectionsPopupPixels = mock()
+
     private val subject = PrivacyProtectionsPopupManagerImpl(
         appCoroutineScope = coroutineRule.testScope,
         featureFlag = featureFlag,
@@ -87,6 +99,8 @@ class PrivacyProtectionsPopupManagerImplTest {
         userAllowListRepository = userAllowListRepository,
         dataStore = dataStore,
         duckDuckGoUrlDetector = duckDuckGoUrlDetector,
+        variantRandomizer = variantRandomizer,
+        pixels = pixels,
     )
 
     @Test
@@ -442,6 +456,167 @@ class PrivacyProtectionsPopupManagerImplTest {
         }
     }
 
+    @Test
+    fun whenPopupConditionsAreMetAndExperimentVariantIsControlThenPopupIsNotShown() = runTest {
+        dataStore.setExperimentVariant(CONTROL)
+        subject.viewState.test {
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
+
+            assertPopupVisible(visible = false)
+        }
+    }
+
+    @Test
+    fun whenPopupConditionsAreMetAndExperimentVariantIsNullThenInitializesVariantWithRandomValue() = runTest {
+        variantRandomizer.variant = CONTROL
+        assertNull(dataStore.getExperimentVariant())
+
+        subject.viewState.test {
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
+
+            assertPopupVisible(visible = false)
+            assertEquals(CONTROL, dataStore.getExperimentVariant())
+        }
+    }
+
+    @Test
+    fun whenExperimentVariantIsAssignedThenPixelIsSent() = runTest {
+        variantRandomizer.variant = CONTROL
+        assertNull(dataStore.getExperimentVariant())
+        var variantIncludedInPixel: PrivacyProtectionsPopupExperimentVariant? = null
+        whenever(pixels.reportExperimentVariantAssigned()) doAnswer {
+            variantIncludedInPixel = runBlocking { dataStore.getExperimentVariant() }
+        }
+
+        subject.viewState.test {
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
+            cancelAndIgnoreRemainingEvents()
+
+            verify(pixels).reportExperimentVariantAssigned()
+            assertEquals(CONTROL, variantIncludedInPixel) // Verify that pixel is sent AFTER assigned variant is stored.
+        }
+    }
+
+    @Test
+    fun whenVariantIsAlreadyAssignedThenPixelIsNotSent() = runTest {
+        dataStore.setExperimentVariant(TEST)
+        subject.viewState.test {
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
+
+            assertPopupVisible(visible = true)
+
+            verify(pixels, never()).reportExperimentVariantAssigned()
+        }
+    }
+
+    @Test
+    fun whenPopupIsTriggeredThenPixelIsSent() = runTest {
+        subject.viewState.test {
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
+            assertPopupVisible(visible = true)
+
+            verify(pixels).reportPopupTriggered()
+        }
+    }
+
+    @Test
+    fun whenPrivacyProtectionsDisableButtonIsClickedThenPixelIsSent() = runTest {
+        subject.viewState.test {
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
+            assertPopupVisible(visible = true)
+
+            subject.onUiEvent(DISABLE_PROTECTIONS_CLICKED)
+
+            verify(pixels).reportProtectionsDisabled()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDismissButtonIsClickedThenPixelIsSent() = runTest {
+        subject.viewState.test {
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
+            assertPopupVisible(visible = true)
+
+            subject.onUiEvent(DISMISS_CLICKED)
+
+            verify(pixels).reportPopupDismissedViaButton()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPopupIsDismissedViaClickOutsideThenPixelIsSent() = runTest {
+        subject.viewState.test {
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
+            assertPopupVisible(visible = true)
+
+            subject.onUiEvent(DISMISSED)
+
+            verify(pixels).reportPopupDismissedViaClickOutside()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDoNotShowAgainButtonIsClickedThenPixelIsSent() = runTest {
+        subject.viewState.test {
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
+            assertPopupVisible(visible = true)
+
+            subject.onUiEvent(DONT_SHOW_AGAIN_CLICKED)
+
+            verify(pixels).reportDoNotShowAgainClicked()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPrivacyDashboardIsOpenedThenPixelIsSent() = runTest {
+        subject.viewState.test {
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
+            assertPopupVisible(visible = true)
+
+            subject.onUiEvent(PRIVACY_DASHBOARD_CLICKED)
+
+            verify(pixels).reportPrivacyDashboardOpened()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPageIsRefreshedAndConditionsAreMetThenPixelIsSent() = runTest {
+        subject.viewState.test {
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
+
+            verify(pixels).reportPageRefreshOnPossibleBreakage()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPageIsRefreshedAndFeatureIsDisabledAndThereIsNoExperimentVariantThenPixelIsNotSent() = runTest {
+        featureFlag.enabled = false
+        subject.viewState.test {
+            subject.onPageLoaded(url = "https://www.example.com", httpErrorCodes = emptyList(), hasBrowserError = false)
+            subject.onPageRefreshTriggeredByUser()
+
+            verify(pixels).reportPageRefreshOnPossibleBreakage()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     private fun ReceiveTurbine<PrivacyProtectionsPopupViewState>.assertPopupVisible(visible: Boolean) {
         if (visible) {
             assertTrue(expectMostRecentItem() is PrivacyProtectionsPopupViewState.Visible)
@@ -509,38 +684,6 @@ private class FakePopupDismissDomainRepository : PopupDismissDomainRepository {
         throw UnsupportedOperationException()
 }
 
-private class FakePrivacyProtectionsPopupDataStore : PrivacyProtectionsPopupDataStore {
-
-    override val data = MutableStateFlow(
-        PrivacyProtectionsPopupData(
-            toggleUsedAt = null,
-            popupTriggerCount = 0,
-            doNotShowAgainClicked = false,
-        ),
-    )
-
-    override suspend fun getToggleUsageTimestamp(): Instant? =
-        data.first().toggleUsedAt
-
-    override suspend fun setToggleUsageTimestamp(timestamp: Instant) {
-        data.update { it.copy(toggleUsedAt = timestamp) }
-    }
-
-    override suspend fun getPopupTriggerCount(): Int =
-        data.first().popupTriggerCount
-
-    override suspend fun setPopupTriggerCount(count: Int) {
-        data.update { it.copy(popupTriggerCount = count) }
-    }
-
-    override suspend fun getDoNotShowAgainClicked(): Boolean =
-        data.first().doNotShowAgainClicked
-
-    override suspend fun setDoNotShowAgainClicked(clicked: Boolean) {
-        data.update { it.copy(doNotShowAgainClicked = clicked) }
-    }
-}
-
 private class FakeDuckDuckGoUrlDetector : DuckDuckGoUrlDetector {
     override fun isDuckDuckGoUrl(url: String): Boolean = AppUrl.Url.HOST == Uri.parse(url).host
 
@@ -550,4 +693,10 @@ private class FakeDuckDuckGoUrlDetector : DuckDuckGoUrlDetector {
     override fun extractQuery(uriString: String): String? = throw UnsupportedOperationException()
     override fun isDuckDuckGoVerticalUrl(uri: String): Boolean = throw UnsupportedOperationException()
     override fun extractVertical(uriString: String): String? = throw UnsupportedOperationException()
+}
+
+private class FakePrivacyProtectionsPopupExperimentVariantRandomizer : PrivacyProtectionsPopupExperimentVariantRandomizer {
+    var variant = TEST
+
+    override fun getRandomVariant(): PrivacyProtectionsPopupExperimentVariant = variant
 }

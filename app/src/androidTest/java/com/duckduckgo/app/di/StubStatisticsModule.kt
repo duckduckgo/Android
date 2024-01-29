@@ -21,9 +21,12 @@ import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.AtbInitializer
 import com.duckduckgo.app.statistics.AtbInitializerListener
 import com.duckduckgo.app.statistics.api.PixelSender
+import com.duckduckgo.app.statistics.api.PixelSender.SendPixelResult
+import com.duckduckgo.app.statistics.api.PixelSender.SendPixelResult.PIXEL_SENT
 import com.duckduckgo.app.statistics.api.StatisticsService
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.device.ContextDeviceInfo
@@ -36,6 +39,7 @@ import dagger.Provides
 import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
 import io.reactivex.Completable
+import io.reactivex.Single
 import kotlinx.coroutines.CoroutineScope
 import retrofit2.Retrofit
 
@@ -73,6 +77,7 @@ class StubStatisticsModule {
                 pixel: Pixel.PixelName,
                 parameters: Map<String, String>,
                 encodedParameters: Map<String, String>,
+                type: PixelType,
             ) {
             }
 
@@ -80,6 +85,7 @@ class StubStatisticsModule {
                 pixelName: String,
                 parameters: Map<String, String>,
                 encodedParameters: Map<String, String>,
+                type: PixelType,
             ) {
             }
 
@@ -122,8 +128,9 @@ class StubStatisticsModule {
                 pixelName: String,
                 parameters: Map<String, String>,
                 encodedParameters: Map<String, String>,
-            ): Completable {
-                return Completable.fromAction {}
+                type: PixelType,
+            ): Single<SendPixelResult> {
+                return Single.just(PIXEL_SENT)
             }
 
             override fun enqueuePixel(

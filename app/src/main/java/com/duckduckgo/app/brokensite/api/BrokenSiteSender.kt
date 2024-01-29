@@ -41,6 +41,7 @@ import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyConfig
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.squareup.anvil.annotations.ContributesBinding
 import java.util.*
 import javax.inject.Inject
@@ -68,6 +69,7 @@ class BrokenSiteSubmitter @Inject constructor(
     private val unprotectedTemporary: UnprotectedTemporary,
     private val contentBlocking: ContentBlocking,
     private val brokenSiteLastSentReport: BrokenSiteLastSentReport,
+    private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels,
 ) : BrokenSiteSender {
 
     override fun submitBrokenSiteFeedback(brokenSite: BrokenSite) {
@@ -118,6 +120,8 @@ class BrokenSiteSubmitter @Inject constructor(
             if (appBuildConfig.deviceLocale.language == Locale.ENGLISH.language) {
                 params[LOGIN_SITE] = brokenSite.loginSite.orEmpty()
             }
+
+            params += privacyProtectionsPopupExperimentExternalPixels.getPixelParams()
 
             val encodedParams = mapOf(
                 BLOCKED_TRACKERS_KEY to brokenSite.blockedTrackers,
