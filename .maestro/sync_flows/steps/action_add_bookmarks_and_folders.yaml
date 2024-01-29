@@ -1,0 +1,69 @@
+# Expected state: Browser screen
+appId: com.duckduckgo.mobile.android
+---
+- runScript: script_add_bookmark_domains.js
+# Until here we've joined an account that has predefined data
+# Now, we add a couple bookmarks
+- tapOn: "Search or type URL"
+- inputText: "${output.bookmarks.domains[0]}"
+# We need this because Dax Dialogs sometimes appears before pressing Enter
+- runFlow:
+    when:
+      visible:
+        id: "com.duckduckgo.mobile.android:id/primaryCta"
+    commands:
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/primaryCta"
+- pressKey: Enter
+- runFlow:
+    when:
+      visible:
+        id: "com.duckduckgo.mobile.android:id/primaryCta"
+    commands:
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/primaryCta"
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+- tapOn: "Add Bookmark"
+- tapOn: "Search or type URL"
+# Now, we add a favourite
+- inputText: "${output.bookmarks.domains[1]}"
+- pressKey: Enter
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+- tapOn: "Add Bookmark"
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/bookmarksBottomSheetSwitch"
+- runFlow:
+    when:
+      visible:
+        id: "com.duckduckgo.mobile.android:id/dialogTextCta"
+    commands:
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/item_container"
+          index: 1
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/touch_outside"
+# Now, we create a new folder
+- runFlow: ../../shared/open_bookmarks.yaml
+- tapOn: "Add Folder"
+- tapOn: "Title"
+- inputText: "${output.bookmarks.folders[0]}"
+- tapOn: "Confirm"
+# Move first item to newly created folder
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/trailingIcon"
+    index: 1
+- tapOn: "Edit"
+- tapOn: "Bookmarks"
+- tapOn: "${output.bookmarks.folders[0]}"
+- tapOn: "Confirm"
+- tapOn: "Navigate up"
+- runFlow:
+    when:
+      visible:
+        id: "com.duckduckgo.mobile.android:id/dialogTextCta"
+    commands:
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/item_container"
+          index: 1
