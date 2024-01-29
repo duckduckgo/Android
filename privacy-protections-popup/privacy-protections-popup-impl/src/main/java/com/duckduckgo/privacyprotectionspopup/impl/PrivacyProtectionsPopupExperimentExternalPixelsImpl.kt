@@ -16,17 +16,24 @@
 
 package com.duckduckgo.privacyprotectionspopup.impl
 
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.duckduckgo.privacyprotectionspopup.impl.PrivacyProtectionsPopupExperimentVariant.CONTROL
 import com.duckduckgo.privacyprotectionspopup.impl.PrivacyProtectionsPopupExperimentVariant.TEST
+import com.duckduckgo.privacyprotectionspopup.impl.PrivacyProtectionsPopupPixelName.*
 import com.duckduckgo.privacyprotectionspopup.impl.store.PrivacyProtectionsPopupDataStore
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 @ContributesBinding(AppScope::class)
 class PrivacyProtectionsPopupExperimentExternalPixelsImpl @Inject constructor(
     private val dataStore: PrivacyProtectionsPopupDataStore,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val pixelSender: Pixel,
 ) : PrivacyProtectionsPopupExperimentExternalPixels {
 
     override suspend fun getPixelParams(): Map<String, String> {
@@ -40,6 +47,40 @@ class PrivacyProtectionsPopupExperimentExternalPixelsImpl @Inject constructor(
             mapOf(PARAM_EXPERIMENT_VARIANT to paramValue)
         } else {
             emptyMap()
+        }
+    }
+
+    override fun tryReportPrivacyDashboardOpened() {
+        fireIfInExperiment(PRIVACY_DASHBOARD_LAUNCHED_UNIQUE)
+    }
+
+    override fun tryReportProtectionsToggledFromPrivacyDashboard(protectionsEnabled: Boolean) {
+        fireIfInExperiment(
+            if (protectionsEnabled) PRIVACY_DASHBOARD_ALLOWLIST_REMOVE_UNIQUE else PRIVACY_DASHBOARD_ALLOWLIST_ADD_UNIQUE,
+        )
+    }
+
+    override fun tryReportProtectionsToggledFromBrowserMenu(protectionsEnabled: Boolean) {
+        fireIfInExperiment(
+            if (protectionsEnabled) BROWSER_MENU_ALLOWLIST_REMOVE_UNIQUE else BROWSER_MENU_ALLOWLIST_ADD_UNIQUE,
+        )
+    }
+
+    override fun tryReportProtectionsToggledFromBrokenSiteReport(protectionsEnabled: Boolean) {
+        fireIfInExperiment(
+            if (protectionsEnabled) BROKEN_SITE_ALLOWLIST_REMOVE_UNIQUE else BROKEN_SITE_ALLOWLIST_ADD_UNIQUE,
+        )
+    }
+
+    private fun fireIfInExperiment(pixel: PrivacyProtectionsPopupPixelName) {
+        appCoroutineScope.launch {
+            if (dataStore.getExperimentVariant() != null) {
+                pixelSender.fire(
+                    pixel = pixel,
+                    parameters = getPixelParams(),
+                    type = pixel.type,
+                )
+            }
         }
     }
 

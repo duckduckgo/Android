@@ -70,6 +70,34 @@ enum class PrivacyProtectionsPopupPixelName(
         pixelName = "m_privacy_protections_popup_page_refresh_on_possible_breakage_d",
         type = DAILY,
     ),
+    PRIVACY_DASHBOARD_LAUNCHED_UNIQUE(
+        pixelName = "m_privacy_protections_popup_dashboard_launched_u",
+        type = UNIQUE,
+    ),
+    PRIVACY_DASHBOARD_ALLOWLIST_ADD_UNIQUE(
+        pixelName = "m_privacy_protections_popup_dashboard_allowlist_add_u",
+        type = UNIQUE,
+    ),
+    PRIVACY_DASHBOARD_ALLOWLIST_REMOVE_UNIQUE(
+        pixelName = "m_privacy_protections_popup__dashboard_allowlist_remove_u",
+        type = UNIQUE,
+    ),
+    BROWSER_MENU_ALLOWLIST_ADD_UNIQUE(
+        pixelName = "m_privacy_protections_popup_browser_menu_allowlist_add_u",
+        type = UNIQUE,
+    ),
+    BROWSER_MENU_ALLOWLIST_REMOVE_UNIQUE(
+        pixelName = "m_privacy_protections_popup_browser_menu_allowlist_remove_u",
+        type = UNIQUE,
+    ),
+    BROKEN_SITE_ALLOWLIST_ADD_UNIQUE(
+        pixelName = "m_privacy_protections_popup_broken_site_allowlist_add_u",
+        type = UNIQUE,
+    ),
+    BROKEN_SITE_ALLOWLIST_REMOVE_UNIQUE(
+        pixelName = "m_privacy_protections_popup_broken_site_allowlist_remove_u",
+        type = UNIQUE,
+    ),
     ;
 
     object Params {

@@ -232,4 +232,12 @@ private class FakePrivacyProtectionsPopupExperimentExternalPixels : PrivacyProte
     var params: Map<String, String> = emptyMap()
 
     override suspend fun getPixelParams(): Map<String, String> = params
+
+    override fun tryReportPrivacyDashboardOpened() = throw UnsupportedOperationException()
+
+    override fun tryReportProtectionsToggledFromPrivacyDashboard(protectionsEnabled: Boolean) = throw UnsupportedOperationException()
+
+    override fun tryReportProtectionsToggledFromBrowserMenu(protectionsEnabled: Boolean) = throw UnsupportedOperationException()
+
+    override fun tryReportProtectionsToggledFromBrokenSiteReport(protectionsEnabled: Boolean) = throw UnsupportedOperationException()
 }

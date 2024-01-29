@@ -24,7 +24,6 @@ import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.UNIQUE
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.DASHBOARD
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -191,8 +190,8 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         viewModelScope.launch {
             val pixelParams = privacyProtectionsPopupExperimentExternalPixels.getPixelParams()
             pixel.fire(PRIVACY_DASHBOARD_OPENED, pixelParams, type = COUNT)
-            pixel.fire(PRIVACY_DASHBOARD_OPENED_UNIQUE, pixelParams, type = UNIQUE)
         }
+        privacyProtectionsPopupExperimentExternalPixels.tryReportPrivacyDashboardOpened()
 
         site.filterNotNull()
             .onEach(::updateSite)
@@ -255,12 +254,11 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                 if (enabled) {
                     userAllowListRepository.removeDomainFromUserAllowList(domain)
                     pixel.fire(PRIVACY_DASHBOARD_ALLOWLIST_REMOVE, pixelParams, type = COUNT)
-                    pixel.fire(PRIVACY_DASHBOARD_ALLOWLIST_REMOVE_UNIQUE, pixelParams, type = UNIQUE)
                 } else {
                     userAllowListRepository.addDomainToUserAllowList(domain)
                     pixel.fire(PRIVACY_DASHBOARD_ALLOWLIST_ADD, pixelParams, type = COUNT)
-                    pixel.fire(PRIVACY_DASHBOARD_ALLOWLIST_ADD_UNIQUE, pixelParams, type = UNIQUE)
                 }
+                privacyProtectionsPopupExperimentExternalPixels.tryReportProtectionsToggledFromPrivacyDashboard(enabled)
             }
         }
     }

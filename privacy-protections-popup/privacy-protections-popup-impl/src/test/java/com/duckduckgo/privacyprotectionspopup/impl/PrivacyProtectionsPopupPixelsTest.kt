@@ -43,7 +43,7 @@ class PrivacyProtectionsPopupPixelsTest {
 
     private val subject = PrivacyProtectionsPopupPixelsImpl(
         pixelSender = pixel,
-        paramsProvider = PrivacyProtectionsPopupExperimentExternalPixelsImpl(dataStore),
+        paramsProvider = PrivacyProtectionsPopupExperimentExternalPixelsImpl(dataStore, coroutineRule.testScope, pixel),
         appCoroutineScope = coroutineRule.testScope,
         dataStore = dataStore,
     )

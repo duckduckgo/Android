@@ -30,7 +30,6 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.UNIQUE
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.feature.toggles.api.FeatureToggle
@@ -44,6 +43,7 @@ import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperim
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsToggleUsageListener
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.*
@@ -89,7 +89,9 @@ class BrokenSiteViewModelTest {
 
     private val mockPrivacyProtectionsToggleUsageListener: PrivacyProtectionsToggleUsageListener = mock()
 
-    private val privacyProtectionsPopupExperimentExternalPixels = FakePrivacyProtectionsPopupExperimentExternalPixels()
+    private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels = mock {
+        runBlocking { whenever(mock.getPixelParams()).thenReturn(emptyMap()) }
+    }
 
     private lateinit var testee: BrokenSiteViewModel
 
@@ -788,7 +790,7 @@ class BrokenSiteViewModelTest {
     @Test
     fun whenPrivacyProtectionsAreToggledThenCorrectPixelsAreSent() = runTest {
         val params = mapOf("test_key" to "test_value")
-        privacyProtectionsPopupExperimentExternalPixels.params = params
+        whenever(privacyProtectionsPopupExperimentExternalPixels.getPixelParams()).thenReturn(params)
         testee.setInitialBrokenSite(
             url = url,
             blockedTrackers = "",
@@ -806,11 +808,11 @@ class BrokenSiteViewModelTest {
 
         testee.onProtectionsToggled(protectionsEnabled = false)
         verify(mockPixel).fire(AppPixelName.BROKEN_SITE_ALLOWLIST_ADD, params, type = COUNT)
-        verify(mockPixel).fire(AppPixelName.BROKEN_SITE_ALLOWLIST_ADD_UNIQUE, params, type = UNIQUE)
+        verify(privacyProtectionsPopupExperimentExternalPixels).tryReportProtectionsToggledFromBrokenSiteReport(protectionsEnabled = false)
 
         testee.onProtectionsToggled(protectionsEnabled = true)
         verify(mockPixel).fire(AppPixelName.BROKEN_SITE_ALLOWLIST_REMOVE, params, type = COUNT)
-        verify(mockPixel).fire(AppPixelName.BROKEN_SITE_ALLOWLIST_REMOVE_UNIQUE, params, type = UNIQUE)
+        verify(privacyProtectionsPopupExperimentExternalPixels).tryReportProtectionsToggledFromBrokenSiteReport(protectionsEnabled = true)
     }
 
     private fun selectAndAcceptCategory(indexSelected: Int = 0) {
@@ -822,10 +824,4 @@ class BrokenSiteViewModelTest {
         private const val url = "http://example.com"
         private const val trackingUrl = "https://foo.com"
     }
-}
-
-private class FakePrivacyProtectionsPopupExperimentExternalPixels : PrivacyProtectionsPopupExperimentExternalPixels {
-    var params: Map<String, String> = emptyMap()
-
-    override suspend fun getPixelParams(): Map<String, String> = params
 }

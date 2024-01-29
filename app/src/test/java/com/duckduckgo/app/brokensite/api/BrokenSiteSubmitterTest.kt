@@ -26,6 +26,7 @@ import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import java.util.*
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -69,7 +70,9 @@ class BrokenSiteSubmitterTest {
 
     private val mockBrokenSiteLastSentReport: BrokenSiteLastSentReport = mock()
 
-    private val privacyProtectionsPopupExperimentExternalPixels = FakePrivacyProtectionsPopupExperimentExternalPixels()
+    private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels = mock {
+        runBlocking { whenever(mock.getPixelParams()).thenReturn(emptyMap()) }
+    }
 
     private lateinit var testee: BrokenSiteSubmitter
 
@@ -290,7 +293,7 @@ class BrokenSiteSubmitterTest {
     @Test
     fun whenPrivacyProtectionsPopupExperimentParamsArePresentThenTheyAreIncludedInPixel() = runTest {
         val params = mapOf("test_key" to "test_value")
-        privacyProtectionsPopupExperimentExternalPixels.params = params
+        whenever(privacyProtectionsPopupExperimentExternalPixels.getPixelParams()).thenReturn(params)
 
         testee.submitBrokenSiteFeedback(getBrokenSite())
 
@@ -320,10 +323,4 @@ class BrokenSiteSubmitterTest {
             reportFlow = ReportFlow.MENU,
         )
     }
-}
-
-private class FakePrivacyProtectionsPopupExperimentExternalPixels : PrivacyProtectionsPopupExperimentExternalPixels {
-    var params: Map<String, String> = emptyMap()
-
-    override suspend fun getPixelParams(): Map<String, String> = params
 }

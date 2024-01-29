@@ -36,7 +36,6 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.UNIQUE
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.DASHBOARD
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
@@ -181,13 +180,11 @@ class BrokenSiteViewModel @Inject constructor(
             if (protectionsEnabled) {
                 userAllowListRepository.removeDomainFromUserAllowList(domain)
                 pixel.fire(AppPixelName.BROKEN_SITE_ALLOWLIST_REMOVE, pixelParams, type = COUNT)
-                pixel.fire(AppPixelName.BROKEN_SITE_ALLOWLIST_REMOVE_UNIQUE, pixelParams, type = UNIQUE)
             } else {
                 userAllowListRepository.addDomainToUserAllowList(domain)
                 pixel.fire(AppPixelName.BROKEN_SITE_ALLOWLIST_ADD, pixelParams, type = COUNT)
-                pixel.fire(AppPixelName.BROKEN_SITE_ALLOWLIST_ADD_UNIQUE, pixelParams, type = UNIQUE)
             }
-
+            privacyProtectionsPopupExperimentExternalPixels.tryReportProtectionsToggledFromBrokenSiteReport(protectionsEnabled)
             protectionsToggleUsageListener.onPrivacyProtectionsToggleUsed()
         }
     }

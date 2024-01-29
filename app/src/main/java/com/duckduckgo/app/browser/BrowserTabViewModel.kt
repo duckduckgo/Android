@@ -107,7 +107,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FAVORITE_MENU_ITEM_STATE
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.UNIQUE
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.notification.SurveyNotificationScheduler
@@ -2255,7 +2254,7 @@ class BrowserTabViewModel @Inject constructor(
     private suspend fun addToAllowList(domain: String) {
         val pixelParams = privacyProtectionsPopupExperimentExternalPixels.getPixelParams()
         pixel.fire(AppPixelName.BROWSER_MENU_ALLOWLIST_ADD, pixelParams, type = COUNT)
-        pixel.fire(AppPixelName.BROWSER_MENU_ALLOWLIST_ADD_UNIQUE, pixelParams, type = UNIQUE)
+        privacyProtectionsPopupExperimentExternalPixels.tryReportProtectionsToggledFromBrowserMenu(protectionsEnabled = false)
         userAllowListRepository.addDomainToUserAllowList(domain)
         withContext(dispatchers.main()) {
             command.value = ShowPrivacyProtectionDisabledConfirmation(domain)
@@ -2266,7 +2265,7 @@ class BrowserTabViewModel @Inject constructor(
     private suspend fun removeFromAllowList(domain: String) {
         val pixelParams = privacyProtectionsPopupExperimentExternalPixels.getPixelParams()
         pixel.fire(AppPixelName.BROWSER_MENU_ALLOWLIST_REMOVE, pixelParams, type = COUNT)
-        pixel.fire(AppPixelName.BROWSER_MENU_ALLOWLIST_REMOVE_UNIQUE, pixelParams, type = UNIQUE)
+        privacyProtectionsPopupExperimentExternalPixels.tryReportProtectionsToggledFromBrowserMenu(protectionsEnabled = true)
         userAllowListRepository.removeDomainFromUserAllowList(domain)
         withContext(dispatchers.main()) {
             command.value = ShowPrivacyProtectionEnabledConfirmation(domain)

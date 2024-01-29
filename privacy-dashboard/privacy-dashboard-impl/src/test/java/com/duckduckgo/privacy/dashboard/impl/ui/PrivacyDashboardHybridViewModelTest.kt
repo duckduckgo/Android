@@ -26,7 +26,6 @@ import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.UNIQUE
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.privacy.config.api.ContentBlocking
@@ -41,6 +40,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
@@ -72,7 +72,9 @@ class PrivacyDashboardHybridViewModelTest {
 
     private val pixel = mock<Pixel>()
     private val privacyProtectionsToggleUsageListener: PrivacyProtectionsToggleUsageListener = mock()
-    private val privacyProtectionsPopupExperimentExternalPixels = FakePrivacyProtectionsPopupExperimentExternalPixels()
+    private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels = mock {
+        runBlocking { whenever(mock.getPixelParams()).thenReturn(emptyMap()) }
+    }
 
     private val testee: PrivacyDashboardHybridViewModel by lazy {
         PrivacyDashboardHybridViewModel(
@@ -162,7 +164,7 @@ class PrivacyDashboardHybridViewModelTest {
     @Test
     fun whenPrivacyProtectionsPopupExperimentParamsArePresentThenTheyShouldBeIncludedInPixels() = runTest {
         val params = mapOf("test_key" to "test_value")
-        privacyProtectionsPopupExperimentExternalPixels.params = params
+        whenever(privacyProtectionsPopupExperimentExternalPixels.getPixelParams()).thenReturn(params)
         val site = site(siteAllowed = false)
         testee.onSiteChanged(site)
         testee.onPrivacyProtectionsClicked(enabled = false)
@@ -170,11 +172,11 @@ class PrivacyDashboardHybridViewModelTest {
         coroutineRule.testScope.advanceUntilIdle()
 
         verify(pixel).fire(PRIVACY_DASHBOARD_OPENED, params, type = COUNT)
-        verify(pixel).fire(PRIVACY_DASHBOARD_OPENED_UNIQUE, params, type = UNIQUE)
+        verify(privacyProtectionsPopupExperimentExternalPixels).tryReportPrivacyDashboardOpened()
         verify(pixel).fire(PRIVACY_DASHBOARD_ALLOWLIST_ADD, params, type = COUNT)
-        verify(pixel).fire(PRIVACY_DASHBOARD_ALLOWLIST_ADD_UNIQUE, params, type = UNIQUE)
+        verify(privacyProtectionsPopupExperimentExternalPixels).tryReportProtectionsToggledFromPrivacyDashboard(protectionsEnabled = false)
         verify(pixel).fire(PRIVACY_DASHBOARD_ALLOWLIST_REMOVE, params, type = COUNT)
-        verify(pixel).fire(PRIVACY_DASHBOARD_ALLOWLIST_REMOVE_UNIQUE, params, type = UNIQUE)
+        verify(privacyProtectionsPopupExperimentExternalPixels).tryReportProtectionsToggledFromPrivacyDashboard(protectionsEnabled = true)
     }
 
     private fun site(
@@ -206,10 +208,4 @@ private class FakeUserAllowListRepository : UserAllowListRepository {
     override suspend fun addDomainToUserAllowList(domain: String) = domains.update { it + domain }
 
     override suspend fun removeDomainFromUserAllowList(domain: String) = domains.update { it - domain }
-}
-
-private class FakePrivacyProtectionsPopupExperimentExternalPixels : PrivacyProtectionsPopupExperimentExternalPixels {
-    var params: Map<String, String> = emptyMap()
-
-    override suspend fun getPixelParams(): Map<String, String> = params
 }

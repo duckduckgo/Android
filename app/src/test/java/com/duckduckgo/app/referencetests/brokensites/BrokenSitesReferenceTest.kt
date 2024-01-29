@@ -42,6 +42,7 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import java.net.URLEncoder
 import java.util.*
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.*
 import org.junit.Before
@@ -81,10 +82,9 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
 
     private val mockUserAllowListRepository: UserAllowListRepository = mock()
 
-    private val privacyProtectionsPopupExperimentExternalPixels =
-        object : PrivacyProtectionsPopupExperimentExternalPixels {
-            override suspend fun getPixelParams(): Map<String, String> = emptyMap()
-        }
+    private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels = mock {
+        runBlocking { whenever(mock.getPixelParams()).thenReturn(emptyMap()) }
+    }
 
     private lateinit var testee: BrokenSiteSubmitter
 

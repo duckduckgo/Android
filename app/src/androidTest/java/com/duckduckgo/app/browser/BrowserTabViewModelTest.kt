@@ -111,7 +111,6 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.UNIQUE
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.survey.api.SurveyRepository
 import com.duckduckgo.app.survey.model.Survey
@@ -177,6 +176,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
@@ -418,7 +418,9 @@ class BrowserTabViewModelTest {
 
     private val mockPrivacyProtectionsToggleUsageListener: PrivacyProtectionsToggleUsageListener = mock()
 
-    private val privacyProtectionsPopupExperimentExternalPixels = FakePrivacyProtectionsPopupExperimentExternalPixels()
+    private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels = mock {
+        runBlocking { whenever(mock.getPixelParams()).thenReturn(emptyMap()) }
+    }
 
     @Before
     fun before() {
@@ -4769,7 +4771,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenPrivacyProtectionsAreToggledThenCorrectPixelsAreSent() = runTest {
         val params = mapOf("test_key" to "test_value")
-        privacyProtectionsPopupExperimentExternalPixels.params = params
+        whenever(privacyProtectionsPopupExperimentExternalPixels.getPixelParams()).thenReturn(params)
         whenever(mockUserAllowListRepository.isDomainInUserAllowList("www.example.com")).thenReturn(false)
         loadUrl("http://www.example.com/home.html")
         testee.onPrivacyProtectionMenuClicked()
@@ -4777,9 +4779,9 @@ class BrowserTabViewModelTest {
         testee.onPrivacyProtectionMenuClicked()
 
         verify(mockPixel).fire(AppPixelName.BROWSER_MENU_ALLOWLIST_ADD, params, type = COUNT)
-        verify(mockPixel).fire(AppPixelName.BROWSER_MENU_ALLOWLIST_ADD_UNIQUE, params, type = UNIQUE)
         verify(mockPixel).fire(AppPixelName.BROWSER_MENU_ALLOWLIST_REMOVE, params, type = COUNT)
-        verify(mockPixel).fire(AppPixelName.BROWSER_MENU_ALLOWLIST_REMOVE_UNIQUE, params, type = UNIQUE)
+        verify(privacyProtectionsPopupExperimentExternalPixels).tryReportProtectionsToggledFromBrowserMenu(protectionsEnabled = false)
+        verify(privacyProtectionsPopupExperimentExternalPixels).tryReportProtectionsToggledFromBrowserMenu(protectionsEnabled = true)
     }
 
     private fun aCredential(): LoginCredentials {
@@ -5073,11 +5075,5 @@ class BrowserTabViewModelTest {
         override suspend fun canSaveCredentialsFromWebView(url: String) = enabled
         override suspend fun canGeneratePasswordFromWebView(url: String) = enabled
         override suspend fun canAccessCredentialManagementScreen() = enabled
-    }
-
-    private class FakePrivacyProtectionsPopupExperimentExternalPixels : PrivacyProtectionsPopupExperimentExternalPixels {
-        var params: Map<String, String> = emptyMap()
-
-        override suspend fun getPixelParams(): Map<String, String> = params
     }
 }
