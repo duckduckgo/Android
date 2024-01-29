@@ -26,4 +26,17 @@ class KeyPair @JvmOverloads constructor(
      * @return the public key
      */
     val publicKey: Key = Key.generatePublicKey(privateKey)
+
+    override fun equals(obj: Any?): Boolean {
+        if (obj === this) return true
+        if (obj == null || obj.javaClass != javaClass) return false
+        val other = obj as KeyPair
+        return other.privateKey == this.privateKey
+    }
+
+    override fun hashCode(): Int {
+        var result = privateKey.hashCode()
+        result = 31 * result + publicKey.hashCode()
+        return result
+    }
 }

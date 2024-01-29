@@ -22,6 +22,8 @@ import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
+import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
+import com.duckduckgo.networkprotection.impl.configuration.asServerDetails
 import com.duckduckgo.networkprotection.impl.connectionclass.ConnectionQuality.EXCELLENT
 import com.duckduckgo.networkprotection.impl.connectionclass.ConnectionQuality.GOOD
 import com.duckduckgo.networkprotection.impl.connectionclass.ConnectionQuality.MODERATE
@@ -29,7 +31,6 @@ import com.duckduckgo.networkprotection.impl.connectionclass.ConnectionQuality.P
 import com.duckduckgo.networkprotection.impl.connectionclass.ConnectionQuality.TERRIBLE
 import com.duckduckgo.networkprotection.impl.connectionclass.ConnectionQuality.UNKNOWN
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
-import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.time.Instant
 import java.util.concurrent.atomic.AtomicLong
@@ -42,7 +43,7 @@ import logcat.logcat
 class VpnLatencySampler @Inject constructor(
     private val connectionClassManager: ConnectionClassManager,
     private val latencyMeasurer: LatencyMeasurer,
-    private val networkProtectionRepository: NetworkProtectionRepository,
+    private val wgTunnelConfig: WgTunnelConfig,
     private val networkProtectionState: NetworkProtectionState,
     private val dispatcherProvider: DispatcherProvider,
     private val networkProtectionPixels: NetworkProtectionPixels,
@@ -84,7 +85,7 @@ class VpnLatencySampler @Inject constructor(
     }
 
     private suspend fun sampleLatency(): ConnectionQuality? = withContext(dispatcherProvider.io()) {
-        return@withContext networkProtectionRepository.serverDetails?.ipAddress?.let { server ->
+        return@withContext wgTunnelConfig.getWgConfig()?.asServerDetails()?.ipAddress?.let { server ->
             val latency = latencyMeasurer.measureLatency(server)
             if (latency >= 0) {
                 connectionClassManager.addLatency(latency.toDouble())

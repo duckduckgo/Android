@@ -33,6 +33,7 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.UNK
 import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
 import com.duckduckgo.mobile.android.vpn.ui.OpenVpnBreakageCategoryWithBrokenApp
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
+import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.None
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowAlwaysOnLockdownEnabled
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowRevoked
@@ -52,7 +53,9 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ViewState
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
-import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ServerDetails
+import com.wireguard.config.Config
+import java.io.BufferedReader
+import java.io.StringReader
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -81,10 +84,30 @@ class NetworkProtectionManagementViewModelTest {
     private lateinit var networkProtectionRepository: NetworkProtectionRepository
 
     @Mock
+    private lateinit var wgTunnelConfig: WgTunnelConfig
+
+    @Mock
     private lateinit var externalVpnDetector: ExternalVpnDetector
 
     @Mock
     private lateinit var networkProtectionPixels: NetworkProtectionPixels
+
+    private val wgQuickConfig = """
+        [Interface]
+        Address = 10.237.97.63/32
+        DNS = 1.2.3.4
+        MTU = 1280
+        PrivateKey = yD1fKxCG/HFbxOy4YfR6zG86YQ1nOswlsv8n7uypb14=
+        
+        [Peer]
+        AllowedIPs = 0.0.0.0/0
+        Endpoint = 10.10.10.10:443
+        Name = euw.1
+        Location = Stockholm, Sweden
+        PublicKey = u4geRTVQHaZYwsQzb/LsJqEDpxU8Fqzb5VjxGeIHslM=
+    """.trimIndent()
+    private val wgConfig: Config = Config.parse(BufferedReader(StringReader(wgQuickConfig)))
+
     private lateinit var testee: NetworkProtectionManagementViewModel
     private val testbreakageCategories = listOf(AppBreakageCategory("test", "test description"))
 
@@ -102,6 +125,7 @@ class NetworkProtectionManagementViewModelTest {
             vpnStateMonitor,
             vpnFeaturesRegistry,
             networkProtectionRepository,
+            wgTunnelConfig,
             coroutineRule.testDispatcherProvider,
             externalVpnDetector,
             networkProtectionPixels,
@@ -226,13 +250,7 @@ class NetworkProtectionManagementViewModelTest {
                 ),
             ),
         )
-        whenever(networkProtectionRepository.serverDetails).thenReturn(
-            ServerDetails(
-                serverName = "euw.1",
-                ipAddress = "10.10.10.10",
-                location = "Stockholm, Sweden",
-            ),
-        )
+        whenever(wgTunnelConfig.getWgConfig()).thenReturn(wgConfig)
 
         testee.viewState().test {
             assertEquals(
@@ -248,13 +266,7 @@ class NetworkProtectionManagementViewModelTest {
     @Test
     fun whenEnabledAndServerDetailsAvailableThenEmitViewStateConnectedWithDetails() = runTest {
         whenever(networkProtectionRepository.enabledTimeInMillis).thenReturn(-1)
-        whenever(networkProtectionRepository.serverDetails).thenReturn(
-            ServerDetails(
-                serverName = "euw.1",
-                ipAddress = "10.10.10.10",
-                location = "Stockholm, Sweden",
-            ),
-        )
+        whenever(wgTunnelConfig.getWgConfig()).thenReturn(wgConfig)
         whenever(vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN)).thenReturn(
             flowOf(
                 VpnState(

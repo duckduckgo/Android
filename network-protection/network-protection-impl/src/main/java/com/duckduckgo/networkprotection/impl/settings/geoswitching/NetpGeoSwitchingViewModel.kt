@@ -107,7 +107,7 @@ class NetpGeoSwitchingViewModel @Inject constructor(
             val newPreferredLocation = netPGeoswitchingRepository.getUserPreferredLocation()
             if (networkProtectionState.isEnabled()) {
                 if (initialPreferredLocation != newPreferredLocation) {
-                    networkProtectionState.restart()
+                    networkProtectionState.clearVPNConfigurationAndRestart()
                 }
             }
 

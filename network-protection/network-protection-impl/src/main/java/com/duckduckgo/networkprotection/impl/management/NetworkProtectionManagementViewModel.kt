@@ -42,6 +42,8 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.REV
 import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
 import com.duckduckgo.mobile.android.vpn.ui.OpenVpnBreakageCategoryWithBrokenApp
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
+import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
+import com.duckduckgo.networkprotection.impl.configuration.asServerDetails
 import com.duckduckgo.networkprotection.impl.di.NetpBreakageCategories
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.None
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowAlwaysOnLockdownEnabled
@@ -71,6 +73,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     private val vpnStateMonitor: VpnStateMonitor,
     private val featuresRegistry: VpnFeaturesRegistry,
     private val networkProtectionRepository: NetworkProtectionRepository,
+    private val wgTunnelConfig: WgTunnelConfig,
     private val dispatcherProvider: DispatcherProvider,
     private val externalVpnDetector: ExternalVpnDetector,
     private val networkProtectionPixels: NetworkProtectionPixels,
@@ -150,25 +153,23 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         }
     }
 
-    private fun loadConnectionDetails() {
-        networkProtectionRepository.serverDetails.run {
-            this?.let { serverDetails ->
-                connectionDetailsFlow.value = if (connectionDetailsFlow.value == null) {
-                    ConnectionDetails(
-                        location = serverDetails.location,
-                        ipAddress = serverDetails.ipAddress,
-                    )
-                } else {
-                    connectionDetailsFlow.value!!.copy(
-                        location = serverDetails.location,
-                        ipAddress = serverDetails.ipAddress,
-                    )
-                }
+    private suspend fun loadConnectionDetails() {
+        wgTunnelConfig.getWgConfig()?.asServerDetails()?.let { serverDetails ->
+            connectionDetailsFlow.value = if (connectionDetailsFlow.value == null) {
+                ConnectionDetails(
+                    location = serverDetails.location,
+                    ipAddress = serverDetails.ipAddress,
+                )
+            } else {
+                connectionDetailsFlow.value!!.copy(
+                    location = serverDetails.location,
+                    ipAddress = serverDetails.ipAddress,
+                )
             }
         }
     }
 
-    private fun startElapsedTimeTimer() {
+    private suspend fun startElapsedTimeTimer() {
         if (!isTimerTickRunning) {
             isTimerTickRunning = true
             loadConnectionDetails()

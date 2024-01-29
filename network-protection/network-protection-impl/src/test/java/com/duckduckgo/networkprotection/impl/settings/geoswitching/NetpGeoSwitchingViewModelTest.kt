@@ -206,7 +206,7 @@ class NetpGeoSwitchingViewModelTest {
         testee.onCountrySelected("us")
         testee.onStop(mockLifecycleOwner)
 
-        verify(networkProtectionState).restart()
+        verify(networkProtectionState).clearVPNConfigurationAndRestart()
     }
 
     @Test
@@ -218,7 +218,7 @@ class NetpGeoSwitchingViewModelTest {
         fakeRepository.setUserPreferredLocation(UserPreferredLocation(countryCode = "us", cityName = "Newark"))
         testee.onStop(mockLifecycleOwner)
 
-        verify(networkProtectionState).restart()
+        verify(networkProtectionState).clearVPNConfigurationAndRestart()
     }
 
     @Test
