@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacyprotectionspopup.impl.db
+package com.duckduckgo.app.statistics.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import org.threeten.bp.Instant
 
-@Entity(tableName = "toggle_usage_timestamp")
-data class ToggleUsageTimestamp(
-    @PrimaryKey val id: Long = 0,
-    val timestamp: Instant,
+@Entity(tableName = "unique_pixels_fired")
+data class UniquePixelFired(
+    @PrimaryKey val name: String,
 )

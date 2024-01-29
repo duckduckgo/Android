@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2023 DuckDuckGo
+  ~ Copyright (c) 2024 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -13,12 +13,12 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
 
-<resources>
+    <stroke
+        android:width="2dp"
+        android:color="@color/cornflowerBlue" />
 
-    <string name="privacy_protections_popup_title">Website not working as expected?</string>
-    <string name="privacy_protections_popup_body">Turning protections off for this site might help.</string>
-    <string name="privacy_protections_popup_button_dismiss">Dismiss</string>
-    <string name="privacy_protections_popup_button_disable">Turn Off Protections</string>
-
-</resources>
+    <solid android:color="@color/cornflowerBlue_10" />
+</shape>

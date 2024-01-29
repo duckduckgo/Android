@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacyprotectionspopup.impl.db
+package com.duckduckgo.app.statistics.store
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import kotlinx.coroutines.flow.Flow
+import com.duckduckgo.app.statistics.model.UniquePixelFired
 
 @Dao
-abstract class ToggleUsageTimestampDao {
+interface UniquePixelFiredDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun insert(entity: ToggleUsageTimestamp)
+    suspend fun insert(value: UniquePixelFired)
 
-    @Query("SELECT * FROM toggle_usage_timestamp")
-    abstract fun query(): Flow<ToggleUsageTimestamp?>
+    @Query("SELECT COUNT(1) > 0 FROM unique_pixels_fired WHERE name = :name")
+    suspend fun hasUniquePixelFired(name: String): Boolean
 }

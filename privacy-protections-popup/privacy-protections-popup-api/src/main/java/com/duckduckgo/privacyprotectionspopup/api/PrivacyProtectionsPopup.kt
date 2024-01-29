@@ -24,13 +24,6 @@ import kotlinx.coroutines.flow.Flow
 interface PrivacyProtectionsPopup {
 
     /**
-     * Updates the view state of the popup.
-     *
-     * @param viewState The new view state to be set for the popup.
-     */
-    fun setViewState(viewState: PrivacyProtectionsPopupViewState)
-
-    /**
      * A flow of UI events for the Privacy Protections Popup.
      *
      * This property emits [PrivacyProtectionsPopupUiEvent] objects representing
@@ -38,4 +31,16 @@ interface PrivacyProtectionsPopup {
      * Those events should be consumed by [PrivacyProtectionsPopupManager]
      */
     val events: Flow<PrivacyProtectionsPopupUiEvent>
+
+    /**
+     * Updates the view state of the popup.
+     *
+     * @param viewState The new view state to be set for the popup.
+     */
+    fun setViewState(viewState: PrivacyProtectionsPopupViewState)
+
+    /**
+     * Notifies the popup UI about configuration change and re-creates UI if necessary.
+     */
+    fun onConfigurationChanged()
 }

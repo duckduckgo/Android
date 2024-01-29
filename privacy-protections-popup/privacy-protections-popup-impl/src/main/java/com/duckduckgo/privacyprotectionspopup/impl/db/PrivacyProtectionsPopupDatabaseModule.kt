@@ -44,9 +44,4 @@ class PrivacyProtectionsPopupDatabaseModule {
     @SingleInstanceIn(AppScope::class)
     fun providePopupDismissDomainsDao(db: PrivacyProtectionsPopupDatabase): PopupDismissDomainsDao =
         db.popupDismissDomainDao()
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun provideToggleUsageTimestampDao(db: PrivacyProtectionsPopupDatabase): ToggleUsageTimestampDao =
-        db.toggleUsageTimestampDao()
 }

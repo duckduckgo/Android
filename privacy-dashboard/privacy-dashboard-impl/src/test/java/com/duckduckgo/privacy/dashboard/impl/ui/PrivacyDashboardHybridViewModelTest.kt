@@ -25,18 +25,23 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
-import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVACY_DASHBOARD_ALLOWLIST_ADD
+import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.*
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchReportBrokenSite
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsToggleUsageListener
 import com.nhaarman.mockitokotlin2.mock
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Assert.assertEquals
@@ -49,6 +54,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class PrivacyDashboardHybridViewModelTest {
 
@@ -66,6 +72,9 @@ class PrivacyDashboardHybridViewModelTest {
 
     private val pixel = mock<Pixel>()
     private val privacyProtectionsToggleUsageListener: PrivacyProtectionsToggleUsageListener = mock()
+    private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels = mock {
+        runBlocking { whenever(mock.getPixelParams()).thenReturn(emptyMap()) }
+    }
 
     private val testee: PrivacyDashboardHybridViewModel by lazy {
         PrivacyDashboardHybridViewModel(
@@ -78,6 +87,7 @@ class PrivacyDashboardHybridViewModelTest {
             privacyDashboardPayloadAdapter = mock(),
             autoconsentStatusViewStateMapper = CookiePromptManagementStatusViewStateMapper(),
             protectionsToggleUsageListener = privacyProtectionsToggleUsageListener,
+            privacyProtectionsPopupExperimentExternalPixels = privacyProtectionsPopupExperimentExternalPixels,
         )
     }
 
@@ -149,6 +159,24 @@ class PrivacyDashboardHybridViewModelTest {
         testee.onPrivacyProtectionsClicked(enabled = false)
 
         verify(privacyProtectionsToggleUsageListener).onPrivacyProtectionsToggleUsed()
+    }
+
+    @Test
+    fun whenPrivacyProtectionsPopupExperimentParamsArePresentThenTheyShouldBeIncludedInPixels() = runTest {
+        val params = mapOf("test_key" to "test_value")
+        whenever(privacyProtectionsPopupExperimentExternalPixels.getPixelParams()).thenReturn(params)
+        val site = site(siteAllowed = false)
+        testee.onSiteChanged(site)
+        testee.onPrivacyProtectionsClicked(enabled = false)
+        testee.onPrivacyProtectionsClicked(enabled = true)
+        coroutineRule.testScope.advanceUntilIdle()
+
+        verify(pixel).fire(PRIVACY_DASHBOARD_OPENED, params, type = COUNT)
+        verify(privacyProtectionsPopupExperimentExternalPixels).tryReportPrivacyDashboardOpened()
+        verify(pixel).fire(PRIVACY_DASHBOARD_ALLOWLIST_ADD, params, type = COUNT)
+        verify(privacyProtectionsPopupExperimentExternalPixels).tryReportProtectionsToggledFromPrivacyDashboard(protectionsEnabled = false)
+        verify(pixel).fire(PRIVACY_DASHBOARD_ALLOWLIST_REMOVE, params, type = COUNT)
+        verify(privacyProtectionsPopupExperimentExternalPixels).tryReportProtectionsToggledFromPrivacyDashboard(protectionsEnabled = true)
     }
 
     private fun site(

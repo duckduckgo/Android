@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,29 +14,18 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacyprotectionspopup.impl.db
+package com.duckduckgo.app.statistics.store
 
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import java.time.Instant
 import javax.inject.Inject
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
-import org.threeten.bp.Instant
 
-interface ToggleUsageTimestampRepository {
-    fun getToggleUsageTimestamp(): Flow<Instant?>
-    suspend fun setToggleUsageTimestamp(timestamp: Instant)
+interface TimeProvider {
+    fun getCurrentTime(): Instant
 }
 
 @ContributesBinding(AppScope::class)
-class ToggleUsageTimestampRepositoryImpl @Inject constructor(
-    private val dao: ToggleUsageTimestampDao,
-) : ToggleUsageTimestampRepository {
-
-    override fun getToggleUsageTimestamp(): Flow<Instant?> =
-        dao.query().map { it?.timestamp }
-
-    override suspend fun setToggleUsageTimestamp(timestamp: Instant) {
-        dao.insert(ToggleUsageTimestamp(timestamp = timestamp))
-    }
+class TimeProviderImpl @Inject constructor() : TimeProvider {
+    override fun getCurrentTime(): Instant = Instant.now()
 }

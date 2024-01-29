@@ -106,6 +106,7 @@ import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FAVORITE_MENU_ITEM_STATE
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.notification.SurveyNotificationScheduler
@@ -135,6 +136,7 @@ import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.privacy.config.api.*
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupManager
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupViewState
@@ -222,6 +224,7 @@ class BrowserTabViewModel @Inject constructor(
     private val androidBrowserConfig: AndroidBrowserConfigFeature,
     private val privacyProtectionsPopupManager: PrivacyProtectionsPopupManager,
     private val privacyProtectionsToggleUsageListener: PrivacyProtectionsToggleUsageListener,
+    private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -281,7 +284,7 @@ class BrowserTabViewModel @Inject constructor(
         val canPrintPage: Boolean = false,
         val showAutofill: Boolean = false,
         val browserError: WebViewErrorResponse = OMITTED,
-        val privacyProtectionsPopupViewState: PrivacyProtectionsPopupViewState = PrivacyProtectionsPopupViewState(visible = false),
+        val privacyProtectionsPopupViewState: PrivacyProtectionsPopupViewState = PrivacyProtectionsPopupViewState.Gone,
     )
 
     sealed class HighlightableButton {
@@ -2249,7 +2252,9 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private suspend fun addToAllowList(domain: String) {
-        pixel.fire(AppPixelName.BROWSER_MENU_ALLOWLIST_ADD)
+        val pixelParams = privacyProtectionsPopupExperimentExternalPixels.getPixelParams()
+        pixel.fire(AppPixelName.BROWSER_MENU_ALLOWLIST_ADD, pixelParams, type = COUNT)
+        privacyProtectionsPopupExperimentExternalPixels.tryReportProtectionsToggledFromBrowserMenu(protectionsEnabled = false)
         userAllowListRepository.addDomainToUserAllowList(domain)
         withContext(dispatchers.main()) {
             command.value = ShowPrivacyProtectionDisabledConfirmation(domain)
@@ -2258,7 +2263,9 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private suspend fun removeFromAllowList(domain: String) {
-        pixel.fire(AppPixelName.BROWSER_MENU_ALLOWLIST_REMOVE)
+        val pixelParams = privacyProtectionsPopupExperimentExternalPixels.getPixelParams()
+        pixel.fire(AppPixelName.BROWSER_MENU_ALLOWLIST_REMOVE, pixelParams, type = COUNT)
+        privacyProtectionsPopupExperimentExternalPixels.tryReportProtectionsToggledFromBrowserMenu(protectionsEnabled = true)
         userAllowListRepository.removeDomainFromUserAllowList(domain)
         withContext(dispatchers.main()) {
             command.value = ShowPrivacyProtectionEnabledConfirmation(domain)

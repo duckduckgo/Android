@@ -20,20 +20,18 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
-import org.threeten.bp.Instant
+import java.time.Instant
 
 @Database(
     exportSchema = true,
     version = 1,
     entities = [
         PopupDismissDomain::class,
-        ToggleUsageTimestamp::class,
     ],
 )
 @TypeConverters(Converters::class)
 abstract class PrivacyProtectionsPopupDatabase : RoomDatabase() {
     abstract fun popupDismissDomainDao(): PopupDismissDomainsDao
-    abstract fun toggleUsageTimestampDao(): ToggleUsageTimestampDao
 }
 
 class Converters {

@@ -18,8 +18,8 @@ package com.duckduckgo.privacyprotectionspopup.impl
 
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import java.time.Instant
 import javax.inject.Inject
-import org.threeten.bp.Instant
 
 interface TimeProvider {
     fun getCurrentTime(): Instant

@@ -34,6 +34,8 @@ dependencies {
     implementation project(':browser-api')
     implementation project(':privacy-config-api')
     implementation project(':feature-toggles-api')
+    implementation project(':app-build-config-api')
+    implementation project(':statistics')
 
     implementation KotlinX.coroutines.android
     implementation AndroidX.core.ktx
@@ -41,8 +43,12 @@ dependencies {
     implementation Google.dagger
     implementation AndroidX.room.ktx
     ksp AndroidX.room.compiler
+    api AndroidX.dataStore.preferences
 
     implementation "com.squareup.logcat:logcat:_"
+    implementation Square.moshi
+
+    implementation "org.apache.commons:commons-math3:_"
 
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
@@ -55,9 +61,6 @@ dependencies {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
     testImplementation AndroidX.test.ext.junit
-
-    implementation "com.jakewharton.threetenabp:threetenabp:_"
-    testImplementation "org.threeten:threetenbp:_"
 
     implementation AndroidX.work.runtimeKtx
     testImplementation AndroidX.work.testing
@@ -75,6 +78,9 @@ android {
         unitTests {
             includeAndroidResources = true
         }
+    }
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
     }
 }
 
