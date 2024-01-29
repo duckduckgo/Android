@@ -59,16 +59,16 @@ class NotificationScheduler(
         if (privacyNotification.canShow()) {
             scheduleNotification(
                 OneTimeWorkRequestBuilder<PrivacyNotificationWorker>(),
-                5L,
-                TimeUnit.SECONDS,
+                PRIVACY_DELAY_DURATION_IN_DAYS,
+                TimeUnit.DAYS,
                 UNUSED_APP_WORK_REQUEST_TAG,
             )
         }
         if (clearDataNotification.canShow()) {
             scheduleNotification(
                 OneTimeWorkRequestBuilder<ClearDataNotificationWorker>(),
-                8L,
-                TimeUnit.SECONDS,
+                CLEAR_DATA_DELAY_DURATION_IN_DAYS,
+                TimeUnit.DAYS,
                 UNUSED_APP_WORK_REQUEST_TAG,
             )
         }
