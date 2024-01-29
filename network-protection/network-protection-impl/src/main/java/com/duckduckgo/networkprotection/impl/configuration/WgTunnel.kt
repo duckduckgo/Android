@@ -22,6 +22,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.duckduckgo.networkprotection.impl.config.NetPDefaultConfigProvider
+import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.Mode.Default
+import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.Mode.FailureRecovery
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesTo
 import com.wireguard.config.Config
@@ -50,7 +52,7 @@ interface WgTunnel {
      *
      * @param keyPair is the private/public key [KeyPair] to be used in the wireguard [Config]
      */
-    suspend fun createWgConfig(keyPair: KeyPair? = null): Result<Config>
+    suspend fun createWgConfig(keyPair: KeyPair? = null, fromFailure: Boolean = false): Result<Config>
 
     /**
      * Creates a new wireguard [Config], returns it and stores it internally.
@@ -58,7 +60,7 @@ interface WgTunnel {
      *
      * @param keyPair is the private/public key [KeyPair] to be used in the wireguard [Config]
      */
-    suspend fun createAndSetWgConfig(keyPair: KeyPair? = null): Result<Config>
+    suspend fun createAndSetWgConfig(keyPair: KeyPair? = null, fromFailure: Boolean = false): Result<Config>
 }
 
 /**
@@ -111,14 +113,14 @@ class RealWgTunnel @Inject constructor(
     @InternalApi private val wgTunnelStore: WgTunnelStore,
 ) : WgTunnel {
 
-    override suspend fun createWgConfig(keyPair: KeyPair?): Result<Config> {
+    override suspend fun createWgConfig(keyPair: KeyPair?, fromFailure: Boolean): Result<Config> {
         try {
             // return updated existing config or new one
             val config = wgTunnelStore.wireguardConfig?.let outerLet@{ wgConfig ->
                 keyPair?.let { newKeys ->
                     if (wgConfig.`interface`.keyPair != newKeys) {
                         logcat { "Different keys, fetching new config" }
-                        return@outerLet fetchNewConfig(keyPair)
+                        return@outerLet fetchNewConfig(keyPair, fromFailure)
                     }
                 }
 
@@ -147,7 +149,7 @@ class RealWgTunnel @Inject constructor(
                 }.build()
 
                 newConfigBuilder.build()
-            } ?: fetchNewConfig(keyPair)
+            } ?: fetchNewConfig(keyPair, fromFailure)
 
             return Result.success(config)
         } catch (e: Throwable) {
@@ -156,8 +158,8 @@ class RealWgTunnel @Inject constructor(
         }
     }
 
-    override suspend fun createAndSetWgConfig(keyPair: KeyPair?): Result<Config> {
-        val result = createWgConfig(keyPair)
+    override suspend fun createAndSetWgConfig(keyPair: KeyPair?, fromFailure: Boolean): Result<Config> {
+        val result = createWgConfig(keyPair, fromFailure)
         if (result.isFailure) {
             return result
         }
@@ -165,14 +167,19 @@ class RealWgTunnel @Inject constructor(
         return result
     }
 
-    private suspend fun fetchNewConfig(keyPair: KeyPair?): Config {
+    private suspend fun fetchNewConfig(keyPair: KeyPair?, fromFailure: Boolean = false): Config {
         @Suppress("NAME_SHADOWING")
         val keyPair = keyPair ?: KeyPair()
         val publicKey = keyPair.publicKey.toBase64()
         val privateKey = keyPair.privateKey.toBase64()
 
         // throw on error
-        val serverData = wgServerApi.registerPublicKey(publicKey) ?: throw NullPointerException("serverData = null")
+        val mode = if (fromFailure) {
+            FailureRecovery(currentServer = wgTunnelStore.wireguardConfig?.asServerDetails()?.serverName ?: "*")
+        } else {
+            Default
+        }
+        val serverData = wgServerApi.registerPublicKey(publicKey, mode = mode) ?: throw NullPointerException("serverData = null")
 
         return Config.Builder()
             .setInterface(
