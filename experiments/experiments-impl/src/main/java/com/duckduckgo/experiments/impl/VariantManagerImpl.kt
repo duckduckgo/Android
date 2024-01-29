@@ -131,9 +131,9 @@ class VariantManagerImpl @Inject constructor(
         const val RESERVED_EU_AUCTION_VARIANT = "ml"
 
         // this will be returned when there are no other active experiments
-        private val DEFAULT_VARIANT = Variant(key = "", filterBy = { noFilter() })
+        val DEFAULT_VARIANT = Variant(key = "", filterBy = { noFilter() })
 
-        private const val REINSTALL_VARIANT = "ru"
+        const val REINSTALL_VARIANT = "ru"
 
         private fun noFilter(): Boolean = true
     }

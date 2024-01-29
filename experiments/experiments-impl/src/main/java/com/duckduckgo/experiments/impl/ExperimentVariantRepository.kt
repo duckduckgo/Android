@@ -19,6 +19,8 @@ package com.duckduckgo.experiments.impl
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.api.VariantConfig
+import com.duckduckgo.experiments.impl.VariantManagerImpl.Companion.DEFAULT_VARIANT
+import com.duckduckgo.experiments.impl.VariantManagerImpl.Companion.REINSTALL_VARIANT
 import com.duckduckgo.experiments.impl.store.ExperimentVariantDao
 import com.duckduckgo.experiments.impl.store.ExperimentVariantEntity
 import com.squareup.anvil.annotations.ContributesBinding
@@ -64,7 +66,13 @@ class ExperimentVariantRepositoryImpl @Inject constructor(
 
     override fun updateVariant(variantKey: String) {
         Timber.i("Updating variant for user: $variantKey")
-        store.variant = variantKey
+        if (updateVariantIsAllowed()) {
+            store.variant = variantKey
+        }
+    }
+
+    private fun updateVariantIsAllowed(): Boolean {
+        return store.variant != DEFAULT_VARIANT.key && store.variant != REINSTALL_VARIANT
     }
 
     override fun getAppReferrerVariant(): String? = store.referrerVariant
