@@ -223,12 +223,23 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
         val dedupedCredentials = loginDeduplicator.deduplicate(url, credentials)
         Timber.v("Original autofill credentials list size: %d, after de-duping: %d", credentials.size, dedupedCredentials.size)
 
-        if (dedupedCredentials.isEmpty()) {
+        val finalCredentialList = ensureUsernamesNotNull(dedupedCredentials)
+
+        if (finalCredentialList.isEmpty()) {
             callback?.noCredentialsAvailable(url)
         } else {
-            callback?.onCredentialsAvailableToInject(url, dedupedCredentials, triggerType)
+            callback?.onCredentialsAvailableToInject(url, finalCredentialList, triggerType)
         }
     }
+
+    private fun ensureUsernamesNotNull(credentials: List<LoginCredentials>) =
+        credentials.map {
+            if (it.username == null) {
+                it.copy(username = "")
+            } else {
+                it
+            }
+        }
 
     private fun convertTriggerType(trigger: SupportedAutofillTriggerType): LoginTriggerType {
         return when (trigger) {
