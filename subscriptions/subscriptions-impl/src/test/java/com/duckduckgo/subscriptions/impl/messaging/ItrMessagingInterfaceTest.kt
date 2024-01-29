@@ -176,6 +176,21 @@ class ItrMessagingInterfaceTest {
         checkEquals(expected, jsMessage)
     }
 
+    @Test
+    fun whenProcessAndGetAccessTokenMessageIfUrlNotInAllowListedDomainsThenDoNothing() = runTest {
+        messagingInterface.register(webView, callback)
+        whenever(webView.url).thenReturn("https://duckduckgo.example.com")
+        givenAccessTokenIsSuccess()
+
+        val message = """
+            {"context":"identityTheftRestorationPages","featureName":"useIdentityTheftRestoration","method":"getAccessToken","id":"myId","params":{}}
+        """.trimIndent()
+
+        messagingInterface.process(message, "duckduckgo-android-messaging-secret")
+
+        verifyNoInteractions()
+    }
+
     private fun verifyNoInteractions() {
         verifyNoInteractions(jsMessageHelper)
         verifyNoInteractions(subscriptionsManager)
@@ -184,7 +199,7 @@ class ItrMessagingInterfaceTest {
 
     private fun givenInterfaceIsRegistered() {
         messagingInterface.register(webView, callback)
-        whenever(webView.url).thenReturn("https://abrown.duckduckgo.com")
+        whenever(webView.url).thenReturn("https://abrown.duckduckgo.com/test")
     }
 
     private suspend fun givenAccessTokenIsSuccess() {

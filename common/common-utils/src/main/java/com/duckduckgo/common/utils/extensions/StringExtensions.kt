@@ -24,6 +24,7 @@ import android.text.Html
 import android.text.Spanned
 import androidx.core.content.ContextCompat
 import java.util.*
+import okhttp3.internal.publicsuffix.PublicSuffixDatabase
 
 fun String.capitalizeFirstLetter() = this.replaceFirstChar {
     if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
@@ -49,6 +50,7 @@ private fun htmlDrawable(
 private const val HTTPS_PREFIX = "https://"
 private const val WWW_PREFIX = "www."
 private const val WWW_SUFFIX = "/"
+private val publicSuffixDatabase = PublicSuffixDatabase()
 
 fun String.websiteFromGeoLocationsApiOrigin(): String {
     val uri = Uri.parse(this)
@@ -60,4 +62,8 @@ fun String.websiteFromGeoLocationsApiOrigin(): String {
 
 fun String.asLocationPermissionOrigin(): String {
     return HTTPS_PREFIX + this + WWW_SUFFIX
+}
+
+fun String.toTldPlusOne(): String? {
+    return runCatching { publicSuffixDatabase.getEffectiveTldPlusOne(this) }.getOrNull()
 }

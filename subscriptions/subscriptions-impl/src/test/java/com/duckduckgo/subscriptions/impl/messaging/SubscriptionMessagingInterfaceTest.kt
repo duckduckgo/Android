@@ -379,9 +379,23 @@ class SubscriptionMessagingInterfaceTest {
         assertEquals(1, callback.counter)
     }
 
+    @Test
+    fun whenProcessAndFeatureSelectedMessageIfUrlNotInAllowListedDomainsThenDoNothing() = runTest {
+        messagingInterface.register(webView, callback)
+        whenever(webView.url).thenReturn("https://duckduckgo.example.com")
+
+        val message = """
+            {"context":"subscriptionPages","featureName":"useSubscription","method":"featureSelected","params":{}}
+        """.trimIndent()
+
+        messagingInterface.process(message, "duckduckgo-android-messaging-secret")
+
+        assertEquals(0, callback.counter)
+    }
+
     private fun givenInterfaceIsRegistered() {
         messagingInterface.register(webView, callback)
-        whenever(webView.url).thenReturn("https://abrown.duckduckgo.com")
+        whenever(webView.url).thenReturn("https://abrown.duckduckgo.com/test")
     }
 
     private suspend fun givenAuthTokenIsSuccess() {
