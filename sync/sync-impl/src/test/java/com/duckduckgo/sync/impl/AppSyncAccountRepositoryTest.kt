@@ -473,10 +473,10 @@ class AppSyncAccountRepositoryTest {
     private fun prepareForEncryption() {
         whenever(nativeLib.decrypt(encryptedData = protectedEncryptionKey, secretKey = stretchedPrimaryKey)).thenReturn(decryptedSecretKey)
         whenever(nativeLib.decryptData(anyString(), primaryKey = eq(primaryKey))).thenAnswer {
-            DecryptResult(0L, it.arguments.first() as String)
+            DecryptResult(0, it.arguments.first() as String)
         }
         whenever(nativeLib.encryptData(anyString(), primaryKey = eq(primaryKey))).thenAnswer {
-            EncryptResult(0L, it.arguments.first() as String)
+            EncryptResult(0, it.arguments.first() as String)
         }
     }
 }
