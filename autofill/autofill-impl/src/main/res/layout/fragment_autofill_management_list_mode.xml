@@ -65,7 +65,7 @@
 
         <include
             android:id="@+id/emptyStateLayout"
-            layout="@layout/autofill_management_credential_list_empty_state"/>
+            layout="@layout/autofill_management_credential_list_empty_state" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
