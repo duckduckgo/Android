@@ -205,5 +205,5 @@ class DeviceShieldWeeklyNotificationFactoryTest {
 }
 
 private fun DeviceShieldNotification.assertTitleEquals(expected: String) {
-    assertEquals("Given notification titles do not match", expected, this.title.toString())
+    assertEquals("Given notification titles do not match", expected, this.text.toString())
 }

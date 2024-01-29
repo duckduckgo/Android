@@ -15,6 +15,7 @@
   -->
 
 <resources>
+    <string name="netp_name" translatable="false">Network Protection</string>
     <string name="netpManagementTitle" translatable="false">Network Protection</string>
     <string name="netpManagementHeadlineStatusOn">Network Protection is On</string>
     <string name="netpManagementHeadlineStatusOff">Network Protection is Off</string>

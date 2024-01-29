@@ -25,6 +25,8 @@ class FakeVpnEnabledNotificationContentPlugin constructor(
     private val priority: VpnEnabledNotificationPriority = VpnEnabledNotificationPriority.NORMAL,
 ) : VpnEnabledNotificationContentPlugin {
 
+    override val uuid: String = "1234"
+
     override fun getInitialContent(): VpnEnabledNotificationContentPlugin.VpnEnabledNotificationContent? {
         return null
     }
