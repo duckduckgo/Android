@@ -35,6 +35,6 @@ class RealMediaPlayback @Inject constructor(
 
     override fun doesMediaPlaybackRequireUserGestureForUrl(url: String): Boolean {
         val uri = url.toUri()
-        return !(mediaPlaybackFeature.self().isEnabled() && mediaPlaybackRepository.exceptions.any { it.domain == uri.baseHost })
+        return mediaPlaybackFeature.self().isEnabled() && mediaPlaybackRepository.exceptions.none { it.domain == uri.baseHost }
     }
 }
