@@ -79,7 +79,7 @@ enum class PrivacyProtectionsPopupPixelName(
         type = UNIQUE,
     ),
     PRIVACY_DASHBOARD_ALLOWLIST_REMOVE_UNIQUE(
-        pixelName = "m_privacy_protections_popup__dashboard_allowlist_remove_u",
+        pixelName = "m_privacy_protections_popup_dashboard_allowlist_remove_u",
         type = UNIQUE,
     ),
     BROWSER_MENU_ALLOWLIST_ADD_UNIQUE(
