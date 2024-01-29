@@ -36,11 +36,13 @@ import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyConfig
 import com.duckduckgo.privacy.config.api.PrivacyConfigData
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import java.net.URLEncoder
 import java.util.*
 import java.util.regex.Pattern
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -82,6 +84,10 @@ class BrokenSitesMultipleReportReferenceTest(private val testCase: MultipleRepor
 
     private val mockBrokenSiteLastSentReport: BrokenSiteLastSentReport = mock()
 
+    private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels = mock {
+        runBlocking { whenever(mock.getPixelParams()).thenReturn(emptyMap()) }
+    }
+
     private lateinit var testee: BrokenSiteSubmitter
 
     companion object {
@@ -122,6 +128,7 @@ class BrokenSitesMultipleReportReferenceTest(private val testCase: MultipleRepor
             mock(),
             mock(),
             mockBrokenSiteLastSentReport,
+            privacyProtectionsPopupExperimentExternalPixels,
         )
     }
 

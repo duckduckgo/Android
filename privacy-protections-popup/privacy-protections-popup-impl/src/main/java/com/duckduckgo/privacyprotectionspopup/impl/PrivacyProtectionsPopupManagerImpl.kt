@@ -30,6 +30,7 @@ import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.DONT_SHOW_AGAIN_CLICKED
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent.PRIVACY_DASHBOARD_CLICKED
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupViewState
+import com.duckduckgo.privacyprotectionspopup.impl.PrivacyProtectionsPopupExperimentVariant.TEST
 import com.duckduckgo.privacyprotectionspopup.impl.db.PopupDismissDomainRepository
 import com.duckduckgo.privacyprotectionspopup.impl.store.PrivacyProtectionsPopupDataStore
 import com.squareup.anvil.annotations.ContributesBinding
@@ -51,7 +52,9 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.launch
+import logcat.logcat
 
 @ContributesBinding(FragmentScope::class)
 class PrivacyProtectionsPopupManagerImpl @Inject constructor(
@@ -63,6 +66,8 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
     private val dataStore: PrivacyProtectionsPopupDataStore,
     private val userAllowListRepository: UserAllowListRepository,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
+    private val variantRandomizer: PrivacyProtectionsPopupExperimentVariantRandomizer,
+    private val pixels: PrivacyProtectionsPopupPixels,
 ) : PrivacyProtectionsPopupManager {
 
     private val state = MutableStateFlow(
@@ -92,25 +97,27 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
         when (event) {
             DISMISSED -> {
                 dismissPopup()
+                pixels.reportPopupDismissedViaClickOutside()
             }
 
             DISMISS_CLICKED -> {
-                // TODO pixel
                 dismissPopup()
+                pixels.reportPopupDismissedViaButton()
             }
 
             DISABLE_PROTECTIONS_CLICKED -> {
-                // TODO pixel
                 state.value.domain?.let { domain ->
                     appCoroutineScope.launch {
                         userAllowListRepository.addDomainToUserAllowList(domain)
                     }
                 }
                 dismissPopup()
+                pixels.reportProtectionsDisabled()
             }
 
             PRIVACY_DASHBOARD_CLICKED -> {
                 dismissPopup()
+                pixels.reportPrivacyDashboardOpened()
             }
 
             DONT_SHOW_AGAIN_CLICKED -> {
@@ -118,21 +125,35 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
                     dataStore.setDoNotShowAgainClicked(clicked = true)
                 }
                 dismissPopup()
+                pixels.reportDoNotShowAgainClicked()
             }
         }
     }
 
     override fun onPageRefreshTriggeredByUser() {
         var popupTriggered = false
+        var experimentVariantToStore: PrivacyProtectionsPopupExperimentVariant? = null
 
-        state.update { oldState ->
-            val shouldShowPopup = canShowPopup(state = oldState)
+        val updatedState = state.updateAndGet { oldState ->
+            if (oldState.popupData == null) return@updateAndGet oldState
+
+            val popupConditionsMet = arePopupConditionsMet(state = oldState)
+
+            var experimentVariant = oldState.popupData.experimentVariant
+
+            if (experimentVariant == null && popupConditionsMet) {
+                experimentVariant = variantRandomizer.getRandomVariant()
+                experimentVariantToStore = experimentVariant
+            } else {
+                experimentVariantToStore = null
+            }
+
+            val shouldShowPopup = popupConditionsMet && experimentVariant == TEST
 
             popupTriggered = shouldShowPopup && oldState.viewState is PrivacyProtectionsPopupViewState.Gone
 
             oldState.copy(
                 viewState = if (shouldShowPopup) {
-                    requireNotNull(oldState.popupData) // implied by the fact that shouldShowPopup is true
                     PrivacyProtectionsPopupViewState.Visible(doNotShowAgainOptionAvailable = oldState.popupData.popupTriggerCount > 0)
                 } else {
                     PrivacyProtectionsPopupViewState.Gone
@@ -140,11 +161,22 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
             )
         }
 
-        if (popupTriggered) {
-            appCoroutineScope.launch {
+        appCoroutineScope.launch {
+            experimentVariantToStore?.let { variant ->
+                dataStore.setExperimentVariant(variant)
+                pixels.reportExperimentVariantAssigned()
+                logcat(tag = PrivacyProtectionsPopupManagerImpl::class.simpleName) {
+                    "Experiment variant assigned: $variant"
+                }
+            }
+
+            if (popupTriggered) {
                 val count = dataStore.getPopupTriggerCount()
                 dataStore.setPopupTriggerCount(count + 1)
+                pixels.reportPopupTriggered()
             }
+
+            tryReportPageRefreshOnPossibleBreakage(updatedState)
         }
     }
 
@@ -187,10 +219,7 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun startDataLoading() {
         dataLoadingJob = appCoroutineScope.launch {
-            val featureAvailable = featureFlag.isEnabled()
-            state.update { it.copy(featureAvailable = featureAvailable) }
-
-            if (!featureAvailable) return@launch
+            state.update { it.copy(featureAvailable = featureFlag.isEnabled()) }
 
             state.map { it.domain }
                 .distinctUntilChanged()
@@ -222,7 +251,7 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
         val viewState: PrivacyProtectionsPopupViewState,
     )
 
-    private fun canShowPopup(state: State): Boolean = with(state) {
+    private fun arePopupConditionsMet(state: State): Boolean = with(state) {
         if (popupData == null) return@with false
 
         val popupDismissed = popupData.popupDismissedAt != null &&
@@ -242,6 +271,22 @@ class PrivacyProtectionsPopupManagerImpl @Inject constructor(
             !popupDismissed &&
             !toggleUsed &&
             !popupData.doNotShowAgainClicked
+    }
+
+    private fun tryReportPageRefreshOnPossibleBreakage(state: State) = with(state) {
+        if (popupData == null) return
+
+        val isDuckDuckGoDomain = domain?.let { duckDuckGoUrlDetector.isDuckDuckGoUrl(it.normalizeScheme()) }
+
+        if (
+            popupData.protectionsEnabled &&
+            domain != null &&
+            isDuckDuckGoDomain == false &&
+            !hasHttpErrorCodes &&
+            !hasBrowserError
+        ) {
+            pixels.reportPageRefreshOnPossibleBreakage()
+        }
     }
 
     companion object {

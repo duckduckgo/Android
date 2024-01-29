@@ -24,7 +24,9 @@ import com.duckduckgo.privacy.config.api.PrivacyConfig
 import com.duckduckgo.privacy.config.api.PrivacyConfigData
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import java.util.*
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -68,6 +70,10 @@ class BrokenSiteSubmitterTest {
 
     private val mockBrokenSiteLastSentReport: BrokenSiteLastSentReport = mock()
 
+    private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels = mock {
+        runBlocking { whenever(mock.getPixelParams()).thenReturn(emptyMap()) }
+    }
+
     private lateinit var testee: BrokenSiteSubmitter
 
     @Before
@@ -98,6 +104,7 @@ class BrokenSiteSubmitterTest {
             mockUnprotectedTemporary,
             mockContentBlocking,
             mockBrokenSiteLastSentReport,
+            privacyProtectionsPopupExperimentExternalPixels,
         )
     }
 
@@ -281,6 +288,19 @@ class BrokenSiteSubmitterTest {
         val params = paramsCaptor.firstValue
 
         assertFalse("reportFlow" in params)
+    }
+
+    @Test
+    fun whenPrivacyProtectionsPopupExperimentParamsArePresentThenTheyAreIncludedInPixel() = runTest {
+        val params = mapOf("test_key" to "test_value")
+        whenever(privacyProtectionsPopupExperimentExternalPixels.getPixelParams()).thenReturn(params)
+
+        testee.submitBrokenSiteFeedback(getBrokenSite())
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any(), eq(COUNT))
+
+        assertEquals("test_value", paramsCaptor.firstValue["test_key"])
     }
 
     private fun getBrokenSite(): BrokenSite {
