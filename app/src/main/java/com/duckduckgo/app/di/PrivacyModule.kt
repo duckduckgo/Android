@@ -46,6 +46,7 @@ import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupDataClearer
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.sync.api.DeviceSyncState
@@ -82,6 +83,7 @@ object PrivacyModule {
         sitePermissionsManager: SitePermissionsManager,
         deviceSyncState: DeviceSyncState,
         savedSitesRepository: SavedSitesRepository,
+        privacyProtectionsPopupDataClearer: PrivacyProtectionsPopupDataClearer,
         dispatcherProvider: DispatcherProvider,
     ): ClearDataAction {
         return ClearPersonalDataAction(
@@ -99,6 +101,7 @@ object PrivacyModule {
             sitePermissionsManager,
             deviceSyncState,
             savedSitesRepository,
+            privacyProtectionsPopupDataClearer,
             dispatcherProvider,
         )
     }

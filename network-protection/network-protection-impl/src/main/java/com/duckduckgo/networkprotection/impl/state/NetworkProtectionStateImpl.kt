@@ -30,13 +30,15 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionSta
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.DISCONNECTED
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.cohort.NetpCohortStore
-import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
+import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
+import com.duckduckgo.networkprotection.impl.configuration.asServerDetails
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
 @ContributesBinding(AppScope::class)
@@ -45,7 +47,7 @@ class NetworkProtectionStateImpl @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val cohortStore: NetpCohortStore,
     private val dispatcherProvider: DispatcherProvider,
-    private val networkProtectionRepository: NetworkProtectionRepository,
+    private val wgTunnelConfig: WgTunnelConfig,
     private val vpnStateMonitor: VpnStateMonitor,
 ) : NetworkProtectionState {
     override suspend fun isOnboarded(): Boolean = withContext(dispatcherProvider.io()) {
@@ -66,12 +68,19 @@ class NetworkProtectionStateImpl @Inject constructor(
         }
     }
 
+    override fun clearVPNConfigurationAndRestart() {
+        coroutineScope.launch(dispatcherProvider.io()) {
+            wgTunnelConfig.clearWgConfig()
+            restart()
+        }
+    }
+
     override suspend fun stop() {
         vpnFeaturesRegistry.unregisterFeature(NetPVpnFeature.NETP_VPN)
     }
 
     override fun serverLocation(): String? {
-        return networkProtectionRepository.serverDetails?.location
+        return runBlocking { wgTunnelConfig.getWgConfig() }?.asServerDetails()?.location
     }
 
     override fun getConnectionStateFlow(): Flow<ConnectionState> {

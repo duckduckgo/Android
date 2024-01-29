@@ -20,9 +20,9 @@ import app.cash.turbine.test
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
-import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_ENABLED
@@ -31,6 +31,7 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_DISPLAYED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.MENU_ACTION_AUTOFILL_PRESSED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.SETTINGS_AUTOFILL_MANAGEMENT_OPENED
+import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ExitCredentialMode
@@ -73,7 +74,7 @@ class AutofillSettingsViewModelTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    private val mockStore: AutofillStore = mock()
+    private val mockStore: InternalAutofillStore = mock()
     private val emailManager: EmailManager = mock()
     private val duckAddressStatusRepository: DuckAddressStatusRepository = mock()
     private val clipboardInteractor: AutofillClipboardInteractor = mock()
@@ -611,7 +612,7 @@ class AutofillSettingsViewModelTest {
         val launchedFromBrowser = false
         val directLinkToCredentials = true
         testee.sendLaunchPixel(launchedFromBrowser, directLinkToCredentials)
-        verify(pixel, never()).fire(any<PixelName>(), any(), any())
+        verify(pixel, never()).fire(any<PixelName>(), any(), any(), eq(COUNT))
     }
 
     @Test
@@ -619,7 +620,7 @@ class AutofillSettingsViewModelTest {
         val launchedFromBrowser = true
         val directLinkToCredentials = true
         testee.sendLaunchPixel(launchedFromBrowser, directLinkToCredentials)
-        verify(pixel, never()).fire(any<PixelName>(), any(), any())
+        verify(pixel, never()).fire(any<PixelName>(), any(), any(), eq(COUNT))
     }
 
     @Test
@@ -627,7 +628,7 @@ class AutofillSettingsViewModelTest {
         val launchedFromBrowser = true
         val directLinkToCredentials = false
         testee.sendLaunchPixel(launchedFromBrowser, directLinkToCredentials)
-        verify(pixel).fire(eq(MENU_ACTION_AUTOFILL_PRESSED), any(), any())
+        verify(pixel).fire(eq(MENU_ACTION_AUTOFILL_PRESSED), any(), any(), eq(COUNT))
     }
 
     @Test
@@ -635,7 +636,7 @@ class AutofillSettingsViewModelTest {
         val launchedFromBrowser = false
         val directLinkToCredentials = false
         testee.sendLaunchPixel(launchedFromBrowser, directLinkToCredentials)
-        verify(pixel).fire(eq(SETTINGS_AUTOFILL_MANAGEMENT_OPENED), any(), any())
+        verify(pixel).fire(eq(SETTINGS_AUTOFILL_MANAGEMENT_OPENED), any(), any(), eq(COUNT))
     }
 
     @Test

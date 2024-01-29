@@ -24,19 +24,16 @@ import com.duckduckgo.mobile.android.vpn.network.DnsProvider
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack.VpnTunnelConfig
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.RESTART
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.SELF_STOP
-import com.duckduckgo.networkprotection.impl.config.NetPDefaultConfigProvider
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnel
-import com.duckduckgo.networkprotection.impl.configuration.WgTunnel.WgTunnelData
-import com.duckduckgo.networkprotection.impl.configuration.toCidrString
+import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
-import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ClientInterface
-import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ServerDetails
 import com.squareup.anvil.annotations.ContributesMultibinding
+import com.wireguard.config.Config
 import dagger.Lazy
 import dagger.SingleInstanceIn
-import java.net.InetAddress
 import javax.inject.Inject
 import logcat.LogPriority
 import logcat.asLog
@@ -50,59 +47,39 @@ import logcat.logcat
 class WgVpnNetworkStack @Inject constructor(
     private val wgProtocol: Lazy<WgProtocol>,
     private val wgTunnelLazy: Lazy<WgTunnel>,
+    private val wgTunnelConfigLazy: Lazy<WgTunnelConfig>,
     private val networkProtectionRepository: Lazy<NetworkProtectionRepository>,
     private val currentTimeProvider: CurrentTimeProvider,
     private val netpPixels: Lazy<NetworkProtectionPixels>,
-    private val netPDefaultConfigProvider: NetPDefaultConfigProvider,
     private val dnsProvider: DnsProvider,
     private val crashLogger: CrashLogger,
 ) : VpnNetworkStack {
-    private var wgTunnelData: WgTunnelData? = null
+    private var wgConfig: Config? = null
 
     override val name: String = NetPVpnFeature.NETP_VPN.featureName
 
     override fun onCreateVpn(): Result<Unit> = Result.success(Unit)
 
     override suspend fun onPrepareVpn(): Result<VpnTunnelConfig> {
-        fun WgTunnelData.allDns(): Set<InetAddress> {
-            return mutableSetOf<InetAddress>().apply {
-                runCatching { InetAddress.getByName(gateway) }.getOrNull()?.let {
-                    add(it)
-                }
-                addAll(netPDefaultConfigProvider.fallbackDns())
-            }.toSet().also { logcat { "DNS to be configured $it" } }
-        }
-
         return try {
             netpPixels.get().reportEnableAttempt()
 
-            wgTunnelData = wgTunnelLazy.get().establish()
+            wgConfig = wgTunnelLazy.get().createAndSetWgConfig()
                 .onFailure { netpPixels.get().reportErrorInRegistration() }
                 .getOrThrow()
-            logcat { "Received config from BE: $wgTunnelData" }
-
-            networkProtectionRepository.get().run {
-                serverDetails = ServerDetails(
-                    serverName = wgTunnelData!!.serverName,
-                    ipAddress = wgTunnelData!!.serverIP,
-                    location = wgTunnelData!!.serverLocation,
-                )
-                clientInterface = ClientInterface(
-                    tunnelCidrSet = wgTunnelData!!.tunnelAddress.toCidrString(),
-                )
-            }
+            logcat { "Wireguard configuration:\n$wgConfig" }
 
             val privateDns = dnsProvider.getPrivateDns()
             Result.success(
                 VpnTunnelConfig(
-                    mtu = netPDefaultConfigProvider.mtu(),
-                    addresses = wgTunnelData?.tunnelAddress ?: emptyMap(),
+                    mtu = wgConfig?.`interface`?.mtu ?: 1280,
+                    addresses = wgConfig!!.`interface`.addresses.associate { Pair(it.address, it.mask) },
                     // when Android private DNS are set, we return DO NOT configure any DNS.
                     // why? no use intercepting encrypted DNS traffic, plus we can't configure any DNS that doesn't support DoT, otherwise Android
                     // will enforce DoT and will stop passing any DNS traffic, resulting in no DNS resolution == connectivity is killed
-                    dns = if (privateDns.isEmpty()) wgTunnelData!!.allDns() else emptySet(),
-                    routes = netPDefaultConfigProvider.routes(),
-                    appExclusionList = netPDefaultConfigProvider.exclusionList(),
+                    dns = if (privateDns.isEmpty()) wgConfig!!.`interface`.dnsServers else emptySet(),
+                    routes = wgConfig!!.`interface`.routes.associate { it.address.hostAddress!! to it.mask },
+                    appExclusionList = wgConfig!!.`interface`.excludedApplications,
                 ),
             ).also { logcat { "Returning VPN configuration: ${it.getOrNull()}" } }
         } catch (e: Throwable) {
@@ -132,17 +109,18 @@ class WgVpnNetworkStack @Inject constructor(
     }
 
     private fun turnOnNative(tunfd: Int): Result<Unit> {
-        if (wgTunnelData == null) {
+        if (wgConfig == null) {
             netpPixels.get().reportErrorWgInvalidState()
             return Result.failure(java.lang.IllegalStateException("Tunnel data not available when attempting to start wg."))
         }
 
         val result = wgProtocol.get().startWg(
             tunfd,
-            wgTunnelData!!.userSpaceConfig.also {
+            wgConfig!!.toWgUserspaceString().also {
                 logcat { "WgUserspace config: $it" }
             },
-            pcapConfig = netPDefaultConfigProvider.pcapConfig(),
+            // pcapConfig = netPDefaultConfigProvider.pcapConfig(),
+            pcapConfig = null,
         )
         return if (result.isFailure) {
             logcat(LogPriority.ERROR) { "Failed to turnOnNative due to ${result.exceptionOrNull()}" }
@@ -170,7 +148,10 @@ class WgVpnNetworkStack @Inject constructor(
         }
         logcat { "Completed turnOffNative" }
 
-        networkProtectionRepository.get().serverDetails = null
+        if (reason != RESTART) {
+            logcat { "Deleting wireguard config..." }
+            wgTunnelConfigLazy.get().clearWgConfig()
+        }
 
         // Only update if enabledTimeInMillis stop has been initiated by the user
         if (reason is SELF_STOP && reason.snoozedTriggerAtMillis == 0L) {

@@ -25,7 +25,12 @@ import retrofit2.http.Header
 interface SubscriptionsService {
     @GET("https://subscriptions-dev.duckduckgo.com/api/subscription")
     suspend fun subscription(@Header("Authorization") authorization: String?): SubscriptionResponse
+
+    @GET("https://subscriptions-dev.duckduckgo.com/api/checkout/portal")
+    suspend fun portal(@Header("Authorization") authorization: String?): PortalResponse
 }
+
+data class PortalResponse(val customerPortalUrl: String)
 
 data class SubscriptionResponse(
     val productId: String,

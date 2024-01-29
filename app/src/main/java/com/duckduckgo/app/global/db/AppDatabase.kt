@@ -68,7 +68,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 
 @Database(
     exportSchema = true,
-    version = 50,
+    version = 51,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -629,6 +629,12 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         }
     }
 
+    private val MIGRATION_50_TO_51: Migration = object : Migration(50, 51) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("ALTER TABLE `page_loaded_pixel_entity` ADD COLUMN `trackerOptimizationEnabled` INTEGER NOT NULL DEFAULT 0")
+        }
+    }
+
     val BOOKMARKS_DB_ON_CREATE = object : RoomDatabase.Callback() {
         override fun onCreate(database: SupportSQLiteDatabase) {
             database.execSQL(
@@ -704,6 +710,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             MIGRATION_47_TO_48,
             MIGRATION_48_TO_49,
             MIGRATION_49_TO_50,
+            MIGRATION_50_TO_51,
         )
 
     @Deprecated(

@@ -62,7 +62,7 @@ class FakeWgVpnControllerService : WgVpnControllerService {
     private fun RegisteredServerInfo.toEligibleServerInfo(): EligibleServerInfo {
         return EligibleServerInfo(
             publicKey = "key",
-            allowedIPs = emptyList(),
+            allowedIPs = listOf("10.64.169.158/32"),
             server = this.server,
         )
     }
@@ -112,7 +112,10 @@ private val SERVER_LOCATIONS_JSON = """
 private val SERVERS_JSON = """
             [
               {
-                "registeredAt": "2023-01-30T14:02:51.056245702-05:00",
+                "expiresAt": "2023-01-30T14:02:51.056245702-05:00",
+                "allowedIPs": [
+                "10.64.169.158/32"
+                ],
                 "server": {
                   "name": "egress.usw.1",
                   "attributes": {
@@ -134,7 +137,10 @@ private val SERVERS_JSON = """
                 }
               },
               {
-                "registeredAt": "2023-01-30T14:02:51.109695295-05:00",
+                "expiresAt": "2023-01-30T14:02:51.109695295-05:00",
+                "allowedIPs": [
+                "10.64.169.158/32"
+                ],
                 "server": {
                   "name": "egress.euw",
                   "attributes": {
@@ -155,7 +161,10 @@ private val SERVERS_JSON = """
                 }
               },
               {
-                "registeredAt": "2023-01-30T14:02:52.602419176-05:00",
+                "expiresAt": "2023-01-30T14:02:52.602419176-05:00",
+                "allowedIPs": [
+                "10.64.169.158/32"
+                ],
                 "server": {
                   "name": "egress.euw.2",
                   "attributes": {
@@ -177,7 +186,10 @@ private val SERVERS_JSON = """
                 }
               },
               {
-                "registeredAt": "2023-01-30T14:02:52.130321638-05:00",
+                "expiresAt": "2023-01-30T14:02:52.130321638-05:00",
+                "allowedIPs": [
+                "10.64.169.158/32"
+                ],
                 "server": {
                   "name": "egress.euw.1",
                   "attributes": {
@@ -199,7 +211,10 @@ private val SERVERS_JSON = """
                 }
               },
               {
-                "registeredAt": "2023-01-30T14:02:51.301505435-05:00",
+                "expiresAt": "2023-01-30T14:02:51.301505435-05:00",
+                "allowedIPs": [
+                "10.64.169.158/32"
+                ],
                 "server": {
                   "name": "egress.use.2",
                   "attributes": {
@@ -221,7 +236,10 @@ private val SERVERS_JSON = """
                 }
               },
               {
-                "registeredAt": "2023-01-30T14:02:50.945553924-05:00",
+                "expiresAt": "2023-01-30T14:02:50.945553924-05:00",
+                "allowedIPs": [
+                "10.64.169.158/32"
+                ],
                 "server": {
                   "name": "egress.use.1",
                   "attributes": {
@@ -243,7 +261,10 @@ private val SERVERS_JSON = """
                 }
               },
               {
-                "registeredAt": "2023-01-30T14:02:52.648854078-05:00",
+                "expiresAt": "2023-01-30T14:02:52.648854078-05:00",
+                "allowedIPs": [
+                "10.64.169.158/32"
+                ],
                 "server": {
                   "name": "egress.usc",
                   "attributes": {
@@ -267,7 +288,10 @@ private val SERVERS_JSON = """
                 }
               },
               {
-                "registeredAt": "2023-01-30T14:02:52.745221926-05:00",
+                "expiresAt": "2023-01-30T14:02:52.745221926-05:00",
+                "allowedIPs": [
+                "10.64.169.158/32"
+                ],
                 "server": {
                   "name": "egress.usw.2",
                   "attributes": {

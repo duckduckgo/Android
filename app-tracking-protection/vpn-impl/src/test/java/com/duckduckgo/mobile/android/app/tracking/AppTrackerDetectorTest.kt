@@ -16,17 +16,26 @@
 
 package com.duckduckgo.mobile.android.app.tracking
 
+import android.content.pm.ApplicationInfo
+import android.content.pm.PackageManager
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.dao.VpnAppTrackerBlockingDao
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.AppTrackerRecorder
 import com.duckduckgo.mobile.android.vpn.trackers.*
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
@@ -35,6 +44,8 @@ class AppTrackerDetectorTest {
     private val appNameResolver: AppNameResolver = mock()
     private val appTrackerRecorder: AppTrackerRecorder = mock()
     private val vpnAppTrackerBlockingDao: VpnAppTrackerBlockingDao = mock()
+    private val packageManager: PackageManager = mock()
+    private val vpnFeaturesRegistry: VpnFeaturesRegistry = mock()
 
     private lateinit var appTrackerDetector: AppTrackerDetector
 
@@ -43,12 +54,16 @@ class AppTrackerDetectorTest {
         whenever(appNameResolver.getAppNameForPackageId(APP_ORIGINATING_APP.packageId)).thenReturn(APP_ORIGINATING_APP)
         whenever(appNameResolver.getAppNameForPackageId(AppNameResolver.OriginatingApp.unknown().packageId))
             .thenReturn(AppNameResolver.OriginatingApp.unknown())
+        whenever(packageManager.getApplicationInfo(any(), eq(0))).thenReturn(ApplicationInfo())
+        runBlocking { whenever(vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)).thenReturn(true) }
 
         appTrackerDetector = RealAppTrackerDetector(
             appTrackerRepository,
             appNameResolver,
             appTrackerRecorder,
             vpnAppTrackerBlockingDao,
+            packageManager,
+            vpnFeaturesRegistry,
         )
     }
 
@@ -59,6 +74,186 @@ class AppTrackerDetectorTest {
         whenever(appNameResolver.getPackageIdForUid(APP_UID)).thenReturn(APP_ORIGINATING_APP.packageId)
 
         whenever(vpnAppTrackerBlockingDao.getRuleByTrackerDomain(TEST_APP_TRACKER.hostname)).thenReturn(null)
+
+        assertEquals(
+            AppTrackerDetector.AppTracker(
+                TEST_APP_TRACKER.hostname,
+                APP_UID,
+                TEST_APP_TRACKER.owner.displayName,
+                APP_ORIGINATING_APP.packageId,
+                APP_ORIGINATING_APP.appName,
+            ),
+            appTrackerDetector.evaluate(TEST_APP_TRACKER.hostname, APP_UID),
+        )
+    }
+
+    @Test
+    fun whenEvaluateThirdPartyTrackerAndSystemAppAndNotInExclusionListAndReturnNull() {
+        whenever(appTrackerRepository.findTracker(TEST_APP_TRACKER.hostname, APP_PACKAGE_ID))
+            .thenReturn(AppTrackerType.ThirdParty(TEST_APP_TRACKER))
+        whenever(appNameResolver.getPackageIdForUid(APP_UID)).thenReturn(APP_ORIGINATING_APP.packageId)
+
+        whenever(vpnAppTrackerBlockingDao.getRuleByTrackerDomain(TEST_APP_TRACKER.hostname)).thenReturn(null)
+        whenever(packageManager.getApplicationInfo(APP_PACKAGE_ID, 0))
+            .thenReturn(ApplicationInfo().apply { flags = ApplicationInfo.FLAG_SYSTEM })
+
+        assertNull(appTrackerDetector.evaluate(TEST_APP_TRACKER.hostname, APP_UID))
+    }
+
+    @Test
+    fun whenEvaluateThirdPartyTrackerAndoverriddenSystemAppAndNotInExclusionListAndReturnTracker() {
+        whenever(appTrackerRepository.findTracker(TEST_APP_TRACKER.hostname, APP_PACKAGE_ID))
+            .thenReturn(AppTrackerType.ThirdParty(TEST_APP_TRACKER))
+        whenever(appNameResolver.getPackageIdForUid(APP_UID)).thenReturn(APP_ORIGINATING_APP.packageId)
+
+        whenever(vpnAppTrackerBlockingDao.getRuleByTrackerDomain(TEST_APP_TRACKER.hostname)).thenReturn(null)
+        whenever(packageManager.getApplicationInfo(APP_PACKAGE_ID, 0))
+            .thenReturn(ApplicationInfo().apply { flags = ApplicationInfo.FLAG_SYSTEM })
+
+        // overridden system app
+        whenever(appTrackerRepository.getSystemAppOverrideList()).thenReturn(
+            listOf(AppTrackerSystemAppOverridePackage(APP_PACKAGE_ID)),
+        )
+
+        assertEquals(
+            AppTrackerDetector.AppTracker(
+                TEST_APP_TRACKER.hostname,
+                APP_UID,
+                TEST_APP_TRACKER.owner.displayName,
+                APP_ORIGINATING_APP.packageId,
+                APP_ORIGINATING_APP.appName,
+            ),
+            appTrackerDetector.evaluate(TEST_APP_TRACKER.hostname, APP_UID),
+        )
+    }
+
+    @Test
+    fun whenEvaluateThirdPartyTrackerAndSystemAppAndInExclusionListAndReturnNull() {
+        whenever(appTrackerRepository.findTracker(TEST_APP_TRACKER.hostname, APP_PACKAGE_ID))
+            .thenReturn(AppTrackerType.ThirdParty(TEST_APP_TRACKER))
+        whenever(appNameResolver.getPackageIdForUid(APP_UID)).thenReturn(APP_ORIGINATING_APP.packageId)
+
+        whenever(vpnAppTrackerBlockingDao.getRuleByTrackerDomain(TEST_APP_TRACKER.hostname)).thenReturn(null)
+        whenever(packageManager.getApplicationInfo(APP_PACKAGE_ID, 0))
+            .thenReturn(ApplicationInfo().apply { flags = ApplicationInfo.FLAG_SYSTEM })
+        // in exclusion list
+        whenever(appTrackerRepository.getAppExclusionList()).thenReturn(
+            listOf(AppTrackerExcludedPackage(APP_PACKAGE_ID, reason = "")),
+        )
+
+        assertNull(appTrackerDetector.evaluate(TEST_APP_TRACKER.hostname, APP_UID))
+    }
+
+    @Test
+    fun whenEvaluateThirdPartyTrackerAndOverriddenSystemAppAndInExclusionListAndReturnNull() {
+        whenever(appTrackerRepository.findTracker(TEST_APP_TRACKER.hostname, APP_PACKAGE_ID))
+            .thenReturn(AppTrackerType.ThirdParty(TEST_APP_TRACKER))
+        whenever(appNameResolver.getPackageIdForUid(APP_UID)).thenReturn(APP_ORIGINATING_APP.packageId)
+
+        whenever(vpnAppTrackerBlockingDao.getRuleByTrackerDomain(TEST_APP_TRACKER.hostname)).thenReturn(null)
+        whenever(packageManager.getApplicationInfo(APP_PACKAGE_ID, 0))
+            .thenReturn(ApplicationInfo().apply { flags = ApplicationInfo.FLAG_SYSTEM })
+        // overridden system app
+        whenever(appTrackerRepository.getSystemAppOverrideList()).thenReturn(
+            listOf(AppTrackerSystemAppOverridePackage(APP_PACKAGE_ID)),
+        )
+        // in exclusion list
+        whenever(appTrackerRepository.getAppExclusionList()).thenReturn(
+            listOf(AppTrackerExcludedPackage(APP_PACKAGE_ID, reason = "")),
+        )
+
+        assertNull(appTrackerDetector.evaluate(TEST_APP_TRACKER.hostname, APP_UID))
+    }
+
+    @Test
+    fun whenEvaluateThirdPartyTrackerAndOverriddenSystemAppThenReturnTracker() {
+        whenever(appTrackerRepository.findTracker(TEST_APP_TRACKER.hostname, APP_PACKAGE_ID))
+            .thenReturn(AppTrackerType.ThirdParty(TEST_APP_TRACKER))
+        whenever(appNameResolver.getPackageIdForUid(APP_UID)).thenReturn(APP_ORIGINATING_APP.packageId)
+
+        whenever(vpnAppTrackerBlockingDao.getRuleByTrackerDomain(TEST_APP_TRACKER.hostname)).thenReturn(null)
+        whenever(packageManager.getApplicationInfo(APP_PACKAGE_ID, 0))
+            .thenReturn(ApplicationInfo().apply { flags = ApplicationInfo.FLAG_SYSTEM })
+        whenever(appTrackerRepository.getSystemAppOverrideList()).thenReturn(
+            listOf(AppTrackerSystemAppOverridePackage(APP_PACKAGE_ID)),
+        )
+
+        assertEquals(
+            AppTrackerDetector.AppTracker(
+                TEST_APP_TRACKER.hostname,
+                APP_UID,
+                TEST_APP_TRACKER.owner.displayName,
+                APP_ORIGINATING_APP.packageId,
+                APP_ORIGINATING_APP.appName,
+            ),
+            appTrackerDetector.evaluate(TEST_APP_TRACKER.hostname, APP_UID),
+        )
+    }
+
+    @Test
+    fun whenEvaluateThirdPartyTrackerAndManuallyUnprotectedThenReturnNull() {
+        whenever(appTrackerRepository.findTracker(TEST_APP_TRACKER.hostname, APP_PACKAGE_ID))
+            .thenReturn(AppTrackerType.ThirdParty(TEST_APP_TRACKER))
+        whenever(appNameResolver.getPackageIdForUid(APP_UID)).thenReturn(APP_ORIGINATING_APP.packageId)
+
+        whenever(vpnAppTrackerBlockingDao.getRuleByTrackerDomain(TEST_APP_TRACKER.hostname)).thenReturn(null)
+        whenever(appTrackerRepository.getManualAppExclusionList()).thenReturn(
+            listOf(AppTrackerManualExcludedApp(APP_PACKAGE_ID, false)),
+        )
+
+        assertNull(appTrackerDetector.evaluate(TEST_APP_TRACKER.hostname, APP_UID))
+    }
+
+    @Test
+    fun whenEvaluateThirdPartyTrackerAndManuallyProtectedThenReturnTracker() {
+        whenever(appTrackerRepository.findTracker(TEST_APP_TRACKER.hostname, APP_PACKAGE_ID))
+            .thenReturn(AppTrackerType.ThirdParty(TEST_APP_TRACKER))
+        whenever(appNameResolver.getPackageIdForUid(APP_UID)).thenReturn(APP_ORIGINATING_APP.packageId)
+
+        whenever(vpnAppTrackerBlockingDao.getRuleByTrackerDomain(TEST_APP_TRACKER.hostname)).thenReturn(null)
+        whenever(appTrackerRepository.getManualAppExclusionList()).thenReturn(
+            listOf(AppTrackerManualExcludedApp(APP_PACKAGE_ID, true)),
+        )
+
+        assertEquals(
+            AppTrackerDetector.AppTracker(
+                TEST_APP_TRACKER.hostname,
+                APP_UID,
+                TEST_APP_TRACKER.owner.displayName,
+                APP_ORIGINATING_APP.packageId,
+                APP_ORIGINATING_APP.appName,
+            ),
+            appTrackerDetector.evaluate(TEST_APP_TRACKER.hostname, APP_UID),
+        )
+    }
+
+    @Test
+    fun whenEvaluateThirdPartyTrackerAndInExclusionListThenReturnNull() {
+        whenever(appTrackerRepository.findTracker(TEST_APP_TRACKER.hostname, APP_PACKAGE_ID))
+            .thenReturn(AppTrackerType.ThirdParty(TEST_APP_TRACKER))
+        whenever(appNameResolver.getPackageIdForUid(APP_UID)).thenReturn(APP_ORIGINATING_APP.packageId)
+
+        whenever(vpnAppTrackerBlockingDao.getRuleByTrackerDomain(TEST_APP_TRACKER.hostname)).thenReturn(null)
+        whenever(appTrackerRepository.getAppExclusionList()).thenReturn(
+            listOf(AppTrackerExcludedPackage(APP_PACKAGE_ID, reason = "")),
+        )
+
+        assertNull(appTrackerDetector.evaluate(TEST_APP_TRACKER.hostname, APP_UID))
+    }
+
+    @Test
+    fun whenEvaluateThirdPartyTrackerAndManuallyProtectedAndInExclusionListThenReturnTracker() {
+        whenever(appTrackerRepository.findTracker(TEST_APP_TRACKER.hostname, APP_PACKAGE_ID))
+            .thenReturn(AppTrackerType.ThirdParty(TEST_APP_TRACKER))
+        whenever(appNameResolver.getPackageIdForUid(APP_UID)).thenReturn(APP_ORIGINATING_APP.packageId)
+
+        whenever(vpnAppTrackerBlockingDao.getRuleByTrackerDomain(TEST_APP_TRACKER.hostname)).thenReturn(null)
+        whenever(appTrackerRepository.getManualAppExclusionList()).thenReturn(
+            listOf(AppTrackerManualExcludedApp(APP_PACKAGE_ID, true)),
+        )
+        whenever(appTrackerRepository.getAppExclusionList()).thenReturn(
+            listOf(AppTrackerExcludedPackage(APP_PACKAGE_ID, reason = "")),
+        )
 
         assertEquals(
             AppTrackerDetector.AppTracker(
@@ -134,6 +329,25 @@ class AppTrackerDetectorTest {
         whenever(vpnAppTrackerBlockingDao.getRuleByTrackerDomain(TEST_APP_TRACKER.hostname)).thenReturn(null)
 
         assertNull(appTrackerDetector.evaluate(TEST_APP_TRACKER.hostname, APP_UID))
+    }
+
+    @Test
+    fun whenAppTpDisabledReturnNull() = runTest {
+        whenever(vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)).thenReturn(false)
+
+        val appTrackerDetectorDisabled = RealAppTrackerDetector(
+            appTrackerRepository,
+            appNameResolver,
+            appTrackerRecorder,
+            vpnAppTrackerBlockingDao,
+            packageManager,
+            vpnFeaturesRegistry,
+        )
+
+        assertNull(appTrackerDetectorDisabled.evaluate(TEST_APP_TRACKER.hostname, APP_UID))
+
+        verifyNoInteractions(appNameResolver)
+        verifyNoInteractions(appTrackerRepository)
     }
 
     @Test

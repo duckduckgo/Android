@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.pageloadpixel
 import com.duckduckgo.app.browser.WebViewPixelName
 import com.duckduckgo.app.statistics.api.OfflinePixel
 import com.duckduckgo.app.statistics.api.PixelSender
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import io.reactivex.Completable
@@ -26,6 +27,7 @@ import javax.inject.Inject
 
 private const val ELAPSED_TIME = "elapsed_time"
 private const val WEBVIEW_VERSION = "webview_version"
+private const val TRACKER_OPTIMIZATION_ENABLED = "tracker_optimization_enabled"
 
 // This is used to ensure the app version we send is the one from the moment the page was loaded, and not then the pixel is fired later on
 private const val APP_VERSION = "app_version_when_page_loaded"
@@ -45,9 +47,11 @@ class PageLoadedOfflinePixelSender @Inject constructor(
                         APP_VERSION to it.appVersion,
                         ELAPSED_TIME to it.elapsedTime.toString(),
                         WEBVIEW_VERSION to it.webviewVersion,
+                        TRACKER_OPTIMIZATION_ENABLED to it.trackerOptimizationEnabled.toString(),
                     ),
                     mapOf(),
-                ).doOnComplete {
+                    COUNT,
+                ).ignoreElement().doOnComplete {
                     pageLoadedPixelDao.deleteAll()
                 }
             }

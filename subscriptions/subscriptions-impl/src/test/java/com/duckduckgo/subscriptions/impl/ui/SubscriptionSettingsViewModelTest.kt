@@ -7,6 +7,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionStatus.AutoRenewable
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.FinishSignOut
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPortal
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Yearly
 import kotlinx.coroutines.test.runTest
@@ -46,6 +47,7 @@ class SubscriptionSettingsViewModelTest {
                 startedAt = 1234,
                 expiresOrRenewsAt = 1701694623000,
                 status = AutoRenewable,
+                platform = "android",
             ),
         )
 
@@ -63,6 +65,7 @@ class SubscriptionSettingsViewModelTest {
                 startedAt = 1234,
                 expiresOrRenewsAt = 1701694623000,
                 status = AutoRenewable,
+                platform = "android",
             ),
         )
 
@@ -80,12 +83,36 @@ class SubscriptionSettingsViewModelTest {
                 startedAt = 1234,
                 expiresOrRenewsAt = 1701694623000,
                 status = AutoRenewable,
+                platform = "android",
             ),
         )
 
         viewModel.onResume(mock())
         viewModel.viewState.test {
             assertEquals(Yearly, awaitItem().duration)
+        }
+    }
+
+    @Test
+    fun whenGoToStripeIfNoUrlThenDoNothing() = runTest {
+        whenever(subscriptionsManager.getPortalUrl()).thenReturn(null)
+
+        viewModel.commands().test {
+            viewModel.goToStripe()
+            expectNoEvents()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenGoToStripeIfNoUrlThenDoSendCommandWithUrl() = runTest {
+        whenever(subscriptionsManager.getPortalUrl()).thenReturn("example.com")
+
+        viewModel.commands().test {
+            viewModel.goToStripe()
+            val value = awaitItem() as GoToPortal
+            assertEquals("example.com", value.url)
+            cancelAndConsumeRemainingEvents()
         }
     }
 }

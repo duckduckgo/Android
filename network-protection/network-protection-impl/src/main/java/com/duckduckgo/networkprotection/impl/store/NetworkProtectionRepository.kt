@@ -18,36 +18,14 @@ package com.duckduckgo.networkprotection.impl.store
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.impl.state.NetPFeatureRemover
-import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ClientInterface
-import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ServerDetails
 import com.duckduckgo.networkprotection.store.NetworkProtectionPrefs
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 interface NetworkProtectionRepository {
-    var privateKey: String?
-    val lastPrivateKeyUpdateTimeInMillis: Long
     var enabledTimeInMillis: Long
-    var serverDetails: ServerDetails?
-    var clientInterface: ClientInterface?
     var vpnAccessRevoked: Boolean
-
-    enum class ReconnectStatus {
-        NotReconnecting,
-        Reconnecting,
-        ReconnectingFailed,
-    }
-
-    data class ServerDetails(
-        val serverName: String?,
-        val ipAddress: String?,
-        val location: String?,
-    )
-
-    data class ClientInterface(
-        val tunnelCidrSet: Set<String>,
-    )
 }
 
 @ContributesBinding(
@@ -62,62 +40,10 @@ class RealNetworkProtectionRepository @Inject constructor(
     private val networkProtectionPrefs: NetworkProtectionPrefs,
 ) : NetworkProtectionRepository, NetPFeatureRemover.NetPStoreRemovalPlugin {
 
-    override var privateKey: String?
-        get() = networkProtectionPrefs.getString(KEY_WG_PRIVATE_KEY, null)
-        set(value) {
-            networkProtectionPrefs.putString(KEY_WG_PRIVATE_KEY, value)
-            if (value == null) {
-                networkProtectionPrefs.putLong(KEY_WG_PRIVATE_KEY_LAST_UPDATE, -1L)
-            } else {
-                networkProtectionPrefs.putLong(KEY_WG_PRIVATE_KEY_LAST_UPDATE, System.currentTimeMillis())
-            }
-        }
-
-    override val lastPrivateKeyUpdateTimeInMillis: Long
-        get() = networkProtectionPrefs.getLong(KEY_WG_PRIVATE_KEY_LAST_UPDATE, -1L)
-
     override var enabledTimeInMillis: Long
         get() = networkProtectionPrefs.getLong(KEY_WG_SERVER_ENABLE_TIME, -1)
         set(value) {
             networkProtectionPrefs.putLong(KEY_WG_SERVER_ENABLE_TIME, value)
-        }
-
-    override var serverDetails: ServerDetails?
-        get() {
-            val name = networkProtectionPrefs.getString(KEY_WG_SERVER_NAME, null)
-            val ip = networkProtectionPrefs.getString(KEY_WG_SERVER_IP, null)
-            val location = networkProtectionPrefs.getString(KEY_WG_SERVER_LOCATION, null)
-
-            return if (ip.isNullOrBlank() && location.isNullOrBlank()) {
-                null
-            } else {
-                ServerDetails(
-                    serverName = name,
-                    ipAddress = ip,
-                    location = location,
-                )
-            }
-        }
-        set(value) {
-            if (value == null) {
-                networkProtectionPrefs.putString(KEY_WG_SERVER_NAME, null)
-                networkProtectionPrefs.putString(KEY_WG_SERVER_IP, null)
-                networkProtectionPrefs.putString(KEY_WG_SERVER_LOCATION, null)
-            } else {
-                networkProtectionPrefs.putString(KEY_WG_SERVER_NAME, value.serverName)
-                networkProtectionPrefs.putString(KEY_WG_SERVER_IP, value.ipAddress)
-                networkProtectionPrefs.putString(KEY_WG_SERVER_LOCATION, value.location)
-            }
-        }
-
-    override var clientInterface: ClientInterface?
-        get() {
-            val tunnelIp = networkProtectionPrefs.getStringSet(KEY_WG_CLIENT_IFACE_TUNNEL_IP)
-
-            return ClientInterface(tunnelIp)
-        }
-        set(value) {
-            networkProtectionPrefs.setStringSet(KEY_WG_CLIENT_IFACE_TUNNEL_IP, value?.tunnelCidrSet ?: emptySet())
         }
 
     override fun clearStore() {
@@ -131,13 +57,7 @@ class RealNetworkProtectionRepository @Inject constructor(
         }
 
     companion object {
-        private const val KEY_WG_PRIVATE_KEY = "wg_private_key"
-        private const val KEY_WG_PRIVATE_KEY_LAST_UPDATE = "wg_private_key_last_update"
-        private const val KEY_WG_SERVER_NAME = "wg_server_name"
-        private const val KEY_WG_SERVER_IP = "wg_server_ip"
-        private const val KEY_WG_SERVER_LOCATION = "wg_server_location"
         private const val KEY_WG_SERVER_ENABLE_TIME = "wg_server_enable_time"
-        private const val KEY_WG_CLIENT_IFACE_TUNNEL_IP = "wg_client_iface_tunnel_ip"
         private const val KEY_VPN_ACCESS_REVOKED = "key_vpn_access_revoked"
     }
 }

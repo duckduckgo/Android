@@ -17,7 +17,7 @@
 package com.duckduckgo.autofill.impl.ui.credential.saving
 
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.autofill.api.store.AutofillStore
+import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
@@ -32,7 +32,7 @@ class AutofillSavingCredentialsViewModelTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    private val mockStore: AutofillStore = mock()
+    private val mockStore: InternalAutofillStore = mock()
     private val pixel: Pixel = mock()
     private val neverSavedSiteRepository: NeverSavedSiteRepository = mock()
     private val testee = AutofillSavingCredentialsViewModel(

@@ -77,7 +77,7 @@
                     android:id="@+id/changePlan"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:primaryText="Change Plan or Billing" />
+                    app:primaryText="@string/changePlanTitle" />
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                     android:layout_width="match_parent"

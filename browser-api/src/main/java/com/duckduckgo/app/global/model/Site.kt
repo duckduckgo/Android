@@ -85,5 +85,10 @@ fun Site.domainMatchesUrl(matchingUrl: String): Boolean {
     return uri?.baseHost == matchingUrl.toUri().baseHost
 }
 
+fun Site.domainMatchesUrl(matchingUrl: Uri): Boolean {
+    // TODO (cbarreiro) can we get rid of baseHost for the Uri as well?
+    return uri?.baseHost == matchingUrl.host
+}
+
 val Site.domain get() = uri?.domain()
 val Site.baseHost get() = uri?.baseHost

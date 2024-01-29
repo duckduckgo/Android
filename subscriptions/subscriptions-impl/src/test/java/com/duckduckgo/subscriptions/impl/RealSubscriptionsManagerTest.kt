@@ -18,11 +18,15 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsData.Failure
 import com.duckduckgo.subscriptions.impl.SubscriptionsData.Success
 import com.duckduckgo.subscriptions.impl.billing.BillingClientWrapper
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState
+import com.duckduckgo.subscriptions.impl.repository.AuthRepository
+import com.duckduckgo.subscriptions.impl.repository.FakeAuthDataStore
+import com.duckduckgo.subscriptions.impl.repository.RealAuthRepository
 import com.duckduckgo.subscriptions.impl.services.AccessTokenResponse
 import com.duckduckgo.subscriptions.impl.services.AccountResponse
 import com.duckduckgo.subscriptions.impl.services.AuthService
 import com.duckduckgo.subscriptions.impl.services.CreateAccountResponse
 import com.duckduckgo.subscriptions.impl.services.Entitlement
+import com.duckduckgo.subscriptions.impl.services.PortalResponse
 import com.duckduckgo.subscriptions.impl.services.StoreLoginResponse
 import com.duckduckgo.subscriptions.impl.services.SubscriptionResponse
 import com.duckduckgo.subscriptions.impl.services.SubscriptionsService
@@ -55,7 +59,8 @@ class RealSubscriptionsManagerTest {
 
     private val authService: AuthService = mock()
     private val subscriptionsService: SubscriptionsService = mock()
-    private val authDataStore: AuthDataStore = FakeDataStore()
+    private val authDataStore: AuthDataStore = FakeAuthDataStore()
+    private val authRepository = RealAuthRepository(authDataStore)
     private val emailManager: EmailManager = mock()
     private val billingClient: BillingClientWrapper = mock()
     private val billingBuilder: BillingFlowParams.Builder = mock()
@@ -71,7 +76,7 @@ class RealSubscriptionsManagerTest {
         subscriptionsManager = RealSubscriptionsManager(
             authService,
             subscriptionsService,
-            authDataStore,
+            authRepository,
             billingClient,
             emailManager,
             context,
@@ -156,6 +161,7 @@ class RealSubscriptionsManagerTest {
         givenUserIsNotAuthenticated()
         givenPurchaseStored()
         givenPurchaseStoredIsValid()
+        givenValidateTokenSucceedsNoEntitlements()
         givenAuthenticateSucceeds()
 
         subscriptionsManager.recoverSubscriptionFromStore()
@@ -329,6 +335,7 @@ class RealSubscriptionsManagerTest {
     fun whenPurchaseFlowIfAccountCreatedThenSignInUserAndSetToken() = runTest {
         givenUserIsNotAuthenticated()
         givenCreateAccountSucceeds()
+        givenValidateTokenSucceedsNoEntitlements()
         givenAuthenticateSucceeds()
 
         subscriptionsManager.purchase(mock(), mock(), "", false)
@@ -345,6 +352,7 @@ class RealSubscriptionsManagerTest {
         givenUserIsNotAuthenticated()
         givenPurchaseStored()
         givenPurchaseStoredIsValid()
+        givenValidateTokenSucceedsNoEntitlements()
         givenAuthenticateSucceeds()
 
         subscriptionsManager.purchase(mock(), mock(), "", false)
@@ -399,7 +407,7 @@ class RealSubscriptionsManagerTest {
         val manager = RealSubscriptionsManager(
             authService,
             subscriptionsService,
-            authDataStore,
+            authRepository,
             billingClient,
             emailManager,
             context,
@@ -421,7 +429,7 @@ class RealSubscriptionsManagerTest {
         val manager = RealSubscriptionsManager(
             authService,
             subscriptionsService,
-            authDataStore,
+            authRepository,
             billingClient,
             emailManager,
             context,
@@ -443,7 +451,7 @@ class RealSubscriptionsManagerTest {
         val manager = RealSubscriptionsManager(
             authService,
             subscriptionsService,
-            authDataStore,
+            authRepository,
             billingClient,
             emailManager,
             context,
@@ -464,7 +472,7 @@ class RealSubscriptionsManagerTest {
         val manager = RealSubscriptionsManager(
             authService,
             subscriptionsService,
-            authDataStore,
+            authRepository,
             billingClient,
             emailManager,
             context,
@@ -485,7 +493,7 @@ class RealSubscriptionsManagerTest {
         val manager = RealSubscriptionsManager(
             authService,
             subscriptionsService,
-            authDataStore,
+            authRepository,
             billingClient,
             emailManager,
             context,
@@ -510,7 +518,7 @@ class RealSubscriptionsManagerTest {
         val manager = RealSubscriptionsManager(
             authService,
             subscriptionsService,
-            authDataStore,
+            authRepository,
             billingClient,
             emailManager,
             context,
@@ -537,7 +545,7 @@ class RealSubscriptionsManagerTest {
         val manager = RealSubscriptionsManager(
             authService,
             subscriptionsService,
-            authDataStore,
+            authRepository,
             billingClient,
             emailManager,
             context,
@@ -697,6 +705,102 @@ class RealSubscriptionsManagerTest {
         assertTrue((subscriptionsManager.getSubscription() as Subscription.Success).status is Unknown)
     }
 
+    @Test
+    fun whenGetSubscriptionThenStorePlatformValue() = runTest {
+        givenUserIsAuthenticated()
+        givenSubscriptionSucceeds("Auto-Renewable")
+
+        assertNull(authDataStore.platform)
+        subscriptionsManager.getSubscription()
+        assertEquals("android", authDataStore.platform)
+    }
+
+    @Test
+    fun whenGetPortalAndUserAuthenticatedReturnUrl() = runTest {
+        givenUserIsAuthenticated()
+        givenUrlPortalSucceeds()
+
+        assertEquals("example.com", subscriptionsManager.getPortalUrl())
+    }
+
+    @Test
+    fun whenGetPortalAndUserIsNotAuthenticatedReturnNull() = runTest {
+        givenUserIsNotAuthenticated()
+
+        assertNull(subscriptionsManager.getPortalUrl())
+    }
+
+    @Test
+    fun whenGetPortalFailsReturnNull() = runTest {
+        givenUserIsAuthenticated()
+        givenUrlPortalFails()
+
+        assertNull(subscriptionsManager.getPortalUrl())
+    }
+
+    @Test
+    fun whenSignOutThenCallRepositorySignOut() = runTest {
+        val mockRepo: AuthRepository = mock()
+        val manager = RealSubscriptionsManager(
+            authService,
+            subscriptionsService,
+            mockRepo,
+            billingClient,
+            emailManager,
+            context,
+            TestScope(),
+            coroutineRule.testDispatcherProvider,
+        )
+        manager.signOut()
+        verify(mockRepo).signOut()
+    }
+
+    @Test
+    fun whenSignOutEmitFalseForIsSignedIn() = runTest {
+        givenAuthenticateSucceeds()
+        givenValidateTokenSucceedsWithEntitlements()
+
+        subscriptionsManager.authenticate("authToken")
+        subscriptionsManager.isSignedIn.test {
+            assertTrue(awaitItem())
+            subscriptionsManager.signOut()
+            assertFalse(awaitItem())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSignOutEmitFalseForHasSubscription() = runTest {
+        givenUserIsAuthenticated()
+        givenValidateTokenSucceedsWithEntitlements()
+        val manager = RealSubscriptionsManager(
+            authService,
+            subscriptionsService,
+            authRepository,
+            billingClient,
+            emailManager,
+            context,
+            TestScope(),
+            coroutineRule.testDispatcherProvider,
+        )
+
+        manager.hasSubscription.test {
+            assertTrue(awaitItem())
+            manager.signOut()
+            assertFalse(awaitItem())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    private suspend fun givenUrlPortalSucceeds() {
+        whenever(subscriptionsService.portal(any())).thenReturn(PortalResponse("example.com"))
+    }
+
+    private suspend fun givenUrlPortalFails() {
+        val exception = "failure".toResponseBody("text/json".toMediaTypeOrNull())
+        whenever(subscriptionsService.portal(any())).thenThrow(HttpException(Response.error<String>(400, exception)))
+    }
+
     private suspend fun givenSubscriptionFails() {
         val exception = "failure".toResponseBody("text/json".toMediaTypeOrNull())
         whenever(subscriptionsService.subscription(any())).thenThrow(HttpException(Response.error<String>(400, exception)))
@@ -708,7 +812,7 @@ class RealSubscriptionsManagerTest {
                 productId = MONTHLY_PLAN,
                 startedAt = 1234,
                 expiresOrRenewsAt = 1234,
-                platform = "google",
+                platform = "android",
                 status = status,
             ),
         )
@@ -836,12 +940,5 @@ class RealSubscriptionsManagerTest {
     private suspend fun givenAuthenticateFails() {
         val exception = "account_failure".toResponseBody("text/json".toMediaTypeOrNull())
         whenever(authService.accessToken(any())).thenThrow(HttpException(Response.error<String>(400, exception)))
-    }
-
-    internal class FakeDataStore : AuthDataStore {
-
-        override var accessToken: String? = null
-        override var authToken: String? = null
-        override fun canUseEncryption(): Boolean = true
     }
 }

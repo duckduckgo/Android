@@ -18,6 +18,7 @@ package com.duckduckgo.mobile.android.vpn.service.notification
 
 import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.content.res.Resources
 import android.text.SpannableStringBuilder
 import androidx.core.app.TaskStackBuilder
@@ -54,13 +55,18 @@ class AppTpEnabledNotificationContentPlugin @Inject constructor(
 ) : VpnEnabledNotificationContentPlugin {
 
     private val notificationPendingIntent by lazy { appTpEnabledNotificationIntentProvider.getOnPressNotificationIntent() }
+    private val deletePendingIntent by lazy { appTpEnabledNotificationIntentProvider.getDeleteNotificationIntent() }
+
+    override val uuid: String = "1e2a9c9f-2ccd-425a-b454-4ea30d62c0cc"
 
     override fun getInitialContent(): VpnEnabledNotificationContent? {
         return if (isActive()) {
             return VpnEnabledNotificationContent(
-                title = SpannableStringBuilder(resources.getString(R.string.atp_OnInitialNotification)),
+                title = context.getString(R.string.atp_name),
+                text = SpannableStringBuilder(resources.getString(R.string.atp_OnInitialNotification)),
                 onNotificationPressIntent = notificationPendingIntent,
                 notificationActions = NotificationActions.VPNFeatureActions(emptyList()),
+                deleteIntent = deletePendingIntent,
             )
         } else {
             null
@@ -84,13 +90,15 @@ class AppTpEnabledNotificationContentPlugin @Inject constructor(
                     resources.getQuantityString(R.plurals.atp_OnNotification, trackingApps.size, trackingApps.size)
                 }
                 VpnEnabledNotificationContent(
-                    title = SpannableStringBuilder(HtmlCompat.fromHtml(notificationText, HtmlCompat.FROM_HTML_MODE_LEGACY)),
+                    title = context.getString(R.string.atp_name),
+                    text = SpannableStringBuilder(HtmlCompat.fromHtml(notificationText, HtmlCompat.FROM_HTML_MODE_LEGACY)),
                     notificationActions = NotificationActions.VPNFeatureActions(
                         listOf(
                             NotificationActionReportIssue.mangeRecentAppsNotificationAction(context),
                         ),
                     ),
                     onNotificationPressIntent = if (isEnabled) notificationPendingIntent else null,
+                    deleteIntent = deletePendingIntent,
                 )
             }
     }
@@ -104,8 +112,10 @@ class AppTpEnabledNotificationContentPlugin @Inject constructor(
     }
 
     // This fun interface is provided just for testing purposes
-    fun interface IntentProvider {
+    interface IntentProvider {
         fun getOnPressNotificationIntent(): PendingIntent?
+
+        fun getDeleteNotificationIntent(): PendingIntent?
     }
 }
 
@@ -121,5 +131,16 @@ class AppTpEnabledNotificationIntentProvider @Inject constructor(
             addNextIntentWithParentStack(privacyReportIntent)
             getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         }
+    }
+
+    override fun getDeleteNotificationIntent(): PendingIntent? {
+        return PendingIntent.getBroadcast(
+            context,
+            0,
+            Intent(context, PersistentNotificationDismissedReceiver::class.java).apply {
+                action = PersistentNotificationDismissedReceiver.ACTION_VPN_PERSISTENT_NOTIF_DISMISSED
+            },
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
     }
 }

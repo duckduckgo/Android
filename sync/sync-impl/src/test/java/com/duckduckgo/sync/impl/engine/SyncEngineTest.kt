@@ -40,6 +40,8 @@ import com.duckduckgo.sync.store.model.SyncAttempt
 import com.duckduckgo.sync.store.model.SyncAttemptState.FAIL
 import com.duckduckgo.sync.store.model.SyncAttemptState.IN_PROGRESS
 import com.duckduckgo.sync.store.model.SyncAttemptState.SUCCESS
+import com.duckduckgo.sync.store.model.SyncOperationErrorType.ORPHANS_PRESENT
+import com.duckduckgo.sync.store.model.SyncOperationErrorType.TIMESTAMP_CONFLICT
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
@@ -482,6 +484,7 @@ internal class SyncEngineTest {
         syncEngine.triggerSync(APP_OPEN)
 
         verify(syncApiClient).patch(any())
+        verify(syncPixels).fireDailySuccessRatePixel()
         verify(syncPixels).fireDailyPixel()
         verify(syncStateRepository).updateSyncState(SUCCESS)
     }
@@ -494,8 +497,23 @@ internal class SyncEngineTest {
         syncEngine.triggerSync(APP_OPEN)
 
         verify(syncApiClient).patch(any())
+        verify(syncPixels).fireDailySuccessRatePixel()
         verify(syncPixels).fireDailyPixel()
-        verify(syncPixels).fireTimestampConflictPixel(any())
+        verify(syncOperationErrorRecorder).record(BOOKMARKS.field, TIMESTAMP_CONFLICT)
+        verify(syncStateRepository).updateSyncState(SUCCESS)
+    }
+
+    @Test
+    fun whenSyncTriggeredWithChangesAndPatchRemoteSucceedsWithOrphansThenStateIsUpdatedAndPixelIsFired() {
+        givenLocalChangesWithOrphansPresent()
+        givenPatchSuccess()
+
+        syncEngine.triggerSync(APP_OPEN)
+
+        verify(syncApiClient).patch(any())
+        verify(syncPixels).fireDailySuccessRatePixel()
+        verify(syncPixels).fireDailyPixel()
+        verify(syncOperationErrorRecorder).record(BOOKMARKS.field, ORPHANS_PRESENT)
         verify(syncStateRepository).updateSyncState(SUCCESS)
     }
 
@@ -522,6 +540,16 @@ internal class SyncEngineTest {
         val fakeProviderPlugin = FakeSyncableDataProvider(fakeChanges = localChanges)
         whenever(persisterPlugins.getPlugins()).thenReturn(listOf(FakeSyncableDataPersister(timestampConflict = true)))
             .thenReturn(listOf(FakeSyncableDataPersister(timestampConflict = true)))
+        whenever(providerPlugins.getPlugins()).thenReturn(listOf(fakeProviderPlugin))
+            .thenReturn(listOf(FakeSyncableDataProvider(fakeChanges = SyncChangesRequest.empty())))
+    }
+
+    private fun givenLocalChangesWithOrphansPresent() {
+        val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "data_sync_sent_bookmarks.json")
+        val localChanges = SyncChangesRequest(BOOKMARKS, updatesJSON, ModifiedSince.Timestamp("2021-01-01T00:00:00.000Z"))
+        val fakeProviderPlugin = FakeSyncableDataProvider(fakeChanges = localChanges)
+        whenever(persisterPlugins.getPlugins()).thenReturn(listOf(FakeSyncableDataPersister(orphans = true)))
+            .thenReturn(listOf(FakeSyncableDataPersister(orphans = true)))
         whenever(providerPlugins.getPlugins()).thenReturn(listOf(fakeProviderPlugin))
             .thenReturn(listOf(FakeSyncableDataProvider(fakeChanges = SyncChangesRequest.empty())))
     }

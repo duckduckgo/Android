@@ -1,9 +1,9 @@
 package com.duckduckgo.autofill.impl.sharedcreds
 
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
-import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.encoding.TestUrlUnicodeNormalizer
 import com.duckduckgo.autofill.impl.sharedcreds.SharedCredentialsParser.SharedCredentialConfig
+import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillDomainNameUrlMatcher
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillUrlMatcher.ExtractedUrlParts
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -24,7 +24,7 @@ class AppleShareableCredentialsTest {
 
     private val jsonParser: SharedCredentialsParser = mock()
     private val shareableCredentialsUrlGenerator: ShareableCredentialsUrlGenerator = mock()
-    private val autofillStore: AutofillStore = mock()
+    private val autofillStore: InternalAutofillStore = mock()
     private val autofillUrlMatcher = AutofillDomainNameUrlMatcher(TestUrlUnicodeNormalizer())
 
     private val testee = AppleShareableCredentials(

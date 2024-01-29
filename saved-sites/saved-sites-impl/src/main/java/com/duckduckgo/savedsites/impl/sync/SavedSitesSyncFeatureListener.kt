@@ -18,6 +18,7 @@ package com.duckduckgo.savedsites.impl.sync
 
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
+import com.duckduckgo.common.utils.notification.checkPermissionAndNotify
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.engine.FeatureSyncError
 import com.duckduckgo.sync.api.engine.FeatureSyncError.COLLECTION_LIMIT_REACHED
@@ -65,7 +66,8 @@ class AppSavedSitesSyncFeatureListener @Inject constructor(
     }
 
     private fun triggerNotification() {
-        notificationManager.notify(
+        notificationManager.checkPermissionAndNotify(
+            context,
             SYNC_PAUSED_SAVED_SITES_NOTIFICATION_ID,
             notificationBuilder.buildRateLimitNotification(context),
         )

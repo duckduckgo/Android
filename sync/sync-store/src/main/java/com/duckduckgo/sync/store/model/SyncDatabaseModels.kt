@@ -78,4 +78,6 @@ enum class SyncOperationErrorType {
     DATA_PERSISTER_ERROR,
     DATA_ENCRYPT,
     DATA_DECRYPT,
+    TIMESTAMP_CONFLICT,
+    ORPHANS_PRESENT,
 }

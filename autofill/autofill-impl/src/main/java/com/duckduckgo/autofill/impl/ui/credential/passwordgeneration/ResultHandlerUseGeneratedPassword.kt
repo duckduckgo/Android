@@ -23,10 +23,11 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autofill.api.AutofillEventListener
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector
+import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult
 import com.duckduckgo.autofill.api.UseGeneratedPasswordDialog
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
-import com.duckduckgo.autofill.api.store.AutofillStore
+import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -39,7 +40,7 @@ import timber.log.Timber
 @ContributesMultibinding(AppScope::class)
 class ResultHandlerUseGeneratedPassword @Inject constructor(
     private val dispatchers: DispatcherProvider,
-    private val autofillStore: AutofillStore,
+    private val autofillStore: InternalAutofillStore,
     private val autoSavedLoginsMonitor: AutomaticSavedLoginsMonitor,
     private val existingCredentialMatchDetector: ExistingCredentialMatchDetector,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
@@ -99,14 +100,14 @@ class ResultHandlerUseGeneratedPassword @Inject constructor(
     }
 
     private suspend fun saveLoginIfNotAlreadySaved(
-        matchType: AutofillStore.ContainsCredentialsResult,
+        matchType: ContainsCredentialsResult,
         originalUrl: String,
         username: String?,
         password: String,
         tabId: String,
     ) {
         when (matchType) {
-            AutofillStore.ContainsCredentialsResult.ExactMatch -> Timber.v("Already got an exact match; nothing to do here")
+            ContainsCredentialsResult.ExactMatch -> Timber.v("Already got an exact match; nothing to do here")
             else -> {
                 autofillStore.saveCredentials(
                     originalUrl,

@@ -27,7 +27,6 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
-import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.deduper.AutofillLoginDeduplicator
 import com.duckduckgo.autofill.impl.domain.javascript.JavascriptCredentials
 import com.duckduckgo.autofill.impl.email.incontext.availability.EmailProtectionInContextRecentInstallChecker
@@ -44,6 +43,7 @@ import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillTriggerTyp
 import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillTriggerType.USER_INITIATED
 import com.duckduckgo.autofill.impl.jsbridge.response.AutofillResponseWriter
 import com.duckduckgo.autofill.impl.sharedcreds.ShareableCredentials
+import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
 import com.duckduckgo.autofill.impl.systemautofill.SystemAutofillServiceSuppressor
 import com.duckduckgo.autofill.impl.ui.credential.passwordgeneration.Actions
@@ -99,7 +99,7 @@ interface AutofillJavascriptInterface {
 @ContributesBinding(AppScope::class)
 class AutofillStoredBackJavascriptInterface @Inject constructor(
     private val requestParser: AutofillRequestParser,
-    private val autofillStore: AutofillStore,
+    private val autofillStore: InternalAutofillStore,
     private val shareableCredentials: ShareableCredentials,
     private val autofillMessagePoster: AutofillMessagePoster,
     private val autofillResponseWriter: AutofillResponseWriter,
@@ -223,12 +223,23 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
         val dedupedCredentials = loginDeduplicator.deduplicate(url, credentials)
         Timber.v("Original autofill credentials list size: %d, after de-duping: %d", credentials.size, dedupedCredentials.size)
 
-        if (dedupedCredentials.isEmpty()) {
+        val finalCredentialList = ensureUsernamesNotNull(dedupedCredentials)
+
+        if (finalCredentialList.isEmpty()) {
             callback?.noCredentialsAvailable(url)
         } else {
-            callback?.onCredentialsAvailableToInject(url, dedupedCredentials, triggerType)
+            callback?.onCredentialsAvailableToInject(url, finalCredentialList, triggerType)
         }
     }
+
+    private fun ensureUsernamesNotNull(credentials: List<LoginCredentials>) =
+        credentials.map {
+            if (it.username == null) {
+                it.copy(username = "")
+            } else {
+                it
+            }
+        }
 
     private fun convertTriggerType(trigger: SupportedAutofillTriggerType): LoginTriggerType {
         return when (trigger) {

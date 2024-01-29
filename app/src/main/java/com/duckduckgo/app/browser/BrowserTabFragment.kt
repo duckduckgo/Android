@@ -203,13 +203,17 @@ import com.duckduckgo.autofill.api.EmailProtectionInContextSignUpScreenNoParams
 import com.duckduckgo.autofill.api.EmailProtectionInContextSignUpScreenResult
 import com.duckduckgo.autofill.api.EmailProtectionUserPromptListener
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector
+import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.ExactMatch
+import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.NoMatch
+import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.UrlOnlyMatch
+import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.UsernameMatch
+import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.UsernameMissing
 import com.duckduckgo.autofill.api.UseGeneratedPasswordDialog
 import com.duckduckgo.autofill.api.credential.saving.DuckAddressLoginCreator
 import com.duckduckgo.autofill.api.dialog.AutofillOverlappingDialogDetector
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.api.emailprotection.EmailInjector
-import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult.*
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.store.BrowserAppTheme
@@ -249,6 +253,9 @@ import com.duckduckgo.js.messaging.api.JsMessageHelper
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopup
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupFactory
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupViewState
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
@@ -270,6 +277,8 @@ import javax.inject.Provider
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.cancellable
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import org.json.JSONObject
 import timber.log.Timber
 
@@ -439,6 +448,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var autofillOverlappingDialogDetector: AutofillOverlappingDialogDetector
+
+    @Inject
+    lateinit var privacyProtectionsPopupFactory: PrivacyProtectionsPopupFactory
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -728,6 +740,8 @@ class BrowserTabFragment :
     // see discussion in https://github.com/duckduckgo/Android/pull/4027#discussion_r1433373625
     private val jsOrientationHandler = JsOrientationHandler()
 
+    private lateinit var privacyProtectionsPopup: PrivacyProtectionsPopup
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         removeDaxDialogFromActivity()
@@ -785,6 +799,7 @@ class BrowserTabFragment :
         configureAutoComplete()
         configureOmnibarQuickAccessGrid()
         configureHomeTabQuickAccessGrid()
+        initPrivacyProtectionsPopup()
 
         decorator.decorateWithFeatures()
 
@@ -814,6 +829,15 @@ class BrowserTabFragment :
             (dialog as EditSavedSiteDialogFragment).listener = viewModel
             dialog.deleteBookmarkListener = viewModel
         }
+    }
+
+    private fun initPrivacyProtectionsPopup() {
+        privacyProtectionsPopup = privacyProtectionsPopupFactory.createPopup(
+            anchor = omnibar.shieldIcon,
+        )
+        privacyProtectionsPopup.events
+            .onEach(viewModel::onPrivacyProtectionsPopupUiEvent)
+            .launchIn(lifecycleScope)
     }
 
     private fun getDaxDialogFromActivity(): Fragment? = activity?.supportFragmentManager?.findFragmentByTag(DAX_DIALOG_DIALOG_TAG)
@@ -1089,11 +1113,11 @@ class BrowserTabFragment :
     }
 
     private fun onRefreshRequested() {
-        viewModel.onRefreshRequested()
+        viewModel.onRefreshRequested(triggeredByUser = true)
     }
 
     override fun onAutofillStateChange() {
-        viewModel.onRefreshRequested()
+        viewModel.onRefreshRequested(triggeredByUser = false)
     }
 
     override fun onRejectGeneratedPassword(originalUrl: String) {
@@ -2720,6 +2744,7 @@ class BrowserTabFragment :
         configureQuickAccessGridLayout(quickAccessItems.quickAccessRecyclerView)
         configureQuickAccessGridLayout(binding.quickAccessSuggestionsRecyclerView)
         decorator.recreatePopupMenu()
+        privacyProtectionsPopup.onConfigurationChanged()
         viewModel.onConfigurationChanged()
     }
 
@@ -3174,7 +3199,7 @@ class BrowserTabFragment :
                     viewModel.onUserLongPressedBack()
                 }
                 onMenuItemClicked(menuBinding.refreshMenuItem) {
-                    viewModel.onRefreshRequested()
+                    viewModel.onRefreshRequested(triggeredByUser = true)
                     pixel.fire(AppPixelName.MENU_ACTION_REFRESH_PRESSED.pixelName)
                 }
                 onMenuItemClicked(menuBinding.newTabMenuItem) {
@@ -3397,7 +3422,9 @@ class BrowserTabFragment :
                 if (isHidden) {
                     return@launch
                 }
-                if (lastSeenOmnibarViewState?.isEditing != true) {
+                val privacyProtectionsPopupVisible = lastSeenBrowserViewState
+                    ?.privacyProtectionsPopupViewState is PrivacyProtectionsPopupViewState.Visible
+                if (lastSeenOmnibarViewState?.isEditing != true && !privacyProtectionsPopupVisible) {
                     val site = viewModel.siteLiveData.value
                     val events = site?.orderedTrackerBlockedEntities()
                     activity?.let { activity ->
@@ -3472,6 +3499,7 @@ class BrowserTabFragment :
                 renderFullscreenMode(viewState)
                 renderVoiceSearch(viewState)
                 omnibar.spacer.isVisible = viewState.showVoiceSearch && lastSeenBrowserViewState?.showClearButton ?: false
+                privacyProtectionsPopup.setViewState(viewState.privacyProtectionsPopupViewState)
 
                 bookmarksBottomSheetDialog?.dialog?.toggleSwitch(viewState.favorite != null)
                 val bookmark = viewModel.browserViewState.value?.bookmark?.copy(isFavorite = viewState.favorite != null)

@@ -35,9 +35,11 @@ import com.duckduckgo.subscriptions.impl.SubscriptionStatus.AutoRenewable
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionSettingsBinding
 import com.duckduckgo.subscriptions.impl.ui.AddDeviceActivity.Companion.AddDeviceScreenWithEmptyParams
+import com.duckduckgo.subscriptions.impl.ui.ChangePlanActivity.Companion.ChangePlanScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsActivity.Companion.SubscriptionsSettingsScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.FinishSignOut
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPortal
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.ViewState
 import javax.inject.Inject
@@ -98,13 +100,6 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
                 .show()
         }
 
-        binding.changePlan.setClickListener {
-            val url = String.format(URL, BASIC_SUBSCRIPTION, applicationContext.packageName)
-            val intent = Intent(Intent.ACTION_VIEW)
-            intent.setData(Uri.parse(url))
-            startActivity(intent)
-        }
-
         binding.faq.setClickListener {
             Toast.makeText(this, "This will take you to FAQs", Toast.LENGTH_SHORT).show()
         }
@@ -116,18 +111,32 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun renderView(viewState: ViewState) {
-        val duration = if (viewState.duration is Monthly) {
-            getString(string.monthly)
-        } else {
-            getString(string.yearly)
-        }
-
+        val duration = if (viewState.duration is Monthly) { getString(string.monthly) } else { getString(string.yearly) }
         val status = when (viewState.status) {
             is AutoRenewable -> getString(string.renews)
             else -> getString(string.expires)
         }
-
         binding.description.text = getString(string.subscriptionsData, duration, status, viewState.date)
+
+        when (viewState.platform?.lowercase()) {
+            "apple", "ios" ->
+                binding.changePlan.setClickListener {
+                    globalActivityStarter.start(this, ChangePlanScreenWithEmptyParams)
+                }
+            "stripe" -> {
+                binding.changePlan.setClickListener {
+                    viewModel.goToStripe()
+                }
+            }
+            else -> {
+                binding.changePlan.setClickListener {
+                    val url = String.format(URL, BASIC_SUBSCRIPTION, applicationContext.packageName)
+                    val intent = Intent(Intent.ACTION_VIEW)
+                    intent.setData(Uri.parse(url))
+                    startActivity(intent)
+                }
+            }
+        }
     }
 
     private fun processCommand(command: Command) {
@@ -136,10 +145,13 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
                 Toast.makeText(this, string.subscriptionRemoved, Toast.LENGTH_SHORT).show()
                 finish()
             }
+            is GoToPortal -> {
+                globalActivityStarter.start(this, SubscriptionsWebViewActivityWithParams(url = command.url, getString(string.changePlanTitle)))
+            }
         }
     }
     companion object {
         const val URL = "https://play.google.com/store/account/subscriptions?sku=%s&package=%s"
-        object SubscriptionsSettingsScreenWithEmptyParams : GlobalActivityStarter.ActivityParams
+        data object SubscriptionsSettingsScreenWithEmptyParams : GlobalActivityStarter.ActivityParams
     }
 }

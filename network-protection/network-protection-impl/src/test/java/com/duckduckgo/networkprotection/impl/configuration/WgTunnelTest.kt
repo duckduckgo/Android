@@ -3,9 +3,11 @@ package com.duckduckgo.networkprotection.impl.configuration
 import android.os.Build.VERSION
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.mobile.android.vpn.prefs.FakeVpnSharedPreferencesProvider
-import com.duckduckgo.networkprotection.impl.store.RealNetworkProtectionRepository
-import com.duckduckgo.networkprotection.store.RealNetworkProtectionPrefs
-import com.wireguard.config.InetAddresses
+import com.duckduckgo.networkprotection.impl.config.NetPDefaultConfigProvider
+import com.wireguard.config.Config
+import com.wireguard.crypto.KeyPair
+import java.io.BufferedReader
+import java.io.StringReader
 import java.lang.reflect.Field
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -20,6 +22,8 @@ import org.mockito.kotlin.*
 class WgTunnelTest {
 
     private val wgServerApi: WgServerApi = mock()
+    private val netPDefaultConfigProvider: NetPDefaultConfigProvider = object : NetPDefaultConfigProvider {}
+    private val keys = KeyPair()
     private val serverData = WgServerApi.WgServerData(
         serverName = "name",
         publicKey = "public key",
@@ -28,36 +32,40 @@ class WgTunnelTest {
         location = "Furadouro",
         gateway = "10.1.1.1",
     )
+
+    private val wgQuickConfig = """
+        [Interface]
+        Address = ${serverData.address}
+        DNS = ${serverData.gateway}
+        MTU = 1280
+        PrivateKey = ${keys.privateKey.toBase64()}
+        
+        [Peer]
+        AllowedIPs = 0.0.0.0/0, ::/0
+        Endpoint = ${serverData.publicEndpoint}
+        Name = ${serverData.serverName}
+        Location = ${serverData.location}
+        PublicKey = ${keys.publicKey.toBase64()}
+    """.trimIndent()
+
     private lateinit var wgTunnel: WgTunnel
 
     @Before
     fun setup() {
-        val networkProtectionPrefs = RealNetworkProtectionPrefs(FakeVpnSharedPreferencesProvider())
-        val networkProtectionRepository = RealNetworkProtectionRepository(networkProtectionPrefs)
-        val deviceKeys = RealDeviceKeys(networkProtectionRepository, WgKeyPairGenerator())
         setFinalStatic(VERSION::class.java.getField("SDK_INT"), 29)
 
         runBlocking {
-            whenever(wgServerApi.registerPublicKey(eq(deviceKeys.publicKey)))
-                .thenReturn(serverData.copy(publicKey = deviceKeys.publicKey))
+            whenever(wgServerApi.registerPublicKey(eq(keys.publicKey.toBase64())))
+                .thenReturn(serverData.copy(publicKey = keys.publicKey.toBase64()))
         }
 
-        wgTunnel = RealWgTunnel(deviceKeys, wgServerApi)
+        wgTunnel = RealWgTunnel(wgServerApi, netPDefaultConfigProvider, WgTunnelStore(FakeVpnSharedPreferencesProvider()))
     }
 
     @Test
     fun establishThenReturnWgTunnelData() = runTest {
-        val actual = wgTunnel.establish().getOrThrow().copy(userSpaceConfig = "")
-        val expected = WgTunnel.WgTunnelData(
-            serverName = serverData.serverName,
-            userSpaceConfig = "",
-            serverLocation = serverData.location,
-            serverIP = serverData.publicEndpoint.substringBefore(":"),
-            gateway = serverData.gateway,
-            tunnelAddress = mapOf(
-                InetAddresses.parse(serverData.address.substringBefore("/")) to serverData.address.substringAfter("/").toInt(),
-            ),
-        )
+        val actual = wgTunnel.createWgConfig(keys).getOrThrow()
+        val expected = Config.parse(BufferedReader(StringReader(wgQuickConfig)))
 
         assertEquals(expected, actual)
     }
@@ -66,7 +74,14 @@ class WgTunnelTest {
     fun establishErrorThenLogError() = runTest {
         whenever(wgServerApi.registerPublicKey(any())).thenReturn(serverData)
 
-        assertNull(wgTunnel.establish().getOrNull())
+        assertNull(wgTunnel.createWgConfig(keys).getOrNull())
+    }
+
+    @Test
+    fun withNoKeysEstablishErrorThenLogError() = runTest {
+        whenever(wgServerApi.registerPublicKey(any())).thenReturn(serverData)
+
+        assertNull(wgTunnel.createWgConfig().getOrNull())
     }
 
     @Throws(Exception::class)

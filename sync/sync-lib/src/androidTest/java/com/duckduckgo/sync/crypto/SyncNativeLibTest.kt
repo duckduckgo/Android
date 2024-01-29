@@ -121,7 +121,7 @@ class SyncNativeLibTest {
     fun whenPrepareForConnectThenResultSuccess() {
         val syncNativeLib = SyncNativeLib(InstrumentationRegistry.getInstrumentation().targetContext)
         val prepareForConnect = syncNativeLib.prepareForConnect()
-        assertEquals(0L, prepareForConnect.result)
+        assertEquals(0, prepareForConnect.result)
     }
 
     @Test

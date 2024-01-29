@@ -86,7 +86,6 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome) 
         super.onViewCreated(view, savedInstanceState)
 
         configureDaxCta()
-        requestNotificationsPermissions()
         setSkipAnimationListener()
 
         lifecycleScope.launch {
@@ -95,12 +94,13 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome) 
                 .flowOn(dispatcherProvider.io())
                 .collect(::render)
         }
+
+        requestNotificationsPermissions()
     }
 
-    @SuppressLint("InlinedApi")
     private fun requestNotificationsPermissions() {
         if (appBuildConfig.sdkInt >= android.os.Build.VERSION_CODES.TIRAMISU) {
-            requestPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+            event(WelcomePageView.Event.OnNotificationPermissionsRequested)
         } else {
             scheduleWelcomeAnimation()
         }
@@ -115,7 +115,14 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome) 
             WelcomePageView.State.Finish -> {
                 onContinuePressed()
             }
+            WelcomePageView.State.ShowWelcomeAnimation -> scheduleWelcomeAnimation()
+            WelcomePageView.State.ShowNotificationsPermissionsPrompt -> showNotificationsPermissionsPrompt()
         }
+    }
+
+    @SuppressLint("InlinedApi")
+    private fun showNotificationsPermissionsPrompt() {
+        requestPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
     }
 
     private fun event(event: WelcomePageView.Event) {

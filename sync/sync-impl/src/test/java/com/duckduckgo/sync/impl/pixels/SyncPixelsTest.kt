@@ -58,29 +58,29 @@ class SyncPixelsTest {
     fun whenDailyPixelCalledThenPixelFired() {
         val dailyStats = givenSomeDailyStats()
 
-        testee.fireDailyPixel()
+        testee.fireDailySuccessRatePixel()
 
         val payload = mapOf(
             SyncPixelParameters.COUNT to dailyStats.attempts,
             SyncPixelParameters.DATE to dailyStats.date,
         ).plus(dailyStats.apiErrorStats)
 
-        verify(pixel).fire(SyncPixelName.SYNC_DAILY_PIXEL, payload)
+        verify(pixel).fire(SyncPixelName.SYNC_DAILY_SUCCESS_RATE_PIXEL, payload)
     }
 
     @Test
     fun whenDailyPixelCalledTwiceThenPixelFiredOnce() {
         val dailyStats = givenSomeDailyStats()
 
-        testee.fireDailyPixel()
-        testee.fireDailyPixel()
+        testee.fireDailySuccessRatePixel()
+        testee.fireDailySuccessRatePixel()
 
         val payload = mapOf(
             SyncPixelParameters.COUNT to dailyStats.attempts,
             SyncPixelParameters.DATE to dailyStats.date,
         ).plus(dailyStats.apiErrorStats).plus(dailyStats.operationErrorStats)
 
-        verify(pixel, times(1)).fire(SyncPixelName.SYNC_DAILY_PIXEL, payload)
+        verify(pixel, times(1)).fire(SyncPixelName.SYNC_DAILY_SUCCESS_RATE_PIXEL, payload)
     }
 
     @Test

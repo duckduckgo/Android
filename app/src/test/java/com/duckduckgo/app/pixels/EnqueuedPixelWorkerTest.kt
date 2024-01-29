@@ -24,12 +24,18 @@ import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browser.api.WebViewVersionProvider
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.*
 
 class EnqueuedPixelWorkerTest {
+    @get:Rule
+    var coroutineRule = CoroutineTestRule()
+
     private val workManager: WorkManager = mock()
     private val pixel: Pixel = mock()
     private val unsentForgetAllPixelStore: UnsentForgetAllPixelStore = mock()
@@ -37,6 +43,7 @@ class EnqueuedPixelWorkerTest {
     private val webViewVersionProvider: WebViewVersionProvider = mock()
     private val defaultBrowserDetector: DefaultBrowserDetector = mock()
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature = mock()
+    private val privacyProtectionsPopupExperimentExternalPixels = FakePrivacyProtectionsPopupExperimentExternalPixels()
 
     private lateinit var enqueuedPixelWorker: EnqueuedPixelWorker
 
@@ -49,6 +56,8 @@ class EnqueuedPixelWorkerTest {
             webViewVersionProvider,
             defaultBrowserDetector,
             androidBrowserConfigFeature,
+            privacyProtectionsPopupExperimentExternalPixels,
+            coroutineRule.testScope,
         )
         setupRemoteConfig(browserEnabled = false, collectFullWebViewVersionEnabled = false)
     }
@@ -164,6 +173,26 @@ class EnqueuedPixelWorkerTest {
         )
     }
 
+    @Test
+    fun whenSendingAppLaunchPixelThenIncludePrivacyProtectionsPopupExperimentParams() {
+        whenever(unsentForgetAllPixelStore.pendingPixelCountClearData).thenReturn(1)
+        whenever(webViewVersionProvider.getMajorVersion()).thenReturn("91")
+        whenever(defaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
+        privacyProtectionsPopupExperimentExternalPixels.params = mapOf("test_key" to "test_value")
+
+        enqueuedPixelWorker.onCreate(lifecycleOwner)
+        enqueuedPixelWorker.onStart(lifecycleOwner)
+
+        verify(pixel).fire(
+            AppPixelName.APP_LAUNCH,
+            mapOf(
+                Pixel.PixelParameter.WEBVIEW_VERSION to "91",
+                Pixel.PixelParameter.DEFAULT_BROWSER to "false",
+                "test_key" to "test_value",
+            ),
+        )
+    }
+
     private fun setupRemoteConfig(browserEnabled: Boolean, collectFullWebViewVersionEnabled: Boolean) {
         whenever(androidBrowserConfigFeature.self()).thenReturn(
             object : Toggle {
@@ -197,4 +226,18 @@ class EnqueuedPixelWorkerTest {
             },
         )
     }
+}
+
+private class FakePrivacyProtectionsPopupExperimentExternalPixels : PrivacyProtectionsPopupExperimentExternalPixels {
+    var params: Map<String, String> = emptyMap()
+
+    override suspend fun getPixelParams(): Map<String, String> = params
+
+    override fun tryReportPrivacyDashboardOpened() = throw UnsupportedOperationException()
+
+    override fun tryReportProtectionsToggledFromPrivacyDashboard(protectionsEnabled: Boolean) = throw UnsupportedOperationException()
+
+    override fun tryReportProtectionsToggledFromBrowserMenu(protectionsEnabled: Boolean) = throw UnsupportedOperationException()
+
+    override fun tryReportProtectionsToggledFromBrokenSiteReport(protectionsEnabled: Boolean) = throw UnsupportedOperationException()
 }

@@ -30,6 +30,7 @@ import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupDataClearer
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.sync.api.DeviceSyncState
@@ -61,6 +62,7 @@ class ClearPersonalDataActionTest {
     private val mockDeviceSyncState: DeviceSyncState = mock()
     private val mockSavedSitesRepository: SavedSitesRepository = mock()
     private val mockSitePermissionsManager: SitePermissionsManager = mock()
+    private val mockPrivacyProtectionsPopupDataClearer: PrivacyProtectionsPopupDataClearer = mock()
 
     private val fireproofWebsites: LiveData<List<FireproofWebsiteEntity>> = MutableLiveData()
 
@@ -80,6 +82,7 @@ class ClearPersonalDataActionTest {
             fireproofWebsiteRepository = mockFireproofWebsiteRepository,
             deviceSyncState = mockDeviceSyncState,
             savedSitesRepository = mockSavedSitesRepository,
+            privacyProtectionsPopupDataClearer = mockPrivacyProtectionsPopupDataClearer,
             sitePermissionsManager = mockSitePermissionsManager,
         )
         whenever(mockFireproofWebsiteRepository.getFireproofWebsites()).thenReturn(fireproofWebsites)
@@ -145,5 +148,11 @@ class ClearPersonalDataActionTest {
         whenever(mockDeviceSyncState.isUserSignedInOnDevice()).thenReturn(false)
         testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
         verify(mockSavedSitesRepository).pruneDeleted()
+    }
+
+    @Test
+    fun whenClearCalledThenPrivacyProtectionsPopupDataClearerIsInvoked() = runTest {
+        testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
+        verify(mockPrivacyProtectionsPopupDataClearer).clearPersonalData()
     }
 }

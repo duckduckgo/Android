@@ -23,6 +23,12 @@
     <attr name="primaryText" format="string"/>
     <attr name="primaryTextColorOverlay" format="color"/>
     <attr name="primaryTextTruncated" format="boolean"/>
+    <attr name="primaryTextType">
+        <!-- Primary text color -->
+        <enum name="primary" value="0" />
+        <!-- Destructive text color -->
+        <enum name="destructive" value="1" />
+    </attr>
     <attr name="secondaryText" format="string"/>
     <attr name="secondaryTextColorOverlay" format="color"/>
     <attr name="leadingIcon" format="integer"/>

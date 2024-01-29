@@ -51,6 +51,14 @@ interface RequestInterceptor {
     ): WebResourceResponse?
 
     @WorkerThread
+    suspend fun shouldIntercept(
+        request: WebResourceRequest,
+        webView: WebView,
+        documentUri: Uri?,
+        webViewClientListener: WebViewClientListener?,
+    ): WebResourceResponse?
+
+    @WorkerThread
     suspend fun shouldInterceptFromServiceWorker(
         request: WebResourceRequest?,
         documentUrl: String?,
@@ -141,6 +149,71 @@ class WebViewRequestInterceptor(
         return getWebResourceResponse(request, documentUrl, webViewClientListener)
     }
 
+    /**
+     * Notify the application of a resource request and allow the application to return the data.
+     *
+     * If the return value is null, the WebView will continue to load the resource as usual.
+     * Otherwise, the return response and data will be used.
+     *
+     * NOTE: This method is called on a thread other than the UI thread so clients should exercise
+     * caution when accessing private data or the view system.
+     */
+    @WorkerThread
+    override suspend fun shouldIntercept(
+        request: WebResourceRequest,
+        webView: WebView,
+        documentUri: Uri?,
+        webViewClientListener: WebViewClientListener?,
+    ): WebResourceResponse? {
+        val url = request.url
+
+        if (requestFilterer.shouldFilterOutRequest(request, documentUri.toString())) return WebResourceResponse(null, null, null)
+
+        adClickManager.detectAdClick(url?.toString(), request.isForMainFrame)
+
+        newUserAgent(request, webView, webViewClientListener)?.let {
+            withContext(dispatchers.main()) {
+                webView.settings?.userAgentString = it
+                webView.loadUrl(url.toString(), getHeaders(request))
+            }
+            return WebResourceResponse(null, null, null)
+        }
+
+        if (appUrlPixel(url)) return null
+
+        if (shouldUpgrade(request)) {
+            val newUri = httpsUpgrader.upgrade(url)
+
+            withContext(dispatchers.main()) {
+                webView.loadUrl(newUri.toString(), getHeaders(request))
+            }
+
+            webViewClientListener?.upgradedToHttps()
+            privacyProtectionCountDao.incrementUpgradeCount()
+            return WebResourceResponse(null, null, null)
+        }
+
+        if (shouldAddGcpHeaders(request) && !requestWasInTheStack(url, webView)) {
+            withContext(dispatchers.main()) {
+                webViewClientListener?.redirectTriggeredByGpc()
+                webView.loadUrl(url.toString(), getHeaders(request))
+            }
+            return WebResourceResponse(null, null, null)
+        }
+
+        if (documentUri == null) return null
+
+        if (TrustedSites.isTrusted(documentUri)) {
+            return null
+        }
+
+        if (url != null && url.isHttp) {
+            webViewClientListener?.pageHasHttpResources(documentUri)
+        }
+
+        return getWebResourceResponse(request, documentUri, webViewClientListener)
+    }
+
     override suspend fun shouldInterceptFromServiceWorker(
         request: WebResourceRequest?,
         documentUrl: String?,
@@ -157,7 +230,7 @@ class WebViewRequestInterceptor(
 
     private fun getWebResourceResponse(
         request: WebResourceRequest,
-        documentUrl: String?,
+        documentUrl: String,
         webViewClientListener: WebViewClientListener?,
     ): WebResourceResponse? {
         val trackingEvent = trackingEvent(request, documentUrl, webViewClientListener)
@@ -168,6 +241,29 @@ class WebViewRequestInterceptor(
             trackingEvent.status == TrackerStatus.SAME_ENTITY_ALLOWED
         ) {
             cloakedCnameDetector.detectCnameCloakedHost(documentUrl, request.url)?.let { uncloakedHost ->
+                trackingEvent(request, documentUrl, webViewClientListener, false, uncloakedHost)?.let { cloakedTrackingEvent ->
+                    if (cloakedTrackingEvent.status == TrackerStatus.BLOCKED) {
+                        return blockRequest(cloakedTrackingEvent, request, webViewClientListener)
+                    }
+                }
+            }
+        }
+        return null
+    }
+
+    private fun getWebResourceResponse(
+        request: WebResourceRequest,
+        documentUrl: Uri,
+        webViewClientListener: WebViewClientListener?,
+    ): WebResourceResponse? {
+        val trackingEvent = trackingEvent(request, documentUrl, webViewClientListener)
+        if (trackingEvent?.status == TrackerStatus.BLOCKED) {
+            return blockRequest(trackingEvent, request, webViewClientListener)
+        } else if (trackingEvent == null ||
+            trackingEvent.status == TrackerStatus.ALLOWED ||
+            trackingEvent.status == TrackerStatus.SAME_ENTITY_ALLOWED
+        ) {
+            cloakedCnameDetector.detectCnameCloakedHost(documentUrl.toString(), request.url)?.let { uncloakedHost ->
                 trackingEvent(request, documentUrl, webViewClientListener, false, uncloakedHost)?.let { cloakedTrackingEvent ->
                     if (cloakedTrackingEvent.status == TrackerStatus.BLOCKED) {
                         return blockRequest(cloakedTrackingEvent, request, webViewClientListener)
@@ -244,7 +340,39 @@ class WebViewRequestInterceptor(
 
     private fun trackingEvent(
         request: WebResourceRequest,
+        documentUrl: Uri?,
+        webViewClientListener: WebViewClientListener?,
+        checkFirstParty: Boolean = true,
+    ): TrackingEvent? {
+        val url = request.url
+        if (request.isForMainFrame || documentUrl == null) {
+            return null
+        }
+
+        val trackingEvent = trackerDetector.evaluate(url, documentUrl, checkFirstParty, request.requestHeaders) ?: return null
+        webViewClientListener?.trackerDetected(trackingEvent)
+        return trackingEvent
+    }
+
+    private fun trackingEvent(
+        request: WebResourceRequest,
         documentUrl: String?,
+        webViewClientListener: WebViewClientListener?,
+        checkFirstParty: Boolean = true,
+        url: String = request.url.toString(),
+    ): TrackingEvent? {
+        if (request.isForMainFrame || documentUrl == null) {
+            return null
+        }
+
+        val trackingEvent = trackerDetector.evaluate(url, documentUrl, checkFirstParty, request.requestHeaders) ?: return null
+        webViewClientListener?.trackerDetected(trackingEvent)
+        return trackingEvent
+    }
+
+    private fun trackingEvent(
+        request: WebResourceRequest,
+        documentUrl: Uri?,
         webViewClientListener: WebViewClientListener?,
         checkFirstParty: Boolean = true,
         url: String = request.url.toString(),

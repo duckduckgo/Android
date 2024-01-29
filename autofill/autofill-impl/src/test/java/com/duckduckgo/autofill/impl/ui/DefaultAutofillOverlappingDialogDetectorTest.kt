@@ -19,6 +19,7 @@ package com.duckduckgo.autofill.impl.ui
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 import com.duckduckgo.autofill.api.CredentialSavePickerDialog
 import com.duckduckgo.autofill.api.UseGeneratedPasswordDialog
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_OVERLAPPING_DIALOG
@@ -84,7 +85,7 @@ class DefaultAutofillOverlappingDialogDetectorTest {
             "newDialogTag" to newDialogTag,
             "existingDialogTags" to existingTags,
         )
-        verify(pixel).fire(eq(AUTOFILL_OVERLAPPING_DIALOG), eq(expectedMap), any())
+        verify(pixel).fire(eq(AUTOFILL_OVERLAPPING_DIALOG), eq(expectedMap), any(), eq(COUNT))
     }
 
     private fun configureFragmentShowing(tags: List<String>) {

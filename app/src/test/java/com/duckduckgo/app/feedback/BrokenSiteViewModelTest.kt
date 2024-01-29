@@ -29,6 +29,7 @@ import com.duckduckgo.app.brokensite.model.SiteProtectionsState
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.feature.toggles.api.FeatureToggle
@@ -38,8 +39,11 @@ import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsToggleUsageListener
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.*
@@ -52,6 +56,7 @@ import org.mockito.Mockito.never
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -82,6 +87,12 @@ class BrokenSiteViewModelTest {
 
     private val mockUserAllowListRepository: UserAllowListRepository = mock()
 
+    private val mockPrivacyProtectionsToggleUsageListener: PrivacyProtectionsToggleUsageListener = mock()
+
+    private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels = mock {
+        runBlocking { whenever(mock.getPixelParams()).thenReturn(emptyMap()) }
+    }
+
     private lateinit var testee: BrokenSiteViewModel
 
     private val viewState: BrokenSiteViewModel.ViewState
@@ -98,6 +109,8 @@ class BrokenSiteViewModelTest {
             mockContentBlocking,
             mockUnprotectedTemporary,
             mockUserAllowListRepository,
+            mockPrivacyProtectionsToggleUsageListener,
+            privacyProtectionsPopupExperimentExternalPixels,
             Moshi.Builder().add(JSONObjectAdapter()).build(),
         )
         testee.command.observeForever(mockCommandObserver)
@@ -749,6 +762,57 @@ class BrokenSiteViewModelTest {
 
         testee.onProtectionsToggled(protectionsEnabled = true)
         verify(mockPixel).fire(AppPixelName.BROKEN_SITE_ALLOWLIST_REMOVE)
+    }
+
+    @Test
+    fun whenProtectionsAreToggledThenPrivacyProtectionsPopupListenerIsInvoked() = runTest {
+        testee.setInitialBrokenSite(
+            url = url,
+            blockedTrackers = "",
+            surrogates = "",
+            upgradedHttps = false,
+            urlParametersRemoved = false,
+            consentManaged = false,
+            consentOptOutFailed = false,
+            consentSelfTestFailed = false,
+            errorCodes = emptyArray(),
+            httpErrorCodes = "",
+            isDesktopMode = false,
+            reportFlow = MENU,
+        )
+
+        testee.onProtectionsToggled(protectionsEnabled = false)
+        verify(mockPrivacyProtectionsToggleUsageListener).onPrivacyProtectionsToggleUsed()
+        testee.onProtectionsToggled(protectionsEnabled = true)
+        verify(mockPrivacyProtectionsToggleUsageListener, times(2)).onPrivacyProtectionsToggleUsed()
+    }
+
+    @Test
+    fun whenPrivacyProtectionsAreToggledThenCorrectPixelsAreSent() = runTest {
+        val params = mapOf("test_key" to "test_value")
+        whenever(privacyProtectionsPopupExperimentExternalPixels.getPixelParams()).thenReturn(params)
+        testee.setInitialBrokenSite(
+            url = url,
+            blockedTrackers = "",
+            surrogates = "",
+            upgradedHttps = false,
+            urlParametersRemoved = false,
+            consentManaged = false,
+            consentOptOutFailed = false,
+            consentSelfTestFailed = false,
+            errorCodes = emptyArray(),
+            httpErrorCodes = "",
+            isDesktopMode = false,
+            reportFlow = MENU,
+        )
+
+        testee.onProtectionsToggled(protectionsEnabled = false)
+        verify(mockPixel).fire(AppPixelName.BROKEN_SITE_ALLOWLIST_ADD, params, type = COUNT)
+        verify(privacyProtectionsPopupExperimentExternalPixels).tryReportProtectionsToggledFromBrokenSiteReport(protectionsEnabled = false)
+
+        testee.onProtectionsToggled(protectionsEnabled = true)
+        verify(mockPixel).fire(AppPixelName.BROKEN_SITE_ALLOWLIST_REMOVE, params, type = COUNT)
+        verify(privacyProtectionsPopupExperimentExternalPixels).tryReportProtectionsToggledFromBrokenSiteReport(protectionsEnabled = true)
     }
 
     private fun selectAndAcceptCategory(indexSelected: Int = 0) {

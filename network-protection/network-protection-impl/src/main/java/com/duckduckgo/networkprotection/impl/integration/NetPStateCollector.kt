@@ -20,10 +20,11 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
+import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
+import com.duckduckgo.networkprotection.impl.configuration.asServerDetails
 import com.duckduckgo.networkprotection.impl.connectionclass.ConnectionQualityStore
 import com.duckduckgo.networkprotection.impl.connectionclass.asConnectionQuality
 import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
-import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -33,7 +34,7 @@ import org.json.JSONObject
 @ContributesMultibinding(ActivityScope::class)
 class NetPStateCollector @Inject constructor(
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
-    private val netpRepository: NetworkProtectionRepository,
+    private val wgTunnelConfig: WgTunnelConfig,
     private val netPExclusionListRepository: NetPExclusionListRepository,
     private val connectionQualityStore: ConnectionQualityStore,
     private val netPSettingsLocalConfig: NetPSettingsLocalConfig,
@@ -47,8 +48,9 @@ class NetPStateCollector @Inject constructor(
                 appPackageId?.let {
                     put("reportedAppProtected", !netPExclusionListRepository.getExcludedAppPackages().contains(it))
                 }
-                put("connectedServer", netpRepository.serverDetails?.location ?: "Unknown")
-                put("connectedServerIP", netpRepository.serverDetails?.ipAddress ?: "Unknown")
+                val serverDetails = wgTunnelConfig.getWgConfig()?.asServerDetails()
+                put("connectedServer", serverDetails?.location ?: "Unknown")
+                put("connectedServerIP", serverDetails?.ipAddress ?: "Unknown")
                 put("connectionQuality", connectionQualityStore.getConnectionLatency().asConnectionQuality())
                 put("customServerSelection", netPGeoswitchingRepository.getUserPreferredLocation().countryCode != null)
                 put("excludeLocalNetworks", netPSettingsLocalConfig.vpnExcludeLocalNetworkRoutes().isEnabled())

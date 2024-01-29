@@ -18,8 +18,8 @@ package com.duckduckgo.autofill.impl.sharedcreds
 
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
-import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.sharedcreds.SharedCredentialsParser.SharedCredentialConfig
+import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillUrlMatcher
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillUrlMatcher.ExtractedUrlParts
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -43,7 +43,7 @@ class AppleShareableCredentials @Inject constructor(
     private val jsonParser: SharedCredentialsParser,
     private val dispatchers: DispatcherProvider,
     private val shareableCredentialsUrlGenerator: ShareableCredentialsUrlGenerator,
-    private val autofillStore: AutofillStore,
+    private val autofillStore: InternalAutofillStore,
     private val autofillUrlMatcher: AutofillUrlMatcher,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : ShareableCredentials {

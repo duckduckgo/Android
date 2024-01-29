@@ -22,6 +22,7 @@ import android.content.pm.PackageManager
 import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.notification.checkPermissionAndNotify
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
@@ -108,7 +109,8 @@ class NetPDisabledNotificationScheduler @Inject constructor(
         coroutineScope.launch(dispatcherProvider.io()) {
             if (triggerAtMillis != 0L) {
                 if (!netPSettingsLocalConfig.vpnNotificationAlerts().isEnabled()) return@launch
-                notificationManager.notify(
+                notificationManager.checkPermissionAndNotify(
+                    context,
                     NETP_REMINDER_NOTIFICATION_ID,
                     netPDisabledNotificationBuilder.buildSnoozeNotification(context, triggerAtMillis),
                 )
@@ -122,7 +124,8 @@ class NetPDisabledNotificationScheduler @Inject constructor(
         coroutineScope.launch(dispatcherProvider.io()) {
             logcat { "Showing disabled notification for NetP" }
             if (!netPSettingsLocalConfig.vpnNotificationAlerts().isEnabled()) return@launch
-            notificationManager.notify(
+            notificationManager.checkPermissionAndNotify(
+                context,
                 NETP_REMINDER_NOTIFICATION_ID,
                 netPDisabledNotificationBuilder.buildDisabledNotification(context),
             )
@@ -141,7 +144,8 @@ class NetPDisabledNotificationScheduler @Inject constructor(
         coroutineScope.launch(dispatcherProvider.io()) {
             logcat { "Showing disabled by vpn notification for NetP" }
             if (!netPSettingsLocalConfig.vpnNotificationAlerts().isEnabled()) return@launch
-            notificationManager.notify(
+            notificationManager.checkPermissionAndNotify(
+                context,
                 NETP_REMINDER_NOTIFICATION_ID,
                 netPDisabledNotificationBuilder.buildDisabledByVpnNotification(context),
             )

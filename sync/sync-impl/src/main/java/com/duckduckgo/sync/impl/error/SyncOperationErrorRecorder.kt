@@ -19,6 +19,7 @@ package com.duckduckgo.sync.impl.error
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.store.model.SyncOperationErrorType
+import com.duckduckgo.sync.store.model.SyncOperationErrorType.TIMESTAMP_CONFLICT
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import timber.log.Timber
@@ -52,6 +53,10 @@ class RealSyncOperationErrorRecorder @Inject constructor(
         errorType: SyncOperationErrorType,
     ) {
         Timber.d("Sync-Error: Recording Operation Error $errorType for $feature")
+        if (errorType == TIMESTAMP_CONFLICT) {
+            syncPixels.fireTimestampConflictPixel(feature)
+        }
+
         repository.addError(feature, errorType)
     }
 }

@@ -23,16 +23,17 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.DASHBOARD
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVACY_DASHBOARD_ALLOWLIST_ADD
-import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVACY_DASHBOARD_ALLOWLIST_REMOVE
-import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVACY_DASHBOARD_OPENED
+import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.*
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchReportBrokenSite
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenSettings
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenURL
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsToggleUsageListener
 import java.util.*
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -63,6 +64,8 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     private val protectionStatusViewStateMapper: ProtectionStatusViewStateMapper,
     private val privacyDashboardPayloadAdapter: PrivacyDashboardPayloadAdapter,
     private val autoconsentStatusViewStateMapper: AutoconsentStatusViewStateMapper,
+    private val protectionsToggleUsageListener: PrivacyProtectionsToggleUsageListener,
+    private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -184,7 +187,11 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     private val site = MutableStateFlow<Site?>(null)
 
     init {
-        pixel.fire(PRIVACY_DASHBOARD_OPENED)
+        viewModelScope.launch {
+            val pixelParams = privacyProtectionsPopupExperimentExternalPixels.getPixelParams()
+            pixel.fire(PRIVACY_DASHBOARD_OPENED, pixelParams, type = COUNT)
+        }
+        privacyProtectionsPopupExperimentExternalPixels.tryReportPrivacyDashboardOpened()
 
         site.filterNotNull()
             .onEach(::updateSite)
@@ -239,15 +246,19 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         Timber.i("PrivacyDashboard: onPrivacyProtectionsClicked $enabled")
 
         viewModelScope.launch(dispatcher.io()) {
+            protectionsToggleUsageListener.onPrivacyProtectionsToggleUsed()
+
             delay(CLOSE_DASHBOARD_ON_INTERACTION_DELAY)
             currentViewState().siteViewState.domain?.let { domain ->
+                val pixelParams = privacyProtectionsPopupExperimentExternalPixels.getPixelParams()
                 if (enabled) {
                     userAllowListRepository.removeDomainFromUserAllowList(domain)
-                    pixel.fire(PRIVACY_DASHBOARD_ALLOWLIST_REMOVE)
+                    pixel.fire(PRIVACY_DASHBOARD_ALLOWLIST_REMOVE, pixelParams, type = COUNT)
                 } else {
                     userAllowListRepository.addDomainToUserAllowList(domain)
-                    pixel.fire(PRIVACY_DASHBOARD_ALLOWLIST_ADD)
+                    pixel.fire(PRIVACY_DASHBOARD_ALLOWLIST_ADD, pixelParams, type = COUNT)
                 }
+                privacyProtectionsPopupExperimentExternalPixels.tryReportProtectionsToggledFromPrivacyDashboard(enabled)
             }
         }
     }

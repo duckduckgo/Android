@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.global
 
+import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.utils.UriString.Companion.isWebUrl
 import com.duckduckgo.common.utils.UriString.Companion.sameOrSubdomain
@@ -33,8 +34,18 @@ class UriStringTest {
     }
 
     @Test
+    fun whenUrlsHaveSameDomainThenSameOrSubdomainIsTrue2() {
+        assertTrue(sameOrSubdomain("http://example.com/index.html".toUri(), "http://example.com/home.html"))
+    }
+
+    @Test
     fun whenUrlIsSubdomainThenSameOrSubdomainIsTrue() {
         assertTrue(sameOrSubdomain("http://subdomain.example.com/index.html", "http://example.com/home.html"))
+    }
+
+    @Test
+    fun whenUrlIsSubdomainThenSameOrSubdomainIsTrue2() {
+        assertTrue(sameOrSubdomain("http://subdomain.example.com/index.html".toUri(), "http://example.com/home.html"))
     }
 
     @Test
@@ -43,13 +54,78 @@ class UriStringTest {
     }
 
     @Test
+    fun whenUrlIsAParentDomainThenSameOrSubdomainIsFalse2() {
+        assertFalse(sameOrSubdomain("http://example.com/index.html".toUri(), "http://parent.example.com/home.html"))
+    }
+
+    @Test
     fun whenChildUrlIsMalformedThenSameOrSubdomainIsFalse() {
         assertFalse(sameOrSubdomain("??.example.com/index.html", "http://example.com/home.html"))
     }
 
     @Test
+    fun whenChildUrlIsMalformedThenSameOrSubdomainIsFalse2() {
+        assertFalse(sameOrSubdomain("??.example.com/index.html".toUri(), "http://example.com/home.html"))
+    }
+
+    @Test
     fun whenParentUrlIsMalformedThenSameOrSubdomainIsFalse() {
         assertFalse(sameOrSubdomain("http://example.com/index.html", "??.example.com/home.html"))
+    }
+
+    @Test
+    fun whenParentUrlIsMalformedThenSameOrSubdomainIsFalse2() {
+        assertFalse(sameOrSubdomain("http://example.com/index.html".toUri(), "??.example.com/home.html"))
+    }
+
+    @Test
+    fun whenUrlsHaveSameDomainThenSafeSameOrSubdomainIsTrue() {
+        assertTrue(sameOrSubdomain("http://example.com/index.html", "http://example.com/home.html"))
+    }
+
+    @Test
+    fun whenUrlsHaveSameDomainThenSafeSameOrSubdomainIsTrue2() {
+        assertTrue(sameOrSubdomain("http://example.com/index.html".toUri(), "http://example.com/home.html"))
+    }
+
+    @Test
+    fun whenUrlIsSubdomainThenSafeSameOrSubdomainIsTrue() {
+        assertTrue(sameOrSubdomain("http://subdomain.example.com/index.html", "http://example.com/home.html"))
+    }
+
+    @Test
+    fun whenUrlIsSubdomainThenSafeSameOrSubdomainIsTrue2() {
+        assertTrue(sameOrSubdomain("http://subdomain.example.com/index.html".toUri(), "http://example.com/home.html"))
+    }
+
+    @Test
+    fun whenUrlIsAParentDomainThenSafeSameOrSubdomainIsFalse() {
+        assertFalse(sameOrSubdomain("http://example.com/index.html", "http://parent.example.com/home.html"))
+    }
+
+    @Test
+    fun whenUrlIsAParentDomainThenSafeSameOrSubdomainIsFalse2() {
+        assertFalse(sameOrSubdomain("http://example.com/index.html".toUri(), "http://parent.example.com/home.html"))
+    }
+
+    @Test
+    fun whenChildUrlIsMalformedThenSafeSameOrSubdomainIsFalse() {
+        assertFalse(sameOrSubdomain("??.example.com/index.html", "http://example.com/home.html"))
+    }
+
+    @Test
+    fun whenChildUrlIsMalformedThenSafeSameOrSubdomainIsFalse2() {
+        assertFalse(sameOrSubdomain("??.example.com/index.html".toUri(), "http://example.com/home.html"))
+    }
+
+    @Test
+    fun whenParentUrlIsMalformedThenSafeSameOrSubdomainIsFalse() {
+        assertFalse(sameOrSubdomain("http://example.com/index.html", "??.example.com/home.html"))
+    }
+
+    @Test
+    fun whenParentUrlIsMalformedThenSafeSameOrSubdomainIsFalse2() {
+        assertFalse(sameOrSubdomain("http://example.com/index.html".toUri(), "??.example.com/home.html"))
     }
 
     @Test

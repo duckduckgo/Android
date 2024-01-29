@@ -23,11 +23,14 @@ object WelcomePageView {
         object OnPrimaryCtaClicked : Event()
         object OnDefaultBrowserSet : Event()
         object OnDefaultBrowserNotSet : Event()
+        object OnNotificationPermissionsRequested : Event()
     }
 
     sealed class State {
         object Idle : State()
         data class ShowDefaultBrowserDialog(val intent: Intent) : State()
         object Finish : State()
+        object ShowWelcomeAnimation : State()
+        object ShowNotificationsPermissionsPrompt : State()
     }
 }

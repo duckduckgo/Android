@@ -22,6 +22,7 @@ import android.text.SpannableStringBuilder
 import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.notification.checkPermissionAndNotify
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerActivityWithEmptyParams
@@ -86,16 +87,16 @@ class AlwaysOnLockDownDetector @Inject constructor(
     }
 
     private suspend fun showNotification() {
-        val title = SpannableStringBuilder(getNotificationText())
+        val text = SpannableStringBuilder(getNotificationText())
         val intent = getNotificationIntent()
 
-        val notification = DeviceShieldNotificationFactory.DeviceShieldNotification(title = title)
+        val notification = DeviceShieldNotificationFactory.DeviceShieldNotification(text = text)
         deviceShieldAlertNotificationBuilder.buildAlwaysOnLockdownNotification(
             context,
             notification,
             intent,
         ).also {
-            notificationManagerCompat.notify(notificationId, it)
+            notificationManagerCompat.checkPermissionAndNotify(context, notificationId, it)
         }
     }
 

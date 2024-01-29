@@ -699,12 +699,12 @@ class WebViewRequestInterceptorTest {
             surrogateId = "testId",
         )
         whenever(mockRequest.isForMainFrame).thenReturn(false)
-        whenever(mockTrackerDetector.evaluate(any(), any(), eq(true), anyMap())).thenReturn(trackingEvent)
+        whenever(mockTrackerDetector.evaluate(anyString(), anyString(), eq(true), anyMap())).thenReturn(trackingEvent)
     }
 
     private fun configureNull() {
         whenever(mockRequest.isForMainFrame).thenReturn(false)
-        whenever(mockTrackerDetector.evaluate(any(), any(), eq(true), anyMap())).thenReturn(null)
+        whenever(mockTrackerDetector.evaluate(anyString(), anyString(), eq(true), anyMap())).thenReturn(null)
     }
 
     private fun configureBlockedCnameTrackingEvent() {
@@ -726,7 +726,7 @@ class WebViewRequestInterceptorTest {
             surrogateId = null,
         )
         whenever(mockRequest.isForMainFrame).thenReturn(false)
-        whenever(mockTrackerDetector.evaluate(any(), any(), eq(false), anyMap())).thenReturn(trackingEvent)
+        whenever(mockTrackerDetector.evaluate(anyString(), anyString(), eq(false), anyMap())).thenReturn(trackingEvent)
     }
 
     private fun configureUrlExistsInTheStack(uri: Uri = validUri()) {
