@@ -151,6 +151,23 @@ class AutofillStoredBackJavascriptInterfaceTest {
     }
 
     @Test
+    fun whenGetAutofillDataCalledWithCredentialsAvailableWithNullUsernameUsernameConvertedToEmptyString() = runTest {
+        setupRequestForSubTypePassword()
+        whenever(autofillStore.getCredentials(any())).thenReturn(
+            listOf(
+                loginCredential(username = null, password = "foo"),
+                loginCredential(username = null, password = "bar"),
+                loginCredential(username = "foo", password = "bar"),
+            ),
+        )
+        initiateGetAutofillDataRequest()
+        assertCredentialsAvailable()
+
+        // ensure the list of credentials now has two entries with empty string username (one for each null username)
+        assertCredentialsContains({ it.username }, "", "")
+    }
+
+    @Test
     fun whenRequestSpecifiesSubtypeUsernameAndNoEntriesThenNoCredentialsCallbackInvoked() = runTest {
         setupRequestForSubTypeUsername()
         whenever(autofillStore.getCredentials(any())).thenReturn(emptyList())
