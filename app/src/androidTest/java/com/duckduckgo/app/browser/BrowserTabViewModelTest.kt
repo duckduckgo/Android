@@ -144,7 +144,7 @@ import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER_VALUE
 import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentPixelParamsProvider
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupManager
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupViewState
@@ -418,7 +418,7 @@ class BrowserTabViewModelTest {
 
     private val mockPrivacyProtectionsToggleUsageListener: PrivacyProtectionsToggleUsageListener = mock()
 
-    private val privacyProtectionsPopupExperimentPixelParamsProvider = FakePrivacyProtectionsPopupExperimentPixelParamsProvider()
+    private val privacyProtectionsPopupExperimentExternalPixels = FakePrivacyProtectionsPopupExperimentExternalPixels()
 
     @Before
     fun before() {
@@ -547,7 +547,7 @@ class BrowserTabViewModelTest {
             androidBrowserConfig = androidBrowserConfig,
             privacyProtectionsPopupManager = mockPrivacyProtectionsPopupManager,
             privacyProtectionsToggleUsageListener = mockPrivacyProtectionsToggleUsageListener,
-            privacyProtectionsPopupExperimentPixelParamsProvider = privacyProtectionsPopupExperimentPixelParamsProvider,
+            privacyProtectionsPopupExperimentExternalPixels = privacyProtectionsPopupExperimentExternalPixels,
         )
 
         testee.loadData("abc", null, false, false)
@@ -4769,7 +4769,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenPrivacyProtectionsAreToggledThenCorrectPixelsAreSent() = runTest {
         val params = mapOf("test_key" to "test_value")
-        privacyProtectionsPopupExperimentPixelParamsProvider.params = params
+        privacyProtectionsPopupExperimentExternalPixels.params = params
         whenever(mockUserAllowListRepository.isDomainInUserAllowList("www.example.com")).thenReturn(false)
         loadUrl("http://www.example.com/home.html")
         testee.onPrivacyProtectionMenuClicked()
@@ -5075,7 +5075,7 @@ class BrowserTabViewModelTest {
         override suspend fun canAccessCredentialManagementScreen() = enabled
     }
 
-    private class FakePrivacyProtectionsPopupExperimentPixelParamsProvider : PrivacyProtectionsPopupExperimentPixelParamsProvider {
+    private class FakePrivacyProtectionsPopupExperimentExternalPixels : PrivacyProtectionsPopupExperimentExternalPixels {
         var params: Map<String, String> = emptyMap()
 
         override suspend fun getPixelParams(): Map<String, String> = params

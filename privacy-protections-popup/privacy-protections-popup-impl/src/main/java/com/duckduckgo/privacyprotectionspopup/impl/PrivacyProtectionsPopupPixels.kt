@@ -19,7 +19,7 @@ package com.duckduckgo.privacyprotectionspopup.impl
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentPixelParamsProvider
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.duckduckgo.privacyprotectionspopup.impl.PrivacyProtectionsPopupPixelName.DO_NOT_SHOW_AGAIN_CLICKED
 import com.duckduckgo.privacyprotectionspopup.impl.PrivacyProtectionsPopupPixelName.EXPERIMENT_VARIANT_ASSIGNED
 import com.duckduckgo.privacyprotectionspopup.impl.PrivacyProtectionsPopupPixelName.PAGE_REFRESH_ON_POSSIBLE_BREAKAGE
@@ -52,7 +52,7 @@ interface PrivacyProtectionsPopupPixels {
 @ContributesBinding(FragmentScope::class)
 class PrivacyProtectionsPopupPixelsImpl @Inject constructor(
     private val pixelSender: Pixel,
-    private val paramsProvider: PrivacyProtectionsPopupExperimentPixelParamsProvider,
+    private val paramsProvider: PrivacyProtectionsPopupExperimentExternalPixels,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dataStore: PrivacyProtectionsPopupDataStore,
 ) : PrivacyProtectionsPopupPixels {

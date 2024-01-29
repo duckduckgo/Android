@@ -16,7 +16,7 @@
 
 package com.duckduckgo.privacyprotectionspopup.api
 
-interface PrivacyProtectionsPopupExperimentPixelParamsProvider {
+interface PrivacyProtectionsPopupExperimentExternalPixels {
     /**
      * Returns params to annotate pixels with popup experiment variant.
      */

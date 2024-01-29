@@ -17,7 +17,7 @@
 package com.duckduckgo.privacyprotectionspopup.impl
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentPixelParamsProvider
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.duckduckgo.privacyprotectionspopup.impl.PrivacyProtectionsPopupExperimentVariant.CONTROL
 import com.duckduckgo.privacyprotectionspopup.impl.PrivacyProtectionsPopupExperimentVariant.TEST
 import com.duckduckgo.privacyprotectionspopup.impl.store.PrivacyProtectionsPopupDataStore
@@ -25,9 +25,9 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
-class PrivacyProtectionsPopupExperimentPixelParamsProviderImpl @Inject constructor(
+class PrivacyProtectionsPopupExperimentExternalPixelsImpl @Inject constructor(
     private val dataStore: PrivacyProtectionsPopupDataStore,
-) : PrivacyProtectionsPopupExperimentPixelParamsProvider {
+) : PrivacyProtectionsPopupExperimentExternalPixels {
 
     override suspend fun getPixelParams(): Map<String, String> {
         val experimentVariant = dataStore.getExperimentVariant()

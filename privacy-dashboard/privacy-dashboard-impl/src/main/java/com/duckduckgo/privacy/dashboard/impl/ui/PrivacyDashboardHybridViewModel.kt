@@ -33,7 +33,7 @@ import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.*
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchReportBrokenSite
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenSettings
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenURL
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentPixelParamsProvider
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsToggleUsageListener
 import java.util.*
 import javax.inject.Inject
@@ -66,7 +66,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     private val privacyDashboardPayloadAdapter: PrivacyDashboardPayloadAdapter,
     private val autoconsentStatusViewStateMapper: AutoconsentStatusViewStateMapper,
     private val protectionsToggleUsageListener: PrivacyProtectionsToggleUsageListener,
-    private val privacyProtectionsPopupExperimentPixelParamsProvider: PrivacyProtectionsPopupExperimentPixelParamsProvider,
+    private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -189,7 +189,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val pixelParams = privacyProtectionsPopupExperimentPixelParamsProvider.getPixelParams()
+            val pixelParams = privacyProtectionsPopupExperimentExternalPixels.getPixelParams()
             pixel.fire(PRIVACY_DASHBOARD_OPENED, pixelParams, type = COUNT)
             pixel.fire(PRIVACY_DASHBOARD_OPENED_UNIQUE, pixelParams, type = UNIQUE)
         }
@@ -251,7 +251,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
 
             delay(CLOSE_DASHBOARD_ON_INTERACTION_DELAY)
             currentViewState().siteViewState.domain?.let { domain ->
-                val pixelParams = privacyProtectionsPopupExperimentPixelParamsProvider.getPixelParams()
+                val pixelParams = privacyProtectionsPopupExperimentExternalPixels.getPixelParams()
                 if (enabled) {
                     userAllowListRepository.removeDomainFromUserAllowList(domain)
                     pixel.fire(PRIVACY_DASHBOARD_ALLOWLIST_REMOVE, pixelParams, type = COUNT)

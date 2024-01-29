@@ -24,7 +24,7 @@ import com.duckduckgo.privacy.config.api.PrivacyConfig
 import com.duckduckgo.privacy.config.api.PrivacyConfigData
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentPixelParamsProvider
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import java.util.*
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -69,7 +69,7 @@ class BrokenSiteSubmitterTest {
 
     private val mockBrokenSiteLastSentReport: BrokenSiteLastSentReport = mock()
 
-    private val privacyProtectionsPopupExperimentPixelParamsProvider = FakePrivacyProtectionsPopupExperimentPixelParamsProvider()
+    private val privacyProtectionsPopupExperimentExternalPixels = FakePrivacyProtectionsPopupExperimentExternalPixels()
 
     private lateinit var testee: BrokenSiteSubmitter
 
@@ -101,7 +101,7 @@ class BrokenSiteSubmitterTest {
             mockUnprotectedTemporary,
             mockContentBlocking,
             mockBrokenSiteLastSentReport,
-            privacyProtectionsPopupExperimentPixelParamsProvider,
+            privacyProtectionsPopupExperimentExternalPixels,
         )
     }
 
@@ -290,7 +290,7 @@ class BrokenSiteSubmitterTest {
     @Test
     fun whenPrivacyProtectionsPopupExperimentParamsArePresentThenTheyAreIncludedInPixel() = runTest {
         val params = mapOf("test_key" to "test_value")
-        privacyProtectionsPopupExperimentPixelParamsProvider.params = params
+        privacyProtectionsPopupExperimentExternalPixels.params = params
 
         testee.submitBrokenSiteFeedback(getBrokenSite())
 
@@ -322,7 +322,7 @@ class BrokenSiteSubmitterTest {
     }
 }
 
-private class FakePrivacyProtectionsPopupExperimentPixelParamsProvider : PrivacyProtectionsPopupExperimentPixelParamsProvider {
+private class FakePrivacyProtectionsPopupExperimentExternalPixels : PrivacyProtectionsPopupExperimentExternalPixels {
     var params: Map<String, String> = emptyMap()
 
     override suspend fun getPixelParams(): Map<String, String> = params

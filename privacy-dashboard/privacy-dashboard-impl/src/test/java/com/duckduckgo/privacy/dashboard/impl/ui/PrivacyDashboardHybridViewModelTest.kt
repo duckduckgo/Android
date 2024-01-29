@@ -33,7 +33,7 @@ import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.*
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchReportBrokenSite
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentPixelParamsProvider
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsToggleUsageListener
 import com.nhaarman.mockitokotlin2.mock
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -72,7 +72,7 @@ class PrivacyDashboardHybridViewModelTest {
 
     private val pixel = mock<Pixel>()
     private val privacyProtectionsToggleUsageListener: PrivacyProtectionsToggleUsageListener = mock()
-    private val privacyProtectionsPopupExperimentPixelParamsProvider = FakePrivacyProtectionsPopupExperimentPixelParamsProvider()
+    private val privacyProtectionsPopupExperimentExternalPixels = FakePrivacyProtectionsPopupExperimentExternalPixels()
 
     private val testee: PrivacyDashboardHybridViewModel by lazy {
         PrivacyDashboardHybridViewModel(
@@ -85,7 +85,7 @@ class PrivacyDashboardHybridViewModelTest {
             privacyDashboardPayloadAdapter = mock(),
             autoconsentStatusViewStateMapper = CookiePromptManagementStatusViewStateMapper(),
             protectionsToggleUsageListener = privacyProtectionsToggleUsageListener,
-            privacyProtectionsPopupExperimentPixelParamsProvider = privacyProtectionsPopupExperimentPixelParamsProvider,
+            privacyProtectionsPopupExperimentExternalPixels = privacyProtectionsPopupExperimentExternalPixels,
         )
     }
 
@@ -162,7 +162,7 @@ class PrivacyDashboardHybridViewModelTest {
     @Test
     fun whenPrivacyProtectionsPopupExperimentParamsArePresentThenTheyShouldBeIncludedInPixels() = runTest {
         val params = mapOf("test_key" to "test_value")
-        privacyProtectionsPopupExperimentPixelParamsProvider.params = params
+        privacyProtectionsPopupExperimentExternalPixels.params = params
         val site = site(siteAllowed = false)
         testee.onSiteChanged(site)
         testee.onPrivacyProtectionsClicked(enabled = false)
@@ -208,7 +208,7 @@ private class FakeUserAllowListRepository : UserAllowListRepository {
     override suspend fun removeDomainFromUserAllowList(domain: String) = domains.update { it - domain }
 }
 
-private class FakePrivacyProtectionsPopupExperimentPixelParamsProvider : PrivacyProtectionsPopupExperimentPixelParamsProvider {
+private class FakePrivacyProtectionsPopupExperimentExternalPixels : PrivacyProtectionsPopupExperimentExternalPixels {
     var params: Map<String, String> = emptyMap()
 
     override suspend fun getPixelParams(): Map<String, String> = params

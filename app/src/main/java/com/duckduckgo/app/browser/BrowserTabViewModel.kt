@@ -137,7 +137,7 @@ import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.privacy.config.api.*
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentPixelParamsProvider
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupManager
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupViewState
@@ -225,7 +225,7 @@ class BrowserTabViewModel @Inject constructor(
     private val androidBrowserConfig: AndroidBrowserConfigFeature,
     private val privacyProtectionsPopupManager: PrivacyProtectionsPopupManager,
     private val privacyProtectionsToggleUsageListener: PrivacyProtectionsToggleUsageListener,
-    private val privacyProtectionsPopupExperimentPixelParamsProvider: PrivacyProtectionsPopupExperimentPixelParamsProvider,
+    private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -2253,7 +2253,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private suspend fun addToAllowList(domain: String) {
-        val pixelParams = privacyProtectionsPopupExperimentPixelParamsProvider.getPixelParams()
+        val pixelParams = privacyProtectionsPopupExperimentExternalPixels.getPixelParams()
         pixel.fire(AppPixelName.BROWSER_MENU_ALLOWLIST_ADD, pixelParams, type = COUNT)
         pixel.fire(AppPixelName.BROWSER_MENU_ALLOWLIST_ADD_UNIQUE, pixelParams, type = UNIQUE)
         userAllowListRepository.addDomainToUserAllowList(domain)
@@ -2264,7 +2264,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private suspend fun removeFromAllowList(domain: String) {
-        val pixelParams = privacyProtectionsPopupExperimentPixelParamsProvider.getPixelParams()
+        val pixelParams = privacyProtectionsPopupExperimentExternalPixels.getPixelParams()
         pixel.fire(AppPixelName.BROWSER_MENU_ALLOWLIST_REMOVE, pixelParams, type = COUNT)
         pixel.fire(AppPixelName.BROWSER_MENU_ALLOWLIST_REMOVE_UNIQUE, pixelParams, type = UNIQUE)
         userAllowListRepository.removeDomainFromUserAllowList(domain)

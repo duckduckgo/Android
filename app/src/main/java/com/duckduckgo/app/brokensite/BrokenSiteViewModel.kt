@@ -47,7 +47,7 @@ import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentPixelParamsProvider
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsToggleUsageListener
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
@@ -68,7 +68,7 @@ class BrokenSiteViewModel @Inject constructor(
     private val unprotectedTemporary: UnprotectedTemporary,
     private val userAllowListRepository: UserAllowListRepository,
     private val protectionsToggleUsageListener: PrivacyProtectionsToggleUsageListener,
-    private val privacyProtectionsPopupExperimentPixelParamsProvider: PrivacyProtectionsPopupExperimentPixelParamsProvider,
+    private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels,
     moshi: Moshi,
 ) : ViewModel() {
     private val jsonStringListAdapter = moshi.adapter<List<String>>(
@@ -177,7 +177,7 @@ class BrokenSiteViewModel @Inject constructor(
         val domain = getDomain() ?: return
 
         viewModelScope.launch {
-            val pixelParams = privacyProtectionsPopupExperimentPixelParamsProvider.getPixelParams()
+            val pixelParams = privacyProtectionsPopupExperimentExternalPixels.getPixelParams()
             if (protectionsEnabled) {
                 userAllowListRepository.removeDomainFromUserAllowList(domain)
                 pixel.fire(AppPixelName.BROKEN_SITE_ALLOWLIST_REMOVE, pixelParams, type = COUNT)

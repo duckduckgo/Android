@@ -40,7 +40,7 @@ import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentPixelParamsProvider
+import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsToggleUsageListener
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.flow.flowOf
@@ -89,7 +89,7 @@ class BrokenSiteViewModelTest {
 
     private val mockPrivacyProtectionsToggleUsageListener: PrivacyProtectionsToggleUsageListener = mock()
 
-    private val privacyProtectionsPopupExperimentPixelParamsProvider = FakePrivacyProtectionsPopupExperimentPixelParamsProvider()
+    private val privacyProtectionsPopupExperimentExternalPixels = FakePrivacyProtectionsPopupExperimentExternalPixels()
 
     private lateinit var testee: BrokenSiteViewModel
 
@@ -108,7 +108,7 @@ class BrokenSiteViewModelTest {
             mockUnprotectedTemporary,
             mockUserAllowListRepository,
             mockPrivacyProtectionsToggleUsageListener,
-            privacyProtectionsPopupExperimentPixelParamsProvider,
+            privacyProtectionsPopupExperimentExternalPixels,
             Moshi.Builder().add(JSONObjectAdapter()).build(),
         )
         testee.command.observeForever(mockCommandObserver)
@@ -788,7 +788,7 @@ class BrokenSiteViewModelTest {
     @Test
     fun whenPrivacyProtectionsAreToggledThenCorrectPixelsAreSent() = runTest {
         val params = mapOf("test_key" to "test_value")
-        privacyProtectionsPopupExperimentPixelParamsProvider.params = params
+        privacyProtectionsPopupExperimentExternalPixels.params = params
         testee.setInitialBrokenSite(
             url = url,
             blockedTrackers = "",
@@ -824,7 +824,7 @@ class BrokenSiteViewModelTest {
     }
 }
 
-private class FakePrivacyProtectionsPopupExperimentPixelParamsProvider : PrivacyProtectionsPopupExperimentPixelParamsProvider {
+private class FakePrivacyProtectionsPopupExperimentExternalPixels : PrivacyProtectionsPopupExperimentExternalPixels {
     var params: Map<String, String> = emptyMap()
 
     override suspend fun getPixelParams(): Map<String, String> = params
