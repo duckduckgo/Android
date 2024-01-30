@@ -103,7 +103,7 @@ class SavedSitesTimestampPersister @Inject constructor(
 
 fun BookmarkFolder.modifiedAfter(after: String?): Boolean {
     return if (this.lastModified == null) {
-        true
+        false
     } else {
         if (after == null) {
             false
@@ -121,7 +121,7 @@ fun BookmarkFolder.isDeleted(): Boolean {
 
 fun SavedSite.modifiedAfter(after: String?): Boolean {
     return if (this.lastModified == null) {
-        true
+        false
     } else {
         if (after == null) {
             false
