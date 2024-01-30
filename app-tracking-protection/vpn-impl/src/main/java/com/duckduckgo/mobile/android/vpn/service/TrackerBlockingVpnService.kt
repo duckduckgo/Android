@@ -24,6 +24,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.content.pm.PackageManager
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED
 import android.net.VpnService
 import android.os.Binder
 import android.os.Build
@@ -31,6 +32,7 @@ import android.os.IBinder
 import android.os.Parcel
 import android.os.ParcelFileDescriptor
 import android.system.OsConstants.AF_INET6
+import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
 import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.anrs.api.CrashLogger.Crash
@@ -650,6 +652,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
     /**
      * @return `true` if the start was initiated correctly, otherwise `false`
      */
+    @SuppressLint("NewApi")
     private fun notifyVpnStart(): Boolean {
         val emptyNotification = VpnEnabledNotificationContentPlugin.VpnEnabledNotificationContent.EMPTY
         var vpnNotification: VpnEnabledNotificationContentPlugin.VpnEnabledNotificationContent = emptyNotification
@@ -664,9 +667,11 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             }
         }
 
-        startForeground(
+        ServiceCompat.startForeground(
+            this,
             VPN_FOREGROUND_SERVICE_ID,
             VpnEnabledNotificationBuilder.buildVpnEnabledNotification(applicationContext, vpnNotification),
+            FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED,
         )
 
         return vpnNotification != emptyNotification
