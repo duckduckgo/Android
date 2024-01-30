@@ -16,6 +16,8 @@
 
 package com.duckduckgo.mobile.android.vpn.service
 
+import android.annotation.SuppressLint
+import android.app.PendingIntent
 import android.content.Intent
 import android.net.VpnService
 import android.os.Build
@@ -27,6 +29,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
@@ -57,6 +60,8 @@ class DeviceShieldTileService : TileService() {
 
     @Inject lateinit var dispatcherProvider: DispatcherProvider
 
+    @Inject lateinit var appBuildConfig: AppBuildConfig
+
     private var deviceShieldStatePollingJob = ConflatedJob()
     private val serviceScope = CoroutineScope(Dispatchers.IO)
 
@@ -79,15 +84,26 @@ class DeviceShieldTileService : TileService() {
                 if (hasVpnPermission()) {
                     startDeviceShield()
                 } else {
-                    launchActivity(VpnPermissionRequesterActivity::class.java)
+                    launchActivity()
                 }
             }
         }
     }
 
-    private fun launchActivity(activityClass: Class<*>) {
-        val intent = Intent(this, activityClass).apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) }
-        startActivityAndCollapse(intent)
+    @SuppressLint("NewApi") // IDE doesn't get we use appBuildConfig
+    private fun launchActivity() {
+        val intent = Intent(this, VpnPermissionRequesterActivity::class.java).apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) }
+        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            val pendingIntent = PendingIntent.getActivity(
+                this,
+                0,
+                intent,
+                PendingIntent.FLAG_IMMUTABLE,
+            )
+            startActivityAndCollapse(pendingIntent)
+        } else {
+            startActivityAndCollapse(intent)
+        }
     }
 
     override fun onStartListening() {
@@ -182,6 +198,7 @@ class VpnPermissionRequesterActivity : AppCompatActivity() {
                 startDeviceShield()
                 finish()
             }
+
             is VpnPermissionStatus.Denied -> obtainVpnRequestPermission(permissionStatus.intent)
         }
     }
