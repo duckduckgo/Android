@@ -89,10 +89,6 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
     AUTOFILL_OVERLAPPING_DIALOG("m_autofill_overlapping_dialog"),
 }
 
-object AutofillPixelParameters {
-    const val AUTOFILL_DEFAULT_STATE = "default_state"
-}
-
 @ContributesMultibinding(
     scope = AppScope::class,
     boundType = PixelParamRemovalPlugin::class,
