@@ -1,0 +1,804 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2023 Asil
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="appName" translatable="false">Asil Browser</string>
+    <string name="appDescription" translatable="false">Asil Browser</string>
+    <string name="asilLogoDescription">شعار أصيل</string>
+    <string name="asilPrivacySimplified">الخصوصية، ببساطة</string>
+    <string name="yes">نعم</string>
+    <string name="no">لا</string>
+    <string name="open">افتح</string>
+    <string name="cancel">إلغاء</string>
+    <string name="search">بحث</string>
+
+
+    <!-- Onboarding Activity -->
+
+    <string name="onboardingDefaultBrowserDescription">قم بزيارة الإعدادات للبحث والتصفح باستخدام أصيل في كل مرة.</string>
+    <string name="onboardingDefaultBrowserTitle">اجعل أصيل هو الافتراضي لديك</string>
+
+    <!-- Default Browser -->
+
+    <string name="cannotLaunchDefaultAppSettings">لا يمكن تشغيل شاشة إعدادات التطبيق الافتراضية</string>
+    <string name="settingsDefaultBrowserEnabled">تعيين كمتصفح افتراضي</string>
+    <string name="defaultBrowserMaybeLater">ربما لاحقاً</string>
+    <string name="defaultBrowserLetsDoIt">تعيين كمتصفح افتراضي</string>
+    <string name="defaultBrowserDescriptionNoDefault">افتح الروابط براحة بال، في كل مرة.</string>
+    <string name="defaultBrowserInstructions">اختر أصيل واضغط على <font color='#678fff'>دائمًا</font>.</string>
+
+
+    <!-- Browser Activity -->
+    <string name="browserPopupMenu">قائمة المتصفح</string>
+    <string name="refresh">تحديث</string>
+    <string name="back">رجوع</string>
+    <string name="forward">للأمام</string>
+    <string name="omnibarInputHint">ابحث أو اكتب عنوان URL</string>
+    <string name="clearButtonContentDescription">مسح إدخال البحث</string>
+    <string name="no_compatible_third_party_app_installed">لا يوجد تطبيق متوافق مثبت</string>
+    <string name="addBookmarkMenuTitle">أضف إشارة مرجعية</string>
+    <string name="editBookmarkMenuTitle">تعديل الإشارة المرجعية</string>
+    <string name="addFavoriteMenuTitle">أضف إلى المفضلة</string>
+    <string name="removeFavoriteMenuTitle">إزالة من المفضلة</string>
+    <string name="favoriteAddedMessage">تمت الإضافة إلى المفضلة</string>
+    <string name="bookmarkAddedMessage">تمت إضافة الإشارة المرجعية</string>
+    <string name="requestDesktopSiteMenuTitle">موقع سطح المكتب</string>
+    <string name="fireproofWebsiteMenuTitleRemove">إزالة الحماية</string>
+    <string name="requestMobileSiteMenuTitle">موقع الجوال</string>
+    <string name="downloadsMenuTitle">التحميلات</string>
+    <string name="printMenuTitle">طباعة الصفحة</string>
+    <string name="favoriteDeleteConfirmationMessage">تمت إزالة المفضلة</string>
+    <string name="fireproofDeleteConfirmationMessage">تمت إزالة الحماية</string>
+    <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">تم تفعيل حماية الخصوصية لـ %1$s</string>
+    <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">تم تعطيل حماية الخصوصية لـ %1$s</string>
+    <string name="undoSnackbarAction">تراجع</string>
+
+
+    <!-- Downloading files -->
+    <string name="downloadImage">تحميل الصورة</string>
+    <string name="permissionRequiredToDownload">التحميل يتطلب إذن التخزين</string>
+
+
+    <!-- Sharing options -->
+    <string name="options">خيارات</string>
+    <string name="shareLink">مشاركة الرابط</string>
+    <string name="shareMenuTitle">مشاركة</string>
+    <string name="copyUrl">نسخ عنوان الرابط</string>
+
+    <!-- Find in page -->
+    <string name="findInPageMenuTitle">البحث في الصفحة</string>
+    <string name="nextSearchTermDescription">البحث عن التالي</string>
+    <string name="previousSearchTermDescription">البحث عن السابق</string>
+    <string name="closeFindInPageButtonDescription">إغلاق عرض البحث في الصفحة</string>
+    <string name="findInPageHint">ابحث في الصفحة</string>
+    <string name="findInPageMatches" translatable="false">%1$d/%2$d</string>
+
+    <!-- AutoComplete Suggestions -->
+    <string name="editQueryBeforeSubmitting">تعديل الاستعلام قبل البحث</string>
+    <string name="settingsAutocompleteEnabled">اقتراحات الإكمال التلقائي</string>
+
+    <!-- Opening external apps -->
+    <string name="openExternalApp">فتح التطبيق الخارجي</string>
+    <string name="launchingExternalApp">فتح في تطبيق آخر</string>
+    <string name="confirmOpenExternalApp">هل ترغب في مغادرة أصيل لعرض هذا المحتوى؟</string>
+    <string name="unableToOpenLink">غير قادر على فتح هذا النوع من الروابط</string>
+
+    <!-- Tabs -->
+    <string name="homeTab" translatable="false">Asil</string> <!-- No translation needed -->
+    <string name="tabActivityTitle">التبويبات</string>
+    <string name="tabsMenuItem">التبويبات</string>
+    <string name="newTabMenuItem">تبويب جديد</string>
+    <string name="openInNewTab">فتح في تبويب جديد</string>
+    <string name="openInNewBackgroundTab">فتح في تبويب خلفي</string>
+    <string name="openImageInNewTab">فتح الصورة في تبويب خلفي</string>
+    <string name="faviconContentDescription">أيقونة الموقع</string>
+    <string name="closeContentDescription">إغلاق</string>
+    <string name="closeAllTabsMenuItem">إغلاق جميع التبويبات</string>
+    <string name="closeTab">إغلاق التبويب</string>
+    <string name="tabClosed">تم إغلاق التبويب</string>
+    <string name="tabClosedUndo">تراجع</string>
+    <string name="downloadsMenuItemTitle">التحميلات</string>
+
+
+    <!-- Fire -->
+    <string name="fireMenu">مسح البيانات</string>
+    <string name="fireClearAll">مسح جميع التبويبات والبيانات</string>
+    <string name="fireCancel">إلغاء</string>
+    <string name="fireDataCleared">تم مسح البيانات</string>
+
+
+    <!-- Settings Activity -->
+    <string name="settingsActivityTitle">الإعدادات</string>
+    <string name="settingsMenuItemTitle">الإعدادات</string>
+    <string name="settingsHeadingPrivacy">الخصوصية</string>
+    <string name="settingsHeadingAppearance">المظهر</string>
+    <string name="settingsHeadingCustomize">تخصيص</string>
+    <string name="settingsHeadingAbout">حول</string>
+    <string name="settingsAboutAsil">حول أصيل</string>
+    <string name="settingsVersion">الإصدار</string>
+    <string name="leaveFeedback">شارك برأيك</string>
+    <string name="settingsEmailProtectionTitle">حماية البريد الإلكتروني</string>
+    <string name="settingsEmailProtectionSubtitle">حظر المتتبعات البريدية وإخفاء عنوانك</string>
+    <string name="settingsHeadingMore">المزيد من أصيل</string>
+    <string name="settingsLightTheme">فاتح</string>
+    <string name="settingsTheme">الثيم</string>
+    <string name="settingsDarkTheme">داكن</string>
+    <string name="settingsSystemTheme">افتراضي النظام</string>
+    <string name="settingsThemeDialogSave">تعيين الثيم</string>
+    <string name="settingsTitleAppLinks">فتح الروابط في التطبيقات</string>
+    <string name="settingsTitleAppLinksDialog">فتح الروابط في التطبيقات</string>
+    <string name="settingsAppLinksAskEveryTime">السؤال في كل مرة</string>
+    <string name="settingsAppLinksAlways">دائما</string>
+    <string name="settingsAppLinksNever">أبدا</string>
+    <string name="settingsTitleNotifications">الإشعارات</string>
+    <string name="settingsSubtitleNotificationsDisabled">معطل</string>
+    <string name="settingsSubtitleNotificationsEnabled">ممكن</string>
+    <string name="settingsDefaultBrowserTitle">المتصفح الافتراضي</string>
+    <string name="settingsDefaultBrowserSetDescription">أصيل هو متصفحك الافتراضي</string>
+    <string name="settingsDefaultBrowserNotSetDescription">اجعل أصيل متصفحك الافتراضي</string>
+    <string name="settingsPrivateSearchTitle">البحث الخاص</string>
+    <string name="settingsPrivateSearchDescription">ممكن بشكل افتراضي</string>
+    <string name="settingsWebTrackingProtectionTitle">حماية تتبع الويب</string>
+    <string name="settingsWebTrackingProtectionDescription">ممكن بشكل افتراضي</string>
+    <string name="settingsHeadingSettings">الإعدادات</string>
+    <string name="settingsPermissionsSetting">الأذونات</string>
+    <string name="settingsSyncSetting">المزامنة والنسخ الاحتياطي</string>
+    <string name="settingsFireButton">زر الحذف</string>
+
+    <!-- Private Search -->
+    <string name="privateSearchActivityTitle">البحث الخاص</string>
+    <string name="privateSearchTitle">البحث الخاص مفعل</string>
+    <string name="privateSearchDescription">محرك البحث الخاص بأصيل هو محرك البحث الافتراضي لديك، حتى تتمكن من البحث على الويب دون تتبع.</string>
+    <string name="privateSearchHeadingSearchSettings">إعدادات البحث</string>
+    <string name="privateSearchAutocompleteToggle">اقتراحات الإكمال التلقائي</string>
+    <string name="privateSearchMoreSearchSettingsPrimaryText">إعدادات البحث الإضافية</string>
+    <string name="privateSearchMoreSearchSettingsSecondaryText">خصص لغة البحث والمنطقة والمزيد</string>
+    <string name="privateSearchMoreSearchSettingsTitle">إعدادات البحث الإضافية</string>
+
+    <!-- Web Tracking Protection -->
+    <string name="webTrackingProtectionActivityTitle">حماية تتبع الويب</string>
+    <string name="webTrackingProtectionLearnMoreTitle">حماية تتبع الويب</string>
+    <string name="webTrackingProtectionTitle">حماية تتبع الويب مفعلة</string>
+    <string name="webTrackingProtectionDescription"><![CDATA[أصيل لا يتتبعك أبدًا ونحن نهدف إلى حماية خصوصيتك قدر الإمكان. نحافظ باستمرار على طبقات الحماية ونطورها لمواكبة طرق التتبع الجديدة ونقدم العديد من وسائل الحماية التي لا تقدمها متصفحات أخرى افتراضيًا. <u><a href="">تعلم المزيد</a><u/>]]></string>
+
+    <!-- Cookie Pop-Up Protection -->
+    <string name="cookiePopupProtectionTitle">حماية نوافذ الكوكيز المنبثقة</string>
+    <string name="cookiePopupProtectionDescription">تخلص من هذه النوافذ المنبثقة وقلل من الكوكيز</string>
+    <string name="cookiePopupProtectionEnabled">مفعل</string>
+
+    <!-- Fire Button -->
+    <string name="fireButtonActivityTitle">زر الحذف</string>
+
+    <!-- Permissions -->
+    <string name="permissionsActivityTitle">الأذونات</string>
+
+    <!-- Appearance -->
+    <string name="appearanceActivityTitle">المظهر</string>
+
+    <!-- Settings - Automatically clearing data -->
+    <string name="settingsAutomaticallyClearingDialogSave">حفظ</string>
+
+    <string name="settingsAutomaticallyClearWhat">تنظيف تلقائي لـ...</string>
+    <string name="settingsAutomaticallyClearWhatDialogTitle">تنظيف تلقائي لـ...</string>
+    <string name="settingsAutomaticallyClearWhatOptionNone">لا شيء</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabs">التبويبات</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndData">التبويبات والبيانات</string>
+
+    <string name="settingsAutomaticallyClearWhen">تنظيف عند...</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">تنظيف عند...</string>
+    <string name="settingsAutomaticallyClearWhenAppExitOnly">خروج التطبيق فقط</string>
+    <string name="settingsAutomaticallyClearWhenAppExit5Seconds">خروج التطبيق، غير نشط لمدة 5 ثوان</string>
+    <string name="settingsAutomaticallyClearWhenAppExit5Minutes">خروج التطبيق، غير نشط لمدة 5 دقائق</string>
+    <string name="settingsAutomaticallyClearWhenAppExit15Minutes">خروج التطبيق، غير نشط لمدة 15 دقيقة</string>
+    <string name="settingsAutomaticallyClearWhenAppExit30Minutes">خروج التطبيق، غير نشط لمدة 30 دقيقة</string>
+    <string name="settingsAutomaticallyClearWhenAppExit60Minutes">خروج التطبيق، غير نشط لمدة ساعة</string>
+
+    <!-- About Activity -->
+    <string name="aboutActivityTitle">حول أصيل</string>
+    <string name="aboutHeader">مرحباً في أصيل!</string>
+    <string name="aboutDescription">أصيل هو شركة خصوصية الإنترنت المستقلة التي تأسست في عام 2008 لكل من يتعب من التتبع عبر الإنترنت ويريد حلاً سهلاً. نحن دليل على أنه يمكنك الحصول على حماية خصوصية حقيقية عبر الإنترنت بدون تنازلات. متصفح أصيل يأتي مع الميزات التي تتوقعها من متصفحك الأساسي، مثل الإشارات المرجعية والتبويبات وكلمات المرور والمزيد، بالإضافة إلى أكثر من عشرة حمايات خصوصية قوية لا تقدمها معظم المتصفحات الشهيرة افتراضيًا. هذه المجموعة الشاملة من حمايات الخصوصية تساعد على حماية أنشطتك عبر الإنترنت، من البحث إلى التصفح والبريد الإلكتروني والمزيد. حمايات الخصوصية لدينا تعمل دون الح
+</string>
+    <!-- Broken Site Activity -->
+    <string name="brokenSiteReportBrokenSiteMenuItem">الإبلاغ عن موقع معطل</string>
+    <string name="brokenSiteHeading">الإبلاغ عن موقع معطل</string>
+    <string name="brokenSiteSubmitted">شكراً لك! تم إرسال الملاحظات.</string>
+    <string name="brokenSitesCategoriesTitle">وصف ما حدث</string>
+    <string name="brokenSitesCategoriesHint">وصف ما حدث</string>
+    <string name="brokenSiteSubmitButton">إرسال التقرير</string>
+    <string name="brokenSiteDescription">إرسال تقرير مجهول عن موقع معطل يساعدنا في تحسين التطبيق.</string>
+
+    <string name="brokenSiteCategoryBlocked">تم حظر الموقع أو لم يتم تحميله</string>
+    <string name="brokenSiteCategoryLayout">تصميم الموقع معطل</string>
+    <string name="brokenSiteCategoryEmptySpaces">يحتوي الموقع على مساحات فارغة كبيرة</string>
+    <string name="brokenSiteCategoryShopping">لا يمكن الدفع أو الشراء</string>
+    <string name="brokenSiteCategoryPaywall">طلب الموقع تعطيل مانع الإعلانات</string>
+    <string name="brokenSiteCategoryComments">لم يتم تحميل التعليقات أو المراجعات أو الدردشات</string>
+    <string name="brokenSiteCategoryVideos">لم يتم تشغيل الفيديو أو تحميله</string>
+    <string name="brokenSiteCategoryLogin">لا يمكن تسجيل الدخول/التسجيل</string>
+    <string name="brokenSiteCategoryOther">شيء آخر</string>
+    <string name="brokenSiteDescriptionTextInputHint">شارك المزيد من التفاصيل (اختياري)</string>
+    <string name="brokenSiteDescriptionCaption">ماذا حدث؟ ما الذي كان يجب أن يحدث؟ هل ساعد إيقاف تشغيل الحمايات؟</string>
+
+    <string name="brokenSiteProtectionsOn">الحمايات <b>مفعلة</b> لهذا الموقع</string>
+    <string name="brokenSiteProtectionsOff">الحمايات <b>معطلة</b> لهذا الموقع</string>
+    <string name="brokenSiteProtectionsOnBannerMessage">قد يساعد إيقاف تشغيل الحمايات.</string>
+    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">قمنا بتعطيل حمايات الخصوصية مؤقتًا لأنها تبدو وكأنها تعطل هذا الموقع.</string>
+
+    <!-- Bookmarks Activity -->
+    <string name="bookmarksMenuTitle">الإشارات المرجعية</string>
+    <string name="bookmarksActivityTitle">الإشارات المرجعية</string>
+    <string name="noBookmarks">لم تتم إضافة إشارات مرجعية بعد</string>
+    <string name="bookmarkOverflowContentDescription" instruction="Placeholder is the title of the bookmark">المزيد من الخيارات للإشارة المرجعية %1$s</string>
+    <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">تم حذف &lt;b>%1$s&lt;/b></string>
+    <string name="exportBookmarksMenu">تصدير</string>
+    <string name="exportBookmarksEmpty">ليس لديك إشارات مرجعية، لن يتم تصدير أي شيء</string>
+    <string name="exportBookmarksError">لم يتم تصدير أي إشارات مرجعية، حدث خطأ ما</string>
+    <string name="exportBookmarksSuccess">تم تصدير جميع الإشارات المرجعية بنجاح</string>
+    <string name="importBookmarksMenu">استيراد</string>
+    <string name="importBookmarksFileTitle">اختر ملف الإشارات المرجعية للاستيراد</string>
+    <string name="importBookmarksError">لم يتم استيراد أي إشارات مرجعية، حدث خطأ ما</string>
+    <string name="importBookmarksEmpty">الملف لا يحتوي على إشارات مرجعية للاستيراد</string>
+    <string name="importBookmarksSuccess" instruction="Placeholder is a number">تم استيراد %1$d إشارة مرجعية بنجاح</string>
+    <string name="savedSiteDialogTitleHint">العنوان</string>
+    <string name="savedSiteDialogUrlHint">عنوان URL</string>
+    <string name="savedSiteDialogTitleEdit">تعديل</string>
+    <string name="bookmarksSectionTitle">الإشارات المرجعية</string>
+    <string name="favoritesSectionTitle">المفضلة</string>
+    <string name="bookmarksEmptyHint">لم تتم إضافة إشارات مرجعية بعد</string>
+    <string name="favoritesEmptyHint">لم تتم إضافة مفضلات بعد</string>
+
+    <!-- Dialogs -->
+    <string name="dialogConfirmTitle">تأكيد</string>
+    <string name="dialogSave">حفظ</string>
+    <string name="delete">حذف</string>
+    <string name="edit">تعديل</string>
+    <string name="remove">إزالة</string>
+    <string name="removeAll">إزالة الكل</string>
+
+    <!-- Widget -->
+    <string name="searchWidgetTextHint">ابحث في أصيل</string>
+
+    <!-- Favorites widget -->
+    <string name="addFavoriteMenuTitleHighlighted">👋 أضف إلى المفضلة</string>
+    <string name="widgetConfigurationTitleText">اختر الثيم</string>
+    <string name="widgetConfigurationSystemThemeOption">افتراضي النظام</string>
+    <string name="widgetConfigurationLightThemeOption">فاتح</string>
+    <string name="widgetConfigurationDarkThemeOption">داكن</string>
+    <string name="widgetConfigurationAddWidgetOption">أضف ويدجت</string>
+    <string name="searchWidgetEmtpyFavoritesHint">لم تتم إضافة مفضلات بعد</string>
+    <string name="searchWidgetEmtpyFavoritesCta">أضف إلى المفضلة</string>
+    <string name="daxFavoritesOnboardingCtaText"><![CDATA[زر مواقعك المفضلة بسرعة!<br/><br/>انتقل إلى موقع تحبه. ثم اضغط على أيقونة "&#x2807;" واختر أضف إلى المفضلة.]]></string>
+    <string name="daxFavoritesOnboardingCtaContentDescription">زر مواقعك المفضلة بسرعة! انتقل إلى موقع تحبه. ثم اضغط على أيقونة قائمة المتصفح واختر أضف إلى المفضلة.</string>
+    <string name="widgetConfigurationActivityTitle">تكوين الويدجت</string>
+    <string name="favoritesWidgetLabel">المفضلة</string>
+    <string name="searchWidgetLabel">البحث</string>
+
+    <!-- Home Screen Shortcuts -->
+    <string name="addToHome">أضف إلى الشاشة الرئيسية</string>
+    <string name="shortcutAddedText" instruction="Placeholder is the name of a website">نجاح! تمت إضافة %1$s إلى شاشتك الرئيسية.</string>
+
+    <!-- User Survey -->
+    <string name="surveyCtaTitle">ساعدنا على تحسين التطبيق!</string>
+    <string name="surveyCtaDescription">شارك في استطلاعنا القصير وشارك برأيك.</string>
+    <string name="surveyCtaLaunchButton">خذ الاستطلاع</string>
+    <string name="surveyCtaDismissButton">لا شكرًا</string>
+    <string name="surveyActivityTitle">استطلاع المستخدم</string>
+    <string name="surveyTitle">استطلاع أصيل</string>
+    <string name="surveyDismissContentDescription">تجاهل الاستطلاع</string>
+    <string name="surveyLoadingErrorTitle">أوه لا!</string>
+    <string name="surveyLoadingErrorText">استطلاعنا لا يتم تحميله حاليًا.\nالرجاء المحاولة لاحقًا.</string>
+
+    <!-- Add widget -->
+    <string name="addWidgetCtaTitle">جرب ويدجت البحث لدينا!</string>
+    <string name="addWidgetCtaDescription">أضف ويدجت البحث إلى شاشتك الرئيسية للوصول السريع والسهل.</string>
+    <string name="addWidgetCtaAutoLaunchButton">أضف ويدجت</string>
+    <string name="addWidgetCtaInstructionsLaunchButton">أرني</string>
+    <string name="addWidgetCtaDismissButton">تجاهل</string>
+    <string name="addWidgetInstructionsActivityTitle">إضافة ويدجت</string>
+    <string name="addWidgetInstruction1Label">1</string>
+    <string name="addWidgetInstruction1">اضغط مطولًا على شاشتك الرئيسية، ثم افتح قائمة الويدجت.</string>
+    <string name="addWidgetInstruction2Label">2</string>
+    <string name="addWidgetInstruction2">ابحث عن ويدجت أصيل.</string>
+    <string name="addWidgetInstruction3Label">3</string>
+    <string name="addWidgetInstruction3">اسحب الويدجت إلى شاشتك الرئيسية.</string>
+    <string name="addWidgetInstructionsButtonGoHome">انتقل إلى الشاشة الرئيسية</string>
+    <string name="addWidgetInstructionsButtonClose">إغلاق</string>
+
+    <!-- App Enjoyment / Rating / Feedback -->
+    <string name="appEnjoymentDialogTitle">هل تستمتع بأصيل؟</string>
+    <string name="appEnjoymentDialogMessage">نود معرفة رأيك.</string>
+    <string name="appEnjoymentDialogPositiveButton">أحبه</string>
+    <string name="appEnjoymentDialogNegativeButton">يحتاج إلى تحسين</string>
+
+    <string name="rateAppDialogTitle">قيم التطبيق</string>
+    <string name="rateAppDialogMessage">رأيك مهم. الرجاء مشاركة الحب بمراجعة.</string>
+    <string name="rateAppDialogPositiveButton">قيم التطبيق</string>
+    <string name="rateAppDialogNegativeButton" translatable="false">@string/noThanks</string>
+
+    <string name="giveFeedbackDialogTitle">نحن آسفون لسماع ذلك</string>
+    <string name="giveFeedbackDialogMessage">دعنا نعرف كيف يمكننا تحسين التطبيق من أجلك.</string>
+    <string name="giveFeedbackDialogPositiveButton">شارك برأيك</string>
+    <string name="giveFeedbackDialogNegativeButton" translatable="false">@string/noThanks</string>
+
+    <string name="noThanks">لا شكرًا</string>
+
+    <!-- Notification Channel Names -->
+    <string name="notificationChannelTutorials">الدروس التعليمية</string>
+
+    <!-- Clear Notification -->
+    <string name="clearNotificationTitle">تعيين مسح البيانات إلى يدوي</string>
+    <string name="clearNotificationDescription">قم بتخصيص أصيل لمسح بيانات التصفح تلقائيًا بعد كل جلسة.</string>
+
+    <!-- Privacy Protection Notification -->
+    <string name="privacyProtectionNotificationDefaultTitle">نحن نحمي خصوصيتك</string>
+    <string name="privacyProtectionNotificationReportTitle">تقرير الخصوصية الخاص بك</string>
+    <string name="privacyProtectionNotificationDefaultDescription">استخدام تطبيق أصيل يحمي بياناتك عن طريق حظر المتتبعين وتشفير الاتصالات.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription" instruction="Placeholder is the number of connections we have protected">لقد حميت بياناتك من خلال تأمين %1$d اتصالات غير مشفرة أثناء استخدام أصيل.</string>
+    <string name="privacyProtectionNotificationTrackerDescription" instruction="Placeholder is the number of trackers blocked">لقد حميت بياناتك من خلال حظر %1$d متتبع أثناء استخدام أصيل.</string>
+    <string name="privacyProtectionNotificationBothDescription" instruction="%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections">لقد حميت بياناتك من خلال حظر %1$d متتبع وتأمين %2$d اتصالات غير مشفرة أثناء استخدام أصيل.</string>
+    <string name="privacyProtectionNotificationLaunchButton">استئناف التصفح</string>
+
+    <!-- Authentication -->
+    <string name="authenticationDialogTitle">تسجيل الدخول</string>
+    <string name="authenticationDialogMessage" instruction="Placeholder is the name of a website">%1$s يتطلب اسم مستخدم وكلمة مرور.</string>
+    <string name="authenticationDialogPositiveButton">تسجيل الدخول</string>
+    <string name="authenticationDialogNegativeButton">إلغاء</string>
+    <string name="authenticationDialogUsernameHint">اسم المستخدم</string>
+    <string name="authenticationDialogPasswordHint">كلمة المرور</string>
+
+    <!-- User-facing label for when a user selects text and might want to search for that text -->
+    <string name="systemTextSearchMessage">ابحث في أصيل</string>
+
+    <!-- App feedback disambiguation -->
+    <string name="feedbackActivityTitle">شارك برأيك</string>
+    <string name="missingBrowserFeaturesTitleLong">ميزات المتصفح مفقودة أو محبطة</string>
+    <string name="missingBrowserFeaturesTitleShort">مشاكل ميزات المتصفح</string>
+    <string name="missingBrowserFeaturesSubtitle">أي ميزة تصفح يمكننا إضافتها أو تحسينها؟</string>
+    <string name="missingBrowserFeatureSubReasonNavigation">التنقل للأمام وللخلف و/أو التحديث</string>
+    <string name="missingBrowserFeatureSubReasonTabManagement">إنشاء وإدارة التبويبات</string>
+    <string name="missingBrowserFeatureSubReasonAdPopups">حظر الإعلانات والنوافذ المنبثقة</string>
+    <string name="missingBrowserFeatureSubReasonVideos">مشاهدة الفيديوهات</string>
+    <string name="missingBrowserFeatureSubReasonImages">التفاعل مع الصور</string>
+    <string name="missingBrowserFeatureSubReasonBookmarks">إنشاء وإدارة الإشارات المرجعية</string>
+    <string name="missingBrowserFeatureSubReasonOther">لا شيء من هذه</string>
+
+    <string name="websiteNotLoadingTitleLong">مشاكل تحميل الموقع</string>
+    <string name="websiteNotLoadingTitleShort">مشاكل تحميل الموقع</string>
+    <string name="websiteNotLoadingSubtitle">أي موقع معطل؟</string>
+
+    <string name="searchNotGoodEnoughTitleLong">بحث أصيل ليس جيدًا بما فيه الكفاية</string>
+    <string name="searchNotGoodEnoughTitleShort">مشاكل بحث أصيل</string>
+    <string name="searchNotGoodEnoughSubtitle">أي ميزة بحث يمكننا إضافتها أو تحسينها؟</string>
+    <string name="searchNotGoodEnoughSubReasonTechnicalSearches">البحث التقني/البرمجي</string>
+    <string name="searchNotGoodEnoughSubReasonGoogleLayout">يجب أن يكون التصميم أشبه بجوجل</string>
+    <string name="searchNotGoodEnoughSubReasonFasterLoadTimes">زمن تحميل أسرع</string>
+    <string name="searchNotGoodEnoughSubReasonSpecificLanguage">البحث بلغة أو منطقة محددة</string>
+    <string name="searchNotGoodEnoughSubReasonBetterAutocomplete">تحسين الإكمال التلقائي</string>
+    <string name="searchNotGoodEnoughSubReasonOther">لا شيء من هذه</string>
+
+    <string name="needMoreCustomizationTitleLong">لا توجد طرق كافية لتخصيص التطبيق</string>
+    <string name="needMoreCustomizationTitleShort">مشاكل التخصيص</string>
+    <string name="needMoreCustomizationSubtitle">أي خيار تخصيص يمكننا إضافته أو تحسينه؟</string>
+    <string name="needMoreCustomizationSubReasonHomeScreenConfiguration">تكوين الشاشة الرئيسية</string>
+    <string name="needMoreCustomizationSubReasonTabDisplay">كيفية عرض التبويبات</string>
+    <string name="needMoreCustomizationSubReasonAppLooks">مظهر التطبيق</string>
+    <string name="needMoreCustomizationSubReasonWhichDataIsCleared">أي بيانات يتم مسحها</string>
+    <string name="needMoreCustomizationSubReasonWhenDataIsCleared">متى يتم مسح البيانات</string>
+    <string name="needMoreCustomizationSubReasonBookmarksDisplay">كيفية عرض الإشارات المرجعية</string>
+    <string name="needMoreCustomizationSubReasonOther">لا شيء من هذه</string>
+
+    <string name="appIsSlowOrBuggyTitleLong">التطبيق بطيء، به أخطاء أو يتعطل</string>
+    <string name="appIsSlowOrBuggyTitleShort">مشاكل الأداء</string>
+    <string name="appIsSlowOrBuggySubtitle">أي مشكلة تواجهها؟</string>
+    <string name="appIsSlowOrBuggySubReasonSlowResults">تحميل صفحات الويب أو نتائج البحث ببطء</string>
+    <string name="appIsSlowOrBuggySubReasonAppCrashesOrFreezes">تعطل التطبيق أو تجمده</string>
+    <string name="appIsSlowOrBuggySubReasonMediaPlayback">أخطاء تشغيل الفيديو أو الوسائط</string>
+    <string name="appIsSlowOrBuggySubReasonOther">لا شيء من هذه</string>
+
+    <string name="otherMainReasonTitleLong">لا شيء من هذه</string>
+    <string name="otherMainReasonTitleShort">مشاكل أخرى</string>
+
+    <string name="openEndedInputHint">يرجى التحديد قدر الإمكان</string>
+    <string name="submitFeedback">إرسال</string>
+
+    <string name="tellUsHowToImprove">يرجى إخبارنا بما يمكننا تحسينه.</string>
+    <string name="thanksForTheFeedback">شكرًا على الملاحظات!</string>
+    <string name="feedbackNegativeMainReasonPageSubtitle">ما هو أكثر ما يتعلق بإحباطك؟</string>
+    <string name="feedbackNegativeMainReasonPageTitle">نحن آسفون لسماع ذلك</string>
+    <string name="feedbackShareDetails">شارك التفاصيل</string>
+    <string name="sharePositiveFeedbackWithTheTeam">هل هناك تفاصيل تود مشاركتها مع الفريق؟</string>
+    <string name="whatHaveYouBeenEnjoying">ما الذي استمتعت به؟</string>
+    <string name="awesomeToHear">رائع أن نسمع ذلك!</string>
+    <string name="shareTheLoveWithARating">الرجاء مشاركة الحب بتقييم في متجر الألعاب.</string>
+    <string name="rateTheApp">قيم التطبيق</string>
+    <string name="declineFurtherFeedback">لا شكرًا، لقد انتهيت</string>
+    <string name="whichBrokenSites">أين ترى هذه المشاكل؟</string>
+    <string name="whichBrokenSitesHint">أي موقع به مشاكل؟</string>
+    <string name="feedbackSpecificAsPossible">يرجى التحديد قدر الإمكان</string>
+    <string name="feedbackInitialDisambiguationTitle">هيا نبدأ!</string>
+    <string name="feedbackInitialDisambiguationSubtitle">كيف تصنف ملاحظاتك؟</string>
+    <string name="feedbackInitialDisambiguationHappyButtonContentDescription">زر الملاحظات الإيجابية</string>
+    <string name="feedbackInitialDisambiguationSadButtonContentDescription">زر الملاحظات السلبية</string>
+    <string name="feedbackIsImportantToUs">ملاحظاتك المجهولة مهمة بالنسبة لنا.</string>
+
+    <!-- Webview Recovery -->
+    <string name="crashedWebViewErrorMessage">"لا يمكن عرض صفحة الويب."</string>
+    <string name="crashedWebViewErrorAction">"إعادة تحميل"</string>
+
+    <!-- System Search-->
+    <string name="systemSearchDeviceAppLabel">من هذا الجهاز</string>
+    <string name="systemSearchAppNotFound">لم يتم العثور على التطبيق</string>
+    <string name="systemSearchOnboardingText">شكرًا لاختيارك أصيل!\nالآن، عند استخدام البحث أو التطبيق، يتم حماية عمليات البحث الخاصة بك.</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">تطبيق أصيل يقدم أيضًا:</string>
+    <string name="systemSearchOnboardingFeatureOneText">حظر المتتبعين غير الآمنين.</string>
+    <string name="systemSearchOnboardingFeatureTwoText">إجبار التشفير على المواقع الإلكترونية.</string>
+    <string name="systemSearchOnboardingFeatureThreeText">مسح البيانات بنقرة واحدة.</string>
+    <string name="systemSearchOnboardingButtonMore">عرض المزيد</string>
+    <string name="systemSearchOnboardingButtonLess">إخفاء</string>
+    <string name="systemSearchOnboardingButtonOk">فهمت</string>
+
+    <!-- Dax Dialog -->
+    <string name="daxDialogHideButton">إخفاء</string>
+    <string name="daxDialogPhew">أوف!</string>
+    <string name="daxDialogNext">التالي</string>
+    <string name="daxDialogHighFive">تحية!</string>
+    <string name="daxDialogGotIt">فهمت</string>
+    <string name="hideTipsTitle">إخفاء النصائح المتبقية؟</string>
+    <string name="hideTipsText">هناك فقط بعض النصائح، وحاولنا أن نجعلها مفيدة.</string>
+    <string name="hideTipsButton">إخفاء النصائح إلى الأبد</string>
+
+    <!-- AppTP Retention Experiment Dax Dialog -->
+
+    <string name="daxDialogAppTpRetentionText"><![CDATA[أنت الآن تحظر المتتبعين عبر الويب 🎉<br/><br/>يمكنني أيضًا حظر المتتبعين المختبئين في تطبيقاتك الأخرى، حتى عندما لا تستخدم هاتفك.]]></string>
+    <string name="daxDialogAppTpRetentionPrimaryButtonText">تفعيل حماية تتبع التطبيقات</string>
+    <string name="daxDialogAppTpRetentionSecondaryButtonText">ليس الآن</string>
+
+    <!-- New Onboarding Experience -->
+    <string name="onboardingWelcomeTitle">"مرحباً بك في أصيل!"</string>
+    <string name="onboardingDaxText"><![CDATA[يمكن أن يكون الإنترنت مخيفاً نوعاً ما.<br/><br/>لا داعي للقلق! البحث والتصفح بخصوصية أسهل مما تظن.]]></string>
+    <string name="onboardingLetsDoItButton">هيا بنا!</string>
+    <string name="daxIntroCtaText"><![CDATA[الخطوة التالية، جرب زيارة واحدة من مواقعك المفضلة!<br/><br/>سأقوم بحظر المتتبعين حتى لا يتمكنوا من التجسس عليك. سأقوم أيضًا بتحسين أمان الاتصال إذا أمكن. 🔒]]></string>
+    <string name="daxEndCtaText"><![CDATA[أنت تستطيع فعل ذلك!<br/><br/>تذكر: في كل مرة تتصفح فيها معي، يفقد إعلان مخيف أجنحته. 👍]]></string>
+    <string name="daxSerpCtaText">بحثك في أصيل مجهول دائمًا. دائمًا. 🙌</string>
+    <plurals name="daxTrackersBlockedCtaText" tools:ignore="MissingQuantity">
+        <item quantity="one" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 1 other..."><![CDATA[&#160;و<b>%1$d آخر</b> كانوا يحاولون تتبعك هنا. <br/><br/>لقد قمت بحظرهم!<br/><br/> ☝️يمكنك التحقق من شريط العناوين لرؤية من يحاول تتبعك عند زيارة موقع جديد.]]></item>
+        <item quantity="other" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 3 others..."><![CDATA[&#160;و<b>%1$d آخرين</b> كانوا يحاولون تتبعك هنا. <br/><br/>لقد قمت بحظرهم!<br/><br/> ☝️يمكنك التحقق من شريط العناوين لرؤية من يحاول تتبعك عند زيارة موقع جديد.]]></item>
+    </plurals>
+    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity,MissingQuantity">
+        <item quantity="one" instruction="This sentence is preceded by the name of a company, i.e. Facebook was trying to track..."><![CDATA[&#160;كان يحاول تتبعك هنا. <br/><br/>لقد قمت بحظرهم!<br/><br/> ☝️يمكنك التحقق من شريط URL لرؤية من يحاول تتبعك عند زيارة موقع جديد.]]></item>
+        <item quantity="other" instruction="This sentence is preceded by the name of several companies, i.e. Facebook and Google were trying to track..."><![CDATA[&#160;كانوا يحاولون تتبعك هنا. <br/><br/>لقد قمت بحظرهم!<br/><br/> ☝️يمكنك التحقق من شريط URL لرؤية من يحاول تتبعك عند زيارة موقع جديد.]]></item>
+    </plurals>
+    <string name="daxNonSerpCtaText"><![CDATA[بينما تنقر وتتصفح، سأقوم بحظر المتتبعين المزعجين. <br/><br/>تفضل — استمر في التصفح!]]></string>
+    <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">انتبه! لا أستطيع منع %1$s من رؤية نشاطك على %2$s &lt;br/&gt;&lt;br/&gt;لكن تصفح معي، ويمكنني تقليل ما يعرفه %3$s عنك بشكل عام من خلال حظر المتتبعين الخاصين بهم على العديد من المواقع الأخرى.</string>
+    <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">انتبه! بما أن %1$s تملك %2$s، لا أستطيع منعهم من رؤية نشاطك هنا.&lt;br/&gt;&lt;br/&gt;لكن تصفح معي، ويمكنني تقليل ما يعرفه %3$s عنك بشكل عام من خلال حظر المتتبعين الخاصين بهم على العديد من المواقع الأخرى.</string>
+
+    <!-- Onboarding DDG Feature Options -->
+    <string name="onboardingFeatureOptionsTitle">ما الذي جاء بك إلى أصيل؟</string>
+    <string name="onboardingFeatureOptionsContinue">استمر</string>
+    <string name="onboardingFeatureOptionsSkip">تخط هذه الخطوة</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionPrivateSearch">بحث خاص</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionTrackerBlocking">حظر المتتبعين</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionSmallerDigitalFootprint">بصمة رقمية أصغر</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionFasterPageLoads">تحميل صفحات أسرع</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionFewerAds">إعلانات أقل</string>
+    <!-- smartling.character_limit = 28 -->
+    <string name="onboardingFeatureOptionOneClickDataClearing">مسح البيانات بنقرة واحدة</string>
+
+    <!-- Download Confirmation -->
+    <string name="downloadConfirmationContinue">حفظ في التحميلات</string>
+    <string name="downloadConfirmationSaveFileTitle" instruction="Placeholder is the name of a file">حفظ %1$s</string>
+    <string name="downloadConfirmationKeepBothFilesText">احتفظ بكلاهما</string>
+    <string name="downloadConfirmationReplaceOldFileText">استبدال</string>
+    <string name="downloadConfirmationOpenFileText">فتح</string>
+    <string name="downloadConfirmationUnableToOpenFileText">لا يمكن فتح الملف</string>
+    <string name="downloadConfirmationUnableToDeleteFileText">لا يمكن حذف الملف القديم</string>
+
+    <!-- Change Icon Activity -->
+    <string name="changeIconActivityTitle">أيقونة التطبيق</string>
+    <string name="changeIconCtaLabel">أيقونة التطبيق</string>
+    <string name="changeIconCtaAccept">تطبيق</string>
+    <string name="changeIconCtaCancel">إلغاء</string>
+    <string name="changeIconDialogTitle">تطبيق أيقونة جديدة؟</string>
+    <string name="changeIconDialogMessage">قد يغلق التطبيق لتطبيق التغييرات. عُد بعد أن تستمتع بأيقونتك الجديدة الجذابة.</string>
+
+    <!-- New dashboard / menu buttons -->
+    <string name="manageAllowlist">المواقع غير المحمية</string>
+    <string name="reportBrokenSite">الإبلاغ عن موقع معطل</string>
+
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">إضافة</string>
+    <string name="dialogEditTitle">تعديل</string>
+    <string name="dialogSaveAction">حفظ</string>
+
+    <!-- Allowlist -->
+    <string name="allowlistActivityTitle">المواقع غير المحمية</string>
+    <string name="enablePrivacyProtection">تفعيل حماية الخصوصية</string>
+    <string name="disablePrivacyProtection">تعطيل حماية الخصوصية</string>
+    <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">المزيد من الخيارات للموقع غير المحمي %1$s</string>
+    <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">هل أنت متأكد أنك تريد إزالة &lt;b>%1$s&lt;/b> من المواقع غير المحمية؟</string>
+    <string name="allowlistExplanation">هذه المواقع لن تستفيد من تحسينات حماية الخصوصية.</string>
+    <string name="allowlistNoEntries">حماية الخصوصية مفعلة لجميع المواقع</string>
+    <string name="allowlistDomainHint">www.example.com</string>
+    <string name="allowlistFormatError">الرجاء إدخال نطاق مثل <b>example.com</b> وحاول مرة أخرى</string>
+
+    <!-- Settings -->
+    <string name="settingsPrivacyProtectionAllowlist">المواقع غير المحمية</string>
+
+    <!-- Fireproof websites -->
+    <string name="fireproofWebsitesActivityTitle">المواقع المحمية</string>
+    <string name="settingsFireproofWebsites">المواقع المحمية</string>
+    <string name="fireproofWebsiteMenuTitleAdd">حماية هذا الموقع</string>
+    <string name="fireproofWebsiteSnackbarConfirmation" instruction="Placeholder is a website">&lt;b>%1$s&lt;/b> محمي الآن</string>
+    <string name="fireproofWebsiteSnackbarAction">تراجع</string>
+    <string name="fireproofWebsiteDeleteConfirmMessage" instruction="Placeholder is a website">هل أنت متأكد أنك تريد حذف &lt;b>%1$s&lt;/b>؟</string>
+
+    <string name="fireproofWebsiteFeatureDescription">تعتمد المواقع على ملفات تعريف الارتباط لإبقائك مسجلًا للدخول. عند حماية موقع، لن يتم مسح ملفات تعريف الارتباط وستبقى مسجلاً للدخول، حتى بعد استخدام زر الحذف. لا يزال نظامنا يحظر المتتبعين الطرف الثالث الموجودين على المواقع المحمية.</string>
+    <string name="fireproofWebsiteOverflowContentDescription" instruction="Placeholder is a website">المزيد من الخيارات للموقع المحمي %1$s</string>
+    <string name="fireproofWebsiteLoginDialogTitle" instruction="Placeholder is a website">هل ترغب في حماية %1$s؟</string>
+    <string name="fireproofWebsiteLoginDialogDescription">حماية هذا الموقع ستبقيك مسجلاً للدخول بعد استخدام زر الحذف.</string>
+    <string name="fireproofWebsiteLoginDialogPositive">حماية</string>
+    <string name="fireproofWebsiteLoginDialogNegative">ليس الآن</string>
+    <string name="fireproofWebsiteItemsSectionTitle">المواقع المحمية</string>
+    <string name="fireproofWebsiteEmptyListHint">لا توجد مواقع محمية بعد</string>
+    <string name="fireproofWebsiteSettingSelectionTitle">حماية المواقع تلقائيًا عند تسجيل الدخول</string>
+    <string name="fireproofWebsiteRemoveAllConfirmation">تمت إزالة الحماية لجميع المواقع</string>
+    <string name="fireproofWebsiteRemovalConfirmation" instruction="Placeholder is a website">تمت إزالة الحماية لـ &lt;b>%1$s&lt;/b></string>
+    <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">اسأل في كل مرة</string>
+    <string name="fireproofWebsiteSettingsSelectionDialogAlways">دائمًا</string>
+    <string name="fireproofWebsiteSettingsSelectionDialogNever">أبدًا</string>
+    <string name="disableLoginDetectionDialogTitle">تعطيل تذكير الحماية عند تسجيل الدخول إلى المواقع؟</string>
+    <string name="disableLoginDetectionDialogDescription">يمكنك تغيير هذا الخيار في أي وقت من الإعدادات.</string>
+    <string name="disableLoginDetectionDialogPositive">تعطيل</string>
+    <string name="disableLoginDetectionDialogNegative">إلغاء</string>
+    <string name="automaticFireproofWebsiteLoginDialogTitle">حماية المواقع تلقائيًا عند تسجيل الدخول؟</string>
+    <string name="automaticFireproofWebsiteLoginDialogDescription">حماية المواقع ستبقيك مسجلاً للدخول بعد استخدام زر الحذف. يمكنك دائمًا تغيير هذا لاحقًا في الإعدادات.</string>
+    <string name="automaticFireproofWebsiteLoginDialogFirstOption">حماية تلقائية دائمًا</string>
+    <string name="automaticFireproofWebsiteLoginDialogSecondOption">حماية هذا الموقع</string>
+    <string name="automaticFireproofWebsiteLoginDialogThirdOption">ليس الآن</string>
+
+    <!-- Fire Button Animation settings -->
+    <string name="settingsFireAnimation">حركة زر الحذف</string>
+    <string name="settingsHeroFireAnimation">إنفرنو</string>
+    <string name="settingsHeroWaterAnimation">دوامة</string>
+    <string name="settingsHeroAbstractAnimation">تيار هوائي</string>
+    <string name="settingsNoneAnimation">بدون</string>
+    <string name="settingsSelectFireAnimationDialog">حركة زر الحذف</string>
+    <string name="settingsSelectFireAnimationDialogSave">حفظ</string>
+
+    <!-- Dos Attack error-->
+    <string name="dosErrorMessage">تم إيقاف الاتصال. هذا الموقع قد يكون ضارًا بجهازك.</string>
+
+    <!-- Precise Location -->
+    <string name="preciseLocationSystemDialogTitle">تفعيل موقع الجهاز لمتصفح أصيل؟</string>
+    <string name="preciseLocationSystemDialogSubtitle" instruction="%1$s and %2$s are both the name of the website requesting the location">%1$s يطلب موقع جهازك. ستحتاج أولاً إلى السماح للتطبيق بإرسال موقع جهازك، ثم يمكن لـ %2$s طلب الإذن.</string>
+    <string name="preciseLocationSystemDialogAllow">تمكين</string>
+    <string name="preciseLocationSystemDialogDeny">ربما لاحقاً</string>
+    <string name="preciseLocationSystemDialogNeverAllow">لا تسأل مرة أخرى لهذا الموقع</string>
+    <string name="preciseLocationSiteDialogTitle" instruction="Placeholder is the name of a website">منح %1$s إذن الوصول إلى الموقع؟</string>
+    <string name="preciseLocationDDGDialogSubtitle">نحن نستخدم موقعك المجهول فقط لتقديم نتائج بحث أفضل وأقرب لك. يمكنك دائمًا تغيير رأيك لاحقًا.</string>
+    <string name="preciseLocationSiteDialogSubtitle">يمكنك إدارة أذونات الوصول إلى الموقع التي منحتها للمواقع الفردية في الإعدادات.</string>
+    <string name="preciseLocationSiteDialogAllowAlways">دائمًا</string>
+    <string name="preciseLocationSiteDialogAllowOnce">فقط لهذه الجلسة</string>
+    <string name="preciseLocationSiteDialogDenyAlways">رفض دائمًا</string>
+    <string name="preciseLocationSiteDialogDenyOnce">رفض لهذه الجلسة</string>
+    <string name="preciseLocationFeatureDescription">قد تطلب المواقع التي تزورها الوصول إلى موقع جهازك. لن يتمكنوا من الوصول إليه حتى تمنحهم الإذن صراحةً. يستخدم أصيل موقعك بشكل مجهول فقط لتقديم نتائج بحث محلية.</string>
+    <string name="preciseLocationToggleText">المواقع يمكنها طلب موقعي</string>
+    <string name="preciseLocationEmptyListHint">لم يتم منح أي مواقع إذن الوصول إلى الموقع</string>
+    <string name="preciseLocationNoSystemPermission">لإدارة أذونات الوصول إلى الموقع التي منحتها للمواقع الفردية، قم بتمكين الموقع لهذا التطبيق في إعدادات Android.</string>
+    <string name="preciseLocationActivityTitle">الموقع</string>
+    <string name="preciseLocationDeleteConfirmMessage" instruction="Placeholder is the name of a website">هل أنت متأكد أنك تريد حذف &lt;b>%1$s&lt;/b>؟</string>
+    <string name="preciseLocationDeleteContentDescription" instruction="Placeholder is the domain of a website">المزيد من الخيارات لأذونات الموقع في النطاق %1$s</string>
+    <string name="preciseLocationAllowedSitesSectionTitle">تم الموافقة</string>
+    <string name="preciseLocationDeniedSitesSectionTitle">تم الرفض</string>
+    <string name="preciseLocationSnackbarMessage" instruction="Placeholder is the name of a website">لقد منحت %1$s إذن الوصول إلى موقع جهازك مسبقًا.</string>
+
+    <!-- Fire button education -->
+    <string name="daxClearDataCtaText">يمكن أن تتراكم البيانات الشخصية في متصفحك. يا للقرف. استخدم زر الحذف لحرق كل شيء. جربه الآن! &#128071;</string>
+
+    <!-- Global Privacy Control -->
+    <string name="globalPrivacyControlActivityTitle">التحكم العالمي بالخصوصية (GPC)</string>
+    <string name="globalPrivacyControlDescription"><![CDATA[يقوم أصيل تلقائيًا بحظر العديد من المتتبعين. مع التحكم العالمي بالخصوصية (GPC)، يمكنك أيضًا طلب من المواقع المشاركة تقييد بيع أو مشاركة بياناتك الشخصية مع شركات أخرى. <u><a href="">تعرف أكثر</a><u/>]]></string>
+    <string name="globalPrivacyControlSetting">التحكم العالمي بالخصوصية (GPC)</string>
+    <string name="globalPrivacyControlToggle">التحكم العالمي بالخصوصية (GPC)</string>
+    <string name="disabled">معطل</string>
+    <string name="enabled">ممكن</string>
+
+    <!-- Opening app links -->
+    <string name="settingTitleOpenLinksInAssociatedApps">فتح الروابط في التطبيقات المرتبطة</string>
+    <string name="settingSubtitleOpenLinksInAssociatedApps">قم بالتعطيل لمنع الروابط من الفتح تلقائيًا في التطبيقات المثبتة الأخرى.</string>
+    <string name="appLinkDialogTitle">فتح في تطبيق آخر؟</string>
+    <string name="appLinkSnackBarAction">فتح في التطبيق</string>
+    <string name="appLinkMultipleSnackBarAction">اختر التطبيق</string>
+    <string name="appLinkSnackBarMessage" instruction="Placeholder is the name of an app">يمكنك فتح هذا الرابط في %1$s.</string>
+    <string name="appLinkMultipleSnackBarMessage">يمكنك فتح هذا الرابط في تطبيقات أخرى.</string>
+    <string name="appLinkIntentChooserTitle">فتح مع</string>
+    <string name="appLinkMenuItemTitle">فتح في التطبيق</string>
+
+    <!-- Email Autofill -->
+    <string name="aliasToClipboardMessage">تم نسخ العنوان الجديد إلى الحافظة الخاصة بك</string>
+    <string name="newEmailAliasMenuTitle">توليد عنوان بريد إلكتروني Duck</string>
+
+    <!-- Autofill -->
+    <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">عرض</string>
+
+    <!-- Waitlist Notification -->
+    <string name="waitlistNotificationDialogDescription">هل تريد منا أن نرسل لك إشعارًا عندما يحين دورك؟</string>
+    <string name="waitlistNotificationDialogNoThanks">لا شكرًا</string>
+    <string name="waitlistNotificationDialogNotifyMe">أعلمني</string>
+
+    <!-- Email Protection -->
+    <string name="emailProtectionActivityTitle">حماية البريد الإلكتروني (تجريبي)</string>
+    <string name="emailNotSupported">الجهاز غير مدعوم</string>
+    <string name="emailNotSupportedExplanation">تسمح حماية البريد الإلكتروني بإنشاء عناوين بريد إلكتروني خاصة تزيل المتتبعين البريديين. نحن بحاجة إلى تشفير وتخزين هذه العناوين التي تنشئها محليًا على جهازك. نظرًا لعدم دعم جهازك للتخزين المشفر، فإن حماية البريد الإلكتروني غير متاحة.</string>
+
+    <!-- Bookmark folders -->
+    <string name="bookmarkDialogTitleEdit">تعديل الإشارة المرجعية</string>
+    <string name="favoriteDialogTitleEdit">تعديل المفضلة</string>
+    <string name="locationLabel">الموقع</string>
+    <string name="folderLocationTitle">اختر الموقع</string>
+    <string name="addFolder">إضافة مجلد</string>
+    <string name="editFolder">تعديل مجلد</string>
+    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"حذف المجلد ومحتوياته؟"</string>
+    <string name="bookmarkFolderDeleteDialogMessage">"هل أنت متأكد أنك تريد حذف "</string>
+    <string name="bookmarkFolderEmpty">فارغ</string>
+
+    <plurals name="bookmarkFolderDeleteDialogMessage" tools:ignore="MissingQuantity">
+        <item quantity="one" instruction="%1$s is the text from bookmarkFolderDeleteDialogMessage, %2$s is the name of the folder and %3$d is the number of items inside the folder">%1$s%2$s و %3$d عنصر؟</item>
+        <item quantity="other" instruction="%1$s is the text from bookmarkFolderDeleteDialogMessage, %2$s is the name of the folder and %3$d is the number of items inside the folder">%1$s%2$s و %3$d عناصر؟</item>
+    </plurals>
+
+    <plurals name="bookmarkFolderItems" tools:ignore="MissingQuantity">
+        <item quantity="one" instruction="Placeholder is the number of items">%1$d عنصر</item>
+        <item quantity="other" instruction="Placeholder is the number of items">%1$d عناصر</item>
+    </plurals>
+
+    <!-- Accessibility-->
+    <string name="settingsAccessibility">سهولة الوصول</string>
+    <string name="accessibilityActivityTitle">سهولة الوصول</string>
+    <string name="accessibilityFontSizeTitle">حجم النص</string>
+    <string name="accessibilityFontSizeHint">اسحب الشريط حتى تتمكن من قراءة هذا براحة. سيتم تعديل المواقع التي تشاهدها في أصيل لتطابقه.</string>
+    <string name="accessibilityForceZoomTitle">فرض تكبير الصفحة يدويًا</string>
+    <string name="accessibilityForceZoomSubtitle">تكبير وتصغير أي موقع، حتى تلك التي تمنع ذلك عادةً</string>
+    <string name="accessibilityTextSizeOverrideTitle">إدارة حجم النص</string>
+    <string name="accessibilityTextSizeOverrideSubtitle">سيتم تعديل النص على المواقع التي تشاهدها في أصيل ليطابق الإعداد أدناه</string>
+
+    <!-- Privacy Policy -->
+    <string name="settingsPrivacyPolicyAsil">سياسة الخصوصية</string>
+
+    <!-- Home Screen Widget -->
+    <string name="homeScreenWidgetAdded" instruction="Placeholder is the name of the widget">%1$s ويدجت تمت إضافته إلى الشاشة الرئيسية</string>
+    <string name="settingsAddHomeScreenWidget">ويدجت الشاشة الرئيسية</string>
+
+    <!-- MacOs Settings -->
+    <string name="macos_settings_description">تصفح بخصوصية مع تطبيقنا لـ Mac</string>
+    <string name="macos_settings_title">تطبيق أصيل لنظام Mac</string>
+
+    <!-- Downloads -->
+    <string name="downloadsMenuItem">التحميلات</string>
+    <string name="downloadsActivityTitle">التحميلات</string>
+    <string name="downloadsActivityNoItemsDescription">لم يتم تحميل أي ملفات بعد</string>
+    <string name="downloadsShareTitle">مشاركة مع...</string>
+    <string name="downloadsDownloadFinishedActionName">فتح</string>
+    <string name="downloadsCannotOpenFileErrorMessage">لا يمكن فتح الملف. تحقق من وجود تطبيق متوافق.</string>
+    <string name="downloadsFileNotFoundErrorMessage">الملف لم يعد موجودًا</string>
+    <string name="downloadsItemMenuShare">مشاركة</string>
+    <string name="downloadsItemMenuDelete">حذف</string>
+    <string name="downloadsItemMenuCancel">إلغاء</string>
+    <string name="downloadsActivityMenuDeleteAll">حذف الكل</string>
+    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">تم حذف %1$s</string>
+    <string name="downloadsAllFilesDeletedMessage">تم حذف جميع الملفات</string>
+    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">المزيد من الخيارات لـ %1$s</string>
+    <string name="downloadsUndoActionName">تراجع</string>
+    <string name="downloadsStateInProgress">جاري التقدم...</string>
+
+    <!-- App Tracking Protection -->
+    <string name="atp_SettingsTitle">حماية تتبع التطبيقات</string>
+    <string name="atp_SettingsDeviceShieldNeverEnabled">حظر المتتبعين في التطبيقات على جهازك</string>
+    <string name="atp_SettingsDeviceShieldEnabled">مفعل</string>
+    <string name="atp_SettingsDeviceShieldDisabled">معطل</string>
+
+    <!-- Autoconsent -->
+    <!-- smartling.character_limit = 82 -->
+    <string name="autoconsentDialogTitle"><![CDATA[<b>هل تريد مني التعامل مع نوافذ الكوكيز المنبثقة؟</b>]]></string>
+    <!-- smartling.character_limit = 160 -->
+    <string name="autoconsentDialogDescription">يمكنني محاولة اختيار الإعدادات الأكثر خصوصية المتاحة وإخفاء نوافذ من هذا النوع.</string>
+    <!-- smartling.character_limit = 42 -->
+    <string name="autoconsentPrimaryCta">تعامل مع النوافذ المنبثقة نيابة عني</string>
+    <!-- smartling.character_limit = 42 -->
+    <string name="autoconsentSecondaryCta">لا، سأتعامل معها بنفسي</string>
+
+    <string name="autoconsentSetting">إدارة نوافذ الكوكيز المنبثقة</string>
+    <string name="autoconsentCosmeticNoticeAnimationText">تم إخفاء النافذة المنبثقة</string>
+    <string name="autoconsentManagedNoticeAnimationText">تم إدارة الكوكيز</string>
+
+    <!-- Site Permissions Settings -->
+    <string name="settingsSitePermissions">أذونات الموقع</string>
+    <string name="sitePermissionsSettingsDescription">قد تطلب المواقع التي تزورها الوصول إلى موقع جهازك، الكاميرا، الميكروفون، أو برامج إدارة الحقوق الرقمية (DRM). لن يتمكنوا من الوصول إليها إلا إذا منحتهم الإذن صراحة.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">السماح لجميع المواقع بطلب:</string>
+    <string name="sitePermissionsSettingsLocation">الموقع</string>
+    <string name="sitePermissionsSettingsCamera">الكاميرا</string>
+    <string name="sitePermissionsSettingsMicrophone">الميكروفون</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">إدارة المواقع</string>
+    <string name="sitePermissionsSettingsEmptyText">لا توجد مواقع بعد</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">تمت إزالة الأذونات لجميع المواقع</string>
+    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">أذونات لـ \"%1$s\" </string>
+    <string name="permissionsPerWebsiteAskSetting">اسأل</string>
+    <string name="permissionsPerWebsiteDenySetting">رفض</string>
+    <string name="permissionsPerWebsiteAllowSetting">السماح</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">تعطيل "اسأل" لجميع المواقع</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%1$s إذن لـ %2$s</string>
+
+    <!-- Notify Me View on Downloads -->
+    <string name="downloadsNotifyMeTitle">اعرف عندما تكون التحميلات جاهزة</string>
+    <string name="downloadsNotifyMeSubtitle">احصل على إشعار عندما تكتمل التحميلات.</string>
+
+    <!-- Windows Settings -->
+    <string name="windows_settings_title">تطبيق أصيل لنظام Windows</string>
+    <string name="windows_settings_description">تصفح بخصوصية مع تطبيقنا لـ Windows</string>
+    <string name="windows_settings_description_ready">التحميل متاح</string>
+    <string name="windows_settings_description_list">أنت على القائمة!</string>
+
+    <!-- Full screen message-->
+    <string name="fullScreenMessage">اسحب لأسفل من الأعلى وانقر على زر الرجوع للخروج من وضع ملء الشاشة</string>
+
+    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">إغلاق جميع التبويبات؟</string>
+    <string name="closeAppTabsConfirmationDialogDescription">هل أنت متأكد أنك تريد إغلاق جميع التبويبات؟</string>
+    <string name="closeAppTabsConfirmationDialogCancel">إلغاء</string>
+    <string name="closeAppTabsConfirmationDialogClose">إغلاق</string>
+
+    <!-- Edit Saved Site screen, 'Delete Saved Site' confirmation prompt -->
+    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">حذف هذه الإشارة المرجعية؟</string>
+    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">سيؤدي ذلك إلى حذف إشارتك المرجعية لـ &lt;b>%1$s&lt;/b>.</string>
+    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">حذف هذه المفضلة؟</string>
+    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">سيؤدي ذلك إلى حذف مفضلتك لـ &lt;b>%1$s&lt;/b>.</string>
+    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">حذف مجلد الإشارات المرجعية هذا؟</string>
+    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">سيؤدي ذلك إلى حذف مجلد الإشارات المرجعية &lt;b>%1$s&lt;/b>.</string>
+    <string name="deleteSavedSiteConfirmationDialogCancel">إلغاء</string>
+    <string name="deleteSavedSiteConfirmationDialogDelete">حذف</string>
+
+    <!-- Private voice search -->
+    <string name="accessibilityVoiceSearchSubtitle">إضافة خيار البحث الصوتي الخاص إلى شريط العناوين. لا يتم تخزين أو مشاركة الصوت مع أي شخص، بما في ذلك أصيل.</string>
+    <string name="accessibilityVoiceSearchTitle">بحث صوتي خاص</string>
+
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">لا يمكن الوصول إلى الكاميرا</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">تحميل صورة</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">اختر ملف</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">التقاط صورة</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">السماح لأصيل بطلب الوصول إلى الكاميرا على هذا الجهاز</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">لا يمكن للمواقع استخدام الكاميرا الخاصة بك إلا إذا سمحت لأصيل بطلب الوصول.</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">فتح الإعدادات</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">إلغاء</string>
+
+    <!-- Autofill -->
+    <string name="settingsAutofillLoginsSetting">كلمات المرور</string>
+    <string name="autofillLoginSavedSnackbarMessage">تم حفظ كلمة المرور</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">تم تحديث كلمة المرور</string>
+    <string name="safe_gaze_arrow" translatable="false">safe_gaze_arrow</string>
+    <string name="pointer_arrow">سهم المؤشر</string>
+    <string name="safe_gaze_up">نظرة آمنة لأعلى</string>
+    <string name="ads_and_other_creepy_things_blocked">تم حظر الإعلانات وأشياء مخيفة أخرى</string>
+    <string name="if_this_site_appears_broken_try_shields_down">إذا بدا هذا الموقع معطلاً، جرب تعطيل الدروع</string>
+    <string name="_0">0</string>
+
+</resources>
