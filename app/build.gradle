@@ -23,7 +23,7 @@ android {
         versionCode 119
         versionName "1.1.9"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        archivesBaseName = "duckduckgo-$versionName"
+        archivesBaseName = "asil-$versionName"
         vectorDrawables.useSupportLibrary = true
         javaCompileOptions {
             annotationProcessorOptions {
