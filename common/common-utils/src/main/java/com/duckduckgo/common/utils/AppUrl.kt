@@ -19,7 +19,7 @@ package com.duckduckgo.common.utils
 class AppUrl {
 
     object Url {
-        const val HOST = "asil.co"
+        const val HOST = "duckduckgo.com"
         const val API = "https://$HOST"
         const val HOME = "https://$HOST"
         const val COOKIES = "https://$HOST"
