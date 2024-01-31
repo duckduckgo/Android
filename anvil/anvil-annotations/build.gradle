@@ -31,5 +31,6 @@ kotlin {
 }
 
 dependencies {
+    implementation Google.dagger
 }
 
