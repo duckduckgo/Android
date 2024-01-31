@@ -793,4 +793,10 @@
     <string name="ads_and_other_creepy_things_blocked">Ads and other creepy things blocked</string>
     <string name="if_this_site_appears_broken_try_shields_down">If this site appears broken, try Shields down</string>
     <string name="_0">0</string>
+    <string name="profile">Profile</string>
+    <string name="preference">Preference</string>
+    <string name="unsubscribe_haram_channels">Unsubscribe Haram Channels</string>
+    <string name="gender">Gender</string>
+    <string name="religion_status">Religion Status</string>
+    <string name="save">Save</string>
 </resources>

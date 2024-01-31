@@ -452,6 +452,18 @@
             android:label="@string/downloadsActivityTitle"
             android:parentActivityName=".BrowserActivity" />
 
+        <activity
+            android:name="org.halalz.kahftube.view.ProfilePageActivity"
+            android:exported="false"
+            android:label="@string/profile"
+            android:parentActivityName=".BrowserActivity" />
+
+        <activity
+            android:name="org.halalz.kahftube.view.PreferencePageActivity"
+            android:exported="false"
+            android:label="@string/preference"
+            android:parentActivityName=".BrowserActivity" />
+
         <service
             android:name="com.duckduckgo.app.job.AppConfigurationJobService"
             android:exported="false"
