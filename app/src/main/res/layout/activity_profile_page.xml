@@ -49,8 +49,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:text="Name"
-
-            android:textColor="@color/black60"
             android:textSize="@dimen/text_size_large"
             android:textStyle="bold" />
 
@@ -94,7 +92,6 @@
                     android:layout_marginStart="20dp"
                     android:layout_weight="1"
                     android:text="@string/preference"
-                    android:textColor="@color/black60"
                     android:textSize="@dimen/text_size_medium" />
 
                 <ImageView
@@ -126,7 +123,6 @@
                     android:layout_marginStart="20dp"
                     android:layout_weight="1"
                     android:text="@string/unsubscribe_haram_channels"
-                    android:textColor="@color/black60"
                     android:textSize="@dimen/text_size_medium" />
 
                 <ImageView

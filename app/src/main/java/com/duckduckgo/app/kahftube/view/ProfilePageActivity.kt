@@ -20,8 +20,18 @@ class ProfilePageActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         sharedPref = SharedPreferenceManager(this@ProfilePageActivity)
+        saveTempDummyInfo()
         prepareViews()
         initListeners()
+    }
+
+    private fun saveTempDummyInfo() {
+        sharedPref.setValue(KeyString.NAME, "Asif Ahmed")
+        sharedPref.setValue(KeyString.EMAIL, "asifddlks8@gmail.com")
+        sharedPref.setValue(KeyString.IMAGE_SRC, "https://yt3.ggpht.com/yti/AGOGRCqFABQK7A5GvVn7iUHY3AWK8GX182NEWZAXhw=s88-c-k-c0x00ffffff-no-rj")
+        sharedPref.setValue(KeyString.PRACTICING_LEVEL, 1)
+        sharedPref.setValue(KeyString.GENDER, 2)
+        sharedPref.setValue(KeyString.TOKEN, "1637|VTwoGKekKw5uLze11HEwQc1kExtFnkuqts0chlOw1c46b4ff")
     }
 
     private fun initListeners() {

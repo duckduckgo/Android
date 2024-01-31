@@ -456,12 +456,14 @@
             android:name="org.halalz.kahftube.view.ProfilePageActivity"
             android:exported="false"
             android:label="@string/profile"
+            android:theme="@style/Theme.KahfTube"
             android:parentActivityName=".BrowserActivity" />
 
         <activity
             android:name="org.halalz.kahftube.view.PreferencePageActivity"
             android:exported="false"
             android:label="@string/preference"
+            android:theme="@style/Theme.KahfTube"
             android:parentActivityName=".BrowserActivity" />
 
         <service

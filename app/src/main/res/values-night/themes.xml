@@ -15,6 +15,7 @@
   -->
 
 <resources>
+    <style name="Theme.KahfTube" parent="Theme.MaterialComponents.DayNight.NoActionBar" />
 
     <style name="textViewStyle" parent="Theme.KahfTube">
         <item name="android:textColor">@color/white60</item>

@@ -34,7 +34,6 @@ class KahfTubeInterface(
 
     @JavascriptInterface
     fun onHalalzTap() {
-        Timber.v("onHalalzTap::")
         javaScriptCallBack.onHalalzTap()
     }
 
@@ -45,6 +44,7 @@ class KahfTubeInterface(
 
     @JavascriptInterface
     fun getUserToken(): String {
+        Timber.v("SharedPreferenceManager:: ${SharedPreferenceManager(context).getValue(KeyString.TOKEN)}")
         return SharedPreferenceManager(context).getValue(KeyString.TOKEN)
     }
 

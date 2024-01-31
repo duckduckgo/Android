@@ -171,6 +171,8 @@ import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.global.view.toggleFullScreen
 import com.duckduckgo.app.kahftube.KahfTubeInterface
 import com.duckduckgo.app.kahftube.KahfTubeInterface.JavaScriptCallBack
+import com.duckduckgo.app.kahftube.SharedPreferenceManager
+import com.duckduckgo.app.kahftube.SharedPreferenceManager.KeyString
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.playstore.PlayStoreUtils
@@ -2216,6 +2218,7 @@ class BrowserTabFragment :
                         }
 
                         override fun onHalalzTap() {
+                            Timber.v("SharedPreferenceManager:: ${SharedPreferenceManager(requireContext()).getValue(KeyString.TOKEN)}")
                             startActivity(Intent(requireContext(), ProfilePageActivity::class.java))
                         }
 
