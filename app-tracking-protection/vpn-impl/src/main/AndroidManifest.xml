@@ -3,7 +3,7 @@
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SYSTEM_EXEMPTED" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
@@ -83,9 +83,13 @@
         <service
             android:name=".service.TrackerBlockingVpnService"
             android:exported="false"
-            android:foregroundServiceType="systemExempted"
+            android:foregroundServiceType="specialUse"
             android:permission="android.permission.BIND_VPN_SERVICE"
             android:process=":vpn">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="VPN"
+                />
             <intent-filter>
                 <action android:name="android.net.VpnService" />
             </intent-filter>
