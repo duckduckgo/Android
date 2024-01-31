@@ -31,4 +31,6 @@
     <string name="downloadsRetry">Повторить попытку</string>
     <string name="notificationDownloadComplete">Загрузка завершена.</string>
     <string name="notificationDownloadFailed">Сбой загрузки.</string>
+
+    <string name="downloadConfirmationContinue">Сохранить в «Загрузки»</string>
 </resources>

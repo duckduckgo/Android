@@ -31,4 +31,6 @@
     <string name="downloadsRetry">Prøv igen</string>
     <string name="notificationDownloadComplete">Download fuldført.</string>
     <string name="notificationDownloadFailed">Det var ikke muligt at downloade.</string>
+
+    <string name="downloadConfirmationContinue">Gem i downloads</string>
 </resources>

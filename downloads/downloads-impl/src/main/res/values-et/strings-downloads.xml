@@ -31,4 +31,6 @@
     <string name="downloadsRetry">Proovi uuesti</string>
     <string name="notificationDownloadComplete">Allalaadimine lõpetatud.</string>
     <string name="notificationDownloadFailed">Allalaadimine nurjus.</string>
+
+    <string name="downloadConfirmationContinue">Salvesta allalaadimistesse</string>
 </resources>

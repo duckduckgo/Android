@@ -31,4 +31,6 @@
     <string name="downloadsRetry">Yritä uudelleen</string>
     <string name="notificationDownloadComplete">Lataus valmis.</string>
     <string name="notificationDownloadFailed">Lataus epäonnistui.</string>
+
+    <string name="downloadConfirmationContinue">Tallenna latauksiin</string>
 </resources>

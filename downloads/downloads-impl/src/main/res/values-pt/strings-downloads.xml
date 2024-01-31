@@ -31,4 +31,6 @@
     <string name="downloadsRetry">Tentar novamente</string>
     <string name="notificationDownloadComplete">Transferência concluída.</string>
     <string name="notificationDownloadFailed">Ocorreu uma falha na transferência.</string>
+
+    <string name="downloadConfirmationContinue">Guardar em Transferências</string>
 </resources>

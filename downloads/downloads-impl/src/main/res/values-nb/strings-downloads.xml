@@ -31,4 +31,6 @@
     <string name="downloadsRetry">Prøv igjen</string>
     <string name="notificationDownloadComplete">Nedlastingen er fullført.</string>
     <string name="notificationDownloadFailed">Nedlastingen mislyktes.</string>
+
+    <string name="downloadConfirmationContinue">Lagre til nedlastinger</string>
 </resources>

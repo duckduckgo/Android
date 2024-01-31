@@ -31,4 +31,6 @@
     <string name="downloadsRetry">Pokušaj ponovno</string>
     <string name="notificationDownloadComplete">Preuzimanje dovršeno.</string>
     <string name="notificationDownloadFailed">Preuzimanje nije uspjelo.</string>
+
+    <string name="downloadConfirmationContinue">Spremi u Preuzimanja</string>
 </resources>

@@ -93,4 +93,7 @@
     <string name="pirDescription">In the DuckDuckGo browser for desktop, go to <b>Settings > Privacy Pro</b> and click <b>I Have a Subscription</b> to get started.</string>
     <string name="pirWindowsButton">Windows</string>
     <string name="pirMacOsButton">macOS</string>
+
+    <string name="downloadsDownloadFinishedActionName">Open</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Can\'t open file. Check for compatible app.</string>
 </resources>

@@ -498,7 +498,6 @@
     <string name="onboardingFeatureOptionOneClickDataClearing">Изчистване с едно кликване</string>
 
     <!-- Download Confirmation -->
-    <string name="downloadConfirmationContinue">Запазване в Изтеглени файлове</string>
     <string name="downloadConfirmationSaveFileTitle" instruction="Placeholder is the name of a file">Запази %1$s</string>
     <string name="downloadConfirmationKeepBothFilesText">Запазване на двете</string>
     <string name="downloadConfirmationReplaceOldFileText">Заместване</string>

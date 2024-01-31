@@ -31,4 +31,6 @@
     <string name="downloadsRetry">Yeniden Dene</string>
     <string name="notificationDownloadComplete">İndirme tamamlandı.</string>
     <string name="notificationDownloadFailed">İndirme başarısız oldu.</string>
+
+    <string name="downloadConfirmationContinue">İndirilenlere Kaydet</string>
 </resources>

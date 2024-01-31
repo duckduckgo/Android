@@ -31,4 +31,6 @@
     <string name="downloadsRetry">Opnieuw proberen</string>
     <string name="notificationDownloadComplete">Download voltooid.</string>
     <string name="notificationDownloadFailed">Downloaden mislukt.</string>
+
+    <string name="downloadConfirmationContinue">Opslaan in downloads</string>
 </resources>

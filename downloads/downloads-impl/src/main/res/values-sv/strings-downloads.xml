@@ -31,4 +31,6 @@
     <string name="downloadsRetry">Försök igen</string>
     <string name="notificationDownloadComplete">Nedladdning klar.</string>
     <string name="notificationDownloadFailed">Det gick inte att ladda ner.</string>
+
+    <string name="downloadConfirmationContinue">Spara till Nerladdningar</string>
 </resources>
