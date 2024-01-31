@@ -1,8 +1,8 @@
 # Test Definition: https://app.asana.com/0/1205017362573508/1206195332210606
 appId: com.duckduckgo.mobile.android
-name: "ReleaseTest: Users can remove all data"
+name: "Sync Critical Path test: Users can remove all data"
 tags:
-  - releaseTest
+  - syncCriticalPathTest
 ---
 - launchApp:
     clearState: true
