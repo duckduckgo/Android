@@ -24,7 +24,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.content.pm.PackageManager
-import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
 import android.net.VpnService
 import android.os.Binder
 import android.os.Build
@@ -671,7 +671,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             this,
             VPN_FOREGROUND_SERVICE_ID,
             VpnEnabledNotificationBuilder.buildVpnEnabledNotification(applicationContext, vpnNotification),
-            FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED,
+            FOREGROUND_SERVICE_TYPE_SPECIAL_USE,
         )
 
         return vpnNotification != emptyNotification
