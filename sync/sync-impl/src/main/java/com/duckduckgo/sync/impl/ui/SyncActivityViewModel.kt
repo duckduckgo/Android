@@ -17,7 +17,6 @@
 package com.duckduckgo.sync.impl.ui
 
 import android.content.Context
-import android.graphics.Bitmap
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -29,14 +28,12 @@ import com.duckduckgo.sync.api.SyncStateMonitor
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import com.duckduckgo.sync.impl.ConnectedDevice
-import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.RecoveryCodePDF
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncFeatureToggle
-import com.duckduckgo.sync.impl.getOrNull
 import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
 import com.duckduckgo.sync.impl.pixels.SyncAccountOperation
@@ -69,7 +66,6 @@ import kotlinx.coroutines.withContext
 
 @ContributesViewModel(ActivityScope::class)
 class SyncActivityViewModel @Inject constructor(
-    private val qrEncoder: QREncoder,
     private val recoveryCodePDF: RecoveryCodePDF,
     private val syncAccountRepository: SyncAccountRepository,
     private val syncStateMonitor: SyncStateMonitor,
@@ -115,12 +111,7 @@ class SyncActivityViewModel @Inject constructor(
         }
     }
 
-    private suspend fun signedInState(): ViewState {
-        val qrBitmap = withContext(dispatchers.io()) {
-            val recoveryCode = syncAccountRepository.getRecoveryCode().getOrNull() ?: return@withContext null
-            qrEncoder.encodeAsBitmap(recoveryCode, R.dimen.qrSizeLarge, R.dimen.qrSizeLarge)
-        } ?: return signedOutState()
-
+    private fun signedInState(): ViewState {
         val connectedDevices = viewState.value.syncedDevices
         val syncedDevices = connectedDevices.ifEmpty {
             val thisDevice = syncAccountRepository.getThisConnectedDevice() ?: return signedOutState()
@@ -129,7 +120,6 @@ class SyncActivityViewModel @Inject constructor(
 
         return ViewState(
             showAccount = syncAccountRepository.isSignedIn(),
-            loginQRCode = qrBitmap,
             syncedDevices = syncedDevices,
             disabledSetupFlows = disabledSetupFlows(),
         )
@@ -149,7 +139,6 @@ class SyncActivityViewModel @Inject constructor(
 
     data class ViewState(
         val showAccount: Boolean = false,
-        val loginQRCode: Bitmap? = null,
         val syncedDevices: List<SyncDeviceListItem> = emptyList(),
         val disabledSetupFlows: List<SetupFlows> = emptyList(),
     )
@@ -164,7 +153,6 @@ class SyncActivityViewModel @Inject constructor(
         object AddAnotherDevice : Command()
         object IntroCreateAccount : Command()
         object IntroRecoverSyncData : Command()
-        object ShowTextCode : Command()
         object ShowRecoveryCode : Command()
         data class AskTurnOffSync(val device: ConnectedDevice) : Command()
         object AskDeleteAccount : Command()
@@ -211,12 +199,6 @@ class SyncActivityViewModel @Inject constructor(
             syncAccountRepository.getThisConnectedDevice()?.let {
                 command.send(AskTurnOffSync(it))
             } ?: showAccountDetailsIfNeeded()
-        }
-    }
-
-    fun onShowTextCodeClicked() {
-        viewModelScope.launch {
-            command.send(Command.ShowTextCode)
         }
     }
 

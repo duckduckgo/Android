@@ -139,5 +139,4 @@
     <string name="sync_notification_channel_name">Sincronizar</string>
     <string name="sync_notify_me_title">As notificações estão desativadas</string>
     <string name="sync_notify_me_description">Recebe uma notificação se a sincronização e a cópia de segurança encontrarem um erro.</string>
-    <string name="sync_rollout_banner_text">A sincronização e cópia de segurança estão a ser disponibilizadas gradualmente e podem ainda não estar disponíveis no DuckDuckGo nos teus outros dispositivos</string>
 </resources>

@@ -139,5 +139,4 @@
     <string name="sync_notification_channel_name">Synchronizacja</string>
     <string name="sync_notify_me_title">Powiadomienia są wyłączone</string>
     <string name="sync_notify_me_description">Otrzymuj powiadomienia po wystąpieniu błędu synchronizacji i kopii zapasowej.</string>
-    <string name="sync_rollout_banner_text">Funkcja Synchronizacja i kopia zapasowa jest wprowadzana stopniowo i może nie być jeszcze dostępna w DuckDuckGo na innych Twoich urządzeniach</string>
 </resources>

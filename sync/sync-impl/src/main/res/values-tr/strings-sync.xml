@@ -139,5 +139,4 @@
     <string name="sync_notification_channel_name">Senkronizasyon</string>
     <string name="sync_notify_me_title">Bildirimler devre dışı bırakıldı</string>
     <string name="sync_notify_me_description">Senkronizasyon ve Yedekleme\'nin bir hatayla karşılaşması durumunda bildirim alın.</string>
-    <string name="sync_rollout_banner_text">Senkronizasyon ve Yedekleme kademeli olarak kullanıma sunulmaktadır ve diğer cihazlarınızda DuckDuckGo\'da henüz mevcut olmayabilir</string>
 </resources>

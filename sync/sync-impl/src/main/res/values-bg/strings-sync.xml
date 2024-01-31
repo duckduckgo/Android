@@ -139,5 +139,4 @@
     <string name="sync_notification_channel_name">Синхронизиране</string>
     <string name="sync_notify_me_title">Известията са деактивирани</string>
     <string name="sync_notify_me_description">Получаване на известие, ако възникне грешка при Синхронизиране и архивиране.</string>
-    <string name="sync_rollout_banner_text">Функцията Синхронизиране и архивиране се въвежда постепенно и може все още да не е достъпна в DuckDuckGo на останалите Ви устройства</string>
 </resources>
