@@ -50,6 +50,8 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/atp_ReportBreakageCategoriesHint"
                     app:clickable="true"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
                     app:endIcon="@drawable/ic_chevron_down_24_small"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"/>
