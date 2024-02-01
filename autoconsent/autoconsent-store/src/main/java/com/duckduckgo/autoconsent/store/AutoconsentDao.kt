@@ -39,6 +39,18 @@ abstract class AutoconsentDao {
         insertExceptions(exceptions)
     }
 
+    @Transaction
+    open fun updateAllDisabledCMPs(disabledCMPs: List<DisabledCmpsEntity>) {
+        deleteDisabledCmps()
+        insertDisabledCmps(disabledCMPs)
+    }
+
+    @Transaction
+    open fun updateAllExceptions(exceptions: List<AutoconsentExceptionEntity>) {
+        deleteExceptions()
+        insertExceptions(exceptions)
+    }
+
     @Query("select * from autoconsent_exceptions")
     abstract fun getExceptions(): List<AutoconsentExceptionEntity>
 

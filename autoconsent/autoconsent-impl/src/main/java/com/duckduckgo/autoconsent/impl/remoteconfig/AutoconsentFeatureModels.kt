@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autoconsent.impl
+package com.duckduckgo.autoconsent.impl.remoteconfig
 
-import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
+import com.squareup.moshi.Json
 
-data class AutoconsentFeature(
-    val state: String,
-    val minSupportedVersion: Int?,
-    val exceptions: List<FeatureException>,
-    val settings: Settings,
-)
+class AutoconsentFeatureModels {
 
-data class Settings(
-    val disabledCMPs: List<String>,
-)
+    data class AutoconsentSettings(
+        @field:Json(name = "disabledCMPs")
+        val disabledCMPs: List<String>,
+    )
+}

@@ -20,15 +20,14 @@ import android.webkit.WebView
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
-import com.duckduckgo.autoconsent.api.AutoconsentFeatureName
 import com.duckduckgo.autoconsent.impl.AutoconsentInterface.Companion.AUTOCONSENT_INTERFACE
 import com.duckduckgo.autoconsent.impl.handlers.ReplyHandler
-import com.duckduckgo.autoconsent.store.AutoconsentRepository
+import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentExceptionsRepository
+import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.autoconsent.store.AutoconsentSettingsRepository
 import com.duckduckgo.common.utils.UriString
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -37,8 +36,8 @@ import javax.inject.Inject
 class RealAutoconsent @Inject constructor(
     private val messageHandlerPlugins: PluginPoint<MessageHandlerPlugin>,
     private val settingsRepository: AutoconsentSettingsRepository,
-    private val autoconsentRepository: AutoconsentRepository,
-    private val featureToggle: FeatureToggle,
+    private val autoconsentExceptionsRepository: AutoconsentExceptionsRepository,
+    private val autoconsent: AutoconsentFeature,
     private val userAllowlistRepository: UserAllowListRepository,
     private val unprotectedTemporary: UnprotectedTemporary,
 ) : Autoconsent {
@@ -88,7 +87,7 @@ class RealAutoconsent @Inject constructor(
     }
 
     private fun isEnabled(): Boolean {
-        return featureToggle.isFeatureEnabled(AutoconsentFeatureName.Autoconsent.value)
+        return autoconsent.self().isEnabled()
     }
 
     private fun isAnException(url: String): Boolean {
@@ -96,7 +95,7 @@ class RealAutoconsent @Inject constructor(
     }
 
     private fun matches(url: String): Boolean {
-        return autoconsentRepository.exceptions.any { UriString.sameOrSubdomain(url, it.domain) }
+        return autoconsentExceptionsRepository.exceptions.any { UriString.sameOrSubdomain(url, it.domain) }
     }
 
     private fun canBeInjected(): Boolean {
