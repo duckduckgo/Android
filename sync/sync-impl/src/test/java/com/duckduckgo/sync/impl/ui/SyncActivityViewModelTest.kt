@@ -99,6 +99,7 @@ class SyncActivityViewModelTest {
         )
 
         whenever(syncStateMonitor.syncState()).thenReturn(emptyFlow())
+        whenever(syncAccountRepository.isSyncSupported()).thenReturn(true)
     }
 
     @Test
@@ -541,6 +542,16 @@ class SyncActivityViewModelTest {
             val viewState = expectMostRecentItem()
             assertFalse(viewState.disabledSetupFlows.contains(SignInFlow))
             assertTrue(viewState.disabledSetupFlows.contains(CreateAccountFlow))
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSyncNotSupportedThenEmitCommandShowDeviceUnsupported() = runTest {
+        whenever(syncAccountRepository.isSyncSupported()).thenReturn(false)
+
+        testee.commands().test {
+            awaitItem().assertCommandType(Command.ShowDeviceUnsupported::class)
             cancelAndIgnoreRemainingEvents()
         }
     }

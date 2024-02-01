@@ -50,6 +50,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasS
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroCreateAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroRecoverSyncData
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowDeviceUnsupported
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowRecoveryCode
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowTextCode
@@ -240,6 +241,10 @@ class SyncActivity : DuckDuckGoActivity() {
             is ShowTextCode -> startActivity(ShowCodeActivity.intent(this))
             is AddAnotherDevice -> loginFlow.launch(null)
             is ShowError -> showError(it)
+            ShowDeviceUnsupported -> {
+                startActivity(DeviceUnsupportedActivity.intent(this))
+                finish()
+            }
         }
     }
 
