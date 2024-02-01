@@ -280,9 +280,10 @@ class BrowserWebViewClient @Inject constructor(
         url: String?
     ) {
         Timber.v("handleKahfTube:: Url: $url")
+        Timber.v("handleKahfTube:: lastPageStarted: ${url == lastPageStarted}")
         if (url == "https://m.youtube.com/?noapp") {
             webView.injectJavascriptFileFromAsset("kahftube/email.js")
-        } else if (!isMainJSLoaded && url == "https://m.youtube.com/") {
+        } else if (!isMainJSLoaded && url?.contains("m.youtube.com") == true) {
             Timber.v("isMainLoaded: $isMainJSLoaded")
             isMainJSLoaded = true
             webView.injectJavascriptFileFromAsset("kahftube/main.js")
@@ -309,8 +310,11 @@ class BrowserWebViewClient @Inject constructor(
         url: String?,
         favicon: Bitmap?,
     ) {
+        isMainJSLoaded = false
         Timber.v("onPageStarted webViewUrl: ${webView.url} URL: $url")
-        //handleSafeGaze(webView)
+        if (url?.contains("m.youtube.com") != true) {
+            handleSafeGaze(webView)
+        }
         //handleKahfTube(webView, url)
         url?.let {
             autoconsent.injectAutoconsent(webView, url)
@@ -323,6 +327,7 @@ class BrowserWebViewClient @Inject constructor(
         val navigationList = webView.safeCopyBackForwardList() ?: return
         webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList))
         if (url != null && url == lastPageStarted) {
+            isMainJSLoaded = false
             webViewClientListener?.pageRefreshed(url)
         }
         lastPageStarted = url
