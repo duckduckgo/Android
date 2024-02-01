@@ -1,9 +1,10 @@
 # Test Definition: https://app.asana.com/0/1205017362573508/1205044961533553/f
 # Test Definition: https://app.asana.com/0/1205017362573508/1205044961533551/f
+# This test also runs the create account test, so we don't need to run both
 appId: com.duckduckgo.mobile.android
-name: "ReleaseTest: Users can recover an account / Device can be added to an account"
+name: "Sync Critical Path test: Users can recover an account / Device can be added to an account"
 tags:
-  - releaseTest
+  - syncCriticalPathTest
 ---
 - launchApp:
     clearState: true
