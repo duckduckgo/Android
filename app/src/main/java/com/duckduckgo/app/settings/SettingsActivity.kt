@@ -59,7 +59,6 @@ import com.duckduckgo.common.ui.view.listitem.TwoLineListItem
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.plugins.PluginPoint
-import com.duckduckgo.di.DaggerMap
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.internal.features.api.InternalFeaturePlugin
 import com.duckduckgo.macos.api.MacOsScreenWithEmptyParams
@@ -99,7 +98,10 @@ class SettingsActivity : DuckDuckGoActivity() {
     lateinit var globalActivityStarter: GlobalActivityStarter
 
     @Inject
-    lateinit var proSettingsPlugin: DaggerMap<Int, ProSettingsPlugin>
+    lateinit var _proSettingsPlugin: PluginPoint<ProSettingsPlugin>
+    private val proSettingsPlugin by lazy {
+        _proSettingsPlugin.getPlugins()
+    }
 
     private val viewsPrivacy
         get() = binding.includeSettings.contentSettingsPrivacy
@@ -165,10 +167,8 @@ class SettingsActivity : DuckDuckGoActivity() {
         if (proSettingsPlugin.isEmpty()) {
             viewsPro.gone()
         } else {
-            proSettingsPlugin.keys.toSortedSet().forEach {
-                proSettingsPlugin[it]?.let { plugin ->
-                    viewsPro.addView(plugin.getView(this))
-                }
+            proSettingsPlugin.forEach { plugin ->
+                viewsPro.addView(plugin.getView(this))
             }
         }
     }
