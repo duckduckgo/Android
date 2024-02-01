@@ -26,8 +26,8 @@ class ProfilePageActivity : AppCompatActivity() {
     }
 
     private fun saveTempDummyInfo() {
-        sharedPref.setValue(KeyString.NAME, "Asif Ahmed")
-        sharedPref.setValue(KeyString.EMAIL, "asifddlks8@gmail.com")
+        sharedPref.setValue(KeyString.NAME, "Guest")
+        sharedPref.setValue(KeyString.EMAIL, "guest@gmail.com")
         sharedPref.setValue(KeyString.IMAGE_SRC, "https://yt3.ggpht.com/yti/AGOGRCqFABQK7A5GvVn7iUHY3AWK8GX182NEWZAXhw=s88-c-k-c0x00ffffff-no-rj")
         sharedPref.setValue(KeyString.PRACTICING_LEVEL, 1)
         sharedPref.setValue(KeyString.GENDER, 2)
