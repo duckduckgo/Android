@@ -111,7 +111,7 @@ class VariantManagerImpl @Inject constructor(
         if (!compliesWithFilters || appBuildConfig.isDefaultVariantForced) {
             newVariant = DEFAULT_VARIANT
         }
-        Timber.i("Current variant is null; allocating new one $newVariant")
+        Timber.i("Current variant is null; allocating new one ${newVariant.key}")
         experimentVariantRepository.updateVariant(newVariant.key)
         return newVariant
     }
