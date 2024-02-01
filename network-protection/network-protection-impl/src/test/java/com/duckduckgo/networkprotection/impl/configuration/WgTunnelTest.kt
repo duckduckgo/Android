@@ -55,7 +55,7 @@ class WgTunnelTest {
         setFinalStatic(VERSION::class.java.getField("SDK_INT"), 29)
 
         runBlocking {
-            whenever(wgServerApi.registerPublicKey(eq(keys.publicKey.toBase64())))
+            whenever(wgServerApi.registerPublicKey(eq(keys.publicKey.toBase64()), isNull()))
                 .thenReturn(serverData.copy(publicKey = keys.publicKey.toBase64()))
         }
 
@@ -72,14 +72,14 @@ class WgTunnelTest {
 
     @Test
     fun establishErrorThenLogError() = runTest {
-        whenever(wgServerApi.registerPublicKey(any())).thenReturn(serverData)
+        whenever(wgServerApi.registerPublicKey(any(), isNull())).thenReturn(serverData)
 
         assertNull(wgTunnel.createWgConfig(keys).getOrNull())
     }
 
     @Test
     fun withNoKeysEstablishErrorThenLogError() = runTest {
-        whenever(wgServerApi.registerPublicKey(any())).thenReturn(serverData)
+        whenever(wgServerApi.registerPublicKey(any(), isNull())).thenReturn(serverData)
 
         assertNull(wgTunnel.createWgConfig().getOrNull())
     }

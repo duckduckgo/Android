@@ -22,14 +22,16 @@ import android.net.ConnectivityManager.NetworkCallback
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
+import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.WgProtocol
-import com.duckduckgo.networkprotection.impl.failure.FailureRecoveryHandler
+import com.duckduckgo.networkprotection.impl.pixels.WireguardHandshakeMonitor.Listener
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.time.Instant
 import java.util.concurrent.atomic.AtomicBoolean
@@ -51,13 +53,16 @@ class WireguardHandshakeMonitor @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val networkProtectionState: NetworkProtectionState,
     private val currentNetworkState: CurrentNetworkState,
-    private val failureRecoveryHandler: FailureRecoveryHandler,
+    private val listeners: PluginPoint<Listener>,
 ) : VpnServiceCallbacks {
 
+    interface Listener {
+        suspend fun onTunnelFailure(lastHandshakeEpocSeconds: Long)
+        suspend fun onTunnelFailureRecovered()
+    }
+
     private val job = ConflatedJob()
-    private val retryJob = ConflatedJob()
     private val failureReported = AtomicBoolean(false)
-    private val recoveryCompleted = AtomicBoolean(false)
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
         job += coroutineScope.launch {
@@ -94,53 +99,24 @@ class WireguardHandshakeMonitor @Inject constructor(
                         // skip if previously reported
                         if (!failureReported.getAndSet(true)) {
                             pixels.reportTunnelFailure()
-                            recoveryCompleted.set(false)
-                            retryJob += this.launch(dispatcherProvider.io()) {
-                                incrementalPeriodicChecks {
-                                    recoveryCompleted.set(failureRecoveryHandler.attemptRecovery().isSuccess)
-                                }
-                            }
                         } else {
                             logcat { "Last handshake was already reported, skipping" }
+                        }
+                        listeners.getPlugins().forEach {
+                            it.onTunnelFailure(lastHandshakeEpocSeconds)
                         }
                     } else if (diff.seconds.inWholeMinutes <= REPORT_TUNNEL_FAILURE_RECOVERY_THRESHOLD_MINUTES) {
                         if (failureReported.getAndSet(false)) {
                             logcat(WARN) { "Recovered from tunnel failure" }
                             pixels.reportTunnelFailureRecovered()
+                            listeners.getPlugins().forEach {
+                                it.onTunnelFailureRecovered()
+                            }
                         }
-                        // stop any recovery job when tunnel recovers from failure
-                        recoveryCompleted.set(true)
-                        retryJob.cancel()
                     }
                 }
                 delay(1.minutes.inWholeMilliseconds)
             }
-        }
-    }
-
-    private suspend fun incrementalPeriodicChecks(
-        times: Int = Int.MAX_VALUE,
-        initialDelay: Long = 30_000, // 30 seconds
-        maxDelay: Long = 300_000, // 5 minutes
-        factor: Double = 2.0,
-        block: suspend () -> Unit,
-    ) {
-        var currentDelay = initialDelay
-        repeat(times - 1) {
-            try {
-                if (!recoveryCompleted.get()) {
-                    block()
-                } else {
-                    // stop this job when recovery is completed
-                    retryJob.cancel()
-                    return@incrementalPeriodicChecks
-                }
-            } catch (t: Throwable) {
-                // you can log an error here and/or make a more finer-grained
-                // analysis of the cause to see if retry is needed
-            }
-            delay(currentDelay)
-            currentDelay = (currentDelay * factor).toLong().coerceAtMost(maxDelay)
         }
     }
 
@@ -207,3 +183,10 @@ open class CurrentNetworkState @Inject constructor(
         return isWifiAvailable.get() || isCellAvailable.get()
     }
 }
+
+@ContributesPluginPoint(
+    scope = VpnScope::class,
+    boundType = Listener::class,
+)
+@Suppress("unused")
+interface WireguardHandshakeListenerPluginPoint

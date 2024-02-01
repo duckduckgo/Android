@@ -22,7 +22,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.duckduckgo.networkprotection.impl.config.NetPDefaultConfigProvider
-import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.Mode.Default
 import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.Mode.FailureRecovery
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesTo
@@ -52,7 +51,7 @@ interface WgTunnel {
      *
      * @param keyPair is the private/public key [KeyPair] to be used in the wireguard [Config]
      */
-    suspend fun createWgConfig(keyPair: KeyPair? = null, fromFailure: Boolean = false): Result<Config>
+    suspend fun createWgConfig(keyPair: KeyPair? = null): Result<Config>
 
     /**
      * Creates a new wireguard [Config], returns it and stores it internally.
@@ -60,7 +59,17 @@ interface WgTunnel {
      *
      * @param keyPair is the private/public key [KeyPair] to be used in the wireguard [Config]
      */
-    suspend fun createAndSetWgConfig(keyPair: KeyPair? = null, fromFailure: Boolean = false): Result<Config>
+    suspend fun createAndSetWgConfig(keyPair: KeyPair? = null): Result<Config>
+
+    /**
+     * Marks the currently stored tunnel config as potentially unhealthy
+     */
+    suspend fun markTunnelUnhealthy()
+
+    /**
+     * Marks the currently stored tunnel config as healthy
+     */
+    suspend fun markTunnelHealthy()
 }
 
 /**
@@ -81,6 +90,8 @@ interface WgTunnelConfig {
      * Clear the current wireguard [Config]
      */
     fun clearWgConfig()
+
+    fun setWgConfig(config: Config)
 }
 
 @ContributesBinding(
@@ -101,6 +112,10 @@ class RealWgTunnelConfig @Inject constructor(
     override fun clearWgConfig() {
         wgTunnelStore.wireguardConfig = null
     }
+
+    override fun setWgConfig(config: Config) {
+        wgTunnelStore.wireguardConfig = config
+    }
 }
 
 @ContributesBinding(
@@ -113,14 +128,16 @@ class RealWgTunnel @Inject constructor(
     @InternalApi private val wgTunnelStore: WgTunnelStore,
 ) : WgTunnel {
 
-    override suspend fun createWgConfig(keyPair: KeyPair?, fromFailure: Boolean): Result<Config> {
+    private var isTunnelHealthy = true
+
+    override suspend fun createWgConfig(keyPair: KeyPair?): Result<Config> {
         try {
             // return updated existing config or new one
             val config = wgTunnelStore.wireguardConfig?.let outerLet@{ wgConfig ->
                 keyPair?.let { newKeys ->
                     if (wgConfig.`interface`.keyPair != newKeys) {
                         logcat { "Different keys, fetching new config" }
-                        return@outerLet fetchNewConfig(keyPair, fromFailure)
+                        return@outerLet fetchNewConfig(keyPair)
                     }
                 }
 
@@ -149,7 +166,7 @@ class RealWgTunnel @Inject constructor(
                 }.build()
 
                 newConfigBuilder.build()
-            } ?: fetchNewConfig(keyPair, fromFailure)
+            } ?: fetchNewConfig(keyPair)
 
             return Result.success(config)
         } catch (e: Throwable) {
@@ -158,8 +175,9 @@ class RealWgTunnel @Inject constructor(
         }
     }
 
-    override suspend fun createAndSetWgConfig(keyPair: KeyPair?, fromFailure: Boolean): Result<Config> {
-        val result = createWgConfig(keyPair, fromFailure)
+    override suspend fun createAndSetWgConfig(keyPair: KeyPair?): Result<Config> {
+        markTunnelHealthy() // reset tunnel health
+        val result = createWgConfig(keyPair)
         if (result.isFailure) {
             return result
         }
@@ -167,18 +185,27 @@ class RealWgTunnel @Inject constructor(
         return result
     }
 
-    private suspend fun fetchNewConfig(keyPair: KeyPair?, fromFailure: Boolean = false): Config {
+    override suspend fun markTunnelUnhealthy() {
+        isTunnelHealthy = false
+    }
+
+    override suspend fun markTunnelHealthy() {
+        isTunnelHealthy = true
+    }
+
+    private suspend fun fetchNewConfig(keyPair: KeyPair?): Config {
         @Suppress("NAME_SHADOWING")
         val keyPair = keyPair ?: KeyPair()
         val publicKey = keyPair.publicKey.toBase64()
         val privateKey = keyPair.privateKey.toBase64()
 
         // throw on error
-        val mode = if (fromFailure) {
+        val mode = if (!isTunnelHealthy) {
             FailureRecovery(currentServer = wgTunnelStore.wireguardConfig?.asServerDetails()?.serverName ?: "*")
         } else {
-            Default
+            null
         }
+
         val serverData = wgServerApi.registerPublicKey(publicKey, mode = mode) ?: throw NullPointerException("serverData = null")
 
         return Config.Builder()
@@ -246,6 +273,7 @@ class WgTunnelStore constructor(
         set(value) {
             prefs.edit(commit = true) { putLong(KEY_WG_PRIVATE_KEY_LAST_UPDATE, value) }
         }
+
     companion object {
         private const val FILENAME = "com.duckduckgo.vpn.tunnel.config.v1"
         private const val KEY_WG_CONFIG = "wg_config_key"

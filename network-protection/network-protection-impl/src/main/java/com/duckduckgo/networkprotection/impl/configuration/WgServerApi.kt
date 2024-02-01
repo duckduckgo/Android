@@ -19,7 +19,6 @@ package com.duckduckgo.networkprotection.impl.configuration
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.Mode
-import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.Mode.Default
 import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.Mode.FailureRecovery
 import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.WgServerData
 import com.duckduckgo.networkprotection.impl.di.UnprotectedVpnControllerService
@@ -40,12 +39,15 @@ interface WgServerApi {
 
     suspend fun registerPublicKey(
         publicKey: String,
-        mode: Mode = Default,
+        mode: Mode? = null,
     ): WgServerData?
 
     sealed class Mode {
-        data object Default : Mode()
-        data class FailureRecovery(val currentServer: String) : Mode()
+        data class FailureRecovery(val currentServer: String) : Mode() {
+            override fun toString(): String {
+                return "failureRecovery"
+            }
+        }
     }
 }
 
@@ -58,7 +60,7 @@ class RealWgServerApi @Inject constructor(
 
     override suspend fun registerPublicKey(
         publicKey: String,
-        mode: Mode,
+        mode: Mode?,
     ): WgServerData? {
         // This bit of code gets all possible egress servers which should be order by proximity, caches them for internal builds and then
         // returns the closest one or null if list is empty
@@ -76,7 +78,7 @@ class RealWgServerApi @Inject constructor(
 
         val userPreferredLocation = netNetpEgressServersProvider.updateServerLocationsAndReturnPreferred()
         val registerKeyBody = if (mode is FailureRecovery) {
-            RegisterKeyBody(publicKey = publicKey, server = mode.currentServer, mode = MODE_FAILURE)
+            RegisterKeyBody(publicKey = publicKey, server = mode.currentServer, mode = mode.toString())
         } else if (selectedServer != null) {
             RegisterKeyBody(publicKey = publicKey, server = selectedServer)
         } else if (userPreferredLocation != null) {
@@ -136,10 +138,6 @@ class RealWgServerApi @Inject constructor(
 
         val city: String? by attributes
         val country: String? by attributes
-    }
-
-    companion object {
-        private const val MODE_FAILURE = "failureRecovery"
     }
 }
 
