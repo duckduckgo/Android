@@ -34,7 +34,6 @@ import android.print.PrintAttributes
 import android.print.PrintManager
 import android.text.Editable
 import android.util.DisplayMetrics
-import android.util.Log
 import android.view.*
 import android.view.View.*
 import android.view.inputmethod.EditorInfo
@@ -2212,9 +2211,9 @@ class BrowserTabFragment :
                             email: String?,
                             imgSrc: String?
                         ) {
-                            Log.v("KahfTubeInterface", "name: $name")
-                            Log.v("KahfTubeInterface", "email: $email")
-                            Log.v("KahfTubeInterface", "imgSrc: $imgSrc")
+                            Timber.tag("KahfTubeInterface").v("name: $name")
+                            Timber.tag("KahfTubeInterface").v("email: $email")
+                            Timber.tag("KahfTubeInterface").v("imgSrc: $imgSrc")
                         }
 
                         override fun onHalalzTap() {

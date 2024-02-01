@@ -13,7 +13,7 @@ open class SharedPreferenceManager(private val context: Context) {
         KeyString.PREFERENCE_NAME,
         Context.MODE_PRIVATE,
     )
-    private val mEditor: SharedPreferences.Editor? = mSettings.edit()
+    private val mEditor: SharedPreferences.Editor = mSettings.edit()
 
     private val defaultValue: String = ""
 
@@ -24,8 +24,8 @@ open class SharedPreferenceManager(private val context: Context) {
         key: String?,
         value: String?
     ) {
-        mEditor!!.putString(key, value)
-        mEditor!!.commit()
+        mEditor.putString(key, value)
+        mEditor.commit()
     }
 
     /***
@@ -35,8 +35,8 @@ open class SharedPreferenceManager(private val context: Context) {
         key: String?,
         value: Int
     ) {
-        mEditor!!.putInt(key, value)
-        mEditor!!.commit()
+        mEditor.putInt(key, value)
+        mEditor.commit()
     }
 
     /***
@@ -56,8 +56,8 @@ open class SharedPreferenceManager(private val context: Context) {
         key: String?,
         value: Long
     ) {
-        mEditor!!.putLong(key, value)
-        mEditor!!.commit()
+        mEditor.putLong(key, value)
+        mEditor.commit()
     }
 
     /****
@@ -96,8 +96,8 @@ open class SharedPreferenceManager(private val context: Context) {
         key: String?,
         value: Boolean
     ) {
-        mEditor!!.putBoolean(key, value)
-        mEditor!!.commit()
+        mEditor.putBoolean(key, value)
+        mEditor.commit()
     }
 
     /**
@@ -105,7 +105,7 @@ open class SharedPreferenceManager(private val context: Context) {
      */
     fun clear(): Boolean {
         return try {
-            mEditor!!.clear().commit()
+            mEditor.clear().commit()
             true
         } catch (e: Exception) {
             e.printStackTrace()
@@ -119,9 +119,7 @@ open class SharedPreferenceManager(private val context: Context) {
      * @param key
      */
     fun removeValue(key: String?) {
-        if (mEditor != null) {
-            mEditor!!.remove(key).commit()
-        }
+        mEditor.remove(key).commit()
     }
 
     class KeyString {
