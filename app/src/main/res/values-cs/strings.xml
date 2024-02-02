@@ -502,7 +502,6 @@
     <string name="onboardingFeatureOptionOneClickDataClearing">Smazání dat jedním kliknutím</string>
 
     <!-- Download Confirmation -->
-    <string name="downloadConfirmationContinue">Uložit do Stahování</string>
     <string name="downloadConfirmationSaveFileTitle" instruction="Placeholder is the name of a file">Uložit %1$s</string>
     <string name="downloadConfirmationKeepBothFilesText">Nechat si oba</string>
     <string name="downloadConfirmationReplaceOldFileText">Nahradit</string>

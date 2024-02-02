@@ -498,7 +498,6 @@
     <string name="onboardingFeatureOptionOneClickDataClearing">Ühe klõpsuga kustutamine</string>
 
     <!-- Download Confirmation -->
-    <string name="downloadConfirmationContinue">Salvesta allalaadimistesse</string>
     <string name="downloadConfirmationSaveFileTitle" instruction="Placeholder is the name of a file">Salvesta %1$s</string>
     <string name="downloadConfirmationKeepBothFilesText">Jäta mõlemad alles</string>
     <string name="downloadConfirmationReplaceOldFileText">Asenda</string>

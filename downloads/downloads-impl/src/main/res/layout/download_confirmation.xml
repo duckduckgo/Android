@@ -47,6 +47,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:leadingIcon="@drawable/ic_close_24"
-        app:primaryText="@string/fireCancel" />
+        app:primaryText="@string/downloadsCancel" />
 
 </LinearLayout>
