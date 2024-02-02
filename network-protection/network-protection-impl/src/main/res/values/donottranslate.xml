@@ -251,6 +251,7 @@
     <string name="netpNotificationCTAReportIssue">Having problems with an app?</string>
     <string name="netpNotificationDisabled">Network Protection is disconnected. Tap to continue securing your device traffic.</string>
     <string name="netpNotificationDisabledByVpn">A VPN app on your device disconnected Network Protection. Tap to reconnect.</string>
+    <string name="netpUnsafeWifi">Connected to unsafe WIFI.</string>
     <string name="netpNotificationCTAReconnectNow">Reconnect Now</string>
     <string name="netpNotificationSnoozeTitle">VPN is snoozed</string>
     <string name="netpNotificationSnoozeBody" instruction="Placeholder is time in hh:mm format">VPN will reconnect at %1$s</string>

@@ -20,7 +20,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
-import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
 import com.duckduckgo.mobile.android.vpn.ui.OpenVpnBreakageCategoryWithBrokenApp
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -35,7 +35,7 @@ interface NetPNotificationActions {
     fun getEnableNetpNotificationAction(context: Context): NotificationCompat.Action
 }
 
-@ContributesBinding(VpnScope::class)
+@ContributesBinding(AppScope::class)
 class RealNetPNotificationActions @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,
     @NetpBreakageCategories private val breakageCategories: Provider<List<AppBreakageCategory>>,
