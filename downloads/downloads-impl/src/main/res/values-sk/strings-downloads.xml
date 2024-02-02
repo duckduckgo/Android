@@ -31,4 +31,6 @@
     <string name="downloadsRetry">Opakovanie</string>
     <string name="notificationDownloadComplete">Sťahovanie je dokončené.</string>
     <string name="notificationDownloadFailed">Sťahovanie zlyhalo.</string>
+
+    <string name="downloadConfirmationContinue">Uložiť do stiahnutých</string>
 </resources>

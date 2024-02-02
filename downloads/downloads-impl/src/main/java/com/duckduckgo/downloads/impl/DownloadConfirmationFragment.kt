@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser
+package com.duckduckgo.downloads.impl
 
 import android.content.Context
 import android.os.Bundle
@@ -22,11 +22,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.browser.databinding.DownloadConfirmationBinding
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.downloads.api.DownloadConfirmationDialogListener
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
-import com.duckduckgo.downloads.impl.FilenameExtractor
-import com.duckduckgo.downloads.impl.isDataUrl
+import com.duckduckgo.downloads.impl.RealDownloadConfirmation.Companion.PENDING_DOWNLOAD_BUNDLE_KEY
+import com.duckduckgo.downloads.impl.databinding.DownloadConfirmationBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
 import java.io.File
@@ -37,7 +37,13 @@ import timber.log.Timber
 class DownloadConfirmationFragment : BottomSheetDialogFragment() {
 
     val listener: DownloadConfirmationDialogListener
-        get() = parentFragment as DownloadConfirmationDialogListener
+        get() {
+            return if (parentFragment != null) {
+                parentFragment as DownloadConfirmationDialogListener
+            } else {
+                activity as DownloadConfirmationDialogListener
+            }
+        }
 
     @Inject
     lateinit var filenameExtractor: FilenameExtractor
@@ -86,25 +92,6 @@ class DownloadConfirmationFragment : BottomSheetDialogFragment() {
             Timber.i("Cancelled download for url ${pendingDownload.url}")
             listener.cancelDownload()
             dismiss()
-        }
-    }
-
-    interface DownloadConfirmationDialogListener {
-        fun continueDownload(pendingFileDownload: PendingFileDownload)
-        fun cancelDownload()
-    }
-
-    companion object {
-
-        private const val PENDING_DOWNLOAD_BUNDLE_KEY = "PENDING_DOWNLOAD_BUNDLE_KEY"
-
-        fun instance(pendingDownload: PendingFileDownload): DownloadConfirmationFragment {
-            val fragment = DownloadConfirmationFragment()
-            fragment.isCancelable = false
-            val bundle = Bundle()
-            bundle.putSerializable(PENDING_DOWNLOAD_BUNDLE_KEY, pendingDownload)
-            fragment.arguments = bundle
-            return fragment
         }
     }
 }

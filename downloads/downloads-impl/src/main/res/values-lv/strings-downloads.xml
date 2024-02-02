@@ -31,4 +31,6 @@
     <string name="downloadsRetry">Mēģināt vēlreiz</string>
     <string name="notificationDownloadComplete">Lejupielāde pabeigta.</string>
     <string name="notificationDownloadFailed">Neizdevās lejupielādēt.</string>
+
+    <string name="downloadConfirmationContinue">Lejupielādēt</string>
 </resources>

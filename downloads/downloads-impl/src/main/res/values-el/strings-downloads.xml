@@ -31,4 +31,6 @@
     <string name="downloadsRetry">Επανάληψη</string>
     <string name="notificationDownloadComplete">Η λήψη ολοκληρώθηκε.</string>
     <string name="notificationDownloadFailed">Αποτυχία λήψης.</string>
+
+    <string name="downloadConfirmationContinue">Αποθήκευση στις λήψεις</string>
 </resources>

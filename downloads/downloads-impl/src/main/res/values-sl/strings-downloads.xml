@@ -31,4 +31,6 @@
     <string name="downloadsRetry">Ponovi</string>
     <string name="notificationDownloadComplete">Prenos končan.</string>
     <string name="notificationDownloadFailed">Prenos ni uspel.</string>
+
+    <string name="downloadConfirmationContinue">Shrani med prenose</string>
 </resources>

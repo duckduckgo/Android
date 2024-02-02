@@ -31,4 +31,6 @@
     <string name="downloadsRetry">Reîncearcă</string>
     <string name="notificationDownloadComplete">Descărcare completă.</string>
     <string name="notificationDownloadFailed">Nu s-a putut descărca.</string>
+
+    <string name="downloadConfirmationContinue">Salvează în Descărcări</string>
 </resources>

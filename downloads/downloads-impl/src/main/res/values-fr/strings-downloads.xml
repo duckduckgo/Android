@@ -31,4 +31,6 @@
     <string name="downloadsRetry">Réessayer</string>
     <string name="notificationDownloadComplete">Téléchargement terminé.</string>
     <string name="notificationDownloadFailed">Échec du téléchargement.</string>
+
+    <string name="downloadConfirmationContinue">Enregistrer dans les téléchargements</string>
 </resources>

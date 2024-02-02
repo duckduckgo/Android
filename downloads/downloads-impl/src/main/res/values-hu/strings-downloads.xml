@@ -31,4 +31,6 @@
     <string name="downloadsRetry">Újrapróbálkozás</string>
     <string name="notificationDownloadComplete">Letöltés kész.</string>
     <string name="notificationDownloadFailed">A letöltés sikertelen.</string>
+
+    <string name="downloadConfirmationContinue">Mentés a Letöltések közé</string>
 </resources>
