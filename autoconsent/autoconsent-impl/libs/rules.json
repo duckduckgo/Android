@@ -4516,12 +4516,12 @@
       ],
       "detectCmp": [
         {
-          "exists": ".js-cookie-notice:has(#cookie_settings-form)"
+          "exists": ".js-cookie-notice #cookie_settings-form"
         }
       ],
       "detectPopup": [
         {
-          "visible": ".js-cookie-notice:has(#cookie_settings-form)"
+          "visible": ".js-cookie-notice #cookie_settings-form"
         }
       ],
       "optIn": [
@@ -6132,12 +6132,12 @@
       "prehideSelectors": [],
       "detectCmp": [
         {
-          "exists": ".ReactModal__Overlay:has([href=\"https://www.twitch.tv/p/cookie-policy\"])"
+          "exists": ".ReactModal__Overlay [href=\"https://www.twitch.tv/p/cookie-policy\"]"
         }
       ],
       "detectPopup": [
         {
-          "visible": ".ReactModal__Overlay:has([href=\"https://www.twitch.tv/p/cookie-policy\"])"
+          "visible": ".ReactModal__Overlay [href=\"https://www.twitch.tv/p/cookie-policy\"]"
         }
       ],
       "optIn": [
