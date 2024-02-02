@@ -59,6 +59,49 @@
       ]
     },
     {
+      "name": "abconcerts.be",
+      "vendorUrl": "https://unknown",
+      "intermediate": false,
+      "prehideSelectors": [
+        "dialog.cookie-consent"
+      ],
+      "detectCmp": [
+        {
+          "exists": "dialog.cookie-consent form.cookie-consent__form"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "dialog.cookie-consent form.cookie-consent__form"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": "dialog.cookie-consent form.cookie-consent__form button[value=yes]"
+        }
+      ],
+      "optOut": [
+        {
+          "if": {
+            "exists": "dialog.cookie-consent form.cookie-consent__form button[value=no]"
+          },
+          "then": [
+            {
+              "click": "dialog.cookie-consent form.cookie-consent__form button[value=no]"
+            }
+          ],
+          "else": [
+            {
+              "click": "dialog.cookie-consent form.cookie-consent__form button.cookie-consent__options-toggle"
+            },
+            {
+              "waitForThenClick": "dialog.cookie-consent form.cookie-consent__form button[value=\"save_options\"]"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "activobank.pt",
       "runContext": {
         "urlPattern": "^https://(www\\.)?activobank\\.pt"
@@ -183,6 +226,47 @@
       "optOut": [
         {
           "hide": "#modal-1 div[data-micromodal-close]"
+        }
+      ]
+    },
+    {
+      "name": "aliexpress",
+      "vendorUrl": "https://aliexpress.com/",
+      "runContext": {
+        "urlPattern": "^https://.*\\.aliexpress\\.com/"
+      },
+      "prehideSelectors": [
+        "#gdpr-new-container"
+      ],
+      "detectCmp": [
+        {
+          "exists": "#gdpr-new-container"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "#gdpr-new-container"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": "#gdpr-new-container .btn-accept"
+        }
+      ],
+      "optOut": [
+        {
+          "waitForThenClick": "#gdpr-new-container .btn-more"
+        },
+        {
+          "waitFor": "#gdpr-new-container .gdpr-dialog-switcher"
+        },
+        {
+          "click": "#gdpr-new-container .switcher-on",
+          "all": true,
+          "optional": true
+        },
+        {
+          "click": "#gdpr-new-container .btn-save"
         }
       ]
     },
@@ -312,6 +396,89 @@
       "optOut": [
         {
           "hide": "#consent-tracking"
+        }
+      ]
+    },
+    {
+      "name": "arbeitsagentur",
+      "vendorUrl": "https://www.arbeitsagentur.de/",
+      "prehideSelectors": [
+        ".modal-open bahf-cookie-disclaimer-dpl3"
+      ],
+      "detectCmp": [
+        {
+          "exists": "bahf-cookie-disclaimer-dpl3"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "bahf-cookie-disclaimer-dpl3"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": [
+            "bahf-cookie-disclaimer-dpl3",
+            "bahf-cd-modal-dpl3 .ba-btn-primary"
+          ]
+        }
+      ],
+      "optOut": [
+        {
+          "waitForThenClick": [
+            "bahf-cookie-disclaimer-dpl3",
+            "bahf-cd-modal-dpl3 .ba-btn-contrast"
+          ]
+        }
+      ],
+      "test": [
+        {
+          "eval": "EVAL_ARBEITSAGENTUR_TEST"
+        }
+      ]
+    },
+    {
+      "name": "asus",
+      "vendorUrl": "https://www.asus.com/",
+      "runContext": {
+        "urlPattern": "^https://www\\.asus\\.com/"
+      },
+      "prehideSelectors": [
+        "#cookie-policy-info,#cookie-policy-info-bg"
+      ],
+      "detectCmp": [
+        {
+          "exists": "#cookie-policy-info"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "#cookie-policy-info"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": "#cookie-policy-info [data-agree=\"Accept Cookies\"]"
+        }
+      ],
+      "optOut": [
+        {
+          "if": {
+            "exists": "#cookie-policy-info .btn-reject"
+          },
+          "then": [
+            {
+              "waitForThenClick": "#cookie-policy-info .btn-reject"
+            }
+          ],
+          "else": [
+            {
+              "waitForThenClick": "#cookie-policy-info .btn-setting"
+            },
+            {
+              "waitForThenClick": "#cookie-policy-lightbox-wrapper [data-agree=\"Save Settings\"]"
+            }
+          ]
         }
       ]
     },
@@ -506,6 +673,55 @@
       "optOut": [
         {
           "hide": ".cookie-alert.t-dark"
+        }
+      ]
+    },
+    {
+      "name": "bahn-de",
+      "vendorUrl": "https://www.bahn.de/",
+      "cosmetic": false,
+      "runContext": {
+        "main": true,
+        "frame": false,
+        "urlPattern": "^https://(www\\.)?bahn\\.de/"
+      },
+      "intermediate": false,
+      "prehideSelectors": [],
+      "detectCmp": [
+        {
+          "exists": [
+            "body > div:first-child",
+            "#consent-layer"
+          ]
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": [
+            "body > div:first-child",
+            "#consent-layer"
+          ]
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": [
+            "body > div:first-child",
+            "#consent-layer .js-accept-all-cookies"
+          ]
+        }
+      ],
+      "optOut": [
+        {
+          "waitForThenClick": [
+            "body > div:first-child",
+            "#consent-layer .js-accept-essential-cookies"
+          ]
+        }
+      ],
+      "test": [
+        {
+          "eval": "EVAL_BAHN_TEST"
         }
       ]
     },
@@ -767,6 +983,38 @@
       "test": [
         {
           "eval": "EVAL_CANVA_0"
+        }
+      ]
+    },
+    {
+      "name": "canyon.com",
+      "runContext": {
+        "urlPattern": "^https://www\\.canyon\\.com/"
+      },
+      "prehideSelectors": [
+        "div.modal.cookiesModal.is-open"
+      ],
+      "detectCmp": [
+        {
+          "exists": "div.modal.cookiesModal.is-open"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "div.modal.cookiesModal.is-open"
+        }
+      ],
+      "optIn": [
+        {
+          "click": "div.cookiesModal__buttonWrapper > button[data-closecause=\"close-by-submit\"]"
+        }
+      ],
+      "optOut": [
+        {
+          "click": "div.cookiesModal__buttonWrapper > button[data-closecause=\"close-by-manage-cookies\"]"
+        },
+        {
+          "waitForThenClick": "button#js-manage-data-privacy-save-button"
         }
       ]
     },
@@ -1144,26 +1392,42 @@
       ],
       "optIn": [
         {
-          "click": ".cc-accept-all",
-          "optional": true
-        },
-        {
-          "click": ".cc-allow",
-          "optional": true
-        },
-        {
-          "click": ".cc-dismiss",
-          "optional": true
+          "any": [
+            {
+              "click": ".cc-accept-all"
+            },
+            {
+              "click": ".cc-allow-all"
+            },
+            {
+              "click": ".cc-allow"
+            },
+            {
+              "click": ".cc-dismiss"
+            }
+          ]
         }
       ],
       "optOut": [
         {
-          "click": ".cc-dismiss"
-        }
-      ],
-      "test": [
-        {
-          "eval": "EVAL_COMPLIANZ_CATEGORIES_0"
+          "if": {
+            "exists": ".cc-type-categories[aria-describedby=\"cookieconsent:desc\"] .cc-dismiss"
+          },
+          "then": [
+            {
+              "click": ".cc-dismiss"
+            }
+          ],
+          "else": [
+            {
+              "click": ".cc-type-categories input[type=checkbox]:not([disabled]):checked",
+              "all": true,
+              "optional": true
+            },
+            {
+              "click": ".cc-save"
+            }
+          ]
         }
       ]
     },
@@ -1175,12 +1439,12 @@
       "cosmetic": true,
       "detectCmp": [
         {
-          "exists": ".cc-type-info[aria-describedby=\"cookieconsent:desc\"]"
+          "exists": ".cc-type-info[aria-describedby=\"cookieconsent:desc\"] .cc-compliance .cc-btn"
         }
       ],
       "detectPopup": [
         {
-          "visible": ".cc-type-info[aria-describedby=\"cookieconsent:desc\"]"
+          "visible": ".cc-type-info[aria-describedby=\"cookieconsent:desc\"] .cc-compliance .cc-btn"
         }
       ],
       "optIn": [
@@ -1199,7 +1463,54 @@
       ],
       "optOut": [
         {
-          "hide": "[aria-describedby=\"cookieconsent:desc\"]"
+          "if": {
+            "exists": ".cc-deny"
+          },
+          "then": [
+            {
+              "click": ".cc-deny"
+            }
+          ],
+          "else": [
+            {
+              "hide": "[aria-describedby=\"cookieconsent:desc\"]"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Complianz opt-both",
+      "prehideSelectors": [
+        "[aria-describedby=\"cookieconsent:desc\"] .cc-type-opt-both"
+      ],
+      "detectCmp": [
+        {
+          "exists": "[aria-describedby=\"cookieconsent:desc\"] .cc-type-opt-both"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "[aria-describedby=\"cookieconsent:desc\"] .cc-type-opt-both"
+        }
+      ],
+      "optIn": [
+        {
+          "click": ".cc-accept-all",
+          "optional": true
+        },
+        {
+          "click": ".cc-allow",
+          "optional": true
+        },
+        {
+          "click": ".cc-dismiss",
+          "optional": true
+        }
+      ],
+      "optOut": [
+        {
+          "waitForThenClick": ".cc-deny"
         }
       ]
     },
@@ -1220,38 +1531,57 @@
       ],
       "optIn": [
         {
-          "click": ".cc-accept-all",
-          "optional": true
-        },
-        {
-          "click": ".cc-allow",
-          "optional": true
-        },
-        {
-          "click": ".cc-dismiss",
-          "optional": true
+          "any": [
+            {
+              "click": ".cc-accept-all"
+            },
+            {
+              "click": ".cc-allow"
+            },
+            {
+              "click": ".cc-dismiss"
+            }
+          ]
         }
       ],
       "optOut": [
         {
-          "click": ".cc-settings"
-        },
-        {
-          "waitForVisible": "[aria-label=\"cookies preferences popup\"]"
-        },
-        {
-          "click": "[aria-label=\"cookies preferences popup\"] input[type=checkbox]:not([disabled]):checked",
-          "all": true,
-          "optional": true
-        },
-        {
-          "click": "[aria-label=\"cookies preferences popup\"] [aria-label=\"Accept Selected\"], [aria-label=\"cookies preferences popup\"] [aria-label=\"Save my choice\"], .cc-btn-accept-selected, .cc-deny",
-          "optional": true
-        }
-      ],
-      "test": [
-        {
-          "eval": "EVAL_COMPLIANZ_OPTIN_0"
+          "if": {
+            "visible": ".cc-deny"
+          },
+          "then": [
+            {
+              "click": ".cc-deny"
+            }
+          ],
+          "else": [
+            {
+              "if": {
+                "visible": ".cc-settings"
+              },
+              "then": [
+                {
+                  "waitForThenClick": ".cc-settings"
+                },
+                {
+                  "waitForVisible": ".cc-settings-view"
+                },
+                {
+                  "click": ".cc-settings-view input[type=checkbox]:not([disabled]):checked",
+                  "all": true,
+                  "optional": true
+                },
+                {
+                  "click": ".cc-settings-view .cc-btn-accept-selected"
+                }
+              ],
+              "else": [
+                {
+                  "click": ".cc-dismiss"
+                }
+              ]
+            }
+          ]
         }
       ]
     },
@@ -1263,6 +1593,9 @@
       "detectCmp": [
         {
           "exists": "#cookie-law-info-bar"
+        },
+        {
+          "eval": "EVAL_COOKIE_LAW_INFO_DETECT"
         }
       ],
       "detectPopup": [
@@ -1404,6 +1737,34 @@
       ]
     },
     {
+      "name": "cookieacceptbar",
+      "vendorUrl": "https://unknown",
+      "cosmetic": true,
+      "prehideSelectors": [
+        "#cookieAcceptBar.cookieAcceptBar"
+      ],
+      "detectCmp": [
+        {
+          "exists": "#cookieAcceptBar.cookieAcceptBar"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "#cookieAcceptBar.cookieAcceptBar"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": "#cookieAcceptBarConfirm"
+        }
+      ],
+      "optOut": [
+        {
+          "hide": "#cookieAcceptBar.cookieAcceptBar"
+        }
+      ]
+    },
+    {
       "name": "cookiealert",
       "intermediate": false,
       "prehideSelectors": [],
@@ -1448,6 +1809,75 @@
       "test": [
         {
           "eval": "EVAL_COOKIEALERT_2"
+        }
+      ]
+    },
+    {
+      "name": "cookieconsent2",
+      "vendorUrl": "https://www.github.com/orestbida/cookieconsent",
+      "comment": "supports v2.x.x of the library",
+      "prehideSelectors": [
+        "#cc--main"
+      ],
+      "detectCmp": [
+        {
+          "exists": "#cc--main"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "#cm"
+        },
+        {
+          "exists": "#s-all-bn"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": "#s-all-bn"
+        }
+      ],
+      "optOut": [
+        {
+          "waitForThenClick": "#s-rall-bn"
+        }
+      ],
+      "test": [
+        {
+          "eval": "EVAL_COOKIECONSENT2_TEST"
+        }
+      ]
+    },
+    {
+      "name": "cookieconsent3",
+      "vendorUrl": "https://www.github.com/orestbida/cookieconsent",
+      "comment": "supports v3.x.x of the library",
+      "prehideSelectors": [
+        "#cc-main"
+      ],
+      "detectCmp": [
+        {
+          "exists": "#cc-main"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "#cc-main .cm-wrapper"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": ".cm__btn[data-role=all]"
+        }
+      ],
+      "optOut": [
+        {
+          "waitForThenClick": ".cm__btn[data-role=necessary]"
+        }
+      ],
+      "test": [
+        {
+          "eval": "EVAL_COOKIECONSENT3_TEST"
         }
       ]
     },
@@ -1882,6 +2312,41 @@
       ]
     },
     {
+      "name": "dndbeyond",
+      "vendorUrl": "https://www.dndbeyond.com/",
+      "runContext": {
+        "urlPattern": "^https://www\\.dndbeyond\\.com/"
+      },
+      "prehideSelectors": [
+        "[id^=cookie-consent-banner]"
+      ],
+      "detectCmp": [
+        {
+          "exists": "[id^=cookie-consent-banner]"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "[id^=cookie-consent-banner]"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": "#cookie-consent-granted"
+        }
+      ],
+      "optOut": [
+        {
+          "waitForThenClick": "#cookie-consent-denied"
+        }
+      ],
+      "test": [
+        {
+          "eval": "EVAL_DNDBEYOND_TEST"
+        }
+      ]
+    },
+    {
       "name": "Drupal",
       "detectCmp": [
         {
@@ -1974,6 +2439,36 @@
       ]
     },
     {
+      "name": "ecosia",
+      "vendorUrl": "https://www.ecosia.org/",
+      "runContext": {
+        "urlPattern": "^https://www\\.ecosia\\.org/"
+      },
+      "prehideSelectors": [
+        ".cookie-wrapper"
+      ],
+      "detectCmp": [
+        {
+          "exists": ".cookie-wrapper > .cookie-notice"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": ".cookie-wrapper > .cookie-notice"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": "[data-test-id=cookie-notice-accept]"
+        }
+      ],
+      "optOut": [
+        {
+          "waitForThenClick": "[data-test-id=cookie-notice-reject]"
+        }
+      ]
+    },
+    {
       "name": "etsy",
       "prehideSelectors": [
         "#gdpr-single-choice-overlay",
@@ -2017,12 +2512,12 @@
       "name": "eu-cookie-compliance-banner",
       "detectCmp": [
         {
-          "exists": ".eu-cookie-compliance-banner-info"
+          "exists": "body.eu-cookie-compliance-popup-open"
         }
       ],
       "detectPopup": [
         {
-          "exists": ".eu-cookie-compliance-popup-open"
+          "exists": "body.eu-cookie-compliance-popup-open"
         }
       ],
       "optIn": [
@@ -2032,8 +2527,14 @@
       ],
       "optOut": [
         {
-          "click": ".decline-button,.eu-cookie-compliance-save-preferences-button",
-          "optional": true
+          "if": {
+            "visible": ".decline-button,.eu-cookie-compliance-save-preferences-button"
+          },
+          "then": [
+            {
+              "click": ".decline-button,.eu-cookie-compliance-save-preferences-button"
+            }
+          ]
         },
         {
           "hide": ".eu-cookie-compliance-banner-info, #sliding-popup"
@@ -2081,6 +2582,37 @@
       ]
     },
     {
+      "name": "europa-eu",
+      "vendorUrl": "https://ec.europa.eu/",
+      "runContext": {
+        "urlPattern": "^https://[^/]*europa\\.eu/"
+      },
+      "prehideSelectors": [
+        "#cookie-consent-banner"
+      ],
+      "detectCmp": [
+        {
+          "exists": ".cck-container"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": ".cck-container"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": ".cck-actions-button[href=\"#accept\"]"
+        }
+      ],
+      "optOut": [
+        {
+          "waitForThenClick": ".cck-actions-button[href=\"#refuse\"]",
+          "hide": ".cck-container"
+        }
+      ]
+    },
+    {
       "name": "EZoic",
       "prehideSelectors": [
         "#ez-cookie-dialog-wrapper"
@@ -2116,7 +2648,7 @@
           "waitFor": "#ez-cookie-dialog input[type=checkbox]"
         },
         {
-          "click": "#ez-cookie-dialog input[type=checkbox][checked]",
+          "click": "#ez-cookie-dialog input[type=checkbox]:checked",
           "all": true
         },
         {
@@ -2163,6 +2695,33 @@
         {
           "waitForVisible": "div[data-testid=\"cookie-policy-manage-dialog\"]",
           "check": "none"
+        }
+      ]
+    },
+    {
+      "name": "fides",
+      "vendorUrl": "https://github.com/ethyca/fides",
+      "prehideSelectors": [
+        "#fides-overlay"
+      ],
+      "detectCmp": [
+        {
+          "exists": "#fides-overlay #fides-banner"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "#fides-overlay #fides-banner"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": "#fides-banner [data-testid=\"Accept all-btn\"]"
+        }
+      ],
+      "optOut": [
+        {
+          "waitForThenClick": "#fides-banner [data-testid=\"Reject all-btn\"]"
         }
       ]
     },
@@ -2342,6 +2901,39 @@
       ]
     },
     {
+      "name": "hashicorp",
+      "vendorUrl": "https://hashicorp.com/",
+      "runContext": {
+        "urlPattern": "^https://[^.]*\\.hashicorp\\.com/"
+      },
+      "prehideSelectors": [
+        "[data-testid=consent-banner]"
+      ],
+      "detectCmp": [
+        {
+          "exists": "[data-testid=consent-banner]"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "[data-testid=consent-banner]"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": "[data-testid=accept]"
+        }
+      ],
+      "optOut": [
+        {
+          "waitForThenClick": "[data-testid=manage-preferences]"
+        },
+        {
+          "waitForThenClick": "[data-testid=consent-mgr-dialog] [data-ga-button=save-preferences]"
+        }
+      ]
+    },
+    {
       "name": "healthline-media",
       "prehideSelectors": [
         "#modal-host > div.no-hash > div.window-wrapper"
@@ -2414,6 +3006,35 @@
       ]
     },
     {
+      "name": "hetzner.com",
+      "runContext": {
+        "urlPattern": "^https://www\\.hetzner\\.com/"
+      },
+      "prehideSelectors": [
+        "#CookieConsent"
+      ],
+      "detectCmp": [
+        {
+          "exists": "#CookieConsent"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "#CookieConsent"
+        }
+      ],
+      "optIn": [
+        {
+          "click": "#CookieConsentGiven"
+        }
+      ],
+      "optOut": [
+        {
+          "click": "#CookieConsentDeclined"
+        }
+      ]
+    },
+    {
       "name": "hl.co.uk",
       "prehideSelectors": [
         ".cookieModalContent",
@@ -2457,6 +3078,36 @@
         },
         {
           "click": "#updateCookieButton"
+        }
+      ]
+    },
+    {
+      "name": "hu-manity",
+      "vendorUrl": "https://hu-manity.co/",
+      "prehideSelectors": [
+        "#hu.hu-wrapper"
+      ],
+      "detectCmp": [
+        {
+          "exists": "#hu.hu-visible"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "#hu.hu-visible"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": "[data-hu-action=cookies-notice-consent-choices-3]"
+        },
+        {
+          "waitForThenClick": "#hu-cookies-save"
+        }
+      ],
+      "optOut": [
+        {
+          "waitForThenClick": "#hu-cookies-save"
         }
       ]
     },
@@ -2543,6 +3194,39 @@
             "[data-tag-name=\"ing-cc-dialog-level0\"]",
             "[data-tag-name=\"ing-cc-button\"][class*=\"more\"]"
           ]
+        }
+      ]
+    },
+    {
+      "name": "instagram",
+      "vendorUrl": "https://instagram.com",
+      "runContext": {
+        "urlPattern": "^https://www\\.instagram\\.com/"
+      },
+      "prehideSelectors": [
+        ".x78zum5.xdt5ytf.xg6iff7.x1n2onr6"
+      ],
+      "detectCmp": [
+        {
+          "exists": ".x1qjc9v5.x9f619.x78zum5.xdt5ytf.x1iyjqo2.xl56j7k"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": ".x1qjc9v5.x9f619.x78zum5.xdt5ytf.x1iyjqo2.xl56j7k"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": "._a9--._a9_0"
+        }
+      ],
+      "optOut": [
+        {
+          "waitForThenClick": "._a9--._a9_1"
+        },
+        {
+          "wait": 2000
         }
       ]
     },
@@ -2672,6 +3356,51 @@
       ]
     },
     {
+      "name": "jdsports",
+      "vendorUrl": "https://www.jdsports.co.uk/",
+      "runContext": {
+        "urlPattern": "^https://www\\.jdsports\\."
+      },
+      "prehideSelectors": [
+        ".miniConsent,#PrivacyPolicyBanner"
+      ],
+      "detectCmp": [
+        {
+          "exists": ".miniConsent,#PrivacyPolicyBanner"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": ".miniConsent,#PrivacyPolicyBanner"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": ".miniConsent .accept-all-cookies"
+        }
+      ],
+      "optOut": [
+        {
+          "if": {
+            "exists": "#PrivacyPolicyBanner"
+          },
+          "then": [
+            {
+              "hide": "#PrivacyPolicyBanner"
+            }
+          ],
+          "else": [
+            {
+              "waitForThenClick": "#cookie-settings"
+            },
+            {
+              "waitForThenClick": "#reject-all-cookies"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "johnlewis.com",
       "prehideSelectors": [
         "div[class^=pecr-cookie-banner-]"
@@ -2791,6 +3520,7 @@
     },
     {
       "name": "ketch",
+      "vendorUrl": "https://www.ketch.com",
       "runContext": {
         "frame": false,
         "main": true
@@ -2816,7 +3546,7 @@
           },
           "then": [
             {
-              "waitForThenClick": "#lanyard_root div[class^='buttons'] > :nth-child(2)"
+              "waitForThenClick": "#lanyard_root div[class*=buttons] > :nth-child(2)"
             },
             {
               "click": "#lanyard_root button[class='confirmButton']"
@@ -2824,43 +3554,42 @@
           ],
           "else": [
             {
-              "waitForThenClick": "#lanyard_root div[class^='buttons'] > :nth-child(2)"
+              "waitForThenClick": "#lanyard_root div[class*=buttons] > :nth-child(2)"
             }
           ]
         }
       ],
       "optOut": [
         {
-          "click": "#lanyard_root button[class^='link']",
+          "if": {
+            "exists": "#lanyard_root [aria-describedby=banner-description]"
+          },
+          "then": [
+            {
+              "waitForThenClick": "#lanyard_root div[class*=buttons] > button[class*=secondaryButton]",
+              "comment": "can be either settings or reject button"
+            }
+          ]
+        },
+        {
+          "waitFor": "#lanyard_root [aria-describedby=preference-description],#lanyard_root [aria-describedby=modal-description]",
+          "timeout": 1000,
           "optional": true
         },
         {
           "if": {
-            "exists": "#lanyard_root button[class*='confirmButton']"
+            "exists": "#lanyard_root [aria-describedby=preference-description],#lanyard_root [aria-describedby=modal-description]"
           },
           "then": [
             {
-              "waitForThenClick": "#lanyard_root button[class*='rejectButton']"
+              "waitForThenClick": "#lanyard_root button[class*=rejectButton]"
             },
             {
-              "click": "#lanyard_root button[class*='confirmButton']"
-            }
-          ],
-          "else": [
-            {
-              "click": "#lanyard_root div[class^='buttons'] > :nth-child(1)",
-              "optional": true
-            },
-            {
-              "waitForThenClick": "#lanyard_root input:checked"
-            },
-            {
-              "click": "#consentsTab > div:nth-child(2) > div > div[class^='actions'] > button:nth-child(1)"
+              "click": "#lanyard_root button[class*=confirmButton],#lanyard_root div[class*=actions_] > button:nth-child(1)"
             }
           ]
         }
-      ],
-      "test": []
+      ]
     },
     {
       "name": "kleinanzeigen-de",
@@ -2956,6 +3685,34 @@
       ]
     },
     {
+      "name": "lineagrafica",
+      "vendorUrl": "https://addons.prestashop.com/en/legal/8734-eu-cookie-law-gdpr-banner-blocker.html",
+      "cosmetic": true,
+      "prehideSelectors": [
+        "#lgcookieslaw_banner,#lgcookieslaw_modal,.lgcookieslaw-overlay"
+      ],
+      "detectCmp": [
+        {
+          "exists": "#lgcookieslaw_banner,#lgcookieslaw_modal,.lgcookieslaw-overlay"
+        }
+      ],
+      "detectPopup": [
+        {
+          "exists": "#lgcookieslaw_banner,#lgcookieslaw_modal,.lgcookieslaw-overlay"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": "#lgcookieslaw_accept"
+        }
+      ],
+      "optOut": [
+        {
+          "hide": "#lgcookieslaw_banner,#lgcookieslaw_modal,.lgcookieslaw-overlay"
+        }
+      ]
+    },
+    {
       "name": "linkedin.com",
       "prehideSelectors": [
         ".artdeco-global-alert[type=COOKIE_CONSENT]"
@@ -2996,6 +3753,47 @@
         {
           "waitForVisible": ".artdeco-global-alert[type=COOKIE_CONSENT]",
           "check": "none"
+        }
+      ]
+    },
+    {
+      "name": "livejasmin",
+      "vendorUrl": "https://www.livejasmin.com/",
+      "runContext": {
+        "urlPattern": "^https://www\\.livejasmin\\.com/"
+      },
+      "prehideSelectors": [
+        "#consent_modal"
+      ],
+      "detectCmp": [
+        {
+          "exists": "#consent_modal"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "#consent_modal"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": "#consent_modal button[data-testid=ButtonStyledButton]:first-of-type"
+        }
+      ],
+      "optOut": [
+        {
+          "waitForThenClick": "#consent_modal button[data-testid=ButtonStyledButton]:nth-of-type(2)"
+        },
+        {
+          "waitForVisible": "[data-testid=PrivacyPreferenceCenterWithConsentCookieContent]"
+        },
+        {
+          "click": "[data-testid=PrivacyPreferenceCenterWithConsentCookieContent] input[data-testid=PrivacyPreferenceCenterWithConsentCookieSwitch]:checked",
+          "optional": true,
+          "all": true
+        },
+        {
+          "waitForThenClick": "[data-testid=PrivacyPreferenceCenterWithConsentCookieContent] button[data-testid=ButtonStyledButton]:last-child"
         }
       ]
     },
@@ -3481,6 +4279,50 @@
       ]
     },
     {
+      "name": "om",
+      "vendorUrl": "https://olli-machts.de/en/extension/cookie-manager",
+      "prehideSelectors": [
+        ".tx-om-cookie-consent"
+      ],
+      "detectCmp": [
+        {
+          "exists": ".tx-om-cookie-consent .active[data-omcookie-panel]"
+        }
+      ],
+      "detectPopup": [
+        {
+          "exists": ".tx-om-cookie-consent .active[data-omcookie-panel]"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": "[data-omcookie-panel-save=all]"
+        }
+      ],
+      "optOut": [
+        {
+          "if": {
+            "exists": "[data-omcookie-panel-save=min]"
+          },
+          "then": [
+            {
+              "waitForThenClick": "[data-omcookie-panel-save=min]"
+            }
+          ],
+          "else": [
+            {
+              "click": "input[data-omcookie-panel-grp]:checked:not(:disabled)",
+              "all": true,
+              "optional": true
+            },
+            {
+              "waitForThenClick": "[data-omcookie-panel-save=save]"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "onlyFans.com",
       "prehideSelectors": [
         "div.b-cookies-informer"
@@ -3509,6 +4351,34 @@
         },
         {
           "click": "div.b-cookies-informer__nav > button"
+        }
+      ]
+    },
+    {
+      "name": "openli",
+      "vendorUrl": "https://openli.com",
+      "prehideSelectors": [
+        ".legalmonster-cleanslate"
+      ],
+      "detectCmp": [
+        {
+          "exists": ".legalmonster-cleanslate"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": ".legalmonster-cleanslate #lm-cookie-wall-container",
+          "check": "any"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": "#lm-accept-all"
+        }
+      ],
+      "optOut": [
+        {
+          "waitForThenClick": "#lm-accept-necessary"
         }
       ]
     },
@@ -3558,9 +4428,8 @@
     {
       "name": "osano",
       "prehideSelectors": [
-        ".osano-cm-window"
+        ".osano-cm-window,.osano-cm-dialog"
       ],
-      "cosmetic": true,
       "detectCmp": [
         {
           "exists": ".osano-cm-window"
@@ -3579,7 +4448,7 @@
       ],
       "optOut": [
         {
-          "hide": ".osano-cm-window"
+          "waitForThenClick": ".osano-cm-denyAll"
         }
       ]
     },
@@ -3610,18 +4479,75 @@
       ]
     },
     {
+      "name": "ourworldindata",
+      "vendorUrl": "https://ourworldindata.org/",
+      "runContext": {
+        "urlPattern": "^https://ourworldindata\\.org/"
+      },
+      "prehideSelectors": [
+        ".cookie-manager"
+      ],
+      "detectCmp": [
+        {
+          "exists": ".cookie-manager"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": ".cookie-manager .cookie-notice.open"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": ".cookie-notice [data-test=accept]"
+        }
+      ],
+      "optOut": [
+        {
+          "waitForThenClick": ".cookie-notice [data-test=reject]"
+        }
+      ]
+    },
+    {
+      "name": "pabcogypsum",
+      "vendorUrl": "https://unknown",
+      "prehideSelectors": [
+        ".js-cookie-notice:has(#cookie_settings-form)"
+      ],
+      "detectCmp": [
+        {
+          "exists": ".js-cookie-notice:has(#cookie_settings-form)"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": ".js-cookie-notice:has(#cookie_settings-form)"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": ".js-cookie-notice button[value=allow]"
+        }
+      ],
+      "optOut": [
+        {
+          "waitForThenClick": ".js-cookie-notice button[value=disable]"
+        }
+      ]
+    },
+    {
       "name": "paypal-us",
       "prehideSelectors": [
         "#ccpaCookieContent_wrapper, article.ppvx_modal--overpanel"
       ],
       "detectCmp": [
         {
-          "exists": "#ccpaCookieBanner, .privacy-modal-content"
+          "exists": "#ccpaCookieBanner, .privacy-sheet-content"
         }
       ],
       "detectPopup": [
         {
-          "exists": "#ccpaCookieBanner, .privacy-modal-content"
+          "exists": "#ccpaCookieBanner, .privacy-sheet-content"
         }
       ],
       "optIn": [
@@ -3641,7 +4567,7 @@
           ],
           "else": [
             {
-              "waitForVisible": ".privacy-modal-content #formContent"
+              "waitForVisible": ".privacy-sheet-content #formContent"
             },
             {
               "click": "#formContent .cookiepref-11m2iee-checkbox_base input:checked",
@@ -3901,6 +4827,34 @@
       ]
     },
     {
+      "name": "productz.com",
+      "vendorUrl": "https://productz.com/",
+      "runContext": {
+        "urlPattern": "^https://productz\\.com/"
+      },
+      "prehideSelectors": [],
+      "detectCmp": [
+        {
+          "exists": ".c-modal.is-active"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": ".c-modal.is-active"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": ".c-modal.is-active .is-accept"
+        }
+      ],
+      "optOut": [
+        {
+          "waitForThenClick": ".c-modal.is-active .is-dismiss"
+        }
+      ]
+    },
+    {
       "name": "pubtech",
       "prehideSelectors": [
         "#pubtech-cmp"
@@ -3991,31 +4945,69 @@
         "urlPattern": "^https://www\\.reddit\\.com/"
       },
       "prehideSelectors": [
-        "section:has(a[href^=\"https://www.reddit.com/policies/cookies\"])"
+        "[bundlename=reddit_cookie_banner]"
       ],
       "detectCmp": [
         {
-          "exists": "section:has(a[href^=\"https://www.reddit.com/policies/cookies\"])"
+          "exists": "reddit-cookie-banner"
         }
       ],
       "detectPopup": [
         {
-          "visible": "section:has(a[href^=\"https://www.reddit.com/policies/cookies\"])"
+          "visible": "reddit-cookie-banner"
         }
       ],
       "optIn": [
         {
-          "waitForThenClick": "section:has(a[href^=\"https://www.reddit.com/policies/cookies\"]) section[class^='_'] > section:first-child form button"
+          "waitForThenClick": [
+            "reddit-cookie-banner",
+            "#accept-all-cookies-button > button"
+          ]
         }
       ],
       "optOut": [
         {
-          "waitForThenClick": "section:has(a[href^=\"https://www.reddit.com/policies/cookies\"]) section[class^='_'] > section:last-child form button"
+          "waitForThenClick": [
+            "reddit-cookie-banner",
+            "#reject-nonessential-cookies-button > button"
+          ]
         }
       ],
       "test": [
         {
           "eval": "EVAL_REDDIT_0"
+        }
+      ]
+    },
+    {
+      "name": "rog-forum.asus.com",
+      "runContext": {
+        "urlPattern": "^https://rog-forum\\.asus\\.com/"
+      },
+      "prehideSelectors": [
+        "#cookie-policy-info"
+      ],
+      "detectCmp": [
+        {
+          "exists": "#cookie-policy-info"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "#cookie-policy-info"
+        }
+      ],
+      "optIn": [
+        {
+          "click": "div.cookie-btn-box > div[aria-label=\"Accept\"]"
+        }
+      ],
+      "optOut": [
+        {
+          "click": "div.cookie-btn-box > div[aria-label=\"Reject\"]"
+        },
+        {
+          "waitForThenClick": ".cookie-policy-lightbox-bottom > div[aria-label=\"Save Settings\"]"
         }
       ]
     },
@@ -4078,6 +5070,35 @@
       "optOut": [
         {
           "hide": "div.cookie-bar"
+        }
+      ]
+    },
+    {
+      "name": "setapp.com",
+      "vendorUrl": "https://setapp.com/",
+      "cosmetic": true,
+      "runContext": {
+        "urlPattern": "^https://setapp\\.com/"
+      },
+      "prehideSelectors": [],
+      "detectCmp": [
+        {
+          "exists": ".cookie-banner.js-cookie-banner"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": ".cookie-banner.js-cookie-banner"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": ".cookie-banner.js-cookie-banner button"
+        }
+      ],
+      "optOut": [
+        {
+          "hide": ".cookie-banner.js-cookie-banner"
         }
       ]
     },
@@ -4262,6 +5283,74 @@
       ]
     },
     {
+      "name": "strato.de",
+      "prehideSelectors": [
+        "#cookie_initial_modal",
+        ".modal-backdrop"
+      ],
+      "runContext": {
+        "urlPattern": "^https://www\\.strato\\.de/"
+      },
+      "detectCmp": [
+        {
+          "exists": "#cookie_initial_modal"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "#cookie_initial_modal"
+        }
+      ],
+      "optIn": [
+        {
+          "click": "button#jss_consent_all_initial_modal"
+        }
+      ],
+      "optOut": [
+        {
+          "click": "button#jss_open_settings_modal"
+        },
+        {
+          "click": "button#jss_consent_checked"
+        }
+      ]
+    },
+    {
+      "name": "svt.se",
+      "vendorUrl": "https://www.svt.se/",
+      "runContext": {
+        "urlPattern": "^https://www\\.svt\\.se/"
+      },
+      "prehideSelectors": [
+        "[class*=CookieConsent__root___]"
+      ],
+      "detectCmp": [
+        {
+          "exists": "[class*=CookieConsent__root___]"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "[class*=CookieConsent__modal___]"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": "[class*=CookieConsent__modal___] > div > button[class*=primary]"
+        }
+      ],
+      "optOut": [
+        {
+          "waitForThenClick": "[class*=CookieConsent__modal___] > div > button[class*=secondary]:nth-child(2)"
+        }
+      ],
+      "test": [
+        {
+          "eval": "EVAL_SVT_TEST"
+        }
+      ]
+    },
+    {
       "name": "takealot.com",
       "cosmetic": true,
       "prehideSelectors": [
@@ -4333,13 +5422,53 @@
       ]
     },
     {
-      "name": "Tealium",
+      "name": "taunton",
+      "vendorUrl": "https://www.taunton.com/",
       "prehideSelectors": [
-        "#__tealiumGDPRecModal,#__tealiumGDPRcpPrefs,#consent-layer"
+        "#taunton-user-consent__overlay"
       ],
       "detectCmp": [
         {
-          "exists": "#__tealiumGDPRecModal *,#__tealiumGDPRcpPrefs *"
+          "exists": "#taunton-user-consent__overlay"
+        }
+      ],
+      "detectPopup": [
+        {
+          "exists": "#taunton-user-consent__overlay:not([aria-hidden=true])"
+        }
+      ],
+      "optIn": [
+        {
+          "click": "#taunton-user-consent__toolbar input[type=checkbox]:not(:checked)"
+        },
+        {
+          "click": "#taunton-user-consent__toolbar button[type=submit]"
+        }
+      ],
+      "optOut": [
+        {
+          "click": "#taunton-user-consent__toolbar input[type=checkbox]:checked",
+          "optional": true,
+          "all": true
+        },
+        {
+          "click": "#taunton-user-consent__toolbar button[type=submit]"
+        }
+      ],
+      "test": [
+        {
+          "eval": "EVAL_TAUNTON_TEST"
+        }
+      ]
+    },
+    {
+      "name": "Tealium",
+      "prehideSelectors": [
+        "#__tealiumGDPRecModal,#__tealiumGDPRcpPrefs,#__tealiumImplicitmodal,#consent-layer"
+      ],
+      "detectCmp": [
+        {
+          "exists": "#__tealiumGDPRecModal *,#__tealiumGDPRcpPrefs *,#__tealiumImplicitmodal *"
         },
         {
           "eval": "EVAL_TEALIUM_0"
@@ -4347,7 +5476,7 @@
       ],
       "detectPopup": [
         {
-          "visible": "#__tealiumGDPRecModal *,#__tealiumGDPRcpPrefs *",
+          "visible": "#__tealiumGDPRecModal *,#__tealiumGDPRcpPrefs *,#__tealiumImplicitmodal *",
           "check": "any"
         }
       ],
@@ -4359,7 +5488,7 @@
           "eval": "EVAL_TEALIUM_DONOTSELL"
         },
         {
-          "hide": "#__tealiumGDPRecModal,#__tealiumGDPRcpPrefs"
+          "hide": "#__tealiumGDPRecModal,#__tealiumGDPRcpPrefs,#__tealiumImplicitmodal"
         },
         {
           "waitForThenClick": "#cm-acceptNone,.js-accept-essential-cookies",
@@ -4385,6 +5514,36 @@
         {
           "visible": "#__tealiumGDPRecModal,#__tealiumGDPRcpPrefs",
           "check": "none"
+        }
+      ]
+    },
+    {
+      "name": "temu",
+      "vendorUrl": "https://temu.com",
+      "runContext": {
+        "urlPattern": "^https://[^/]*temu\\.com/"
+      },
+      "prehideSelectors": [
+        "._2d-8vq-W,._1UdBUwni"
+      ],
+      "detectCmp": [
+        {
+          "exists": "._3YCsmIaS"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "._3YCsmIaS"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": "._3fKiu5wx._3zN5SumS._3tAK973O.IYOfhWEs.VGNGF1pA"
+        }
+      ],
+      "optOut": [
+        {
+          "waitForThenClick": "._3fKiu5wx._1_XToJBF._3tAK973O.IYOfhWEs.VGNGF1pA"
         }
       ]
     },
@@ -4445,6 +5604,63 @@
               ]
             }
           ]
+        }
+      ]
+    },
+    {
+      "name": "termsfeed",
+      "vendorUrl": "https://termsfeed.com",
+      "comment": "v4.x.x",
+      "prehideSelectors": [
+        ".termsfeed-com---nb"
+      ],
+      "detectCmp": [
+        {
+          "exists": ".termsfeed-com---nb"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": ".termsfeed-com---nb"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": ".cc-nb-okagree"
+        }
+      ],
+      "optOut": [
+        {
+          "waitForThenClick": ".cc-nb-reject"
+        }
+      ]
+    },
+    {
+      "name": "termsfeed3",
+      "vendorUrl": "https://termsfeed.com",
+      "comment": "v3.x.x",
+      "cosmetic": true,
+      "prehideSelectors": [
+        ".cc_dialog.cc_css_reboot"
+      ],
+      "detectCmp": [
+        {
+          "exists": ".cc_dialog.cc_css_reboot"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": ".cc_dialog.cc_css_reboot"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": ".cc_dialog.cc_css_reboot .cc_b_ok"
+        }
+      ],
+      "optOut": [
+        {
+          "hide": ".cc_dialog.cc_css_reboot"
         }
       ]
     },
@@ -4698,6 +5914,92 @@
       ]
     },
     {
+      "name": "transcend",
+      "vendorUrl": "https://unknown",
+      "cosmetic": true,
+      "prehideSelectors": [
+        "#transcend-consent-manager"
+      ],
+      "detectCmp": [
+        {
+          "exists": "#transcend-consent-manager"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "#transcend-consent-manager"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": [
+            "#transcend-consent-manager",
+            "#consentManagerMainDialog .inner-container button"
+          ]
+        }
+      ],
+      "optOut": [
+        {
+          "hide": "#transcend-consent-manager"
+        }
+      ]
+    },
+    {
+      "name": "transip-nl",
+      "runContext": {
+        "urlPattern": "^https://www\\.transip\\.nl/"
+      },
+      "prehideSelectors": [
+        "#consent-modal"
+      ],
+      "detectCmp": [
+        {
+          "any": [
+            {
+              "exists": "#consent-modal"
+            },
+            {
+              "exists": "#privacy-settings-content"
+            }
+          ]
+        }
+      ],
+      "detectPopup": [
+        {
+          "any": [
+            {
+              "visible": "#consent-modal"
+            },
+            {
+              "visible": "#privacy-settings-content"
+            }
+          ]
+        }
+      ],
+      "optIn": [
+        {
+          "click": "button[type=\"submit\"]"
+        }
+      ],
+      "optOut": [
+        {
+          "if": {
+            "exists": "#privacy-settings-content"
+          },
+          "then": [
+            {
+              "click": "button[type=\"submit\"]"
+            }
+          ],
+          "else": [
+            {
+              "click": "div.one-modal__action-footer-column--secondary > a"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "tropicfeel-com",
       "prehideSelectors": [
         "#shopify-section-cookies-controller"
@@ -4817,6 +6119,35 @@
       "optOut": [
         {
           "hide": "#cmp-app-container"
+        }
+      ]
+    },
+    {
+      "name": "twitch-mobile",
+      "vendorUrl": "https://m.twitch.tv/",
+      "cosmetic": true,
+      "runContext": {
+        "urlPattern": "^https?://m\\.twitch\\.tv"
+      },
+      "prehideSelectors": [],
+      "detectCmp": [
+        {
+          "exists": ".ReactModal__Overlay:has([href=\"https://www.twitch.tv/p/cookie-policy\"])"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": ".ReactModal__Overlay:has([href=\"https://www.twitch.tv/p/cookie-policy\"])"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": ".ReactModal__Overlay:has([href=\"https://www.twitch.tv/p/cookie-policy\"]) button"
+        }
+      ],
+      "optOut": [
+        {
+          "hide": ".ReactModal__Overlay:has([href=\"https://www.twitch.tv/p/cookie-policy\"])"
         }
       ]
     },
@@ -4946,7 +6277,7 @@
         {
           "any": [
             {
-              "waitForThenClick": "button.p-button"
+              "waitForThenClick": "button.js-manage"
             },
             {
               "waitForThenClick": "xpath///*[@id=\"cookie-policy-content\"]/p[4]/button[2]"
@@ -4954,14 +6285,15 @@
           ]
         },
         {
-          "waitForThenClick": ".p-switch__input:checked",
+          "waitForThenClick": "dialog.cookie-policy .p-switch__input:checked",
           "optional": true,
-          "all": true
+          "all": true,
+          "timeout": 500
         },
         {
           "any": [
             {
-              "waitForThenClick": "div > button"
+              "waitForThenClick": "dialog.cookie-policy .js-save-preferences"
             },
             {
               "waitForThenClick": "xpath///*[@id=\"modal\"]/div/button"
@@ -5207,6 +6539,42 @@
       ]
     },
     {
+      "name": "webflow",
+      "vendorUrl": "https://webflow.com/",
+      "prehideSelectors": [
+        ".fs-cc-components"
+      ],
+      "detectCmp": [
+        {
+          "exists": ".fs-cc-components"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": ".fs-cc-components"
+        },
+        {
+          "visible": "[fs-cc=banner]"
+        }
+      ],
+      "optIn": [
+        {
+          "wait": 500
+        },
+        {
+          "waitForThenClick": "[fs-cc=banner] [fs-cc=allow]"
+        }
+      ],
+      "optOut": [
+        {
+          "wait": 500
+        },
+        {
+          "waitForThenClick": "[fs-cc=banner] [fs-cc=deny]"
+        }
+      ]
+    },
+    {
       "name": "wetransfer.com",
       "detectCmp": [
         {
@@ -5256,6 +6624,35 @@
       "optOut": [
         {
           "hide": ".cookie-wrapper"
+        }
+      ]
+    },
+    {
+      "name": "wolframalpha",
+      "vendorUrl": "https://www.wolframalpha.com",
+      "prehideSelectors": [],
+      "cosmetic": true,
+      "runContext": {
+        "urlPattern": "^https://www\\.wolframalpha\\.com/"
+      },
+      "detectCmp": [
+        {
+          "exists": "section._a_yb"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "section._a_yb"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": "section._a_yb button"
+        }
+      ],
+      "optOut": [
+        {
+          "hide": "section._a_yb"
         }
       ]
     },
@@ -5348,6 +6745,47 @@
       "optOut": [
         {
           "hide": ".wpcc-container"
+        }
+      ]
+    },
+    {
+      "name": "xe.com",
+      "vendorUrl": "https://www.xe.com/",
+      "runContext": {
+        "urlPattern": "^https://www\\.xe\\.com/"
+      },
+      "prehideSelectors": [
+        "[class*=ConsentBanner]"
+      ],
+      "detectCmp": [
+        {
+          "exists": "[class*=ConsentBanner]"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "[class*=ConsentBanner]"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": "[class*=ConsentBanner] .egnScw"
+        }
+      ],
+      "optOut": [
+        {
+          "wait": 1000
+        },
+        {
+          "waitForThenClick": "[class*=ConsentBanner] .frDWEu"
+        },
+        {
+          "waitForThenClick": "[class*=ConsentBanner] .hXIpFU"
+        }
+      ],
+      "test": [
+        {
+          "eval": "EVAL_XE_TEST"
         }
       ]
     },
@@ -5462,6 +6900,34 @@
       "optOut": [
         {
           "hide": "#cookies-use-alert"
+        }
+      ]
+    },
+    {
+      "name": "xvideos",
+      "vendorUrl": "https://xvideos.com",
+      "runContext": {
+        "urlPattern": "^https://[^/]*xvideos\\.com/"
+      },
+      "prehideSelectors": [],
+      "detectCmp": [
+        {
+          "exists": ".disclaimer-opened #disclaimer-cookies"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": ".disclaimer-opened #disclaimer-cookies"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": "#disclaimer-accept_cookies"
+        }
+      ],
+      "optOut": [
+        {
+          "waitForThenClick": "#disclaimer-reject_cookies"
         }
       ]
     },
