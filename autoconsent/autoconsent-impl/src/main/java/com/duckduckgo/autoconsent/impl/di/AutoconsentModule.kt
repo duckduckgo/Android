@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentExceptionsRepository
+import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeatureSettingsRepository
 import com.duckduckgo.autoconsent.impl.remoteconfig.RealAutoconsentExceptionsRepository
 import com.duckduckgo.autoconsent.impl.remoteconfig.RealAutoconsentFeatureSettingsRepository
@@ -38,8 +39,8 @@ import kotlinx.coroutines.CoroutineScope
 object AutoconsentModule {
 
     @Provides
-    fun provideAutoconsentSettingsRepository(context: Context): AutoconsentSettingsRepository {
-        return AutoconsentSettingsRepository.create(context)
+    fun provideAutoconsentSettingsRepository(context: Context, autoconsentFeature: AutoconsentFeature): AutoconsentSettingsRepository {
+        return AutoconsentSettingsRepository.create(context, autoconsentFeature.onByDefault().isEnabled())
     }
 
     @Provides

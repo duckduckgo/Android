@@ -36,4 +36,7 @@ interface AutoconsentFeature {
      */
     @Toggle.DefaultValue(true)
     fun self(): Toggle
+
+    @Toggle.DefaultValue(false)
+    fun onByDefault(): Toggle
 }
