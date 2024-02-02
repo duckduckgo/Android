@@ -1,6 +1,10 @@
 appId: com.duckduckgo.mobile.android
-name: Autofill - Run all tests
+name: "Autofill: Run all tests"
+tags:
+    - autofillNoAuthTests
 ---
+# Pre-requisite: the app is installed on an autofill-eligible device with a special build flag set to bypass device-authentication requirement
+
 - launchApp:
     clearState: true
 - runFlow: ../shared/onboarding.yaml
@@ -10,3 +14,6 @@ name: Autofill - Run all tests
 - runFlow: 2_autofill_reach_creds_management.yaml
 - runFlow: 3_autofill_manually_add_cred.yaml
 - runFlow: 4_search_logins.yaml
+- runFlow: 5_autofill_manually_updating_an_existing_credential.yaml
+- runFlow: 6_delete_logins.yaml
+- runFlow: 7_autofill_prompted_to_save_creds_on_form.yaml

@@ -114,6 +114,7 @@ class AutofillSettingsViewModelTest {
         runTest {
             whenever(mockStore.getAllCredentials()).thenReturn(emptyFlow())
             whenever(neverSavedSiteRepository.neverSaveListCount()).thenReturn(emptyFlow())
+            whenever(deviceAuthenticator.isAuthenticationRequiredForAutofill()).thenReturn(true)
         }
     }
 

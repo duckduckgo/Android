@@ -101,6 +101,7 @@ class AutofillGlobalCapabilityCheckerImplSecureStorageAvailableTest(
     }
 
     private fun configureDeviceAuthValid(isValid: Boolean) {
+        whenever(deviceAuthenticator.isAuthenticationRequiredForAutofill()).thenReturn(true)
         whenever(deviceAuthenticator.hasValidDeviceAuthentication()).thenReturn(isValid)
     }
 

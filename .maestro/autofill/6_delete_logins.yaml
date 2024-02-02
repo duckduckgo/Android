@@ -1,0 +1,30 @@
+appId: com.duckduckgo.mobile.android
+name: "Autofill: Delete credentials"
+---
+# Pre-requisite: the user is viewing the password manager screen with some saved passwords added by a previous test step, on an autofill-eligible device
+
+- tapOn:
+    id: "item_container"
+    index: 1
+- tapOn: "More options"
+- tapOn: "Delete"
+- tapOn: "Delete"
+
+- tapOn:
+      id: "item_container"
+      index: 1
+- tapOn: "More options"
+- tapOn: "Delete"
+- tapOn: "Delete"
+
+- tapOn:
+    id: "item_container"
+    index: 1
+- tapOn: "More options"
+- tapOn: "Delete"
+- tapOn: "Delete"
+
+- assertVisible:
+    text: "No passwords saved yet"
+
+- tapOn: "Navigate up"

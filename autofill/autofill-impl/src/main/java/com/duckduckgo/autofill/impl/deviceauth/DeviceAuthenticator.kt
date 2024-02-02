@@ -21,6 +21,7 @@ import androidx.annotation.UiThread
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.autofill.impl.BuildConfig
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthConfiguration
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthResult
@@ -55,6 +56,15 @@ interface DeviceAuthenticator {
         config: AuthConfiguration = AuthConfiguration(),
         onResult: (AuthResult) -> Unit,
     )
+
+    /**
+     * Returns true if the user has to authenticate to use autofill. This is always true in production.
+     *
+     * When running some specific UI tests, this can be set to false with a build flag to allow us to have increased test coverage.
+     */
+    fun isAuthenticationRequiredForAutofill(): Boolean {
+        return BuildConfig.AUTH_REQUIRED
+    }
 
     sealed class AuthResult {
         object Success : AuthResult()
@@ -93,7 +103,7 @@ class RealDeviceAuthenticator @Inject constructor(
         config: AuthConfiguration,
         onResult: (AuthResult) -> Unit,
     ) {
-        if (config.requireUserAction || autofillAuthGracePeriod.isAuthRequired()) {
+        if (isAuthenticationRequiredForAutofill() && (config.requireUserAction || autofillAuthGracePeriod.isAuthRequired())) {
             authLauncher.launch(
                 featureTitleText = config.displayTitleResource,
                 featureAuthText = config.displayTextResource,
@@ -111,7 +121,7 @@ class RealDeviceAuthenticator @Inject constructor(
         config: AuthConfiguration,
         onResult: (AuthResult) -> Unit,
     ) {
-        if (config.requireUserAction || autofillAuthGracePeriod.isAuthRequired()) {
+        if (isAuthenticationRequiredForAutofill() && (config.requireUserAction || autofillAuthGracePeriod.isAuthRequired())) {
             authLauncher.launch(
                 featureTitleText = config.displayTitleResource,
                 featureAuthText = config.displayTextResource,
