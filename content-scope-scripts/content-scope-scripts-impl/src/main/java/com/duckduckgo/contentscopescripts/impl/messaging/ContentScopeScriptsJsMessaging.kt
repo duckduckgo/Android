@@ -109,9 +109,9 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
     }
 
     inner class ContentScopeHandler : JsMessageHandler {
-        override fun process(jsMessage: JsMessage, secret: String, jsMessageCallback: JsMessageCallback) {
+        override fun process(jsMessage: JsMessage, secret: String, jsMessageCallback: JsMessageCallback?) {
             if (jsMessage.id == null) return
-            jsMessageCallback.process(featureName, jsMessage.method, jsMessage.id, jsMessage.params)
+            jsMessageCallback?.process(featureName, jsMessage.method, jsMessage.id, jsMessage.params)
         }
 
         override val allowedDomains: List<String> = emptyList()

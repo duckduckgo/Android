@@ -22,4 +22,5 @@
         android:layout_height="wrap_content"
         app:primaryText="@string/itrSettingTitle"
         app:primaryTextTruncated="false"
+        app:itemState="enabled"
         app:secondaryText="@string/itrSettingSubtitle" />

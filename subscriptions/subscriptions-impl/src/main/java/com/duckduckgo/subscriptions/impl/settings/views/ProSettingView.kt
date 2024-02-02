@@ -133,7 +133,14 @@ class ProSettingView @JvmOverloads constructor(
                 globalActivityStarter.start(context, SubscriptionsSettingsScreenWithEmptyParams)
             }
             is OpenBuyScreen -> {
-                globalActivityStarter.start(context, SubscriptionsWebViewActivityWithParams(url = SubscriptionsConstants.BUY_URL, ""))
+                globalActivityStarter.start(
+                    context,
+                    SubscriptionsWebViewActivityWithParams(
+                        url = SubscriptionsConstants.BUY_URL,
+                        screenTitle = "",
+                        defaultToolbar = true,
+                    ),
+                )
             }
         }
     }

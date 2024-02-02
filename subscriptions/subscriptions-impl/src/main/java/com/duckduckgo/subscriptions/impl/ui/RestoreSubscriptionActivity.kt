@@ -85,7 +85,11 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
     private fun goToRestore() {
         val intent = globalActivityStarter.startIntent(
             this,
-            SubscriptionsWebViewActivityWithParams(url = ACTIVATE_URL, getString(string.addEmailText)),
+            SubscriptionsWebViewActivityWithParams(
+                url = ACTIVATE_URL,
+                screenTitle = getString(string.addEmailText),
+                defaultToolbar = false,
+            ),
         )
         startForResultRestore.launch(intent)
     }
@@ -118,7 +122,11 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
                     override fun onPositiveButtonClicked() {
                         globalActivityStarter.start(
                             this@RestoreSubscriptionActivity,
-                            SubscriptionsWebViewActivityWithParams(url = BUY_URL, screenTitle = getString(string.buySubscriptionTitle)),
+                            SubscriptionsWebViewActivityWithParams(
+                                url = BUY_URL,
+                                screenTitle = getString(string.buySubscriptionTitle),
+                                defaultToolbar = true,
+                            ),
                         )
                     }
                 },
