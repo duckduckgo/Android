@@ -20,7 +20,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.FrameLayout
-import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
@@ -32,6 +31,7 @@ import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.impl.databinding.ViewPirSettingsBinding
+import com.duckduckgo.subscriptions.impl.pir.PirActivity.Companion.PirScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.Command
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.Command.OpenPir
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.Factory
@@ -109,7 +109,7 @@ class PirSettingView @JvmOverloads constructor(
     private fun processCommands(command: Command) {
         when (command) {
             is OpenPir -> {
-                Toast.makeText(context, "Open PIR", Toast.LENGTH_SHORT).show()
+                globalActivityStarter.start(context, PirScreenWithEmptyParams)
             }
         }
     }

@@ -310,7 +310,7 @@ class RealSubscriptionsManager @Inject constructor(
             if (isUserAuthenticated()) {
                 getSubscriptionDataFromToken(authRepository.tokens().accessToken!!)
             } else {
-                Failure("Subscription data not found")
+                Success(email = null, externalId = "", entitlements = emptyList())
             }
         } catch (e: HttpException) {
             val error = parseError(e)?.error ?: "An error happened"
