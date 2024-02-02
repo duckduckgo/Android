@@ -42,8 +42,8 @@
     <string name="subscriptionNotFoundDescription">The subscription associated with this Google Account is no longer active or could not be found.</string>
     <string name="purchaseRestored">Your purchase has been restored.</string>
     <string name="restoreSubscriptionTitle">Activate your subscription on this device</string>
-    <string name="restoreSubscriptionDescription">Access your Privacy Pro subscription on this device Google Play or an email address.</string>
-    <string name="restoreDeviceDescription">Access your subscription on any of your devices Google Play or by adding an email address.</string>
+    <string name="restoreSubscriptionDescription">Access your Privacy Pro subscription on this device via Google Play or an email address.</string>
+    <string name="restoreDeviceDescription">Access your subscription on any of your devices via Google Play or by adding an email address.</string>
     <string name="restoreSubscriptionGooglePlayTitle">Google Play</string>
     <string name="restoreSubscriptionGooglePlayDescription">Restore your purchase to activate your subscription on this device.</string>
     <string name="restoreSubscriptionGooglePlayButton">Restore Purchase</string>
