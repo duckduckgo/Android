@@ -181,6 +181,7 @@ class DaxTextInput @JvmOverloads constructor(
         get() = binding.internalEditText.text.toString()
         set(value) {
             binding.internalEditText.setText(value)
+            binding.internalEditText.setSelection(value.length)
         }
 
     override var hint: String

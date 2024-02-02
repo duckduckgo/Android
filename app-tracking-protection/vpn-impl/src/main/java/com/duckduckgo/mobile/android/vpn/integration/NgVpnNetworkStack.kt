@@ -123,6 +123,7 @@ class NgVpnNetworkStack @Inject constructor(
                     InetAddress.getByName("fd00:1:fd00:1:fd00:1:fd00:1") to 128, // Add IPv6 Unique Local Address
                 ),
                 dns = getDns(),
+                customDns = emptySet(),
                 routes = emptyMap(),
                 appExclusionList = trackingProtectionAppsRepository.getExclusionAppsList().toSet(),
             ),
