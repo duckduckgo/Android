@@ -2315,7 +2315,7 @@
       "name": "dndbeyond",
       "vendorUrl": "https://www.dndbeyond.com/",
       "runContext": {
-        "urlPattern": "^https://www\\.dndbeyond\\.com/"
+        "urlPattern": "^https://(www\\.)?dndbeyond\\.com/"
       },
       "prehideSelectors": [
         "[id^=cookie-consent-banner]"
@@ -3359,7 +3359,7 @@
       "name": "jdsports",
       "vendorUrl": "https://www.jdsports.co.uk/",
       "runContext": {
-        "urlPattern": "^https://www\\.jdsports\\."
+        "urlPattern": "^https://(www|m)\\.jdsports\\."
       },
       "prehideSelectors": [
         ".miniConsent,#PrivacyPolicyBanner"
@@ -3760,7 +3760,7 @@
       "name": "livejasmin",
       "vendorUrl": "https://www.livejasmin.com/",
       "runContext": {
-        "urlPattern": "^https://www\\.livejasmin\\.com/"
+        "urlPattern": "^https://(m|www)\\.livejasmin\\.com/"
       },
       "prehideSelectors": [
         "#consent_modal"
