@@ -442,7 +442,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                 // else we resort to compute it using isEnabled()
                                 val previousStateValue = previousState?.enable ?: this.feature.get().invokeMethod(subfeature.key).isEnabled()
                                 
-                                val previousRolloutStep = previousState?.rolloutStep 
+                                val previousRolloutThreshold = previousState?.rolloutThreshold 
                                 val newStateValue = (jsonToggle.state == "enabled" || (appBuildConfig.flavor == %T && jsonToggle.state == "internal"))
                                 val targets = jsonToggle?.targets?.map { target ->
                                     Toggle.State.Target(
@@ -455,7 +455,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                         enable = previousStateValue,
                                         minSupportedVersion = jsonToggle.minSupportedVersion?.toInt(),
                                         rollout = jsonToggle?.rollout?.steps?.map { it.percent },
-                                        rolloutStep = previousRolloutStep,
+                                        rolloutThreshold = previousRolloutThreshold,
                                         targets = targets,
                                     ),
                                 )
