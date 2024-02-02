@@ -20,6 +20,7 @@ import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import androidx.core.net.toUri
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.toTldPlusOne
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
@@ -61,11 +62,11 @@ class ItrMessagingInterface @Inject constructor(
         try {
             val adapter = moshi.adapter(JsMessage::class.java)
             val jsMessage = adapter.fromJson(message)
-            val domain = runBlocking(dispatcherProvider.main()) {
+            val url = runBlocking(dispatcherProvider.main()) {
                 webView.url?.toUri()?.host
             }
             jsMessage?.let {
-                if (this.secret == secret && context == jsMessage.context && (allowedDomains.isEmpty() || allowedDomains.contains(domain))) {
+                if (this.secret == secret && context == jsMessage.context && isUrlAllowed(url)) {
                     handlers.firstOrNull {
                         it.methods.contains(jsMessage.method) && it.featureName == jsMessage.featureName
                     }?.process(jsMessage, secret, jsMessageCallback)
@@ -90,10 +91,16 @@ class ItrMessagingInterface @Inject constructor(
         // NOOP
     }
 
+    private fun isUrlAllowed(url: String?): Boolean {
+        if (allowedDomains.isEmpty()) return true
+        val eTld = url?.toTldPlusOne() ?: return false
+        return (allowedDomains.contains(eTld))
+    }
+
     override val context: String = "identityTheftRestorationPages"
     override val callbackName: String = "messageCallback"
     override val secret: String = "duckduckgo-android-messaging-secret"
-    override val allowedDomains: List<String> = listOf("abrown.duckduckgo.com")
+    override val allowedDomains: List<String> = listOf("duckduckgo.com")
 
     inner class GetAccessTokenMessage(
         private val subscriptionsManager: SubscriptionsManager,
