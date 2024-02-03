@@ -21,7 +21,6 @@ plugins {
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
-apply from: "$rootDir/versioning.gradle"
 
 ext {
     autofillDisableAuthRequirementBuildFlag = "autofill-disable-auth-requirement"
@@ -119,9 +118,3 @@ tasks.register('autofillTestLocal', Exec) {
     commandLine 'maestro', 'test', '--include-tags', 'autofillNoAuthTests', "$rootDir/.maestro"
     dependsOn 'installForAutofillTesting'
 }
-
-tasks.register('autofillTestCloud', Exec) {
-    commandLine 'maestro', 'cloud', '--include-tags', 'autofillNoAuthTests', "$rootDir/app/build/outputs/apk/internal/release/duckduckgo-${buildVersionName()}-internal-release.apk", "$rootDir/.maestro"
-    dependsOn 'installForAutofillTesting'
-}
-
