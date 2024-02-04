@@ -22,9 +22,16 @@ import android.graphics.Bitmap
 import android.graphics.Bitmap.CompressFormat.PNG
 import android.net.Uri
 import android.net.http.SslError
-import android.net.http.SslError.*
+import android.net.http.SslError.SSL_UNTRUSTED
 import android.os.Build
-import android.webkit.*
+import android.webkit.HttpAuthHandler
+import android.webkit.RenderProcessGoneDetail
+import android.webkit.SslErrorHandler
+import android.webkit.WebResourceError
+import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.annotation.UiThread
@@ -59,15 +66,19 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.privacy.config.api.AmpLinks
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import org.halalz.kahftube.extentions.injectJavascriptFileFromAsset
 import timber.log.Timber
+import java.io.BufferedReader
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
-import java.net.URI
-import javax.inject.Inject
-import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
+import java.net.URI
+import javax.inject.Inject
 
 class BrowserWebViewClient @Inject constructor(
     private val webViewHttpAuthStore: WebViewHttpAuthStore,
@@ -96,6 +107,7 @@ class BrowserWebViewClient @Inject constructor(
 
     var webViewClientListener: WebViewClientListener? = null
     private var lastPageStarted: String? = null
+    private var isMainJSLoaded = false
 
     /**
      * This is the new method of url overriding available from API 24 onwards
@@ -252,14 +264,29 @@ class BrowserWebViewClient @Inject constructor(
         }
     }
 
-    private fun handleSafeGaze(webView: WebView){
+    private fun handleSafeGaze(webView: WebView) {
         val sharedPreferences = context.getSharedPreferences("safe_gaze_preferences", Context.MODE_PRIVATE)
         val isSafeGazeActive = sharedPreferences.getBoolean("safe_gaze_active", true)
         println("Safe gaze active value -> $isSafeGazeActive")
-        if (isSafeGazeActive){
+        if (isSafeGazeActive) {
             println("Injected")
             val jsCode = readAssetFile(context.assets, "safe_gaze.js")
             webView.evaluateJavascript("javascript:(function() { $jsCode })()", null)
+        }
+    }
+
+    private fun handleKahfTube(
+        webView: WebView,
+        url: String?
+    ) {
+        Timber.v("handleKahfTube:: Url: $url")
+        Timber.v("handleKahfTube:: lastPageStarted: ${url == lastPageStarted}")
+        if (url == "https://m.youtube.com/?noapp") {
+            webView.injectJavascriptFileFromAsset("kahftube/email.js")
+        } else if (!isMainJSLoaded && url?.contains("m.youtube.com") == true) {
+            Timber.v("isMainLoaded: $isMainJSLoaded")
+            isMainJSLoaded = true
+            webView.injectJavascriptFileFromAsset("kahftube/main.js")
         }
     }
 
@@ -283,8 +310,12 @@ class BrowserWebViewClient @Inject constructor(
         url: String?,
         favicon: Bitmap?,
     ) {
+        isMainJSLoaded = false
         Timber.v("onPageStarted webViewUrl: ${webView.url} URL: $url")
-        handleSafeGaze(webView)
+        if (url?.contains("m.youtube.com") != true) {
+            handleSafeGaze(webView)
+        }
+        //handleKahfTube(webView, url)
         url?.let {
             autoconsent.injectAutoconsent(webView, url)
             adClickManager.detectAdDomain(url)
@@ -296,6 +327,7 @@ class BrowserWebViewClient @Inject constructor(
         val navigationList = webView.safeCopyBackForwardList() ?: return
         webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList))
         if (url != null && url == lastPageStarted) {
+            isMainJSLoaded = false
             webViewClientListener?.pageRefreshed(url)
         }
         lastPageStarted = url
@@ -311,6 +343,9 @@ class BrowserWebViewClient @Inject constructor(
         webView: WebView,
         url: String?,
     ) {
+        super.onPageFinished(webView, url)
+        handleKahfTube(webView, url)
+        //handleSafeGaze(webView)
         jsPlugins.getPlugins().forEach {
             it.onPageFinished(webView, url, webViewClientListener?.getSite())
         }

@@ -168,6 +168,10 @@ import com.duckduckgo.app.global.view.isImmersiveModeEnabled
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.global.view.toggleFullScreen
+import com.duckduckgo.app.kahftube.KahfTubeInterface
+import com.duckduckgo.app.kahftube.KahfTubeInterface.JavaScriptCallBack
+import com.duckduckgo.app.kahftube.SharedPreferenceManager
+import com.duckduckgo.app.kahftube.SharedPreferenceManager.KeyString
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.playstore.PlayStoreUtils
@@ -262,16 +266,17 @@ import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.cancellable
+import org.halalz.kahftube.view.ProfilePageActivity
 import org.json.JSONObject
 import timber.log.Timber
+import java.io.BufferedReader
 import java.io.File
+import java.io.IOException
+import java.io.InputStreamReader
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Provider
 import kotlin.coroutines.CoroutineContext
-import java.io.BufferedReader
-import java.io.IOException
-import java.io.InputStreamReader
 
 @InjectWith(FragmentScope::class)
 class BrowserTabFragment :
@@ -861,7 +866,7 @@ class BrowserTabFragment :
                     safeGazeIcon,
                     Gravity.NO_GRAVITY,
                     newPopUpPosition,
-                    (y + omnibar.toolbar.height) - 25
+                    (y + omnibar.toolbar.height) - 25,
                 )
                 val pointerArrow =
                     popupView.findViewById<ImageView>(R.id.pointer_arrow_safe_gaze_image_view)
@@ -2192,6 +2197,41 @@ class BrowserTabFragment :
             it.webViewClient = browserWebViewClient
             it.webChromeClient = browserWebChromeClient
             it.addJavascriptInterface(SafeGazeJsInterface(requireContext()), "SafeGazeInterface")
+            it.addJavascriptInterface(
+                KahfTubeInterface(
+                    requireContext(),
+                    object :
+                        JavaScriptCallBack {
+                        override fun showToast(message: String) {
+                            Toast.makeText(context, "KahfTubeInterface: $message", Toast.LENGTH_SHORT).show()
+                        }
+
+                        override fun callHandler(
+                            name: String?,
+                            email: String?,
+                            imgSrc: String?
+                        ) {
+                            Timber.tag("KahfTubeInterface").v("name: $name")
+                            Timber.tag("KahfTubeInterface").v("email: $email")
+                            Timber.tag("KahfTubeInterface").v("imgSrc: $imgSrc")
+                        }
+
+                        override fun onHalalzTap() {
+                            Timber.v("SharedPreferenceManager:: ${SharedPreferenceManager(requireContext()).getValue(KeyString.TOKEN)}")
+                            startActivity(Intent(requireContext(), ProfilePageActivity::class.java))
+                        }
+
+                        override fun shouldRestart() {
+                            //recreate()
+                        }
+
+                        override fun fetchYtInitialData(id: String?) {
+                            Timber.v("fetchYtInitialData: id: $id")
+                        }
+                    },
+                ),
+                "KahfTubeInterface",
+            )
             it.settings.apply {
                 userAgentString = userAgentProvider.userAgent()
                 javaScriptEnabled = true
