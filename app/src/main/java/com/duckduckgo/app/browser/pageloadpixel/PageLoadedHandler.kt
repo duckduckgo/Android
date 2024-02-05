@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser.pageloadpixel
 
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.pixels.remoteconfig.OptimizeTrackerEvaluationRCWrapper
+import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.UriString
@@ -51,6 +52,7 @@ class RealPageLoadedHandler @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val optimizeTrackerEvaluationRCWrapper: OptimizeTrackerEvaluationRCWrapper,
+    private val autoconsent: Autoconsent,
 ) : PageLoadedHandler {
 
     override operator fun invoke(url: String, start: Long, end: Long) {
@@ -62,6 +64,7 @@ class RealPageLoadedHandler @Inject constructor(
                         webviewVersion = webViewVersionProvider.getMajorVersion(),
                         appVersion = deviceInfo.appVersion,
                         trackerOptimizationEnabled = optimizeTrackerEvaluationRCWrapper.enabled,
+                        cpmEnabled = autoconsent.isAutoconsentEnabled(),
                     ),
                 )
             }
