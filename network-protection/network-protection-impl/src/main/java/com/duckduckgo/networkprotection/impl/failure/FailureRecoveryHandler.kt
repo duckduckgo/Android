@@ -18,6 +18,7 @@ package com.duckduckgo.networkprotection.impl.failure
 
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
+import com.duckduckgo.networkprotection.impl.CurrentTimeProvider
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnel
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
@@ -25,7 +26,6 @@ import com.duckduckgo.networkprotection.impl.configuration.asServerDetails
 import com.duckduckgo.networkprotection.impl.pixels.WireguardHandshakeMonitor
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.wireguard.crypto.KeyPair
-import java.time.Instant
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.delay
@@ -38,21 +38,27 @@ class FailureRecoveryHandler @Inject constructor(
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
     private val wgTunnel: WgTunnel,
     private val wgTunnelConfig: WgTunnelConfig,
+    private val currentTimeProvider: CurrentTimeProvider,
 ) : WireguardHandshakeMonitor.Listener {
 
     private var recoveryCompleted = false
     private var recoveryInProgress = false
     override suspend fun onTunnelFailure(lastHandshakeEpocSeconds: Long) {
-        val nowSeconds = Instant.now().epochSecond
+        val nowSeconds = currentTimeProvider.getTimeInEpochSeconds()
         val diff = nowSeconds - lastHandshakeEpocSeconds
         if (diff.seconds.inWholeMinutes >= FAILURE_RECOVERY_THRESHOLD_MINUTES && !recoveryInProgress) {
+            logcat { "Failure recovery: starting recovery" }
             recoveryInProgress = true
             recoveryCompleted = false
             incrementalPeriodicChecks {
                 recoveryCompleted = attemptRecovery().isSuccess
             }
         } else {
-            logcat { "Failure recovery: time since lastHandshakeEpocSeconds is not within failure recovery threshold." }
+            if (recoveryInProgress) {
+                logcat { "Failure recovery: Recovery already in progress. Do nothing" }
+            } else {
+                logcat { "Failure recovery: time since lastHandshakeEpocSeconds is not within failure recovery threshold" }
+            }
         }
     }
 
@@ -63,7 +69,7 @@ class FailureRecoveryHandler @Inject constructor(
     }
 
     private suspend fun incrementalPeriodicChecks(
-        times: Int = 5,
+        times: Int = 6,
         initialDelay: Long = 30_000, // 30 seconds
         maxDelay: Long = 300_000, // 5 minutes
         factor: Double = 2.0,
