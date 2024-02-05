@@ -298,6 +298,11 @@ interface NetworkProtectionPixels {
      */
     fun reportTunnelFailureRecovered()
     fun reportVpnSnoozedCanceled()
+
+    fun reportFailureRecoveryStarted()
+    fun reportFailureRecoveryFailed()
+    fun reportFailureRecoveryCompletedWithServerHealthy()
+    fun reportFailureRecoveryCompletedWithServerUnhealthy()
 }
 
 @ContributesBinding(AppScope::class)
@@ -523,6 +528,26 @@ class RealNetworkProtectionPixel @Inject constructor(
     override fun reportVpnSnoozedCanceled() {
         tryToFireDailyPixel(VPN_SNOOZE_CANCELED_DAILY)
         firePixel(VPN_SNOOZE_CANCELED)
+    }
+
+    override fun reportFailureRecoveryStarted() {
+        firePixel(NETP_FAILURE_RECOVERY_STARTED)
+        tryToFireDailyPixel(NETP_FAILURE_RECOVERY_STARTED_DAILY)
+    }
+
+    override fun reportFailureRecoveryFailed() {
+        firePixel(NETP_FAILURE_RECOVERY_FAILED)
+        tryToFireDailyPixel(NETP_FAILURE_RECOVERY_FAILED_DAILY)
+    }
+
+    override fun reportFailureRecoveryCompletedWithServerHealthy() {
+        firePixel(NETP_FAILURE_RECOVERY_COMPLETED_SERVER_HEALTHY)
+        tryToFireDailyPixel(NETP_FAILURE_RECOVERY_COMPLETED_SERVER_HEALTHY_DAILY)
+    }
+
+    override fun reportFailureRecoveryCompletedWithServerUnhealthy() {
+        firePixel(NETP_FAILURE_RECOVERY_COMPLETED_SERVER_UNHEALTHY)
+        tryToFireDailyPixel(NETP_FAILURE_RECOVERY_COMPLETED_SERVER_UNHEALTHY_DAILY)
     }
 
     private fun firePixel(

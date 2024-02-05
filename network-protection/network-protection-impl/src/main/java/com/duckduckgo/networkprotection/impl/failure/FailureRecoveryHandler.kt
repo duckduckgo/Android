@@ -23,6 +23,7 @@ import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnel
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.configuration.asServerDetails
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.impl.pixels.WireguardHandshakeMonitor
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.wireguard.crypto.KeyPair
@@ -39,6 +40,7 @@ class FailureRecoveryHandler @Inject constructor(
     private val wgTunnel: WgTunnel,
     private val wgTunnelConfig: WgTunnelConfig,
     private val currentTimeProvider: CurrentTimeProvider,
+    private val networkProtectionPixels: NetworkProtectionPixels,
 ) : WireguardHandshakeMonitor.Listener {
 
     private var recoveryCompleted = false
@@ -69,14 +71,14 @@ class FailureRecoveryHandler @Inject constructor(
     }
 
     private suspend fun incrementalPeriodicChecks(
-        times: Int = 6,
+        times: Int = 5,
         initialDelay: Long = 30_000, // 30 seconds
         maxDelay: Long = 300_000, // 5 minutes
         factor: Double = 2.0,
         block: suspend () -> Unit,
     ) {
         var currentDelay = initialDelay
-        repeat(times - 1) {
+        repeat(times) {
             try {
                 if (!recoveryCompleted) {
                     block()
@@ -96,12 +98,14 @@ class FailureRecoveryHandler @Inject constructor(
         logcat { "Failure recovery: attemptRecovery" }
 
         if (vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)) {
+            networkProtectionPixels.reportFailureRecoveryStarted()
             wgTunnel.markTunnelUnhealthy()
             val currentServer = wgTunnelConfig.getWgConfig()?.asServerDetails()?.serverName
 
             // Create a new config + register a new keypair
             val config = wgTunnel.createWgConfig(KeyPair())
                 .onFailure {
+                    networkProtectionPixels.reportFailureRecoveryFailed()
                     logcat(LogPriority.ERROR) { "Failure recovery: Failed registering the new key:  ${it.asLog()}" }
                 }.getOrElse {
                     return Result.failure(it)
@@ -111,10 +115,12 @@ class FailureRecoveryHandler @Inject constructor(
             if (config.asServerDetails().serverName != currentServer) {
                 logcat { "Failure recovery: Restarting VPN to connect to new server" }
                 // Store the created config since it contains a new server
+                networkProtectionPixels.reportFailureRecoveryCompletedWithServerUnhealthy()
                 wgTunnel.markTunnelHealthy()
                 wgTunnelConfig.setWgConfig(config)
                 vpnFeaturesRegistry.refreshFeature(NetPVpnFeature.NETP_VPN)
             } else {
+                networkProtectionPixels.reportFailureRecoveryCompletedWithServerHealthy()
                 // Ignore created config, new keypair should eventually be ignored by the controller
                 logcat { "Failure recovery: server is healthy, nothing to do." }
             }

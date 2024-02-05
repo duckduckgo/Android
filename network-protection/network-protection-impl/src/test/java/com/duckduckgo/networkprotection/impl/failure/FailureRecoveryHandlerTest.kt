@@ -22,6 +22,7 @@ import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.WgServerData
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnel
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.wireguard.config.Config
 import com.wireguard.crypto.KeyPair
 import java.io.BufferedReader
@@ -52,6 +53,9 @@ class FailureRecoveryHandlerTest {
     @Mock
     private lateinit var currentTimeProvider: CurrentTimeProvider
 
+    @Mock
+    private lateinit var networkProtectionPixels: NetworkProtectionPixels
+
     private lateinit var testee: FailureRecoveryHandler
 
     private val keys = KeyPair()
@@ -77,7 +81,7 @@ class FailureRecoveryHandlerTest {
     fun setUp() {
         MockitoAnnotations.openMocks(this)
 
-        testee = FailureRecoveryHandler(vpnFeaturesRegistry, wgTunnel, wgTunnelConfig, currentTimeProvider)
+        testee = FailureRecoveryHandler(vpnFeaturesRegistry, wgTunnel, wgTunnelConfig, currentTimeProvider, networkProtectionPixels)
     }
 
     @Test
@@ -89,6 +93,7 @@ class FailureRecoveryHandlerTest {
         verifyNoInteractions(vpnFeaturesRegistry)
         verifyNoInteractions(wgTunnel)
         verifyNoInteractions(wgTunnelConfig)
+        verifyNoInteractions(networkProtectionPixels)
     }
 
     @Test
@@ -96,6 +101,7 @@ class FailureRecoveryHandlerTest {
         testee.onTunnelFailureRecovered()
 
         verify(wgTunnel).markTunnelHealthy()
+        verifyNoInteractions(networkProtectionPixels)
     }
 
     @Test
@@ -112,10 +118,12 @@ class FailureRecoveryHandlerTest {
         verify(wgTunnel).markTunnelHealthy()
         verify(wgTunnelConfig).setWgConfig(newConfig)
         verify(vpnFeaturesRegistry).refreshFeature(NetPVpnFeature.NETP_VPN)
+        verify(networkProtectionPixels).reportFailureRecoveryStarted()
+        verify(networkProtectionPixels).reportFailureRecoveryCompletedWithServerUnhealthy()
     }
 
     @Test
-    fun whenFailureRecoveryAndServerChangedThenDoNothing() = runTest {
+    fun whenFailureRecoveryAndServerDidnotChangedThenDoNothing() = runTest {
         whenever(currentTimeProvider.getTimeInEpochSeconds()).thenReturn(1080)
         whenever(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(true)
         whenever(wgTunnelConfig.getWgConfig()).thenReturn(getWgConfig(defaultServerData))
@@ -127,6 +135,8 @@ class FailureRecoveryHandlerTest {
         verify(wgTunnel, never()).markTunnelHealthy()
         verify(wgTunnelConfig, never()).setWgConfig(any())
         verify(vpnFeaturesRegistry, never()).refreshFeature(NetPVpnFeature.NETP_VPN)
+        verify(networkProtectionPixels).reportFailureRecoveryStarted()
+        verify(networkProtectionPixels).reportFailureRecoveryCompletedWithServerHealthy()
     }
 
     @Test
@@ -139,6 +149,8 @@ class FailureRecoveryHandlerTest {
         testee.onTunnelFailure(180)
 
         verify(wgTunnel, atMost(5)).markTunnelUnhealthy()
+        verify(networkProtectionPixels, atMost(5)).reportFailureRecoveryStarted()
+        verify(networkProtectionPixels, atMost(5)).reportFailureRecoveryFailed()
     }
 
     @Test
@@ -156,6 +168,8 @@ class FailureRecoveryHandlerTest {
         verify(wgTunnel).markTunnelHealthy()
         verify(wgTunnelConfig).setWgConfig(newConfig)
         verify(vpnFeaturesRegistry).refreshFeature(NetPVpnFeature.NETP_VPN)
+        verify(networkProtectionPixels).reportFailureRecoveryStarted()
+        verify(networkProtectionPixels).reportFailureRecoveryCompletedWithServerUnhealthy()
     }
 
     @Test
@@ -174,6 +188,8 @@ class FailureRecoveryHandlerTest {
         verify(wgTunnel, times(3)).markTunnelHealthy()
         verify(wgTunnelConfig, times(2)).setWgConfig(newConfig)
         verify(vpnFeaturesRegistry, times(2)).refreshFeature(NetPVpnFeature.NETP_VPN)
+        verify(networkProtectionPixels, times(2)).reportFailureRecoveryStarted()
+        verify(networkProtectionPixels, times(2)).reportFailureRecoveryCompletedWithServerUnhealthy()
     }
 
     private fun getWgConfig(serverData: WgServerData): Config {
