@@ -48,6 +48,7 @@ class VpnEnabledNotificationBuilder {
                         VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_NAME,
                         IMPORTANCE_LOW,
                     )
+                channel.setShowBadge(false)
                 channel.description = VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_DESCRIPTION
                 val notificationManager = NotificationManagerCompat.from(context)
                 notificationManager.createNotificationChannel(channel)
