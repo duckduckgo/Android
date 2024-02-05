@@ -152,6 +152,7 @@ data class RegisterKeyBody(
     val server: String = "*",
     val country: String? = null,
     val city: String? = null,
+    val mode: String? = null,
 )
 
 data class EligibleServerInfo(

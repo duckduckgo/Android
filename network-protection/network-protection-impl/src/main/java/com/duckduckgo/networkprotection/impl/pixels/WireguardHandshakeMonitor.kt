@@ -22,13 +22,16 @@ import android.net.ConnectivityManager.NetworkCallback
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
+import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.WgProtocol
+import com.duckduckgo.networkprotection.impl.pixels.WireguardHandshakeMonitor.Listener
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.time.Instant
 import java.util.concurrent.atomic.AtomicBoolean
@@ -50,7 +53,13 @@ class WireguardHandshakeMonitor @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val networkProtectionState: NetworkProtectionState,
     private val currentNetworkState: CurrentNetworkState,
+    private val listeners: PluginPoint<Listener>,
 ) : VpnServiceCallbacks {
+
+    interface Listener {
+        suspend fun onTunnelFailure(lastHandshakeEpocSeconds: Long)
+        suspend fun onTunnelFailureRecovered()
+    }
 
     private val job = ConflatedJob()
     private val failureReported = AtomicBoolean(false)
@@ -93,10 +102,16 @@ class WireguardHandshakeMonitor @Inject constructor(
                         } else {
                             logcat { "Last handshake was already reported, skipping" }
                         }
+                        listeners.getPlugins().forEach {
+                            it.onTunnelFailure(lastHandshakeEpocSeconds)
+                        }
                     } else if (diff.seconds.inWholeMinutes <= REPORT_TUNNEL_FAILURE_RECOVERY_THRESHOLD_MINUTES) {
                         if (failureReported.getAndSet(false)) {
                             logcat(WARN) { "Recovered from tunnel failure" }
                             pixels.reportTunnelFailureRecovered()
+                            listeners.getPlugins().forEach {
+                                it.onTunnelFailureRecovered()
+                            }
                         }
                     }
                 }
@@ -163,7 +178,15 @@ open class CurrentNetworkState @Inject constructor(
             connectivityManager.unregisterNetworkCallback(cellularNetworkCallback)
         }
     }
+
     internal fun isConnected(): Boolean {
         return isWifiAvailable.get() || isCellAvailable.get()
     }
 }
+
+@ContributesPluginPoint(
+    scope = VpnScope::class,
+    boundType = Listener::class,
+)
+@Suppress("unused")
+interface WireguardHandshakeListenerPluginPoint
