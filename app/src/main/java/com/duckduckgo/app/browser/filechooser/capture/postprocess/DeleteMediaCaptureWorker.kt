@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.filechooser.camera.postprocess
+package com.duckduckgo.app.browser.filechooser.capture.postprocess
 
 import android.content.Context
 import androidx.work.CoroutineWorker
@@ -28,21 +28,21 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 /**
- * Images captured by the camera to be uploaded through the WebView shouldn't be kept forever.
- * The URI for the image is passed to the WebView, but we don't know when it is safe to delete the file.
+ * Media captured from camera / sound recorder to be uploaded through the WebView shouldn't be kept forever.
+ * The URI for the content is passed to the WebView, but we don't know when it is safe to delete the file.
  *
  * This worker is responsible for deleting the file after a period of time.
  *
  * The typical use case is that:
- * - the user chooses to upload an image on a website
- * - user chooses to take a photo rather than use an existing image
- * - the camera app is launched
- * - a new file is created to store the image
- * - we pass the URI of the file to the camera app
+ * - the user chooses to upload an image / video / audio on a website
+ * - user chooses to record rather than use existing content
+ * - the media app is launched
+ * - a new file is created to store the captured content
+ * - we pass the URI of the file to the media app
  * - we schedule the file to be deleted using this worker
  */
 @ContributesWorker(AppScope::class)
-class DeleteCameraCaptureWorker(
+class DeleteMediaCaptureWorker(
     context: Context,
     workerParameters: WorkerParameters,
 ) :

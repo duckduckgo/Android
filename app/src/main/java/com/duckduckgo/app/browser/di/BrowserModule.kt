@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.di
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.pm.PackageManager
+import androidx.room.Room
 import androidx.work.WorkManager
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.*
@@ -35,6 +36,9 @@ import com.duckduckgo.app.browser.favicon.FaviconPersister
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.logindetection.*
+import com.duckduckgo.app.browser.mediaplayback.store.ALL_MIGRATIONS
+import com.duckduckgo.app.browser.mediaplayback.store.MediaPlaybackDao
+import com.duckduckgo.app.browser.mediaplayback.store.MediaPlaybackDatabase
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedPixelDao
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
@@ -303,5 +307,21 @@ class BrowserModule {
     @SingleInstanceIn(AppScope::class)
     fun providePageLoadedPixelDao(appDatabase: AppDatabase): PageLoadedPixelDao {
         return appDatabase.pageLoadedPixelDao()
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun provideMediaPlaybackDatabase(context: Context): MediaPlaybackDatabase {
+        return Room.databaseBuilder(context, MediaPlaybackDatabase::class.java, "media_playback.db")
+            .enableMultiInstanceInvalidation()
+            .fallbackToDestructiveMigration()
+            .addMigrations(*ALL_MIGRATIONS)
+            .build()
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun providesMediaPlaybackDao(mediaPlaybackDatabase: MediaPlaybackDatabase): MediaPlaybackDao {
+        return mediaPlaybackDatabase.mediaPlaybackDao()
     }
 }
