@@ -24,6 +24,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import io.reactivex.Completable
 import javax.inject.Inject
+import timber.log.Timber
 
 private const val ELAPSED_TIME = "elapsed_time"
 private const val WEBVIEW_VERSION = "webview_version"
@@ -39,23 +40,29 @@ class PageLoadedOfflinePixelSender @Inject constructor(
 ) : OfflinePixel {
     override fun send(): Completable {
         return Completable.defer {
+            val pixels = mutableListOf<Completable>()
+
             val pendingPixels = pageLoadedPixelDao.all()
             pendingPixels.map {
-                return@defer pixelSender.sendPixel(
+                val params = mapOf(
+                    APP_VERSION to it.appVersion,
+                    ELAPSED_TIME to it.elapsedTime.toString(),
+                    WEBVIEW_VERSION to it.webviewVersion,
+                    TRACKER_OPTIMIZATION_ENABLED to it.trackerOptimizationEnabled.toString(),
+                )
+
+                val pixel = pixelSender.sendPixel(
                     WebViewPixelName.WEB_PAGE_LOADED.pixelName,
-                    mapOf(
-                        APP_VERSION to it.appVersion,
-                        ELAPSED_TIME to it.elapsedTime.toString(),
-                        WEBVIEW_VERSION to it.webviewVersion,
-                        TRACKER_OPTIMIZATION_ENABLED to it.trackerOptimizationEnabled.toString(),
-                    ),
+                    params,
                     mapOf(),
                     COUNT,
                 ).ignoreElement().doOnComplete {
-                    pageLoadedPixelDao.deleteAll()
+                    Timber.d("Sent page loaded pixel with params: $params")
+                    pageLoadedPixelDao.delete(it)
                 }
+                pixels.add(pixel)
             }
-            return@defer Completable.complete()
+            return@defer Completable.mergeDelayError(pixels)
         }
     }
 }
