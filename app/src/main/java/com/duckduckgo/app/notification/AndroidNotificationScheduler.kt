@@ -18,6 +18,7 @@ package com.duckduckgo.app.notification
 
 import android.content.Context
 import androidx.annotation.WorkerThread
+import androidx.core.app.NotificationManagerCompat
 import androidx.work.*
 import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.notification.model.ClearDataNotification
@@ -37,6 +38,7 @@ interface AndroidNotificationScheduler {
 
 class NotificationScheduler(
     private val workManager: WorkManager,
+    private val notificationManager: NotificationManagerCompat,
     private val clearDataNotification: SchedulableNotification,
     private val privacyNotification: SchedulableNotification,
 ) : AndroidNotificationScheduler {
@@ -48,7 +50,9 @@ class NotificationScheduler(
     private suspend fun scheduleInactiveUserNotifications() {
         workManager.cancelAllWorkByTag(UNUSED_APP_WORK_REQUEST_TAG)
 
-        scheduleUnusedAppNotifications()
+        if (notificationManager.areNotificationsEnabled()) {
+            scheduleUnusedAppNotifications()
+        }
     }
 
     private suspend fun scheduleUnusedAppNotifications() {
