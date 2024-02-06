@@ -42,8 +42,8 @@
     <string name="subscriptionNotFoundDescription">The subscription associated with this Google Account is no longer active or could not be found.</string>
     <string name="purchaseRestored">Your purchase has been restored.</string>
     <string name="restoreSubscriptionTitle">Activate your subscription on this device</string>
-    <string name="restoreSubscriptionDescription">Access your Privacy Pro subscription on this device Google Play or an email address.</string>
-    <string name="restoreDeviceDescription">Access your subscription on any of your devices Google Play or by adding an email address.</string>
+    <string name="restoreSubscriptionDescription">Access your Privacy Pro subscription on this device via Google Play or an email address.</string>
+    <string name="restoreDeviceDescription">Access your subscription on any of your devices via Google Play or by adding an email address.</string>
     <string name="restoreSubscriptionGooglePlayTitle">Google Play</string>
     <string name="restoreSubscriptionGooglePlayDescription">Restore your purchase to activate your subscription on this device.</string>
     <string name="restoreSubscriptionGooglePlayButton">Restore Purchase</string>
@@ -87,4 +87,13 @@
     <!-- Change Plan -->
     <string name="changePlanTitle">Change Plan or Billing</string>
     <string name="changePlanDescription">Your subscription was purchased through the Apple App Store. To change your plan or billing settings, please go to Settings > Apple ID > Subscriptions on a device signed in to the same Apple ID used to purchase your subscription.</string>
+
+    <!-- PIR Activity-->
+    <string name="pirTitle">Activate Privacy Pro on desktop to set up Personal Information Removal</string>
+    <string name="pirDescription">In the DuckDuckGo browser for desktop, go to <b>Settings > Privacy Pro</b> and click <b>I Have a Subscription</b> to get started.</string>
+    <string name="pirWindowsButton">Windows</string>
+    <string name="pirMacOsButton">macOS</string>
+
+    <string name="downloadsDownloadFinishedActionName">Open</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Can\'t open file. Check for compatible app.</string>
 </resources>

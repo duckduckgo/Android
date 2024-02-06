@@ -17,6 +17,8 @@
 package com.duckduckgo.autofill.impl.ui.credential.management
 
 import android.os.Bundle
+import android.system.Os.remove
+import android.text.TextUtils.replace
 import android.view.WindowManager
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
@@ -44,6 +46,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsVie
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.InitialiseViewAfterUnlock
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.LaunchDeviceAuth
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.OfferUserUndoDeletion
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.OfferUserUndoMassDeletion
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowCredentialMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowDeviceUnsupportedMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowDisabledMode
@@ -93,7 +96,11 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+
+        if (deviceAuthenticator.isAuthenticationRequiredForAutofill()) {
+            window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+        }
+
         setContentView(binding.root)
         setupToolbar(binding.toolbar)
         observeViewModel()
@@ -173,6 +180,7 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
             is ShowUserUsernameCopied -> showCopiedToClipboardSnackbar(CopiedToClipboardDataType.Username)
             is ShowUserPasswordCopied -> showCopiedToClipboardSnackbar(CopiedToClipboardDataType.Password)
             is OfferUserUndoDeletion -> showUserCredentialDeletedWithUndoAction(command)
+            is OfferUserUndoMassDeletion -> showUserCredentialsMassDeletedWithUndoAction(command)
             is ShowListMode -> showListMode()
             is ShowDisabledMode -> showDisabledMode()
             is ShowDeviceUnsupportedMode -> showDeviceUnsupportedMode()
@@ -207,6 +215,21 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
             }
         }
         snackbar.show()
+    }
+
+    private fun showUserCredentialsMassDeletedWithUndoAction(command: OfferUserUndoMassDeletion) {
+        val numberDeleted = command.credentials.size
+        val stringResource = resources.getQuantityString(
+            R.plurals.credentialManagementDeleteAllPasswordsSnackbarConfirmation,
+            numberDeleted,
+            numberDeleted,
+        )
+
+        Snackbar.make(binding.root, stringResource, Snackbar.LENGTH_LONG).also {
+            it.setAction(R.string.autofillManagementUndoDeletion) {
+                viewModel.reinsertCredentials(command.credentials)
+            }
+        }.show()
     }
 
     private fun showListMode() {

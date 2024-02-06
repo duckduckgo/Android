@@ -108,4 +108,12 @@ enum class NetworkProtectionPixelNames(
     VPN_SNOOZE_CANCELED("m_vpn_ev_snooze_canceled_c", enqueue = true),
     VPN_SNOOZE_CANCELED_DAILY("m_vpn_ev_snooze_canceled_d", enqueue = true),
     NETP_SETTINGS_PRESSED("m_netp_ev_setting_pressed_c"),
+    NETP_FAILURE_RECOVERY_STARTED("m_netp_ev_failure_recovery_started_c", enqueue = true),
+    NETP_FAILURE_RECOVERY_STARTED_DAILY("m_netp_ev_failure_recovery_started_d", enqueue = true),
+    NETP_FAILURE_RECOVERY_FAILED("m_netp_ev_failure_recovery_failed_c", enqueue = true),
+    NETP_FAILURE_RECOVERY_FAILED_DAILY("m_netp_ev_failure_recovery_failed_d", enqueue = true),
+    NETP_FAILURE_RECOVERY_COMPLETED_SERVER_UNHEALTHY("m_netp_ev_failure_recovery_completed_server_unhealthy_c", enqueue = true),
+    NETP_FAILURE_RECOVERY_COMPLETED_SERVER_UNHEALTHY_DAILY("m_netp_ev_failure_recovery_completed_server_unhealthy_d", enqueue = true),
+    NETP_FAILURE_RECOVERY_COMPLETED_SERVER_HEALTHY("m_netp_ev_failure_recovery_completed_server_healthy_c", enqueue = true),
+    NETP_FAILURE_RECOVERY_COMPLETED_SERVER_HEALTHY_DAILY("m_netp_ev_failure_recovery_completed_server_healthy_d", enqueue = true),
 }

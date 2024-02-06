@@ -167,7 +167,7 @@ interface Toggle {
         val minSupportedVersion: Int? = null,
         val enabledOverrideValue: Boolean? = null,
         val rollout: List<Double>? = null,
-        val rolloutStep: Int? = null,
+        val rolloutThreshold: Double? = null,
         val targets: List<Target> = emptyList(),
     ) {
         data class Target(
@@ -285,13 +285,17 @@ internal class ToggleImpl constructor(
     }
 
     private fun calculateRolloutState(
-        state: State,
+        inputState: State,
     ): State {
-        fun sample(probability: Double): Boolean {
-            val random = Random.nextDouble(100.0)
-            return random < probability
+        fun checkAndSetRolloutThreshold(state: State): State {
+            if (state.rolloutThreshold == null) {
+                val random = Random.nextDouble(100.0)
+                return state.copy(rolloutThreshold = random)
+            }
+            return state
         }
-        val rolloutStep = state.rolloutStep
+
+        val state = checkAndSetRolloutThreshold(inputState)
 
         // there is no rollout, return whatever the previous state was
         if (state.rollout.isNullOrEmpty()) {
@@ -306,36 +310,8 @@ internal class ToggleImpl constructor(
         val sortedRollout = state.rollout.sorted().filter { it in 0.0..100.0 }
         if (sortedRollout.isEmpty()) return state
 
-        when (rolloutStep) {
-            // first time we see the rollout, pick the last step
-            null -> {
-                val step = sortedRollout.last()
-                val isEnabled = sample(step.toDouble())
-                return state.copy(
-                    enable = isEnabled,
-                    rolloutStep = sortedRollout.size,
-                )
-            }
-            // this is an error and should not happen, don't change state
-            0 -> {
-                return state
-            }
-            else -> {
-                val steps = sortedRollout.size
-                val lastStep = state.rolloutStep
-
-                for (s in lastStep until steps) {
-                    // determine effective probability
-                    val probability = (sortedRollout[s] - sortedRollout[s - 1]) / (100.0 - sortedRollout[s - 1])
-                    if (sample(probability * 100.0)) {
-                        return state.copy(
-                            enable = true,
-                            rolloutStep = s + 1,
-                        )
-                    }
-                }
-                return state.copy(rolloutStep = sortedRollout.size)
-            }
-        }
+        return state.copy(
+            enable = (state.rolloutThreshold ?: 0.0) <= sortedRollout.last(),
+        )
     }
 }

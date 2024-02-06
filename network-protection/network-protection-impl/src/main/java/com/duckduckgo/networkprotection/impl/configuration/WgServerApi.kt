@@ -18,6 +18,8 @@ package com.duckduckgo.networkprotection.impl.configuration
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.Mode
+import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.Mode.FailureRecovery
 import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.WgServerData
 import com.duckduckgo.networkprotection.impl.di.UnprotectedVpnControllerService
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpEgressServersProvider
@@ -35,7 +37,18 @@ interface WgServerApi {
         val gateway: String,
     )
 
-    suspend fun registerPublicKey(publicKey: String): WgServerData?
+    suspend fun registerPublicKey(
+        publicKey: String,
+        mode: Mode? = null,
+    ): WgServerData?
+
+    sealed class Mode {
+        data class FailureRecovery(val currentServer: String) : Mode() {
+            override fun toString(): String {
+                return "failureRecovery"
+            }
+        }
+    }
 }
 
 @ContributesBinding(VpnScope::class)
@@ -45,7 +58,10 @@ class RealWgServerApi @Inject constructor(
     private val netNetpEgressServersProvider: NetpEgressServersProvider,
 ) : WgServerApi {
 
-    override suspend fun registerPublicKey(publicKey: String): WgServerData? {
+    override suspend fun registerPublicKey(
+        publicKey: String,
+        mode: Mode?,
+    ): WgServerData? {
         // This bit of code gets all possible egress servers which should be order by proximity, caches them for internal builds and then
         // returns the closest one or null if list is empty
         val selectedServer = wgVpnControllerService.getServers().map { it.server }
@@ -61,11 +77,17 @@ class RealWgServerApi @Inject constructor(
             }
 
         val userPreferredLocation = netNetpEgressServersProvider.updateServerLocationsAndReturnPreferred()
-        val registerKeyBody = if (selectedServer != null) {
+        val registerKeyBody = if (mode is FailureRecovery) {
+            RegisterKeyBody(publicKey = publicKey, server = mode.currentServer, mode = mode.toString())
+        } else if (selectedServer != null) {
             RegisterKeyBody(publicKey = publicKey, server = selectedServer)
         } else if (userPreferredLocation != null) {
             if (userPreferredLocation.cityName != null) {
-                RegisterKeyBody(publicKey = publicKey, country = userPreferredLocation.countryCode, city = userPreferredLocation.cityName)
+                RegisterKeyBody(
+                    publicKey = publicKey,
+                    country = userPreferredLocation.countryCode,
+                    city = userPreferredLocation.cityName,
+                )
             } else {
                 RegisterKeyBody(publicKey = publicKey, country = userPreferredLocation.countryCode)
             }

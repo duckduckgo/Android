@@ -38,6 +38,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsVie
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ExitListMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ExitLockedMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.LaunchDeviceAuth
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.OfferUserUndoMassDeletion
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowCredentialMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowDeviceUnsupportedMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowDisabledMode
@@ -46,6 +47,9 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsVie
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowUserUsernameCopied
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.CredentialMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.CredentialMode.EditingExisting
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchDeleteAllPasswordsConfirmation
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.PromptUserToAuthenticateMassDeletion
 import com.duckduckgo.autofill.impl.ui.credential.management.searching.CredentialListFilter
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.duckaddress.DuckAddressIdentifier
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.duckaddress.RealDuckAddressIdentifier
@@ -57,6 +61,8 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -80,7 +86,7 @@ class AutofillSettingsViewModelTest {
     private val clipboardInteractor: AutofillClipboardInteractor = mock()
     private val pixel: Pixel = mock()
     private val deviceAuthenticator: DeviceAuthenticator = mock()
-    private val credentialListFilter: CredentialListFilter = mock()
+    private val credentialListFilter: CredentialListFilter = TestFilterPassthrough()
     private val faviconManager: FaviconManager = mock()
     private val webUrlIdentifier: WebUrlIdentifier = mock()
     private val duckAddressIdentifier: DuckAddressIdentifier = RealDuckAddressIdentifier()
@@ -108,6 +114,7 @@ class AutofillSettingsViewModelTest {
         runTest {
             whenever(mockStore.getAllCredentials()).thenReturn(emptyFlow())
             whenever(neverSavedSiteRepository.neverSaveListCount()).thenReturn(emptyFlow())
+            whenever(deviceAuthenticator.isAuthenticationRequiredForAutofill()).thenReturn(true)
         }
     }
 
@@ -663,8 +670,102 @@ class AutofillSettingsViewModelTest {
         verify(pixel).fire(AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_DISMISSED)
     }
 
+    @Test
+    fun whenDeleteAllFirstCalledWithNoSavedLoginsThenNoCommandSentToShowConfirmationDialog() = runTest {
+        configureStoreToHaveThisManyCredentialsStored(0)
+        testee.onViewCreated()
+        testee.onDeleteAllPasswordsInitialSelection()
+        testee.commandsListView.test {
+            awaitItem().verifyDoesNotHaveCommandToShowDeleteAllConfirmation()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDeleteAllFirstCalledWithOneSavedLoginThenCommandSentToShowConfirmationDialog() = runTest {
+        configureStoreToHaveThisManyCredentialsStored(1)
+        testee.onViewCreated()
+        testee.onDeleteAllPasswordsInitialSelection()
+        testee.commandsListView.test {
+            awaitItem().verifyHasCommandToShowDeleteAllConfirmation(1)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDeleteAllPasswordsConfirmedButNoPasswordsSavedThenDoesNotIssueCommandToShowUndoSnackbar() = runTest {
+        whenever(mockStore.deleteAllCredentials()).thenReturn(emptyList())
+        testee.onDeleteAllPasswordsConfirmed()
+        testee.commandsListView.test {
+            awaitItem().verifyHasCommandToAuthenticateMassDeletion()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDeleteAllPasswordsConfirmedWithPasswordsSavedThenDoesIssueCommandToShowUndoSnackbar() = runTest {
+        testee.onDeleteAllPasswordsConfirmed()
+        testee.commandsListView.test {
+            awaitItem().verifyHasCommandToAuthenticateMassDeletion()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenAuthenticationSucceedsToMassDeletePasswordsThenDoesIssueCommandToShowUndoSnackbar() = runTest {
+        whenever(mockStore.deleteAllCredentials()).thenReturn(listOf(someCredentials()))
+        testee.onAuthenticatedToDeleteAllPasswords()
+        testee.commands.test {
+            awaitItem().verifyDoesHaveCommandToShowUndoDeletionSnackbar(1)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDeleteAllFirstCalledWithManySavedLoginThenCommandSentToShowConfirmationDialog() = runTest {
+        configureStoreToHaveThisManyCredentialsStored(100)
+        testee.onViewCreated()
+        testee.onDeleteAllPasswordsInitialSelection()
+        testee.commandsListView.test {
+            awaitItem().verifyHasCommandToShowDeleteAllConfirmation(100)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    private fun List<ListModeCommand>.verifyHasCommandToShowDeleteAllConfirmation(expectedNumberOfCredentialsToDelete: Int) {
+        val confirmationCommand = this.firstOrNull { it is LaunchDeleteAllPasswordsConfirmation }
+        assertNotNull(confirmationCommand)
+        assertEquals(expectedNumberOfCredentialsToDelete, (confirmationCommand as LaunchDeleteAllPasswordsConfirmation).numberToDelete)
+    }
+
+    private fun List<ListModeCommand>.verifyDoesNotHaveCommandToShowDeleteAllConfirmation() {
+        val confirmationCommand = this.firstOrNull { it is LaunchDeleteAllPasswordsConfirmation }
+        assertNull(confirmationCommand)
+    }
+
+    private fun List<Command>.verifyDoesHaveCommandToShowUndoDeletionSnackbar(expectedNumberOfCredentialsToDelete: Int) {
+        val confirmationCommand = this.firstOrNull { it is OfferUserUndoMassDeletion }
+        assertNotNull(confirmationCommand)
+        assertEquals(expectedNumberOfCredentialsToDelete, (confirmationCommand as OfferUserUndoMassDeletion).credentials.size)
+    }
+
+    private fun List<ListModeCommand>.verifyHasCommandToAuthenticateMassDeletion() {
+        val command = this.firstOrNull { it is PromptUserToAuthenticateMassDeletion }
+        assertNotNull(command)
+        assertTrue((command as PromptUserToAuthenticateMassDeletion).authConfiguration.requireUserAction)
+    }
+
+    private fun List<Command>.verifyDoesNotHaveCommandToShowUndoDeletionSnackbar() {
+        val confirmationCommand = this.firstOrNull { it is OfferUserUndoMassDeletion }
+        assertNull(confirmationCommand)
+    }
+
     private suspend fun configureStoreToHaveThisManyCredentialsStored(value: Int) {
         whenever(mockStore.getCredentialCount()).thenReturn(flowOf(value))
+
+        val credentialList = mutableListOf<LoginCredentials>()
+        repeat(value) { credentialList.add(someCredentials()) }
+        whenever(mockStore.getAllCredentials()).thenReturn(flowOf(credentialList))
     }
 
     private fun configureDeviceToHaveValidAuthentication(hasValidAuth: Boolean) {
@@ -690,5 +791,14 @@ class AutofillSettingsViewModelTest {
 
     private fun Command.assertCommandType(expectedType: KClass<out Command>) {
         assertTrue(String.format("Unexpected command type: %s", this::class.simpleName), this::class == expectedType)
+    }
+}
+
+private class TestFilterPassthrough : CredentialListFilter {
+    override suspend fun filter(
+        originalList: List<LoginCredentials>,
+        query: String,
+    ): List<LoginCredentials> {
+        return originalList
     }
 }

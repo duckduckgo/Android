@@ -16,15 +16,18 @@
 
 package com.duckduckgo.sync.impl.ui.setup
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.sync.impl.Result.Error
-import com.duckduckgo.sync.impl.Result.Success
+import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.onFailure
+import com.duckduckgo.sync.impl.onSuccess
 import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command.FinishSetupFlow
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.ViewMode.CreatingAccount
 import javax.inject.*
@@ -47,13 +50,13 @@ class SyncCreateAccountViewModel @Inject constructor(
 
     private val viewState = MutableStateFlow(ViewState())
     fun viewState(): Flow<ViewState> = viewState.onStart { createAccount() }
-
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
     sealed class Command {
         object FinishSetupFlow : Command()
         object AbortFlow : Command()
         object Error : Command()
+        data class ShowError(@StringRes val message: Int, val reason: String? = "") : Command()
     }
 
     data class ViewState(
@@ -70,16 +73,18 @@ class SyncCreateAccountViewModel @Inject constructor(
         if (syncAccountRepository.isSignedIn()) {
             command.send(FinishSetupFlow)
         } else {
-            when (syncAccountRepository.createAccount()) {
-                is Error -> {
-                    command.send(Command.Error)
-                }
-
-                is Success -> {
-                    syncPixels.fireSignupDirectPixel()
-                    command.send(FinishSetupFlow)
-                }
+            syncAccountRepository.createAccount().onSuccess {
+                syncPixels.fireSignupDirectPixel()
+                command.send(FinishSetupFlow)
+            }.onFailure {
+                command.send(Command.ShowError(R.string.sync_create_account_generic_error, it.reason))
             }
+        }
+    }
+
+    fun onErrorDialogDismissed() {
+        viewModelScope.launch(dispatchers.io()) {
+            command.send(Command.AbortFlow)
         }
     }
 }

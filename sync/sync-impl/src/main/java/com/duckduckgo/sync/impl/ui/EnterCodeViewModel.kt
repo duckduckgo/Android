@@ -16,14 +16,22 @@
 
 package com.duckduckgo.sync.impl.ui
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.sync.impl.AccountErrorCodes.ALREADY_SIGNED_IN
+import com.duckduckgo.sync.impl.AccountErrorCodes.CONNECT_FAILED
+import com.duckduckgo.sync.impl.AccountErrorCodes.CREATE_ACCOUNT_FAILED
+import com.duckduckgo.sync.impl.AccountErrorCodes.INVALID_CODE
+import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
 import com.duckduckgo.sync.impl.Clipboard
+import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.ShowError
 import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -59,6 +67,7 @@ class EnterCodeViewModel @Inject constructor(
 
     sealed class Command {
         object LoginSucess : Command()
+        data class ShowError(@StringRes val message: Int, val reason: String = "") : Command()
     }
 
     fun onPasteCodeClicked() {
@@ -76,8 +85,32 @@ class EnterCodeViewModel @Inject constructor(
         when (result) {
             is Result.Success -> command.send(Command.LoginSucess)
             is Result.Error -> {
-                viewState.value = viewState.value.copy(authState = AuthState.Error)
+                when (result.code) {
+                    ALREADY_SIGNED_IN.code -> {
+                        showError(R.string.sync_login_authenticated_device_error, result.reason)
+                    }
+                    LOGIN_FAILED.code -> {
+                        showError(R.string.sync_connect_login_error, result.reason)
+                    }
+                    CONNECT_FAILED.code -> {
+                        showError(R.string.sync_connect_generic_error, result.reason)
+                    }
+                    CREATE_ACCOUNT_FAILED.code -> {
+                        showError(R.string.sync_create_account_generic_error, result.reason)
+                    }
+                    INVALID_CODE.code -> {
+                        viewState.value = viewState.value.copy(authState = AuthState.Error)
+                    }
+                    else -> {}
+                }
             }
         }
+    }
+
+    private suspend fun showError(
+        message: Int,
+        reason: String,
+    ) {
+        command.send(ShowError(message = message, reason = reason))
     }
 }

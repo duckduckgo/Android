@@ -23,6 +23,7 @@ import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command.Error
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command.FinishSetupFlow
+import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.ViewMode.CreatingAccount
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
@@ -77,7 +78,7 @@ class SyncCreateAccountViewModelTest {
 
         testee.commands().test {
             val command = awaitItem()
-            Assert.assertTrue(command is Error)
+            Assert.assertTrue(command is ShowError)
             verifyNoInteractions(syncPixels)
             cancelAndIgnoreRemainingEvents()
         }

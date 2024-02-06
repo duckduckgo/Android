@@ -31,4 +31,6 @@
     <string name="downloadsRetry">Pakartoti</string>
     <string name="notificationDownloadComplete">Atsisiuntimas baigtas.</string>
     <string name="notificationDownloadFailed">Nepavyko atsisiųsti.</string>
+
+    <string name="downloadConfirmationContinue">Išsaugoti Atsisiuntimuose</string>
 </resources>

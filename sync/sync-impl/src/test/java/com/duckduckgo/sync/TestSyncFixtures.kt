@@ -161,6 +161,7 @@ object TestSyncFixtures {
     val connectKey = ConnectKey(encryptedRecoveryCode)
     const val keysNotFoundErr = "connection_keys_not_found"
     const val keysNotFoundCode = 404
+    const val keysGoneCode = 410
     val connectSuccess = Result.Success(true)
     val connectError = Result.Error(code = invalidCodeErr, reason = invalidMessageErr)
     val connectResponse = Response.success<Void>(null)
@@ -180,6 +181,7 @@ object TestSyncFixtures {
     )
     val connectDeviceSuccess = Result.Success(encryptedRecoveryCode)
     val connectDeviceKeysNotFoundError = Result.Error(code = keysNotFoundCode, reason = keysNotFoundErr)
+    val connectDeviceKeysGoneError = Result.Error(code = keysGoneCode, reason = keysNotFoundErr)
 
     val firstSyncWithBookmarksAndFavorites = "{\"bookmarks\":{\"updates\":[{\"client_last_modified\":\"timestamp\"" +
         ",\"folder\":{\"children\":[\"bookmark1\"]},\"id\":\"favorites_root\",\"title\":\"Favorites\"},{\"client_last_modified\"" +

@@ -30,6 +30,9 @@ interface WebsiteLoginCredentialsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(loginCredentials: WebsiteLoginCredentialsEntity): Long
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(loginCredentials: List<WebsiteLoginCredentialsEntity>)
+
     @Update(onConflict = OnConflictStrategy.REPLACE)
     fun update(loginCredentials: WebsiteLoginCredentialsEntity)
 
@@ -47,6 +50,9 @@ interface WebsiteLoginCredentialsDao {
 
     @Query("DELETE FROM website_login_credentials WHERE id = :id")
     fun delete(id: Long)
+
+    @Query("DELETE FROM website_login_credentials WHERE id IN (:ids)")
+    fun delete(ids: List<Long>)
 
     @Query("select * from website_login_credentials where domain is null OR domain = ''")
     fun websiteLoginCredentialsWithoutDomain(): Flow<List<WebsiteLoginCredentialsEntity>>

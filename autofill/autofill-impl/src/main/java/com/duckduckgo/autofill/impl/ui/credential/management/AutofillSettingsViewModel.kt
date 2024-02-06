@@ -24,7 +24,9 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
+import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
+import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthConfiguration
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_ENABLED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_CONFIRMED
@@ -41,6 +43,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsVie
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.InitialiseViewAfterUnlock
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.LaunchDeviceAuth
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.OfferUserUndoDeletion
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.OfferUserUndoMassDeletion
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowCredentialMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowDeviceUnsupportedMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowDisabledMode
@@ -63,7 +66,9 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsVie
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.NotADuckAddress
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.NotManageable
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.SettingActivationStatus
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchDeleteAllPasswordsConfirmation
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchResetNeverSaveListConfirmation
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.PromptUserToAuthenticateMassDeletion
 import com.duckduckgo.autofill.impl.ui.credential.management.neversaved.NeverSavedSitesViewState
 import com.duckduckgo.autofill.impl.ui.credential.management.searching.CredentialListFilter
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.duckaddress.DuckAddressIdentifier
@@ -247,7 +252,7 @@ class AutofillSettingsViewModel @Inject constructor(
             return
         }
 
-        if (!deviceAuthenticator.hasValidDeviceAuthentication()) {
+        if (deviceAuthenticator.isAuthenticationRequiredForAutofill() && !deviceAuthenticator.hasValidDeviceAuthentication()) {
             Timber.d("Can't show device auth as there is no valid device authentication")
             disabled()
             return
@@ -409,6 +414,12 @@ class AutofillSettingsViewModel @Inject constructor(
     }
 
     fun reinsertCredentials(credentials: LoginCredentials) {
+        viewModelScope.launch(dispatchers.io()) {
+            autofillStore.reinsertCredentials(credentials)
+        }
+    }
+
+    fun reinsertCredentials(credentials: List<LoginCredentials>) {
         viewModelScope.launch(dispatchers.io()) {
             autofillStore.reinsertCredentials(credentials)
         }
@@ -595,6 +606,34 @@ class AutofillSettingsViewModel @Inject constructor(
         pixel.fire(AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_DISPLAYED)
     }
 
+    fun onDeleteAllPasswordsInitialSelection() {
+        val numberToDelete = viewState.value.logins.orEmpty().size
+        if (numberToDelete > 0) {
+            addCommand(LaunchDeleteAllPasswordsConfirmation(numberToDelete))
+        }
+    }
+
+    fun onDeleteAllPasswordsConfirmed() {
+        val authConfiguration = AuthConfiguration(
+            requireUserAction = true,
+            displayTextResource = R.string.autofill_auth_text_for_delete_all,
+            displayTitleResource = R.string.autofill_title_text_for_delete_all,
+        )
+
+        addCommand(PromptUserToAuthenticateMassDeletion(authConfiguration))
+    }
+
+    fun onAuthenticatedToDeleteAllPasswords() {
+        viewModelScope.launch(dispatchers.io()) {
+            val removedCredentials = autofillStore.deleteAllCredentials()
+            Timber.i("Removed %d credentials", removedCredentials.size)
+
+            if (removedCredentials.isNotEmpty()) {
+                addCommand(OfferUserUndoMassDeletion(removedCredentials))
+            }
+        }
+    }
+
     data class ViewState(
         val autofillEnabled: Boolean = true,
         val showAutofillEnabledToggle: Boolean = true,
@@ -645,6 +684,7 @@ class AutofillSettingsViewModel @Inject constructor(
         class ShowUserPasswordCopied : Command()
 
         class OfferUserUndoDeletion(val credentials: LoginCredentials?) : Command()
+        class OfferUserUndoMassDeletion(val credentials: List<LoginCredentials>) : Command()
 
         object ShowListMode : Command()
         object ShowCredentialMode : Command()
@@ -666,6 +706,8 @@ class AutofillSettingsViewModel @Inject constructor(
 
     sealed class ListModeCommand(val id: String = UUID.randomUUID().toString()) {
         data object LaunchResetNeverSaveListConfirmation : ListModeCommand()
+        data class LaunchDeleteAllPasswordsConfirmation(val numberToDelete: Int) : ListModeCommand()
+        data class PromptUserToAuthenticateMassDeletion(val authConfiguration: AuthConfiguration) : ListModeCommand()
     }
 
     sealed class DuckAddressStatus {

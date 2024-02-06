@@ -146,7 +146,14 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
                 finish()
             }
             is GoToPortal -> {
-                globalActivityStarter.start(this, SubscriptionsWebViewActivityWithParams(url = command.url, getString(string.changePlanTitle)))
+                globalActivityStarter.start(
+                    this,
+                    SubscriptionsWebViewActivityWithParams(
+                        url = command.url,
+                        screenTitle = getString(string.changePlanTitle),
+                        defaultToolbar = false,
+                    ),
+                )
             }
         }
     }

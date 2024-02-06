@@ -45,6 +45,10 @@ dependencies {
     implementation project(path: ':autofill-api')
     implementation project(path: ':network-protection-api')
     implementation project(path: ':internal-features-api')
+    implementation project(path: ':internal-features-api')
+    implementation project(path: ':macos-api')
+    implementation project(path: ':windows-api')
+    implementation project(path: ':downloads-api')
 
     implementation AndroidX.appCompat
     implementation KotlinX.coroutines.core

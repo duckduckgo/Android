@@ -21,6 +21,7 @@ import android.webkit.WebView
 import androidx.core.net.toUri
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.toTldPlusOne
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
@@ -68,11 +69,11 @@ class SubscriptionMessagingInterface @Inject constructor(
         try {
             val adapter = moshi.adapter(JsMessage::class.java)
             val jsMessage = adapter.fromJson(message)
-            val domain = runBlocking(dispatcherProvider.main()) {
+            val url = runBlocking(dispatcherProvider.main()) {
                 webView.url?.toUri()?.host
             }
             jsMessage?.let {
-                if (this.secret == secret && context == jsMessage.context && (allowedDomains.isEmpty() || allowedDomains.contains(domain))) {
+                if (this.secret == secret && context == jsMessage.context && isUrlAllowed(url)) {
                     handlers.firstOrNull {
                         it.methods.contains(jsMessage.method) && it.featureName == jsMessage.featureName
                     }?.process(jsMessage, secret, jsMessageCallback)
@@ -115,11 +116,17 @@ class SubscriptionMessagingInterface @Inject constructor(
     override val context: String = "subscriptionPages"
     override val callbackName: String = "messageCallback"
     override val secret: String = "duckduckgo-android-messaging-secret"
-    override val allowedDomains: List<String> = listOf("abrown.duckduckgo.com")
+    override val allowedDomains: List<String> = listOf("duckduckgo.com")
+
+    private fun isUrlAllowed(url: String?): Boolean {
+        if (allowedDomains.isEmpty()) return true
+        val eTld = url?.toTldPlusOne() ?: return false
+        return (allowedDomains.contains(eTld))
+    }
 
     inner class SubscriptionsHandler : JsMessageHandler {
-        override fun process(jsMessage: JsMessage, secret: String, jsMessageCallback: JsMessageCallback) {
-            jsMessageCallback.process(featureName, jsMessage.method, jsMessage.id, jsMessage.params)
+        override fun process(jsMessage: JsMessage, secret: String, jsMessageCallback: JsMessageCallback?) {
+            jsMessageCallback?.process(featureName, jsMessage.method, jsMessage.id, jsMessage.params)
         }
 
         override val allowedDomains: List<String> = emptyList()
@@ -138,7 +145,7 @@ class SubscriptionMessagingInterface @Inject constructor(
         private val dispatcherProvider: DispatcherProvider,
     ) : JsMessageHandler {
 
-        override fun process(jsMessage: JsMessage, secret: String, jsMessageCallback: JsMessageCallback) {
+        override fun process(jsMessage: JsMessage, secret: String, jsMessageCallback: JsMessageCallback?) {
             if (jsMessage.id == null) return
 
             val pat: AuthToken = runBlocking(dispatcherProvider.io()) {
@@ -179,7 +186,7 @@ class SubscriptionMessagingInterface @Inject constructor(
         @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
         private val dispatcherProvider: DispatcherProvider,
     ) : JsMessageHandler {
-        override fun process(jsMessage: JsMessage, secret: String, jsMessageCallback: JsMessageCallback) {
+        override fun process(jsMessage: JsMessage, secret: String, jsMessageCallback: JsMessageCallback?) {
             try {
                 val token = jsMessage.params.getString("token")
                 appCoroutineScope.launch(dispatcherProvider.io()) {

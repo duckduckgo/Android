@@ -180,6 +180,7 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
         this.context?.let {
             TextAlertDialogBuilder(it)
                 .setTitle(R.string.autofillDeleteLoginDialogTitle)
+                .setMessage(R.string.credentialManagementDeletePasswordConfirmationMessage)
                 .setDestructiveButtons(true)
                 .setPositiveButton(R.string.autofillDeleteLoginDialogDelete)
                 .setNegativeButton(R.string.autofillDeleteLoginDialogCancel)

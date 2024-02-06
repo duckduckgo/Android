@@ -32,6 +32,7 @@ import android.net.Uri
 import android.os.*
 import android.print.PrintAttributes
 import android.print.PrintManager
+import android.provider.MediaStore
 import android.text.Editable
 import android.text.Spannable
 import android.text.SpannableString
@@ -100,7 +101,6 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.NavigationCommand
 import com.duckduckgo.app.browser.BrowserTabViewModel.OmnibarViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.PrivacyShieldViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.SavedSiteChangedViewState
-import com.duckduckgo.app.browser.DownloadConfirmationFragment.DownloadConfirmationDialogListener
 import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
@@ -120,11 +120,11 @@ import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.Companio
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.browser.favorites.QuickAccessDragTouchItemListener
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
-import com.duckduckgo.app.browser.filechooser.camera.launcher.UploadFromExternalCameraLauncher
-import com.duckduckgo.app.browser.filechooser.camera.launcher.UploadFromExternalCameraLauncher.CameraImageCaptureResult.CouldNotCapturePermissionDenied
-import com.duckduckgo.app.browser.filechooser.camera.launcher.UploadFromExternalCameraLauncher.CameraImageCaptureResult.ErrorAccessingCamera
-import com.duckduckgo.app.browser.filechooser.camera.launcher.UploadFromExternalCameraLauncher.CameraImageCaptureResult.ImageCaptured
-import com.duckduckgo.app.browser.filechooser.camera.launcher.UploadFromExternalCameraLauncher.CameraImageCaptureResult.NoImageCaptured
+import com.duckduckgo.app.browser.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher
+import com.duckduckgo.app.browser.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher.MediaCaptureResult.CouldNotCapturePermissionDenied
+import com.duckduckgo.app.browser.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher.MediaCaptureResult.ErrorAccessingMediaApp
+import com.duckduckgo.app.browser.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher.MediaCaptureResult.MediaCaptured
+import com.duckduckgo.app.browser.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher.MediaCaptureResult.NoMediaCaptured
 import com.duckduckgo.app.browser.history.NavigationHistorySheet
 import com.duckduckgo.app.browser.history.NavigationHistorySheet.NavigationHistorySheetListener
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
@@ -155,7 +155,6 @@ import com.duckduckgo.app.browser.webview.WebContentDebugging
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.cta.ui.DaxDialogCta.*
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.downloads.DownloadsFileActions
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
@@ -245,6 +244,9 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_DELAY
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_LENGTH
 import com.duckduckgo.downloads.api.DownloadCommand
+import com.duckduckgo.downloads.api.DownloadConfirmation
+import com.duckduckgo.downloads.api.DownloadConfirmationDialogListener
+import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -267,6 +269,7 @@ import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermission
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.duckduckgo.voice.api.VoiceSearchLauncher
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
@@ -444,10 +447,13 @@ class BrowserTabFragment :
     lateinit var jsMessageHelper: JsMessageHelper
 
     @Inject
-    lateinit var externalCameraLauncher: UploadFromExternalCameraLauncher
+    lateinit var externalCameraLauncher: UploadFromExternalMediaAppLauncher
 
     @Inject
     lateinit var autofillOverlappingDialogDetector: AutofillOverlappingDialogDetector
+
+    @Inject
+    lateinit var downloadConfirmation: DownloadConfirmation
 
     @Inject
     lateinit var privacyProtectionsPopupFactory: PrivacyProtectionsPopupFactory
@@ -761,17 +767,17 @@ class BrowserTabFragment :
         sitePermissionsDialogLauncher.registerPermissionLauncher(this)
         externalCameraLauncher.registerForResult(this) {
             when (it) {
-                is ImageCaptured -> pendingUploadTask?.onReceiveValue(arrayOf(Uri.fromFile(it.file)))
-                CouldNotCapturePermissionDenied -> {
+                is MediaCaptured -> pendingUploadTask?.onReceiveValue(arrayOf(Uri.fromFile(it.file)))
+                is CouldNotCapturePermissionDenied -> {
                     pendingUploadTask?.onReceiveValue(null)
                     activity?.let { activity ->
-                        externalCameraLauncher.showPermissionRationaleDialog(activity)
+                        externalCameraLauncher.showPermissionRationaleDialog(activity, it.inputAction)
                     }
                 }
-                NoImageCaptured -> pendingUploadTask?.onReceiveValue(null)
-                ErrorAccessingCamera -> {
+                is NoMediaCaptured -> pendingUploadTask?.onReceiveValue(null)
+                is ErrorAccessingMediaApp -> {
                     pendingUploadTask?.onReceiveValue(null)
-                    Snackbar.make(binding.root, R.string.imageCaptureCameraUnavailable, BaseTransientBottomBar.LENGTH_SHORT).show()
+                    Snackbar.make(binding.root, it.messageId, BaseTransientBottomBar.LENGTH_SHORT).show()
                 }
             }
             pendingUploadTask = null
@@ -909,7 +915,7 @@ class BrowserTabFragment :
     }
 
     private fun dismissDownloadFragment() {
-        val fragment = fragmentManager?.findFragmentByTag(DOWNLOAD_CONFIRMATION_TAG) as? DownloadConfirmationFragment
+        val fragment = fragmentManager?.findFragmentByTag(DOWNLOAD_CONFIRMATION_TAG) as? BottomSheetDialogFragment
         fragment?.dismiss()
     }
 
@@ -1273,7 +1279,10 @@ class BrowserTabFragment :
             is Command.SharePromoLinkRMF -> launchSharePromoRMFPageChooser(it.url, it.shareTitle)
             is Command.CopyLink -> clipboardManager.setPrimaryClip(ClipData.newPlainText(null, it.url))
             is Command.ShowFileChooser -> launchFilePicker(it.filePathCallback, it.fileChooserParams)
-            is Command.ShowExistingImageOrCameraChooser -> launchImageOrCameraChooser(it.fileChooserParams, it.filePathCallback)
+            is Command.ShowExistingImageOrCameraChooser -> launchImageOrCameraChooser(it.fileChooserParams, it.filePathCallback, it.inputAction)
+            is Command.ShowImageCamera -> launchCameraCapture(it.filePathCallback, it.fileChooserParams, MediaStore.ACTION_IMAGE_CAPTURE)
+            is Command.ShowVideoCamera -> launchCameraCapture(it.filePathCallback, it.fileChooserParams, MediaStore.ACTION_VIDEO_CAPTURE)
+            is Command.ShowSoundRecorder -> launchCameraCapture(it.filePathCallback, it.fileChooserParams, MediaStore.Audio.Media.RECORD_SOUND_ACTION)
 
             is Command.AddHomeShortcut -> {
                 context?.let { context ->
@@ -1616,7 +1625,7 @@ class BrowserTabFragment :
             val action: String?
 
             if (appLink.appIntent != null) {
-                val packageName = appLink.appIntent.component?.packageName ?: return
+                val packageName = appLink.appIntent!!.component?.packageName ?: return
                 message = getString(R.string.appLinkSnackBarMessage, getAppName(packageName))
                 action = getString(R.string.appLinkSnackBarAction)
             } else {
@@ -1669,15 +1678,15 @@ class BrowserTabFragment :
     @Suppress("NewApi") // we use appBuildConfig
     private fun openAppLink(appLink: SpecialUrlDetector.UrlType.AppLink) {
         if (appLink.appIntent != null) {
-            appLink.appIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            appLink.appIntent!!.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             try {
-                startActivityOrQuietlyFail(appLink.appIntent)
+                startActivityOrQuietlyFail(appLink.appIntent!!)
             } catch (e: SecurityException) {
                 showToast(R.string.unableToOpenLink)
             }
         } else if (appLink.excludedComponents != null && appBuildConfig.sdkInt >= Build.VERSION_CODES.N) {
             val title = getString(R.string.appLinkIntentChooserTitle)
-            val chooserIntent = getChooserIntent(appLink.uriString, title, appLink.excludedComponents)
+            val chooserIntent = getChooserIntent(appLink.uriString, title, appLink.excludedComponents!!)
             startActivityOrQuietlyFail(chooserIntent)
         }
         viewModel.clearPreviousUrl()
@@ -2835,7 +2844,7 @@ class BrowserTabFragment :
     private fun requestDownloadConfirmation(pendingDownload: PendingFileDownload) {
         if (isStateSaved) return
 
-        val downloadConfirmationFragment = DownloadConfirmationFragment.instance(pendingDownload)
+        val downloadConfirmationFragment = downloadConfirmation.instance(pendingDownload)
         showDialogHidingPrevious(downloadConfirmationFragment, DOWNLOAD_CONFIRMATION_TAG)
     }
 
@@ -2846,14 +2855,20 @@ class BrowserTabFragment :
         startActivityForResult(intent, REQUEST_CODE_CHOOSE_FILE)
     }
 
-    private fun launchCameraCapture(filePathCallback: ValueCallback<Array<Uri>>) {
+    private fun launchCameraCapture(filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: FileChooserRequestedParams, inputAction: String) {
+        if (Intent(inputAction).resolveActivity(requireContext().packageManager) == null) {
+            launchFilePicker(filePathCallback, fileChooserParams)
+            return
+        }
+
         pendingUploadTask = filePathCallback
-        externalCameraLauncher.launch()
+        externalCameraLauncher.launch(inputAction)
     }
 
     private fun launchImageOrCameraChooser(
         fileChooserParams: FileChooserRequestedParams,
         filePathCallback: ValueCallback<Array<Uri>>,
+        inputAction: String,
     ) {
         context?.let {
             val cameraString = getString(R.string.imageCaptureCameraGalleryDisambiguationCameraOption)
@@ -2873,7 +2888,7 @@ class BrowserTabFragment :
                         }
 
                         override fun onSecondaryItemClicked() {
-                            launchCameraCapture(filePathCallback)
+                            launchCameraCapture(filePathCallback, fileChooserParams, inputAction)
                         }
 
                         override fun onBottomSheetDismissed() {

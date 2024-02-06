@@ -193,6 +193,15 @@ class SecureStoreBackedAutofillStore @Inject constructor(
         return existingCredential?.toLoginCredentials()
     }
 
+    override suspend fun deleteAllCredentials(): List<LoginCredentials> {
+        val savedCredentials = secureStorage.websiteLoginDetailsWithCredentials().firstOrNull() ?: emptyList()
+        val idsToDelete = savedCredentials.mapNotNull { it.details.id }
+        secureStorage.deleteWebSiteLoginDetailsWithCredentials(idsToDelete)
+        Timber.i("Deleted %d credentials", idsToDelete.size)
+        syncCredentialsListener.onCredentialRemoved(idsToDelete)
+        return savedCredentials.map { it.toLoginCredentials() }
+    }
+
     override suspend fun updateCredentials(credentials: LoginCredentials): LoginCredentials? {
         val cleanedDomain: String? = credentials.domain?.let {
             autofillUrlMatcher.cleanRawUrl(it)
@@ -248,23 +257,35 @@ class SecureStoreBackedAutofillStore @Inject constructor(
         return matchType
     }
 
-    override suspend fun reinsertCredentials(credentials: LoginCredentials) {
+    private fun LoginCredentials.prepareForReinsertion(): WebsiteLoginDetailsWithCredentials {
         val loginDetails = WebsiteLoginDetails(
-            id = credentials.id,
-            domain = credentials.domain,
-            username = credentials.username,
-            domainTitle = credentials.domainTitle,
-            lastUpdatedMillis = credentials.lastUpdatedMillis,
+            id = id,
+            domain = domain,
+            username = username,
+            domainTitle = domainTitle,
+            lastUpdatedMillis = lastUpdatedMillis,
         )
-        val webSiteLoginCredentials = WebsiteLoginDetailsWithCredentials(
+        return WebsiteLoginDetailsWithCredentials(
             details = loginDetails,
-            password = credentials.password,
-            notes = credentials.notes,
+            password = password,
+            notes = notes,
         )
+    }
 
+    override suspend fun reinsertCredentials(credentials: LoginCredentials) {
         withContext(dispatcherProvider.io()) {
-            secureStorage.addWebsiteLoginDetailsWithCredentials(webSiteLoginCredentials)?.also {
+            secureStorage.addWebsiteLoginDetailsWithCredentials(credentials.prepareForReinsertion())?.also {
                 syncCredentialsListener.onCredentialAdded(it.details.id!!)
+            }
+        }
+    }
+
+    override suspend fun reinsertCredentials(credentials: List<LoginCredentials>) {
+        withContext(dispatcherProvider.io()) {
+            val mappedCredentials = credentials.map { it.prepareForReinsertion() }
+            secureStorage.addWebsiteLoginDetailsWithCredentials(mappedCredentials).also {
+                val ids = mappedCredentials.mapNotNull { it.details.id }
+                syncCredentialsListener.onCredentialsAdded(ids)
             }
         }
     }

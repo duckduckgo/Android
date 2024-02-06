@@ -27,11 +27,12 @@ import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.getOrNull
 import com.duckduckgo.sync.impl.internal.SyncInternalEnvDataStore
-import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ReadConnectQR
-import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ReadQR
-import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ShowMessage
-import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ShowQR
+import com.duckduckgo.sync.impl.ui.SyncInternalSettingsViewModel.Command.ReadConnectQR
+import com.duckduckgo.sync.impl.ui.SyncInternalSettingsViewModel.Command.ReadQR
+import com.duckduckgo.sync.impl.ui.SyncInternalSettingsViewModel.Command.ShowMessage
+import com.duckduckgo.sync.impl.ui.SyncInternalSettingsViewModel.Command.ShowQR
 import com.duckduckgo.sync.store.*
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
@@ -44,7 +45,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 @ContributesViewModel(ActivityScope::class)
-class SyncInitialSetupViewModel
+class SyncInternalSettingsViewModel
 @Inject
 constructor(
     private val syncAccountRepository: SyncAccountRepository,
@@ -201,7 +202,7 @@ constructor(
 
     fun onShowQRClicked() {
         viewModelScope.launch(dispatchers.io()) {
-            val recoveryCode = syncAccountRepository.getRecoveryCode() ?: return@launch
+            val recoveryCode = syncAccountRepository.getRecoveryCode().getOrNull() ?: return@launch
             command.send(ShowQR(recoveryCode))
         }
     }

@@ -60,12 +60,13 @@ class ItrSettingViewModelTest {
     }
 
     @Test
-    fun whenOnResumeEntitlementCheckFailsEmitViewState() = runTest {
+    fun whenOnResumeEntitlementCheckFailsDoNotEmitViewState() = runTest {
         whenever(subscriptions.getEntitlementStatus("Identity Theft Restoration")).thenReturn(Result.failure(RuntimeException()))
 
-        viewModel.onResume(mock())
         viewModel.viewState.test {
             assertFalse(awaitItem().hasSubscription)
+            viewModel.onResume(mock())
+            expectNoEvents()
             cancelAndConsumeRemainingEvents()
         }
     }

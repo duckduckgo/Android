@@ -498,7 +498,6 @@
     <string name="onboardingFeatureOptionOneClickDataClearing">Gegevens wissen met één klik</string>
 
     <!-- Download Confirmation -->
-    <string name="downloadConfirmationContinue">Opslaan in downloads</string>
     <string name="downloadConfirmationSaveFileTitle" instruction="Placeholder is the name of a file">%1$s opslaan</string>
     <string name="downloadConfirmationKeepBothFilesText">Houd beide</string>
     <string name="downloadConfirmationReplaceOldFileText">Vervangen</string>

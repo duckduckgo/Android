@@ -44,6 +44,10 @@ internal class FakeSecureStorage : SecureStorage {
         return newLogin
     }
 
+    override suspend fun addWebsiteLoginDetailsWithCredentials(credentials: List<WebsiteLoginDetailsWithCredentials>) {
+        credentials.forEach { addWebsiteLoginDetailsWithCredentials(it) }
+    }
+
     override suspend fun websiteLoginDetailsForDomain(domain: String): Flow<List<WebsiteLoginDetails>> {
         TODO("Not yet implemented")
     }
@@ -80,6 +84,10 @@ internal class FakeSecureStorage : SecureStorage {
         entities.find { it.details.id == id }?.let {
             entities.remove(it)
         }
+    }
+
+    override suspend fun deleteWebSiteLoginDetailsWithCredentials(ids: List<Long>) {
+        entities.removeAll { ids.contains(it.details.id) }
     }
 
     override suspend fun addToNeverSaveList(domain: String) {

@@ -45,7 +45,9 @@ class AutofillGlobalCapabilityCheckerImpl @Inject constructor(
     override suspend fun isSecureAutofillAvailable(): Boolean {
         return withContext(dispatcherProvider.io()) {
             if (!autofillStore.autofillAvailable) return@withContext false
-            if (!deviceAuthenticator.hasValidDeviceAuthentication()) return@withContext false
+            if (deviceAuthenticator.isAuthenticationRequiredForAutofill() && !deviceAuthenticator.hasValidDeviceAuthentication()) {
+                return@withContext false
+            }
             return@withContext true
         }
     }

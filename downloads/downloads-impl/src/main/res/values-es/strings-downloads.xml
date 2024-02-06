@@ -31,4 +31,6 @@
     <string name="downloadsRetry">Volver a intentar</string>
     <string name="notificationDownloadComplete">Descarga finalizada.</string>
     <string name="notificationDownloadFailed">No se ha podido descargar.</string>
+
+    <string name="downloadConfirmationContinue">Guardar en descargas</string>
 </resources>

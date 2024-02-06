@@ -21,6 +21,7 @@ import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.sync.TestSyncFixtures.jsonRecoveryKeyEncoded
 import com.duckduckgo.sync.impl.Clipboard
+import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.ui.ShowCodeViewModel.Command
 import com.duckduckgo.sync.impl.ui.ShowCodeViewModel.ViewState
@@ -50,14 +51,14 @@ internal class ShowCodeViewModelTest {
 
     @Test
     fun whenUserClicksOnCopyCodeThenClipboardIsCopied() = runTest {
-        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(jsonRecoveryKeyEncoded)
+        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(jsonRecoveryKeyEncoded))
         testee.onCopyCodeClicked()
         verify(clipboard).copyToClipboard(jsonRecoveryKeyEncoded)
     }
 
     @Test
     fun whenViewStateInitializedButNoRecoveryCodeThenShowError() = runTest {
-        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(null)
+        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Error())
         testee.viewState().test {
             awaitItem()
         }
@@ -68,7 +69,7 @@ internal class ShowCodeViewModelTest {
 
     @Test
     fun whenViewStateInitializedThenViewIsUpdated() = runTest {
-        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(jsonRecoveryKeyEncoded)
+        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(jsonRecoveryKeyEncoded))
         testee.viewState().test {
             assertEquals(ViewState(jsonRecoveryKeyEncoded), awaitItem())
         }

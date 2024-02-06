@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,13 +25,17 @@ import android.os.Build
 import androidx.core.content.FileProvider
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.downloads.api.DownloadsFileActions
+import com.squareup.anvil.annotations.ContributesBinding
 import java.io.File
 import javax.inject.Inject
 import timber.log.Timber
 
-class DownloadsFileActions @Inject constructor(private val appBuildConfig: AppBuildConfig) {
+@ContributesBinding(AppScope::class)
+class RealDownloadsFileActions @Inject constructor(private val appBuildConfig: AppBuildConfig) : DownloadsFileActions {
 
-    fun openFile(applicationContext: Context, file: File): Boolean {
+    override fun openFile(applicationContext: Context, file: File): Boolean {
         val intent = createIntentToOpenFile(applicationContext, file)
         return applicationContext.packageManager?.let { packageManager ->
             if (intent.resolveActivity(packageManager) != null) {
@@ -44,7 +48,7 @@ class DownloadsFileActions @Inject constructor(private val appBuildConfig: AppBu
             ?: false
     }
 
-    fun shareFile(applicationContext: Context, file: File): Boolean {
+    override fun shareFile(applicationContext: Context, file: File): Boolean {
         val intent = createShareIntent(applicationContext, file)
         return if (intent != null) startActivity(applicationContext, intent) else false
     }
