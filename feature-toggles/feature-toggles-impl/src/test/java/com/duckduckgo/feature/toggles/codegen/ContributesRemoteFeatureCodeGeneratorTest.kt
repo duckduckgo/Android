@@ -1575,7 +1575,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 }
 
-private class FakeVariantManager : VariantManager {
+internal class FakeVariantManager : VariantManager {
     var saveVariantsCallCounter = 0
     var variant: String? = null
 
