@@ -32,7 +32,6 @@ private val sites = listOf(
     "bbc.com",
     "ebay.com",
     "espn.com",
-    "nytimes.com",
     "reddit.com",
     "twitch.tv",
     "twitter.com",
