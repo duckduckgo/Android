@@ -28,6 +28,8 @@
     <string name="sync_recovery_pdf_error">Unable to create the recovery PDF.</string>
     <string name="sync_dialog_error_ok">OK</string>
     <string name="sync_dialog_error_title">Sync &amp; Backup</string>
+    <string name="sync_encryption_not_supported_error_title">Device not supported</string>
+    <string name="sync_encryption_not_supported_error">Sync &amp; Backup is end-to-end encrypted, and needs to be able to encrypt and store data on your device. Because your device does not support encrypted storage, Sync &amp; Backup is unavailable.</string>
 
     <!-- Internal Setting -->
     <string name="sync_internal_activity_label">Sync Setup Internal</string>

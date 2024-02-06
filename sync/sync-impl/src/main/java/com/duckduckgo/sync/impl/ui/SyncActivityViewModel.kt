@@ -48,6 +48,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroCreateAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowDeviceUnsupported
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.LoadingItem
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.SyncedDevice
@@ -80,7 +81,9 @@ class SyncActivityViewModel @Inject constructor(
 
     private val command = Channel<Command>(1, DROP_OLDEST)
     private val viewState = MutableStateFlow(ViewState())
-    fun commands(): Flow<Command> = command.receiveAsFlow()
+    fun commands(): Flow<Command> = command.receiveAsFlow().onStart {
+        checkIfDeviceSupported()
+    }
 
     fun viewState(): Flow<ViewState> =
         viewState.onStart {
@@ -101,6 +104,15 @@ class SyncActivityViewModel @Inject constructor(
             syncEngine.triggerSync(FEATURE_READ)
         }.flowOn(dispatchers.io())
             .launchIn(viewModelScope)
+    }
+
+    private suspend fun checkIfDeviceSupported() {
+        val isSupported = withContext(dispatchers.io()) {
+            syncAccountRepository.isSyncSupported()
+        }
+        if (!isSupported) {
+            command.send(ShowDeviceUnsupported)
+        }
     }
 
     private suspend fun signedInState(): ViewState {
@@ -161,6 +173,7 @@ class SyncActivityViewModel @Inject constructor(
         data class AskRemoveDevice(val device: ConnectedDevice) : Command()
         data class AskEditDevice(val device: ConnectedDevice) : Command()
         data class ShowError(@StringRes val message: Int, val reason: String = "") : Command()
+        object ShowDeviceUnsupported : Command()
     }
 
     fun onSyncWithAnotherDevice() {

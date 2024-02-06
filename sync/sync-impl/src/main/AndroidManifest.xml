@@ -72,6 +72,13 @@
             android:parentActivityName=".ui.SyncActivity"/>
 
         <activity
+            android:name=".ui.DeviceUnsupportedActivity"
+            android:exported="false"
+            android:label="@string/sync_screen_title"
+            android:screenOrientation="portrait"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"/>
+
+        <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="portrait"
             tools:replace="screenOrientation" />

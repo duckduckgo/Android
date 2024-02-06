@@ -109,6 +109,7 @@ class AppSyncDeviceIdsTest {
             override var token: String? = "token"
             override var primaryKey: String? = "primaryKey"
             override var secretKey: String? = "secretKey"
+            override fun isEncryptionSupported() = true
 
             override fun isSignedInFlow() = emptyFlow<Boolean>()
 
@@ -140,6 +141,8 @@ class AppSyncDeviceIdsTest {
             override var token: String? = null
             override var primaryKey: String? = null
             override var secretKey: String? = null
+            override fun isEncryptionSupported() = true
+
             override fun isSignedInFlow() = emptyFlow<Boolean>()
 
             override fun isSignedIn(): Boolean = false

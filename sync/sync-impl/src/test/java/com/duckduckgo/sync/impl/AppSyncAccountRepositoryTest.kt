@@ -476,6 +476,15 @@ class AppSyncAccountRepositoryTest {
         assertTrue(result is Result.Success)
     }
 
+    @Test
+    fun whenEncryptionNotSupportedThenSyncNotSupported() {
+        whenever(syncStore.isEncryptionSupported()).thenReturn(false)
+
+        val result = syncRepo.isSyncSupported()
+
+        assertFalse(result)
+    }
+
     private fun prepareForLoginSuccess() {
         prepareForEncryption()
         whenever(syncDeviceIds.deviceId()).thenReturn(deviceId)

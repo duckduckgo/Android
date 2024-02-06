@@ -17,6 +17,7 @@ interface SyncStore {
     var token: String?
     var primaryKey: String?
     var secretKey: String?
+    fun isEncryptionSupported(): Boolean
     fun isSignedInFlow(): Flow<Boolean>
     fun isSignedIn(): Boolean
     fun storeCredentials(
@@ -132,6 +133,8 @@ constructor(
                 }
             }
         }
+
+    override fun isEncryptionSupported(): Boolean = encryptedPreferences != null
 
     override fun isSignedInFlow(): Flow<Boolean> = isSignedInStateFlow
 

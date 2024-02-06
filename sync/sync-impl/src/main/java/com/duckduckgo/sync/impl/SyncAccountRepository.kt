@@ -45,6 +45,7 @@ import timber.log.Timber
 
 interface SyncAccountRepository {
 
+    fun isSyncSupported(): Boolean
     fun createAccount(): Result<Boolean>
     fun isSignedIn(): Boolean
     fun processCode(stringCode: String): Result<Boolean>
@@ -73,6 +74,10 @@ class AppSyncAccountRepository @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
 ) : SyncAccountRepository {
+
+    override fun isSyncSupported(): Boolean {
+        return syncStore.isEncryptionSupported()
+    }
 
     override fun createAccount(): Result<Boolean> {
         if (isSignedIn()) {
