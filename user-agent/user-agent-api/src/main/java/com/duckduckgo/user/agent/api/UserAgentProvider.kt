@@ -17,6 +17,7 @@
 package com.duckduckgo.user.agent.api
 
 import android.webkit.WebSettings
+import com.duckduckgo.feature.toggles.api.Toggle
 
 interface UserAgentProvider {
     /**
@@ -42,4 +43,9 @@ interface UserAgentInterceptor {
      * @return a string with the new user agent
      */
     fun intercept(userAgent: String): String
+}
+
+interface ClientBrandHintFeature {
+    @Toggle.DefaultValue(false)
+    fun self(): Toggle
 }

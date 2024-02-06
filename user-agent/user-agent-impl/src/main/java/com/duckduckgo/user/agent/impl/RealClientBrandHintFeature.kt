@@ -18,14 +18,11 @@ package com.duckduckgo.user.agent.impl
 
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.user.agent.api.ClientBrandHintFeature
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
     featureName = "clientBrandHint",
+    boundType = ClientBrandHintFeature::class
 )
-
-interface ClientBrandHintFeature {
-    @Toggle.DefaultValue(false)
-    fun self(): Toggle
-}
+interface RealClientBrandHintFeature

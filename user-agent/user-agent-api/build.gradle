@@ -32,7 +32,7 @@ kotlin {
 
 dependencies {
     implementation project(':common-utils')
-
+    implementation project(':feature-toggles-api')
     implementation AndroidX.webkit
 }
 

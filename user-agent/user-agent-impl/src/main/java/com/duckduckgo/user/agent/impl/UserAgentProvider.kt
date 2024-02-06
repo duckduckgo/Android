@@ -36,6 +36,7 @@ import com.duckduckgo.privacy.config.api.DefaultPolicy.DDG
 import com.duckduckgo.privacy.config.api.DefaultPolicy.DDG_FIXED
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.UserAgent
+import com.duckduckgo.user.agent.api.ClientBrandHintFeature
 import com.duckduckgo.user.agent.api.UserAgentInterceptor
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.squareup.anvil.annotations.ContributesBinding
