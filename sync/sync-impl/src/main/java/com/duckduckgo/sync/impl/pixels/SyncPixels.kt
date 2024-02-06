@@ -68,6 +68,7 @@ interface SyncPixels {
 
     fun fireSyncAccountErrorPixel(
         result: Error,
+        type: SyncAccountOperation,
     )
 }
 
@@ -114,12 +115,65 @@ class RealSyncPixels @Inject constructor(
         pixel.fire(SyncPixelName.SYNC_SIGNUP_DIRECT)
     }
 
-    override fun fireSyncAccountErrorPixel(result: Error) {
+    override fun fireSyncAccountErrorPixel(
+        result: Error,
+        type: SyncAccountOperation,
+    ) {
+        when (type) {
+            SyncAccountOperation.SIGNUP -> fireSignupErrorPixel(result)
+            SyncAccountOperation.LOGIN -> fireLoginErrorPixel(result)
+            SyncAccountOperation.LOGOUT -> fireLogoutErrorPixel(result)
+            SyncAccountOperation.UPDATE_DEVICE -> fireUpdateDeviceErrorPixel(result)
+            SyncAccountOperation.REMOVE_DEVICE -> fireRemoveDeviceErrorPixel(result)
+            SyncAccountOperation.DELETE_ACCOUNT -> fireDeleteAccountErrorPixel(result)
+            SyncAccountOperation.USER_SIGNED_IN -> fireAlreadySignedInErrorPixel(result)
+            SyncAccountOperation.CREATE_PDF -> fireSaveRecoveryPdfErrorPixel(result)
+            SyncAccountOperation.GENERIC -> fireSyncAccountErrorPixel(result)
+        }
+    }
+
+    private fun fireSyncAccountErrorPixel(result: Error) {
+        result.fireAddingErrorAsParams(SyncPixelName.SYNC_ACCOUNT_FAILURE)
+    }
+
+    private fun fireSignupErrorPixel(result: Error) {
+        result.fireAddingErrorAsParams(SyncPixelName.SYNC_SIGN_UP_FAILURE)
+    }
+
+    private fun fireLoginErrorPixel(result: Error) {
+        result.fireAddingErrorAsParams(SyncPixelName.SYNC_LOGIN_FAILURE)
+    }
+
+    private fun fireLogoutErrorPixel(result: Error) {
+        result.fireAddingErrorAsParams(SyncPixelName.SYNC_LOGOUT_FAILURE)
+    }
+
+    private fun fireUpdateDeviceErrorPixel(result: Error) {
+        result.fireAddingErrorAsParams(SyncPixelName.SYNC_UPDATE_DEVICE_FAILURE)
+    }
+
+    private fun fireRemoveDeviceErrorPixel(result: Error) {
+        result.fireAddingErrorAsParams(SyncPixelName.SYNC_REMOVE_DEVICE_FAILURE)
+    }
+
+    private fun fireDeleteAccountErrorPixel(result: Error) {
+        result.fireAddingErrorAsParams(SyncPixelName.SYNC_DELETE_ACCOUNT_FAILURE)
+    }
+
+    private fun fireAlreadySignedInErrorPixel(result: Error) {
+        result.fireAddingErrorAsParams(SyncPixelName.SYNC_USER_SIGNED_IN_FAILURE)
+    }
+
+    private fun fireSaveRecoveryPdfErrorPixel(result: Error) {
+        result.fireAddingErrorAsParams(SyncPixelName.SYNC_CREATE_PDF_FAILURE)
+    }
+
+    private fun Error.fireAddingErrorAsParams(pixelName: SyncPixelName) {
         pixel.fire(
-            SyncPixelName.SYNC_ACCOUNT_FAILURE,
+            pixelName,
             mapOf(
-                SyncPixelParameters.ERROR_CODE to result.code.toString(),
-                SyncPixelParameters.ERROR_REASON to result.reason,
+                SyncPixelParameters.ERROR_CODE to this.code.toString(),
+                SyncPixelParameters.ERROR_REASON to this.reason,
             ),
         )
     }
@@ -152,6 +206,18 @@ class RealSyncPixels @Inject constructor(
     }
 }
 
+enum class SyncAccountOperation {
+    GENERIC,
+    SIGNUP,
+    LOGIN,
+    LOGOUT,
+    UPDATE_DEVICE,
+    REMOVE_DEVICE,
+    DELETE_ACCOUNT,
+    USER_SIGNED_IN,
+    CREATE_PDF,
+}
+
 // https://app.asana.com/0/72649045549333/1205649300615861
 enum class SyncPixelName(override val pixelName: String) : Pixel.PixelName {
     SYNC_DAILY("m_sync_daily"),
@@ -161,6 +227,14 @@ enum class SyncPixelName(override val pixelName: String) : Pixel.PixelName {
     SYNC_SIGNUP_DIRECT("m_sync_signup_direct"),
     SYNC_SIGNUP_CONNECT("m_sync_signup_connect"),
     SYNC_ACCOUNT_FAILURE("m_sync_account_failure"),
+    SYNC_SIGN_UP_FAILURE("m_sync_signup_error"),
+    SYNC_LOGIN_FAILURE("m_sync_login_error"),
+    SYNC_LOGOUT_FAILURE("m_sync_logout_error"),
+    SYNC_UPDATE_DEVICE_FAILURE("m_update_device_error"),
+    SYNC_REMOVE_DEVICE_FAILURE("m_remove_device_error"),
+    SYNC_DELETE_ACCOUNT_FAILURE("m_delete_account_error"),
+    SYNC_USER_SIGNED_IN_FAILURE("m_login_existing_account_error"),
+    SYNC_CREATE_PDF_FAILURE("m_sync_create_recovery_pdf_error"),
 }
 
 object SyncPixelParameters {

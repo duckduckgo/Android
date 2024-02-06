@@ -174,4 +174,6 @@ enum class API_CODE(val code: Int) {
     VALIDATION_ERROR(400),
     TOO_MANY_REQUESTS_1(429),
     TOO_MANY_REQUESTS_2(418),
+    NOT_FOUND(404),
+    GONE(410),
 }
