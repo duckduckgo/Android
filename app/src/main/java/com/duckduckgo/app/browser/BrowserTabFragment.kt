@@ -2252,6 +2252,9 @@ class BrowserTabFragment :
     private fun configureWebViewForAutofill(it: DuckDuckGoWebView) {
         browserAutofill.addJsInterface(it, autofillCallback, this, null, tabId)
 
+        WebViewCompat.addWebMessageListener(it, "craig", setOf("*")
+        ) { webView, webMessage, uri, isMainFrame, reply -> Timber.w("cdr received a web message [${webMessage.data}] from JS layer, from main frame? $isMainFrame from url $uri")}
+
         // called once per webview init
 
         if(WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
