@@ -40,9 +40,10 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 import com.duckduckgo.sync.crypto.EncryptResult
 import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.store.SyncStore
+import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.test.runTest
 import org.jsoup.Jsoup
-import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -103,14 +104,14 @@ class SavedSitesParserTest {
 
     @Test
     fun whenSomeBookmarksExistThenHtmlIsGenerated() = runTest {
-        val bookmark = SavedSite.Bookmark(
+        val bookmark = Bookmark(
             id = "bookmark1",
             title = "example",
             url = "www.example.com",
             SavedSitesNames.BOOKMARKS_ROOT,
             lastModified = "timestamp",
         )
-        val favorite = SavedSite.Favorite(id = "fav1", title = "example", url = "www.example.com", lastModified = "timestamp", 0)
+        val favorite = Favorite(id = "fav1", title = "example", url = "www.example.com", lastModified = "timestamp", 0)
 
         val node = TreeNode(FolderTreeItem(SavedSitesNames.BOOKMARKS_ROOT, RealSavedSitesParser.BOOKMARKS_FOLDER, "", null, 0))
         node.add(TreeNode(FolderTreeItem(bookmark.id, bookmark.title, bookmark.parentId, bookmark.url, 1)))
@@ -134,7 +135,7 @@ class SavedSitesParserTest {
             "    </DL><p>\n" +
             "</DL><p>\n"
 
-        Assert.assertEquals(expectedHtml, result)
+        assertEquals(expectedHtml, result)
     }
 
     @Test
@@ -144,7 +145,7 @@ class SavedSitesParserTest {
         val result = parser.generateHtml(node, emptyList())
         val expectedHtml = ""
 
-        Assert.assertEquals(expectedHtml, result)
+        assertEquals(expectedHtml, result)
     }
 
     @Test
@@ -154,7 +155,7 @@ class SavedSitesParserTest {
 
         val bookmarks = parser.parseHtml(document, repository)
 
-        Assert.assertTrue(bookmarks.isEmpty())
+        assertTrue(bookmarks.isEmpty())
     }
 
     @Test
@@ -164,15 +165,16 @@ class SavedSitesParserTest {
 
         val bookmarks = parser.parseHtml(document, repository).filterIsInstance<Bookmark>()
 
-        Assert.assertEquals(17, bookmarks.size)
+        assertEquals(17, bookmarks.size)
 
         val firstBookmark = bookmarks.first()
-        Assert.assertEquals("https://support.mozilla.org/en-US/products/firefox", (firstBookmark as Bookmark).url)
-        Assert.assertEquals("Get Help", firstBookmark.title)
+        assertEquals("https://support.mozilla.org/en-US/products/firefox", firstBookmark.url)
+        assertEquals("Get Help", firstBookmark.title)
 
         val lastBookmark = bookmarks.last()
-        Assert.assertEquals("https://www.mozilla.org/en-US/firefox/central/", (lastBookmark as Bookmark).url)
-        Assert.assertEquals("Getting Started", lastBookmark.title)
+        assertEquals("https://www.mozilla.org/en-US/firefox/central/", lastBookmark.url)
+        assertEquals("Getting Started", lastBookmark.title)
+        assertEquals(SavedSitesNames.BOOKMARKS_ROOT, bookmarks[13].parentId)
     }
 
     @Test
@@ -182,18 +184,18 @@ class SavedSitesParserTest {
 
         val bookmarks = parser.parseHtml(document, repository).filterIsInstance<Bookmark>()
 
-        Assert.assertEquals(12, bookmarks.size)
+        assertEquals(12, bookmarks.size)
 
         val firstBookmark = bookmarks.first()
-        Assert.assertEquals(
+        assertEquals(
             "https://www.theguardian.com/international",
-            (firstBookmark as Bookmark).url,
+            firstBookmark.url,
         )
-        Assert.assertEquals("News, sport and opinion from the Guardian's global edition | The Guardian", firstBookmark.title)
+        assertEquals("News, sport and opinion from the Guardian's global edition | The Guardian", firstBookmark.title)
 
         val lastBookmark = bookmarks.last()
-        Assert.assertEquals("https://www.macrumors.com/", (lastBookmark as Bookmark).url)
-        Assert.assertEquals("MacRumors: Apple News and Rumors", lastBookmark.title)
+        assertEquals("https://www.macrumors.com/", lastBookmark.url)
+        assertEquals("MacRumors: Apple News and Rumors", lastBookmark.title)
     }
 
     @Test
@@ -203,18 +205,19 @@ class SavedSitesParserTest {
 
         val bookmarks = parser.parseHtml(document, repository).filterIsInstance<Bookmark>()
 
-        Assert.assertEquals(12, bookmarks.size)
+        assertEquals(12, bookmarks.size)
 
         val firstBookmark = bookmarks.first()
-        Assert.assertEquals(
+        assertEquals(
             "https://www.theguardian.com/international",
-            (firstBookmark as Bookmark).url,
+            firstBookmark.url,
         )
-        Assert.assertEquals("News, sport and opinion from the Guardian's global edition | The Guardian", firstBookmark.title)
+        assertEquals("News, sport and opinion from the Guardian's global edition | The Guardian", firstBookmark.title)
 
         val lastBookmark = bookmarks.last()
-        Assert.assertEquals("https://www.macrumors.com/", (lastBookmark as Bookmark).url)
-        Assert.assertEquals("MacRumors: Apple News and Rumors", lastBookmark.title)
+        assertEquals("https://www.macrumors.com/", lastBookmark.url)
+        assertEquals("MacRumors: Apple News and Rumors", lastBookmark.title)
+        assertEquals(SavedSitesNames.BOOKMARKS_ROOT, bookmarks[9].parentId)
     }
 
     @Test
@@ -224,18 +227,19 @@ class SavedSitesParserTest {
 
         val bookmarks = parser.parseHtml(document, repository).filterNot { it is BookmarkFolder }
 
-        Assert.assertEquals(13, bookmarks.size)
+        assertEquals(13, bookmarks.size)
 
         val firstBookmark = bookmarks.first()
-        Assert.assertEquals(
+        assertEquals(
             "https://www.theguardian.com/international",
             (firstBookmark as Bookmark).url,
         )
-        Assert.assertEquals("News, sport and opinion from the Guardian's global edition | The Guardian", firstBookmark.title)
+        assertEquals("News, sport and opinion from the Guardian's global edition | The Guardian", firstBookmark.title)
 
         val lastBookmark = bookmarks.last()
-        Assert.assertEquals("https://www.apple.com/uk/", (lastBookmark as Favorite).url)
-        Assert.assertEquals("Apple (United Kingdom)", lastBookmark.title)
+        assertEquals("https://www.apple.com/uk/", (lastBookmark as Favorite).url)
+        assertEquals("Apple (United Kingdom)", lastBookmark.title)
+        assertEquals(SavedSitesNames.BOOKMARKS_ROOT, (bookmarks[9] as Bookmark).parentId)
     }
 
     @Test
@@ -245,18 +249,20 @@ class SavedSitesParserTest {
 
         val bookmarks = parser.parseHtml(document, repository).filterIsInstance<Bookmark>()
 
-        Assert.assertEquals(13, bookmarks.size)
+        assertEquals(13, bookmarks.size)
 
         val firstBookmark = bookmarks.first()
-        Assert.assertEquals(
+        assertEquals(
             "https://www.theguardian.com/international",
-            (firstBookmark as Bookmark).url,
+            firstBookmark.url,
         )
-        Assert.assertEquals("News, sport and opinion from the Guardian's global edition | The Guardian", firstBookmark.title)
+        assertEquals("News, sport and opinion from the Guardian's global edition | The Guardian", firstBookmark.title)
 
         val lastBookmark = bookmarks.last()
-        Assert.assertEquals("https://www.apple.com/uk/", (lastBookmark as Bookmark).url)
-        Assert.assertEquals("Apple (United Kingdom)", lastBookmark.title)
+        assertEquals("https://www.apple.com/uk/", lastBookmark.url)
+        assertEquals("Apple (United Kingdom)", lastBookmark.title)
+        assertEquals(SavedSitesNames.BOOKMARKS_ROOT, bookmarks[9].parentId)
+        assertEquals(SavedSitesNames.BOOKMARKS_ROOT, bookmarks[12].parentId)
     }
 
     @Test
@@ -266,18 +272,19 @@ class SavedSitesParserTest {
 
         val bookmarks = parser.parseHtml(document, repository).filterIsInstance<Bookmark>()
 
-        Assert.assertEquals(14, bookmarks.size)
+        assertEquals(14, bookmarks.size)
 
         val firstBookmark = bookmarks.first()
-        Assert.assertEquals(
+        assertEquals(
             "https://www.apple.com/uk",
-            (firstBookmark as Bookmark).url,
+            firstBookmark.url,
         )
-        Assert.assertEquals("Apple", firstBookmark.title)
+        assertEquals("Apple", firstBookmark.title)
 
         val lastBookmark = bookmarks.last()
-        Assert.assertEquals("https://www.macrumors.com/", (lastBookmark as Bookmark).url)
-        Assert.assertEquals("MacRumors: Apple News and Rumors", lastBookmark.title)
+        assertEquals("https://www.macrumors.com/", lastBookmark.url)
+        assertEquals("MacRumors: Apple News and Rumors", lastBookmark.title)
+        assertEquals(SavedSitesNames.BOOKMARKS_ROOT, bookmarks[11].parentId)
     }
 
     @Test
@@ -287,12 +294,12 @@ class SavedSitesParserTest {
 
         val savedSites = parser.parseHtml(document, repository)
 
-        val favorites = savedSites.filterIsInstance<SavedSite.Favorite>()
-        val bookmarks = savedSites.filterIsInstance<SavedSite.Bookmark>()
+        val favorites = savedSites.filterIsInstance<Favorite>()
+        val bookmarks = savedSites.filterIsInstance<Bookmark>()
 
-        Assert.assertEquals(12, savedSites.size)
-        Assert.assertEquals(3, favorites.size)
-        Assert.assertEquals(9, bookmarks.size)
+        assertEquals(12, savedSites.size)
+        assertEquals(3, favorites.size)
+        assertEquals(9, bookmarks.size)
     }
 
     @Test
@@ -333,11 +340,11 @@ class SavedSitesParserTest {
                     val link = linkItem.attr("href")
                     val title = linkItem.text()
                     if (inFavorite) {
-                        savedSites.add(SavedSite.Favorite("favorite1", title = title, url = link, "timestamp", favorites))
+                        savedSites.add(Favorite("favorite1", title = title, url = link, "timestamp", favorites))
                         favorites++
                     } else {
                         savedSites.add(
-                            SavedSite.Bookmark(
+                            Bookmark(
                                 "bookmark1",
                                 title = title,
                                 url = link,
@@ -350,11 +357,11 @@ class SavedSitesParserTest {
             }
         }
 
-        val favoritesLists = savedSites.filterIsInstance<SavedSite.Favorite>()
-        val bookmarks = savedSites.filterIsInstance<SavedSite.Bookmark>()
+        val favoritesLists = savedSites.filterIsInstance<Favorite>()
+        val bookmarks = savedSites.filterIsInstance<Bookmark>()
 
-        Assert.assertEquals(12, savedSites.size)
-        Assert.assertEquals(3, favoritesLists.size)
-        Assert.assertEquals(9, bookmarks.size)
+        assertEquals(12, savedSites.size)
+        assertEquals(3, favoritesLists.size)
+        assertEquals(9, bookmarks.size)
     }
 }

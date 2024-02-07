@@ -136,7 +136,7 @@ class RealSavedSitesParser : SavedSitesParser {
         if (children.size > 1) {
             rootElement = Element("DL").appendChildren(children)
         }
-        return parseElement(rootElement, "", savedSitesRepository, mutableListOf(), false)
+        return parseElement(rootElement, SavedSitesNames.BOOKMARKS_ROOT, savedSitesRepository, mutableListOf(), false)
     }
 
     private fun parseElement(
