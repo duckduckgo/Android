@@ -143,4 +143,21 @@
     <string name="credentialManagementClearNeverForThisSiteDialogPositiveButton">Нулиране</string>
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Отмени</string>
 
+    <string name="credentialManagementDeleteAllPasswordsMenu">Изтриване на всички пароли</string>
+    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Сигурни ли сте, че искате да изтриете %1$d парола?</item>
+        <item quantity="other">Сигурни ли сте, че искате да изтриете %1$d пароли?</item>
+    </plurals>
+
+    <string name="credentialManagementDeletePasswordConfirmationMessage">Вашата парола ще бъде изтрита от всички синхронизирани устройства. Уверете се, че все още имате друг начин за достъп до акаунта си.</string>
+    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Вашите пароли ще бъдат изтрити от всички синхронизирани устройства. Уверете се, че все още имате друг начин за достъп до Вашите акаунти.</string>
+
+    <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
+        <item quantity="one">%1$d изтрита парола</item>
+        <item quantity="other">%1$d изтрити пароли</item>
+    </plurals>
+
+    <string name="autofill_auth_text_for_delete_all">Удостоверете се, за да потвърдите, че искате да изтриете всички пароли</string>
+    <string name="autofill_title_text_for_delete_all">Изтриване на всички пароли</string>
+
 </resources>
