@@ -243,6 +243,7 @@ import com.duckduckgo.common.utils.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.common.utils.webview.enableDarkMode
 import com.duckduckgo.common.utils.webview.enableLightMode
+import com.duckduckgo.contentscopescripts.impl.RealContentScopeScripts.Companion.userPreferences
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_DELAY
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_LENGTH
@@ -2255,7 +2256,20 @@ class BrowserTabFragment :
 
         if(WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
             launch(dispatchers.io()) {
+
+                val platform = """
+                    userPreferences = {
+                        "debug": false,
+                        "platform": {
+                            "name": "android"
+                        }
+                    }
+                """.trimIndent()
+
                 val js = autofillJavascriptLoader.getAutofillJavascript()
+                    .replace("// INJECT userPreferences HERE", platform)
+                    .also { Timber.w("cdr init config is $it") }
+
                 WebViewCompat.addDocumentStartJavaScript(it, js, setOf("*"))
             }
         } else {

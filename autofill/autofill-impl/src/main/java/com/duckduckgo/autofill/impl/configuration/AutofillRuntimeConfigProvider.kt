@@ -31,7 +31,7 @@ import timber.log.Timber
 
 interface AutofillRuntimeConfigProvider {
     suspend fun getRuntimeConfiguration(
-        rawJs: String,
+        //rawJs: String,
         url: String?,
     ): String
 }
@@ -47,7 +47,7 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
     private val neverSavedSiteRepository: NeverSavedSiteRepository,
 ) : AutofillRuntimeConfigProvider {
     override suspend fun getRuntimeConfiguration(
-        rawJs: String,
+        //rawJs: String,
         url: String?,
     ): String {
         Timber.v("BrowserAutofill: getRuntimeConfiguration called")
@@ -63,11 +63,22 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
         )
         val availableInputTypes = generateAvailableInputTypes(url)
 
-        return rawJs
-            .replace("// INJECT contentScope HERE", contentScope)
-            .replace("// INJECT userUnprotectedDomains HERE", userUnprotectedDomains)
-            .replace("// INJECT userPreferences HERE", userPreferences)
-            .replace("// INJECT availableInputTypes HERE", availableInputTypes)
+        return """
+            {
+              $contentScope,
+              $userPreferences,
+              $availableInputTypes,
+              $userUnprotectedDomains
+            }
+        """.trimIndent().also {
+            Timber.w("cdr generated json config $it")
+        }
+
+        // return rawJs
+        //     .replace("// INJECT contentScope HERE", contentScope)
+        //     .replace("// INJECT userUnprotectedDomains HERE", userUnprotectedDomains)
+        //     .replace("// INJECT userPreferences HERE", userPreferences)
+        //     .replace("// INJECT availableInputTypes HERE", availableInputTypes)
     }
 
     private suspend fun generateAvailableInputTypes(url: String?): String {
@@ -77,7 +88,7 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
         val json = runtimeConfigurationWriter.generateResponseGetAvailableInputTypes(credentialsAvailable, emailAvailable).also {
             Timber.v("availableInputTypes for %s: \n%s", url, it)
         }
-        return "availableInputTypes = $json"
+        return """"availableInputTypes" : $json"""
     }
 
     private suspend fun determineIfCredentialsAvailable(url: String?): AvailableInputTypeCredentials {

@@ -53,6 +53,7 @@ class AutofillWebViewMessagePoster @Inject constructor(
                     return@withContext
                 }
 
+                Timber.v("cdr posting webmessage to webview: $message")
                 WebViewCompat.postWebMessage(wv, WebMessageCompat(message), WILDCARD_ORIGIN_URL)
             }
         }

@@ -20,6 +20,7 @@ import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
+import com.duckduckgo.autofill.api.BrowserAutofill.Configurator
 import com.duckduckgo.autofill.api.Callback
 import com.duckduckgo.autofill.api.EmailProtectionInContextSignupFlowListener
 import com.duckduckgo.autofill.api.EmailProtectionUserPromptListener
@@ -66,7 +67,7 @@ import timber.log.Timber
 interface AutofillJavascriptInterface {
 
     @JavascriptInterface
-    fun getAutofillConfig(data: String)
+    fun getAutofillConfig()
 
     @JavascriptInterface
     fun getAutofillData(requestString: String)
@@ -117,6 +118,7 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
     private val loginDeduplicator: AutofillLoginDeduplicator,
     private val systemAutofillServiceSuppressor: SystemAutofillServiceSuppressor,
     private val neverSavedSiteRepository: NeverSavedSiteRepository,
+    private val autofillConfigurator : Configurator,
 ) : AutofillJavascriptInterface {
 
     override var callback: Callback? = null
@@ -133,8 +135,14 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
     private val emailProtectionInContextSignupJob = ConflatedJob()
 
     @JavascriptInterface
-    override fun getAutofillConfig(data: String) {
+    override fun getAutofillConfig() {
         Timber.w("cdr getAutofillConfig called")
+
+        coroutineScope.launch(dispatcherProvider.io()) {
+            webView?.let { wv ->
+                autofillConfigurator.configureAutofillForCurrentPage(wv, currentUrlProvider.currentUrl(webView))
+            }
+        }
     }
 
     @JavascriptInterface

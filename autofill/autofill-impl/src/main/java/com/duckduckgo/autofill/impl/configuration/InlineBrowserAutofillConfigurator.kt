@@ -19,6 +19,7 @@ import android.webkit.WebView
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.BrowserAutofill.Configurator
+import com.duckduckgo.autofill.impl.jsbridge.AutofillMessagePoster
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -36,6 +37,7 @@ class InlineBrowserAutofillConfigurator @Inject constructor(
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
     private val autofillCapabilityChecker: AutofillCapabilityChecker,
     private val autofillJavascriptLoader: AutofillJavascriptLoader,
+    private val messagePoster: AutofillMessagePoster,
 ) : Configurator {
     override fun configureAutofillForCurrentPage(
         webView: WebView,
@@ -45,11 +47,20 @@ class InlineBrowserAutofillConfigurator @Inject constructor(
             if (canJsBeInjected(url)) {
                 Timber.v("Injecting autofill JS into WebView for %s", url)
 
-                val rawJs = autofillJavascriptLoader.getAutofillJavascript()
-                val formatted = autofillRuntimeConfigProvider.getRuntimeConfiguration(rawJs, url)
+                //val rawJs = autofillJavascriptLoader.getAutofillJavascript()
+                val formatted = autofillRuntimeConfigProvider.getRuntimeConfiguration(url)
+                val fullJs = """
+                    {
+                       "type": "getAutofillConfigResponse",
+                       "success" : $formatted
+                    }
+                """.trimIndent().also {
+                    Timber.w("cdr json to send $it")
+                }
 
                 withContext(dispatchers.main()) {
-                    webView.evaluateJavascript("javascript:$formatted", null)
+                    messagePoster.postMessage(webView, fullJs)
+                    //webView.evaluateJavascript("javascript:$formatted", null)
                 }
             } else {
                 Timber.v("Won't inject autofill JS into WebView for: %s", url)
