@@ -139,5 +139,4 @@
     <string name="sync_notification_channel_name">Sincronizzazione</string>
     <string name="sync_notify_me_title">Le notifiche sono disabilitate</string>
     <string name="sync_notify_me_description">Ricevi una notifica nel caso in cui Sincronizzazione e backup riscontri un errore.</string>
-    <string name="sync_rollout_banner_text">Sincronizzazione e backup viene implementata gradualmente e potrebbe non essere ancora disponibile in DuckDuckGo sugli altri dispositivi che possiedi</string>
 </resources>

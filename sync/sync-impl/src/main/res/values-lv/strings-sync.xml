@@ -139,5 +139,4 @@
     <string name="sync_notification_channel_name">Sinhronizēt</string>
     <string name="sync_notify_me_title">Paziņojumi ir atspējoti</string>
     <string name="sync_notify_me_description">Saņem paziņojumu, ja sinhronizācijas un dublēšanas laikā rodas kļūda.</string>
-    <string name="sync_rollout_banner_text">Sinhronizācija un dublēšana tiek ieviesta pakāpeniski, un tā var vēl nebūt pieejama DuckDuckGo citās ierīcēs</string>
 </resources>

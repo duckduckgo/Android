@@ -139,5 +139,4 @@
     <string name="sync_notification_channel_name">Синхронизация</string>
     <string name="sync_notify_me_title">Уведомления отключены</string>
     <string name="sync_notify_me_description">Позволяет получать уведомления об ошибках при синхронизации и резервном копировании.</string>
-    <string name="sync_rollout_banner_text">Внедрение функции «Синхронизация и резервное копирование» в DuckDuckGo выполняется постепенно, поэтому она доступна не на всех устройствах.</string>
 </resources>

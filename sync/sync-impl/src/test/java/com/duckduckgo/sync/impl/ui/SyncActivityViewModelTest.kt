@@ -23,7 +23,6 @@ import com.duckduckgo.sync.TestSyncFixtures
 import com.duckduckgo.sync.TestSyncFixtures.connectedDevice
 import com.duckduckgo.sync.TestSyncFixtures.deviceId
 import com.duckduckgo.sync.TestSyncFixtures.jsonRecoveryKeyEncoded
-import com.duckduckgo.sync.TestSyncFixtures.qrBitmap
 import com.duckduckgo.sync.api.SyncState
 import com.duckduckgo.sync.api.SyncState.IN_PROGRESS
 import com.duckduckgo.sync.api.SyncState.OFF
@@ -31,7 +30,6 @@ import com.duckduckgo.sync.api.SyncState.READY
 import com.duckduckgo.sync.api.SyncStateMonitor
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
-import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.RecoveryCodePDF
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Result.Success
@@ -73,7 +71,6 @@ class SyncActivityViewModelTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    private val qrEncoder: QREncoder = mock()
     private val recoveryPDF: RecoveryCodePDF = mock()
     private val syncAccountRepository: SyncAccountRepository = mock()
     private val syncStateMonitor: SyncStateMonitor = mock()
@@ -88,7 +85,6 @@ class SyncActivityViewModelTest {
     @Before
     fun before() {
         testee = SyncActivityViewModel(
-            qrEncoder = qrEncoder,
             syncAccountRepository = syncAccountRepository,
             dispatchers = coroutineTestRule.testDispatcherProvider,
             syncStateMonitor = syncStateMonitor,
@@ -132,7 +128,7 @@ class SyncActivityViewModelTest {
 
         testee.viewState().test {
             val viewState = expectMostRecentItem()
-            assertTrue(viewState.loginQRCode != null)
+            assertTrue(viewState.showAccount)
 
             verify(syncEngine).triggerSync(FEATURE_READ)
             cancelAndIgnoreRemainingEvents()
@@ -425,16 +421,6 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenOnShowTextCodeClickedThenEmitCommandShowTextCode() = runTest {
-        testee.onShowTextCodeClicked()
-
-        testee.commands().test {
-            awaitItem().assertCommandType(Command.ShowTextCode::class)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
     fun whenOnDeviceConnectedThenFetchRemoteDevices() = runTest {
         givenAuthenticatedUser()
 
@@ -566,6 +552,5 @@ class SyncActivityViewModelTest {
         whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(jsonRecoveryKeyEncoded))
         whenever(syncAccountRepository.getThisConnectedDevice()).thenReturn(connectedDevice)
         whenever(syncAccountRepository.getConnectedDevices()).thenReturn(Success(listOf(connectedDevice)))
-        whenever(qrEncoder.encodeAsBitmap(any(), any(), any())).thenReturn(qrBitmap())
     }
 }

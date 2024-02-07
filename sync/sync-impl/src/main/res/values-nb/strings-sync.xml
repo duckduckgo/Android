@@ -139,5 +139,4 @@
     <string name="sync_notification_channel_name">Synkr.</string>
     <string name="sync_notify_me_title">Varsler er deaktivert</string>
     <string name="sync_notify_me_description">Få varsel hvis det skulle oppstå en feil ved synkronisering og sikkerhetskopiering.</string>
-    <string name="sync_rollout_banner_text">Synkronisering og sikkerhetskopiering rulles ut gradvis og er kanskje ikke tilgjengelig ennå i DuckDuckGo på dine andre enheter</string>
 </resources>

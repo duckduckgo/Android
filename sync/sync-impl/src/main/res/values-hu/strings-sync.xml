@@ -139,5 +139,4 @@
     <string name="sync_notification_channel_name">Szinkronizálás</string>
     <string name="sync_notify_me_title">Az értesítések le vannak tiltva</string>
     <string name="sync_notify_me_description">Értesítést kaphatsz, ha a szinkronizálás és biztonsági mentés funkció hibát észlel.</string>
-    <string name="sync_rollout_banner_text">A szinkronizálás és biztonsági mentés funkció fokozatosan kerül bevezetésre, és előfordulhat, hogy a többi eszköz DuckDuckGo alkalmazásában még nem érhető el</string>
 </resources>

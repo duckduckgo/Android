@@ -41,14 +41,6 @@
         app:contentOrientation="start"
         app:sharedPrefsKeyForDismiss="key_component_dismissed_in_sync_settings" />
 
-
-    <com.duckduckgo.common.ui.view.InfoPanel
-        style="@style/Widget.DuckDuckGo.InfoPanel"
-        android:layout_margin="@dimen/keyline_4"
-        app:panelBackground="@drawable/info_panel_tooltip_background"
-        app:panelDrawable="@drawable/ic_info_panel_info"
-        app:panelText="@string/sync_rollout_banner_text"/>
-
     <com.duckduckgo.sync.impl.ui.SyncDisabledView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
@@ -73,49 +65,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/sync_new_device_section_title"
-        app:primaryTextTruncated="true" />
-
-    <ImageView
-        android:id="@+id/qrCodeImageView"
-        android:layout_width="@dimen/qrSizeLarge"
-        android:layout_height="@dimen/qrSizeLarge"
-        android:layout_gravity="center"
-        android:visibility="gone"
-        tools:ignore="ContentDescription" />
-
-    <com.duckduckgo.common.ui.view.text.DaxTextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/keyline_4"
-        android:text="@string/sync_new_device_hint"
-        app:textType="secondary"
-        app:typography="body2" />
-
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-        android:id="@+id/showTextCodeItem"
+        android:id="@+id/syncAnotherDeviceItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:leadingIcon="@drawable/ic_code_24"
-        app:leadingIconBackground="circular"
-        app:primaryText="@string/sync_show_text_code_item"
+        app:primaryText="@string/sync_setup_with_another_device_cta_title"
         app:primaryTextTruncated="true" />
-
-    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-        android:id="@+id/scanQrCodeItem"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:leadingIcon="@drawable/ic_camera_photos_24"
-        app:leadingIconBackground="circular"
-        app:primaryText="@string/sync_show_qr_code_item"
-        app:primaryTextTruncated="true"/>
 
     <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:layout_width="match_parent"
