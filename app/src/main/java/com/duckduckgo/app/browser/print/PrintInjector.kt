@@ -49,6 +49,5 @@ class PrintInjectorJS @Inject constructor() : PrintInjector {
             this.initted = true
             WebViewCompat.addDocumentStartJavaScript(webView, "window.print = function() { ${PrintJavascriptInterface.JAVASCRIPT_INTERFACE_NAME}.print() }", setOf("*"))
         }
-        // webView.loadUrl("javascript:window.print = function() { ${PrintJavascriptInterface.JAVASCRIPT_INTERFACE_NAME}.print() }")
     }
 }

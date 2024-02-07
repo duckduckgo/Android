@@ -34,6 +34,7 @@ class ContentScopeScriptsJsInjectorPlugin @Inject constructor(
     override fun onInit(webView: WebView, site: Site?) {
         script?.let {
             it.remove()
+            script = null
         }
         // if (coreContentScopeScripts.isEnabled()) {
         script = WebViewCompat.addDocumentStartJavaScript(webView, "${coreContentScopeScripts.getScript(site)}", setOf("*"))

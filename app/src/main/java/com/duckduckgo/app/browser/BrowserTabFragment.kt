@@ -2168,6 +2168,8 @@ class BrowserTabFragment :
 
         webView?.let {
             it.webViewClient = webViewClient
+            webViewClient.reloadJSIfNeeded(it)
+
             it.webChromeClient = webChromeClient
 
             it.settings.apply {
