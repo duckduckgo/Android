@@ -99,8 +99,6 @@ class RealAutoconsent @Inject constructor(
     }
 
     private fun canBeInjected(): Boolean {
-        // Remove comment to promote feature
-        // return isEnabled() && (settingsRepository.userSetting || !settingsRepository.firstPopupHandled)
         return isEnabled() && settingsRepository.userSetting
     }
 
