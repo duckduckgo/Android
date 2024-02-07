@@ -17,6 +17,7 @@
 package com.duckduckgo.autoconsent.impl
 
 import android.webkit.WebView
+import androidx.webkit.WebViewCompat
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
@@ -44,10 +45,12 @@ class RealAutoconsent @Inject constructor(
 ) : Autoconsent {
 
     private lateinit var autoconsentJs: String
+    private var initted: Boolean = false
 
     override fun injectAutoconsent(webView: WebView, url: String) {
-        if (canBeInjected() && !urlInUserAllowList(url) && !isAnException(url)) {
-            webView.evaluateJavascript("javascript:${getFunctionsJS()}", null)
+        if (canBeInjected() && !urlInUserAllowList(url) && !isAnException(url) && !this.initted) {
+            this.initted = true
+            WebViewCompat.addDocumentStartJavaScript(webView, "${getFunctionsJS()}", setOf("*"))
         }
     }
 

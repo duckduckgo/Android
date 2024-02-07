@@ -17,6 +17,7 @@
 package com.duckduckgo.contentscopescripts.impl
 
 import android.webkit.WebView
+import androidx.webkit.ScriptHandler
 import androidx.webkit.WebViewCompat
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.browser.api.JsInjectorPlugin
@@ -28,9 +29,14 @@ import javax.inject.Inject
 class ContentScopeScriptsJsInjectorPlugin @Inject constructor(
     private val coreContentScopeScripts: CoreContentScopeScripts,
 ) : JsInjectorPlugin {
+    private var script: ScriptHandler? = null
+
     override fun onInit(webView: WebView, site: Site?) {
+        script?.let {
+            it.remove()
+        }
         // if (coreContentScopeScripts.isEnabled()) {
-            WebViewCompat.addDocumentStartJavaScript(webView, "debugger;${coreContentScopeScripts.getScript(site)}", setOf("*"))
+        script = WebViewCompat.addDocumentStartJavaScript(webView, "${coreContentScopeScripts.getScript(site)}", setOf("*"))
         // }
     }
 

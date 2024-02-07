@@ -1056,6 +1056,10 @@ class BrowserTabFragment :
                         // want to ensure that we aren't offering to inject credentials from an inactive tab
                         hideDialogWithTag(CredentialAutofillPickerDialog.TAG)
                     }
+                    if (isActiveTab) {
+                        // TODO jkt
+                        webView?.let { it1 -> webViewClient.reloadJSIfNeeded(it1) }
+                    }
                 }
             },
         )

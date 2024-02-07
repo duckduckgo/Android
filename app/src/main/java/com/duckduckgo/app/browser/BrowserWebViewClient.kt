@@ -318,6 +318,13 @@ class BrowserWebViewClient @Inject constructor(
         webView.settings.mediaPlaybackRequiresUserGesture = mediaPlayback.doesMediaPlaybackRequireUserGestureForUrl(url)
     }
 
+    fun reloadJSIfNeeded (webView: WebView) {
+        // TODO check config was outdated here
+        jsPlugins.getPlugins().forEach {
+            it.onInit(webView, webViewClientListener?.getSite())
+        }
+    }
+
     @UiThread
     override fun onPageFinished(
         webView: WebView,

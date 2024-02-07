@@ -44,6 +44,7 @@ dependencies {
     implementation project(path: ':navigation-api')
 
     implementation AndroidX.appCompat
+    implementation AndroidX.webkit
     implementation JakeWharton.timber
     implementation KotlinX.coroutines.core
     implementation Google.android.material
