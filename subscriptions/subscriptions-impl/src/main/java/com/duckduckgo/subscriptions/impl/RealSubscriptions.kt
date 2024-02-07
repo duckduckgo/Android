@@ -17,6 +17,7 @@
 package com.duckduckgo.subscriptions.impl
 
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.api.Subscriptions.EntitlementStatus
 import com.duckduckgo.subscriptions.api.Subscriptions.EntitlementStatus.Found
@@ -35,9 +36,9 @@ class RealSubscriptions @Inject constructor(
         }
     }
 
-    override suspend fun getEntitlementStatus(product: String): Result<EntitlementStatus> {
+    override suspend fun getEntitlementStatus(product: Product): Result<EntitlementStatus> {
         return when (val result = subscriptionsManager.getSubscriptionData()) {
-            is SubscriptionsData.Success -> result.entitlements.firstOrNull { it.product == product }?.run {
+            is SubscriptionsData.Success -> result.entitlements.firstOrNull { it.product == product.value }?.run {
                 Result.success(Found)
             } ?: Result.success(NotFound)
 

@@ -29,10 +29,16 @@ interface Subscriptions {
      * This method returns a [true] if a  given [product] can be found in the entitlements list or [false] otherwise
      * @return [Boolean]
      */
-    suspend fun getEntitlementStatus(product: String): Result<EntitlementStatus>
+    suspend fun getEntitlementStatus(product: Product): Result<EntitlementStatus>
 
     sealed class EntitlementStatus {
         data object Found : EntitlementStatus()
         data object NotFound : EntitlementStatus()
     }
+}
+
+enum class Product(val value: String) {
+    NetP("Network Protection"),
+    ITR("Identity Theft Restoration"),
+    PIR("Data Broker Protection"),
 }

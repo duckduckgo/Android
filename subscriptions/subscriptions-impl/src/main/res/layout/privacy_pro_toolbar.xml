@@ -16,12 +16,12 @@
   -->
 
 <com.google.android.material.appbar.AppBarLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto">
+        android:theme="@style/Widget.DuckDuckGo.ToolbarTheme">
 
     <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
@@ -33,18 +33,18 @@
 
         <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/logoToolbar"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                app:srcCompat="@drawable/logo_medium" />
+                app:srcCompat="@drawable/ic_subs_toolbar_logo"/>
         <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/titleToolbar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:typography="body2"
+                app:typography="h2"
                 android:layout_gravity="center"
                 android:layout_marginStart="@dimen/keyline_5"
-                app:textType="secondary"
+                app:textType="primary"
                 android:text="@string/privacyPro"
         />
     </androidx.appcompat.widget.Toolbar>
