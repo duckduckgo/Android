@@ -121,6 +121,11 @@ class InlineBrowserAutofillTest {
 
         var lastAction: Actions? = null
 
+        override fun getAutofillConfig(data: String) {
+
+
+        }
+
         override fun getAutofillData(requestString: String) {
             lastAction = GetAutoFillData(requestString)
         }

@@ -300,7 +300,7 @@ class BrowserWebViewClient @Inject constructor(
             webViewClientListener?.pageRefreshed(url)
         }
         lastPageStarted = url
-        browserAutofillConfigurator.configureAutofillForCurrentPage(webView, url)
+        //browserAutofillConfigurator.configureAutofillForCurrentPage(webView, url)
         jsPlugins.getPlugins().forEach {
             it.onPageStarted(webView, url, webViewClientListener?.getSite())
         }

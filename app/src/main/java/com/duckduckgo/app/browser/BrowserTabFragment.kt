@@ -78,6 +78,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.webkit.WebViewCompat
+import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
@@ -214,6 +215,7 @@ import com.duckduckgo.autofill.api.dialog.AutofillOverlappingDialogDetector
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.api.emailprotection.EmailInjector
+import com.duckduckgo.autofill.impl.configuration.AutofillJavascriptLoader
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.store.BrowserAppTheme
@@ -458,6 +460,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var privacyProtectionsPopupFactory: PrivacyProtectionsPopupFactory
+
+    @Inject
+    lateinit var autofillJavascriptLoader: AutofillJavascriptLoader
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -2192,10 +2197,6 @@ class BrowserTabFragment :
                 }
             }
 
-            // WebViewCompat.addDocumentStartJavaScript(it, "alert(1)", setOf("*"))
-            // WebViewCompat.addDocumentStartJavaScript(webView, "alert(2),${coreContentScopeScripts.getScript(site)}", setOf("*"))
-
-
             it.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
                 viewModel.requestFileDownload(url, contentDisposition, mimeType, true)
             }
@@ -2249,6 +2250,17 @@ class BrowserTabFragment :
 
     private fun configureWebViewForAutofill(it: DuckDuckGoWebView) {
         browserAutofill.addJsInterface(it, autofillCallback, this, null, tabId)
+
+        // called once per webview init
+
+        if(WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
+            launch(dispatchers.io()) {
+                val js = autofillJavascriptLoader.getAutofillJavascript()
+                WebViewCompat.addDocumentStartJavaScript(it, js, setOf("*"))
+            }
+        } else {
+            Timber.e("cdr document start script not supported")
+        }
 
         autofillFragmentResultListeners.getPlugins().forEach { plugin ->
             setFragmentResultListener(plugin.resultKey(tabId)) { _, result ->

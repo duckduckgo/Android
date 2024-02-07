@@ -66,6 +66,9 @@ import timber.log.Timber
 interface AutofillJavascriptInterface {
 
     @JavascriptInterface
+    fun getAutofillConfig(data: String)
+
+    @JavascriptInterface
     fun getAutofillData(requestString: String)
 
     @JavascriptInterface
@@ -128,6 +131,11 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
     private val storeFormDataJob = ConflatedJob()
     private val injectCredentialsJob = ConflatedJob()
     private val emailProtectionInContextSignupJob = ConflatedJob()
+
+    @JavascriptInterface
+    override fun getAutofillConfig(data: String) {
+        Timber.w("cdr getAutofillConfig called")
+    }
 
     @JavascriptInterface
     override fun getAutofillData(requestString: String) {
