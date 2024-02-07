@@ -57,7 +57,7 @@
                 android:id="@+id/custom_dns_heading"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Use DuckDuckGo VPN or specify custom DNS server. Only IPv4 public address supported." />
+                android:text="@string/netpCustomDnsHeading" />
 
             <RadioGroup
                     android:layout_width="match_parent"
@@ -72,13 +72,13 @@
                         android:id="@+id/default_dns_option"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Default"
+                        android:text="@string/netpCustomDnsDefault"
                         android:checked="true" />
 
                 <RadioButton
                         android:id="@+id/custom_dns_option"
                         android:layout_width="wrap_content"
-                        android:text="Custom"
+                        android:text="@string/netpCustomDnsCustom"
                         android:layout_height="wrap_content" />
 
             </RadioGroup>
@@ -88,7 +88,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="@dimen/keyline_4"
-                android:hint="Enter DNS server IP address"
+                android:hint="@string/netpCustomDnsInputAddressHint"
+                app:type="ip_address"
                 app:editable="true" />
 
             <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
@@ -97,7 +98,7 @@
                     android:layout_height="wrap_content"
                     android:enabled="false"
                     app:buttonSize="large"
-                    android:text="Apply"/>
+                    android:text="@string/netpCustomDnsApply"/>
         </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>
