@@ -143,4 +143,21 @@
     <string name="credentialManagementClearNeverForThisSiteDialogPositiveButton">Återställ</string>
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Avbryt</string>
 
+    <string name="credentialManagementDeleteAllPasswordsMenu">Radera alla lösenord</string>
+    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Är du säker på att du vill radera %1$d lösenord?</item>
+        <item quantity="other">Är du säker på att du vill radera %1$d lösenord?</item>
+    </plurals>
+
+    <string name="credentialManagementDeletePasswordConfirmationMessage">Ditt lösenord kommer att raderas från alla synkroniserade enheter. Se till att du har kvar ett sätt att komma åt ditt konto.</string>
+    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Dina lösenord raderas från alla synkroniserade enheter. Se till att du har kvar ett sätt att komma åt dina konton.</string>
+
+    <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
+        <item quantity="one">%1$d lösenord raderat</item>
+        <item quantity="other">%1$d lösenord raderade</item>
+    </plurals>
+
+    <string name="autofill_auth_text_for_delete_all">Autentisera för att bekräfta att du vill radera alla lösenord</string>
+    <string name="autofill_title_text_for_delete_all">Radera alla lösenord</string>
+
 </resources>
