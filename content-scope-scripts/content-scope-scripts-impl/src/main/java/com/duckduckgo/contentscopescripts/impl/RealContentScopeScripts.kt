@@ -35,7 +35,7 @@ import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 
 interface CoreContentScopeScripts {
-    fun getScript(site: Site?): String
+    fun getScript(): String
     fun isEnabled(): Boolean
 
     val secret: String
@@ -71,7 +71,7 @@ class RealContentScopeScripts @Inject constructor(
     override val javascriptInterface: String = getSecret()
     override val callbackName: String = getSecret()
 
-    override fun getScript(site: Site?): String {
+    override fun getScript(): String {
         var updateJS = false
 
         val pluginParameters = getPluginParameters()
@@ -92,7 +92,7 @@ class RealContentScopeScripts @Inject constructor(
             updateJS = true
         }
 
-        val userPreferencesJson = getUserPreferencesJson(pluginParameters.preferences, site)
+        val userPreferencesJson = getUserPreferencesJson(pluginParameters.preferences)
         if (cachedUserPreferencesJson != userPreferencesJson) {
             cachedUserPreferencesJson = userPreferencesJson
             updateJS = true
@@ -176,8 +176,8 @@ class RealContentScopeScripts @Inject constructor(
         return jsonAdapter.toJson(unprotectedTemporaryExceptions)
     }
 
-    private fun getUserPreferencesJson(userPreferences: String, site: Site?): String {
-        val isDesktopMode = site?.isDesktopMode ?: false
+    private fun getUserPreferencesJson(userPreferences: String): String {
+        val isDesktopMode = false // TODO fix via message passing.
         val defaultParameters = "${getVersionNumberKeyValuePair()},${getPlatformKeyValuePair()},${getSessionKeyValuePair()}," +
             "${getDesktopModeKeyValuePair(isDesktopMode)},$messagingParameters"
         if (userPreferences.isEmpty()) {

@@ -31,14 +31,14 @@ class ContentScopeScriptsJsInjectorPlugin @Inject constructor(
 ) : JsInjectorPlugin {
     private var script: ScriptHandler? = null
 
-    override fun onInit(webView: WebView, site: Site?) {
+    override fun onInit(webView: WebView) {
         script?.let {
             it.remove()
             script = null
         }
-        // if (coreContentScopeScripts.isEnabled()) {
-        script = WebViewCompat.addDocumentStartJavaScript(webView, "${coreContentScopeScripts.getScript(site)}", setOf("*"))
-        // }
+        if (coreContentScopeScripts.isEnabled()) {
+            script = WebViewCompat.addDocumentStartJavaScript(webView, "${coreContentScopeScripts.getScript()}", setOf("*"))
+        }
     }
 
     override fun onPageStarted(webView: WebView, url: String?, site: Site?) {

@@ -315,7 +315,7 @@ class BrowserWebViewClient @Inject constructor(
     fun reloadJSIfNeeded (webView: WebView) {
         // TODO check config was outdated here
         jsPlugins.getPlugins().forEach {
-            it.onInit(webView, webViewClientListener?.getSite())
+            it.onInit(webView)
         }
     }
 

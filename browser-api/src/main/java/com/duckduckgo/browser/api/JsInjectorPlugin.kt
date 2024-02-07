@@ -24,7 +24,7 @@ interface JsInjectorPlugin {
     /**
      * On init of webview this is called and receives a [webView] instance.
      */
-    fun onInit(webView: WebView, site: Site?)
+    fun onInit(webView: WebView)
 
     /**
      * This method is called during onPageStarted and receives a [webView] instance, the [url] of the website and the [site]
