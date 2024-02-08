@@ -143,4 +143,21 @@
     <string name="credentialManagementClearNeverForThisSiteDialogPositiveButton">Zurücksetzen</string>
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Abbrechen</string>
 
+    <string name="credentialManagementDeleteAllPasswordsMenu">Alle Passwörter löschen</string>
+    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Möchtest du dieses %1$d Passwort wirklich löschen?</item>
+        <item quantity="other">Möchtest du diese %1$d Passwörter wirklich löschen?</item>
+    </plurals>
+
+    <string name="credentialManagementDeletePasswordConfirmationMessage">Dein Passwort wird von allen synchronisierten Geräten gelöscht. Vergewissere dich, dass du weiterhin eine Möglichkeit hast, auf dein Konto zuzugreifen.</string>
+    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Deine Passwörter werden von allen synchronisierten Geräten gelöscht. Vergewissere dich, dass du weiterhin eine Möglichkeit hast, auf deine Konten zuzugreifen.</string>
+
+    <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
+        <item quantity="one">%1$d Passwort gelöscht</item>
+        <item quantity="other">%1$d Passwörter gelöscht</item>
+    </plurals>
+
+    <string name="autofill_auth_text_for_delete_all">Authentifiziere dich, um zu bestätigen, dass du alle Passwörter löschen willst</string>
+    <string name="autofill_title_text_for_delete_all">Alle Passwörter löschen</string>
+
 </resources>
