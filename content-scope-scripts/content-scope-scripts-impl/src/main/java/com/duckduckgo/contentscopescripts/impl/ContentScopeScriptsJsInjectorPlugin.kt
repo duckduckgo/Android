@@ -30,15 +30,25 @@ class ContentScopeScriptsJsInjectorPlugin @Inject constructor(
     private val coreContentScopeScripts: CoreContentScopeScripts,
 ) : JsInjectorPlugin {
     private var script: ScriptHandler? = null
+    private var currentScriptString: String? = null
 
-    override fun onInit(webView: WebView) {
+    fun reloadJSIfNeeded(webView: WebView) {
+        var scriptString = coreContentScopeScripts.getScript()
+        if (scriptString == currentScriptString) {
+            return
+        }
         script?.let {
             it.remove()
             script = null
         }
         if (coreContentScopeScripts.isEnabled()) {
-            script = WebViewCompat.addDocumentStartJavaScript(webView, "${coreContentScopeScripts.getScript()}", setOf("*"))
+            currentScriptString = scriptString
+            script = WebViewCompat.addDocumentStartJavaScript(webView, scriptString, setOf("*"))
         }
+    }
+
+    override fun onInit(webView: WebView) {
+        reloadJSIfNeeded(webView)
     }
 
     override fun onPageStarted(webView: WebView, url: String?, site: Site?) {
@@ -46,6 +56,6 @@ class ContentScopeScriptsJsInjectorPlugin @Inject constructor(
     }
 
     override fun onPageFinished(webView: WebView, url: String?, site: Site?) {
-        // NOOP
+        reloadJSIfNeeded(webView)
     }
 }
