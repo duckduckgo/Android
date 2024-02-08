@@ -143,4 +143,23 @@
     <string name="credentialManagementClearNeverForThisSiteDialogPositiveButton">Resetează</string>
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Anulare</string>
 
+    <string name="credentialManagementDeleteAllPasswordsMenu">Șterge toate parolele</string>
+    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Sigur dorești să ștergi %1$d parolă?</item>
+        <item quantity="few">Sigur dorești să ștergi %1$d parole?</item>
+        <item quantity="other">Sigur dorești să ștergi această %1$d de parole?</item>
+    </plurals>
+
+    <string name="credentialManagementDeletePasswordConfirmationMessage">Parola ta va fi ștearsă de pe toate dispozitivele sincronizate. Asigură-te că ai în continuare posibilitatea de a-ți accesa contul.</string>
+    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Parolele tale vor fi șterse de pe toate dispozitivele sincronizate. Asigură-te că ai în continuare posibilitatea de a-ți accesa conturile.</string>
+
+    <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
+        <item quantity="one">%1$d parolă ștearsă</item>
+        <item quantity="few">%1$d parole șterse</item>
+        <item quantity="other">%1$d de parole șterse</item>
+    </plurals>
+
+    <string name="autofill_auth_text_for_delete_all">Autentifică-te pentru a confirma că dorești să ștergi toate parolele</string>
+    <string name="autofill_title_text_for_delete_all">Șterge toate parolele</string>
+
 </resources>
