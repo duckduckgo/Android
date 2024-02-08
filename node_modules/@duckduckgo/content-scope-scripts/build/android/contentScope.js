@@ -8695,11 +8695,13 @@
      * @param {string} locale UI locale
      */
     function getConfig (locale) {
-        const locales = JSON.parse(localesJSON);
-        const fbStrings = locales[locale]['facebook.json'];
-        const ytStrings = locales[locale]['youtube.json'];
+        const allLocales = JSON.parse(localesJSON);
+        const localeStrings = allLocales[locale] || allLocales.en;
 
-        const sharedStrings = locales[locale]['shared.json'];
+        const fbStrings = localeStrings['facebook.json'];
+        const ytStrings = localeStrings['youtube.json'];
+        const sharedStrings = localeStrings['shared.json'];
+
         const config = {
             'Facebook, Inc.': {
                 informationalModal: {
