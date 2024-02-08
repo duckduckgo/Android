@@ -65,10 +65,13 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
 
         return """
             {
-              $contentScope,
-              $userPreferences,
-              $availableInputTypes,
-              $userUnprotectedDomains
+                "type": "getAutofillConfigResponse",
+                "success": {
+                    $contentScope,
+                    $userPreferences,
+                    $availableInputTypes,
+                    $userUnprotectedDomains
+                }
             }
         """.trimIndent().also {
             Timber.w("cdr generated json config $it")

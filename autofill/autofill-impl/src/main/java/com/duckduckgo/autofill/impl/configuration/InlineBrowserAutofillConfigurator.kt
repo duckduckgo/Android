@@ -55,7 +55,7 @@ class InlineBrowserAutofillConfigurator @Inject constructor(
                        "success" : $formatted
                     }
                 """.trimIndent().also {
-                    Timber.w("cdr json to send $it")
+                    Timber.w("cdr json to send ")
                 }
 
                 withContext(dispatchers.main()) {

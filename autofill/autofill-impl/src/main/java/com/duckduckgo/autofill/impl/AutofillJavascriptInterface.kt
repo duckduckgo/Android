@@ -18,6 +18,8 @@ package com.duckduckgo.autofill.impl
 
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
+import androidx.webkit.JavaScriptReplyProxy
+import androidx.webkit.WebViewFeature
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.BrowserAutofill.Configurator
@@ -66,14 +68,12 @@ import timber.log.Timber
 
 interface AutofillJavascriptInterface {
 
-    @JavascriptInterface
-    fun getAutofillConfig()
+    // @JavascriptInterface
+    // fun getAutofillConfig()
 
-    @JavascriptInterface
     fun getAutofillData(requestString: String)
 
-    @JavascriptInterface
-    fun getIncontextSignupDismissedAt(data: String)
+    fun getIncontextSignupDismissedAt(replier: JavaScriptReplyProxy)
 
     fun injectCredentials(credentials: LoginCredentials)
     fun injectNoCredentials()
@@ -119,6 +119,7 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
     private val systemAutofillServiceSuppressor: SystemAutofillServiceSuppressor,
     private val neverSavedSiteRepository: NeverSavedSiteRepository,
     private val autofillConfigurator : Configurator,
+    private val messagePoster: AutofillMessagePoster,
 ) : AutofillJavascriptInterface {
 
     override var callback: Callback? = null
@@ -134,16 +135,17 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
     private val injectCredentialsJob = ConflatedJob()
     private val emailProtectionInContextSignupJob = ConflatedJob()
 
-    @JavascriptInterface
-    override fun getAutofillConfig() {
-        Timber.w("cdr getAutofillConfig called")
-
-        coroutineScope.launch(dispatcherProvider.io()) {
-            webView?.let { wv ->
-                autofillConfigurator.configureAutofillForCurrentPage(wv, currentUrlProvider.currentUrl(webView))
-            }
-        }
-    }
+    // @JavascriptInterface
+    // override fun getAutofillConfig() {
+    //     Timber.w("cdr getAutofillConfig called")
+    //
+    //     coroutineScope.launch(dispatcherProvider.io()) {
+    //         webView?.let { wv ->
+    //             val config = autofillConfigurator.configureAutofillForCurrentPage(wv, currentUrlProvider.currentUrl(webView))
+    //
+    //         }
+    //     }
+    // }
 
     @JavascriptInterface
     override fun getAutofillData(requestString: String) {
@@ -183,13 +185,20 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
         }
     }
 
-    @JavascriptInterface
-    override fun getIncontextSignupDismissedAt(data: String) {
+    override fun getIncontextSignupDismissedAt(replier: JavaScriptReplyProxy) {
         emailProtectionInContextSignupJob += coroutineScope.launch(dispatcherProvider.io()) {
             val permanentDismissalTime = inContextDataStore.timestampUserChoseNeverAskAgain()
             val installedRecently = recentInstallChecker.isRecentInstall()
             val jsonResponse = autofillResponseWriter.generateResponseForEmailProtectionInContextSignup(installedRecently, permanentDismissalTime)
-            autofillMessagePoster.postMessage(webView, jsonResponse)
+            replier.sendReply(jsonResponse)
+        }
+    }
+
+    private fun JavaScriptReplyProxy.sendReply(message: String){
+        if(WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {
+            this.postMessage(message)
+        } else {
+            Timber.e("cdr cannot reply to web message, feature not supported")
         }
     }
 

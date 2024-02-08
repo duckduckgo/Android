@@ -19,12 +19,14 @@ package com.duckduckgo.autofill.impl.jsbridge
 import android.annotation.SuppressLint
 import android.webkit.WebView
 import androidx.core.net.toUri
+import androidx.webkit.JavaScriptReplyProxy
 import androidx.webkit.WebMessageCompat
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -34,12 +36,17 @@ interface AutofillMessagePoster {
         webView: WebView?,
         message: String,
     )
+
+    var messagePosterReplier : JavaScriptReplyProxy?
 }
 
+@SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class AutofillWebViewMessagePoster @Inject constructor(
     private val dispatchers: DispatcherProvider,
 ) : AutofillMessagePoster {
+
+    override var messagePosterReplier : JavaScriptReplyProxy? = null
 
     @SuppressLint("RequiresFeature")
     override suspend fun postMessage(
@@ -53,8 +60,14 @@ class AutofillWebViewMessagePoster @Inject constructor(
                     return@withContext
                 }
 
-                Timber.v("cdr posting webmessage to webview: $message")
-                WebViewCompat.postWebMessage(wv, WebMessageCompat(message), WILDCARD_ORIGIN_URL)
+                if(messagePosterReplier != null) {
+                    Timber.v("cdr posting reply webmessage to webview: $message")
+                    messagePosterReplier?.postMessage(message)
+                    messagePosterReplier = null
+                } else {
+                    Timber.v("cdr posting webmessage to webview: $message")
+                    WebViewCompat.postWebMessage(wv, WebMessageCompat(message), WILDCARD_ORIGIN_URL)
+                }
             }
         }
     }

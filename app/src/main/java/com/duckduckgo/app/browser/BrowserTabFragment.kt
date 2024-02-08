@@ -77,7 +77,10 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.webkit.JavaScriptReplyProxy
+import androidx.webkit.WebMessageCompat
 import androidx.webkit.WebViewCompat
+import androidx.webkit.WebViewCompat.WebMessageListener
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
@@ -216,6 +219,7 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.api.emailprotection.EmailInjector
 import com.duckduckgo.autofill.impl.configuration.AutofillJavascriptLoader
+import com.duckduckgo.autofill.impl.configuration.AutofillRuntimeConfigProvider
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.store.BrowserAppTheme
@@ -2247,9 +2251,6 @@ class BrowserTabFragment :
 
     private fun configureWebViewForAutofill(it: DuckDuckGoWebView) {
         browserAutofill.addJsInterface(it, autofillCallback, this, null, tabId)
-
-        WebViewCompat.addWebMessageListener(it, "ddgGetAutofillConfig", setOf("*")
-        ) { webView, webMessage, uri, isMainFrame, reply -> Timber.w("cdr received a web message [${webMessage.data}] from JS layer, from main frame? $isMainFrame from url $uri")}
 
         // called once per webview init
 
