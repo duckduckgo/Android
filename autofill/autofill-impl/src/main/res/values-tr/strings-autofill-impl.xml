@@ -143,4 +143,21 @@
     <string name="credentialManagementClearNeverForThisSiteDialogPositiveButton">Sıfırla</string>
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Vazgeç</string>
 
+    <string name="credentialManagementDeleteAllPasswordsMenu">Tüm Şifreleri Sil</string>
+    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Bu %1$d şifreyi silmek istediğinizden emin misiniz?</item>
+        <item quantity="other">Bu %1$d şifreyi silmek istediğinizden emin misiniz?</item>
+    </plurals>
+
+    <string name="credentialManagementDeletePasswordConfirmationMessage">Şifreniz senkronize edilen tüm cihazlardan silinecek. Hesabınıza başka bir şekilde erişebilecek olduğunuzdan emin olun.</string>
+    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Şifreleriniz senkronize edilen tüm cihazlardan silinecektir. Hesaplarınıza başka bir şekilde erişebilecek olduğunuzdan emin olun.</string>
+
+    <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
+        <item quantity="one">%1$d şifre silindi</item>
+        <item quantity="other">%1$d şifre silindi</item>
+    </plurals>
+
+    <string name="autofill_auth_text_for_delete_all">Tüm şifreleri silmek istediğinizi onaylamak için kimlik doğrulaması yapın</string>
+    <string name="autofill_title_text_for_delete_all">Tüm Şifreleri Sil</string>
+
 </resources>
