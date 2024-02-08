@@ -2,6 +2,7 @@ package com.duckduckgo.subscriptions.impl.settings.views
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.subscriptions.api.Product.PIR
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.api.Subscriptions.EntitlementStatus.Found
 import com.duckduckgo.subscriptions.api.Subscriptions.EntitlementStatus.NotFound
@@ -39,7 +40,7 @@ class PirSettingViewModelTest {
 
     @Test
     fun whenOnResumeIfEntitlementPresentEmitViewState() = runTest {
-        whenever(subscriptions.getEntitlementStatus("Data Broker Protection")).thenReturn(Result.success(Found))
+        whenever(subscriptions.getEntitlementStatus(PIR)).thenReturn(Result.success(Found))
 
         viewModel.onResume(mock())
 
@@ -51,7 +52,7 @@ class PirSettingViewModelTest {
 
     @Test
     fun whenOnResumeIfEntitlementNotPresentEmitViewState() = runTest {
-        whenever(subscriptions.getEntitlementStatus("Data Broker Protection")).thenReturn(Result.success(NotFound))
+        whenever(subscriptions.getEntitlementStatus(PIR)).thenReturn(Result.success(NotFound))
 
         viewModel.onResume(mock())
         viewModel.viewState.test {
@@ -62,7 +63,7 @@ class PirSettingViewModelTest {
 
     @Test
     fun whenOnResumeEntitlementCheckFailsDoNotEmitViewState() = runTest {
-        whenever(subscriptions.getEntitlementStatus("Data Broker Protection")).thenReturn(Result.failure(RuntimeException()))
+        whenever(subscriptions.getEntitlementStatus(PIR)).thenReturn(Result.failure(RuntimeException()))
 
         viewModel.viewState.test {
             assertFalse(awaitItem().hasSubscription)
