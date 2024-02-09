@@ -27,6 +27,7 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.extensions.launchAlwaysOnSystemSettings
 import com.duckduckgo.common.utils.extensions.launchIgnoreBatteryOptimizationSettings
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.networkprotection.impl.R
@@ -38,7 +39,10 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
-@InjectWith(ActivityScope::class)
+@InjectWith(
+    scope = ActivityScope::class,
+    delayGeneration = true, // VpnSettingPlugin can be contributed from other modules
+)
 @ContributeToActivityStarter(NetPVpnSettingsScreenNoParams::class)
 class NetPVpnSettingsActivity : DuckDuckGoActivity() {
 
@@ -47,6 +51,9 @@ class NetPVpnSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var vpnRemoteSettings: PluginPoint<VpnSettingPlugin>
 
     private val binding: ActivityNetpVpnSettingsBinding by viewBinding()
     private val viewModel: NetPVpnSettingsViewModel by bindViewModel()
@@ -57,6 +64,7 @@ class NetPVpnSettingsActivity : DuckDuckGoActivity() {
         setupToolbar(binding.toolbar)
 
         setupUiElements()
+        setupRemoteSettings()
         observeViewModel()
 
         lifecycle.addObserver(viewModel)
@@ -119,6 +127,15 @@ class NetPVpnSettingsActivity : DuckDuckGoActivity() {
         binding.geoswitching.setOnClickListener {
             globalActivityStarter.start(this, NetpGeoswitchingScreenNoParams)
         }
+    }
+
+    private fun setupRemoteSettings() {
+        vpnRemoteSettings.getPlugins()
+            .map { it.getView(this) }
+            .filterNotNull()
+            .forEach { remoteViewPlugin ->
+                binding.vpnSettingsContent.addView(remoteViewPlugin)
+            }
     }
 }
 

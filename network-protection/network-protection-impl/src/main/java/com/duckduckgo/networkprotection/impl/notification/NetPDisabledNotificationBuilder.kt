@@ -26,7 +26,7 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.TaskStackBuilder
-import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.impl.R
 import com.squareup.anvil.annotations.ContributesBinding
 import java.text.DateFormat
@@ -43,9 +43,11 @@ interface NetPDisabledNotificationBuilder {
     ): Notification
 
     fun buildDisabledByVpnNotification(context: Context): Notification
+
+    fun buildUnsafeWifiWithoutVpnNotification(context: Context): Notification
 }
 
-@ContributesBinding(VpnScope::class)
+@ContributesBinding(AppScope::class)
 class RealNetPDisabledNotificationBuilder @Inject constructor(
     private val netPNotificationActions: NetPNotificationActions,
 ) : NetPDisabledNotificationBuilder {
@@ -137,6 +139,21 @@ class RealNetPDisabledNotificationBuilder @Inject constructor(
             .setCategory(NotificationCompat.CATEGORY_STATUS)
             .addAction(netPNotificationActions.getEnableNetpNotificationAction(context))
             .addAction(netPNotificationActions.getReportIssueNotificationAction(context))
+            .setAutoCancel(false)
+            .build()
+    }
+
+    override fun buildUnsafeWifiWithoutVpnNotification(context: Context): Notification {
+        registerChannel(context)
+
+        return NotificationCompat.Builder(context, NETP_ALERTS_CHANNEL_ID)
+            .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(context.getString(R.string.netpUnsafeWifi)))
+            .setContentTitle(context.getString(R.string.netp_name))
+            .setContentIntent(getPendingIntent(context))
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setCategory(NotificationCompat.CATEGORY_STATUS)
+            .addAction(netPNotificationActions.getEnableNetpNotificationAction(context))
             .setAutoCancel(false)
             .build()
     }

@@ -51,4 +51,8 @@ class SubsNetpDisabledNotificationBuilder @Inject constructor(
 
     override fun buildDisabledByVpnNotification(context: Context): Notification =
         realNetPDisabledNotificationBuilder.buildDisabledByVpnNotification(context)
+
+    override fun buildUnsafeWifiWithoutVpnNotification(context: Context): Notification {
+        TODO("Not yet implemented")
+    }
 }
