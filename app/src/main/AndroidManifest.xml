@@ -227,6 +227,12 @@
             android:theme="@style/Theme.DuckDuckGo.Light" />
 
         <activity
+            android:name="com.duckduckgo.app.browser.customtabs.CustomTabActivity"
+            android:exported="false"
+            android:label="@string/appName"
+            android:theme="@style/Theme.DuckDuckGo.Light" />
+
+        <activity
             android:name=".BrowserActivity"
             android:configChanges="keyboardHidden|orientation|screenSize|smallestScreenSize|screenLayout|navigation|keyboard"
             android:exported="true"
@@ -465,6 +471,14 @@
             android:name="com.duckduckgo.widget.EmptyFavoritesWidgetService"
             android:exported="false"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
+
+        <service
+            android:name="com.duckduckgo.app.browser.customtabs.DuckDuckGoCustomTabService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.support.customtabs.action.CustomTabsService" />
+            </intent-filter>
+        </service>
 
         <service android:name="com.duckduckgo.app.notification.NotificationHandlerService" />
 
