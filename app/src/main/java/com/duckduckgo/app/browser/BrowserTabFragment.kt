@@ -26,7 +26,9 @@ import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.content.res.Configuration
+import android.graphics.Color
 import android.graphics.Typeface
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.*
 import android.print.PrintAttributes
@@ -273,17 +275,18 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
-import java.io.File
-import javax.inject.Inject
-import javax.inject.Named
-import javax.inject.Provider
-import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import org.json.JSONObject
 import timber.log.Timber
+import java.io.File
+import javax.inject.Inject
+import javax.inject.Named
+import javax.inject.Provider
+import kotlin.coroutines.CoroutineContext
+
 
 @InjectWith(FragmentScope::class)
 class BrowserTabFragment :
@@ -350,6 +353,8 @@ class BrowserTabFragment :
     lateinit var blobConverterInjector: BlobConverterInjector
 
     val tabId get() = requireArguments()[TAB_ID_ARG] as String
+    val tabToolbarColor get() = requireArguments()[TAB_TOOLBAR_COLOR_ARG] as Int? ?: 0
+    val tabDisplayedInCustomTabScreen get() = requireArguments()[TAB_DISPLAYED_IN_CUSTOM_TAB_SCREEN_ARG] as Boolean? ?: false
 
     @Inject
     lateinit var userAgentProvider: UserAgentProvider
@@ -803,6 +808,35 @@ class BrowserTabFragment :
         configureOmnibarQuickAccessGrid()
         configureHomeTabQuickAccessGrid()
         initPrivacyProtectionsPopup()
+
+        if (tabDisplayedInCustomTabScreen) {
+            omnibar.omniBarContainer.hide()
+            omnibar.fireIconMenu.hide()
+            omnibar.tabsMenu.hide()
+
+            omnibar.toolbar.background = ColorDrawable(tabToolbarColor)
+            omnibar.toolbarContainer.background = ColorDrawable(tabToolbarColor)
+
+            omnibar.customTabCloseIcon.show()
+            omnibar.customTabCloseIcon.setOnClickListener {
+                requireActivity().finish()
+            }
+
+            omnibar.customTabDaxIcon.show()
+
+            omnibar.customTabUrl.text = viewModel.url
+            omnibar.customTabUrl.show()
+
+            // TODO: The toolbar will have as background the color from the intent. Check if that is a dark or a light color.
+            // If that color is dark, we need to tint the "close" and the "overflow menu" icons with white.
+            // If that color is light, we need to tint the "close" and the "overflow menu" icons with black.
+            omnibar.browserMenuImageView.setColorFilter(Color.argb(255, 255, 255, 255))
+
+            requireActivity().window.navigationBarColor = tabToolbarColor
+            requireActivity().window.statusBarColor = tabToolbarColor
+
+        }
+
 
         decorator.decorateWithFeatures()
 
@@ -2996,6 +3030,8 @@ class BrowserTabFragment :
     }
 
     companion object {
+        private const val TAB_TOOLBAR_COLOR_ARG = "TAB_TOOLBAR_COLOR_ARG"
+        private const val TAB_DISPLAYED_IN_CUSTOM_TAB_SCREEN_ARG = "TAB_DISPLAYED_IN_CUSTOM_TAB_SCREEN_ARG"
         private const val TAB_ID_ARG = "TAB_ID_ARG"
         private const val URL_EXTRA_ARG = "URL_EXTRA_ARG"
         private const val SKIP_HOME_ARG = "SKIP_HOME_ARG"
@@ -3042,6 +3078,25 @@ class BrowserTabFragment :
             return fragment
         }
 
+        fun newInstanceForCustomTab(
+            tabId: String,
+            query: String? = null,
+            skipHome: Boolean,
+            toolbarColor: Int,
+        ): BrowserTabFragment {
+            val fragment = BrowserTabFragment()
+            val args = Bundle()
+            args.putString(TAB_ID_ARG, tabId)
+            args.putBoolean(SKIP_HOME_ARG, skipHome)
+            args.putInt(TAB_TOOLBAR_COLOR_ARG, toolbarColor)
+            args.putBoolean(TAB_DISPLAYED_IN_CUSTOM_TAB_SCREEN_ARG, true)
+            query.let {
+                args.putString(URL_EXTRA_ARG, query)
+            }
+            fragment.arguments = args
+            return fragment
+        }
+
         fun newInstanceFavoritesOnboarding(tabId: String): BrowserTabFragment {
             val fragment = BrowserTabFragment()
             val args = Bundle()
@@ -3067,8 +3122,8 @@ class BrowserTabFragment :
         }
 
         fun updateToolbarActionsVisibility(viewState: BrowserViewState) {
-            tabsButton?.isVisible = viewState.showTabsButton
-            fireMenuButton?.isVisible = viewState.fireButton is HighlightableButton.Visible
+            tabsButton?.isVisible = viewState.showTabsButton && !tabDisplayedInCustomTabScreen
+            fireMenuButton?.isVisible = viewState.fireButton is HighlightableButton.Visible && !tabDisplayedInCustomTabScreen
             menuButton?.isVisible = viewState.showMenuButton is HighlightableButton.Visible
 
             val targetView = if (viewState.showMenuButton.isHighlighted()) {
@@ -3118,6 +3173,7 @@ class BrowserTabFragment :
             popupMenu = BrowserPopupMenu(
                 context = requireContext(),
                 layoutInflater = layoutInflater,
+                displayedInCustomTabScreen = tabDisplayedInCustomTabScreen
             )
             val menuBinding = PopupWindowBrowserMenuBinding.bind(popupMenu.contentView)
             popupMenu.apply {
@@ -3189,6 +3245,14 @@ class BrowserTabFragment :
                 onMenuItemClicked(menuBinding.autofillMenuItem) {
                     viewModel.onAutofillMenuSelected()
                 }
+
+                onMenuItemClicked(menuBinding.openInDdgBrowserMenuItem) {
+                    val url = viewModel.url
+                    val i = Intent(Intent.ACTION_VIEW)
+                    i.setData(Uri.parse(url))
+                    startActivity(i)
+                }
+
             }
             omnibar.browserMenu.setOnClickListener {
                 viewModel.onBrowserMenuClicked()
@@ -3429,7 +3493,7 @@ class BrowserTabFragment :
                 }
 
                 renderToolbarMenus(viewState)
-                popupMenu.renderState(browserShowing, viewState)
+                popupMenu.renderState(browserShowing, viewState, tabDisplayedInCustomTabScreen)
                 renderFullscreenMode(viewState)
                 renderVoiceSearch(viewState)
                 omnibar.spacer.isVisible = viewState.showVoiceSearch && lastSeenBrowserViewState?.showClearButton ?: false

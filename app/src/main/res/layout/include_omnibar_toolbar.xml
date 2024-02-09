@@ -48,6 +48,42 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu">
 
+                <ImageView
+                    android:id="@+id/customTabCloseIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:importantForAccessibility="no"
+                    android:padding="16dp"
+                    android:paddingBottom="16dp"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="2dp"
+                    android:layout_gravity="start"
+                    app:tint="@color/white"
+                    app:srcCompat="@drawable/ic_close_24"
+                    android:visibility="gone" />
+
+                <ImageView
+                    android:id="@+id/customTabDaxIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:paddingBottom="16dp"
+                    android:paddingStart="0dp"
+                    android:paddingEnd="0dp"
+                    android:importantForAccessibility="no"
+                    android:layout_gravity="start"
+                    app:srcCompat="@drawable/ic_dax_icon"
+                    android:visibility="gone" />
+
+
+                <TextView
+                    android:id="@+id/customTabUrl"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:textColor="@color/white" />
+
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/omniBarContainer"
                     android:layout_width="match_parent"

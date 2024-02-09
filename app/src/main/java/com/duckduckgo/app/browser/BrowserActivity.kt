@@ -30,6 +30,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.VisibleForTesting
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.lifecycle.lifecycleScope
 import androidx.webkit.ServiceWorkerClientCompat
 import androidx.webkit.ServiceWorkerControllerCompat
@@ -38,6 +39,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity.Companion.SAVED_SITE_URL_EXTRA
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Query
+import com.duckduckgo.app.browser.customtabs.CustomTabActivity
 import com.duckduckgo.app.browser.databinding.ActivityBrowserBinding
 import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBinding
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
@@ -164,6 +166,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
         instanceStateBundles = CombinedInstanceState(originalInstanceState = savedInstanceState, newInstanceState = newInstanceState)
 
         super.onCreate(savedInstanceState = newInstanceState, daggerInject = false)
+
+        if (intent?.hasExtra(CustomTabsIntent.EXTRA_SESSION) == true) {
+            println("TAG_ANA new intent has session, show custom tab")
+            showCustomTab()
+        }
+
         toolbarMockupBinding = IncludeOmnibarToolbarMockupBinding.bind(binding.root)
         setContentView(binding.root)
         viewModel.viewState.observe(this) {
@@ -700,6 +708,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
         val originalInstanceState: Bundle?,
         val newInstanceState: Bundle?,
     )
+
+    private fun showCustomTab() {
+        startActivity(CustomTabActivity.intent(this, intent))
+        finish()
+    }
 }
 
 // Temporary class to keep track of latest visited tabs, keeping unique ids.
