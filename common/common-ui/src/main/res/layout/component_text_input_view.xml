@@ -163,6 +163,15 @@
             app:endIcon="@drawable/ic_copy"
             app:type="password" />
 
+        <com.duckduckgo.common.ui.view.text.DaxTextInput
+            android:id="@+id/outlinedinputtext21"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_3"
+            android:hint="Error"
+            android:text="This is an error"
+            app:editable="false"/>
+
     </LinearLayout>
 
 </androidx.core.widget.NestedScrollView>
