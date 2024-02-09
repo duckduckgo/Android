@@ -21,7 +21,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.sync.impl.Clipboard
+import com.duckduckgo.sync.api.favicons.FaviconsFetchingStore
 import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Result.Error
@@ -43,6 +43,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @ContributesViewModel(ActivityScope::class)
 class SyncInternalSettingsViewModel
@@ -51,7 +52,7 @@ constructor(
     private val syncAccountRepository: SyncAccountRepository,
     private val syncStore: SyncStore,
     private val syncEnvDataStore: SyncInternalEnvDataStore,
-    private val clipboard: Clipboard,
+    private val syncFaviconFetchingStore: FaviconsFetchingStore,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
 
@@ -275,6 +276,12 @@ constructor(
         viewModelScope.launch(dispatchers.io()) {
             authFlow(recoveryCode)
         }
+    }
+
+    fun resetFaviconsPrompt() {
+        Timber.d("Sync-Internal: Reset Favicons Prompt")
+        syncFaviconFetchingStore.isFaviconsFetchingEnabled = false
+        syncFaviconFetchingStore.promptShown = false
     }
 
     private suspend fun authFlow(

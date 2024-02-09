@@ -35,6 +35,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.faviconLocation
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
+import com.duckduckgo.sync.api.favicons.FaviconsFetchingStore
 import java.io.File
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertNull
@@ -59,6 +60,7 @@ class DuckDuckGoFaviconManagerTest {
     private val mockLocationPermissionsDao: LocationPermissionsDao = mock()
     private val mockFaviconDownloader: FaviconDownloader = mock()
     private val mockAutofillStore: AutofillStore = mock()
+    private val mockFaviconFetchingStore: FaviconsFetchingStore = mock()
     private val mockFile: File = File("test")
     private val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
 
@@ -82,6 +84,7 @@ class DuckDuckGoFaviconManagerTest {
             faviconDownloader = mockFaviconDownloader,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             autofillStore = mockAutofillStore,
+            faviconsFetchingStore = mockFaviconFetchingStore,
             context = context,
         )
     }

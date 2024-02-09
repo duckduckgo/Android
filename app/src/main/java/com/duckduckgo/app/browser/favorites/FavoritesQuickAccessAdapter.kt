@@ -191,7 +191,7 @@ class FavoritesQuickAccessAdapter(
 
         private fun loadFavicon(url: String) {
             lifecycleOwner.lifecycleScope.launch {
-                faviconManager.loadToViewFromLocalWithPlaceholder(url = url, view = binding.quickAccessFavicon)
+                faviconManager.loadToViewMaybeFromRemoteWithPlaceholder(url = url, view = binding.quickAccessFavicon)
             }
         }
 

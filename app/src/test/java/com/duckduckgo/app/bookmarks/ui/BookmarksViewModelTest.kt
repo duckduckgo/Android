@@ -33,6 +33,7 @@ import com.duckduckgo.savedsites.api.models.SavedSites
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.api.service.SavedSitesManager
 import com.duckduckgo.sync.api.engine.SyncEngine
+import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -69,6 +70,7 @@ class BookmarksViewModelTest {
     private val savedSitesManager: SavedSitesManager = mock()
     private val syncEngine: SyncEngine = mock()
     private val pixel: Pixel = mock()
+    private val faviconsFetchingPrompt: FaviconsFetchingPrompt = mock()
 
     private val bookmark =
         Bookmark(
@@ -90,6 +92,7 @@ class BookmarksViewModelTest {
             savedSitesManager,
             pixel,
             syncEngine,
+            faviconsFetchingPrompt,
             coroutineRule.testDispatcherProvider,
             coroutineRule.testScope,
         )

@@ -48,8 +48,10 @@
     <string name="sync_internal_environment_subtitle_prod">https://sync.duckduckgo.com</string>
     <string name="sync_internal_environment_subtitle_dev">https://dev-sync-use.duckduckgo.com</string>
     <string name="sync_internal_account_header">Account Settings</string>
+    <string name="sync_internal_device_header">Device Settings</string>
     <string name="sync_internal_recovery_code">Recovery code</string>
     <string name="sync_internal_recovery_code_cta">Copy Recovery code</string>
+    <string name="sync_internal_favicons_prompt_cta">Reset Favicons Prompt</string>
     <string name="userIdSectionHeader">User ID</string>
     <string name="deviceIdSectionHeader">Device Id</string>
     <string name="deviceNameSectionHeader">Device Name</string>
