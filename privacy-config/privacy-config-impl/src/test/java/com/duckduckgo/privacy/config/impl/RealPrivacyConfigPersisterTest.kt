@@ -109,8 +109,16 @@ class RealPrivacyConfigPersisterTest {
     }
 
     @Test
-    fun whenPluginPointSignatureThenReturnUniqueSignature() {
-        assertEquals(pluginPoint.signature(), pluginPoint.signature())
+    fun whenHashIsNullSignatureReturnsFeatureName() {
+        val expected = pluginPoint.getPlugins().sumOf { it.featureName.hashCode() }
+        assertEquals(expected, pluginPoint.signature())
+    }
+
+    @Test
+    fun whenHashIsNotNullSignatureReturnsHash() {
+        val pluginPoint = FakePrivacyFeaturePluginPoint(listOf(HashedFakePrivacyFeaturePlugin()))
+        val expected = pluginPoint.getPlugins().sumOf { it.hash().hashCode() }
+        assertEquals(expected, pluginPoint.signature())
     }
 
     @Test
@@ -230,7 +238,7 @@ class RealPrivacyConfigPersisterTest {
         }
     }
 
-    class FakePrivacyFeaturePlugin : PrivacyFeaturePlugin {
+    private class FakePrivacyFeaturePlugin : PrivacyFeaturePlugin {
         var count = 0
 
         override fun store(
@@ -243,6 +251,22 @@ class RealPrivacyConfigPersisterTest {
 
         override val featureName: String =
             PrivacyFeatureName.GpcFeatureName.value
+    }
+
+    private class HashedFakePrivacyFeaturePlugin : PrivacyFeaturePlugin {
+        var count = 0
+
+        override fun store(
+            featureName: String,
+            jsonString: String,
+        ): Boolean {
+            count++
+            return true
+        }
+
+        override val featureName: String = "HashedFakePrivacyFeaturePlugin"
+
+        override fun hash() = "HashedFakePrivacyFeaturePluginHash"
     }
 
     class FakePrivacyVariantManagerPlugin : PrivacyFeaturePlugin {
