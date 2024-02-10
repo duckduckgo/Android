@@ -142,7 +142,10 @@ class RealPrivacyConfigPersister @Inject constructor(
 
 @VisibleForTesting
 fun PluginPoint<PrivacyFeaturePlugin>.signature(): Int {
-    return this.getPlugins().sumOf { it.featureName.hashCode() }
+    return this.getPlugins().sumOf {
+        // use the hash() of the feature or featureName for backwards compat
+        it.hash()?.hashCode() ?: it.featureName.hashCode()
+    }
 }
 
 @Retention(AnnotationRetention.BINARY)
