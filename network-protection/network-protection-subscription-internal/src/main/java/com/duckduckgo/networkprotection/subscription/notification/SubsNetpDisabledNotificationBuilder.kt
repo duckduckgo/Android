@@ -18,7 +18,7 @@ package com.duckduckgo.networkprotection.subscription.notification
 
 import android.app.Notification
 import android.content.Context
-import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.impl.notification.NetPDisabledNotificationBuilder
 import com.duckduckgo.networkprotection.impl.notification.RealNetPDisabledNotificationBuilder
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
@@ -27,7 +27,7 @@ import com.squareup.anvil.annotations.ContributesBinding.Priority.HIGHEST
 import javax.inject.Inject
 
 @ContributesBinding(
-    scope = VpnScope::class,
+    scope = AppScope::class,
     priority = HIGHEST,
 )
 class SubsNetpDisabledNotificationBuilder @Inject constructor(
