@@ -60,3 +60,18 @@ interface TestTriggerFeature {
     @Experiment
     fun experimentDisabledByDefault(): Toggle
 }
+
+@ContributesRemoteFeature(
+    scope = TriggerTestScope::class,
+    featureName = "testFeature",
+)
+interface AnotherTestTriggerFeature {
+    @DefaultValue(false)
+    fun self(): Toggle
+
+    @DefaultValue(false)
+    fun fooFeature(): Toggle
+
+    @DefaultValue(false)
+    fun newFooFeature(): Toggle
+}
