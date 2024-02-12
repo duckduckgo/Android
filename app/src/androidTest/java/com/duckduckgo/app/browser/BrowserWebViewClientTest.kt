@@ -340,139 +340,86 @@ class BrowserWebViewClientTest {
     fun whenShouldOverrideThrowsExceptionThenRecordException() {
         val exception = RuntimeException()
         whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenThrow(exception)
-        testee.shouldOverrideUrlLoading(webView, "")
+        testee.shouldOverrideUrlLoading(webView, webResourceRequest)
         verify(crashLogger).logCrash(Crash(shortName = "m_webview_should_override", t = exception))
     }
 
     @Test
     fun whenAppLinkDetectedAndIsHandledThenReturnTrue() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
-            whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
-            whenever(webResourceRequest.isRedirect).thenReturn(false)
-            whenever(webResourceRequest.isForMainFrame).thenReturn(true)
-            whenever(listener.handleAppLink(any(), any())).thenReturn(true)
-            assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
-            verify(listener).handleAppLink(urlType, isForMainFrame = true)
-        }
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+        whenever(webResourceRequest.isRedirect).thenReturn(false)
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        whenever(listener.handleAppLink(any(), any())).thenReturn(true)
+        assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+        verify(listener).handleAppLink(urlType, isForMainFrame = true)
     }
 
     @Test
     fun whenAppLinkDetectedAndIsNotHandledThenReturnFalse() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
-            whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
-            whenever(webResourceRequest.isRedirect).thenReturn(false)
-            whenever(webResourceRequest.isForMainFrame).thenReturn(true)
-            whenever(listener.handleAppLink(any(), any())).thenReturn(false)
-            assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
-            verify(listener).handleAppLink(urlType, isForMainFrame = true)
-        }
+        val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+        whenever(webResourceRequest.isRedirect).thenReturn(false)
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        whenever(listener.handleAppLink(any(), any())).thenReturn(false)
+        assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+        verify(listener).handleAppLink(urlType, isForMainFrame = true)
     }
 
     @Test
     fun whenAppLinkDetectedAndListenerIsNullThenReturnFalse() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any()))
-                .thenReturn(SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL))
-            testee.webViewClientListener = null
-            assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
-            verify(listener, never()).handleAppLink(any(), any())
-        }
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any()))
+            .thenReturn(SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL))
+        testee.webViewClientListener = null
+        assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+        verify(listener, never()).handleAppLink(any(), any())
     }
 
     @Test
     fun whenNonHttpAppLinkDetectedAndIsHandledThenReturnTrue() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink(EXAMPLE_URL, Intent(), EXAMPLE_URL)
-            whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
-            whenever(webResourceRequest.isRedirect).thenReturn(false)
-            whenever(listener.handleNonHttpAppLink(any())).thenReturn(true)
-            whenever(webResourceRequest.isForMainFrame).thenReturn(true)
-            assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
-            verify(listener).handleNonHttpAppLink(urlType)
-        }
+        val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink(EXAMPLE_URL, Intent(), EXAMPLE_URL)
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+        whenever(webResourceRequest.isRedirect).thenReturn(false)
+        whenever(listener.handleNonHttpAppLink(any())).thenReturn(true)
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+        verify(listener).handleNonHttpAppLink(urlType)
     }
 
     @Test
     fun whenNonHttpAppLinkDetectedAndIsNotForMainframeThenOnlyReturnTrue() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink(EXAMPLE_URL, Intent(), EXAMPLE_URL)
-            whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
-            whenever(webResourceRequest.isRedirect).thenReturn(false)
-            whenever(listener.handleNonHttpAppLink(any())).thenReturn(true)
-            whenever(webResourceRequest.isForMainFrame).thenReturn(false)
-            assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
-            verifyNoInteractions(listener)
-        }
-    }
-
-    @Test
-    fun whenNonHttpAppLinkDetectedAndIsHandledOnApiLessThan24ThenReturnTrue() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-            val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink(EXAMPLE_URL, Intent(), EXAMPLE_URL)
-            whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
-            whenever(listener.handleNonHttpAppLink(any())).thenReturn(true)
-            whenever(webResourceRequest.isForMainFrame).thenReturn(true)
-            assertTrue(testee.shouldOverrideUrlLoading(webView, EXAMPLE_URL))
-            verify(listener).handleNonHttpAppLink(urlType)
-        }
+        val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink(EXAMPLE_URL, Intent(), EXAMPLE_URL)
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+        whenever(webResourceRequest.isRedirect).thenReturn(false)
+        whenever(listener.handleNonHttpAppLink(any())).thenReturn(true)
+        whenever(webResourceRequest.isForMainFrame).thenReturn(false)
+        assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+        verifyNoInteractions(listener)
     }
 
     @Test
     fun whenNonHttpAppLinkDetectedAndIsNotHandledThenReturnFalse() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink(EXAMPLE_URL, Intent(), EXAMPLE_URL)
-            whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
-            whenever(webResourceRequest.isRedirect).thenReturn(false)
-            whenever(listener.handleNonHttpAppLink(any())).thenReturn(false)
-            whenever(webResourceRequest.isForMainFrame).thenReturn(true)
-            assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
-            verify(listener).handleNonHttpAppLink(urlType)
-        }
-    }
-
-    @Test
-    fun whenNonHttpAppLinkDetectedAndIsNotHandledOnApiLessThan24ThenReturnFalse() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-            val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink(EXAMPLE_URL, Intent(), EXAMPLE_URL)
-            whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
-            whenever(listener.handleNonHttpAppLink(any())).thenReturn(false)
-            assertFalse(testee.shouldOverrideUrlLoading(webView, EXAMPLE_URL))
-            verify(listener).handleNonHttpAppLink(urlType)
-        }
+        val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink(EXAMPLE_URL, Intent(), EXAMPLE_URL)
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+        whenever(webResourceRequest.isRedirect).thenReturn(false)
+        whenever(listener.handleNonHttpAppLink(any())).thenReturn(false)
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+        verify(listener).handleNonHttpAppLink(urlType)
     }
 
     @Test
     fun whenNonHttpAppLinkDetectedAndListenerIsNullThenReturnTrue() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(
-                SpecialUrlDetector.UrlType.NonHttpAppLink(
-                    EXAMPLE_URL,
-                    Intent(),
-                    EXAMPLE_URL,
-                ),
-            )
-            testee.webViewClientListener = null
-            assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
-            verify(listener, never()).handleNonHttpAppLink(any())
-        }
-    }
-
-    @Test
-    fun whenNonHttpAppLinkDetectedAndListenerIsNullOnApiLessThan24ThenReturnTrue() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-            whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(
-                SpecialUrlDetector.UrlType.NonHttpAppLink(
-                    EXAMPLE_URL,
-                    Intent(),
-                    EXAMPLE_URL,
-                ),
-            )
-            testee.webViewClientListener = null
-            assertTrue(testee.shouldOverrideUrlLoading(webView, EXAMPLE_URL))
-            verify(listener, never()).handleNonHttpAppLink(any())
-        }
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(
+            SpecialUrlDetector.UrlType.NonHttpAppLink(
+                EXAMPLE_URL,
+                Intent(),
+                EXAMPLE_URL,
+            ),
+        )
+        testee.webViewClientListener = null
+        assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+        verify(listener, never()).handleNonHttpAppLink(any())
     }
 
     @Test

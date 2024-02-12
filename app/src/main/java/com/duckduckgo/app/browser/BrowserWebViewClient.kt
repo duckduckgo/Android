@@ -20,7 +20,6 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.net.http.SslError
 import android.net.http.SslError.SSL_UNTRUSTED
-import android.os.Build
 import android.webkit.HttpAuthHandler
 import android.webkit.RenderProcessGoneDetail
 import android.webkit.SslErrorHandler
@@ -29,7 +28,6 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
@@ -103,27 +101,14 @@ class BrowserWebViewClient @Inject constructor(
     private var start: Long? = null
 
     /**
-     * This is the new method of url overriding available from API 24 onwards
+     * This is the method of url overriding available from API 24 onwards
      */
-    @RequiresApi(Build.VERSION_CODES.N)
     override fun shouldOverrideUrlLoading(
         view: WebView,
         request: WebResourceRequest,
     ): Boolean {
         val url = request.url
         return shouldOverride(view, url, request.isForMainFrame)
-    }
-
-    /**
-     * * This is the old, deprecated method of url overriding available until API 23
-     */
-    @Suppress("OverridingDeprecatedMember")
-    override fun shouldOverrideUrlLoading(
-        view: WebView,
-        urlString: String,
-    ): Boolean {
-        val url = Uri.parse(urlString)
-        return shouldOverride(view, url, isForMainFrame = true)
     }
 
     /**
@@ -370,7 +355,6 @@ class BrowserWebViewClient @Inject constructor(
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onRenderProcessGone(
         view: WebView?,
         detail: RenderProcessGoneDetail?,

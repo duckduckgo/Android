@@ -19,10 +19,8 @@ package com.duckduckgo.app.permissions
 import android.annotation.SuppressLint
 import android.app.ActivityOptions
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.view.View
 import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -65,7 +63,6 @@ class PermissionsActivity : DuckDuckGoActivity() {
         setupToolbar(binding.includeToolbar.toolbar)
 
         configureUiEventHandlers()
-        configureAppLinksSettingVisibility()
         observeViewModel()
     }
 
@@ -80,12 +77,6 @@ class PermissionsActivity : DuckDuckGoActivity() {
         binding.includePermissions.sitePermissions.setClickListener { viewModel.onSitePermissionsClicked() }
         binding.includePermissions.notificationsSetting.setClickListener { viewModel.userRequestedToChangeNotificationsSetting() }
         binding.includePermissions.appLinksSetting.setClickListener { viewModel.userRequestedToChangeAppLinkSetting() }
-    }
-
-    private fun configureAppLinksSettingVisibility() {
-        if (appBuildConfig.sdkInt < Build.VERSION_CODES.N) {
-            binding.includePermissions.appLinksSetting.visibility = View.GONE
-        }
     }
 
     private fun observeViewModel() {
@@ -155,22 +146,10 @@ class PermissionsActivity : DuckDuckGoActivity() {
 
     @SuppressLint("InlinedApi")
     private fun launchNotificationsSettings() {
-        val settingsIntent = if (appBuildConfig.sdkInt >= Build.VERSION_CODES.O) {
-            Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                .putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
-        } else {
-            Intent(ANDROID_M_APP_NOTIFICATION_SETTINGS)
-                .putExtra(ANDROID_M_APP_PACKAGE, packageName)
-                .putExtra(ANDROID_M_APP_UID, applicationInfo.uid)
-        }
+        val settingsIntent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            .putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
 
         startActivity(settingsIntent, null)
-    }
-
-    companion object {
-        private const val ANDROID_M_APP_NOTIFICATION_SETTINGS = "android.settings.APP_NOTIFICATION_SETTINGS"
-        private const val ANDROID_M_APP_PACKAGE = "app_package"
-        private const val ANDROID_M_APP_UID = "app_uid"
     }
 }

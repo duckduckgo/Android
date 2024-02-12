@@ -308,7 +308,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
     }
 
     private fun openVPNSettings() {
-        this.launchAlwaysOnSystemSettings(appBuildConfig.sdkInt)
+        this.launchAlwaysOnSystemSettings()
     }
 
     private fun resetToggle() {

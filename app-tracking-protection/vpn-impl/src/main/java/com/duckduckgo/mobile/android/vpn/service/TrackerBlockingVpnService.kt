@@ -785,9 +785,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
 
             for (service in manager.getRunningServices(Int.MAX_VALUE)) {
                 if (TrackerBlockingVpnService::class.java.name == service.service.className) {
-                    if (Build.VERSION.SDK_INT == Build.VERSION_CODES.M) {
-                        return service.started
-                    }
                     return true
                 }
             }

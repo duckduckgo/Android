@@ -46,7 +46,8 @@ class AndroidDefaultBrowserDetector @Inject constructor(
 ) : DefaultBrowserDetector, BrowserFeatureStateReporterPlugin {
 
     override fun deviceSupportsDefaultBrowserConfiguration(): Boolean {
-        return appBuildConfig.sdkInt >= Build.VERSION_CODES.N
+        // previously was ensuring that device was >= Build.VERSION_CODES.N. Returning true here to minimize further changes.
+        return true
     }
 
     override fun isDefaultBrowser(): Boolean {

@@ -18,7 +18,6 @@ package com.duckduckgo.vpn.internal.flipper
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.os.Build
 import android.preference.PreferenceManager
 import androidx.core.content.edit
 import com.duckduckgo.di.scopes.AppScope
@@ -202,11 +201,7 @@ class PreferencesFlipperPlugin @Inject constructor(context: Context) : FlipperPl
         }
 
         private fun getDefaultSharedPreferencesName(context: Context): String {
-            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                PreferenceManager.getDefaultSharedPreferencesName(context)
-            } else {
-                context.packageName + "_preferences"
-            }
+            return PreferenceManager.getDefaultSharedPreferencesName(context)
         }
     }
 }

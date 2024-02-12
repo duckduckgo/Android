@@ -16,17 +16,16 @@
 
 package com.duckduckgo.app.browser.applinks
 
-import android.os.Build
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import junit.framework.TestCase.*
+import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertFalse
+import junit.framework.TestCase.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
-import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class DuckDuckGoAppLinksHandlerTest {
@@ -34,12 +33,10 @@ class DuckDuckGoAppLinksHandlerTest {
     private lateinit var testee: DuckDuckGoAppLinksHandler
 
     private var mockCallback: () -> Unit = mock()
-    private val appBuildConfig: AppBuildConfig = mock()
 
     @Before
     fun setup() {
-        whenever(appBuildConfig.sdkInt).thenReturn(Build.VERSION_CODES.N)
-        testee = DuckDuckGoAppLinksHandler(appBuildConfig)
+        testee = DuckDuckGoAppLinksHandler()
         testee.previousUrl = "example.com"
     }
 
