@@ -17,11 +17,11 @@
 package com.duckduckgo.app.anr
 
 import android.util.Base64
+import com.duckduckgo.app.anr.CrashPixel.APPLICATION_CRASH_GLOBAL
 import com.duckduckgo.app.anrs.store.UncaughtExceptionDao
 import com.duckduckgo.app.statistics.api.OfflinePixel
 import com.duckduckgo.app.statistics.api.PixelSender
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
-import com.duckduckgo.app.statistics.pixels.Pixel.StatisticsPixelName.APPLICATION_CRASH_GLOBAL
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding

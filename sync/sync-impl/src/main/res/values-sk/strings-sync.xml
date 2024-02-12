@@ -139,5 +139,4 @@
     <string name="sync_notification_channel_name">Synchronizácia</string>
     <string name="sync_notify_me_title">Oznámenia sú vypnuté</string>
     <string name="sync_notify_me_description">Poslať upozornenie v prípade, že sa pri Synchronizácii a zálohovaní vyskytne chyba.</string>
-    <string name="sync_rollout_banner_text">Synchronizácia a zálohovanie sa zavádza postupne a nemusí byť ešte k dispozícii v rámci DuckDuckGo vo vašich ostatných zariadeniach.</string>
 </resources>

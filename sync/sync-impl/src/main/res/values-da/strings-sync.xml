@@ -139,5 +139,4 @@
     <string name="sync_notification_channel_name">Synkronisering</string>
     <string name="sync_notify_me_title">Notifikationer er deaktiveret</string>
     <string name="sync_notify_me_description">Få besked, hvis synkronisering og sikkerhedskopiering støder på en fejl.</string>
-    <string name="sync_rollout_banner_text">Synkronisering og sikkerhedskopiering udrulles gradvist og er muligvis endnu ikke tilgængelig i DuckDuckGo på dine andre enheder</string>
 </resources>

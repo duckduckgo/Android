@@ -49,6 +49,14 @@
             android:screenOrientation="portrait"/>
 
         <activity
+            android:name=".ui.SyncWithAnotherDeviceActivity"
+            android:exported="false"
+            android:label="@string/login_screen_title"
+            android:theme="@style/Theme.DuckDuckGo.Dark"
+            android:parentActivityName=".ui.SyncActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity
             android:name=".ui.SyncConnectActivity"
             android:exported="false"
             android:label="@string/connect_screen_title"
@@ -63,13 +71,6 @@
             android:theme="@style/Theme.DuckDuckGo.Dark"
             android:screenOrientation="portrait"
             android:parentActivityName=".ui.setup.SetupAccountActivity"/>
-
-        <activity
-            android:name=".ui.ShowCodeActivity"
-            android:exported="false"
-            android:label="@string/show_code_screen_title"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".ui.SyncActivity"/>
 
         <activity
             android:name=".ui.DeviceUnsupportedActivity"

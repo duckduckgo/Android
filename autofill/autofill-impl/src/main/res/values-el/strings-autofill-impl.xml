@@ -143,4 +143,21 @@
     <string name="credentialManagementClearNeverForThisSiteDialogPositiveButton">Επαναφορά</string>
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Ακύρωση</string>
 
+    <string name="credentialManagementDeleteAllPasswordsMenu">Διαγραφή όλων των κωδικών πρόσβασης</string>
+    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Θέλετε σίγουρα να διαγράψετε %1$d κωδικούς πρόσβασης;</item>
+        <item quantity="other">Θέλετε σίγουρα να διαγράψετε %1$d κωδικούς πρόσβασης;</item>
+    </plurals>
+
+    <string name="credentialManagementDeletePasswordConfirmationMessage">Ο κωδικός πρόσβασής σας θα διαγραφεί από όλες τις συγχρονισμένες συσκευές. Βεβαιωθείτε ότι έχετε ακόμα τρόπο πρόσβασης στον λογαριασμό σας.</string>
+    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Οι κωδικοί πρόσβασής σας θα διαγραφούν από όλες τις συγχρονισμένες συσκευές. Βεβαιωθείτε ότι έχετε ακόμα τρόπο πρόσβασης στους λογαριασμούς σας.</string>
+
+    <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
+        <item quantity="one">%1$d κωδικός πρόσβασης διαγράφηκε</item>
+        <item quantity="other">%1$d κωδικοί πρόσβασης διαγράφηκαν</item>
+    </plurals>
+
+    <string name="autofill_auth_text_for_delete_all">Επαληθεύστε την ταυτότητά σας για να επιβεβαιώσετε ότι θέλετε να διαγράψετε όλους τους κωδικούς πρόσβασης</string>
+    <string name="autofill_title_text_for_delete_all">Διαγραφή όλων των κωδικών πρόσβασης</string>
+
 </resources>

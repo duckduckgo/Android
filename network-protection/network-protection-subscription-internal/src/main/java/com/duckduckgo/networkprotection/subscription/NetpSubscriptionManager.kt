@@ -18,6 +18,7 @@ package com.duckduckgo.networkprotection.subscription
 
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.subscriptions.api.Product.NetP
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.api.Subscriptions.EntitlementStatus.Found
 import com.duckduckgo.subscriptions.api.Subscriptions.EntitlementStatus.NotFound
@@ -40,16 +41,12 @@ class RealNetpSubscriptionManager @Inject constructor(
     }
 
     override suspend fun hasValidEntitlement(): Result<Boolean> = withContext(dispatcherProvider.io()) {
-        subscriptions.getEntitlementStatus(NETP_ENTITLEMENT).run {
+        subscriptions.getEntitlementStatus(NetP).run {
             if (isSuccess) {
                 Result.success(getOrDefault(NotFound) == Found)
             } else {
                 Result.failure(this.exceptionOrNull() ?: RuntimeException())
             }
         }
-    }
-
-    companion object {
-        private const val NETP_ENTITLEMENT = "Dummy"
     }
 }

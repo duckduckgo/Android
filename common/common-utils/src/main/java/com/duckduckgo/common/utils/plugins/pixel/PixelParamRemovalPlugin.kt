@@ -31,12 +31,13 @@ interface PixelParamRemovalPlugin {
     fun names(): List<Pair<String, Set<PixelParameter>>>
 
     enum class PixelParameter {
-        ATB, APP_VERSION;
+        ATB, APP_VERSION, OS_VERSION;
 
         companion object {
-            fun removeAll() = setOf(ATB, APP_VERSION)
+            fun removeAll() = setOf(ATB, APP_VERSION, OS_VERSION)
             fun removeAtb() = setOf(ATB)
             fun removeVersion() = setOf(APP_VERSION)
+            fun removeOSVersion() = setOf(APP_VERSION)
         }
     }
 }

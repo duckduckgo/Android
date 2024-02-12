@@ -50,4 +50,13 @@
     <string name="audioCaptureSoundRecorderUnavailable">Could not access sound recorder</string>
     <string name="audioCaptureSoundRecorderPermissionDeniedTitle">Allow DuckDuckGo to ask for sound recorder access on this device</string>
     <string name="audioCaptureSoundRecorderPermissionDeniedMessage">Sites can only use the sound recorder if you allow DuckDuckGo to ask for access.</string>
+
+    <!-- Sync Favicons -->
+    <string name="sync_fetch_icons_title">Fetch Bookmark Icons</string>
+    <string name="sync_fetch_icons_subtitle">Automatically download icons for your synced bookmarks.</string>
+    <string name="faviconsPromptTitle">Download Missing Icons?</string>
+    <string name="faviconsPromptMessage">Do you want this device to automatically download icons for synced bookmarks from the bookmarked websites?</string>
+    <string name="faviconsPromptPrimaryCta">Keep Bookmark Icons Updated</string>
+    <string name="faviconsPromptSecondaryCta">Not Now</string>
+
 </resources>

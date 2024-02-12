@@ -19,7 +19,6 @@ package com.duckduckgo.networkprotection.impl.waitlist
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.inputmethod.EditorInfo
-import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -60,18 +59,20 @@ class NetPWaitlistRedeemCodeActivity : DuckDuckGoActivity() {
 
     private fun configureUiEventHandlers() {
         binding.redeemButton.setOnClickListener {
-            val code = binding.redeemCode.editText?.text.toString()
+            val code = binding.redeemCode.text
             it.hideKeyboard()
             viewModel.redeemCode(code)
         }
-        binding.redeemCode.editText?.doOnTextChanged { inputText, _, _, _ ->
+
+        binding.redeemCode.doOnTextChanged { inputText, _, _, _ ->
             binding.redeemCode.error = null
             binding.redeemButton.isEnabled = !inputText.isNullOrEmpty()
         }
-        binding.redeemCode.editText?.setOnEditorActionListener { textView, actionId, keyEvent ->
+
+        binding.redeemCode.setOnEditorActionListener { textView, actionId, keyEvent ->
             if (actionId == EditorInfo.IME_ACTION_GO || keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
                 if (binding.redeemButton.isEnabled) {
-                    val code = binding.redeemCode.editText?.text.toString()
+                    val code = binding.redeemCode.text
                     textView.hideKeyboard()
                     viewModel.redeemCode(code)
                 }

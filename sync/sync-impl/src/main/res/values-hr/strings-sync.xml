@@ -139,5 +139,4 @@
     <string name="sync_notification_channel_name">Sinkronizacija</string>
     <string name="sync_notify_me_title">Obavijesti su onemogućene</string>
     <string name="sync_notify_me_description">Primi obavijest u slučaju da Sinkronizacija i sigurnosno kopiranje nailazi na pogrešku.</string>
-    <string name="sync_rollout_banner_text">Sinkronizacija i sigurnosno kopiranje postupno se uvode i možda još nisu dostupni unutar DuckDuckGoa na tvojim drugim uređajima</string>
 </resources>

@@ -23,6 +23,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.subscriptions.api.Product.ITR
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.api.Subscriptions.EntitlementStatus.Found
 import com.duckduckgo.subscriptions.api.Subscriptions.EntitlementStatus.NotFound
@@ -60,7 +61,7 @@ class ItrSettingViewModel(
     override fun onResume(owner: LifecycleOwner) {
         super.onResume(owner)
         viewModelScope.launch(dispatcherProvider.io()) {
-            subscriptions.getEntitlementStatus(ITR_PRODUCT_NAME).also {
+            subscriptions.getEntitlementStatus(ITR).also {
                 if (it.isSuccess) {
                     _viewState.emit(viewState.value.copy(hasSubscription = it.getOrDefault(NotFound) == Found))
                 }
@@ -87,9 +88,5 @@ class ItrSettingViewModel(
                 }
             } as T
         }
-    }
-
-    companion object {
-        private const val ITR_PRODUCT_NAME = "Identity Theft Restoration"
     }
 }

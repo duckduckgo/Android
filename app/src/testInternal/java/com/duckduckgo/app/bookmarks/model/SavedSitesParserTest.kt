@@ -98,7 +98,7 @@ class SavedSitesParserTest {
         whenever(store.primaryKey).thenReturn("primaryKey")
 
         whenever(nativeLib.encryptData(ArgumentMatchers.anyString(), ArgumentMatchers.anyString()))
-            .thenAnswer { invocation -> EncryptResult(result = 0L, encryptedData = invocation.getArgument(0)) }
+            .thenAnswer { invocation -> EncryptResult(result = 0, encryptedData = invocation.getArgument(0)) }
     }
 
     @Test

@@ -139,5 +139,4 @@
     <string name="sync_notification_channel_name">Sync</string>
     <string name="sync_notify_me_title">Notifications are disabled</string>
     <string name="sync_notify_me_description">Get notified in the event Sync &amp; Backup encounters an error.</string>
-    <string name="sync_rollout_banner_text">Sync &amp; Backup is rolling out gradually and may not be available yet within DuckDuckGo on your other devices</string>
 </resources>

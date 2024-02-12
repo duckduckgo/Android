@@ -311,6 +311,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                     )
                     .addProperty(createSharedPreferencesProperty(generatedPackage, featureName, module))
                     .addProperty(createFeatureNameProperty(featureName))
+                    .addFunction(createFeatureHashcode(module))
                     .addFunction(createStoreOverride(module))
                     .addFunctions(createToggleStoreImplementation(module))
                     .addFunction(createCompareAndSetHash())
@@ -406,6 +407,31 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
             .build()
     }
 
+    private fun createFeatureHashcode(module: ModuleDescriptor): FunSpec {
+        return FunSpec.builder("hash")
+            .addModifiers(KModifier.OVERRIDE)
+            .addCode(
+                CodeBlock.of(
+                    """
+                        try {
+                            // try to hash with all sub-features
+                            val concatMethodNames = this.feature.get().javaClass
+                                .declaredMethods
+                                .map { it.name }
+                                .joinToString(separator = "")
+                            val hash = %T().writeUtf8(concatMethodNames).md5().hex()
+                            return hash
+                        } catch(e: Throwable) {
+                            // fallback to just featureName 
+                            return this.featureName
+                        }
+                    """.trimIndent(),
+                    okioBuffer.asClassName(module),
+                ),
+            )
+            .returns(String::class.asClassName().copy(nullable = true))
+            .build()
+    }
     private fun createStoreOverride(module: ModuleDescriptor): FunSpec {
         return FunSpec.builder("store")
             .addModifiers(KModifier.OVERRIDE)
@@ -416,7 +442,13 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                 if (featureName == this.featureName) {
                     val feature = parseJson(jsonString) ?: return false
                     
-                    if (compareAndSetHash(feature.hash)) return true
+                    // feature hash is the hash of the feature + hash coming from remote config
+                    // this way we evaluate either when remote config has changes OR when feature changes
+                    // when the feature.hash (remote config) is null we always re-evaluate
+                    if (feature.hash != null) {
+                        val _hash = hash() + feature.hash
+                        if (compareAndSetHash(_hash)) return true
+                    }
         
                     val exceptions = parseExceptions(feature)
                     exceptionStore.insertAll(exceptions)

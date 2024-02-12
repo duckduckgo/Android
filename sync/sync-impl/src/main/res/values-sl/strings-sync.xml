@@ -139,5 +139,4 @@
     <string name="sync_notification_channel_name">Sinhronizacija</string>
     <string name="sync_notify_me_title">Obvestila so onemogočena</string>
     <string name="sync_notify_me_description">Prejmite obvestilo, če pride do napake pri sinhronizaciji in varnostnem kopiranju.</string>
-    <string name="sync_rollout_banner_text">Sinhronizacijo in varnostno kopiranje uvajamo postopoma in morda še ni na voljo v DuckDuckGo v vaših drugih napravah.</string>
 </resources>

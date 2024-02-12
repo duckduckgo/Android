@@ -139,5 +139,4 @@
     <string name="sync_notification_channel_name">Συγχρονισμός</string>
     <string name="sync_notify_me_title">Οι ειδοποιήσεις είναι απενεργοποιημένες</string>
     <string name="sync_notify_me_description">Ειδοποιηθείτε σε περίπτωση που η λειτουργία Συγχρονισμός και δημιουργία αντιγράφων ασφάλειας αντιμετωπίσει κάποιο σφάλμα.</string>
-    <string name="sync_rollout_banner_text">Η λειτουργία Συγχρονισμός και δημιουργία αντιγράφων ασφάλειας κυκλοφορεί σταδιακά και ενδέχεται να μην είναι ακόμα διαθέσιμη στο DuckDuckGo στις άλλες συσκευές σας</string>
 </resources>

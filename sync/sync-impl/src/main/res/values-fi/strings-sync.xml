@@ -139,5 +139,4 @@
     <string name="sync_notification_channel_name">Synkronoi</string>
     <string name="sync_notify_me_title">Ilmoitukset on poistettu käytöstä</string>
     <string name="sync_notify_me_description">Saat ilmoituksen, jos synkronointi ja varmuuskopiointi kohtaa virheen.</string>
-    <string name="sync_rollout_banner_text">Synkronointi ja varmuuskopiointi otetaan käyttöön vähitellen, eikä se välttämättä ole vielä käytettävissä DuckDuckGo-sovelluksessa muilla laitteillasi</string>
 </resources>

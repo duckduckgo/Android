@@ -2,6 +2,7 @@ package com.duckduckgo.subscriptions.impl.settings.views
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.subscriptions.api.Product.ITR
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.api.Subscriptions.EntitlementStatus.Found
 import com.duckduckgo.subscriptions.api.Subscriptions.EntitlementStatus.NotFound
@@ -39,7 +40,7 @@ class ItrSettingViewModelTest {
 
     @Test
     fun whenOnResumeIfSubscriptionEmitViewState() = runTest {
-        whenever(subscriptions.getEntitlementStatus("Identity Theft Restoration")).thenReturn(Result.success(Found))
+        whenever(subscriptions.getEntitlementStatus(ITR)).thenReturn(Result.success(Found))
 
         viewModel.onResume(mock())
         viewModel.viewState.test {
@@ -50,7 +51,7 @@ class ItrSettingViewModelTest {
 
     @Test
     fun whenOnResumeIfNotSubscriptionEmitViewState() = runTest {
-        whenever(subscriptions.getEntitlementStatus("Identity Theft Restoration")).thenReturn(Result.success(NotFound))
+        whenever(subscriptions.getEntitlementStatus(ITR)).thenReturn(Result.success(NotFound))
 
         viewModel.onResume(mock())
         viewModel.viewState.test {
@@ -61,7 +62,7 @@ class ItrSettingViewModelTest {
 
     @Test
     fun whenOnResumeEntitlementCheckFailsDoNotEmitViewState() = runTest {
-        whenever(subscriptions.getEntitlementStatus("Identity Theft Restoration")).thenReturn(Result.failure(RuntimeException()))
+        whenever(subscriptions.getEntitlementStatus(ITR)).thenReturn(Result.failure(RuntimeException()))
 
         viewModel.viewState.test {
             assertFalse(awaitItem().hasSubscription)

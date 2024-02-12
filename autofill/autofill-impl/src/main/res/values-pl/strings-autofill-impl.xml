@@ -143,4 +143,25 @@
     <string name="credentialManagementClearNeverForThisSiteDialogPositiveButton">Resetowanie</string>
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Anuluj</string>
 
+    <string name="credentialManagementDeleteAllPasswordsMenu">Usuń wszystkie hasła</string>
+    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Czy na pewno chcesz usunąć %1$d hasło?</item>
+        <item quantity="few">Czy na pewno chcesz usunąć %1$d hasła?</item>
+        <item quantity="many">Czy na pewno chcesz usunąć %1$d haseł?</item>
+        <item quantity="other">Czy na pewno chcesz usunąć %1$d hasła?</item>
+    </plurals>
+
+    <string name="credentialManagementDeletePasswordConfirmationMessage">Twoje hasło zostanie usunięte ze wszystkich zsynchronizowanych urządzeń. Upewnij się, że nadal masz możliwość dostępu do swojego konta.</string>
+    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Twoje hasła zostaną usunięte ze wszystkich zsynchronizowanych urządzeń. Upewnij się, że nadal masz możliwość dostępu do swoich kont.</string>
+
+    <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
+        <item quantity="one">Usunięto %1$d hasło</item>
+        <item quantity="few">Usunięto %1$d hasła</item>
+        <item quantity="many">Usunięto %1$d haseł</item>
+        <item quantity="other">Usunięto %1$d hasła</item>
+    </plurals>
+
+    <string name="autofill_auth_text_for_delete_all">Uwierzytelnij, aby potwierdzić, że chcesz usunąć wszystkie hasła</string>
+    <string name="autofill_title_text_for_delete_all">Usuń wszystkie hasła</string>
+
 </resources>

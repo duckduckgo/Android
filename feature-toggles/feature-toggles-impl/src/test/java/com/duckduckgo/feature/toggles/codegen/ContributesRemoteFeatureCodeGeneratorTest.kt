@@ -48,6 +48,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
 
     private val context: Context = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext
     private lateinit var testFeature: TestTriggerFeature
+    private lateinit var anotherTestFeature: AnotherTestTriggerFeature
     private val appBuildConfig: AppBuildConfig = mock()
     private lateinit var variantManager: FakeVariantManager
     private lateinit var toggleStore: FakeToggleStore
@@ -65,6 +66,14 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             appVariantProvider = { variantManager.getVariantKey() },
             forceDefaultVariant = { variantManager.saveVariants(emptyList()) },
         ).build().create(TestTriggerFeature::class.java)
+        anotherTestFeature = FeatureToggles.Builder(
+            toggleStore,
+            featureName = "testFeature",
+            appVersionProvider = { appBuildConfig.versionCode },
+            flavorNameProvider = { appBuildConfig.flavor.name },
+            appVariantProvider = { variantManager.getVariantKey() },
+            forceDefaultVariant = { variantManager.saveVariants(emptyList()) },
+        ).build().create(AnotherTestTriggerFeature::class.java)
     }
 
     @Test
@@ -113,6 +122,227 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertEquals(TriggerTestScope::class, annotation.scope)
         assertEquals(PrivacyFeaturePlugin::class, annotation.boundType)
         assertTrue(annotation.ignoreQualifier)
+    }
+
+    @Test
+    fun `re-evaluate feature state when feature hash is null`() {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "state": "disabled",
+                    "features": {
+                        "missingFeature": {
+                            "state": "enabled"
+                        },
+                        "fooFeature": {
+                            "state": "enabled"
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+        assertFalse(testFeature.self().isEnabled())
+        assertTrue(testFeature.fooFeature().isEnabled())
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "state": "enabled",
+                    "features": {
+                        "missingFeature": {
+                            "state": "enabled"
+                        },
+                        "fooFeature": {
+                            "state": "disabled"
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+        assertTrue(testFeature.self().isEnabled())
+        assertFalse(testFeature.fooFeature().isEnabled())
+    }
+
+    @Test
+    fun `do not re-evaluate feature state if hash hasn't changed`() {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "1",
+                    "state": "disabled",
+                    "features": {
+                        "missingFeature": {
+                            "state": "enabled"
+                        },
+                        "fooFeature": {
+                            "state": "enabled"
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+        assertFalse(testFeature.self().isEnabled())
+        assertTrue(testFeature.fooFeature().isEnabled())
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "1",
+                    "state": "enabled",
+                    "features": {
+                        "missingFeature": {
+                            "state": "enabled"
+                        },
+                        "fooFeature": {
+                            "state": "disabled"
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+        assertFalse(testFeature.self().isEnabled())
+        assertTrue(testFeature.fooFeature().isEnabled())
+    }
+
+    @Test
+    fun `re-evaluate feature state if hash changed`() {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "1",
+                    "state": "disabled",
+                    "features": {
+                        "missingFeature": {
+                            "state": "enabled"
+                        },
+                        "fooFeature": {
+                            "state": "enabled"
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+        assertFalse(testFeature.self().isEnabled())
+        assertTrue(testFeature.fooFeature().isEnabled())
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "2",
+                    "state": "enabled",
+                    "features": {
+                        "missingFeature": {
+                            "state": "enabled"
+                        },
+                        "fooFeature": {
+                            "state": "disabled"
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+        assertTrue(testFeature.self().isEnabled())
+        assertFalse(testFeature.fooFeature().isEnabled())
+    }
+
+    @Test
+    fun `re-evaluate feature when already preset in remote config but just added to client`() {
+        fun createAnotherFooFeature(): Any {
+            return Class
+                .forName("com.duckduckgo.feature.toggles.codegen.AnotherTestTriggerFeature_RemoteFeature")
+                .getConstructor(
+                    FeatureExceptions.Store::class.java,
+                    FeatureSettings.Store::class.java,
+                    dagger.Lazy::class.java as Class<*>,
+                    AppBuildConfig::class.java,
+                    VariantManager::class.java,
+                    Context::class.java,
+                ).newInstance(
+                    FeatureExceptions.EMPTY_STORE,
+                    FeatureSettings.EMPTY_STORE,
+                    Lazy { anotherTestFeature },
+                    appBuildConfig,
+                    variantManager,
+                    context,
+                )
+        }
+
+        assertFalse(anotherTestFeature.newFooFeature().isEnabled())
+
+        assertTrue(
+            (generatedFeatureNewInstance() as PrivacyFeaturePlugin).store(
+                "testFeature",
+                """
+                {
+                    "hash": "1",
+                    "state": "disabled",
+                    "features": {
+                        "newFooFeature": {
+                            "state": "enabled"
+                        },
+                        "fooFeature": {
+                            "state": "enabled"
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+        assertFalse(testFeature.self().isEnabled())
+        assertTrue(testFeature.fooFeature().isEnabled())
+        assertFalse(anotherTestFeature.newFooFeature().isEnabled())
+
+        assertTrue(
+            (createAnotherFooFeature() as PrivacyFeaturePlugin).store(
+                "testFeature",
+                """
+                {
+                    "hash": "1",
+                    "state": "disabled",
+                    "features": {
+                        "newFooFeature": {
+                            "state": "enabled"
+                        },
+                        "fooFeature": {
+                            "state": "enabled"
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        assertTrue(anotherTestFeature.newFooFeature().isEnabled())
     }
 
     @Test
@@ -1575,7 +1805,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 }
 
-private class FakeVariantManager : VariantManager {
+internal class FakeVariantManager : VariantManager {
     var saveVariantsCallCounter = 0
     var variant: String? = null
 
