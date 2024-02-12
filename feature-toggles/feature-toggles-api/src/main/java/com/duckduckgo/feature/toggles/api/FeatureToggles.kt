@@ -307,11 +307,11 @@ internal class ToggleImpl constructor(
             } ?: state
         }
 
-        val sortedRollout = state.rollout.sorted().filter { it in 0.0..100.0 }
-        if (sortedRollout.isEmpty()) return state
+        val scopedRolloutRange = state.rollout.filter { it in 0.0..100.0 }
+        if (scopedRolloutRange.isEmpty()) return state
 
         return state.copy(
-            enable = (state.rolloutThreshold ?: 0.0) <= sortedRollout.last(),
+            enable = (state.rolloutThreshold ?: 0.0) <= scopedRolloutRange.last(),
         )
     }
 }
