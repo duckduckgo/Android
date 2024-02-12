@@ -30,10 +30,13 @@ import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.BrowserAutofill
+import com.duckduckgo.autofill.api.Callback
 import com.duckduckgo.autofill.api.EmailProtectionInContextSignUpHandleVerificationLink
 import com.duckduckgo.autofill.api.EmailProtectionInContextSignUpScreenNoParams
 import com.duckduckgo.autofill.api.EmailProtectionInContextSignUpScreenResult
 import com.duckduckgo.autofill.api.EmailProtectionInContextSignupFlowListener
+import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.emailprotection.EmailInjector
 import com.duckduckgo.autofill.impl.AutofillJavascriptInterface
@@ -50,6 +53,7 @@ import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import javax.inject.Inject
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(EmailProtectionInContextSignUpScreenNoParams::class)
@@ -82,6 +86,9 @@ class EmailProtectionInContextSignupActivity :
 
     @Inject
     lateinit var pixel: Pixel
+
+    @Inject
+    lateinit var browserAutofill: BrowserAutofill
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -236,15 +243,48 @@ class EmailProtectionInContextSignupActivity :
                 setSupportZoom(true)
             }
 
-            it.addJavascriptInterface(autofillInterface, AutofillJavascriptInterface.INTERFACE_NAME)
+            Timber.w("cdr user agent is ${it.settings.userAgentString}")
+
+            //it.addJavascriptInterface(autofillInterface, AutofillJavascriptInterface.INTERFACE_NAME)
             autofillInterface.webView = it
-            autofillInterface.emailProtectionInContextSignupFlowCallback = object : EmailProtectionInContextSignupFlowListener {
+            val signupCallback = object : EmailProtectionInContextSignupFlowListener {
                 override fun closeInContextSignup() {
                     closeActivityAsSuccessfulSignup()
                 }
             }
-
             emailInjector.addJsInterface(it, {}, {})
+
+            browserAutofill.addJsInterface(it, autofillCallback = object: Callback {
+                override suspend fun onCredentialsAvailableToInject(
+                    originalUrl: String,
+                    credentials: List<LoginCredentials>,
+                    triggerType: LoginTriggerType
+                ) {
+                }
+
+                override suspend fun onCredentialsAvailableToSave(
+                    currentUrl: String,
+                    credentials: LoginCredentials
+                ) {
+                }
+
+                override suspend fun onGeneratedPasswordAvailableToUse(
+                    originalUrl: String,
+                    username: String?,
+                    generatedPassword: String
+                ) {
+                }
+
+                override fun noCredentialsAvailable(originalUrl: String) {
+                }
+
+                override fun onCredentialsSaved(savedCredentials: LoginCredentials) {
+                }
+            },
+                emailProtectionInContextCallback = null,
+                emailProtectionInContextSignupFlowCallback = signupCallback ,
+                tabId = ""
+            )
         }
     }
 
@@ -273,5 +313,5 @@ class EmailProtectionInContextSignupActivity :
         return webHistory.getItemAtIndex(previousIndex)?.url
     }
 
-    private fun getToolbar() = binding.includeToolbar.toolbar as Toolbar
+    private fun getToolbar() = binding.includeToolbar.toolbar
 }

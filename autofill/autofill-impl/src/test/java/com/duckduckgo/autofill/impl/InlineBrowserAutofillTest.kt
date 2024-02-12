@@ -121,11 +121,6 @@ class InlineBrowserAutofillTest {
 
         var lastAction: Actions? = null
 
-        override fun getAutofillConfig() {
-
-
-        }
-
         override fun getAutofillData(requestString: String) {
             lastAction = GetAutoFillData(requestString)
         }
@@ -139,9 +134,6 @@ class InlineBrowserAutofillTest {
         }
 
         override fun closeEmailProtectionTab(data: String) {
-        }
-
-        override fun getIncontextSignupDismissedAt(data: String) {
         }
 
         override fun cancelRetrievingStoredLogins() {

@@ -71,6 +71,8 @@ interface AutofillJavascriptInterface {
     // @JavascriptInterface
     // fun getAutofillConfig()
 
+    fun storeFormData(data: String)
+
     fun getAutofillData(requestString: String)
 
     fun getIncontextSignupDismissedAt(replier: JavaScriptReplyProxy)
@@ -83,7 +85,9 @@ interface AutofillJavascriptInterface {
     fun acceptGeneratedPassword()
     fun rejectGeneratedPassword()
 
+    @JavascriptInterface
     fun inContextEmailProtectionFlowFinished()
+    fun showInContextEmailProtectionSignupPrompt(data: String)
 
     var callback: Callback?
     var emailProtectionInContextCallback: EmailProtectionUserPromptListener?
@@ -96,7 +100,6 @@ interface AutofillJavascriptInterface {
         const val INTERFACE_NAME = "BrowserAutofill"
     }
 
-    @JavascriptInterface
     fun closeEmailProtectionTab(data: String)
 }
 
@@ -202,13 +205,11 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
         }
     }
 
-    @JavascriptInterface
     override fun closeEmailProtectionTab(data: String) {
         emailProtectionInContextSignupFlowCallback?.closeInContextSignup()
     }
 
-    @JavascriptInterface
-    fun showInContextEmailProtectionSignupPrompt(data: String) {
+    override fun showInContextEmailProtectionSignupPrompt(data: String) {
         coroutineScope.launch(dispatcherProvider.io()) {
             currentUrlProvider.currentUrl(webView)?.let {
                 val isSignedIn = emailManager.isSignedIn()
@@ -292,7 +293,7 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
     }
 
     @JavascriptInterface
-    fun storeFormData(data: String) {
+    override fun storeFormData(data: String) {
         // important to call suppressor as soon as possible
         systemAutofillServiceSuppressor.suppressAutofill(webView)
 

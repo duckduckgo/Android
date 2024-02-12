@@ -17,12 +17,8 @@
 package com.duckduckgo.autofill.impl
 
 import android.annotation.SuppressLint
-import android.net.Uri
 import android.webkit.WebView
-import androidx.webkit.JavaScriptReplyProxy
-import androidx.webkit.WebMessageCompat
 import androidx.webkit.WebViewCompat
-import androidx.webkit.WebViewCompat.WebMessageListener
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autofill.api.BrowserAutofill
@@ -34,15 +30,15 @@ import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonito
 import com.duckduckgo.autofill.impl.configuration.AutofillRuntimeConfigProvider
 import com.duckduckgo.autofill.impl.jsbridge.AutofillMessagePoster
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 import timber.log.Timber
+import javax.inject.Inject
 
-@ContributesBinding(FragmentScope::class)
+@ContributesBinding(AppScope::class)
 class InlineBrowserAutofill @Inject constructor(
     private val autofillInterface: AutofillJavascriptInterface,
     private val autoSavedLoginsMonitor: AutomaticSavedLoginsMonitor,
@@ -68,10 +64,13 @@ class InlineBrowserAutofill @Inject constructor(
         autofillInterface.autoSavedLoginsMonitor = autoSavedLoginsMonitor
         autofillInterface.tabId = tabId
 
-        if(WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER))  {
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {
             addWebMessageListenerGetAutofillConfig(webView)
             addWebMessageListenerGetAutofillData(webView)
             addWebMessageListenerGetInContextDismissedAt(webView)
+            addWebMessageListenerShowInContextEmailProtectionSignupPrompt(webView)
+            addWebMessageListenerStoreFormData(webView)
+            addWebMessageListenerCloseEmailProtectionTab(webView)
         } else {
             Timber.w("cdr cannot add web message listeners, feature not supported")
         }
@@ -91,6 +90,42 @@ class InlineBrowserAutofill @Inject constructor(
             }
         }
     }
+
+    @SuppressLint("RequiresFeature")
+    private fun addWebMessageListenerCloseEmailProtectionTab(webView: WebView) {
+        WebViewCompat.addWebMessageListener(webView, "ddgCloseEmailProtectionTab", setOf("*")) { wv, webMessage, uri, isMainFrame, reply ->
+            Timber.w("cdr received a web message [ddgCloseEmailProtectionTab] from JS layer, from main frame? $isMainFrame from url $uri")
+
+            appCoroutineScope.launch(dispatchers.io()) {
+                autofillInterface.closeEmailProtectionTab(webMessage.data.toString())
+            }
+        }
+    }
+
+    @SuppressLint("RequiresFeature")
+    private fun addWebMessageListenerShowInContextEmailProtectionSignupPrompt(webView: WebView) {
+        WebViewCompat.addWebMessageListener(webView, "ddgShowInContextEmailProtectionSignupPrompt", setOf("*")) { wv, webMessage, uri, isMainFrame, reply ->
+            Timber.w("cdr received a web message [ddgShowInContextEmailProtectionSignupPrompt] from JS layer, from main frame? $isMainFrame from url $uri")
+
+            appCoroutineScope.launch(dispatchers.io()) {
+                autofillInterface.showInContextEmailProtectionSignupPrompt(webMessage.data.toString())
+            }
+        }
+    }
+
+    @SuppressLint("RequiresFeature")
+    private fun addWebMessageListenerStoreFormData(webView: WebView) {
+        WebViewCompat.addWebMessageListener(webView, "ddgStoreFormData", setOf("*")) { wv, webMessage, uri, isMainFrame, reply ->
+            Timber.w("cdr received a web message [ddgStoreFormData] from JS layer, from main frame? $isMainFrame from url $uri")
+            messagePoster.messagePosterReplier = reply
+
+            appCoroutineScope.launch(dispatchers.io()) {
+                val url = withContext(dispatchers.main()) { wv.url }
+                autofillInterface.storeFormData(webMessage.data.toString())
+            }
+        }
+    }
+
 
     @SuppressLint("RequiresFeature")
     private fun addWebMessageListenerGetAutofillData(webView: WebView) {
