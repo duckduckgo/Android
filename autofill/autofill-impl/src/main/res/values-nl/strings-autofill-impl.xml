@@ -143,4 +143,21 @@
     <string name="credentialManagementClearNeverForThisSiteDialogPositiveButton">Herstel</string>
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Annuleren</string>
 
+    <string name="credentialManagementDeleteAllPasswordsMenu">Alle wachtwoorden verwijderen</string>
+    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Weet je zeker dat je %1$d wachtwoord wilt verwijderen?</item>
+        <item quantity="other">Weet je zeker dat je %1$d wachtwoorden wilt verwijderen?</item>
+    </plurals>
+
+    <string name="credentialManagementDeletePasswordConfirmationMessage">Je wachtwoord wordt verwijderd van alle gesynchroniseerde apparaten. Zorg ervoor dat je nog steeds toegang hebt tot je account.</string>
+    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Je wachtwoorden worden verwijderd van alle gesynchroniseerde apparaten. Zorg ervoor dat je nog steeds toegang hebt tot je accounts.</string>
+
+    <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
+        <item quantity="one">%1$d wachtwoord verwijderd</item>
+        <item quantity="other">%1$d wachtwoorden verwijderd</item>
+    </plurals>
+
+    <string name="autofill_auth_text_for_delete_all">Verifieer om te bevestigen dat je alle wachtwoorden wilt verwijderen</string>
+    <string name="autofill_title_text_for_delete_all">Alle wachtwoorden verwijderen</string>
+
 </resources>

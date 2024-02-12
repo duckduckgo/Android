@@ -143,4 +143,25 @@
     <string name="credentialManagementClearNeverForThisSiteDialogPositiveButton">Resetiraj</string>
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Odustani</string>
 
+    <string name="credentialManagementDeleteAllPasswordsMenu">Izbriši sve lozinke</string>
+    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Sigurno želiš izbrisati %1$d lozinku?</item>
+        <item quantity="few">Sigurno želiš izbrisati %1$d lozinke?</item>
+        <item quantity="many">Sigurno želiš izbrisati %1$d lozinki?</item>
+        <item quantity="other">Sigurno želiš izbrisati %1$d lozinki?</item>
+    </plurals>
+
+    <string name="credentialManagementDeletePasswordConfirmationMessage">Tvoja lozinka bit će izbrisana sa svih sinkroniziranih uređaja. Uvjeri se da i dalje imaš način pristupa svom računu.</string>
+    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Tvoje lozinke bit će izbrisane sa svih sinkroniziranih uređaja. Uvjeri se da i dalje imaš način pristupa svojim računima.</string>
+
+    <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
+        <item quantity="one">Izbrisana je %1$d lozinka</item>
+        <item quantity="few">Izbrisane su %1$d lozinke</item>
+        <item quantity="many">Izbrisano je %1$d lozinki</item>
+        <item quantity="other">Izbrisano je %1$d lozinki</item>
+    </plurals>
+
+    <string name="autofill_auth_text_for_delete_all">Izvrši autentifikaciju i time potvrdi da želiš izbrisati sve lozinke</string>
+    <string name="autofill_title_text_for_delete_all">Izbriši sve lozinke</string>
+
 </resources>

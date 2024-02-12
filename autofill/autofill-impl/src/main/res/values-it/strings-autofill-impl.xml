@@ -143,4 +143,21 @@
     <string name="credentialManagementClearNeverForThisSiteDialogPositiveButton">Ripristina</string>
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Annulla</string>
 
+    <string name="credentialManagementDeleteAllPasswordsMenu">Elimina tutte le password</string>
+    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Eliminare %1$d password?</item>
+        <item quantity="other">Eliminare %1$d password?</item>
+    </plurals>
+
+    <string name="credentialManagementDeletePasswordConfirmationMessage">La password verrà eliminata da tutti i dispositivi sincronizzati. Assicurati di avere ancora la possibilità di accedere al tuo account.</string>
+    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Le password verranno eliminate da tutti i dispositivi sincronizzati. Assicurati di avere ancora la possibilità di accedere ai tuoi account.</string>
+
+    <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
+        <item quantity="one">%1$d password eliminata</item>
+        <item quantity="other">%1$d password eliminate</item>
+    </plurals>
+
+    <string name="autofill_auth_text_for_delete_all">Esegui l\'autenticazione per confermare l\'eliminazione di tutte le password</string>
+    <string name="autofill_title_text_for_delete_all">Elimina tutte le password</string>
+
 </resources>

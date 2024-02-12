@@ -144,7 +144,7 @@
     <string name="settingsDefaultBrowserTitle">Alapértelmezett böngésző</string>
     <string name="settingsDefaultBrowserSetDescription">A DuckDuckGo az alapértelmezett böngésző</string>
     <string name="settingsDefaultBrowserNotSetDescription">Legyen a DuckDuckGo az alapértelmezett böngésző</string>
-    <string name="settingsPrivateSearchTitle">privát keresés</string>
+    <string name="settingsPrivateSearchTitle">Privát Keresés</string>
     <string name="settingsPrivateSearchDescription">Alapértelmezés szerint engedélyezve</string>
     <string name="settingsWebTrackingProtectionTitle">Webes követés elleni védelem</string>
     <string name="settingsWebTrackingProtectionDescription">Alapértelmezés szerint engedélyezve</string>
@@ -154,7 +154,7 @@
     <string name="settingsFireButton">Tűz gomb</string>
 
     <!-- Private Search -->
-    <string name="privateSearchActivityTitle">privát keresés</string>
+    <string name="privateSearchActivityTitle">Privát Keresés</string>
     <string name="privateSearchTitle">A Private Search engedélyezve van</string>
     <string name="privateSearchDescription">A DuckDuckGo Private Search az alapértelmezett keresőmotor, így nyomon követés nélkül kereshetsz az interneten.</string>
     <string name="privateSearchHeadingSearchSettings">Keresési beállítások</string>

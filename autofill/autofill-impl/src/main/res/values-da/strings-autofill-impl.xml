@@ -143,4 +143,21 @@
     <string name="credentialManagementClearNeverForThisSiteDialogPositiveButton">Nulstil</string>
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Annuller</string>
 
+    <string name="credentialManagementDeleteAllPasswordsMenu">Slet alle adgangskoder</string>
+    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Er du sikker på, at du vil slette %1$d adgangskode?</item>
+        <item quantity="other">Er du sikker på, at du vil slette %1$d adgangskoder?</item>
+    </plurals>
+
+    <string name="credentialManagementDeletePasswordConfirmationMessage">Din adgangskode slettes fra alle synkroniserede enheder. Husk at sikre, at du stadig har adgang til din konto.</string>
+    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Dine adgangskoder slettes fra alle synkroniserede enheder. Husk at sikre, at du stadig har adgang til dine konti.</string>
+
+    <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
+        <item quantity="one">%1$d adgangskode slettet</item>
+        <item quantity="other">%1$d adgangskoder slettet</item>
+    </plurals>
+
+    <string name="autofill_auth_text_for_delete_all">Bekræft, at du vil slette alle adgangskoder</string>
+    <string name="autofill_title_text_for_delete_all">Slet alle adgangskoder</string>
+
 </resources>
