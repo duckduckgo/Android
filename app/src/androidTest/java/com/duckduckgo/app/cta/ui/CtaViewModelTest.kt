@@ -51,7 +51,6 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
-import com.duckduckgo.common.ui.store.AppTheme
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.drop
@@ -112,9 +111,6 @@ class CtaViewModelTest {
     private lateinit var mockTabRepository: TabRepository
 
     @Mock
-    private lateinit var mockAppTheme: AppTheme
-
-    @Mock
     private lateinit var mockSurveyRepository: SurveyRepository
 
     private val requiredDaxOnboardingCtas: List<CtaId> = listOf(
@@ -154,7 +150,6 @@ class CtaViewModelTest {
             tabRepository = mockTabRepository,
             dispatchers = coroutineRule.testDispatcherProvider,
             duckDuckGoUrlDetector = DuckDuckGoUrlDetectorImpl(),
-            appTheme = mockAppTheme,
             surveyRepository = mockSurveyRepository,
         )
     }
@@ -464,16 +459,6 @@ class CtaViewModelTest {
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
 
         assertTrue(value is DaxDialogCta.DaxNoSerpCta)
-    }
-
-    @Test
-    fun whenRefreshCtaWhileBrowsingAndAutoconsentPresentThenReturnOtherCta() = runTest {
-        givenDaxOnboardingActive()
-        testee.enableAutoconsentCta()
-        val site = site(url = "http://www.wikipedia.com")
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
-
-        assertTrue(value is DaxDialogCta.DaxAutoconsentCta)
     }
 
     @Test

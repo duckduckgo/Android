@@ -25,16 +25,27 @@ interface AutoconsentSettingsDataStore {
     var firstPopupHandled: Boolean
 }
 
-class RealAutoconsentSettingsDataStore constructor(private val context: Context) :
+class RealAutoconsentSettingsDataStore constructor(
+    private val context: Context,
+    onByDefault: Boolean,
+) :
     AutoconsentSettingsDataStore {
 
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
+    private var internalUserSettings: Boolean
+
+    init {
+        internalUserSettings = preferences.getBoolean(AUTOCONSENT_USER_SETTING, onByDefault)
+    }
 
     override var userSetting: Boolean
-        get() = preferences.getBoolean(AUTOCONSENT_USER_SETTING, false)
+        get() = internalUserSettings
+
         set(value) {
             preferences.edit(commit = true) {
                 putBoolean(AUTOCONSENT_USER_SETTING, value)
+            }.also {
+                internalUserSettings = value
             }
         }
 

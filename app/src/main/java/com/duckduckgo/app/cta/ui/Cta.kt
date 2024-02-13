@@ -37,9 +37,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_FIRE_DIALOG_CTA
 import com.duckduckgo.app.trackerdetection.model.Entity
-import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.DaxDialogListener
-import com.duckduckgo.common.ui.view.LottieDaxDialog
 import com.duckduckgo.common.ui.view.TypeAnimationTextView
 import com.duckduckgo.common.ui.view.TypewriterDaxDialog
 import com.duckduckgo.common.ui.view.gone
@@ -233,35 +231,6 @@ sealed class DaxDialogCta(
                 daxText = context.getString(R.string.daxNonSerpCtaText),
                 primaryButtonText = context.getString(R.string.daxDialogGotIt),
                 hideButtonText = context.getString(R.string.daxDialogHideButton),
-            )
-            dialog.setDaxDialogListener(daxDialogListener)
-            return dialog
-        }
-    }
-
-    class DaxAutoconsentCta(
-        override val onboardingStore: OnboardingStore,
-        override val appInstallStore: AppInstallStore,
-        private val appTheme: AppTheme,
-    ) : DaxDialogCta(
-        CtaId.DAX_DIALOG_AUTOCONSENT,
-        AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
-        AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
-        null,
-        Pixel.PixelValues.DAX_AUTOCONSENT_CTA,
-        onboardingStore,
-        appInstallStore,
-    ) {
-        override fun createCta(context: Context, daxDialogListener: DaxDialogListener): DialogFragment {
-            val lottieRes = if (appTheme.isLightModeEnabled()) R.raw.cookie_banner_light else R.raw.cookie_banner_dark
-            val dialog = LottieDaxDialog.newInstance(
-                titleText = context.getString(R.string.autoconsentDialogTitle),
-                descriptionText = context.getString(R.string.autoconsentDialogDescription),
-                lottieRes = lottieRes,
-                primaryButtonText = context.getString(R.string.autoconsentPrimaryCta),
-                secondaryButtonText = context.getString(R.string.autoconsentSecondaryCta),
-                hideButtonText = context.getString(R.string.daxDialogHideButton),
-                showHideButton = false,
             )
             dialog.setDaxDialogListener(daxDialogListener)
             return dialog

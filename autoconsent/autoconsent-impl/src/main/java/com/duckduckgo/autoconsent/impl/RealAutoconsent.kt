@@ -45,7 +45,7 @@ class RealAutoconsent @Inject constructor(
     private lateinit var autoconsentJs: String
 
     override fun injectAutoconsent(webView: WebView, url: String) {
-        if (canBeInjected() && !urlInUserAllowList(url) && !isAnException(url)) {
+        if (isAutoconsentEnabled() && !urlInUserAllowList(url) && !isAnException(url)) {
             webView.evaluateJavascript("javascript:${getFunctionsJS()}", null)
         }
     }
@@ -63,6 +63,10 @@ class RealAutoconsent @Inject constructor(
 
     override fun isSettingEnabled(): Boolean {
         return settingsRepository.userSetting
+    }
+
+    override fun isAutoconsentEnabled(): Boolean {
+        return isEnabled() && isSettingEnabled()
     }
 
     override fun setAutoconsentOptOut(webView: WebView) {
@@ -96,12 +100,6 @@ class RealAutoconsent @Inject constructor(
 
     private fun matches(url: String): Boolean {
         return autoconsentExceptionsRepository.exceptions.any { UriString.sameOrSubdomain(url, it.domain) }
-    }
-
-    private fun canBeInjected(): Boolean {
-        // Remove comment to promote feature
-        // return isEnabled() && (settingsRepository.userSetting || !settingsRepository.firstPopupHandled)
-        return isEnabled() && settingsRepository.userSetting
     }
 
     private fun getFunctionsJS(): String {

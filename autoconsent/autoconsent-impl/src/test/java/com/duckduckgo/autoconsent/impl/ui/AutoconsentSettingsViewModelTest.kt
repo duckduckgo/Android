@@ -92,6 +92,10 @@ class AutoconsentSettingsViewModelTest {
 
         override fun isSettingEnabled(): Boolean = test
 
+        override fun isAutoconsentEnabled(): Boolean {
+            return isSettingEnabled()
+        }
+
         override fun setAutoconsentOptOut(webView: WebView) {
             // NO OP
         }
