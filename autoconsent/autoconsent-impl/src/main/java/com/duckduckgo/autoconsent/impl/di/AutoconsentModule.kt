@@ -39,6 +39,7 @@ import kotlinx.coroutines.CoroutineScope
 object AutoconsentModule {
 
     @Provides
+    @SingleInstanceIn(AppScope::class)
     fun provideAutoconsentSettingsRepository(context: Context, autoconsentFeature: AutoconsentFeature): AutoconsentSettingsRepository {
         return AutoconsentSettingsRepository.create(context, autoconsentFeature.onByDefault().isEnabled())
     }
