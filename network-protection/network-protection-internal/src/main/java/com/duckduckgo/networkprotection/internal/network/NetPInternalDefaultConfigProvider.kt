@@ -39,6 +39,7 @@ class NetPInternalDefaultConfigProvider @Inject constructor(
     private val mtuInternalProvider: NetPInternalMtuProvider,
     private val exclusionListProvider: NetPInternalExclusionListProvider,
     private val netPInternalFeatureToggles: NetPInternalFeatureToggles,
+    private val netPInternalEnvDataStore: NetPInternalEnvDataStore,
     private val context: Context,
 ) : NetPDefaultConfigProvider {
 
@@ -55,8 +56,8 @@ class NetPInternalDefaultConfigProvider @Inject constructor(
 
     override fun fallbackDns(): Set<InetAddress> {
         return realNetPConfigProvider.fallbackDns().toMutableSet().apply {
-            if (netPInternalFeatureToggles.cloudflareDnsFallback().isEnabled()) {
-                runCatching { InetAddress.getAllByName("one.one.one.one") }.getOrNull()?.let {
+            netPInternalEnvDataStore.customDns?.let { dns ->
+                runCatching { InetAddress.getAllByName(dns) }.getOrNull()?.let {
                     addAll(it)
                 } ?: logcat(LogPriority.ERROR) { "Error resolving fallback DNS" }
             }

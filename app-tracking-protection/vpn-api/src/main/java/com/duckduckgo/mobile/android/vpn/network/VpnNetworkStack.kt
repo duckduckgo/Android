@@ -77,6 +77,7 @@ interface VpnNetworkStack {
         val mtu: Int,
         val addresses: Map<InetAddress, Int>,
         val dns: Set<InetAddress>,
+        val customDns: Set<InetAddress>,
         val routes: Map<String, Int>,
         val appExclusionList: Set<String>,
     )

@@ -443,7 +443,9 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
                 allowFamily(AF_INET6)
             }
 
-            val dnsToConfigure = checkAndReturnDns(tunnelConfig.dns)
+            val tunnelDns = checkAndReturnDns(tunnelConfig.dns)
+            val customDns = checkAndReturnDns(tunnelConfig.customDns).filterIsInstance<Inet4Address>()
+            val dnsToConfigure = customDns.ifEmpty { tunnelDns }
 
             // TODO: eventually routes will be set by remote config
             if (appBuildConfig.isPerformanceTest && appBuildConfig.isInternalBuild()) {
