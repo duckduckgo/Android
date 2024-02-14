@@ -302,6 +302,7 @@ class RealSecureStorage @Inject constructor(
             notesIv = encryptedNotes?.iv,
             domainTitle = details.domainTitle,
             lastUpdatedInMillis = details.lastUpdatedMillis,
+            lastUsedInMillis = details.lastUsedInMillis,
         )
     }
 
@@ -319,6 +320,7 @@ class RealSecureStorage @Inject constructor(
             id = id,
             domainTitle = domainTitle,
             lastUpdatedMillis = lastUpdatedInMillis,
+            lastUsedInMillis = lastUsedInMillis,
         )
 
     // only encrypt when there's data

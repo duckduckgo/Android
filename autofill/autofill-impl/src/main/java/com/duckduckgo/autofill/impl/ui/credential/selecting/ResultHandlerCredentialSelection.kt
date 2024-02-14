@@ -31,6 +31,7 @@ import com.duckduckgo.autofill.api.CredentialAutofillPickerDialog
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
+import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -47,6 +48,7 @@ class ResultHandlerCredentialSelection @Inject constructor(
     private val pixel: Pixel,
     private val deviceAuthenticator: DeviceAuthenticator,
     private val appBuildConfig: AppBuildConfig,
+    private val autofillStore: InternalAutofillStore,
 ) : AutofillFragmentResultsPlugin {
 
     override fun processResult(
@@ -85,6 +87,8 @@ class ResultHandlerCredentialSelection @Inject constructor(
         val selectedCredentials: LoginCredentials =
             result.safeGetParcelable(CredentialAutofillPickerDialog.KEY_CREDENTIALS) ?: return
 
+        selectedCredentials.updateLastUsedTimestamp()
+
         pixel.fire(AutofillPixelNames.AUTOFILL_AUTHENTICATION_TO_AUTOFILL_SHOWN)
 
         withContext(dispatchers.main()) {
@@ -111,6 +115,13 @@ class ResultHandlerCredentialSelection @Inject constructor(
                     }
                 }
             }
+        }
+    }
+
+    private fun LoginCredentials.updateLastUsedTimestamp() {
+        appCoroutineScope.launch(dispatchers.io()) {
+            val updated = this@updateLastUsedTimestamp.copy(lastUsedMillis = System.currentTimeMillis())
+            autofillStore.updateCredentials(updated, refreshLastUpdatedTimestamp = false)
         }
     }
 

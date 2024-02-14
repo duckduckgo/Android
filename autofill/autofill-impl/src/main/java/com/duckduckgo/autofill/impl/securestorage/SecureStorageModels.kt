@@ -46,6 +46,7 @@ data class WebsiteLoginDetailsWithCredentials(
  * [id] database id associated to the website login
  * [domainTitle] title associated to the login
  * [lastUpdatedMillis] time in milliseconds when the credential was last updated
+ * [lastUsedInMillis] time in milliseconds when the credential was last used to autofill
  */
 data class WebsiteLoginDetails(
     val domain: String?,
@@ -53,6 +54,7 @@ data class WebsiteLoginDetails(
     val id: Long? = null,
     val domainTitle: String? = null,
     val lastUpdatedMillis: Long? = null,
+    val lastUsedInMillis: Long? = null,
 ) {
     override fun toString(): String {
         return """

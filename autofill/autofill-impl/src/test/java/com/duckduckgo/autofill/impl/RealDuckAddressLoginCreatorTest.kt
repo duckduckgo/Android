@@ -112,11 +112,11 @@ class RealDuckAddressLoginCreatorTest {
     }
 
     private suspend fun verifyLoginSaved() = verify(autofillStore).saveCredentials(eq(URL), any())
-    private suspend fun verifyLoginUpdated() = verify(autofillStore).updateCredentials(any())
+    private suspend fun verifyLoginUpdated() = verify(autofillStore).updateCredentials(any(), any())
 
     private suspend fun verifyNotSavedOrUpdated() {
         verify(autofillStore, never()).saveCredentials(any(), any())
-        verify(autofillStore, never()).updateCredentials(any())
+        verify(autofillStore, never()).updateCredentials(any(), any())
     }
 
     private fun aLogin(id: Long? = null, username: String? = null, password: String? = null): LoginCredentials {
