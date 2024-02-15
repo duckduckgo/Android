@@ -1307,7 +1307,6 @@ class BrowserTabViewModel @Inject constructor(
         Timber.i("Blank: cancel job $deferredBlankSite")
         deferredBlankSite?.cancel()
         deferredBlankSite = viewModelScope.launch(dispatchers.io()) {
-            delay(timeMillis = NEW_CONTENT_MAX_DELAY_MS)
             withContext(dispatchers.main()) {
                 command.value = HideWebContent
             }
