@@ -459,6 +459,9 @@ class BrowserTabFragment :
     @Inject
     lateinit var privacyProtectionsPopupFactory: PrivacyProtectionsPopupFactory
 
+    @Inject
+    lateinit var appLinksSnackBarConfigurator: AppLinksSnackBarConfigurator
+
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
      * This is needed because the activity stack will be cleared if an external link is opened in our browser
@@ -1621,11 +1624,10 @@ class BrowserTabFragment :
     }
 
     private fun showAppLinkSnackBar(appLink: SpecialUrlDetector.UrlType.AppLink) {
-        appLinksSnackBar = AppLinksSnackBarConfigurator().configureAppLinkSnackBar(
+        appLinksSnackBar = appLinksSnackBarConfigurator.configureAppLinkSnackBar(
             view = view,
             appLink = appLink,
             openAppLinkAction = { openAppLink(appLink) },
-            pixel = pixel,
         )
         appLinksSnackBar?.show()
     }
