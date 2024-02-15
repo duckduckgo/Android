@@ -2,6 +2,12 @@
 appId: com.duckduckgo.mobile.android
 ---
 - runScript: script_add_bookmark_domains.js
+- runFlow:
+    when:
+      visible: "Not Now"
+    commands:
+      - tapOn: "Not Now"
+- pressKey: Back
 # Until here we've joined an account that has predefined data
 # Now, we add a couple bookmarks
 - tapOn: "Search or type URL"
@@ -53,7 +59,7 @@ appId: com.duckduckgo.mobile.android
 - runFlow: ../../shared/open_bookmarks.yaml
 - runFlow:
     when:
-      visible: "Download Missing Icons?"
+      visible: "Not Now"
     commands:
       - tapOn: "Not Now"
 - tapOn: "Add Folder"

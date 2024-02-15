@@ -4,6 +4,11 @@ appId: com.duckduckgo.mobile.android
 - runScript: script_verify_bookmark_domains.js
 # Verify newly created bookmarks and folders have been added
 - runFlow: ../../shared/open_bookmarks.yaml
+- runFlow:
+    when:
+      visible: "Not Now"
+    commands:
+      - tapOn: "Not Now"
 - assertVisible: "${output.bookmarks.titles[0]}"
 - assertVisible: "${output.bookmarks.titles[1]}"
 - assertVisible: "${output.bookmarks.folders[0]}"

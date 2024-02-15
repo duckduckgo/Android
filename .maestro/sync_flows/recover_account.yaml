@@ -4,7 +4,7 @@
 appId: com.duckduckgo.mobile.android
 name: "Sync Critical Path test: Users can recover an account / Device can be added to an account"
 tags:
-  - syncCriticalPathTest
+  - syncReleaseTest
 ---
 - launchApp:
     clearState: true
