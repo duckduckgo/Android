@@ -22,7 +22,6 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.TaskStackBuilder
@@ -54,17 +53,15 @@ class RealNetPDisabledNotificationBuilder @Inject constructor(
     private val defaultDateTimeFormatter = SimpleDateFormat.getTimeInstance(DateFormat.SHORT)
 
     private fun registerChannel(context: Context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val notificationManager = NotificationManagerCompat.from(context)
-            if (notificationManager.getNotificationChannel(NETP_ALERTS_CHANNEL_ID) == null) {
-                val channel = NotificationChannel(
-                    NETP_ALERTS_CHANNEL_ID,
-                    NETP_ALERTS_CHANNEL_NAME,
-                    NotificationManager.IMPORTANCE_DEFAULT,
-                )
-                channel.description = NETP_ALERTS_CHANNEL_DESCRIPTION
-                notificationManager.createNotificationChannel(channel)
-            }
+        val notificationManager = NotificationManagerCompat.from(context)
+        if (notificationManager.getNotificationChannel(NETP_ALERTS_CHANNEL_ID) == null) {
+            val channel = NotificationChannel(
+                NETP_ALERTS_CHANNEL_ID,
+                NETP_ALERTS_CHANNEL_NAME,
+                NotificationManager.IMPORTANCE_DEFAULT,
+            )
+            channel.description = NETP_ALERTS_CHANNEL_DESCRIPTION
+            notificationManager.createNotificationChannel(channel)
         }
     }
 

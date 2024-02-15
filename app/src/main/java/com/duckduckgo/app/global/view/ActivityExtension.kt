@@ -20,11 +20,9 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
-import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityOptionsCompat
 import androidx.fragment.app.FragmentActivity
 import com.duckduckgo.app.browser.R
@@ -39,7 +37,6 @@ fun FragmentActivity.launchExternalActivity(intent: Intent) {
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.N)
 fun Context.launchDefaultAppActivity() {
     try {
         val intent = DefaultBrowserSystemSettings.intent()

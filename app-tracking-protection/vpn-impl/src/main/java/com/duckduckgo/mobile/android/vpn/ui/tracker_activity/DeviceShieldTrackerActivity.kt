@@ -445,7 +445,7 @@ class DeviceShieldTrackerActivity :
 
     @SuppressLint("InlinedApi")
     private fun openVPNSettings() {
-        this.launchAlwaysOnSystemSettings(appBuildConfig.sdkInt)
+        this.launchAlwaysOnSystemSettings()
     }
 
     fun onVpnConflictDialogContinue() {

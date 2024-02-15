@@ -19,11 +19,9 @@ package com.duckduckgo.subscriptions.impl.ui
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import androidx.annotation.RequiresApi
 import com.duckduckgo.app.browser.SpecialUrlDetector
 
 class SubscriptionsWebViewClient(
@@ -31,7 +29,6 @@ class SubscriptionsWebViewClient(
     private val context: Context,
 ) : WebViewClient() {
 
-    @RequiresApi(Build.VERSION_CODES.N)
     override fun shouldOverrideUrlLoading(
         view: WebView,
         request: WebResourceRequest,

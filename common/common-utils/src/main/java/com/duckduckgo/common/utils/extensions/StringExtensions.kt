@@ -19,7 +19,6 @@ package com.duckduckgo.common.utils.extensions
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.os.Build
 import android.text.Html
 import android.text.Spanned
 import androidx.core.content.ContextCompat
@@ -30,12 +29,8 @@ fun String.capitalizeFirstLetter() = this.replaceFirstChar {
     if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
 }
 
-@Suppress("deprecation")
 fun String.html(context: Context): Spanned {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-        return Html.fromHtml(this, Html.FROM_HTML_MODE_COMPACT, { htmlDrawable(context, it.toInt()) }, null)
-    }
-    return Html.fromHtml(this, { htmlDrawable(context, it.toInt()) }, null)
+    return Html.fromHtml(this, Html.FROM_HTML_MODE_COMPACT, { htmlDrawable(context, it.toInt()) }, null)
 }
 
 private fun htmlDrawable(

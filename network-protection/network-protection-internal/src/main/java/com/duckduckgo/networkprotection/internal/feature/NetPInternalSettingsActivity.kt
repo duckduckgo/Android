@@ -20,7 +20,6 @@ import android.Manifest.permission.READ_PHONE_STATE
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.widget.PopupMenu
@@ -181,14 +180,10 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
 
     private fun setupConfigSection() {
         fun hasPhoneStatePermission(): Boolean {
-            return if (appBuildConfig.sdkInt >= Build.VERSION_CODES.M) {
-                ContextCompat.checkSelfPermission(
-                    this,
-                    READ_PHONE_STATE,
-                ) == PackageManager.PERMISSION_GRANTED
-            } else {
-                true
-            }
+            return ContextCompat.checkSelfPermission(
+                this,
+                READ_PHONE_STATE,
+            ) == PackageManager.PERMISSION_GRANTED
         }
 
         lifecycleScope.launch {

@@ -121,7 +121,7 @@ class ManageRecentAppsProtectionActivity :
     private fun bindViews() {
         binding.manageRecentAppsSkeleton.startShimmer()
         binding.alwaysOn.setOnClickListener {
-            this.launchAlwaysOnSystemSettings(appBuildConfig.sdkInt)
+            this.launchAlwaysOnSystemSettings()
         }
         binding.unrestrictedBatteryUsage.setOnClickListener {
             this.launchIgnoreBatteryOptimizationSettings()

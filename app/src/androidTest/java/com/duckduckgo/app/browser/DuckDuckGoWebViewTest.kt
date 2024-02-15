@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,20 +16,18 @@
 
 package com.duckduckgo.app.browser
 
-import android.os.Build
+import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Assert.assertFalse
 import org.junit.Test
 
 class DuckDuckGoWebViewTest {
 
-    private lateinit var testee: DuckDuckGoWebView
-
     @Test
+    @UiThreadTest
     fun whenWebViewInitialisedThenSafeBrowsingDisabled() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            testee = DuckDuckGoWebView(InstrumentationRegistry.getInstrumentation().targetContext)
-            assertFalse(testee.settings.safeBrowsingEnabled)
-        }
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val testee = DuckDuckGoWebView(context)
+        assertFalse(testee.settings.safeBrowsingEnabled)
     }
 }

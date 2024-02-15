@@ -19,7 +19,6 @@ package com.duckduckgo.common.utils.extensions
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.provider.Settings
 import androidx.appcompat.app.AppCompatActivity
 
@@ -39,12 +38,8 @@ fun AppCompatActivity.launchApplicationInfoSettings(): Boolean {
 }
 
 @SuppressLint("InlinedApi")
-fun AppCompatActivity.launchAlwaysOnSystemSettings(sdkInt: Int) {
-    val intent = if (sdkInt >= Build.VERSION_CODES.N) {
-        Intent(Settings.ACTION_VPN_SETTINGS)
-    } else {
-        Intent("android.net.vpn.SETTINGS")
-    }
+fun AppCompatActivity.launchAlwaysOnSystemSettings() {
+    val intent = Intent(Settings.ACTION_VPN_SETTINGS)
     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
     startActivity(intent)
 }

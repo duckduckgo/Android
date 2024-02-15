@@ -22,7 +22,6 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.TaskStackBuilder
 import android.content.Context
-import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
@@ -35,17 +34,15 @@ class NetpAccessRevokedNotificationBuilder @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,
 ) {
     private fun registerChannel(context: Context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val notificationManager = NotificationManagerCompat.from(context)
-            if (notificationManager.getNotificationChannel(RealNetPDisabledNotificationBuilder.NETP_ALERTS_CHANNEL_ID) == null) {
-                val channel = NotificationChannel(
-                    RealNetPDisabledNotificationBuilder.NETP_ALERTS_CHANNEL_ID,
-                    RealNetPDisabledNotificationBuilder.NETP_ALERTS_CHANNEL_NAME,
-                    NotificationManager.IMPORTANCE_DEFAULT,
-                )
-                channel.description = RealNetPDisabledNotificationBuilder.NETP_ALERTS_CHANNEL_DESCRIPTION
-                notificationManager.createNotificationChannel(channel)
-            }
+        val notificationManager = NotificationManagerCompat.from(context)
+        if (notificationManager.getNotificationChannel(RealNetPDisabledNotificationBuilder.NETP_ALERTS_CHANNEL_ID) == null) {
+            val channel = NotificationChannel(
+                RealNetPDisabledNotificationBuilder.NETP_ALERTS_CHANNEL_ID,
+                RealNetPDisabledNotificationBuilder.NETP_ALERTS_CHANNEL_NAME,
+                NotificationManager.IMPORTANCE_DEFAULT,
+            )
+            channel.description = RealNetPDisabledNotificationBuilder.NETP_ALERTS_CHANNEL_DESCRIPTION
+            notificationManager.createNotificationChannel(channel)
         }
     }
 

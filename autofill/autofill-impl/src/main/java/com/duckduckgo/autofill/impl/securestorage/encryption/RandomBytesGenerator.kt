@@ -16,9 +16,6 @@
 
 package com.duckduckgo.securestorage.impl.encryption
 
-import android.annotation.SuppressLint
-import android.os.Build
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import java.security.SecureRandom
@@ -32,18 +29,11 @@ interface RandomBytesGenerator {
 }
 
 @ContributesBinding(AppScope::class)
-class RealRandomBytesGenerator @Inject constructor(
-    private val appBuildConfig: AppBuildConfig,
-) : RandomBytesGenerator {
+class RealRandomBytesGenerator @Inject constructor() : RandomBytesGenerator {
 
-    @SuppressLint("NewApi")
     override fun generateBytes(size: Int): ByteArray {
         return ByteArray(size).apply {
-            if (appBuildConfig.sdkInt >= Build.VERSION_CODES.O) {
-                SecureRandom.getInstanceStrong().nextBytes(this)
-            } else {
-                SecureRandom().nextBytes(this)
-            }
+            SecureRandom.getInstanceStrong().nextBytes(this)
         }
     }
 }

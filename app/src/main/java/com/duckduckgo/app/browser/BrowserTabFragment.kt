@@ -58,7 +58,6 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.annotation.AnyThread
-import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -1671,7 +1670,6 @@ class BrowserTabFragment :
         }
     }
 
-    @Suppress("NewApi") // we use appBuildConfig
     private fun openAppLink(appLink: SpecialUrlDetector.UrlType.AppLink) {
         if (appLink.appIntent != null) {
             appLink.appIntent!!.flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -1680,7 +1678,7 @@ class BrowserTabFragment :
             } catch (e: SecurityException) {
                 showToast(R.string.unableToOpenLink)
             }
-        } else if (appLink.excludedComponents != null && appBuildConfig.sdkInt >= Build.VERSION_CODES.N) {
+        } else if (appLink.excludedComponents != null) {
             val title = getString(R.string.appLinkIntentChooserTitle)
             val chooserIntent = getChooserIntent(appLink.uriString, title, appLink.excludedComponents!!)
             startActivityOrQuietlyFail(chooserIntent)
@@ -1701,7 +1699,6 @@ class BrowserTabFragment :
         appLinksSnackBar = null
     }
 
-    @RequiresApi(Build.VERSION_CODES.N)
     private fun getChooserIntent(
         url: String?,
         title: String,
@@ -2957,11 +2954,8 @@ class BrowserTabFragment :
         playStoreUtils.launchPlayStore(appPackage)
     }
 
-    @Suppress("NewApi") // we use appBuildConfig
     private fun launchDefaultBrowser() {
-        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.N) {
-            requireActivity().launchDefaultAppActivity()
-        }
+        requireActivity().launchDefaultAppActivity()
     }
 
     private fun launchAppTPOnboardingScreen() {
