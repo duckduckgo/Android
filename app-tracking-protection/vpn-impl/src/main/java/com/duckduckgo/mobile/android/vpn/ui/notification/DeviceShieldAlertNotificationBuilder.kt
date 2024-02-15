@@ -22,12 +22,10 @@ import android.app.NotificationManager.IMPORTANCE_DEFAULT
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.ResultReceiver
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.TaskStackBuilder
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationFactory.DeviceShieldNotification
@@ -41,10 +39,8 @@ import dagger.Provides
 object DeviceShieldAlertNotificationBuilderModule {
 
     @Provides
-    fun providesDeviceShieldAlertNotificationBuilder(
-        appBuildConfig: AppBuildConfig,
-    ): DeviceShieldAlertNotificationBuilder {
-        return AndroidDeviceShieldAlertNotificationBuilder(appBuildConfig)
+    fun providesDeviceShieldAlertNotificationBuilder(): DeviceShieldAlertNotificationBuilder {
+        return AndroidDeviceShieldAlertNotificationBuilder()
     }
 }
 
@@ -63,19 +59,14 @@ interface DeviceShieldAlertNotificationBuilder {
     ): Notification
 }
 
-class AndroidDeviceShieldAlertNotificationBuilder constructor(
-    private val appBuildConfig: AppBuildConfig,
-) : DeviceShieldAlertNotificationBuilder {
+class AndroidDeviceShieldAlertNotificationBuilder : DeviceShieldAlertNotificationBuilder {
 
-    @Suppress("NewApi") // we use appBuildConfig
     private fun registerAlertChannel(context: Context) {
-        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.O) {
-            val notificationManager = NotificationManagerCompat.from(context)
-            if (notificationManager.getNotificationChannel(VPN_ALERTS_CHANNEL_ID) == null) {
-                val channel = NotificationChannel(VPN_ALERTS_CHANNEL_ID, VPN_ALERTS_CHANNEL_NAME, IMPORTANCE_DEFAULT)
-                channel.description = VPN_ALERTS_CHANNEL_DESCRIPTION
-                notificationManager.createNotificationChannel(channel)
-            }
+        val notificationManager = NotificationManagerCompat.from(context)
+        if (notificationManager.getNotificationChannel(VPN_ALERTS_CHANNEL_ID) == null) {
+            val channel = NotificationChannel(VPN_ALERTS_CHANNEL_ID, VPN_ALERTS_CHANNEL_NAME, IMPORTANCE_DEFAULT)
+            channel.description = VPN_ALERTS_CHANNEL_DESCRIPTION
+            notificationManager.createNotificationChannel(channel)
         }
     }
 

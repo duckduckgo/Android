@@ -17,15 +17,12 @@
 package com.duckduckgo.app.browser.defaultbrowsing
 
 import android.content.Intent
-import android.os.Build
 import android.provider.Settings
-import androidx.annotation.RequiresApi
 import androidx.core.os.bundleOf
 
 class DefaultBrowserSystemSettings {
 
     companion object {
-        @RequiresApi(Build.VERSION_CODES.N)
         fun intent(): Intent {
             val intent = Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS)
             intent.putExtra(SETTINGS_SELECT_OPTION_KEY, DEFAULT_BROWSER_APP_OPTION)

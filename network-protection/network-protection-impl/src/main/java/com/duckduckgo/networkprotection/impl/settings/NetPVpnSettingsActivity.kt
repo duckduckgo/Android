@@ -121,7 +121,7 @@ class NetPVpnSettingsActivity : DuckDuckGoActivity() {
         }
 
         binding.alwaysOn.setOnClickListener {
-            this.launchAlwaysOnSystemSettings(appBuildConfig.sdkInt)
+            this.launchAlwaysOnSystemSettings()
         }
 
         binding.geoswitching.setOnClickListener {

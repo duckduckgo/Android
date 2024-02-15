@@ -16,9 +16,7 @@
 
 package com.duckduckgo.autofill.impl.securestorage
 
-import android.os.Build
 import android.security.keystore.KeyProperties
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import java.security.Key
@@ -40,9 +38,7 @@ interface SecureStorageKeyGenerator {
 
 @ContributesBinding(AppScope::class)
 class RealSecureStorageKeyGenerator @Inject constructor(
-    private val appBuildConfig: AppBuildConfig,
     @Named("DerivedKeySecretFactoryFor26Up") private val derivedKeySecretFactory: Provider<DerivedKeySecretFactory>,
-    @Named("DerivedKeySecretFactoryForLegacy") private val legacyDerivedKeySecretFactory: Provider<DerivedKeySecretFactory>,
 ) : SecureStorageKeyGenerator {
     private val keyGenerator: KeyGenerator by lazy {
         KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES).also {
@@ -61,31 +57,19 @@ class RealSecureStorageKeyGenerator @Inject constructor(
         password: String,
         salt: ByteArray,
     ): Key =
-        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.O) {
-            derivedKeySecretFactory.get().getKey(
-                PBEKeySpec(
-                    password.toCharArray(),
-                    salt,
-                    ITERATIONS_26_UP,
-                    SIZE,
-                ),
-            )
-        } else {
-            legacyDerivedKeySecretFactory.get().getKey(
-                PBEKeySpec(
-                    password.toCharArray(),
-                    salt,
-                    ITERATIONS_LEGACY,
-                    SIZE,
-                ),
-            )
-        }.run {
+        derivedKeySecretFactory.get().getKey(
+            PBEKeySpec(
+                password.toCharArray(),
+                salt,
+                ITERATIONS_26_UP,
+                SIZE,
+            ),
+        ).run {
             SecretKeySpec(this.encoded, KeyProperties.KEY_ALGORITHM_AES)
         }
 
     companion object {
         private const val ITERATIONS_26_UP = 100_000
-        private const val ITERATIONS_LEGACY = 50_000
         private const val SIZE = 256
     }
 }

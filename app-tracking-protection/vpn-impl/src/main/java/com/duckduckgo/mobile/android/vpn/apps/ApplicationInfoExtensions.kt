@@ -34,28 +34,11 @@ private fun parseAppCategory(category: Int): AppCategory {
 }
 
 fun ApplicationInfo.parseAppCategory(): AppCategory {
-    return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-        parseAppCategory(category)
-    } else {
-        AppCategory.Undefined
-    }
-}
-
-fun ApplicationInfo.getAppCategoryCompat(): Int {
-    return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-        category
-    } else {
-        -1 // inlined value of CATEGORY_UNDEFINED
-    }
+    return parseAppCategory(category)
 }
 
 fun ApplicationInfo.isGame(): Boolean {
-    val category = getAppCategoryCompat()
-    return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-        category == ApplicationInfo.CATEGORY_GAME
-    } else {
-        category == 0 // inlined value of CATEGORY_GAME
-    }
+    return category == ApplicationInfo.CATEGORY_GAME
 }
 
 fun ApplicationInfo.isSystemApp(): Boolean {

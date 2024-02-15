@@ -20,7 +20,6 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager.IMPORTANCE_DEFAULT
 import android.content.Context
-import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.di.scopes.AppScope
@@ -41,17 +40,15 @@ class RealVpnReminderNotificationBuilder @Inject constructor(
 ) : VpnReminderNotificationBuilder {
 
     private fun registerAlertChannel(context: Context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val notificationManager = NotificationManagerCompat.from(context)
-            if (notificationManager.getNotificationChannel(AndroidDeviceShieldAlertNotificationBuilder.VPN_ALERTS_CHANNEL_ID) == null) {
-                val channel = NotificationChannel(
-                    VPN_ALERTS_CHANNEL_ID,
-                    VPN_ALERTS_CHANNEL_NAME,
-                    IMPORTANCE_DEFAULT,
-                )
-                channel.description = VPN_ALERTS_CHANNEL_DESCRIPTION
-                notificationManager.createNotificationChannel(channel)
-            }
+        val notificationManager = NotificationManagerCompat.from(context)
+        if (notificationManager.getNotificationChannel(AndroidDeviceShieldAlertNotificationBuilder.VPN_ALERTS_CHANNEL_ID) == null) {
+            val channel = NotificationChannel(
+                VPN_ALERTS_CHANNEL_ID,
+                VPN_ALERTS_CHANNEL_NAME,
+                IMPORTANCE_DEFAULT,
+            )
+            channel.description = VPN_ALERTS_CHANNEL_DESCRIPTION
+            notificationManager.createNotificationChannel(channel)
         }
     }
 

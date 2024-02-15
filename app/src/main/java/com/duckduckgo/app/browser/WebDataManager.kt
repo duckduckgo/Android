@@ -20,7 +20,6 @@ import android.content.Context
 import android.webkit.WebStorage
 import android.webkit.WebView
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
-import com.duckduckgo.app.browser.httpauth.db.clearFormDataCompat
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
@@ -70,7 +69,7 @@ class WebViewDataManager @Inject constructor(
     }
 
     private fun clearFormData(webView: WebView) {
-        webView.clearFormDataCompat()
+        webView.clearFormData()
     }
 
     /**

@@ -23,9 +23,7 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.net.Uri
-import android.os.Build
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.privacy.config.api.AmpLinkType
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.TrackingParameters
@@ -36,7 +34,6 @@ class SpecialUrlDetectorImpl(
     private val packageManager: PackageManager,
     private val ampLinks: AmpLinks,
     private val trackingParameters: TrackingParameters,
-    private val appBuildConfig: AppBuildConfig,
 ) : SpecialUrlDetector {
 
     override fun determineType(initiatingUrl: String?, uri: Uri): UrlType {
@@ -72,22 +69,20 @@ class SpecialUrlDetectorImpl(
             return UrlType.TrackingParameterLink(cleanedUrl = cleanedUrl)
         }
 
-        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.N) {
-            try {
-                val activities = queryActivities(uriString)
-                val nonBrowserActivities = keepNonBrowserActivities(activities)
+        try {
+            val activities = queryActivities(uriString)
+            val nonBrowserActivities = keepNonBrowserActivities(activities)
 
-                if (nonBrowserActivities.isNotEmpty()) {
-                    nonBrowserActivities.singleOrNull()?.let { resolveInfo ->
-                        val nonBrowserIntent = buildNonBrowserIntent(resolveInfo, uriString)
-                        return UrlType.AppLink(appIntent = nonBrowserIntent, uriString = uriString)
-                    }
-                    val excludedComponents = getExcludedComponents(activities)
-                    return UrlType.AppLink(excludedComponents = excludedComponents, uriString = uriString)
+            if (nonBrowserActivities.isNotEmpty()) {
+                nonBrowserActivities.singleOrNull()?.let { resolveInfo ->
+                    val nonBrowserIntent = buildNonBrowserIntent(resolveInfo, uriString)
+                    return UrlType.AppLink(appIntent = nonBrowserIntent, uriString = uriString)
                 }
-            } catch (e: URISyntaxException) {
-                Timber.w(e, "Failed to parse uri $uriString")
+                val excludedComponents = getExcludedComponents(activities)
+                return UrlType.AppLink(excludedComponents = excludedComponents, uriString = uriString)
             }
+        } catch (e: URISyntaxException) {
+            Timber.w(e, "Failed to parse uri $uriString")
         }
 
         ampLinks.extractCanonicalFromAmpLink(uriString)?.let { ampLinkType ->

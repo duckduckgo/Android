@@ -26,7 +26,6 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.Command.CheckPermissionRationale
 import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.Command.DismissComponent
-import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.Command.OpenSettings
 import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.Command.OpenSettingsOnAndroid8Plus
 import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.Command.ShowPermissionRationale
 import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.Command.UpdateNotificationsState
@@ -58,7 +57,6 @@ class NotifyMeViewModel(
         object UpdateNotificationsState : Command()
         object UpdateNotificationsStateOnAndroid13Plus : Command()
         object OpenSettingsOnAndroid8Plus : Command()
-        object OpenSettings : Command()
         object CheckPermissionRationale : Command()
         object ShowPermissionRationale : Command()
         object DismissComponent : Command()
@@ -130,11 +128,7 @@ class NotifyMeViewModel(
     }
 
     private fun openSettings() {
-        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.O) {
-            sendCommand(OpenSettingsOnAndroid8Plus)
-        } else {
-            sendCommand(OpenSettings)
-        }
+        sendCommand(OpenSettingsOnAndroid8Plus)
     }
 
     private fun isDismissed(): Boolean {

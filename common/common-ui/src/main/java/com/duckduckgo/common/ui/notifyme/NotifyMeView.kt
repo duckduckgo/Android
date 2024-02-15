@@ -43,7 +43,6 @@ import com.duckduckgo.common.ui.notifyme.NotifyMeView.Orientation.Center
 import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.Command
 import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.Command.CheckPermissionRationale
 import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.Command.DismissComponent
-import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.Command.OpenSettings
 import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.Command.OpenSettingsOnAndroid8Plus
 import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.Command.ShowPermissionRationale
 import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.Command.UpdateNotificationsState
@@ -204,7 +203,6 @@ class NotifyMeView @JvmOverloads constructor(
         when (command) {
             is UpdateNotificationsState -> updateNotificationsState()
             is UpdateNotificationsStateOnAndroid13Plus -> updateNotificationsPermissionsOnAndroid13Plus()
-            is OpenSettings -> openSettings()
             is OpenSettingsOnAndroid8Plus -> openSettingsOnAndroid8Plus()
             is DismissComponent -> hideMe()
             is CheckPermissionRationale -> checkPermissionRationale()
@@ -222,14 +220,6 @@ class NotifyMeView @JvmOverloads constructor(
         val granted =
             ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
         viewModel.updateNotificationsPermissions(granted)
-    }
-
-    private fun openSettings() {
-        val settingsIntent = Intent(ANDROID_M_APP_NOTIFICATION_SETTINGS)
-            .putExtra(ANDROID_M_APP_PACKAGE, context.packageName)
-            .putExtra(ANDROID_M_APP_UID, context.applicationInfo.uid)
-
-        startActivity(context, settingsIntent, null)
     }
 
     @SuppressLint("InlinedApi")
