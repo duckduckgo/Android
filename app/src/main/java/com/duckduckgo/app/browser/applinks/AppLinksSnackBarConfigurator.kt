@@ -24,12 +24,24 @@ import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
+import com.duckduckgo.di.scopes.AppScope
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
+import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
 
-class AppLinksSnackBarConfigurator {
+interface AppLinksSnackBarConfigurator {
+    fun configureAppLinkSnackBar(
+        view: View?,
+        appLink: AppLink,
+        openAppLinkAction: () -> Unit,
+    ): Snackbar?
+}
 
-    fun configureAppLinkSnackBar(view: View?, appLink: AppLink, openAppLinkAction: () -> Unit, pixel: Pixel): Snackbar? {
+@ContributesBinding(AppScope::class)
+class DuckDuckGoAppLinksSnackBarConfigurator @Inject constructor(private val pixel: Pixel) : AppLinksSnackBarConfigurator {
+
+    override fun configureAppLinkSnackBar(view: View?, appLink: AppLink, openAppLinkAction: () -> Unit): Snackbar? {
         return view?.let {
             val context = it.context
             val (message, action) = getSnackBarContent(context, appLink) ?: return null
@@ -39,12 +51,14 @@ class AppLinksSnackBarConfigurator {
                     pixel.fire(AppPixelName.APP_LINKS_SNACKBAR_OPEN_ACTION_PRESSED)
                     openAppLinkAction()
                 }
-                addCallback(object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
-                    override fun onShown(transientBottomBar: Snackbar?) {
-                        super.onShown(transientBottomBar)
-                        pixel.fire(AppPixelName.APP_LINKS_SNACKBAR_SHOWN)
-                    }
-                },)
+                addCallback(
+                    object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
+                        override fun onShown(transientBottomBar: Snackbar?) {
+                            super.onShown(transientBottomBar)
+                            pixel.fire(AppPixelName.APP_LINKS_SNACKBAR_SHOWN)
+                        }
+                    },
+                )
                 duration = DURATION
             }
         }
