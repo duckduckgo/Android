@@ -129,7 +129,7 @@ class BrowserWebViewClient @Inject constructor(
         url: Uri,
         isForMainFrame: Boolean,
     ): Boolean {
-        Timber.v("shouldOverride $url")
+        Timber.v("shouldOverride webViewUrl: ${webView.url} URL: $url")
         try {
             if (isForMainFrame && dosDetector.isUrlGeneratingDos(url)) {
                 webView.loadUrl("about:blank")
@@ -270,6 +270,18 @@ class BrowserWebViewClient @Inject constructor(
         }
     }
 
+    override fun onPageCommitVisible (webView: WebView, url: String) {
+        // Show only when the commit matches the tab state
+        if (webView.url == url) {
+            Timber.v("onPageCommitVisible webViewUrl: ${webView.url} URL: $url")
+            val navigationList = webView.safeCopyBackForwardList() ?: return
+            webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList))
+            if (url != null && url == lastPageStarted) {
+                webViewClientListener?.pageRefreshed(url)
+            }
+        }
+    }
+
     private fun loadUrl(
         listener: WebViewClientListener,
         webView: WebView,
@@ -304,11 +316,6 @@ class BrowserWebViewClient @Inject constructor(
             appCoroutineScope.launch(dispatcherProvider.io()) {
                 thirdPartyCookieManager.processUriForThirdPartyCookies(webView, url.toUri())
             }
-        }
-        val navigationList = webView.safeCopyBackForwardList() ?: return
-        webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList))
-        if (url != null && url == lastPageStarted) {
-            webViewClientListener?.pageRefreshed(url)
         }
         lastPageStarted = url
         jsPlugins.getPlugins().forEach {
