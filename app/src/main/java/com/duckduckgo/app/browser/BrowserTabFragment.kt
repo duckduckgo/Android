@@ -23,7 +23,6 @@ import android.app.ActivityOptions
 import android.app.PendingIntent
 import android.content.*
 import android.content.pm.ActivityInfo
-import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.content.res.Configuration
@@ -103,6 +102,7 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.SavedSiteChangedViewState
 import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
+import com.duckduckgo.app.browser.applinks.AppLinksSnackBarConfigurator
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.databinding.ContentSiteLocationPermissionDialogBinding
@@ -1614,60 +1614,13 @@ class BrowserTabFragment :
     }
 
     private fun showAppLinkSnackBar(appLink: SpecialUrlDetector.UrlType.AppLink) {
-        view?.let { view ->
-
-            val message: String?
-            val action: String?
-
-            if (appLink.appIntent != null) {
-                val packageName = appLink.appIntent!!.component?.packageName ?: return
-                message = getString(R.string.appLinkSnackBarMessage, getAppName(packageName))
-                action = getString(R.string.appLinkSnackBarAction)
-            } else {
-                message = getString(R.string.appLinkMultipleSnackBarMessage)
-                action = getString(R.string.appLinkMultipleSnackBarAction)
-            }
-
-            appLinksSnackBar = view.makeSnackbarWithNoBottomInset(
-                message,
-                Snackbar.LENGTH_LONG,
-            )
-                .setAction(action) {
-                    pixel.fire(AppPixelName.APP_LINKS_SNACKBAR_OPEN_ACTION_PRESSED)
-                    openAppLink(appLink)
-                }
-                .addCallback(
-                    object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
-                        override fun onShown(transientBottomBar: Snackbar?) {
-                            super.onShown(transientBottomBar)
-                            pixel.fire(AppPixelName.APP_LINKS_SNACKBAR_SHOWN)
-                        }
-
-                        override fun onDismissed(
-                            transientBottomBar: Snackbar?,
-                            event: Int,
-                        ) {
-                            super.onDismissed(transientBottomBar, event)
-                        }
-                    },
-                )
-
-            appLinksSnackBar?.setDuration(6000)?.show()
-        }
-    }
-
-    private fun getAppName(packageName: String): String? {
-        val packageManager: PackageManager? = context?.packageManager
-        val applicationInfo: ApplicationInfo? = try {
-            packageManager?.getApplicationInfo(packageName, 0)
-        } catch (e: PackageManager.NameNotFoundException) {
-            null
-        }
-        return if (applicationInfo != null) {
-            packageManager?.getApplicationLabel(applicationInfo).toString()
-        } else {
-            null
-        }
+        appLinksSnackBar = AppLinksSnackBarConfigurator().configureAppLinkSnackBar(
+            view = view,
+            appLink = appLink,
+            openAppLinkAction = { openAppLink(appLink) },
+            pixel = pixel,
+        )
+        appLinksSnackBar?.show()
     }
 
     private fun openAppLink(appLink: SpecialUrlDetector.UrlType.AppLink) {
