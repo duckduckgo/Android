@@ -44,7 +44,7 @@ class AppLinksSnackBarConfigurator {
                         super.onShown(transientBottomBar)
                         pixel.fire(AppPixelName.APP_LINKS_SNACKBAR_SHOWN)
                     }
-                })
+                },)
                 duration = DURATION
             }
         }
