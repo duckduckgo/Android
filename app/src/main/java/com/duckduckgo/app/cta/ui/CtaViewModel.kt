@@ -38,11 +38,9 @@ import com.duckduckgo.app.survey.api.SurveyRepository
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
-import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
-import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -64,11 +62,9 @@ class CtaViewModel @Inject constructor(
     private val tabRepository: TabRepository,
     private val dispatchers: DispatcherProvider,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
-    private val appTheme: AppTheme,
     private val surveyRepository: SurveyRepository,
 ) {
     val surveyLiveData: LiveData<Survey> = surveyRepository.getScheduledLiveSurvey()
-    var canShowAutoconsentCta: AtomicBoolean = AtomicBoolean(false)
 
     @ExperimentalCoroutinesApi
     @VisibleForTesting
@@ -261,14 +257,6 @@ class CtaViewModel @Inject constructor(
                 return null
             }
 
-            val oldAutoconsentValue = canShowAutoconsentCta.get()
-            canShowAutoconsentCta.set(false)
-
-            // Autoconsent
-            if (oldAutoconsentValue && !daxDialogAutoconsentShown()) {
-                return DaxDialogCta.DaxAutoconsentCta(onboardingStore, appInstallStore, appTheme)
-            }
-
             if (!canShowDaxDialogCta()) return null
 
             // Trackers blocked
@@ -297,13 +285,7 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    fun enableAutoconsentCta() {
-        canShowAutoconsentCta.set(true)
-    }
-
     private fun daxDialogIntroShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_INTRO)
-
-    private fun daxDialogAutoconsentShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_AUTOCONSENT)
 
     private fun daxDialogEndShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_END)
 

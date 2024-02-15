@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autoconsent.store
+package com.duckduckgo.autoconsent.impl.remoteconfig
 
+import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeatureModels.AutoconsentSettings
+import com.duckduckgo.autoconsent.store.AutoconsentDao
+import com.duckduckgo.autoconsent.store.AutoconsentDatabase
+import com.duckduckgo.autoconsent.store.DisabledCmpsEntity
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -29,7 +33,7 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-class RealAutoconsentRepositoryTest {
+class RealAutoconsentFeatureSettingsRepositoryTest {
 
     @get:Rule
     var coroutineRule = CoroutineTestRule()
@@ -37,56 +41,51 @@ class RealAutoconsentRepositoryTest {
     private val mockDatabase: AutoconsentDatabase = mock()
     private val mockDao: AutoconsentDao = mock()
 
-    lateinit var repository: AutoconsentRepository
+    lateinit var repository: AutoconsentFeatureSettingsRepository
 
     @Before
     fun before() {
         whenever(mockDatabase.autoconsentDao()).thenReturn(mockDao)
-
-        repository = RealAutoconsentRepository(mockDatabase, TestScope(), coroutineRule.testDispatcherProvider)
     }
 
     @Test
     fun whenRepositoryIsCreatedThenExceptionsLoadedIntoMemory() {
-        givenDaoContainsExceptionsAndDisabledCmps()
+        givenDaoContainsDisabledCmps()
 
-        repository = RealAutoconsentRepository(mockDatabase, TestScope(), coroutineRule.testDispatcherProvider)
+        repository = RealAutoconsentFeatureSettingsRepository(TestScope(), coroutineRule.testDispatcherProvider, mockDatabase)
 
-        assertEquals(exception.toFeatureException(), repository.exceptions.first())
-        assertEquals(disabledCmp, repository.disabledCmps.first())
+        assertEquals(disabledCmpName, repository.disabledCMPs.first())
     }
 
     @Test
     fun whenUpdateAllThenUpdateAllCalled() = runTest {
-        repository = RealAutoconsentRepository(mockDatabase, TestScope(), coroutineRule.testDispatcherProvider)
+        repository = RealAutoconsentFeatureSettingsRepository(TestScope(), coroutineRule.testDispatcherProvider, mockDatabase)
 
-        repository.updateAll(listOf(), listOf())
+        repository.updateAllSettings(AutoconsentSettings(listOf()))
 
-        verify(mockDao).updateAll(anyList(), anyList())
+        verify(mockDao).updateAllDisabledCMPs(anyList())
     }
 
     @Test
     fun whenUpdateAllThenPreviousExceptionsAreCleared() = runTest {
-        givenDaoContainsExceptionsAndDisabledCmps()
-        repository = RealAutoconsentRepository(mockDatabase, TestScope(), coroutineRule.testDispatcherProvider)
+        givenDaoContainsDisabledCmps()
+        repository = RealAutoconsentFeatureSettingsRepository(TestScope(), coroutineRule.testDispatcherProvider, mockDatabase)
 
-        assertEquals(1, repository.exceptions.size)
-        assertEquals(1, repository.disabledCmps.size)
+        assertEquals(1, repository.disabledCMPs.size)
+
         reset(mockDao)
 
-        repository.updateAll(listOf(), listOf())
+        repository.updateAllSettings(AutoconsentSettings(listOf()))
 
-        assertEquals(0, repository.exceptions.size)
-        assertEquals(0, repository.disabledCmps.size)
+        assertEquals(0, repository.disabledCMPs.size)
     }
 
-    private fun givenDaoContainsExceptionsAndDisabledCmps() {
-        whenever(mockDao.getExceptions()).thenReturn(listOf(exception))
+    private fun givenDaoContainsDisabledCmps() {
         whenever(mockDao.getDisabledCmps()).thenReturn(listOf(disabledCmp))
     }
 
     companion object {
-        val exception = AutoconsentExceptionEntity("example.com", "reason")
-        val disabledCmp = DisabledCmpsEntity("disabledcmp")
+        const val disabledCmpName = "disabledcmp"
+        val disabledCmp = DisabledCmpsEntity(disabledCmpName)
     }
 }

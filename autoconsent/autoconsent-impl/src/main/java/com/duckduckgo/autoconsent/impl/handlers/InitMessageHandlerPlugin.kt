@@ -23,7 +23,7 @@ import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.impl.JsReader
 import com.duckduckgo.autoconsent.impl.MessageHandlerPlugin
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
-import com.duckduckgo.autoconsent.store.AutoconsentRepository
+import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeatureSettingsRepository
 import com.duckduckgo.autoconsent.store.AutoconsentSettingsRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.isHttp
@@ -43,7 +43,7 @@ class InitMessageHandlerPlugin @Inject constructor(
     @AppCoroutineScope val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val settingsRepository: AutoconsentSettingsRepository,
-    private val repository: AutoconsentRepository,
+    private val autoconsentFeatureSettingsRepository: AutoconsentFeatureSettingsRepository,
 ) : MessageHandlerPlugin {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -71,7 +71,7 @@ class InitMessageHandlerPlugin @Inject constructor(
                     // Reset site
                     autoconsentCallback.onResultReceived(consentManaged = false, optOutFailed = false, selfTestFailed = false, isCosmetic = false)
 
-                    val disabledCmps = repository.disabledCmps.map { it.name }
+                    val disabledCmps = autoconsentFeatureSettingsRepository.disabledCMPs
                     val autoAction = getAutoAction()
                     val enablePreHide = settingsRepository.userSetting
                     val detectRetries = 20

@@ -19,11 +19,13 @@ package com.duckduckgo.autoconsent.impl.di
 import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentExceptionsRepository
+import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
+import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeatureSettingsRepository
+import com.duckduckgo.autoconsent.impl.remoteconfig.RealAutoconsentExceptionsRepository
+import com.duckduckgo.autoconsent.impl.remoteconfig.RealAutoconsentFeatureSettingsRepository
 import com.duckduckgo.autoconsent.store.AutoconsentDatabase
-import com.duckduckgo.autoconsent.store.AutoconsentFeatureToggleRepository
-import com.duckduckgo.autoconsent.store.AutoconsentRepository
 import com.duckduckgo.autoconsent.store.AutoconsentSettingsRepository
-import com.duckduckgo.autoconsent.store.RealAutoconsentRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
@@ -37,8 +39,9 @@ import kotlinx.coroutines.CoroutineScope
 object AutoconsentModule {
 
     @Provides
-    fun provideAutoconsentSettingsRepository(context: Context): AutoconsentSettingsRepository {
-        return AutoconsentSettingsRepository.create(context)
+    @SingleInstanceIn(AppScope::class)
+    fun provideAutoconsentSettingsRepository(context: Context, autoconsentFeature: AutoconsentFeature): AutoconsentSettingsRepository {
+        return AutoconsentSettingsRepository.create(context, autoconsentFeature.onByDefault().isEnabled())
     }
 
     @Provides
@@ -51,17 +54,21 @@ object AutoconsentModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideAutoconsentRepository(
+    fun provideAutoconsentExceptionsRepository(
         database: AutoconsentDatabase,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
-    ): AutoconsentRepository {
-        return RealAutoconsentRepository(database, appCoroutineScope, dispatcherProvider)
+    ): AutoconsentExceptionsRepository {
+        return RealAutoconsentExceptionsRepository(appCoroutineScope, dispatcherProvider, database)
     }
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideAutoconsentFeatureToggleRepository(context: Context): AutoconsentFeatureToggleRepository {
-        return AutoconsentFeatureToggleRepository.create(context)
+    fun provideAutoconsentFeatureSettingsRepository(
+        database: AutoconsentDatabase,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
+        dispatcherProvider: DispatcherProvider,
+    ): AutoconsentFeatureSettingsRepository {
+        return RealAutoconsentFeatureSettingsRepository(appCoroutineScope, dispatcherProvider, database)
     }
 }

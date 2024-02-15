@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,49 +14,42 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autoconsent.store
+package com.duckduckgo.autoconsent.impl.remoteconfig
 
+import com.duckduckgo.autoconsent.store.AutoconsentDatabase
+import com.duckduckgo.autoconsent.store.AutoconsentExceptionEntity
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-interface AutoconsentRepository {
-    fun updateAll(exceptions: List<AutoconsentExceptionEntity>, disabledCmps: List<DisabledCmpsEntity>)
-    val exceptions: List<FeatureException>
-    val disabledCmps: List<DisabledCmpsEntity>
+interface AutoconsentExceptionsRepository {
+    fun insertAllExceptions(exceptions: List<FeatureException>)
+    val exceptions: CopyOnWriteArrayList<FeatureException>
 }
 
-class RealAutoconsentRepository(
-    val database: AutoconsentDatabase,
+class RealAutoconsentExceptionsRepository(
     coroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider,
-) : AutoconsentRepository {
+    val database: AutoconsentDatabase,
+) : AutoconsentExceptionsRepository {
 
-    private val autoconsentDao: AutoconsentDao = database.autoconsentDao()
-
+    private val dao = database.autoconsentDao()
     override val exceptions = CopyOnWriteArrayList<FeatureException>()
-    override val disabledCmps = CopyOnWriteArrayList<DisabledCmpsEntity>()
 
     init {
-        coroutineScope.launch(dispatcherProvider.io()) {
-            loadToMemory()
-        }
+        coroutineScope.launch(dispatcherProvider.io()) { loadToMemory() }
     }
 
-    override fun updateAll(exceptions: List<AutoconsentExceptionEntity>, disabledCmps: List<DisabledCmpsEntity>) {
-        autoconsentDao.updateAll(exceptions, disabledCmps)
+    override fun insertAllExceptions(exceptions: List<FeatureException>) {
+        dao.updateAllExceptions(exceptions.map { AutoconsentExceptionEntity(domain = it.domain, reason = it.reason ?: "") })
         loadToMemory()
     }
 
     private fun loadToMemory() {
         exceptions.clear()
-        autoconsentDao.getExceptions().map {
-            exceptions.add(it.toFeatureException())
-        }
-
-        disabledCmps.clear()
-        disabledCmps.addAll(autoconsentDao.getDisabledCmps())
+        val exceptionsEntityList = dao.getExceptions()
+        exceptions.addAll(exceptionsEntityList.map { FeatureException(domain = it.domain, reason = it.reason) })
     }
 }
