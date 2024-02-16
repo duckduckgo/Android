@@ -1,9 +1,0 @@
-appId: com.duckduckgo.mobile.android
-name: "Autofill: Password manager screen when no passwords saved"
----
-# Pre-requisite: the user is viewing the password manager screen with no saved passwords, on an autofill-eligible device
-
-- assertVisible:
-    text: "No passwords saved yet"
-- assertNotVisible:
-    id: searchLogins

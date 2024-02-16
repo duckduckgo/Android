@@ -26,5 +26,3 @@ name: "Autofill: Delete credentials"
 
 - assertVisible:
     text: "No passwords saved yet"
-
-- tapOn: "Navigate up"
