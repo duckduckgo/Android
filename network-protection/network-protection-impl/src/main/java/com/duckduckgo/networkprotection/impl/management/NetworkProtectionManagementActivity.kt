@@ -21,6 +21,7 @@ import android.net.VpnService
 import android.os.Bundle
 import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -32,7 +33,6 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.addClickableLink
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
-import com.duckduckgo.common.ui.view.listitem.TwoLineListItem
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.extensions.launchAlwaysOnSystemSettings
@@ -111,6 +111,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
     private fun bindViews() {
         setTitle(R.string.netpManagementTitle)
         binding.netpToggle.setOnCheckedChangeListener(toggleChangeListener)
+        binding.netpToggle.setPrimaryText(getString(R.string.netpManagementToggleTitle))
 
         binding.netpBetaDescription.addClickableLink(
             REPORT_ISSUES_ANNOTATION,
@@ -184,8 +185,10 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
     }
 
     private fun ActivityNetpManagementBinding.renderConnectedState(connectionDetailsData: ConnectionDetails) {
-        netpStatusImage.setImageResource(R.drawable.illustration_vpn_on)
+        netpStatusImage.setImageResource(R.drawable.illustration_vpn_connected)
         netpStatusHeader.setText(R.string.netpManagementHeadlineStatusOn)
+        netpStatusDescription.setText(R.string.netpManagementDescriptionOn)
+        netpToggle.indicator.setImageDrawable(AppCompatResources.getDrawable(applicationContext, R.drawable.indicator_vpn_connected))
         netpToggle.quietlySetChecked(true)
         netpToggle.isEnabled = true
         connectionDetailsData.elapsedConnectedTime?.let {
@@ -205,8 +208,10 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
     }
 
     private fun ActivityNetpManagementBinding.renderDisconnectedState() {
-        netpStatusImage.setImageResource(R.drawable.illustration_vpn_off)
+        netpStatusImage.setImageResource(R.drawable.illustration_vpn_disconnected)
         netpStatusHeader.setText(R.string.netpManagementHeadlineStatusOff)
+        netpStatusDescription.setText(R.string.netpManagementDescriptionOff)
+        netpToggle.indicator.setImageDrawable(AppCompatResources.getDrawable(applicationContext, R.drawable.indicator_vpn_disconnected))
         netpToggle.quietlySetChecked(false)
         netpToggle.setSecondaryText(getString(R.string.netpManagementToggleSubtitleDisconnected))
         netpToggle.isEnabled = true
@@ -214,9 +219,11 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
     }
 
     private fun ActivityNetpManagementBinding.renderConnectingState() {
-        netpStatusImage.setImageResource(R.drawable.illustration_vpn_off)
+        netpStatusImage.setImageResource(R.drawable.illustration_vpn_disconnected)
         netpToggle.quietlySetChecked(true)
+        netpToggle.indicator.setImageDrawable(AppCompatResources.getDrawable(applicationContext, R.drawable.indicator_vpn_disconnected))
         netpStatusHeader.setText(R.string.netpManagementHeadlineStatusOff)
+        netpStatusDescription.setText(R.string.netpManagementDescriptionOff)
         netpToggle.setSecondaryText(getString(R.string.netpManagementToggleSubtitleConnecting))
         netpToggle.isEnabled = false
         connectionDetails.root.gone()
@@ -348,7 +355,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         (supportFragmentManager.findFragmentByTag(TAG_ALWAYS_ON_DIALOG) as? DialogFragment)?.dismiss()
     }
 
-    private fun TwoLineListItem.quietlySetChecked(isChecked: Boolean) {
+    private fun VpnToggle.quietlySetChecked(isChecked: Boolean) {
         setOnCheckedChangeListener { _, _ -> }
         setIsChecked(isChecked)
         setOnCheckedChangeListener(toggleChangeListener)

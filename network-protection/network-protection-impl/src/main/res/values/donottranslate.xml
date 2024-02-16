@@ -19,7 +19,8 @@
     <string name="netpManagementTitle" translatable="false">Network Protection</string>
     <string name="netpManagementHeadlineStatusOn">Network Protection is On</string>
     <string name="netpManagementHeadlineStatusOff">Network Protection is Off</string>
-    <string name="netpManagementDescription">DuckDuckGo\'s VPN secures all of your device\'s Internet traffic anytime, anywhere.</string>
+    <string name="netpManagementDescriptionOff">Connect to secure all of your device’s Internet traffic.</string>
+    <string name="netpManagementDescriptionOn">All device Internet traffic is being secured through the VPN.</string>
     <string name="netpManagementToggleTitle">Network Protection</string>
     <string name="netpManagementToggleSubtitleConnecting">Connecting…</string>
     <string name="netpManagementToggleSubtitleConnected" instruction="Placeholder is elapsed time in hh:MM:ss format.">Connected · %1$s</string>

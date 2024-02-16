@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2024 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/item_container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    android:paddingTop="@dimen/twoLineItemVerticalPadding"
+    android:paddingBottom="@dimen/twoLineItemVerticalPadding"
+    android:minHeight="@dimen/twoLineItemHeight">
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/primaryText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_4"
+        android:breakStrategy="balanced"
+        app:layout_constraintEnd_toStartOf="@id/trailingSwitch"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_default="wrap"
+        app:typography="h4" />
+
+    <ImageView
+        android:id="@+id/indicator"
+        android:layout_width="@dimen/keyline_2"
+        android:layout_height="@dimen/keyline_2"
+        android:src="@drawable/indicator_vpn_disconnected"
+        android:layout_marginEnd="@dimen/keyline_2"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/secondaryText"
+        app:layout_constraintStart_toStartOf="@+id/primaryText"
+        app:layout_constraintTop_toBottomOf="@id/primaryText"/>
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/secondaryText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/keyline_2"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/trailingSwitch"
+        app:layout_constraintStart_toEndOf="@id/indicator"
+        app:layout_constraintTop_toBottomOf="@id/primaryText"
+        app:textType="secondary"
+        app:typography="body2"
+        tools:text="Secondary Text" />
+
+    <com.duckduckgo.common.ui.view.SwitchView
+        android:id="@+id/trailingSwitch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_1"
+        android:layout_marginEnd="@dimen/keyline_2"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/secondaryText"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="SpeakableTextPresentCheck" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
