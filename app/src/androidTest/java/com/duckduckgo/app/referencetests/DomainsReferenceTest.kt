@@ -115,7 +115,6 @@ class DomainsReferenceTest(private val testCase: TestCase) {
         fakeToggle,
         fakeUserAllowListRepository,
         mock(),
-        mock(),
     )
     private val mockGpc: Gpc = mock()
     private val mockAdClickManager: AdClickManager = mock()

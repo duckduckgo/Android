@@ -14,18 +14,22 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.user.agent.impl
+package com.duckduckgo.user.agent.impl.store
 
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
-import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.Toggle
+import androidx.room.Database
+import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
 
-@ContributesRemoteFeature(
-    scope = AppScope::class,
-    featureName = "clientBrandHint",
+@Database(
+    exportSchema = true,
+    version = 1,
+    entities = [
+        ClientHintBrandDomainEntity::class,
+    ],
 )
+abstract class ClientBrandHintDatabase : RoomDatabase() {
 
-interface ClientBrandHintFeature {
-    @Toggle.DefaultValue(false)
-    fun self(): Toggle
+    abstract fun clientBrandHintDao(): ClientBrandHintDao
 }
+
+val ALL_MIGRATIONS = emptyArray<Migration>()

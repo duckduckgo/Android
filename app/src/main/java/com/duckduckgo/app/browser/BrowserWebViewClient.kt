@@ -62,6 +62,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.privacy.config.api.AmpLinks
+import com.duckduckgo.user.agent.api.ClientBrandHintProvider
 import java.net.URI
 import javax.inject.Inject
 import kotlinx.coroutines.*
@@ -97,6 +98,7 @@ class BrowserWebViewClient @Inject constructor(
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
+    var clientProvider: ClientBrandHintProvider? = null
     private var lastPageStarted: String? = null
     private var start: Long? = null
 
@@ -179,7 +181,19 @@ class BrowserWebViewClient @Inject constructor(
                         }
                     }
                     if (isForMainFrame) {
-                        webViewClientListener?.willOverrideUrl(url.toString())
+                        webViewClientListener?.let { listener ->
+                            listener.willOverrideUrl(url.toString())
+                            clientProvider?.let { provider ->
+                                if (provider.shouldChangeBranding(url.toString())) {
+                                    provider.setOn(webView.settings, url.toString())
+                                    loadUrl(listener, webView, url.toString())
+                                    return true
+                                } else {
+                                    return false
+                                }
+                            }
+                            return false
+                        }
                     }
                     false
                 }
