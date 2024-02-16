@@ -47,7 +47,8 @@ class LaunchViewModel @Inject constructor(
 
         if (userStageStore.isNewUser()) {
             // TODO experiment check featureFlag to set light or system theme and pass it as argument
-            command.value = Command.Onboarding()
+            val isExperimentalVariant = true
+            command.value = Command.Onboarding(forceLightTheme = !isExperimentalVariant)
         } else {
             command.value = Command.Home()
         }

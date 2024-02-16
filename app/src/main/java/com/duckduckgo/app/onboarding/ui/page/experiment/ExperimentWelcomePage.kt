@@ -36,8 +36,12 @@ import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
 import com.duckduckgo.app.onboarding.ui.page.experiment.ExperimentWelcomePage.Companion.PreOnboardingDialogType.CELEBRATION
 import com.duckduckgo.app.onboarding.ui.page.experiment.ExperimentWelcomePage.Companion.PreOnboardingDialogType.COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.experiment.ExperimentWelcomePage.Companion.PreOnboardingDialogType.INITIAL
-import com.duckduckgo.app.onboarding.ui.page.experiment.ExperimentWelcomePageViewModel.Command.Command1
+import com.duckduckgo.app.onboarding.ui.page.experiment.ExperimentWelcomePageViewModel.Command.Finish
+import com.duckduckgo.app.onboarding.ui.page.experiment.ExperimentWelcomePageViewModel.Command.ShowComparisonChart
+import com.duckduckgo.app.onboarding.ui.page.experiment.ExperimentWelcomePageViewModel.Command.ShowSuccessDialog
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.html
@@ -61,6 +65,7 @@ class ExperimentWelcomePage : OnboardingPageFragment(R.layout.content_onboarding
     }
 
     private var ctaText: String = ""
+    private var hikerAnimation: ViewPropertyAnimatorCompat? = null
     private var welcomeAnimation: ViewPropertyAnimatorCompat? = null
     private var typingAnimation: ViewPropertyAnimatorCompat? = null
     private var welcomeAnimationFinished = false
@@ -79,7 +84,9 @@ class ExperimentWelcomePage : OnboardingPageFragment(R.layout.content_onboarding
         val binding = ContentOnboardingWelcomeExperimentBinding.inflate(inflater, container, false)
         viewModel.commands.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach {
             when (it) {
-                is Command1 -> {}
+                is ShowComparisonChart -> configureDaxCta(COMPARISON_CHART)
+                is ShowSuccessDialog -> configureDaxCta(CELEBRATION)
+                is Finish -> onContinuePressed()
             }
         }.launchIn(lifecycleScope)
         return binding.root
@@ -111,19 +118,34 @@ class ExperimentWelcomePage : OnboardingPageFragment(R.layout.content_onboarding
                     ctaText = it.getString(R.string.preOnboardingDaxDialog1Title)
                     binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
                     binding.daxDialogCta.dialogTextCta.textInDialog = ctaText.html(it)
+                    binding.daxDialogCta.experimentDialogContentImage.alpha = 0f
+                    binding.daxDialogCta.experimentDialogContentText.gone()
                     binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog1Button)
+                    binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(INITIAL) }
                 }
                 COMPARISON_CHART -> {
                     ctaText = it.getString(R.string.preOnboardingDaxDialog2Title)
                     binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
                     binding.daxDialogCta.dialogTextCta.textInDialog = ctaText.html(it)
+                    ViewCompat.animate(binding.daxDialogCta.experimentDialogContentImage).alpha(MAX_ALPHA).duration = ANIMATION_DURATION
+                    binding.daxDialogCta.experimentDialogContentImage.setImageResource(R.drawable.comparison_chart)
+                    binding.daxDialogCta.experimentDialogContentText.gone()
                     binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog2Button)
+                    binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(COMPARISON_CHART) }
+                    scheduleTypingAnimation()
                 }
                 CELEBRATION -> {
                     ctaText = it.getString(R.string.preOnboardingDaxDialog3Title)
                     binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
                     binding.daxDialogCta.dialogTextCta.textInDialog = ctaText.html(it)
+                    binding.daxDialogCta.experimentDialogContentImage.alpha = 1f
+                    binding.daxDialogCta.experimentDialogContentImage.setImageResource(R.drawable.ic_success_128)
+                    binding.daxDialogCta.experimentDialogContentText.show()
+                    binding.daxDialogCta.experimentDialogContentText.text = it.getString(R.string.preOnboardingDaxDialog3Content)
+                    ViewCompat.animate(binding.daxDialogCta.experimentDialogContentText).alpha(MIN_ALPHA).duration = ANIMATION_DURATION
                     binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog3Button)
+                    binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(CELEBRATION) }
+                    scheduleTypingAnimation()
                 }
             }
         }
@@ -135,6 +157,7 @@ class ExperimentWelcomePage : OnboardingPageFragment(R.layout.content_onboarding
                 finishTypingAnimation()
             } else if (!welcomeAnimationFinished) {
                 welcomeAnimation?.cancel()
+                hikerAnimation?.cancel()
                 scheduleWelcomeAnimation(0L)
             }
             welcomeAnimationFinished = true
@@ -142,35 +165,37 @@ class ExperimentWelcomePage : OnboardingPageFragment(R.layout.content_onboarding
     }
 
     private fun scheduleWelcomeAnimation(startDelay: Long = ANIMATION_DELAY) {
+        ViewCompat.animate(binding.foregroundImageView)
+            .alpha(MIN_ALPHA)
+            .setDuration(ANIMATION_DURATION).startDelay = startDelay
         welcomeAnimation = ViewCompat.animate(binding.welcomeContent as View)
             .alpha(MIN_ALPHA)
             .setDuration(ANIMATION_DURATION)
             .setStartDelay(startDelay)
             .withEndAction {
-                typingAnimation = ViewCompat.animate(binding.daxDialogCta.daxCtaContainer)
-                    .alpha(MAX_ALPHA)
-                    .setDuration(ANIMATION_DURATION)
-                    .withEndAction {
-                        welcomeAnimationFinished = true
-                        binding.daxDialogCta.dialogTextCta.startTypingAnimation(ctaText)
-                        setPrimaryCtaListenerAfterWelcomeAlphaAnimation()
-                    }
+                scheduleTypingAnimation()
+            }
+    }
+
+    private fun scheduleTypingAnimation() {
+        typingAnimation = ViewCompat.animate(binding.daxDialogCta.daxCtaContainer)
+            .alpha(MAX_ALPHA)
+            .setDuration(ANIMATION_DURATION)
+            .withEndAction {
+                welcomeAnimationFinished = true
+                binding.daxDialogCta.dialogTextCta.startTypingAnimation(ctaText)
             }
     }
 
     private fun finishTypingAnimation() {
         welcomeAnimation?.cancel()
+        hikerAnimation?.cancel()
         binding.daxDialogCta.dialogTextCta.finishAnimation()
-        setPrimaryCtaListenerAfterWelcomeAlphaAnimation()
-    }
-
-    private fun setPrimaryCtaListenerAfterWelcomeAlphaAnimation() {
-        binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked() }
     }
 
     companion object {
 
-        private enum class PreOnboardingDialogType {
+        enum class PreOnboardingDialogType {
             INITIAL, COMPARISON_CHART, CELEBRATION
         }
         private const val MIN_ALPHA = 0f

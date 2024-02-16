@@ -34,9 +34,10 @@
         app:srcCompat="@drawable/onboarding_experiment_background" />
 
     <ImageView
+        android:id="@+id/foregroundImageView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/keyline_5"
+        android:layout_marginHorizontal="@dimen/keyline_6"
         android:adjustViewBounds="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
