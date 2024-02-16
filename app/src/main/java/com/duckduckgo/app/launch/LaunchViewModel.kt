@@ -38,7 +38,7 @@ class LaunchViewModel @Inject constructor(
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     sealed class Command {
-        object Onboarding : Command()
+        data class Onboarding(val forceLightTheme: Boolean = true) : Command()
         data class Home(val replaceExistingSearch: Boolean = false) : Command()
     }
 
@@ -46,7 +46,8 @@ class LaunchViewModel @Inject constructor(
         waitForReferrerData()
 
         if (userStageStore.isNewUser()) {
-            command.value = Command.Onboarding
+            // TODO experiment check featureFlag to set light or system theme and pass it as argument
+            command.value = Command.Onboarding()
         } else {
             command.value = Command.Home()
         }

@@ -35,4 +35,8 @@ class ExperimentWelcomePageViewModel @Inject constructor() : ViewModel() {
     sealed interface Command {
         data class Command1(val result: EmailProtectionInContextSignUpResult) : Command
     }
+
+    fun onPrimaryCtaClicked() {
+        TODO("Not yet implemented")
+    }
 }

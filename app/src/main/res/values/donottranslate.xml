@@ -45,4 +45,13 @@
     <string name="audioCaptureSoundRecorderUnavailable">Could not access sound recorder</string>
     <string name="audioCaptureSoundRecorderPermissionDeniedTitle">Allow DuckDuckGo to ask for sound recorder access on this device</string>
     <string name="audioCaptureSoundRecorderPermissionDeniedMessage">Sites can only use the sound recorder if you allow DuckDuckGo to ask for access.</string>
+
+    <!-- Onboarding Experiment-->
+    <string name="preOnboardingDaxDialog1Title">Hi there. Ready for a better, more private internet?</string>
+    <string name="preOnboardingDaxDialog1Button">See the Benefits</string>
+    <string name="preOnboardingDaxDialog2Title">A better internet starts with a more private browser.</string>
+    <string name="preOnboardingDaxDialog2Button">Choose Your Browser</string>
+    <string name="preOnboardingDaxDialog3Title">Good choice!\n\nYour privacy is always the top priority here. Welcome to the duck side.</string>
+    <string name="preOnboardingDaxDialog3Button">Get Started</string>
+
 </resources>
