@@ -29,6 +29,7 @@ import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import timber.log.Timber
 
 interface AppLinksSnackBarConfigurator {
     fun configureAppLinkSnackBar(
@@ -83,7 +84,8 @@ class DuckDuckGoAppLinksSnackBarConfigurator @Inject constructor(private val pix
             val packageManager = context.packageManager
             val applicationInfo = packageManager.getApplicationInfo(packageName, 0)
             packageManager.getApplicationLabel(applicationInfo).toString()
-        } catch (e: PackageManager.NameNotFoundException) {
+        } catch (exception: PackageManager.NameNotFoundException) {
+            Timber.e(exception, "App name not found")
             null
         }
     }
