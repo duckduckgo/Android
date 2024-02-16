@@ -34,6 +34,7 @@ class RealAmpLinksRepository(
     val database: PrivacyConfigDatabase,
     coroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider,
+    isMainProcess: Boolean,
 ) : AmpLinksRepository {
 
     private val ampLinksDao: AmpLinksDao = database.ampLinksDao()
@@ -44,7 +45,9 @@ class RealAmpLinksRepository(
 
     init {
         coroutineScope.launch(dispatcherProvider.io()) {
-            loadToMemory()
+            if (isMainProcess) {
+                loadToMemory()
+            }
         }
     }
 

@@ -52,6 +52,7 @@ class RealCookieRepositoryTest {
             mockDatabase,
             TestScope(),
             coroutineRule.testDispatcherProvider,
+            true,
         )
 
         assertEquals(cookieExceptionEntity.toFeatureException(), testee.exceptions.first())
@@ -67,6 +68,7 @@ class RealCookieRepositoryTest {
             mockDatabase,
             TestScope(),
             coroutineRule.testDispatcherProvider,
+            true,
         )
 
         assertEquals(DEFAULT_THRESHOLD, testee.firstPartyCookiePolicy.threshold)
@@ -81,6 +83,7 @@ class RealCookieRepositoryTest {
             mockDatabase,
             TestScope(),
             coroutineRule.testDispatcherProvider,
+            true,
         )
 
         testee.updateAll(listOf(), policy)
@@ -96,6 +99,7 @@ class RealCookieRepositoryTest {
             mockDatabase,
             TestScope(),
             coroutineRule.testDispatcherProvider,
+            true,
         )
         assertEquals(1, testee.exceptions.size)
         assertEquals(THRESHOLD, testee.firstPartyCookiePolicy.threshold)

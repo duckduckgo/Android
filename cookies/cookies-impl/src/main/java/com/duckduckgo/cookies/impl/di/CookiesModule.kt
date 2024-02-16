@@ -19,6 +19,7 @@ package com.duckduckgo.cookies.impl.di
 import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.store.ALL_MIGRATIONS
 import com.duckduckgo.cookies.store.CookiesDatabase
@@ -56,8 +57,9 @@ object CookiesModule {
         database: CookiesDatabase,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
+        @IsMainProcess isMainProcess: Boolean,
     ): CookiesRepository {
-        return RealCookieRepository(database, appCoroutineScope, dispatcherProvider)
+        return RealCookieRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
     }
 
     @SingleInstanceIn(AppScope::class)
@@ -78,7 +80,8 @@ object CookiesModule {
         database: CookiesDatabase,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
+        @IsMainProcess isMainProcess: Boolean,
     ): ContentScopeScriptsCookieRepository {
-        return RealContentScopeScriptsCookieRepository(database, appCoroutineScope, dispatcherProvider)
+        return RealContentScopeScriptsCookieRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
     }
 }

@@ -33,13 +33,18 @@ class RealAutoconsentExceptionsRepository(
     coroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider,
     val database: AutoconsentDatabase,
+    isMainProcess: Boolean,
 ) : AutoconsentExceptionsRepository {
 
     private val dao = database.autoconsentDao()
     override val exceptions = CopyOnWriteArrayList<FeatureException>()
 
     init {
-        coroutineScope.launch(dispatcherProvider.io()) { loadToMemory() }
+        coroutineScope.launch(dispatcherProvider.io()) {
+            if (isMainProcess) {
+                loadToMemory()
+            }
+        }
     }
 
     override fun insertAllExceptions(exceptions: List<FeatureException>) {

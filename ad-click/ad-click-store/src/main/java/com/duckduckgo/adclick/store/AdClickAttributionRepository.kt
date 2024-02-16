@@ -38,6 +38,7 @@ class RealAdClickAttributionRepository(
     val database: AdClickDatabase,
     coroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider,
+    isMainProcess: Boolean,
 ) : AdClickAttributionRepository {
 
     private val adClickAttributionDao: AdClickDao = database.adClickDao()
@@ -49,7 +50,9 @@ class RealAdClickAttributionRepository(
 
     init {
         coroutineScope.launch(dispatcherProvider.io()) {
-            loadToMemory()
+            if (isMainProcess) {
+                loadToMemory()
+            }
         }
     }
 

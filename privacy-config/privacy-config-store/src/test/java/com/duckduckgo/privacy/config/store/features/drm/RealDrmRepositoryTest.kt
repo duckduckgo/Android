@@ -50,14 +50,14 @@ class RealDrmRepositoryTest {
     fun whenRepositoryIsCreatedThenExceptionsLoadedIntoMemory() = runTest {
         givenDrmDaoContainsExceptions()
 
-        testee = RealDrmRepository(mockDatabase, this, coroutineRule.testDispatcherProvider)
+        testee = RealDrmRepository(mockDatabase, this, coroutineRule.testDispatcherProvider, true)
 
         assertEquals(drmException.toFeatureException(), testee.exceptions.first())
     }
 
     @Test
     fun whenUpdateAllThenUpdateAllCalled() = runTest {
-        testee = RealDrmRepository(mockDatabase, this, coroutineRule.testDispatcherProvider)
+        testee = RealDrmRepository(mockDatabase, this, coroutineRule.testDispatcherProvider, true)
 
         testee.updateAll(listOf())
 
@@ -67,7 +67,7 @@ class RealDrmRepositoryTest {
     @Test
     fun whenUpdateAllThenPreviousExceptionsAreCleared() = runTest {
         givenDrmDaoContainsExceptions()
-        testee = RealDrmRepository(mockDatabase, this, coroutineRule.testDispatcherProvider)
+        testee = RealDrmRepository(mockDatabase, this, coroutineRule.testDispatcherProvider, true)
         assertEquals(1, testee.exceptions.size)
         reset(mockDrmDao)
 
