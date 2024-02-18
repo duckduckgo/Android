@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.applinks
 import android.content.Context
 import android.content.pm.PackageManager
 import android.view.View
+import com.duckduckgo.app.browser.BrowserTabViewModel
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
 import com.duckduckgo.app.pixels.AppPixelName
@@ -35,14 +36,17 @@ interface AppLinksSnackBarConfigurator {
     fun configureAppLinkSnackBar(
         view: View?,
         appLink: AppLink,
-        openAppLinkAction: () -> Unit,
+        viewModel: BrowserTabViewModel,
     ): Snackbar?
 }
 
 @ContributesBinding(AppScope::class)
-class DuckDuckGoAppLinksSnackBarConfigurator @Inject constructor(private val pixel: Pixel) : AppLinksSnackBarConfigurator {
+class DuckDuckGoAppLinksSnackBarConfigurator @Inject constructor(
+    private val appLinksLauncher: AppLinksLauncher,
+    private val pixel: Pixel,
+) : AppLinksSnackBarConfigurator {
 
-    override fun configureAppLinkSnackBar(view: View?, appLink: AppLink, openAppLinkAction: () -> Unit): Snackbar? {
+    override fun configureAppLinkSnackBar(view: View?, appLink: AppLink, viewModel: BrowserTabViewModel): Snackbar? {
         return view?.let {
             val context = it.context
             val (message, action) = getSnackBarContent(context, appLink) ?: return null
@@ -50,7 +54,7 @@ class DuckDuckGoAppLinksSnackBarConfigurator @Inject constructor(private val pix
             it.makeSnackbarWithNoBottomInset(message, Snackbar.LENGTH_LONG).apply {
                 setAction(action) {
                     pixel.fire(AppPixelName.APP_LINKS_SNACKBAR_OPEN_ACTION_PRESSED)
-                    openAppLinkAction()
+                    appLinksLauncher.openAppLink(context, appLink, viewModel)
                 }
                 addCallback(
                     object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
