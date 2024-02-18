@@ -33,11 +33,7 @@ import javax.inject.Inject
 import timber.log.Timber
 
 interface AppLinksSnackBarConfigurator {
-    fun configureAppLinkSnackBar(
-        view: View?,
-        appLink: AppLink,
-        viewModel: BrowserTabViewModel,
-    ): Snackbar?
+    fun configureAppLinkSnackBar(view: View?, appLink: AppLink, viewModel: BrowserTabViewModel): Snackbar?
 }
 
 @ContributesBinding(AppScope::class)
