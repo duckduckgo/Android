@@ -298,6 +298,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             logcat { "VPN log: NEW network ${vpnNetworkStack.name}" }
         }
         dnsChangeCallback.unregister()
+        // cancel previous monitor
+        alwaysOnStateJob.cancel()
 
         vpnServiceStateStatsDao.insert(createVpnState(state = ENABLING))
 
