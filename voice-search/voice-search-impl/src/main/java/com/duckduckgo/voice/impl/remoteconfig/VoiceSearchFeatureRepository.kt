@@ -17,6 +17,7 @@
 package com.duckduckgo.voice.impl.remoteconfig
 
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.voice.store.LocaleEntity
 import com.duckduckgo.voice.store.ManufacturerEntity
 import com.duckduckgo.voice.store.MinVersionEntity
 import com.duckduckgo.voice.store.VoiceSearchDao
@@ -26,12 +27,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 interface VoiceSearchFeatureRepository {
-    fun updateAllExceptions(exceptions: List<Manufacturer>, minVersion: Int)
+    fun updateAllExceptions(manufacturerExceptions: List<Manufacturer>, localeExceptions: List<Locale>, minVersion: Int)
     val manufacturerExceptions: CopyOnWriteArrayList<Manufacturer>
+    val localeExceptions: CopyOnWriteArrayList<Locale>
     val minVersion: Int?
 }
 
-class RealVoiceSearchFeatureRepository constructor(
+class RealVoiceSearchFeatureRepository(
     database: VoiceSearchDatabase,
     coroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider,
@@ -41,6 +43,7 @@ class RealVoiceSearchFeatureRepository constructor(
     private val voiceSearchDao: VoiceSearchDao = database.voiceSearchDao()
     private var _minVersion: Int? = null
     override val manufacturerExceptions = CopyOnWriteArrayList<Manufacturer>()
+    override val localeExceptions = CopyOnWriteArrayList<Locale>()
     override val minVersion: Int?
         get() = _minVersion
 
@@ -52,15 +55,24 @@ class RealVoiceSearchFeatureRepository constructor(
         }
     }
 
-    override fun updateAllExceptions(exceptions: List<Manufacturer>, minVersion: Int) {
-        voiceSearchDao.updateAll(exceptions.map { ManufacturerEntity(it.name) }, MinVersionEntity(minVersion))
+    override fun updateAllExceptions(manufacturerExceptions: List<Manufacturer>, localeExceptions: List<Locale>, minVersion: Int) {
+        voiceSearchDao.updateAll(
+            manufacturerExceptions.map { ManufacturerEntity(it.name) },
+            localeExceptions.map { LocaleEntity(it.name) },
+            MinVersionEntity(minVersion),
+        )
         loadToMemory()
     }
 
     private fun loadToMemory() {
         manufacturerExceptions.clear()
-        val manufacturerExceptionsEntityList = voiceSearchDao.getAllExceptions()
+        val manufacturerExceptionsEntityList = voiceSearchDao.getManufacturerExceptions()
         manufacturerExceptions.addAll(manufacturerExceptionsEntityList.map { Manufacturer(it.name) })
+
+        localeExceptions.clear()
+        val localeExceptionsEntityList = voiceSearchDao.getLocaleExceptions()
+        localeExceptions.addAll(localeExceptionsEntityList.map { Locale(it.name) })
+
         _minVersion = voiceSearchDao.getMinVersion()?.minVersion
     }
 }

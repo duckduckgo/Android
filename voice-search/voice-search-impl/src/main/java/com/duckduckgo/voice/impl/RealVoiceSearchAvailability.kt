@@ -32,7 +32,6 @@ class RealVoiceSearchAvailability @Inject constructor(
     private val voiceSearchRepository: VoiceSearchRepository,
 ) : VoiceSearchAvailability {
     companion object {
-        private const val LANGUAGE_TAG_ENG_US = "en-US"
         private const val URL_DDG_SERP = "https://duckduckgo.com/?"
     }
 
@@ -52,7 +51,7 @@ class RealVoiceSearchAvailability @Inject constructor(
         sdkInt >= minVersion
     } ?: true
 
-    private fun hasValidLocale(localeLanguageTag: String) = localeLanguageTag == LANGUAGE_TAG_ENG_US
+    private fun hasValidLocale(localeLanguageTag: String) = voiceSearchFeatureRepository.localeExceptions.none { it.name == localeLanguageTag }
 
     override fun shouldShowVoiceSearch(
         hasFocus: Boolean,
