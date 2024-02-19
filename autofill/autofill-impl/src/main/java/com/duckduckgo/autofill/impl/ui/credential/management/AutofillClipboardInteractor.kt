@@ -20,9 +20,7 @@ import android.annotation.SuppressLint
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
-import android.os.Build
 import android.os.PersistableBundle
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.ActivityScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -34,14 +32,13 @@ interface AutofillClipboardInteractor {
 @ContributesBinding(ActivityScope::class)
 class RealAutofillClipboardInteractor @Inject constructor(
     context: Context,
-    private val appBuildConfig: AppBuildConfig,
 ) : AutofillClipboardInteractor {
     private val clipboardManager by lazy { context.getSystemService(ClipboardManager::class.java) }
 
     @SuppressLint("NewApi")
     override fun copyToClipboard(toCopy: String, isSensitive: Boolean) {
         val clipData = ClipData.newPlainText("", toCopy)
-        if (isSensitive && appBuildConfig.sdkInt >= Build.VERSION_CODES.N) {
+        if (isSensitive) {
             clipData.description.extras = PersistableBundle().apply {
                 putBoolean("android.content.extra.IS_SENSITIVE", true)
             }

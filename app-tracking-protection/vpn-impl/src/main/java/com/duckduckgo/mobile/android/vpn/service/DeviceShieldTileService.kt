@@ -25,7 +25,6 @@ import android.os.Bundle
 import android.service.quicksettings.Tile.STATE_ACTIVE
 import android.service.quicksettings.Tile.STATE_INACTIVE
 import android.service.quicksettings.TileService
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -44,7 +43,6 @@ import kotlinx.coroutines.*
 import logcat.logcat
 
 @Suppress("NoHardcodedCoroutineDispatcher")
-@RequiresApi(Build.VERSION_CODES.N)
 // We don't use the DeviceShieldTileService::class as binding key because TileService (Android) class does not
 // exist in all APIs, and so using it DeviceShieldTileService::class as key would compile but immediately crash
 // at startup when Java class loader tries to resolve the TileService::class upon Dagger setup

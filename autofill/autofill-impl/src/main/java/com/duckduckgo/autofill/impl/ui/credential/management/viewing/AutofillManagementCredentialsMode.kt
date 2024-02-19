@@ -18,8 +18,6 @@ package com.duckduckgo.autofill.impl.ui.credential.management.viewing
 
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
-import android.os.Build.VERSION
-import android.os.Build.VERSION_CODES
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
@@ -492,9 +490,7 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
     }
 
     private fun disableSystemAutofillServiceOnPasswordField() {
-        if (VERSION.SDK_INT >= VERSION_CODES.O) {
-            binding.passwordEditText.importantForAutofill = View.IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS
-        }
+        binding.passwordEditText.importantForAutofill = View.IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS
     }
 
     private fun String.convertBlankToNull(): String? = this.ifBlank { null }

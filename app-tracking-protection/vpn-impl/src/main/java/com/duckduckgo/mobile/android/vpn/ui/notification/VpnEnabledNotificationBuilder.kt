@@ -41,22 +41,20 @@ class VpnEnabledNotificationBuilder {
         private const val VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_DESCRIPTION = "Ongoing state of App Tracking Protection"
 
         private fun registerOngoingNotificationChannel(context: Context) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val channel =
-                    NotificationChannel(
-                        VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID,
-                        VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_NAME,
-                        IMPORTANCE_LOW,
-                    )
-                channel.setShowBadge(false)
-                channel.description = VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_DESCRIPTION
-                val notificationManager = NotificationManagerCompat.from(context)
-                notificationManager.createNotificationChannel(channel)
-                /**
-                 * We needed to create a new channel to fix: https://app.asana.com/0/488551667048375/1206484244032061/f
-                 */
-                notificationManager.deleteNotificationChannel("com.duckduckgo.mobile.android.vpn.notification.ongoing")
-            }
+            val channel =
+                NotificationChannel(
+                    VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID,
+                    VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_NAME,
+                    IMPORTANCE_LOW,
+                )
+            channel.setShowBadge(false)
+            channel.description = VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_DESCRIPTION
+            val notificationManager = NotificationManagerCompat.from(context)
+            notificationManager.createNotificationChannel(channel)
+            /**
+             * We needed to create a new channel to fix: https://app.asana.com/0/488551667048375/1206484244032061/f
+             */
+            notificationManager.deleteNotificationChannel("com.duckduckgo.mobile.android.vpn.notification.ongoing")
         }
 
         fun buildVpnEnabledNotification(

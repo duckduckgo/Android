@@ -23,9 +23,7 @@ import android.net.LinkProperties
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
-import android.os.Build
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.mobile.android.vpn.network.util.getActiveNetwork
 import java.net.InetAddress
@@ -37,7 +35,6 @@ import logcat.asLog
 import logcat.logcat
 
 class DnsChangeCallback @Inject constructor(
-    private val appBuildConfig: AppBuildConfig,
     private val context: Context,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
@@ -56,7 +53,7 @@ class DnsChangeCallback @Inject constructor(
             // we only care about changes in the active network
             if (activeNetwork != null && activeNetwork != network) return@launch
 
-            if (appBuildConfig.sdkInt >= Build.VERSION_CODES.O && !same(lastDns, dns)) {
+            if (!same(lastDns, dns)) {
                 logcat {
                     """
                     onLinkPropertiesChanged: DNS changed

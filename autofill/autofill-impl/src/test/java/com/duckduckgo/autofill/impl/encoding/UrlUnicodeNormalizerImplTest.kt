@@ -22,9 +22,9 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class ModernUrlUnicodeNormalizerTest {
+class UrlUnicodeNormalizerImplTest {
 
-    private val testee = ModernUrlUnicodeNormalizer()
+    private val testee = UrlUnicodeNormalizerImpl()
 
     @Test
     fun whenNormalizingToAsciiAndContainsNonAsciiThenOutputIdnaEncoded() {

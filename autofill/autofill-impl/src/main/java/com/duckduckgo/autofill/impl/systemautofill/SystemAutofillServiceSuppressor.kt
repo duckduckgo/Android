@@ -16,11 +16,8 @@
 
 package com.duckduckgo.autofill.impl.systemautofill
 
-import android.annotation.SuppressLint
-import android.os.Build
 import android.view.autofill.AutofillManager
 import android.webkit.WebView
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -30,14 +27,9 @@ interface SystemAutofillServiceSuppressor {
 }
 
 @ContributesBinding(AppScope::class)
-class RealSystemAutofillServiceSuppressor @Inject constructor(
-    private val appBuildConfig: AppBuildConfig,
-) : SystemAutofillServiceSuppressor {
+class RealSystemAutofillServiceSuppressor @Inject constructor() : SystemAutofillServiceSuppressor {
 
-    @SuppressLint("NewApi")
     override fun suppressAutofill(webView: WebView?) {
-        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.O) {
-            webView?.context?.getSystemService(AutofillManager::class.java)?.cancel()
-        }
+        webView?.context?.getSystemService(AutofillManager::class.java)?.cancel()
     }
 }

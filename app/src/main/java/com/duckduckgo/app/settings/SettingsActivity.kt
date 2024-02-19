@@ -19,7 +19,6 @@ package com.duckduckgo.app.settings
 import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.isVisible
@@ -325,13 +324,8 @@ class SettingsActivity : DuckDuckGoActivity() {
         }
     }
 
-    @Suppress("NewApi") // we use appBuildConfig
     private fun launchDefaultAppScreen() {
-        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.N) {
-            launchDefaultAppActivity()
-        } else {
-            throw IllegalStateException("Unable to launch default app activity on this OS")
-        }
+        launchDefaultAppActivity()
     }
 
     private fun launchAutofillSettings() {

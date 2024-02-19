@@ -20,7 +20,6 @@ import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -192,16 +191,13 @@ class DefaultBrowserPage : OnboardingPageFragment(R.layout.content_onboarding_de
         startActivityForResult(intent, DEFAULT_BROWSER_REQUEST_CODE_DIALOG)
     }
 
-    @Suppress("NewApi") // we use appBuildConfig
     private fun onLaunchDefaultBrowserSettingsClicked() {
         userTriedToSetDDGAsDefault = true
-        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.N) {
-            val intent = DefaultBrowserSystemSettings.intent()
-            try {
-                startActivityForResult(intent, DEFAULT_BROWSER_REQUEST_CODE_SETTINGS)
-            } catch (e: ActivityNotFoundException) {
-                Timber.w(e, getString(R.string.cannotLaunchDefaultAppSettings))
-            }
+        val intent = DefaultBrowserSystemSettings.intent()
+        try {
+            startActivityForResult(intent, DEFAULT_BROWSER_REQUEST_CODE_SETTINGS)
+        } catch (e: ActivityNotFoundException) {
+            Timber.w(e, getString(R.string.cannotLaunchDefaultAppSettings))
         }
     }
 
