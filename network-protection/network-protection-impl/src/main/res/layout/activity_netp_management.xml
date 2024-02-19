@@ -77,6 +77,10 @@
                 android:layout_height="wrap_content" />
 
             <include
+                android:id="@+id/location_details"
+                layout="@layout/section_location" />
+
+            <include
                 android:id="@+id/connection_details"
                 layout="@layout/section_connection_details" />
 

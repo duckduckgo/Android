@@ -49,9 +49,12 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Connected
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Connecting
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Disconnected
+import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.LocationState
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ViewState
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
+import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
+import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository.UserPreferredLocation
 import com.wireguard.config.Config
 import java.io.BufferedReader
 import java.io.StringReader
@@ -90,6 +93,9 @@ class NetworkProtectionManagementViewModelTest {
     @Mock
     private lateinit var networkProtectionState: NetworkProtectionState
 
+    @Mock
+    private lateinit var netPGeoswitchingRepository: NetPGeoswitchingRepository
+
     private val wgQuickConfig = """
         [Interface]
         Address = 10.237.97.63/32
@@ -101,7 +107,7 @@ class NetworkProtectionManagementViewModelTest {
         AllowedIPs = 0.0.0.0/0
         Endpoint = 10.10.10.10:443
         Name = euw.1
-        Location = Stockholm, Sweden
+        Location = Stockholm, SE
         PublicKey = u4geRTVQHaZYwsQzb/LsJqEDpxU8Fqzb5VjxGeIHslM=
     """.trimIndent()
     private val wgConfig: Config = Config.parse(BufferedReader(StringReader(wgQuickConfig)))
@@ -127,6 +133,7 @@ class NetworkProtectionManagementViewModelTest {
             networkProtectionPixels,
             testbreakageCategories,
             networkProtectionState,
+            netPGeoswitchingRepository,
         )
     }
 
@@ -219,6 +226,7 @@ class NetworkProtectionManagementViewModelTest {
                 ),
             ),
         )
+        whenever(netPGeoswitchingRepository.getUserPreferredLocation()).thenReturn(UserPreferredLocation())
 
         testee.onStartVpn()
 
@@ -227,6 +235,11 @@ class NetworkProtectionManagementViewModelTest {
                 ViewState(
                     connectionState = Connecting,
                     alertState = None,
+                    locationState = LocationState(
+                        location = null,
+                        icon = null,
+                        isCustom = false,
+                    ),
                 ),
                 this.expectMostRecentItem(),
             )
@@ -244,11 +257,22 @@ class NetworkProtectionManagementViewModelTest {
             ),
         )
         whenever(wgTunnelConfig.getWgConfig()).thenReturn(wgConfig)
+        whenever(netPGeoswitchingRepository.getUserPreferredLocation()).thenReturn(
+            UserPreferredLocation(
+                countryCode = "ES",
+                cityName = "Madrid",
+            ),
+        )
 
         testee.viewState().test {
             assertEquals(
                 ViewState(
                     connectionState = Disconnected,
+                    locationState = LocationState(
+                        location = "Madrid, Spain",
+                        icon = "🇪🇸",
+                        isCustom = true,
+                    ),
                 ),
                 this.awaitItem(),
             )
@@ -267,15 +291,21 @@ class NetworkProtectionManagementViewModelTest {
                 ),
             ),
         )
+        whenever(netPGeoswitchingRepository.getUserPreferredLocation()).thenReturn(UserPreferredLocation())
 
         testee.viewState().distinctUntilChanged().test {
             assertEquals(
                 ViewState(
                     connectionState = Connected,
                     connectionDetails = ConnectionDetails(
-                        location = "Stockholm, Sweden",
+                        location = "Stockholm, SE",
                         ipAddress = "10.10.10.10",
                         elapsedConnectedTime = null,
+                    ),
+                    locationState = LocationState(
+                        location = "Stockholm, Sweden",
+                        icon = "🇸🇪",
+                        isCustom = false,
                     ),
                 ),
                 this.expectMostRecentItem(),

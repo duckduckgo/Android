@@ -27,6 +27,13 @@
     <string name="netpManagementToggleSubtitleDisconnected">Not connected</string>
     <string name="netpManagementBetaDescription">DuckDuckGo Network Protection is currently in beta. <annotation type="report_issues_link">Share feedback</annotation> to help us improve!</string>
 
+    <!-- Location -->
+    <string name="netpManagementLocationHeaderVpnOff">Selected Location</string>
+    <string name="netpManagementLocationHeaderVpnOn">Connected Location</string>
+    <string name="netpManagementLocationNearest">(Nearest)</string>
+    <string name="netpManagementLocationPlaceholder">Nearest Location</string>
+    <string name="netpManagementLocationCustom">(Custom)</string>
+
     <!-- Connection details -->
     <string name="netpManagementConnectionDetailsHeader">Connection Details</string>
     <string name="netpManagementConnectionDetailsLocation">Location</string>
