@@ -73,6 +73,7 @@ class RealSecureStorageTest {
         notesIv = expectedEncryptedIv,
         domainTitle = "test",
         lastUpdatedInMillis = 1000L,
+        lastUsedInMillis = null,
     )
 
     @Before
