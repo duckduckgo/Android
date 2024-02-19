@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
 import com.duckduckgo.autofill.api.InternalTestUserChecker
@@ -112,8 +113,9 @@ class AutofillModule {
         database: AutofillDatabase,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
+        @IsMainProcess isMainProcess: Boolean,
     ): AutofillFeatureRepository {
-        return RealAutofillFeatureRepository(database, appCoroutineScope, dispatcherProvider)
+        return RealAutofillFeatureRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
     }
 
     @SingleInstanceIn(AppScope::class)
@@ -122,8 +124,9 @@ class AutofillModule {
         database: EmailProtectionInContextDatabase,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
+        @IsMainProcess isMainProcess: Boolean,
     ): EmailProtectionInContextFeatureRepository {
-        return RealEmailProtectionInContextFeatureRepository(database, appCoroutineScope, dispatcherProvider)
+        return RealEmailProtectionInContextFeatureRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
     }
 
     @Provides

@@ -19,6 +19,7 @@ package com.duckduckgo.autoconsent.impl.di
 import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentExceptionsRepository
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeatureSettingsRepository
@@ -58,8 +59,9 @@ object AutoconsentModule {
         database: AutoconsentDatabase,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
+        @IsMainProcess isMainProcess: Boolean,
     ): AutoconsentExceptionsRepository {
-        return RealAutoconsentExceptionsRepository(appCoroutineScope, dispatcherProvider, database)
+        return RealAutoconsentExceptionsRepository(appCoroutineScope, dispatcherProvider, database, isMainProcess)
     }
 
     @SingleInstanceIn(AppScope::class)

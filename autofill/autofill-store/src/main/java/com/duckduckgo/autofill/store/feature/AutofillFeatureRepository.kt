@@ -35,13 +35,18 @@ class RealAutofillFeatureRepository(
     val database: AutofillDatabase,
     coroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider,
+    isMainProcess: Boolean,
 ) : AutofillFeatureRepository {
 
     private val autofillDao: AutofillDao = database.autofillDao()
     override val exceptions = CopyOnWriteArrayList<FeatureException>()
 
     init {
-        coroutineScope.launch(dispatcherProvider.io()) { loadToMemory() }
+        coroutineScope.launch(dispatcherProvider.io()) {
+            if (isMainProcess) {
+                loadToMemory()
+            }
+        }
     }
 
     override fun updateAllExceptions(exceptions: List<AutofillExceptionEntity>) {

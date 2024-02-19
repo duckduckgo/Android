@@ -51,6 +51,7 @@ class RealFingerprintingHardwareRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    true,
                 )
 
             verify(mockFingerprintingHardwareDao).get()
@@ -66,6 +67,7 @@ class RealFingerprintingHardwareRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    true,
                 )
 
             verify(mockFingerprintingHardwareDao).get()
@@ -80,6 +82,7 @@ class RealFingerprintingHardwareRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    true,
                 )
 
             testee.updateAll(fingerprintingHardwareEntity)

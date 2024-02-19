@@ -51,6 +51,7 @@ class RealFingerprintingScreenSizeRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    true,
                 )
 
             verify(mockFingerprintingScreenSizeDao).get()
@@ -66,6 +67,7 @@ class RealFingerprintingScreenSizeRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    true,
                 )
 
             verify(mockFingerprintingScreenSizeDao).get()
@@ -80,6 +82,7 @@ class RealFingerprintingScreenSizeRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    true,
                 )
 
             testee.updateAll(fingerprintingScreenSizeEntity)

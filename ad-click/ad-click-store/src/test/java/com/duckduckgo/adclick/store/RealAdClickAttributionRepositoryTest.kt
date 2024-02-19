@@ -48,6 +48,7 @@ class RealAdClickAttributionRepositoryTest {
             database = mockDatabase,
             coroutineScope = TestScope(),
             dispatcherProvider = coroutineRule.testDispatcherProvider,
+            isMainProcess = true,
         )
     }
 

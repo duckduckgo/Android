@@ -51,6 +51,7 @@ class RealFingerprintingCanvasRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    isMainProcess = true,
                 )
 
             verify(mockFingerprintingCanvasDao).get()
@@ -66,6 +67,7 @@ class RealFingerprintingCanvasRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    isMainProcess = true,
                 )
 
             verify(mockFingerprintingCanvasDao).get()
@@ -80,6 +82,7 @@ class RealFingerprintingCanvasRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    isMainProcess = true,
                 )
 
             testee.updateAll(fingerprintingCanvasEntity)

@@ -35,6 +35,7 @@ class RealVoiceSearchFeatureRepository constructor(
     database: VoiceSearchDatabase,
     coroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider,
+    isMainProcess: Boolean,
 ) : VoiceSearchFeatureRepository {
 
     private val voiceSearchDao: VoiceSearchDao = database.voiceSearchDao()
@@ -44,7 +45,11 @@ class RealVoiceSearchFeatureRepository constructor(
         get() = _minVersion
 
     init {
-        coroutineScope.launch(dispatcherProvider.io()) { loadToMemory() }
+        coroutineScope.launch(dispatcherProvider.io()) {
+            if (isMainProcess) {
+                loadToMemory()
+            }
+        }
     }
 
     override fun updateAllExceptions(exceptions: List<Manufacturer>, minVersion: Int) {
