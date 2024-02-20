@@ -24,7 +24,7 @@ data class VoiceSearchSetting(
     @field:Json(name = "excludedManufacturers")
     val excludedManufacturers: List<Manufacturer>,
     @field:Json(name = "excludedLocales")
-    val excludedLocales: List<Locale>,
+    val excludedLocales: List<Locale> = emptyList(),
     @field:Json(name = "minVersion")
     val minVersion: Int,
 )
