@@ -29,7 +29,6 @@ import com.duckduckgo.common.utils.extensions.isIgnoringBatteryOptimizations
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
-import com.duckduckgo.networkprotection.impl.settings.geoswitching.DisplayablePreferredLocationProvider
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -48,7 +47,6 @@ import kotlinx.coroutines.launch
 @ContributesViewModel(ActivityScope::class)
 class NetPVpnSettingsViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
-    private val displayablePreferredLocationProvider: DisplayablePreferredLocationProvider,
     private val netPSettingsLocalConfig: NetPSettingsLocalConfig,
     private val networkProtectionState: NetworkProtectionState,
     @InternalApi private val isIgnoringBatteryOptimizations: () -> Boolean,
@@ -69,7 +67,6 @@ class NetPVpnSettingsViewModel @Inject constructor(
     internal fun viewState(): Flow<ViewState> = _viewState.asStateFlow()
 
     internal data class ViewState(
-        val preferredLocation: String? = null,
         val excludeLocalNetworks: Boolean = false,
     )
 
@@ -87,8 +84,7 @@ class NetPVpnSettingsViewModel @Inject constructor(
         super.onStart(owner)
         viewModelScope.launch(dispatcherProvider.io()) {
             val excludeLocalRoutes = netPSettingsLocalConfig.vpnExcludeLocalNetworkRoutes().isEnabled()
-            val location = displayablePreferredLocationProvider.getDisplayablePreferredLocation()
-            _viewState.emit(_viewState.value.copy(preferredLocation = location, excludeLocalNetworks = excludeLocalRoutes))
+            _viewState.emit(_viewState.value.copy(excludeLocalNetworks = excludeLocalRoutes))
         }
     }
 

@@ -34,7 +34,6 @@ import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpVpnSettingsBinding
 import com.duckduckgo.networkprotection.impl.settings.NetPVpnSettingsViewModel.RecommendedSettings
 import com.duckduckgo.networkprotection.impl.settings.NetPVpnSettingsViewModel.ViewState
-import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpGeoswitchingScreenNoParams
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -105,8 +104,6 @@ class NetPVpnSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun renderViewState(viewState: ViewState) {
-        val geoSwitchingSubtitle = viewState.preferredLocation ?: getString(R.string.netpVpnSettingGeoswitchingDefault)
-        binding.geoswitching.setSecondaryText(geoSwitchingSubtitle)
         binding.excludeLocalNetworks.quietlySetIsChecked(viewState.excludeLocalNetworks) { _, isChecked ->
             viewModel.onExcludeLocalRoutes(isChecked)
         }
@@ -122,10 +119,6 @@ class NetPVpnSettingsActivity : DuckDuckGoActivity() {
 
         binding.alwaysOn.setOnClickListener {
             this.launchAlwaysOnSystemSettings()
-        }
-
-        binding.geoswitching.setOnClickListener {
-            globalActivityStarter.start(this, NetpGeoswitchingScreenNoParams)
         }
     }
 
