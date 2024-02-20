@@ -338,6 +338,23 @@ class BrowserWebViewClient @Inject constructor(
                 val progress = webView.progress
                 // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
                 if (url != ABOUT_BLANK && progress == 100) {
+                    val safeEnd = currentTimeProvider.getTimeInMillis()
+                    Timber.v("shouldSendPageLoadedPixel webViewUrl: ${webView.url} URL: $url safeStart $safeStart safeEnd: $safeEnd")
+
+                    val kotlinTime = safeEnd - safeStart
+                    val JSEval = """(() => {
+                        const resources = performance.getEntriesByType("navigation");
+                        const paintResources = performance.getEntriesByType("paint");
+                        const results = {
+                            navigation: resources.map((e) => JSON.parse(JSON.stringify(e))),
+                            paint: paintResources.map((e) => JSON.parse(JSON.stringify(e)))
+                        }
+                        return JSON.stringify(results, null, 4)
+                    })()""".trimIndent()
+                    webView.evaluateJavascript("javascript:${JSEval}", { value ->
+                        Timber.v("JS Timing: webViewUrl: ${webView.url} kotlin load time: $kotlinTime - $value")
+                    })
+
                     shouldSendPageLoadedPixel(it, safeStart, currentTimeProvider.getTimeInMillis())
                     start = null
                 }
