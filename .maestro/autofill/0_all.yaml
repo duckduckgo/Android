@@ -1,19 +1,12 @@
 appId: com.duckduckgo.mobile.android
 name: "Autofill: Run all tests"
-tags:
-    - autofillNoAuthTests
 ---
 # Pre-requisite: the app is installed on an autofill-eligible device with a special build flag set to bypass device-authentication requirement
+# This should only be run locally, as Maestro cloud will likely timeout trying to run them all as one flow.
 
 - launchApp:
     clearState: true
 - runFlow: ../shared/onboarding.yaml
 - runFlow: 1_autofill_shown_in_overflow.yaml
-
-  # Everything below requires a device has device-level authentication set (e.g., a PIN/Password etc...)
-- runFlow: 2_autofill_reach_creds_management.yaml
-- runFlow: 3_autofill_manually_add_cred.yaml
-- runFlow: 4_search_logins.yaml
-- runFlow: 5_autofill_manually_updating_an_existing_credential.yaml
-- runFlow: 6_delete_logins.yaml
-- runFlow: 7_autofill_prompted_to_save_creds_on_form.yaml
+- runFlow: 2_autofill_add_search_update_delete_creds.yaml
+- runFlow: 3_autofill_prompted_to_save_creds_on_form.yaml

@@ -1,9 +1,21 @@
 appId: com.duckduckgo.mobile.android
 name: "Autofill: Manually add credentials"
+tags:
+  - autofillNoAuthTests
 ---
-# Pre-requisite: the user is viewing the password manager screen with no saved passwords, on an autofill-eligible device
+# Pre-requisite: on an autofill-eligible device
 
-- runScript: 3_script.js
+- launchApp:
+    clearState: true
+- runFlow: ../shared/onboarding.yaml
+- runFlow: steps/access_passwords_screen.yaml
+
+- assertVisible:
+    text: "No passwords saved yet"
+- assertNotVisible:
+    id: searchLogins
+
+- runScript: steps/2_script.js
 
 - repeat:
       while:
@@ -61,3 +73,8 @@ name: "Autofill: Manually add credentials"
 
 - assertNotVisible:
     text: "fill.dev/example"
+
+
+- runFlow: steps/search_logins.yaml
+- runFlow: steps/manual_update.yaml
+- runFlow: steps/delete_logins.yaml
