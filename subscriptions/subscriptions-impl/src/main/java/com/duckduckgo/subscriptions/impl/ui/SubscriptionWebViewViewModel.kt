@@ -38,6 +38,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.billing.getPrice
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.SubscriptionsRepository
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.*
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView.Failure
@@ -66,6 +67,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
     private val subscriptionsRepository: SubscriptionsRepository,
     private val networkProtectionWaitlist: NetworkProtectionWaitlist,
+    private val pixelSender: SubscriptionPixelSender,
 ) : ViewModel() {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -137,6 +139,8 @@ class SubscriptionWebViewViewModel @Inject constructor(
     }
 
     private fun subscriptionSelected(data: JSONObject?) {
+        pixelSender.reportOfferSubscribeClick()
+
         viewModelScope.launch(dispatcherProvider.io()) {
             val id = runCatching { data?.getString("id") }.getOrNull()
             if (id.isNullOrBlank()) {

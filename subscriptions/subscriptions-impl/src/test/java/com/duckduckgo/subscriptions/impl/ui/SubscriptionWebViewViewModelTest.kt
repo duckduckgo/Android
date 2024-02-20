@@ -14,6 +14,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.SubscriptionsRepository
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Companion
@@ -31,6 +32,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
@@ -43,6 +45,7 @@ class SubscriptionWebViewViewModelTest {
     private val subscriptionsManager: SubscriptionsManager = mock()
     private val subscriptionsRepository: SubscriptionsRepository = mock()
     private val networkProtectionWaitlist: NetworkProtectionWaitlist = mock()
+    private val pixelSender: SubscriptionPixelSender = mock()
 
     private lateinit var viewModel: SubscriptionWebViewViewModel
 
@@ -54,6 +57,7 @@ class SubscriptionWebViewViewModelTest {
             subscriptionsManager,
             subscriptionsRepository,
             networkProtectionWaitlist,
+            pixelSender,
         )
     }
 
@@ -241,6 +245,17 @@ class SubscriptionWebViewViewModelTest {
             )
             assertTrue(awaitItem() is Command.GoToPIR)
         }
+    }
+
+    @Test
+    fun whenSubscriptionSelectedThenPixelIsSent() = runTest {
+        viewModel.processJsCallbackMessage(
+            featureName = "test",
+            method = "subscriptionSelected",
+            id = "id",
+            data = JSONObject("""{"id":"myId"}"""),
+        )
+        verify(pixelSender).reportOfferSubscribeClick()
     }
 
     private fun getSubscriptionOfferDetails(planId: String): SubscriptionOfferDetails {
