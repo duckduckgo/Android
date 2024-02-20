@@ -60,6 +60,7 @@ import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.getDisplayableCountry
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.getEmojiForCountryCode
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
+import com.duckduckgo.networkprotection.impl.volume.NetpDataVolumeStore
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository.UserPreferredLocation
 import java.util.concurrent.TimeUnit
@@ -83,6 +84,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     @NetpBreakageCategories private val netpBreakageCategories: List<AppBreakageCategory>,
     private val networkProtectionState: NetworkProtectionState,
     private val netPGeoswitchingRepository: NetPGeoswitchingRepository,
+    private val netpDataVolumeStore: NetpDataVolumeStore,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val refreshVpnRunningState = MutableStateFlow(System.currentTimeMillis())
@@ -217,13 +219,18 @@ class NetworkProtectionManagementViewModel @Inject constructor(
                         // We can't do anything with  a -1 enabledTime so we try to refetch it.
                         enabledTime = networkProtectionRepository.enabledTimeInMillis
                     } else {
+                        val dataVolume = netpDataVolumeStore.dataVolume
                         connectionDetailsFlow.value = if (connectionDetailsFlow.value == null) {
                             ConnectionDetails(
                                 elapsedConnectedTime = getElapsedTimeString(enabledTime),
+                                transmittedData = dataVolume.transmittedBytes,
+                                receivedData = dataVolume.receivedBytes,
                             )
                         } else {
                             connectionDetailsFlow.value!!.copy(
                                 elapsedConnectedTime = getElapsedTimeString(enabledTime),
+                                transmittedData = dataVolume.transmittedBytes,
+                                receivedData = dataVolume.receivedBytes,
                             )
                         }
                     }
@@ -375,6 +382,8 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         val location: String? = null,
         val ipAddress: String? = null,
         val elapsedConnectedTime: String? = null,
+        val transmittedData: Long = 0L,
+        val receivedData: Long = 0L,
     )
 
     enum class ConnectionState {

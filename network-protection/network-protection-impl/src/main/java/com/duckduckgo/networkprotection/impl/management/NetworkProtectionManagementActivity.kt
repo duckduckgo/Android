@@ -19,6 +19,7 @@ package com.duckduckgo.networkprotection.impl.management
 import android.content.Intent
 import android.net.VpnService
 import android.os.Bundle
+import android.text.format.Formatter.formatFileSize
 import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.content.res.AppCompatResources
@@ -225,6 +226,14 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         } else {
             connectionDetails.connectionDetailsIp.setSecondaryText(connectionDetailsData.ipAddress)
         }
+
+        connectionDetails.connectionDetailsDataVolume.setSecondaryText(
+            getString(
+                R.string.netpManagementConnectionDetailsDataVolumeFormat,
+                formatFileSize(applicationContext, connectionDetailsData.transmittedData),
+                formatFileSize(applicationContext, connectionDetailsData.receivedData),
+            ),
+        )
     }
 
     private fun ActivityNetpManagementBinding.renderDisconnectedState() {

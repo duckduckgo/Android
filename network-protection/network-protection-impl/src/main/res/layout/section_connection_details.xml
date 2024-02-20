@@ -29,7 +29,12 @@
         android:id="@+id/connection_details_ip"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:leadingIcon="@drawable/ic_ip_24"
-        app:leadingIconBackground="none"
         app:primaryText="@string/netpManagementConnectionDetailsIp" />
+
+    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+        android:id="@+id/connection_details_data_volume"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/netpManagementConnectionDetailsDataVolume"
+        app:secondaryText="@string/netpManagementConnectionDetailsDataVolumeFormat" />
 </LinearLayout>

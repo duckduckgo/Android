@@ -53,6 +53,7 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ViewState
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
+import com.duckduckgo.networkprotection.impl.volume.NetpDataVolumeStore
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository.UserPreferredLocation
 import com.wireguard.config.Config
@@ -96,6 +97,9 @@ class NetworkProtectionManagementViewModelTest {
     @Mock
     private lateinit var netPGeoswitchingRepository: NetPGeoswitchingRepository
 
+    @Mock
+    private lateinit var netpDataVolumeStore: NetpDataVolumeStore
+
     private val wgQuickConfig = """
         [Interface]
         Address = 10.237.97.63/32
@@ -134,6 +138,7 @@ class NetworkProtectionManagementViewModelTest {
             testbreakageCategories,
             networkProtectionState,
             netPGeoswitchingRepository,
+            netpDataVolumeStore,
         )
     }
 
