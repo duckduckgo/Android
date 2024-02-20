@@ -49,6 +49,7 @@ dependencies {
     implementation project(path: ':macos-api')
     implementation project(path: ':windows-api')
     implementation project(path: ':downloads-api')
+    implementation project(path: ':statistics')
 
     implementation AndroidX.appCompat
     implementation KotlinX.coroutines.core
