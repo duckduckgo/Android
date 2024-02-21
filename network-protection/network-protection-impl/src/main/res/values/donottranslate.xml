@@ -122,7 +122,12 @@
 
     <!-- Manage -->
     <string name="netpManagementManageHeader">Manage</string>
-    <string name="netpManagementManageItemExclusion">Having issues with an app?</string>
+    <string name="netpManagementManageItemExclusion">Excluded Apps</string>
+    <string name="netpManagementManageItemExclusionSubtitleEmpty">None</string>
+    <plurals name="netpManagementManageItemExclusionSubtitleAppCount">
+        <item quantity="one" instruction="Placeholder is a number">%1$d app</item>
+        <item quantity="other" instruction="Placeholder is a number">%1$d apps</item>
+    </plurals>
     <string name="netpManagementVpnSettings">VPN Settings</string>
     <string name="netpManagementVpnNotificationSettings">VPN Notifications</string>
 

@@ -56,7 +56,6 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.LocationState
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ViewState
 import com.duckduckgo.networkprotection.impl.management.alwayson.NetworkProtectionAlwaysOnDialogFragment
-import com.duckduckgo.networkprotection.impl.settings.NetPNotificationSettingsScreenNoParams
 import com.duckduckgo.networkprotection.impl.settings.NetPVpnSettingsScreenNoParams
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpGeoswitchingScreenNoParams
 import javax.inject.Inject
@@ -134,10 +133,6 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
             globalActivityStarter.start(this, NetPVpnSettingsScreenNoParams)
         }
 
-        binding.settings.settingsVpnNotifications.setClickListener {
-            globalActivityStarter.start(this, NetPNotificationSettingsScreenNoParams)
-        }
-
         binding.about.aboutVpn.setClickListener {
             globalActivityStarter.start(this, NetPAboutVPNScreenNoParams)
         }
@@ -174,6 +169,17 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         }
 
         binding.renderLocationState(viewState.locationState)
+        if (viewState.excludedAppsCount == 0) {
+            binding.settings.settingsExclusion.setSecondaryText(getString(R.string.netpManagementManageItemExclusionSubtitleEmpty))
+        } else {
+            binding.settings.settingsExclusion.setSecondaryText(
+                resources.getQuantityString(
+                    R.plurals.netpManagementManageItemExclusionSubtitleAppCount,
+                    viewState.excludedAppsCount,
+                    viewState.excludedAppsCount,
+                ),
+            )
+        }
     }
 
     private fun ActivityNetpManagementBinding.renderLocationState(locationState: LocationState?) {
