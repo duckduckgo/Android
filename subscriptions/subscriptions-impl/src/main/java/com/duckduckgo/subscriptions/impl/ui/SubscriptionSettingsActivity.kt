@@ -126,15 +126,18 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         when (viewState.platform?.lowercase()) {
             "apple", "ios" ->
                 binding.changePlan.setClickListener {
+                    pixelSender.reportSubscriptionSettingsChangePlanOrBillingClick()
                     globalActivityStarter.start(this, ChangePlanScreenWithEmptyParams)
                 }
             "stripe" -> {
                 binding.changePlan.setClickListener {
+                    pixelSender.reportSubscriptionSettingsChangePlanOrBillingClick()
                     viewModel.goToStripe()
                 }
             }
             else -> {
                 binding.changePlan.setClickListener {
+                    pixelSender.reportSubscriptionSettingsChangePlanOrBillingClick()
                     val url = String.format(URL, BASIC_SUBSCRIPTION, applicationContext.packageName)
                     val intent = Intent(Intent.ACTION_VIEW)
                     intent.setData(Uri.parse(url))
