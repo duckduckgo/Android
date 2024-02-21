@@ -44,7 +44,6 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetPAppExcl
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenAndEnable
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.networkprotection.impl.R
-import com.duckduckgo.networkprotection.impl.about.NetworkProtectionAboutScreens.NetPAboutVPNScreenNoParams
 import com.duckduckgo.networkprotection.impl.about.NetworkProtectionAboutScreens.NetPFaqsScreenNoParams
 import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpManagementBinding
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.None
@@ -131,10 +130,6 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
 
         binding.settings.settingsVpn.setClickListener {
             globalActivityStarter.start(this, NetPVpnSettingsScreenNoParams)
-        }
-
-        binding.about.aboutVpn.setClickListener {
-            globalActivityStarter.start(this, NetPAboutVPNScreenNoParams)
         }
 
         binding.about.aboutFaq.setClickListener {

@@ -181,18 +181,10 @@
 
     <!-- About -->
     <string name="netpManagementAboutHeader">About</string>
-    <string name="netpManagementAboutItemInfoVpn">What is a VPN?</string>
-    <string name="netpManagementAboutItemFaqs">Network Protection FAQs</string>
-
-    <!-- Info VPN -->
-    <string name="netpInfoVPNTitle">What is a VPN?</string>
-    <string name="netpInfoVPNFirstQuestion">What is a VPN?</string>
-    <string name="netpInfoVPNFirstAnswer">A virtual private network, commonly known as a VPN, protects your privacy and anonymity online by <b>hiding your IP address so websites and apps can\'t identify you</b> or your location by accessing your real IP address. VPNs also <b>encrypt the data sent over your device\'s network connection</b> so information that could otherwise reveal your identity or your online activities (e.g., the links you click, the files you download, or the messages you send) is obscured from others on the same network.\n\nUsing a VPN when connecting to public Wi-Fi, in places like coffee shops or airports, prevents your private information and browsing habits from being exposed to others on the network. Using a VPN on your home network <b>hides your web browsing history from your Internet service provider</b>, who could otherwise log and sell that information to third parties.</string>
-    <string name="netpInfoVPNSecondQuestion">How does a VPN work?</string>
-    <string name="netpInfoVPNSecondAnswer">A VPN allows you to <b>re-route your online activity through a remote server</b> in another location operated by the VPN provider. This ensures that websites and apps see the remote server\'s IP address location instead of your real one. VPNs also encrypt (or scramble) data in-transit, so others can\'t read it.\n\nThere can be some drawbacks to using a VPN. Depending on how far away you are from the remote server, your Internet speed may be affected. Some websites and apps also intentionally limit access to people using a VPN. Additionally, some VPN providers may also log and share your online activity with 3rd parties. <b>Using a VPN with a "no logging" privacy policy</b> like DuckDuckGo\'s Network Protection <b>is recommended.</b></string>
+    <string name="netpManagementAboutItemFaqs">Frequently Asked Questions</string>
 
     <!-- FAQS -->
-    <string name="netpFaqTitle">Network Protection FAQs</string>
+    <string name="netpFaqTitle">Frequently Asked Questions</string>
     <string name="netpFaqQuestionOne">How does Network Protection work?</string>
     <string name="netpFaqAnswerOne">Network Protection uses the open source WireGuard protocol to configure a virtual private network (VPN) on your device. When enabled, all of your device traffic is first encrypted and then routed through the nearest VPN server to protect your browsing activity from Internet service providers and hide your location from apps and sites you visit.</string>
     <string name="netpFaqQuestionTwo">Is only my web browsing protected?</string>

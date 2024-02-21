@@ -47,11 +47,6 @@
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
             android:exported="false" />
         <activity
-            android:name=".about.NetpAboutVpnActivity"
-            android:label="@string/netpInfoVPNTitle"
-            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
-            android:exported="false" />
-        <activity
             android:name=".about.NetpFaqActivity"
             android:label="@string/netpFaqTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
