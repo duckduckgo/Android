@@ -20,14 +20,11 @@ import android.content.ActivityNotFoundException
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import com.duckduckgo.app.browser.BrowserTabViewModel
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -38,18 +35,15 @@ interface AppLinksLauncher {
 }
 
 @ContributesBinding(AppScope::class)
-class DuckDuckGoAppLinksLauncher @Inject constructor(
-    private val appBuildConfig: AppBuildConfig,
-) : AppLinksLauncher {
+class DuckDuckGoAppLinksLauncher @Inject constructor() : AppLinksLauncher {
 
-    @Suppress("NewApi")
     override fun openAppLink(context: Context?, appLink: AppLink, viewModel: BrowserTabViewModel) {
         if (context == null) return
         appLink.appIntent?.let {
             it.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             startActivityOrQuietlyFail(context, it)
         } ?: run {
-            if (appLink.excludedComponents != null && appBuildConfig.sdkInt >= Build.VERSION_CODES.N) {
+            if (appLink.excludedComponents != null) {
                 val title = context.getString(R.string.appLinkIntentChooserTitle)
                 val chooserIntent = getChooserIntent(appLink.uriString, title, appLink.excludedComponents!!)
                 startActivityOrQuietlyFail(context, chooserIntent)
@@ -58,7 +52,6 @@ class DuckDuckGoAppLinksLauncher @Inject constructor(
         viewModel.clearPreviousUrl()
     }
 
-    @RequiresApi(Build.VERSION_CODES.N)
     private fun getChooserIntent(url: String?, title: String, excludedComponents: List<ComponentName>): Intent {
         val urlIntent = Intent.parseUri(url, Intent.URI_ANDROID_APP_SCHEME).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
