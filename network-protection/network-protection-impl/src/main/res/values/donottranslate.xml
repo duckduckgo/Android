@@ -129,7 +129,6 @@
         <item quantity="other" instruction="Placeholder is a number">%1$d apps</item>
     </plurals>
     <string name="netpManagementVpnSettings">VPN Settings</string>
-    <string name="netpManagementVpnNotificationSettings">VPN Notifications</string>
 
     <!-- VPN settings -->
     <string name="netpVpnSettingKillSwitch">Always On</string>
@@ -146,6 +145,7 @@
     <string name="netpVpnSettingGeoswitchingDefault">Nearest Available</string>
     <string name="netpVpnSettingSecureDNSByLine">Our VPN uses Secure DNS to keep your online activity private, so that your Internet provider can\'t see what websites you visit.</string>
 
+    <string name="netpVpnNotificationSettings">VPN Notifications</string>
     <string name="netpVpnSettingExcludeLocalNetworksBatteryUsage">Unrestricted Battery Usage</string>
     <string name="netpVpnSettingExcludeLocalNetworksBatteryUsageByline">Prevents Android from stopping the VPN.</string>
     <!-- VPN Notification settings -->
