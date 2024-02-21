@@ -251,6 +251,7 @@ class SubscriptionMessagingInterfaceTest {
 
         verify(subscriptionsManager).authenticate("authToken")
         verify(pixelSender).reportRestoreUsingEmailSuccess()
+        verify(pixelSender).reportSubscriptionActivated()
     }
 
     @Test

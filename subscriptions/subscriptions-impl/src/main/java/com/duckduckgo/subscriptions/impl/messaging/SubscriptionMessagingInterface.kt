@@ -195,6 +195,7 @@ class SubscriptionMessagingInterface @Inject constructor(
                 appCoroutineScope.launch(dispatcherProvider.io()) {
                     subscriptionsManager.authenticate(token)
                     pixelSender.reportRestoreUsingEmailSuccess()
+                    pixelSender.reportSubscriptionActivated()
                 }
             } catch (e: Exception) {
                 logcat { "Error parsing the token" }
