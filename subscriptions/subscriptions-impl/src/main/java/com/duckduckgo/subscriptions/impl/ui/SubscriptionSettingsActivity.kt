@@ -108,6 +108,10 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         binding.faq.setClickListener {
             Toast.makeText(this, "This will take you to FAQs", Toast.LENGTH_SHORT).show()
         }
+
+        if (savedInstanceState == null) {
+            pixelSender.reportSubscriptionSettingsShown()
+        }
     }
 
     override fun onDestroy() {
