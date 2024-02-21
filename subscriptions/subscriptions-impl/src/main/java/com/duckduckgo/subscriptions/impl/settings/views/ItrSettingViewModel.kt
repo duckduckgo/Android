@@ -30,6 +30,7 @@ import com.duckduckgo.subscriptions.api.Subscriptions.EntitlementStatus.NotFound
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingViewModel.Command.OpenItr
 import javax.inject.Inject
+import javax.inject.Provider
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -39,7 +40,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
-class ItrSettingViewModel(
+class ItrSettingViewModel @Inject constructor(
     private val subscriptions: Subscriptions,
     private val dispatcherProvider: DispatcherProvider,
     private val pixelSender: SubscriptionPixelSender,
@@ -80,14 +81,12 @@ class ItrSettingViewModel(
 
     @Suppress("UNCHECKED_CAST")
     class Factory @Inject constructor(
-        private val subscriptions: Subscriptions,
-        private val dispatcherProvider: DispatcherProvider,
-        private val pixelSender: SubscriptionPixelSender,
+        private val itrSettingViewModel: Provider<ItrSettingViewModel>,
     ) : ViewModelProvider.NewInstanceFactory() {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return with(modelClass) {
                 when {
-                    isAssignableFrom(ItrSettingViewModel::class.java) -> ItrSettingViewModel(subscriptions, dispatcherProvider, pixelSender)
+                    isAssignableFrom(ItrSettingViewModel::class.java) -> itrSettingViewModel.get()
                     else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
                 }
             } as T

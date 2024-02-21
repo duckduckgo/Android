@@ -30,6 +30,7 @@ import com.duckduckgo.subscriptions.api.Subscriptions.EntitlementStatus.NotFound
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.Command.OpenPir
 import javax.inject.Inject
+import javax.inject.Provider
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -39,7 +40,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
-class PirSettingViewModel(
+class PirSettingViewModel @Inject constructor(
     private val subscriptions: Subscriptions,
     private val dispatcherProvider: DispatcherProvider,
     private val pixelSender: SubscriptionPixelSender,
@@ -80,14 +81,12 @@ class PirSettingViewModel(
 
     @Suppress("UNCHECKED_CAST")
     class Factory @Inject constructor(
-        private val subscriptions: Subscriptions,
-        private val dispatcherProvider: DispatcherProvider,
-        private val pixelSender: SubscriptionPixelSender,
+        private val pirSettingViewModel: Provider<PirSettingViewModel>,
     ) : ViewModelProvider.NewInstanceFactory() {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return with(modelClass) {
                 when {
-                    isAssignableFrom(PirSettingViewModel::class.java) -> PirSettingViewModel(subscriptions, dispatcherProvider, pixelSender)
+                    isAssignableFrom(PirSettingViewModel::class.java) -> pirSettingViewModel.get()
                     else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
                 }
             } as T
