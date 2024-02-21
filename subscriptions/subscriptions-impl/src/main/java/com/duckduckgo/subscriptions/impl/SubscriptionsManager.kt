@@ -32,6 +32,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionStatus.Unknown
 import com.duckduckgo.subscriptions.impl.SubscriptionsData.*
 import com.duckduckgo.subscriptions.impl.billing.BillingClientWrapper
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
 import com.duckduckgo.subscriptions.impl.services.AuthService
 import com.duckduckgo.subscriptions.impl.services.CreateAccountResponse
@@ -142,6 +143,7 @@ class RealSubscriptionsManager @Inject constructor(
     private val context: Context,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    private val pixelSender: SubscriptionPixelSender,
 ) : SubscriptionsManager {
 
     private val adapter = Moshi.Builder().build().adapter(ResponseError::class.java)
@@ -246,8 +248,10 @@ class RealSubscriptionsManager @Inject constructor(
             retries++
         }
         if (hasSubscription) {
+            pixelSender.reportPurchaseSuccess()
             _currentPurchaseState.emit(CurrentPurchase.Success)
         } else {
+            pixelSender.reportPurchaseFailureOther()
             _currentPurchaseState.emit(CurrentPurchase.Failure("An error happened, try again"))
         }
         _hasSubscription.emit(hasSubscription)
@@ -342,11 +346,13 @@ class RealSubscriptionsManager @Inject constructor(
                         billingClientWrapper.launchBillingFlow(activity, billingParams)
                     }
                 } else {
+                    pixelSender.reportRestoreAfterPurchaseAttemptSuccess()
                     _currentPurchaseState.emit(CurrentPurchase.Recovered)
                 }
             }
             is Failure -> {
                 logcat(LogPriority.ERROR) { "Subs: ${response.message}" }
+                pixelSender.reportPurchaseFailureOther()
                 _currentPurchaseState.emit(CurrentPurchase.Failure(response.message))
             }
         }
