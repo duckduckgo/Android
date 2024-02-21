@@ -27,6 +27,7 @@ import com.duckduckgo.subscriptions.api.Product.ITR
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.api.Subscriptions.EntitlementStatus.Found
 import com.duckduckgo.subscriptions.api.Subscriptions.EntitlementStatus.NotFound
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingViewModel.Command.OpenItr
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
@@ -41,6 +42,7 @@ import kotlinx.coroutines.launch
 class ItrSettingViewModel(
     private val subscriptions: Subscriptions,
     private val dispatcherProvider: DispatcherProvider,
+    private val pixelSender: SubscriptionPixelSender,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     sealed class Command {
@@ -55,6 +57,7 @@ class ItrSettingViewModel(
     val viewState = _viewState.asStateFlow()
 
     fun onItr() {
+        pixelSender.reportAppSettingsIdtrClick()
         sendCommand(OpenItr)
     }
 
@@ -79,11 +82,12 @@ class ItrSettingViewModel(
     class Factory @Inject constructor(
         private val subscriptions: Subscriptions,
         private val dispatcherProvider: DispatcherProvider,
+        private val pixelSender: SubscriptionPixelSender,
     ) : ViewModelProvider.NewInstanceFactory() {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return with(modelClass) {
                 when {
-                    isAssignableFrom(ItrSettingViewModel::class.java) -> ItrSettingViewModel(subscriptions, dispatcherProvider)
+                    isAssignableFrom(ItrSettingViewModel::class.java) -> ItrSettingViewModel(subscriptions, dispatcherProvider, pixelSender)
                     else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
                 }
             } as T
