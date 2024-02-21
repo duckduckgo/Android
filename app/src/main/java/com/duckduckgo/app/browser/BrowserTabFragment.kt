@@ -210,7 +210,6 @@ import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCrede
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.UsernameMissing
 import com.duckduckgo.autofill.api.UseGeneratedPasswordDialog
 import com.duckduckgo.autofill.api.credential.saving.DuckAddressLoginCreator
-import com.duckduckgo.autofill.api.dialog.AutofillOverlappingDialogDetector
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.api.emailprotection.EmailInjector
@@ -449,9 +448,6 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var externalCameraLauncher: UploadFromExternalMediaAppLauncher
-
-    @Inject
-    lateinit var autofillOverlappingDialogDetector: AutofillOverlappingDialogDetector
 
     @Inject
     lateinit var downloadConfirmation: DownloadConfirmation
@@ -2284,12 +2280,10 @@ class BrowserTabFragment :
     ) {
         // want to ensure lifecycle is at least resumed before attempting to show dialog
         lifecycleScope.launchWhenResumed {
-            val currentUrl = webView?.url
-            val urlMatch = requiredUrl == null || requiredUrl == currentUrl
-
-            autofillOverlappingDialogDetector.detectOverlappingDialogs(childFragmentManager, tag, urlMatch)
             hideDialogWithTag(tag)
 
+            val currentUrl = webView?.url
+            val urlMatch = requiredUrl == null || requiredUrl == currentUrl
             if (isActiveTab && urlMatch) {
                 Timber.i("Showing dialog (%s), hidden=%s, requiredUrl=%s, currentUrl=%s, tabId=%s", tag, isHidden, requiredUrl, currentUrl, tabId)
                 dialog.show(childFragmentManager, tag)
