@@ -152,6 +152,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             val id = runCatching { data?.getString("id") }.getOrNull()
             if (id.isNullOrBlank()) {
+                pixelSender.reportPurchaseFailureOther()
                 _currentPurchaseViewState.emit(currentPurchaseViewState.value.copy(purchaseState = Failure("")))
             } else {
                 command.send(SubscriptionSelected(id))

@@ -860,7 +860,7 @@ class RealSubscriptionsManagerTest {
             assertTrue(awaitItem() is CurrentPurchase.InProgress)
             assertTrue(awaitItem() is CurrentPurchase.Failure)
 
-            verify(pixelSender).reportPurchaseFailureOther()
+            verify(pixelSender).reportPurchaseFailureBackend()
             verifyNoMoreInteractions(pixelSender)
 
             cancelAndConsumeRemainingEvents()
@@ -879,6 +879,24 @@ class RealSubscriptionsManagerTest {
         assertTrue(value is Success)
         verify(pixelSender).reportSubscriptionActivated()
         verifyNoMoreInteractions(pixelSender)
+    }
+
+    @Test
+    fun whenPurchaseFlowIfCreateAccountFailsThenPixelIsSent() = runTest {
+        givenUserIsNotAuthenticated()
+        givenCreateAccountFails()
+
+        subscriptionsManager.currentPurchaseState.test {
+            subscriptionsManager.purchase(mock(), mock(), "", false)
+            assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
+            assertTrue(awaitItem() is CurrentPurchase.Failure)
+
+            verify(pixelSender).reportPurchaseFailureAccountCreation()
+            verify(pixelSender).reportPurchaseFailureOther()
+            verifyNoMoreInteractions(pixelSender)
+
+            cancelAndConsumeRemainingEvents()
+        }
     }
 
     private suspend fun givenUrlPortalSucceeds() {

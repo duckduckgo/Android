@@ -41,6 +41,8 @@ import com.duckduckgo.subscriptions.impl.services.ResponseError
 import com.duckduckgo.subscriptions.impl.services.StoreLoginBody
 import com.duckduckgo.subscriptions.impl.services.SubscriptionsService
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.moshi.JsonDataException
+import com.squareup.moshi.JsonEncodingException
 import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -252,7 +254,7 @@ class RealSubscriptionsManager @Inject constructor(
             pixelSender.reportSubscriptionActivated()
             _currentPurchaseState.emit(CurrentPurchase.Success)
         } else {
-            pixelSender.reportPurchaseFailureOther()
+            pixelSender.reportPurchaseFailureBackend()
             _currentPurchaseState.emit(CurrentPurchase.Failure("An error happened, try again"))
         }
         _hasSubscription.emit(hasSubscription)
@@ -452,7 +454,20 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     private suspend fun createAccount(): CreateAccountResponse {
-        return authService.createAccount("Bearer ${emailManager.getToken()}")
+        try {
+            val account = authService.createAccount("Bearer ${emailManager.getToken()}")
+            if (account.authToken.isEmpty()) {
+                pixelSender.reportPurchaseFailureAccountCreation()
+            }
+            return account
+        } catch (e: Exception) {
+            when (e) {
+                is JsonDataException, is JsonEncodingException, is HttpException -> {
+                    pixelSender.reportPurchaseFailureAccountCreation()
+                }
+            }
+            throw e
+        }
     }
 
     private fun parseError(e: HttpException): ResponseError? {
