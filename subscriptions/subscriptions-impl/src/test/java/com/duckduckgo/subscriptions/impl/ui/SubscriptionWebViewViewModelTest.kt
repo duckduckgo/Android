@@ -282,6 +282,42 @@ class SubscriptionWebViewViewModelTest {
         verify(pixelSender).reportOnboardingAddDeviceClick()
     }
 
+    @Test
+    fun whenFeatureSelectedAndFeatureIsNetPThenPixelSent() = runTest {
+        whenever(subscriptionsManager.hasSubscription()).thenReturn(false)
+        viewModel.processJsCallbackMessage(
+            featureName = "test",
+            method = "featureSelected",
+            id = null,
+            data = JSONObject("""{"feature":"${SubscriptionsConstants.NETP}"}"""),
+        )
+        verify(pixelSender).reportOnboardingVpnClick()
+    }
+
+    @Test
+    fun whenFeatureSelectedAndFeatureIsItrThenPixelIsSent() = runTest {
+        whenever(subscriptionsManager.hasSubscription()).thenReturn(false)
+        viewModel.processJsCallbackMessage(
+            featureName = "test",
+            method = "featureSelected",
+            id = null,
+            data = JSONObject("""{"feature":"${SubscriptionsConstants.ITR}"}"""),
+        )
+        verify(pixelSender).reportOnboardingIdtrClick()
+    }
+
+    @Test
+    fun whenFeatureSelectedAndFeatureIsPirThenPixelIsSent() = runTest {
+        whenever(subscriptionsManager.hasSubscription()).thenReturn(false)
+        viewModel.processJsCallbackMessage(
+            featureName = "test",
+            method = "featureSelected",
+            id = null,
+            data = JSONObject("""{"feature":"${SubscriptionsConstants.PIR}"}"""),
+        )
+        verify(pixelSender).reportOnboardingPirClick()
+    }
+
     private fun getSubscriptionOfferDetails(planId: String): SubscriptionOfferDetails {
         val subscriptionOfferDetails: SubscriptionOfferDetails = mock()
         whenever(subscriptionOfferDetails.basePlanId).thenReturn(planId)

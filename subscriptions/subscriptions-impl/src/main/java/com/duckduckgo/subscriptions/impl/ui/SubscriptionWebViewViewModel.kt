@@ -123,6 +123,12 @@ class SubscriptionWebViewViewModel @Inject constructor(
                 PIR -> GoToPIR
                 else -> null
             }
+            when (commandToSend) {
+                GoToITR -> pixelSender.reportOnboardingIdtrClick()
+                is GoToNetP -> pixelSender.reportOnboardingVpnClick()
+                GoToPIR -> pixelSender.reportOnboardingPirClick()
+                else -> {} // no-op
+            }
             commandToSend?.let {
                 command.send(commandToSend)
             }
