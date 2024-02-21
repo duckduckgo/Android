@@ -249,6 +249,7 @@ class RealSubscriptionsManager @Inject constructor(
         }
         if (hasSubscription) {
             pixelSender.reportPurchaseSuccess()
+            pixelSender.reportSubscriptionActivated()
             _currentPurchaseState.emit(CurrentPurchase.Success)
         } else {
             pixelSender.reportPurchaseFailureOther()
@@ -297,7 +298,11 @@ class RealSubscriptionsManager @Inject constructor(
                 val storeLoginBody = StoreLoginBody(signature = signature, signedData = body, packageName = context.packageName)
                 val response = authService.storeLogin(storeLoginBody)
                 logcat(LogPriority.DEBUG) { "Subs: store login succeeded" }
-                authenticate(response.authToken)
+                val subscriptionsData = authenticate(response.authToken)
+                if (subscriptionsData is Success && subscriptionsData.entitlements.isNotEmpty()) {
+                    pixelSender.reportSubscriptionActivated()
+                }
+                subscriptionsData
             } else {
                 Failure(SUBSCRIPTION_NOT_FOUND_ERROR)
             }
@@ -362,6 +367,11 @@ class RealSubscriptionsManager @Inject constructor(
         return try {
             val subscriptionData = if (isUserAuthenticated()) {
                 getSubscriptionDataFromToken(authRepository.tokens().accessToken!!)
+                    .also { subscriptionsData ->
+                        if (subscriptionsData is Success && subscriptionsData.entitlements.isNotEmpty()) {
+                            pixelSender.reportSubscriptionActivated()
+                        }
+                    }
             } else {
                 recoverSubscriptionFromStore()
             }

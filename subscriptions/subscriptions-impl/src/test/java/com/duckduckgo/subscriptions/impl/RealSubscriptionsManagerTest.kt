@@ -821,6 +821,7 @@ class RealSubscriptionsManagerTest {
             assertTrue(awaitItem() is CurrentPurchase.Success)
 
             verify(pixelSender).reportPurchaseSuccess()
+            verify(pixelSender).reportSubscriptionActivated()
             verifyNoMoreInteractions(pixelSender)
 
             cancelAndConsumeRemainingEvents()
@@ -841,6 +842,7 @@ class RealSubscriptionsManagerTest {
             assertTrue(awaitItem() is CurrentPurchase.Recovered)
 
             verify(pixelSender).reportRestoreAfterPurchaseAttemptSuccess()
+            verify(pixelSender).reportSubscriptionActivated()
             verifyNoMoreInteractions(pixelSender)
 
             cancelAndConsumeRemainingEvents()
@@ -863,6 +865,20 @@ class RealSubscriptionsManagerTest {
 
             cancelAndConsumeRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenSubscriptionIsRecoveredFromStoreThenPixelIsSent() = runTest {
+        givenPurchaseStored()
+        givenPurchaseStoredIsValid()
+        givenValidateTokenSucceedsWithEntitlements()
+        givenAuthenticateSucceeds()
+
+        val value = subscriptionsManager.recoverSubscriptionFromStore()
+
+        assertTrue(value is Success)
+        verify(pixelSender).reportSubscriptionActivated()
+        verifyNoMoreInteractions(pixelSender)
     }
 
     private suspend fun givenUrlPortalSucceeds() {
