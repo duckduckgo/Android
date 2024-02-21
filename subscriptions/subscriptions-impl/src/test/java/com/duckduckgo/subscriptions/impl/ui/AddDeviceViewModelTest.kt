@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.subscriptions.impl.SubscriptionsData
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.AddDeviceViewModel.Command.AddEmail
 import com.duckduckgo.subscriptions.impl.ui.AddDeviceViewModel.Command.Error
 import com.duckduckgo.subscriptions.impl.ui.AddDeviceViewModel.Command.ManageEmail
@@ -13,6 +14,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 class AddDeviceViewModelTest {
@@ -21,11 +23,12 @@ class AddDeviceViewModelTest {
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val subscriptionsManager: SubscriptionsManager = mock()
+    private val pixelSender: SubscriptionPixelSender = mock()
     private lateinit var viewModel: AddDeviceViewModel
 
     @Before
     fun before() {
-        viewModel = AddDeviceViewModel(subscriptionsManager, coroutineTestRule.testDispatcherProvider)
+        viewModel = AddDeviceViewModel(subscriptionsManager, coroutineTestRule.testDispatcherProvider, pixelSender)
     }
 
     @Test
@@ -99,5 +102,11 @@ class AddDeviceViewModelTest {
             viewModel.onResume(mock())
             assertNull(awaitItem().email)
         }
+    }
+
+    @Test
+    fun whenEnterEmailClickedThenPixelIsSent() = runTest {
+        viewModel.useEmail()
+        verify(pixelSender).reportAddDeviceEnterEmailClick()
     }
 }

@@ -26,6 +26,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.subscriptions.impl.SubscriptionsData
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.AddDeviceViewModel.Command.AddEmail
 import com.duckduckgo.subscriptions.impl.ui.AddDeviceViewModel.Command.Error
 import com.duckduckgo.subscriptions.impl.ui.AddDeviceViewModel.Command.ManageEmail
@@ -43,6 +44,7 @@ import kotlinx.coroutines.launch
 class AddDeviceViewModel @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
     private val dispatcherProvider: DispatcherProvider,
+    private val pixelSender: SubscriptionPixelSender,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -69,6 +71,8 @@ class AddDeviceViewModel @Inject constructor(
     }
 
     fun useEmail() {
+        pixelSender.reportAddDeviceEnterEmailClick()
+
         viewModelScope.launch(dispatcherProvider.io()) {
             val subs = subscriptionsManager.getSubscriptionData()
             if (subs is SubscriptionsData.Success) {
