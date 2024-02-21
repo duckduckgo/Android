@@ -62,6 +62,12 @@ class NetworkProtectionStateImpl @Inject constructor(
         return vpnFeaturesRegistry.isFeatureRunning(NetPVpnFeature.NETP_VPN)
     }
 
+    override fun start() {
+        coroutineScope.launch(dispatcherProvider.io()) {
+            vpnFeaturesRegistry.registerFeature(NetPVpnFeature.NETP_VPN)
+        }
+    }
+
     override fun restart() {
         coroutineScope.launch(dispatcherProvider.io()) {
             vpnFeaturesRegistry.refreshFeature(NetPVpnFeature.NETP_VPN)
@@ -77,6 +83,13 @@ class NetworkProtectionStateImpl @Inject constructor(
 
     override suspend fun stop() {
         vpnFeaturesRegistry.unregisterFeature(NetPVpnFeature.NETP_VPN)
+    }
+
+    override fun clearVPNConfigurationAndStop() {
+        coroutineScope.launch(dispatcherProvider.io()) {
+            wgTunnelConfig.clearWgConfig()
+            stop()
+        }
     }
 
     override fun serverLocation(): String? {
