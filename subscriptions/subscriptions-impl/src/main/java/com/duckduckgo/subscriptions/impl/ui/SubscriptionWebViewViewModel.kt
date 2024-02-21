@@ -131,6 +131,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
     private fun activateSubscription() {
         viewModelScope.launch(dispatcherProvider.io()) {
             if (subscriptionsManager.hasSubscription()) {
+                pixelSender.reportOnboardingAddDeviceClick()
                 activateOnAnotherDevice()
             } else {
                 pixelSender.reportOfferRestorePurchaseClick()
