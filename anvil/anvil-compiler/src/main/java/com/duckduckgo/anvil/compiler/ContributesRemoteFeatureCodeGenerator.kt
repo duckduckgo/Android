@@ -418,6 +418,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                             val concatMethodNames = this.feature.get().javaClass
                                 .declaredMethods
                                 .map { it.name }
+                                .sorted()
                                 .joinToString(separator = "")
                             val hash = %T().writeUtf8(concatMethodNames).md5().hex()
                             return hash
