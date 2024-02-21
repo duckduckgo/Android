@@ -258,6 +258,18 @@ class SubscriptionWebViewViewModelTest {
         verify(pixelSender).reportOfferSubscribeClick()
     }
 
+    @Test
+    fun whenRestorePurchaseClickedThenPixelIsSent() = runTest {
+        whenever(subscriptionsManager.hasSubscription()).thenReturn(false)
+        viewModel.processJsCallbackMessage(
+            featureName = "test",
+            method = "activateSubscription",
+            id = null,
+            data = null,
+        )
+        verify(pixelSender).reportOfferRestorePurchaseClick()
+    }
+
     private fun getSubscriptionOfferDetails(planId: String): SubscriptionOfferDetails {
         val subscriptionOfferDetails: SubscriptionOfferDetails = mock()
         whenever(subscriptionOfferDetails.basePlanId).thenReturn(planId)

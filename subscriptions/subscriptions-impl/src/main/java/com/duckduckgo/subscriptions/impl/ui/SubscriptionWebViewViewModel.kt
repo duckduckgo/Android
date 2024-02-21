@@ -133,6 +133,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
             if (subscriptionsManager.hasSubscription()) {
                 activateOnAnotherDevice()
             } else {
+                pixelSender.reportOfferRestorePurchaseClick()
                 recoverSubscription()
             }
         }
