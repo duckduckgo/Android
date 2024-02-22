@@ -22,25 +22,4 @@ data class UserAgentFeature(
     val state: String,
     val minSupportedVersion: Int?,
     val exceptions: List<FeatureException>,
-    val settings: UserAgentSettings,
-)
-
-data class UserAgentSettings(
-    val defaultPolicy: String?,
-    val ddgDefaultSites: List<FeatureException>,
-    val ddgFixedSites: List<FeatureException>,
-    val closestUserAgent: ClosestUserAgent?,
-    val ddgFixedUserAgent: DdgFixedUserAgent?,
-    val omitApplicationSites: List<FeatureException>,
-    val omitVersionSites: List<FeatureException>,
-)
-
-data class ClosestUserAgent(
-    val versions: List<String>,
-    val state: String,
-)
-
-data class DdgFixedUserAgent(
-    val versions: List<String>,
-    val state: String,
 )

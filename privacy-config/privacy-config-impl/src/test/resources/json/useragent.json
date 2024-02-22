@@ -2,67 +2,16 @@
   "state": "enabled",
   "exceptions": [
     {
-      "domain": "default.com",
+      "domain": "example.com",
       "reason": "Site reports browser not supported"
     },
     {
-      "domain": "duplicatedversion.com",
+      "domain": "foo.com",
       "reason": "Site reports browser not supported"
     },
     {
-      "domain": "duplicatedapplication.com",
+      "domain": "bar.com",
       "reason": "Site reports browser not supported"
     }
-  ],
-  "settings": {
-    "defaultPolicy": "ddg",
-    "ddgDefaultSites": [
-      {
-        "domain": "defaultsite.com",
-        "reason": "Site needs ddg policy"
-      }
-    ],
-    "ddgFixedSites": [
-      {
-        "domain": "fixedsite.com",
-        "reason": "Site needs ddg fixed policy"
-      }
-    ],
-    "closestUserAgent": {
-      "versions": ["123", "456"],
-      "state": "enabled"
-    },
-    "ddgFixedUserAgent": {
-      "versions": ["789", "321"],
-      "state": "enabled"
-    },
-    "omitApplicationSites": [
-      {
-        "domain": "application.com",
-        "reason": "Site reports browser not supported"
-      },
-      {
-        "domain": "duplicatedapplication.com",
-        "reason": "Site reports browser not supported"
-      },
-      {
-        "domain": "versionapplication.com",
-        "reason": "Site reports browser not supported"
-      }
-    ],
-    "omitVersionSites": [
-      {
-        "domain": "version.com",
-        "reason": "Site reports browser not supported"
-      },
-      {
-        "domain": "duplicatedversion.com",
-        "reason": "Site reports browser not supported"
-      },
-      {
-        "domain": "versionapplication.com",
-        "reason": "Site reports browser not supported"
-      }
-    ]
-  }
+  ]
 }

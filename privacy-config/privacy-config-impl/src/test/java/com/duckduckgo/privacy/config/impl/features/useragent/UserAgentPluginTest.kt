@@ -21,9 +21,6 @@ import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.UserAgentExceptionEntity
-import com.duckduckgo.privacy.config.store.UserAgentSitesEntity
-import com.duckduckgo.privacy.config.store.UserAgentStatesEntity
-import com.duckduckgo.privacy.config.store.UserAgentVersionsEntity
 import com.duckduckgo.privacy.config.store.features.useragent.UserAgentRepository
 import org.junit.Assert.*
 import org.junit.Before
@@ -86,60 +83,14 @@ class UserAgentPluginTest {
     fun whenFeatureNameMatchesUserAgentThenUpdateAllExistingExceptions() {
         val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/useragent.json")
         val exceptionsCaptor = argumentCaptor<List<UserAgentExceptionEntity>>()
-        val sitesCaptor = argumentCaptor<List<UserAgentSitesEntity>>()
-        val statesCaptor = argumentCaptor<UserAgentStatesEntity>()
-        val versionsCaptor = argumentCaptor<List<UserAgentVersionsEntity>>()
 
         testee.store(FEATURE_NAME_VALUE, jsonString)
 
-        verify(mockUserAgentRepository).updateAll(
-            exceptionsCaptor.capture(),
-            sitesCaptor.capture(),
-            statesCaptor.capture(),
-            versionsCaptor.capture(),
-        )
+        verify(mockUserAgentRepository).updateAll(exceptionsCaptor.capture())
 
-        val exceptions = exceptionsCaptor.firstValue
-        val sites = sitesCaptor.firstValue
-        val states = statesCaptor.firstValue
-        val versions = versionsCaptor.firstValue
-
-        val default = exceptions.first { it.domain == "default.com" }
-        val application = exceptions.first { it.domain == "application.com" }
-        val version = exceptions.first { it.domain == "version.com" }
-        val duplicatedApplication = exceptions.first { it.domain == "duplicatedapplication.com" }
-        val duplicatedVersion = exceptions.first { it.domain == "duplicatedversion.com" }
-        val versionApplication = exceptions.first { it.domain == "versionapplication.com" }
-
-        assertFalse(default.omitApplication)
-        assertFalse(default.omitVersion)
-
-        assertTrue(application.omitApplication)
-        assertFalse(application.omitVersion)
-
-        assertTrue(version.omitVersion)
-        assertFalse(version.omitApplication)
-
-        assertFalse(duplicatedApplication.omitApplication)
-        assertFalse(duplicatedApplication.omitVersion)
-
-        assertFalse(duplicatedVersion.omitApplication)
-        assertFalse(duplicatedVersion.omitVersion)
-
-        assertTrue(versionApplication.omitApplication)
-        assertTrue(versionApplication.omitVersion)
-
-        val defaultSite = sites.first { it.domain == "defaultsite.com" }
-        val fixedSite = sites.first { it.domain == "fixedsite.com" }
-
-        assertTrue(defaultSite.ddgDefaultSite)
-        assertTrue(fixedSite.ddgFixedSite)
-
-        assertTrue(states.closestUserAgent)
-        assertTrue(states.ddgFixedUserAgent)
-
-        assertEquals(versions.filter { it.closestUserAgent }.map { it.version }, listOf("123", "456"))
-        assertEquals(versions.filter { it.ddgFixedUserAgent }.map { it.version }, listOf("789", "321"))
+        assertEquals("example.com", exceptionsCaptor.firstValue[0].domain)
+        assertEquals("foo.com", exceptionsCaptor.firstValue[1].domain)
+        assertEquals("bar.com", exceptionsCaptor.firstValue[2].domain)
     }
 
     companion object {

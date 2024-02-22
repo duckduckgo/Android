@@ -20,76 +20,15 @@ package com.duckduckgo.privacy.config.api
 interface UserAgent {
     /**
      * This method takes a [url] and returns `true` or `false` depending if the [url] is in the
-     * application exceptions list
-     * @return a `true` if the given [url] if the url is in the application exceptions list and `false`
-     * otherwise.
+     * local DDG UA sites list (ie. duckduckgo.com)
+     * @return a `true` if the given [url] is in the DDG UA sites list and `false` otherwise.
      */
-    fun isAnApplicationException(url: String): Boolean
+    fun isDuckDuckGoSite(url: String): Boolean
 
     /**
      * This method takes a [url] and returns `true` or `false` depending if the [url] is in the
-     * version exceptions list
-     * @return a `true` if the given [url] if the url is in the version exceptions list and `false`
-     * otherwise.
+     * exceptions list (ie. Should use the WebView UA)
+     * @return a `true` if the given [url] is in the exceptions list and `false` otherwise.
      */
-    fun isAVersionException(url: String): Boolean
-
-    /**
-     * This method takes a [url] and returns `true` or `false` depending if the [url] is in the
-     * default exceptions list
-     * @return a `true` if the given [url] if the url is in the default exceptions list and `false`
-     * otherwise.
-     */
-    fun isADefaultException(url: String): Boolean
-
-    /**
-     * This method returns the default user agent policy [DefaultPolicy]
-     * @return the default policy [DefaultPolicy]
-     */
-    fun defaultPolicy(): DefaultPolicy
-
-    /**
-     * This method takes a [url] and returns `true` or `false` depending if the [url] is in the
-     * DDG default sites list
-     * @return a `true` if the given [url] is in the DDG default sites list and `false` otherwise.
-     */
-    fun isADdgDefaultSite(url: String): Boolean
-
-    /**
-     * This method takes a [url] and returns `true` or `false` depending if the [url] is in the
-     * DDG fixed sites list
-     * @return a `true` if the given [url] is in the DDG fixed sites list and `false` otherwise.
-     */
-    fun isADdgFixedSite(url: String): Boolean
-
-    /**
-     * This method returns `true` or `false` depending if the closest user agent policy is enabled or not
-     * @return a `true` if the closest user agent is enabled and `false` otherwise.
-     */
-    fun closestUserAgentEnabled(): Boolean
-
-    /**
-     * This method returns `true` or `false` depending if the DDG fixed user agent policy is enabled or not
-     * @return a `true` if the DDG fixed user agent is enabled and `false` otherwise.
-     */
-    fun ddgFixedUserAgentEnabled(): Boolean
-
-    /**
-     * This method takes a [version] and returns `true` or `false` depending if the [version] is in the
-     * closest user agent versions list
-     * @return a `true` if the given [version] is in the closest user agent versions and `false` otherwise.
-     */
-    fun isClosestUserAgentVersion(version: String): Boolean
-
-    /**
-     * This method takes a [version] and returns `true` or `false` depending if the [version] is in the
-     * ddg fixed user agent versions list
-     * @return a `true` if the given [version] is in the ddg fixed user agent versions and `false` otherwise.
-     */
-    fun isDdgFixedUserAgentVersion(version: String): Boolean
-}
-
-/** Public enum class for the default policy */
-enum class DefaultPolicy {
-    DDG, DDG_FIXED, CLOSEST
+    fun isException(url: String): Boolean
 }

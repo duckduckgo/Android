@@ -82,7 +82,6 @@ class WebViewRequestInterceptorTest {
         fakeUserAgent,
         fakeToggle,
         fakeUserAllowListRepository,
-        FakeStatisticsDataStore(),
         mock(),
     )
 

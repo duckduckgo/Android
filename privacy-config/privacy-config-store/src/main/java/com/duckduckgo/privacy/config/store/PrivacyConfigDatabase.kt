@@ -31,17 +31,14 @@ import com.duckduckgo.privacy.config.store.features.https.HttpsDao
 import com.duckduckgo.privacy.config.store.features.trackerallowlist.TrackerAllowlistDao
 import com.duckduckgo.privacy.config.store.features.trackingparameters.TrackingParametersDao
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryDao
-import com.duckduckgo.privacy.config.store.features.useragent.UserAgentDao
-import com.duckduckgo.privacy.config.store.features.useragent.UserAgentSitesDao
-import com.duckduckgo.privacy.config.store.features.useragent.UserAgentStatesDao
-import com.duckduckgo.privacy.config.store.features.useragent.UserAgentVersionsDao
+import com.duckduckgo.privacy.config.store.features.useragent.UserAgentExceptionsDao
 
 @TypeConverters(
     RuleTypeConverter::class,
 )
 @Database(
     exportSchema = true,
-    version = 17,
+    version = 18,
     entities = [
         TrackerAllowlistEntity::class,
         UnprotectedTemporaryEntity::class,
@@ -58,9 +55,6 @@ import com.duckduckgo.privacy.config.store.features.useragent.UserAgentVersionsD
         TrackingParameterEntity::class,
         TrackingParameterExceptionEntity::class,
         UserAgentExceptionEntity::class,
-        UserAgentSitesEntity::class,
-        UserAgentStatesEntity::class,
-        UserAgentVersionsEntity::class,
     ],
 )
 abstract class PrivacyConfigDatabase : RoomDatabase() {
@@ -75,10 +69,7 @@ abstract class PrivacyConfigDatabase : RoomDatabase() {
     abstract fun drmDao(): DrmDao
     abstract fun ampLinksDao(): AmpLinksDao
     abstract fun trackingParametersDao(): TrackingParametersDao
-    abstract fun userAgentDao(): UserAgentDao
-    abstract fun userAgentSitesDao(): UserAgentSitesDao
-    abstract fun userAgentStatesDao(): UserAgentStatesDao
-    abstract fun userAgentVersionsDao(): UserAgentVersionsDao
+    abstract fun userAgentExceptionsDao(): UserAgentExceptionsDao
 }
 
 val MIGRATION_2_3 = object : Migration(2, 3) {
@@ -126,4 +117,23 @@ val MIGRATION_16_17 = object : Migration(16, 17) {
     }
 }
 
-val ALL_MIGRATIONS = arrayOf(MIGRATION_2_3, MIGRATION_3_4, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_13_14, MIGRATION_15_16, MIGRATION_16_17)
+val MIGRATION_17_18 = object : Migration(17, 18) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("DROP TABLE IF EXISTS `user_agent_exceptions`")
+        database.execSQL("DROP TABLE IF EXISTS `user_agent_sites`")
+        database.execSQL("DROP TABLE IF EXISTS `user_agent_states`")
+        database.execSQL("DROP TABLE IF EXISTS `user_agent_versions`")
+        database.execSQL("DELETE FROM privacy_config")
+    }
+}
+
+val ALL_MIGRATIONS = arrayOf(
+    MIGRATION_2_3,
+    MIGRATION_3_4,
+    MIGRATION_10_11,
+    MIGRATION_11_12,
+    MIGRATION_13_14,
+    MIGRATION_15_16,
+    MIGRATION_16_17,
+    MIGRATION_17_18,
+)

@@ -46,7 +46,7 @@ class DevSettingsSharedPreferences @Inject constructor(private val context: Cont
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
 
     private fun selectedUASavedValue(): UAOverride {
-        val savedValue = preferences.getString(KEY_SELECTED_UA, null) ?: return UAOverride.DDG
+        val savedValue = preferences.getString(KEY_SELECTED_UA, null) ?: return UAOverride.DEFAULT
         return UAOverride.valueOf(savedValue)
     }
     companion object {
@@ -58,10 +58,7 @@ class DevSettingsSharedPreferences @Inject constructor(private val context: Cont
 }
 
 enum class UAOverride {
-    NO_APP_ID,
-    NO_VERSION,
-    CHROME,
     FIREFOX,
-    DDG,
+    DEFAULT,
     WEBVIEW,
 }
