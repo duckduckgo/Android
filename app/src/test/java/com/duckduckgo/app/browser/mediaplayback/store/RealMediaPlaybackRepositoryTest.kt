@@ -65,6 +65,7 @@ class RealMediaPlaybackRepositoryTest {
             mockMediaPlaybackDao,
             TestScope(),
             coroutineRule.testDispatcherProvider,
+            isMainProcess = true,
         )
     }
 

@@ -6,6 +6,7 @@ import com.duckduckgo.subscriptions.api.Product.PIR
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.api.Subscriptions.EntitlementStatus.Found
 import com.duckduckgo.subscriptions.api.Subscriptions.EntitlementStatus.NotFound
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.Command.OpenPir
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -14,6 +15,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
@@ -22,11 +24,12 @@ class PirSettingViewModelTest {
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val subscriptions: Subscriptions = mock()
+    private val pixelSender: SubscriptionPixelSender = mock()
     private lateinit var viewModel: PirSettingViewModel
 
     @Before
     fun before() {
-        viewModel = PirSettingViewModel(subscriptions, coroutineTestRule.testDispatcherProvider)
+        viewModel = PirSettingViewModel(subscriptions, coroutineTestRule.testDispatcherProvider, pixelSender)
     }
 
     @Test
@@ -36,6 +39,12 @@ class PirSettingViewModelTest {
             assertTrue(awaitItem() is OpenPir)
             cancelAndConsumeRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenOnPirThenPixelSent() = runTest {
+        viewModel.onPir()
+        verify(pixelSender).reportAppSettingsPirClick()
     }
 
     @Test

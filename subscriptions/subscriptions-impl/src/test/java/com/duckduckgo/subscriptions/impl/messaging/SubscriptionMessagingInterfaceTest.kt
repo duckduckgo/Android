@@ -8,6 +8,7 @@ import com.duckduckgo.js.messaging.api.JsMessageHelper
 import com.duckduckgo.js.messaging.api.JsRequestResponse
 import com.duckduckgo.subscriptions.impl.AuthToken
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
@@ -31,11 +32,13 @@ class SubscriptionMessagingInterfaceTest {
     private val webView: WebView = mock()
     private val jsMessageHelper: JsMessageHelper = mock()
     private val subscriptionsManager: SubscriptionsManager = mock()
+    private val pixelSender: SubscriptionPixelSender = mock()
     private val messagingInterface = SubscriptionMessagingInterface(
         subscriptionsManager,
         jsMessageHelper,
         coroutineRule.testDispatcherProvider,
         TestScope(),
+        pixelSender,
     )
 
     private val callback = object : JsMessageCallback() {
@@ -233,6 +236,7 @@ class SubscriptionMessagingInterfaceTest {
         messagingInterface.process(message, "duckduckgo-android-messaging-secret")
 
         verifyNoInteractions(subscriptionsManager)
+        verifyNoInteractions(pixelSender)
     }
 
     @Test
@@ -246,6 +250,8 @@ class SubscriptionMessagingInterfaceTest {
         messagingInterface.process(message, "duckduckgo-android-messaging-secret")
 
         verify(subscriptionsManager).authenticate("authToken")
+        verify(pixelSender).reportRestoreUsingEmailSuccess()
+        verify(pixelSender).reportSubscriptionActivated()
     }
 
     @Test
@@ -259,6 +265,7 @@ class SubscriptionMessagingInterfaceTest {
         messagingInterface.process(message, "duckduckgo-android-messaging-secret")
 
         verifyNoInteractions(subscriptionsManager)
+        verifyNoInteractions(pixelSender)
     }
 
     @Test

@@ -1,0 +1,80 @@
+appId: com.duckduckgo.mobile.android
+name: "Autofill: Manually add credentials"
+tags:
+  - autofillNoAuthTests
+---
+# Pre-requisite: on an autofill-eligible device
+
+- launchApp:
+    clearState: true
+- runFlow: ../shared/onboarding.yaml
+- runFlow: steps/access_passwords_screen.yaml
+
+- assertVisible:
+    text: "No passwords saved yet"
+- assertNotVisible:
+    id: searchLogins
+
+- runScript: steps/2_script.js
+
+- repeat:
+      while:
+          true: ${output.addLogins.counter < output.addLogins.domains.length}
+      commands:
+          - tapOn:
+                  id: addLoginManually
+          - assertVisible:
+                  text: Add Password
+          - assertNotVisible:
+                  id: view_menu_save
+
+          - tapOn:
+                id: usernameEditText
+          - inputText: "user"
+
+          - assertVisible:
+                id: view_menu_save
+
+          - tapOn:
+                id: passwordEditText
+          - inputText: "123"
+
+          - tapOn:
+                id: domainEditText
+          - inputText: "${output.addLogins.domains[output.addLogins.counter]}"
+
+          - tapOn:
+                id: notesEditText
+          - inputText: "a note"
+
+          - tapOn:
+                id: view_menu_save
+                retryTapIfNoChange: false
+
+          - assertVisible: "Last updated.*"
+
+          - tapOn: "Navigate up"
+
+          - assertVisible:
+                text: "Save and autofill passwords"
+          - evalScript: ${output.addLogins.counter++}
+
+- assertVisible:
+    text: "#"
+
+- assertVisible:
+    text: "a.example.com"
+
+- assertNotVisible:
+    text: "https://a.example.com"
+
+- assertVisible:
+    text: "fill.dev"
+
+- assertNotVisible:
+    text: "fill.dev/example"
+
+
+- runFlow: steps/search_logins.yaml
+- runFlow: steps/manual_update.yaml
+- runFlow: steps/delete_logins.yaml

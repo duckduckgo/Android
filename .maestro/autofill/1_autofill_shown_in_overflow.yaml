@@ -1,9 +1,11 @@
 appId: com.duckduckgo.mobile.android
 name: "Autofill: Autofill screen is reachable from overflow menu"
+tags:
+    - autofillNoAuthTests
 ---
-# Pre-requisite: the user has cleared onboarding and is on the new tab page
+# Pre-requisite: None (can be run whether auth is required or not)
 
-- tapOn:
-      id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
-- assertVisible: "Passwords"
-- tapOn: "Passwords"
+- launchApp:
+      clearState: true
+- runFlow: ../shared/onboarding.yaml
+- runFlow: steps/access_passwords_screen.yaml

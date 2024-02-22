@@ -1,0 +1,47 @@
+appId: com.duckduckgo.mobile.android
+name: "Autofill: Prompted to save and update credentials on web form"
+tags:
+    - autofillNoAuthTests
+---
+# Pre-requisite: on an autofill-eligible device
+
+- launchApp:
+      clearState: true
+- runFlow: ../shared/onboarding.yaml
+
+- tapOn:
+    id: "omnibarTextInput"
+- eraseText
+- inputText: "fill.dev/form/login-simple"
+- pressKey: enter
+
+- tapOn:
+    text: "Got it"
+    optional: true
+
+- tapOn:
+    id: "username"
+- inputText: "user"
+- tapOn:
+    id: "password"
+- inputText: "password1"
+- tapOn:
+    text: "Login"
+- assertVisible: "Save Password"
+- tapOn: "Save Password"
+- pressKey: back
+- tapOn: "Close Autofill Dialog"
+- tapOn:
+    id: "password"
+- inputText: "password2"
+- tapOn:
+    text: "Login"
+- assertVisible: "Update Password"
+- tapOn: "Update Password"
+
+- runFlow: steps/access_passwords_screen.yaml
+
+- tapOn: "user"
+- tapOn:
+    id: "internal_password_icon"
+- assertVisible: "password2"

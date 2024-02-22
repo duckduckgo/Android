@@ -34,6 +34,7 @@ import com.duckduckgo.subscriptions.impl.R.string
 import com.duckduckgo.subscriptions.impl.SubscriptionStatus.AutoRenewable
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionSettingsBinding
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.AddDeviceActivity.Companion.AddDeviceScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.ui.ChangePlanActivity.Companion.ChangePlanScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsActivity.Companion.SubscriptionsSettingsScreenWithEmptyParams
@@ -52,6 +53,9 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var pixelSender: SubscriptionPixelSender
 
     private val viewModel: SubscriptionSettingsViewModel by bindViewModel()
     private val binding: ActivitySubscriptionSettingsBinding by viewBinding()
@@ -76,6 +80,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         }.launchIn(lifecycleScope)
 
         binding.addDevice.setClickListener {
+            pixelSender.reportSettingsAddDeviceClick()
             globalActivityStarter.start(this, AddDeviceScreenWithEmptyParams)
         }
 
@@ -103,6 +108,10 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         binding.faq.setClickListener {
             Toast.makeText(this, "This will take you to FAQs", Toast.LENGTH_SHORT).show()
         }
+
+        if (savedInstanceState == null) {
+            pixelSender.reportSubscriptionSettingsShown()
+        }
     }
 
     override fun onDestroy() {
@@ -121,15 +130,18 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         when (viewState.platform?.lowercase()) {
             "apple", "ios" ->
                 binding.changePlan.setClickListener {
+                    pixelSender.reportSubscriptionSettingsChangePlanOrBillingClick()
                     globalActivityStarter.start(this, ChangePlanScreenWithEmptyParams)
                 }
             "stripe" -> {
                 binding.changePlan.setClickListener {
+                    pixelSender.reportSubscriptionSettingsChangePlanOrBillingClick()
                     viewModel.goToStripe()
                 }
             }
             else -> {
                 binding.changePlan.setClickListener {
+                    pixelSender.reportSubscriptionSettingsChangePlanOrBillingClick()
                     val url = String.format(URL, BASIC_SUBSCRIPTION, applicationContext.packageName)
                     val intent = Intent(Intent.ACTION_VIEW)
                     intent.setData(Uri.parse(url))

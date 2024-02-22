@@ -1,6 +1,7 @@
 package com.duckduckgo.app.browser.pageloadpixel
 
 import com.duckduckgo.app.pixels.remoteconfig.OptimizeTrackerEvaluationRCWrapper
+import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.device.DeviceInfo
@@ -26,6 +27,7 @@ class PageLoadedHandlerTest {
     private val deviceInfo: DeviceInfo = mock()
     private val webViewVersionProvider: WebViewVersionProvider = mock()
     private val pageLoadedPixelDao: PageLoadedPixelDao = mock()
+    private val autoconsent: Autoconsent = mock()
     private val optimizeTrackerEvaluationRCWrapper = object : OptimizeTrackerEvaluationRCWrapper {
         override val enabled: Boolean
             get() = true
@@ -38,12 +40,14 @@ class PageLoadedHandlerTest {
         TestScope(),
         coroutinesTestRule.testDispatcherProvider,
         optimizeTrackerEvaluationRCWrapper,
+        autoconsent,
     )
 
     @Before
     fun before() {
         whenever(webViewVersionProvider.getMajorVersion()).thenReturn("1")
         whenever(deviceInfo.appVersion).thenReturn("1")
+        whenever(autoconsent.isAutoconsentEnabled()).thenReturn(true)
     }
 
     @Test

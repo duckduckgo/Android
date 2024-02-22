@@ -33,6 +33,7 @@ import com.duckduckgo.autofill.impl.urlmatcher.AutofillDomainNameUrlMatcher
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillUrlMatcher
 import com.duckduckgo.autofill.store.AutofillPrefsStore
 import com.duckduckgo.autofill.store.LastUpdatedTimeProvider
+import com.duckduckgo.autofill.sync.CredentialsFixtures.toLoginCredentials
 import com.duckduckgo.autofill.sync.CredentialsSyncMetadata
 import com.duckduckgo.autofill.sync.SyncCredentialsListener
 import com.duckduckgo.autofill.sync.inMemoryAutofillDatabase
@@ -446,6 +447,22 @@ class SecureStoreBackedAutofillStoreTest {
         assertEquals(originalCredentials.password, reinsertedCredentials.password)
     }
 
+    @Test
+    fun whenUpdatingCredentialsByDefaultLastUpdatedTimestampGetsUpdated() = runTest {
+        setupTesteeWithAutofillAvailable()
+        val saved = storeCredentials(id = 1, domain = "example.com", username = "username", password = "password")
+        val updated = testee.updateCredentials(saved)!!
+        assertEquals(UPDATED_INITIAL_LAST_UPDATED, updated.lastUpdatedMillis)
+    }
+
+    @Test
+    fun whenUpdatingCredentialsAndSpecifyNotToUpdateLastUpdatedTimestampThenNotUpdated() = runTest {
+        setupTesteeWithAutofillAvailable()
+        val saved = storeCredentials(id = 1, domain = "example.com", username = "username", password = "password")
+        val updated = testee.updateCredentials(saved, refreshLastUpdatedTimestamp = false)!!
+        assertEquals(DEFAULT_INITIAL_LAST_UPDATED, updated.lastUpdatedMillis)
+    }
+
     private fun List<LoginCredentials>.assertHasNoLoginCredentials(
         url: String,
         username: String,
@@ -519,10 +536,10 @@ class SecureStoreBackedAutofillStoreTest {
         password: String,
         lastUpdatedTimeMillis: Long = DEFAULT_INITIAL_LAST_UPDATED,
         notes: String = "notes",
-    ) {
+    ): LoginCredentials {
         val details = WebsiteLoginDetails(domain = domain, username = username, id = id, lastUpdatedMillis = lastUpdatedTimeMillis)
         val credentials = WebsiteLoginDetailsWithCredentials(details, password, notes)
-        secureStore.addWebsiteLoginDetailsWithCredentials(credentials)
+        return secureStore.addWebsiteLoginDetailsWithCredentials(credentials).toLoginCredentials()
     }
 
     private class FakeSecureStore(val canAccessSecureStorage: Boolean) : SecureStorage {

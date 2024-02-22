@@ -32,6 +32,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionStatus.Unknown
 import com.duckduckgo.subscriptions.impl.SubscriptionsData.*
 import com.duckduckgo.subscriptions.impl.billing.BillingClientWrapper
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
 import com.duckduckgo.subscriptions.impl.services.AuthService
 import com.duckduckgo.subscriptions.impl.services.CreateAccountResponse
@@ -40,6 +41,8 @@ import com.duckduckgo.subscriptions.impl.services.ResponseError
 import com.duckduckgo.subscriptions.impl.services.StoreLoginBody
 import com.duckduckgo.subscriptions.impl.services.SubscriptionsService
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.moshi.JsonDataException
+import com.squareup.moshi.JsonEncodingException
 import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -142,6 +145,7 @@ class RealSubscriptionsManager @Inject constructor(
     private val context: Context,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    private val pixelSender: SubscriptionPixelSender,
 ) : SubscriptionsManager {
 
     private val adapter = Moshi.Builder().build().adapter(ResponseError::class.java)
@@ -246,8 +250,11 @@ class RealSubscriptionsManager @Inject constructor(
             retries++
         }
         if (hasSubscription) {
+            pixelSender.reportPurchaseSuccess()
+            pixelSender.reportSubscriptionActivated()
             _currentPurchaseState.emit(CurrentPurchase.Success)
         } else {
+            pixelSender.reportPurchaseFailureBackend()
             _currentPurchaseState.emit(CurrentPurchase.Failure("An error happened, try again"))
         }
         _hasSubscription.emit(hasSubscription)
@@ -293,7 +300,11 @@ class RealSubscriptionsManager @Inject constructor(
                 val storeLoginBody = StoreLoginBody(signature = signature, signedData = body, packageName = context.packageName)
                 val response = authService.storeLogin(storeLoginBody)
                 logcat(LogPriority.DEBUG) { "Subs: store login succeeded" }
-                authenticate(response.authToken)
+                val subscriptionsData = authenticate(response.authToken)
+                if (subscriptionsData is Success && subscriptionsData.entitlements.isNotEmpty()) {
+                    pixelSender.reportSubscriptionActivated()
+                }
+                subscriptionsData
             } else {
                 Failure(SUBSCRIPTION_NOT_FOUND_ERROR)
             }
@@ -342,11 +353,13 @@ class RealSubscriptionsManager @Inject constructor(
                         billingClientWrapper.launchBillingFlow(activity, billingParams)
                     }
                 } else {
+                    pixelSender.reportRestoreAfterPurchaseAttemptSuccess()
                     _currentPurchaseState.emit(CurrentPurchase.Recovered)
                 }
             }
             is Failure -> {
                 logcat(LogPriority.ERROR) { "Subs: ${response.message}" }
+                pixelSender.reportPurchaseFailureOther()
                 _currentPurchaseState.emit(CurrentPurchase.Failure(response.message))
             }
         }
@@ -356,6 +369,11 @@ class RealSubscriptionsManager @Inject constructor(
         return try {
             val subscriptionData = if (isUserAuthenticated()) {
                 getSubscriptionDataFromToken(authRepository.tokens().accessToken!!)
+                    .also { subscriptionsData ->
+                        if (subscriptionsData is Success && subscriptionsData.entitlements.isNotEmpty()) {
+                            pixelSender.reportSubscriptionActivated()
+                        }
+                    }
             } else {
                 recoverSubscriptionFromStore()
             }
@@ -436,7 +454,20 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     private suspend fun createAccount(): CreateAccountResponse {
-        return authService.createAccount("Bearer ${emailManager.getToken()}")
+        try {
+            val account = authService.createAccount("Bearer ${emailManager.getToken()}")
+            if (account.authToken.isEmpty()) {
+                pixelSender.reportPurchaseFailureAccountCreation()
+            }
+            return account
+        } catch (e: Exception) {
+            when (e) {
+                is JsonDataException, is JsonEncodingException, is HttpException -> {
+                    pixelSender.reportPurchaseFailureAccountCreation()
+                }
+            }
+            throw e
+        }
     }
 
     private fun parseError(e: HttpException): ResponseError? {

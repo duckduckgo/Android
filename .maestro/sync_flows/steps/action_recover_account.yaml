@@ -12,5 +12,4 @@ appId: com.duckduckgo.mobile.android
     timeout: 5000
 - tapOn: "Next"
 - tapOn: "Done"
-- assertVisible:
-    id: "com.duckduckgo.mobile.android:id/qrCodeImageView"
+- assertVisible: "Synced Devices"

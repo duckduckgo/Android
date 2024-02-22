@@ -24,6 +24,11 @@
             android:process=":vpn"
             android:label="@string/netpEnvironmentSetting"
             android:exported="false" />
+        <activity
+            android:name=".feature.custom_dns.VpnCustomDnsActivity"
+            android:process=":vpn"
+            android:label="@string/netpCustomDns"
+            android:exported="false" />
     </application>
 
 </manifest>

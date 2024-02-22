@@ -6,6 +6,7 @@ import com.duckduckgo.subscriptions.api.Product.ITR
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.api.Subscriptions.EntitlementStatus.Found
 import com.duckduckgo.subscriptions.api.Subscriptions.EntitlementStatus.NotFound
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingViewModel.Command.OpenItr
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -14,6 +15,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
@@ -22,11 +24,12 @@ class ItrSettingViewModelTest {
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val subscriptions: Subscriptions = mock()
+    private val pixelSender: SubscriptionPixelSender = mock()
     private lateinit var viewModel: ItrSettingViewModel
 
     @Before
     fun before() {
-        viewModel = ItrSettingViewModel(subscriptions, coroutineTestRule.testDispatcherProvider)
+        viewModel = ItrSettingViewModel(subscriptions, coroutineTestRule.testDispatcherProvider, pixelSender)
     }
 
     @Test
@@ -36,6 +39,12 @@ class ItrSettingViewModelTest {
             assertTrue(awaitItem() is OpenItr)
             cancelAndConsumeRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenOnItrThenPixelSent() = runTest {
+        viewModel.onItr()
+        verify(pixelSender).reportAppSettingsIdtrClick()
     }
 
     @Test

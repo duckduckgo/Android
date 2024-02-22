@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser.mediaplayback.store
 
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureExceptions
@@ -38,13 +39,16 @@ class RealMediaPlaybackRepository @Inject constructor(
     private val mediaPlaybackDao: MediaPlaybackDao,
     @AppCoroutineScope appCoroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider,
+    @IsMainProcess isMainProcess: Boolean,
 ) : MediaPlaybackRepository {
 
     override val exceptions = CopyOnWriteArrayList<FeatureExceptions.FeatureException>()
 
     init {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            loadToMemory()
+            if (isMainProcess) {
+                loadToMemory()
+            }
         }
     }
 

@@ -947,50 +947,7 @@
                     "reason": "Site breakage"
                 }
             ]
-        },
-        "notificationPermissions": {
-            "state": "enabled",
-            "features": {
-                "noPermissionsPrompt": {
-                    "state": "enabled",
-                    "targets": [
-                        {
-                            "variantKey": "mg"
-                        }
-                    ]
-                }
-            }
         }
     },
-    "unprotectedTemporary": [],
-    "experimentalVariants": {
-        "variants": [
-            {
-                "desc": "this is SERP don't remove",
-                "variantKey": "sc",
-                "weight": 0.0
-            },
-            {
-                "desc": "this is SERP don't remove",
-                "variantKey": "se",
-                "weight": 0.0
-            },
-            {
-                "desc": "Control group for notification permissions experiment",
-                "variantKey": "mf",
-                "weight": 1.0,
-                "filters": {
-                    "androidVersion": ["34", "33"]
-                }
-            },
-            {
-                "desc": "No notifications permissions prompt experimental group",
-                "variantKey": "mg",
-                "weight": 1.0,
-                "filters": {
-                    "androidVersion": ["34", "33"]
-                }
-            }
-        ]
-    }
+    "unprotectedTemporary": []
 }

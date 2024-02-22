@@ -203,6 +203,7 @@ class RealSecureStorageRepositoryTest {
         notesIv: String = "notesIv",
         domainTitle: String = "test",
         lastUpdatedInMillis: Long = 0L,
+        lastUsedInMillis: Long = 0L,
     ): WebsiteLoginCredentialsEntity {
         return WebsiteLoginCredentialsEntity(
             id = id,
@@ -214,6 +215,7 @@ class RealSecureStorageRepositoryTest {
             notesIv = notesIv,
             domainTitle = domainTitle,
             lastUpdatedInMillis = lastUpdatedInMillis,
+            lastUsedInMillis = lastUsedInMillis,
         )
     }
 }

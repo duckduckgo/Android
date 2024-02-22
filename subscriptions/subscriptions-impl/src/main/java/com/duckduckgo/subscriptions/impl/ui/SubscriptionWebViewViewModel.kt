@@ -38,6 +38,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.billing.getPrice
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.SubscriptionsRepository
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.*
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView.Failure
@@ -66,6 +67,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
     private val subscriptionsRepository: SubscriptionsRepository,
     private val networkProtectionWaitlist: NetworkProtectionWaitlist,
+    private val pixelSender: SubscriptionPixelSender,
 ) : ViewModel() {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -121,6 +123,12 @@ class SubscriptionWebViewViewModel @Inject constructor(
                 PIR -> GoToPIR
                 else -> null
             }
+            when (commandToSend) {
+                GoToITR -> pixelSender.reportOnboardingIdtrClick()
+                is GoToNetP -> pixelSender.reportOnboardingVpnClick()
+                GoToPIR -> pixelSender.reportOnboardingPirClick()
+                else -> {} // no-op
+            }
             commandToSend?.let {
                 command.send(commandToSend)
             }
@@ -129,17 +137,22 @@ class SubscriptionWebViewViewModel @Inject constructor(
     private fun activateSubscription() {
         viewModelScope.launch(dispatcherProvider.io()) {
             if (subscriptionsManager.hasSubscription()) {
+                pixelSender.reportOnboardingAddDeviceClick()
                 activateOnAnotherDevice()
             } else {
+                pixelSender.reportOfferRestorePurchaseClick()
                 recoverSubscription()
             }
         }
     }
 
     private fun subscriptionSelected(data: JSONObject?) {
+        pixelSender.reportOfferSubscribeClick()
+
         viewModelScope.launch(dispatcherProvider.io()) {
             val id = runCatching { data?.getString("id") }.getOrNull()
             if (id.isNullOrBlank()) {
+                pixelSender.reportPurchaseFailureOther()
                 _currentPurchaseViewState.emit(currentPurchaseViewState.value.copy(purchaseState = Failure("")))
             } else {
                 command.send(SubscriptionSelected(id))

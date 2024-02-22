@@ -45,6 +45,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LIST_OF_PRODUCTS
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState.Canceled
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState.InProgress
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState.Purchased
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
@@ -80,6 +81,7 @@ class RealBillingClientWrapper @Inject constructor(
     private val context: Context,
     val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope val coroutineScope: CoroutineScope,
+    private val pixelSender: SubscriptionPixelSender,
 ) : BillingClientWrapper, MainProcessLifecycleObserver {
 
     private var billingFlowInProcess = false
@@ -109,6 +111,7 @@ class RealBillingClientWrapper @Inject constructor(
                 }
                 // Handle an error caused by a user cancelling the purchase flow.
             } else {
+                pixelSender.reportPurchaseFailureStore()
                 coroutineScope.launch(dispatcherProvider.io()) {
                     _purchaseState.emit(Canceled)
                 }

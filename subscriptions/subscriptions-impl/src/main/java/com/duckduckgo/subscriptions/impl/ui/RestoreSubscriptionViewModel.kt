@@ -24,6 +24,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.Companion.SUBSCRIPTION_NOT_FOUND_ERROR
 import com.duckduckgo.subscriptions.impl.SubscriptionsData
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.Error
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.RestoreFromEmail
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.SubscriptionNotFound
@@ -41,6 +42,7 @@ import kotlinx.coroutines.launch
 class RestoreSubscriptionViewModel @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
     private val dispatcherProvider: DispatcherProvider,
+    private val pixelSender: SubscriptionPixelSender,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -53,20 +55,29 @@ class RestoreSubscriptionViewModel @Inject constructor(
     )
 
     fun restoreFromStore() {
+        pixelSender.reportActivateSubscriptionRestorePurchaseClick()
         viewModelScope.launch(dispatcherProvider.io()) {
             when (val response = subscriptionsManager.recoverSubscriptionFromStore()) {
                 is SubscriptionsData.Success -> {
                     if (response.entitlements.isEmpty()) {
+                        pixelSender.reportRestoreUsingStoreFailureSubscriptionNotFound()
                         subscriptionsManager.signOut()
                         command.send(SubscriptionNotFound)
                     } else {
+                        pixelSender.reportRestoreUsingStoreSuccess()
                         command.send(Success)
                     }
                 }
                 is SubscriptionsData.Failure -> {
                     when (response.message) {
-                        SUBSCRIPTION_NOT_FOUND_ERROR -> command.send(SubscriptionNotFound)
-                        else -> command.send(Error(response.message))
+                        SUBSCRIPTION_NOT_FOUND_ERROR -> {
+                            pixelSender.reportRestoreUsingStoreFailureSubscriptionNotFound()
+                            command.send(SubscriptionNotFound)
+                        }
+                        else -> {
+                            pixelSender.reportRestoreUsingStoreFailureOther()
+                            command.send(Error(response.message))
+                        }
                     }
                 }
             }
@@ -74,6 +85,7 @@ class RestoreSubscriptionViewModel @Inject constructor(
     }
 
     fun restoreFromEmail() {
+        pixelSender.reportActivateSubscriptionEnterEmailClick()
         viewModelScope.launch {
             command.send(RestoreFromEmail)
         }

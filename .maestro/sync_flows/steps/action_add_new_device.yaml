@@ -21,7 +21,6 @@ name: "Sync Critical Path: Devices can be added to an existing account"
       text: "Sync & Backup"
     direction: UP
 - tapOn: "Sync & Backup"
-- assertVisible:
-      id: "com.duckduckgo.mobile.android:id/qrCodeImageView"
+- assertVisible: "Synced Devices"
 - tapOn: "Navigate up"
 - tapOn: "Navigate up"

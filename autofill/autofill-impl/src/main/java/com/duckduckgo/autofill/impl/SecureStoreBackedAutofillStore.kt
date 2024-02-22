@@ -202,14 +202,15 @@ class SecureStoreBackedAutofillStore @Inject constructor(
         return savedCredentials.map { it.toLoginCredentials() }
     }
 
-    override suspend fun updateCredentials(credentials: LoginCredentials): LoginCredentials? {
+    override suspend fun updateCredentials(credentials: LoginCredentials, refreshLastUpdatedTimestamp: Boolean): LoginCredentials? {
         val cleanedDomain: String? = credentials.domain?.let {
             autofillUrlMatcher.cleanRawUrl(it)
         }
 
+        val lastUpdated = if (refreshLastUpdatedTimestamp) lastUpdatedTimeProvider.getInMillis() else credentials.lastUpdatedMillis
+
         return secureStorage.updateWebsiteLoginDetailsWithCredentials(
-            credentials.copy(lastUpdatedMillis = lastUpdatedTimeProvider.getInMillis(), domain = cleanedDomain)
-                .toWebsiteLoginCredentials(),
+            credentials.copy(lastUpdatedMillis = lastUpdated, domain = cleanedDomain).toWebsiteLoginCredentials(),
         )?.toLoginCredentials()?.also {
             syncCredentialsListener.onCredentialUpdated(it.id!!)
         }
@@ -317,6 +318,7 @@ class SecureStoreBackedAutofillStore @Inject constructor(
             domainTitle = details.domainTitle,
             notes = notes,
             lastUpdatedMillis = details.lastUpdatedMillis,
+            lastUsedMillis = details.lastUsedInMillis,
         )
     }
 
@@ -328,6 +330,7 @@ class SecureStoreBackedAutofillStore @Inject constructor(
                 id = id,
                 domainTitle = domainTitle,
                 lastUpdatedMillis = lastUpdatedMillis,
+                lastUsedInMillis = lastUsedMillis,
             ),
             password = password,
             notes = notes,

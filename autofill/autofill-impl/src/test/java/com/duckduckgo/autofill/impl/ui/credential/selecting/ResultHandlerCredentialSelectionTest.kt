@@ -28,6 +28,7 @@ import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.NoMatch
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.deviceauth.FakeAuthenticator
+import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -48,6 +49,7 @@ class ResultHandlerCredentialSelectionTest {
     private val appBuildConfig: AppBuildConfig = mock()
     private lateinit var deviceAuthenticator: FakeAuthenticator
     private lateinit var testee: ResultHandlerCredentialSelection
+    private val autofillStore: InternalAutofillStore = mock()
 
     @Before
     fun setup() = runTest {
@@ -156,6 +158,7 @@ class ResultHandlerCredentialSelectionTest {
             pixel = pixel,
             deviceAuthenticator = deviceAuthenticator,
             appBuildConfig = appBuildConfig,
+            autofillStore = autofillStore,
         )
     }
 }

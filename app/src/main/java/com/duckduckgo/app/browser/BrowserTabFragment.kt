@@ -23,7 +23,6 @@ import android.app.ActivityOptions
 import android.app.PendingIntent
 import android.content.*
 import android.content.pm.ActivityInfo
-import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.content.res.Configuration
@@ -103,6 +102,8 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.SavedSiteChangedViewState
 import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
+import com.duckduckgo.app.browser.applinks.AppLinksLauncher
+import com.duckduckgo.app.browser.applinks.AppLinksSnackBarConfigurator
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.databinding.ContentSiteLocationPermissionDialogBinding
@@ -458,6 +459,12 @@ class BrowserTabFragment :
     @Inject
     lateinit var privacyProtectionsPopupFactory: PrivacyProtectionsPopupFactory
 
+    @Inject
+    lateinit var appLinksSnackBarConfigurator: AppLinksSnackBarConfigurator
+
+    @Inject
+    lateinit var appLinksLauncher: AppLinksLauncher
+
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
      * This is needed because the activity stack will be cleared if an external link is opened in our browser
@@ -591,13 +598,7 @@ class BrowserTabFragment :
     }
 
     private val autoconsentCallback = object : AutoconsentCallback {
-        override fun onFirstPopUpHandled() {
-            // Remove comment to promote feature
-            // ctaViewModel.enableAutoconsentCta()
-            // launch {
-            //     viewModel.refreshCta()
-            // }
-        }
+        override fun onFirstPopUpHandled() { }
 
         override fun onPopUpHandled(isCosmetic: Boolean) {
             launch {
@@ -1620,101 +1621,17 @@ class BrowserTabFragment :
     }
 
     private fun showAppLinkSnackBar(appLink: SpecialUrlDetector.UrlType.AppLink) {
-        view?.let { view ->
-
-            val message: String?
-            val action: String?
-
-            if (appLink.appIntent != null) {
-                val packageName = appLink.appIntent!!.component?.packageName ?: return
-                message = getString(R.string.appLinkSnackBarMessage, getAppName(packageName))
-                action = getString(R.string.appLinkSnackBarAction)
-            } else {
-                message = getString(R.string.appLinkMultipleSnackBarMessage)
-                action = getString(R.string.appLinkMultipleSnackBarAction)
-            }
-
-            appLinksSnackBar = view.makeSnackbarWithNoBottomInset(
-                message,
-                Snackbar.LENGTH_LONG,
-            )
-                .setAction(action) {
-                    pixel.fire(AppPixelName.APP_LINKS_SNACKBAR_OPEN_ACTION_PRESSED)
-                    openAppLink(appLink)
-                }
-                .addCallback(
-                    object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
-                        override fun onShown(transientBottomBar: Snackbar?) {
-                            super.onShown(transientBottomBar)
-                            pixel.fire(AppPixelName.APP_LINKS_SNACKBAR_SHOWN)
-                        }
-
-                        override fun onDismissed(
-                            transientBottomBar: Snackbar?,
-                            event: Int,
-                        ) {
-                            super.onDismissed(transientBottomBar, event)
-                        }
-                    },
-                )
-
-            appLinksSnackBar?.setDuration(6000)?.show()
-        }
-    }
-
-    private fun getAppName(packageName: String): String? {
-        val packageManager: PackageManager? = context?.packageManager
-        val applicationInfo: ApplicationInfo? = try {
-            packageManager?.getApplicationInfo(packageName, 0)
-        } catch (e: PackageManager.NameNotFoundException) {
-            null
-        }
-        return if (applicationInfo != null) {
-            packageManager?.getApplicationLabel(applicationInfo).toString()
-        } else {
-            null
-        }
+        appLinksSnackBar = appLinksSnackBarConfigurator.configureAppLinkSnackBar(view = view, appLink = appLink, viewModel = viewModel)
+        appLinksSnackBar?.show()
     }
 
     private fun openAppLink(appLink: SpecialUrlDetector.UrlType.AppLink) {
-        if (appLink.appIntent != null) {
-            appLink.appIntent!!.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            try {
-                startActivityOrQuietlyFail(appLink.appIntent!!)
-            } catch (e: SecurityException) {
-                showToast(R.string.unableToOpenLink)
-            }
-        } else if (appLink.excludedComponents != null) {
-            val title = getString(R.string.appLinkIntentChooserTitle)
-            val chooserIntent = getChooserIntent(appLink.uriString, title, appLink.excludedComponents!!)
-            startActivityOrQuietlyFail(chooserIntent)
-        }
-        viewModel.clearPreviousUrl()
-    }
-
-    private fun startActivityOrQuietlyFail(intent: Intent) {
-        try {
-            startActivity(intent)
-        } catch (e: ActivityNotFoundException) {
-            Timber.w(e, "Activity not found")
-        }
+        appLinksLauncher.openAppLink(context = context, appLink = appLink, viewModel = viewModel)
     }
 
     private fun dismissAppLinkSnackBar() {
         appLinksSnackBar?.dismiss()
         appLinksSnackBar = null
-    }
-
-    private fun getChooserIntent(
-        url: String?,
-        title: String,
-        excludedComponents: List<ComponentName>,
-    ): Intent {
-        val urlIntent = Intent.parseUri(url, Intent.URI_ANDROID_APP_SCHEME)
-        urlIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        val chooserIntent = Intent.createChooser(urlIntent, title)
-        chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, excludedComponents.toTypedArray())
-        return chooserIntent
     }
 
     private fun openExternalDialog(
@@ -3668,8 +3585,7 @@ class BrowserTabFragment :
             val configuration = lastSeenCtaViewState?.cta
             if (configuration is DaxDialogCta) {
                 activity?.let { activity ->
-                    val listener = if (configuration is DaxAutoconsentCta) daxAutoconsentListener else daxListener
-                    configuration.createCta(activity, listener).apply {
+                    configuration.createCta(activity, daxListener).apply {
                         showDialogHidingPrevious(this, DAX_DIALOG_DIALOG_TAG)
                     }
                 }
@@ -3680,32 +3596,10 @@ class BrowserTabFragment :
             hideHomeCta()
             hideDaxCta()
             activity?.let { activity ->
-                val listener = if (configuration is DaxAutoconsentCta) daxAutoconsentListener else daxListener
-                configuration.createCta(activity, listener).apply {
+                configuration.createCta(activity, daxListener).apply {
                     showDialogIfNotExist(this, DAX_DIALOG_DIALOG_TAG)
                 }
                 viewModel.onCtaShown()
-            }
-        }
-
-        private val daxAutoconsentListener = object : DaxDialogListener {
-            override fun onDaxDialogDismiss() {
-                autoconsent.firstPopUpHandled()
-                viewModel.onDaxDialogDismissed()
-            }
-
-            override fun onDaxDialogHideClick() {
-                viewModel.onUserHideDaxDialog()
-            }
-
-            override fun onDaxDialogPrimaryCtaClick() {
-                webView?.let { autoconsent.setAutoconsentOptOut(it) }
-                viewModel.onUserClickCtaOkButton()
-            }
-
-            override fun onDaxDialogSecondaryCtaClick() {
-                autoconsent.setAutoconsentOptIn()
-                viewModel.onUserClickCtaSecondaryButton()
             }
         }
 

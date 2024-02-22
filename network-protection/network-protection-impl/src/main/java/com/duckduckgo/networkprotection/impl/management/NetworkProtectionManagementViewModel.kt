@@ -27,7 +27,6 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.network.ExternalVpnDetector
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.AlwaysOnState
@@ -41,6 +40,7 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.ERR
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.REVOKED
 import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
 import com.duckduckgo.mobile.android.vpn.ui.OpenVpnBreakageCategoryWithBrokenApp
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.configuration.asServerDetails
@@ -71,13 +71,13 @@ import kotlinx.coroutines.withContext
 @ContributesViewModel(ActivityScope::class)
 class NetworkProtectionManagementViewModel @Inject constructor(
     private val vpnStateMonitor: VpnStateMonitor,
-    private val featuresRegistry: VpnFeaturesRegistry,
     private val networkProtectionRepository: NetworkProtectionRepository,
     private val wgTunnelConfig: WgTunnelConfig,
     private val dispatcherProvider: DispatcherProvider,
     private val externalVpnDetector: ExternalVpnDetector,
     private val networkProtectionPixels: NetworkProtectionPixels,
     @NetpBreakageCategories private val netpBreakageCategories: List<AppBreakageCategory>,
+    private val networkProtectionState: NetworkProtectionState,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val refreshVpnRunningState = MutableStateFlow(System.currentTimeMillis())
@@ -239,7 +239,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
 
     fun onStartVpn() {
         viewModelScope.launch(dispatcherProvider.io()) {
-            featuresRegistry.registerFeature(NetPVpnFeature.NETP_VPN)
+            networkProtectionState.start()
             networkProtectionRepository.enabledTimeInMillis = -1L
             forceUpdateRunningState()
             tryShowAlwaysOnPromotion()
@@ -287,7 +287,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
 
     private fun onStopVpn() {
         viewModelScope.launch(dispatcherProvider.io()) {
-            featuresRegistry.unregisterFeature(NetPVpnFeature.NETP_VPN)
+            networkProtectionState.clearVPNConfigurationAndStop()
             forceUpdateRunningState()
         }
     }

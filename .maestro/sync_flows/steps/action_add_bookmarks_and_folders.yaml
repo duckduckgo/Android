@@ -42,10 +42,20 @@ appId: com.duckduckgo.mobile.android
       - tapOn:
           id: "com.duckduckgo.mobile.android:id/item_container"
           index: 1
-- tapOn:
-    id: "com.duckduckgo.mobile.android:id/touch_outside"
+- runFlow:
+    when:
+      visible:
+        id: "com.duckduckgo.mobile.android:id/touch_outside"
+    commands:
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/touch_outside"
 # Now, we create a new folder
 - runFlow: ../../shared/open_bookmarks.yaml
+- runFlow:
+    when:
+      visible: "Download Missing Icons?"
+    commands:
+      - tapOn: "Not Now"
 - tapOn: "Add Folder"
 - tapOn: "Title"
 - inputText: "${output.bookmarks.folders[0]}"

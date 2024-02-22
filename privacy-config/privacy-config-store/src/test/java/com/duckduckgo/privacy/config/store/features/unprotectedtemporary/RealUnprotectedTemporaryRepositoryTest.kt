@@ -49,6 +49,7 @@ class RealUnprotectedTemporaryRepositoryTest {
                 mockDatabase,
                 TestScope(),
                 coroutineRule.testDispatcherProvider,
+                isMainProcess = true,
             )
     }
 
@@ -61,6 +62,7 @@ class RealUnprotectedTemporaryRepositoryTest {
                 mockDatabase,
                 TestScope(),
                 coroutineRule.testDispatcherProvider,
+                isMainProcess = true,
             )
 
         assertEquals(unprotectedTemporaryException.toFeatureException(), testee.exceptions.first())
@@ -74,6 +76,7 @@ class RealUnprotectedTemporaryRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    isMainProcess = true,
                 )
 
             testee.updateAll(listOf())
@@ -90,6 +93,7 @@ class RealUnprotectedTemporaryRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    isMainProcess = true,
                 )
             assertEquals(1, testee.exceptions.size)
             reset(mockUnprotectedTemporaryDao)

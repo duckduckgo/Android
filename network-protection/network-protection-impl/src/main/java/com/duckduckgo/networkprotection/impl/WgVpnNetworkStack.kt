@@ -26,6 +26,7 @@ import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack.VpnTunnelConfig
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.RESTART
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.SELF_STOP
+import com.duckduckgo.networkprotection.impl.config.NetPDefaultConfigProvider
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnel
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
@@ -49,6 +50,7 @@ class WgVpnNetworkStack @Inject constructor(
     private val wgTunnelLazy: Lazy<WgTunnel>,
     private val wgTunnelConfigLazy: Lazy<WgTunnelConfig>,
     private val networkProtectionRepository: Lazy<NetworkProtectionRepository>,
+    private val netPDefaultConfigProvider: NetPDefaultConfigProvider,
     private val currentTimeProvider: CurrentTimeProvider,
     private val netpPixels: Lazy<NetworkProtectionPixels>,
     private val dnsProvider: DnsProvider,
@@ -78,6 +80,7 @@ class WgVpnNetworkStack @Inject constructor(
                     // why? no use intercepting encrypted DNS traffic, plus we can't configure any DNS that doesn't support DoT, otherwise Android
                     // will enforce DoT and will stop passing any DNS traffic, resulting in no DNS resolution == connectivity is killed
                     dns = if (privateDns.isEmpty()) wgConfig!!.`interface`.dnsServers else emptySet(),
+                    customDns = netPDefaultConfigProvider.fallbackDns(),
                     routes = wgConfig!!.`interface`.routes.associate { it.address.hostAddress!! to it.mask },
                     appExclusionList = wgConfig!!.`interface`.excludedApplications,
                 ),

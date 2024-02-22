@@ -49,6 +49,7 @@ class RuntimeChecksRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    isMainProcess = true,
                 )
 
             verify(mockRuntimeChecksDao).get()
@@ -64,6 +65,7 @@ class RuntimeChecksRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    isMainProcess = true,
                 )
 
             verify(mockRuntimeChecksDao).get()
@@ -78,6 +80,7 @@ class RuntimeChecksRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    isMainProcess = true,
                 )
 
             testee.updateAll(runtimeChecksEntity)
