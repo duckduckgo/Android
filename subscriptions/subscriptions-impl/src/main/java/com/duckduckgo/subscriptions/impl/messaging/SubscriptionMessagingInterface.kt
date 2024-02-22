@@ -35,6 +35,7 @@ import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.subscriptions.impl.AuthToken
 import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
 import javax.inject.Inject
@@ -52,6 +53,7 @@ class SubscriptionMessagingInterface @Inject constructor(
     private val jsMessageHelper: JsMessageHelper,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val pixelSender: SubscriptionPixelSender,
 ) : JsMessaging {
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
 
@@ -61,7 +63,7 @@ class SubscriptionMessagingInterface @Inject constructor(
     private val handlers = listOf(
         SubscriptionsHandler(),
         GetSubscriptionMessage(subscriptionsManager, dispatcherProvider),
-        SetSubscriptionMessage(subscriptionsManager, appCoroutineScope, dispatcherProvider),
+        SetSubscriptionMessage(subscriptionsManager, appCoroutineScope, dispatcherProvider, pixelSender),
     )
 
     @JavascriptInterface
@@ -185,12 +187,15 @@ class SubscriptionMessagingInterface @Inject constructor(
         private val subscriptionsManager: SubscriptionsManager,
         @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
         private val dispatcherProvider: DispatcherProvider,
+        private val pixelSender: SubscriptionPixelSender,
     ) : JsMessageHandler {
         override fun process(jsMessage: JsMessage, secret: String, jsMessageCallback: JsMessageCallback?) {
             try {
                 val token = jsMessage.params.getString("token")
                 appCoroutineScope.launch(dispatcherProvider.io()) {
                     subscriptionsManager.authenticate(token)
+                    pixelSender.reportRestoreUsingEmailSuccess()
+                    pixelSender.reportSubscriptionActivated()
                 }
             } catch (e: Exception) {
                 logcat { "Error parsing the token" }

@@ -27,6 +27,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenBuyScreen
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenSettings
 import javax.inject.Inject
+import javax.inject.Provider
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -36,7 +37,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
-class ProSettingViewModel(
+class ProSettingViewModel @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel(), DefaultLifecycleObserver {
@@ -78,13 +79,12 @@ class ProSettingViewModel(
 
     @Suppress("UNCHECKED_CAST")
     class Factory @Inject constructor(
-        private val subscriptionsManager: SubscriptionsManager,
-        private val dispatcherProvider: DispatcherProvider,
+        private val proSettingViewModel: Provider<ProSettingViewModel>,
     ) : ViewModelProvider.NewInstanceFactory() {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return with(modelClass) {
                 when {
-                    isAssignableFrom(ProSettingViewModel::class.java) -> ProSettingViewModel(subscriptionsManager, dispatcherProvider)
+                    isAssignableFrom(ProSettingViewModel::class.java) -> proSettingViewModel.get()
                     else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
                 }
             } as T
