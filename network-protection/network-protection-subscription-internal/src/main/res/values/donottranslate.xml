@@ -19,7 +19,7 @@
     <string name="netpVerifySubscriptionLabel">Verify Subscription</string>
     <string name="netpVerifySubscriptionInProgress">Please wait while we verify your subscription…</string>
     <string name="netpVerifySubscriptionNoSubscription">Oops! You don’t have any valid subscription.</string>
-    <string name="netpVerifySubscriptionNoEntitlement">Oops! Your subscription is not valid for Network Protection.</string>
+    <string name="netpVerifySubscriptionNoEntitlement">Oops! Your subscription is not valid for DuckDuckGo VPN.</string>
 
     <!-- NetP Settings-->
     <string name="netpSubscriptionSettingsTitle">VPN</string>

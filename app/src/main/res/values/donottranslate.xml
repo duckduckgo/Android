@@ -25,7 +25,7 @@
     <string name="syncSettingsEnabled">On</string>
 
     <!-- Network Protection -->
-    <string name="netpSettingsTitle">Network Protection</string>
+    <string name="netpSettingsTitle">VPN</string>
     <string name="netpSettingsNeverEnabled">Secure your network connection</string>
     <string name="netpSettingsConnected">Enabled</string>
     <string name="netpSettingsConnecting">Connecting…</string>
