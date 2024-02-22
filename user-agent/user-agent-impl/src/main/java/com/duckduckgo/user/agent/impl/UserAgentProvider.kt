@@ -232,7 +232,7 @@ class RealUserAgentProvider @Inject constructor(
 
 @ContributesTo(AppScope::class)
 @Module
-class UserAgentModule {
+class DefaultUserAgentModule {
     @SingleInstanceIn(AppScope::class)
     @Provides
     @Named("defaultUserAgent")
