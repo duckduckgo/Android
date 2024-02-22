@@ -16,16 +16,24 @@
 
 package com.duckduckgo.app.onboarding.ui.page.experiment
 
+import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.global.DefaultRoleBrowserDialog
+import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.ui.page.experiment.ExperimentWelcomePage.Companion.PreOnboardingDialogType
 import com.duckduckgo.app.onboarding.ui.page.experiment.ExperimentWelcomePage.Companion.PreOnboardingDialogType.CELEBRATION
 import com.duckduckgo.app.onboarding.ui.page.experiment.ExperimentWelcomePage.Companion.PreOnboardingDialogType.COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.experiment.ExperimentWelcomePage.Companion.PreOnboardingDialogType.INITIAL
 import com.duckduckgo.app.onboarding.ui.page.experiment.ExperimentWelcomePageViewModel.Command.Finish
 import com.duckduckgo.app.onboarding.ui.page.experiment.ExperimentWelcomePageViewModel.Command.ShowComparisonChart
+import com.duckduckgo.app.onboarding.ui.page.experiment.ExperimentWelcomePageViewModel.Command.ShowDefaultBrowserDialog
 import com.duckduckgo.app.onboarding.ui.page.experiment.ExperimentWelcomePageViewModel.Command.ShowSuccessDialog
+import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.FragmentScope
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -34,14 +42,21 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
+@SuppressLint("StaticFieldLeak")
 @ContributesViewModel(FragmentScope::class)
-class ExperimentWelcomePageViewModel @Inject constructor() : ViewModel() {
+class ExperimentWelcomePageViewModel @Inject constructor(
+    private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
+    private val context: Context,
+    private val pixel: Pixel,
+    private val appInstallStore: AppInstallStore,
+) : ViewModel() {
 
     private val _commands = Channel<Command>(1, DROP_OLDEST)
     val commands: Flow<Command> = _commands.receiveAsFlow()
 
     sealed interface Command {
         data object ShowComparisonChart : Command
+        data class ShowDefaultBrowserDialog(val intent: Intent) : Command
         data object ShowSuccessDialog : Command
         data object Finish : Command
     }
@@ -53,16 +68,48 @@ class ExperimentWelcomePageViewModel @Inject constructor() : ViewModel() {
                     _commands.send(ShowComparisonChart)
                 }
             }
+
             COMPARISON_CHART -> {
                 viewModelScope.launch {
-                    _commands.send(ShowSuccessDialog)
+                    if (defaultRoleBrowserDialog.shouldShowDialog()) {
+                        val intent = defaultRoleBrowserDialog.createIntent(context)
+                        if (intent != null) {
+                            _commands.send(ShowDefaultBrowserDialog(intent))
+                        } else {
+                            pixel.fire(AppPixelName.DEFAULT_BROWSER_DIALOG_NOT_SHOWN)
+                            _commands.send(Finish)
+                        }
+                    } else {
+                        _commands.send(Finish)
+                    }
                 }
             }
+
             CELEBRATION -> {
                 viewModelScope.launch {
                     _commands.send(Finish)
                 }
             }
+        }
+    }
+
+    fun onDefaultBrowserSet() {
+        defaultRoleBrowserDialog.dialogShown()
+        appInstallStore.defaultBrowser = true
+        pixel.fire(AppPixelName.DEFAULT_BROWSER_SET, mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()))
+
+        viewModelScope.launch {
+            _commands.send(ShowSuccessDialog)
+        }
+    }
+
+    fun onDefaultBrowserNotSet() {
+        defaultRoleBrowserDialog.dialogShown()
+        appInstallStore.defaultBrowser = false
+        pixel.fire(AppPixelName.DEFAULT_BROWSER_NOT_SET, mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()))
+
+        viewModelScope.launch {
+            _commands.send(Finish)
         }
     }
 }
