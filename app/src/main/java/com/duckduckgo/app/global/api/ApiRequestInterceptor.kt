@@ -39,7 +39,7 @@ class ApiRequestInterceptor(
         val url = chain.request().url
         if (url.toString().startsWith("${AppUrl.Url.PIXEL}/t/rq_")) {
             // user agent for re-query pixels needs to be the same for the webview
-            request.addHeader(Header.USER_AGENT, userAgentProvider.userAgent())
+            request.addHeader(Header.USER_AGENT, userAgentProvider.userAgent(url = url.toString()))
         } else {
             request.addHeader(Header.USER_AGENT, userAgent)
         }
