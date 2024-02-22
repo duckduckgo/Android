@@ -41,4 +41,8 @@
         app:leadingIconBackground="circular"
         app:primaryText="@string/netpManagementManageItemExclusion"
         app:secondaryText="@string/netpManagementManageItemExclusionSubtitleEmpty" />
+
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent" />
 </LinearLayout>
