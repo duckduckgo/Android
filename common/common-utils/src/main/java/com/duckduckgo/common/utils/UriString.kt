@@ -17,6 +17,7 @@
 package com.duckduckgo.common.utils
 
 import android.net.Uri
+import android.util.LruCache
 import androidx.core.util.PatternsCompat
 import java.lang.IllegalArgumentException
 import okhttp3.HttpUrl.Companion.toHttpUrl
@@ -30,6 +31,7 @@ class UriString {
         private const val space = " "
         private val webUrlRegex by lazy { PatternsCompat.WEB_URL.toRegex() }
         private val domainRegex by lazy { PatternsCompat.DOMAIN_NAME.toRegex() }
+        private val cache = LruCache<Int, Boolean>(250_000)
 
         fun host(uriString: String): String? {
             return Uri.parse(uriString).baseHost
@@ -41,7 +43,10 @@ class UriString {
         ): Boolean {
             val childHost = host(child) ?: return false
             val parentHost = host(parent) ?: return false
-            return parentHost == childHost || childHost.endsWith(".$parentHost")
+            val hash = (childHost + parentHost).hashCode()
+            return cache.get(hash) ?: (parentHost == childHost || childHost.endsWith(".$parentHost")).also {
+                cache.put(hash, it)
+            }
         }
 
         fun sameOrSubdomain(
@@ -50,7 +55,10 @@ class UriString {
         ): Boolean {
             val childHost = child.host ?: return false
             val parentHost = host(parent) ?: return false
-            return parentHost == childHost || childHost.endsWith(".$parentHost")
+            val hash = (childHost + parentHost).hashCode()
+            return cache.get(hash) ?: (parentHost == childHost || childHost.endsWith(".$parentHost")).also {
+                cache.put(hash, it)
+            }
         }
 
         fun sameOrSubdomainPair(
@@ -59,7 +67,10 @@ class UriString {
         ): Boolean {
             val childHost = first.host ?: return false
             val parentHost = host(second) ?: return false
-            return parentHost == childHost || (childHost.endsWith(".$parentHost") || parentHost.endsWith(".$childHost"))
+            val hash = (childHost + parentHost).hashCode()
+            return cache.get(hash) ?: (parentHost == childHost || (childHost.endsWith(".$parentHost") || parentHost.endsWith(".$childHost"))).also {
+                cache.put(hash, it)
+            }
         }
 
         fun sameOrSubdomainPair(
@@ -68,7 +79,10 @@ class UriString {
         ): Boolean {
             val childHost = first.host ?: return false
             val parentHost = second.host ?: return false
-            return parentHost == childHost || (childHost.endsWith(".$parentHost") || parentHost.endsWith(".$childHost"))
+            val hash = (childHost + parentHost).hashCode()
+            return cache.get(hash) ?: (parentHost == childHost || (childHost.endsWith(".$parentHost") || parentHost.endsWith(".$childHost"))).also {
+                cache.put(hash, it)
+            }
         }
 
         fun isWebUrl(inputQuery: String): Boolean {

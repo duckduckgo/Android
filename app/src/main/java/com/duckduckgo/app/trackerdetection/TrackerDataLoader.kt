@@ -31,6 +31,7 @@ import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.app.trackerdetection.db.TdsTrackerDao
 import com.duckduckgo.app.trackerdetection.model.TdsMetadata
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.toTldPlusOne
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
@@ -97,8 +98,8 @@ class TrackerDataLoader @Inject constructor(
     }
 
     fun loadTrackers() {
-        val trackers = tdsTrackerDao.getAll()
-        Timber.d("Loaded ${trackers.size} tds trackers from DB")
+        val trackers = tdsTrackerDao.getAll().groupBy { it.domain.toTldPlusOne().orEmpty() }
+        Timber.d("aitor Loaded ${trackers.size} tds trackers from DB")
         val client = TdsClient(Client.ClientName.TDS, trackers, urlToTypeMapper)
         trackerDetector.addClient(client)
     }
