@@ -54,6 +54,7 @@ class AccessibilitySettingsViewModelTest {
             VoiceSearchAvailabilityConfig("Google", "Pixel 7 Pro", 31, "en-US", true)
         }
     }
+
     @Test
     fun whenViewModelCreatedThenDefaultViewStateEmitted() = runTest {
         val viewState = AccessibilitySettingsViewModel.ViewState(
