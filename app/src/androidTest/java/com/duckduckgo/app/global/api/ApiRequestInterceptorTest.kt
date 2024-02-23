@@ -88,7 +88,7 @@ class ApiRequestInterceptorTest {
         val response = testee.intercept(fakeChain)
         val header = response.request.header(Header.USER_AGENT)!!
         val regex =
-            "Mozilla/.* \\(Linux; Android.*\\) AppleWebKit/.* \\(KHTML, like Gecko\\) Version/.* Chrome/.* Mobile DuckDuckGo/.* Safari/.*".toRegex()
+            "Mozilla/.* \\(Linux; Android.*\\) AppleWebKit/.* \\(KHTML, like Gecko\\) Chrome/.* Mobile Safari/.*".toRegex()
         assertTrue(header.matches(regex))
     }
 }
