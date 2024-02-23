@@ -228,13 +228,8 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
             connectionDetails.connectionDetailsIp.setSecondaryText(connectionDetailsData.ipAddress)
         }
 
-        connectionDetails.connectionDetailsDataVolume.setSecondaryText(
-            getString(
-                R.string.netpManagementConnectionDetailsDataVolumeFormat,
-                formatFileSize(applicationContext, connectionDetailsData.transmittedData),
-                formatFileSize(applicationContext, connectionDetailsData.receivedData),
-            ),
-        )
+        connectionDetails.transmittedText.text = formatFileSize(applicationContext, connectionDetailsData.transmittedData)
+        connectionDetails.receivedText.text = formatFileSize(applicationContext, connectionDetailsData.receivedData)
     }
 
     private fun ActivityNetpManagementBinding.renderDisconnectedState() {

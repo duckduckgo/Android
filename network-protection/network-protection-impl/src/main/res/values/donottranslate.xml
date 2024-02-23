@@ -38,7 +38,6 @@
     <string name="netpManagementConnectionDetailsHeader">Connection Details</string>
     <string name="netpManagementConnectionDetailsIp">IP Address</string>
     <string name="netpManagementConnectionDetailsDataVolume">Data Volume</string>
-    <string name="netpManagementConnectionDetailsDataVolumeFormat" instruction="Placeholders are transmitted bytes and received bytes">&#8593; %1$s  &#8595; %2$s</string>
 
     <!-- NetP enabled notification -->
     <string name="netpEnabledNotificationInitialTitle">VPN is connected.</string>
