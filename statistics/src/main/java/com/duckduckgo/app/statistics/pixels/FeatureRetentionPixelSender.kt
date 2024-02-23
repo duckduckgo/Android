@@ -22,10 +22,12 @@ import androidx.core.content.edit
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.api.BrowserFeatureStateReporterPlugin
 import com.duckduckgo.app.statistics.api.RefreshRetentionAtbPlugin
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.VOICE_SEARCH_ENABLED
 import com.duckduckgo.app.statistics.pixels.Pixel.StatisticsPixelName
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.time.Instant
 import java.time.ZoneOffset
@@ -41,6 +43,7 @@ class FeatureRetentionPixelSender @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val plugins: PluginPoint<BrowserFeatureStateReporterPlugin>,
+    private val voiceSearchAvailability: VoiceSearchAvailability,
 ) : RefreshRetentionAtbPlugin {
 
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(PIXELS_PREF_FILE, Context.MODE_PRIVATE) }
@@ -68,6 +71,7 @@ class FeatureRetentionPixelSender @Inject constructor(
             val featureState = plugin.featureState()
             parameters[featureState.second] = featureState.first.toBinaryString()
         }
+        parameters[VOICE_SEARCH_ENABLED] = voiceSearchAvailability.isVoiceSearchAvailable.toString()
 
         // check if pixel was already sent in the current day
         if (timestamp == null || now > timestamp) {

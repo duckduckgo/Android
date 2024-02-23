@@ -45,6 +45,9 @@ class MicrophonePermissionRequestTest {
     @Mock
     private lateinit var permissionRationale: PermissionRationale
 
+    @Mock
+    private lateinit var configProvider: VoiceSearchAvailabilityConfigProvider
+
     private lateinit var voiceSearchPermissionDialogsLauncher: FakeVoiceSearchPermissionDialogsLauncher
 
     private lateinit var activityResultLauncherWrapper: FakeActivityResultLauncherWrapper
@@ -62,6 +65,7 @@ class MicrophonePermissionRequestTest {
             voiceSearchPermissionDialogsLauncher,
             activityResultLauncherWrapper,
             permissionRationale,
+            configProvider,
         )
     }
 

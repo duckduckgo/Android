@@ -33,12 +33,15 @@ class RealVoiceSearchAvailabilityPixelLoggerTest {
     @Mock
     private lateinit var voiceSearchRepository: VoiceSearchRepository
 
+    @Mock
+    private lateinit var configProvider: VoiceSearchAvailabilityConfigProvider
+
     private lateinit var testee: RealVoiceSearchAvailabilityPixelLogger
 
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
-        testee = RealVoiceSearchAvailabilityPixelLogger(pixel, voiceSearchRepository)
+        testee = RealVoiceSearchAvailabilityPixelLogger(pixel, voiceSearchRepository, configProvider)
     }
 
     @Test

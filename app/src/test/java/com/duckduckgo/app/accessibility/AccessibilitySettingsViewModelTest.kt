@@ -18,8 +18,10 @@ package com.duckduckgo.app.accessibility
 
 import app.cash.turbine.test
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.voice.api.VoiceSearchAvailability
+import com.duckduckgo.voice.impl.VoiceSearchAvailabilityConfigProvider
 import com.duckduckgo.voice.store.VoiceSearchRepository
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.test.runTest
@@ -39,7 +41,9 @@ class AccessibilitySettingsViewModelTest {
     private val voiceSearchRepository: VoiceSearchRepository = mock()
     private val voiceSearchAvailability: VoiceSearchAvailability = mock()
     private val accessibilitySettings: AccessibilitySettingsDataStore = mock()
-    private val testee = AccessibilitySettingsViewModel(accessibilitySettings, voiceSearchAvailability, voiceSearchRepository)
+    private val configProvider: VoiceSearchAvailabilityConfigProvider = mock()
+    private val pixel: Pixel = mock()
+    private val testee = AccessibilitySettingsViewModel(accessibilitySettings, voiceSearchAvailability, voiceSearchRepository, configProvider, pixel)
 
     @Test
     fun whenViewModelCreatedThenDefaultViewStateEmitted() = runTest {

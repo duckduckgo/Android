@@ -55,6 +55,9 @@ class RealVoiceSearchActivityLauncherTest {
     @Mock
     private lateinit var dialogLauncher: VoiceSearchPermissionDialogsLauncher
 
+    @Mock
+    private lateinit var configProvider: VoiceSearchAvailabilityConfigProvider
+
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
@@ -65,7 +68,11 @@ class RealVoiceSearchActivityLauncherTest {
             activityResultLauncherWrapper,
             voiceSearchRepository,
             dialogLauncher,
+            configProvider,
         )
+        whenever(configProvider.get()).thenAnswer {
+            VoiceSearchAvailabilityConfig("Google", "Pixel 7 Pro", 31, "en-US", true)
+        }
     }
 
     @Test
@@ -78,7 +85,10 @@ class RealVoiceSearchActivityLauncherTest {
         val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.ResultFromVoiceSearch
         lastKnownRequest.onResult(Activity.RESULT_OK, "Result")
 
-        verify(pixel).fire(VoiceSearchPixelNames.VOICE_SEARCH_DONE, mapOf("source" to "browser"))
+        verify(pixel).fire(
+            VoiceSearchPixelNames.VOICE_SEARCH_DONE,
+            mapOf("source" to "browser", "locale" to "en-US", "manufacturer" to "Google", "model" to "Pixel 7 Pro"),
+        )
         assertEquals(Event.VoiceRecognitionSuccess("Result"), lastKnownEvent)
     }
 
@@ -91,6 +101,10 @@ class RealVoiceSearchActivityLauncherTest {
 
         val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.ResultFromVoiceSearch
         lastKnownRequest.onResult(VoiceSearchActivity.VOICE_SEARCH_ERROR, "1")
+        verify(pixel).fire(
+            VoiceSearchPixelNames.VOICE_SEARCH_ERROR,
+            mapOf("source" to "browser", "locale" to "en-US", "manufacturer" to "Google", "model" to "Pixel 7 Pro"),
+        )
 
         assertNull(lastKnownEvent)
     }
@@ -105,7 +119,10 @@ class RealVoiceSearchActivityLauncherTest {
         val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.ResultFromVoiceSearch
         lastKnownRequest.onResult(Activity.RESULT_OK, "Result")
 
-        verify(pixel).fire(VoiceSearchPixelNames.VOICE_SEARCH_DONE, mapOf("source" to "widget"))
+        verify(pixel).fire(
+            VoiceSearchPixelNames.VOICE_SEARCH_DONE,
+            mapOf("source" to "widget", "locale" to "en-US", "manufacturer" to "Google", "model" to "Pixel 7 Pro"),
+        )
         assertEquals(Event.VoiceRecognitionSuccess("Result"), lastKnownEvent)
     }
 
@@ -119,7 +136,10 @@ class RealVoiceSearchActivityLauncherTest {
         val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.ResultFromVoiceSearch
         lastKnownRequest.onResult(Activity.RESULT_OK, "")
 
-        verify(pixel, never()).fire(VoiceSearchPixelNames.VOICE_SEARCH_DONE, mapOf("source" to "browser"))
+        verify(pixel, never()).fire(
+            VoiceSearchPixelNames.VOICE_SEARCH_DONE,
+            mapOf("source" to "browser", "locale" to "en-US", "manufacturer" to "Google", "model" to "Pixel 7 Pro"),
+        )
         assertEquals(Event.SearchCancelled, lastKnownEvent)
     }
 
@@ -133,7 +153,10 @@ class RealVoiceSearchActivityLauncherTest {
         val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.ResultFromVoiceSearch
         lastKnownRequest.onResult(Activity.RESULT_CANCELED, "Result")
 
-        verify(pixel, never()).fire(VoiceSearchPixelNames.VOICE_SEARCH_DONE, mapOf("source" to "browser"))
+        verify(pixel, never()).fire(
+            VoiceSearchPixelNames.VOICE_SEARCH_DONE,
+            mapOf("source" to "browser", "locale" to "en-US", "manufacturer" to "Google", "model" to "Pixel 7 Pro"),
+        )
         verify(voiceSearchRepository).dismissVoiceSearch()
         assertEquals(Event.SearchCancelled, lastKnownEvent)
     }
@@ -149,7 +172,10 @@ class RealVoiceSearchActivityLauncherTest {
         val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.ResultFromVoiceSearch
         lastKnownRequest.onResult(Activity.RESULT_CANCELED, "Result")
 
-        verify(pixel, never()).fire(VoiceSearchPixelNames.VOICE_SEARCH_DONE, mapOf("source" to "browser"))
+        verify(pixel, never()).fire(
+            VoiceSearchPixelNames.VOICE_SEARCH_DONE,
+            mapOf("source" to "browser", "locale" to "en-US", "manufacturer" to "Google", "model" to "Pixel 7 Pro"),
+        )
         verify(dialogLauncher).showRemoveVoiceSearchDialog(any(), any(), any())
         assertEquals(Event.SearchCancelled, lastKnownEvent)
     }
@@ -165,7 +191,10 @@ class RealVoiceSearchActivityLauncherTest {
         val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.ResultFromVoiceSearch
         lastKnownRequest.onResult(Activity.RESULT_CANCELED, "Result")
 
-        verify(pixel, never()).fire(VoiceSearchPixelNames.VOICE_SEARCH_DONE, mapOf("source" to "browser"))
+        verify(pixel, never()).fire(
+            VoiceSearchPixelNames.VOICE_SEARCH_DONE,
+            mapOf("source" to "browser", "locale" to "en-US", "manufacturer" to "Google", "model" to "Pixel 7 Pro"),
+        )
         verify(dialogLauncher, never()).showRemoveVoiceSearchDialog(any(), any(), any())
         assertEquals(Event.SearchCancelled, lastKnownEvent)
     }
@@ -191,7 +220,10 @@ class RealVoiceSearchActivityLauncherTest {
 
         testee.launch(mock())
 
-        verify(pixel).fire(VoiceSearchPixelNames.VOICE_SEARCH_STARTED, mapOf("source" to "browser"))
+        verify(pixel).fire(
+            VoiceSearchPixelNames.VOICE_SEARCH_STARTED,
+            mapOf("source" to "browser", "locale" to "en-US", "manufacturer" to "Google", "model" to "Pixel 7 Pro"),
+        )
         assertEquals(LaunchVoiceSearch, activityResultLauncherWrapper.lastKnownAction)
     }
 
@@ -201,7 +233,10 @@ class RealVoiceSearchActivityLauncherTest {
 
         testee.launch(mock())
 
-        verify(pixel).fire(VoiceSearchPixelNames.VOICE_SEARCH_STARTED, mapOf("source" to "widget"))
+        verify(pixel).fire(
+            VoiceSearchPixelNames.VOICE_SEARCH_STARTED,
+            mapOf("source" to "widget", "locale" to "en-US", "manufacturer" to "Google", "model" to "Pixel 7 Pro"),
+        )
         assertEquals(LaunchVoiceSearch, activityResultLauncherWrapper.lastKnownAction)
     }
 }

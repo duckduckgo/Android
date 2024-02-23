@@ -54,6 +54,7 @@ class RealVoiceSearchActivityLauncher @Inject constructor(
     private val activityResultLauncherWrapper: ActivityResultLauncherWrapper,
     private val voiceSearchRepository: VoiceSearchRepository,
     private val permissionRequest: VoiceSearchPermissionDialogsLauncher,
+    private val configProvider: VoiceSearchAvailabilityConfigProvider,
 ) : VoiceSearchActivityLauncher {
 
     companion object {
@@ -77,7 +78,12 @@ class RealVoiceSearchActivityLauncher @Inject constructor(
                     if (data.isNotEmpty()) {
                         pixel.fire(
                             pixel = VoiceSearchPixelNames.VOICE_SEARCH_DONE,
-                            parameters = mapOf(KEY_PARAM_SOURCE to _source.paramValueName),
+                            parameters = mapOf(
+                                KEY_PARAM_SOURCE to _source.paramValueName,
+                                Pixel.PixelParameter.LOCALE to configProvider.get().languageTag,
+                                Pixel.PixelParameter.MANUFACTURER to configProvider.get().deviceManufacturer,
+                                Pixel.PixelParameter.MODEL to configProvider.get().deviceModel,
+                            ),
                         )
                         voiceSearchRepository.resetVoiceSearchDismissed()
                         onEvent(Event.VoiceRecognitionSuccess(data))
@@ -96,6 +102,15 @@ class RealVoiceSearchActivityLauncher @Inject constructor(
                                 }
                             snackbar.show()
                         }
+                        pixel.fire(
+                            pixel = VoiceSearchPixelNames.VOICE_SEARCH_ERROR,
+                            parameters = mapOf(
+                                KEY_PARAM_SOURCE to _source.paramValueName,
+                                Pixel.PixelParameter.LOCALE to configProvider.get().languageTag,
+                                Pixel.PixelParameter.MANUFACTURER to configProvider.get().deviceManufacturer,
+                                Pixel.PixelParameter.MODEL to configProvider.get().deviceModel,
+                            ),
+                        )
                     } else {
                         onEvent(Event.SearchCancelled)
                     }
@@ -127,7 +142,12 @@ class RealVoiceSearchActivityLauncher @Inject constructor(
         }
         pixel.fire(
             pixel = VoiceSearchPixelNames.VOICE_SEARCH_STARTED,
-            parameters = mapOf(KEY_PARAM_SOURCE to _source.paramValueName),
+            parameters = mapOf(
+                KEY_PARAM_SOURCE to _source.paramValueName,
+                Pixel.PixelParameter.LOCALE to configProvider.get().languageTag,
+                Pixel.PixelParameter.MANUFACTURER to configProvider.get().deviceManufacturer,
+                Pixel.PixelParameter.MODEL to configProvider.get().deviceModel,
+            ),
         )
         activityResultLauncherWrapper.launch(LaunchVoiceSearch)
     }

@@ -59,7 +59,13 @@ class RealVoiceSearchAvailabilityTest {
     @Test
     fun whenDeviceHasValidConfigThenIsVoiceSearchSupportedTrue() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray(), excludedLocales = emptyArray())
-        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupDeviceConfig(
+            manufacturer = "Google",
+            model = "Pixel 7 Pro",
+            sdkInt = 31,
+            languageTag = "en-US",
+            isOnDeviceSpeechRecognitionAvailable = true,
+        )
         setupUserSettings(true)
 
         assertTrue(testee.isVoiceSearchSupported)
@@ -68,7 +74,13 @@ class RealVoiceSearchAvailabilityTest {
     @Test
     fun whenDeviceHasValidConfigAndMinVersionIsNullThenIsVoiceSearchSupportedTrue() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = null, excludedManufacturers = emptyArray(), excludedLocales = emptyArray())
-        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupDeviceConfig(
+            manufacturer = "Google",
+            model = "Pixel 7 Pro",
+            sdkInt = 31,
+            languageTag = "en-US",
+            isOnDeviceSpeechRecognitionAvailable = true,
+        )
         setupUserSettings(true)
 
         assertTrue(testee.isVoiceSearchSupported)
@@ -77,7 +89,13 @@ class RealVoiceSearchAvailabilityTest {
     @Test
     fun whenDeviceHasInvalidLanguageThenIsVoiceSearchSupportedFalse() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray(), excludedLocales = arrayOf("en-UK"))
-        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-UK", isOnDeviceSpeechRecognitionAvailable = true)
+        setupDeviceConfig(
+            manufacturer = "Google",
+            model = "Pixel 7 Pro",
+            sdkInt = 31,
+            languageTag = "en-UK",
+            isOnDeviceSpeechRecognitionAvailable = true,
+        )
         setupUserSettings(true)
 
         assertFalse(testee.isVoiceSearchSupported)
@@ -86,7 +104,13 @@ class RealVoiceSearchAvailabilityTest {
     @Test
     fun whenDeviceHasInvalidSdkThenIsVoiceSearchSupportedFalse() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 33, excludedManufacturers = emptyArray(), excludedLocales = emptyArray())
-        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-UK", isOnDeviceSpeechRecognitionAvailable = true)
+        setupDeviceConfig(
+            manufacturer = "Google",
+            model = "Pixel 7 Pro",
+            sdkInt = 31,
+            languageTag = "en-UK",
+            isOnDeviceSpeechRecognitionAvailable = true,
+        )
         setupUserSettings(true)
 
         assertFalse(testee.isVoiceSearchSupported)
@@ -95,7 +119,13 @@ class RealVoiceSearchAvailabilityTest {
     @Test
     fun whenDeviceHasNoSupportForOnDeviceSpeechRecognitionThenIsVoiceSearchSupportedFalse() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray(), excludedLocales = emptyArray())
-        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = false)
+        setupDeviceConfig(
+            manufacturer = "Google",
+            model = "Pixel 7 Pro",
+            sdkInt = 31,
+            languageTag = "en-US",
+            isOnDeviceSpeechRecognitionAvailable = false,
+        )
         setupUserSettings(true)
 
         assertFalse(testee.isVoiceSearchSupported)
@@ -104,7 +134,13 @@ class RealVoiceSearchAvailabilityTest {
     @Test
     fun whenManufacturerIsInExcludedManufacturersListThenIsVoiceSearchSupportedFalse() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = arrayOf("Google"), excludedLocales = emptyArray())
-        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupDeviceConfig(
+            manufacturer = "Google",
+            model = "Pixel 7 Pro",
+            sdkInt = 31,
+            languageTag = "en-US",
+            isOnDeviceSpeechRecognitionAvailable = true,
+        )
         setupUserSettings(true)
 
         assertFalse(testee.isVoiceSearchSupported)
@@ -113,7 +149,13 @@ class RealVoiceSearchAvailabilityTest {
     @Test
     fun whenVoiceSearchNotSupportedThenShouldShowVoiceSearchFalse() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray(), excludedLocales = emptyArray())
-        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = false)
+        setupDeviceConfig(
+            manufacturer = "Google",
+            model = "Pixel 7 Pro",
+            sdkInt = 31,
+            languageTag = "en-US",
+            isOnDeviceSpeechRecognitionAvailable = false,
+        )
         setupUserSettings(true)
 
         val result = testee.shouldShowVoiceSearch(
@@ -129,7 +171,13 @@ class RealVoiceSearchAvailabilityTest {
     @Test
     fun whenVoiceSearchSupportedAndIsEditingUrlAndUserDisabledThenShouldShowVoiceSearchFalse() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray(), excludedLocales = emptyArray())
-        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupDeviceConfig(
+            manufacturer = "Google",
+            model = "Pixel 7 Pro",
+            sdkInt = 31,
+            languageTag = "en-US",
+            isOnDeviceSpeechRecognitionAvailable = true,
+        )
         setupUserSettings(false)
 
         val result = testee.shouldShowVoiceSearch(
@@ -145,7 +193,13 @@ class RealVoiceSearchAvailabilityTest {
     @Test
     fun whenVoiceSearchSupportedAndIsEditingUrlWithUnchangedQueryThenShouldShowVoiceSearchTrue() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray(), excludedLocales = emptyArray())
-        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupDeviceConfig(
+            manufacturer = "Google",
+            model = "Pixel 7 Pro",
+            sdkInt = 31,
+            languageTag = "en-US",
+            isOnDeviceSpeechRecognitionAvailable = true,
+        )
 
         setupUserSettings(true)
 
@@ -162,7 +216,13 @@ class RealVoiceSearchAvailabilityTest {
     @Test
     fun whenVoiceSearchSupportedAndIsEditingUrlWithEmptyQueryThenShouldShowVoiceSearchTrue() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray(), excludedLocales = emptyArray())
-        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupDeviceConfig(
+            manufacturer = "Google",
+            model = "Pixel 7 Pro",
+            sdkInt = 31,
+            languageTag = "en-US",
+            isOnDeviceSpeechRecognitionAvailable = true,
+        )
         setupUserSettings(true)
 
         val result = testee.shouldShowVoiceSearch(
@@ -178,7 +238,13 @@ class RealVoiceSearchAvailabilityTest {
     @Test
     fun whenVoiceSearchSupportedAndIsEditingUrlWithChangedQueryThenShouldShowVoiceSearchTrue() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray(), excludedLocales = emptyArray())
-        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupDeviceConfig(
+            manufacturer = "Google",
+            model = "Pixel 7 Pro",
+            sdkInt = 31,
+            languageTag = "en-US",
+            isOnDeviceSpeechRecognitionAvailable = true,
+        )
 
         setupUserSettings(true)
 
@@ -195,7 +261,13 @@ class RealVoiceSearchAvailabilityTest {
     @Test
     fun whenVoiceSearchSupportedAndUrlShownInAddressBarWithNoFocusThenShouldShowVoiceSearchFalse() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray(), excludedLocales = emptyArray())
-        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupDeviceConfig(
+            manufacturer = "Google",
+            model = "Pixel 7 Pro",
+            sdkInt = 31,
+            languageTag = "en-US",
+            isOnDeviceSpeechRecognitionAvailable = true,
+        )
         setupUserSettings(true)
 
         val result = testee.shouldShowVoiceSearch(
@@ -211,7 +283,13 @@ class RealVoiceSearchAvailabilityTest {
     @Test
     fun whenVoiceSearchSupportedAndUrlShownInAddressBarWithFocusAndEmptyUnchangedQueryThenShouldShowVoiceSearchTrue() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray(), excludedLocales = emptyArray())
-        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupDeviceConfig(
+            manufacturer = "Google",
+            model = "Pixel 7 Pro",
+            sdkInt = 31,
+            languageTag = "en-US",
+            isOnDeviceSpeechRecognitionAvailable = true,
+        )
         setupUserSettings(true)
 
         val result = testee.shouldShowVoiceSearch(
@@ -227,7 +305,13 @@ class RealVoiceSearchAvailabilityTest {
     @Test
     fun whenVoiceSearchSupportedAndUrlShownInAddressBarWithFocusAndEmptyChangedQueryThenShouldShowVoiceSearchTrue() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray(), excludedLocales = emptyArray())
-        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupDeviceConfig(
+            manufacturer = "Google",
+            model = "Pixel 7 Pro",
+            sdkInt = 31,
+            languageTag = "en-US",
+            isOnDeviceSpeechRecognitionAvailable = true,
+        )
         setupUserSettings(true)
 
         val result = testee.shouldShowVoiceSearch(
@@ -243,7 +327,13 @@ class RealVoiceSearchAvailabilityTest {
     @Test
     fun whenVoiceSearchSupportedAndUrlShownInAddressBarWithFocusAndNonEmptyChangedQueryThenShouldShowVoiceSearchFalse() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray(), excludedLocales = emptyArray())
-        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupDeviceConfig(
+            manufacturer = "Google",
+            model = "Pixel 7 Pro",
+            sdkInt = 31,
+            languageTag = "en-US",
+            isOnDeviceSpeechRecognitionAvailable = true,
+        )
         setupUserSettings(true)
 
         val result = testee.shouldShowVoiceSearch(
@@ -259,7 +349,13 @@ class RealVoiceSearchAvailabilityTest {
     @Test
     fun whenVoiceSearchSupportedAndUrlEmptyThenShouldShowVoiceSearchTrue() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray(), excludedLocales = emptyArray())
-        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupDeviceConfig(
+            manufacturer = "Google",
+            model = "Pixel 7 Pro",
+            sdkInt = 31,
+            languageTag = "en-US",
+            isOnDeviceSpeechRecognitionAvailable = true,
+        )
         setupUserSettings(true)
 
         val result = testee.shouldShowVoiceSearch(
@@ -275,7 +371,13 @@ class RealVoiceSearchAvailabilityTest {
     @Test
     fun whenVoiceSearchSupportedAndUrlEmptyWithNoFocusThenShouldShowVoiceSearchTrue() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray(), excludedLocales = emptyArray())
-        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupDeviceConfig(
+            manufacturer = "Google",
+            model = "Pixel 7 Pro",
+            sdkInt = 31,
+            languageTag = "en-US",
+            isOnDeviceSpeechRecognitionAvailable = true,
+        )
         setupUserSettings(true)
 
         val result = testee.shouldShowVoiceSearch(
@@ -291,7 +393,13 @@ class RealVoiceSearchAvailabilityTest {
     @Test
     fun whenFeatureIsDisabledThenShouldShowVoiceSearchFalse() {
         setupRemoteConfig(voiceSearchEnabled = false, minSdk = 30, excludedManufacturers = emptyArray(), excludedLocales = emptyArray())
-        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupDeviceConfig(
+            manufacturer = "Google",
+            model = "Pixel 7 Pro",
+            sdkInt = 31,
+            languageTag = "en-US",
+            isOnDeviceSpeechRecognitionAvailable = true,
+        )
         setupUserSettings(true)
 
         val result = testee.shouldShowVoiceSearch(
@@ -307,7 +415,13 @@ class RealVoiceSearchAvailabilityTest {
     @Test
     fun whenVoiceSearchSupportedAndSERPShownThenShouldShowVoiceSearchTrue() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray(), excludedLocales = emptyArray())
-        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupDeviceConfig(
+            manufacturer = "Google",
+            model = "Pixel 7 Pro",
+            sdkInt = 31,
+            languageTag = "en-US",
+            isOnDeviceSpeechRecognitionAvailable = true,
+        )
         setupUserSettings(true)
 
         val result = testee.shouldShowVoiceSearch(
@@ -323,7 +437,13 @@ class RealVoiceSearchAvailabilityTest {
     @Test
     fun whenVoiceSearchSupportedAndIsEditingSERPWithUnchangedQueryThenShouldShowVoiceSearchTrue() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray(), excludedLocales = emptyArray())
-        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupDeviceConfig(
+            manufacturer = "Google",
+            model = "Pixel 7 Pro",
+            sdkInt = 31,
+            languageTag = "en-US",
+            isOnDeviceSpeechRecognitionAvailable = true,
+        )
         setupUserSettings(true)
 
         val result = testee.shouldShowVoiceSearch(
@@ -339,7 +459,13 @@ class RealVoiceSearchAvailabilityTest {
     @Test
     fun whenVoiceSearchSupportedAndIsEditingSERPWithChangedQueryThenShouldShowVoiceSearchFalse() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray(), excludedLocales = emptyArray())
-        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupDeviceConfig(
+            manufacturer = "Google",
+            model = "Pixel 7 Pro",
+            sdkInt = 31,
+            languageTag = "en-US",
+            isOnDeviceSpeechRecognitionAvailable = true,
+        )
         setupUserSettings(true)
 
         val result = testee.shouldShowVoiceSearch(
@@ -355,7 +481,13 @@ class RealVoiceSearchAvailabilityTest {
     @Test
     fun whenVoiceSearchSupportedAndIsEditingSERPWithEmptyQueryThenShouldShowVoiceSearchTrue() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray(), excludedLocales = emptyArray())
-        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupDeviceConfig(
+            manufacturer = "Google",
+            model = "Pixel 7 Pro",
+            sdkInt = 31,
+            languageTag = "en-US",
+            isOnDeviceSpeechRecognitionAvailable = true,
+        )
         setupUserSettings(true)
 
         val result = testee.shouldShowVoiceSearch(
@@ -371,7 +503,13 @@ class RealVoiceSearchAvailabilityTest {
     @Test
     fun whenModelIsPixel6ThenDefaultUserSettingsTrue() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray(), excludedLocales = emptyArray())
-        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupDeviceConfig(
+            manufacturer = "Google",
+            model = "Pixel 7 Pro",
+            sdkInt = 31,
+            languageTag = "en-US",
+            isOnDeviceSpeechRecognitionAvailable = true,
+        )
         whenever(voiceSearchRepository.getHasAcceptedRationaleDialog()).thenReturn(true)
 
         testee.isVoiceSearchAvailable
@@ -382,7 +520,13 @@ class RealVoiceSearchAvailabilityTest {
     @Test
     fun whenDeviceHadNotPreviouslyAcceptedVoiceRationaleThenDefaultUserSettingsFalse() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray(), excludedLocales = emptyArray())
-        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupDeviceConfig(
+            manufacturer = "Google",
+            model = "Pixel 7 Pro",
+            sdkInt = 31,
+            languageTag = "en-US",
+            isOnDeviceSpeechRecognitionAvailable = true,
+        )
         whenever(voiceSearchRepository.getHasAcceptedRationaleDialog()).thenReturn(false)
 
         testee.isVoiceSearchAvailable
@@ -413,12 +557,13 @@ class RealVoiceSearchAvailabilityTest {
 
     private fun setupDeviceConfig(
         manufacturer: String,
+        model: String,
         sdkInt: Int,
         languageTag: String,
         isOnDeviceSpeechRecognitionAvailable: Boolean,
     ) {
         whenever(configProvider.get()).thenReturn(
-            VoiceSearchAvailabilityConfig(manufacturer, sdkInt, languageTag, isOnDeviceSpeechRecognitionAvailable),
+            VoiceSearchAvailabilityConfig(manufacturer, model, sdkInt, languageTag, isOnDeviceSpeechRecognitionAvailable),
         )
     }
 

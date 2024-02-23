@@ -27,6 +27,7 @@ import javax.inject.Inject
 
 data class VoiceSearchAvailabilityConfig(
     val deviceManufacturer: String,
+    val deviceModel: String,
     val sdkInt: Int,
     val languageTag: String,
     val isOnDeviceSpeechRecognitionSupported: Boolean,
@@ -45,6 +46,7 @@ class DefaultVoiceSearchAvailabilityConfigProvider @Inject constructor(
     @SuppressLint("NewApi")
     override fun get(): VoiceSearchAvailabilityConfig = VoiceSearchAvailabilityConfig(
         deviceManufacturer = appBuildConfig.manufacturer,
+        deviceModel = appBuildConfig.model,
         sdkInt = appBuildConfig.sdkInt,
         languageTag = appBuildConfig.deviceLocale.toLanguageTag(),
         isOnDeviceSpeechRecognitionSupported = if (appBuildConfig.sdkInt >= VERSION_CODES.S) {
