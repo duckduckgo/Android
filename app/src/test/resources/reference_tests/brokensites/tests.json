@@ -106,7 +106,8 @@
                     {"name": "protectionsState", "value": "true"}
                 ],
                 "exceptPlatforms": [
-                    "ios-browser"
+                    "ios-browser",
+                    "macos-browser"
                 ]
             },
             {
@@ -134,7 +135,8 @@
                     {"name": "protectionsState", "value": "true"}
                 ],
                 "exceptPlatforms": [
-                    "ios-browser"
+                    "ios-browser",
+                    "macos-browser"
                 ]
             },
             {
@@ -162,7 +164,8 @@
                     {"name": "protectionsState", "value": "true"}
                 ],
                 "exceptPlatforms": [
-                    "ios-browser"
+                    "ios-browser",
+                    "macos-browser"
                 ]
             },
             {
@@ -211,6 +214,7 @@
                 ],
                 "exceptPlatforms": [
                     "ios-browser",
+                    "macos-browser",
                     "safari-extension"
                 ]
             },
@@ -418,6 +422,38 @@
                     "android-browser",
                     "ios-browser",
                     "macos-browser",
+                    "safari-extension",
+                    "windows-browser"
+                ]
+            },
+            {
+                "name": "Test error information and HTTP status code are included",
+                "siteURL": "https://example.test/",
+                "wasUpgraded": true,
+                "category": "content",
+                "blockedTrackers": ["bad.tracker.test", "tracking.test"],
+                "surrogates": ["surrogate.domain.test", "domain2.test"],
+                "atb": "v123-456g",
+                "blocklistVersion": "abc123",
+                "remoteConfigEtag": "abd142",
+                "remoteConfigVersion": "1234",
+                "protectionsEnabled": true,
+                "expectReportURLPrefix": "https://improving.duckduckgo.com/t/epbf",
+                "errorDescriptions": ["net::ERR_NAME_NOT_RESOLVED","net::ERR_ABORTED"],
+                "httpErrorCodes": [304, 200],
+                "expectReportURLParams": [
+                    {"name": "category", "value": "content"},
+                    {"name": "siteUrl", "value": "https%3A%2F%2Fexample.test%2F"},
+                    {"name": "upgradedHttps", "value": "true"},
+                    {"name": "tds", "value": "abc123"},
+                    {"name": "blockedTrackers", "value": "bad.tracker.test,tracking.test"},
+                    {"name": "surrogates", "value": "surrogate.domain.test,domain2.test"},
+                    {"name": "protectionsState", "value": "true"},
+                    {"name": "errorDescriptions", "value": "%5B%22net%3A%3AERR_NAME_NOT_RESOLVED%22%2C%22net%3A%3AERR_ABORTED%22%5D"},
+                    {"name": "httpErrorCodes", "value": "304,200"}
+                ],
+                "exceptPlatforms": [
+                    "android-browser",
                     "safari-extension",
                     "windows-browser"
                 ]
