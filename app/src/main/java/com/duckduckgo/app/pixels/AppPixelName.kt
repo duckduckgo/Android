@@ -257,6 +257,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     EMAIL_DID_PRESS_WAITLIST_DIALOG_NOTIFY_ME("email_did_press_waitlist_dialog_notify_me"),
     EMAIL_DID_PRESS_WAITLIST_DIALOG_NO_THANKS("email_did_press_waitlist_dialog_dismiss"),
 
+    ENCRYPTION_UNABLE_TO_DECRYPT_SECURE_EMAIL_DATA("m_unable_to_decrypt_secure_email_data"),
     ENCRYPTED_IO_EXCEPTION("m_e_io_e"),
     ENCRYPTED_GENERAL_EXCEPTION("m_e_g_e"),
 
