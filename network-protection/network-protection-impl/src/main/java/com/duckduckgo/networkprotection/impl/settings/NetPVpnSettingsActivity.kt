@@ -113,6 +113,10 @@ class NetPVpnSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun setupUiElements() {
+        binding.vpnNotifications.setClickListener {
+            globalActivityStarter.start(this, NetPNotificationSettingsScreenNoParams)
+        }
+
         binding.excludeLocalNetworks.setOnCheckedChangeListener { _, isChecked ->
             viewModel.onExcludeLocalRoutes(isChecked)
         }

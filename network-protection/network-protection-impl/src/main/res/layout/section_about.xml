@@ -26,12 +26,6 @@
         app:primaryText="@string/netpManagementAboutHeader" />
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-        android:id="@+id/about_vpn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/netpManagementAboutItemInfoVpn" />
-
-    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/about_faq"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
