@@ -19,6 +19,7 @@ package com.duckduckgo.networkprotection.impl.management
 import android.content.Intent
 import android.net.VpnService
 import android.os.Bundle
+import android.text.format.Formatter.formatFileSize
 import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.content.res.AppCompatResources
@@ -43,7 +44,6 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetPAppExcl
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenAndEnable
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.networkprotection.impl.R
-import com.duckduckgo.networkprotection.impl.about.NetworkProtectionAboutScreens.NetPAboutVPNScreenNoParams
 import com.duckduckgo.networkprotection.impl.about.NetworkProtectionAboutScreens.NetPFaqsScreenNoParams
 import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpManagementBinding
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.None
@@ -55,7 +55,6 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.LocationState
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ViewState
 import com.duckduckgo.networkprotection.impl.management.alwayson.NetworkProtectionAlwaysOnDialogFragment
-import com.duckduckgo.networkprotection.impl.settings.NetPNotificationSettingsScreenNoParams
 import com.duckduckgo.networkprotection.impl.settings.NetPVpnSettingsScreenNoParams
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpGeoswitchingScreenNoParams
 import javax.inject.Inject
@@ -133,14 +132,6 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
             globalActivityStarter.start(this, NetPVpnSettingsScreenNoParams)
         }
 
-        binding.settings.settingsVpnNotifications.setClickListener {
-            globalActivityStarter.start(this, NetPNotificationSettingsScreenNoParams)
-        }
-
-        binding.about.aboutVpn.setClickListener {
-            globalActivityStarter.start(this, NetPAboutVPNScreenNoParams)
-        }
-
         binding.about.aboutFaq.setClickListener {
             globalActivityStarter.start(this, NetPFaqsScreenNoParams)
         }
@@ -173,6 +164,17 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         }
 
         binding.renderLocationState(viewState.locationState)
+        if (viewState.excludedAppsCount == 0) {
+            binding.settings.settingsExclusion.setSecondaryText(getString(R.string.netpManagementManageItemExclusionSubtitleEmpty))
+        } else {
+            binding.settings.settingsExclusion.setSecondaryText(
+                resources.getQuantityString(
+                    R.plurals.netpManagementManageItemExclusionSubtitleAppCount,
+                    viewState.excludedAppsCount,
+                    viewState.excludedAppsCount,
+                ),
+            )
+        }
     }
 
     private fun ActivityNetpManagementBinding.renderLocationState(locationState: LocationState?) {
@@ -225,6 +227,9 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         } else {
             connectionDetails.connectionDetailsIp.setSecondaryText(connectionDetailsData.ipAddress)
         }
+
+        connectionDetails.transmittedText.text = formatFileSize(applicationContext, connectionDetailsData.transmittedData)
+        connectionDetails.receivedText.text = formatFileSize(applicationContext, connectionDetailsData.receivedData)
     }
 
     private fun ActivityNetpManagementBinding.renderDisconnectedState() {

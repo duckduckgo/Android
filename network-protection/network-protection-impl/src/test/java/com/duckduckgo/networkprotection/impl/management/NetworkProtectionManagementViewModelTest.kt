@@ -17,6 +17,7 @@
 package com.duckduckgo.networkprotection.impl.management
 
 import android.content.Intent
+import androidx.lifecycle.LifecycleOwner
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.mobile.android.vpn.network.ExternalVpnDetector
@@ -53,6 +54,8 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ViewState
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
+import com.duckduckgo.networkprotection.impl.volume.NetpDataVolumeStore
+import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository.UserPreferredLocation
 import com.wireguard.config.Config
@@ -96,6 +99,15 @@ class NetworkProtectionManagementViewModelTest {
     @Mock
     private lateinit var netPGeoswitchingRepository: NetPGeoswitchingRepository
 
+    @Mock
+    private lateinit var netpDataVolumeStore: NetpDataVolumeStore
+
+    @Mock
+    private lateinit var netPExclusionListRepository: NetPExclusionListRepository
+
+    @Mock
+    private lateinit var lifecycleOwner: LifecycleOwner
+
     private val wgQuickConfig = """
         [Interface]
         Address = 10.237.97.63/32
@@ -134,6 +146,8 @@ class NetworkProtectionManagementViewModelTest {
             testbreakageCategories,
             networkProtectionState,
             netPGeoswitchingRepository,
+            netpDataVolumeStore,
+            netPExclusionListRepository,
         )
     }
 
@@ -312,6 +326,38 @@ class NetworkProtectionManagementViewModelTest {
             )
             testee.onStop(mock())
             cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnResumeThenReturnViewStateExcludeAppCount() = runTest {
+        whenever(vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN)).thenReturn(
+            flowOf(
+                VpnState(
+                    state = ENABLING,
+                ),
+            ),
+        )
+        whenever(netPGeoswitchingRepository.getUserPreferredLocation()).thenReturn(UserPreferredLocation())
+        whenever(netPExclusionListRepository.getExcludedAppPackages()).thenReturn(listOf("app1"))
+
+        testee.onResume(lifecycleOwner)
+
+        testee.viewState().test {
+            assertEquals(
+                ViewState(
+                    connectionState = Connecting,
+                    alertState = None,
+                    locationState = LocationState(
+                        location = null,
+                        icon = null,
+                        isCustom = false,
+                    ),
+                    excludedAppsCount = 1,
+                ),
+                this.expectMostRecentItem(),
+            )
+            cancelAndConsumeRemainingEvents()
         }
     }
 

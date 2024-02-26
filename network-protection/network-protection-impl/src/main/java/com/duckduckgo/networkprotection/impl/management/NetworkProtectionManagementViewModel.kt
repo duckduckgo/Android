@@ -60,6 +60,8 @@ import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.getDisplayableCountry
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.getEmojiForCountryCode
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
+import com.duckduckgo.networkprotection.impl.volume.NetpDataVolumeStore
+import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository.UserPreferredLocation
 import java.util.concurrent.TimeUnit
@@ -83,6 +85,8 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     @NetpBreakageCategories private val netpBreakageCategories: List<AppBreakageCategory>,
     private val networkProtectionState: NetworkProtectionState,
     private val netPGeoswitchingRepository: NetPGeoswitchingRepository,
+    private val netpDataVolumeStore: NetpDataVolumeStore,
+    private val netPExclusionListRepository: NetPExclusionListRepository,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val refreshVpnRunningState = MutableStateFlow(System.currentTimeMillis())
@@ -92,6 +96,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     private var isTimerTickRunning: Boolean = false
     private var timerTickJob = ConflatedJob()
     private var lastVpnRequestTime = -1L
+    private var excludedAppsCount: Int = 0
 
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
 
@@ -114,6 +119,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
                 connectionDetails = connectionDetailsToEmit,
                 alertState = getAlertState(vpnState.state, vpnState.stopReason, vpnState.alwaysOnState),
                 locationState = locationState,
+                excludedAppsCount = excludedAppsCount,
             )
         }
     }
@@ -154,6 +160,13 @@ class NetworkProtectionManagementViewModel @Inject constructor(
             getRunningState().firstOrNull()?.alwaysOnState?.let {
                 handleAlwaysOnInitialState(it)
             }
+        }
+    }
+
+    override fun onResume(owner: LifecycleOwner) {
+        super.onResume(owner)
+        viewModelScope.launch(dispatcherProvider.io()) {
+            excludedAppsCount = netPExclusionListRepository.getExcludedAppPackages().size
         }
     }
 
@@ -217,13 +230,18 @@ class NetworkProtectionManagementViewModel @Inject constructor(
                         // We can't do anything with  a -1 enabledTime so we try to refetch it.
                         enabledTime = networkProtectionRepository.enabledTimeInMillis
                     } else {
+                        val dataVolume = netpDataVolumeStore.dataVolume
                         connectionDetailsFlow.value = if (connectionDetailsFlow.value == null) {
                             ConnectionDetails(
                                 elapsedConnectedTime = getElapsedTimeString(enabledTime),
+                                transmittedData = dataVolume.transmittedBytes,
+                                receivedData = dataVolume.receivedBytes,
                             )
                         } else {
                             connectionDetailsFlow.value!!.copy(
                                 elapsedConnectedTime = getElapsedTimeString(enabledTime),
+                                transmittedData = dataVolume.transmittedBytes,
+                                receivedData = dataVolume.receivedBytes,
                             )
                         }
                     }
@@ -363,6 +381,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         val connectionDetails: ConnectionDetails? = null,
         val alertState: AlertState = None,
         val locationState: LocationState? = null,
+        val excludedAppsCount: Int = 0,
     )
 
     data class LocationState(
@@ -375,6 +394,8 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         val location: String? = null,
         val ipAddress: String? = null,
         val elapsedConnectedTime: String? = null,
+        val transmittedData: Long = 0L,
+        val receivedData: Long = 0L,
     )
 
     enum class ConnectionState {

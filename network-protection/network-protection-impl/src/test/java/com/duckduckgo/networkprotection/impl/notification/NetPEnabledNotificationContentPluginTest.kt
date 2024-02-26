@@ -81,7 +81,7 @@ class NetPEnabledNotificationContentPluginTest {
         val content = plugin.getInitialContent()
 
         assertNotNull(content)
-        content!!.assertTitleEquals("Network Protection is connected and routing traffic through the VPN.")
+        content!!.assertTitleEquals("VPN is connected.")
     }
 
     @Test
@@ -104,7 +104,7 @@ class NetPEnabledNotificationContentPluginTest {
             val item = awaitItem()
 
             assertNotNull(item)
-            item!!.assertTitleEquals("Network Protection is connected and routing traffic through the VPN.")
+            item!!.assertTitleEquals("VPN is connected.")
 
             cancelAndIgnoreRemainingEvents()
         }
@@ -119,7 +119,7 @@ class NetPEnabledNotificationContentPluginTest {
             val item = awaitItem()
 
             assertNotNull(item)
-            item!!.assertTitleEquals("Network Protection is connected and routing device traffic through Stockholm, SE.")
+            item!!.assertTitleEquals("VPN is connected and routing device traffic through Stockholm, SE.")
 
             cancelAndIgnoreRemainingEvents()
         }
