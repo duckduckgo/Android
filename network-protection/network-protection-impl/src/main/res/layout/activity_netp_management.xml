@@ -46,7 +46,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginHorizontal="@dimen/keyline_4"
+                android:layout_margin="@dimen/keyline_4"
                 app:srcCompat="@drawable/illustration_vpn_disconnected" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
@@ -54,7 +54,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/keyline_4"
-                android:layout_marginTop="@dimen/keyline_4"
                 android:layout_marginBottom="@dimen/keyline_2"
                 android:gravity="center"
                 android:text="@string/netpManagementHeadlineStatusOff"

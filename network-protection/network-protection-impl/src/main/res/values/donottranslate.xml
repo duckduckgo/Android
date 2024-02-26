@@ -191,9 +191,7 @@
     <string name="netpFaqQuestionThree">Does DuckDuckGo keep logs of my data?</string>
     <string name="netpFaqAnswerThree">No, we do not store logs.</string>
     <string name="netpFaqQuestionFour">Where are the VPN servers located?</string>
-    <string name="netpFaqAnswerFour">DuckDuckGo offers a limited number of servers while DuckDuckGo VPN is in beta, located in the United States and Europe.</string>
-    <string name="netpFaqQuestionFive">Why can\'t I choose my server location?</string>
-    <string name="netpFaqAnswerFive">The VPN automatically selects the nearest server to you to maintain the highest connection speed possible while browsing.</string>
+    <string name="netpFaqAnswerFour">DuckDuckGo offers a limited number of servers while DuckDuckGo VPN is in beta, located in the United States, Canada, and Europe.</string>
     <string name="netpFaqQuestionSix">Why do some apps not work when the VPN is on?</string>
     <string name="netpFaqAnswerSix">Some websites and apps intentionally limit access to people using a VPN. For example, they may ask you to solve a CAPTCHA to ensure you\'re a real person instead of a bot. If you experience repeated issues with an app, you can exclude it from the VPN altogether under DuckDuckGo VPN settings.</string>
     <string name="netpFaqQuestionSeven">Why can\'t I dismiss VPN notifications?</string>
