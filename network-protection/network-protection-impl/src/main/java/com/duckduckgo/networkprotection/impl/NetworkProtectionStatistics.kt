@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.networkprotection.api
+package com.duckduckgo.networkprotection.impl
 
 data class NetworkProtectionStatistics(
     val publicKey: String = "",

@@ -19,6 +19,7 @@ package com.duckduckgo.networkprotection.impl.management
 import android.content.Intent
 import android.net.VpnService
 import android.os.Bundle
+import android.text.format.Formatter.formatFileSize
 import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.content.res.AppCompatResources
@@ -43,7 +44,6 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetPAppExcl
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenAndEnable
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.networkprotection.impl.R
-import com.duckduckgo.networkprotection.impl.about.NetworkProtectionAboutScreens.NetPAboutVPNScreenNoParams
 import com.duckduckgo.networkprotection.impl.about.NetworkProtectionAboutScreens.NetPFaqsScreenNoParams
 import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpManagementBinding
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.None
@@ -52,9 +52,9 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionDetails
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState
+import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.LocationState
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ViewState
 import com.duckduckgo.networkprotection.impl.management.alwayson.NetworkProtectionAlwaysOnDialogFragment
-import com.duckduckgo.networkprotection.impl.settings.NetPNotificationSettingsScreenNoParams
 import com.duckduckgo.networkprotection.impl.settings.NetPVpnSettingsScreenNoParams
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpGeoswitchingScreenNoParams
 import javax.inject.Inject
@@ -120,7 +120,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
             viewModel.onReportIssuesClicked()
         }
 
-        binding.connectionDetails.connectionDetailsLocation.setOnClickListener {
+        binding.locationDetails.locationItem.setClickListener {
             globalActivityStarter.start(this, NetpGeoswitchingScreenNoParams)
         }
 
@@ -130,14 +130,6 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
 
         binding.settings.settingsVpn.setClickListener {
             globalActivityStarter.start(this, NetPVpnSettingsScreenNoParams)
-        }
-
-        binding.settings.settingsVpnNotifications.setClickListener {
-            globalActivityStarter.start(this, NetPNotificationSettingsScreenNoParams)
-        }
-
-        binding.about.aboutVpn.setClickListener {
-            globalActivityStarter.start(this, NetPAboutVPNScreenNoParams)
         }
 
         binding.about.aboutFaq.setClickListener {
@@ -170,6 +162,38 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
             ShowAlwaysOnLockdownEnabled -> binding.renderAlertLockdownEnabled()
             None -> binding.netPAlert.gone()
         }
+
+        binding.renderLocationState(viewState.locationState)
+        if (viewState.excludedAppsCount == 0) {
+            binding.settings.settingsExclusion.setSecondaryText(getString(R.string.netpManagementManageItemExclusionSubtitleEmpty))
+        } else {
+            binding.settings.settingsExclusion.setSecondaryText(
+                resources.getQuantityString(
+                    R.plurals.netpManagementManageItemExclusionSubtitleAppCount,
+                    viewState.excludedAppsCount,
+                    viewState.excludedAppsCount,
+                ),
+            )
+        }
+    }
+
+    private fun ActivityNetpManagementBinding.renderLocationState(locationState: LocationState?) {
+        if (locationState == null || locationState.location.isNullOrEmpty()) {
+            locationDetails.locationItem.setDetails(getString(R.string.netpManagementLocationPlaceholder))
+            locationDetails.locationItem.setLeadingIcon(R.drawable.ic_location)
+            locationDetails.locationItem.status.gone()
+        } else {
+            locationDetails.locationItem.apply {
+                status.show()
+                setDetails(locationState.location)
+                locationState.icon?.let { setLeadingIcon(it) }
+                if (locationState.isCustom) {
+                    setStatus(getString(R.string.netpManagementLocationCustom))
+                } else {
+                    setStatus(getString(R.string.netpManagementLocationNearest))
+                }
+            }
+        }
     }
 
     private fun ActivityNetpManagementBinding.renderAlertRevoked() {
@@ -191,20 +215,21 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         netpToggle.indicator.setImageDrawable(AppCompatResources.getDrawable(applicationContext, R.drawable.indicator_vpn_connected))
         netpToggle.quietlySetChecked(true)
         netpToggle.isEnabled = true
+
+        locationDetails.locationHeader.setText(R.string.netpManagementLocationHeaderVpnOn)
         connectionDetailsData.elapsedConnectedTime?.let {
             netpToggle.setSecondaryText(getString(R.string.netpManagementToggleSubtitleConnected, it))
         }
         connectionDetails.root.show()
-        if (connectionDetailsData.location.isNullOrEmpty()) {
-            connectionDetails.connectionDetailsLocation.gone()
-        } else {
-            connectionDetails.connectionDetailsLocation.setSecondaryText(connectionDetailsData.location)
-        }
+
         if (connectionDetailsData.ipAddress.isNullOrEmpty()) {
             connectionDetails.connectionDetailsIp.gone()
         } else {
             connectionDetails.connectionDetailsIp.setSecondaryText(connectionDetailsData.ipAddress)
         }
+
+        connectionDetails.transmittedText.text = formatFileSize(applicationContext, connectionDetailsData.transmittedData)
+        connectionDetails.receivedText.text = formatFileSize(applicationContext, connectionDetailsData.receivedData)
     }
 
     private fun ActivityNetpManagementBinding.renderDisconnectedState() {
@@ -212,6 +237,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         netpStatusHeader.setText(R.string.netpManagementHeadlineStatusOff)
         netpStatusDescription.setText(R.string.netpManagementDescriptionOff)
         netpToggle.indicator.setImageDrawable(AppCompatResources.getDrawable(applicationContext, R.drawable.indicator_vpn_disconnected))
+        locationDetails.locationHeader.setText(R.string.netpManagementLocationHeaderVpnOff)
         netpToggle.quietlySetChecked(false)
         netpToggle.setSecondaryText(getString(R.string.netpManagementToggleSubtitleDisconnected))
         netpToggle.isEnabled = true
@@ -225,6 +251,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         netpStatusHeader.setText(R.string.netpManagementHeadlineStatusOff)
         netpStatusDescription.setText(R.string.netpManagementDescriptionOff)
         netpToggle.setSecondaryText(getString(R.string.netpManagementToggleSubtitleConnecting))
+        locationDetails.locationHeader.setText(R.string.netpManagementLocationHeaderVpnOff)
         netpToggle.isEnabled = false
         connectionDetails.root.gone()
     }
@@ -248,6 +275,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
             is VpnPermissionStatus.Granted -> {
                 viewModel.onStartVpn()
             }
+
             is VpnPermissionStatus.Denied -> {
                 binding.netpToggle.quietlySetChecked(false)
                 viewModel.onRequiredPermissionNotGranted(permissionStatus.intent, System.currentTimeMillis())

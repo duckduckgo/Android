@@ -76,6 +76,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent" />
+
+            <include
+                android:id="@+id/location_details"
+                layout="@layout/section_location" />
+
             <include
                 android:id="@+id/connection_details"
                 layout="@layout/section_connection_details" />

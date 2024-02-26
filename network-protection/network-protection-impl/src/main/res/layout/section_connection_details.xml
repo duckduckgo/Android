@@ -26,18 +26,80 @@
         app:primaryText="@string/netpManagementConnectionDetailsHeader" />
 
     <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-        android:id="@+id/connection_details_location"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:leadingIcon="@drawable/ic_server_location_24"
-        app:leadingIconBackground="none"
-        app:primaryText="@string/netpManagementConnectionDetailsLocation" />
-
-    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
         android:id="@+id/connection_details_ip"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:leadingIcon="@drawable/ic_ip_24"
-        app:leadingIconBackground="none"
         app:primaryText="@string/netpManagementConnectionDetailsIp" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/data_volume_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:minHeight="@dimen/twoLineItemHeight"
+        android:paddingTop="@dimen/twoLineItemVerticalPadding"
+        android:paddingBottom="@dimen/twoLineItemVerticalPadding">
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/data_volume_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:breakStrategy="balanced"
+            android:text="@string/netpManagementConnectionDetailsDataVolume"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_default="wrap"
+            app:typography="h4" />
+
+        <ImageView
+            android:id="@+id/transmitted_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:background="@drawable/ic_down"
+            android:rotationX="180"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/data_volume_title" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/transmitted_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_0"
+            app:layout_constraintBottom_toBottomOf="@+id/transmitted_icon"
+            app:layout_constraintStart_toEndOf="@id/transmitted_icon"
+            app:layout_constraintTop_toTopOf="@+id/transmitted_icon"
+            app:textType="secondary"
+            app:typography="body2" />
+
+        <ImageView
+            android:id="@+id/received_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_3"
+            android:background="@drawable/ic_down"
+            app:layout_constraintBottom_toBottomOf="@+id/transmitted_icon"
+            app:layout_constraintStart_toEndOf="@id/transmitted_text"
+            app:layout_constraintTop_toTopOf="@+id/transmitted_icon" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/received_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_0"
+            android:layout_marginEnd="@dimen/keyline_4"
+            app:layout_constraintBottom_toBottomOf="@+id/transmitted_icon"
+            app:layout_constraintStart_toEndOf="@id/received_icon"
+            app:layout_constraintTop_toTopOf="@+id/transmitted_icon"
+            app:textType="secondary"
+            app:typography="body2" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent" />
 </LinearLayout>

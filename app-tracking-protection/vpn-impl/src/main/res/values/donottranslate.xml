@@ -16,8 +16,8 @@
   -->
 
 <resources>
-    <string name="atp_ExcludedReasonExcludedThroughNetP">Manually disabled in Network Protection</string>
-    <string name="atp_CompanyDetailsBannerForUnprotectedThroughNetP">Protection has been manually disabled for this app through Network Protection. To re-enable, configure in <annotation type="manage_app_exclusion_link">Network Protection</annotation>.</string>
+    <string name="atp_ExcludedReasonExcludedThroughNetP">Manually disabled in DuckDuckGo VPN</string>
+    <string name="atp_CompanyDetailsBannerForUnprotectedThroughNetP">Protection has been manually disabled for this app through DuckDuckGo VPN. To re-enable, configure in <annotation type="manage_app_exclusion_link">DuckDuckGo VPN</annotation>.</string>
 
     <!-- Silent notifications -->
     <string name="vpn_SilentNotificationTitleAppTPAndNetpEnabledNoneBlockedNoLocation">Device traffic routing through the VPN. No tracking attempts blocked in apps (past hour).</string>
@@ -34,7 +34,7 @@
     <string name="vpn_NotificationCTADisableVpn">Disconnect</string>
 
     <!-- Lockdown notification -->
-    <string name="vpn_LockdownNotificationTextWithNetPOnlyEnabled">Action required! An Android setting needs to be changed for Network Protection.</string>
-    <string name="vpn_LockdownNotificationTextWithNetPAndAppTPEnabled">Action required! Change an Android setting to use Network Protection and App Tracking Protection.</string>
+    <string name="vpn_LockdownNotificationTextWithNetPOnlyEnabled">Action required! An Android setting needs to be changed for DuckDuckGo VPN.</string>
+    <string name="vpn_LockdownNotificationTextWithNetPAndAppTPEnabled">Action required! Change an Android setting to use DuckDuckGo VPN and App Tracking Protection.</string>
 
 </resources>

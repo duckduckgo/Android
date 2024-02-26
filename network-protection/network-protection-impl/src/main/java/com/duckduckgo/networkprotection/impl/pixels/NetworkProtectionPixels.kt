@@ -191,13 +191,6 @@ interface NetworkProtectionPixels {
      * daily -> fire only once a day no matter how many times we call this fun
      * count -> fire a pixel on every call
      */
-    fun reportWhatIsAVpnScreenShown()
-
-    /**
-     * This fun will fire two pixels
-     * daily -> fire only once a day no matter how many times we call this fun
-     * count -> fire a pixel on every call
-     */
     fun reportFaqsShown()
 
     /**
@@ -441,11 +434,6 @@ class RealNetworkProtectionPixel @Inject constructor(
     override fun reportExclusionListLaunchBreakageReport() {
         tryToFireDailyPixel(NETP_EXCLUSION_LIST_LAUNCH_BREAKAGE_REPORT_DAILY)
         firePixel(NETP_EXCLUSION_LIST_LAUNCH_BREAKAGE_REPORT)
-    }
-
-    override fun reportWhatIsAVpnScreenShown() {
-        tryToFireDailyPixel(NETP_INFO_VPN_SHOWN_DAILY)
-        firePixel(NETP_INFO_VPN_SHOWN)
     }
 
     override fun reportFaqsShown() {

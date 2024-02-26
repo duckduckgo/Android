@@ -20,11 +20,6 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 
 sealed class NetworkProtectionAboutScreens {
     /**
-     * Use this model to launch the "What is a VPN" screen
-     */
-    object NetPAboutVPNScreenNoParams : ActivityParams
-
-    /**
      * Use this model to launch the "Network Protection FAQs" screen
      */
     object NetPFaqsScreenNoParams : ActivityParams

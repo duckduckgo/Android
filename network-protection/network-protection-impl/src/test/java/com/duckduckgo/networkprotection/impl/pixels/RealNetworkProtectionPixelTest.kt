@@ -239,15 +239,6 @@ class RealNetworkProtectionPixelTest {
     }
 
     @Test
-    fun whenReportWhatIsAVpnScreenShownCalledTwiceThenFireDailyPixelOnce() {
-        testee.reportWhatIsAVpnScreenShown()
-        testee.reportWhatIsAVpnScreenShown()
-
-        verify(pixel).fire("m_netp_imp_info_vpn_d")
-        verify(pixel, times(2)).fire("m_netp_imp_info_vpn_c")
-    }
-
-    @Test
     fun whenReportFaqsShownCalledTwiceThenFireDailyPixelOnce() {
         testee.reportFaqsShown()
         testee.reportFaqsShown()
