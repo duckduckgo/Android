@@ -31,7 +31,6 @@ import com.duckduckgo.privacy.config.store.features.https.HttpsDao
 import com.duckduckgo.privacy.config.store.features.trackerallowlist.TrackerAllowlistDao
 import com.duckduckgo.privacy.config.store.features.trackingparameters.TrackingParametersDao
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryDao
-import com.duckduckgo.privacy.config.store.features.useragent.UserAgentExceptionsDao
 
 @TypeConverters(
     RuleTypeConverter::class,
@@ -54,7 +53,6 @@ import com.duckduckgo.privacy.config.store.features.useragent.UserAgentException
         AmpLinkExceptionEntity::class,
         TrackingParameterEntity::class,
         TrackingParameterExceptionEntity::class,
-        UserAgentExceptionEntity::class,
     ],
 )
 abstract class PrivacyConfigDatabase : RoomDatabase() {
@@ -69,7 +67,6 @@ abstract class PrivacyConfigDatabase : RoomDatabase() {
     abstract fun drmDao(): DrmDao
     abstract fun ampLinksDao(): AmpLinksDao
     abstract fun trackingParametersDao(): TrackingParametersDao
-    abstract fun userAgentExceptionsDao(): UserAgentExceptionsDao
 }
 
 val MIGRATION_2_3 = object : Migration(2, 3) {

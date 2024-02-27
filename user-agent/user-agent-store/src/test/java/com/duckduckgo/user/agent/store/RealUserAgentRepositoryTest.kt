@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,9 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.store.features.useragent
+package com.duckduckgo.user.agent.store
 
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
-import com.duckduckgo.privacy.config.store.UserAgentExceptionEntity
-import com.duckduckgo.privacy.config.store.toFeatureException
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -38,7 +35,7 @@ class RealUserAgentRepositoryTest {
 
     lateinit var testee: RealUserAgentRepository
 
-    private val mockDatabase: PrivacyConfigDatabase = mock()
+    private val mockDatabase: UserAgentDatabase = mock()
     private val mockUserAgentExceptionsDao: UserAgentExceptionsDao = mock()
 
     @Before

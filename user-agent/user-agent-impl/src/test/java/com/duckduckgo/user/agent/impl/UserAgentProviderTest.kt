@@ -28,10 +28,9 @@ import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import com.duckduckgo.privacy.config.api.UserAgent
 import com.duckduckgo.user.agent.api.UserAgentInterceptor
 import com.duckduckgo.user.agent.api.UserAgentProvider
+import com.duckduckgo.user.agent.store.UserAgentFeatureName
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import org.junit.After
@@ -62,7 +61,7 @@ class UserAgentProviderTest {
     @Before
     fun before() {
         whenever(deviceInfo.majorAppVersion).thenReturn("5")
-        whenever(toggle.isFeatureEnabled(PrivacyFeatureName.UserAgentFeatureName.value)).thenReturn(true)
+        whenever(toggle.isFeatureEnabled(UserAgentFeatureName.UserAgent.value)).thenReturn(true)
         whenever(clientBrandHintFeature.self()).thenReturn(toggles)
         whenever(clientBrandHintFeature.self().isEnabled()).thenReturn(false)
         whenever(userAgent.isException("default.com")).thenReturn(true)
@@ -157,7 +156,7 @@ class UserAgentProviderTest {
 
     @Test
     fun whenFeatureIsDisabledThenUaIsDefault() {
-        whenever(toggle.isFeatureEnabled(PrivacyFeatureName.UserAgentFeatureName.value)).thenReturn(false)
+        whenever(toggle.isFeatureEnabled(UserAgentFeatureName.UserAgent.value)).thenReturn(false)
         testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
         val actual = testee.userAgent(DOMAIN)
         assertTrue("$actual does not match expected regex", ValidationRegex.default.matches(actual))

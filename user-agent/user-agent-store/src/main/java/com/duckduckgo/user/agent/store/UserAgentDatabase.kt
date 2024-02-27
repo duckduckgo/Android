@@ -14,11 +14,21 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.fakes
+package com.duckduckgo.user.agent.store
 
-import com.duckduckgo.user.agent.impl.UserAgent
+import androidx.room.Database
+import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
 
-class UserAgentFake : UserAgent {
-    override fun isDuckDuckGoSite(url: String): Boolean = false
-    override fun isException(url: String): Boolean = false
+@Database(
+    exportSchema = true,
+    version = 1,
+    entities = [
+        UserAgentExceptionEntity::class,
+    ],
+)
+abstract class UserAgentDatabase : RoomDatabase() {
+    abstract fun userAgentExceptionsDao(): UserAgentExceptionsDao
 }
+
+val ALL_MIGRATIONS = emptyArray<Migration>()

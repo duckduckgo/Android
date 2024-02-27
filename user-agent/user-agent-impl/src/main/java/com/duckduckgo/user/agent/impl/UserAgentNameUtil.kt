@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.impl.features.useragent
+package com.duckduckgo.user.agent.impl
 
-import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
+import com.duckduckgo.user.agent.store.UserAgentFeatureName
 
-data class UserAgentFeature(
-    val state: String,
-    val minSupportedVersion: Int?,
-    val exceptions: List<FeatureException>,
-)
+fun userAgentFeatureValueOf(value: String): UserAgentFeatureName? {
+    return UserAgentFeatureName.values().find { it.value == value }
+}

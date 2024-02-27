@@ -16,7 +16,6 @@
 
 package com.duckduckgo.user.agent.impl
 
-import android.content.Context
 import android.os.Build
 import android.webkit.WebSettings
 import androidx.core.net.toUri
@@ -30,14 +29,10 @@ import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
-import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import com.duckduckgo.privacy.config.api.UserAgent
 import com.duckduckgo.user.agent.api.UserAgentInterceptor
 import com.duckduckgo.user.agent.api.UserAgentProvider
+import com.duckduckgo.user.agent.store.UserAgentFeatureName
 import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import javax.inject.Named
@@ -120,7 +115,7 @@ class RealUserAgentProvider @Inject constructor(
 
         val isDomainInUserAllowList = isHostInUserAllowedList(host)
 
-        if (isDomainInUserAllowList || !toggle.isFeatureEnabled(PrivacyFeatureName.UserAgentFeatureName.value) || shouldUseDefaultUserAgent) {
+        if (isDomainInUserAllowList || !toggle.isFeatureEnabled(UserAgentFeatureName.UserAgent.value) || shouldUseDefaultUserAgent) {
             return if (isDesktop) {
                 defaultUserAgent.get().replace(AgentRegex.platform, fallbackDesktopPrefix)
             } else {
@@ -227,18 +222,5 @@ class RealUserAgentProvider @Inject constructor(
         }
 
         return userAgent
-    }
-}
-
-@ContributesTo(AppScope::class)
-@Module
-class DefaultUserAgentModule {
-    @SingleInstanceIn(AppScope::class)
-    @Provides
-    @Named("defaultUserAgent")
-    fun provideDefaultUserAgent(context: Context): String {
-        return runCatching {
-            WebSettings.getDefaultUserAgent(context)
-        }.getOrDefault(RealUserAgentProvider.fallbackDefaultUA)
     }
 }

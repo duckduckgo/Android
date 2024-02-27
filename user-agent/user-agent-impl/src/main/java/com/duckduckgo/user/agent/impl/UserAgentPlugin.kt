@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.impl.features.useragent
+package com.duckduckgo.user.agent.impl
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
-import com.duckduckgo.privacy.config.impl.features.privacyFeatureValueOf
-import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
-import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
-import com.duckduckgo.privacy.config.store.UserAgentExceptionEntity
-import com.duckduckgo.privacy.config.store.features.useragent.UserAgentRepository
+import com.duckduckgo.user.agent.store.UserAgentExceptionEntity
+import com.duckduckgo.user.agent.store.UserAgentFeatureName
+import com.duckduckgo.user.agent.store.UserAgentFeatureToggle
+import com.duckduckgo.user.agent.store.UserAgentRepository
+import com.duckduckgo.user.agent.store.UserAgentFeatureToggleRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -32,14 +31,14 @@ import javax.inject.Inject
 @ContributesMultibinding(AppScope::class)
 class UserAgentPlugin @Inject constructor(
     private val userAgentRepository: UserAgentRepository,
-    private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository,
+    private val userAgentFeatureToggleRepository: UserAgentFeatureToggleRepository,
 ) : PrivacyFeaturePlugin {
 
     override fun store(
         featureName: String,
         jsonString: String,
     ): Boolean {
-        val privacyFeature = privacyFeatureValueOf(featureName) ?: return false
+        val privacyFeature = userAgentFeatureValueOf(featureName) ?: return false
         if (privacyFeature.value == this.featureName) {
             val userAgentExceptions = mutableListOf<UserAgentExceptionEntity>()
             val moshi = Moshi.Builder().build()
@@ -55,11 +54,11 @@ class UserAgentPlugin @Inject constructor(
 
             userAgentRepository.updateAll(userAgentExceptions)
             val isEnabled = userAgentFeature?.state == "enabled"
-            privacyFeatureTogglesRepository.insert(PrivacyFeatureToggles(this.featureName, isEnabled, userAgentFeature?.minSupportedVersion))
+            userAgentFeatureToggleRepository.insert(UserAgentFeatureToggle(this.featureName, isEnabled, userAgentFeature?.minSupportedVersion))
             return true
         }
         return false
     }
 
-    override val featureName: String = PrivacyFeatureName.UserAgentFeatureName.value
+    override val featureName: String = UserAgentFeatureName.UserAgent.value
 }

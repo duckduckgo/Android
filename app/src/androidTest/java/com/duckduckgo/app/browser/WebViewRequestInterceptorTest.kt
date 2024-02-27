@@ -41,11 +41,11 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import com.duckduckgo.privacy.config.api.Gpc
-import com.duckduckgo.privacy.config.api.UserAgent
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
 import com.duckduckgo.request.filterer.api.RequestFilterer
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.duckduckgo.user.agent.impl.RealUserAgentProvider
+import com.duckduckgo.user.agent.impl.UserAgent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before

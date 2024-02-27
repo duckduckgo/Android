@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,19 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.impl.features.useragent
+package com.duckduckgo.user.agent.impl
 
 import com.duckduckgo.common.utils.UriString
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
-import com.duckduckgo.privacy.config.api.UserAgent
-import com.duckduckgo.privacy.config.store.features.useragent.UserAgentRepository
+import com.duckduckgo.user.agent.store.UserAgentRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+
+interface UserAgent {
+    fun isDuckDuckGoSite(url: String): Boolean
+    fun isException(url: String): Boolean
+}
 
 @ContributesBinding(AppScope::class)
 class RealUserAgent @Inject constructor(

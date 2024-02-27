@@ -108,16 +108,6 @@ fun ContentBlockingExceptionEntity.toFeatureException(): FeatureException {
     return FeatureException(domain = this.domain, reason = this.reason)
 }
 
-@Entity(tableName = "user_agent_exceptions")
-data class UserAgentExceptionEntity(
-    @PrimaryKey val domain: String,
-    val reason: String,
-)
-
-fun UserAgentExceptionEntity.toFeatureException(): FeatureException {
-    return FeatureException(domain = this.domain, reason = this.reason)
-}
-
 @Entity(tableName = "privacy_config")
 data class PrivacyConfig(
     @PrimaryKey val id: Int = 1,

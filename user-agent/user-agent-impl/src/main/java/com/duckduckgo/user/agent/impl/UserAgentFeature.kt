@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.fakes
+package com.duckduckgo.user.agent.impl
 
-import com.duckduckgo.user.agent.impl.UserAgent
+import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 
-class UserAgentFake : UserAgent {
-    override fun isDuckDuckGoSite(url: String): Boolean = false
-    override fun isException(url: String): Boolean = false
-}
+data class UserAgentFeature(
+    val state: String,
+    val minSupportedVersion: Int?,
+    val exceptions: List<FeatureException>,
+)
