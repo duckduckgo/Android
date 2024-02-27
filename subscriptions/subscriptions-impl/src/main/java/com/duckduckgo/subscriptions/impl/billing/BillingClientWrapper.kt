@@ -145,12 +145,6 @@ class RealBillingClientWrapper @Inject constructor(
         }
     }
 
-    override fun onDestroy(owner: LifecycleOwner) {
-        if (billingClient.isReady) {
-            billingClient.endConnection()
-        }
-    }
-
     override suspend fun launchBillingFlow(activity: Activity, params: BillingFlowParams) {
         if (!billingClient.isReady) {
             logcat { "Service not ready" }
