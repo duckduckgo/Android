@@ -205,14 +205,14 @@ class UserAgentProviderTest {
     }
 
     @Test
-    fun whenIsDuckDuckGoSiteThenReturnDuckDuckGoUserAgent() {
+    fun whenIsLegacySiteThenReturnLegacyUserAgent() {
         testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
         val actual = testee.userAgent(DOMAIN, false)
         assertTrue("$actual does not match expected regex", ValidationRegex.converted.matches(actual))
     }
 
     @Test
-    fun whenIsDuckDuckGoSiteAndIsDesktopThenReturnDesktopDuckDuckGoUserAgent() {
+    fun whenIsLegacySiteAndIsDesktopThenReturnDesktopLegacyUserAgent() {
         testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
         val actual = testee.userAgent(DOMAIN, true)
         assertTrue("$actual does not match expected regex", ValidationRegex.desktop.matches(actual))

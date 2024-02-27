@@ -123,9 +123,9 @@ class RealUserAgentProvider @Inject constructor(
             }
         }
 
-        val shouldUseDuckDuckGoUserAgent = if (host != null) userAgent.useLegacyUserAgent(host) else false
-        if (shouldUseDuckDuckGoUserAgent) {
-            return getUserAgent(url = url, host = host, isDesktop = isDesktop, useDuckDuckGo = true)
+        val shouldUseLegacyUserAgent = if (host != null) userAgent.useLegacyUserAgent(host) else false
+        if (shouldUseLegacyUserAgent) {
+            return getUserAgent(url = url, host = host, isDesktop = isDesktop, useLegacy = true)
         }
 
         return getUserAgent(url = url, host = host, isDesktop = isDesktop)
@@ -199,7 +199,7 @@ class RealUserAgentProvider @Inject constructor(
         val excludedPaths: List<String> = emptyList(),
     )
 
-    private fun getUserAgent(url: String?, host: String?, isDesktop: Boolean, useDuckDuckGo: Boolean = false): String {
+    private fun getUserAgent(url: String?, host: String?, isDesktop: Boolean, useLegacy: Boolean = false): String {
         val shouldUseDesktopAgent = if (url != null && host != null) {
             sitesThatShouldUseDesktopAgent.any { UriString.sameOrSubdomain(host, it.host) && !containsExcludedPath(url, it) }
         } else {
@@ -207,11 +207,11 @@ class RealUserAgentProvider @Inject constructor(
         }
 
         val prefix = when {
-            useDuckDuckGo -> if (isDesktop || shouldUseDesktopAgent) fallbackBaseDesktopAgent else fallbackBaseAgent
+            useLegacy -> if (isDesktop || shouldUseDesktopAgent) fallbackBaseDesktopAgent else fallbackBaseAgent
             else -> if (isDesktop || shouldUseDesktopAgent) baseDesktopAgent else baseAgent
-        }.let { if (useDuckDuckGo) it else it.replace(AgentRegex.version, "") }
+        }.let { if (useLegacy) it else it.replace(AgentRegex.version, "") }
 
-        var userAgent = if (useDuckDuckGo) {
+        var userAgent = if (useLegacy) {
             concatWithSpaces(prefix, applicationComponent, safariComponent)
         } else {
             concatWithSpaces(prefix, null, safariComponent)
