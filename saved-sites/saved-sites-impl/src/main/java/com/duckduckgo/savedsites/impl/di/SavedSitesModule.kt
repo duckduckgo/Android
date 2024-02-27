@@ -108,8 +108,9 @@ class SavedSitesModule {
         savedSitesEntitiesDao: SavedSitesEntitiesDao,
         savedSitesRelationsDao: SavedSitesRelationsDao,
         savedSitesSyncMetadataDao: SavedSitesSyncMetadataDao,
+        savedSitesSyncStore: SavedSitesSyncStore,
     ): SyncSavedSitesRepository {
-        return RealSyncSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao, savedSitesSyncMetadataDao)
+        return RealSyncSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao, savedSitesSyncMetadataDao, savedSitesSyncStore)
     }
 
     @Provides
