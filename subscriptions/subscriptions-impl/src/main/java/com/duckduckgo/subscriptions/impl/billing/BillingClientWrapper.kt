@@ -34,7 +34,6 @@ import com.android.billingclient.api.PurchasesUpdatedListener
 import com.android.billingclient.api.QueryProductDetailsParams
 import com.android.billingclient.api.QueryProductDetailsParams.Product
 import com.android.billingclient.api.QueryPurchaseHistoryParams
-import com.android.billingclient.api.QueryPurchasesParams
 import com.android.billingclient.api.queryProductDetails
 import com.android.billingclient.api.queryPurchaseHistory
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -53,16 +52,13 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
 
 interface BillingClientWrapper {
     val products: Map<String, ProductDetails>
-    val purchases: Flow<List<Purchase>>
     val purchaseHistory: List<PurchaseHistoryRecord>
     val purchaseState: Flow<PurchaseState>
     fun billingFlowParamsBuilder(
@@ -92,10 +88,6 @@ class RealBillingClientWrapper @Inject constructor(
 
     // New Subscription ProductDetails
     override val products = mutableMapOf<String, ProductDetails>()
-
-    // Current Purchases
-    private val _purchases = MutableStateFlow<List<Purchase>>(listOf())
-    override val purchases = _purchases.asStateFlow()
 
     // Purchase History
     override val purchaseHistory = mutableListOf<PurchaseHistoryRecord>()
@@ -138,7 +130,6 @@ class RealBillingClientWrapper @Inject constructor(
             if (billingClient.isReady) {
                 owner.lifecycleScope.launch(dispatcherProvider.io()) {
                     getSubscriptions()
-                    queryPurchases()
                     queryPurchaseHistory()
                 }
             }
@@ -159,9 +150,6 @@ class RealBillingClientWrapper @Inject constructor(
     }
 
     private suspend fun processPurchases(purchases: List<Purchase>) {
-        // Post new purchase List to _purchases
-        _purchases.value = purchases
-        // Then, handle the purchases
         for (purchase in purchases) {
             if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
                 _purchaseState.emit(
@@ -181,7 +169,6 @@ class RealBillingClientWrapper @Inject constructor(
                     val responseCode = billingResult.responseCode
                     if (responseCode == BillingResponseCode.OK) {
                         coroutineScope.launch(dispatcherProvider.io()) {
-                            queryPurchases()
                             queryPurchaseHistory()
                             getSubscriptions()
                         }
@@ -237,27 +224,6 @@ class RealBillingClientWrapper @Inject constructor(
             }
             else -> {
                 logcat { "onProductDetailsResponse: $responseCode $debugMessage" }
-            }
-        }
-    }
-
-    private fun queryPurchases() {
-        if (!billingClient.isReady) {
-            // Handle client not ready
-            return
-        }
-        // Query for existing subscription products that have been purchased.
-        billingClient.queryPurchasesAsync(
-            QueryPurchasesParams.newBuilder().setProductType(ProductType.SUBS).build(),
-        ) { billingResult, purchaseList ->
-            if (billingResult.responseCode == BillingResponseCode.OK) {
-                if (purchaseList.isNotEmpty()) {
-                    _purchases.value = purchaseList.filter { it.purchaseState == Purchase.PurchaseState.PURCHASED }
-                } else {
-                    _purchases.value = emptyList()
-                }
-            } else {
-                // Handle error codes
             }
         }
     }
