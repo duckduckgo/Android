@@ -32,6 +32,7 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.api.models.TreeNode
+import com.duckduckgo.savedsites.impl.MissingEntitiesRelationReconciler
 import com.duckduckgo.savedsites.impl.RealFavoritesDelegate
 import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
 import com.duckduckgo.savedsites.impl.service.RealSavedSitesParser
@@ -92,6 +93,7 @@ class SavedSitesParserTest {
             savedSitesEntitiesDao,
             savedSitesRelationsDao,
             favoritesDelegate,
+            MissingEntitiesRelationReconciler(savedSitesEntitiesDao),
             coroutinesTestRule.testDispatcherProvider,
         )
         parser = RealSavedSitesParser()

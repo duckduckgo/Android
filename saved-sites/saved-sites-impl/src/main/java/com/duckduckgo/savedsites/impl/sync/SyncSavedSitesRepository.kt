@@ -185,4 +185,14 @@ interface SyncSavedSitesRepository {
      * they are available for the next sync operation
      */
     fun setLocalEntitiesForNextSync(startTimestamp: String)
+
+    /**
+     * Returns the list of [SavedSite] that are marked as Invalid
+     */
+    fun getInvalidSavedSites(): List<SavedSite>
+
+    /**
+     * Marks as Invalid a list of [SavedSite] with the given ids
+     */
+    fun markSavedSitesAsInvalid(ids: List<String>)
 }

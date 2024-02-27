@@ -36,6 +36,7 @@ class RealSyncSavedSitesRepository(
     private val savedSitesEntitiesDao: SavedSitesEntitiesDao,
     private val savedSitesRelationsDao: SavedSitesRelationsDao,
     private val savedSitesSyncMetadataDao: SavedSitesSyncMetadataDao,
+    private val savedSitesSyncStore: SavedSitesSyncStore,
 ) : SyncSavedSitesRepository {
 
     private val stringListType = Types.newParameterizedType(List::class.java, String::class.java)
@@ -389,6 +390,23 @@ class RealSyncSavedSitesRepository(
 
         Timber.d("Sync-Bookmarks: updating $entitiesToUpdate modifiedSince to $modifiedSince")
         savedSitesEntitiesDao.updateModified(entitiesToUpdate.toList(), DatabaseDateFormatter.iso8601(modifiedSince))
+    }
+
+    override fun getInvalidSavedSites(): List<SavedSite> {
+        return savedSitesSyncStore.invalidEntitiesIds.takeIf { it.isNotEmpty() }?.let { ids ->
+            getSavedSites(ids)
+        } ?: emptyList()
+    }
+
+    override fun markSavedSitesAsInvalid(ids: List<String>) {
+        Timber.i("Sync-Bookmarks: Storing invalid items: $ids")
+        savedSitesSyncStore.invalidEntitiesIds = ids
+    }
+
+    private fun getSavedSites(ids: List<String>): List<SavedSite> {
+        return savedSitesEntitiesDao.entities(ids).filter { it.type == BOOKMARK }.map {
+            it.mapToSavedSite()
+        }
     }
 
     private fun traverseParents(entity: String, entitiesToUpdate: MutableList<String>) {

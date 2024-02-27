@@ -47,6 +47,7 @@ class RealSavedSitesRepository(
     private val savedSitesEntitiesDao: SavedSitesEntitiesDao,
     private val savedSitesRelationsDao: SavedSitesRelationsDao,
     private val favoritesDelegate: FavoritesDelegate,
+    private val relationsReconciler: RelationsReconciler,
     private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider(),
 ) : SavedSitesRepository {
 
@@ -507,6 +508,10 @@ class RealSavedSitesRepository(
         folderId: String,
         entities: List<String>,
     ) {
+        val result = relationsReconciler.reconcileRelations(
+            originalRelations = savedSitesRelationsDao.relationsByFolderId(folderId).map { it.entityId },
+            newFolderRelations = entities,
+        )
         savedSitesRelationsDao.replaceBookmarkFolder(folderId, entities)
     }
 
