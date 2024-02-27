@@ -87,10 +87,10 @@ class RealBillingClientWrapper @Inject constructor(
     override val purchaseState = _purchaseState.asSharedFlow()
 
     // New Subscription ProductDetails
-    override val products = mutableListOf<ProductDetails>()
+    override var products = emptyList<ProductDetails>()
 
     // Purchase History
-    override val purchaseHistory = mutableListOf<PurchaseHistoryRecord>()
+    override var purchaseHistory = emptyList<PurchaseHistoryRecord>()
     private val purchasesUpdatedListener =
         PurchasesUpdatedListener { billingResult, purchases ->
             if (billingResult.responseCode == BillingResponseCode.OK && !purchases.isNullOrEmpty()) {
@@ -220,8 +220,7 @@ class RealBillingClientWrapper @Inject constructor(
                 if (productDetailsList.isEmpty()) {
                     logcat { "No products found" }
                 }
-                products.clear()
-                products.addAll(productDetailsList)
+                products = productDetailsList
             }
             else -> {
                 logcat { "onProductDetailsResponse: $responseCode $debugMessage" }
@@ -238,12 +237,7 @@ class RealBillingClientWrapper @Inject constructor(
             QueryPurchaseHistoryParams.newBuilder().setProductType(ProductType.SUBS).build(),
         )
         if (billingResult.responseCode == BillingResponseCode.OK) {
-            if (purchaseList?.isNotEmpty() == true) {
-                purchaseHistory.clear()
-                purchaseHistory.addAll(purchaseList)
-            } else {
-                purchaseHistory.clear()
-            }
+            purchaseHistory = purchaseList.orEmpty()
         }
     }
 
