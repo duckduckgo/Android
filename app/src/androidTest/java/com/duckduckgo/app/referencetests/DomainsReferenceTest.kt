@@ -195,7 +195,7 @@ class DomainsReferenceTest(private val testCase: TestCase) {
 
         val response = testee.shouldIntercept(
             request = mockRequest,
-            documentUrl = testCase.siteURL,
+            documentUri = testCase.siteURL.toUri(),
             webView = webView,
             webViewClientListener = null,
         )

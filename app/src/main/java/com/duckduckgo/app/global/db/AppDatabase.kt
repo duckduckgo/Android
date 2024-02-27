@@ -68,7 +68,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 
 @Database(
     exportSchema = true,
-    version = 52,
+    version = 53,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -641,6 +641,21 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         }
     }
 
+    private val MIGRATION_52_TO_53: Migration = object : Migration(52, 53) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL(
+                "CREATE TABLE IF NOT EXISTS `page_loaded_pixel_entity_new` (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                    "appVersion TEXT NOT NULL, elapsedTime INTEGER NOT NULL, webviewVersion TEXT NOT NULL, cpmEnabled INTEGER NOT NULL DEFAULT 0)",
+            )
+            database.execSQL(
+                "INSERT INTO `page_loaded_pixel_entity_new` (id, appVersion, elapsedTime, webviewVersion, cpmEnabled) " +
+                    "SELECT id, appVersion, elapsedTime, webviewVersion, cpmEnabled FROM `page_loaded_pixel_entity`",
+            )
+            database.execSQL("DROP TABLE `page_loaded_pixel_entity`")
+            database.execSQL("ALTER TABLE `page_loaded_pixel_entity_new` RENAME TO `page_loaded_pixel_entity`")
+        }
+    }
+
     val BOOKMARKS_DB_ON_CREATE = object : RoomDatabase.Callback() {
         override fun onCreate(database: SupportSQLiteDatabase) {
             database.execSQL(
@@ -718,6 +733,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             MIGRATION_49_TO_50,
             MIGRATION_50_TO_51,
             MIGRATION_51_TO_52,
+            MIGRATION_52_TO_53,
         )
 
     @Deprecated(
