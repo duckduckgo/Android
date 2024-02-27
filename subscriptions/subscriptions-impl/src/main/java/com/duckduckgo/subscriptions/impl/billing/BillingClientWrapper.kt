@@ -80,7 +80,7 @@ class RealBillingClientWrapper @Inject constructor(
     private val pixelSender: SubscriptionPixelSender,
 ) : BillingClientWrapper, MainProcessLifecycleObserver {
 
-    private var billingFlowInProcess = false
+    private var billingFlowInProgress = false
 
     // PurchaseState
     private val _purchaseState = MutableSharedFlow<PurchaseState>()
@@ -108,7 +108,7 @@ class RealBillingClientWrapper @Inject constructor(
                     _purchaseState.emit(Canceled)
                 }
             }
-            billingFlowInProcess = false
+            billingFlowInProgress = false
         }
 
     private lateinit var billingClient: BillingClient
@@ -126,7 +126,7 @@ class RealBillingClientWrapper @Inject constructor(
 
     override fun onResume(owner: LifecycleOwner) {
         // Will call on resume coming back from a purchase flow
-        if (!billingFlowInProcess) {
+        if (!billingFlowInProgress) {
             if (billingClient.isReady) {
                 owner.lifecycleScope.launch(dispatcherProvider.io()) {
                     getSubscriptions()
@@ -149,7 +149,7 @@ class RealBillingClientWrapper @Inject constructor(
         val billingFlow = billingClient.launchBillingFlow(activity, params)
         if (billingFlow.responseCode == BillingResponseCode.OK) {
             _purchaseState.emit(InProgress)
-            billingFlowInProcess = true
+            billingFlowInProgress = true
         } else {
             _purchaseState.emit(Canceled)
         }
