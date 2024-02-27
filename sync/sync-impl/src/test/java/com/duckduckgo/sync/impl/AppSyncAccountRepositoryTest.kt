@@ -312,6 +312,24 @@ class AppSyncAccountRepositoryTest {
     }
 
     @Test
+    fun getConnectedDevicesDecryptionFailsThenLogoutDevice() {
+        givenAuthenticatedDevice()
+        prepareForEncryption()
+        val thisDevice = Device(deviceId = deviceId, deviceName = deviceName, jwIat = "", deviceType = deviceFactor)
+        val anotherDevice = Device(deviceId = "anotherDeviceId", deviceName = deviceName, jwIat = "", deviceType = deviceFactor)
+        whenever(syncStore.token).thenReturn(token)
+        whenever(syncStore.deviceId).thenReturn(deviceId)
+        whenever(syncStore.primaryKey).thenReturn(primaryKey)
+        whenever(nativeLib.decryptData(anyString(), anyString())).thenThrow(NegativeArraySizeException())
+        whenever(syncApi.getDevices(anyString())).thenReturn(Result.Success(listOf(thisDevice)))
+        whenever(syncApi.logout("token", "deviceId")).thenReturn(Result.Success(Logout("deviceId")))
+
+        val result = syncRepo.getConnectedDevices() as Success
+        verify(syncApi).logout("token", "deviceId")
+        assertTrue(result.data.isEmpty())
+    }
+
+    @Test
     fun whenGenerateRecoveryCodeAsStringThenReturnExpectedJson() {
         whenever(syncStore.primaryKey).thenReturn(primaryKey)
         whenever(syncStore.userId).thenReturn(userId)
