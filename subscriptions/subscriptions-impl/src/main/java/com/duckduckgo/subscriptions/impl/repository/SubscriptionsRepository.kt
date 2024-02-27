@@ -37,11 +37,7 @@ class RealSubscriptionsRepository @Inject constructor(
 ) : SubscriptionsRepository {
 
     override suspend fun subscriptionDetails(): ProductDetails? {
-        return if (billingClientWrapper.products.containsKey(BASIC_SUBSCRIPTION)) {
-            billingClientWrapper.products[BASIC_SUBSCRIPTION]
-        } else {
-            null
-        }
+        return billingClientWrapper.products.find { it.productId == BASIC_SUBSCRIPTION }
     }
 
     override suspend fun offerDetail(): Map<String, SubscriptionOfferDetails> {

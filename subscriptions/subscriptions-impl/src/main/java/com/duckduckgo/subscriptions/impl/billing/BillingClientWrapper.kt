@@ -58,7 +58,7 @@ import kotlinx.coroutines.withContext
 import logcat.logcat
 
 interface BillingClientWrapper {
-    val products: Map<String, ProductDetails>
+    val products: List<ProductDetails>
     val purchaseHistory: List<PurchaseHistoryRecord>
     val purchaseState: Flow<PurchaseState>
 
@@ -87,7 +87,7 @@ class RealBillingClientWrapper @Inject constructor(
     override val purchaseState = _purchaseState.asSharedFlow()
 
     // New Subscription ProductDetails
-    override val products = mutableMapOf<String, ProductDetails>()
+    override val products = mutableListOf<ProductDetails>()
 
     // Purchase History
     override val purchaseHistory = mutableListOf<PurchaseHistoryRecord>()
@@ -217,16 +217,11 @@ class RealBillingClientWrapper @Inject constructor(
         val productDetailsList = productDetailsResult.productDetailsList.orEmpty()
         when (responseCode) {
             BillingResponseCode.OK -> {
-                var newMap = emptyMap<String, ProductDetails>()
                 if (productDetailsList.isEmpty()) {
                     logcat { "No products found" }
-                } else {
-                    newMap = productDetailsList.associateBy {
-                        it.productId
-                    }
                 }
                 products.clear()
-                newMap.toMap(products)
+                products.addAll(productDetailsList.distinctBy { it.productId })
             }
             else -> {
                 logcat { "onProductDetailsResponse: $responseCode $debugMessage" }

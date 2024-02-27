@@ -1022,7 +1022,7 @@ class RealSubscriptionsManagerTest {
         """,
             "signature",
         )
-        whenever(billingClient.products).thenReturn(mapOf())
+        whenever(billingClient.products).thenReturn(emptyList())
         whenever(billingClient.purchaseHistory).thenReturn(listOf(purchaseRecord))
     }
 

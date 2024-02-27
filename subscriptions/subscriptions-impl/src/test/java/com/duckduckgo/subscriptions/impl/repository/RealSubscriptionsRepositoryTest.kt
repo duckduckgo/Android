@@ -71,7 +71,7 @@ class RealSubscriptionsRepositoryTest {
         return productDetails
     }
     private fun givenProductExist(productId: String = BASIC_SUBSCRIPTION) {
-        val testMap: Map<String, ProductDetails> = mapOf(productId to getProductDetails(productId))
-        whenever(billingClient.products).thenReturn(testMap)
+        val mockProducts = listOf(getProductDetails(productId))
+        whenever(billingClient.products).thenReturn(mockProducts)
     }
 }
