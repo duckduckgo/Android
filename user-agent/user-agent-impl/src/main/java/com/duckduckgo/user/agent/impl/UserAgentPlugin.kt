@@ -21,8 +21,8 @@ import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.duckduckgo.user.agent.store.UserAgentExceptionEntity
 import com.duckduckgo.user.agent.store.UserAgentFeatureName
 import com.duckduckgo.user.agent.store.UserAgentFeatureToggle
-import com.duckduckgo.user.agent.store.UserAgentRepository
 import com.duckduckgo.user.agent.store.UserAgentFeatureToggleRepository
+import com.duckduckgo.user.agent.store.UserAgentRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi

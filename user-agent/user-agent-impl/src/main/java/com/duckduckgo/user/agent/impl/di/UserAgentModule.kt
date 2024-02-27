@@ -25,13 +25,13 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.user.agent.impl.RealUserAgentProvider
 import com.duckduckgo.user.agent.store.ALL_MIGRATIONS
-import com.duckduckgo.user.agent.store.RealUserAgentRepository
+import com.duckduckgo.user.agent.store.RealUserAgentFeatureToggleDatStore
 import com.duckduckgo.user.agent.store.RealUserAgentFeatureToggleRepository
+import com.duckduckgo.user.agent.store.RealUserAgentRepository
 import com.duckduckgo.user.agent.store.UserAgentDatabase
-import com.duckduckgo.user.agent.store.UserAgentRepository
 import com.duckduckgo.user.agent.store.UserAgentFeatureToggleDataStore
 import com.duckduckgo.user.agent.store.UserAgentFeatureToggleRepository
-import com.duckduckgo.user.agent.store.RealUserAgentFeatureToggleDatStore
+import com.duckduckgo.user.agent.store.UserAgentRepository
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
