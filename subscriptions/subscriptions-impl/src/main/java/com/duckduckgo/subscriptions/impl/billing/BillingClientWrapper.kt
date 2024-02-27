@@ -221,7 +221,7 @@ class RealBillingClientWrapper @Inject constructor(
                     logcat { "No products found" }
                 }
                 products.clear()
-                products.addAll(productDetailsList.distinctBy { it.productId })
+                products.addAll(productDetailsList)
             }
             else -> {
                 logcat { "onProductDetailsResponse: $responseCode $debugMessage" }
