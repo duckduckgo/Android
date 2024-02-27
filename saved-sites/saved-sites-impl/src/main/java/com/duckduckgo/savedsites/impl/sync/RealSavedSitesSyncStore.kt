@@ -37,6 +37,7 @@ interface SavedSitesSyncStore {
     var clientModifiedSince: String
     var isSyncPaused: Boolean
     fun isSyncPausedFlow(): Flow<Boolean>
+    var invalidEntitiesIds: List<String>
 }
 
 @ContributesBinding(AppScope::class)
@@ -69,6 +70,14 @@ class RealSavedSitesSyncStore @Inject constructor(
             emitNewValue()
         }
 
+    override var invalidEntitiesIds: List<String>
+        get() = preferences.getStringSet(KEY_CLIENT_INVALID_IDS, mutableSetOf())?.toList() ?: mutableListOf()
+        set(value) {
+            preferences.edit(true) {
+                putStringSet(KEY_CLIENT_INVALID_IDS, value.toSet())
+            }
+        }
+
     override fun isSyncPausedFlow(): Flow<Boolean> = syncPausedSharedFlow
 
     private fun emitNewValue() {
@@ -86,5 +95,6 @@ class RealSavedSitesSyncStore @Inject constructor(
         private const val KEY_START_TIMESTAMP = "KEY_START_TIMESTAMP"
         private const val KEY_CLIENT_MODIFIED_SINCE = "KEY_CLIENT_MODIFIED_SINCE"
         private const val KEY_CLIENT_LIMIT_EXCEEDED = "KEY_CLIENT_LIMIT_EXCEEDED"
+        private const val KEY_CLIENT_INVALID_IDS = "KEY_CLIENT_INVALID_IDS"
     }
 }
