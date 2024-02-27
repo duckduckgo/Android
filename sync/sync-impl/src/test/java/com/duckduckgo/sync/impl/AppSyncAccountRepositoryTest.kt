@@ -316,7 +316,6 @@ class AppSyncAccountRepositoryTest {
         givenAuthenticatedDevice()
         prepareForEncryption()
         val thisDevice = Device(deviceId = deviceId, deviceName = deviceName, jwIat = "", deviceType = deviceFactor)
-        val anotherDevice = Device(deviceId = "anotherDeviceId", deviceName = deviceName, jwIat = "", deviceType = deviceFactor)
         whenever(syncStore.token).thenReturn(token)
         whenever(syncStore.deviceId).thenReturn(deviceId)
         whenever(syncStore.primaryKey).thenReturn(primaryKey)
