@@ -61,13 +61,13 @@ interface BillingClientWrapper {
     val products: Map<String, ProductDetails>
     val purchaseHistory: List<PurchaseHistoryRecord>
     val purchaseState: Flow<PurchaseState>
-    fun billingFlowParamsBuilder(
+
+    suspend fun launchBillingFlow(
+        activity: Activity,
         productDetails: ProductDetails,
         offerToken: String,
         externalId: String,
-        isReset: Boolean,
-    ): BillingFlowParams.Builder
-    suspend fun launchBillingFlow(activity: Activity, params: BillingFlowParams)
+    )
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -136,10 +136,16 @@ class RealBillingClientWrapper @Inject constructor(
         }
     }
 
-    override suspend fun launchBillingFlow(activity: Activity, params: BillingFlowParams) {
+    override suspend fun launchBillingFlow(
+        activity: Activity,
+        productDetails: ProductDetails,
+        offerToken: String,
+        externalId: String,
+    ) {
         if (!billingClient.isReady) {
             logcat { "Service not ready" }
         }
+        val params = buildBillingFlowParams(productDetails, offerToken, externalId)
         val billingFlow = billingClient.launchBillingFlow(activity, params)
         if (billingFlow.responseCode == BillingResponseCode.OK) {
             _purchaseState.emit(InProgress)
@@ -246,13 +252,11 @@ class RealBillingClientWrapper @Inject constructor(
         }
     }
 
-    override fun billingFlowParamsBuilder(
+    private fun buildBillingFlowParams(
         productDetails: ProductDetails,
         offerToken: String,
         externalId: String,
-        isReset: Boolean,
-    ): BillingFlowParams.Builder {
-        val finalId = if (isReset) "randomId" else externalId
+    ): BillingFlowParams {
         return BillingFlowParams.newBuilder()
             .setProductDetailsParamsList(
                 listOf(
@@ -262,8 +266,9 @@ class RealBillingClientWrapper @Inject constructor(
                         .build(),
                 ),
             )
-            .setObfuscatedAccountId(finalId)
-            .setObfuscatedProfileId(finalId)
+            .setObfuscatedAccountId(externalId)
+            .setObfuscatedProfileId(externalId)
+            .build()
     }
 }
 

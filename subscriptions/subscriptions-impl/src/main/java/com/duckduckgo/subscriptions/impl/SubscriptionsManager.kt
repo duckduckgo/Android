@@ -404,16 +404,15 @@ class RealSubscriptionsManager @Inject constructor(
         when (val response = prePurchaseFlow()) {
             is Success -> {
                 if (response.entitlements.isEmpty()) {
-                    val billingParams = billingClientWrapper.billingFlowParamsBuilder(
-                        productDetails = productDetails,
-                        offerToken = offerToken,
-                        externalId = response.externalId,
-                        isReset = isReset,
-                    ).build()
                     logcat(LogPriority.DEBUG) { "Subs: external id is ${response.externalId}" }
                     _currentPurchaseState.emit(CurrentPurchase.PreFlowFinished)
                     withContext(dispatcherProvider.main()) {
-                        billingClientWrapper.launchBillingFlow(activity, billingParams)
+                        billingClientWrapper.launchBillingFlow(
+                            activity = activity,
+                            productDetails = productDetails,
+                            offerToken = offerToken,
+                            externalId = response.externalId,
+                        )
                     }
                 } else {
                     pixelSender.reportRestoreAfterPurchaseAttemptSuccess()
