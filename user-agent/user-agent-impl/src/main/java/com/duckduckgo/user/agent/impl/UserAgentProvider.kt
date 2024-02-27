@@ -123,7 +123,7 @@ class RealUserAgentProvider @Inject constructor(
             }
         }
 
-        val shouldUseDuckDuckGoUserAgent = if (host != null) userAgent.isDuckDuckGoSite(host) else false
+        val shouldUseDuckDuckGoUserAgent = if (host != null) userAgent.useLegacyUserAgent(host) else false
         if (shouldUseDuckDuckGoUserAgent) {
             return getUserAgent(url = url, host = host, isDesktop = isDesktop, useDuckDuckGo = true)
         }

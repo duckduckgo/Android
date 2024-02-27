@@ -24,7 +24,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 interface UserAgent {
-    fun isDuckDuckGoSite(url: String): Boolean
+    fun useLegacyUserAgent(url: String): Boolean
     fun isException(url: String): Boolean
 }
 
@@ -34,10 +34,10 @@ class RealUserAgent @Inject constructor(
     private val unprotectedTemporary: UnprotectedTemporary,
 ) : UserAgent {
 
-    private val duckDuckGoSites = listOf("duckduckgo.com")
+    private val legacySites = listOf("duckduckgo.com")
 
-    override fun isDuckDuckGoSite(url: String): Boolean {
-        return duckDuckGoSites.any { UriString.sameOrSubdomain(url, it) }
+    override fun useLegacyUserAgent(url: String): Boolean {
+        return legacySites.any { UriString.sameOrSubdomain(url, it) }
     }
 
     override fun isException(url: String): Boolean {

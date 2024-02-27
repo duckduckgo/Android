@@ -68,7 +68,7 @@ class UserAgentProviderTest {
         whenever(userAgent.isException("unprotected.com")).thenReturn(true)
         whenever(userAgent.isException("subdomain.default.com")).thenReturn(true)
         whenever(userAgent.isException("subdomain.unprotected.com")).thenReturn(true)
-        whenever(userAgent.isDuckDuckGoSite(anyString())).thenReturn(true)
+        whenever(userAgent.useLegacyUserAgent(anyString())).thenReturn(true)
 
         System.setProperty("os.arch", "aarch64")
     }
@@ -220,7 +220,7 @@ class UserAgentProviderTest {
 
     @Test
     fun whenHasNoExceptionsThenReturnUserAgent() {
-        whenever(userAgent.isDuckDuckGoSite(anyString())).thenReturn(false)
+        whenever(userAgent.useLegacyUserAgent(anyString())).thenReturn(false)
         testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
         val actual = testee.userAgent(DOMAIN, false)
         assertTrue("$actual does not match expected regex", ValidationRegex.userAgent.matches(actual))
@@ -228,7 +228,7 @@ class UserAgentProviderTest {
 
     @Test
     fun whenIsDesktopThenReturnDesktopUserAgent() {
-        whenever(userAgent.isDuckDuckGoSite(anyString())).thenReturn(false)
+        whenever(userAgent.useLegacyUserAgent(anyString())).thenReturn(false)
         testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
         val actual = testee.userAgent(DOMAIN, true)
         assertTrue("$actual does not match expected regex", ValidationRegex.userAgentDesktop.matches(actual))
@@ -236,7 +236,7 @@ class UserAgentProviderTest {
 
     @Test
     fun whenIsDesktopAndIsAarch64ThenReturnX86_64DesktopUserAgent() {
-        whenever(userAgent.isDuckDuckGoSite(anyString())).thenReturn(false)
+        whenever(userAgent.useLegacyUserAgent(anyString())).thenReturn(false)
         testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
         val actual = testee.userAgent(DOMAIN, true)
         assertTrue("$actual does not match expected regex", ValidationRegex.userAgentDesktopArch.matches(actual))
