@@ -46,7 +46,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import logcat.logcat
 
-interface BillingClientWrapper {
+interface PlayBillingManager {
     val products: List<ProductDetails>
     val purchaseHistory: List<PurchaseHistoryRecord>
     val purchaseState: Flow<PurchaseState>
@@ -60,14 +60,14 @@ interface BillingClientWrapper {
 }
 
 @SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class, boundType = BillingClientWrapper::class)
+@ContributesBinding(AppScope::class, boundType = PlayBillingManager::class)
 @ContributesMultibinding(scope = AppScope::class, boundType = MainProcessLifecycleObserver::class)
-class RealBillingClientWrapper @Inject constructor(
+class RealPlayBillingManager @Inject constructor(
     val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope val coroutineScope: CoroutineScope,
     private val pixelSender: SubscriptionPixelSender,
     private val billingClient: BillingClientAdapter,
-) : BillingClientWrapper, MainProcessLifecycleObserver {
+) : PlayBillingManager, MainProcessLifecycleObserver {
 
     private var billingFlowInProgress = false
 

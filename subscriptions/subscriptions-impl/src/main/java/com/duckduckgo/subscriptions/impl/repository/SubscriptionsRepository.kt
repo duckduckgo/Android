@@ -20,7 +20,7 @@ import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.ProductDetails.SubscriptionOfferDetails
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTION
-import com.duckduckgo.subscriptions.impl.billing.BillingClientWrapper
+import com.duckduckgo.subscriptions.impl.billing.PlayBillingManager
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -33,11 +33,11 @@ interface SubscriptionsRepository {
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class RealSubscriptionsRepository @Inject constructor(
-    private val billingClientWrapper: BillingClientWrapper,
+    private val playBillingManager: PlayBillingManager,
 ) : SubscriptionsRepository {
 
     override suspend fun subscriptionDetails(): ProductDetails? {
-        return billingClientWrapper.products.find { it.productId == BASIC_SUBSCRIPTION }
+        return playBillingManager.products.find { it.productId == BASIC_SUBSCRIPTION }
     }
 
     override suspend fun offerDetail(): Map<String, SubscriptionOfferDetails> {

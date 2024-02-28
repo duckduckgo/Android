@@ -30,7 +30,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionStatus.Inactive
 import com.duckduckgo.subscriptions.impl.SubscriptionStatus.NotAutoRenewable
 import com.duckduckgo.subscriptions.impl.SubscriptionStatus.Unknown
 import com.duckduckgo.subscriptions.impl.SubscriptionsData.*
-import com.duckduckgo.subscriptions.impl.billing.BillingClientWrapper
+import com.duckduckgo.subscriptions.impl.billing.PlayBillingManager
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
@@ -146,7 +146,7 @@ class RealSubscriptionsManager @Inject constructor(
     private val authService: AuthService,
     private val subscriptionsService: SubscriptionsService,
     private val authRepository: AuthRepository,
-    private val billingClientWrapper: BillingClientWrapper,
+    private val playBillingManager: PlayBillingManager,
     private val emailManager: EmailManager,
     private val context: Context,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
@@ -177,7 +177,7 @@ class RealSubscriptionsManager @Inject constructor(
     private suspend fun emitCurrentPurchaseValues() {
         purchaseStateJob?.cancel()
         purchaseStateJob = coroutineScope.launch(dispatcherProvider.io()) {
-            billingClientWrapper.purchaseState.collect {
+            playBillingManager.purchaseState.collect {
                 when (it) {
                     is PurchaseState.Purchased -> checkPurchase(it.packageName, it.purchaseToken)
                     else -> {
@@ -356,7 +356,7 @@ class RealSubscriptionsManager @Inject constructor(
 
     override suspend fun recoverSubscriptionFromStore(): SubscriptionsData {
         return try {
-            val purchase = billingClientWrapper.purchaseHistory.lastOrNull()
+            val purchase = playBillingManager.purchaseHistory.lastOrNull()
             return if (purchase != null) {
                 val signature = purchase.signature
                 val body = purchase.originalJson
@@ -407,7 +407,7 @@ class RealSubscriptionsManager @Inject constructor(
                     logcat(LogPriority.DEBUG) { "Subs: external id is ${response.externalId}" }
                     _currentPurchaseState.emit(CurrentPurchase.PreFlowFinished)
                     withContext(dispatcherProvider.main()) {
-                        billingClientWrapper.launchBillingFlow(
+                        playBillingManager.launchBillingFlow(
                             activity = activity,
                             productDetails = productDetails,
                             offerToken = offerToken,

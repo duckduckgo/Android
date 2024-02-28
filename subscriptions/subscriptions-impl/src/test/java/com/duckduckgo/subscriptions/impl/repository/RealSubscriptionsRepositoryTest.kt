@@ -5,7 +5,7 @@ import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.ProductDetails.SubscriptionOfferDetails
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTION
-import com.duckduckgo.subscriptions.impl.billing.BillingClientWrapper
+import com.duckduckgo.subscriptions.impl.billing.PlayBillingManager
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -22,7 +22,7 @@ class RealSubscriptionsRepositoryTest {
     val coroutineRule = CoroutineTestRule()
 
     private lateinit var repository: RealSubscriptionsRepository
-    private val billingClient: BillingClientWrapper = mock()
+    private val billingClient: PlayBillingManager = mock()
 
     @Before
     fun before() {
