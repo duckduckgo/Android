@@ -20,6 +20,7 @@ import android.util.Base64
 import androidx.annotation.WorkerThread
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.downloads.api.DownloadFailReason
+import com.duckduckgo.downloads.api.DownloadFailReason.DataUriParseException
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.impl.DataUriParser.GeneratedFilename
@@ -28,7 +29,8 @@ import com.duckduckgo.downloads.store.DownloadStatus.STARTED
 import java.io.File
 import java.io.IOException
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.asLog
+import logcat.logcat
 
 class DataUriDownloader @Inject constructor(
     private val dataUriParser: DataUriParser,
@@ -42,8 +44,8 @@ class DataUriDownloader @Inject constructor(
         try {
             when (val parsedDataUri = dataUriParser.generate(pending.url)) {
                 is ParseResult.Invalid -> {
-                    Timber.w("Failed to extract data from data URI")
-                    callback.onError(url = pending.url, reason = DownloadFailReason.DataUriParseException)
+                    logcat { "Failed to extract data from data URI" }
+                    callback.onError(url = pending.url, reason = DataUriParseException)
                     return
                 }
                 is ParseResult.ParsedDataUri -> {
@@ -64,17 +66,17 @@ class DataUriDownloader @Inject constructor(
                         writeBytesToFiles(parsedDataUri.data, file)
                     }
                         .onSuccess {
-                            Timber.v("Succeeded to decode Base64")
+                            logcat { "Succeeded to decode Base64" }
                             callback.onSuccess(file = file, mimeType = parsedDataUri.mimeType)
                         }
                         .onFailure {
-                            Timber.e(it, "Failed to decode Base64")
+                            logcat { "Failed to decode Base64: ${it.asLog()}" }
                             callback.onError(url = pending.url, reason = DownloadFailReason.DataUriParseException)
                         }
                 }
             }
         } catch (e: IOException) {
-            Timber.e(e, "Failed to save data uri")
+            logcat { "Failed to save data uri: ${e.asLog()}" }
             callback.onError(url = pending.url, reason = DownloadFailReason.DataUriParseException)
         }
     }

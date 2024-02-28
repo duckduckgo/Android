@@ -31,7 +31,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
 import java.io.File
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.logcat
 
 @InjectWith(FragmentScope::class)
 class DownloadConfirmationFragment : BottomSheetDialogFragment() {
@@ -89,7 +89,7 @@ class DownloadConfirmationFragment : BottomSheetDialogFragment() {
             dismiss()
         }
         binding.cancel.setOnClickListener {
-            Timber.i("Cancelled download for url ${pendingDownload.url}")
+            logcat { "Cancelled download for url ${pendingDownload.url}" }
             listener.cancelDownload()
             dismiss()
         }

@@ -23,7 +23,7 @@ import com.duckduckgo.downloads.impl.FilenameExtractor.GuessQuality.NotGoodEnoug
 import com.duckduckgo.downloads.impl.FilenameExtractor.GuessQuality.TriedAllOptions
 import java.io.File
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.logcat
 
 class FilenameExtractor @Inject constructor(
     private val pixel: Pixel,
@@ -77,7 +77,7 @@ class FilenameExtractor @Inject constructor(
             guessedFilename = guessedFilename.removeSuffix(DEFAULT_FILE_TYPE)
         }
 
-        Timber.v("From URL [$url], guessed [$guessedFilename]")
+        logcat { "From URL [$url], guessed [$guessedFilename]" }
         return guessedFilename
     }
 
