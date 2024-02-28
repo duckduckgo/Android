@@ -355,6 +355,7 @@ dependencies {
     implementation "io.reactivex.rxjava2:rxjava:_"
     implementation "io.reactivex.rxjava2:rxandroid:_"
     implementation JakeWharton.timber
+    implementation 'nl.dionsegijn:konfetti:1.2.5'
 
     // RxRelay
     implementation "com.jakewharton.rxrelay2:rxrelay:_"

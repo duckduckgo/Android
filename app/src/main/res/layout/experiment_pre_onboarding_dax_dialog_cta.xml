@@ -41,75 +41,69 @@
         app:layout_constraintTop_toBottomOf="@id/logo"
         app:layout_constraintWidth_max="600dp">
 
-        <LinearLayout
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_height="wrap_content">
 
-            <ScrollView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <LinearLayout
-                    android:id="@+id/cardContainer"
-                    style="@style/Widget.DuckDuckGo.DaxDialog.Content"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <FrameLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                        <com.duckduckgo.common.ui.view.text.DaxTextView
-                            android:id="@+id/hiddenTextCta"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:visibility="invisible"
-                            app:typography="h2"
-                            tools:text="Hi there. Ready for a better, more private internet?"
-                            tools:visibility="visible" />
-
-                        <com.duckduckgo.common.ui.view.TypeAnimationTextView
-                            android:id="@+id/dialogTextCta"
-                            style="@style/Typography.DuckDuckGo.H2"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:textColor="?attr/daxColorPrimaryText" />
-                    </FrameLayout>
-
-                    <ImageView
-                        android:id="@+id/experimentDialogContentImage"
-                        android:layout_gravity="center"
-                        android:layout_marginTop="@dimen/keyline_4"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:adjustViewBounds="true" />
-
-                    <com.duckduckgo.common.ui.view.text.DaxTextView
-                        android:id="@+id/experimentDialogContentText"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:visibility="gone"
-                        android:alpha="0"
-                        app:typography="body1" />
-
-                </LinearLayout>
-            </ScrollView>
-
-            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
-                android:id="@+id/primaryCta"
+            <LinearLayout
+                android:id="@+id/cardContainer"
+                style="@style/Widget.DuckDuckGo.DaxDialog.Content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/keyline_5"
-                android:layout_marginTop="@dimen/daxDialogButtonSpacing"
-                android:layout_marginBottom="@dimen/keyline_4"
-                android:text="@string/onboardingLetsDoItButton"
-                android:alpha="0"
-                app:buttonSize="large" />
-        </LinearLayout>
+                android:orientation="vertical">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <com.duckduckgo.common.ui.view.text.DaxTextView
+                        android:id="@+id/hiddenTextCta"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="invisible"
+                        app:typography="h2"
+                        tools:text="Hi there. Ready for a better, more private internet?"
+                        tools:visibility="visible" />
+
+                    <com.duckduckgo.common.ui.view.TypeAnimationTextView
+                        android:id="@+id/dialogTextCta"
+                        style="@style/Typography.DuckDuckGo.H2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:textColor="?attr/daxColorPrimaryText" />
+                </FrameLayout>
+
+                <ImageView
+                    android:id="@+id/experimentDialogContentImage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="@dimen/keyline_4"
+                    android:adjustViewBounds="true" />
+
+                <com.duckduckgo.common.ui.view.text.DaxTextView
+                    android:id="@+id/experimentDialogContentText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:alpha="0"
+                    android:visibility="gone"
+                    app:typography="body1" />
+
+                <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                    android:id="@+id/primaryCta"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/keyline_5"
+                    android:layout_marginTop="@dimen/keyline_5"
+                    android:alpha="0"
+                    android:text="@string/onboardingLetsDoItButton"
+                    app:buttonSize="large"
+                    tools:alpha="1" />
+
+            </LinearLayout>
+        </ScrollView>
     </com.duckduckgo.common.ui.view.shape.DaxBubbleCardView>
 
 </LinearLayout>

@@ -31,35 +31,24 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/onboarding_experiment_background" />
-
-    <ImageView
-        android:id="@+id/foregroundImageView"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_marginTop="64dp"
-        android:adjustViewBounds="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/welcomeContent"
-        app:srcCompat="@drawable/onboarding_experiment_foreground" />
+        app:srcCompat="@drawable/onboarding_background_experiment_large" />
 
     <LinearLayout
         android:id="@+id/welcomeContent"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/foregroundImageView"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/daxLogo"
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:layout_gravity="center"
-            android:layout_marginTop="80dp"
             app:srcCompat="@drawable/ic_dax_icon" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
@@ -74,12 +63,24 @@
             app:typography="title" />
     </LinearLayout>
 
+    <ImageView
+        android:id="@+id/foregroundImageView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/keyline_6"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@id/welcomeContent"
+        app:srcCompat="@drawable/onboarding_experiment_foreground" />
+
     <include
         android:id="@+id/daxDialogCta"
         layout="@layout/experiment_pre_onboarding_dax_dialog_cta"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="93dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"

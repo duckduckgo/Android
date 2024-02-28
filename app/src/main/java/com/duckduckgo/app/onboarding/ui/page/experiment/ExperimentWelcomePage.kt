@@ -25,6 +25,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewPropertyAnimatorCompat
 import androidx.lifecycle.Lifecycle
@@ -52,6 +53,8 @@ import com.duckduckgo.di.scopes.FragmentScope
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import nl.dionsegijn.konfetti.models.Shape
+import nl.dionsegijn.konfetti.models.Size
 
 @InjectWith(FragmentScope::class)
 class ExperimentWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_experiment) {
@@ -182,7 +185,7 @@ class ExperimentWelcomePage : OnboardingPageFragment(R.layout.content_onboarding
                     binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(CELEBRATION) }
                     ViewCompat.animate(binding.daxDialogCta.primaryCta).alpha(MAX_ALPHA).setDuration(ANIMATION_DURATION).startDelay = ANIMATION_DELAY
                     scheduleTypingAnimation()
-                    // TODO experiment setConfetti
+                    launchKonfetti()
                 }
             }
         }
@@ -233,6 +236,27 @@ class ExperimentWelcomePage : OnboardingPageFragment(R.layout.content_onboarding
 
     private fun showDefaultBrowserDialog(intent: Intent) {
         startActivityForResult(intent, DEFAULT_BROWSER_ROLE_MANAGER_DIALOG)
+    }
+
+    private fun launchKonfetti() {
+        val magenta = ResourcesCompat.getColor(resources, com.duckduckgo.mobile.android.R.color.magenta, null)
+        val blue = ResourcesCompat.getColor(resources, com.duckduckgo.mobile.android.R.color.blue30, null)
+        val purple = ResourcesCompat.getColor(resources, com.duckduckgo.mobile.android.R.color.purple, null)
+        val green = ResourcesCompat.getColor(resources, com.duckduckgo.mobile.android.R.color.green, null)
+        val yellow = ResourcesCompat.getColor(resources, com.duckduckgo.mobile.android.R.color.yellow, null)
+
+        val displayWidth = resources.displayMetrics.widthPixels
+
+        binding.setAsDefaultKonfetti.build()
+            .addColors(magenta, blue, purple, green, yellow)
+            .setDirection(0.0, 359.0)
+            .setSpeed(4f, 9f)
+            .setFadeOutEnabled(true)
+            .setTimeToLive(1500L)
+            .addShapes(Shape.Rectangle(1f))
+            .addSizes(Size(8))
+            .setPosition(displayWidth / 2f, displayWidth / 2f, -50f, -50f)
+            .streamFor(60, 2000L)
     }
 
     companion object {
