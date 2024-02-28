@@ -20,7 +20,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 
-interface UserAgentFeatureToggleDataStore {
+interface UserAgentFeatureToggleStore {
     fun get(
         featureName: UserAgentFeatureName,
         defaultValue: Boolean,
@@ -32,7 +32,7 @@ interface UserAgentFeatureToggleDataStore {
     fun deleteAll()
 }
 
-class RealUserAgentFeatureToggleDatStore(private val context: Context) : UserAgentFeatureToggleDataStore {
+class RealUserAgentFeatureToggleStore(private val context: Context) : UserAgentFeatureToggleStore {
 
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
 
@@ -61,7 +61,7 @@ class RealUserAgentFeatureToggleDatStore(private val context: Context) : UserAge
     }
 
     companion object {
-        const val FILENAME = "com.duckduckgo.user.agent.store.toggle"
+        const val FILENAME = "com.duckduckgo.user.agent.store.toggles"
         const val MIN_SUPPORTED_VERSION = "MinSupportedVersion"
     }
 }

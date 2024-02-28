@@ -25,25 +25,25 @@ class RealUserAgentFeatureToggleRepositoryTest {
 
     lateinit var testee: RealUserAgentFeatureToggleRepository
 
-    private val mockPrivacyFeatureTogglesDataStore: UserAgentFeatureToggleDataStore = mock()
+    private val mockPrivacyFeatureTogglesStore: UserAgentFeatureToggleStore = mock()
 
     @Before
     fun before() {
-        testee = RealUserAgentFeatureToggleRepository(mockPrivacyFeatureTogglesDataStore)
+        testee = RealUserAgentFeatureToggleRepository(mockPrivacyFeatureTogglesStore)
     }
 
     @Test
     fun whenDeleteAllThenDeleteAllCalled() {
         testee.deleteAll()
 
-        verify(mockPrivacyFeatureTogglesDataStore).deleteAll()
+        verify(mockPrivacyFeatureTogglesStore).deleteAll()
     }
 
     @Test
     fun whenGetThenGetCalled() {
         testee.get(UserAgentFeatureName.UserAgent, true)
 
-        verify(mockPrivacyFeatureTogglesDataStore).get(UserAgentFeatureName.UserAgent, true)
+        verify(mockPrivacyFeatureTogglesStore).get(UserAgentFeatureName.UserAgent, true)
     }
 
     @Test
@@ -51,6 +51,6 @@ class RealUserAgentFeatureToggleRepositoryTest {
         val privacyFeatureToggle = UserAgentFeatureToggle(UserAgentFeatureName.UserAgent.value, true, null)
         testee.insert(privacyFeatureToggle)
 
-        verify(mockPrivacyFeatureTogglesDataStore).insert(privacyFeatureToggle)
+        verify(mockPrivacyFeatureTogglesStore).insert(privacyFeatureToggle)
     }
 }

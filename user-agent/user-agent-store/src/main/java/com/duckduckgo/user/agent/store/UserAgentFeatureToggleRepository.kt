@@ -16,8 +16,8 @@
 
 package com.duckduckgo.user.agent.store
 
-interface UserAgentFeatureToggleRepository : UserAgentFeatureToggleDataStore
+interface UserAgentFeatureToggleRepository : UserAgentFeatureToggleStore
 
 class RealUserAgentFeatureToggleRepository(
-    userAgentFeatureToggleDataStore: UserAgentFeatureToggleDataStore,
-) : UserAgentFeatureToggleRepository, UserAgentFeatureToggleDataStore by userAgentFeatureToggleDataStore
+    userAgentFeatureToggleStore: UserAgentFeatureToggleStore,
+) : UserAgentFeatureToggleRepository, UserAgentFeatureToggleStore by userAgentFeatureToggleStore

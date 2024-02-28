@@ -25,12 +25,12 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.user.agent.impl.RealUserAgentProvider
 import com.duckduckgo.user.agent.store.ALL_MIGRATIONS
-import com.duckduckgo.user.agent.store.RealUserAgentFeatureToggleDatStore
 import com.duckduckgo.user.agent.store.RealUserAgentFeatureToggleRepository
+import com.duckduckgo.user.agent.store.RealUserAgentFeatureToggleStore
 import com.duckduckgo.user.agent.store.RealUserAgentRepository
 import com.duckduckgo.user.agent.store.UserAgentDatabase
-import com.duckduckgo.user.agent.store.UserAgentFeatureToggleDataStore
 import com.duckduckgo.user.agent.store.UserAgentFeatureToggleRepository
+import com.duckduckgo.user.agent.store.UserAgentFeatureToggleStore
 import com.duckduckgo.user.agent.store.UserAgentRepository
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -69,17 +69,17 @@ class UserAgentModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideUserAgentFeatureToggleDataStore(context: Context): UserAgentFeatureToggleDataStore {
-        return RealUserAgentFeatureToggleDatStore(context)
+    fun provideUserAgentFeatureToggleStore(context: Context): UserAgentFeatureToggleStore {
+        return RealUserAgentFeatureToggleStore(context)
     }
 
     @SingleInstanceIn(AppScope::class)
     @Provides
     fun provideUserAgentFeatureToggleRepository(
-        dataStore: UserAgentFeatureToggleDataStore,
+        userAgentFeatureToggleStore: UserAgentFeatureToggleStore,
     ): UserAgentFeatureToggleRepository {
         return RealUserAgentFeatureToggleRepository(
-            userAgentFeatureToggleDataStore = dataStore,
+            userAgentFeatureToggleStore = userAgentFeatureToggleStore,
         )
     }
 
