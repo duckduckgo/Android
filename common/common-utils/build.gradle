@@ -42,6 +42,8 @@ dependencies {
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
     implementation project(path: ':di')
+    implementation project(path: ':common-kotlin')
+
 
     implementation KotlinX.coroutines.core
     implementation KotlinX.coroutines.android
