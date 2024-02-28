@@ -23,7 +23,6 @@ import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.PurchaseHistoryRecord
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LIST_OF_PRODUCTS
 import com.duckduckgo.subscriptions.impl.billing.BillingInitResult.Failure
@@ -63,7 +62,6 @@ interface PlayBillingManager {
 @ContributesBinding(AppScope::class, boundType = PlayBillingManager::class)
 @ContributesMultibinding(scope = AppScope::class, boundType = MainProcessLifecycleObserver::class)
 class RealPlayBillingManager @Inject constructor(
-    val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope val coroutineScope: CoroutineScope,
     private val pixelSender: SubscriptionPixelSender,
     private val billingClient: BillingClientAdapter,
@@ -89,7 +87,7 @@ class RealPlayBillingManager @Inject constructor(
         // Will call on resume coming back from a purchase flow
         if (!billingFlowInProgress) {
             if (billingClient.ready) {
-                owner.lifecycleScope.launch(dispatcherProvider.io()) {
+                owner.lifecycleScope.launch {
                     loadProducts()
                     loadPurchaseHistory()
                 }
