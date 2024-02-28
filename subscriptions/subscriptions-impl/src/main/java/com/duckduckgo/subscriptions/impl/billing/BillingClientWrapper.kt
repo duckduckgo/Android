@@ -17,33 +17,23 @@
 package com.duckduckgo.subscriptions.impl.billing
 
 import android.app.Activity
-import android.content.Context
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import com.android.billingclient.api.BillingClient
-import com.android.billingclient.api.BillingClient.BillingResponseCode
-import com.android.billingclient.api.BillingClient.ProductType
-import com.android.billingclient.api.BillingClientStateListener
-import com.android.billingclient.api.BillingFlowParams
-import com.android.billingclient.api.BillingResult
 import com.android.billingclient.api.ProductDetails
-import com.android.billingclient.api.ProductDetailsResult
-import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.PurchaseHistoryRecord
-import com.android.billingclient.api.PurchasesUpdatedListener
-import com.android.billingclient.api.QueryProductDetailsParams
-import com.android.billingclient.api.QueryProductDetailsParams.Product
-import com.android.billingclient.api.QueryPurchaseHistoryParams
-import com.android.billingclient.api.queryProductDetails
-import com.android.billingclient.api.queryPurchaseHistory
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LIST_OF_PRODUCTS
+import com.duckduckgo.subscriptions.impl.billing.BillingInitResult.Failure
+import com.duckduckgo.subscriptions.impl.billing.BillingInitResult.Success
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState.Canceled
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState.InProgress
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState.Purchased
+import com.duckduckgo.subscriptions.impl.billing.PurchasesUpdateResult.PurchaseAbsent
+import com.duckduckgo.subscriptions.impl.billing.PurchasesUpdateResult.PurchasePresent
+import com.duckduckgo.subscriptions.impl.billing.PurchasesUpdateResult.UserCancelled
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -54,7 +44,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import logcat.logcat
 
 interface BillingClientWrapper {
@@ -74,10 +63,10 @@ interface BillingClientWrapper {
 @ContributesBinding(AppScope::class, boundType = BillingClientWrapper::class)
 @ContributesMultibinding(scope = AppScope::class, boundType = MainProcessLifecycleObserver::class)
 class RealBillingClientWrapper @Inject constructor(
-    private val context: Context,
     val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope val coroutineScope: CoroutineScope,
     private val pixelSender: SubscriptionPixelSender,
+    private val billingClient: BillingClientAdapter,
 ) : BillingClientWrapper, MainProcessLifecycleObserver {
 
     private var billingFlowInProgress = false
@@ -91,47 +80,37 @@ class RealBillingClientWrapper @Inject constructor(
 
     // Purchase History
     override var purchaseHistory = emptyList<PurchaseHistoryRecord>()
-    private val purchasesUpdatedListener =
-        PurchasesUpdatedListener { billingResult, purchases ->
-            if (billingResult.responseCode == BillingResponseCode.OK && !purchases.isNullOrEmpty()) {
-                coroutineScope.launch(dispatcherProvider.io()) {
-                    processPurchases(purchases)
-                }
-            } else if (billingResult.responseCode == BillingResponseCode.USER_CANCELED) {
-                coroutineScope.launch(dispatcherProvider.io()) {
-                    _purchaseState.emit(Canceled)
-                }
-                // Handle an error caused by a user cancelling the purchase flow.
-            } else {
-                pixelSender.reportPurchaseFailureStore()
-                coroutineScope.launch(dispatcherProvider.io()) {
-                    _purchaseState.emit(Canceled)
-                }
-            }
-            billingFlowInProgress = false
-        }
-
-    private lateinit var billingClient: BillingClient
 
     override fun onCreate(owner: LifecycleOwner) {
-        billingClient = BillingClient.newBuilder(context)
-            .enablePendingPurchases()
-            .setListener(purchasesUpdatedListener)
-            .build()
-
-        if (!billingClient.isReady) {
-            connect()
-        }
+        coroutineScope.launch { connect() }
     }
 
     override fun onResume(owner: LifecycleOwner) {
         // Will call on resume coming back from a purchase flow
         if (!billingFlowInProgress) {
-            if (billingClient.isReady) {
+            if (billingClient.ready) {
                 owner.lifecycleScope.launch(dispatcherProvider.io()) {
-                    getSubscriptions()
-                    queryPurchaseHistory()
+                    loadProducts()
+                    loadPurchaseHistory()
                 }
+            }
+        }
+    }
+
+    private suspend fun connect() {
+        val result = billingClient.connect(
+            purchasesListener = { result -> onPurchasesUpdated(result) },
+            disconnectionListener = { onBillingClientDisconnected() },
+        )
+
+        when (result) {
+            Success -> {
+                loadProducts()
+                loadPurchaseHistory()
+            }
+
+            Failure -> {
+                logcat { "Service error" }
             }
         }
     }
@@ -142,122 +121,87 @@ class RealBillingClientWrapper @Inject constructor(
         offerToken: String,
         externalId: String,
     ) {
-        if (!billingClient.isReady) {
+        if (!billingClient.ready) {
             logcat { "Service not ready" }
         }
-        val params = buildBillingFlowParams(productDetails, offerToken, externalId)
-        val billingFlow = billingClient.launchBillingFlow(activity, params)
-        if (billingFlow.responseCode == BillingResponseCode.OK) {
-            _purchaseState.emit(InProgress)
-            billingFlowInProgress = true
-        } else {
-            _purchaseState.emit(Canceled)
-        }
-    }
 
-    private suspend fun processPurchases(purchases: List<Purchase>) {
-        for (purchase in purchases) {
-            if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
-                _purchaseState.emit(
-                    Purchased(
-                        purchaseToken = purchase.purchaseToken,
-                        packageName = purchase.packageName,
-                    ),
-                )
-            }
-        }
-    }
-
-    private fun connect() {
-        billingClient.startConnection(
-            object : BillingClientStateListener {
-                override fun onBillingSetupFinished(billingResult: BillingResult) {
-                    val responseCode = billingResult.responseCode
-                    if (responseCode == BillingResponseCode.OK) {
-                        coroutineScope.launch(dispatcherProvider.io()) {
-                            queryPurchaseHistory()
-                            getSubscriptions()
-                        }
-                    } else {
-                        logcat { "Service error" }
-                    }
-                }
-                override fun onBillingServiceDisconnected() {
-                    // TODO: Try reconnecting again
-                    logcat { "Service disconnected" }
-                }
-            },
+        val launchBillingFlowResult = billingClient.launchBillingFlow(
+            activity = activity,
+            productDetails = productDetails,
+            offerToken = offerToken,
+            externalId = externalId,
         )
-    }
 
-    private suspend fun getSubscriptions() {
-        val productList = mutableListOf<Product>()
-        val params = QueryProductDetailsParams.newBuilder()
-
-        for (product in LIST_OF_PRODUCTS) {
-            productList.add(
-                Product.newBuilder()
-                    .setProductId(product)
-                    .setProductType(ProductType.SUBS)
-                    .build(),
-            )
-        }
-
-        params.setProductList(productList).let { productDetailsParams ->
-            val productDetailsResult = withContext(dispatcherProvider.io()) {
-                billingClient.queryProductDetails(productDetailsParams.build())
+        when (launchBillingFlowResult) {
+            LaunchBillingFlowResult.Success -> {
+                _purchaseState.emit(InProgress)
+                billingFlowInProgress = true
             }
-            processProducts(productDetailsResult)
+
+            LaunchBillingFlowResult.Failure -> {
+                _purchaseState.emit(Canceled)
+            }
         }
     }
 
-    private fun processProducts(productDetailsResult: ProductDetailsResult) {
-        val responseCode = productDetailsResult.billingResult.responseCode
-        val debugMessage = productDetailsResult.billingResult.debugMessage
-        val productDetailsList = productDetailsResult.productDetailsList.orEmpty()
-        when (responseCode) {
-            BillingResponseCode.OK -> {
-                if (productDetailsList.isEmpty()) {
+    private fun onPurchasesUpdated(result: PurchasesUpdateResult) {
+        coroutineScope.launch {
+            when (result) {
+                is PurchasePresent -> {
+                    Purchased(
+                        purchaseToken = result.purchaseToken,
+                        packageName = result.packageName,
+                    )
+                }
+
+                PurchaseAbsent -> {}
+                UserCancelled -> {
+                    _purchaseState.emit(Canceled)
+                    // Handle an error caused by a user cancelling the purchase flow.
+                }
+
+                PurchasesUpdateResult.Failure -> {
+                    pixelSender.reportPurchaseFailureStore()
+                    _purchaseState.emit(Canceled)
+                }
+            }
+        }
+
+        billingFlowInProgress = false
+    }
+
+    private fun onBillingClientDisconnected() {
+        logcat { "Service disconnected" }
+    }
+
+    private suspend fun loadProducts() {
+        when (val result = billingClient.getSubscriptions(LIST_OF_PRODUCTS)) {
+            is SubscriptionsResult.Success -> {
+                if (result.products.isEmpty()) {
                     logcat { "No products found" }
                 }
-                products = productDetailsList
+                this.products = result.products
             }
-            else -> {
-                logcat { "onProductDetailsResponse: $responseCode $debugMessage" }
+
+            is SubscriptionsResult.Failure -> {
+                logcat { "onProductDetailsResponse: ${result.billingResponseCode} ${result.debugMessage}" }
             }
         }
     }
 
-    private suspend fun queryPurchaseHistory() {
-        if (!billingClient.isReady) {
+    private suspend fun loadPurchaseHistory() {
+        if (!billingClient.ready) {
             // Handle client not ready
             return
         }
-        val (billingResult, purchaseList) = billingClient.queryPurchaseHistory(
-            QueryPurchaseHistoryParams.newBuilder().setProductType(ProductType.SUBS).build(),
-        )
-        if (billingResult.responseCode == BillingResponseCode.OK) {
-            purchaseHistory = purchaseList.orEmpty()
-        }
-    }
 
-    private fun buildBillingFlowParams(
-        productDetails: ProductDetails,
-        offerToken: String,
-        externalId: String,
-    ): BillingFlowParams {
-        return BillingFlowParams.newBuilder()
-            .setProductDetailsParamsList(
-                listOf(
-                    BillingFlowParams.ProductDetailsParams.newBuilder()
-                        .setProductDetails(productDetails)
-                        .setOfferToken(offerToken)
-                        .build(),
-                ),
-            )
-            .setObfuscatedAccountId(externalId)
-            .setObfuscatedProfileId(externalId)
-            .build()
+        when (val result = billingClient.getSubscriptionsPurchaseHistory()) {
+            is SubscriptionsPurchaseHistoryResult.Success -> {
+                purchaseHistory = result.history
+            }
+            SubscriptionsPurchaseHistoryResult.Failure -> {
+            }
+        }
     }
 }
 
