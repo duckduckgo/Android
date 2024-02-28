@@ -46,7 +46,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(NetPAppExclusionListNoParams::class)
@@ -70,11 +69,6 @@ class NetpAppExclusionListActivity :
 
     private lateinit var adapter: AppExclusionListAdapter
 
-    private val isNetpEnabled by lazy {
-        runBlocking {
-            vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)
-        }
-    }
     private val binding: ActivityNetpAppExclusionBinding by viewBinding()
     private val viewModel: NetpAppExclusionListViewModel by bindViewModel()
     private val shimmerLayout: ShimmerFrameLayout by lazy { binding.netpAppExclusionListSkeleton }
@@ -105,7 +99,6 @@ class NetpAppExclusionListActivity :
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         val restoreDefault = menu.findItem(R.id.netp_exclusion_menu_restore)
         // onPrepareOptionsMenu is called when overflow menu is being displayed, that's why this can be an imperative call
-        restoreDefault?.isVisible = isNetpEnabled
         restoreDefault?.isEnabled = viewModel.canRestoreDefaults()
 
         return super.onPrepareOptionsMenu(menu)
@@ -171,15 +164,7 @@ class NetpAppExclusionListActivity :
             },
         )
 
-        val recyclerView = binding.netpAppExclusionListRecycler
-
-        if (isNetpEnabled) {
-            recyclerView.alpha = 1.0f
-        } else {
-            recyclerView.alpha = 0.45f
-        }
-
-        recyclerView.adapter = adapter
+        binding.netpAppExclusionListRecycler.adapter = adapter
     }
 
     private fun showFilterPopupMenu(anchor: View) {
@@ -199,7 +184,7 @@ class NetpAppExclusionListActivity :
 
     private fun renderViewState(viewState: ViewState) {
         shimmerLayout.stopShimmer()
-        adapter.update(viewState, isNetpEnabled)
+        adapter.update(viewState)
         shimmerLayout.gone()
     }
 
@@ -218,7 +203,9 @@ class NetpAppExclusionListActivity :
     private fun restartVpn() {
         // we use the app coroutine scope to ensure this call outlives the Activity
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            vpnFeaturesRegistry.refreshFeature(NetPVpnFeature.NETP_VPN)
+            if (vpnFeaturesRegistry.isFeatureRunning(NetPVpnFeature.NETP_VPN)) {
+                vpnFeaturesRegistry.refreshFeature(NetPVpnFeature.NETP_VPN)
+            }
         }
     }
 

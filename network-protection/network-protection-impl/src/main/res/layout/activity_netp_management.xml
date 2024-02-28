@@ -36,10 +36,10 @@
             <com.duckduckgo.common.ui.view.InfoPanel
                 android:id="@+id/netP_alert"
                 style="@style/Widget.DuckDuckGo.InfoPanel"
-                app:panelBackground="@drawable/info_panel_alert_background"
-                app:panelDrawable="@drawable/ic_info_panel_alert"
+                android:layout_margin="16dp"
                 android:visibility="gone"
-                android:layout_margin="16dp"/>
+                app:panelBackground="@drawable/info_panel_alert_background"
+                app:panelDrawable="@drawable/ic_info_panel_alert" />
 
             <ImageView
                 android:id="@+id/netp_status_image"
@@ -47,7 +47,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_margin="@dimen/keyline_4"
-                app:srcCompat="@drawable/illustration_vpn_off" />
+                app:srcCompat="@drawable/illustration_vpn_disconnected" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/netp_status_header"
@@ -64,19 +64,24 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/keyline_4"
-                android:layout_marginBottom="@dimen/keyline_3"
+                android:layout_marginBottom="@dimen/keyline_4"
                 android:gravity="center"
-                android:text="@string/netpManagementDescription"
+                android:text="@string/netpManagementDescriptionOff"
                 app:textType="secondary"
                 app:typography="body2" />
 
-            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+            <com.duckduckgo.networkprotection.impl.management.VpnToggle
                 android:id="@+id/netp_toggle"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:primaryText="@string/netpManagementToggleTitle"
-                app:showBetaPill="false"
-                app:showSwitch="true" />
+                android:layout_height="wrap_content" />
+
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent" />
+
+            <include
+                android:id="@+id/location_details"
+                layout="@layout/section_location" />
 
             <include
                 android:id="@+id/connection_details"

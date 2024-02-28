@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2023 DuckDuckGo
+  ~ Copyright (c) 2024 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -14,35 +14,25 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical">
 
     <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+        android:id="@+id/location_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/netpManagementManageHeader" />
+        app:primaryText="@string/netpManagementLocationHeaderVpnOff" />
 
-    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-        android:id="@+id/settings_vpn"
+    <com.duckduckgo.networkprotection.impl.management.LocationView
+        android:id="@+id/location_item"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:leadingIcon="@drawable/ic_settings"
-        app:leadingIconBackground="circular"
-        app:primaryText="@string/netpManagementVpnSettings" />
-
-    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-        android:id="@+id/settings_exclusion"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:leadingIcon="@drawable/ic_exclusion"
-        app:leadingIconBackground="circular"
-        app:primaryText="@string/netpManagementManageItemExclusion"
-        app:secondaryText="@string/netpManagementManageItemExclusionSubtitleEmpty" />
+        android:layout_height="wrap_content" />
 
     <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:layout_width="wrap_content"
         android:layout_height="match_parent" />
-</LinearLayout>
+
+</androidx.appcompat.widget.LinearLayoutCompat>

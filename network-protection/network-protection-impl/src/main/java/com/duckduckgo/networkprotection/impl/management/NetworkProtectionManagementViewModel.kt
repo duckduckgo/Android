@@ -57,7 +57,13 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Disconnected
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Unknown
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
+import com.duckduckgo.networkprotection.impl.settings.geoswitching.getDisplayableCountry
+import com.duckduckgo.networkprotection.impl.settings.geoswitching.getEmojiForCountryCode
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
+import com.duckduckgo.networkprotection.impl.volume.NetpDataVolumeStore
+import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
+import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
+import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository.UserPreferredLocation
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -78,6 +84,9 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     private val networkProtectionPixels: NetworkProtectionPixels,
     @NetpBreakageCategories private val netpBreakageCategories: List<AppBreakageCategory>,
     private val networkProtectionState: NetworkProtectionState,
+    private val netPGeoswitchingRepository: NetPGeoswitchingRepository,
+    private val netpDataVolumeStore: NetpDataVolumeStore,
+    private val netPExclusionListRepository: NetPExclusionListRepository,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val refreshVpnRunningState = MutableStateFlow(System.currentTimeMillis())
@@ -87,26 +96,60 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     private var isTimerTickRunning: Boolean = false
     private var timerTickJob = ConflatedJob()
     private var lastVpnRequestTime = -1L
+    private var excludedAppsCount: Int = 0
 
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
 
     internal fun viewState(): Flow<ViewState> {
         return combine(connectionDetailsFlow, getRunningState()) { connectionDetails, vpnState ->
+            val preferredLocation = netPGeoswitchingRepository.getUserPreferredLocation()
             var connectionDetailsToEmit = connectionDetails
+            var locationState: LocationState? = connectionDetails?.toLocationState(preferredLocation.countryCode)
 
             if (vpnState.state == ENABLED && !isTimerTickRunning) {
                 startElapsedTimeTimer()
             } else if (vpnState.state is DISABLED || vpnState.state == ENABLING) {
                 stopElapsedTimeTimer()
                 connectionDetailsToEmit = null
+                locationState = preferredLocation.toLocationState()
             }
 
             return@combine ViewState(
                 connectionState = vpnState.toConnectionState(),
                 connectionDetails = connectionDetailsToEmit,
                 alertState = getAlertState(vpnState.state, vpnState.stopReason, vpnState.alwaysOnState),
+                locationState = locationState,
+                excludedAppsCount = excludedAppsCount,
             )
         }
+    }
+
+    private fun UserPreferredLocation.toLocationState(): LocationState {
+        return LocationState(
+            icon = countryCode?.run {
+                getEmojiForCountryCode(this)
+            },
+            isCustom = countryCode != null,
+            location = if (!cityName.isNullOrEmpty()) {
+                "${cityName!!}, ${getDisplayableCountry(countryCode!!)}"
+            } else {
+                countryCode?.let {
+                    getDisplayableCountry(it)
+                }
+            },
+        )
+    }
+
+    private fun ConnectionDetails.toLocationState(preferredCountry: String?): LocationState {
+        val city = location?.split(",")?.get(0)?.trim()
+        val countryCode = location?.split(",")?.get(1)?.trim()
+        return LocationState(
+            icon = countryCode?.run {
+                getEmojiForCountryCode(this)
+            },
+            isCustom = preferredCountry != null,
+            location = "$city, ${getDisplayableCountry(countryCode!!)}",
+        )
     }
 
     override fun onStart(owner: LifecycleOwner) {
@@ -117,6 +160,13 @@ class NetworkProtectionManagementViewModel @Inject constructor(
             getRunningState().firstOrNull()?.alwaysOnState?.let {
                 handleAlwaysOnInitialState(it)
             }
+        }
+    }
+
+    override fun onResume(owner: LifecycleOwner) {
+        super.onResume(owner)
+        viewModelScope.launch(dispatcherProvider.io()) {
+            excludedAppsCount = netPExclusionListRepository.getExcludedAppPackages().size
         }
     }
 
@@ -180,13 +230,18 @@ class NetworkProtectionManagementViewModel @Inject constructor(
                         // We can't do anything with  a -1 enabledTime so we try to refetch it.
                         enabledTime = networkProtectionRepository.enabledTimeInMillis
                     } else {
+                        val dataVolume = netpDataVolumeStore.dataVolume
                         connectionDetailsFlow.value = if (connectionDetailsFlow.value == null) {
                             ConnectionDetails(
                                 elapsedConnectedTime = getElapsedTimeString(enabledTime),
+                                transmittedData = dataVolume.transmittedBytes,
+                                receivedData = dataVolume.receivedBytes,
                             )
                         } else {
                             connectionDetailsFlow.value!!.copy(
                                 elapsedConnectedTime = getElapsedTimeString(enabledTime),
+                                transmittedData = dataVolume.transmittedBytes,
+                                receivedData = dataVolume.receivedBytes,
                             )
                         }
                     }
@@ -325,12 +380,22 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         val connectionState: ConnectionState = Disconnected,
         val connectionDetails: ConnectionDetails? = null,
         val alertState: AlertState = None,
+        val locationState: LocationState? = null,
+        val excludedAppsCount: Int = 0,
+    )
+
+    data class LocationState(
+        val location: String?,
+        val icon: String?,
+        val isCustom: Boolean,
     )
 
     data class ConnectionDetails(
         val location: String? = null,
         val ipAddress: String? = null,
         val elapsedConnectedTime: String? = null,
+        val transmittedData: Long = 0L,
+        val receivedData: Long = 0L,
     )
 
     enum class ConnectionState {

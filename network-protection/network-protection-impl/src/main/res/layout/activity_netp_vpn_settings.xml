@@ -49,14 +49,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-
-            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-                android:id="@+id/geoswitching"
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                android:id="@+id/vpn_notifications"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:primaryText="@string/netpVpnSettingGeoswitching"
-                app:secondaryText="@string/netpVpnSettingGeoswitchingDefault"
-                app:showSwitch="false" />
+                app:primaryText="@string/netpVpnNotificationSettings" />
 
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/exclude_local_networks"
