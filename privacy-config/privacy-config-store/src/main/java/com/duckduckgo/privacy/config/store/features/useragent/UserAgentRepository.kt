@@ -51,6 +51,7 @@ class RealUserAgentRepository(
     val database: PrivacyConfigDatabase,
     coroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider,
+    isMainProcess: Boolean,
 ) : UserAgentRepository {
 
     private val userAgentDao: UserAgentDao = database.userAgentDao()
@@ -69,7 +70,11 @@ class RealUserAgentRepository(
     override var ddgFixedUserAgentVersions = CopyOnWriteArrayList<String>()
 
     init {
-        coroutineScope.launch(dispatcherProvider.io()) { loadToMemory() }
+        coroutineScope.launch(dispatcherProvider.io()) {
+            if (isMainProcess) {
+                loadToMemory()
+            }
+        }
     }
 
     override fun updateAll(

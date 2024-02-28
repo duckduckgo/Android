@@ -17,10 +17,9 @@
 package com.duckduckgo.networkprotection.impl.management
 
 import android.content.Intent
+import androidx.lifecycle.LifecycleOwner
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.mobile.android.vpn.FakeVpnFeaturesRegistry
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.network.ExternalVpnDetector
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.AlwaysOnState
@@ -32,6 +31,7 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.REV
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.UNKNOWN
 import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
 import com.duckduckgo.mobile.android.vpn.ui.OpenVpnBreakageCategoryWithBrokenApp
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.None
@@ -50,9 +50,14 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Connected
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Connecting
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Disconnected
+import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.LocationState
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ViewState
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
+import com.duckduckgo.networkprotection.impl.volume.NetpDataVolumeStore
+import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
+import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
+import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository.UserPreferredLocation
 import com.wireguard.config.Config
 import java.io.BufferedReader
 import java.io.StringReader
@@ -60,8 +65,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -78,8 +81,6 @@ class NetworkProtectionManagementViewModelTest {
     @Mock
     private lateinit var vpnStateMonitor: VpnStateMonitor
 
-    private lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
-
     @Mock
     private lateinit var networkProtectionRepository: NetworkProtectionRepository
 
@@ -92,6 +93,21 @@ class NetworkProtectionManagementViewModelTest {
     @Mock
     private lateinit var networkProtectionPixels: NetworkProtectionPixels
 
+    @Mock
+    private lateinit var networkProtectionState: NetworkProtectionState
+
+    @Mock
+    private lateinit var netPGeoswitchingRepository: NetPGeoswitchingRepository
+
+    @Mock
+    private lateinit var netpDataVolumeStore: NetpDataVolumeStore
+
+    @Mock
+    private lateinit var netPExclusionListRepository: NetPExclusionListRepository
+
+    @Mock
+    private lateinit var lifecycleOwner: LifecycleOwner
+
     private val wgQuickConfig = """
         [Interface]
         Address = 10.237.97.63/32
@@ -103,7 +119,7 @@ class NetworkProtectionManagementViewModelTest {
         AllowedIPs = 0.0.0.0/0
         Endpoint = 10.10.10.10:443
         Name = euw.1
-        Location = Stockholm, Sweden
+        Location = Stockholm, SE
         PublicKey = u4geRTVQHaZYwsQzb/LsJqEDpxU8Fqzb5VjxGeIHslM=
     """.trimIndent()
     private val wgConfig: Config = Config.parse(BufferedReader(StringReader(wgQuickConfig)))
@@ -114,7 +130,6 @@ class NetworkProtectionManagementViewModelTest {
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
-        vpnFeaturesRegistry = FakeVpnFeaturesRegistry()
 
         runTest {
             whenever(vpnStateMonitor.isAlwaysOnEnabled()).thenReturn(false)
@@ -123,13 +138,16 @@ class NetworkProtectionManagementViewModelTest {
 
         testee = NetworkProtectionManagementViewModel(
             vpnStateMonitor,
-            vpnFeaturesRegistry,
             networkProtectionRepository,
             wgTunnelConfig,
             coroutineRule.testDispatcherProvider,
             externalVpnDetector,
             networkProtectionPixels,
             testbreakageCategories,
+            networkProtectionState,
+            netPGeoswitchingRepository,
+            netpDataVolumeStore,
+            netPExclusionListRepository,
         )
     }
 
@@ -146,20 +164,16 @@ class NetworkProtectionManagementViewModelTest {
 
     @Test
     fun whenOnStartVpnThenRegisterFeature() = runTest {
-        assertFalse(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN))
-
         testee.onStartVpn()
 
-        assertTrue(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN))
+        verify(networkProtectionState).start()
     }
 
     @Test
     fun whenOnNetpToggleClickedToDisabledThenUnregisterFeature() = runTest {
-        vpnFeaturesRegistry.registerFeature(NetPVpnFeature.NETP_VPN)
-
         testee.onNetpToggleClicked(false)
 
-        assertFalse(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN))
+        verify(networkProtectionState).clearVPNConfigurationAndStop()
     }
 
     @Test
@@ -226,6 +240,7 @@ class NetworkProtectionManagementViewModelTest {
                 ),
             ),
         )
+        whenever(netPGeoswitchingRepository.getUserPreferredLocation()).thenReturn(UserPreferredLocation())
 
         testee.onStartVpn()
 
@@ -234,6 +249,11 @@ class NetworkProtectionManagementViewModelTest {
                 ViewState(
                     connectionState = Connecting,
                     alertState = None,
+                    locationState = LocationState(
+                        location = null,
+                        icon = null,
+                        isCustom = false,
+                    ),
                 ),
                 this.expectMostRecentItem(),
             )
@@ -251,11 +271,22 @@ class NetworkProtectionManagementViewModelTest {
             ),
         )
         whenever(wgTunnelConfig.getWgConfig()).thenReturn(wgConfig)
+        whenever(netPGeoswitchingRepository.getUserPreferredLocation()).thenReturn(
+            UserPreferredLocation(
+                countryCode = "ES",
+                cityName = "Madrid",
+            ),
+        )
 
         testee.viewState().test {
             assertEquals(
                 ViewState(
                     connectionState = Disconnected,
+                    locationState = LocationState(
+                        location = "Madrid, Spain",
+                        icon = "🇪🇸",
+                        isCustom = true,
+                    ),
                 ),
                 this.awaitItem(),
             )
@@ -274,21 +305,59 @@ class NetworkProtectionManagementViewModelTest {
                 ),
             ),
         )
+        whenever(netPGeoswitchingRepository.getUserPreferredLocation()).thenReturn(UserPreferredLocation())
 
         testee.viewState().distinctUntilChanged().test {
             assertEquals(
                 ViewState(
                     connectionState = Connected,
                     connectionDetails = ConnectionDetails(
-                        location = "Stockholm, Sweden",
+                        location = "Stockholm, SE",
                         ipAddress = "10.10.10.10",
                         elapsedConnectedTime = null,
+                    ),
+                    locationState = LocationState(
+                        location = "Stockholm, Sweden",
+                        icon = "🇸🇪",
+                        isCustom = false,
                     ),
                 ),
                 this.expectMostRecentItem(),
             )
             testee.onStop(mock())
             cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnResumeThenReturnViewStateExcludeAppCount() = runTest {
+        whenever(vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN)).thenReturn(
+            flowOf(
+                VpnState(
+                    state = ENABLING,
+                ),
+            ),
+        )
+        whenever(netPGeoswitchingRepository.getUserPreferredLocation()).thenReturn(UserPreferredLocation())
+        whenever(netPExclusionListRepository.getExcludedAppPackages()).thenReturn(listOf("app1"))
+
+        testee.onResume(lifecycleOwner)
+
+        testee.viewState().test {
+            assertEquals(
+                ViewState(
+                    connectionState = Connecting,
+                    alertState = None,
+                    locationState = LocationState(
+                        location = null,
+                        icon = null,
+                        isCustom = false,
+                    ),
+                    excludedAppsCount = 1,
+                ),
+                this.expectMostRecentItem(),
+            )
+            cancelAndConsumeRemainingEvents()
         }
     }
 

@@ -24,6 +24,7 @@ import com.duckduckgo.adclick.store.AdClickDatabase.Companion.ALL_MIGRATIONS
 import com.duckduckgo.adclick.store.AdClickFeatureToggleRepository
 import com.duckduckgo.adclick.store.RealAdClickAttributionRepository
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
@@ -51,8 +52,9 @@ class AdClickModule {
         database: AdClickDatabase,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
+        @IsMainProcess isMainProcess: Boolean,
     ): AdClickAttributionRepository {
-        return RealAdClickAttributionRepository(database, appCoroutineScope, dispatcherProvider)
+        return RealAdClickAttributionRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
     }
 
     @SingleInstanceIn(AppScope::class)

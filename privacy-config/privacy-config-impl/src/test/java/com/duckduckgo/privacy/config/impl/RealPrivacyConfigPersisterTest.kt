@@ -105,6 +105,7 @@ class RealPrivacyConfigPersisterTest {
                 db,
                 TestScope(),
                 coroutineRule.testDispatcherProvider,
+                isMainProcess = true,
             )
     }
 

@@ -23,11 +23,11 @@ import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.impl.FakeSettingsRepository
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
 import com.duckduckgo.autoconsent.impl.handlers.InitMessageHandlerPlugin.InitResp
-import com.duckduckgo.autoconsent.store.AutoconsentRepository
-import com.duckduckgo.autoconsent.store.DisabledCmpsEntity
+import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeatureSettingsRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.*
 import org.junit.Rule
@@ -43,7 +43,7 @@ class InitMessageHandlerPluginTest {
     @get:Rule var coroutineRule = CoroutineTestRule()
 
     private val mockCallback: AutoconsentCallback = mock()
-    private val repository: AutoconsentRepository = mock()
+    private val repository: AutoconsentFeatureSettingsRepository = mock()
     private val webView: WebView = WebView(InstrumentationRegistry.getInstrumentation().targetContext)
     private val settingsRepository = FakeSettingsRepository()
 
@@ -105,7 +105,7 @@ class InitMessageHandlerPluginTest {
 
     @Test
     fun whenProcessMessageForFirstTimeThenDoNotCallEvaluate() {
-        whenever(repository.disabledCmps).thenReturn(listOf(DisabledCmpsEntity("MyCmp")))
+        whenever(repository.disabledCMPs).thenReturn(CopyOnWriteArrayList<String>().apply { add("MyCmp") })
         settingsRepository.userSetting = false
         settingsRepository.firstPopupHandled = false
 
@@ -120,6 +120,7 @@ class InitMessageHandlerPluginTest {
     fun whenProcessMessageResponseSentIsCorrect() {
         settingsRepository.userSetting = true
         settingsRepository.firstPopupHandled = true
+        whenever(repository.disabledCMPs).thenReturn(CopyOnWriteArrayList())
 
         initHandlerPlugin.process(initHandlerPlugin.supportedTypes.first(), message(), webView, mockCallback)
 

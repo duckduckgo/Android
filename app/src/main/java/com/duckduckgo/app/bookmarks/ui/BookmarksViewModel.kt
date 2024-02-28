@@ -336,7 +336,7 @@ class BookmarksViewModel @Inject constructor(
 
     fun addFavorite(bookmark: Bookmark) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            savedSitesRepository.insertFavorite(bookmark.id, bookmark.url, bookmark.title, bookmark.lastModified)
+            savedSitesRepository.insertFavorite(bookmark.id, bookmark.url, bookmark.title)
         }
     }
 

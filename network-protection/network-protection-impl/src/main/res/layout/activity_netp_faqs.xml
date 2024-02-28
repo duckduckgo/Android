@@ -64,12 +64,6 @@
             <com.duckduckgo.networkprotection.impl.about.AboutQAItemView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:answer="@string/netpFaqAnswerFive"
-                app:question="@string/netpFaqQuestionFive" />
-
-            <com.duckduckgo.networkprotection.impl.about.AboutQAItemView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 app:answer="@string/netpFaqAnswerSix"
                 app:question="@string/netpFaqQuestionSix" />
 

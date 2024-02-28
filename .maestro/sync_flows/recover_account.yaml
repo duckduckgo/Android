@@ -10,9 +10,13 @@ tags:
     clearState: true
     stopApp: true
 - runFlow: create_account.yaml
-- tapOn: "Show Text Code"
-- copyTextFrom:
-    id: "com.duckduckgo.mobile.android:id/recoveryCode"
+- tapOn: "Sync With Another Device"
+- runFlow:
+    when:
+      visible: "Don't allow"
+    commands:
+      - tapOn: "Don't allow"
+- tapOn: "Can't Scan? Share Text Code"
 - tapOn: "Navigate up"
 - tapOn: "Turn Off Sync & Backup…"
 - tapOn: "Turn Off"

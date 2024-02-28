@@ -29,6 +29,7 @@ import timber.log.Timber
 private const val ELAPSED_TIME = "elapsed_time"
 private const val WEBVIEW_VERSION = "webview_version"
 private const val TRACKER_OPTIMIZATION_ENABLED = "tracker_optimization_enabled"
+private const val CPM_ENABLED = "cpm_enabled"
 
 // This is used to ensure the app version we send is the one from the moment the page was loaded, and not then the pixel is fired later on
 private const val APP_VERSION = "app_version_when_page_loaded"
@@ -49,6 +50,7 @@ class PageLoadedOfflinePixelSender @Inject constructor(
                     ELAPSED_TIME to it.elapsedTime.toString(),
                     WEBVIEW_VERSION to it.webviewVersion,
                     TRACKER_OPTIMIZATION_ENABLED to it.trackerOptimizationEnabled.toString(),
+                    CPM_ENABLED to it.cpmEnabled.toString(),
                 )
 
                 val pixel = pixelSender.sendPixel(

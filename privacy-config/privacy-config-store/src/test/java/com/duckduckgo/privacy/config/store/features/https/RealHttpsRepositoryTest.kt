@@ -49,6 +49,7 @@ class RealHttpsRepositoryTest {
                 mockDatabase,
                 TestScope(),
                 coroutineRule.testDispatcherProvider,
+                true,
             )
     }
 
@@ -61,6 +62,7 @@ class RealHttpsRepositoryTest {
                 mockDatabase,
                 TestScope(),
                 coroutineRule.testDispatcherProvider,
+                true,
             )
 
         assertEquals(httpException.toFeatureException(), testee.exceptions.first())
@@ -74,6 +76,7 @@ class RealHttpsRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    true,
                 )
 
             testee.updateAll(listOf())
@@ -90,6 +93,7 @@ class RealHttpsRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    true,
                 )
             assertEquals(1, testee.exceptions.size)
             reset(mockHttpsDao)

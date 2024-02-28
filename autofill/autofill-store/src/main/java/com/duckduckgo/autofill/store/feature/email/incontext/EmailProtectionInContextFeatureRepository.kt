@@ -30,13 +30,18 @@ class RealEmailProtectionInContextFeatureRepository(
     val database: EmailProtectionInContextDatabase,
     coroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider,
+    isMainProcess: Boolean,
 ) : EmailProtectionInContextFeatureRepository {
 
     private val dao = database.emailInContextDao()
     override val exceptions = CopyOnWriteArrayList<String>()
 
     init {
-        coroutineScope.launch(dispatcherProvider.io()) { loadToMemory() }
+        coroutineScope.launch(dispatcherProvider.io()) {
+            if (isMainProcess) {
+                loadToMemory()
+            }
+        }
     }
 
     override fun updateAllExceptions(exceptions: List<EmailInContextExceptionEntity>) {

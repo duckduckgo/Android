@@ -37,7 +37,7 @@ interface PixelParamRemovalPlugin {
             fun removeAll() = setOf(ATB, APP_VERSION, OS_VERSION)
             fun removeAtb() = setOf(ATB)
             fun removeVersion() = setOf(APP_VERSION)
-            fun removeOSVersion() = setOf(APP_VERSION)
+            fun removeOSVersion() = setOf(OS_VERSION)
         }
     }
 }

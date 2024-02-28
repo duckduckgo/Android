@@ -56,6 +56,7 @@ class RealGpcRepositoryTest {
                 mockDatabase,
                 TestScope(),
                 coroutineRule.testDispatcherProvider,
+                true,
             )
     }
 
@@ -69,6 +70,7 @@ class RealGpcRepositoryTest {
                 mockDatabase,
                 TestScope(),
                 coroutineRule.testDispatcherProvider,
+                isMainProcess = true,
             )
 
         assertEquals(gpcException.toGpcException(), testee.exceptions.first())
@@ -83,6 +85,7 @@ class RealGpcRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    isMainProcess = true,
                 )
 
             testee.updateAll(listOf(), listOf(), configEntity)
@@ -102,6 +105,7 @@ class RealGpcRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    isMainProcess = true,
                 )
             assertEquals(1, testee.exceptions.size)
             reset(mockGpcExceptionsDao)
@@ -121,6 +125,7 @@ class RealGpcRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    isMainProcess = true,
                 )
             assertEquals(1, testee.headerEnabledSites.size)
             reset(mockGpcHeadersDao)
@@ -140,6 +145,7 @@ class RealGpcRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    isMainProcess = true,
                 )
             assertEquals(configEntity.config, testee.gpcContentScopeConfig)
             givenGpcDaoContainsConfig(configEntity2)

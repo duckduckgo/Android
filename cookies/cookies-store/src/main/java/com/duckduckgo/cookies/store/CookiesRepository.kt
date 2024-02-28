@@ -32,6 +32,7 @@ class RealCookieRepository constructor(
     val database: CookiesDatabase,
     coroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider,
+    isMainProcess: Boolean,
 ) : CookiesRepository {
 
     private val cookiesDao: CookiesDao = database.cookiesDao()
@@ -41,7 +42,9 @@ class RealCookieRepository constructor(
 
     init {
         coroutineScope.launch(dispatcherProvider.io()) {
-            loadToMemory()
+            if (isMainProcess) {
+                loadToMemory()
+            }
         }
     }
 

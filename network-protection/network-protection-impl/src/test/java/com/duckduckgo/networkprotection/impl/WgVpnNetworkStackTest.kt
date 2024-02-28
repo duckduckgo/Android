@@ -114,6 +114,7 @@ class WgVpnNetworkStackTest {
             { wgTunnel },
             { wgTunnelConfig },
             { networkProtectionRepository },
+            netPDefaultConfigProvider,
             currentTimeProvider,
             { netpPixels },
             privateDnsProvider,
@@ -274,6 +275,7 @@ class WgVpnNetworkStackTest {
             // why? no use intercepting encrypted DNS traffic, plus we can't configure any DNS that doesn't support DoT, otherwise Android
             // will enforce DoT and will stop passing any DNS traffic, resulting in no DNS resolution == connectivity is killed
             dns = this.`interface`.dnsServers,
+            customDns = netPDefaultConfigProvider.fallbackDns(),
             routes = this.`interface`.routes.associate { it.address.hostAddress!! to it.mask },
             appExclusionList = this.`interface`.excludedApplications,
         )

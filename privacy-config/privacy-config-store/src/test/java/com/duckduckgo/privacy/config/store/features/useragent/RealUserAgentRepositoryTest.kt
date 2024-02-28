@@ -59,6 +59,7 @@ class RealUserAgentRepositoryTest {
                 mockDatabase,
                 TestScope(),
                 coroutineRule.testDispatcherProvider,
+                isMainProcess = true,
             )
     }
 
@@ -71,6 +72,7 @@ class RealUserAgentRepositoryTest {
                 mockDatabase,
                 TestScope(),
                 coroutineRule.testDispatcherProvider,
+                isMainProcess = true,
             )
 
         assertEquals(testee.omitApplicationExceptions.first(), actual)
@@ -86,6 +88,7 @@ class RealUserAgentRepositoryTest {
                 mockDatabase,
                 TestScope(),
                 coroutineRule.testDispatcherProvider,
+                isMainProcess = true,
             )
 
         assertEquals(testee.closestUserAgentState, true)
@@ -104,6 +107,7 @@ class RealUserAgentRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    isMainProcess = true,
                 )
 
             testee.updateAll(listOf(), listOf(), anyOrNull(), listOf())
@@ -120,6 +124,7 @@ class RealUserAgentRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    isMainProcess = true,
                 )
             assertEquals(1, testee.defaultExceptions.size)
             assertEquals(1, testee.omitApplicationExceptions.size)
@@ -142,6 +147,7 @@ class RealUserAgentRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    isMainProcess = true,
                 )
             assertEquals(true, testee.closestUserAgentState)
             assertEquals(true, testee.ddgFixedUserAgentState)

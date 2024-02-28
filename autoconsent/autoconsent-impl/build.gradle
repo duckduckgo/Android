@@ -61,6 +61,9 @@ dependencies {
     implementation AndroidX.lifecycle.runtime.ktx
     implementation AndroidX.room.runtime
     implementation AndroidX.constraintLayout
+    implementation Square.moshi
+    implementation "com.squareup.moshi:moshi-kotlin:_"
+    implementation "com.squareup.moshi:moshi-adapters:_"
 
     // Testing dependencies
     testImplementation project(path: ':common-test')

@@ -103,9 +103,11 @@ interface InternalAutofillStore : AutofillStore {
     /**
      * Updates the given login credentials, replacing what was saved before for the credentials with the specified ID
      * @param credentials The ID of the given credentials must match a saved credential for it to be updated.
+     * @param refreshLastUpdatedTimestamp Whether to update the last-updated timestamp of the credential.
+     * Defaults to true. Set to false if you don't want the last-updated timestamp modified.
      * @return The saved credential if it saved successfully, otherwise null
      */
-    suspend fun updateCredentials(credentials: LoginCredentials): LoginCredentials?
+    suspend fun updateCredentials(credentials: LoginCredentials, refreshLastUpdatedTimestamp: Boolean = true): LoginCredentials?
 
     /**
      * Used to reinsert a credential that was previously deleted

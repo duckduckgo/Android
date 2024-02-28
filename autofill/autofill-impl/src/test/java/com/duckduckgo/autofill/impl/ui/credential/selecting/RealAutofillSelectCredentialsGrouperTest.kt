@@ -31,10 +31,14 @@ class RealAutofillSelectCredentialsGrouperTest {
 
     private val urlMatcher = AutofillDomainNameUrlMatcher(TestUrlUnicodeNormalizer())
     private val sorter = CredentialListSorterByTitleAndDomain(urlMatcher)
+    private val lastUsedSorter = LastUsedCredentialSorter()
+    private val lastModifiedSorter = LastUpdatedCredentialSorter()
 
     private val testee = RealAutofillSelectCredentialsGrouper(
         autofillUrlMatcher = urlMatcher,
         sorter = sorter,
+        lastUsedCredentialSorter = lastUsedSorter,
+        lastUpdatedCredentialSorter = lastModifiedSorter,
     )
 
     @Test
@@ -100,7 +104,7 @@ class RealAutofillSelectCredentialsGrouperTest {
     }
 
     @Test
-    fun whenSortingPerfectMatchesThenLastEditedSortedFirst() {
+    fun whenSortingPerfectMatchesWithNoLastUsedThenLastUpdatedSortedFirst() {
         val creds = listOf(
             creds(lastUpdated = 100, domain = "example.com"),
             creds(lastUpdated = 300, domain = "example.com"),
@@ -113,7 +117,20 @@ class RealAutofillSelectCredentialsGrouperTest {
     }
 
     @Test
-    fun whenSortingPartialMatchesThenLastEditedSortedFirst() {
+    fun whenSortingPerfectMatchesThenLastUsedSortedFirst() {
+        val creds = listOf(
+            creds(lastUsed = 100, domain = "example.com"),
+            creds(lastUsed = 300, domain = "example.com"),
+            creds(lastUsed = 200, domain = "example.com"),
+        )
+        val grouped = testee.group("example.com", unsortedCredentials = creds)
+        assertEquals(300L, grouped.perfectMatches[0].lastUsedMillis)
+        assertEquals(200L, grouped.perfectMatches[1].lastUsedMillis)
+        assertEquals(100L, grouped.perfectMatches[2].lastUsedMillis)
+    }
+
+    @Test
+    fun whenSortingPartialMatchesWithNoLastUsedThenLastUpdatedSortedFirst() {
         val creds = listOf(
             creds(lastUpdated = 100, domain = "foo.example.com"),
             creds(lastUpdated = 300, domain = "foo.example.com"),
@@ -124,6 +141,48 @@ class RealAutofillSelectCredentialsGrouperTest {
         assertEquals(300L, group?.get(0)?.lastUpdatedMillis)
         assertEquals(200L, group?.get(1)?.lastUpdatedMillis)
         assertEquals(100L, group?.get(2)?.lastUpdatedMillis)
+    }
+
+    @Test
+    fun whenSortingPartialMatchesThenLastUpdatedSortedFirst() {
+        val creds = listOf(
+            creds(lastUsed = 100, domain = "foo.example.com"),
+            creds(lastUsed = 300, domain = "foo.example.com"),
+            creds(lastUsed = 200, domain = "foo.example.com"),
+        )
+        val grouped = testee.group("example.com", unsortedCredentials = creds)
+        val group = grouped.partialMatches["foo.example.com"]
+        assertEquals(300L, group?.get(0)?.lastUsedMillis)
+        assertEquals(200L, group?.get(1)?.lastUsedMillis)
+        assertEquals(100L, group?.get(2)?.lastUsedMillis)
+    }
+
+    @Test
+    fun whenSortingOtherMatchesWithNoLastUsedThenLastUpdatedSortedFirst() {
+        val creds = listOf(
+            creds(lastUpdated = 100, domain = "other.site"),
+            creds(lastUpdated = 300, domain = "other.site"),
+            creds(lastUpdated = 200, domain = "other.site"),
+        )
+        val grouped = testee.group("example.com", unsortedCredentials = creds)
+        val group = grouped.shareableCredentials["other.site"]
+        assertEquals(300L, group?.get(0)?.lastUpdatedMillis)
+        assertEquals(200L, group?.get(1)?.lastUpdatedMillis)
+        assertEquals(100L, group?.get(2)?.lastUpdatedMillis)
+    }
+
+    @Test
+    fun whenSortingOtherMatchesThenLastUsedSortedFirst() {
+        val creds = listOf(
+            creds(lastUsed = 100, domain = "other.site"),
+            creds(lastUsed = 300, domain = "other.site"),
+            creds(lastUsed = 200, domain = "other.site"),
+        )
+        val grouped = testee.group("example.com", unsortedCredentials = creds)
+        val group = grouped.shareableCredentials["other.site"]
+        assertEquals(300L, group?.get(0)?.lastUsedMillis)
+        assertEquals(200L, group?.get(1)?.lastUsedMillis)
+        assertEquals(100L, group?.get(2)?.lastUsedMillis)
     }
 
     @Test
@@ -183,7 +242,8 @@ class RealAutofillSelectCredentialsGrouperTest {
         domain: String,
         id: Long? = null,
         lastUpdated: Long? = null,
+        lastUsed: Long? = null,
     ): LoginCredentials {
-        return LoginCredentials(id = id, domain = domain, username = "a", password = "b", lastUpdatedMillis = lastUpdated)
+        return LoginCredentials(id = id, domain = domain, username = "a", password = "b", lastUpdatedMillis = lastUpdated, lastUsedMillis = lastUsed)
     }
 }

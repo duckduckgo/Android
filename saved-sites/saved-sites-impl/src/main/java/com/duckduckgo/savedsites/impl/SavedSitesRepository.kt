@@ -405,7 +405,7 @@ class RealSavedSitesRepository(
 
         if (updateFavorite) {
             if (bookmark.isFavorite) {
-                insertFavorite(bookmark.id, bookmark.url, bookmark.title, bookmark.lastModified)
+                insertFavorite(bookmark.id, bookmark.url, bookmark.title)
             } else {
                 deleteFavorite(
                     Favorite(

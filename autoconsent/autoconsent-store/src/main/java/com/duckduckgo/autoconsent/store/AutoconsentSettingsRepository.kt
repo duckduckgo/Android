@@ -22,8 +22,9 @@ interface AutoconsentSettingsRepository : AutoconsentSettingsDataStore {
     companion object {
         fun create(
             context: Context,
+            onByDefault: Boolean,
         ): AutoconsentSettingsRepository {
-            val store = RealAutoconsentSettingsDataStore(context)
+            val store = RealAutoconsentSettingsDataStore(context, onByDefault)
             return RealAutoconsentSettingsRepository(store)
         }
     }

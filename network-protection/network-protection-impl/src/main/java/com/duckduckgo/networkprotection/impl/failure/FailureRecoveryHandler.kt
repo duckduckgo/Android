@@ -100,7 +100,9 @@ class FailureRecoveryHandler @Inject constructor(
         if (vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)) {
             networkProtectionPixels.reportFailureRecoveryStarted()
             wgTunnel.markTunnelUnhealthy()
-            val currentServer = wgTunnelConfig.getWgConfig()?.asServerDetails()?.serverName
+            val (currentServer, currentTunAddresses) = with(wgTunnelConfig.getWgConfig()) {
+                this?.asServerDetails()?.serverName to this?.`interface`?.addresses.orEmpty()
+            }
 
             // Create a new config + register a new keypair
             val config = wgTunnel.createWgConfig(KeyPair())
@@ -112,7 +114,7 @@ class FailureRecoveryHandler @Inject constructor(
                 }
 
             logcat { "Failure recovery: current server: $currentServer config server: ${config.asServerDetails().serverName}" }
-            if (config.asServerDetails().serverName != currentServer) {
+            if (config.asServerDetails().serverName != currentServer || !config.`interface`.addresses.containsAll(currentTunAddresses)) {
                 logcat { "Failure recovery: Restarting VPN to connect to new server" }
                 // Store the created config since it contains a new server
                 networkProtectionPixels.reportFailureRecoveryCompletedWithServerUnhealthy()

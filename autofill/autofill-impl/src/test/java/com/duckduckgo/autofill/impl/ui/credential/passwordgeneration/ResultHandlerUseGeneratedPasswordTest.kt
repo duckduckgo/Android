@@ -126,7 +126,7 @@ class ResultHandlerUseGeneratedPasswordTest {
         )
         testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
         verify(autofillStore, never()).saveCredentials(any(), any())
-        verify(autofillStore, never()).updateCredentials(any())
+        verify(autofillStore, never()).updateCredentials(any(), any())
     }
 
     @Test
@@ -143,7 +143,7 @@ class ResultHandlerUseGeneratedPasswordTest {
         )
         testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
         verify(autofillStore, never()).saveCredentials(any(), any())
-        verify(autofillStore).updateCredentials(any())
+        verify(autofillStore).updateCredentials(any(), any())
     }
 
     @Test
@@ -160,7 +160,7 @@ class ResultHandlerUseGeneratedPasswordTest {
         )
         testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
         verify(autofillStore, never()).saveCredentials(any(), any())
-        verify(autofillStore).updateCredentials(any())
+        verify(autofillStore).updateCredentials(any(), any())
     }
 
     @Test
