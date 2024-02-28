@@ -49,14 +49,9 @@ class ExclusionListAdapter(val listener: ExclusionListListener) :
         private const val HEADER_ITEMS = 2
     }
 
-    private var isListEnabled: Boolean = false
     private val exclusionListItems = mutableListOf<AppsProtectionType>()
 
-    fun update(
-        viewState: ViewState,
-        isListStateEnabled: Boolean = true,
-    ) {
-        isListEnabled = isListStateEnabled
+    fun update(viewState: ViewState) {
         val oldData = exclusionListItems
         val newList = viewState.excludedApps
         val diffResult = DiffCallback(oldData, newList).run { DiffUtil.calculateDiff(this) }
@@ -84,9 +79,11 @@ class ExclusionListAdapter(val listener: ExclusionListListener) :
             PANEL_TYPE -> {
                 InfoPanelViewHolder.create(parent)
             }
+
             FILTER_TYPE -> {
                 FilterViewHolder.create(parent)
             }
+
             else -> {
                 AppViewHolder.create(parent)
             }
@@ -100,7 +97,7 @@ class ExclusionListAdapter(val listener: ExclusionListListener) :
         when (holder) {
             is InfoPanelViewHolder -> {
                 val infoPanel = exclusionListItems[position] as InfoPanelType
-                holder.bind(infoPanel.bannerContent, isListEnabled, listener)
+                holder.bind(infoPanel.bannerContent, listener)
             }
 
             is FilterViewHolder -> {
@@ -110,7 +107,7 @@ class ExclusionListAdapter(val listener: ExclusionListListener) :
 
             is AppViewHolder -> {
                 val appInfoType = exclusionListItems[position] as AppInfoType
-                holder.bind(isListEnabled, appInfoType.appInfo, position, listener)
+                holder.bind(appInfoType.appInfo, position, listener)
             }
         }
     }
@@ -161,7 +158,6 @@ class ExclusionListAdapter(val listener: ExclusionListListener) :
 
         fun bind(
             bannerContent: BannerContent,
-            isListEnabled: Boolean,
             listener: ExclusionListListener,
         ) {
             when (bannerContent) {
@@ -194,13 +190,8 @@ class ExclusionListAdapter(val listener: ExclusionListListener) :
                 ) { listener.onLaunchFeedback() }
             }
 
-            if (isListEnabled) {
-                binding.excludedAppsEnabledVPNLabel.show()
-                binding.excludedAppsDisabledVPNLabel.gone()
-            } else {
-                binding.excludedAppsEnabledVPNLabel.gone()
-                binding.excludedAppsDisabledVPNLabel.show()
-            }
+            binding.excludedAppsEnabledVPNLabel.show()
+            binding.excludedAppsDisabledVPNLabel.gone()
         }
     }
 
@@ -237,7 +228,6 @@ class ExclusionListAdapter(val listener: ExclusionListListener) :
         private val context: Context = binding.root.context
 
         fun bind(
-            isListEnabled: Boolean,
             excludedAppInfo: TrackingProtectionAppInfo,
             position: Int,
             listener: ExclusionListListener,
@@ -245,7 +235,7 @@ class ExclusionListAdapter(val listener: ExclusionListListener) :
             val appIcon = itemView.context.packageManager.safeGetApplicationIcon(excludedAppInfo.packageName)
             binding.deviceShieldAppEntryIcon.setImageDrawable(appIcon)
             binding.deviceShieldAppEntryName.text = excludedAppInfo.name
-            binding.handleToggleState(excludedAppInfo.knownProblem, isListEnabled)
+            binding.handleToggleState(excludedAppInfo.knownProblem)
 
             if (excludedAppInfo.isProblematic()) {
                 if (excludedAppInfo.isExcluded) {
@@ -287,12 +277,8 @@ class ExclusionListAdapter(val listener: ExclusionListListener) :
                 }
             }
 
-            if (isListEnabled) {
-                binding.deviceShieldAppEntryShieldEnabled.quietlySetIsChecked(!excludedAppInfo.isExcluded) { _, enabled ->
-                    listener.onAppProtectionChanged(excludedAppInfo, enabled, position)
-                }
-            } else {
-                binding.deviceShieldAppEntryShieldEnabled.quietlySetIsChecked(!excludedAppInfo.isExcluded, null)
+            binding.deviceShieldAppEntryShieldEnabled.quietlySetIsChecked(!excludedAppInfo.isExcluded) { _, enabled ->
+                listener.onAppProtectionChanged(excludedAppInfo, enabled, position)
             }
         }
 
@@ -303,6 +289,7 @@ class ExclusionListAdapter(val listener: ExclusionListListener) :
             return when (excludingReason) {
                 TrackingProtectionAppInfo.LOADS_WEBSITES_EXCLUSION_REASON, TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON ->
                     context.getString(R.string.atp_ExcludedReasonIssuesMayOccur)
+
                 TrackingProtectionAppInfo.EXCLUDED_THROUGH_NETP -> context.getString(R.string.atp_ExcludedReasonExcludedThroughNetP)
                 else -> ""
             }
@@ -314,6 +301,7 @@ class ExclusionListAdapter(val listener: ExclusionListListener) :
                 TrackingProtectionAppInfo.LOADS_WEBSITES_EXCLUSION_REASON,
                 TrackingProtectionAppInfo.EXCLUDED_THROUGH_NETP,
                 -> R.drawable.ic_apptp_alert
+
                 else -> 0
             }
         }
