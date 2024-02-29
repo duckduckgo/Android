@@ -103,6 +103,8 @@ enum class DeviceShieldPixelNames(override val pixelName: String, val enqueue: B
 
     ATP_ESTABLISH_TUN_INTERFACE_ERROR_DAILY("m_atp_ev_establish_tun_error_d"),
     ATP_ESTABLISH_TUN_INTERFACE_ERROR("m_atp_ev_establish_tun_error_c"),
+    ATP_ESTABLISH_NULL_TUN_INTERFACE_ERROR_DAILY("m_atp_ev_establish_null_tun_error_d"),
+    ATP_ESTABLISH_NULL_TUN_INTERFACE_ERROR("m_atp_ev_establish_null_tun_error_c"),
 
     ATP_PROCESS_EXPENDABLE_LOW_DAILY("m_atp_ev_expen_memory_low_d"),
     ATP_PROCESS_EXPENDABLE_MODERATE_DAILY("m_atp_ev_expen_memory_moderate_d"),
