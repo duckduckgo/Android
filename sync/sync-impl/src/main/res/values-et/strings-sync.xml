@@ -139,4 +139,30 @@
     <string name="sync_notification_channel_name">Sünkrooni</string>
     <string name="sync_notify_me_title">Teavitused on välja lülitatud</string>
     <string name="sync_notify_me_description">Saad teavituse, kui sünkroonimisel ja varundamisel tekib mõni tõrge.</string>
+
+    <!-- setup errors -->
+    <string name="sync_turn_off_error">Sünkroonimist ja varundamist ei saa välja lülitada.</string>
+    <string name="sync_edit_device_error">Seadme nime ei saa uuendada.</string>
+    <string name="sync_remove_device_error">Seda seadet ei saa sünkroonimisest ja varundamisest eemaldada.</string>
+    <string name="sync_delete_data_error">Serveris olevaid andmeid ei saa kustutada.</string>
+    <string name="sync_login_authenticated_device_error">"Nende seadmete sidumiseks lülitage ühes seadmes välja Sync &amp; Backup ning puudutage siis teises seadmes suvandit „Sünkrooni teise seadmega“."</string>
+    <string name="sync_connect_generic_error">Serveriga ei saa ühendust luua.</string>
+    <string name="sync_connect_login_error">Teise seadmega ei saa sünkroonida.</string>
+    <string name="sync_create_account_generic_error">Serveriga ei saa ühendust luua.</string>
+    <string name="sync_invalid_code_error">Kahjuks on see kood kehtetu. Veenduge, et sisestatud või skaneeritud kood on õige.</string>
+    <string name="sync_recovery_pdf_error">Taaste-PDFi ei saa luua.</string>
+    <string name="sync_dialog_error_ok">OK</string>
+    <string name="sync_dialog_error_title">Sünkroonimine ja varundamine</string>
+    <string name="sync_encryption_not_supported_error_title">Seadet ei toetata</string>
+    <string name="sync_encryption_not_supported_error">Sync &amp; Backup on otsast lõpuni krüptitud ja peab olema võimeline krüptima ja salvestama andmeid teie seadmes. Kuna teie seade ei toeta krüptitud salvestusruumi, pole Sync &amp; Backup saadaval.</string>
+
+    <!-- Sync Device Authentication -->
+    <string name="sync_auth_text_for_access">Sync &amp; Backup funktsiooni juurde pääsemiseks avage seade.</string>
+    <string name="sync_biometric_prompt_title">Sync &amp; Backup on lukustatud</string>
+
+    <!-- Sync Settings -->
+    <string name="sync_delete_server_data_dialog_title">Kas kustutada serveri andmed?</string>
+    <string name="sync_delete_server_data_dialog_content">Kõigi seadmete ühendus katkestatakse ja sinu sünkroonitud andmed kustutatakse serverist.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Andmete kustutamine</string>
+    <string name="sync_delete_server_data_dialog_secondary_button">Loobu</string>
 </resources>
