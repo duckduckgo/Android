@@ -171,8 +171,6 @@ fladle {
 }
 
 dependencies {
-    implementation "androidx.browser:browser:1.7.0"
-
 	implementation project(":verified-installation-impl")
 	implementation project(":verified-installation-api")
 
