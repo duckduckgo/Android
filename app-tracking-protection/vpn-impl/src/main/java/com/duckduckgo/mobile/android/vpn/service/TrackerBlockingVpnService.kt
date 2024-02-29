@@ -319,12 +319,14 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         val nullTun = createNullRouteTempTunnel()?.let {
             if (!it.waitForTunnelUpOrTimeout()) {
                 logcat(WARN) { "VPN log: timeout waiting for null tunnel to go up" }
+                null
+            } else {
+                it
             }
-            it
         }
         if (nullTun == null) {
-            logcat(ERROR) { "VPN log: Failed to establish the TUN interface" }
-            deviceShieldPixels.vpnEstablishTunInterfaceError()
+            logcat(ERROR) { "VPN log: Failed to establish the null TUN interface" }
+            deviceShieldPixels.vpnEstablishNullTunInterfaceError()
             stopVpn(VpnStopReason.ERROR, false)
             return@withContext
         }
@@ -529,7 +531,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
 
         if (tunInterface == null) {
             logcat(ERROR) { "VPN log: Failed to establish VPN tunnel" }
-            stopVpn(VpnStopReason.ERROR, false)
         } else {
             logcat { "VPN log: Final TUN interface created ${tunInterface.fd}" }
         }
