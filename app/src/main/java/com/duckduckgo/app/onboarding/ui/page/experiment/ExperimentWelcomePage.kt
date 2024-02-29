@@ -20,10 +20,12 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.ViewCompat
@@ -106,6 +108,11 @@ class ExperimentWelcomePage : OnboardingPageFragment(R.layout.content_onboarding
         super.onViewCreated(view, savedInstanceState)
         requestNotificationsPermissions()
         setSkipAnimationListener()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        applyFullScreenFlags()
     }
 
     override fun onActivityResult(
@@ -257,6 +264,18 @@ class ExperimentWelcomePage : OnboardingPageFragment(R.layout.content_onboarding
             .addSizes(Size(8))
             .setPosition(displayWidth / 2f, displayWidth / 2f, -50f, -50f)
             .streamFor(60, 2000L)
+    }
+
+    private fun applyFullScreenFlags() {
+        activity?.window?.apply {
+            clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+            addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+            decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+            decorView.systemUiVisibility += View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+            statusBarColor = Color.TRANSPARENT
+            navigationBarColor = Color.BLACK
+        }
+        ViewCompat.requestApplyInsets(binding.longDescriptionContainer)
     }
 
     companion object {

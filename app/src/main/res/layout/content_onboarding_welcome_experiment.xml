@@ -23,7 +23,7 @@
     android:tag="onboardingDefaultBrowser"
     tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivity">
 
-    <ImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/sceneBg"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -79,10 +79,12 @@
         layout="@layout/experiment_pre_onboarding_dax_dialog_cta"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="93dp"
+        android:layout_marginTop="@dimen/keyline_4"
+        app:layout_constraintVertical_bias="0.4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintWidth_max="600dp" />
 
     <nl.dionsegijn.konfetti.KonfettiView
