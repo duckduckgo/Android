@@ -29,14 +29,16 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.registerNotExportedReceiver
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.downloads.api.*
-import com.duckduckgo.downloads.impl.pixels.DownloadsPixelName
+import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.downloads.impl.pixels.DownloadsPixelName.DOWNLOAD_REQUEST_CANCELLED_BY_USER
+import com.duckduckgo.downloads.impl.pixels.DownloadsPixelName.DOWNLOAD_REQUEST_RETRIED
 import com.duckduckgo.downloads.store.DownloadStatus.STARTED
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesMultibinding(
     scope = AppScope::class,
@@ -55,7 +57,7 @@ class FileDownloadNotificationActionReceiver @Inject constructor(
 
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
-        Timber.v("Registering file download notification action receiver")
+        logcat { "Registering file download notification action receiver" }
         context.registerNotExportedReceiver(this, IntentFilter(INTENT_DOWNLOADS_NOTIFICATION_ACTION))
 
         // When the app process is killed and restarted, this onCreate method is called and we take the opportunity
@@ -79,22 +81,22 @@ class FileDownloadNotificationActionReceiver @Inject constructor(
         if (shouldDismissNotification(intent)) fileDownloadNotificationManager.cancelDownloadFileNotification(downloadId)
 
         if (isCancelIntent(intent)) {
-            Timber.v("Received cancel download intent for download id $downloadId")
-            pixel.fire(DownloadsPixelName.DOWNLOAD_REQUEST_CANCELLED_BY_USER)
+            logcat { "Received cancel download intent for download id $downloadId" }
+            pixel.fire(DOWNLOAD_REQUEST_CANCELLED_BY_USER)
 
             coroutineScope.launch(dispatcherProvider.io()) {
                 downloadsRepository.delete(downloadId)
             }
         } else if (isRetryIntent(intent)) {
-            Timber.v("Received retry download intent for download id $downloadId")
-            pixel.fire(DownloadsPixelName.DOWNLOAD_REQUEST_RETRIED)
+            logcat { "Received retry download intent for download id $downloadId" }
+            pixel.fire(DOWNLOAD_REQUEST_RETRIED)
 
             val url = extractUrlFromRetryIntent(intent) ?: return
-            FileDownloader.PendingFileDownload(
+            PendingFileDownload(
                 url = url,
                 subfolder = Environment.DIRECTORY_DOWNLOADS,
             ).run {
-                Timber.v("Retrying download for $url")
+                logcat { "Retrying download for $url" }
                 coroutineScope.launch(dispatcherProvider.io()) {
                     downloadsRepository.delete(downloadId)
                     fileDownloader.enqueueDownload(this@run)

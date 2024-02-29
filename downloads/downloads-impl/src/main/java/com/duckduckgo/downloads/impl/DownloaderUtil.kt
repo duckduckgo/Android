@@ -24,7 +24,7 @@ import java.util.Locale
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 import kotlin.jvm.Throws
-import timber.log.Timber
+import logcat.logcat
 
 object DownloaderUtil {
 
@@ -132,7 +132,7 @@ object DownloaderUtil {
         val mimeTypeFromFileExtension = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension)
 
         if (mimeTypeFromFileExtension != null) {
-            Timber.d("File extension $fileExtension matched mime type $mimeTypeFromFileExtension.")
+            logcat { "File extension $fileExtension matched mime type $mimeTypeFromFileExtension." }
             return ".$fileExtension"
         }
 
