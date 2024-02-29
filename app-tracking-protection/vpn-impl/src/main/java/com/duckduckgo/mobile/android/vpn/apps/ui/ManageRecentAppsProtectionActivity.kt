@@ -56,7 +56,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 @InjectWith(ActivityScope::class)
 class ManageRecentAppsProtectionActivity :
@@ -84,12 +83,6 @@ class ManageRecentAppsProtectionActivity :
     lateinit var adapter: TrackingProtectionAppsAdapter
 
     private val shimmerLayout by lazy { findViewById<ShimmerFrameLayout>(R.id.manageRecentAppsSkeleton) }
-
-    private val isAppTPEnabled by lazy {
-        runBlocking {
-            vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)
-        }
-    }
 
     private lateinit var reportBreakage: ActivityResultLauncher<ReportBreakageScreen>
 
@@ -151,15 +144,7 @@ class ManageRecentAppsProtectionActivity :
             },
         )
 
-        val recyclerView = binding.manageRecentAppsRecycler
-
-        if (isAppTPEnabled) {
-            recyclerView.alpha = 1.0f
-        } else {
-            recyclerView.alpha = 0.45f
-        }
-
-        recyclerView.adapter = adapter
+        binding.manageRecentAppsRecycler.adapter = adapter
     }
 
     private fun observeViewModel() {
@@ -186,7 +171,7 @@ class ManageRecentAppsProtectionActivity :
             binding.manageRecentAppsEmptyView.show()
         } else {
             binding.manageRecentAppsEmptyView.gone()
-            adapter.update(viewState.excludedApps, isAppTPEnabled)
+            adapter.update(viewState.excludedApps)
             binding.manageRecentAppsRecycler.show()
         }
         binding.manageRecentAppsShowAll.show()
@@ -232,7 +217,9 @@ class ManageRecentAppsProtectionActivity :
     private fun restartVpn() {
         // we use the app coroutine scope to ensure this call outlives the Activity
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
+            if (vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)) {
+                vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
+            }
         }
     }
 
