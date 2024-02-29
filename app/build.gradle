@@ -403,6 +403,8 @@ dependencies {
     // HTML
     implementation 'org.jsoup:jsoup:_'
 
+    // Browser
+    implementation "androidx.browser:browser:_"
 
     // Flipper
     internalImplementation "com.facebook.flipper:flipper:_"
