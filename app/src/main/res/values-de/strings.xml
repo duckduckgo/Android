@@ -805,4 +805,12 @@
         <item quantity="other">Möchtest du diesen Ordner mit %1$d Elementen wirklich löschen?</item>
     </plurals>
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Bist du sicher, dass du das Lesezeichen &lt;b&gt;%1$s&lt;/b&gt; löschen möchtest?</string>
+
+    <!-- Sync Favicons -->
+    <string name="sync_fetch_icons_title">Lesezeichen-Symbole abrufen</string>
+    <string name="sync_fetch_icons_subtitle">Symbole für deine synchronisierten Lesezeichen automatisch herunterladen.</string>
+    <string name="faviconsPromptTitle">Fehlende Symbole herunterladen?</string>
+    <string name="faviconsPromptMessage">Möchtest du, dass dieses Gerät automatisch Symbole für synchronisierte Lesezeichen von den mit Lesezeichen versehenen Websites herunterlädt?</string>
+    <string name="faviconsPromptPrimaryCta">Halte die Lesezeichensymbole auf dem neuesten Stand</string>
+    <string name="faviconsPromptSecondaryCta">Jetzt nicht</string>
 </resources>
