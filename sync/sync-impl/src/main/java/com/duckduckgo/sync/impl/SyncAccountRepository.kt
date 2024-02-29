@@ -307,7 +307,9 @@ class AppSyncAccountRepository @Inject constructor(
                             )
                         } catch (throwable: Throwable) {
                             throwable.asErrorResult().alsoFireAccountErrorPixel()
-                            logout(device.deviceId)
+                            if (syncStore.deviceId != device.deviceId) {
+                                logout(device.deviceId)
+                            }
                             null
                         }
                     }.sortedWith { a, b ->

@@ -316,15 +316,16 @@ class AppSyncAccountRepositoryTest {
         givenAuthenticatedDevice()
         prepareForEncryption()
         val thisDevice = Device(deviceId = deviceId, deviceName = deviceName, jwIat = "", deviceType = deviceFactor)
+        val otherDevice = Device(deviceId = "otherDeviceId", deviceName = "otherDeviceName", jwIat = "", deviceType = "otherDeviceType")
         whenever(syncStore.token).thenReturn(token)
         whenever(syncStore.deviceId).thenReturn(deviceId)
         whenever(syncStore.primaryKey).thenReturn(primaryKey)
         whenever(nativeLib.decryptData(anyString(), anyString())).thenThrow(NegativeArraySizeException())
-        whenever(syncApi.getDevices(anyString())).thenReturn(Result.Success(listOf(thisDevice)))
-        whenever(syncApi.logout("token", "deviceId")).thenReturn(Result.Success(Logout("deviceId")))
+        whenever(syncApi.getDevices(anyString())).thenReturn(Result.Success(listOf(thisDevice, otherDevice)))
+        whenever(syncApi.logout("token", "otherDeviceId")).thenReturn(Result.Success(Logout("otherDeviceId")))
 
         val result = syncRepo.getConnectedDevices() as Success
-        verify(syncApi).logout("token", "deviceId")
+        verify(syncApi).logout("token", "otherDeviceId")
         assertTrue(result.data.isEmpty())
     }
 
