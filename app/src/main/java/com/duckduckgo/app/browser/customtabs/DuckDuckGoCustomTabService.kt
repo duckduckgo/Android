@@ -17,58 +17,95 @@
 package com.duckduckgo.app.browser.customtabs
 
 import android.net.Uri
+import android.os.Binder
 import android.os.Bundle
 import androidx.browser.customtabs.CustomTabsService
 import androidx.browser.customtabs.CustomTabsSessionToken
+import timber.log.Timber
 
-class DuckDuckGoCustomTabService: CustomTabsService() {
+class DuckDuckGoCustomTabService : CustomTabsService() {
     override fun warmup(flags: Long): Boolean {
-        println("TAG_ANA warmup called with $flags")
-        return false
+        Timber.d("TAG_CUSTOM_TAB_IMPL warmup called in DuckDuckGoCustomTabService with flags: $flags")
+        return true
     }
 
     override fun newSession(sessionToken: CustomTabsSessionToken): Boolean {
-        println("TAG_ANA newSession called with $sessionToken")
-        return false
+        Timber.d("TAG_CUSTOM_TAB_IMPL newSession called in DuckDuckGoCustomTabService with sessionToken: $sessionToken")
+        val uid = Binder.getCallingUid()
+        val packageName = packageManager.getPackagesForUid(uid)?.singleOrNull()
+        Timber.d("TAG_CUSTOM_TAB_IMPL newSession called in DuckDuckGoCustomTabService with uid: $uid -- packageName: $packageName")
+        return true
     }
 
     override fun mayLaunchUrl(
         sessionToken: CustomTabsSessionToken,
         url: Uri?,
         extras: Bundle?,
-        otherLikelyBundles: MutableList<Bundle>?
+        otherLikelyBundles: MutableList<Bundle>?,
     ): Boolean {
-        println("TAG_ANA mayLaunchUrl called with $sessionToken and $url and $extras and $otherLikelyBundles")
+        Timber.d(
+            "TAG_CUSTOM_TAB_IMPL mayLaunchUrl called in DuckDuckGoCustomTabService with sessionToken: $sessionToken -- url: $url -- " +
+                "extras: $extras -- otherLikelyBundles: $otherLikelyBundles",
+        )
         return true
     }
 
     override fun extraCommand(commandName: String, args: Bundle?): Bundle? {
-        println("TAG_ANA extraCommand called with $commandName and $args")
+        Timber.d("TAG_CUSTOM_TAB_IMPL extraCommand called in DuckDuckGoCustomTabService with commandName: $commandName -- args: $args")
         return null
     }
 
     override fun updateVisuals(sessionToken: CustomTabsSessionToken, bundle: Bundle?): Boolean {
-        println("TAG_ANA updateVisuals called with $sessionToken and $bundle")
+        Timber.d("TAG_CUSTOM_TAB_IMPL updateVisuals called with $sessionToken and $bundle")
         return false
     }
 
-    override fun requestPostMessageChannel(sessionToken: CustomTabsSessionToken, postMessageOrigin: Uri): Boolean {
-        println("TAG_ANA requestPostMessageChannel called with $sessionToken and $postMessageOrigin")
+    override fun requestPostMessageChannel(
+        sessionToken: CustomTabsSessionToken,
+        postMessageOrigin: Uri,
+    ): Boolean {
+        Timber.d(
+            "TAG_CUSTOM_TAB_IMPL requestPostMessageChannel called in DuckDuckGoCustomTabService with sessionToken: $sessionToken -- " +
+                "postMessageOrigin: $postMessageOrigin",
+        )
         return false
     }
 
-    override fun postMessage(sessionToken: CustomTabsSessionToken, message: String, extras: Bundle?): Int {
-        println("TAG_ANA postMessage called with $sessionToken and $message and $extras")
-        return CustomTabsService.RESULT_FAILURE_DISALLOWED
+    override fun postMessage(
+        sessionToken: CustomTabsSessionToken,
+        message: String,
+        extras: Bundle?,
+    ): Int {
+        Timber.d(
+            "TAG_CUSTOM_TAB_IMPL postMessage called in DuckDuckGoCustomTabService with sessionToken: $sessionToken -- " +
+                "message: $message -- extras: $extras",
+        )
+        return RESULT_FAILURE_DISALLOWED
     }
 
-    override fun validateRelationship(sessionToken: CustomTabsSessionToken, relation: Int, origin: Uri, extras: Bundle?): Boolean {
-        println("TAG_ANA validateRelationship called with $sessionToken and $relation and $origin and $extras")
-        return false
+    override fun validateRelationship(
+        sessionToken: CustomTabsSessionToken,
+        relation: Int,
+        origin: Uri,
+        extras: Bundle?,
+    ): Boolean {
+        Timber.d(
+            "TAG_CUSTOM_TAB_IMPL validateRelationship called in DuckDuckGoCustomTabService with sessionToken: $sessionToken -- " +
+                "relation: $relation -- origin: $origin -- extras: $extras",
+        )
+        return true
     }
 
-    override fun receiveFile(sessionToken: CustomTabsSessionToken, uri: Uri, purpose: Int, extras: Bundle?): Boolean {
-        println("TAG_ANA receiveFile called with $sessionToken and $uri and $purpose and $extras")
+    override fun receiveFile(
+        sessionToken: CustomTabsSessionToken,
+        uri: Uri,
+        purpose: Int,
+        extras: Bundle?,
+    ): Boolean {
+        Timber.d(
+            "TAG_CUSTOM_TAB_IMPL receiveFile called in DuckDuckGoCustomTabService with sessionToken: $sessionToken -- " +
+                "uri: $uri -- purpose: $purpose -- extras: $extras",
+        )
         return false
     }
 }

@@ -256,6 +256,7 @@ import com.duckduckgo.js.messaging.api.JsMessageHelper
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreen
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopup
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupFactory
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupViewState
@@ -275,18 +276,17 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
+import java.io.File
+import javax.inject.Inject
+import javax.inject.Named
+import javax.inject.Provider
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import org.json.JSONObject
 import timber.log.Timber
-import java.io.File
-import javax.inject.Inject
-import javax.inject.Named
-import javax.inject.Provider
-import kotlin.coroutines.CoroutineContext
-
 
 @InjectWith(FragmentScope::class)
 class BrowserTabFragment :
@@ -755,6 +755,9 @@ class BrowserTabFragment :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        Timber.d("TAG_CUSTOM_TAB_IMPL tabId: $tabId")
+
         removeDaxDialogFromActivity()
         renderer = BrowserTabFragmentRenderer()
         decorator = BrowserTabFragmentDecorator()
@@ -826,6 +829,11 @@ class BrowserTabFragment :
             }
 
             omnibar.customTabDaxIcon.show()
+            omnibar.customTabDaxIcon.setOnClickListener {
+                val params = PrivacyDashboardHybridScreen.PrivacyDashboardHybridWithTabIdParam(tabId)
+                val intent = globalActivityStarter.startIntent(requireContext(), params)
+                intent?.let { intentPd -> startActivity(intentPd) }
+            }
 
             omnibar.customTabUrl.text = viewModel.url
             omnibar.customTabUrl.show()
@@ -837,9 +845,7 @@ class BrowserTabFragment :
 
             requireActivity().window.navigationBarColor = tabToolbarColor
             requireActivity().window.statusBarColor = tabToolbarColor
-
         }
-
 
         decorator.decorateWithFeatures()
 
@@ -1092,6 +1098,10 @@ class BrowserTabFragment :
                 }
             },
         )
+    }
+
+    private fun isActiveCustomTab(): Boolean {
+        return tabId.startsWith("CustomTab-") && fragmentIsVisible()
     }
 
     private fun fragmentIsVisible(): Boolean {
@@ -1722,7 +1732,7 @@ class BrowserTabFragment :
         useFirstActivityFound: Boolean,
         isOpenedInNewTab: Boolean,
     ) {
-        if (!isActiveTab && !isOpenedInNewTab) {
+        if (!isActiveCustomTab() && !isActiveTab && !isOpenedInNewTab) {
             Timber.v("Will not launch a dialog for an inactive tab")
             return
         }
@@ -2328,7 +2338,7 @@ class BrowserTabFragment :
 
             val currentUrl = webView?.url
             val urlMatch = requiredUrl == null || requiredUrl == currentUrl
-            if (isActiveTab && urlMatch) {
+            if ((isActiveCustomTab() || isActiveTab) && urlMatch) {
                 Timber.i("Showing dialog (%s), hidden=%s, requiredUrl=%s, currentUrl=%s, tabId=%s", tag, isHidden, requiredUrl, currentUrl, tabId)
                 dialog.show(childFragmentManager, tag)
             } else {
@@ -3180,7 +3190,7 @@ class BrowserTabFragment :
             popupMenu = BrowserPopupMenu(
                 context = requireContext(),
                 layoutInflater = layoutInflater,
-                displayedInCustomTabScreen = tabDisplayedInCustomTabScreen
+                displayedInCustomTabScreen = tabDisplayedInCustomTabScreen,
             )
             val menuBinding = PopupWindowBrowserMenuBinding.bind(popupMenu.contentView)
             popupMenu.apply {
@@ -3259,7 +3269,6 @@ class BrowserTabFragment :
                     i.setData(Uri.parse(url))
                     startActivity(i)
                 }
-
             }
             omnibar.browserMenu.setOnClickListener {
                 viewModel.onBrowserMenuClicked()

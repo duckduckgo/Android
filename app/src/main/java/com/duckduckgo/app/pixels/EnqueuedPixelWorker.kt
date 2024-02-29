@@ -67,6 +67,8 @@ class EnqueuedPixelWorker @Inject constructor(
     }
 
     override fun onStart(owner: LifecycleOwner) {
+        Timber.d("TAG_CUSTOM_TAB_IMPL onStart called in EnqueuedPixelWorker")
+
         if (launchedByFireAction) {
             // skip the next on_start if branch
             Timber.i("Suppressing app launch pixel")

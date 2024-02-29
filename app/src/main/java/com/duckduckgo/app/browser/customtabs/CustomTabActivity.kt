@@ -28,6 +28,8 @@ import com.duckduckgo.app.global.intentText
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import java.util.UUID
+import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
 class CustomTabActivity : DuckDuckGoActivity() {
@@ -38,9 +40,9 @@ class CustomTabActivity : DuckDuckGoActivity() {
 
         setContentView(binding.root)
 
-        println("TAG_ANA CustomTabActivity onCreate")
+        Timber.d("TAG_CUSTOM_TAB_IMPL onCreate called in CustomTabActivity")
 
-        val tabId = "CustomTab"
+        val tabId = "CustomTab-${UUID.randomUUID()}"
         val fragment = BrowserTabFragment.newInstanceForCustomTab(
             tabId = tabId,
             query = intent.intentText,
@@ -51,6 +53,17 @@ class CustomTabActivity : DuckDuckGoActivity() {
         transaction.replace(R.id.fragmentTabContainer, fragment, tabId)
         transaction.commit()
     }
+
+    override fun onStart() {
+        super.onStart()
+        Timber.d("TAG_CUSTOM_TAB_IMPL onStart called in CustomTabActivity")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Timber.d("TAG_CUSTOM_TAB_IMPL onStop called in CustomTabActivity")
+    }
+
     companion object {
 
         fun intent(context: Context, oldIntent: Intent): Intent {
