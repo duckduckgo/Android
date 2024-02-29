@@ -17,7 +17,7 @@
 package com.duckduckgo.subscriptions.impl.repository
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.subscriptions.store.AuthDataStore
+import com.duckduckgo.subscriptions.impl.store.SubscriptionsDataStore
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -40,37 +40,41 @@ interface AuthRepository {
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class RealAuthRepository @Inject constructor(
-    private val authDataStore: AuthDataStore,
+    private val subscriptionsDataStore: SubscriptionsDataStore,
 ) : AuthRepository {
 
-    override fun isUserAuthenticated(): Boolean = !authDataStore.accessToken.isNullOrBlank() && !authDataStore.authToken.isNullOrBlank()
+    override fun isUserAuthenticated(): Boolean =
+        !subscriptionsDataStore.accessToken.isNullOrBlank() && !subscriptionsDataStore.authToken.isNullOrBlank()
 
     override suspend fun signOut() {
-        authDataStore.authToken = null
-        authDataStore.accessToken = null
-        authDataStore.platform = null
-        authDataStore.email = null
-        authDataStore.externalId = null
-        authDataStore.expiresOrRenewsAt = 0
+        subscriptionsDataStore.authToken = null
+        subscriptionsDataStore.accessToken = null
+        subscriptionsDataStore.platform = null
+        subscriptionsDataStore.email = null
+        subscriptionsDataStore.externalId = null
+        subscriptionsDataStore.expiresOrRenewsAt = 0
     }
 
     override suspend fun clearSubscriptionData() {
-        authDataStore.platform = null
-        authDataStore.expiresOrRenewsAt = 0
+        subscriptionsDataStore.platform = null
+        subscriptionsDataStore.expiresOrRenewsAt = 0
     }
 
     override suspend fun authenticate(authToken: String?, accessToken: String?, externalId: String?, email: String?) {
-        authDataStore.authToken = authToken
-        authDataStore.accessToken = accessToken
-        authDataStore.externalId = externalId
-        authDataStore.email = email
+        subscriptionsDataStore.authToken = authToken
+        subscriptionsDataStore.accessToken = accessToken
+        subscriptionsDataStore.externalId = externalId
+        subscriptionsDataStore.email = email
     }
 
-    override fun tokens(): SubscriptionsTokens = SubscriptionsTokens(authToken = authDataStore.authToken, accessToken = authDataStore.accessToken)
+    override fun tokens(): SubscriptionsTokens = SubscriptionsTokens(
+        authToken = subscriptionsDataStore.authToken,
+        accessToken = subscriptionsDataStore.accessToken,
+    )
 
     override suspend fun saveSubscriptionData(platform: String, expiresOrRenewsAt: Long) {
-        authDataStore.platform = platform
-        authDataStore.expiresOrRenewsAt = expiresOrRenewsAt
+        subscriptionsDataStore.platform = platform
+        subscriptionsDataStore.expiresOrRenewsAt = expiresOrRenewsAt
     }
 }
 

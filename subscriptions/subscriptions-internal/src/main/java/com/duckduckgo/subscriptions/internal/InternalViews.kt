@@ -27,7 +27,7 @@ import com.duckduckgo.internal.features.api.InternalFeaturePlugin
 import com.duckduckgo.subscriptions.impl.AccessToken
 import com.duckduckgo.subscriptions.impl.SubscriptionsData
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
-import com.duckduckgo.subscriptions.store.AuthDataStore
+import com.duckduckgo.subscriptions.impl.store.SubscriptionsDataStore
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -67,7 +67,7 @@ class InternalDeleteView @Inject constructor(
 @ContributesMultibinding(AppScope::class)
 class CopyDataView @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
-    private val authDataStore: AuthDataStore,
+    private val subscriptionsDataStore: SubscriptionsDataStore,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     val dispatcherProvider: DispatcherProvider,
     val context: Context,
@@ -84,7 +84,7 @@ class CopyDataView @Inject constructor(
         val clipboardManager = context.getSystemService(ClipboardManager::class.java)
 
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            val auth = authDataStore.authToken
+            val auth = subscriptionsDataStore.authToken
             val authToken = if (auth.isNullOrBlank()) {
                 "No auth token found"
             } else {
