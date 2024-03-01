@@ -22,9 +22,9 @@
         <item name="android:windowLightStatusBar" >?attr/preferDarkStatusBarIcons</item>
         <item name="android:windowLightNavigationBar">?attr/preferDarkNavigationBarIcons</item>
         <item name="android:statusBarColor">?attr/preferredStatusBarColor</item>
-        <item name="android:navigationBarColor" tools:ignore="NewApi">?attr/preferredNavigationBarColor</item>
+        <item name="android:navigationBarColor">?attr/preferredNavigationBarColor</item>
         <item name="preferDarkNavigationBarIcons">false</item>
-        <item name="preferredNavigationBarColor">@color/black</item>
+        <item name="preferredNavigationBarColor">?attr/daxColorBlack</item>
     </style>
 
 </resources>
