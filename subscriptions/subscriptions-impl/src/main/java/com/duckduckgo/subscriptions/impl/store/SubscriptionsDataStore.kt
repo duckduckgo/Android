@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.subscriptions.store
+package com.duckduckgo.subscriptions.impl.store
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
 
-interface AuthDataStore {
+interface SubscriptionsDataStore {
     var accessToken: String?
     var authToken: String?
     var email: String?
@@ -29,9 +29,9 @@ interface AuthDataStore {
     fun canUseEncryption(): Boolean
 }
 
-class AuthEncryptedDataStore(
+class SubscriptionsEncryptedDataStore(
     private val sharedPrefsProv: SharedPrefsProvider,
-) : AuthDataStore {
+) : SubscriptionsDataStore {
 
     private val encryptedPreferences: SharedPreferences? by lazy { encryptedPreferences() }
 
