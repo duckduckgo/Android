@@ -559,58 +559,58 @@ class UserAgentProviderTest {
         )
         val converted = Regex(
             "Mozilla/5.0 \\(Linux; Android .*?\\) AppleWebKit/[.0-9]+" +
-                " \\(KHTML, like Gecko\\) Version/[.0-9]+ Chrome/[.0-9]+ Mobile DuckDuckGo/5 Safari/[.0-9]+",
+                " \\(KHTML, like Gecko\\) Version/[.0-9]+ Chrome/(\\d+)\\.0\\.0\\.0 Mobile DuckDuckGo/5 Safari/[.0-9]+",
         )
         val desktop = Regex(
             "Mozilla/5.0 \\(X11; Linux .*?\\) AppleWebKit/[.0-9]+ " +
-                "\\(KHTML, like Gecko\\) Version/[.0-9]+ Chrome/[.0-9]+ DuckDuckGo/5 Safari/[.0-9]+",
+                "\\(KHTML, like Gecko\\) Version/[.0-9]+ Chrome/(\\d+)\\.0\\.0\\.0 DuckDuckGo/5 Safari/[.0-9]+",
         )
         val noApplication = Regex(
             "Mozilla/5.0 \\(Linux; Android .*?\\) AppleWebKit/[.0-9]+ " +
-                "\\(KHTML, like Gecko\\) Version/[.0-9]+ Chrome/[.0-9]+ Mobile Safari/[.0-9]+",
+                "\\(KHTML, like Gecko\\) Version/[.0-9]+ Chrome/(\\d+)\\.0\\.0\\.0 Mobile Safari/[.0-9]+",
         )
         val noVersion = Regex(
             "Mozilla/5.0 \\(Linux; Android .*?\\) AppleWebKit/[.0-9]+ " +
-                "\\(KHTML, like Gecko\\) Chrome/[.0-9]+ Mobile DuckDuckGo/5 Safari/[.0-9]+",
+                "\\(KHTML, like Gecko\\) Chrome/(\\d+)\\.0\\.0\\.0 Mobile DuckDuckGo/5 Safari/[.0-9]+",
         )
         val missingWebKit = Regex(
             "Mozilla/5.0 \\(Linux; Android .*?\\) DuckDuckGo/5 Safari/[.0-9]+",
         )
         val missingSafari = Regex(
             "Mozilla/5.0 \\(Linux; Android .*?\\) AppleWebKit/[.0-9]+ " +
-                "\\(KHTML, like Gecko\\) Version/[.0-9]+ Chrome/[.0-9]+ Mobile DuckDuckGo/5",
+                "\\(KHTML, like Gecko\\) Version/[.0-9]+ Chrome/(\\d+)\\.0\\.0\\.0 Mobile DuckDuckGo/5",
         )
         val ddgFixed = Regex(
             "Mozilla/5.0 \\(Linux; Android 10; K\\) AppleWebKit/[.0-9]+ " +
-                "\\(KHTML, like Gecko\\) Chrome/[.0-9]+ Mobile DuckDuckGo/5 Safari/[.0-9]+",
+                "\\(KHTML, like Gecko\\) Chrome/(\\d+)\\.0\\.0\\.0 Mobile DuckDuckGo/5 Safari/[.0-9]+",
         )
         val ddgFixedNoApplication = Regex(
             "Mozilla/5.0 \\(Linux; Android 10; K\\) AppleWebKit/[.0-9]+ " +
-                "\\(KHTML, like Gecko\\) Chrome/[.0-9]+ Mobile Safari/[.0-9]+",
+                "\\(KHTML, like Gecko\\) Chrome/(\\d+)\\.0\\.0\\.0 Mobile Safari/[.0-9]+",
         )
         val ddgFixedDesktop = Regex(
             "Mozilla/5.0 \\(X11; Linux .*?\\) AppleWebKit/[.0-9]+ " +
-                "\\(KHTML, like Gecko\\) Chrome/[.0-9]+ DuckDuckGo/5 Safari/[.0-9]+",
+                "\\(KHTML, like Gecko\\) Chrome/(\\d+)\\.0\\.0\\.0 DuckDuckGo/5 Safari/[.0-9]+",
         )
         val ddgFixedDesktopArch = Regex(
             "Mozilla/5.0 \\(X11; Linux x86_64\\) AppleWebKit/[.0-9]+ " +
-                "\\(KHTML, like Gecko\\) Chrome/[.0-9]+ DuckDuckGo/5 Safari/[.0-9]+",
+                "\\(KHTML, like Gecko\\) Chrome/(\\d+)\\.0\\.0\\.0 DuckDuckGo/5 Safari/[.0-9]+",
         )
         val ddgFixedDesktopNoApplication = Regex(
             "Mozilla/5.0 \\(X11; Linux .*?\\) AppleWebKit/[.0-9]+ " +
-                "\\(KHTML, like Gecko\\) Chrome/[.0-9]+ Safari/[.0-9]+",
+                "\\(KHTML, like Gecko\\) Chrome/(\\d+)\\.0\\.0\\.0 Safari/[.0-9]+",
         )
         val closest = Regex(
             "Mozilla/5.0 \\(Linux; Android 10; K\\) AppleWebKit/[.0-9]+ " +
-                "\\(KHTML, like Gecko\\) Chrome/[.0-9]+ Mobile Safari/[.0-9]+",
+                "\\(KHTML, like Gecko\\) Chrome/(\\d+)\\.0\\.0\\.0 Mobile Safari/[.0-9]+",
         )
         val closestDesktop = Regex(
             "Mozilla/5.0 \\(X11; Linux .*?\\) AppleWebKit/[.0-9]+ " +
-                "\\(KHTML, like Gecko\\) Chrome/[.0-9]+ Safari/[.0-9]+",
+                "\\(KHTML, like Gecko\\) Chrome/(\\d+)\\.0\\.0\\.0 Safari/[.0-9]+",
         )
         val closestDesktopArch = Regex(
             "Mozilla/5.0 \\(X11; Linux x86_64\\) AppleWebKit/[.0-9]+ " +
-                "\\(KHTML, like Gecko\\) Chrome/[.0-9]+ Safari/[.0-9]+",
+                "\\(KHTML, like Gecko\\) Chrome/(\\d+)\\.0\\.0\\.0 Safari/[.0-9]+",
         )
     }
 }
