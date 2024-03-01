@@ -26,7 +26,7 @@
     <style name="Platform.Theme.DuckDuckGo" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:windowLightStatusBar">?attr/preferDarkStatusBarIcons</item>
         <item name="preferDarkNavigationBarIcons">false</item>
-        <item name="preferredNavigationBarColor">@color/black</item>
+        <item name="preferredNavigationBarColor">?attr/daxColorBlack</item>
     </style>
 
     <!--  Our base theme, Base.Theme.DuckDuckGo,
