@@ -805,4 +805,12 @@
         <item quantity="other">Сигурни ли сте, че искате да изтриете тази папка и %1$d елемента?</item>
     </plurals>
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Сигурни ли сте, че искате да изтриете отметката за &lt;b&gt;%1$s&lt;/b&gt;?</string>
+
+    <!-- Sync Favicons -->
+    <string name="sync_fetch_icons_title">Извличане на икони на отметки</string>
+    <string name="sync_fetch_icons_subtitle">Автоматично изтегляне на икони за синхронизираните отметки.</string>
+    <string name="faviconsPromptTitle">Изтегляне липсващи икони?</string>
+    <string name="faviconsPromptMessage">Искате ли това устройство автоматично да изтегля икони за синхронизираните отметки от отбелязаните уебсайтове?</string>
+    <string name="faviconsPromptPrimaryCta">Актуализиране на иконите на отметките</string>
+    <string name="faviconsPromptSecondaryCta">Не сега</string>
 </resources>
