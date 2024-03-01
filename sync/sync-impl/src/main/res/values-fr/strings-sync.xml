@@ -139,4 +139,30 @@
     <string name="sync_notification_channel_name">Synchronisation</string>
     <string name="sync_notify_me_title">Les notifications sont désactivées</string>
     <string name="sync_notify_me_description">Recevez une notification si Synchronisation et sauvegarde rencontre une erreur.</string>
+
+    <!-- setup errors -->
+    <string name="sync_turn_off_error">Impossible de désactiver Synchronisation et sauvegarde.</string>
+    <string name="sync_edit_device_error">Impossible de mettre à jour le nom de l\'appareil.</string>
+    <string name="sync_remove_device_error">Impossible de supprimer cet appareil de Synchronisation et sauvegarde.</string>
+    <string name="sync_delete_data_error">Impossible de supprimer les données du serveur.</string>
+    <string name="sync_login_authenticated_device_error">"Pour jumeler ces appareils, désactivez Sync &amp; Backup sur un appareil, puis appuyez sur « Synchroniser avec un autre appareil » sur l'autre appareil."</string>
+    <string name="sync_connect_generic_error">Impossible de se connecter au serveur.</string>
+    <string name="sync_connect_login_error">Impossible de synchroniser avec un autre appareil.</string>
+    <string name="sync_create_account_generic_error">Impossible de se connecter au serveur.</string>
+    <string name="sync_invalid_code_error">Désolé, ce code n\'est pas valide. Veuillez vous assurer que le bon code a été saisi ou scanné.</string>
+    <string name="sync_recovery_pdf_error">Impossible de créer le PDF de récupération.</string>
+    <string name="sync_dialog_error_ok">Ok</string>
+    <string name="sync_dialog_error_title">Synchronisation et sauvegarde</string>
+    <string name="sync_encryption_not_supported_error_title">Appareil non pris en charge</string>
+    <string name="sync_encryption_not_supported_error">Sync &amp; Backup est chiffré de bout en bout et doit pouvoir chiffrer et stocker les données sur votre appareil. Étant donné que votre appareil ne prend pas en charge le stockage chiffré, Sync &amp; Backup n\'est pas disponible.</string>
+
+    <!-- Sync Device Authentication -->
+    <string name="sync_auth_text_for_access">Déverrouillez l\'appareil pour accéder à Sync &amp; Backup.</string>
+    <string name="sync_biometric_prompt_title">Sync &amp; Backup verrouillé</string>
+
+    <!-- Sync Settings -->
+    <string name="sync_delete_server_data_dialog_title">Supprimer les données du serveur ?</string>
+    <string name="sync_delete_server_data_dialog_content">Tous les appareils seront déconnectés et vos données synchronisées seront supprimées du serveur.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Supprimer les données</string>
+    <string name="sync_delete_server_data_dialog_secondary_button">Annuler</string>
 </resources>
