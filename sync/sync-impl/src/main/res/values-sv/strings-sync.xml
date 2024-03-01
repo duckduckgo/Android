@@ -139,4 +139,30 @@
     <string name="sync_notification_channel_name">Synkronisering</string>
     <string name="sync_notify_me_title">Meddelanden är inaktiverade</string>
     <string name="sync_notify_me_description">Få ett meddelande om ett fel uppstår under synkronisering och säkerhetskopiering.</string>
+
+    <!-- setup errors -->
+    <string name="sync_turn_off_error">Det gick inte att stänga av synkronisering och säkerhetskopiering.</string>
+    <string name="sync_edit_device_error">Det gick inte att uppdatera enhetens namn.</string>
+    <string name="sync_remove_device_error">Det gick inte att ta bort denna enhet från synkronisering och säkerhetskopiering.</string>
+    <string name="sync_delete_data_error">Det gick inte att radera data på servern.</string>
+    <string name="sync_login_authenticated_device_error">"För att parkoppla dessa enheter stänger du av Sync &amp; Backup på en enhet och trycker därefter på ”Synkronisera med en annan enhet” på den andra enheten."</string>
+    <string name="sync_connect_generic_error">Det gick inte att ansluta till servern.</string>
+    <string name="sync_connect_login_error">Det gick inte att synkronisera med en annan enhet.</string>
+    <string name="sync_create_account_generic_error">Det gick inte att ansluta till servern.</string>
+    <string name="sync_invalid_code_error">Denna kod är tyvärr ogiltig. Kontrollera att rätt kod har angetts eller skannats.</string>
+    <string name="sync_recovery_pdf_error">Det gick inte att skapa återställnings-PDF.</string>
+    <string name="sync_dialog_error_ok">OK</string>
+    <string name="sync_dialog_error_title">Synkronisering och säkerhetskopiering</string>
+    <string name="sync_encryption_not_supported_error_title">Enheten stöds inte</string>
+    <string name="sync_encryption_not_supported_error">Sync &amp; Backup krypteras från början till slut och måste kunna kryptera och lagra data på din enhet. Eftersom din enhet inte stöder krypterad lagring är Sync &amp; Backup inte tillgängligt.</string>
+
+    <!-- Sync Device Authentication -->
+    <string name="sync_auth_text_for_access">Lås upp enheten för att komma åt Sync &amp; Backup.</string>
+    <string name="sync_biometric_prompt_title">Sync &amp; Backup har låsts</string>
+
+    <!-- Sync Settings -->
+    <string name="sync_delete_server_data_dialog_title">Radera serverdata?</string>
+    <string name="sync_delete_server_data_dialog_content">Alla enheter kopplas bort och dina synkroniserade data raderas från servern.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Radera data</string>
+    <string name="sync_delete_server_data_dialog_secondary_button">Avbryt</string>
 </resources>
