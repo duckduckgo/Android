@@ -139,4 +139,30 @@
     <string name="sync_notification_channel_name">Sinhronizēt</string>
     <string name="sync_notify_me_title">Paziņojumi ir atspējoti</string>
     <string name="sync_notify_me_description">Saņem paziņojumu, ja sinhronizācijas un dublēšanas laikā rodas kļūda.</string>
+
+    <!-- setup errors -->
+    <string name="sync_turn_off_error">Nevar izslēgt sinhronizāciju un dublēšanu.</string>
+    <string name="sync_edit_device_error">Nevar atjaunināt ierīces nosaukumu.</string>
+    <string name="sync_remove_device_error">Nevar noņemt šo ierīci no sinhronizācijas un dublēšanas.</string>
+    <string name="sync_delete_data_error">Nespēj izdzēst datus serverī.</string>
+    <string name="sync_login_authenticated_device_error">"Lai šīs ierīces savienotu pārī, vienā ierīcē izslēdz sinhronizēšanu un dublēšanu un pēc tam otrā ierīcē nospied \"Sinhronizēt ar citu ierīci\"."</string>
+    <string name="sync_connect_generic_error">Nevar izveidot savienojumu ar serveri.</string>
+    <string name="sync_connect_login_error">Nevar sinhronizēt ar citu ierīci.</string>
+    <string name="sync_create_account_generic_error">Nevar izveidot savienojumu ar serveri.</string>
+    <string name="sync_invalid_code_error">Atvaino, šis kods nav derīgs. Lūdzu, pārliecinies, ka ir ievadīts vai skenēts pareizais kods.</string>
+    <string name="sync_recovery_pdf_error">Nevar izveidot atkopšanas PDF failu.</string>
+    <string name="sync_dialog_error_ok">Labi</string>
+    <string name="sync_dialog_error_title">Sinhronizācija un dublēšana</string>
+    <string name="sync_encryption_not_supported_error_title">Ierīce netiek atbalstīta</string>
+    <string name="sync_encryption_not_supported_error">Sinhronizēšana un dublēšana ir pilnīgi šifrēta, un tai ir jāspēj šifrēt un saglabāt datus tavā ierīcē. Tā kā tava ierīce neatbalsta šifrētu glabāšanu, sinhronizēšana un dublēšana nav pieejama.</string>
+
+    <!-- Sync Device Authentication -->
+    <string name="sync_auth_text_for_access">Atbloķē ierīci, lai piekļūtu sinhronizēšanai un dublēšanai.</string>
+    <string name="sync_biometric_prompt_title">Sinhronizēšana un dublēšana ir bloķēta</string>
+
+    <!-- Sync Settings -->
+    <string name="sync_delete_server_data_dialog_title">Dzēst servera datus?</string>
+    <string name="sync_delete_server_data_dialog_content">Visas ierīces tiks atvienotas un tavi sinhronizētie dati tiks dzēsti no servera.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Dzēst datus</string>
+    <string name="sync_delete_server_data_dialog_secondary_button">Atcelt</string>
 </resources>
