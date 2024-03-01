@@ -838,10 +838,10 @@ class BrowserTabFragment :
             omnibar.customTabUrl.text = viewModel.url
             omnibar.customTabUrl.show()
 
-            // TODO: The toolbar will have as background the color from the intent. Check if that is a dark or a light color.
-            // If that color is dark, we need to tint the "close" and the "overflow menu" icons with white.
-            // If that color is light, we need to tint the "close" and the "overflow menu" icons with black.
-            omnibar.browserMenuImageView.setColorFilter(Color.argb(255, 255, 255, 255))
+            val foregroundColor = calculateForegroundColor(tabToolbarColor)
+            omnibar.customTabCloseIcon.setColorFilter(foregroundColor)
+            omnibar.customTabUrl.setTextColor(foregroundColor)
+            omnibar.browserMenuImageView.setColorFilter(foregroundColor)
 
             requireActivity().window.navigationBarColor = tabToolbarColor
             requireActivity().window.statusBarColor = tabToolbarColor
@@ -874,6 +874,18 @@ class BrowserTabFragment :
         childFragmentManager.findFragmentByTag(ADD_SAVED_SITE_FRAGMENT_TAG)?.let { dialog ->
             (dialog as EditSavedSiteDialogFragment).listener = viewModel
             dialog.deleteBookmarkListener = viewModel
+        }
+    }
+
+    private fun calculateForegroundColor(color: Int): Int {
+        if (color == Color.WHITE || Color.alpha(color) < 128) {
+            return Color.BLACK
+        }
+        val greyValue = (0.299 * Color.red(color) + 0.587 * Color.green(color) + 0.114 * Color.blue(color)).toInt()
+        return if (greyValue < 186) {
+            Color.WHITE
+        } else {
+            Color.BLACK
         }
     }
 
