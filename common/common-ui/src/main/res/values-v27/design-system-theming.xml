@@ -18,13 +18,13 @@
 
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <style name="Platform.V27.Theme.DuckDuckGo" parent="Platform.V23.Theme.DuckDuckGo">
+    <style name="Platform.Theme.DuckDuckGo" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:windowLightStatusBar" >?attr/preferDarkStatusBarIcons</item>
         <item name="android:windowLightNavigationBar">?attr/preferDarkNavigationBarIcons</item>
         <item name="android:statusBarColor">?attr/preferredStatusBarColor</item>
         <item name="android:navigationBarColor" tools:ignore="NewApi">?attr/preferredNavigationBarColor</item>
+        <item name="preferDarkNavigationBarIcons">false</item>
+        <item name="preferredNavigationBarColor">@color/black</item>
     </style>
-
-    <style name="Platform.Theme.DuckDuckGo" parent="Platform.V27.Theme.DuckDuckGo" />
 
 </resources>
