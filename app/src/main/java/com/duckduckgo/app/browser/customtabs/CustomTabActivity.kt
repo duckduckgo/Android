@@ -65,13 +65,11 @@ class CustomTabActivity : DuckDuckGoActivity() {
     }
 
     companion object {
-
-        fun intent(context: Context, oldIntent: Intent): Intent {
-            // TODO Maybe sanitize the old intent?
-            return Intent(context, CustomTabActivity::class.java).also {
-                it.data = oldIntent.data
-                it.putExtras(oldIntent)
-                it.putExtra(Intent.EXTRA_TEXT, oldIntent.intentText)
+        fun intent(context: Context, flags: Int, text: String?, toolbarColor: Int): Intent {
+            return Intent(context, CustomTabActivity::class.java).apply {
+                addFlags(flags)
+                putExtra(CustomTabsIntent.EXTRA_TOOLBAR_COLOR, toolbarColor)
+                putExtra(Intent.EXTRA_TEXT, text)
             }
         }
     }

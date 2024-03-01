@@ -38,6 +38,11 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
         if (intent?.hasExtra(CustomTabsIntent.EXTRA_SESSION) == true) {
             Timber.d("TAG_CUSTOM_TAB_IMPL new intent has session, show custom tab")
             Timber.d("TAG_CUSTOM_TAB_IMPL intent: $intent -- extras: ${intent.extras}")
+            val pairs = intent.getBundleExtra(Browser.EXTRA_HEADERS)
+            pairs?.keySet()?.forEach { key ->
+                val header = pairs.getString(key)
+                Timber.d("TAG_CUSTOM_TAB_IMPL header: $header -- key: $key")
+            }
             showCustomTab()
         } else {
             Timber.d("TAG_CUSTOM_TAB_IMPL show browser activity")
@@ -46,29 +51,25 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
     }
 
     private fun showCustomTab() {
-        val newIntent = intent.apply {
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK and Intent.FLAG_ACTIVITY_CLEAR_TASK and Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
-        }
+        // As customizations we only support the toolbar color at the moment.
+        startActivity(
+            CustomTabActivity.intent(
+                context = this,
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK and Intent.FLAG_ACTIVITY_CLEAR_TASK and Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS,
+                text = intent.intentText,
+                toolbarColor = intent.getIntExtra(CustomTabsIntent.EXTRA_TOOLBAR_COLOR, 0),
+            ),
+        )
 
-        Timber.d("TAG_CUSTOM_TAB_IMPL updated intent: $newIntent")
-
-        val pairs = intent.getBundleExtra(Browser.EXTRA_HEADERS)
-        pairs?.keySet()?.forEach { key ->
-            val header = pairs.getString(key)
-            Timber.d("TAG_CUSTOM_TAB_IMPL header: $header -- key: $key")
-        }
-
-        startActivity(CustomTabActivity.intent(this, newIntent))
         finish()
     }
 
     private fun showBrowserActivity() {
         startActivity(
-            Intent(this, BrowserActivity::class.java).also {
-                it.data = intent.data
-                it.putExtras(intent)
-                it.putExtra(Intent.EXTRA_TEXT, intent.intentText)
-            },
+            BrowserActivity.intent(
+                context = this,
+                queryExtra = intent.intentText,
+            ),
         )
 
         overridePendingTransition(0, 0)
