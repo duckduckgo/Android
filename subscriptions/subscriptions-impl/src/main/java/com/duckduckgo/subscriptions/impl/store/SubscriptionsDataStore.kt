@@ -18,27 +18,75 @@ package com.duckduckgo.subscriptions.impl.store
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
+import javax.inject.Inject
 
 interface SubscriptionsDataStore {
+
+    // Auth
     var accessToken: String?
     var authToken: String?
     var email: String?
     var externalId: String?
+
+    // Subscription
     var expiresOrRenewsAt: Long?
+    var startedAt: Long?
     var platform: String?
+    var status: String?
+    var entitlements: String?
+    var productId: String?
+
     fun canUseEncryption(): Boolean
 }
 
-class SubscriptionsEncryptedDataStore(
+@ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
+class SubscriptionsEncryptedDataStore @Inject constructor(
     private val sharedPrefsProv: SharedPrefsProvider,
 ) : SubscriptionsDataStore {
-
     private val encryptedPreferences: SharedPreferences? by lazy { encryptedPreferences() }
-
-    @Synchronized
     private fun encryptedPreferences(): SharedPreferences? {
         return sharedPrefsProv.getSharedPrefs(FILENAME)
     }
+
+    override var productId: String?
+        get() = encryptedPreferences?.getString(KEY_PRODUCT_ID, null)
+        set(value) {
+            encryptedPreferences?.edit(commit = true) {
+                if (value == null) {
+                    remove(KEY_PRODUCT_ID)
+                } else {
+                    putString(KEY_PRODUCT_ID, value)
+                }
+            }
+        }
+
+    override var status: String?
+        get() = encryptedPreferences?.getString(KEY_STATUS, null)
+        set(value) {
+            encryptedPreferences?.edit(commit = true) {
+                if (value == null) {
+                    remove(KEY_STATUS)
+                } else {
+                    putString(KEY_STATUS, value)
+                }
+            }
+        }
+
+    override var entitlements: String?
+        get() = encryptedPreferences?.getString(KEY_ENTITLEMENTS, null)
+        set(value) {
+            encryptedPreferences?.edit(commit = true) {
+                if (value == null) {
+                    remove(KEY_ENTITLEMENTS)
+                } else {
+                    putString(KEY_ENTITLEMENTS, value)
+                }
+            }
+        }
 
     override var accessToken: String?
         get() = encryptedPreferences?.getString(KEY_ACCESS_TOKEN, null)
@@ -112,6 +160,18 @@ class SubscriptionsEncryptedDataStore(
             }
         }
 
+    override var startedAt: Long?
+        get() = encryptedPreferences?.getLong(KEY_STARTED_AT, 0L)
+        set(value) {
+            encryptedPreferences?.edit(commit = true) {
+                if (value == null) {
+                    remove(KEY_STARTED_AT)
+                } else {
+                    putLong(KEY_STARTED_AT, value)
+                }
+            }
+        }
+
     override fun canUseEncryption(): Boolean = encryptedPreferences != null
 
     companion object {
@@ -122,5 +182,9 @@ class SubscriptionsEncryptedDataStore(
         const val KEY_EMAIL = "KEY_EMAIL"
         const val KEY_EXTERNAL_ID = "KEY_EXTERNAL_ID"
         const val KEY_EXPIRES_OR_RENEWS_AT = "KEY_EXPIRES_OR_RENEWS_AT"
+        const val KEY_STARTED_AT = "KEY_STARTED_AT"
+        const val KEY_ENTITLEMENTS = "KEY_ENTITLEMENTS"
+        const val KEY_STATUS = "KEY_STATUS"
+        const val KEY_PRODUCT_ID = "KEY_PRODUCT_ID"
     }
 }

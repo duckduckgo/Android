@@ -37,12 +37,14 @@ class RealSubscriptions @Inject constructor(
     }
 
     override suspend fun getEntitlementStatus(product: Product): Result<EntitlementStatus> {
-        return when (val result = subscriptionsManager.getSubscriptionData()) {
-            is SubscriptionsData.Success -> result.entitlements.firstOrNull { it.product == product.value }?.run {
+        val subscription = subscriptionsManager.getSubscription()
+        return if (subscription?.isActive() == true) {
+            val entitlements = subscription.entitlements
+            entitlements.firstOrNull { it.product == product.value }?.run {
                 Result.success(Found)
             } ?: Result.success(NotFound)
-
-            is SubscriptionsData.Failure -> Result.failure(RuntimeException(result.message))
+        } else {
+            Result.success(NotFound)
         }
     }
 }

@@ -24,7 +24,6 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.subscriptions.impl.Subscription
 import com.duckduckgo.subscriptions.impl.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
@@ -66,12 +65,14 @@ class SubscriptionSettingsViewModel @Inject constructor(
 
     override fun onResume(owner: LifecycleOwner) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            val subs = subscriptionsManager.getSubscription()
-            if (subs is Subscription.Success) {
+            val subscription = subscriptionsManager.getSubscription()
+            if (subscription != null) {
                 val formatter = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
-                val date = formatter.format(Date(subs.expiresOrRenewsAt))
-                val type = if (subs.productId == MONTHLY_PLAN) Monthly else Yearly
-                _viewState.emit(viewState.value.copy(date = date, duration = type, status = subs.status, platform = subs.platform))
+                val date = formatter.format(Date(subscription.expiresOrRenewsAt))
+                val type = if (subscription.productId == MONTHLY_PLAN) Monthly else Yearly
+                _viewState.emit(
+                    viewState.value.copy(date = date, duration = type, status = subscription.status, platform = subscription.platform),
+                )
             }
         }
     }

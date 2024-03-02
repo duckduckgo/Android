@@ -19,9 +19,12 @@ package com.duckduckgo.subscriptions.impl
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.subscriptions.api.Product
+import com.duckduckgo.subscriptions.api.Product.NetP
 import com.duckduckgo.subscriptions.api.Subscriptions.EntitlementStatus.Found
 import com.duckduckgo.subscriptions.api.Subscriptions.EntitlementStatus.NotFound
-import com.duckduckgo.subscriptions.impl.services.Entitlement
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus.AUTO_RENEWABLE
+import com.duckduckgo.subscriptions.impl.repository.Entitlement
+import com.duckduckgo.subscriptions.impl.repository.Subscription
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -60,11 +63,18 @@ class RealSubscriptionsTest {
 
     @Test
     fun whenSubscriptionDataHasEntitlementThenReturnFound() = runTest {
-        whenever(mockSubscriptionsManager.getSubscriptionData()).thenReturn(
-            SubscriptionsData.Success("email", "externalId", listOf(Entitlement("id", "name", Product.NetP.value))),
+        whenever(mockSubscriptionsManager.getSubscription()).thenReturn(
+            Subscription(
+                "productId",
+                10000L,
+                100000L,
+                AUTO_RENEWABLE,
+                "google",
+                listOf(Entitlement(NetP.value, NetP.value)),
+            ),
         )
 
-        subscriptions.getEntitlementStatus(Product.NetP).also {
+        subscriptions.getEntitlementStatus(NetP).also {
             assertTrue(it.isSuccess)
             assertEquals(Found, it.getOrNull())
         }
@@ -72,22 +82,20 @@ class RealSubscriptionsTest {
 
     @Test
     fun whenSubscriptionDataHasNoEntitlementThenReturnNotFound() = runTest {
-        whenever(mockSubscriptionsManager.getSubscriptionData()).thenReturn(
-            SubscriptionsData.Success("email", "externalId", listOf(Entitlement("id", "name", Product.NetP.value))),
+        whenever(mockSubscriptionsManager.getSubscription()).thenReturn(
+            Subscription(
+                "productId",
+                10000L,
+                100000L,
+                AUTO_RENEWABLE,
+                "google",
+                listOf(Entitlement(NetP.value, "name")),
+            ),
         )
 
         subscriptions.getEntitlementStatus(Product.ITR).also {
             assertTrue(it.isSuccess)
             assertEquals(NotFound, it.getOrNull())
-        }
-    }
-
-    @Test
-    fun whenSubscriptionDataFailsThenReturnFailure() = runTest {
-        whenever(mockSubscriptionsManager.getSubscriptionData()).thenReturn(SubscriptionsData.Failure("error"))
-
-        subscriptions.getEntitlementStatus(Product.NetP).also {
-            assertTrue(it.isFailure)
         }
     }
 }

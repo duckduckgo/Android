@@ -10,6 +10,7 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetPWaitlis
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist
 import com.duckduckgo.subscriptions.impl.CurrentPurchase
 import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
+import com.duckduckgo.subscriptions.impl.SubscriptionsChecker
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN
@@ -45,6 +46,7 @@ class SubscriptionWebViewViewModelTest {
     private val subscriptionsManager: SubscriptionsManager = mock()
     private val subscriptionsRepository: SubscriptionsRepository = mock()
     private val networkProtectionWaitlist: NetworkProtectionWaitlist = mock()
+    private val subscriptionsChecker: SubscriptionsChecker = mock()
     private val pixelSender: SubscriptionPixelSender = mock()
 
     private lateinit var viewModel: SubscriptionWebViewViewModel
@@ -55,6 +57,7 @@ class SubscriptionWebViewViewModelTest {
         viewModel = SubscriptionWebViewViewModel(
             coroutineTestRule.testDispatcherProvider,
             subscriptionsManager,
+            subscriptionsChecker,
             subscriptionsRepository,
             networkProtectionWaitlist,
             pixelSender,

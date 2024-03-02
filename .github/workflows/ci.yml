@@ -35,7 +35,7 @@ jobs:
           distribution: 'adopt'
 
       - name: Run Code Formatting Checks
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         with:
           arguments: code_format_checks
 
@@ -56,7 +56,7 @@ jobs:
           distribution: 'adopt'
 
       - name: JVM tests
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         with:
           arguments: jvm_tests
 
@@ -92,10 +92,15 @@ jobs:
         with:
           go-version: '1.18.3'
 
-      - name: Lint
-        uses: gradle/gradle-build-action@v2
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
         with:
-          arguments: lint
+          cache-disabled: true
+          cache-read-only: false
+          cache-write-only: false
+
+      - name: Lint
+        run: ./gradlew propertyTypes lint -Didea.max.content.load.filesize=3000000 -Didea.max.intellisense.filesize=3000000
 
       - name: Bundle the lint report
         if: always()
@@ -140,12 +145,12 @@ jobs:
         run: echo $FLANK > flank.json
 
       - name: Build
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         with:
           arguments: androidTestsBuild
 
       - name: Run Android Tests
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         with:
           arguments: runFlankAndroidTests
 
