@@ -33,13 +33,18 @@ class RealAutoconsentFeatureSettingsRepository(
     coroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider,
     val database: AutoconsentDatabase,
+    isMainProcess: Boolean,
 ) : AutoconsentFeatureSettingsRepository {
 
     override val disabledCMPs = CopyOnWriteArrayList<String>()
     private val dao = database.autoconsentDao()
 
     init {
-        coroutineScope.launch(dispatcherProvider.io()) { loadToMemory() }
+        coroutineScope.launch(dispatcherProvider.io()) {
+            if (isMainProcess) {
+                loadToMemory()
+            }
+        }
     }
 
     override fun updateAllSettings(settings: AutoconsentSettings) {
