@@ -39,7 +39,6 @@ import com.duckduckgo.anrs.api.CrashLogger.Crash
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
-import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.checkMainThread
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.VpnScope
@@ -68,7 +67,6 @@ import java.net.Inet4Address
 import java.net.Inet6Address
 import java.net.InetAddress
 import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.properties.Delegates
 import kotlin.system.exitProcess
@@ -76,8 +74,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -152,8 +148,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
     @Inject lateinit var crashLogger: CrashLogger
 
     @Inject lateinit var dnsChangeCallback: DnsChangeCallback
-
-    private val alwaysOnStateJob = ConflatedJob()
 
     private val serviceDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 
@@ -299,8 +293,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             logcat { "VPN log: NEW network ${vpnNetworkStack.name}" }
         }
         dnsChangeCallback.unregister()
-        // cancel previous monitor
-        alwaysOnStateJob.cancel()
 
         vpnServiceStateStatsDao.insert(createVpnState(state = ENABLING))
 
@@ -401,7 +393,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             }
         }
 
-        alwaysOnStateJob += launch { monitorVpnAlwaysOnState() }
+        reportVpnAlwaysOnState()
+
         if (isAlwaysOnTriggered) {
             logcat { "VPN log: VPN was always on triggered" }
             deviceShieldPixels.reportVpnAlwaysOnTriggered()
@@ -577,8 +570,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
 
         activeTun = null
 
-        alwaysOnStateJob.cancel()
-
         sendStopPixels(reason)
 
         // If VPN has been started, then onVpnStopped must be called. Else, an error might have occurred before start so we call onVpnStartFailed
@@ -683,28 +674,11 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         return vpnNotification != emptyNotification
     }
 
-    private suspend fun monitorVpnAlwaysOnState() = withContext(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) {
-        suspend fun endlessPeriodicChecks(
-            periodMillis: Long = TimeUnit.MINUTES.toMillis(5),
-            block: suspend () -> Unit,
-        ) {
-            while (isActive) {
-                runCatching { block() }.onFailure { return }
-                delay(periodMillis)
-            }
-        }
-
+    private fun reportVpnAlwaysOnState() {
         @SuppressLint("NewApi") // IDE doesn't get we use appBuildConfig
         if (appBuildConfig.sdkInt >= 29) {
-            endlessPeriodicChecks {
-                vpnServiceStateStatsDao.getLastStateStats()?.let { vpnState ->
-                    if (vpnState.state == ENABLED) {
-                        if (vpnState.alwaysOnState.alwaysOnEnabled) deviceShieldPixels.reportAlwaysOnEnabledDaily()
-                        if (vpnState.alwaysOnState.alwaysOnLockedDown) deviceShieldPixels.reportAlwaysOnLockdownEnabledDaily()
-                    }
-                    logcat { "state: $vpnState" }
-                }
-            }
+            if (this@TrackerBlockingVpnService.isAlwaysOn) deviceShieldPixels.reportAlwaysOnEnabledDaily()
+            if (this@TrackerBlockingVpnService.isLockdownEnabled) deviceShieldPixels.reportAlwaysOnLockdownEnabledDaily()
         }
     }
 
