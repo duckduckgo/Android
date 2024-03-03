@@ -139,4 +139,30 @@
     <string name="sync_notification_channel_name">Szinkronizálás</string>
     <string name="sync_notify_me_title">Az értesítések le vannak tiltva</string>
     <string name="sync_notify_me_description">Értesítést kaphatsz, ha a szinkronizálás és biztonsági mentés funkció hibát észlel.</string>
+
+    <!-- setup errors -->
+    <string name="sync_turn_off_error">Nem sikerült kikapcsolni a Szinkronizálás és biztonsági mentés funkciót.</string>
+    <string name="sync_edit_device_error">Nem sikerült frissíteni az eszköz nevét.</string>
+    <string name="sync_remove_device_error">Az eszközt nem sikerült eltávolítani a Szinkronizálás és biztonsági mentés funkcióból.</string>
+    <string name="sync_delete_data_error">Nem sikerült adatokat törölni a szerveren.</string>
+    <string name="sync_login_authenticated_device_error">"Az eszközök párosításához kapcsold ki a Szinkronizálás és biztonsági mentés funkciót az egyik eszközön, majd koppints a Szinkronizálás másik eszközzel lehetőségre a másik eszközön."</string>
+    <string name="sync_connect_generic_error">Nem sikerült csatlakozni a szerverhez.</string>
+    <string name="sync_connect_login_error">Nem sikerült a másik eszközzel szinkronizálni.</string>
+    <string name="sync_create_account_generic_error">Nem sikerült csatlakozni a szerverhez.</string>
+    <string name="sync_invalid_code_error">Ez a kód sajnos érvénytelen. Győződj meg róla, hogy a helyes kódot adtad meg vagy olvastad be.</string>
+    <string name="sync_recovery_pdf_error">Nem sikerült létrehozni a helyreállítási PDF-fájlt.</string>
+    <string name="sync_dialog_error_ok">OK</string>
+    <string name="sync_dialog_error_title">Szinkronizálás és biztonsági mentés</string>
+    <string name="sync_encryption_not_supported_error_title">Az eszköz nem támogatott</string>
+    <string name="sync_encryption_not_supported_error">A Sync &amp; Backup funkció végpontok közötti titkosítást használ, és képesnek kell lennie az adatok eszközön való titkosítására és tárolására. Mivel az eszközöd nem támogatja a titkosított tárhelyet, a Sync &amp; Backup funkció nem érhető el.</string>
+
+    <!-- Sync Device Authentication -->
+    <string name="sync_auth_text_for_access">Oldd fel az eszközt a Szinkronizálás és biztonsági mentés funkció eléréséhez.</string>
+    <string name="sync_biometric_prompt_title">A Szinkronizálás és biztonsági mentés funkció zárolva</string>
+
+    <!-- Sync Settings -->
+    <string name="sync_delete_server_data_dialog_title">Szerveradatok törlése?</string>
+    <string name="sync_delete_server_data_dialog_content">A rendszer minden eszközt lecsatlakoztat, és a szinkronizált adatokat törli a szerverről.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Adatok törlése</string>
+    <string name="sync_delete_server_data_dialog_secondary_button">Mégsem</string>
 </resources>
