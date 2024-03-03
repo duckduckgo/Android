@@ -141,14 +141,20 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     }
 
     private fun ConnectionDetails.toLocationState(preferredCountry: String?): LocationState {
-        val city = location?.split(",")?.get(0)?.trim()
-        val countryCode = location?.split(",")?.get(1)?.trim()
+        // split can throw index out of bounds
+        val city = runCatching { location?.split(",")?.get(0)?.trim() }.getOrNull()
+        val countryCode = runCatching { location?.split(",")?.get(1)?.trim() }.getOrNull()
+        val location = if (city != null && countryCode != null) {
+            "$city, ${getDisplayableCountry(countryCode)}"
+        } else {
+            null
+        }
         return LocationState(
             icon = countryCode?.run {
                 getEmojiForCountryCode(this)
             },
             isCustom = preferredCountry != null,
-            location = "$city, ${getDisplayableCountry(countryCode!!)}",
+            location = location,
         )
     }
 
