@@ -68,6 +68,7 @@ import java.net.Inet4Address
 import java.net.Inet6Address
 import java.net.InetAddress
 import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.properties.Delegates
 import kotlin.system.exitProcess
@@ -683,36 +684,25 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
     }
 
     private suspend fun monitorVpnAlwaysOnState() = withContext(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) {
-        suspend fun incrementalPeriodicChecks(
-            times: Int = Int.MAX_VALUE,
-            initialDelay: Long = 500, // 0.5 second
-            maxDelay: Long = 300_000, // 5 minutes
-            factor: Double = 1.05, // 5% increase
+        suspend fun endlessPeriodicChecks(
+            periodMillis: Long = TimeUnit.MINUTES.toMillis(5),
             block: suspend () -> Unit,
         ) {
-            var currentDelay = initialDelay
-            repeat(times - 1) {
-                try {
-                    if (isActive) block()
-                } catch (t: Throwable) {
-                    // you can log an error here and/or make a more finer-grained
-                    // analysis of the cause to see if retry is needed
-                }
-                delay(currentDelay)
-                currentDelay = (currentDelay * factor).toLong().coerceAtMost(maxDelay)
+            while (isActive) {
+                runCatching { block() }.onFailure { return }
+                delay(periodMillis)
             }
         }
 
-        val vpnState = createVpnState(ENABLED)
-
         @SuppressLint("NewApi") // IDE doesn't get we use appBuildConfig
         if (appBuildConfig.sdkInt >= 29) {
-            incrementalPeriodicChecks {
-                if (vpnServiceStateStatsDao.getLastStateStats()?.state == ENABLED) {
-                    if (vpnState.alwaysOnState.alwaysOnEnabled) deviceShieldPixels.reportAlwaysOnEnabledDaily()
-                    if (vpnState.alwaysOnState.alwaysOnLockedDown) deviceShieldPixels.reportAlwaysOnLockdownEnabledDaily()
-
-                    vpnServiceStateStatsDao.insert(vpnState).also { logcat { "state: $vpnState" } }
+            endlessPeriodicChecks {
+                vpnServiceStateStatsDao.getLastStateStats()?.let { vpnState ->
+                    if (vpnState.state == ENABLED) {
+                        if (vpnState.alwaysOnState.alwaysOnEnabled) deviceShieldPixels.reportAlwaysOnEnabledDaily()
+                        if (vpnState.alwaysOnState.alwaysOnLockedDown) deviceShieldPixels.reportAlwaysOnLockdownEnabledDaily()
+                    }
+                    logcat { "state: $vpnState" }
                 }
             }
         }
