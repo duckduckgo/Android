@@ -23,6 +23,8 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     PROCESS_CREATED_MAIN("m_process_created_main"),
     PROCESS_CREATED_VPN("m_process_created_vpn"),
 
+    WEBVIEW_FEATURE_FLAGS_INJECTION_CAPABILITY("m_modern_webview_javascript_injection_capability"),
+
     FORGET_ALL_PRESSED_BROWSING("mf_bp"),
     FORGET_ALL_PRESSED_TABSWITCHING("mf_tp"),
     FORGET_ALL_EXECUTED("mf"),

@@ -18,6 +18,7 @@ package com.duckduckgo.app.global.api
 
 import com.duckduckgo.app.browser.WebViewPixelName
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.AppPixelName.WEBVIEW_FEATURE_FLAGS_INJECTION_CAPABILITY
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.StatisticsPixelName
 import com.duckduckgo.common.utils.AppUrl
@@ -82,6 +83,7 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             AppPixelName.EMAIL_COPIED_TO_CLIPBOARD.pixelName to PixelParameter.removeAll(),
             StatisticsPixelName.BROWSER_DAILY_ACTIVE_FEATURE_STATE.pixelName to PixelParameter.removeAll(),
             WebViewPixelName.WEB_PAGE_LOADED.pixelName to PixelParameter.removeAll(),
+            WEBVIEW_FEATURE_FLAGS_INJECTION_CAPABILITY.pixelName to PixelParameter.removeAll(),
         )
     }
 }
