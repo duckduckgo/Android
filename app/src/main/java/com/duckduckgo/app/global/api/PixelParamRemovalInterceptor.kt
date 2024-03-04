@@ -80,7 +80,7 @@ object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
     override fun names(): List<Pair<String, Set<PixelParameter>>> {
         return listOf(
             AppPixelName.EMAIL_COPIED_TO_CLIPBOARD.pixelName to PixelParameter.removeAll(),
-            StatisticsPixelName.BROWSER_DAILY_ACTIVE_FEATURE_STATE.pixelName to PixelParameter.removeAll(),
+            StatisticsPixelName.BROWSER_DAILY_ACTIVE_FEATURE.pixelName to PixelParameter.removeAll(),
             WebViewPixelName.WEB_PAGE_LOADED.pixelName to PixelParameter.removeAll(),
         )
     }

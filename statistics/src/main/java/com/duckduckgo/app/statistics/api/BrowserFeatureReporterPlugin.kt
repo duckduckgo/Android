@@ -21,12 +21,12 @@ import com.duckduckgo.app.statistics.pixels.Pixel.StatisticsPixelName
 import com.duckduckgo.di.scopes.AppScope
 
 @ContributesPluginPoint(AppScope::class)
-interface BrowserFeatureStateReporterPlugin {
+interface BrowserFeatureReporterPlugin {
 
     /**
-     * Used by the [StatisticsPixelName.BROWSER_DAILY_ACTIVE_FEATURE_STATE] pixel,
-     * to notify the state of a feature
-     * @return true if the feature is enabled, false if not, alongside the feature name
+     * Used by the [StatisticsPixelName.BROWSER_DAILY_ACTIVE_FEATURE] pixel,
+     * to notify the value of a feature
+     * The first parameter is the feature value, the second parameter is the feature name
      */
-    fun featureState(): Pair<Boolean, String>
+    fun feature(): Pair<String, String>
 }

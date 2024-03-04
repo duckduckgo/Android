@@ -35,7 +35,7 @@ interface Pixel {
     }
 
     enum class StatisticsPixelName(override val pixelName: String) : PixelName {
-        BROWSER_DAILY_ACTIVE_FEATURE_STATE("m_browser_feature_daily_active_user_d"),
+        BROWSER_DAILY_ACTIVE_FEATURE("m_browser_feature_daily_active_user_d"),
     }
 
     object PixelParameter {
@@ -65,6 +65,7 @@ interface Pixel {
         const val ACTION_SUCCESS = "success"
         const val SYNC = "sync"
         const val VOICE_SEARCH = "voice_search"
+        const val LOCALE = "locale"
     }
 
     object PixelValues {

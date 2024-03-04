@@ -22,9 +22,10 @@ import com.duckduckgo.app.email.db.EmailDataStore
 import com.duckduckgo.app.email.sync.*
 import com.duckduckgo.app.pixels.AppPixelName.EMAIL_DISABLED
 import com.duckduckgo.app.pixels.AppPixelName.EMAIL_ENABLED
-import com.duckduckgo.app.statistics.api.BrowserFeatureStateReporterPlugin
+import com.duckduckgo.app.statistics.api.BrowserFeatureReporterPlugin
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
+import com.duckduckgo.app.statistics.pixels.toBinaryString
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -40,7 +41,7 @@ import kotlinx.coroutines.launch
 import org.json.JSONObject
 import timber.log.Timber
 
-@ContributesMultibinding(scope = AppScope::class, boundType = BrowserFeatureStateReporterPlugin::class)
+@ContributesMultibinding(scope = AppScope::class, boundType = BrowserFeatureReporterPlugin::class)
 @ContributesBinding(scope = AppScope::class, boundType = EmailManager::class)
 @SingleInstanceIn(AppScope::class)
 class AppEmailManager @Inject constructor(
@@ -50,7 +51,7 @@ class AppEmailManager @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val pixel: Pixel,
-) : EmailManager, BrowserFeatureStateReporterPlugin {
+) : EmailManager, BrowserFeatureReporterPlugin {
 
     private val isSignedInStateFlow = MutableStateFlow(false)
     override fun signedInFlow(): StateFlow<Boolean> = isSignedInStateFlow.asStateFlow()
@@ -188,7 +189,7 @@ class AppEmailManager @Inject constructor(
         nextAlias = null
     }
 
-    override fun featureState(): Pair<Boolean, String> {
-        return Pair(isSignedIn(), PixelParameter.EMAIL)
+    override fun feature(): Pair<String, String> {
+        return Pair(isSignedIn().toBinaryString(), PixelParameter.EMAIL)
     }
 }
