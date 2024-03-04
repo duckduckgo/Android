@@ -20,7 +20,7 @@ import com.duckduckgo.subscriptions.impl.billing.BillingClientWrapper
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
-import com.duckduckgo.subscriptions.impl.repository.FakeAuthDataStore
+import com.duckduckgo.subscriptions.impl.repository.FakeSubscriptionsDataStore
 import com.duckduckgo.subscriptions.impl.repository.RealAuthRepository
 import com.duckduckgo.subscriptions.impl.services.AccessTokenResponse
 import com.duckduckgo.subscriptions.impl.services.AccountResponse
@@ -32,7 +32,7 @@ import com.duckduckgo.subscriptions.impl.services.StoreLoginResponse
 import com.duckduckgo.subscriptions.impl.services.SubscriptionResponse
 import com.duckduckgo.subscriptions.impl.services.SubscriptionsService
 import com.duckduckgo.subscriptions.impl.services.ValidateTokenResponse
-import com.duckduckgo.subscriptions.store.AuthDataStore
+import com.duckduckgo.subscriptions.impl.store.SubscriptionsDataStore
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.TestScope
@@ -62,7 +62,7 @@ class RealSubscriptionsManagerTest {
 
     private val authService: AuthService = mock()
     private val subscriptionsService: SubscriptionsService = mock()
-    private val authDataStore: AuthDataStore = FakeAuthDataStore()
+    private val authDataStore: SubscriptionsDataStore = FakeSubscriptionsDataStore()
     private val authRepository = RealAuthRepository(authDataStore)
     private val emailManager: EmailManager = mock()
     private val billingClient: BillingClientWrapper = mock()

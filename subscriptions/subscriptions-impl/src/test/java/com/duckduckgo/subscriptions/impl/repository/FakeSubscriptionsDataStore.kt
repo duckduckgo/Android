@@ -16,9 +16,9 @@
 
 package com.duckduckgo.subscriptions.impl.repository
 
-import com.duckduckgo.subscriptions.store.AuthDataStore
+import com.duckduckgo.subscriptions.impl.store.SubscriptionsDataStore
 
-class FakeAuthDataStore : AuthDataStore {
+class FakeSubscriptionsDataStore : SubscriptionsDataStore {
 
     override var accessToken: String? = null
     override var authToken: String? = null

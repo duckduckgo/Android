@@ -114,4 +114,12 @@ enum class NetworkProtectionPixelNames(
     NETP_FAILURE_RECOVERY_COMPLETED_SERVER_UNHEALTHY_DAILY("m_netp_ev_failure_recovery_completed_server_unhealthy_d", enqueue = true),
     NETP_FAILURE_RECOVERY_COMPLETED_SERVER_HEALTHY("m_netp_ev_failure_recovery_completed_server_healthy_c", enqueue = true),
     NETP_FAILURE_RECOVERY_COMPLETED_SERVER_HEALTHY_DAILY("m_netp_ev_failure_recovery_completed_server_healthy_d", enqueue = true),
+    NETP_FAILURE_RECOVERY_COMPLETED_SERVER_HEALTHY_NEW_TUN_ADDRESS(
+        "m_netp_ev_failure_recovery_completed_new_tun_address_server_healthy_c",
+        enqueue = true,
+    ),
+    NETP_FAILURE_RECOVERY_COMPLETED_SERVER_HEALTHY_NEW_TUN_ADDRESS_DAILY(
+        "m_netp_ev_failure_recovery_completed_new_tun_address_server_healthy_d",
+        enqueue = true,
+    ),
 }

@@ -32,7 +32,6 @@ android {
 dependencies {
     anvil project(':anvil-compiler')
     implementation project(':anvil-annotations')
-    implementation project(':subscriptions-store')
     implementation project(':subscriptions-impl')
     implementation project(':di')
     implementation project(':common-utils')

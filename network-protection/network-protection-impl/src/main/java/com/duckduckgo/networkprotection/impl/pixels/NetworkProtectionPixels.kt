@@ -26,9 +26,11 @@ import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import java.time.Instant
+import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 import javax.inject.Qualifier
 
@@ -296,6 +298,7 @@ interface NetworkProtectionPixels {
     fun reportFailureRecoveryFailed()
     fun reportFailureRecoveryCompletedWithServerHealthy()
     fun reportFailureRecoveryCompletedWithServerUnhealthy()
+    fun reportFailureRecoveryCompletedWithDifferentTunnelAddress()
 }
 
 @ContributesBinding(AppScope::class)
@@ -331,8 +334,22 @@ class RealNetworkProtectionPixel @Inject constructor(
     }
 
     override fun reportEnabled() {
-        tryToFireDailyPixel(NETP_ENABLE_DAILY, mapOf("cohort" to cohortStore.cohortLocalDate?.toString().orEmpty()))
-        tryToFireUniquePixel(NETP_ENABLE_UNIQUE, payload = mapOf("cohort" to cohortStore.cohortLocalDate?.toString().orEmpty()))
+        fun LocalDate?.asWeeklyCohortDate(): String {
+            val baseDate = LocalDate.of(2023, 1, 1)
+            return this?.let { cohortLocalDate ->
+                // do we need to coalesce
+                // I know cohortLocalDate is in ET timezone and we're comparing with LocalDate.now() but the error should be ok
+                val weeksSinceCohortAssigned = ChronoUnit.WEEKS.between(cohortLocalDate, LocalDate.now())
+                return@let if (weeksSinceCohortAssigned > WEEKS_TO_COALESCE_COHORT) {
+                    // coalesce to no cohort
+                    ""
+                } else {
+                    "week-${ChronoUnit.WEEKS.between(baseDate, cohortLocalDate) + 1}"
+                }
+            } ?: ""
+        }
+        tryToFireDailyPixel(NETP_ENABLE_DAILY, mapOf("cohort" to cohortStore.cohortLocalDate.asWeeklyCohortDate()))
+        tryToFireUniquePixel(NETP_ENABLE_UNIQUE, payload = mapOf("cohort" to cohortStore.cohortLocalDate.asWeeklyCohortDate()))
     }
 
     override fun reportEnabledOnSearch() {
@@ -538,6 +555,11 @@ class RealNetworkProtectionPixel @Inject constructor(
         tryToFireDailyPixel(NETP_FAILURE_RECOVERY_COMPLETED_SERVER_UNHEALTHY_DAILY)
     }
 
+    override fun reportFailureRecoveryCompletedWithDifferentTunnelAddress() {
+        firePixel(NETP_FAILURE_RECOVERY_COMPLETED_SERVER_HEALTHY_NEW_TUN_ADDRESS)
+        tryToFireDailyPixel(NETP_FAILURE_RECOVERY_COMPLETED_SERVER_HEALTHY_NEW_TUN_ADDRESS_DAILY)
+    }
+
     private fun firePixel(
         p: NetworkProtectionPixelNames,
         payload: Map<String, String> = emptyMap(),
@@ -618,6 +640,7 @@ class RealNetworkProtectionPixel @Inject constructor(
     companion object {
         private const val NETP_PIXELS_PREF_FILE = "com.duckduckgo.networkprotection.pixels.v1"
         private const val TIMESTAMP_ET_PARAM = "ts"
+        private const val WEEKS_TO_COALESCE_COHORT = 6
     }
 }
 

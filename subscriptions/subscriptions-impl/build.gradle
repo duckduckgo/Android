@@ -40,7 +40,6 @@ dependencies {
     implementation project(path: ':js-messaging-api')
     implementation project(path: ':user-agent-api')
     implementation project(path: ':subscriptions-api')
-    implementation project(path: ':subscriptions-store')
     implementation project(path: ':settings-api')
     implementation project(path: ':autofill-api')
     implementation project(path: ':network-protection-api')
@@ -53,6 +52,7 @@ dependencies {
 
     implementation AndroidX.appCompat
     implementation KotlinX.coroutines.core
+    implementation AndroidX.work.runtimeKtx
     implementation Google.android.material
 
     implementation "com.android.billingclient:billing:_"
@@ -66,6 +66,7 @@ dependencies {
     implementation AndroidX.constraintLayout
     implementation Square.retrofit2.converter.moshi
     implementation Square.okHttp3.okHttp
+    implementation AndroidX.security.crypto
 
     // Testing dependencies
     testImplementation project(path: ':common-test')

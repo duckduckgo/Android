@@ -33,6 +33,7 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.atMost
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -119,7 +120,7 @@ class FailureRecoveryHandlerTest {
         whenever(currentTimeProvider.getTimeInEpochSeconds()).thenReturn(1080)
         whenever(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(true)
         whenever(wgTunnelConfig.getWgConfig()).thenReturn(getWgConfig(defaultServerData))
-        whenever(wgTunnel.createWgConfig(any())).thenReturn(Result.success(newConfig))
+        whenever(wgTunnel.createWgConfig(anyOrNull())).thenReturn(Result.success(newConfig))
 
         failureRecoveryHandler.onTunnelFailure(180)
 
@@ -129,6 +130,7 @@ class FailureRecoveryHandlerTest {
         verify(vpnFeaturesRegistry).refreshFeature(NetPVpnFeature.NETP_VPN)
         verify(networkProtectionPixels).reportFailureRecoveryStarted()
         verify(networkProtectionPixels).reportFailureRecoveryCompletedWithServerUnhealthy()
+        verify(networkProtectionPixels, never()).reportFailureRecoveryCompletedWithDifferentTunnelAddress()
     }
 
     @Test
@@ -137,7 +139,7 @@ class FailureRecoveryHandlerTest {
         whenever(currentTimeProvider.getTimeInEpochSeconds()).thenReturn(1080)
         whenever(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(true)
         whenever(wgTunnelConfig.getWgConfig()).thenReturn(getWgConfig(defaultServerData))
-        whenever(wgTunnel.createWgConfig(any())).thenReturn(Result.success(newConfig))
+        whenever(wgTunnel.createWgConfig(anyOrNull())).thenReturn(Result.success(newConfig))
 
         failureRecoveryHandler.onTunnelFailure(180)
 
@@ -147,6 +149,7 @@ class FailureRecoveryHandlerTest {
         verify(vpnFeaturesRegistry).refreshFeature(NetPVpnFeature.NETP_VPN)
         verify(networkProtectionPixels).reportFailureRecoveryStarted()
         verify(networkProtectionPixels).reportFailureRecoveryCompletedWithServerUnhealthy()
+        verify(networkProtectionPixels).reportFailureRecoveryCompletedWithDifferentTunnelAddress()
     }
 
     @Test
@@ -154,7 +157,7 @@ class FailureRecoveryHandlerTest {
         whenever(currentTimeProvider.getTimeInEpochSeconds()).thenReturn(1080)
         whenever(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(true)
         whenever(wgTunnelConfig.getWgConfig()).thenReturn(getWgConfig(defaultServerData))
-        whenever(wgTunnel.createWgConfig(any())).thenReturn(Result.success(getWgConfig(defaultServerData)))
+        whenever(wgTunnel.createWgConfig(anyOrNull())).thenReturn(Result.success(getWgConfig(defaultServerData)))
 
         failureRecoveryHandler.onTunnelFailure(180)
 
@@ -186,7 +189,7 @@ class FailureRecoveryHandlerTest {
         whenever(currentTimeProvider.getTimeInEpochSeconds()).thenReturn(1080)
         whenever(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(true)
         whenever(wgTunnelConfig.getWgConfig()).thenReturn(getWgConfig(defaultServerData))
-        whenever(wgTunnel.createWgConfig(any())).thenReturn(Result.success(newConfig))
+        whenever(wgTunnel.createWgConfig(anyOrNull())).thenReturn(Result.success(newConfig))
 
         failureRecoveryHandler.onTunnelFailure(180)
         failureRecoveryHandler.onTunnelFailure(180)
@@ -197,6 +200,7 @@ class FailureRecoveryHandlerTest {
         verify(vpnFeaturesRegistry).refreshFeature(NetPVpnFeature.NETP_VPN)
         verify(networkProtectionPixels).reportFailureRecoveryStarted()
         verify(networkProtectionPixels).reportFailureRecoveryCompletedWithServerUnhealthy()
+        verify(networkProtectionPixels, never()).reportFailureRecoveryCompletedWithDifferentTunnelAddress()
     }
 
     @Test
@@ -205,7 +209,7 @@ class FailureRecoveryHandlerTest {
         whenever(currentTimeProvider.getTimeInEpochSeconds()).thenReturn(1080)
         whenever(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(true)
         whenever(wgTunnelConfig.getWgConfig()).thenReturn(getWgConfig(defaultServerData))
-        whenever(wgTunnel.createWgConfig(any())).thenReturn(Result.success(newConfig))
+        whenever(wgTunnel.createWgConfig(anyOrNull())).thenReturn(Result.success(newConfig))
 
         failureRecoveryHandler.onTunnelFailure(180)
         failureRecoveryHandler.onTunnelFailure(180)
@@ -216,6 +220,7 @@ class FailureRecoveryHandlerTest {
         verify(vpnFeaturesRegistry).refreshFeature(NetPVpnFeature.NETP_VPN)
         verify(networkProtectionPixels).reportFailureRecoveryStarted()
         verify(networkProtectionPixels).reportFailureRecoveryCompletedWithServerUnhealthy()
+        verify(networkProtectionPixels).reportFailureRecoveryCompletedWithDifferentTunnelAddress()
     }
 
     @Test
@@ -224,7 +229,7 @@ class FailureRecoveryHandlerTest {
         whenever(currentTimeProvider.getTimeInEpochSeconds()).thenReturn(1080)
         whenever(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(true)
         whenever(wgTunnelConfig.getWgConfig()).thenReturn(getWgConfig(defaultServerData))
-        whenever(wgTunnel.createWgConfig(any())).thenReturn(Result.success(newConfig))
+        whenever(wgTunnel.createWgConfig(anyOrNull())).thenReturn(Result.success(newConfig))
 
         failureRecoveryHandler.onTunnelFailure(180)
         failureRecoveryHandler.onTunnelFailureRecovered()
@@ -244,7 +249,7 @@ class FailureRecoveryHandlerTest {
         whenever(currentTimeProvider.getTimeInEpochSeconds()).thenReturn(1080)
         whenever(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(true)
         whenever(wgTunnelConfig.getWgConfig()).thenReturn(getWgConfig(defaultServerData))
-        whenever(wgTunnel.createWgConfig(any())).thenReturn(Result.success(newConfig))
+        whenever(wgTunnel.createWgConfig(anyOrNull())).thenReturn(Result.success(newConfig))
 
         failureRecoveryHandler.onTunnelFailure(180)
         failureRecoveryHandler.onTunnelFailureRecovered()

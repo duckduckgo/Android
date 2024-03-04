@@ -49,6 +49,7 @@ class WebCompatRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    isMainProcess = true,
                 )
 
             verify(mockWebCompatDao).get()
@@ -64,6 +65,7 @@ class WebCompatRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    isMainProcess = true,
                 )
 
             verify(mockWebCompatDao).get()
@@ -78,6 +80,7 @@ class WebCompatRepositoryTest {
                     mockDatabase,
                     TestScope(),
                     coroutineRule.testDispatcherProvider,
+                    isMainProcess = true,
                 )
 
             testee.updateAll(webCompatEntity)

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.subscriptions.store
+package com.duckduckgo.subscriptions.impl.store
 
 import android.content.Context
 import android.content.SharedPreferences

@@ -19,6 +19,7 @@ package com.duckduckgo.webcompat.impl.di
 import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.webcompat.store.ALL_MIGRATIONS
@@ -51,7 +52,8 @@ object WebCompatModule {
         database: WebCompatDatabase,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
+        @IsMainProcess isMainProcess: Boolean,
     ): WebCompatRepository {
-        return RealWebCompatRepository(database, appCoroutineScope, dispatcherProvider)
+        return RealWebCompatRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
     }
 }

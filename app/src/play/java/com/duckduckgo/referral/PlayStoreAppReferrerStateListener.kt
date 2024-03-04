@@ -34,7 +34,8 @@ import com.duckduckgo.app.referral.ParsedReferrerResult.*
 import com.duckduckgo.app.statistics.AtbInitializerListener
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.api.VariantManager
-import com.duckduckgo.experiments.impl.VariantManagerImpl.Companion.RESERVED_EU_AUCTION_VARIANT
+import com.duckduckgo.experiments.impl.VariantManagerImpl.Companion.RESERVED_EU_BROWSER_CHOICE_AUCTION_VARIANT
+import com.duckduckgo.experiments.impl.VariantManagerImpl.Companion.RESERVED_EU_SEARCH_CHOICE_AUCTION_VARIANT
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.delay
@@ -63,7 +64,7 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
 
             if (appReferrerDataStore.referrerCheckedPreviously) {
                 referralResult = if (appReferrerDataStore.installedFromEuAuction) {
-                    EuAuctionReferrerFound(fromCache = true)
+                    EuAuctionSearchChoiceReferrerFound(fromCache = true)
                 } else {
                     loadPreviousReferrerData()
                 }
@@ -173,8 +174,12 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
                 variantManager.updateAppReferrerVariant(result.campaignSuffix)
                 appReferrerDataStore.campaignSuffix = result.campaignSuffix
             }
-            is EuAuctionReferrerFound -> {
-                variantManager.updateAppReferrerVariant(RESERVED_EU_AUCTION_VARIANT)
+            is EuAuctionSearchChoiceReferrerFound -> {
+                variantManager.updateAppReferrerVariant(RESERVED_EU_SEARCH_CHOICE_AUCTION_VARIANT)
+                appReferrerDataStore.installedFromEuAuction = true
+            }
+            is EuAuctionBrowserChoiceReferrerFound -> {
+                variantManager.updateAppReferrerVariant(RESERVED_EU_BROWSER_CHOICE_AUCTION_VARIANT)
                 appReferrerDataStore.installedFromEuAuction = true
             }
             else -> {}

@@ -10,7 +10,7 @@ class RealAuthRepositoryTest {
     @get:Rule
     val coroutineRule = CoroutineTestRule()
 
-    private val authStore = FakeAuthDataStore()
+    private val authStore = FakeSubscriptionsDataStore()
     private val authRepository: AuthRepository = RealAuthRepository(authStore)
 
     @Test

@@ -134,11 +134,17 @@ class RealWgTunnel @Inject constructor(
         try {
             // return updated existing config or new one
             val config = wgTunnelStore.wireguardConfig?.let outerLet@{ wgConfig ->
+                // if new keys are provided and are different from current key, fetch new config
                 keyPair?.let { newKeys ->
                     if (wgConfig.`interface`.keyPair != newKeys) {
                         logcat { "Different keys, fetching new config" }
                         return@outerLet fetchNewConfig(keyPair)
                     }
+                }
+
+                // if tunnel is marked unhealthy fetch new config
+                if (!isTunnelHealthy) {
+                    return@outerLet fetchNewConfig(keyPair ?: wgConfig.`interface`.keyPair)
                 }
 
                 logcat { "Updating existing WG config" }

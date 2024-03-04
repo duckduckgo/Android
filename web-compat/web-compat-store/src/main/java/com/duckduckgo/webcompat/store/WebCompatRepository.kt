@@ -28,9 +28,10 @@ interface WebCompatRepository {
 }
 
 class RealWebCompatRepository constructor(
-    private val database: WebCompatDatabase,
+    database: WebCompatDatabase,
     coroutineScope: CoroutineScope,
-    private val dispatcherProvider: DispatcherProvider,
+    dispatcherProvider: DispatcherProvider,
+    isMainProcess: Boolean,
 ) : WebCompatRepository {
 
     private val webCompatDao: WebCompatDao = database.webCompatDao()
@@ -38,7 +39,9 @@ class RealWebCompatRepository constructor(
 
     init {
         coroutineScope.launch(dispatcherProvider.io()) {
-            loadToMemory()
+            if (isMainProcess) {
+                loadToMemory()
+            }
         }
     }
 
