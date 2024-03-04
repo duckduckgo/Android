@@ -21,6 +21,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.trackerdetection.model.Action.BLOCK
 import com.duckduckgo.app.trackerdetection.model.TdsTracker
+import com.duckduckgo.common.Domain
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -95,7 +96,7 @@ class TdsTrackerDaoTest {
     }
 
     private fun createTracker(domain: String): TdsTracker {
-        return TdsTracker(domain, BLOCK, "", emptyList(), emptyList())
+        return TdsTracker(Domain(domain), BLOCK, "", emptyList(), emptyList())
     }
 
     companion object {

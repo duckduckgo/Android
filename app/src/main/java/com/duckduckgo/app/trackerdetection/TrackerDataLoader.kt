@@ -101,7 +101,7 @@ class TrackerDataLoader @Inject constructor(
     fun loadTrackers() {
         val trackers = tdsTrackerDao.getAll()
         Timber.d("Loaded ${trackers.size} tds trackers from DB")
-        val client = TdsClient(Client.ClientName.TDS, trackers, urlToTypeMapper, optimizeTrackerEvaluationRCWrapper)
+        val client = TdsClient(Client.ClientName.TDS, trackers, urlToTypeMapper, optimizeTrackerEvaluationRCWrapper.enabled)
         trackerDetector.addClient(client)
     }
 

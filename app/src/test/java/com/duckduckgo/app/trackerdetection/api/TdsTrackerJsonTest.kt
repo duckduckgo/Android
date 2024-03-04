@@ -19,6 +19,7 @@ package com.duckduckgo.app.trackerdetection.api
 import com.duckduckgo.app.trackerdetection.model.Action.BLOCK
 import com.duckduckgo.app.trackerdetection.model.Action.UNSUPPORTED
 import com.duckduckgo.app.trackerdetection.model.TdsTracker
+import com.duckduckgo.common.Domain
 import com.duckduckgo.common.test.FileUtilities.loadText
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -44,7 +45,7 @@ class TdsTrackerJsonTest {
         val json = loadText(javaClass.classLoader!!, "json/tds_trackers.json")
         val trackers = jsonAdapter.fromJson(json)!!.jsonToTrackers()
         val tracker = trackers["1dmp.io"]
-        assertEquals(TdsTracker("1dmp.io", BLOCK, "CleverDATA LLC", listOf("Advertising"), arrayListOf()), tracker)
+        assertEquals(TdsTracker(Domain("1dmp.io"), BLOCK, "CleverDATA LLC", listOf("Advertising"), arrayListOf()), tracker)
     }
 
     @Test
@@ -53,7 +54,7 @@ class TdsTrackerJsonTest {
         val jsonTrackers = jsonAdapter.fromJson(json)!!
         val trackers = jsonTrackers.jsonToTrackers()
         val tracker = trackers["1dmp.io"]
-        assertEquals(TdsTracker("1dmp.io", UNSUPPORTED, "CleverDATA LLC", listOf("Advertising"), arrayListOf()), tracker)
+        assertEquals(TdsTracker(Domain("1dmp.io"), UNSUPPORTED, "CleverDATA LLC", listOf("Advertising"), arrayListOf()), tracker)
     }
 
     @Test

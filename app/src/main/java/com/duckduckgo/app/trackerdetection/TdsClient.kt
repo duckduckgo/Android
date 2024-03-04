@@ -17,7 +17,6 @@
 package com.duckduckgo.app.trackerdetection
 
 import android.net.Uri
-import com.duckduckgo.app.pixels.remoteconfig.OptimizeTrackerEvaluationRCWrapper
 import com.duckduckgo.app.trackerdetection.model.Action.BLOCK
 import com.duckduckgo.app.trackerdetection.model.Action.IGNORE
 import com.duckduckgo.app.trackerdetection.model.TdsTracker
@@ -29,7 +28,7 @@ class TdsClient(
     override val name: Client.ClientName,
     private val trackers: List<TdsTracker>,
     private val urlToTypeMapper: UrlToTypeMapper,
-    private val optimizeTrackerEvaluationRCWrapper: OptimizeTrackerEvaluationRCWrapper
+    private val optimizeTrackerEvaluation: Boolean,
 ) : Client {
 
     override fun matches(
@@ -37,7 +36,7 @@ class TdsClient(
         documentUrl: Uri,
         requestHeaders: Map<String, String>,
     ): Client.Result {
-        val tracker = if (optimizeTrackerEvaluationRCWrapper.enabled) {
+        val tracker = if (optimizeTrackerEvaluation) {
             val domain = host(url)?.let { Domain(it) }
             trackers.firstOrNull { domain?.let { domain -> sameOrSubdomain(domain, it.domain)} ?: false } ?: return Client.Result(matches = false, isATracker = false)
         } else {
@@ -58,7 +57,7 @@ class TdsClient(
         documentUrl: Uri,
         requestHeaders: Map<String, String>,
     ): Client.Result {
-        val tracker = if (optimizeTrackerEvaluationRCWrapper.enabled) {
+        val tracker = if (optimizeTrackerEvaluation) {
             val domain = url.host?.let { Domain(it) }
             trackers.firstOrNull { sameOrSubdomain(domain, it.domain) } ?: return Client.Result(matches = false, isATracker = false)
         } else {
