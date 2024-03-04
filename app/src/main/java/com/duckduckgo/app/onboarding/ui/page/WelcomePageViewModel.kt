@@ -33,7 +33,6 @@ class WelcomePageViewModel(
     private val context: Context,
     private val pixel: Pixel,
     private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
-    private val notificationPermissionsFeatureToggles: NotificationPermissionsFeatureToggles,
 ) : ViewModel() {
 
     fun reduce(event: WelcomePageView.Event): Flow<WelcomePageView.State> {
@@ -41,7 +40,6 @@ class WelcomePageViewModel(
             WelcomePageView.Event.OnPrimaryCtaClicked -> onPrimaryCtaClicked()
             WelcomePageView.Event.OnDefaultBrowserSet -> onDefaultBrowserSet()
             WelcomePageView.Event.OnDefaultBrowserNotSet -> onDefaultBrowserNotSet()
-            WelcomePageView.Event.OnNotificationPermissionsRequested -> notificationPermissionsRequested()
         }
     }
 
@@ -88,14 +86,6 @@ class WelcomePageViewModel(
 
         emit(WelcomePageView.State.Finish)
     }
-
-    private fun notificationPermissionsRequested(): Flow<WelcomePageView.State> = flow {
-        if (notificationPermissionsFeatureToggles.noPermissionsPrompt().isEnabled()) {
-            emit(WelcomePageView.State.ShowWelcomeAnimation)
-        } else {
-            emit(WelcomePageView.State.ShowNotificationsPermissionsPrompt)
-        }
-    }
 }
 
 @Suppress("UNCHECKED_CAST")
@@ -104,7 +94,6 @@ class WelcomePageViewModelFactory(
     private val context: Context,
     private val pixel: Pixel,
     private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
-    private val notificationPermissionsFeatureToggles: NotificationPermissionsFeatureToggles,
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -115,7 +104,6 @@ class WelcomePageViewModelFactory(
                     context,
                     pixel,
                     defaultRoleBrowserDialog,
-                    notificationPermissionsFeatureToggles,
                 )
                 else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
             }

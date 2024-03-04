@@ -74,7 +74,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome) 
     private val events = MutableSharedFlow<WelcomePageView.Event>(replay = 0, extraBufferCapacity = 1)
 
     private val welcomePageViewModel: WelcomePageViewModel by lazy {
-        ViewModelProvider(this, viewModelFactory).get(WelcomePageViewModel::class.java)
+        ViewModelProvider(this, viewModelFactory)[WelcomePageViewModel::class.java]
     }
 
     private val binding: ContentOnboardingWelcomeBinding by viewBinding()
@@ -86,6 +86,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome) 
         super.onViewCreated(view, savedInstanceState)
 
         configureDaxCta()
+        requestNotificationsPermissions()
         setSkipAnimationListener()
 
         lifecycleScope.launch {
@@ -94,13 +95,12 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome) 
                 .flowOn(dispatcherProvider.io())
                 .collect(::render)
         }
-
-        requestNotificationsPermissions()
     }
 
+    @SuppressLint("InlinedApi")
     private fun requestNotificationsPermissions() {
         if (appBuildConfig.sdkInt >= android.os.Build.VERSION_CODES.TIRAMISU) {
-            event(WelcomePageView.Event.OnNotificationPermissionsRequested)
+            requestPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
         } else {
             scheduleWelcomeAnimation()
         }
@@ -115,14 +115,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome) 
             WelcomePageView.State.Finish -> {
                 onContinuePressed()
             }
-            WelcomePageView.State.ShowWelcomeAnimation -> scheduleWelcomeAnimation()
-            WelcomePageView.State.ShowNotificationsPermissionsPrompt -> showNotificationsPermissionsPrompt()
         }
-    }
-
-    @SuppressLint("InlinedApi")
-    private fun showNotificationsPermissionsPrompt() {
-        requestPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
     }
 
     private fun event(event: WelcomePageView.Event) {
