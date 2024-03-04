@@ -105,7 +105,6 @@
                         android:layout_height="wrap_content"
                         app:typography="body2"
                         android:visibility="gone"
-                        android:textColor="@color/white"
                         android:layout_marginStart="88dp"
                         android:layout_marginEnd="@dimen/keyline_6"
                         app:layout_constraintStart_toStartOf="@id/customTabTitle"
