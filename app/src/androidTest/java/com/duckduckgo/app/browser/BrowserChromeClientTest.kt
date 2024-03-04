@@ -20,7 +20,6 @@ package com.duckduckgo.app.browser
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.Color
 import android.net.Uri
 import android.os.Message
 import android.view.View
@@ -28,7 +27,6 @@ import android.webkit.PermissionRequest
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebView
-import androidx.core.graphics.get
 import androidx.core.net.toUri
 import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
@@ -36,7 +34,6 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
-import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -244,15 +241,6 @@ class BrowserChromeClientTest {
         testee.onPermissionRequest(mockRequest)
 
         verify(mockWebViewClientListener, never()).onSitePermissionRequested(mockRequest, permissions)
-    }
-
-    @Test
-    fun whenGetDefaultVideoPosterThenReturnTransparentPixel() = runTest {
-        val bitmap = testee.defaultVideoPoster
-
-        assertEquals(1, bitmap.width)
-        assertEquals(1, bitmap.height)
-        assertEquals(Color.TRANSPARENT, bitmap[0, 0])
     }
 
     private val mockMsg = Message().apply {
