@@ -128,7 +128,14 @@ class VariantManagerImpl @Inject constructor(
 
     companion object {
 
-        const val RESERVED_EU_AUCTION_VARIANT = "ml"
+        /**
+         * Since March 7th 2024 there are two choice screens on Android
+         * Once for Search choice (existing since 2021) and Browser Choice (new since 2024)
+         * We want to be able to measure installs and retention from both screens separately
+         * https://app.asana.com/0/0/1206729008769473/f
+         */
+        const val RESERVED_EU_SEARCH_CHOICE_AUCTION_VARIANT = "ml"
+        const val RESERVED_EU_BROWSER_CHOICE_AUCTION_VARIANT = "mm"
 
         // this will be returned when there are no other active experiments
         val DEFAULT_VARIANT = Variant(key = "", filterBy = { noFilter() })
