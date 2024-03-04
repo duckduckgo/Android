@@ -35,7 +35,6 @@ dependencies {
     implementation project(path: ':autofill-api')
     implementation project(path: ':experiments-api')
     implementation project(path: ':privacy-config-api')
-    implementation project(path: ':voice-search-api')
 
     implementation KotlinX.coroutines.core
     implementation KotlinX.coroutines.android
