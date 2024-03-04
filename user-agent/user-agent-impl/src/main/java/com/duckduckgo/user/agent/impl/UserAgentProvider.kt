@@ -181,7 +181,7 @@ class RealUserAgentProvider @Inject constructor(
         if (forDesktop) {
             result = result.replace(" Mobile", "")
         }
-        return result
+        return result.replace(AgentRegex.chrome, "$1.0.0.0")
     }
 
     private fun concatWithSpaces(vararg elements: String?): String {
@@ -199,6 +199,7 @@ class RealUserAgentProvider @Inject constructor(
         val safari = Regex("(Safari/[^ ]+) *")
         val version = Regex("(Version/[^ ]+) *")
         val platform = Regex(".*Linux; Android \\d+")
+        val chrome = Regex("(Chrome/\\d+)\\.\\d+\\.\\d+\\.\\d+")
     }
 
     companion object {
