@@ -239,6 +239,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.websiteFromGeoLocationsApiOrigin
+import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.common.utils.webview.enableDarkMode
 import com.duckduckgo.common.utils.webview.enableLightMode
@@ -820,24 +821,27 @@ class BrowserTabFragment :
             omnibar.toolbar.background = ColorDrawable(tabToolbarColor)
             omnibar.toolbarContainer.background = ColorDrawable(tabToolbarColor)
 
+            omnibar.customTabToolbarContainer.show()
+
             omnibar.customTabCloseIcon.show()
             omnibar.customTabCloseIcon.setOnClickListener {
                 requireActivity().finish()
             }
 
-            omnibar.customTabDaxIcon.show()
-            omnibar.customTabDaxIcon.setOnClickListener {
+            omnibar.customTabShieldIcon.show()
+            omnibar.customTabShieldIcon.setOnClickListener {
                 val params = PrivacyDashboardHybridScreen.PrivacyDashboardHybridWithTabIdParam(tabId)
                 val intent = globalActivityStarter.startIntent(requireContext(), params)
                 intent?.let { intentPd -> startActivity(intentPd) }
             }
 
-            omnibar.customTabUrl.text = viewModel.url
-            omnibar.customTabUrl.show()
+            omnibar.customTabDomain.text = viewModel.url?.extractDomain()
+            omnibar.customTabDomain.show()
 
             val foregroundColor = calculateForegroundColor(tabToolbarColor)
             omnibar.customTabCloseIcon.setColorFilter(foregroundColor)
-            omnibar.customTabUrl.setTextColor(foregroundColor)
+            omnibar.customTabDomain.setTextColor(foregroundColor)
+            omnibar.customTabTitle.setTextColor(foregroundColor)
             omnibar.browserMenuImageView.setColorFilter(foregroundColor)
 
             requireActivity().window.navigationBarColor = tabToolbarColor
@@ -1433,9 +1437,17 @@ class BrowserTabFragment :
             is Command.ScreenLock -> screenLock(it.data)
             is Command.ScreenUnlock -> screenUnlock()
             is Command.ShowFaviconsPrompt -> showFaviconsPrompt()
+            is Command.ShowWebPageTitle -> showWebPageTitleInCustomTab(it.title)
             else -> {
                 // NO OP
             }
+        }
+    }
+
+    private fun showWebPageTitleInCustomTab(title: String) {
+        if (isActiveCustomTab()) {
+            omnibar.customTabTitle.text = title
+            omnibar.customTabTitle.show()
         }
     }
 
@@ -3335,7 +3347,11 @@ class BrowserTabFragment :
             renderIfChanged(viewState, lastSeenPrivacyShieldViewState) {
                 if (viewState.privacyShield != UNKNOWN) {
                     lastSeenPrivacyShieldViewState = viewState
-                    privacyShieldView.setAnimationView(omnibar.shieldIcon, viewState.privacyShield)
+                    if (isActiveCustomTab()) {
+                        privacyShieldView.setAnimationView(omnibar.customTabShieldIcon, viewState.privacyShield)
+                    } else {
+                        privacyShieldView.setAnimationView(omnibar.shieldIcon, viewState.privacyShield)
+                    }
                     cancelTrackersAnimation()
                 }
             }

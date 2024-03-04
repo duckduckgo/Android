@@ -471,6 +471,11 @@ class BrowserTabViewModel @Inject constructor(
         object LaunchTabSwitcher : Command()
         object HideWebContent : Command()
         object ShowWebContent : Command()
+
+        class ShowWebPageTitle(
+            val title: String,
+        ) : Command()
+
         class CheckSystemLocationPermission(
             val domain: String,
             val deniedForever: Boolean,
@@ -1839,6 +1844,7 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun titleReceived(newTitle: String) {
         site?.title = newTitle
+        command.postValue(ShowWebPageTitle(newTitle))
         onSiteChanged()
     }
 
