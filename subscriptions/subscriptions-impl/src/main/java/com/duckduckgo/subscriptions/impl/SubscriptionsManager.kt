@@ -35,6 +35,7 @@ import com.duckduckgo.subscriptions.impl.billing.PurchaseState
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
 import com.duckduckgo.subscriptions.impl.services.AuthService
+import com.duckduckgo.subscriptions.impl.services.ConfirmationBody
 import com.duckduckgo.subscriptions.impl.services.CreateAccountResponse
 import com.duckduckgo.subscriptions.impl.services.Entitlement
 import com.duckduckgo.subscriptions.impl.services.ResponseError
@@ -66,7 +67,12 @@ interface SubscriptionsManager {
     /**
      * Launches the purchase flow for a given product details and token
      */
-    suspend fun purchase(activity: Activity, productDetails: ProductDetails, offerToken: String, isReset: Boolean = false)
+    suspend fun purchase(
+        activity: Activity,
+        productDetails: ProductDetails,
+        offerToken: String,
+        isReset: Boolean = false,
+    )
 
     /**
      * Recovers a subscription from the store
@@ -173,7 +179,7 @@ class RealSubscriptionsManager @Inject constructor(
         purchaseStateJob = coroutineScope.launch(dispatcherProvider.io()) {
             billingClientWrapper.purchaseState.collect {
                 when (it) {
-                    is PurchaseState.Purchased -> checkPurchase()
+                    is PurchaseState.Purchased -> checkPurchase(it.packageName, it.purchaseToken)
                     else -> {
                         // NOOP
                     }
@@ -239,25 +245,81 @@ class RealSubscriptionsManager @Inject constructor(
         _hasSubscription.emit(false)
     }
 
-    private suspend fun checkPurchase() {
+    private suspend fun checkPurchase(
+        packageName: String,
+        purchaseToken: String,
+    ) {
+        var retryCompleted = false
+
+        suspend fun retry(
+            times: Int = 3,
+            initialDelay: Long = 500, // .5 seconds
+            maxDelay: Long = 1_500, // 1.5 seconds
+            factor: Double = 2.0,
+            block: suspend () -> Unit,
+        ) {
+            var currentDelay = initialDelay
+            repeat(times) {
+                try {
+                    if (!retryCompleted) {
+                        block()
+                    } else {
+                        return@retry
+                    }
+                } catch (t: Throwable) {
+                    logcat { "Subs: error in confirmation retry" }
+                }
+                delay(currentDelay)
+                currentDelay = (currentDelay * factor).toLong().coerceAtMost(maxDelay)
+            }
+        }
+
         _currentPurchaseState.emit(CurrentPurchase.InProgress)
-        delay(500)
-        var retries = 1
-        var hasSubscription = hasSubscription()
-        while (!hasSubscription && retries <= 3) {
-            delay(500L * retries)
-            hasSubscription = hasSubscription()
-            retries++
+
+        retry {
+            retryCompleted = attemptConfirmPurchase(packageName, purchaseToken)
+            logcat { "Subs: retry success: $retryCompleted" }
         }
-        if (hasSubscription) {
-            pixelSender.reportPurchaseSuccess()
-            pixelSender.reportSubscriptionActivated()
-            _currentPurchaseState.emit(CurrentPurchase.Success)
-        } else {
-            pixelSender.reportPurchaseFailureBackend()
-            _currentPurchaseState.emit(CurrentPurchase.Failure("An error happened, try again"))
+
+        if (!retryCompleted) {
+            handlePurchaseFailed()
         }
-        _hasSubscription.emit(hasSubscription)
+    }
+
+    private suspend fun attemptConfirmPurchase(
+        packageName: String,
+        purchaseToken: String,
+    ): Boolean {
+        return try {
+            subscriptionsService.confirm(
+                "Bearer ${authRepository.tokens().accessToken}",
+                ConfirmationBody(
+                    packageName = packageName,
+                    purchaseToken = purchaseToken,
+                ),
+            ).also {
+                val status = it.subscription.status
+                if (status == "Auto-Renewable" || status == "Not Auto-Renewable" || status == "Grace Period") {
+                    pixelSender.reportPurchaseSuccess()
+                    pixelSender.reportSubscriptionActivated()
+                    _currentPurchaseState.emit(CurrentPurchase.Success)
+                } else {
+                    handlePurchaseFailed()
+                }
+            }
+
+            _hasSubscription.emit(true)
+            true
+        } catch (e: Exception) {
+            logcat { "Subs: failed to confirm purchase $e" }
+            false
+        }
+    }
+
+    private suspend fun handlePurchaseFailed() {
+        pixelSender.reportPurchaseFailureBackend()
+        _currentPurchaseState.emit(CurrentPurchase.Failure("An error happened, try again"))
+        _hasSubscription.emit(false)
     }
 
     override suspend fun hasSubscription(): Boolean {
@@ -267,6 +329,7 @@ class RealSubscriptionsManager @Inject constructor(
                 _hasSubscription.emit(isSubscribed)
                 isSubscribed
             }
+
             is Failure -> {
                 false
             }
@@ -357,6 +420,7 @@ class RealSubscriptionsManager @Inject constructor(
                     _currentPurchaseState.emit(CurrentPurchase.Recovered)
                 }
             }
+
             is Failure -> {
                 logcat(LogPriority.ERROR) { "Subs: ${response.message}" }
                 pixelSender.reportPurchaseFailureOther()
@@ -403,6 +467,7 @@ class RealSubscriptionsManager @Inject constructor(
                         AuthToken.Success(authRepository.tokens().authToken!!)
                     }
                 }
+
                 is Failure -> {
                     when (response.message) {
                         "expired_token" -> {
@@ -418,6 +483,7 @@ class RealSubscriptionsManager @Inject constructor(
                                 AuthToken.Failure(response.message)
                             }
                         }
+
                         else -> {
                             AuthToken.Failure(response.message)
                         }
@@ -495,7 +561,12 @@ sealed class AuthToken {
 }
 
 sealed class SubscriptionsData {
-    data class Success(val email: String?, val externalId: String, val entitlements: List<Entitlement>) : SubscriptionsData()
+    data class Success(
+        val email: String?,
+        val externalId: String,
+        val entitlements: List<Entitlement>,
+    ) : SubscriptionsData()
+
     data class Failure(val message: String) : SubscriptionsData()
 }
 
@@ -507,6 +578,7 @@ sealed class Subscription {
         val status: SubscriptionStatus,
         val platform: String,
     ) : Subscription()
+
     data class Failure(val message: String) : Subscription()
 }
 

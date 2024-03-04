@@ -25,6 +25,7 @@ import com.duckduckgo.subscriptions.impl.repository.RealAuthRepository
 import com.duckduckgo.subscriptions.impl.services.AccessTokenResponse
 import com.duckduckgo.subscriptions.impl.services.AccountResponse
 import com.duckduckgo.subscriptions.impl.services.AuthService
+import com.duckduckgo.subscriptions.impl.services.ConfirmationResponse
 import com.duckduckgo.subscriptions.impl.services.CreateAccountResponse
 import com.duckduckgo.subscriptions.impl.services.Entitlement
 import com.duckduckgo.subscriptions.impl.services.PortalResponse
@@ -524,6 +525,7 @@ class RealSubscriptionsManagerTest {
     fun whenPurchaseSuccessfulThenPurchaseCheckedAndSuccessEmit() = runTest {
         givenUserIsAuthenticated()
         givenValidateTokenSucceedsWithEntitlements()
+        givenConfirmPurchaseSucceeds()
 
         val flowTest: MutableSharedFlow<PurchaseState> = MutableSharedFlow()
         whenever(billingClient.purchaseState).thenReturn(flowTest)
@@ -541,7 +543,7 @@ class RealSubscriptionsManagerTest {
         )
 
         manager.currentPurchaseState.test {
-            flowTest.emit(PurchaseState.Purchased)
+            flowTest.emit(PurchaseState.Purchased("validToken", "packageName"))
             assertTrue(awaitItem() is CurrentPurchase.InProgress)
             assertTrue(awaitItem() is CurrentPurchase.Success)
             cancelAndConsumeRemainingEvents()
@@ -552,6 +554,7 @@ class RealSubscriptionsManagerTest {
     fun whenPurchaseFailedThenPurchaseCheckedAndFailureEmit() = runTest {
         givenUserIsAuthenticated()
         givenValidateTokenFails("failure")
+        givenConfirmPurchaseFails()
 
         val flowTest: MutableSharedFlow<PurchaseState> = MutableSharedFlow()
         whenever(billingClient.purchaseState).thenReturn(flowTest)
@@ -569,7 +572,7 @@ class RealSubscriptionsManagerTest {
         )
 
         manager.currentPurchaseState.test {
-            flowTest.emit(PurchaseState.Purchased)
+            flowTest.emit(PurchaseState.Purchased("validateToken", "packageName"))
             assertTrue(awaitItem() is CurrentPurchase.InProgress)
             assertTrue(awaitItem() is CurrentPurchase.Failure)
             cancelAndConsumeRemainingEvents()
@@ -813,8 +816,9 @@ class RealSubscriptionsManagerTest {
     fun whenPurchaseIsSuccessfulThenPixelIsSent() = runTest {
         givenUserIsAuthenticated()
         givenValidateTokenSucceedsWithEntitlements()
+        givenConfirmPurchaseSucceeds()
 
-        whenever(billingClient.purchaseState).thenReturn(flowOf(PurchaseState.Purchased))
+        whenever(billingClient.purchaseState).thenReturn(flowOf(PurchaseState.Purchased("any", "any")))
 
         subscriptionsManager.currentPurchaseState.test {
             assertTrue(awaitItem() is CurrentPurchase.InProgress)
@@ -853,8 +857,9 @@ class RealSubscriptionsManagerTest {
     fun whenPurchaseFailsThenPixelIsSent() = runTest {
         givenUserIsAuthenticated()
         givenValidateTokenFails("failure")
+        givenConfirmPurchaseFails()
 
-        whenever(billingClient.purchaseState).thenReturn(flowOf(PurchaseState.Purchased))
+        whenever(billingClient.purchaseState).thenReturn(flowOf(PurchaseState.Purchased("validateToken", "packageName")))
 
         subscriptionsManager.currentPurchaseState.test {
             assertTrue(awaitItem() is CurrentPurchase.InProgress)
@@ -1047,5 +1052,26 @@ class RealSubscriptionsManagerTest {
     private suspend fun givenAuthenticateFails() {
         val exception = "account_failure".toResponseBody("text/json".toMediaTypeOrNull())
         whenever(authService.accessToken(any())).thenThrow(HttpException(Response.error<String>(400, exception)))
+    }
+
+    private suspend fun givenConfirmPurchaseFails() {
+        val exception = "account_failure".toResponseBody("text/json".toMediaTypeOrNull())
+        whenever(subscriptionsService.confirm(any(), any())).thenThrow(HttpException(Response.error<String>(400, exception)))
+    }
+
+    private suspend fun givenConfirmPurchaseSucceeds() {
+        whenever(subscriptionsService.confirm(any(), any())).thenReturn(
+            ConfirmationResponse(
+                email = "test@duck.com",
+                entitlements = listOf(),
+                subscription = SubscriptionResponse(
+                    productId = "id",
+                    platform = "google",
+                    status = "Auto-Renewable",
+                    startedAt = 1000000L,
+                    expiresOrRenewsAt = 1000000L,
+                ),
+            ),
+        )
     }
 }
