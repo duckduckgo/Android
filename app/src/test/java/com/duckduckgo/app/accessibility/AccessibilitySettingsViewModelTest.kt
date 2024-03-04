@@ -21,14 +21,11 @@ import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.voice.api.VoiceSearchAvailability
-import com.duckduckgo.voice.impl.VoiceSearchAvailabilityConfig
-import com.duckduckgo.voice.impl.VoiceSearchAvailabilityConfigProvider
 import com.duckduckgo.voice.impl.VoiceSearchPixelNames
 import com.duckduckgo.voice.store.VoiceSearchRepository
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -44,16 +41,8 @@ class AccessibilitySettingsViewModelTest {
     private val voiceSearchRepository: VoiceSearchRepository = mock()
     private val voiceSearchAvailability: VoiceSearchAvailability = mock()
     private val accessibilitySettings: AccessibilitySettingsDataStore = mock()
-    private val configProvider: VoiceSearchAvailabilityConfigProvider = mock()
     private val pixel: Pixel = mock()
-    private val testee = AccessibilitySettingsViewModel(accessibilitySettings, voiceSearchAvailability, voiceSearchRepository, configProvider, pixel)
-
-    @Before
-    fun setUp() {
-        whenever(configProvider.get()).thenAnswer {
-            VoiceSearchAvailabilityConfig("Google", "Pixel 7 Pro", 31, "en-US", true)
-        }
-    }
+    private val testee = AccessibilitySettingsViewModel(accessibilitySettings, voiceSearchAvailability, voiceSearchRepository, pixel)
 
     @Test
     fun whenViewModelCreatedThenDefaultViewStateEmitted() = runTest {
@@ -190,19 +179,13 @@ class AccessibilitySettingsViewModelTest {
     @Test
     fun whenVoiceSearchEnabledThenFirePixel() = runTest {
         testee.onVoiceSearchChanged(true)
-        verify(pixel).fire(
-            VoiceSearchPixelNames.VOICE_SEARCH_ON,
-            mapOf("locale" to "en-US", "manufacturer" to "Google", "model" to "Pixel 7 Pro"),
-        )
+        verify(pixel).fire(VoiceSearchPixelNames.VOICE_SEARCH_ON)
     }
 
     @Test
     fun whenVoiceSearchDisabledThenFirePixel() = runTest {
         testee.onVoiceSearchChanged(false)
-        verify(pixel).fire(
-            VoiceSearchPixelNames.VOICE_SEARCH_OFF,
-            mapOf("locale" to "en-US", "manufacturer" to "Google", "model" to "Pixel 7 Pro"),
-        )
+        verify(pixel).fire(VoiceSearchPixelNames.VOICE_SEARCH_OFF)
     }
 
     private fun defaultViewState() = AccessibilitySettingsViewModel.ViewState()

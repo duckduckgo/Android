@@ -23,7 +23,6 @@ import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.voice.api.VoiceSearchAvailability
-import com.duckduckgo.voice.impl.VoiceSearchAvailabilityConfigProvider
 import com.duckduckgo.voice.impl.VoiceSearchPixelNames.VOICE_SEARCH_OFF
 import com.duckduckgo.voice.impl.VoiceSearchPixelNames.VOICE_SEARCH_ON
 import com.duckduckgo.voice.store.VoiceSearchRepository
@@ -38,7 +37,6 @@ class AccessibilitySettingsViewModel @Inject constructor(
     private val accessibilitySettings: AccessibilitySettingsDataStore,
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val voiceSearchRepository: VoiceSearchRepository,
-    private val configProvider: VoiceSearchAvailabilityConfigProvider,
     private val pixel: Pixel,
 ) : ViewModel() {
 
@@ -108,23 +106,9 @@ class AccessibilitySettingsViewModel @Inject constructor(
         voiceSearchRepository.setVoiceSearchUserEnabled(checked)
         if (checked) {
             voiceSearchRepository.resetVoiceSearchDismissed()
-            pixel.fire(
-                VOICE_SEARCH_ON,
-                mapOf(
-                    Pixel.PixelParameter.LOCALE to configProvider.get().languageTag,
-                    Pixel.PixelParameter.MANUFACTURER to configProvider.get().deviceManufacturer,
-                    Pixel.PixelParameter.MODEL to configProvider.get().deviceModel,
-                ),
-            )
+            pixel.fire(VOICE_SEARCH_ON)
         } else {
-            pixel.fire(
-                VOICE_SEARCH_OFF,
-                mapOf(
-                    Pixel.PixelParameter.LOCALE to configProvider.get().languageTag,
-                    Pixel.PixelParameter.MANUFACTURER to configProvider.get().deviceManufacturer,
-                    Pixel.PixelParameter.MODEL to configProvider.get().deviceModel,
-                ),
-            )
+            pixel.fire(VOICE_SEARCH_OFF)
         }
         viewModelScope.launch {
             viewState.emit(

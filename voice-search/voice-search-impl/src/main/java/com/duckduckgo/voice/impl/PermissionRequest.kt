@@ -48,7 +48,6 @@ class MicrophonePermissionRequest @Inject constructor(
     private val voiceSearchPermissionDialogsLauncher: VoiceSearchPermissionDialogsLauncher,
     private val activityResultLauncherWrapper: ActivityResultLauncherWrapper,
     private val permissionRationale: PermissionRationale,
-    private val configProvider: VoiceSearchAvailabilityConfigProvider,
 ) : PermissionRequest {
     companion object {
         private const val SCHEME_PACKAGE = "package"
@@ -105,23 +104,13 @@ class MicrophonePermissionRequest @Inject constructor(
     }
 
     private fun handleRationaleAccepted() {
-        val params = mapOf(
-            Pixel.PixelParameter.LOCALE to configProvider.get().languageTag,
-            Pixel.PixelParameter.MANUFACTURER to configProvider.get().deviceManufacturer,
-            Pixel.PixelParameter.MODEL to configProvider.get().deviceModel,
-        )
-        pixel.fire(VoiceSearchPixelNames.VOICE_SEARCH_PRIVACY_DIALOG_ACCEPTED, params)
+        pixel.fire(VoiceSearchPixelNames.VOICE_SEARCH_PRIVACY_DIALOG_ACCEPTED)
         voiceSearchRepository.acceptRationaleDialog()
         activityResultLauncherWrapper.launch(LaunchPermissionRequest)
     }
 
     private fun handleRationaleCancelled(context: Context) {
-        val params = mapOf(
-            Pixel.PixelParameter.LOCALE to configProvider.get().languageTag,
-            Pixel.PixelParameter.MANUFACTURER to configProvider.get().deviceManufacturer,
-            Pixel.PixelParameter.MODEL to configProvider.get().deviceModel,
-        )
-        pixel.fire(VoiceSearchPixelNames.VOICE_SEARCH_PRIVACY_DIALOG_REJECTED, params)
+        pixel.fire(VoiceSearchPixelNames.VOICE_SEARCH_PRIVACY_DIALOG_REJECTED)
         showRemoveVoiceSearchDialog(context)
     }
 

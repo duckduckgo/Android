@@ -33,18 +33,12 @@ class RealVoiceSearchAvailabilityPixelLoggerTest {
     @Mock
     private lateinit var voiceSearchRepository: VoiceSearchRepository
 
-    @Mock
-    private lateinit var configProvider: VoiceSearchAvailabilityConfigProvider
-
     private lateinit var testee: RealVoiceSearchAvailabilityPixelLogger
 
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
-        testee = RealVoiceSearchAvailabilityPixelLogger(pixel, voiceSearchRepository, configProvider)
-        whenever(configProvider.get()).thenAnswer {
-            VoiceSearchAvailabilityConfig("Google", "Pixel 7 Pro", 31, "en-US", true)
-        }
+        testee = RealVoiceSearchAvailabilityPixelLogger(pixel, voiceSearchRepository)
     }
 
     @Test
@@ -53,10 +47,7 @@ class RealVoiceSearchAvailabilityPixelLoggerTest {
 
         testee.log()
 
-        verify(pixel).fire(
-            VoiceSearchPixelNames.VOICE_SEARCH_AVAILABLE,
-            mapOf("locale" to "en-US", "manufacturer" to "Google", "model" to "Pixel 7 Pro"),
-        )
+        verify(pixel).fire(VoiceSearchPixelNames.VOICE_SEARCH_AVAILABLE)
         verify(voiceSearchRepository).saveLoggedAvailability()
     }
 
@@ -66,10 +57,7 @@ class RealVoiceSearchAvailabilityPixelLoggerTest {
 
         testee.log()
 
-        verify(pixel, never()).fire(
-            VoiceSearchPixelNames.VOICE_SEARCH_AVAILABLE,
-            mapOf("locale" to "en-US", "manufacturer" to "Google", "model" to "Pixel 7 Pro"),
-        )
+        verify(pixel, never()).fire(VoiceSearchPixelNames.VOICE_SEARCH_AVAILABLE)
         verify(voiceSearchRepository, never()).saveLoggedAvailability()
     }
 }

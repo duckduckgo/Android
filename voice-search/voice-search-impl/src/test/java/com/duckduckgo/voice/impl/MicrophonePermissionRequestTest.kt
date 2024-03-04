@@ -45,9 +45,6 @@ class MicrophonePermissionRequestTest {
     @Mock
     private lateinit var permissionRationale: PermissionRationale
 
-    @Mock
-    private lateinit var configProvider: VoiceSearchAvailabilityConfigProvider
-
     private lateinit var voiceSearchPermissionDialogsLauncher: FakeVoiceSearchPermissionDialogsLauncher
 
     private lateinit var activityResultLauncherWrapper: FakeActivityResultLauncherWrapper
@@ -65,11 +62,7 @@ class MicrophonePermissionRequestTest {
             voiceSearchPermissionDialogsLauncher,
             activityResultLauncherWrapper,
             permissionRationale,
-            configProvider,
         )
-        whenever(configProvider.get()).thenAnswer {
-            VoiceSearchAvailabilityConfig("Google", "Pixel 7 Pro", 31, "en-US", true)
-        }
     }
 
     @Test
@@ -176,10 +169,7 @@ class MicrophonePermissionRequestTest {
 
         voiceSearchPermissionDialogsLauncher.boundOnRationaleAccepted.invoke()
 
-        verify(pixel).fire(
-            VoiceSearchPixelNames.VOICE_SEARCH_PRIVACY_DIALOG_ACCEPTED,
-            mapOf("locale" to "en-US", "manufacturer" to "Google", "model" to "Pixel 7 Pro"),
-        )
+        verify(pixel).fire(VoiceSearchPixelNames.VOICE_SEARCH_PRIVACY_DIALOG_ACCEPTED)
         verify(voiceSearchRepository).acceptRationaleDialog()
         assertEquals(LaunchPermissionRequest, activityResultLauncherWrapper.lastKnownAction)
     }
@@ -193,10 +183,7 @@ class MicrophonePermissionRequestTest {
 
         voiceSearchPermissionDialogsLauncher.boundOnRationaleDeclined.invoke()
 
-        verify(pixel).fire(
-            VoiceSearchPixelNames.VOICE_SEARCH_PRIVACY_DIALOG_REJECTED,
-            mapOf("locale" to "en-US", "manufacturer" to "Google", "model" to "Pixel 7 Pro"),
-        )
+        verify(pixel).fire(VoiceSearchPixelNames.VOICE_SEARCH_PRIVACY_DIALOG_REJECTED)
     }
 
     @Test

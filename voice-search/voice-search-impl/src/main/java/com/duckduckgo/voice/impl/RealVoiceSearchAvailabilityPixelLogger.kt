@@ -27,17 +27,11 @@ import javax.inject.Inject
 class RealVoiceSearchAvailabilityPixelLogger @Inject constructor(
     private val pixel: Pixel,
     private val voiceSearchRepository: VoiceSearchRepository,
-    private val configProvider: VoiceSearchAvailabilityConfigProvider,
 ) : VoiceSearchAvailabilityPixelLogger {
 
     override fun log() {
         if (!voiceSearchRepository.getHasLoggedAvailability()) {
-            val params = mapOf(
-                Pixel.PixelParameter.LOCALE to configProvider.get().languageTag,
-                Pixel.PixelParameter.MANUFACTURER to configProvider.get().deviceManufacturer,
-                Pixel.PixelParameter.MODEL to configProvider.get().deviceModel,
-            )
-            pixel.fire(VoiceSearchPixelNames.VOICE_SEARCH_AVAILABLE, params)
+            pixel.fire(VoiceSearchPixelNames.VOICE_SEARCH_AVAILABLE)
             voiceSearchRepository.saveLoggedAvailability()
         }
     }

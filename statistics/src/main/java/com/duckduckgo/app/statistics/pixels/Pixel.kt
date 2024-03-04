@@ -64,10 +64,7 @@ interface Pixel {
         const val MESSAGE_SHOWN = "message"
         const val ACTION_SUCCESS = "success"
         const val SYNC = "sync"
-        const val LOCALE = "locale"
-        const val MANUFACTURER = "manufacturer"
-        const val MODEL = "model"
-        const val VOICE_SEARCH_ENABLED = "voice_search_enabled"
+        const val VOICE_SEARCH = "voice_search"
     }
 
     object PixelValues {
