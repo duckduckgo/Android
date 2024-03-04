@@ -38,7 +38,9 @@ class TdsClient(
     ): Client.Result {
         val tracker = if (optimizeTrackerEvaluation) {
             val domain = host(url)?.let { Domain(it) }
-            trackers.firstOrNull { domain?.let { domain -> sameOrSubdomain(domain, it.domain)} ?: false } ?: return Client.Result(matches = false, isATracker = false)
+            trackers.firstOrNull {
+                domain?.let { domain -> sameOrSubdomain(domain, it.domain) } ?: false
+            } ?: return Client.Result(matches = false, isATracker = false)
         } else {
             trackers.firstOrNull { sameOrSubdomain(url, it.domain.value) } ?: return Client.Result(matches = false, isATracker = false)
         }

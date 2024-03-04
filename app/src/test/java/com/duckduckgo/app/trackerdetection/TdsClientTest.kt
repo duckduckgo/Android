@@ -48,7 +48,6 @@ class TdsClientTest {
     private val imageUrl = "http://api.tracker.com/auth/image.png"
     private val image = "image"
 
-
     @Test
     fun whenUrlHasSameDomainAsTrackerEntryAndDefaultActionBlockThenMatchesIsTrue() {
         test(url = "http://tracker.com/script.js", trackerDomain = trackerDomain, action = BLOCK, expected = true)

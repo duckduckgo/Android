@@ -58,7 +58,7 @@ class TrackerDataLoader @Inject constructor(
     private val moshi: Moshi,
     private val urlToTypeMapper: UrlToTypeMapper,
     private val dispatcherProvider: DispatcherProvider,
-    private val optimizeTrackerEvaluationRCWrapper: OptimizeTrackerEvaluationRCWrapper
+    private val optimizeTrackerEvaluationRCWrapper: OptimizeTrackerEvaluationRCWrapper,
 ) : MainProcessLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
