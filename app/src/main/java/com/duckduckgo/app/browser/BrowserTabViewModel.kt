@@ -1643,6 +1643,7 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun titleReceived(newTitle: String) {
         site?.title = newTitle
+        command.postValue(ShowWebPageTitle(newTitle))
         onSiteChanged()
     }
 
