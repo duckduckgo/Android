@@ -21,7 +21,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.extensions.registerNotExportedReceiver
+import com.duckduckgo.common.utils.extensions.registerExportedReceiver
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
@@ -49,7 +49,8 @@ class ExceptionRulesDebugReceiver(
 
     init {
         kotlin.runCatching { context.unregisterReceiver(this) }
-        context.registerNotExportedReceiver(this, IntentFilter(intentAction))
+        // needs to be exported because it's register on the :vpn process but can be intent-trigger from the :app process
+        context.registerExportedReceiver(this, IntentFilter(intentAction))
     }
 
     override fun onReceive(
