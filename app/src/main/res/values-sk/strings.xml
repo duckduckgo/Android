@@ -815,4 +815,9 @@
         <item quantity="other">Naozaj chcete odstrániť tento priečinok a %1$d položiek?</item>
     </plurals>
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Naozaj chcete odstrániť záložku používateľa &lt;b&gt;%1$s&lt;/b&gt;?</string>
+
+
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">Otvoriť v DuckDuckGo</string>
+    <string name="runningInDdgMenuItemTitle">Spustené v DuckDuckGo</string>
 </resources>

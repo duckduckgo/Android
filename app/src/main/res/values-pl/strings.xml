@@ -815,4 +815,9 @@
         <item quantity="other">Czy na pewno chcesz usunąć ten folder i %1$d elementu?</item>
     </plurals>
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Czy na pewno chcesz usunąć zakładkę &lt;b&gt;%1$s&lt;/b&gt;?</string>
+
+
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">Otwórz w DuckDuckGo</string>
+    <string name="runningInDdgMenuItemTitle">Uruchamianie w DuckDuckGo</string>
 </resources>
