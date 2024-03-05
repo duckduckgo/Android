@@ -68,7 +68,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 
 @Database(
     exportSchema = true,
-    version = 52,
+    version = 53,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -641,6 +641,12 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         }
     }
 
+    private val MIGRATION_52_TO_53: Migration = object : Migration(52, 53) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("DELETE FROM `page_loaded_pixel_entity`")
+        }
+    }
+
     val BOOKMARKS_DB_ON_CREATE = object : RoomDatabase.Callback() {
         override fun onCreate(database: SupportSQLiteDatabase) {
             database.execSQL(
@@ -718,6 +724,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             MIGRATION_49_TO_50,
             MIGRATION_50_TO_51,
             MIGRATION_51_TO_52,
+            MIGRATION_52_TO_53,
         )
 
     @Deprecated(

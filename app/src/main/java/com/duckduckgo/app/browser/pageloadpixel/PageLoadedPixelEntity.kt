@@ -25,7 +25,6 @@ class PageLoadedPixelEntity(
     val appVersion: String,
     val elapsedTime: Long,
     val webviewVersion: String,
-    @Deprecated("trackerOptimizationEnabled isn't sent as part of the pixel")
-    val trackerOptimizationEnabled: Boolean = true,
+    val trackerOptimizationEnabled: Boolean,
     val cpmEnabled: Boolean,
 )
