@@ -141,24 +141,24 @@
     <string name="sync_notify_me_description">Gaukite pranešimą, jei „Sinchronizavimas ir atsarginės kopijos kūrimas“ susiduria su klaida.</string>
 
     <!-- setup errors -->
-    <string name="sync_turn_off_error">Nepavyko išjungti sinchronizavimo ir atsarginės kopijos kūrimo.</string>
+    <string name="sync_turn_off_error">Nepavyko išjungti funkcijos „Sync &amp; Backup“.</string>
     <string name="sync_edit_device_error">Nepavyko atnaujinti įrenginio pavadinimo.</string>
-    <string name="sync_remove_device_error">Nepavyko pašalinti šio įrenginio iš sinchronizavimo ir atsarginės kopijos kūrimo.</string>
+    <string name="sync_remove_device_error">Nepavyko pašalinti šio įrenginio iš funkcijos „Sync &amp; Backup“.</string>
     <string name="sync_delete_data_error">Nepavyko ištrinti duomenų serveryje.</string>
-    <string name="sync_login_authenticated_device_error">"Norėdami susieti šiuos įrenginius, viename įrenginyje išjunkite funkciją „Sinchronizuoti ir sukurti atsarginę kopiją“, tada kitame įrenginyje palieskite „Sinchronizuoti su kitu įrenginiu“."</string>
+    <string name="sync_login_authenticated_device_error">"Norėdami susieti šiuos įrenginius, viename įrenginyje išjunkite funkciją „Sync &amp; Backup“, tada kitame įrenginyje bakstelėkite „Sinchronizuoti su kitu įrenginiu“."</string>
     <string name="sync_connect_generic_error">Nepavyko prisijungti prie serverio.</string>
     <string name="sync_connect_login_error">Nepavyko sinchronizuoti su kitu įrenginiu.</string>
     <string name="sync_create_account_generic_error">Nepavyko prisijungti prie serverio.</string>
     <string name="sync_invalid_code_error">Atsiprašome, šis kodas neteisingas. Įsitikinkite, kad įvestas arba nuskaitytas teisingas kodas.</string>
     <string name="sync_recovery_pdf_error">Nepavyko sukurti atkūrimo PDF.</string>
     <string name="sync_dialog_error_ok">Gerai</string>
-    <string name="sync_dialog_error_title">Sinchronizuoti ir kurti atsarginę kopiją</string>
+    <string name="sync_dialog_error_title">Sync &amp; Backup</string>
     <string name="sync_encryption_not_supported_error_title">Nepalaikomas įrenginys</string>
-    <string name="sync_encryption_not_supported_error">Funkcijai „Sync &amp; Backup“ (sinchronizavimas ir atsarginės kopijos kūrimas) naudojamas ištisinis šifravimas, todėl jūsų įrenginyje turi būti galima užšifruoti ir išsaugoti duomenis. Jūsų įrenginys nepalaiko šifruotos saugyklos, todėl „Sync &amp; Backup“ funkcija nepasiekiama.</string>
+    <string name="sync_encryption_not_supported_error">Funkcijai „Sync &amp; Backup“ naudojamas ištisinis šifravimas, todėl jūsų įrenginyje turi būti galima užšifruoti ir išsaugoti duomenis. Jūsų įrenginys nepalaiko šifruotos saugyklos, todėl „Sync &amp; Backup“ funkcija nepasiekiama.</string>
 
     <!-- Sync Device Authentication -->
-    <string name="sync_auth_text_for_access">Atrakinkite įrenginį, kad pasiektumėte sinchronizavimo ir atsarginės kopijos kūrimo funkciją.</string>
-    <string name="sync_biometric_prompt_title">Sinchronizavimo ir atsarginės kopijos kūrimo funkcija užrakinta</string>
+    <string name="sync_auth_text_for_access">Atrakinkite įrenginį, kad galėtumėte pasiekti funkciją „Sync &amp; Backup“.</string>
+    <string name="sync_biometric_prompt_title">Funkcija „Sync &amp; Backup“ užrakinta</string>
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Ištrinti serverio duomenis?</string>
