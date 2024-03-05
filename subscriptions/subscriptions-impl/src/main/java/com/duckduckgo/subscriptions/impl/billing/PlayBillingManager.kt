@@ -204,11 +204,11 @@ class RealPlayBillingManager @Inject constructor(
 }
 
 sealed class PurchaseState {
-    object InProgress : PurchaseState()
+    data object InProgress : PurchaseState()
     data class Purchased(
         val purchaseToken: String,
         val packageName: String,
     ) : PurchaseState()
 
-    object Canceled : PurchaseState()
+    data object Canceled : PurchaseState()
 }
