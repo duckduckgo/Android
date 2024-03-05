@@ -58,8 +58,4 @@
     <string name="faviconsPromptMessage">Do you want this device to automatically download icons for synced bookmarks from the bookmarked websites?</string>
     <string name="faviconsPromptPrimaryCta">Keep Bookmark Icons Updated</string>
     <string name="faviconsPromptSecondaryCta">Not Now</string>
-
-    <!-- Custom Tab -->
-    <string name="openInDdgMenuItemTitle">Open in DuckDuckGo</string>
-    <string name="runningInDdgMenuItemTitle">Running in DuckDuckGo</string>
 </resources>
