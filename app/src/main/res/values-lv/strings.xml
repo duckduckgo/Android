@@ -810,4 +810,9 @@
         <item quantity="other">Vai tiešām vēlies dzēst šo mapi un %1$d vienumus?</item>
     </plurals>
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Vai tiešām vēlies dzēst savu &lt;b&gt;%1$s&lt;/b&gt; grāmatzīmi?</string>
+
+
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">Atvērt vietnē DuckDuckGo</string>
+    <string name="runningInDdgMenuItemTitle">Darbojas programmā DuckDuckGo</string>
 </resources>
