@@ -302,29 +302,31 @@ class BrowserWebViewClient @Inject constructor(
         webView: WebView,
         url: String?,
     ) {
-        jsPlugins.getPlugins().forEach {
-            it.onPageFinished(webView, url, webViewClientListener?.getSite())
-        }
-        url?.let {
-            // We call this for any url but it will only be processed for an internal tester verification url
-            internalTestUserChecker.verifyVerificationCompleted(it)
-        }
-        Timber.v("onPageFinished webViewUrl: ${webView.url} URL: $url")
-        val navigationList = webView.safeCopyBackForwardList() ?: return
-        webViewClientListener?.run {
-            navigationStateChanged(WebViewNavigationState(navigationList))
-            url?.let { prefetchFavicon(url) }
-        }
-        flushCookies()
-        printInjector.injectPrint(webView)
+        Timber.v("onPageFinished webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}")
+        if (webView.progress == 100) {
+            jsPlugins.getPlugins().forEach {
+                it.onPageFinished(webView, url, webViewClientListener?.getSite())
+            }
+            url?.let {
+                // We call this for any url but it will only be processed for an internal tester verification url
+                internalTestUserChecker.verifyVerificationCompleted(it)
+            }
+            val navigationList = webView.safeCopyBackForwardList() ?: return
+            webViewClientListener?.run {
+                navigationStateChanged(WebViewNavigationState(navigationList))
+                url?.let { prefetchFavicon(url) }
+            }
+            flushCookies()
+            printInjector.injectPrint(webView)
 
-        url?.let {
-            start?.let { safeStart ->
-                val progress = webView.progress
-                // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
-                if (url != ABOUT_BLANK && progress == 100) {
-                    shouldSendPageLoadedPixel(it, safeStart, currentTimeProvider.getTimeInMillis())
-                    start = null
+            url?.let {
+                start?.let { safeStart ->
+                    val progress = webView.progress
+                    // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
+                    if (url != ABOUT_BLANK) {
+                        shouldSendPageLoadedPixel(it, safeStart, currentTimeProvider.getTimeInMillis())
+                        start = null
+                    }
                 }
             }
         }
