@@ -170,7 +170,12 @@ class RealBillingClientWrapper @Inject constructor(
         // Then, handle the purchases
         for (purchase in purchases) {
             if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
-                _purchaseState.emit(Purchased)
+                _purchaseState.emit(
+                    Purchased(
+                        purchaseToken = purchase.purchaseToken,
+                        packageName = purchase.packageName,
+                    ),
+                )
             }
         }
     }
@@ -304,6 +309,10 @@ class RealBillingClientWrapper @Inject constructor(
 
 sealed class PurchaseState {
     object InProgress : PurchaseState()
-    object Purchased : PurchaseState()
+    data class Purchased(
+        val purchaseToken: String,
+        val packageName: String,
+    ) : PurchaseState()
+
     object Canceled : PurchaseState()
 }
