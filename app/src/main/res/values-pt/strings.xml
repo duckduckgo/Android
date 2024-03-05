@@ -805,4 +805,9 @@
         <item quantity="other">Tem a certeza de que quer eliminar esta pasta e %1$d itens?</item>
     </plurals>
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Tens a certeza de que queres eliminar o marcador para &lt;b&gt;%1$s&lt;/b&gt;?</string>
+
+
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">Abrir no DuckDuckGo</string>
+    <string name="runningInDdgMenuItemTitle">Em execução no DuckDuckGo</string>
 </resources>
