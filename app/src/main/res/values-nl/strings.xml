@@ -805,4 +805,9 @@
         <item quantity="other">Weet je zeker dat je deze map en %1$d items wilt verwijderen?</item>
     </plurals>
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Weet je zeker dat je bladwijzer voor &lt;b&gt;%1$s&lt;/b&gt; wilt verwijderen?</string>
+
+
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">Openen in DuckDuckGo</string>
+    <string name="runningInDdgMenuItemTitle">Uitgevoerd in DuckDuckGo</string>
 </resources>
