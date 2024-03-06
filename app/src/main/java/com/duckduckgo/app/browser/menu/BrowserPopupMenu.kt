@@ -17,9 +17,7 @@
 package com.duckduckgo.app.browser.menu
 
 import android.content.Context
-import android.content.res.Configuration
 import android.view.LayoutInflater
-import android.view.ViewGroup.LayoutParams
 import androidx.core.view.isVisible
 import com.duckduckgo.app.browser.BrowserTabViewModel.BrowserViewState
 import com.duckduckgo.app.browser.R
@@ -34,7 +32,7 @@ class BrowserPopupMenu(
 ) : PopupMenu(
     layoutInflater,
     resourceId = R.layout.popup_window_browser_menu,
-    width = getPopupMenuWidth(context),
+    width = context.resources.getDimensionPixelSize(dimen.popupMenuWidth),
 ) {
     private val binding = PopupWindowBrowserMenuBinding.inflate(layoutInflater)
 
@@ -113,14 +111,5 @@ class BrowserPopupMenu(
             binding.printPageMenuItem.isVisible = viewState.canPrintPage
             binding.autofillMenuItem.isVisible = viewState.showAutofill
         }
-    }
-}
-
-private fun getPopupMenuWidth(context: Context): Int {
-    val orientation = context.resources.configuration.orientation
-    return if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-        LayoutParams.WRAP_CONTENT
-    } else {
-        context.resources.getDimensionPixelSize(dimen.popupMenuWidth)
     }
 }
