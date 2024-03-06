@@ -25,14 +25,22 @@ import com.duckduckgo.app.browser.BrowserTabFragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityCustomTabBinding
 import com.duckduckgo.app.global.intentText
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import java.util.UUID
+import javax.inject.Inject
 import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
 class CustomTabActivity : DuckDuckGoActivity() {
+
+    @Inject
+    lateinit var pixel: Pixel
+
+    @Inject
+    lateinit var customTabDetector: CustomTabDetector
 
     private val binding: ActivityCustomTabBinding by viewBinding()
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,16 +60,22 @@ class CustomTabActivity : DuckDuckGoActivity() {
         val transaction = supportFragmentManager.beginTransaction()
         transaction.replace(R.id.fragmentTabContainer, fragment, tabId)
         transaction.commit()
+
+        pixel.fire(CustomTabPixelNames.CUSTOM_TABS_OPENED)
     }
 
     override fun onStart() {
         super.onStart()
         Timber.d("TAG_CUSTOM_TAB_IMPL onStart called in CustomTabActivity")
+
+        customTabDetector.setCustomTab(true)
     }
 
     override fun onStop() {
         super.onStop()
         Timber.d("TAG_CUSTOM_TAB_IMPL onStop called in CustomTabActivity")
+
+        customTabDetector.setCustomTab(false)
     }
 
     companion object {

@@ -19,6 +19,7 @@ package com.duckduckgo.app.pixels
 import androidx.lifecycle.LifecycleOwner
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.WorkManager
+import com.duckduckgo.app.browser.customtabs.CustomTabDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
@@ -43,6 +44,7 @@ class EnqueuedPixelWorkerTest {
     private val lifecycleOwner: LifecycleOwner = mock()
     private val webViewVersionProvider: WebViewVersionProvider = mock()
     private val defaultBrowserDetector: DefaultBrowserDetector = mock()
+    private val customTabDetector: CustomTabDetector = mock()
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature = mock()
     private val isVerifiedPlayStoreInstall: IsVerifiedPlayStoreInstall = mock()
     private val privacyProtectionsPopupExperimentExternalPixels = FakePrivacyProtectionsPopupExperimentExternalPixels()
@@ -57,6 +59,7 @@ class EnqueuedPixelWorkerTest {
             unsentForgetAllPixelStore,
             webViewVersionProvider,
             defaultBrowserDetector,
+            customTabDetector,
             androidBrowserConfigFeature,
             privacyProtectionsPopupExperimentExternalPixels,
             isVerifiedPlayStoreInstall,

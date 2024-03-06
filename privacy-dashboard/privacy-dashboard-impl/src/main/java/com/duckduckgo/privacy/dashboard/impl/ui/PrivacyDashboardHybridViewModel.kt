@@ -28,6 +28,8 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.DASHBOARD
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardCustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_ALLOW_LIST_ADD
+import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardCustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_ALLOW_LIST_REMOVE
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.*
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchReportBrokenSite
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenSettings
@@ -242,7 +244,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         }
     }
 
-    fun onPrivacyProtectionsClicked(enabled: Boolean) {
+    fun onPrivacyProtectionsClicked(enabled: Boolean, dashboardOpenedFromCustomTab: Boolean = false) {
         Timber.i("PrivacyDashboard: onPrivacyProtectionsClicked $enabled")
 
         viewModelScope.launch(dispatcher.io()) {
@@ -253,10 +255,18 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                 val pixelParams = privacyProtectionsPopupExperimentExternalPixels.getPixelParams()
                 if (enabled) {
                     userAllowListRepository.removeDomainFromUserAllowList(domain)
-                    pixel.fire(PRIVACY_DASHBOARD_ALLOWLIST_REMOVE, pixelParams, type = COUNT)
+                    if (dashboardOpenedFromCustomTab) {
+                        pixel.fire(CUSTOM_TABS_PRIVACY_DASHBOARD_ALLOW_LIST_REMOVE)
+                    } else {
+                        pixel.fire(PRIVACY_DASHBOARD_ALLOWLIST_REMOVE, pixelParams, type = COUNT)
+                    }
                 } else {
                     userAllowListRepository.addDomainToUserAllowList(domain)
-                    pixel.fire(PRIVACY_DASHBOARD_ALLOWLIST_ADD, pixelParams, type = COUNT)
+                    if (dashboardOpenedFromCustomTab) {
+                        pixel.fire(CUSTOM_TABS_PRIVACY_DASHBOARD_ALLOW_LIST_ADD)
+                    } else {
+                        pixel.fire(PRIVACY_DASHBOARD_ALLOWLIST_ADD, pixelParams, type = COUNT)
+                    }
                 }
                 privacyProtectionsPopupExperimentExternalPixels.tryReportProtectionsToggledFromPrivacyDashboard(enabled)
             }

@@ -108,6 +108,7 @@ import com.duckduckgo.app.browser.commands.Command
 import com.duckduckgo.app.browser.commands.Command.ShowBackNavigationHistory
 import com.duckduckgo.app.browser.commands.NavigationCommand
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
+import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.databinding.ContentSiteLocationPermissionDialogBinding
 import com.duckduckgo.app.browser.databinding.ContentSystemLocationPermissionDialogBinding
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
@@ -836,6 +837,7 @@ class BrowserTabFragment :
                 val params = PrivacyDashboardHybridScreen.PrivacyDashboardHybridWithTabIdParam(tabId)
                 val intent = globalActivityStarter.startIntent(requireContext(), params)
                 intent?.let { intentPd -> startActivity(intentPd) }
+                pixel.fire(CustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_OPENED)
             }
 
             omnibar.customTabDomain.text = viewModel.url?.extractDomain()
@@ -3231,7 +3233,11 @@ class BrowserTabFragment :
                 }
                 onMenuItemClicked(menuBinding.refreshMenuItem) {
                     viewModel.onRefreshRequested(triggeredByUser = true)
-                    pixel.fire(AppPixelName.MENU_ACTION_REFRESH_PRESSED.pixelName)
+                    if (isActiveCustomTab()) {
+                        pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_REFRESH)
+                    } else {
+                        pixel.fire(AppPixelName.MENU_ACTION_REFRESH_PRESSED.pixelName)
+                    }
                 }
                 onMenuItemClicked(menuBinding.newTabMenuItem) {
                     viewModel.userRequestedOpeningNewTab()
@@ -3251,7 +3257,7 @@ class BrowserTabFragment :
                     pixel.fire(AppPixelName.MENU_ACTION_FIND_IN_PAGE_PRESSED)
                     viewModel.onFindInPageSelected()
                 }
-                onMenuItemClicked(menuBinding.privacyProtectionMenuItem) { viewModel.onPrivacyProtectionMenuClicked() }
+                onMenuItemClicked(menuBinding.privacyProtectionMenuItem) { viewModel.onPrivacyProtectionMenuClicked(isActiveCustomTab()) }
                 onMenuItemClicked(menuBinding.brokenSiteMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_REPORT_BROKEN_SITE_PRESSED)
                     viewModel.onBrokenSiteSelected()
@@ -3292,6 +3298,7 @@ class BrowserTabFragment :
                     val i = Intent(Intent.ACTION_VIEW)
                     i.setData(Uri.parse(url))
                     startActivity(i)
+                    pixel.fire(CustomTabPixelNames.CUSTOM_TABS_OPEN_IN_DDG)
                 }
             }
             omnibar.browserMenu.setOnClickListener {
@@ -3305,7 +3312,11 @@ class BrowserTabFragment :
             popupMenu.show(binding.rootView, omnibar.toolbar) {
                 viewModel.onBrowserMenuClosed()
             }
-            pixel.fire(AppPixelName.MENU_ACTION_POPUP_OPENED.pixelName)
+            if (isActiveCustomTab()) {
+                pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_OPENED)
+            } else {
+                pixel.fire(AppPixelName.MENU_ACTION_POPUP_OPENED.pixelName)
+            }
         }
 
         private fun configureShowTabSwitcherListener() {
