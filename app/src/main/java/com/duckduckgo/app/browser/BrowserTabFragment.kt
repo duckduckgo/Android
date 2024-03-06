@@ -238,8 +238,6 @@ import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.common.utils.plugins.PluginPoint
-import com.duckduckgo.common.utils.webview.enableDarkMode
-import com.duckduckgo.common.utils.webview.enableLightMode
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_DELAY
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_LENGTH
@@ -2091,7 +2089,6 @@ class BrowserTabFragment :
                 setSupportMultipleWindows(true)
                 disableWebSql(this)
                 setSupportZoom(true)
-                configureDarkThemeSupport(this)
                 if (accessibilitySettingsDataStore.overrideSystemFontSize) {
                     textZoom = accessibilitySettingsDataStore.fontSize.toInt()
                 }
@@ -2311,13 +2308,6 @@ class BrowserTabFragment :
             return
         }
         dialog.show(childFragmentManager, tag)
-    }
-
-    private fun configureDarkThemeSupport(webSettings: WebSettings) {
-        when (appTheme.isLightModeEnabled()) {
-            true -> webSettings.enableLightMode()
-            false -> webSettings.enableDarkMode()
-        }
     }
 
     private fun configureSwipeRefresh() {
