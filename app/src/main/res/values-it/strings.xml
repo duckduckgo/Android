@@ -805,4 +805,9 @@
         <item quantity="other">Vuoi davvero eliminare questa cartella e %1$d elementi?</item>
     </plurals>
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Eliminare il tuo segnalibro per &lt;b&gt;%1$s&lt;/b&gt;?</string>
+
+
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">Apri in DuckDuckGo</string>
+    <string name="runningInDdgMenuItemTitle">Esecuzione in DuckDuckGo</string>
 </resources>
