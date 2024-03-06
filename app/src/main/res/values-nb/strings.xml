@@ -805,4 +805,9 @@
         <item quantity="other">Er du sikker på at du vil slette denne mappen og %1$d elementer?</item>
     </plurals>
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Er du sikker på at du vil slette bokmerket for &lt;b&gt;%1$s&lt;/b&gt;?</string>
+
+
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">Åpne i DuckDuckGo</string>
+    <string name="runningInDdgMenuItemTitle">Kjører i DuckDuckGo</string>
 </resources>
