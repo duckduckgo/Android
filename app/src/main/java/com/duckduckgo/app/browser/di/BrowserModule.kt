@@ -29,6 +29,7 @@ import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.AppThirdPartyCookieManager
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsRepository
+import com.duckduckgo.app.browser.customtabs.CustomTabDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserObserver
 import com.duckduckgo.app.browser.downloader.*
@@ -128,8 +129,9 @@ class BrowserModule {
     fun webViewLongPressHandler(
         context: Context,
         pixel: Pixel,
+        customTabDetector: CustomTabDetector,
     ): LongPressHandler {
-        return WebViewLongPressHandler(context, pixel)
+        return WebViewLongPressHandler(context, pixel, customTabDetector)
     }
 
     @Provides
