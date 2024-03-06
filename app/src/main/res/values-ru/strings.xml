@@ -815,4 +815,9 @@
         <item quantity="other">Вы точно хотите удалить эту папку с объектами (%1$d)?</item>
     </plurals>
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Вы точно хотите удалить закладку &lt;b&gt;«%1$s»&lt;/b&gt;?</string>
+
+
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">Открыть в DuckDuckGo</string>
+    <string name="runningInDdgMenuItemTitle">Выполняется в DuckDuckGo</string>
 </resources>
