@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2021 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,22 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.anr
+plugins {
+    id 'java-library'
+    id 'kotlin'
+}
 
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
+apply from: "$rootProject.projectDir/code-formatting.gradle"
 
-internal enum class CrashPixel(override val pixelName: String) : PixelName {
-    APPLICATION_CRASH_GLOBAL("m_d_ac_g"),
-    APPLICATION_CRASH_GLOBAL_VERIFIED_INSTALL("m_app_crashed_on_verified_play_store_install"),
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+kotlin {
+    jvmToolchain(17)
+}
+
+dependencies {
+    implementation Kotlin.stdlib.jdk7
 }

@@ -27,6 +27,7 @@ import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
+import com.duckduckgo.verifiedinstallation.IsVerifiedPlayStoreInstall
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -43,6 +44,7 @@ class EnqueuedPixelWorkerTest {
     private val webViewVersionProvider: WebViewVersionProvider = mock()
     private val defaultBrowserDetector: DefaultBrowserDetector = mock()
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature = mock()
+    private val isVerifiedPlayStoreInstall: IsVerifiedPlayStoreInstall = mock()
     private val privacyProtectionsPopupExperimentExternalPixels = FakePrivacyProtectionsPopupExperimentExternalPixels()
 
     private lateinit var enqueuedPixelWorker: EnqueuedPixelWorker
@@ -57,6 +59,7 @@ class EnqueuedPixelWorkerTest {
             defaultBrowserDetector,
             androidBrowserConfigFeature,
             privacyProtectionsPopupExperimentExternalPixels,
+            isVerifiedPlayStoreInstall,
             coroutineRule.testScope,
         )
         setupRemoteConfig(browserEnabled = false, collectFullWebViewVersionEnabled = false)
