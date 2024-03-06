@@ -805,4 +805,9 @@
         <item quantity="other">Сигурни ли сте, че искате да изтриете тази папка и %1$d елемента?</item>
     </plurals>
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Сигурни ли сте, че искате да изтриете отметката за &lt;b&gt;%1$s&lt;/b&gt;?</string>
+
+
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">Отваряне в DuckDuckGo</string>
+    <string name="runningInDdgMenuItemTitle">Работи в DuckDuckGo</string>
 </resources>
