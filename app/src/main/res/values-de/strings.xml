@@ -805,4 +805,9 @@
         <item quantity="other">Möchtest du diesen Ordner mit %1$d Elementen wirklich löschen?</item>
     </plurals>
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Bist du sicher, dass du das Lesezeichen &lt;b&gt;%1$s&lt;/b&gt; löschen möchtest?</string>
+
+
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">In DuckDuckGo öffnen</string>
+    <string name="runningInDdgMenuItemTitle">Laufen in DuckDuckGo</string>
 </resources>
