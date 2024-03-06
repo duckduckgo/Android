@@ -85,7 +85,7 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
                 holder = webView,
                 onPrivacyProtectionSettingChanged = { userChangedValues -> if (userChangedValues) finish() },
                 onPrivacyProtectionsClicked = { newValue ->
-                    viewModel.onPrivacyProtectionsClicked(newValue)
+                    viewModel.onPrivacyProtectionsClicked(newValue, dashboardOpenedFromCustomTab())
                 },
                 onUrlClicked = { payload ->
                     viewModel.onUrlClicked(payload)
@@ -206,5 +206,10 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
         } else {
             super.onBackPressed()
         }
+    }
+
+    private fun dashboardOpenedFromCustomTab(): Boolean {
+        val tabIdParam = intent.getActivityParams(PrivacyDashboardHybridWithTabIdParam::class.java)?.tabId
+        return tabIdParam?.startsWith("CustomTab-") ?: false
     }
 }

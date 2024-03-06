@@ -25,15 +25,20 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.global.intentText
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
+import javax.inject.Inject
 import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
 class IntentDispatcherActivity : DuckDuckGoActivity() {
 
+    @Inject lateinit var customTabDetector: CustomTabDetector
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         Timber.d("TAG_CUSTOM_TAB_IMPL onCreate called in IntentDispatcherActivity -- ${System.identityHashCode(this)}")
+
+        customTabDetector.setCustomTab(false)
 
         if (intent?.hasExtra(CustomTabsIntent.EXTRA_SESSION) == true) {
             Timber.d("TAG_CUSTOM_TAB_IMPL new intent has session, show custom tab")

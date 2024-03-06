@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.lifecycle.LifecycleOwner
 import androidx.work.*
 import com.duckduckgo.anvil.annotations.ContributesWorker
+import com.duckduckgo.app.browser.customtabs.CustomTabDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
@@ -52,6 +53,7 @@ class EnqueuedPixelWorker @Inject constructor(
     private val unsentForgetAllPixelStore: UnsentForgetAllPixelStore,
     private val webViewVersionProvider: WebViewVersionProvider,
     private val defaultBrowserDetector: DefaultBrowserDetector,
+    private val customTabDetector: CustomTabDetector,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
@@ -85,10 +87,12 @@ class EnqueuedPixelWorker @Inject constructor(
         }.toMap()
         appCoroutineScope.launch {
             val popupExperimentParams = privacyProtectionsPopupExperimentExternalPixels.getPixelParams()
-            pixel.get().fire(
-                pixel = AppPixelName.APP_LAUNCH,
-                parameters = paramsMap + popupExperimentParams,
-            )
+            if (!customTabDetector.isCustomTab()) {
+                pixel.get().fire(
+                    pixel = AppPixelName.APP_LAUNCH,
+                    parameters = paramsMap + popupExperimentParams,
+                )
+            }
         }
     }
 
