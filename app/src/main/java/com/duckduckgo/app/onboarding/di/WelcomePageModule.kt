@@ -20,7 +20,6 @@ import android.content.Context
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.RealDefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
-import com.duckduckgo.app.onboarding.ui.page.NotificationPermissionsFeatureToggles
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModelFactory
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -36,8 +35,7 @@ class WelcomePageModule {
         context: Context,
         pixel: Pixel,
         defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
-        notificationPermissionsFeatureToggles: NotificationPermissionsFeatureToggles,
-    ) = WelcomePageViewModelFactory(appInstallStore, context, pixel, defaultRoleBrowserDialog, notificationPermissionsFeatureToggles)
+    ) = WelcomePageViewModelFactory(appInstallStore, context, pixel, defaultRoleBrowserDialog)
 
     @Provides
     fun defaultRoleBrowserDialog(
