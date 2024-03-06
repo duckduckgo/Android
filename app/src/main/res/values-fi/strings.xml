@@ -805,4 +805,9 @@
         <item quantity="other">Haluatko varmasti poistaa tämän kansion ja %1$d kohdetta?</item>
     </plurals>
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Haluatko varmasti poistaa kirjanmerkin &lt;b&gt;%1$s&lt;/b&gt;?</string>
+
+
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">Avaa DuckDuckGo:ssa</string>
+    <string name="runningInDdgMenuItemTitle">Käynnissä DuckDuckGossa</string>
 </resources>
