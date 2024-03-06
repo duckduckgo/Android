@@ -48,21 +48,24 @@ class WebViewFeatureFlagReporter @Inject constructor(
     @UiThread
     override fun onCreate(owner: LifecycleOwner) {
         appCoroutineScope.launch(dispatchers.io()) {
+            val params = buildParams() ?: return@launch
             pixel.fire(
                 pixelName = AppPixelName.WEBVIEW_FEATURE_FLAGS_INJECTION_CAPABILITY.pixelName,
-                parameters = buildParams(),
+                parameters = params,
                 encodedParameters = emptyMap(),
                 type = PixelType.UNIQUE,
             )
         }
     }
 
-    private fun buildParams(): Map<String, String> {
-        return mapOf(
-            "supportsWebMessageListener" to isFeatureSupported(WEB_MESSAGE_LISTENER).toString(),
-            "supportsPostWebMessage" to isFeatureSupported(POST_WEB_MESSAGE).toString(),
-            "supportsDocumentStartJavascript" to isFeatureSupported(DOCUMENT_START_SCRIPT).toString(),
-            "supportsUserAgentMetadata" to isFeatureSupported(USER_AGENT_METADATA).toString(),
-        )
+    private fun buildParams(): Map<String, String>? {
+        return runCatching {
+            mapOf(
+                "supportsWebMessageListener" to isFeatureSupported(WEB_MESSAGE_LISTENER).toString(),
+                "supportsPostWebMessage" to isFeatureSupported(POST_WEB_MESSAGE).toString(),
+                "supportsDocumentStartJavascript" to isFeatureSupported(DOCUMENT_START_SCRIPT).toString(),
+                "supportsUserAgentMetadata" to isFeatureSupported(USER_AGENT_METADATA).toString(),
+            )
+        }.getOrDefault(null)
     }
 }
