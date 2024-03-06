@@ -34,9 +34,9 @@ interface VariantManager {
     fun updateAppReferrerVariant(variant: String)
 
     /**
-     * Persists experimental variants in the local database
+     * Updated experimental variants received
      *
      * @param variants Updated list of VariantConfig objects
      */
-    fun saveVariants(variants: List<VariantConfig>)
+    fun updateVariants(variants: List<VariantConfig>)
 }
