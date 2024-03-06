@@ -810,4 +810,9 @@
         <item quantity="other">Sigur vrei să ștergi acest folder și %1$d elemente?</item>
     </plurals>
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Sigur dorești să ștergi marcajul pentru &lt;b&gt;%1$s&lt;/b&gt;?</string>
+
+
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">Deschide în DuckDuckGo</string>
+    <string name="runningInDdgMenuItemTitle">Redare în DuckDuckGo</string>
 </resources>
