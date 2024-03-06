@@ -21,6 +21,7 @@ import android.view.ContextMenu
 import android.view.MenuItem
 import android.webkit.WebView.HitTestResult
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.browser.customtabs.CustomTabDetector
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -56,12 +57,15 @@ class WebViewLongPressHandlerTest {
     private lateinit var mockPixel: Pixel
 
     @Mock
+    private lateinit var mockCustomTabDetector: CustomTabDetector
+
+    @Mock
     private lateinit var context: Context
 
     @Before
     fun setup() {
         MockitoAnnotations.openMocks(this)
-        testee = WebViewLongPressHandler(context, mockPixel)
+        testee = WebViewLongPressHandler(context, mockPixel, mockCustomTabDetector)
     }
 
     @Test
