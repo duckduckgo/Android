@@ -21,12 +21,15 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.mobile.android.vpn.prefs.FakeVpnSharedPreferencesProvider
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.settings.FakeNetPSettingsLocalConfigFactory
 import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
+import com.duckduckgo.networkprotection.impl.store.RealNetworkProtectionRepository
 import com.duckduckgo.networkprotection.impl.waitlist.FakeNetPRemoteFeatureFactory
 import com.duckduckgo.networkprotection.impl.waitlist.NetPRemoteFeature
+import com.duckduckgo.networkprotection.store.RealNetworkProtectionPrefs
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -72,6 +75,9 @@ class NetPDisabledNotificationSchedulerTest {
             TestScope(),
             coroutineRule.testDispatcherProvider,
             netPRemoteFeature,
+            RealNetworkProtectionRepository(
+                RealNetworkProtectionPrefs(FakeVpnSharedPreferencesProvider()),
+            ),
         )
     }
 
