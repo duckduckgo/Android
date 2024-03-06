@@ -815,4 +815,9 @@
         <item quantity="other">Jeste li sigurni da želite izbrisati ovu mapu i %1$d stavki?</item>
     </plurals>
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Sigurno želiš izbrisati svoju oznaku za &lt;b&gt;%1$s&lt;/b&gt;?</string>
+
+
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">Otvori u DuckDuckGou</string>
+    <string name="runningInDdgMenuItemTitle">Izvodi se u DuckDuckGou</string>
 </resources>
