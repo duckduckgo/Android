@@ -805,4 +805,9 @@
         <item quantity="other">Θέλετε σίγουρα να διαγράψετε αυτόν τον φάκελο και %1$d αντικείμενα;</item>
     </plurals>
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Θέλετε σίγουρα να διαγράψετε τον σελιδοδείκτη σας για το &lt;b&gt;%1$s&lt;/b&gt;;</string>
+
+
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">Άνοιγμα στο DuckDuckGo</string>
+    <string name="runningInDdgMenuItemTitle">Εκτέλεση στο DuckDuckGo</string>
 </resources>
