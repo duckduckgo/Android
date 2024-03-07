@@ -48,6 +48,7 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionSta
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.DISCONNECTED
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState
+import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.sync.api.DeviceSyncState
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
@@ -62,6 +63,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @SuppressLint("NoLifecycleObserver")
 @ContributesViewModel(ActivityScope::class)
@@ -76,6 +78,7 @@ class SettingsViewModel @Inject constructor(
     private val networkProtectionWaitlist: NetworkProtectionWaitlist,
     private val dispatcherProvider: DispatcherProvider,
     private val autoconsent: Autoconsent,
+    private val subscriptions: Subscriptions,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
@@ -88,6 +91,7 @@ class SettingsViewModel @Inject constructor(
         val showSyncSetting: Boolean = false,
         val networkProtectionEntryState: NetPEntryState = Hidden,
         val isAutoconsentEnabled: Boolean = false,
+        val isPrivacyProEnabled: Boolean = false,
     )
 
     sealed class NetPEntryState {
@@ -166,7 +170,7 @@ class SettingsViewModel @Inject constructor(
                 }
             }
             NetPWaitlistState.NotUnlocked -> Hidden
-            NetPWaitlistState.PendingInviteCode, NetPWaitlistState.JoinedWaitlist, NetPWaitlistState.VerifySubscription -> Pending
+            NetPWaitlistState.PendingInviteCode, NetPWaitlistState.JoinedWaitlist -> Pending
         }
     }
 
@@ -210,9 +214,13 @@ class SettingsViewModel @Inject constructor(
         appTPPollJob += viewModelScope.launch(dispatcherProvider.io()) {
             while (isActive) {
                 val isDeviceShieldEnabled = appTrackingProtection.isRunning()
-                viewState.value = currentViewState().copy(
+                val isPrivacyProEnabled = subscriptions.isEnabled()
+                val currentState = currentViewState()
+                viewState.value = currentState.copy(
                     appTrackingProtectionOnboardingShown = appTrackingProtection.isOnboarded(),
                     appTrackingProtectionEnabled = isDeviceShieldEnabled,
+                    isPrivacyProEnabled = isPrivacyProEnabled,
+                    networkProtectionEntryState = if (isPrivacyProEnabled) Hidden else currentState.networkProtectionEntryState,
                 )
                 delay(1_000)
             }
@@ -307,8 +315,10 @@ class SettingsViewModel @Inject constructor(
     fun onNetPSettingClicked() {
         viewModelScope.launch {
             val screen = networkProtectionWaitlist.getScreenForCurrentState()
-            command.send(Command.LaunchNetPWaitlist(screen))
-            pixel.fire(SETTINGS_NETP_PRESSED)
+            screen?.let {
+                command.send(Command.LaunchNetPWaitlist(screen))
+                pixel.fire(SETTINGS_NETP_PRESSED)
+            } ?: Timber.w("Get screen for current NetP state is null")
         }
     }
 

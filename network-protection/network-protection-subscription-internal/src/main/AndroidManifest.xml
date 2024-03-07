@@ -19,10 +19,6 @@
           package="com.duckduckgo.networkprotection.subscription">
 
     <application>
-        <activity
-            android:name="com.duckduckgo.networkprotection.subscription.ui.NetpVerifySubscriptionActivity"
-            android:label="@string/netpVerifySubscriptionLabel"
-            android:exported="false" />
     </application>
 
 </manifest>

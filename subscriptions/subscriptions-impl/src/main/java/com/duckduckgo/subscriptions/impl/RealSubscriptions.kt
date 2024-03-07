@@ -48,7 +48,7 @@ class RealSubscriptions @Inject constructor(
     }
 
     override suspend fun isEnabled(): Boolean {
-        return privacyProFeature.self().isEnabled()
+        return privacyProFeature.isLaunched().isEnabled()
     }
 }
 
@@ -59,4 +59,10 @@ class RealSubscriptions @Inject constructor(
 interface PrivacyProFeature {
     @Toggle.DefaultValue(false)
     fun self(): Toggle
+
+    @Toggle.DefaultValue(false)
+    fun isLaunched(): Toggle
+
+    @Toggle.DefaultValue(false)
+    fun allowPurchase(): Toggle
 }

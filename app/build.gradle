@@ -305,10 +305,10 @@ dependencies {
     implementation project(':web-compat-store')
 
     implementation project(':subscriptions-api')
+    implementation project(':network-protection-subscription-internal')
     if (project.hasProperty('internal-testing')) {
         implementation project(':subscriptions-impl')
         internalImplementation project(':subscriptions-internal')
-        internalImplementation project(':network-protection-subscription-internal')
     } else {
         implementation project(":subscriptions-dummy-impl")
     }

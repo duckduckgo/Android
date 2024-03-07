@@ -123,7 +123,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
         val feature = runCatching { data.getString("feature") }.getOrNull() ?: return
         viewModelScope.launch {
             val commandToSend = when (feature) {
-                NETP -> GoToNetP(networkProtectionWaitlist.getScreenForCurrentState())
+                NETP -> networkProtectionWaitlist.getScreenForCurrentState()?.let { GoToNetP(it) }
                 ITR -> GoToITR
                 PIR -> GoToPIR
                 else -> null

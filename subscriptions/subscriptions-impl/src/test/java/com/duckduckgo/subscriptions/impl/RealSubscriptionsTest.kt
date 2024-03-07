@@ -51,7 +51,7 @@ class RealSubscriptionsTest {
     @Test
     fun whenSubscriptionDataSucceedsThenReturnAccessToken() = runTest {
         whenever(mockSubscriptionsManager.getAccessToken()).thenReturn(AccessToken.Success("accessToken"))
-        privacyProFeature.self().setEnabled(State(enable = true))
+        privacyProFeature.isLaunched().setEnabled(State(enable = true))
         val result = subscriptions.getAccessToken()
         assertEquals("accessToken", result)
     }
@@ -64,7 +64,7 @@ class RealSubscriptionsTest {
 
     @Test
     fun whenSubscriptionDataHasEntitlementThenReturnList() = runTest {
-        privacyProFeature.self().setEnabled(State(enable = true))
+        privacyProFeature.isLaunched().setEnabled(State(enable = true))
         whenever(mockSubscriptionsManager.entitlements).thenReturn(flowOf(listOf(NetP)))
 
         subscriptions.getEntitlementStatus().test {
@@ -75,7 +75,7 @@ class RealSubscriptionsTest {
 
     @Test
     fun whenSubscriptionDataHasNoEntitlementThenReturnEmptyList() = runTest {
-        privacyProFeature.self().setEnabled(State(enable = true))
+        privacyProFeature.isLaunched().setEnabled(State(enable = true))
         whenever(mockSubscriptionsManager.entitlements).thenReturn(flowOf(emptyList()))
 
         subscriptions.getEntitlementStatus().test {
