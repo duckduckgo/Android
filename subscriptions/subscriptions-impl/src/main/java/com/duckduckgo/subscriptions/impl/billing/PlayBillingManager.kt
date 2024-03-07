@@ -146,9 +146,11 @@ class RealPlayBillingManager @Inject constructor(
         coroutineScope.launch {
             when (result) {
                 is PurchasePresent -> {
-                    Purchased(
-                        purchaseToken = result.purchaseToken,
-                        packageName = result.packageName,
+                    _purchaseState.emit(
+                        Purchased(
+                            purchaseToken = result.purchaseToken,
+                            packageName = result.packageName,
+                        ),
                     )
                 }
 
