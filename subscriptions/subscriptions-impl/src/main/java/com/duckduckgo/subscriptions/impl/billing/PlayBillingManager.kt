@@ -43,6 +43,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import logcat.logcat
 
 interface PlayBillingManager {
@@ -67,6 +69,7 @@ class RealPlayBillingManager @Inject constructor(
     private val billingClient: BillingClientAdapter,
 ) : PlayBillingManager, MainProcessLifecycleObserver {
 
+    private val connectionMutex = Mutex()
     private var billingFlowInProgress = false
 
     // PurchaseState
@@ -95,7 +98,9 @@ class RealPlayBillingManager @Inject constructor(
         }
     }
 
-    private suspend fun connect() {
+    private suspend fun connect() = connectionMutex.withLock {
+        if (billingClient.ready) return@withLock
+
         val result = billingClient.connect(
             purchasesListener = { result -> onPurchasesUpdated(result) },
             disconnectionListener = { onBillingClientDisconnected() },
@@ -121,6 +126,7 @@ class RealPlayBillingManager @Inject constructor(
     ) {
         if (!billingClient.ready) {
             logcat { "Service not ready" }
+            connect()
         }
 
         val launchBillingFlowResult = billingClient.launchBillingFlow(

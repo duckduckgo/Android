@@ -5,6 +5,7 @@ import androidx.lifecycle.Lifecycle.State.CREATED
 import androidx.lifecycle.Lifecycle.State.INITIALIZED
 import androidx.lifecycle.Lifecycle.State.RESUMED
 import androidx.lifecycle.testing.TestLifecycleOwner
+import app.cash.turbine.test
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.PurchaseHistoryRecord
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -14,6 +15,8 @@ import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMe
 import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMethodInvocation.GetSubscriptions
 import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMethodInvocation.GetSubscriptionsPurchaseHistory
 import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMethodInvocation.LaunchBillingFlow
+import com.duckduckgo.subscriptions.impl.billing.PurchaseState.Canceled
+import com.duckduckgo.subscriptions.impl.billing.PurchaseState.InProgress
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -76,6 +79,52 @@ class RealPlayBillingManagerTest {
         assertEquals(1, subject.products.size)
         assertEquals("test-sub", subject.products.single().productId)
     }
+
+    @Test
+    fun `when service not ready before launching billing flow then attempts to connect`() = runTest {
+        processLifecycleOwner.currentState = RESUMED
+        billingClientAdapter.connected = false
+        billingClientAdapter.launchBillingFlowResult = LaunchBillingFlowResult.Success
+        billingClientAdapter.methodInvocations.clear()
+
+        val productDetails: ProductDetails = subject.products.single()
+        val offerToken = "offer_token"
+        val externalId = "external_id"
+
+        subject.purchaseState.test {
+            expectNoEvents()
+
+            subject.launchBillingFlow(activity = mock(), productDetails, offerToken, externalId)
+
+            assertEquals(InProgress, awaitItem())
+        }
+
+        billingClientAdapter.verifyConnectInvoked()
+        billingClientAdapter.verifyLaunchBillingFlowInvoked(productDetails, offerToken, externalId)
+    }
+
+    @Test
+    fun `when can't connect to service then launching billing flow is cancelled`() = runTest {
+        billingClientAdapter.canConnect = false
+        processLifecycleOwner.currentState = RESUMED
+        billingClientAdapter.launchBillingFlowResult = LaunchBillingFlowResult.Failure
+        billingClientAdapter.methodInvocations.clear()
+
+        val productDetails: ProductDetails = mock()
+        val offerToken = "offer_token"
+        val externalId = "external_id"
+
+        subject.purchaseState.test {
+            expectNoEvents()
+
+            subject.launchBillingFlow(activity = mock(), productDetails, offerToken, externalId)
+
+            assertEquals(Canceled, awaitItem())
+        }
+
+        billingClientAdapter.verifyConnectInvoked()
+        billingClientAdapter.verifyLaunchBillingFlowInvoked(productDetails, offerToken, externalId)
+    }
 }
 
 class FakeBillingClientAdapter : BillingClientAdapter {
@@ -91,6 +140,7 @@ class FakeBillingClientAdapter : BillingClientAdapter {
     )
 
     var subscriptionsPurchaseHistory: List<PurchaseHistoryRecord> = emptyList()
+    var launchBillingFlowResult: LaunchBillingFlowResult = LaunchBillingFlowResult.Failure
 
     var purchasesListener: ((PurchasesUpdateResult) -> Unit)? = null
     var disconnectionListener: (() -> Unit)? = null
@@ -139,7 +189,7 @@ class FakeBillingClientAdapter : BillingClientAdapter {
         externalId: String,
     ): LaunchBillingFlowResult {
         methodInvocations.add(LaunchBillingFlow(productDetails, offerToken, externalId))
-        return LaunchBillingFlowResult.Failure
+        return launchBillingFlowResult
     }
 
     fun verifyConnectInvoked(times: Int = 1) {
@@ -156,6 +206,22 @@ class FakeBillingClientAdapter : BillingClientAdapter {
 
     fun verifyGetSubscriptionPurchaseHistoryInvoked(times: Int = 1) {
         val invocations = methodInvocations.filterIsInstance<GetSubscriptionsPurchaseHistory>()
+        assertEquals(times, invocations.count())
+    }
+
+    fun verifyLaunchBillingFlowInvoked(
+        productDetails: ProductDetails,
+        offerToken: String,
+        externalId: String,
+        times: Int = 1,
+    ) {
+        val invocations = methodInvocations
+            .filterIsInstance<LaunchBillingFlow>()
+            .filter { invocation ->
+                invocation.productDetails == productDetails &&
+                    invocation.offerToken == offerToken &&
+                    invocation.externalId == externalId
+            }
         assertEquals(times, invocations.count())
     }
 
