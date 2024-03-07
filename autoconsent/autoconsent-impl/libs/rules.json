@@ -1057,7 +1057,8 @@
             },
             {
               "click": ".cc-preferences[data-cc-preferences] input[type=radio][data-cc-action=toggle-category][value=off]",
-              "all": true
+              "all": true,
+              "optional": true
             },
             {
               "if": {
@@ -1253,15 +1254,27 @@
       ],
       "optOut": [
         {
-          "click": "#manage_cookie_preferences"
-        },
-        {
-          "click": "#cookie_consent_preferences input:checked",
-          "all": true,
-          "optional": true
-        },
-        {
-          "click": "#consent_save"
+          "if": {
+            "exists": "#consent_reject"
+          },
+          "then": [
+            {
+              "click": "#consent_reject"
+            }
+          ],
+          "else": [
+            {
+              "click": "#manage_cookie_preferences"
+            },
+            {
+              "click": "#cookie_consent_preferences input:checked",
+              "all": true,
+              "optional": true
+            },
+            {
+              "click": "#consent_save"
+            }
+          ]
         }
       ],
       "test": [
@@ -5188,6 +5201,7 @@
     },
     {
       "name": "Sirdata",
+      "cosmetic": true,
       "prehideSelectors": [
         "#sd-cmp"
       ],
@@ -5208,12 +5222,10 @@
       ],
       "optOut": [
         {
-          "waitForThenClick": "#sd-cmp .sd-cmp-1pO44"
-        }
-      ],
-      "test": [
+          "hide": "#sd-cmp"
+        },
         {
-          "eval": "EVAL_SIRDATA_0"
+          "eval": "EVAL_SIRDATA_UNBLOCK_SCROLL"
         }
       ]
     },
