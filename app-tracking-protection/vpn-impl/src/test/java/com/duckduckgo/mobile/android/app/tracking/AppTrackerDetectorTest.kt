@@ -19,6 +19,7 @@ package com.duckduckgo.mobile.android.app.tracking
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.dao.VpnAppTrackerBlockingDao
@@ -64,6 +65,7 @@ class AppTrackerDetectorTest {
             vpnAppTrackerBlockingDao,
             packageManager,
             vpnFeaturesRegistry,
+            InstrumentationRegistry.getInstrumentation().targetContext,
         )
     }
 
@@ -284,7 +286,7 @@ class AppTrackerDetectorTest {
         // This test case is just in case we pass the DDG traffic through the VPN. Our app doesn't embed trackers but web trackers might be detected
         // as app trackers.
 
-        val packageId = "com.duckduckgo.mobile"
+        val packageId = "com.duckduckgo.mobile.android.vpn.test"
 
         whenever(appTrackerRepository.findTracker(TEST_APP_TRACKER.hostname, packageId))
             .thenReturn(AppTrackerType.ThirdParty(TEST_APP_TRACKER))
@@ -342,6 +344,7 @@ class AppTrackerDetectorTest {
             vpnAppTrackerBlockingDao,
             packageManager,
             vpnFeaturesRegistry,
+            InstrumentationRegistry.getInstrumentation().targetContext,
         )
 
         assertNull(appTrackerDetectorDisabled.evaluate(TEST_APP_TRACKER.hostname, APP_UID))

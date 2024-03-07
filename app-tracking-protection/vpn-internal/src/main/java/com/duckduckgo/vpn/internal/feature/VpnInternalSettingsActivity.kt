@@ -34,9 +34,9 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.isDdgApp
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
-import com.duckduckgo.mobile.android.vpn.apps.VpnExclusionList
 import com.duckduckgo.mobile.android.vpn.apps.isSystemApp
 import com.duckduckgo.mobile.android.vpn.blocklist.AppTrackerListUpdateWorker
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
@@ -170,7 +170,7 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun shouldNotBeShown(appInfo: ApplicationInfo): Boolean {
-        return VpnExclusionList.isDdgApp(appInfo.packageName) || isSystemAppAndNotOverridden(appInfo)
+        return this.isDdgApp(appInfo.packageName) || isSystemAppAndNotOverridden(appInfo)
     }
 
     private fun isSystemAppAndNotOverridden(appInfo: ApplicationInfo): Boolean {
