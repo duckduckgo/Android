@@ -789,6 +789,64 @@ class BrowserWebViewClientTest {
         assertEquals(10L, endArgumentCaptor.firstValue)
     }
 
+    @UiThreadTest
+    @Test
+    fun whenOnPageFinishedCalledBeforeCompletionThenJsCodeNotInjected() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.progress).thenReturn(10)
+        whenever(mockWebView.settings).thenReturn(mock())
+
+        assertEquals(0, jsPlugins.plugin.countFinished)
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+        assertEquals(0, jsPlugins.plugin.countFinished)
+        assertEquals(0, jsPlugins.plugin.countStarted)
+    }
+
+    @Test
+    fun whenOnPageFinishedCalledBeforeCompleteThenVerifyVerificationCompletedNotCalled() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.progress).thenReturn(10)
+        whenever(mockWebView.settings).thenReturn(mock())
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+        verifyNoInteractions(internalTestUserChecker)
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnPageFinishedCalledBeforeCompleteThenNavigationStateNotInvoked() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.progress).thenReturn(10)
+        whenever(mockWebView.settings).thenReturn(mock())
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+        verifyNoInteractions(listener)
+    }
+
+    @Test
+    fun whenOnPageFinishedCalledThenPrintInjectorInjected() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.progress).thenReturn(100)
+        whenever(mockWebView.settings).thenReturn(mock())
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+        verify(printInjector).injectPrint(mockWebView)
+    }
+
+    @Test
+    fun whenOnPageFinishedBeforeCompleteThenPrintInjectorNotInjected() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.progress).thenReturn(10)
+        whenever(mockWebView.settings).thenReturn(mock())
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+        verifyNoInteractions(printInjector)
+    }
+
     private class TestWebView(context: Context) : WebView(context) {
         override fun getOriginalUrl(): String {
             return EXAMPLE_URL
