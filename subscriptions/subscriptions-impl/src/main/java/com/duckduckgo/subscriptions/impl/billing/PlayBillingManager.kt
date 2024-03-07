@@ -197,11 +197,6 @@ class RealPlayBillingManager @Inject constructor(
     }
 
     private suspend fun loadPurchaseHistory() {
-        if (!billingClient.ready) {
-            // Handle client not ready
-            return
-        }
-
         when (val result = billingClient.getSubscriptionsPurchaseHistory()) {
             is SubscriptionsPurchaseHistoryResult.Success -> {
                 purchaseHistory = result.history
