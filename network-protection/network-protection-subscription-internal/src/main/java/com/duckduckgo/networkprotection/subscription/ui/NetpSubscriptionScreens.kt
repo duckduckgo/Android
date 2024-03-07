@@ -21,4 +21,8 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 /**
  * Use this model to launch the NetP verify subscription screen
  */
-object NetpVerifySubscriptionParams : ActivityParams
+sealed class NetpSubscriptionScreens {
+    data object NetpVerifySubscriptionParams : ActivityParams {
+        private fun readResolve(): Any = NetpVerifySubscriptionParams
+    }
+}

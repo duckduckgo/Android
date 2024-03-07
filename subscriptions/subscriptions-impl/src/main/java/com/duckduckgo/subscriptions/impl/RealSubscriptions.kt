@@ -16,18 +16,25 @@
 
 package com.duckduckgo.subscriptions.impl
 
+import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 
 @ContributesBinding(AppScope::class)
 class RealSubscriptions @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
+    private val privacyProFeature: PrivacyProFeature,
 ) : Subscriptions {
     override suspend fun getAccessToken(): String? {
+        if (!isEnabled()) return null
+
         return when (val result = subscriptionsManager.getAccessToken()) {
             is AccessToken.Success -> result.accessToken
             is AccessToken.Failure -> null
@@ -35,6 +42,21 @@ class RealSubscriptions @Inject constructor(
     }
 
     override fun getEntitlementStatus(): Flow<List<Product>> {
-        return subscriptionsManager.entitlements
+        return subscriptionsManager.entitlements.map {
+            if (!isEnabled()) emptyList() else it
+        }
     }
+
+    override suspend fun isEnabled(): Boolean {
+        return privacyProFeature.self().isEnabled()
+    }
+}
+
+@ContributesRemoteFeature(
+    scope = AppScope::class,
+    featureName = "privacyPro",
+)
+interface PrivacyProFeature {
+    @Toggle.DefaultValue(false)
+    fun self(): Toggle
 }

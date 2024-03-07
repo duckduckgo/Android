@@ -28,6 +28,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetPWaitlistInvitedScreenNoParams
 import com.duckduckgo.networkprotection.subscription.databinding.ActivityNetpVerifySubsBinding
+import com.duckduckgo.networkprotection.subscription.ui.NetpSubscriptionScreens.NetpVerifySubscriptionParams
 import com.duckduckgo.networkprotection.subscription.ui.NetpVerifySubscriptionViewModel.Command.LaunchNetPScreen
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn

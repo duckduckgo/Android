@@ -134,4 +134,5 @@ dependencies {
     testImplementation Testing.robolectric
     testImplementation project(':common-test')
     testImplementation project(':vpn-api-test')
+    testImplementation project(':feature-toggles-test')
 }
