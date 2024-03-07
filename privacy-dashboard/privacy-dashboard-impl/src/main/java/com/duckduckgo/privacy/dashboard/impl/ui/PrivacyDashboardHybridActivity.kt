@@ -19,7 +19,6 @@ package com.duckduckgo.privacy.dashboard.impl.ui
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.webkit.WebResourceRequest
-import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.lifecycle.Lifecycle.State.STARTED
@@ -35,8 +34,6 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteNav
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.common.utils.webview.enableDarkMode
-import com.duckduckgo.common.utils.webview.enableLightMode
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreen.PrivacyDashboardHybridWithTabIdParam
@@ -152,7 +149,6 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
         with(webView.settings) {
             builtInZoomControls = false
             javaScriptEnabled = true
-            configureDarkThemeSupport(this)
         }
 
         webView.webViewClient = object : WebViewClient() {
@@ -178,13 +174,6 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
                 super.onPageFinished(view, url)
                 configViewStateObserver()
             }
-        }
-    }
-
-    private fun configureDarkThemeSupport(webSettings: WebSettings) {
-        when (appTheme.isLightModeEnabled()) {
-            true -> webSettings.enableLightMode()
-            false -> webSettings.enableDarkMode()
         }
     }
 
