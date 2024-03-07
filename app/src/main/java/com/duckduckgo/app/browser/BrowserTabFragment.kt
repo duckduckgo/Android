@@ -1983,7 +1983,7 @@ class BrowserTabFragment :
     }
 
     private fun configureQuickAccessGridLayout(recyclerView: RecyclerView) {
-        val numOfColumns = gridViewColumnCalculator.calculateNumberOfColumns(QUICK_ACCESS_ITEM_MAX_SIZE_DP, QUICK_ACCESS_GRID_MAX_COLUMNS)
+        val numOfColumns = gridViewColumnCalculator.calculateNumberOfColumns(QUICK_ACCESS_ITEM_MAX_SIZE_DP)
         val layoutManager = GridLayoutManager(requireContext(), numOfColumns)
         recyclerView.layoutManager = layoutManager
         val sidePadding = gridViewColumnCalculator.calculateSidePadding(QUICK_ACCESS_ITEM_MAX_SIZE_DP, numOfColumns)
@@ -3009,8 +3009,6 @@ class BrowserTabFragment :
         private const val TRACKERS_SECONDARY_DELAY = 200L
 
         private const val DEFAULT_CIRCLE_TARGET_TIMES_1_5 = 96
-
-        private const val QUICK_ACCESS_GRID_MAX_COLUMNS = 6
 
         private const val COOKIES_ANIMATION_DELAY = 400L
 

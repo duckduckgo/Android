@@ -228,7 +228,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     private fun configureQuickAccessGrid() {
         val quickAccessRecyclerView = quickAccessItemsBinding.quickAccessRecyclerView
-        val numOfColumns = gridViewColumnCalculator.calculateNumberOfColumns(QUICK_ACCESS_ITEM_MAX_SIZE_DP, QUICK_ACCESS_GRID_MAX_COLUMNS)
+        val numOfColumns = gridViewColumnCalculator.calculateNumberOfColumns(QUICK_ACCESS_ITEM_MAX_SIZE_DP)
         val layoutManager = GridLayoutManager(this, numOfColumns)
         quickAccessRecyclerView.layoutManager = layoutManager
         quickAccessAdapter = FavoritesQuickAccessAdapter(
@@ -500,7 +500,6 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         const val WIDGET_SEARCH_WITH_FAVS_EXTRA = "WIDGET_SEARCH_WITH_FAVS_EXTRA"
         const val WIDGET_SEARCH_LAUNCH_VOICE = "WIDGET_SEARCH_LAUNCH_VOICE"
         const val NEW_SEARCH_ACTION = "com.duckduckgo.mobile.android.NEW_SEARCH"
-        private const val QUICK_ACCESS_GRID_MAX_COLUMNS = 6
 
         fun fromWidget(
             context: Context,
