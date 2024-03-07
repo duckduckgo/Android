@@ -125,6 +125,18 @@ class RealPlayBillingManagerTest {
         billingClientAdapter.verifyConnectInvoked()
         billingClientAdapter.verifyLaunchBillingFlowInvoked(productDetails, offerToken, externalId)
     }
+
+    @Test
+    fun `when service disconnected then attempt to connect`() = runTest {
+        processLifecycleOwner.currentState = RESUMED
+        billingClientAdapter.methodInvocations.clear()
+
+        // simulate service disconnection
+        billingClientAdapter.connected = false
+        billingClientAdapter.disconnectionListener?.invoke()
+
+        billingClientAdapter.verifyConnectInvoked()
+    }
 }
 
 class FakeBillingClientAdapter : BillingClientAdapter {

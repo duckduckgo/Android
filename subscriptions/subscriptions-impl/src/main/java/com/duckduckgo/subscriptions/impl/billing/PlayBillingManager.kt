@@ -178,6 +178,7 @@ class RealPlayBillingManager @Inject constructor(
 
     private fun onBillingClientDisconnected() {
         logcat { "Service disconnected" }
+        coroutineScope.launch { connect() }
     }
 
     private suspend fun loadProducts() {
