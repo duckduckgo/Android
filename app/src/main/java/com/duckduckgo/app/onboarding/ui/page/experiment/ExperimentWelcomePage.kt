@@ -115,6 +115,12 @@ class ExperimentWelcomePage : OnboardingPageFragment(R.layout.content_onboarding
         applyFullScreenFlags()
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        welcomeAnimation?.cancel()
+        typingAnimation?.cancel()
+    }
+
     override fun onActivityResult(
         requestCode: Int,
         resultCode: Int,
