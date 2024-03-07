@@ -42,6 +42,7 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitli
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.JoinedWaitlist
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.NotUnlocked
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.PendingInviteCode
+import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.sync.api.DeviceSyncState
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.flow.emptyFlow
@@ -92,6 +93,9 @@ class SettingsViewModelTest {
     @Mock
     private lateinit var mockAutoconsent: Autoconsent
 
+    @Mock
+    private lateinit var subscriptions: Subscriptions
+
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
@@ -107,6 +111,7 @@ class SettingsViewModelTest {
             whenever(appTrackingProtection.isRunning()).thenReturn(false)
             whenever(appTrackingProtection.isEnabled()).thenReturn(false)
             whenever(appTrackingProtection.isOnboarded()).thenReturn(false)
+            whenever(subscriptions.isEnabled()).thenReturn(false)
         }
 
         testee = SettingsViewModel(
@@ -120,6 +125,7 @@ class SettingsViewModelTest {
             networkProtectionWaitlist,
             coroutineTestRule.testDispatcherProvider,
             mockAutoconsent,
+            subscriptions,
         )
 
         runTest {

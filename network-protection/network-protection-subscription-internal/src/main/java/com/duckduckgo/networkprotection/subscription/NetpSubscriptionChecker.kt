@@ -33,6 +33,7 @@ import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
+import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.util.concurrent.TimeUnit.MINUTES
 import javax.inject.Inject
@@ -45,6 +46,7 @@ class NetpSubscriptionChecker @Inject constructor(
     private val workManager: WorkManager,
     private val networkProtectionState: NetworkProtectionState,
     private val dispatcherProvider: DispatcherProvider,
+    private val subscriptions: Subscriptions,
 ) : VpnServiceCallbacks {
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
         coroutineScope.launch(dispatcherProvider.io()) {
@@ -67,7 +69,7 @@ class NetpSubscriptionChecker @Inject constructor(
     }
 
     private suspend fun runChecker() {
-        if (networkProtectionState.isEnabled()) {
+        if (networkProtectionState.isEnabled() && subscriptions.isEnabled()) {
             logcat { "Sub check: Scheduling checker" }
             PeriodicWorkRequestBuilder<NetpSubscriptionCheckWorker>(20, MINUTES)
                 .addTag(TAG_WORKER_NETP_SUBS_CHECK)
@@ -110,20 +112,12 @@ class NetpSubscriptionCheckWorker(
     override suspend fun doWork(): Result {
         logcat { "Sub check: checking entitlement" }
         if (networkProtectionState.isEnabled()) {
-            netpSubscriptionManager.hasValidEntitlement().also {
-                if (it.isSuccess) {
-                    val hasEntitlement = it.getOrDefault(false)
-                    if (!hasEntitlement) {
-                        logcat { "Sub check: disabling" }
-                        netpRepository.vpnAccessRevoked = true
-                        networkProtectionState.stop()
-                    } else {
-                        netpRepository.vpnAccessRevoked = false
-                    }
-                } else {
-                    logcat { "Sub check: failed checking entitlement" }
-                    return Result.failure()
-                }
+            if (netpSubscriptionManager.hasValidEntitlement()) {
+                netpRepository.vpnAccessRevoked = false
+            } else {
+                logcat { "Sub check: disabling" }
+                netpRepository.vpnAccessRevoked = true
+                networkProtectionState.stop()
             }
         } else {
             logcat { "Sub check: cancelling scheduled checker" }
