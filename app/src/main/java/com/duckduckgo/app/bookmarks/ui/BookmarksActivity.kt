@@ -23,6 +23,7 @@ import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -52,6 +53,7 @@ import com.duckduckgo.app.browser.databinding.ContentBookmarksBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.setting.FaviconPromptSheet
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
+import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenWithParamsTest
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.SearchBar
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
@@ -61,6 +63,7 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.mobile.android.R as commonR
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
@@ -74,7 +77,8 @@ import java.util.*
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(BookmarksScreenNoParams::class)
+@ContributeToActivityStarter(BookmarksScreenNoParams::class, "Bookmarks")
+@ContributeToActivityStarter(BookmarksScreenWithParamsTest::class, "Bookmarks")
 class BookmarksActivity : DuckDuckGoActivity() {
 
     @Inject
@@ -115,6 +119,10 @@ class BookmarksActivity : DuckDuckGoActivity() {
 
         setupBookmarksRecycler()
         observeViewModel()
+
+        intent.getActivityParams(BookmarksScreenWithParamsTest::class.java)?.let {
+            Toast.makeText(this, "ScreenWithParams!", Toast.LENGTH_SHORT).show()
+        }
 
         viewModel.fetchBookmarksAndFolders(getParentFolderId())
     }

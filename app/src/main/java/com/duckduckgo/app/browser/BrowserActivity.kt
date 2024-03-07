@@ -73,6 +73,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParams
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreen.PrivacyDashboardHybridWithTabIdParam
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -492,7 +493,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     fun launchBookmarks() {
-        startBookmarksActivityForResult.launch(globalActivityStarter.startIntent(this, BookmarksScreenNoParams))
+        startBookmarksActivityForResult.launch(globalActivityStarter.startIntent(
+            this,
+            DeeplinkActivityParams(screenName = "Bookmarks"),
+            //DeeplinkActivityParams(screenName = "Bookmarks", jsonArguments = "{\"foo\": \"Params received\"}"),
+        ))
     }
 
     fun launchDownloads() {
