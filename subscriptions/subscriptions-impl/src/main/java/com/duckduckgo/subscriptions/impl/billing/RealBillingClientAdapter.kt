@@ -38,6 +38,7 @@ import com.duckduckgo.subscriptions.impl.billing.BillingInitResult.Failure
 import com.duckduckgo.subscriptions.impl.billing.BillingInitResult.Success
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import java.lang.IllegalArgumentException
 import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -109,7 +110,7 @@ class RealBillingClientAdapter @Inject constructor(
 
         return when (billingResult.responseCode) {
             BillingResponseCode.OK -> SubscriptionsResult.Success(productDetails.orEmpty())
-            else -> SubscriptionsResult.Failure(billingResult.responseCode, billingResult.debugMessage)
+            else -> SubscriptionsResult.Failure(billingResult.responseCode.toBillingError(), billingResult.debugMessage)
         }
     }
 
@@ -186,4 +187,21 @@ class RealBillingClientAdapter @Inject constructor(
             BillingResponseCode.USER_CANCELED -> PurchasesUpdateResult.UserCancelled
             else -> PurchasesUpdateResult.Failure
         }
+}
+
+private fun Int.toBillingError(): BillingError = when (this) {
+    BillingResponseCode.OK -> throw IllegalArgumentException()
+    BillingResponseCode.SERVICE_TIMEOUT -> BillingError.SERVICE_TIMEOUT
+    BillingResponseCode.FEATURE_NOT_SUPPORTED -> BillingError.FEATURE_NOT_SUPPORTED
+    BillingResponseCode.SERVICE_DISCONNECTED -> BillingError.SERVICE_DISCONNECTED
+    BillingResponseCode.USER_CANCELED -> BillingError.USER_CANCELED
+    BillingResponseCode.SERVICE_UNAVAILABLE -> BillingError.SERVICE_UNAVAILABLE
+    BillingResponseCode.BILLING_UNAVAILABLE -> BillingError.BILLING_UNAVAILABLE
+    BillingResponseCode.ITEM_UNAVAILABLE -> BillingError.ITEM_UNAVAILABLE
+    BillingResponseCode.DEVELOPER_ERROR -> BillingError.DEVELOPER_ERROR
+    BillingResponseCode.ERROR -> BillingError.ERROR
+    BillingResponseCode.ITEM_ALREADY_OWNED -> BillingError.ITEM_ALREADY_OWNED
+    BillingResponseCode.ITEM_NOT_OWNED -> BillingError.ITEM_NOT_OWNED
+    BillingResponseCode.NETWORK_ERROR -> BillingError.NETWORK_ERROR
+    else -> BillingError.UNKNOWN_ERROR
 }

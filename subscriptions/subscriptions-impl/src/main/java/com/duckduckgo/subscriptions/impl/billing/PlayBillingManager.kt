@@ -191,7 +191,7 @@ class RealPlayBillingManager @Inject constructor(
             }
 
             is SubscriptionsResult.Failure -> {
-                logcat { "onProductDetailsResponse: ${result.billingResponseCode} ${result.debugMessage}" }
+                logcat { "onProductDetailsResponse: ${result.billingError} ${result.debugMessage}" }
             }
         }
     }
