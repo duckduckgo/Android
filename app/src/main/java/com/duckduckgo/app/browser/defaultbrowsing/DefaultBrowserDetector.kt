@@ -23,8 +23,7 @@ import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.net.Uri
 import android.os.Build
-import com.duckduckgo.app.brokensite.api.toBinaryString
-import com.duckduckgo.app.statistics.api.BrowserFeatureReporterPlugin
+import com.duckduckgo.app.statistics.api.BrowserFeatureStateReporterPlugin
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
@@ -39,12 +38,12 @@ interface DefaultBrowserDetector {
     fun hasDefaultBrowser(): Boolean
 }
 
-@ContributesMultibinding(scope = AppScope::class, boundType = BrowserFeatureReporterPlugin::class)
+@ContributesMultibinding(scope = AppScope::class, boundType = BrowserFeatureStateReporterPlugin::class)
 @ContributesBinding(scope = AppScope::class, boundType = DefaultBrowserDetector::class)
 class AndroidDefaultBrowserDetector @Inject constructor(
     private val context: Context,
     private val appBuildConfig: AppBuildConfig,
-) : DefaultBrowserDetector, BrowserFeatureReporterPlugin {
+) : DefaultBrowserDetector, BrowserFeatureStateReporterPlugin {
 
     override fun deviceSupportsDefaultBrowserConfiguration(): Boolean {
         // previously was ensuring that device was >= Build.VERSION_CODES.N. Returning true here to minimize further changes.
@@ -67,8 +66,8 @@ class AndroidDefaultBrowserDetector @Inject constructor(
         return resolutionInfo?.activityInfo?.packageName
     }
 
-    override fun feature(): Pair<String, String> {
-        return Pair(isDefaultBrowser().toBinaryString(), PixelParameter.DEFAULT_BROWSER)
+    override fun featureState(): Pair<Boolean, String> {
+        return Pair(isDefaultBrowser(), PixelParameter.DEFAULT_BROWSER)
     }
 
     @Suppress("NewApi") // we use appBuildConfig

@@ -16,23 +16,22 @@
 
 package com.duckduckgo.voice.impl
 
-import com.duckduckgo.app.statistics.api.BrowserFeatureReporterPlugin
+import com.duckduckgo.app.statistics.api.BrowserFeatureStateReporterPlugin
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
-import com.duckduckgo.app.statistics.pixels.toBinaryString
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
-interface VoiceSearchStateReporterPlugin
+interface VoiceStateReporterPlugin
 
-@ContributesMultibinding(scope = AppScope::class, boundType = BrowserFeatureReporterPlugin::class)
-@ContributesBinding(scope = AppScope::class, boundType = VoiceSearchStateReporterPlugin::class)
-class RealVoiceSearchStateReporterPlugin @Inject constructor(
+@ContributesMultibinding(scope = AppScope::class, boundType = BrowserFeatureStateReporterPlugin::class)
+@ContributesBinding(scope = AppScope::class, boundType = VoiceStateReporterPlugin::class)
+class RealVoiceStateReporterPlugin @Inject constructor(
     private val voiceSearchAvailability: VoiceSearchAvailability,
-) : VoiceSearchStateReporterPlugin, BrowserFeatureReporterPlugin {
-    override fun feature(): Pair<String, String> {
-        return Pair(voiceSearchAvailability.isVoiceSearchAvailable.toBinaryString(), PixelParameter.VOICE_SEARCH)
+) : VoiceStateReporterPlugin, BrowserFeatureStateReporterPlugin {
+    override fun featureState(): Pair<Boolean, String> {
+        return Pair(voiceSearchAvailability.isVoiceSearchAvailable, PixelParameter.VOICE_SEARCH)
     }
 }

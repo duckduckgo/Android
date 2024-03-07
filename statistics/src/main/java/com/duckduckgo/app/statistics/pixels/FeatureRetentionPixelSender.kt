@@ -20,7 +20,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.statistics.api.BrowserFeatureReporterPlugin
+import com.duckduckgo.app.statistics.api.BrowserFeatureStateReporterPlugin
 import com.duckduckgo.app.statistics.api.RefreshRetentionAtbPlugin
 import com.duckduckgo.app.statistics.pixels.Pixel.StatisticsPixelName
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -40,20 +40,20 @@ class FeatureRetentionPixelSender @Inject constructor(
     private val pixel: Pixel,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
-    private val plugins: PluginPoint<BrowserFeatureReporterPlugin>,
+    private val plugins: PluginPoint<BrowserFeatureStateReporterPlugin>,
 ) : RefreshRetentionAtbPlugin {
 
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(PIXELS_PREF_FILE, Context.MODE_PRIVATE) }
 
     override fun onSearchRetentionAtbRefreshed() {
         coroutineScope.launch(dispatcherProvider.io()) {
-            tryToFireDailyPixel(StatisticsPixelName.BROWSER_DAILY_ACTIVE_FEATURE.pixelName)
+            tryToFireDailyPixel(StatisticsPixelName.BROWSER_DAILY_ACTIVE_FEATURE_STATE.pixelName)
         }
     }
 
     override fun onAppRetentionAtbRefreshed() {
         coroutineScope.launch(dispatcherProvider.io()) {
-            tryToFireDailyPixel(StatisticsPixelName.BROWSER_DAILY_ACTIVE_FEATURE.pixelName)
+            tryToFireDailyPixel(StatisticsPixelName.BROWSER_DAILY_ACTIVE_FEATURE_STATE.pixelName)
         }
     }
 
@@ -65,8 +65,8 @@ class FeatureRetentionPixelSender @Inject constructor(
 
         val parameters = mutableMapOf<String, String>()
         plugins.getPlugins().forEach { plugin ->
-            val featureState = plugin.feature()
-            parameters[featureState.second] = featureState.first
+            val featureState = plugin.featureState()
+            parameters[featureState.second] = featureState.first.toBinaryString()
         }
 
         // check if pixel was already sent in the current day
