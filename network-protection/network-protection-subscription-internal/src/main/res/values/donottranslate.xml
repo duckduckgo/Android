@@ -28,10 +28,4 @@
     <string name="netpSubscriptionSettingsDisconnected">Disabled</string>
     <string name="netpSubscriptionSettingsNeverEnabled">Secure your network connection anytime, anywhere</string>
 
-    <!-- Access revoked-->
-    <string name="netpDialogVpnAccessRevokedTitle">VPN disconnected due to expired subscription</string>
-    <string name="netpDialogVpnAccessRevokedBody">Subscribe to Privacy Pro to reconnect DuckDuckGo VPN.</string>
-    <string name="netpDialogVpnAccessRevokedPositiveAction">Subscribe</string>
-    <string name="netpDialogVpnAccessRevokedNegativeAction">Dismiss</string>
-
 </resources>
