@@ -111,12 +111,14 @@ internal fun String.sanitizeStackTrace(): String {
         val phoneRegex = Regex("\\b(?:\\d[\\s()-]?){6,14}\\b") // This regex matches common phone number formats
         val phoneRegex2 = Regex("\\b\\+?\\d[- (]*\\d{3}[- )]*\\d{3}[- ]*\\d{4}\\b") // enhanced to redact also other phone number formats
         val urlRegex = Regex("\\b(?:https?://|www\\.)\\S+\\b")
+        val ipv4Regex = Regex("\\b(?:\\d{1,3}\\.){3}\\d{1,3}\\b")
 
         var sanitizedStackTrace = this
         sanitizedStackTrace = sanitizedStackTrace.replace(urlRegex, "[REDACTED_URL]")
         sanitizedStackTrace = sanitizedStackTrace.replace(emailRegex, "[REDACTED_EMAIL]")
         sanitizedStackTrace = sanitizedStackTrace.replace(phoneRegex2, "[REDACTED_PHONE]")
         sanitizedStackTrace = sanitizedStackTrace.replace(phoneRegex, "[REDACTED_PHONE]")
+        sanitizedStackTrace = sanitizedStackTrace.replace(ipv4Regex, "[REDACTED_IPV4]")
 
         return sanitizedStackTrace
     }.getOrDefault("")
