@@ -116,7 +116,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                 .featureName(%S)
                                 .appVariantProvider({ appBuildConfig.variantName })
                                 // save empty variants will force the default variant to be set
-                                .forceDefaultVariantProvider({ variantManager.saveVariants(emptyList()) })
+                                .forceDefaultVariantProvider({ variantManager.updateVariants(emptyList()) })
                                 .build()
                                 .create(%T::class.java)
                                 """.trimIndent(),
