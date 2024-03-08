@@ -19,8 +19,7 @@ package com.duckduckgo.networkprotection.impl.rekey
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
-import com.duckduckgo.networkprotection.impl.NetPVpnFeature.NETP_VPN
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnel
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
@@ -44,7 +43,7 @@ import org.mockito.kotlin.whenever
 @RunWith(AndroidJUnit4::class)
 class RealNetPRekeyerTest {
     @Mock
-    private lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
+    private lateinit var networkProtectionState: NetworkProtectionState
 
     @Mock
     private lateinit var networkProtectionPixels: NetworkProtectionPixels
@@ -90,7 +89,7 @@ class RealNetPRekeyerTest {
         }
 
         testee = RealNetPRekeyer(
-            vpnFeaturesRegistry,
+            networkProtectionState,
             networkProtectionPixels,
             "name",
             wgTunnel,
@@ -102,7 +101,7 @@ class RealNetPRekeyerTest {
 
     @Test
     fun `do not rekey in production if time since last rekey is less than 24h`() = runTest {
-        whenever(vpnFeaturesRegistry.isFeatureRegistered(NETP_VPN)).thenReturn(true)
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
         whenever(wgTunnelConfig.getWgConfigCreatedAt())
             .thenReturn(System.currentTimeMillis() - TimeUnit.HOURS.toMillis(23))
         isDeviceLocked = true
@@ -115,7 +114,7 @@ class RealNetPRekeyerTest {
 
     @Test
     fun `do not rekey in internal if time since last rekey is less than 24h`() = runTest {
-        whenever(vpnFeaturesRegistry.isFeatureRegistered(NETP_VPN)).thenReturn(true)
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
         whenever(wgTunnelConfig.getWgConfigCreatedAt())
             .thenReturn(System.currentTimeMillis() - TimeUnit.HOURS.toMillis(23))
         isDeviceLocked = true
@@ -128,7 +127,7 @@ class RealNetPRekeyerTest {
 
     @Test
     fun `do not rekey if registering new key fails`() = runTest {
-        whenever(vpnFeaturesRegistry.isFeatureRegistered(NETP_VPN)).thenReturn(true)
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
         whenever(wgTunnelConfig.getWgConfigCreatedAt())
             .thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
 
@@ -139,7 +138,7 @@ class RealNetPRekeyerTest {
 
     @Test
     fun `do not rekey device is not locked`() = runTest {
-        whenever(vpnFeaturesRegistry.isFeatureRegistered(NETP_VPN)).thenReturn(true)
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
         whenever(wgTunnelConfig.getWgConfigCreatedAt())
             .thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
         isDeviceLocked = false
@@ -151,7 +150,7 @@ class RealNetPRekeyerTest {
 
     @Test
     fun `do not rekey if not internal build and forced rekey`() = runTest {
-        whenever(vpnFeaturesRegistry.isFeatureRegistered(NETP_VPN)).thenReturn(true)
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
         whenever(wgTunnelConfig.getWgConfigCreatedAt())
             .thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
         isDeviceLocked = true
@@ -164,7 +163,7 @@ class RealNetPRekeyerTest {
 
     @Test
     fun `do rekey if internal build and forced rekey`() = runTest {
-        whenever(vpnFeaturesRegistry.isFeatureRegistered(NETP_VPN)).thenReturn(true)
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
         whenever(wgTunnelConfig.getWgConfigCreatedAt())
             .thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
         isDeviceLocked = true
@@ -177,7 +176,7 @@ class RealNetPRekeyerTest {
 
     @Test
     fun `do not rekey if internal build and forced rekey but vpn disabled`() = runTest {
-        whenever(vpnFeaturesRegistry.isFeatureRegistered(NETP_VPN)).thenReturn(false)
+        whenever(networkProtectionState.isEnabled()).thenReturn(false)
         whenever(wgTunnelConfig.getWgConfigCreatedAt())
             .thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
         isDeviceLocked = true
@@ -190,7 +189,7 @@ class RealNetPRekeyerTest {
 
     @Test
     fun `do rekey if production build`() = runTest {
-        whenever(vpnFeaturesRegistry.isFeatureRegistered(NETP_VPN)).thenReturn(true)
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
         whenever(wgTunnelConfig.getWgConfigCreatedAt())
             .thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
         isDeviceLocked = true
@@ -203,7 +202,7 @@ class RealNetPRekeyerTest {
 
     @Test
     fun `do not rekey if production build but vpn disabled`() = runTest {
-        whenever(vpnFeaturesRegistry.isFeatureRegistered(NETP_VPN)).thenReturn(false)
+        whenever(networkProtectionState.isEnabled()).thenReturn(false)
         whenever(wgTunnelConfig.getWgConfigCreatedAt())
             .thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
         isDeviceLocked = true
@@ -217,14 +216,14 @@ class RealNetPRekeyerTest {
     private suspend fun assertNoRekey() {
         verify(wgTunnel, never()).createWgConfig(any())
         verify(wgTunnel, never()).createAndSetWgConfig(any())
-        verify(vpnFeaturesRegistry, never()).refreshFeature(NETP_VPN)
+        verify(networkProtectionState, never()).restart()
         verify(networkProtectionPixels, never()).reportRekeyCompleted()
     }
 
     private suspend fun assertRekey() {
         verify(wgTunnel, never()).createWgConfig(any())
         verify(wgTunnel).createAndSetWgConfig(any())
-        verify(vpnFeaturesRegistry).refreshFeature(NETP_VPN)
+        verify(networkProtectionState).restart()
         verify(networkProtectionPixels).reportRekeyCompleted()
     }
 }

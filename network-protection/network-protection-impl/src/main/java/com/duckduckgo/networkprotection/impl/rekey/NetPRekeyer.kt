@@ -23,8 +23,7 @@ import com.duckduckgo.app.di.ProcessName
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.VpnScope
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
-import com.duckduckgo.networkprotection.impl.NetPVpnFeature
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnel
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
@@ -47,7 +46,7 @@ interface NetPRekeyer {
 
 @ContributesBinding(VpnScope::class)
 class RealNetPRekeyer @Inject constructor(
-    private val vpnFeaturesRegistry: VpnFeaturesRegistry,
+    private val networkProtectionState: NetworkProtectionState,
     private val networkProtectionPixels: NetworkProtectionPixels,
     @ProcessName private val processName: String,
     private val wgTunnel: WgTunnel,
@@ -74,7 +73,7 @@ class RealNetPRekeyer @Inject constructor(
         }
 
         if (deviceLockedChecker.invoke() || forceOrFalseInProductionBuilds) {
-            if (vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)) {
+            if (networkProtectionState.isEnabled()) {
                 val config = wgTunnel.createAndSetWgConfig(KeyPair())
                     .onFailure {
                         logcat(LogPriority.ERROR) { "Failed registering the new key during re-keying: ${it.asLog()}" }
@@ -84,7 +83,7 @@ class RealNetPRekeyer @Inject constructor(
 
                 logcat { "Restarting VPN after clearing client keys" }
                 networkProtectionPixels.reportRekeyCompleted()
-                vpnFeaturesRegistry.refreshFeature(NetPVpnFeature.NETP_VPN)
+                networkProtectionState.restart()
             } else {
                 logcat(LogPriority.ERROR) { "Re-key work should not happen" }
             }

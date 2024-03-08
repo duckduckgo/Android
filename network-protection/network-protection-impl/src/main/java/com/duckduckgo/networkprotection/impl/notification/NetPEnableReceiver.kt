@@ -22,8 +22,7 @@ import android.content.Intent
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.di.scopes.ReceiverScope
 import com.duckduckgo.mobile.android.vpn.Vpn
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
-import com.duckduckgo.networkprotection.impl.NetPVpnFeature
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import dagger.android.AndroidInjection
 import javax.inject.Inject
@@ -37,7 +36,7 @@ import logcat.logcat
 @InjectWith(ReceiverScope::class)
 class NetPEnableReceiver : BroadcastReceiver() {
 
-    @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
+    @Inject lateinit var networkProtectionState: NetworkProtectionState
 
     @Inject lateinit var vpn: Vpn
 
@@ -55,7 +54,7 @@ class NetPEnableReceiver : BroadcastReceiver() {
         if (intent.action == ACTION_NETP_ENABLE) {
             logcat { "NetP will restart because the user asked it" }
             goAsync(pendingResult) {
-                vpnFeaturesRegistry.registerFeature(NetPVpnFeature.NETP_VPN)
+                networkProtectionState.start()
             }
         } else if (intent.action == ACTION_VPN_SNOOZE_CANCEL) {
             logcat { "Entire VPN will be enabled because the user asked it" }

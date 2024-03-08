@@ -17,9 +17,8 @@
 package com.duckduckgo.networkprotection.impl.failure
 
 import com.duckduckgo.di.scopes.VpnScope
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.CurrentTimeProvider
-import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnel
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.configuration.asServerDetails
@@ -35,7 +34,7 @@ import logcat.logcat
 
 @ContributesMultibinding(VpnScope::class)
 class FailureRecoveryHandler @Inject constructor(
-    private val vpnFeaturesRegistry: VpnFeaturesRegistry,
+    private val networkProtectionState: NetworkProtectionState,
     private val wgTunnel: WgTunnel,
     private val wgTunnelConfig: WgTunnelConfig,
     private val currentTimeProvider: CurrentTimeProvider,
@@ -96,7 +95,7 @@ class FailureRecoveryHandler @Inject constructor(
     private suspend fun attemptRecovery(): Result<Unit> {
         logcat { "Failure recovery: attemptRecovery" }
 
-        if (vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)) {
+        if (networkProtectionState.isEnabled()) {
             networkProtectionPixels.reportFailureRecoveryStarted()
             wgTunnel.markTunnelUnhealthy()
             val (currentServer, currentTunAddresses) = with(wgTunnelConfig.getWgConfig()) {
@@ -123,7 +122,7 @@ class FailureRecoveryHandler @Inject constructor(
 
                 wgTunnel.markTunnelHealthy()
                 wgTunnelConfig.setWgConfig(config)
-                vpnFeaturesRegistry.refreshFeature(NetPVpnFeature.NETP_VPN)
+                networkProtectionState.restart()
             } else {
                 networkProtectionPixels.reportFailureRecoveryCompletedWithServerHealthy()
                 // Ignore created config, new keypair should eventually be ignored by the controller
