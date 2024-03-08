@@ -34,7 +34,7 @@ class ExtendedOnboardingExperimentVariantManagerImpl @Inject constructor(
     private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles,
 ) : ExtendedOnboardingExperimentVariantManager {
 
-    private val isExtendedOnboardingEnabled: Boolean = true
+    private val isExtendedOnboardingEnabled: Boolean = false
 
     override fun setExperimentVariants() {
         val variants = listOf(
