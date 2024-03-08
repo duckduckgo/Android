@@ -813,4 +813,8 @@
     <string name="faviconsPromptMessage">Haluatko, että tämä laite lataa synkronoitujen kirjanmerkkien kuvakkeet automaattisesti kirjanmerkityiltä verkkosivustoilta?</string>
     <string name="faviconsPromptPrimaryCta">Pidä kirjanmerkkikuvakkeet ajan tasalla</string>
     <string name="faviconsPromptSecondaryCta">Ei nyt</string>
+
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">Avaa DuckDuckGo:ssa</string>
+    <string name="runningInDdgMenuItemTitle">Käynnissä DuckDuckGossa</string>
 </resources>
