@@ -63,3 +63,5 @@ fun Context.registerExportedReceiver(
 ) {
     ContextCompat.registerReceiver(this, receiver, intentFilter, ContextCompat.RECEIVER_EXPORTED)
 }
+
+fun Context.isDdgApp(packageName: String): Boolean = packageName == this.applicationContext.packageName || packageName.startsWith("com.duckduckgo")

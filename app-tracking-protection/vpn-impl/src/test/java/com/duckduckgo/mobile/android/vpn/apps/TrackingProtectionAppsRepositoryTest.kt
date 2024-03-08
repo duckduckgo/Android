@@ -20,6 +20,7 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.content.pm.PackageManager.NameNotFoundException
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository.ProtectionState
@@ -61,6 +62,7 @@ class TrackingProtectionAppsRepositoryTest {
                 appTrackerRepository,
                 coroutineRule.testDispatcherProvider,
                 networkProtectionExclusionList,
+                InstrumentationRegistry.getInstrumentation().targetContext,
             )
     }
 
@@ -69,7 +71,7 @@ class TrackingProtectionAppsRepositoryTest {
         val exclusionList = trackingProtectionAppsRepository.getExclusionAppsList()
 
         assertEquals(
-            listOf("com.example.app2", "com.example.app3", "com.example.app5", "com.example.system", "com.duckduckgo.mobile"),
+            listOf("com.example.app2", "com.example.app3", "com.example.app5", "com.example.system", "com.duckduckgo.mobile.android.vpn.test"),
             exclusionList,
         )
     }
@@ -125,11 +127,11 @@ class TrackingProtectionAppsRepositoryTest {
 
     @Test
     fun whenGetAppProtectionStatusCalledOnDdgAppThenReturnUnprotected() = runTest {
-        whenever(packageManager.getApplicationInfo("com.duckduckgo.mobile", 0))
-            .thenReturn(ApplicationInfo().apply { packageName = "com.duckduckgo.mobile" })
-        whenever(networkProtectionExclusionList.isExcluded("com.duckduckgo.mobile")).thenReturn(false)
+        whenever(packageManager.getApplicationInfo("com.duckduckgo.mobile.android.vpn.test", 0))
+            .thenReturn(ApplicationInfo().apply { packageName = "com.duckduckgo.mobile.android.vpn.test" })
+        whenever(networkProtectionExclusionList.isExcluded("com.duckduckgo.mobile.android.vpn.test")).thenReturn(false)
 
-        val protectionState = trackingProtectionAppsRepository.getAppProtectionStatus("com.duckduckgo.mobile")
+        val protectionState = trackingProtectionAppsRepository.getAppProtectionStatus("com.duckduckgo.mobile.android.vpn.test")
 
         assertEquals(ProtectionState.UNPROTECTED, protectionState)
     }
@@ -161,7 +163,7 @@ class TrackingProtectionAppsRepositoryTest {
 
         val exclusionList = trackingProtectionAppsRepository.getExclusionAppsList()
 
-        assertEquals(listOf("com.example.app3", "com.example.app5", "com.example.system", "com.duckduckgo.mobile"), exclusionList)
+        assertEquals(listOf("com.example.app3", "com.example.app5", "com.example.system", "com.duckduckgo.mobile.android.vpn.test"), exclusionList)
     }
 
     @Test
@@ -188,7 +190,7 @@ class TrackingProtectionAppsRepositoryTest {
                 "com.example.app3",
                 "com.example.app5",
                 "com.example.system",
-                "com.duckduckgo.mobile",
+                "com.duckduckgo.mobile.android.vpn.test",
             ),
             exclusionList,
         )
@@ -201,7 +203,7 @@ class TrackingProtectionAppsRepositoryTest {
         val exclusionList = trackingProtectionAppsRepository.getExclusionAppsList()
 
         assertEquals(
-            listOf("com.example.app1", "com.example.app3", "com.example.app5", "com.example.system", "com.duckduckgo.mobile"),
+            listOf("com.example.app1", "com.example.app3", "com.example.app5", "com.example.system", "com.duckduckgo.mobile.android.vpn.test"),
             exclusionList,
         )
     }
@@ -293,7 +295,7 @@ class TrackingProtectionAppsRepositoryTest {
             "com.example.game", // it's a game and should be protected by default
             "com.example.system", // should be automatically be added to exclusion list
             "com.example.system.overriden",
-            "com.duckduckgo.mobile", // should be automatically be added to exclusion list
+            "com.duckduckgo.mobile.android.vpn.test", // should be automatically be added to exclusion list, packageName returned during test
         )
         private val EXCLUSION_LIST = mapOf(
             "com.example.app1" to "UNKNOWN",

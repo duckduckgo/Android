@@ -16,9 +16,11 @@
 
 package com.duckduckgo.mobile.android.vpn.apps
 
+import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.isDdgApp
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository.ProtectionState
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository.ProtectionState.PROTECTED
@@ -79,6 +81,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
     private val appTrackerRepository: AppTrackerRepository,
     private val dispatcherProvider: DispatcherProvider,
     private val networkProtectionExclusionList: NetworkProtectionExclusionList,
+    private val context: Context,
 ) : TrackingProtectionAppsRepository, SystemAppOverridesProvider {
 
     private var installedApps: Sequence<ApplicationInfo> = emptySequence()
@@ -131,7 +134,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
     }
 
     private fun shouldNotBeShown(appInfo: ApplicationInfo): Boolean {
-        return VpnExclusionList.isDdgApp(appInfo.packageName) || isSystemAppAndNotOverridden(appInfo)
+        return context.isDdgApp(appInfo.packageName) || isSystemAppAndNotOverridden(appInfo)
     }
 
     private fun isSystemAppAndNotOverridden(appInfo: ApplicationInfo): Boolean {
@@ -147,7 +150,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
         ddgExclusionList: List<AppTrackerExcludedPackage>,
         userExclusionList: List<AppTrackerManualExcludedApp>,
     ): Boolean {
-        return VpnExclusionList.isDdgApp(appInfo.packageName) ||
+        return context.isDdgApp(appInfo.packageName) ||
             isSystemAppAndNotOverridden(appInfo) ||
             isManuallyExcluded(appInfo, ddgExclusionList, userExclusionList)
     }
