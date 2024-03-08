@@ -64,6 +64,15 @@ class RedactDomainTest {
                     at java.base/java.lang.Integer.parseInt(Integer.java:770)
                     at com.example.Helper.validatePhoneNumber(Helper.java:45)
                     ... 6 more
+                Caused by: java.net.SocketTimeoutException: failed to connect to controller.netp.duckduckgo.com/208.43.237.140 (port 443) from /192.168.1.5 (port 48459) after 10000ms
+                    at libcore.io.IoBridge.connectErrno(IoBridge.java:185)
+                    at libcore.io.IoBridge.connect(IoBridge.java:130)
+                    at java.net.PlainSocketImpl.socketConnect(PlainSocketImpl.java:129)
+                    at java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:357)
+                    at java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:201)
+                    at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:183)
+                    at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:356)        
+                    ... 6 more
         """.trimIndent()
 
         val actual = message.sanitizeStackTrace()
@@ -75,6 +84,8 @@ class RedactDomainTest {
             .replace("john.doe@example.com", "[REDACTED_EMAIL]")
             .replace("john.doe.doe@example.com", "[REDACTED_EMAIL]")
             .replace("john@example.com", "[REDACTED_EMAIL]")
+            .replace("208.43.237.140", "[REDACTED_IPV4]")
+            .replace("192.168.1.5", "[REDACTED_IPV4]")
         assertEquals(expected, actual)
     }
 }
