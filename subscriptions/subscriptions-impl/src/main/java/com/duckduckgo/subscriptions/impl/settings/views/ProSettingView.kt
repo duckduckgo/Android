@@ -45,9 +45,11 @@ import com.duckduckgo.subscriptions.impl.databinding.ViewSettingsBinding
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenBuyScreen
+import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenRestoreScreen
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenSettings
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Factory
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.ViewState
+import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionActivity.Companion.RestoreSubscriptionScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsActivity.Companion.SubscriptionsSettingsScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams
 import dagger.android.support.AndroidSupportInjection
@@ -121,22 +123,29 @@ class ProSettingView @JvmOverloads constructor(
         binding.subscriptionSetting.setOnTouchListener(null)
         binding.subscriptionBuy.setOnClickListener(null)
         binding.subscriptionBuy.setOnTouchListener(null)
+        binding.subscriptionGet.setOnClickListener(null)
+        binding.subscriptionGet.setOnTouchListener(null)
+        binding.subscriptionRestore.setOnTouchListener(null)
+        binding.subscriptionRestore.setOnClickListener(null)
 
         if (viewState.hasSubscription) {
-            binding.subscriptionBuy.gone()
-            binding.subscribeSecondary.gone()
-            binding.subscriptionSetting.show()
-            binding.settingContainer.setOnClickListener {
+            binding.subscriptionBuyContainer.gone()
+            binding.subscriptionRestoreContainer.gone()
+            binding.subscriptionSettingContainer.show()
+            binding.subscriptionSettingContainer.setOnClickListener {
                 viewModel.onSettings()
             }
         } else {
             val htmlText = context.getString(R.string.subscriptionSettingFeaturesList).html(context)
-            binding.subscribeSecondary.show()
             binding.subscribeSecondary.text = htmlText
-            binding.subscriptionBuy.show()
-            binding.subscriptionSetting.gone()
-            binding.settingContainer.setOnClickListener {
+            binding.subscriptionBuyContainer.show()
+            binding.subscriptionSettingContainer.gone()
+            binding.subscriptionRestoreContainer.show()
+            binding.subscriptionBuyContainer.setOnClickListener {
                 viewModel.onBuy()
+            }
+            binding.subscriptionRestoreContainer.setOnClickListener {
+                viewModel.onRestore()
             }
         }
     }
@@ -155,6 +164,9 @@ class ProSettingView @JvmOverloads constructor(
                         defaultToolbar = true,
                     ),
                 )
+            }
+            is OpenRestoreScreen -> {
+                globalActivityStarter.start(context, RestoreSubscriptionScreenWithEmptyParams)
             }
         }
     }

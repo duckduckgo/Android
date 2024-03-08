@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenBuyScreen
+import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenRestoreScreen
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenSettings
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -40,6 +41,15 @@ class ProSettingViewModelTest {
         viewModel.commands().test {
             viewModel.onBuy()
             assertTrue(awaitItem() is OpenBuyScreen)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnRestoreThenCommandSent() = runTest {
+        viewModel.commands().test {
+            viewModel.onRestore()
+            assertTrue(awaitItem() is OpenRestoreScreen)
             cancelAndConsumeRemainingEvents()
         }
     }

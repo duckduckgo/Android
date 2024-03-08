@@ -25,6 +25,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenBuyScreen
+import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenRestoreScreen
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenSettings
 import javax.inject.Inject
 import javax.inject.Provider
@@ -45,6 +46,7 @@ class ProSettingViewModel @Inject constructor(
     sealed class Command {
         data object OpenSettings : Command()
         data object OpenBuyScreen : Command()
+        data object OpenRestoreScreen : Command()
     }
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
@@ -60,6 +62,10 @@ class ProSettingViewModel @Inject constructor(
 
     fun onBuy() {
         sendCommand(OpenBuyScreen)
+    }
+
+    fun onRestore() {
+        sendCommand(OpenRestoreScreen)
     }
 
     override fun onResume(owner: LifecycleOwner) {

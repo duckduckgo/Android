@@ -67,7 +67,9 @@
     <string name="subscriptionSetting">Subscription Settings</string>
     <string name="subscriptionSettingSubscribe">Subscribe To Privacy Pro</string>
     <string name="subscriptionSettingSubscribeSubtitle">More seamless privacy with three new protections, including:</string>
-    <string name="subscriptionSettingFeaturesList"><![CDATA[<ul><li>&nbsp;VPN (Virtual Private Network)</li><li>&nbsp;Personal Information Removal</li><li>&nbsp;Identity Theft Restoration</li></ul><br/><u><a href="">Learn More</a></u>]]></string>
+    <string name="subscriptionSettingFeaturesList"><![CDATA[<ul><li>&nbsp;VPN</li><li>&nbsp;Personal Information Removal</li><li>&nbsp;Identity Theft Restoration</li></ul>]]></string>
+    <string name="subscriptionSettingGet">Get Privacy Pro</string>
+    <string name="subscriptionSettingRestore">I Have a Subscription</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">You\'re all set.</string>
