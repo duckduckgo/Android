@@ -323,9 +323,8 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
                 )
                 binding.netpStatusImage.playAnimation()
             } else if (previousState != Disconnected) {
-                binding.netpStatusImage.setMinAndMaxProgress(0f, 0.27f)
-                binding.netpStatusImage.progress = 0.27f
-                binding.netpStatusImage.speed = -1f
+                binding.netpStatusImage.setMinAndMaxProgress(0f, 0f)
+                binding.netpStatusImage.progress = 0f
                 binding.netpStatusImage.repeatCount = 0
                 binding.netpStatusImage.playAnimation()
             }
