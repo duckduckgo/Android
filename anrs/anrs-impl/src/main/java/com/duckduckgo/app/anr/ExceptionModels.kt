@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.anr
 
-import android.webkit.URLUtil
 import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.anrs.store.AnrEntity
 import com.duckduckgo.app.anrs.store.ExceptionEntity
@@ -71,7 +70,7 @@ internal fun CrashLogger.Crash.asCrashEntity(
     webView: String,
 ): ExceptionEntity {
     val timestamp = FORMATTER_SECONDS.format(LocalDateTime.now())
-    val stacktrace = this.t.asLog().redactDomains()
+    val stacktrace = this.t.asLog().sanitizeStackTrace()
     return ExceptionEntity(
         hash = (stacktrace + timestamp).encode().md5().hex(),
         shortName = this.shortName,
@@ -105,12 +104,20 @@ internal fun Array<StackTraceElement>.asStringArray(): ArrayList<String> {
 
 private val FORMATTER_SECONDS: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
 
-internal fun String.redactDomains(): String {
-    return this.split(" ").map {
-        if (URLUtil.isValidUrl(it)) {
-            "[REDACTED]"
-        } else {
-            it
-        }
-    }.joinToString(" ")
+internal fun String.sanitizeStackTrace(): String {
+    // if we fail for whatever reason, we don't include the stack trace
+    return runCatching {
+        val emailRegex = Regex("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}")
+        val phoneRegex = Regex("\\b(?:\\d[\\s()-]?){6,14}\\b") // This regex matches common phone number formats
+        val phoneRegex2 = Regex("\\b\\+?\\d[- (]*\\d{3}[- )]*\\d{3}[- ]*\\d{4}\\b") // enhanced to redact also other phone number formats
+        val urlRegex = Regex("\\b(?:https?://|www\\.)\\S+\\b")
+
+        var sanitizedStackTrace = this
+        sanitizedStackTrace = sanitizedStackTrace.replace(urlRegex, "[REDACTED_URL]")
+        sanitizedStackTrace = sanitizedStackTrace.replace(emailRegex, "[REDACTED_EMAIL]")
+        sanitizedStackTrace = sanitizedStackTrace.replace(phoneRegex2, "[REDACTED_PHONE]")
+        sanitizedStackTrace = sanitizedStackTrace.replace(phoneRegex, "[REDACTED_PHONE]")
+
+        return sanitizedStackTrace
+    }.getOrDefault("")
 }

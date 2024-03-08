@@ -17,31 +17,64 @@
 package com.duckduckgo.app.anr
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import logcat.asLog
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.lang.RuntimeException
 
 @RunWith(AndroidJUnit4::class)
 class RedactDomainTest {
 
     @Test
-    fun whenAllDomainsMultilinePresentThenRedact() {
-        val t = try {
-            throw RuntimeException("""
-                exception with https://redact.me and http://redact.me and redact.me and www.redact.me domains
-                and http://www.redact.me
-            """.trimIndent())
-        } catch (t: Throwable) {
-            t
-        }
-        val actual = t.asLog()
-        val expected = actual
-            .replace("https://redact.me", "[REDACTED]")
-            .replace("http://redact.me", "[REDACTED]")
-            .replace("http://www.redact.me", "[REDACTED]")
+    fun `redact PII from stack trace`() {
+        val message = """
+            Exception in thread "main" java.lang.NullPointerException: Something went wrong
+                at com.example.MyClass.method(MyClass.java:10)
+                at com.example.AnotherClass.anotherMethod(AnotherClass.java:20)
+                at com.example.Main.main(Main.java:5)
+                Caused by: java.lang.IllegalArgumentException: Invalid input: john@example.com
+                    at com.example.Helper.validateEmail(Helper.java:15)
+                    at com.example.MyClass.method(MyClass.java:8)
+                    at com.example.Main.main(Main.java:10)
+                    ... 2 more
+                Caused by: java.lang.IllegalArgumentException: Invalid input: john.doe@example.com
+                    at com.example.Helper.validateEmail(Helper.java:15)
+                    at com.example.MyClass.method(MyClass.java:8)
+                    at com.example.Main.main(Main.java:10)
+                    ... 2 more
+                Caused by: java.lang.IllegalArgumentException: Invalid input: john.doe.doe@example.com
+                    at com.example.Helper.validateEmail(Helper.java:15)
+                    at com.example.MyClass.method(MyClass.java:8)
+                    at com.example.Main.main(Main.java:10)
+                    ... 2 more
+                Caused by: java.net.MalformedURLException: Invalid URL: https://example.com/user/profile?id=123456
+                    at com.example.Helper.validateUrl(Helper.java:25)
+                    ... 3 more
+                Caused by: java.lang.NumberFormatException: For input string: "555-123-4567"
+                    at java.base/java.lang.Integer.parseInt(Integer.java:652)
+                    at java.base/java.lang.Integer.parseInt(Integer.java:770)
+                    at com.example.Helper.validatePhoneNumber(Helper.java:35)
+                    ... 4 more
+                Caused by: java.lang.NumberFormatException: For input string: "5551234567"
+                    at java.base/java.lang.Integer.parseInt(Integer.java:652)
+                    at java.base/java.lang.Integer.parseInt(Integer.java:770)
+                    at com.example.Helper.validatePhoneNumber(Helper.java:40)
+                    ... 5 more
+                Caused by: java.lang.NumberFormatException: For input string: "+1 (555) 123-4567"
+                    at java.base/java.lang.Integer.parseInt(Integer.java:652)
+                    at java.base/java.lang.Integer.parseInt(Integer.java:770)
+                    at com.example.Helper.validatePhoneNumber(Helper.java:45)
+                    ... 6 more
+        """.trimIndent()
 
-        assertEquals(expected, actual.redactDomains())
+        val actual = message.sanitizeStackTrace()
+        val expected = message
+            .replace("https://example.com/user/profile?id=123456", "[REDACTED_URL]")
+            .replace("555-123-4567", "[REDACTED_PHONE]")
+            .replace("5551234567", "[REDACTED_PHONE]")
+            .replace("1 (555) 123-4567", "[REDACTED_PHONE]")
+            .replace("john.doe@example.com", "[REDACTED_EMAIL]")
+            .replace("john.doe.doe@example.com", "[REDACTED_EMAIL]")
+            .replace("john@example.com", "[REDACTED_EMAIL]")
+        assertEquals(expected, actual)
     }
 }
