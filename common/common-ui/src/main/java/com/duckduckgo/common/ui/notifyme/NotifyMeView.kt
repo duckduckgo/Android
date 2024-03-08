@@ -47,11 +47,11 @@ import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.Command.OpenSettingsO
 import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.Command.ShowPermissionRationale
 import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.Command.UpdateNotificationsState
 import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.Command.UpdateNotificationsStateOnAndroid13Plus
-import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.Factory
 import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.ViewState
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.R.styleable
@@ -74,7 +74,7 @@ class NotifyMeView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyle) {
 
     @Inject
-    lateinit var viewModelFactory: Factory
+    lateinit var viewModelFactory: ViewViewModelFactory
 
     private lateinit var sharedPrefsKeyForDismiss: String
 
