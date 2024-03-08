@@ -22,10 +22,9 @@ import android.content.Intent
 import android.content.IntentFilter
 import com.duckduckgo.common.utils.extensions.registerNotExportedReceiver
 import com.duckduckgo.di.scopes.VpnScope
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
-import com.duckduckgo.networkprotection.impl.NetPVpnFeature
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -42,11 +41,11 @@ import logcat.logcat
     boundType = VpnServiceCallbacks::class,
 )
 class NetPTimezoneMonitor @Inject constructor(
-    private val vpnFeaturesRegistry: VpnFeaturesRegistry,
+    private val networkProtectionState: NetworkProtectionState,
     private val context: Context,
 ) : BroadcastReceiver(), VpnServiceCallbacks {
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        if (runBlocking { !vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN) }) {
+        if (runBlocking { !networkProtectionState.isEnabled() }) {
             logcat { "NetP not enabled, skip registering timezone monitor" }
             return
         }
@@ -65,7 +64,7 @@ class NetPTimezoneMonitor @Inject constructor(
             Intent.ACTION_TIMEZONE_CHANGED -> {
                 val pendingResult = goAsync()
                 execAsync(pendingResult) {
-                    vpnFeaturesRegistry.refreshFeature(NetPVpnFeature.NETP_VPN)
+                    networkProtectionState.restart()
                 }
             }
         }

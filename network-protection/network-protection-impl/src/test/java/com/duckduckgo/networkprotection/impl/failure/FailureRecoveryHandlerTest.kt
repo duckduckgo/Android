@@ -16,9 +16,8 @@
 
 package com.duckduckgo.networkprotection.impl.failure
 
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.CurrentTimeProvider
-import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.WgServerData
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnel
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
@@ -43,7 +42,7 @@ import org.mockito.kotlin.whenever
 
 class FailureRecoveryHandlerTest {
     @Mock
-    private lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
+    private lateinit var networkProtectionState: NetworkProtectionState
 
     @Mock
     private lateinit var wgTunnel: WgTunnel
@@ -91,7 +90,7 @@ class FailureRecoveryHandlerTest {
     fun setUp() {
         MockitoAnnotations.openMocks(this)
 
-        failureRecoveryHandler = FailureRecoveryHandler(vpnFeaturesRegistry, wgTunnel, wgTunnelConfig, currentTimeProvider, networkProtectionPixels)
+        failureRecoveryHandler = FailureRecoveryHandler(networkProtectionState, wgTunnel, wgTunnelConfig, currentTimeProvider, networkProtectionPixels)
     }
 
     @Test
@@ -100,7 +99,7 @@ class FailureRecoveryHandlerTest {
 
         failureRecoveryHandler.onTunnelFailure(180)
 
-        verifyNoInteractions(vpnFeaturesRegistry)
+        verifyNoInteractions(networkProtectionState)
         verifyNoInteractions(wgTunnel)
         verifyNoInteractions(wgTunnelConfig)
         verifyNoInteractions(networkProtectionPixels)
@@ -118,7 +117,7 @@ class FailureRecoveryHandlerTest {
     fun whenFailureRecoveryAndServerChangedThenSetConfigAndRefreshNetp() = runTest {
         val newConfig = getWgConfig(updatedServerDataDifferentServer)
         whenever(currentTimeProvider.getTimeInEpochSeconds()).thenReturn(1080)
-        whenever(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(true)
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
         whenever(wgTunnelConfig.getWgConfig()).thenReturn(getWgConfig(defaultServerData))
         whenever(wgTunnel.createWgConfig(anyOrNull())).thenReturn(Result.success(newConfig))
 
@@ -127,7 +126,7 @@ class FailureRecoveryHandlerTest {
         verify(wgTunnel).markTunnelUnhealthy()
         verify(wgTunnel).markTunnelHealthy()
         verify(wgTunnelConfig).setWgConfig(newConfig)
-        verify(vpnFeaturesRegistry).refreshFeature(NetPVpnFeature.NETP_VPN)
+        verify(networkProtectionState).restart()
         verify(networkProtectionPixels).reportFailureRecoveryStarted()
         verify(networkProtectionPixels).reportFailureRecoveryCompletedWithServerUnhealthy()
         verify(networkProtectionPixels, never()).reportFailureRecoveryCompletedWithDifferentTunnelAddress()
@@ -137,7 +136,7 @@ class FailureRecoveryHandlerTest {
     fun whenFailureRecoveryAndTunnelAddressChangedThenSetConfigAndRefreshNetp() = runTest {
         val newConfig = getWgConfig(updatedServerDataDifferentAddress)
         whenever(currentTimeProvider.getTimeInEpochSeconds()).thenReturn(1080)
-        whenever(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(true)
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
         whenever(wgTunnelConfig.getWgConfig()).thenReturn(getWgConfig(defaultServerData))
         whenever(wgTunnel.createWgConfig(anyOrNull())).thenReturn(Result.success(newConfig))
 
@@ -146,7 +145,7 @@ class FailureRecoveryHandlerTest {
         verify(wgTunnel).markTunnelUnhealthy()
         verify(wgTunnel).markTunnelHealthy()
         verify(wgTunnelConfig).setWgConfig(newConfig)
-        verify(vpnFeaturesRegistry).refreshFeature(NetPVpnFeature.NETP_VPN)
+        verify(networkProtectionState).restart()
         verify(networkProtectionPixels).reportFailureRecoveryStarted()
         verify(networkProtectionPixels).reportFailureRecoveryCompletedWithServerUnhealthy()
         verify(networkProtectionPixels).reportFailureRecoveryCompletedWithDifferentTunnelAddress()
@@ -155,7 +154,7 @@ class FailureRecoveryHandlerTest {
     @Test
     fun whenFailureRecoveryAndServerDidnotChangedThenDoNothing() = runTest {
         whenever(currentTimeProvider.getTimeInEpochSeconds()).thenReturn(1080)
-        whenever(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(true)
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
         whenever(wgTunnelConfig.getWgConfig()).thenReturn(getWgConfig(defaultServerData))
         whenever(wgTunnel.createWgConfig(anyOrNull())).thenReturn(Result.success(getWgConfig(defaultServerData)))
 
@@ -164,7 +163,7 @@ class FailureRecoveryHandlerTest {
         verify(wgTunnel).markTunnelUnhealthy()
         verify(wgTunnel, never()).markTunnelHealthy()
         verify(wgTunnelConfig, never()).setWgConfig(any())
-        verify(vpnFeaturesRegistry, never()).refreshFeature(NetPVpnFeature.NETP_VPN)
+        verify(networkProtectionState, never()).restart()
         verify(networkProtectionPixels).reportFailureRecoveryStarted()
         verify(networkProtectionPixels).reportFailureRecoveryCompletedWithServerHealthy()
     }
@@ -172,7 +171,7 @@ class FailureRecoveryHandlerTest {
     @Test
     fun whenFailureRecoveryAndCreateConfigFailedThenAttemptMax5TimesOnly() = runTest {
         whenever(currentTimeProvider.getTimeInEpochSeconds()).thenReturn(1080)
-        whenever(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(true)
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
         whenever(wgTunnelConfig.getWgConfig()).thenReturn(getWgConfig(defaultServerData))
         whenever(wgTunnel.createWgConfig(any())).thenReturn(Result.failure(RuntimeException()))
 
@@ -187,7 +186,7 @@ class FailureRecoveryHandlerTest {
     fun whenOnTunnelFailureCalledTwiceThenAttemptRecoveryOnceOnly() = runTest {
         val newConfig = getWgConfig(updatedServerDataDifferentServer)
         whenever(currentTimeProvider.getTimeInEpochSeconds()).thenReturn(1080)
-        whenever(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(true)
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
         whenever(wgTunnelConfig.getWgConfig()).thenReturn(getWgConfig(defaultServerData))
         whenever(wgTunnel.createWgConfig(anyOrNull())).thenReturn(Result.success(newConfig))
 
@@ -197,7 +196,7 @@ class FailureRecoveryHandlerTest {
         verify(wgTunnel).markTunnelUnhealthy()
         verify(wgTunnel).markTunnelHealthy()
         verify(wgTunnelConfig).setWgConfig(newConfig)
-        verify(vpnFeaturesRegistry).refreshFeature(NetPVpnFeature.NETP_VPN)
+        verify(networkProtectionState).restart()
         verify(networkProtectionPixels).reportFailureRecoveryStarted()
         verify(networkProtectionPixels).reportFailureRecoveryCompletedWithServerUnhealthy()
         verify(networkProtectionPixels, never()).reportFailureRecoveryCompletedWithDifferentTunnelAddress()
@@ -207,7 +206,7 @@ class FailureRecoveryHandlerTest {
     fun whenOnTunnelFailureCalledTwiceAndDifferentTunnelAddressThenAttemptRecoveryOnceOnly() = runTest {
         val newConfig = getWgConfig(updatedServerDataDifferentAddress)
         whenever(currentTimeProvider.getTimeInEpochSeconds()).thenReturn(1080)
-        whenever(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(true)
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
         whenever(wgTunnelConfig.getWgConfig()).thenReturn(getWgConfig(defaultServerData))
         whenever(wgTunnel.createWgConfig(anyOrNull())).thenReturn(Result.success(newConfig))
 
@@ -217,7 +216,7 @@ class FailureRecoveryHandlerTest {
         verify(wgTunnel).markTunnelUnhealthy()
         verify(wgTunnel).markTunnelHealthy()
         verify(wgTunnelConfig).setWgConfig(newConfig)
-        verify(vpnFeaturesRegistry).refreshFeature(NetPVpnFeature.NETP_VPN)
+        verify(networkProtectionState).restart()
         verify(networkProtectionPixels).reportFailureRecoveryStarted()
         verify(networkProtectionPixels).reportFailureRecoveryCompletedWithServerUnhealthy()
         verify(networkProtectionPixels).reportFailureRecoveryCompletedWithDifferentTunnelAddress()
@@ -227,7 +226,7 @@ class FailureRecoveryHandlerTest {
     fun whenOnTunnelFailureCalledAfterRecoveryThenAttemptRecoveryTwice() = runTest {
         val newConfig = getWgConfig(updatedServerDataDifferentServer)
         whenever(currentTimeProvider.getTimeInEpochSeconds()).thenReturn(1080)
-        whenever(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(true)
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
         whenever(wgTunnelConfig.getWgConfig()).thenReturn(getWgConfig(defaultServerData))
         whenever(wgTunnel.createWgConfig(anyOrNull())).thenReturn(Result.success(newConfig))
 
@@ -238,7 +237,7 @@ class FailureRecoveryHandlerTest {
         verify(wgTunnel, times(2)).markTunnelUnhealthy()
         verify(wgTunnel, times(3)).markTunnelHealthy()
         verify(wgTunnelConfig, times(2)).setWgConfig(newConfig)
-        verify(vpnFeaturesRegistry, times(2)).refreshFeature(NetPVpnFeature.NETP_VPN)
+        verify(networkProtectionState, times(2)).restart()
         verify(networkProtectionPixels, times(2)).reportFailureRecoveryStarted()
         verify(networkProtectionPixels, times(2)).reportFailureRecoveryCompletedWithServerUnhealthy()
     }
@@ -247,7 +246,7 @@ class FailureRecoveryHandlerTest {
     fun whenOnTunnelFailureCalledAfterRecoveryAndDifferentTunnelAddrThenAttemptRecoveryTwice() = runTest {
         val newConfig = getWgConfig(updatedServerDataDifferentAddress)
         whenever(currentTimeProvider.getTimeInEpochSeconds()).thenReturn(1080)
-        whenever(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(true)
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
         whenever(wgTunnelConfig.getWgConfig()).thenReturn(getWgConfig(defaultServerData))
         whenever(wgTunnel.createWgConfig(anyOrNull())).thenReturn(Result.success(newConfig))
 
@@ -258,7 +257,7 @@ class FailureRecoveryHandlerTest {
         verify(wgTunnel, times(2)).markTunnelUnhealthy()
         verify(wgTunnel, times(3)).markTunnelHealthy()
         verify(wgTunnelConfig, times(2)).setWgConfig(newConfig)
-        verify(vpnFeaturesRegistry, times(2)).refreshFeature(NetPVpnFeature.NETP_VPN)
+        verify(networkProtectionState, times(2)).restart()
         verify(networkProtectionPixels, times(2)).reportFailureRecoveryStarted()
         verify(networkProtectionPixels, times(2)).reportFailureRecoveryCompletedWithServerUnhealthy()
     }

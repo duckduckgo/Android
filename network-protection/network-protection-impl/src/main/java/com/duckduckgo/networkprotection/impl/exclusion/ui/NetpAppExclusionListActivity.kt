@@ -32,10 +32,9 @@ import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetPAppExclusionListNoParams
-import com.duckduckgo.networkprotection.impl.NetPVpnFeature
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.R.layout
 import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpAppExclusionBinding
@@ -55,7 +54,7 @@ class NetpAppExclusionListActivity :
     RestoreDefaultProtectionDialog.RestoreDefaultProtectionDialogListener {
 
     @Inject
-    lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
+    lateinit var networkProtectionState: NetworkProtectionState
 
     @Inject
     @AppCoroutineScope
@@ -194,6 +193,7 @@ class NetpAppExclusionListActivity :
             is Command.ShowDisableProtectionDialog -> showDisableProtectionDialog(
                 command.forApp,
             )
+
             is Command.ShowIssueReportingPage -> globalActivityStarter.start(this, command.params)
             else -> { /* noop */
             }
@@ -203,8 +203,8 @@ class NetpAppExclusionListActivity :
     private fun restartVpn() {
         // we use the app coroutine scope to ensure this call outlives the Activity
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            if (vpnFeaturesRegistry.isFeatureRunning(NetPVpnFeature.NETP_VPN)) {
-                vpnFeaturesRegistry.refreshFeature(NetPVpnFeature.NETP_VPN)
+            if (networkProtectionState.isRunning()) {
+                networkProtectionState.restart()
             }
         }
     }
