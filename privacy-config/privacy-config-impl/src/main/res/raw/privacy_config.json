@@ -947,61 +947,7 @@
                     "reason": "Site breakage"
                 }
             ]
-        },
-        "extendedOnboarding": {
-            "state": "enabled",
-            "features": {
-                "comparisonChart": {
-                    "state": "enabled",
-                    "targets": [
-                        {
-                            "variantKey": "mt"
-                        },
-                        {
-                            "variantKey": "mu"
-                        }
-                    ]
-                }
-            }
         }
-    },
-    "experimentalVariants": {
-        "variants": [
-            {
-                "desc": "this is SERP don't remove",
-                "variantKey": "sc",
-                "weight": 0.0
-            },
-            {
-                "desc": "this is SERP don't remove",
-                "variantKey": "se",
-                "weight": 0.0
-            },
-            {
-                "desc": "Control group for extended onboarding experiment",
-                "variantKey": "ms",
-                "weight": 1.0,
-                "filters": {
-                    "locale": ["en_US", "en_UK", "en_CA" ,"en_IN", "en_AU"]
-                }
-            },
-            {
-                "desc": "Aesthetic updates in onboarding experimental group",
-                "variantKey": "mt",
-                "weight": 1.0,
-                "filters": {
-                    "locale": ["en_US", "en_UK", "en_CA" ,"en_IN", "en_AU"]
-                }
-            },
-            {
-                "desc": "Structure updates in onboarding experimental group",
-                "variantKey": "mu",
-                "weight": 0.0,
-                "filters": {
-                    "locale": ["en_US", "en_UK", "en_CA" ,"en_IN", "en_AU"]
-                }
-            }
-        ]
     },
     "unprotectedTemporary": []
 }

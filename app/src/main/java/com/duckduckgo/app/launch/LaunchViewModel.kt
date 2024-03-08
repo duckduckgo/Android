@@ -21,6 +21,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.store.isNewUser
+import com.duckduckgo.app.onboarding.ui.page.experiment.ExtendedOnboardingExperimentVariantManager
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener.Companion.MAX_REFERRER_WAIT_TIME_MS
 import com.duckduckgo.di.scopes.ActivityScope
@@ -32,6 +33,7 @@ import timber.log.Timber
 class LaunchViewModel @Inject constructor(
     private val userStageStore: UserStageStore,
     private val appReferrerStateListener: AppInstallationReferrerStateListener,
+    private val extendedOnboardingExperimentVariantManager: ExtendedOnboardingExperimentVariantManager,
 ) :
     ViewModel() {
 
@@ -46,9 +48,8 @@ class LaunchViewModel @Inject constructor(
         waitForReferrerData()
 
         if (userStageStore.isNewUser()) {
-            // TODO experiment check featureFlag to set light or system theme and pass it as argument
-            val isExperimentalVariant = true
-            command.value = Command.Onboarding(forceLightTheme = !isExperimentalVariant)
+            extendedOnboardingExperimentVariantManager.setExperimentVariants()
+            command.value = Command.Onboarding(forceLightTheme = !extendedOnboardingExperimentVariantManager.isComparisonChartEnabled())
         } else {
             command.value = Command.Home()
         }

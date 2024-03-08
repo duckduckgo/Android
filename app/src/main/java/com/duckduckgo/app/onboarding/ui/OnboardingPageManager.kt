@@ -26,6 +26,7 @@ import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage
 import com.duckduckgo.app.onboarding.ui.page.experiment.ExperimentWelcomePage
+import com.duckduckgo.app.onboarding.ui.page.experiment.ExtendedOnboardingExperimentVariantManager
 
 interface OnboardingPageManager {
     fun pageCount(): Int
@@ -37,6 +38,7 @@ class OnboardingPageManagerWithTrackerBlocking(
     private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
     private val onboardingPageBuilder: OnboardingPageBuilder,
     private val defaultWebBrowserCapability: DefaultBrowserDetector,
+    private val extendedOnboardingExperimentVariantManager: ExtendedOnboardingExperimentVariantManager,
 ) : OnboardingPageManager {
 
     private val pages = mutableListOf<OnboardingPageBlueprint>()
@@ -46,7 +48,7 @@ class OnboardingPageManagerWithTrackerBlocking(
     override fun buildPageBlueprints() {
         pages.clear()
 
-        if (onboardingExperimentVariant()) {
+        if (extendedOnboardingExperimentVariantManager.isComparisonChartEnabled()) {
             pages.add(ExperimentWelcomeBluePrint)
         } else {
             pages.add(WelcomeBlueprint)
@@ -64,11 +66,6 @@ class OnboardingPageManagerWithTrackerBlocking(
             is DefaultBrowserBlueprint -> buildDefaultBrowserPage()
             else -> null
         }
-    }
-
-    private fun onboardingExperimentVariant(): Boolean {
-        // TODO check experiment feature flag
-        return true
     }
 
     private fun shouldShowDefaultBrowserPage(): Boolean {
