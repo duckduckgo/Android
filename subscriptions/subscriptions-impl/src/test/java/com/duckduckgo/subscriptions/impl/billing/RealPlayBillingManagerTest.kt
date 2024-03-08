@@ -11,12 +11,19 @@ import com.android.billingclient.api.PurchaseHistoryRecord
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LIST_OF_PRODUCTS
+import com.duckduckgo.subscriptions.impl.billing.BillingError.BILLING_UNAVAILABLE
+import com.duckduckgo.subscriptions.impl.billing.BillingError.NETWORK_ERROR
 import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMethodInvocation.Connect
 import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMethodInvocation.GetSubscriptions
 import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMethodInvocation.GetSubscriptionsPurchaseHistory
 import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMethodInvocation.LaunchBillingFlow
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState.Canceled
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState.InProgress
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -25,6 +32,7 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class RealPlayBillingManagerTest {
 
     @get:Rule
@@ -57,7 +65,7 @@ class RealPlayBillingManagerTest {
 
     @Test
     fun `when connection failed then does not attempt loading anything`() = runTest {
-        billingClientAdapter.canConnect = false
+        billingClientAdapter.billingInitResult = BillingInitResult.Failure(BILLING_UNAVAILABLE)
 
         processLifecycleOwner.currentState = CREATED
 
@@ -105,7 +113,7 @@ class RealPlayBillingManagerTest {
 
     @Test
     fun `when can't connect to service then launching billing flow is cancelled`() = runTest {
-        billingClientAdapter.canConnect = false
+        billingClientAdapter.billingInitResult = BillingInitResult.Failure(BILLING_UNAVAILABLE)
         processLifecycleOwner.currentState = RESUMED
         billingClientAdapter.launchBillingFlowResult = LaunchBillingFlowResult.Failure
         billingClientAdapter.methodInvocations.clear()
@@ -137,11 +145,26 @@ class RealPlayBillingManagerTest {
 
         billingClientAdapter.verifyConnectInvoked()
     }
+
+    @Test
+    fun `when connect fails with recoverable error then retry with exponential backoff`() = runTest {
+        billingClientAdapter.billingInitResult = BillingInitResult.Failure(NETWORK_ERROR)
+
+        processLifecycleOwner.currentState = RESUMED
+
+        val incrementalDelays = generateSequence(1.seconds) { (it * 4).coerceAtMost(5.minutes) }.iterator()
+
+        repeat(times = 6) { attemptIndex ->
+            billingClientAdapter.verifyConnectInvoked(times = 1 + attemptIndex)
+
+            advanceTimeBy(incrementalDelays.next())
+            runCurrent()
+        }
+    }
 }
 
 class FakeBillingClientAdapter : BillingClientAdapter {
 
-    var canConnect = true
     var connected = false
     val methodInvocations = mutableListOf<FakeMethodInvocation>()
 
@@ -153,6 +176,7 @@ class FakeBillingClientAdapter : BillingClientAdapter {
 
     var subscriptionsPurchaseHistory: List<PurchaseHistoryRecord> = emptyList()
     var launchBillingFlowResult: LaunchBillingFlowResult = LaunchBillingFlowResult.Failure
+    var billingInitResult: BillingInitResult = BillingInitResult.Success
 
     var purchasesListener: ((PurchasesUpdateResult) -> Unit)? = null
     var disconnectionListener: (() -> Unit)? = null
@@ -165,15 +189,21 @@ class FakeBillingClientAdapter : BillingClientAdapter {
         disconnectionListener: () -> Unit,
     ): BillingInitResult {
         methodInvocations.add(Connect)
-        return if (canConnect) {
-            connected = true
-            this.purchasesListener = purchasesListener
-            this.disconnectionListener = disconnectionListener
-            BillingInitResult.Success
-        } else {
-            connected = false
-            BillingInitResult.Failure
+
+        when (billingInitResult) {
+            BillingInitResult.Success -> {
+                connected = true
+                this.purchasesListener = purchasesListener
+                this.disconnectionListener = disconnectionListener
+            }
+            is BillingInitResult.Failure -> {
+                connected = false
+                this.purchasesListener = null
+                this.disconnectionListener = null
+            }
         }
+
+        return billingInitResult
     }
 
     override suspend fun getSubscriptions(productIds: List<String>): SubscriptionsResult {

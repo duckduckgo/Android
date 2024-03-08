@@ -42,7 +42,7 @@ interface BillingClientAdapter {
 
 sealed class BillingInitResult {
     data object Success : BillingInitResult()
-    data object Failure : BillingInitResult()
+    data class Failure(val billingError: BillingError) : BillingInitResult()
 }
 
 sealed class SubscriptionsResult {

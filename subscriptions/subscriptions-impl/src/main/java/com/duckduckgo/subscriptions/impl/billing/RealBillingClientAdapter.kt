@@ -81,7 +81,7 @@ class RealBillingClientAdapter @Inject constructor(
                     override fun onBillingSetupFinished(p0: BillingResult) {
                         val result = when (p0.responseCode) {
                             BillingResponseCode.OK -> Success
-                            else -> Failure
+                            else -> Failure(billingError = p0.responseCode.toBillingError())
                         }
 
                         continuation.resume(result, onCancellation = null)

@@ -25,6 +25,10 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LIST_OF_PRODUCTS
+import com.duckduckgo.subscriptions.impl.billing.BillingError.ERROR
+import com.duckduckgo.subscriptions.impl.billing.BillingError.NETWORK_ERROR
+import com.duckduckgo.subscriptions.impl.billing.BillingError.SERVICE_DISCONNECTED
+import com.duckduckgo.subscriptions.impl.billing.BillingError.SERVICE_UNAVAILABLE
 import com.duckduckgo.subscriptions.impl.billing.BillingInitResult.Failure
 import com.duckduckgo.subscriptions.impl.billing.BillingInitResult.Success
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState.Canceled
@@ -37,8 +41,12 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
+import java.util.EnumSet
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -70,6 +78,7 @@ class RealPlayBillingManager @Inject constructor(
 ) : PlayBillingManager, MainProcessLifecycleObserver {
 
     private val connectionMutex = Mutex()
+    private var connectionJob: Job? = null
     private var billingFlowInProgress = false
 
     // PurchaseState
@@ -83,7 +92,7 @@ class RealPlayBillingManager @Inject constructor(
     override var purchaseHistory = emptyList<PurchaseHistoryRecord>()
 
     override fun onCreate(owner: LifecycleOwner) {
-        coroutineScope.launch { connect() }
+        connectAsyncWithRetry()
     }
 
     override fun onResume(owner: LifecycleOwner) {
@@ -98,22 +107,47 @@ class RealPlayBillingManager @Inject constructor(
         }
     }
 
-    private suspend fun connect() = connectionMutex.withLock {
-        if (billingClient.ready) return@withLock
+    private fun connectAsyncWithRetry() {
+        if (connectionJob?.isActive == true) return
 
-        val result = billingClient.connect(
-            purchasesListener = { result -> onPurchasesUpdated(result) },
-            disconnectionListener = { onBillingClientDisconnected() },
-        )
+        connectionJob = coroutineScope.launch {
+            connect(
+                retryPolicy = RetryPolicy(
+                    retryCount = 5,
+                    initialDelay = 1.seconds,
+                    maxDelay = 5.minutes,
+                    delayIncrementFactor = 4.0,
+                ),
+            )
+        }
+    }
 
-        when (result) {
-            Success -> {
-                loadProducts()
-                loadPurchaseHistory()
-            }
+    private suspend fun connect(retryPolicy: RetryPolicy? = null) = retry(retryPolicy) {
+        connectionMutex.withLock {
+            if (billingClient.ready) return@withLock true
 
-            Failure -> {
-                logcat { "Service error" }
+            val result = billingClient.connect(
+                purchasesListener = { result -> onPurchasesUpdated(result) },
+                disconnectionListener = { onBillingClientDisconnected() },
+            )
+
+            when (result) {
+                Success -> {
+                    loadProducts()
+                    loadPurchaseHistory()
+                    true // success, don't retry
+                }
+
+                is Failure -> {
+                    logcat { "Service error" }
+                    val recoverable = result.billingError in EnumSet.of(
+                        ERROR,
+                        SERVICE_DISCONNECTED,
+                        SERVICE_UNAVAILABLE,
+                        NETWORK_ERROR,
+                    )
+                    !recoverable // complete without retry if error is not recoverable
+                }
             }
         }
     }
@@ -178,7 +212,7 @@ class RealPlayBillingManager @Inject constructor(
 
     private fun onBillingClientDisconnected() {
         logcat { "Service disconnected" }
-        coroutineScope.launch { connect() }
+        connectAsyncWithRetry()
     }
 
     private suspend fun loadProducts() {
