@@ -68,42 +68,72 @@
                     android:text="@string/addDeviceDescription"
                     tools:ignore="HardcodedText"/>
 
-            <com.duckduckgo.common.ui.view.expand.DaxExpandableMenu
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/keyline_5"
+                android:layout_marginTop="@dimen/keyline_5"
+                android:layout_marginEnd="@dimen/keyline_5"
+                android:layout_marginBottom="@dimen/keyline_5"
+                android:background="@drawable/background_expandable_menu"
+                android:orientation="vertical"
+                android:paddingHorizontal="@dimen/keyline_5"
+                android:paddingTop="@dimen/keyline_5"
+                android:paddingBottom="@dimen/keyline_4">
+
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/keyline_5"
-                    android:layout_marginStart="@dimen/keyline_5"
-                    android:layout_marginEnd="@dimen/keyline_5"
-                    android:layout_marginBottom="@dimen/keyline_5"
-                    android:background="@drawable/background_expandable_menu"
-                    android:orientation="vertical">
+                    android:orientation="horizontal">
 
-                <com.duckduckgo.common.ui.view.expand.DaxExpandableMenuItem
-                        android:id="@+id/googlePlay"
-                        android:layout_width="match_parent"
+                    <ImageView
+                        android:id="@+id/emailIcon"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:primaryText="@string/addDeviceGooglePlayTitle"
-                        app:leadingIcon="@drawable/ic_google_play"
-                        app:leadingIconSize="small"
-                        app:secondaryText="@string/addDeviceGooglePlayDescription"/>
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginTop="1dp"
+                        app:srcCompat="@drawable/ic_email_16"
+                        tools:ignore="ContentDescription" />
 
-                <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-                        android:layout_width="match_parent"
+                    <com.duckduckgo.common.ui.view.text.DaxTextView
+                        android:id="@+id/emailTitle"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:fullWidth="false"
-                        app:defaultPadding="false"/>
+                        android:layout_marginStart="@dimen/keyline_2"
+                        android:text="@string/addDeviceEmail"
+                        app:textType="primary"
+                        app:typography="h3" />
 
-                <com.duckduckgo.common.ui.view.expand.DaxExpandableMenuItem
-                        android:id="@+id/email"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:primaryText="@string/addDeviceEmail"
-                        app:leadingIcon="@drawable/ic_email_16"
-                        app:leadingIconSize="small"
-                        app:secondaryText="@string/addEmail"
-                        app:primaryButtonText="@string/addEmailText"/>
+                </LinearLayout>
 
-            </com.duckduckgo.common.ui.view.expand.DaxExpandableMenu>
+                <com.duckduckgo.common.ui.view.text.DaxTextView
+                    android:id="@+id/emailAddress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/keyline_2"
+                    android:visibility="gone"
+                    app:textType="primary"
+                    app:typography="h3"
+                    tools:text="john.smith@duck.com"
+                    tools:visibility="visible"/>
+
+                <com.duckduckgo.common.ui.view.text.DaxTextView
+                    android:id="@+id/emailSubtitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/keyline_2"
+                    android:text="@string/addEmail"
+                    app:textType="secondary"
+                    app:typography="body2" />
+
+                <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                    android:id="@+id/emailButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/keyline_3"
+                    android:text="@string/addEmailText" />
+
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

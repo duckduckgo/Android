@@ -24,13 +24,13 @@
     <!--Add Device Activity-->
     <string name="manage">Manage</string>
     <string name="addEmailText">Add Email</string>
-    <string name="useEmail" instruction="Placeholder is an email address">%1$s You can use this email to activate your subscription on your other devices.</string>
-    <string name="addEmail">Add an email address to activate your subscription on your other devices. We’ll only use this address to verify your subscription.</string>
+    <string name="useEmail">You can use this email to activate your subscription from browser settings in the DuckDuckGo app on your other devices.</string>
+    <string name="addEmail">Add an email address to access your subscription in DuckDuckGo on other devices. We’ll only use this address to verify your subscription.</string>
     <string name="manageEmail">Manage Email</string>
     <string name="addDeviceEmail">Email</string>
     <string name="randomError">An error happened, try again</string>
     <string name="addDeviceTitle">Use your subscription on all your devices</string>
-    <string name="addDeviceDescription">Access your subscription on any of your devices Google Play or by adding an email address.</string>
+    <string name="addDeviceDescription">Access your Privacy Pro subscription on other devices via an email address.</string>
     <string name="addDeviceGooglePlayTitle">Google Play</string>
     <string name="addDeviceGooglePlayDescription">Privacy Pro is available on any device signed in to your Google Play Store account.</string>
 
