@@ -34,18 +34,10 @@ jobs:
         with:
           go-version: '1.18.3'
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-        with:
-          cache-disabled: true
-          cache-read-only: false
-          cache-write-only: false
-
-      - name: Test
-        run: ./gradlew propertyTypes
-
       - name: Build
-        run: ./gradlew propertyTypes assembleInternalDebug -Pforce-default-variant -Didea.max.content.load.filesize=3000000 -Didea.max.intellisense.filesize=3000000
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: assembleInternalDebug -Pforce-default-variant
 
       - name: Obtain debug apk
         if: always()

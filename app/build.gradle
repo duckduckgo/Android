@@ -16,11 +16,11 @@ ext {
 
 android {
     defaultConfig {
-//        if (project.hasProperty('internal-testing')) {
+        if (project.hasProperty('internal-testing')) {
             applicationId "com.duckduckgo.dev.android"
-//        } else {
-//            applicationId "com.duckduckgo.mobile.android"
-//        }
+        } else {
+            applicationId "com.duckduckgo.mobile.android"
+        }
         minSdk min_sdk
         targetSdk target_sdk
         compileSdk compile_sdk
@@ -80,9 +80,9 @@ android {
     }
     buildTypes {
         debug {
-//            if (!project.hasProperty('internal-testing')) {
-//                applicationIdSuffix ".debug"
-//            }
+            if (!project.hasProperty('internal-testing')) {
+                applicationIdSuffix ".debug"
+            }
             pseudoLocalesEnabled false
             manifestPlaceholders = [
                     appIcon     : "@mipmap/ic_launcher_blue",
@@ -304,12 +304,12 @@ dependencies {
     implementation project(':web-compat-impl')
     implementation project(':web-compat-store')
 
-//    if (project.hasProperty('internal-testing')) {
+    if (project.hasProperty('internal-testing')) {
         implementation project(':subscriptions-api')
         implementation project(':subscriptions-impl')
         internalImplementation project(':subscriptions-internal')
         internalImplementation project(':network-protection-subscription-internal')
-//    }
+    }
 
     implementation project(':user-agent-api')
     implementation project(':user-agent-impl')
@@ -449,13 +449,6 @@ dependencies {
     lintChecks project(":lint-rules")
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
-}
-
-tasks.register('propertyTypes') {
-    doLast{
-        println "Our input argument with system property ["+System.getProperty("idea.max.intellisense.filesize")+"]"
-        println "Our input argument with system property ["+System.getProperty("idea.max.content.load.filesize")+"]"
-    }
 }
 
 tasks.register('fastlaneVersionCode') {
