@@ -91,7 +91,6 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(binding.root)
-        setupToolbar(binding.includeToolbar.toolbar)
         bindViews()
         intent.getActivityParams(NetworkProtectionManagementScreenAndEnable::class.java)?.enable?.let { shouldEnable ->
             if (shouldEnable) {
@@ -109,7 +108,17 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
     }
 
     private fun bindViews() {
-        setTitle(R.string.netpManagementTitle)
+        setSupportActionBar(binding.includeToolbar.toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        binding.includeToolbar.appbar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
+            if (kotlin.math.abs(verticalOffset) >= appBarLayout.totalScrollRange) {
+                binding.includeToolbar.collapsingToolbar.title = getString(R.string.netpManagementTitle)
+                binding.includeToolbar.appbar.background.alpha = 255
+            } else {
+                binding.includeToolbar.collapsingToolbar.title = ""
+                binding.includeToolbar.appbar.background.alpha = 0
+            }
+        }
         binding.netpToggle.setOnCheckedChangeListener(toggleChangeListener)
         binding.netpToggle.setPrimaryText(getString(R.string.netpManagementToggleTitle))
 
