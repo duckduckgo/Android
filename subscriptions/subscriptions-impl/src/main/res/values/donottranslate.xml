@@ -57,9 +57,9 @@
     <string name="subscriptionRemoved">Your subscription has been removed from this device</string>
     <string name="removeFromDevice">Remove From This Device?</string>
     <string name="removeFromDeviceDescription">You will no longer be able to access your subscription on this device. This will not cancel your subscription, and it will remain active on your other device.</string>
-    <string name="subscriptionsData" instruction="First placeholder is either monthly or yearly, second is renews or expires, third is a date in format MMMM dd, yyyy">Your %1$s Privacy Pro subscription %2$s on %3$s.</string>
-    <string name="monthly">monthly</string>
-    <string name="yearly">yearly</string>
+    <string name="subscriptionsData" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Your subscription %1$s on %2$s.</string>
+    <string name="monthlySubscription">Monthly Subscription</string>
+    <string name="yearlySubscription">Yearly Subscription</string>
     <string name="renews">renews</string>
     <string name="expires">expires</string>
 
