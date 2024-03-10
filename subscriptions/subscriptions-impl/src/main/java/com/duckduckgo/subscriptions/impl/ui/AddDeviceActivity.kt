@@ -69,7 +69,7 @@ class AddDeviceActivity : DuckDuckGoActivity() {
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
 
-        binding.emailButton.setOnClickListener {
+        binding.manageEmailCard.emailButton.setOnClickListener {
             viewModel.useEmail()
         }
     }
@@ -81,14 +81,14 @@ class AddDeviceActivity : DuckDuckGoActivity() {
 
     private fun renderView(viewState: ViewState) {
         if (viewState.email != null) {
-            binding.emailAddress.isVisible = true
-            binding.emailAddress.text = viewState.email
-            binding.emailSubtitle.setText(R.string.useEmail)
-            binding.emailButton.setText(R.string.manage)
+            binding.manageEmailCard.emailAddress.isVisible = true
+            binding.manageEmailCard.emailAddress.text = viewState.email
+            binding.manageEmailCard.emailSubtitle.setText(R.string.useEmail)
+            binding.manageEmailCard.emailButton.setText(R.string.manage)
         } else {
-            binding.emailAddress.isVisible = false
-            binding.emailSubtitle.setText(R.string.addEmail)
-            binding.emailButton.setText(R.string.addEmailText)
+            binding.manageEmailCard.emailAddress.isVisible = false
+            binding.manageEmailCard.emailSubtitle.setText(R.string.addEmail)
+            binding.manageEmailCard.emailButton.setText(R.string.addEmailText)
         }
     }
 

@@ -20,6 +20,7 @@
     <string name="cancel">Cancel</string>
     <string name="ok">OK</string>
     <string name="privacyPro">Privacy Pro</string>
+    <string name="email">Email</string>
 
     <!--Add Device Activity-->
     <string name="manage">Manage</string>
@@ -27,7 +28,6 @@
     <string name="useEmail">You can use this email to activate your subscription from browser settings in the DuckDuckGo app on your other devices.</string>
     <string name="addEmail">Add an email address to access your subscription in DuckDuckGo on other devices. We’ll only use this address to verify your subscription.</string>
     <string name="manageEmail">Manage Email</string>
-    <string name="addDeviceEmail">Email</string>
     <string name="randomError">An error happened, try again</string>
     <string name="addDeviceTitle">Use your subscription on all your devices</string>
     <string name="addDeviceDescription">Access your Privacy Pro subscription on other devices via an email address.</string>
@@ -47,7 +47,6 @@
     <string name="restoreSubscriptionGooglePlayTitle">Google Play</string>
     <string name="restoreSubscriptionGooglePlayDescription">Restore your purchase to activate your subscription on this device.</string>
     <string name="restoreSubscriptionGooglePlayButton">Restore Purchase</string>
-    <string name="restoreSubscriptionEmailTitle">Email</string>
     <string name="restoreSubscriptionEmailDescription">Use your email to activate your subscription on this device.</string>
     <string name="restoreSubscriptionEmailButton">Enter Email</string>
     <string name="buySubscriptionTitle">Buy Subscription</string>
