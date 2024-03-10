@@ -43,9 +43,7 @@
     <string name="purchaseRestored">Your purchase has been restored.</string>
     <string name="restoreSubscriptionTitle">Activate your subscription on this device</string>
     <string name="restoreSubscriptionDescription">Access your Privacy Pro subscription on this device via Google Play or an email address.</string>
-    <string name="restoreDeviceDescription">Access your subscription on any of your devices via Google Play or by adding an email address.</string>
-    <string name="restoreSubscriptionGooglePlayTitle">Google Play</string>
-    <string name="restoreSubscriptionGooglePlayDescription">Restore your purchase to activate your subscription on this device.</string>
+    <string name="restoreSubscriptionGooglePlayDescription">Your subscription is automatically available in DuckDuckGo on any device signed in to your Google Play account.</string>
     <string name="restoreSubscriptionGooglePlayButton">Restore Purchase</string>
     <string name="restoreSubscriptionEmailDescription">Use your email to activate your subscription on this device.</string>
     <string name="restoreSubscriptionEmailButton">Enter Email</string>

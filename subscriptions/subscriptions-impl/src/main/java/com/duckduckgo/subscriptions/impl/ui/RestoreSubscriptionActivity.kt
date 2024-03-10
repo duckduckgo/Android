@@ -66,12 +66,16 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
 
-        binding.googlePlay.setPrimaryButtonClickListener {
+        binding.googlePlay.setOnClickListener {
             viewModel.restoreFromStore()
         }
 
-        binding.email.setPrimaryButtonClickListener {
-            viewModel.restoreFromEmail()
+        with(binding.manageEmailCard) {
+            emailSubtitle.setText(string.restoreSubscriptionEmailDescription)
+            emailButton.setText(string.restoreSubscriptionEmailButton)
+            emailButton.setOnClickListener {
+                viewModel.restoreFromEmail()
+            }
         }
     }
 
