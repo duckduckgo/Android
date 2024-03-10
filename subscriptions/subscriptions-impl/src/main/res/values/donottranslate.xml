@@ -36,11 +36,12 @@
 
     <!--Restore Subscriptions Activity-->
     <string name="somethingWentWrong">Something Went Wrong</string>
+    <string name="somethingWentWrongDescription">Google Play was unable to process your purchase. Please try again later.</string>
     <string name="youAreSet">You\'re all set.</string>
     <string name="viewPlans">View Plans</string>
     <string name="subscriptionNotFound">Subscription Not Found</string>
-    <string name="subscriptionNotFoundDescription">The subscription associated with this Google Account is no longer active or could not be found.</string>
-    <string name="purchaseRestored">Your purchase has been restored.</string>
+    <string name="subscriptionNotFoundDescription">The subscription associated with this Google Play account is no longer active.</string>
+    <string name="purchaseRestored">Your purchases have been restored.</string>
     <string name="restoreSubscriptionTitle">Activate your subscription on this device</string>
     <string name="restoreSubscriptionDescription">Access your Privacy Pro subscription on this device via Google Play or an email address.</string>
     <string name="restoreSubscriptionGooglePlayDescription">Your subscription is automatically available in DuckDuckGo on any device signed in to your Google Play account.</string>

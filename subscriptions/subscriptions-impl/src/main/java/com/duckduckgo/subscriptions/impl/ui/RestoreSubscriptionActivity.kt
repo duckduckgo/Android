@@ -138,10 +138,10 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
             .show()
     }
 
-    private fun showError(message: String) {
+    private fun showError() {
         TextAlertDialogBuilder(this)
             .setTitle(string.somethingWentWrong)
-            .setMessage(message)
+            .setMessage(string.somethingWentWrongDescription)
             .setDestructiveButtons(false)
             .setPositiveButton(string.ok)
             .show()
@@ -152,7 +152,7 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
             is RestoreFromEmail -> goToRestore()
             is Success -> onPurchaseRestored()
             is SubscriptionNotFound -> subscriptionNotFound()
-            is Error -> showError(command.message)
+            is Error -> showError()
         }
     }
     companion object {
