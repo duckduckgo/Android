@@ -233,17 +233,13 @@
             android:persistableMode="persistNever"
             android:excludeFromRecents="true"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize"
-            android:resizeableActivity="true"
-            android:label="@string/appName"
-            android:theme="@style/Theme.DuckDuckGo.Light" />
+            android:resizeableActivity="true" />
 
         <activity
             android:name="com.duckduckgo.app.browser.customtabs.IntentDispatcherActivity"
             android:theme="@style/Theme.AppCompat.Transparent.NoActionBar"
             android:excludeFromRecents="true"
-            android:exported="true"
-            android:relinquishTaskIdentity="true"
-            android:taskAffinity="">
+            android:exported="true">
 
             <!-- Allows app to become default browser -->
             <intent-filter>
