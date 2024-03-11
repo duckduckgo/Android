@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser.pageloadpixel
 
 import com.duckduckgo.app.browser.UriString
+import com.duckduckgo.app.browser.pageloadpixel.PageLoadedSites.Companion.sites
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.pixels.remoteconfig.OptimizeTrackerEvaluationRCWrapper
 import com.duckduckgo.autoconsent.api.Autoconsent
@@ -28,17 +29,6 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-
-private val sites = listOf(
-    "bbc.com",
-    "ebay.com",
-    "espn.com",
-    "reddit.com",
-    "twitch.tv",
-    "twitter.com",
-    "wikipedia.org",
-    "weather.com",
-)
 
 interface PageLoadedHandler {
     operator fun invoke(url: String, start: Long, end: Long)
