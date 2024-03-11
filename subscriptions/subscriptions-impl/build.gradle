@@ -76,6 +76,7 @@ dependencies {
     testImplementation AndroidX.core
     testImplementation AndroidX.test.ext.junit
     testImplementation "androidx.test:runner:_"
+    testImplementation "androidx.lifecycle:lifecycle-runtime-testing:_"
     testImplementation Testing.robolectric
     testImplementation 'app.cash.turbine:turbine:_'
     testImplementation project(path: ':common-test')

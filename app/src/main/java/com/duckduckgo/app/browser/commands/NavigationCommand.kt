@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,16 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.onboarding.ui.page
+package com.duckduckgo.app.browser.commands
 
-import android.content.Intent
+sealed class NavigationCommand : Command() {
+    class NavigateToHistory(val historyStackIndex: Int) : Command()
+    object Refresh : NavigationCommand()
+    class Navigate(
+        val url: String,
+        val headers: Map<String, String>,
+    ) : NavigationCommand()
 
-object WelcomePageView {
-    sealed class Event {
-        object OnPrimaryCtaClicked : Event()
-        object OnDefaultBrowserSet : Event()
-        object OnDefaultBrowserNotSet : Event()
-    }
-
-    sealed class State {
-        object Idle : State()
-        data class ShowDefaultBrowserDialog(val intent: Intent) : State()
-        object Finish : State()
-    }
+    class NavigateBack(val steps: Int) : NavigationCommand()
+    object NavigateForward : NavigationCommand()
 }

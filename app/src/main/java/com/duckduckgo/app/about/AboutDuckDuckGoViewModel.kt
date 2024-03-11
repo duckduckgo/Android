@@ -24,7 +24,6 @@ import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.NotUnlocked
@@ -41,7 +40,6 @@ import kotlinx.coroutines.launch
 class AboutDuckDuckGoViewModel @Inject constructor(
     private val networkProtectionWaitlist: NetworkProtectionWaitlist,
     private val appBuildConfig: AppBuildConfig,
-    private val variantManager: VariantManager,
     private val pixel: Pixel,
 ) : ViewModel() {
 
@@ -65,13 +63,11 @@ class AboutDuckDuckGoViewModel @Inject constructor(
     private var netPEasterEggCounter = 0
 
     fun viewState(): Flow<ViewState> = viewState.onStart {
-        val variantKey = variantManager.getVariantKey()
-
         viewModelScope.launch {
             viewState.emit(
                 currentViewState().copy(
                     networkProtectionWaitlistState = networkProtectionWaitlist.getState(),
-                    version = obtainVersion(variantKey),
+                    version = obtainVersion(),
                 ),
             )
         }
@@ -129,9 +125,8 @@ class AboutDuckDuckGoViewModel @Inject constructor(
         return viewState.value
     }
 
-    private fun obtainVersion(variantKey: String?): String {
-        val formattedVariantKey = if (variantKey.isNullOrBlank()) " " else " $variantKey "
-        return "${appBuildConfig.versionName}$formattedVariantKey(${appBuildConfig.versionCode})"
+    private fun obtainVersion(): String {
+        return "${appBuildConfig.versionName} (${appBuildConfig.versionCode})"
     }
 
     companion object {

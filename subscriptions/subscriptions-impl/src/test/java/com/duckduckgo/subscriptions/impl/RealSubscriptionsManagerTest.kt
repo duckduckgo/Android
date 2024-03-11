@@ -3,7 +3,6 @@ package com.duckduckgo.subscriptions.impl
 import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
-import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.PurchaseHistoryRecord
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -16,7 +15,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionStatus.Unknown
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN
 import com.duckduckgo.subscriptions.impl.SubscriptionsData.Failure
 import com.duckduckgo.subscriptions.impl.SubscriptionsData.Success
-import com.duckduckgo.subscriptions.impl.billing.BillingClientWrapper
+import com.duckduckgo.subscriptions.impl.billing.PlayBillingManager
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
@@ -25,6 +24,7 @@ import com.duckduckgo.subscriptions.impl.repository.RealAuthRepository
 import com.duckduckgo.subscriptions.impl.services.AccessTokenResponse
 import com.duckduckgo.subscriptions.impl.services.AccountResponse
 import com.duckduckgo.subscriptions.impl.services.AuthService
+import com.duckduckgo.subscriptions.impl.services.ConfirmationResponse
 import com.duckduckgo.subscriptions.impl.services.CreateAccountResponse
 import com.duckduckgo.subscriptions.impl.services.Entitlement
 import com.duckduckgo.subscriptions.impl.services.PortalResponse
@@ -65,8 +65,7 @@ class RealSubscriptionsManagerTest {
     private val authDataStore: SubscriptionsDataStore = FakeSubscriptionsDataStore()
     private val authRepository = RealAuthRepository(authDataStore)
     private val emailManager: EmailManager = mock()
-    private val billingClient: BillingClientWrapper = mock()
-    private val billingBuilder: BillingFlowParams.Builder = mock()
+    private val playBillingManager: PlayBillingManager = mock()
     private val context: Context = mock()
     private val pixelSender: SubscriptionPixelSender = mock()
     private lateinit var subscriptionsManager: SubscriptionsManager
@@ -75,13 +74,11 @@ class RealSubscriptionsManagerTest {
     fun before() {
         whenever(emailManager.getToken()).thenReturn(null)
         whenever(context.packageName).thenReturn("packageName")
-        whenever(billingClient.billingFlowParamsBuilder(any(), any(), any(), any())).thenReturn(billingBuilder)
-        whenever(billingBuilder.build()).thenReturn(mock())
         subscriptionsManager = RealSubscriptionsManager(
             authService,
             subscriptionsService,
             authRepository,
-            billingClient,
+            playBillingManager,
             emailManager,
             context,
             TestScope(),
@@ -251,8 +248,7 @@ class RealSubscriptionsManagerTest {
 
         subscriptionsManager.purchase(mock(), mock(), "", false)
 
-        verify(billingClient).billingFlowParamsBuilder(any(), any(), eq("1234"), any())
-        verify(billingClient).launchBillingFlow(any(), any())
+        verify(playBillingManager).launchBillingFlow(any(), any(), any(), externalId = eq("1234"))
     }
 
     @Test
@@ -265,8 +261,7 @@ class RealSubscriptionsManagerTest {
 
         subscriptionsManager.purchase(mock(), mock(), "", false)
 
-        verify(billingClient).billingFlowParamsBuilder(any(), any(), eq("1234"), any())
-        verify(billingClient).launchBillingFlow(any(), any())
+        verify(playBillingManager).launchBillingFlow(any(), any(), any(), externalId = eq("1234"))
     }
 
     @Test
@@ -280,8 +275,7 @@ class RealSubscriptionsManagerTest {
         subscriptionsManager.currentPurchaseState.test {
             subscriptionsManager.purchase(mock(), mock(), "", false)
             assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
-            verify(billingClient, never()).billingFlowParamsBuilder(any(), any(), eq("1234"), any())
-            verify(billingClient, never()).launchBillingFlow(any(), any())
+            verify(playBillingManager, never()).launchBillingFlow(any(), any(), any(), any())
             assertTrue(awaitItem() is CurrentPurchase.Recovered)
             cancelAndConsumeRemainingEvents()
         }
@@ -319,8 +313,7 @@ class RealSubscriptionsManagerTest {
         subscriptionsManager.currentPurchaseState.test {
             subscriptionsManager.purchase(mock(), mock(), "", false)
             assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
-            verify(billingClient).billingFlowParamsBuilder(any(), any(), eq("1234"), any())
-            verify(billingClient).launchBillingFlow(any(), any())
+            verify(playBillingManager).launchBillingFlow(any(), any(), any(), externalId = eq("1234"))
             assertTrue(awaitItem() is CurrentPurchase.PreFlowFinished)
             cancelAndConsumeRemainingEvents()
         }
@@ -416,7 +409,7 @@ class RealSubscriptionsManagerTest {
             authService,
             subscriptionsService,
             authRepository,
-            billingClient,
+            playBillingManager,
             emailManager,
             context,
             TestScope(),
@@ -439,7 +432,7 @@ class RealSubscriptionsManagerTest {
             authService,
             subscriptionsService,
             authRepository,
-            billingClient,
+            playBillingManager,
             emailManager,
             context,
             TestScope(),
@@ -462,7 +455,7 @@ class RealSubscriptionsManagerTest {
             authService,
             subscriptionsService,
             authRepository,
-            billingClient,
+            playBillingManager,
             emailManager,
             context,
             TestScope(),
@@ -484,7 +477,7 @@ class RealSubscriptionsManagerTest {
             authService,
             subscriptionsService,
             authRepository,
-            billingClient,
+            playBillingManager,
             emailManager,
             context,
             TestScope(),
@@ -506,7 +499,7 @@ class RealSubscriptionsManagerTest {
             authService,
             subscriptionsService,
             authRepository,
-            billingClient,
+            playBillingManager,
             emailManager,
             context,
             TestScope(),
@@ -524,15 +517,16 @@ class RealSubscriptionsManagerTest {
     fun whenPurchaseSuccessfulThenPurchaseCheckedAndSuccessEmit() = runTest {
         givenUserIsAuthenticated()
         givenValidateTokenSucceedsWithEntitlements()
+        givenConfirmPurchaseSucceeds()
 
         val flowTest: MutableSharedFlow<PurchaseState> = MutableSharedFlow()
-        whenever(billingClient.purchaseState).thenReturn(flowTest)
+        whenever(playBillingManager.purchaseState).thenReturn(flowTest)
 
         val manager = RealSubscriptionsManager(
             authService,
             subscriptionsService,
             authRepository,
-            billingClient,
+            playBillingManager,
             emailManager,
             context,
             TestScope(),
@@ -541,7 +535,7 @@ class RealSubscriptionsManagerTest {
         )
 
         manager.currentPurchaseState.test {
-            flowTest.emit(PurchaseState.Purchased)
+            flowTest.emit(PurchaseState.Purchased("validToken", "packageName"))
             assertTrue(awaitItem() is CurrentPurchase.InProgress)
             assertTrue(awaitItem() is CurrentPurchase.Success)
             cancelAndConsumeRemainingEvents()
@@ -552,15 +546,16 @@ class RealSubscriptionsManagerTest {
     fun whenPurchaseFailedThenPurchaseCheckedAndFailureEmit() = runTest {
         givenUserIsAuthenticated()
         givenValidateTokenFails("failure")
+        givenConfirmPurchaseFails()
 
         val flowTest: MutableSharedFlow<PurchaseState> = MutableSharedFlow()
-        whenever(billingClient.purchaseState).thenReturn(flowTest)
+        whenever(playBillingManager.purchaseState).thenReturn(flowTest)
 
         val manager = RealSubscriptionsManager(
             authService,
             subscriptionsService,
             authRepository,
-            billingClient,
+            playBillingManager,
             emailManager,
             context,
             TestScope(),
@@ -569,7 +564,7 @@ class RealSubscriptionsManagerTest {
         )
 
         manager.currentPurchaseState.test {
-            flowTest.emit(PurchaseState.Purchased)
+            flowTest.emit(PurchaseState.Purchased("validateToken", "packageName"))
             assertTrue(awaitItem() is CurrentPurchase.InProgress)
             assertTrue(awaitItem() is CurrentPurchase.Failure)
             cancelAndConsumeRemainingEvents()
@@ -760,7 +755,7 @@ class RealSubscriptionsManagerTest {
             authService,
             subscriptionsService,
             mockRepo,
-            billingClient,
+            playBillingManager,
             emailManager,
             context,
             TestScope(),
@@ -793,7 +788,7 @@ class RealSubscriptionsManagerTest {
             authService,
             subscriptionsService,
             authRepository,
-            billingClient,
+            playBillingManager,
             emailManager,
             context,
             TestScope(),
@@ -813,8 +808,9 @@ class RealSubscriptionsManagerTest {
     fun whenPurchaseIsSuccessfulThenPixelIsSent() = runTest {
         givenUserIsAuthenticated()
         givenValidateTokenSucceedsWithEntitlements()
+        givenConfirmPurchaseSucceeds()
 
-        whenever(billingClient.purchaseState).thenReturn(flowOf(PurchaseState.Purchased))
+        whenever(playBillingManager.purchaseState).thenReturn(flowOf(PurchaseState.Purchased("any", "any")))
 
         subscriptionsManager.currentPurchaseState.test {
             assertTrue(awaitItem() is CurrentPurchase.InProgress)
@@ -853,8 +849,9 @@ class RealSubscriptionsManagerTest {
     fun whenPurchaseFailsThenPixelIsSent() = runTest {
         givenUserIsAuthenticated()
         givenValidateTokenFails("failure")
+        givenConfirmPurchaseFails()
 
-        whenever(billingClient.purchaseState).thenReturn(flowOf(PurchaseState.Purchased))
+        whenever(playBillingManager.purchaseState).thenReturn(flowOf(PurchaseState.Purchased("validateToken", "packageName")))
 
         subscriptionsManager.currentPurchaseState.test {
             assertTrue(awaitItem() is CurrentPurchase.InProgress)
@@ -1025,8 +1022,8 @@ class RealSubscriptionsManagerTest {
         """,
             "signature",
         )
-        whenever(billingClient.products).thenReturn(mapOf())
-        whenever(billingClient.purchaseHistory).thenReturn(listOf(purchaseRecord))
+        whenever(playBillingManager.products).thenReturn(emptyList())
+        whenever(playBillingManager.purchaseHistory).thenReturn(listOf(purchaseRecord))
     }
 
     private suspend fun givenPurchaseStoredIsValid() {
@@ -1047,5 +1044,26 @@ class RealSubscriptionsManagerTest {
     private suspend fun givenAuthenticateFails() {
         val exception = "account_failure".toResponseBody("text/json".toMediaTypeOrNull())
         whenever(authService.accessToken(any())).thenThrow(HttpException(Response.error<String>(400, exception)))
+    }
+
+    private suspend fun givenConfirmPurchaseFails() {
+        val exception = "account_failure".toResponseBody("text/json".toMediaTypeOrNull())
+        whenever(subscriptionsService.confirm(any(), any())).thenThrow(HttpException(Response.error<String>(400, exception)))
+    }
+
+    private suspend fun givenConfirmPurchaseSucceeds() {
+        whenever(subscriptionsService.confirm(any(), any())).thenReturn(
+            ConfirmationResponse(
+                email = "test@duck.com",
+                entitlements = listOf(),
+                subscription = SubscriptionResponse(
+                    productId = "id",
+                    platform = "google",
+                    status = "Auto-Renewable",
+                    startedAt = 1000000L,
+                    expiresOrRenewsAt = 1000000L,
+                ),
+            ),
+        )
     }
 }

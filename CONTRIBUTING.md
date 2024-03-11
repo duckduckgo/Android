@@ -44,8 +44,8 @@ See Chris Beams' guide to writing good commit messages https://chris.beams.io/po
 
 ### Why is a build failing?
 
-Bitrise as a our CI environment, [all builds can be seen here](https://app.bitrise.io/app/dc22e377b9a9ccbf#/builds).
-We use [Spotless](https://github.com/diffplug/spotless) as a code formatter, and every build in Bitrise will trigger a check for several rules.
+GitHub Actions is our CI environment, [all builds can be seen here](https://github.com/duckduckgo/Android/actions).
+We use [Spotless](https://github.com/diffplug/spotless) as a code formatter, and every build in GitHub Actions will trigger a check for several rules.
 If your PR is failing because of that, please make sure that you follow our [style guide](STYLEGUIDE.md) and the code is formatted.
 You can also trigger an automatic code formatting of the code by executing:
 

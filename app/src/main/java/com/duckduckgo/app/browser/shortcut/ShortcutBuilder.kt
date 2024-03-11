@@ -25,8 +25,8 @@ import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.graphics.drawable.IconCompat
 import com.duckduckgo.app.browser.BrowserActivity
-import com.duckduckgo.app.browser.BrowserTabViewModel
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.commands.Command
 import java.util.UUID
 import javax.inject.Inject
 
@@ -34,7 +34,7 @@ class ShortcutBuilder @Inject constructor() {
 
     private fun buildPinnedPageShortcut(
         context: Context,
-        homeShortcut: BrowserTabViewModel.Command.AddHomeShortcut,
+        homeShortcut: Command.AddHomeShortcut,
     ): ShortcutInfoCompat {
         val intent = Intent(context, BrowserActivity::class.java)
         intent.action = Intent.ACTION_VIEW
@@ -66,7 +66,7 @@ class ShortcutBuilder @Inject constructor() {
 
     fun requestPinShortcut(
         context: Context,
-        homeShortcut: BrowserTabViewModel.Command.AddHomeShortcut,
+        homeShortcut: Command.AddHomeShortcut,
     ) {
         val shortcutInfo = buildPinnedPageShortcut(context, homeShortcut)
         val pendingIntent = buildPendingIntent(context, homeShortcut.url, homeShortcut.title)

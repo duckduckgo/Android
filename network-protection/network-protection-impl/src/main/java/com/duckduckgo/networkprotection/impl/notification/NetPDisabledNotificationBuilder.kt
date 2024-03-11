@@ -25,8 +25,11 @@ import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.TaskStackBuilder
+import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.networkprotection.impl.R
+import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -44,11 +47,15 @@ interface NetPDisabledNotificationBuilder {
     fun buildDisabledByVpnNotification(context: Context): Notification
 
     fun buildUnsafeWifiWithoutVpnNotification(context: Context): Notification
+
+    fun buildVpnAccessRevokedNotification(context: Context): Notification
 }
 
 @ContributesBinding(AppScope::class)
 class RealNetPDisabledNotificationBuilder @Inject constructor(
     private val netPNotificationActions: NetPNotificationActions,
+    private val globalActivityStarter: GlobalActivityStarter,
+    private val netpRepository: NetworkProtectionRepository,
 ) : NetPDisabledNotificationBuilder {
     private val defaultDateTimeFormatter = SimpleDateFormat.getTimeInstance(DateFormat.SHORT)
 
@@ -66,6 +73,14 @@ class RealNetPDisabledNotificationBuilder @Inject constructor(
     }
 
     override fun buildDisabledNotification(context: Context): Notification {
+        return if (netpRepository.vpnAccessRevoked) {
+            buildVpnAccessRevokedNotification(context)
+        } else {
+            buildVpnDisabledNotification(context)
+        }
+    }
+
+    private fun buildVpnDisabledNotification(context: Context): Notification {
         registerChannel(context)
 
         return NotificationCompat.Builder(context, NETP_ALERTS_CHANNEL_ID)
@@ -155,6 +170,30 @@ class RealNetPDisabledNotificationBuilder @Inject constructor(
             .build()
     }
 
+    override fun buildVpnAccessRevokedNotification(context: Context): Notification {
+        registerChannel(context)
+
+        val intent = globalActivityStarter.startIntent(context, SettingsScreenNoParams)
+        val pendingIntent: PendingIntent? = android.app.TaskStackBuilder.create(context).run {
+            addNextIntentWithParentStack(intent)
+            getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        }
+
+        return NotificationCompat.Builder(context, NETP_ALERTS_CHANNEL_ID)
+            .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
+            .setContentIntent(pendingIntent)
+            .setContentText(context.getString(R.string.netpNotificationVpnAccessRevoked))
+            .setStyle(
+                NotificationCompat.BigTextStyle().bigText(
+                    context.getString(R.string.netpNotificationVpnAccessRevoked),
+                ),
+            )
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setCategory(NotificationCompat.CATEGORY_STATUS)
+            .setAutoCancel(false)
+            .build()
+    }
+
     private fun getPendingIntent(context: Context): PendingIntent? = TaskStackBuilder.create(context).run {
         addNextIntentWithParentStack(
             Intent(
@@ -166,7 +205,7 @@ class RealNetPDisabledNotificationBuilder @Inject constructor(
     }
     companion object {
         const val NETP_ALERTS_CHANNEL_ID = "com.duckduckgo.networkprotection.impl.alerts"
-        const val NETP_ALERTS_CHANNEL_NAME = "Network Protection Alerts"
-        const val NETP_ALERTS_CHANNEL_DESCRIPTION = "Alerts from Network Protection"
+        const val NETP_ALERTS_CHANNEL_NAME = "DuckDuckgo VPN Alerts"
+        const val NETP_ALERTS_CHANNEL_DESCRIPTION = "Alerts from DuckDuckgo VPN"
     }
 }

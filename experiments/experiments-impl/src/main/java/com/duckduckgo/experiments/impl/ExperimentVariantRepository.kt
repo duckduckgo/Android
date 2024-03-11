@@ -18,18 +18,13 @@ package com.duckduckgo.experiments.impl
 
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.experiments.api.VariantConfig
 import com.duckduckgo.experiments.impl.VariantManagerImpl.Companion.DEFAULT_VARIANT
 import com.duckduckgo.experiments.impl.VariantManagerImpl.Companion.REINSTALL_VARIANT
-import com.duckduckgo.experiments.impl.store.ExperimentVariantDao
-import com.duckduckgo.experiments.impl.store.ExperimentVariantEntity
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import timber.log.Timber
 
 interface ExperimentVariantRepository {
-    fun saveVariants(variants: List<VariantConfig>)
-    fun getActiveVariants(): List<ExperimentVariantEntity>
     fun getUserVariant(): String?
     fun updateVariant(variantKey: String)
     fun getAppReferrerVariant(): String?
@@ -38,29 +33,8 @@ interface ExperimentVariantRepository {
 
 @ContributesBinding(AppScope::class)
 class ExperimentVariantRepositoryImpl @Inject constructor(
-    private val experimentVariantDao: ExperimentVariantDao,
     private val store: StatisticsDataStore,
 ) : ExperimentVariantRepository {
-
-    override fun saveVariants(variants: List<VariantConfig>) {
-        val variantEntityList: MutableList<ExperimentVariantEntity> = mutableListOf()
-        variants.map {
-            variantEntityList.add(
-                ExperimentVariantEntity(
-                    key = it.variantKey,
-                    weight = it.weight,
-                    localeFilter = it.filters?.locale.orEmpty(),
-                    androidVersionFilter = it.filters?.androidVersion.orEmpty(),
-                ),
-            )
-        }
-        experimentVariantDao.delete()
-        experimentVariantDao.insertAll(variantEntityList)
-    }
-
-    override fun getActiveVariants(): List<ExperimentVariantEntity> {
-        return experimentVariantDao.variants()
-    }
 
     override fun getUserVariant(): String? = store.variant
 

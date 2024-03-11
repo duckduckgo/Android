@@ -86,8 +86,6 @@ import com.duckduckgo.app.brokensite.BrokenSiteActivity
 import com.duckduckgo.app.browser.BrowserTabViewModel.AccessibilityViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.AutoCompleteViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.BrowserViewState
-import com.duckduckgo.app.browser.BrowserTabViewModel.Command
-import com.duckduckgo.app.browser.BrowserTabViewModel.Command.ShowBackNavigationHistory
 import com.duckduckgo.app.browser.BrowserTabViewModel.CtaViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.FileChooserRequestedParams
 import com.duckduckgo.app.browser.BrowserTabViewModel.FindInPageViewState
@@ -95,7 +93,6 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.HighlightableButton
 import com.duckduckgo.app.browser.BrowserTabViewModel.LoadingViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.LocationPermission
-import com.duckduckgo.app.browser.BrowserTabViewModel.NavigationCommand
 import com.duckduckgo.app.browser.BrowserTabViewModel.OmnibarViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.PrivacyShieldViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.SavedSiteChangedViewState
@@ -105,6 +102,9 @@ import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.applinks.AppLinksLauncher
 import com.duckduckgo.app.browser.applinks.AppLinksSnackBarConfigurator
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
+import com.duckduckgo.app.browser.commands.Command
+import com.duckduckgo.app.browser.commands.Command.ShowBackNavigationHistory
+import com.duckduckgo.app.browser.commands.NavigationCommand
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.databinding.ContentSiteLocationPermissionDialogBinding
 import com.duckduckgo.app.browser.databinding.ContentSystemLocationPermissionDialogBinding
@@ -238,8 +238,6 @@ import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.common.utils.plugins.PluginPoint
-import com.duckduckgo.common.utils.webview.enableDarkMode
-import com.duckduckgo.common.utils.webview.enableLightMode
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_DELAY
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_LENGTH
@@ -2091,7 +2089,6 @@ class BrowserTabFragment :
                 setSupportMultipleWindows(true)
                 disableWebSql(this)
                 setSupportZoom(true)
-                configureDarkThemeSupport(this)
                 if (accessibilitySettingsDataStore.overrideSystemFontSize) {
                     textZoom = accessibilitySettingsDataStore.fontSize.toInt()
                 }
@@ -2311,13 +2308,6 @@ class BrowserTabFragment :
             return
         }
         dialog.show(childFragmentManager, tag)
-    }
-
-    private fun configureDarkThemeSupport(webSettings: WebSettings) {
-        when (appTheme.isLightModeEnabled()) {
-            true -> webSettings.enableLightMode()
-            false -> webSettings.enableDarkMode()
-        }
     }
 
     private fun configureSwipeRefresh() {

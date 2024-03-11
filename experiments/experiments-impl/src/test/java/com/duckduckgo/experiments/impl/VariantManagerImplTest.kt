@@ -19,7 +19,6 @@ package com.duckduckgo.experiments.impl
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.experiments.api.VariantConfig
 import com.duckduckgo.experiments.api.VariantManager
-import com.duckduckgo.experiments.impl.store.ExperimentVariantEntity
 import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -76,19 +75,10 @@ class VariantManagerImplTest {
     }
 
     @Test
-    fun whenVariantsConfigUpdatedThenSaveNewVariantsConfig() {
-        val variantsConfig = listOf(VariantConfig("variant1", 1.0), VariantConfig("variant2", 1.0))
-
-        testee.saveVariants(variantsConfig)
-
-        verify(mockExperimentVariantRepository).saveVariants(variantsConfig)
-    }
-
-    @Test
     fun whenVariantAlreadyPersistedThenVariantAllocatorNeverInvoked() {
         val variantsConfig = listOf(VariantConfig("variantKey", 1.0))
         whenever(mockExperimentVariantRepository.getUserVariant()).thenReturn("variantKey")
-        testee.saveVariants(variantsConfig)
+        testee.updateVariants(variantsConfig)
 
         verify(mockRandomizer, never()).random(any())
     }
@@ -96,10 +86,8 @@ class VariantManagerImplTest {
     @Test
     fun givenVariantsUpdateWhenVariantNeverPersistedThenVariantAllocatorNeverInvoked() {
         val variantsConfig = listOf(VariantConfig("variantKey", 1.0))
-        val testVariantEntity = ExperimentVariantEntity("variantKey", 1.0)
-        whenever(mockExperimentVariantRepository.getActiveVariants()).thenReturn(listOf(testVariantEntity))
         whenever(mockExperimentVariantRepository.getUserVariant()).thenReturn(null)
-        testee.saveVariants(variantsConfig)
+        testee.updateVariants(variantsConfig)
 
         verify(mockExperimentVariantRepository).updateVariant(any())
         verify(mockRandomizer).random(any())
@@ -108,11 +96,9 @@ class VariantManagerImplTest {
     @Test
     fun givenReturnUserVariantWhenVariantsConfigUpdatedThenNewVariantNoAllocated() {
         val variantsConfig = listOf(VariantConfig("variant1", 1.0), VariantConfig("variant2", 1.0))
-        val testVariantEntity = ExperimentVariantEntity("variant1", 1.0)
-        whenever(mockExperimentVariantRepository.getActiveVariants()).thenReturn(listOf(testVariantEntity))
         whenever(mockExperimentVariantRepository.getUserVariant()).thenReturn("ru")
 
-        testee.saveVariants(variantsConfig)
+        testee.updateVariants(variantsConfig)
 
         verify(mockExperimentVariantRepository, never()).updateVariant(any())
         verify(mockRandomizer, never()).random(any())
@@ -120,18 +106,16 @@ class VariantManagerImplTest {
 
     @Test
     fun whenNoVariantsAvailableThenDefaultVariantIsAssigned() {
-        whenever(mockExperimentVariantRepository.getActiveVariants()).thenReturn(emptyList())
         whenever(mockExperimentVariantRepository.getUserVariant()).thenReturn(null)
-        testee.saveVariants(emptyList())
+        testee.updateVariants(emptyList())
 
         verify(mockExperimentVariantRepository).updateVariant("")
     }
 
     @Test
     fun whenVariantPersistedIsNotFoundInActiveVariantListThenRestoredToDefaultVariant() {
-        whenever(mockExperimentVariantRepository.getActiveVariants()).thenReturn(emptyList())
         whenever(mockExperimentVariantRepository.getUserVariant()).thenReturn("variantKey")
-        testee.saveVariants(emptyList())
+        testee.updateVariants(emptyList())
 
         verify(mockExperimentVariantRepository).updateVariant("")
     }
@@ -139,29 +123,29 @@ class VariantManagerImplTest {
     @Test
     fun whenVariantPersistedHasWeightEqualToZeroInActiveVariantListThenVariantIsNotRestored() {
         val variantsConfig = listOf(VariantConfig("variantKey", 0.0))
-        val testVariantEntity = ExperimentVariantEntity("variantKey", 0.0)
-        whenever(mockExperimentVariantRepository.getActiveVariants()).thenReturn(listOf(testVariantEntity))
         whenever(mockExperimentVariantRepository.getUserVariant()).thenReturn("variantKey")
-        testee.saveVariants(variantsConfig)
+        testee.updateVariants(variantsConfig)
 
         verify(mockExperimentVariantRepository, never()).updateVariant(any())
     }
 
     @Test
     fun whenNoVariantPersistedThenNewVariantAllocated() {
-        addActiveVariantToConfig()
+        val variantsConfig = listOf(VariantConfig("variantKey", 1.0))
+        whenever(mockExperimentVariantRepository.getUserVariant()).thenReturn(null)
 
-        testee.getVariantKey()
+        testee.updateVariants(variantsConfig)
         verify(mockRandomizer).random(any())
     }
 
     @Test
     fun whenNoVariantPersistedThenNewVariantKeyIsAllocatedAndPersisted() {
-        addActiveVariantToConfig()
+        val variantsConfig = listOf(VariantConfig("variantKey", 1.0))
+        whenever(mockExperimentVariantRepository.getUserVariant()).thenReturn(null)
 
-        testee.getVariantKey()
+        testee.updateVariants(variantsConfig)
 
-        verify(mockExperimentVariantRepository).updateVariant("foo")
+        verify(mockExperimentVariantRepository).updateVariant("variantKey")
     }
 
     @Test
@@ -199,13 +183,6 @@ class VariantManagerImplTest {
         val newVariant = testee.getVariantKey()
         Assert.assertNotEquals(originalVariant, newVariant)
         assertEquals("xx", newVariant)
-    }
-
-    private fun addActiveVariantToConfig(variantKey: String = "foo", weight: Double = 1.0) {
-        val testVariantEntity = ExperimentVariantEntity(variantKey, weight)
-        whenever(mockExperimentVariantRepository.getActiveVariants()).thenReturn(listOf(testVariantEntity))
-
-        testee.saveVariants(listOf(VariantConfig(variantKey)))
     }
 
     private fun mockUpdateScenario(key: String) {

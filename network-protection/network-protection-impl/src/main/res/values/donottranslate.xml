@@ -258,6 +258,7 @@
     <string name="netpNotificationCTAReconnectNow">Reconnect Now</string>
     <string name="netpNotificationSnoozeTitle">VPN is snoozed</string>
     <string name="netpNotificationSnoozeBody" instruction="Placeholder is time in hh:mm format">VPN will reconnect at %1$s</string>
+    <string name="netpNotificationVpnAccessRevoked">VPN disconnected due to expired subscription. Subscribe to Privacy Pro to reconnect DuckDuckGo VPN.</string>
 
     <!-- Geoswitching -->
     <string name="netpGeoswitchingTitle">VPN Location</string>
