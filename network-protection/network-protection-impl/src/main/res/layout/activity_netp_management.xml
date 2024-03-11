@@ -41,13 +41,13 @@
                 app:panelBackground="@drawable/info_panel_alert_background"
                 app:panelDrawable="@drawable/ic_info_panel_alert" />
 
-            <ImageView
+            <com.airbnb.lottie.LottieAnimationView
                 android:id="@+id/netp_status_image"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_margin="@dimen/keyline_4"
-                app:srcCompat="@drawable/illustration_vpn_disconnected" />
+                android:importantForAccessibility="no" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/netp_status_header"
