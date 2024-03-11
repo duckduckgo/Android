@@ -18,9 +18,9 @@ package com.duckduckgo.networkprotection.impl.integration
 
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.VpnScope
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.integration.VpnNetworkStackProvider
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -31,12 +31,10 @@ import javax.inject.Inject
 )
 class NetpVpnNetworkStackProviderImpl @Inject constructor(
     private val vpnNetworkStacks: PluginPoint<VpnNetworkStack>,
-    private val vpnFeaturesRegistry: VpnFeaturesRegistry,
+    private val networkProtectionState: NetworkProtectionState,
 ) : VpnNetworkStackProvider {
     override suspend fun provideNetworkStack(): VpnNetworkStack {
-        val features = vpnFeaturesRegistry.getRegisteredFeatures().map { it.featureName }
-
-        val networkStack = if (features.contains(NetPVpnFeature.NETP_VPN.featureName)) {
+        val networkStack = if (networkProtectionState.isEnabled()) {
             // if we have NetP enabled, return NetP's network stack
             vpnNetworkStacks.getPlugins().firstOrNull { it.name == NetPVpnFeature.NETP_VPN.featureName }
         } else {

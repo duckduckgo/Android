@@ -90,7 +90,13 @@ class FailureRecoveryHandlerTest {
     fun setUp() {
         MockitoAnnotations.openMocks(this)
 
-        failureRecoveryHandler = FailureRecoveryHandler(networkProtectionState, wgTunnel, wgTunnelConfig, currentTimeProvider, networkProtectionPixels)
+        failureRecoveryHandler = FailureRecoveryHandler(
+            networkProtectionState,
+            wgTunnel,
+            wgTunnelConfig,
+            currentTimeProvider,
+            networkProtectionPixels,
+        )
     }
 
     @Test
