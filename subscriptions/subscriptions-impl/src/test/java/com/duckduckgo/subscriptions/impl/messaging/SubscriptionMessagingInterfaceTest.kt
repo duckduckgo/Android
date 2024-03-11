@@ -91,7 +91,7 @@ class SubscriptionMessagingInterfaceTest {
 
     @Test
     fun whenProcessInterfaceNotRegisteredDoNothing() = runTest {
-        whenever(webView.url).thenReturn("https://abrown.duckduckgo.com")
+        whenever(webView.url).thenReturn("https://duckduckgo.com/test")
 
         val message = """
             {"context":"subscriptionPages","featureName":"useSubscription","method":"getSubscription","id":"myId","params":{}}
@@ -402,7 +402,7 @@ class SubscriptionMessagingInterfaceTest {
 
     private fun givenInterfaceIsRegistered() {
         messagingInterface.register(webView, callback)
-        whenever(webView.url).thenReturn("https://abrown.duckduckgo.com/test")
+        whenever(webView.url).thenReturn("https://duckduckgo.com/test")
     }
 
     private suspend fun givenAuthTokenIsSuccess() {

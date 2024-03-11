@@ -83,7 +83,7 @@ class ItrMessagingInterfaceTest {
 
     @Test
     fun whenProcessInterfaceNotRegisteredDoNothing() = runTest {
-        whenever(webView.url).thenReturn("https://abrown.duckduckgo.com")
+        whenever(webView.url).thenReturn("https://duckduckgo.com/test")
 
         val message = """
             {"context":"identityTheftRestorationPages","featureName":"useIdentityTheftRestoration","method":"getAccessToken","id":"myId","params":{}}
@@ -199,7 +199,7 @@ class ItrMessagingInterfaceTest {
 
     private fun givenInterfaceIsRegistered() {
         messagingInterface.register(webView, callback)
-        whenever(webView.url).thenReturn("https://abrown.duckduckgo.com/test")
+        whenever(webView.url).thenReturn("https://duckduckgo.com/test")
     }
 
     private suspend fun givenAccessTokenIsSuccess() {
