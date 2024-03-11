@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.common.utils
+package com.duckduckgo.app.browser
 
 import android.net.Uri
+import androidx.collection.LruCache
 import androidx.core.util.PatternsCompat
+import com.duckduckgo.common.utils.UrlScheme
+import com.duckduckgo.common.utils.baseHost
+import com.duckduckgo.common.utils.withScheme
 import java.lang.IllegalArgumentException
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import timber.log.Timber
@@ -25,11 +29,11 @@ import timber.log.Timber
 class UriString {
 
     companion object {
-
         private const val localhost = "localhost"
         private const val space = " "
         private val webUrlRegex by lazy { PatternsCompat.WEB_URL.toRegex() }
         private val domainRegex by lazy { PatternsCompat.DOMAIN_NAME.toRegex() }
+        private val cache = LruCache<Int, Boolean>(250_000)
 
         fun host(uriString: String): String? {
             return Uri.parse(uriString).baseHost
@@ -45,11 +49,31 @@ class UriString {
         }
 
         fun sameOrSubdomain(
+            child: Domain?,
+            parent: Domain,
+        ): Boolean {
+            child ?: return false
+            val hash = (child.value + parent.value).hashCode()
+            return cache.get(hash) ?: (parent == child || child.value.endsWith(".${parent.value}")).also {
+                cache.put(hash, it)
+            }
+        }
+
+        fun sameOrSubdomain(
             child: Uri,
             parent: String,
         ): Boolean {
             val childHost = child.host ?: return false
             val parentHost = host(parent) ?: return false
+            return parentHost == childHost || childHost.endsWith(".$parentHost")
+        }
+
+        fun sameOrSubdomain(
+            child: Uri,
+            parent: Domain,
+        ): Boolean {
+            val childHost = child.host ?: return false
+            val parentHost = host(parent.value) ?: return false
             return parentHost == childHost || childHost.endsWith(".$parentHost")
         }
 

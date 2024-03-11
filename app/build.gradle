@@ -72,6 +72,9 @@ android {
     kotlin {
         jvmToolchain(17)
     }
+    ksp {
+        arg("room.generateKotlin", "true")
+    }
     signingConfigs {
         release
     }

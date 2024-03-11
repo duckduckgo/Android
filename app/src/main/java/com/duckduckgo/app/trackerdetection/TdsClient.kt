@@ -17,15 +17,18 @@
 package com.duckduckgo.app.trackerdetection
 
 import android.net.Uri
+import com.duckduckgo.app.browser.Domain
+import com.duckduckgo.app.browser.UriString.Companion.host
+import com.duckduckgo.app.browser.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.app.trackerdetection.model.Action.BLOCK
 import com.duckduckgo.app.trackerdetection.model.Action.IGNORE
 import com.duckduckgo.app.trackerdetection.model.TdsTracker
-import com.duckduckgo.common.utils.UriString.Companion.sameOrSubdomain
 
 class TdsClient(
     override val name: Client.ClientName,
     private val trackers: List<TdsTracker>,
     private val urlToTypeMapper: UrlToTypeMapper,
+    private val optimizeTrackerEvaluation: Boolean,
 ) : Client {
 
     override fun matches(
@@ -33,7 +36,14 @@ class TdsClient(
         documentUrl: Uri,
         requestHeaders: Map<String, String>,
     ): Client.Result {
-        val tracker = trackers.firstOrNull { sameOrSubdomain(url, it.domain) } ?: return Client.Result(matches = false, isATracker = false)
+        val tracker = if (optimizeTrackerEvaluation) {
+            val domain = host(url)?.let { Domain(it) }
+            trackers.firstOrNull {
+                domain?.let { domain -> sameOrSubdomain(domain, it.domain) } ?: false
+            } ?: return Client.Result(matches = false, isATracker = false)
+        } else {
+            trackers.firstOrNull { sameOrSubdomain(url, it.domain.value) } ?: return Client.Result(matches = false, isATracker = false)
+        }
         val matches = matchesTrackerEntry(tracker, url, documentUrl, requestHeaders)
         return Client.Result(
             matches = matches.shouldBlock,
@@ -49,7 +59,12 @@ class TdsClient(
         documentUrl: Uri,
         requestHeaders: Map<String, String>,
     ): Client.Result {
-        val tracker = trackers.firstOrNull { sameOrSubdomain(url, it.domain) } ?: return Client.Result(matches = false, isATracker = false)
+        val tracker = if (optimizeTrackerEvaluation) {
+            val domain = url.host?.let { Domain(it) }
+            trackers.firstOrNull { sameOrSubdomain(domain, it.domain) } ?: return Client.Result(matches = false, isATracker = false)
+        } else {
+            trackers.firstOrNull { sameOrSubdomain(url, it.domain.value) } ?: return Client.Result(matches = false, isATracker = false)
+        }
         val matches = matchesTrackerEntry(tracker, url.toString(), documentUrl, requestHeaders)
         return Client.Result(
             matches = matches.shouldBlock,
