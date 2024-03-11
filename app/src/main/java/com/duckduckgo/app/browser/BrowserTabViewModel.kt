@@ -49,7 +49,6 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.A
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.DeleteBookmarkListener
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.EditSavedSiteListener
-import com.duckduckgo.app.browser.BrowserTabViewModel.Command.*
 import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState.Browser
 import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState.Invalidated
 import com.duckduckgo.app.browser.BrowserTabViewModel.HighlightableButton.Visible
@@ -61,12 +60,14 @@ import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
 import com.duckduckgo.app.browser.camera.CameraHardwareChecker
+import com.duckduckgo.app.browser.commands.Command
+import com.duckduckgo.app.browser.commands.Command.*
+import com.duckduckgo.app.browser.commands.NavigationCommand
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource.ImageFavicon
 import com.duckduckgo.app.browser.favicon.FaviconSource.UrlFavicon
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.browser.history.NavigationHistoryAdapter.NavigationHistoryListener
-import com.duckduckgo.app.browser.history.NavigationHistoryEntry
 import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler
 import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler.Event
 import com.duckduckgo.app.browser.logindetection.LoginDetected
@@ -360,202 +361,6 @@ class BrowserTabViewModel @Inject constructor(
         val filePickingMode: Int,
         val acceptMimeTypes: List<String>,
     )
-
-    sealed class Command {
-        class OpenInNewTab(
-            val query: String,
-            val sourceTabId: String? = null,
-        ) : Command()
-
-        class OpenMessageInNewTab(
-            val message: Message,
-            val sourceTabId: String? = null,
-        ) : Command()
-
-        class OpenInNewBackgroundTab(val query: String) : Command()
-        object LaunchNewTab : Command()
-        object ResetHistory : Command()
-        class DialNumber(val telephoneNumber: String) : Command()
-        class SendSms(val telephoneNumber: String) : Command()
-        class SendEmail(val emailAddress: String) : Command()
-        object ShowKeyboard : Command()
-        object HideKeyboard : Command()
-        class ShowFullScreen(val view: View) : Command()
-        class DownloadImage(
-            val url: String,
-            val requestUserConfirmation: Boolean,
-        ) : Command()
-
-        class ShowSavedSiteAddedConfirmation(val savedSiteChangedViewState: SavedSiteChangedViewState) : Command()
-        class ShowEditSavedSiteDialog(val savedSiteChangedViewState: SavedSiteChangedViewState) : Command()
-        class DeleteSavedSiteConfirmation(val savedSite: SavedSite) : Command()
-        class DeleteFavoriteConfirmation(val savedSite: SavedSite) : Command()
-
-        class ShowFireproofWebSiteConfirmation(val fireproofWebsiteEntity: FireproofWebsiteEntity) : Command()
-        class DeleteFireproofConfirmation(val fireproofWebsiteEntity: FireproofWebsiteEntity) : Command()
-        class ShowPrivacyProtectionEnabledConfirmation(val domain: String) : Command()
-        class ShowPrivacyProtectionDisabledConfirmation(val domain: String) : Command()
-        object AskToDisableLoginDetection : Command()
-        class AskToFireproofWebsite(val fireproofWebsite: FireproofWebsiteEntity) : Command()
-        class AskToAutomateFireproofWebsite(val fireproofWebsite: FireproofWebsiteEntity) : Command()
-        class ShareLink(
-            val url: String,
-            val title: String = "",
-        ) : Command()
-
-        class SharePromoLinkRMF(
-            val url: String,
-            val shareTitle: String,
-        ) : Command()
-
-        class PrintLink(
-            val url: String,
-            val mediaSize: PrintAttributes.MediaSize,
-        ) : Command()
-
-        class CopyLink(val url: String) : Command()
-        class FindInPageCommand(val searchTerm: String) : Command()
-        class BrokenSiteFeedback(val data: BrokenSiteData) : Command()
-        object DismissFindInPage : Command()
-        class ShowFileChooser(
-            val filePathCallback: ValueCallback<Array<Uri>>,
-            val fileChooserParams: FileChooserRequestedParams,
-        ) : Command()
-
-        class ShowExistingImageOrCameraChooser(
-            val filePathCallback: ValueCallback<Array<Uri>>,
-            val fileChooserParams: FileChooserRequestedParams,
-            val inputAction: String,
-        ) : Command()
-        class ShowImageCamera(
-            val filePathCallback: ValueCallback<Array<Uri>>,
-            val fileChooserParams: FileChooserRequestedParams,
-        ) : Command()
-        class ShowVideoCamera(
-            val filePathCallback: ValueCallback<Array<Uri>>,
-            val fileChooserParams: FileChooserRequestedParams,
-        ) : Command()
-        class ShowSoundRecorder(
-            val filePathCallback: ValueCallback<Array<Uri>>,
-            val fileChooserParams: FileChooserRequestedParams,
-        ) : Command()
-
-        class HandleNonHttpAppLink(
-            val nonHttpAppLink: NonHttpAppLink,
-            val headers: Map<String, String>,
-        ) : Command()
-
-        class ShowAppLinkPrompt(val appLink: AppLink) : Command()
-        class OpenAppLink(val appLink: AppLink) : Command()
-        class ExtractUrlFromCloakedAmpLink(val initialUrl: String) : Command()
-        class LoadExtractedUrl(val extractedUrl: String) : Command()
-        class AddHomeShortcut(
-            val title: String,
-            val url: String,
-            val icon: Bitmap? = null,
-        ) : Command()
-
-        class SubmitUrl(val url: String) : Command()
-        class LaunchPlayStore(val appPackage: String) : Command()
-        class LaunchSurvey(val survey: Survey) : Command()
-        object LaunchDefaultBrowser : Command()
-        object LaunchAppTPOnboarding : Command()
-        object LaunchAddWidget : Command()
-        class RequiresAuthentication(val request: BasicAuthenticationRequest) : Command()
-        class SaveCredentials(
-            val request: BasicAuthenticationRequest,
-            val credentials: BasicAuthenticationCredentials,
-        ) : Command()
-
-        object GenerateWebViewPreviewImage : Command()
-        object LaunchTabSwitcher : Command()
-        object HideWebContent : Command()
-        object ShowWebContent : Command()
-        class CheckSystemLocationPermission(
-            val domain: String,
-            val deniedForever: Boolean,
-        ) : Command()
-
-        class AskDomainPermission(val locationPermission: LocationPermission) : Command()
-        object RequestSystemLocationPermission : Command()
-        class RefreshUserAgent(
-            val url: String?,
-            val isDesktop: Boolean,
-        ) : Command()
-
-        class ShowErrorWithAction(
-            val textResId: Int,
-            val action: () -> Unit,
-        ) : Command()
-
-        class ShowDomainHasPermissionMessage(val domain: String) : Command()
-        class ConvertBlobToDataUri(
-            val url: String,
-            val mimeType: String,
-        ) : Command()
-
-        class RequestFileDownload(
-            val url: String,
-            val contentDisposition: String?,
-            val mimeType: String,
-            val requestUserConfirmation: Boolean,
-        ) : Command()
-
-        object ChildTabClosed : Command()
-
-        class CopyAliasToClipboard(val alias: String) : Command()
-        class InjectEmailAddress(
-            val duckAddress: String,
-            val originalUrl: String,
-            val autoSaveLogin: Boolean,
-        ) : Command()
-
-        class ShowEmailProtectionChooseEmailPrompt(val address: String) : Command()
-        object ShowEmailProtectionInContextSignUpPrompt : Command()
-        sealed class DaxCommand : Command() {
-            object FinishPartialTrackerAnimation : DaxCommand()
-            class HideDaxDialog(val cta: Cta) : DaxCommand()
-        }
-
-        class CancelIncomingAutofillRequest(val url: String) : Command()
-        object LaunchAutofillSettings : Command()
-        class EditWithSelectedQuery(val query: String) : Command()
-        class ShowBackNavigationHistory(val history: List<NavigationHistoryEntry>) : Command()
-        object EmailSignEvent : Command()
-        class ShowSitePermissionsDialog(
-            val permissionsToRequest: SitePermissions,
-            val request: PermissionRequest,
-        ) : Command()
-
-        class ShowUserCredentialSavedOrUpdatedConfirmation(
-            val credentials: LoginCredentials,
-            val includeShortcutToViewCredential: Boolean,
-            val messageResourceId: Int,
-        ) : Command()
-
-        data class WebViewError(
-            val errorType: WebViewErrorResponse,
-            val url: String,
-        ) : Command()
-
-        data class SendResponseToJs(val data: JsCallbackData) : Command()
-        data class WebShareRequest(val data: JsCallbackData) : Command()
-        data class ScreenLock(val data: JsCallbackData) : Command()
-        object ScreenUnlock : Command()
-        data object ShowFaviconsPrompt : Command()
-    }
-
-    sealed class NavigationCommand : Command() {
-        class NavigateToHistory(val historyStackIndex: Int) : Command()
-        object Refresh : NavigationCommand()
-        class Navigate(
-            val url: String,
-            val headers: Map<String, String>,
-        ) : NavigationCommand()
-
-        class NavigateBack(val steps: Int) : NavigationCommand()
-        object NavigateForward : NavigationCommand()
-    }
 
     val autoCompleteViewState: MutableLiveData<AutoCompleteViewState> = MutableLiveData()
     val browserViewState: MutableLiveData<BrowserViewState> = MutableLiveData()
