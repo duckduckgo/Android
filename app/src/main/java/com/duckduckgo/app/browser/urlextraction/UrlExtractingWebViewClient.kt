@@ -74,7 +74,7 @@ class UrlExtractingWebViewClient(
         request: WebResourceRequest,
     ): WebResourceResponse? {
         return runBlocking {
-            val documentUrl = withContext(dispatcherProvider.main()) { webView.url }
+            val documentUrl = withContext(dispatcherProvider.main()) { webView.url?.toUri() }
             Timber.v(
                 "Intercepting resource ${request.url} type:${request.method} on page $documentUrl",
             )

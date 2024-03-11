@@ -17,6 +17,7 @@
 package com.duckduckgo.app.trackerdetection
 
 import android.net.Uri
+import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.privacy.db.UserAllowListDao
@@ -83,7 +84,7 @@ class TrackerDetectorTest {
         assertNotNull(
             trackerDetector.evaluate(
                 "http://thirdparty.com/update.js",
-                "http://example.com/index.com",
+                "http://example.com/index.com".toUri(),
                 requestHeaders = mapOf(),
             ),
         )
@@ -93,7 +94,7 @@ class TrackerDetectorTest {
         assertNotNull(
             trackerDetector.evaluate(
                 "http://thirdparty.com/update.js",
-                "http://example.com/index.com",
+                "http://example.com/index.com".toUri(),
                 requestHeaders = mapOf(),
             ),
         )
@@ -106,7 +107,7 @@ class TrackerDetectorTest {
         assertNotNull(
             trackerDetector.evaluate(
                 Uri.parse("http://thirdparty.com/update.js"),
-                "http://example.com/index.com",
+                "http://example.com/index.com".toUri(),
                 requestHeaders = mapOf(),
             ),
         )
@@ -116,7 +117,7 @@ class TrackerDetectorTest {
         assertNotNull(
             trackerDetector.evaluate(
                 Uri.parse("http://thirdparty.com/update.js"),
-                "http://example.com/index.com",
+                "http://example.com/index.com".toUri(),
                 requestHeaders = mapOf(),
             ),
         )
@@ -137,7 +138,7 @@ class TrackerDetectorTest {
 
         val actual = trackerDetector.evaluate(
             "http://thirdparty.com/update.js",
-            "http://example.com/index.com",
+            "http://example.com/index.com".toUri(),
             requestHeaders = mapOf(),
         )
         assertEquals(expected, actual)
@@ -158,7 +159,7 @@ class TrackerDetectorTest {
 
         val actual = trackerDetector.evaluate(
             Uri.parse("http://thirdparty.com/update.js"),
-            "http://example.com/index.com",
+            "http://example.com/index.com".toUri(),
             requestHeaders = mapOf(),
         )
         assertEquals(expected, actual)
@@ -168,6 +169,7 @@ class TrackerDetectorTest {
     fun whenThereAreNoClientsAndIsThirdPartyFromSameEntityThenEvaluateReturnsSameEntityNonTrackingEvent() {
         val entity = TdsEntity("example", "example", 0.0)
         whenever(mockEntityLookup.entityForUrl(anyString())).thenReturn(entity)
+        whenever(mockEntityLookup.entityForUrl(any<Uri>())).thenReturn(entity)
         trackerDetector.addClient(nonMatchingClientNoTracker(CLIENT_A))
         val expected = TrackingEvent(
             documentUrl = "http://example.com/index.com",
@@ -181,7 +183,7 @@ class TrackerDetectorTest {
 
         val actual = trackerDetector.evaluate(
             "http://thirdparty.com/update.js",
-            "http://example.com/index.com",
+            "http://example.com/index.com".toUri(),
             requestHeaders = mapOf(),
         )
         assertEquals(expected, actual)
@@ -205,7 +207,7 @@ class TrackerDetectorTest {
 
         val actual = trackerDetector.evaluate(
             Uri.parse("http://thirdparty.com/update.js"),
-            "http://example.com/index.com",
+            "http://example.com/index.com".toUri(),
             requestHeaders = mapOf(),
         )
         assertEquals(expected, actual)
@@ -215,6 +217,7 @@ class TrackerDetectorTest {
     fun whenThereAreClientsAndIsThirdPartyButIgnoredThenEvaluateReturnsNonTrackingEvent() {
         val entity = TdsEntity("example", "example", 0.0)
         whenever(mockEntityLookup.entityForUrl(anyString())).thenReturn(entity)
+        whenever(mockEntityLookup.entityForUrl(any<Uri>())).thenReturn(entity)
         trackerDetector.addClient(matchingClientTrackerIgnored(CLIENT_A))
         val expected = TrackingEvent(
             documentUrl = "http://example.com/index.com",
@@ -228,7 +231,7 @@ class TrackerDetectorTest {
 
         val actual = trackerDetector.evaluate(
             "http://thirdparty.com/update.js",
-            "http://example.com/index.com",
+            "http://example.com/index.com".toUri(),
             requestHeaders = mapOf(),
         )
         assertEquals(expected, actual)
@@ -252,7 +255,7 @@ class TrackerDetectorTest {
 
         val actual = trackerDetector.evaluate(
             Uri.parse("http://thirdparty.com/update.js"),
-            "http://example.com/index.com",
+            "http://example.com/index.com".toUri(),
             requestHeaders = mapOf(),
         )
         assertEquals(expected, actual)
@@ -274,7 +277,7 @@ class TrackerDetectorTest {
         )
         val actual = trackerDetector.evaluate(
             "http://thirdparty.com/update.js",
-            "http://example.com/index.com",
+            "http://example.com/index.com".toUri(),
             requestHeaders = mapOf(),
         )
         assertEquals(expected, actual)
@@ -296,7 +299,7 @@ class TrackerDetectorTest {
         )
         val actual = trackerDetector.evaluate(
             Uri.parse("http://thirdparty.com/update.js"),
-            "http://example.com/index.com",
+            "http://example.com/index.com".toUri(),
             requestHeaders = mapOf(),
         )
         assertEquals(expected, actual)
@@ -318,7 +321,7 @@ class TrackerDetectorTest {
         )
         val actual = trackerDetector.evaluate(
             "http://thirdparty.com/update.js",
-            "http://example.com/index.com",
+            "http://example.com/index.com".toUri(),
             requestHeaders = mapOf(),
         )
         assertEquals(expected, actual)
@@ -340,7 +343,7 @@ class TrackerDetectorTest {
         )
         val actual = trackerDetector.evaluate(
             Uri.parse("http://thirdparty.com/update.js"),
-            "http://example.com/index.com",
+            "http://example.com/index.com".toUri(),
             requestHeaders = mapOf(),
         )
         assertEquals(expected, actual)
@@ -361,7 +364,7 @@ class TrackerDetectorTest {
         )
         val actual = trackerDetector.evaluate(
             "http://thirdparty.com/update.js",
-            "http://example.com/index.com",
+            "http://example.com/index.com".toUri(),
             requestHeaders = mapOf(),
         )
         assertEquals(expected, actual)
@@ -382,7 +385,7 @@ class TrackerDetectorTest {
         )
         val actual = trackerDetector.evaluate(
             Uri.parse("http://thirdparty.com/update.js"),
-            "http://example.com/index.com",
+            "http://example.com/index.com".toUri(),
             requestHeaders = mapOf(),
         )
         assertEquals(expected, actual)
@@ -403,7 +406,7 @@ class TrackerDetectorTest {
         )
         val actual = trackerDetector.evaluate(
             "http://thirdparty.com/update.js",
-            "http://example.com/index.com",
+            "http://example.com/index.com".toUri(),
             requestHeaders = mapOf(),
         )
         assertEquals(expected, actual)
@@ -424,7 +427,7 @@ class TrackerDetectorTest {
         )
         val actual = trackerDetector.evaluate(
             Uri.parse("http://thirdparty.com/update.js"),
-            "http://example.com/index.com",
+            "http://example.com/index.com".toUri(),
             requestHeaders = mapOf(),
         )
         assertEquals(expected, actual)
@@ -445,7 +448,7 @@ class TrackerDetectorTest {
         )
         val actual = trackerDetector.evaluate(
             "http://thirdparty.com/update.js",
-            "http://example.com/index.com",
+            "http://example.com/index.com".toUri(),
             requestHeaders = mapOf(),
         )
         assertEquals(expected, actual)
@@ -466,7 +469,7 @@ class TrackerDetectorTest {
         )
         val actual = trackerDetector.evaluate(
             Uri.parse("http://thirdparty.com/update.js"),
-            "http://example.com/index.com",
+            "http://example.com/index.com".toUri(),
             requestHeaders = mapOf(),
         )
         assertEquals(expected, actual)
@@ -487,7 +490,7 @@ class TrackerDetectorTest {
         )
         val actual = trackerDetector.evaluate(
             "http://thirdparty.com/update.js",
-            "http://example.com/index.com",
+            "http://example.com/index.com".toUri(),
             requestHeaders = mapOf(),
         )
         assertEquals(expected, actual)
@@ -508,7 +511,7 @@ class TrackerDetectorTest {
         )
         val actual = trackerDetector.evaluate(
             Uri.parse("http://thirdparty.com/update.js"),
-            "http://example.com/index.com",
+            "http://example.com/index.com".toUri(),
             requestHeaders = mapOf(),
         )
         assertEquals(expected, actual)
@@ -529,7 +532,7 @@ class TrackerDetectorTest {
         )
         val actual = trackerDetector.evaluate(
             "http://thirdparty.com/update.js",
-            "http://example.com/index.com",
+            "http://example.com/index.com".toUri(),
             requestHeaders = mapOf(),
         )
         assertEquals(expected, actual)
@@ -550,7 +553,7 @@ class TrackerDetectorTest {
         )
         val actual = trackerDetector.evaluate(
             Uri.parse("http://thirdparty.com/update.js"),
-            "http://example.com/index.com",
+            "http://example.com/index.com".toUri(),
             requestHeaders = mapOf(),
         )
         assertEquals(expected, actual)
@@ -571,7 +574,7 @@ class TrackerDetectorTest {
         )
         val actual = trackerDetector.evaluate(
             "http://thirdparty.com/update.js",
-            "http://example.com/index.com",
+            "http://example.com/index.com".toUri(),
             requestHeaders = mapOf(),
         )
         assertEquals(expected, actual)
@@ -592,7 +595,7 @@ class TrackerDetectorTest {
         )
         val actual = trackerDetector.evaluate(
             Uri.parse("http://thirdparty.com/update.js"),
-            "http://example.com/index.com",
+            "http://example.com/index.com".toUri(),
             requestHeaders = mapOf(),
         )
         assertEquals(expected, actual)
@@ -601,13 +604,19 @@ class TrackerDetectorTest {
     @Test
     fun whenUrlHasSameDomainAsDocumentThenEvaluateReturnsNull() {
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
-        assertNull(trackerDetector.evaluate("http://example.com/update.js", "http://example.com/index.com", requestHeaders = mapOf()))
+        assertNull(trackerDetector.evaluate("http://example.com/update.js", "http://example.com/index.com".toUri(), requestHeaders = mapOf()))
     }
 
     @Test
     fun whenUrlHasSameDomainAsDocumentThenEvaluateReturnsNull2() {
         trackerDetector.addClient(alwaysMatchingClient(CLIENT_A))
-        assertNull(trackerDetector.evaluate(Uri.parse("http://example.com/update.js"), "http://example.com/index.com", requestHeaders = mapOf()))
+        assertNull(
+            trackerDetector.evaluate(
+                Uri.parse("http://example.com/update.js"),
+                "http://example.com/index.com".toUri(),
+                requestHeaders = mapOf(),
+            ),
+        )
     }
 
     @Test
@@ -616,7 +625,7 @@ class TrackerDetectorTest {
         assertNull(
             trackerDetector.evaluate(
                 "http://mobile.example.com/update.js",
-                "http://example.com/index.com",
+                "http://example.com/index.com".toUri(),
                 requestHeaders = mapOf(),
             ),
         )
@@ -628,7 +637,7 @@ class TrackerDetectorTest {
         assertNull(
             trackerDetector.evaluate(
                 Uri.parse("http://mobile.example.com/update.js"),
-                "http://example.com/index.com",
+                "http://example.com/index.com".toUri(),
                 requestHeaders = mapOf(),
             ),
         )
@@ -640,7 +649,7 @@ class TrackerDetectorTest {
         assertNull(
             trackerDetector.evaluate(
                 "http://example.com/update.js",
-                "http://mobile.example.com/index.com",
+                "http://mobile.example.com/index.com".toUri(),
                 requestHeaders = mapOf(),
             ),
         )
@@ -652,7 +661,7 @@ class TrackerDetectorTest {
         assertNull(
             trackerDetector.evaluate(
                 Uri.parse("http://example.com/update.js"),
-                "http://mobile.example.com/index.com",
+                "http://mobile.example.com/index.com".toUri(),
                 requestHeaders = mapOf(),
             ),
         )
@@ -661,17 +670,17 @@ class TrackerDetectorTest {
     private fun alwaysMatchingClient(name: ClientName): Client {
         val client: Client = mock()
         whenever(client.name).thenReturn(name)
-        whenever(client.matches(anyString(), anyString(), anyMap())).thenReturn(Client.Result(matches = true, isATracker = true))
-        whenever(client.matches(any<Uri>(), anyString(), anyMap())).thenReturn(Client.Result(matches = true, isATracker = true))
+        whenever(client.matches(anyString(), any<Uri>(), anyMap())).thenReturn(Client.Result(matches = true, isATracker = true))
+        whenever(client.matches(any<Uri>(), any<Uri>(), anyMap())).thenReturn(Client.Result(matches = true, isATracker = true))
         return client
     }
 
     private fun alwaysMatchingClientWithSurrogate(name: ClientName): Client {
         val client: Client = mock()
         whenever(client.name).thenReturn(name)
-        whenever(client.matches(anyString(), anyString(), anyMap()))
+        whenever(client.matches(anyString(), any<Uri>(), anyMap()))
             .thenReturn(Client.Result(matches = true, surrogate = "testId", isATracker = true))
-        whenever(client.matches(any<Uri>(), anyString(), anyMap()))
+        whenever(client.matches(any<Uri>(), any<Uri>(), anyMap()))
             .thenReturn(Client.Result(matches = true, surrogate = "testId", isATracker = true))
         return client
     }
@@ -679,14 +688,14 @@ class TrackerDetectorTest {
     private fun nonMatchingClientNoTracker(name: ClientName): Client {
         val client: Client = mock()
         whenever(client.name).thenReturn(name)
-        whenever(client.matches(anyString(), anyString(), anyMap())).thenReturn(Client.Result(matches = false, isATracker = false))
+        whenever(client.matches(anyString(), any<Uri>(), anyMap())).thenReturn(Client.Result(matches = false, isATracker = false))
         return client
     }
 
     private fun matchingClientTrackerIgnored(name: ClientName): Client {
         val client: Client = mock()
         whenever(client.name).thenReturn(name)
-        whenever(client.matches(anyString(), anyString(), anyMap())).thenReturn(Client.Result(matches = false, isATracker = true))
+        whenever(client.matches(anyString(), any<Uri>(), anyMap())).thenReturn(Client.Result(matches = false, isATracker = true))
         return client
     }
     companion object {

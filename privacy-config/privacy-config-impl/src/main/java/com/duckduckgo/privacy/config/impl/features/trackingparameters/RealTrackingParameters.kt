@@ -18,8 +18,8 @@ package com.duckduckgo.privacy.config.impl.features.trackingparameters
 
 import android.net.Uri
 import androidx.annotation.VisibleForTesting
+import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
-import com.duckduckgo.common.utils.UriString
 import com.duckduckgo.common.utils.replaceQueryParameters
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.FragmentScope
