@@ -20,8 +20,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.voice.api.VoiceSearchAvailability
+import com.duckduckgo.voice.impl.VoiceSearchPixelNames.VOICE_SEARCH_OFF
+import com.duckduckgo.voice.impl.VoiceSearchPixelNames.VOICE_SEARCH_ON
 import com.duckduckgo.voice.store.VoiceSearchRepository
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,6 +37,7 @@ class AccessibilitySettingsViewModel @Inject constructor(
     private val accessibilitySettings: AccessibilitySettingsDataStore,
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val voiceSearchRepository: VoiceSearchRepository,
+    private val pixel: Pixel,
 ) : ViewModel() {
 
     data class ViewState(
@@ -102,6 +106,9 @@ class AccessibilitySettingsViewModel @Inject constructor(
         voiceSearchRepository.setVoiceSearchUserEnabled(checked)
         if (checked) {
             voiceSearchRepository.resetVoiceSearchDismissed()
+            pixel.fire(VOICE_SEARCH_ON)
+        } else {
+            pixel.fire(VOICE_SEARCH_OFF)
         }
         viewModelScope.launch {
             viewState.emit(
