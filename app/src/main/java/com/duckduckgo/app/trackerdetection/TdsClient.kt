@@ -17,12 +17,12 @@
 package com.duckduckgo.app.trackerdetection
 
 import android.net.Uri
+import com.duckduckgo.app.browser.Domain
+import com.duckduckgo.app.browser.UriString.Companion.host
+import com.duckduckgo.app.browser.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.app.trackerdetection.model.Action.BLOCK
 import com.duckduckgo.app.trackerdetection.model.Action.IGNORE
 import com.duckduckgo.app.trackerdetection.model.TdsTracker
-import com.duckduckgo.common.Domain
-import com.duckduckgo.common.utils.UriString.Companion.host
-import com.duckduckgo.common.utils.UriString.Companion.sameOrSubdomain
 
 class TdsClient(
     override val name: Client.ClientName,

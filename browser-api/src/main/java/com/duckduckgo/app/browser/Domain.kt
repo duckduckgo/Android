@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.common
+package com.duckduckgo.app.browser
 
 @JvmInline
 value class Domain(

@@ -193,7 +193,6 @@ dependencies {
     implementation project(':statistics')
     implementation project(':experiments-api')
     implementation project(':experiments-impl')
-    implementation project(':common-kotlin')
     implementation project(':common-utils')
     implementation project(':app-store')
     implementation project(':common-ui')

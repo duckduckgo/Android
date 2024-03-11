@@ -19,8 +19,8 @@ package com.duckduckgo.app.trackerdetection.model
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
+import com.duckduckgo.app.browser.Domain
 import com.duckduckgo.app.di.JsonModule
-import com.duckduckgo.common.Domain
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Types
 

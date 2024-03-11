@@ -18,6 +18,7 @@ package com.duckduckgo.app.trackerdetection
 
 import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.browser.Domain
 import com.duckduckgo.app.trackerdetection.Client.ClientName.TDS
 import com.duckduckgo.app.trackerdetection.model.Action
 import com.duckduckgo.app.trackerdetection.model.Action.BLOCK
@@ -26,7 +27,6 @@ import com.duckduckgo.app.trackerdetection.model.Options
 import com.duckduckgo.app.trackerdetection.model.Rule
 import com.duckduckgo.app.trackerdetection.model.RuleExceptions
 import com.duckduckgo.app.trackerdetection.model.TdsTracker
-import com.duckduckgo.common.Domain
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith

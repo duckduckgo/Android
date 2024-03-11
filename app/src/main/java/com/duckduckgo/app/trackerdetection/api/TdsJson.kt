@@ -16,9 +16,9 @@
 
 package com.duckduckgo.app.trackerdetection.api
 
+import com.duckduckgo.app.browser.Domain
 import com.duckduckgo.app.trackerdetection.model.*
 import com.duckduckgo.app.trackerdetection.model.Action.UNSUPPORTED
-import com.duckduckgo.common.Domain
 import com.squareup.moshi.FromJson
 import java.util.*
 

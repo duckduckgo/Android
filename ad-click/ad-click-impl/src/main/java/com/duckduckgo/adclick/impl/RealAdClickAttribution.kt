@@ -20,7 +20,7 @@ import android.net.Uri
 import com.duckduckgo.adclick.api.AdClickFeatureName
 import com.duckduckgo.adclick.store.AdClickAttributionLinkFormatEntity
 import com.duckduckgo.adclick.store.AdClickAttributionRepository
-import com.duckduckgo.common.utils.UriString
+import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.squareup.anvil.annotations.ContributesBinding

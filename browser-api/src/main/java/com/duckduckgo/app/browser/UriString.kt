@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.common.utils
+package com.duckduckgo.app.browser
 
 import android.net.Uri
 import androidx.collection.LruCache
 import androidx.core.util.PatternsCompat
-import com.duckduckgo.common.Domain
+import com.duckduckgo.common.utils.UrlScheme
+import com.duckduckgo.common.utils.baseHost
+import com.duckduckgo.common.utils.withScheme
 import java.lang.IllegalArgumentException
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import timber.log.Timber
