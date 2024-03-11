@@ -18,6 +18,7 @@ package com.duckduckgo.voice.impl
 
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.voice.impl.language.LanguageSupportChecker
 import com.duckduckgo.voice.impl.remoteconfig.Locale
 import com.duckduckgo.voice.impl.remoteconfig.Manufacturer
 import com.duckduckgo.voice.impl.remoteconfig.VoiceSearchFeature
@@ -48,12 +49,22 @@ class RealVoiceSearchAvailabilityTest {
     @Mock
     private lateinit var voiceSearchRepository: VoiceSearchRepository
 
+    @Mock
+    private lateinit var languageSupportChecker: LanguageSupportChecker
+
     private lateinit var testee: RealVoiceSearchAvailability
 
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
-        testee = RealVoiceSearchAvailability(configProvider, voiceSearchFeature, voiceSearchFeatureRepository, voiceSearchRepository)
+        testee = RealVoiceSearchAvailability(
+            configProvider,
+            voiceSearchFeature,
+            voiceSearchFeatureRepository,
+            voiceSearchRepository,
+            languageSupportChecker,
+        )
+        whenever(languageSupportChecker.isLanguageSupported()).thenReturn(true)
     }
 
     @Test
@@ -63,6 +74,17 @@ class RealVoiceSearchAvailabilityTest {
         setupUserSettings(true)
 
         assertTrue(testee.isVoiceSearchSupported)
+    }
+
+    @Test
+    fun whenDeviceHasValidConfigAndLanguageIsNotSupportedThenIsVoiceSearchSupportedFalse() {
+        whenever(languageSupportChecker.isLanguageSupported()).thenReturn(false)
+
+        setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray(), excludedLocales = emptyArray())
+        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupUserSettings(true)
+
+        assertFalse(testee.isVoiceSearchSupported)
     }
 
     @Test

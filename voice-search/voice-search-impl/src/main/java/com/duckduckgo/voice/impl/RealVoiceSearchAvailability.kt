@@ -18,6 +18,7 @@ package com.duckduckgo.voice.impl
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.voice.api.VoiceSearchAvailability
+import com.duckduckgo.voice.impl.language.LanguageSupportChecker
 import com.duckduckgo.voice.impl.remoteconfig.VoiceSearchFeature
 import com.duckduckgo.voice.impl.remoteconfig.VoiceSearchFeatureRepository
 import com.duckduckgo.voice.store.VoiceSearchRepository
@@ -30,6 +31,7 @@ class RealVoiceSearchAvailability @Inject constructor(
     private val voiceSearchFeature: VoiceSearchFeature,
     private val voiceSearchFeatureRepository: VoiceSearchFeatureRepository,
     private val voiceSearchRepository: VoiceSearchRepository,
+    private val languageSupportChecker: LanguageSupportChecker,
 ) : VoiceSearchAvailability {
     companion object {
         private const val URL_DDG_SERP = "https://duckduckgo.com/?"
@@ -40,6 +42,7 @@ class RealVoiceSearchAvailability @Inject constructor(
             voiceSearchFeature.self().isEnabled() &&
                 hasValidVersion(sdkInt) &&
                 isOnDeviceSpeechRecognitionSupported &&
+                languageSupportChecker.isLanguageSupported() &&
                 hasValidLocale(languageTag) &&
                 voiceSearchFeatureRepository.manufacturerExceptions.none { it.name == deviceManufacturer }
         }
