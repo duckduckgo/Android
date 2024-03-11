@@ -22,8 +22,7 @@ import androidx.work.*
 import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
+import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.vpn.dao.VpnServiceStateStatsDao
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesTo
@@ -80,10 +79,10 @@ class DeviceShieldStatusReportingWorker(
     lateinit var deviceShieldPixels: DeviceShieldPixels
 
     @Inject
-    lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
+    lateinit var appTrackingProtection: AppTrackingProtection
 
     override suspend fun doWork(): Result {
-        if (vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)) {
+        if (appTrackingProtection.isEnabled()) {
             deviceShieldPixels.reportEnabled()
         } else {
             deviceShieldPixels.reportDisabled()

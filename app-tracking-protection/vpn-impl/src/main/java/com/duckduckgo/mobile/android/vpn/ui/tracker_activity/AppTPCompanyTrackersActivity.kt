@@ -43,11 +43,9 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.safeGetApplicationIcon
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
-import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature.APPTP_VPN
+import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.R.string
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageContract
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityApptpCompanyTrackersActivityBinding
@@ -86,7 +84,7 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
-    @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
+    @Inject lateinit var appTrackingProtection: AppTrackingProtection
 
     @Inject lateinit var reportBreakageContract: Provider<ReportBreakageContract>
 
@@ -223,8 +221,8 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
     private fun restartVpn() {
         // we use the app coroutine scope to ensure this call outlives the Activity
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            if (vpnFeaturesRegistry.isFeatureRegistered(APPTP_VPN)) {
-                vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
+            if (appTrackingProtection.isEnabled()) {
+                appTrackingProtection.restart()
             }
         }
     }
