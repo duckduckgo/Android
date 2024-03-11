@@ -47,4 +47,9 @@ interface AppTrackingProtection {
      * This method will stop the App Tracking Protection feature
      */
     fun stop()
+
+    /**
+     * This method will start the App Tracking Protection feature
+     */
+    fun start()
 }

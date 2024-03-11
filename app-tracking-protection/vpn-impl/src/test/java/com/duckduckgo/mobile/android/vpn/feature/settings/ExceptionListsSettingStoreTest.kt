@@ -17,8 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.feature.settings
 
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
+import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.vpn.dao.VpnAppTrackerBlockingDao
 import com.duckduckgo.mobile.android.vpn.dao.VpnAppTrackerSystemAppsOverridesDao
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
@@ -44,7 +43,7 @@ class ExceptionListsSettingStoreTest {
 
     private lateinit var exceptionListsSettingStore: ExceptionListsSettingStore
 
-    private val mockVpnFeaturesRegistry: VpnFeaturesRegistry = mock()
+    private val appTrackingProtection: AppTrackingProtection = mock()
     private val mockVpnDatabase: VpnDatabase = mock()
     private val mockVpnAppTrackerBlockingDao: VpnAppTrackerBlockingDao = mock()
     private val mockVpnAppTrackerSystemAppsOverridesDao: VpnAppTrackerSystemAppsOverridesDao = mock()
@@ -86,7 +85,7 @@ class ExceptionListsSettingStoreTest {
         exceptionListsSettingStore = ExceptionListsSettingStore(
             mockVpnDatabase,
             coroutineRule.testScope,
-            mockVpnFeaturesRegistry,
+            appTrackingProtection,
             coroutineRule.testDispatcherProvider,
         )
 
@@ -105,7 +104,7 @@ class ExceptionListsSettingStoreTest {
         exceptionListsSettingStore = ExceptionListsSettingStore(
             mockVpnDatabase,
             coroutineRule.testScope,
-            mockVpnFeaturesRegistry,
+            appTrackingProtection,
             coroutineRule.testDispatcherProvider,
         )
 
@@ -125,6 +124,6 @@ class ExceptionListsSettingStoreTest {
         verify(mockVpnAppTrackerSystemAppsOverridesDao).upsertSystemAppOverrides(systemOverrides)
 
         advanceUntilIdle()
-        verify(mockVpnFeaturesRegistry).refreshFeature(AppTpVpnFeature.APPTP_VPN)
+        verify(appTrackingProtection).restart()
     }
 }

@@ -21,8 +21,6 @@ import android.content.pm.PackageManager
 import android.util.LruCache
 import com.duckduckgo.common.utils.extensions.isDdgApp
 import com.duckduckgo.di.scopes.VpnScope
-import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.apps.isSystemApp
 import com.duckduckgo.mobile.android.vpn.dao.VpnAppTrackerBlockingDao
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
@@ -44,12 +42,12 @@ class RealAppTrackerDetector constructor(
     private val appTrackerRecorder: AppTrackerRecorder,
     private val vpnAppTrackerBlockingDao: VpnAppTrackerBlockingDao,
     private val packageManager: PackageManager,
-    private val vpnFeaturesRegistry: VpnFeaturesRegistry,
+    private val appTrackingProtection: AppTrackingProtection,
     private val context: Context,
 ) : AppTrackerDetector {
 
     private fun isAppTpDisabled(): Boolean {
-        return runBlocking { !vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN) }
+        return runBlocking { !appTrackingProtection.isEnabled() }
     }
 
     // cache packageId -> app name
@@ -138,7 +136,7 @@ object AppTrackerDetectorModule {
         appTrackerRecorder: AppTrackerRecorder,
         vpnDatabase: VpnDatabase,
         packageManager: PackageManager,
-        vpnFeaturesRegistry: VpnFeaturesRegistry,
+        appTrackingProtection: AppTrackingProtection,
         context: Context,
     ): AppTrackerDetector {
         return RealAppTrackerDetector(
@@ -147,7 +145,7 @@ object AppTrackerDetectorModule {
             appTrackerRecorder = appTrackerRecorder,
             vpnAppTrackerBlockingDao = vpnDatabase.vpnAppTrackerBlockingDao(),
             packageManager = packageManager,
-            vpnFeaturesRegistry = vpnFeaturesRegistry,
+            appTrackingProtection = appTrackingProtection,
             context = context,
         )
     }

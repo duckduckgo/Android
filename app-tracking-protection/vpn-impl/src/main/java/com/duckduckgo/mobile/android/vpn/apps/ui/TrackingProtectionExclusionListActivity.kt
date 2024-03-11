@@ -40,11 +40,9 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.R as commonR
-import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
-import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature.APPTP_VPN
+import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.R.string
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.apps.Command
 import com.duckduckgo.mobile.android.vpn.apps.ManageAppsProtectionViewModel
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo
@@ -80,7 +78,7 @@ class TrackingProtectionExclusionListActivity :
     lateinit var deviceShieldPixels: DeviceShieldPixels
 
     @Inject
-    lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
+    lateinit var appTrackingProtection: AppTrackingProtection
 
     @Inject lateinit var reportBreakageContract: Provider<ReportBreakageContract>
 
@@ -233,8 +231,8 @@ class TrackingProtectionExclusionListActivity :
     private fun restartVpn() {
         // we use the app coroutine scope to ensure this call outlives the Activity
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            if (vpnFeaturesRegistry.isFeatureRegistered(APPTP_VPN)) {
-                vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
+            if (appTrackingProtection.isEnabled()) {
+                appTrackingProtection.restart()
             }
         }
     }

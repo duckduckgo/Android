@@ -21,7 +21,7 @@ import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.api.FakeChain
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
+import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import java.time.LocalDate
 import org.junit.Assert
@@ -40,7 +40,7 @@ class CohortPixelInterceptorTest {
     val coroutineRule = CoroutineTestRule()
 
     @Mock
-    private lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
+    private lateinit var appTrackingProtection: AppTrackingProtection
 
     @Mock
     private lateinit var appBuildConfig: AppBuildConfig
@@ -61,7 +61,7 @@ class CohortPixelInterceptorTest {
 
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
 
-        cohortStore = RealCohortStore(sharedPreferencesProvider, vpnFeaturesRegistry, coroutineRule.testDispatcherProvider, appBuildConfig)
+        cohortStore = RealCohortStore(sharedPreferencesProvider, appTrackingProtection, coroutineRule.testDispatcherProvider, appBuildConfig)
         cohortCalculator = RealCohortCalculator()
         cohortPixelInterceptor = CohortPixelInterceptor(cohortCalculator, cohortStore)
     }

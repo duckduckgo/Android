@@ -35,11 +35,10 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.launchAlwaysOnSystemSettings
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
-import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.R.string
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityVpnOnboardingBinding
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.Command.CheckVPNPermission
@@ -64,7 +63,7 @@ class VpnOnboardingActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
 
-    @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
+    @Inject lateinit var appTrackingProtection: AppTrackingProtection
 
     @Inject lateinit var dispatcherProvider: DispatcherProvider
 
@@ -232,7 +231,7 @@ class VpnOnboardingActivity : DuckDuckGoActivity() {
 
     private fun startVpn() {
         lifecycleScope.launch(dispatcherProvider.io()) {
-            vpnFeaturesRegistry.registerFeature(AppTpVpnFeature.APPTP_VPN)
+            appTrackingProtection.start()
             launchDeviceShieldTrackerActivity()
             viewModel.onAppTpEnabled()
         }

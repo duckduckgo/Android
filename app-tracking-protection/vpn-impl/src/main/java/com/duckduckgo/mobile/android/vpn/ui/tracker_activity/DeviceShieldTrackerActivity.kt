@@ -48,10 +48,9 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.launchAlwaysOnSystemSettings
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerActivityWithEmptyParams
-import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.R
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.apps.ui.ManageRecentAppsProtectionActivity
 import com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionListActivity
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageContract
@@ -98,7 +97,7 @@ class DeviceShieldTrackerActivity :
     lateinit var appBuildConfig: AppBuildConfig
 
     @Inject
-    lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
+    lateinit var appTrackingProtection: AppTrackingProtection
 
     @Inject lateinit var reportBreakageContract: Provider<ReportBreakageContract>
 
@@ -490,14 +489,14 @@ class DeviceShieldTrackerActivity :
     private fun startVPN() {
         quietlyToggleAppTpSwitch(true)
         lifecycleScope.launch(dispatcherProvider.io()) {
-            vpnFeaturesRegistry.registerFeature(AppTpVpnFeature.APPTP_VPN)
+            appTrackingProtection.start()
         }
     }
 
     private fun stopDeviceShield() {
         quietlyToggleAppTpSwitch(false)
         lifecycleScope.launch(dispatcherProvider.io()) {
-            vpnFeaturesRegistry.unregisterFeature(AppTpVpnFeature.APPTP_VPN)
+            appTrackingProtection.stop()
         }
     }
 

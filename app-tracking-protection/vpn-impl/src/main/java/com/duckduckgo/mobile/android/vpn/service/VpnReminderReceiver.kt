@@ -21,8 +21,7 @@ import android.content.Context
 import android.content.Intent
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.di.scopes.ReceiverScope
-import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
+import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import dagger.android.AndroidInjection
 import javax.inject.Inject
@@ -39,7 +38,7 @@ class VpnReminderReceiver : BroadcastReceiver() {
     @Inject
     lateinit var deviceShieldPixels: DeviceShieldPixels
 
-    @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
+    @Inject lateinit var appTrackingProtection: AppTrackingProtection
 
     override fun onReceive(
         context: Context,
@@ -54,7 +53,7 @@ class VpnReminderReceiver : BroadcastReceiver() {
             logcat { "Vpn will restart because the user asked it" }
             deviceShieldPixels.enableFromReminderNotification()
             goAsync(pendingResult) {
-                vpnFeaturesRegistry.registerFeature(AppTpVpnFeature.APPTP_VPN)
+                appTrackingProtection.start()
             }
         } else {
             logcat(LogPriority.WARN) { "VpnReminderReceiver: unknown action" }

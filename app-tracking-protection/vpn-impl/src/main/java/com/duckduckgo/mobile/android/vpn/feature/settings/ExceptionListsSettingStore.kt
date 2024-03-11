@@ -21,8 +21,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureSettings
 import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
-import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
+import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.vpn.feature.AppTpRemoteFeatures
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRule
@@ -42,7 +41,7 @@ import logcat.logcat
 class ExceptionListsSettingStore @Inject constructor(
     private val vpnDatabase: VpnDatabase,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val vpnFeaturesRegistry: VpnFeaturesRegistry,
+    private val appTrackingProtection: AppTrackingProtection,
     private val dispatcherProvider: DispatcherProvider,
 ) : FeatureSettings.Store {
     private val jsonAdapter = Moshi.Builder().build().adapter(JsonConfigModel::class.java)
@@ -69,7 +68,7 @@ class ExceptionListsSettingStore @Inject constructor(
 
                 // Restart VPN now that the lists were updated
                 appCoroutineScope.launch(dispatcherProvider.io()) {
-                    vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
+                    appTrackingProtection.restart()
                 }
             }
         }.onFailure {
