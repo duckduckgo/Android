@@ -314,13 +314,11 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     override suspend fun fetchAndStoreAllData(authToken: String?): Subscription? {
+        authToken?.let { authRepository.saveAuthToken(it) }
         if (!isUserAuthenticated()) return null
         val token = (authToken ?: authRepository.getAccessToken()) ?: return null
         val subscription = subscriptionsService.subscription("Bearer $token")
         val accountData = validateToken(token).account
-        authToken?.let {
-            authRepository.saveAuthToken(it)
-        }
         authRepository.saveExternalId(accountData.externalId)
         authRepository.saveSubscriptionData(subscription, accountData.entitlements.toEntitlements(), accountData.email)
 
@@ -438,7 +436,6 @@ class RealSubscriptionsManager @Inject constructor(
                         AuthToken.Failure("")
                     }
                 }
-
                 else -> {
                     AuthToken.Failure("")
                 }

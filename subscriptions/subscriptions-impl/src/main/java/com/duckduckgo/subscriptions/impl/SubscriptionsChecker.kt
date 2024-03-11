@@ -39,7 +39,6 @@ import java.util.concurrent.TimeUnit.MINUTES
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import logcat.logcat
 
 interface SubscriptionsChecker {
     suspend fun runChecker()
@@ -66,9 +65,7 @@ class RealSubscriptionsChecker @Inject constructor(
     }
 
     override suspend fun runChecker() {
-        logcat { "Marcos Subscription check: Scheduling checker" }
         if (subscriptionsManager.hasSubscription()) {
-            logcat { "Marcos run checker has subscription" }
             PeriodicWorkRequestBuilder<SubscriptionsCheckWorker>(1, HOURS)
                 .addTag(TAG_WORKER_SUBSCRIPTION_CHECK)
                 .setConstraints(
@@ -102,17 +99,13 @@ class SubscriptionsCheckWorker(
     lateinit var workManager: WorkManager
 
     override suspend fun doWork(): Result {
-        logcat { "Marcos check: checking entitlement" }
         return try {
             if (subscriptionsManager.hasSubscription()) {
-                logcat { "Marcos has subscription" }
                 val subscription = subscriptionsManager.fetchAndStoreAllData()
                 if (subscription?.isActive() != true) {
-                    logcat { "Marcos subscription not active" }
                     workManager.cancelAllWorkByTag(TAG_WORKER_SUBSCRIPTION_CHECK)
                 }
             } else {
-                logcat { "Marcos does not have subscription" }
                 workManager.cancelAllWorkByTag(TAG_WORKER_SUBSCRIPTION_CHECK)
             }
             Result.success()
