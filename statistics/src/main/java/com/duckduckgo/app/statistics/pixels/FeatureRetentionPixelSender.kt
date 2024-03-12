@@ -22,7 +22,9 @@ import androidx.core.content.edit
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.api.BrowserFeatureStateReporterPlugin
 import com.duckduckgo.app.statistics.api.RefreshRetentionAtbPlugin
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.LOCALE
 import com.duckduckgo.app.statistics.pixels.Pixel.StatisticsPixelName
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
@@ -41,6 +43,7 @@ class FeatureRetentionPixelSender @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val plugins: PluginPoint<BrowserFeatureStateReporterPlugin>,
+    private val appBuildConfig: AppBuildConfig,
 ) : RefreshRetentionAtbPlugin {
 
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(PIXELS_PREF_FILE, Context.MODE_PRIVATE) }
@@ -69,6 +72,8 @@ class FeatureRetentionPixelSender @Inject constructor(
             parameters[featureState.second] = featureState.first.toBinaryString()
         }
 
+        parameters[LOCALE] = getLocale()
+
         // check if pixel was already sent in the current day
         if (timestamp == null || now > timestamp) {
             pixel.fire(pixelName, parameters, emptyMap())
@@ -79,6 +84,10 @@ class FeatureRetentionPixelSender @Inject constructor(
     private fun getUtcIsoLocalDate(): String {
         // returns YYYY-MM-dd
         return Instant.now().atOffset(ZoneOffset.UTC).format(DateTimeFormatter.ISO_LOCAL_DATE)
+    }
+
+    private fun getLocale(): String {
+        return appBuildConfig.deviceLocale.toLanguageTag()
     }
 
     companion object {
