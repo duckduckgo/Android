@@ -48,10 +48,10 @@ class VpnSharedPreferencesProviderImpl @Inject constructor(
     }
 
     private fun migrateToHarmonyIfNecessary(name: String): SharedPreferences {
-        val origin = context.getSharedPreferences(name, MODE_PRIVATE)
         val destination = context.getHarmonySharedPreferences(name)
 
         if (destination.getBoolean(MIGRATED_TO_HARMONY, false)) return destination
+        val origin = context.getSharedPreferences(name, MODE_PRIVATE)
         logcat { "Performing migration to Harmony" }
 
         val contents = origin.all
