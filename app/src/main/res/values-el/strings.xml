@@ -805,4 +805,12 @@
         <item quantity="other">Θέλετε σίγουρα να διαγράψετε αυτόν τον φάκελο και %1$d αντικείμενα;</item>
     </plurals>
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Θέλετε σίγουρα να διαγράψετε τον σελιδοδείκτη σας για το &lt;b&gt;%1$s&lt;/b&gt;;</string>
+
+    <!-- Sync Favicons -->
+    <string name="sync_fetch_icons_title">Λήψη εικονιδίων σελιδοδείκτη</string>
+    <string name="sync_fetch_icons_subtitle">Αυτόματη λήψη εικονιδίων για τους συγχρονισμένους σελιδοδείκτες σας.</string>
+    <string name="faviconsPromptTitle">Λήψη των εικονιδίων που λείπουν;</string>
+    <string name="faviconsPromptMessage">Θέλετε αυτή η συσκευή να πραγματοποιεί αυτόματη λήψη εικονιδίων για συγχρονισμένους σελιδοδείκτες από τους ιστότοπους με σελιδοδείκτες;</string>
+    <string name="faviconsPromptPrimaryCta">Διατηρήστε ενημερωμένα τα εικονίδια σελιδοδείκτη</string>
+    <string name="faviconsPromptSecondaryCta">Όχι τώρα</string>
 </resources>

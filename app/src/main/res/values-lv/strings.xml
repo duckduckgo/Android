@@ -810,4 +810,12 @@
         <item quantity="other">Vai tiešām vēlies dzēst šo mapi un %1$d vienumus?</item>
     </plurals>
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Vai tiešām vēlies dzēst savu &lt;b&gt;%1$s&lt;/b&gt; grāmatzīmi?</string>
+
+    <!-- Sync Favicons -->
+    <string name="sync_fetch_icons_title">Ienest grāmatzīmju ikonas</string>
+    <string name="sync_fetch_icons_subtitle">Automātiski lejupielādē sinhronizēto grāmatzīmju ikonas.</string>
+    <string name="faviconsPromptTitle">Lejupielādēt trūkstošās ikonas?</string>
+    <string name="faviconsPromptMessage">Vai vēlies, lai šī ierīce automātiski lejupielādētu sinhronizēto grāmatzīmju ikonas no vietnēm, kuru grāmatzīmes ir saglabātas?</string>
+    <string name="faviconsPromptPrimaryCta">Pastāvīgi atjaunināt grāmatzīmju ikonas</string>
+    <string name="faviconsPromptSecondaryCta">Ne tagad</string>
 </resources>

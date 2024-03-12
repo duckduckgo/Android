@@ -139,4 +139,30 @@
     <string name="sync_notification_channel_name">Synchronizace</string>
     <string name="sync_notify_me_title">Oznámení jsou vypnutá</string>
     <string name="sync_notify_me_description">Nech si poslat upozornění v případě, že dojde k chybě při synchronizaci a zálohování.</string>
+
+    <!-- setup errors -->
+    <string name="sync_turn_off_error">Synchronizaci a zálohování nejde vypnout.</string>
+    <string name="sync_edit_device_error">Název zařízení nejde aktualizovat.</string>
+    <string name="sync_remove_device_error">Tohle zařízení nejde ze synchronizace a zálohování odebrat.</string>
+    <string name="sync_delete_data_error">Data na serveru se nedají smazat.</string>
+    <string name="sync_login_authenticated_device_error">"Pokud chceš tahle zařízení spárovat, vypni na jednom z nich synchronizaci a zálohování a na druhém klepni na Synchronizovat s jiným zařízením."</string>
+    <string name="sync_connect_generic_error">Nejde se připojit k serveru.</string>
+    <string name="sync_connect_login_error">Synchronizaci s jiným zařízením nejde provést.</string>
+    <string name="sync_create_account_generic_error">Nejde se připojit k serveru.</string>
+    <string name="sync_invalid_code_error">Ajaj, tenhle kód je neplatný. Zkontroluj, že zadáváš nebo skenuješ správný kód.</string>
+    <string name="sync_recovery_pdf_error">Soubor PDF pro obnovení nejde vytvořit.</string>
+    <string name="sync_dialog_error_ok">Dobře</string>
+    <string name="sync_dialog_error_title">Synchronizace a zálohování</string>
+    <string name="sync_encryption_not_supported_error_title">Zařízení není podporované</string>
+    <string name="sync_encryption_not_supported_error">Funkce Sync &amp; Backup používá end-to-end šifrování a musí mít možnost šifrovat a ukládat data v zařízení. Protože tvoje zařízení nepodporuje šifrované úložiště, funkce Sync &amp; Backup není dostupná.</string>
+
+    <!-- Sync Device Authentication -->
+    <string name="sync_auth_text_for_access">Pro přístup k synchronizaci a zálohování zařízení odemkni.</string>
+    <string name="sync_biometric_prompt_title">Funkce Sync &amp; Backup je nedostupná</string>
+
+    <!-- Sync Settings -->
+    <string name="sync_delete_server_data_dialog_title">Smazat data ze serveru?</string>
+    <string name="sync_delete_server_data_dialog_content">Dojde k odpojení všech zařízení a smazání synchronizovaných dat ze serveru.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Smazat data</string>
+    <string name="sync_delete_server_data_dialog_secondary_button">Zrušit</string>
 </resources>

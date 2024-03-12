@@ -139,4 +139,30 @@
     <string name="sync_notification_channel_name">Synchronisieren</string>
     <string name="sync_notify_me_title">Benachrichtigungen sind deaktiviert</string>
     <string name="sync_notify_me_description">Lass dich benachrichtigen, wenn bei Synchronisieren und speichern ein Fehler auftritt.</string>
+
+    <!-- setup errors -->
+    <string name="sync_turn_off_error">„Synchronisieren und sichern“ kann nicht deaktiviert werden.</string>
+    <string name="sync_edit_device_error">Der Gerätename kann nicht aktualisiert werden.</string>
+    <string name="sync_remove_device_error">Dieses Gerät kann nicht aus „Synchronisieren und sichern“ entfernt werden.</string>
+    <string name="sync_delete_data_error">Daten auf dem Server können nicht gelöscht werden.</string>
+    <string name="sync_login_authenticated_device_error">"Um diese Geräte zu koppeln, deaktiviere „Sync &amp; Backup“ auf einem Gerät und tippe dann auf dem anderen Gerät auf „Mit anderem Gerät synchronisieren“."</string>
+    <string name="sync_connect_generic_error">Es kann keine Verbindung zum Server hergestellt werden.</string>
+    <string name="sync_connect_login_error">Synchronisierung mit einem anderen Gerät nicht möglich.</string>
+    <string name="sync_create_account_generic_error">Es kann keine Verbindung zum Server hergestellt werden.</string>
+    <string name="sync_invalid_code_error">Sorry, dieser Code ist ungültig. Bitte stelle sicher, dass du den richtigen Code eingegeben oder gescannt hast.</string>
+    <string name="sync_recovery_pdf_error">Das Wiederherstellungs-PDF kann nicht erstellt werden.</string>
+    <string name="sync_dialog_error_ok">OK</string>
+    <string name="sync_dialog_error_title">Synchronisieren und sichern</string>
+    <string name="sync_encryption_not_supported_error_title">Gerät nicht unterstützt</string>
+    <string name="sync_encryption_not_supported_error">Sync &amp; Backup ist Ende-zu-Ende-verschlüsselt und muss in der Lage sein, Daten auf deinem Gerät zu verschlüsseln und zu speichern. Da dein Gerät keine verschlüsselte Speicherung unterstützt, ist Sync &amp; Backup nicht verfügbar.</string>
+
+    <!-- Sync Device Authentication -->
+    <string name="sync_auth_text_for_access">Entsperre das Gerät, um auf Sync &amp; Backup zuzugreifen.</string>
+    <string name="sync_biometric_prompt_title">Sync &amp; Backup gesperrt</string>
+
+    <!-- Sync Settings -->
+    <string name="sync_delete_server_data_dialog_title">Serverdaten löschen?</string>
+    <string name="sync_delete_server_data_dialog_content">Alle Geräte werden getrennt und deine synchronisierten Daten werden vom Server gelöscht.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Daten löschen</string>
+    <string name="sync_delete_server_data_dialog_secondary_button">Abbrechen</string>
 </resources>

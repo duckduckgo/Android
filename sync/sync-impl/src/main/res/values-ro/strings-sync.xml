@@ -139,4 +139,30 @@
     <string name="sync_notification_channel_name">Sincronizare</string>
     <string name="sync_notify_me_title">Notificările sunt dezactivate</string>
     <string name="sync_notify_me_description">Primește o notificare în cazul în care Sincronizare și backup întâmpină o eroare.</string>
+
+    <!-- setup errors -->
+    <string name="sync_turn_off_error">Nu se pot opri Sincronizare și backup.</string>
+    <string name="sync_edit_device_error">Nu se poate actualiza numele dispozitivului.</string>
+    <string name="sync_remove_device_error">Nu se poate elimina acest dispozitiv din Sincronizare și backup.</string>
+    <string name="sync_delete_data_error">Nu se pot șterge datele de pe server.</string>
+    <string name="sync_login_authenticated_device_error">"Pentru a asocia aceste dispozitive, dezactivează Sync &amp; Backup și backup pe un dispozitiv, apoi atinge „Sincronizează cu un alt dispozitiv” pe celălalt dispozitiv."</string>
+    <string name="sync_connect_generic_error">Nu se poate conecta la server.</string>
+    <string name="sync_connect_login_error">Nu se poate sincroniza cu un alt dispozitiv.</string>
+    <string name="sync_create_account_generic_error">Nu se poate conecta la server.</string>
+    <string name="sync_invalid_code_error">Ne pare rău, acest cod este nevalid. Asigură-te că ai completat sau scanat codul corect.</string>
+    <string name="sync_recovery_pdf_error">Nu se poate crea fișierul PDF de recuperare.</string>
+    <string name="sync_dialog_error_ok">OK</string>
+    <string name="sync_dialog_error_title">Sincronizare și copiere de rezervă</string>
+    <string name="sync_encryption_not_supported_error_title">Dispozitivul nu este acceptat</string>
+    <string name="sync_encryption_not_supported_error">Sync &amp; Backup este criptat de la un capăt la altul și trebuie să fie capabil să cripteze și să stocheze datele de pe dispozitivul tău. Deoarece dispozitivul tău nu acceptă stocarea criptată, Sync &amp; Backup nu este disponibil.</string>
+
+    <!-- Sync Device Authentication -->
+    <string name="sync_auth_text_for_access">Deblochează dispozitivul pentru a accesa Sync &amp; Backup.</string>
+    <string name="sync_biometric_prompt_title">Sync &amp; Backup blocat</string>
+
+    <!-- Sync Settings -->
+    <string name="sync_delete_server_data_dialog_title">Ștergi datele serverului?</string>
+    <string name="sync_delete_server_data_dialog_content">Toate dispozitivele vor fi deconectate, iar datele tale sincronizate vor fi șterse de pe server.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Șterge datele</string>
+    <string name="sync_delete_server_data_dialog_secondary_button">Anulare</string>
 </resources>

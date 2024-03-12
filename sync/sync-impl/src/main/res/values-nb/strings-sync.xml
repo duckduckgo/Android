@@ -139,4 +139,30 @@
     <string name="sync_notification_channel_name">Synkr.</string>
     <string name="sync_notify_me_title">Varsler er deaktivert</string>
     <string name="sync_notify_me_description">Få varsel hvis det skulle oppstå en feil ved synkronisering og sikkerhetskopiering.</string>
+
+    <!-- setup errors -->
+    <string name="sync_turn_off_error">Kan ikke slå av Synkronisering og sikkerhetskopiering.</string>
+    <string name="sync_edit_device_error">Kan ikke oppdatere enhetens navn.</string>
+    <string name="sync_remove_device_error">Kan ikke fjerne denne enheten fra Synkronisering og sikkerhetskopiering.</string>
+    <string name="sync_delete_data_error">Kan ikke slette data på serveren.</string>
+    <string name="sync_login_authenticated_device_error">"For å pare disse enhetene må du slå av Sync &amp; Backup på den ene enheten og trykke på «Synkroniser med en annen enhet» på den andre."</string>
+    <string name="sync_connect_generic_error">Kan ikke koble til serveren.</string>
+    <string name="sync_connect_login_error">Kan ikke synkronisere med en annen enhet.</string>
+    <string name="sync_create_account_generic_error">Kan ikke koble til serveren.</string>
+    <string name="sync_invalid_code_error">Beklager, denne koden er ugyldig. Kontroller at riktig kode ble tastet inn eller skannet.</string>
+    <string name="sync_recovery_pdf_error">Kan ikke opprette gjenopprettings-PDF-en.</string>
+    <string name="sync_dialog_error_ok">OK</string>
+    <string name="sync_dialog_error_title">Synkronisering og sikkerhetskopiering</string>
+    <string name="sync_encryption_not_supported_error_title">Enheten støttes ikke</string>
+    <string name="sync_encryption_not_supported_error">Sync &amp; Backup er ende-til-ende-kryptert og må kunne kryptere og lagre data på enheten din. Ettersom enheten din ikke støtter kryptert lagring, er ikke Sync &amp; Backup tilgjengelig.</string>
+
+    <!-- Sync Device Authentication -->
+    <string name="sync_auth_text_for_access">Lås opp enheten for å få tilgang til Sync &amp; Backup.</string>
+    <string name="sync_biometric_prompt_title">Sync &amp; Backup er låst</string>
+
+    <!-- Sync Settings -->
+    <string name="sync_delete_server_data_dialog_title">Vil du slette serverdata?</string>
+    <string name="sync_delete_server_data_dialog_content">Alle enheter blir frakoblet og dine synkroniserte data blir slettet fra serveren.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Slett data</string>
+    <string name="sync_delete_server_data_dialog_secondary_button">Avbryt</string>
 </resources>

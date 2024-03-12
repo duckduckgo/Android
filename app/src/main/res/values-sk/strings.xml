@@ -815,4 +815,12 @@
         <item quantity="other">Naozaj chcete odstrániť tento priečinok a %1$d položiek?</item>
     </plurals>
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Naozaj chcete odstrániť záložku používateľa &lt;b&gt;%1$s&lt;/b&gt;?</string>
+
+    <!-- Sync Favicons -->
+    <string name="sync_fetch_icons_title">Prevzatie ikon záložiek</string>
+    <string name="sync_fetch_icons_subtitle">Automatické preberanie ikon pre synchronizované záložky.</string>
+    <string name="faviconsPromptTitle">Chcete si stiahnuť chýbajúce ikony?</string>
+    <string name="faviconsPromptMessage">Chcete, aby toto zariadenie automaticky preberalo ikony synchronizovaných záložiek z webových stránok so záložkami?</string>
+    <string name="faviconsPromptPrimaryCta">Udržujte ikony záložiek aktualizované</string>
+    <string name="faviconsPromptSecondaryCta">Teraz nie</string>
 </resources>

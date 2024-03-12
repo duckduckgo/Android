@@ -805,4 +805,12 @@
         <item quantity="other">Biztos, hogy törölni akarod ezt a mappát és annak %1$d elemét?</item>
     </plurals>
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Biztosan törlöd a(z) &lt;b&gt;%1$s&lt;/b&gt; könyvjelzőjét?</string>
+
+    <!-- Sync Favicons -->
+    <string name="sync_fetch_icons_title">Könyvjelző ikonok lekérése</string>
+    <string name="sync_fetch_icons_subtitle">Automatikusan letölti a szinkronizált könyvjelzők ikonjait.</string>
+    <string name="faviconsPromptTitle">Hiányzó ikonok letöltése?</string>
+    <string name="faviconsPromptMessage">Szeretnéd, hogy az eszköz automatikusan letöltse a szinkronizált könyvjelzők ikonjait a könyvjelzővel ellátott webhelyekről?</string>
+    <string name="faviconsPromptPrimaryCta">Könyvjelzőikonok frissítése</string>
+    <string name="faviconsPromptSecondaryCta">Most nem</string>
 </resources>

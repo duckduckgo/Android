@@ -805,4 +805,12 @@
         <item quantity="other">Er du sikker på at du vil slette denne mappen og %1$d elementer?</item>
     </plurals>
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Er du sikker på at du vil slette bokmerket for &lt;b&gt;%1$s&lt;/b&gt;?</string>
+
+    <!-- Sync Favicons -->
+    <string name="sync_fetch_icons_title">Hent bokmerkeikoner</string>
+    <string name="sync_fetch_icons_subtitle">Last ned ikoner automatisk for dine synkroniserte bokmerker.</string>
+    <string name="faviconsPromptTitle">Vil du laste ned manglende ikoner?</string>
+    <string name="faviconsPromptMessage">Vil du at denne enheten skal automatisk laste ned ikoner for synkroniserte bokmerker fra bokmerkede nettsteder?</string>
+    <string name="faviconsPromptPrimaryCta">Hold bokmerkeikonene oppdatert</string>
+    <string name="faviconsPromptSecondaryCta">Ikke nå</string>
 </resources>

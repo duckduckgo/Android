@@ -139,4 +139,30 @@
     <string name="sync_notification_channel_name">Sincronizar</string>
     <string name="sync_notify_me_title">Las notificaciones están desactivadas</string>
     <string name="sync_notify_me_description">Recibe una notificación en caso de que Sincronización y copia de seguridad encuentre un error.</string>
+
+    <!-- setup errors -->
+    <string name="sync_turn_off_error">No se puede desactivar Sincronización y copia de seguridad.</string>
+    <string name="sync_edit_device_error">No se puede actualizar el nombre del dispositivo.</string>
+    <string name="sync_remove_device_error">No se puede eliminar este dispositivo de Sincronización y copia de seguridad.</string>
+    <string name="sync_delete_data_error">No se pueden eliminar los datos en el servidor.</string>
+    <string name="sync_login_authenticated_device_error">"Para emparejar estos dispositivos, desactiva Sync &amp; Backup en un dispositivo y luego pulsa «Sincronizar con otro dispositivo» en el otro dispositivo."</string>
+    <string name="sync_connect_generic_error">No se puede conectar al servidor.</string>
+    <string name="sync_connect_login_error">No se puede sincronizar con otro dispositivo.</string>
+    <string name="sync_create_account_generic_error">No se puede conectar al servidor.</string>
+    <string name="sync_invalid_code_error">Lo sentimos, este código no es válido. Asegúrate de haber introducido o escaneado el código correcto.</string>
+    <string name="sync_recovery_pdf_error">No se puede crear el PDF de recuperación.</string>
+    <string name="sync_dialog_error_ok">De acuerdo</string>
+    <string name="sync_dialog_error_title">Sincronización y copia de seguridad</string>
+    <string name="sync_encryption_not_supported_error_title">Dispositivo no compatible</string>
+    <string name="sync_encryption_not_supported_error">Sync &amp; Backup está cifrado de extremo a extremo y debe poder cifrar y almacenar datos en tu dispositivo. Debido a que tu dispositivo no admite almacenamiento cifrado, Sync &amp; Backup no está disponible.</string>
+
+    <!-- Sync Device Authentication -->
+    <string name="sync_auth_text_for_access">Desbloquea el dispositivo para acceder a Sync &amp; Backup.</string>
+    <string name="sync_biometric_prompt_title">Sync &amp; Backup bloqueado</string>
+
+    <!-- Sync Settings -->
+    <string name="sync_delete_server_data_dialog_title">¿Eliminar datos del servidor?</string>
+    <string name="sync_delete_server_data_dialog_content">Todos los dispositivos se desconectarán y tus datos sincronizados se eliminarán del servidor.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Eliminar datos</string>
+    <string name="sync_delete_server_data_dialog_secondary_button">Cancelar</string>
 </resources>

@@ -805,4 +805,12 @@
         <item quantity="other">Vuoi davvero eliminare questa cartella e %1$d elementi?</item>
     </plurals>
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Eliminare il tuo segnalibro per &lt;b&gt;%1$s&lt;/b&gt;?</string>
+
+    <!-- Sync Favicons -->
+    <string name="sync_fetch_icons_title">Recupera icone segnalibro</string>
+    <string name="sync_fetch_icons_subtitle">Scarica automaticamente le icone dei segnalibri sincronizzati.</string>
+    <string name="faviconsPromptTitle">Scaricare le icone mancanti?</string>
+    <string name="faviconsPromptMessage">Vuoi che questo dispositivo scarichi automaticamente le icone per i segnalibri sincronizzati dai siti web preferiti?</string>
+    <string name="faviconsPromptPrimaryCta">Tieni aggiornate le icone dei segnalibri</string>
+    <string name="faviconsPromptSecondaryCta">Non adesso</string>
 </resources>

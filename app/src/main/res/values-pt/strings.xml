@@ -805,4 +805,12 @@
         <item quantity="other">Tem a certeza de que quer eliminar esta pasta e %1$d itens?</item>
     </plurals>
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Tens a certeza de que queres eliminar o marcador para &lt;b&gt;%1$s&lt;/b&gt;?</string>
+
+    <!-- Sync Favicons -->
+    <string name="sync_fetch_icons_title">A obter ícones dos marcadores</string>
+    <string name="sync_fetch_icons_subtitle">Transferir automaticamente ícones para os teus marcadores sincronizados.</string>
+    <string name="faviconsPromptTitle">Transferir ícones em falta?</string>
+    <string name="faviconsPromptMessage">Queres que este dispositivo transfira automaticamente os ícones dos marcadores sincronizados dos sites nos marcadores?</string>
+    <string name="faviconsPromptPrimaryCta">Manter os ícones dos marcadores atualizados</string>
+    <string name="faviconsPromptSecondaryCta">Agora não</string>
 </resources>

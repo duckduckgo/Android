@@ -815,4 +815,12 @@
         <item quantity="other">Ali ste prepričani, da želite izbrisati to mapo in %1$d elementov?</item>
     </plurals>
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Ali ste prepričani, da želite izbrisati zaznamek za &lt;b&gt;%1$s&lt;/b&gt;?</string>
+
+    <!-- Sync Favicons -->
+    <string name="sync_fetch_icons_title">Pridobivanje ikon zaznamkov</string>
+    <string name="sync_fetch_icons_subtitle">Samodejno prenesite ikone za sinhronizirane zaznamke.</string>
+    <string name="faviconsPromptTitle">Želite prenesti manjkajoče ikone?</string>
+    <string name="faviconsPromptMessage">Ali želite, da naprava samodejno prenese ikone za sinhronizirane zaznamke s spletnih mest z zaznamki?</string>
+    <string name="faviconsPromptPrimaryCta">Posodobi ikone zaznamkov</string>
+    <string name="faviconsPromptSecondaryCta">Ne zdaj</string>
 </resources>

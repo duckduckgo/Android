@@ -805,4 +805,12 @@
         <item quantity="other">Kas soovid kindlasti kustutada selle kausta ja %1$d üksust?</item>
     </plurals>
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Kas soovid järjehoidja &lt;b&gt;%1$s&lt;/b&gt; kindlasti kustutada?</string>
+
+    <!-- Sync Favicons -->
+    <string name="sync_fetch_icons_title">Too järjehoidjaikoonid</string>
+    <string name="sync_fetch_icons_subtitle">Laadi automaatselt alla oma sünkroonitud järjehoidjate ikoonid.</string>
+    <string name="faviconsPromptTitle">Kas laadida alla puuduvad ikoonid?</string>
+    <string name="faviconsPromptMessage">Kas soovite, et see seade laadiks automaatselt alla sünkroonitud järjehoidjate ikoone järjehoidjatesse lisatud veebilehtedelt?</string>
+    <string name="faviconsPromptPrimaryCta">Hoidke järjehoidjate ikoonid ajakohastatud</string>
+    <string name="faviconsPromptSecondaryCta">Mitte praegu</string>
 </resources>
