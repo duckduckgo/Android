@@ -47,10 +47,10 @@
 
             <LinearLayout
                 android:id="@+id/cardContainer"
-                style="@style/Widget.DuckDuckGo.DaxDialog.Content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:padding="@dimen/keyline_5">
 
                 <FrameLayout
                     android:layout_width="match_parent"
@@ -81,7 +81,8 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginTop="@dimen/keyline_4"
-                    android:adjustViewBounds="true" />
+                    android:adjustViewBounds="true"
+                    android:visibility="gone" />
 
                 <com.duckduckgo.common.ui.view.text.DaxTextView
                     android:id="@+id/experimentDialogContentText"
@@ -95,7 +96,6 @@
                     android:id="@+id/primaryCta"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/keyline_5"
                     android:layout_marginTop="@dimen/keyline_5"
                     android:alpha="0"
                     android:text="@string/onboardingLetsDoItButton"

@@ -38,8 +38,8 @@ class ExtendedOnboardingExperimentVariantManagerImpl @Inject constructor(
 
     override fun setExperimentVariants() {
         val variants = listOf(
-            VariantConfig("ms", 1.0, VariantFilters(locale = listOf("en_US", "en_GB", "en_CA", "en_IN", "en_AU"))),
-            VariantConfig("mt", 1.0, VariantFilters(locale = listOf("en_US", "en_GB", "en_CA", "en_IN", "en_AU"))),
+            VariantConfig("ms", 0.0, VariantFilters(locale = listOf("en_US", "en_GB", "en_CA", "en_IN", "en_AU"))),
+            VariantConfig("mt", 0.0, VariantFilters(locale = listOf("en_US", "en_GB", "en_CA", "en_IN", "en_AU"))),
         )
         variantManager.updateVariants(variants)
     }
