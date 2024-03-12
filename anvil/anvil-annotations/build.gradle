@@ -32,5 +32,7 @@ kotlin {
 
 dependencies {
     implementation Google.dagger
+    api Square.retrofit2.converter.moshi
+    api "com.squareup.moshi:moshi-kotlin:_"
 }
 
