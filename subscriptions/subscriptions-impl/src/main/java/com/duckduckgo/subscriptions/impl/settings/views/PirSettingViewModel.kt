@@ -26,8 +26,6 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.subscriptions.api.Product.PIR
 import com.duckduckgo.subscriptions.api.Subscriptions
-import com.duckduckgo.subscriptions.api.Subscriptions.EntitlementStatus.Found
-import com.duckduckgo.subscriptions.api.Subscriptions.EntitlementStatus.NotFound
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.Command.OpenPir
 import javax.inject.Inject
@@ -36,6 +34,9 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
@@ -65,13 +66,12 @@ class PirSettingViewModel @Inject constructor(
 
     override fun onResume(owner: LifecycleOwner) {
         super.onResume(owner)
-        viewModelScope.launch(dispatcherProvider.io()) {
-            subscriptions.getEntitlementStatus(PIR).also {
-                if (it.isSuccess) {
-                    _viewState.emit(viewState.value.copy(hasSubscription = it.getOrDefault(NotFound) == Found))
-                }
-            }
-        }
+
+        subscriptions.getEntitlementStatus()
+            .onEach {
+                _viewState.emit(viewState.value.copy(hasSubscription = it.contains(PIR)))
+            }.flowOn(dispatcherProvider.main())
+            .launchIn(viewModelScope)
     }
 
     private fun sendCommand(newCommand: Command) {

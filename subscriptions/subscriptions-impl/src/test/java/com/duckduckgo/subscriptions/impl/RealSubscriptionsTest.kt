@@ -17,14 +17,10 @@
 package com.duckduckgo.subscriptions.impl
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.Product.NetP
-import com.duckduckgo.subscriptions.api.Subscriptions.EntitlementStatus.Found
-import com.duckduckgo.subscriptions.api.Subscriptions.EntitlementStatus.NotFound
-import com.duckduckgo.subscriptions.impl.SubscriptionStatus.AUTO_RENEWABLE
-import com.duckduckgo.subscriptions.impl.repository.Entitlement
-import com.duckduckgo.subscriptions.impl.repository.Subscription
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -62,40 +58,22 @@ class RealSubscriptionsTest {
     }
 
     @Test
-    fun whenSubscriptionDataHasEntitlementThenReturnFound() = runTest {
-        whenever(mockSubscriptionsManager.getSubscription()).thenReturn(
-            Subscription(
-                "productId",
-                10000L,
-                100000L,
-                AUTO_RENEWABLE,
-                "google",
-                listOf(Entitlement(NetP.value, NetP.value)),
-            ),
-        )
+    fun whenSubscriptionDataHasEntitlementThenReturnList() = runTest {
+        whenever(mockSubscriptionsManager.entitlements).thenReturn(flowOf(listOf(NetP)))
 
-        subscriptions.getEntitlementStatus(NetP).also {
-            assertTrue(it.isSuccess)
-            assertEquals(Found, it.getOrNull())
+        subscriptions.getEntitlementStatus().test {
+            assertTrue(awaitItem().isNotEmpty())
+            cancelAndConsumeRemainingEvents()
         }
     }
 
     @Test
-    fun whenSubscriptionDataHasNoEntitlementThenReturnNotFound() = runTest {
-        whenever(mockSubscriptionsManager.getSubscription()).thenReturn(
-            Subscription(
-                "productId",
-                10000L,
-                100000L,
-                AUTO_RENEWABLE,
-                "google",
-                listOf(Entitlement(NetP.value, "name")),
-            ),
-        )
+    fun whenSubscriptionDataHasNoEntitlementThenReturnEmptyList() = runTest {
+        whenever(mockSubscriptionsManager.entitlements).thenReturn(flowOf(emptyList()))
 
-        subscriptions.getEntitlementStatus(Product.ITR).also {
-            assertTrue(it.isSuccess)
-            assertEquals(NotFound, it.getOrNull())
+        subscriptions.getEntitlementStatus().test {
+            assertTrue(awaitItem().isEmpty())
+            cancelAndConsumeRemainingEvents()
         }
     }
 }
