@@ -20,8 +20,7 @@ import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
-import com.duckduckgo.networkprotection.impl.NetPVpnFeature
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
@@ -49,13 +48,13 @@ interface NetPFeatureRemover {
 class NetPFeatureRemoverImpl @Inject constructor(
     private val netpStores: PluginPoint<NetPFeatureRemover.NetPStoreRemovalPlugin>,
     private val dispatcherProvider: DispatcherProvider,
-    private val vpnFeaturesRegistry: VpnFeaturesRegistry,
+    private val networkProtectionState: NetworkProtectionState,
 ) : NetPFeatureRemover {
     override suspend fun removeFeature() = withContext(dispatcherProvider.io()) {
         netpStores.getPlugins().forEach {
             logcat { "NetP clearing state for ${it.javaClass}" }
             it.clearStore()
         }
-        vpnFeaturesRegistry.unregisterFeature(NetPVpnFeature.NETP_VPN)
+        networkProtectionState.stop()
     }
 }

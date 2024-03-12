@@ -16,8 +16,7 @@
 
 package com.duckduckgo.networkprotection.impl.exclusion
 
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
-import com.duckduckgo.networkprotection.impl.NetPVpnFeature
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
@@ -31,7 +30,7 @@ import org.mockito.kotlin.whenever
 class RealNetworkProtectionExclusionListTest {
 
     @Mock
-    private lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
+    private lateinit var networkProtectionState: NetworkProtectionState
 
     @Mock
     private lateinit var netPExclusionListRepository: NetPExclusionListRepository
@@ -41,13 +40,13 @@ class RealNetworkProtectionExclusionListTest {
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
-        testee = RealNetworkProtectionExclusionList(netPExclusionListRepository, vpnFeaturesRegistry)
+        testee = RealNetworkProtectionExclusionList(netPExclusionListRepository, networkProtectionState)
     }
 
     @Test
     fun whenNetpIsEnabledAndAppIsInExcludedPackagesThenReturnIsExcludedTrue() = runTest {
         whenever(netPExclusionListRepository.getExcludedAppPackages()).thenReturn(listOf("com.test.app"))
-        whenever(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(true)
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
 
         assertTrue(testee.isExcluded("com.test.app"))
     }
@@ -55,7 +54,7 @@ class RealNetworkProtectionExclusionListTest {
     @Test
     fun whenNetpIsDisabledAndAppIsInExcludedPackagesThenReturnIsExcludedFalse() = runTest {
         whenever(netPExclusionListRepository.getExcludedAppPackages()).thenReturn(listOf("com.test.app"))
-        whenever(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(false)
+        whenever(networkProtectionState.isEnabled()).thenReturn(false)
 
         assertFalse(testee.isExcluded("com.test.app"))
     }
@@ -63,7 +62,7 @@ class RealNetworkProtectionExclusionListTest {
     @Test
     fun whenNetpIsEnabledAndAppIsNotInExcludedPackagesThenReturnIsExcludedFalse() = runTest {
         whenever(netPExclusionListRepository.getExcludedAppPackages()).thenReturn(emptyList())
-        whenever(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(true)
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
 
         assertFalse(testee.isExcluded("com.test.app"))
     }
@@ -71,7 +70,7 @@ class RealNetworkProtectionExclusionListTest {
     @Test
     fun whenNetpIsNotEnabledAndAppIsNotInExcludedPackagesThenReturnIsExcludedFalse() = runTest {
         whenever(netPExclusionListRepository.getExcludedAppPackages()).thenReturn(emptyList())
-        whenever(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(false)
+        whenever(networkProtectionState.isEnabled()).thenReturn(false)
 
         assertFalse(testee.isExcluded("com.test.app"))
     }
