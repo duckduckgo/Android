@@ -53,6 +53,7 @@ dependencies {
     implementation KotlinX.coroutines.core
     implementation Square.retrofit2.retrofit
     implementation Square.retrofit2.converter.moshi
+    implementation "com.squareup.moshi:moshi-kotlin:_"
 
     // Lottie
     implementation "com.airbnb.android:lottie:_"
