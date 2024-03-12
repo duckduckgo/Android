@@ -96,9 +96,10 @@ class SavedSitesModule {
         savedSitesEntitiesDao: SavedSitesEntitiesDao,
         savedSitesRelationsDao: SavedSitesRelationsDao,
         favoritesDelegate: FavoritesDelegate,
+        relationsReconciler: RelationsReconciler,
         coroutineDispatcher: DispatcherProvider = DefaultDispatcherProvider(),
     ): SavedSitesRepository {
-        return RealSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao, favoritesDelegate, coroutineDispatcher)
+        return RealSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao, favoritesDelegate, relationsReconciler, coroutineDispatcher)
     }
 
     @Provides

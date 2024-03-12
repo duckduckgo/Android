@@ -270,9 +270,10 @@ class RealSyncSavedSitesRepository(
     }
 
     override fun getFolderDiff(folderId: String): SyncFolderChildren {
-        val entities = savedSitesEntitiesDao.allEntitiesInFolderSync(folderId)
-        val deletedChildren = entities.filter { it.deleted }.map { it.entityId }
-        val childrenLocal = entities.filterNot { it.deleted }.map { it.entityId }
+        val entitiesId = savedSitesRelationsDao.relationsByFolderId(folderId).map { it.entityId }
+        val existingEntities = savedSitesEntitiesDao.allEntitiesInFolderSync(folderId)
+        val deletedChildren = existingEntities.filter { it.deleted }.map { it.entityId }
+        val childrenLocal = entitiesId.filterNot { deletedChildren.contains(it) }
 
         val metadata = savedSitesSyncMetadataDao.get(folderId)
             // no response stored for this folder, add children in insert modifier too
