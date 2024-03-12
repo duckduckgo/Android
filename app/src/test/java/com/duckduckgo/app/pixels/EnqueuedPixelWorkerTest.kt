@@ -118,6 +118,19 @@ class EnqueuedPixelWorkerTest {
     }
 
     @Test
+    fun whenOnStartAndInCustomTabAndAppLaunchThenDoNotSendAppLaunchPixel() {
+        whenever(customTabDetector.isCustomTab()).thenReturn(true)
+        whenever(unsentForgetAllPixelStore.pendingPixelCountClearData).thenReturn(1)
+        whenever(webViewVersionProvider.getMajorVersion()).thenReturn("91")
+        whenever(defaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
+
+        enqueuedPixelWorker.onCreate(lifecycleOwner)
+        enqueuedPixelWorker.onStart(lifecycleOwner)
+
+        verify(pixel, never()).fire(AppPixelName.APP_LAUNCH)
+    }
+
+    @Test
     fun whenOnStartAndAppLaunchAndShouldCollectOnAppLaunchIsTrueThenSendAppLaunchPixelWithFullWebViewVersion() {
         whenever(unsentForgetAllPixelStore.pendingPixelCountClearData).thenReturn(1)
         whenever(webViewVersionProvider.getMajorVersion()).thenReturn("91")

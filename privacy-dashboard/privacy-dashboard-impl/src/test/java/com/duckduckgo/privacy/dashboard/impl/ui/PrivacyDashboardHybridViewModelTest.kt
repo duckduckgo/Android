@@ -30,6 +30,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
+import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardCustomTabPixelNames
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.*
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchReportBrokenSite
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
@@ -177,6 +178,24 @@ class PrivacyDashboardHybridViewModelTest {
         verify(privacyProtectionsPopupExperimentExternalPixels).tryReportProtectionsToggledFromPrivacyDashboard(protectionsEnabled = false)
         verify(pixel).fire(PRIVACY_DASHBOARD_ALLOWLIST_REMOVE, params, type = COUNT)
         verify(privacyProtectionsPopupExperimentExternalPixels).tryReportProtectionsToggledFromPrivacyDashboard(protectionsEnabled = true)
+    }
+
+    @Test
+    fun whenOnPrivacyProtectionClickedAndProtectionsEnabledAndOpenedFromCustomTabThenFireCustomTabSpecificPixel() = runTest {
+        val site = site(siteAllowed = false)
+        testee.onSiteChanged(site)
+        testee.onPrivacyProtectionsClicked(enabled = true, dashboardOpenedFromCustomTab = true)
+        coroutineRule.testScope.advanceUntilIdle()
+        verify(pixel).fire(PrivacyDashboardCustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_ALLOW_LIST_REMOVE)
+    }
+
+    @Test
+    fun whenOnPrivacyProtectionClickedAndProtectionsDisabledAndOpenedFromCustomTabThenFireCustomTabSpecificPixel() = runTest {
+        val site = site(siteAllowed = false)
+        testee.onSiteChanged(site)
+        testee.onPrivacyProtectionsClicked(enabled = false, dashboardOpenedFromCustomTab = true)
+        coroutineRule.testScope.advanceUntilIdle()
+        verify(pixel).fire(PrivacyDashboardCustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_ALLOW_LIST_ADD)
     }
 
     private fun site(

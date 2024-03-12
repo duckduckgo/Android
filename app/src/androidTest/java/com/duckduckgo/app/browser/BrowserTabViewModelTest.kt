@@ -60,6 +60,7 @@ import com.duckduckgo.app.browser.commands.Command.ShowPrivacyProtectionDisabled
 import com.duckduckgo.app.browser.commands.Command.ShowPrivacyProtectionEnabledConfirmation
 import com.duckduckgo.app.browser.commands.NavigationCommand
 import com.duckduckgo.app.browser.commands.NavigationCommand.Navigate
+import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
@@ -1744,6 +1745,24 @@ class BrowserTabViewModelTest {
         assertCommandIssued<ShowPrivacyProtectionEnabledConfirmation> {
             assertEquals("www.example.com", this.domain)
         }
+    }
+
+    @Test
+    fun whenInCustomTabAndPrivacyProtectionMenuClickedAndSiteNotInAllowListThenSiteAddedToAllowListAndPixelSentAndPageRefreshed() = runTest {
+        whenever(mockUserAllowListRepository.isDomainInUserAllowList("www.example.com")).thenReturn(false)
+        loadUrl("http://www.example.com/home.html")
+        testee.onPrivacyProtectionMenuClicked(clickedFromCustomTab = true)
+        verify(mockUserAllowListRepository).addDomainToUserAllowList("www.example.com")
+        verify(mockPixel).fire(CustomTabPixelNames.CUSTOM_TABS_MENU_DISABLE_PROTECTIONS_ALLOW_LIST_ADD)
+    }
+
+    @Test
+    fun whenInCustomTabAndPrivacyProtectionMenuClickedForAllowListedSiteThenSiteRemovedFromAllowListAndPixelSentAndPageRefreshed() = runTest {
+        whenever(mockUserAllowListRepository.isDomainInUserAllowList("www.example.com")).thenReturn(true)
+        loadUrl("http://www.example.com/home.html")
+        testee.onPrivacyProtectionMenuClicked(clickedFromCustomTab = true)
+        verify(mockUserAllowListRepository).removeDomainFromUserAllowList("www.example.com")
+        verify(mockPixel).fire(CustomTabPixelNames.CUSTOM_TABS_MENU_DISABLE_PROTECTIONS_ALLOW_LIST_REMOVE)
     }
 
     @Test

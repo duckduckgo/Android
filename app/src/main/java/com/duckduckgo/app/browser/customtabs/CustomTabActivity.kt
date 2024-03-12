@@ -50,7 +50,7 @@ class CustomTabActivity : DuckDuckGoActivity() {
 
         Timber.d("TAG_CUSTOM_TAB_IMPL onCreate called in CustomTabActivity")
 
-        val tabId = "CustomTab-${UUID.randomUUID()}"
+        val tabId = "$CUSTOM_TAB_NAME_PREFIX${UUID.randomUUID()}"
         val fragment = BrowserTabFragment.newInstanceForCustomTab(
             tabId = tabId,
             query = intent.intentText,
@@ -86,5 +86,7 @@ class CustomTabActivity : DuckDuckGoActivity() {
                 putExtra(Intent.EXTRA_TEXT, text)
             }
         }
+
+        const val CUSTOM_TAB_NAME_PREFIX = "CustomTab-"
     }
 }

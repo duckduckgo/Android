@@ -108,6 +108,7 @@ import com.duckduckgo.app.browser.commands.Command
 import com.duckduckgo.app.browser.commands.Command.ShowBackNavigationHistory
 import com.duckduckgo.app.browser.commands.NavigationCommand
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
+import com.duckduckgo.app.browser.customtabs.CustomTabActivity.Companion.CUSTOM_TAB_NAME_PREFIX
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.databinding.ContentSiteLocationPermissionDialogBinding
 import com.duckduckgo.app.browser.databinding.ContentSystemLocationPermissionDialogBinding
@@ -355,8 +356,8 @@ class BrowserTabFragment :
     lateinit var blobConverterInjector: BlobConverterInjector
 
     val tabId get() = requireArguments()[TAB_ID_ARG] as String
-    val tabToolbarColor get() = requireArguments()[TAB_TOOLBAR_COLOR_ARG] as Int? ?: 0
-    val tabDisplayedInCustomTabScreen get() = requireArguments()[TAB_DISPLAYED_IN_CUSTOM_TAB_SCREEN_ARG] as Boolean? ?: false
+    private val tabToolbarColor get() = requireArguments().getInt(TAB_TOOLBAR_COLOR_ARG)
+    private val tabDisplayedInCustomTabScreen get() = requireArguments().getBoolean(TAB_DISPLAYED_IN_CUSTOM_TAB_SCREEN_ARG)
 
     @Inject
     lateinit var userAgentProvider: UserAgentProvider
@@ -818,39 +819,7 @@ class BrowserTabFragment :
         initPrivacyProtectionsPopup()
 
         if (tabDisplayedInCustomTabScreen) {
-            omnibar.omniBarContainer.hide()
-            omnibar.fireIconMenu.hide()
-            omnibar.tabsMenu.hide()
-
-            omnibar.toolbar.background = ColorDrawable(tabToolbarColor)
-            omnibar.toolbarContainer.background = ColorDrawable(tabToolbarColor)
-
-            omnibar.customTabToolbarContainer.show()
-
-            omnibar.customTabCloseIcon.show()
-            omnibar.customTabCloseIcon.setOnClickListener {
-                requireActivity().finish()
-            }
-
-            omnibar.customTabShieldIcon.show()
-            omnibar.customTabShieldIcon.setOnClickListener {
-                val params = PrivacyDashboardHybridScreen.PrivacyDashboardHybridWithTabIdParam(tabId)
-                val intent = globalActivityStarter.startIntent(requireContext(), params)
-                intent?.let { intentPd -> startActivity(intentPd) }
-                pixel.fire(CustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_OPENED)
-            }
-
-            omnibar.customTabDomain.text = viewModel.url?.extractDomain()
-            omnibar.customTabDomain.show()
-
-            val foregroundColor = calculateForegroundColor(tabToolbarColor)
-            omnibar.customTabCloseIcon.setColorFilter(foregroundColor)
-            omnibar.customTabDomain.setTextColor(foregroundColor)
-            omnibar.customTabTitle.setTextColor(foregroundColor)
-            omnibar.browserMenuImageView.setColorFilter(foregroundColor)
-
-            requireActivity().window.navigationBarColor = tabToolbarColor
-            requireActivity().window.statusBarColor = tabToolbarColor
+            configureCustomTab()
         }
 
         decorator.decorateWithFeatures()
@@ -881,6 +850,42 @@ class BrowserTabFragment :
             (dialog as EditSavedSiteDialogFragment).listener = viewModel
             dialog.deleteBookmarkListener = viewModel
         }
+    }
+
+    private fun configureCustomTab() {
+        omnibar.omniBarContainer.hide()
+        omnibar.fireIconMenu.hide()
+        omnibar.tabsMenu.hide()
+
+        omnibar.toolbar.background = ColorDrawable(tabToolbarColor)
+        omnibar.toolbarContainer.background = ColorDrawable(tabToolbarColor)
+
+        omnibar.customTabToolbarContainer.show()
+
+        omnibar.customTabCloseIcon.show()
+        omnibar.customTabCloseIcon.setOnClickListener {
+            requireActivity().finish()
+        }
+
+        omnibar.customTabShieldIcon.show()
+        omnibar.customTabShieldIcon.setOnClickListener { _ ->
+            val params = PrivacyDashboardHybridScreen.PrivacyDashboardHybridWithTabIdParam(tabId)
+            val intent = globalActivityStarter.startIntent(requireContext(), params)
+            intent?.let { startActivity(it) }
+            pixel.fire(CustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_OPENED)
+        }
+
+        omnibar.customTabDomain.text = viewModel.url?.extractDomain()
+        omnibar.customTabDomain.show()
+
+        val foregroundColor = calculateForegroundColor(tabToolbarColor)
+        omnibar.customTabCloseIcon.setColorFilter(foregroundColor)
+        omnibar.customTabDomain.setTextColor(foregroundColor)
+        omnibar.customTabTitle.setTextColor(foregroundColor)
+        omnibar.browserMenuImageView.setColorFilter(foregroundColor)
+
+        requireActivity().window.navigationBarColor = tabToolbarColor
+        requireActivity().window.statusBarColor = tabToolbarColor
     }
 
     private fun calculateForegroundColor(color: Int): Int {
@@ -1119,7 +1124,7 @@ class BrowserTabFragment :
     }
 
     private fun isActiveCustomTab(): Boolean {
-        return tabId.startsWith("CustomTab-") && fragmentIsVisible()
+        return tabId.startsWith(CUSTOM_TAB_NAME_PREFIX) && fragmentIsVisible()
     }
 
     private fun fragmentIsVisible(): Boolean {
@@ -3294,11 +3299,10 @@ class BrowserTabFragment :
                 }
 
                 onMenuItemClicked(menuBinding.openInDdgBrowserMenuItem) {
-                    val url = viewModel.url
-                    val i = Intent(Intent.ACTION_VIEW)
-                    i.setData(Uri.parse(url))
-                    startActivity(i)
-                    pixel.fire(CustomTabPixelNames.CUSTOM_TABS_OPEN_IN_DDG)
+                    viewModel.url?.let {
+                        launchCustomTabUrlInDdg(it)
+                        pixel.fire(CustomTabPixelNames.CUSTOM_TABS_OPEN_IN_DDG)
+                    }
                 }
             }
             omnibar.browserMenu.setOnClickListener {
@@ -3306,6 +3310,13 @@ class BrowserTabFragment :
                 hideKeyboardImmediately()
                 launchTopAnchoredPopupMenu()
             }
+        }
+
+        private fun launchCustomTabUrlInDdg(url: String) {
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                data = Uri.parse(url)
+            }
+            startActivity(intent)
         }
 
         private fun launchTopAnchoredPopupMenu() {
@@ -3365,11 +3376,8 @@ class BrowserTabFragment :
             renderIfChanged(viewState, lastSeenPrivacyShieldViewState) {
                 if (viewState.privacyShield != UNKNOWN) {
                     lastSeenPrivacyShieldViewState = viewState
-                    if (isActiveCustomTab()) {
-                        privacyShieldView.setAnimationView(omnibar.customTabShieldIcon, viewState.privacyShield)
-                    } else {
-                        privacyShieldView.setAnimationView(omnibar.shieldIcon, viewState.privacyShield)
-                    }
+                    val animationViewHolder = if (isActiveCustomTab()) omnibar.customTabShieldIcon else omnibar.shieldIcon
+                    privacyShieldView.setAnimationView(animationViewHolder, viewState.privacyShield)
                     cancelTrackersAnimation()
                 }
             }
