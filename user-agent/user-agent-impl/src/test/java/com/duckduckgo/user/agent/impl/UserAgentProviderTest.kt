@@ -17,11 +17,7 @@
 package com.duckduckgo.user.agent.impl
 
 import android.net.Uri
-import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
-import androidx.webkit.WebSettingsCompat
-import androidx.webkit.WebViewFeature
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -37,11 +33,11 @@ import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.UserAgent
 import com.duckduckgo.user.agent.api.UserAgentInterceptor
 import com.duckduckgo.user.agent.api.UserAgentProvider
+import com.duckduckgo.user.agent.impl.remoteconfig.ClientBrandHintFeature
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -59,7 +55,7 @@ class UserAgentProviderTest {
     var coroutinesTestRule = CoroutineTestRule()
 
     private lateinit var testee: UserAgentProvider
-    private val context = InstrumentationRegistry.getInstrumentation().targetContext
+
     private var deviceInfo: DeviceInfo = mock()
     private var userAgent: UserAgent = mock()
     private var toggle: FeatureToggle = mock()
@@ -453,37 +449,6 @@ class UserAgentProviderTest {
         assertTrue("$actual does not match expected regex", ValidationRegex.closestDesktopArch.matches(actual))
     }
 
-    @Test
-    fun whenHintFeatureDisabledThenMetadataContainsAndroid() {
-        if (WebViewFeature.isFeatureSupported(WebViewFeature.USER_AGENT_METADATA)) {
-            val settings = WebView(context).settings
-            testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
-            testee.setHintHeader(settings)
-
-            val metadata = WebSettingsCompat.getUserAgentMetadata(settings)
-            val result = metadata.brandVersionList.firstOrNull {
-                it.brand.contains("Android")
-            }
-            assertNotNull(result)
-        }
-    }
-
-    @Test
-    fun whenHintFeatureEnabledThenMetadataContainsDuckDuckGo() {
-        if (WebViewFeature.isFeatureSupported(WebViewFeature.USER_AGENT_METADATA)) {
-            whenever(clientBrandHintFeature.self().isEnabled()).thenReturn(true)
-            val settings = WebView(context).settings
-            testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
-            testee.setHintHeader(settings)
-
-            val metadata = WebSettingsCompat.getUserAgentMetadata(settings)
-            val result = metadata.brandVersionList.firstOrNull {
-                it.brand.contains("DuckDuckGo")
-            }
-            assertNotNull(result)
-        }
-    }
-
     private fun getUserAgentProvider(
         defaultUserAgent: String,
         device: DeviceInfo,
@@ -497,7 +462,6 @@ class UserAgentProviderTest {
             toggle,
             FakeUserAllowListRepo(),
             statisticsDataStore,
-            clientBrandHintFeature,
         )
     }
 

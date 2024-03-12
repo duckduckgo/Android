@@ -18,6 +18,7 @@ plugins {
     id 'com.android.library'
     id 'kotlin-android'
     id 'com.squareup.anvil'
+    id 'com.google.devtools.ksp' version "$ksp_version"
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
@@ -29,10 +30,10 @@ dependencies {
     implementation project(':di')
     implementation project(':common-utils')
     implementation project(':browser-api')
-    implementation project(':user-agent-api')
     implementation project(':feature-toggles-api')
     implementation project(':privacy-config-api')
     implementation project(':app-build-config-api')
+    implementation project(':user-agent-api')
     implementation project(':statistics')
 
     implementation AndroidX.appCompat
@@ -45,6 +46,12 @@ dependencies {
     implementation Square.retrofit2.converter.moshi
     implementation "com.squareup.moshi:moshi-kotlin:_"
 
+    // Room
+    implementation AndroidX.room.runtime
+    implementation AndroidX.room.ktx
+    testImplementation AndroidX.room.testing
+    ksp AndroidX.room.compiler
+
     // Testing dependencies
     testImplementation project(':feature-toggles-test')
     testImplementation project(':common-test')
@@ -55,6 +62,8 @@ dependencies {
     testImplementation AndroidX.test.ext.junit
     testImplementation Square.retrofit2.converter.moshi
     testImplementation Testing.junit4
+    testImplementation AndroidX.archCore.testing
+    androidTestImplementation AndroidX.archCore.testing
 }
 
 anvil {
@@ -63,5 +72,8 @@ anvil {
 
 
 android {
-  namespace 'com.duckduckgo.user.agent.impl'
+    namespace 'com.duckduckgo.user.agent.impl'
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
+    }
 }

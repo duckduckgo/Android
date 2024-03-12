@@ -83,7 +83,6 @@ class WebViewRequestInterceptorTest {
         fakeToggle,
         fakeUserAllowListRepository,
         FakeStatisticsDataStore(),
-        mock(),
     )
 
     private var webView: WebView = mock()
