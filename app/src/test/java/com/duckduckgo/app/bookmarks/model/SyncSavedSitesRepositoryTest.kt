@@ -58,6 +58,7 @@ import java.time.ZoneOffset
 import junit.framework.TestCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Assert
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -147,6 +148,11 @@ class SyncSavedSitesRepositoryTest {
         )
 
         givenInitialFolderState()
+    }
+
+    @After
+    fun after() {
+        appDatabase.close()
     }
 
     @Test
@@ -240,6 +246,27 @@ class SyncSavedSitesRepositoryTest {
         Assert.assertEquals(folderChildren.insert.size, 0)
         Assert.assertEquals(folderChildren.remove.size, 1)
         Assert.assertEquals(folderChildren.remove, listOf(entityRemoved.entityId))
+    }
+
+    @Test
+    fun whenFolderMetadataPresentAndLocalContentHasMissingRelationsThenFolderDiffDoesNotContainDeletedItem() = runTest {
+        val entities = BookmarkTestUtils.givenSomeBookmarks(5)
+        savedSitesEntitiesDao.insertList(entities.dropLast(1))
+
+        val relation = BookmarkTestUtils.givenFolderWithContent(folder.id, entities)
+        savedSitesRelationsDao.insertList(relation)
+
+        val serverEntities = entities.map { it.entityId }
+        val childrenJSON = stringListAdapter.toJson(serverEntities)
+        val metadata = SavedSitesSyncMetadataEntity(folder.id, childrenJSON, "[]")
+        savedSitesMetadataDao.addOrUpdate(metadata)
+
+        val folderChildren = repository.getFolderDiff(folder.id)
+
+        Assert.assertEquals(entities.map { it.entityId }, folderChildren.current)
+        Assert.assertEquals(5, folderChildren.current.size)
+        Assert.assertEquals(0, folderChildren.insert.size)
+        Assert.assertEquals(0, folderChildren.remove.size)
     }
 
     @Test
