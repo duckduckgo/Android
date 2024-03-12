@@ -79,6 +79,8 @@ interface NetworkProtectionState {
      */
     fun getConnectionStateFlow(): Flow<ConnectionState>
 
+    suspend fun wasEnabledDuringBeta(): Boolean
+
     enum class ConnectionState {
         CONNECTED,
         CONNECTING,

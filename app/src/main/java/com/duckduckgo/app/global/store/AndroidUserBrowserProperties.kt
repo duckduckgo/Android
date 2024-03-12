@@ -82,6 +82,6 @@ class AndroidUserBrowserProperties(
     }
 
     override suspend fun networkProtectionOnboarded(): Boolean {
-        return networkProtectionState.isOnboarded()
+        return networkProtectionState.isOnboarded() || networkProtectionState.wasEnabledDuringBeta()
     }
 }
