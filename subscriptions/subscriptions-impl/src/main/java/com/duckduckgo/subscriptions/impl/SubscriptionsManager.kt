@@ -32,6 +32,8 @@ import com.duckduckgo.subscriptions.impl.SubscriptionStatus.Unknown
 import com.duckduckgo.subscriptions.impl.SubscriptionsData.*
 import com.duckduckgo.subscriptions.impl.billing.PlayBillingManager
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState
+import com.duckduckgo.subscriptions.impl.billing.RetryPolicy
+import com.duckduckgo.subscriptions.impl.billing.retry
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
 import com.duckduckgo.subscriptions.impl.services.AuthService
@@ -47,9 +49,9 @@ import com.squareup.moshi.JsonEncodingException
 import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -249,36 +251,26 @@ class RealSubscriptionsManager @Inject constructor(
         packageName: String,
         purchaseToken: String,
     ) {
-        var retryCompleted = false
-
-        suspend fun retry(
-            times: Int = 3,
-            initialDelay: Long = 500, // .5 seconds
-            maxDelay: Long = 1_500, // 1.5 seconds
-            factor: Double = 2.0,
-            block: suspend () -> Unit,
-        ) {
-            var currentDelay = initialDelay
-            repeat(times) {
-                try {
-                    if (!retryCompleted) {
-                        block()
-                    } else {
-                        return@retry
-                    }
-                } catch (t: Throwable) {
-                    logcat { "Subs: error in confirmation retry" }
-                }
-                delay(currentDelay)
-                currentDelay = (currentDelay * factor).toLong().coerceAtMost(maxDelay)
-            }
-        }
-
         _currentPurchaseState.emit(CurrentPurchase.InProgress)
 
-        retry {
-            retryCompleted = attemptConfirmPurchase(packageName, purchaseToken)
-            logcat { "Subs: retry success: $retryCompleted" }
+        var retryCompleted = false
+
+        retry(
+            retryPolicy = RetryPolicy(
+                retryCount = 2,
+                initialDelay = 500.milliseconds,
+                maxDelay = 1500.milliseconds,
+                delayIncrementFactor = 2.0,
+            ),
+        ) {
+            try {
+                retryCompleted = attemptConfirmPurchase(packageName, purchaseToken)
+                logcat { "Subs: retry success: $retryCompleted" }
+                retryCompleted
+            } catch (e: Throwable) {
+                logcat { "Subs: error in confirmation retry" }
+                false
+            }
         }
 
         if (!retryCompleted) {

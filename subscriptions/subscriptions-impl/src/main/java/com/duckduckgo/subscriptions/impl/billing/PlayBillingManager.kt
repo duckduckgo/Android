@@ -25,6 +25,10 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LIST_OF_PRODUCTS
+import com.duckduckgo.subscriptions.impl.billing.BillingError.ERROR
+import com.duckduckgo.subscriptions.impl.billing.BillingError.NETWORK_ERROR
+import com.duckduckgo.subscriptions.impl.billing.BillingError.SERVICE_DISCONNECTED
+import com.duckduckgo.subscriptions.impl.billing.BillingError.SERVICE_UNAVAILABLE
 import com.duckduckgo.subscriptions.impl.billing.BillingInitResult.Failure
 import com.duckduckgo.subscriptions.impl.billing.BillingInitResult.Success
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState.Canceled
@@ -37,12 +41,18 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
+import java.util.EnumSet
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import logcat.logcat
 
 interface PlayBillingManager {
@@ -67,6 +77,8 @@ class RealPlayBillingManager @Inject constructor(
     private val billingClient: BillingClientAdapter,
 ) : PlayBillingManager, MainProcessLifecycleObserver {
 
+    private val connectionMutex = Mutex()
+    private var connectionJob: Job? = null
     private var billingFlowInProgress = false
 
     // PurchaseState
@@ -80,7 +92,7 @@ class RealPlayBillingManager @Inject constructor(
     override var purchaseHistory = emptyList<PurchaseHistoryRecord>()
 
     override fun onCreate(owner: LifecycleOwner) {
-        coroutineScope.launch { connect() }
+        connectAsyncWithRetry()
     }
 
     override fun onResume(owner: LifecycleOwner) {
@@ -95,20 +107,47 @@ class RealPlayBillingManager @Inject constructor(
         }
     }
 
-    private suspend fun connect() {
-        val result = billingClient.connect(
-            purchasesListener = { result -> onPurchasesUpdated(result) },
-            disconnectionListener = { onBillingClientDisconnected() },
-        )
+    private fun connectAsyncWithRetry() {
+        if (connectionJob?.isActive == true) return
 
-        when (result) {
-            Success -> {
-                loadProducts()
-                loadPurchaseHistory()
-            }
+        connectionJob = coroutineScope.launch {
+            connect(
+                retryPolicy = RetryPolicy(
+                    retryCount = 5,
+                    initialDelay = 1.seconds,
+                    maxDelay = 5.minutes,
+                    delayIncrementFactor = 4.0,
+                ),
+            )
+        }
+    }
 
-            Failure -> {
-                logcat { "Service error" }
+    private suspend fun connect(retryPolicy: RetryPolicy? = null) = retry(retryPolicy) {
+        connectionMutex.withLock {
+            if (billingClient.ready) return@withLock true
+
+            val result = billingClient.connect(
+                purchasesListener = { result -> onPurchasesUpdated(result) },
+                disconnectionListener = { onBillingClientDisconnected() },
+            )
+
+            when (result) {
+                Success -> {
+                    loadProducts()
+                    loadPurchaseHistory()
+                    true // success, don't retry
+                }
+
+                is Failure -> {
+                    logcat { "Service error" }
+                    val recoverable = result.billingError in EnumSet.of(
+                        ERROR,
+                        SERVICE_DISCONNECTED,
+                        SERVICE_UNAVAILABLE,
+                        NETWORK_ERROR,
+                    )
+                    !recoverable // complete without retry if error is not recoverable
+                }
             }
         }
     }
@@ -121,6 +160,7 @@ class RealPlayBillingManager @Inject constructor(
     ) {
         if (!billingClient.ready) {
             logcat { "Service not ready" }
+            connect()
         }
 
         val launchBillingFlowResult = billingClient.launchBillingFlow(
@@ -172,6 +212,7 @@ class RealPlayBillingManager @Inject constructor(
 
     private fun onBillingClientDisconnected() {
         logcat { "Service disconnected" }
+        connectAsyncWithRetry()
     }
 
     private suspend fun loadProducts() {
@@ -184,17 +225,12 @@ class RealPlayBillingManager @Inject constructor(
             }
 
             is SubscriptionsResult.Failure -> {
-                logcat { "onProductDetailsResponse: ${result.billingResponseCode} ${result.debugMessage}" }
+                logcat { "onProductDetailsResponse: ${result.billingError} ${result.debugMessage}" }
             }
         }
     }
 
     private suspend fun loadPurchaseHistory() {
-        if (!billingClient.ready) {
-            // Handle client not ready
-            return
-        }
-
         when (val result = billingClient.getSubscriptionsPurchaseHistory()) {
             is SubscriptionsPurchaseHistoryResult.Success -> {
                 purchaseHistory = result.history

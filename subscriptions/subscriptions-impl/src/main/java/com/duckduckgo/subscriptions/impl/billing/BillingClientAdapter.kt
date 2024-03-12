@@ -42,14 +42,14 @@ interface BillingClientAdapter {
 
 sealed class BillingInitResult {
     data object Success : BillingInitResult()
-    data object Failure : BillingInitResult()
+    data class Failure(val billingError: BillingError) : BillingInitResult()
 }
 
 sealed class SubscriptionsResult {
     data class Success(val products: List<ProductDetails>) : SubscriptionsResult()
 
     data class Failure(
-        val billingResponseCode: Int? = null,
+        val billingError: BillingError? = null,
         val debugMessage: String? = null,
     ) : SubscriptionsResult()
 }
@@ -73,4 +73,21 @@ sealed class PurchasesUpdateResult {
     data object PurchaseAbsent : PurchasesUpdateResult()
     data object UserCancelled : PurchasesUpdateResult()
     data object Failure : PurchasesUpdateResult()
+}
+
+enum class BillingError {
+    SERVICE_TIMEOUT,
+    FEATURE_NOT_SUPPORTED,
+    SERVICE_DISCONNECTED,
+    USER_CANCELED,
+    SERVICE_UNAVAILABLE,
+    BILLING_UNAVAILABLE,
+    ITEM_UNAVAILABLE,
+    DEVELOPER_ERROR,
+    ERROR,
+    ITEM_ALREADY_OWNED,
+    ITEM_NOT_OWNED,
+    NETWORK_ERROR,
+    UNKNOWN_ERROR,
+    ;
 }
