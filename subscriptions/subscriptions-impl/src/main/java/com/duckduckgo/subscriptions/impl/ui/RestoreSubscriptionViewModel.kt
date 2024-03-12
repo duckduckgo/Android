@@ -76,7 +76,7 @@ class RestoreSubscriptionViewModel @Inject constructor(
                         }
                         else -> {
                             pixelSender.reportRestoreUsingStoreFailureOther()
-                            command.send(Error(response.message))
+                            command.send(Error)
                         }
                     }
                 }
@@ -95,6 +95,6 @@ class RestoreSubscriptionViewModel @Inject constructor(
         object RestoreFromEmail : Command()
         object Success : Command()
         object SubscriptionNotFound : Command()
-        data class Error(val message: String) : Command()
+        data object Error : Command()
     }
 }

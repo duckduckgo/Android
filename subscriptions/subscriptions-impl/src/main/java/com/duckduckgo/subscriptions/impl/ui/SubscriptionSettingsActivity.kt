@@ -120,12 +120,15 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun renderView(viewState: ViewState) {
-        val duration = if (viewState.duration is Monthly) { getString(string.monthly) } else { getString(string.yearly) }
+        binding.subscriptionDuration.setText(
+            if (viewState.duration is Monthly) string.monthlySubscription else string.yearlySubscription,
+        )
+
         val status = when (viewState.status) {
             is AutoRenewable -> getString(string.renews)
             else -> getString(string.expires)
         }
-        binding.description.text = getString(string.subscriptionsData, duration, status, viewState.date)
+        binding.description.text = getString(string.subscriptionsData, status, viewState.date)
 
         when (viewState.platform?.lowercase()) {
             "apple", "ios" ->

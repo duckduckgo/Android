@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<!--
+  ~ Copyright (c) 2024 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="@dimen/keyline_5"
+    android:layout_marginVertical="@dimen/keyline_4"
+    android:background="@drawable/background_expandable_menu"
+    android:orientation="vertical"
+    android:paddingHorizontal="@dimen/keyline_5"
+    android:paddingTop="@dimen/keyline_5"
+    android:paddingBottom="@dimen/keyline_4"
+    tools:showIn="@layout/activity_add_device">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/emailIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginTop="1dp"
+            app:srcCompat="@drawable/ic_email_16"
+            tools:ignore="ContentDescription" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/emailTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_2"
+            android:text="@string/email"
+            app:textType="primary"
+            app:typography="h3" />
+
+    </LinearLayout>
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/emailAddress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_2"
+        android:visibility="gone"
+        app:textType="primary"
+        app:typography="h3"
+        tools:text="john.smith@duck.com"
+        tools:visibility="visible" />
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/emailSubtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_2"
+        app:textType="secondary"
+        app:typography="body2"
+        tools:text="@string/addEmail" />
+
+    <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+        android:id="@+id/emailButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_3"
+        tools:text="@string/addEmailText" />
+
+</LinearLayout>

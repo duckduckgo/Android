@@ -56,7 +56,6 @@ class RestoreSubscriptionViewModelTest {
             viewModel.restoreFromStore()
             val result = awaitItem()
             assertTrue(result is Error)
-            assertEquals("error", (result as Error).message)
         }
     }
 

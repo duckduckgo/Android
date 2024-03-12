@@ -20,9 +20,10 @@ import android.annotation.SuppressLint
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.subscriptions.api.Product.ITR
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.api.Subscriptions.EntitlementStatus.Found
@@ -30,7 +31,6 @@ import com.duckduckgo.subscriptions.api.Subscriptions.EntitlementStatus.NotFound
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingViewModel.Command.OpenItr
 import javax.inject.Inject
-import javax.inject.Provider
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -40,6 +40,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
+@ContributesViewModel(ViewScope::class)
 class ItrSettingViewModel @Inject constructor(
     private val subscriptions: Subscriptions,
     private val dispatcherProvider: DispatcherProvider,
@@ -76,20 +77,6 @@ class ItrSettingViewModel @Inject constructor(
     private fun sendCommand(newCommand: Command) {
         viewModelScope.launch {
             command.send(newCommand)
-        }
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    class Factory @Inject constructor(
-        private val itrSettingViewModel: Provider<ItrSettingViewModel>,
-    ) : ViewModelProvider.NewInstanceFactory() {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return with(modelClass) {
-                when {
-                    isAssignableFrom(ItrSettingViewModel::class.java) -> itrSettingViewModel.get()
-                    else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
-                }
-            } as T
         }
     }
 }
