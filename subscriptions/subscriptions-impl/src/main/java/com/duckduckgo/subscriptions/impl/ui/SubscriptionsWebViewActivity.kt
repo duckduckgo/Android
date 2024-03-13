@@ -44,7 +44,6 @@ import com.duckduckgo.app.browser.SpecialUrlDetector
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
-import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
 import com.duckduckgo.common.ui.view.show
@@ -85,6 +84,7 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.GoToNetP
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.GoToPIR
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.RestoreSubscription
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SendJsEvent
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SendResponseToJs
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SubscriptionSelected
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView
@@ -393,6 +393,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     private fun processCommand(command: Command) {
         when (command) {
             is BackToSettings -> backToSettings()
+            is SendJsEvent -> sendJsEvent(command.event)
             is SendResponseToJs -> sendResponseToJs(command.data)
             is SubscriptionSelected -> selectSubscription(command.id)
             is ActivateOnAnotherDevice -> activateOnAnotherDevice()
@@ -401,6 +402,10 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             is GoToPIR -> goToPIR()
             is GoToNetP -> goToNetP(command.activityParams)
         }
+    }
+
+    private fun sendJsEvent(event: SubscriptionEventData) {
+        subscriptionJsMessaging.sendSubscriptionEvent(event)
     }
 
     private fun goToITR() {
@@ -424,31 +429,16 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
 
     private fun renderPurchaseState(purchaseState: PurchaseStateView) {
         when (purchaseState) {
-            is PurchaseStateView.InProgress -> {
-                binding.webview.gone()
-                binding.progress.show()
+            is PurchaseStateView.InProgress, PurchaseStateView.Inactive -> {
+                // NO OP
             }
-
-            is PurchaseStateView.Inactive -> {
-                binding.webview.show()
-                binding.progress.gone()
-            }
-
             is PurchaseStateView.Success -> {
-                binding.webview.show()
-                binding.progress.gone()
                 onPurchaseSuccess(purchaseState.subscriptionEventData)
             }
-
             is PurchaseStateView.Recovered -> {
-                binding.webview.show()
-                binding.progress.gone()
                 onPurchaseRecovered()
             }
-
             is PurchaseStateView.Failure -> {
-                binding.webview.show()
-                binding.progress.gone()
                 onPurchaseFailure(purchaseState.message)
             }
         }

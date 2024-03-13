@@ -534,6 +534,30 @@ class RealSubscriptionsManagerTest {
     }
 
     @Test
+    fun whenPurchaseCanceledThenEmitCanceled() = runTest {
+        val flowTest: MutableSharedFlow<PurchaseState> = MutableSharedFlow()
+        whenever(playBillingManager.purchaseState).thenReturn(flowTest)
+
+        val manager = RealSubscriptionsManager(
+            authService,
+            subscriptionsService,
+            authRepository,
+            playBillingManager,
+            emailManager,
+            context,
+            TestScope(),
+            coroutineRule.testDispatcherProvider,
+            pixelSender,
+        )
+
+        manager.currentPurchaseState.test {
+            flowTest.emit(PurchaseState.Canceled)
+            assertTrue(awaitItem() is CurrentPurchase.Canceled)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenGetAccessTokenIfUserIsAuthenticatedThenReturnSuccess() = runTest {
         givenUserIsAuthenticated()
 

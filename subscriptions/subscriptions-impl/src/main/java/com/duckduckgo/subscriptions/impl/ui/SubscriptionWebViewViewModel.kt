@@ -86,7 +86,14 @@ class SubscriptionWebViewViewModel @Inject constructor(
     fun start() {
         subscriptionsManager.currentPurchaseState.onEach {
             val state = when (it) {
-                is CurrentPurchase.Failure -> Failure(it.message)
+                is CurrentPurchase.Canceled -> {
+                    enablePurchaseButton()
+                    Inactive
+                }
+                is CurrentPurchase.Failure -> {
+                    enablePurchaseButton()
+                    Failure(it.message)
+                }
                 is CurrentPurchase.Success -> {
                     subscriptionsChecker.runChecker()
                     Success(
@@ -116,6 +123,17 @@ class SubscriptionWebViewViewModel @Inject constructor(
             else -> {
                 // NOOP
             }
+        }
+    }
+
+    private fun enablePurchaseButton() {
+        viewModelScope.launch {
+            val response = SubscriptionEventData(
+                featureName = PURCHASE_COMPLETED_FEATURE_NAME,
+                subscriptionName = PURCHASE_COMPLETED_SUBSCRIPTION_NAME,
+                params = JSONObject(PURCHASE_CANCELED_JSON),
+            )
+            command.send(SendJsEvent(response))
         }
     }
 
@@ -248,6 +266,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
 
     sealed class Command {
         data object BackToSettings : Command()
+        data class SendJsEvent(val event: SubscriptionEventData) : Command()
         data class SendResponseToJs(val data: JsCallbackData) : Command()
         data class SubscriptionSelected(val id: String) : Command()
         data object ActivateOnAnotherDevice : Command()
@@ -261,5 +280,6 @@ class SubscriptionWebViewViewModel @Inject constructor(
         const val PURCHASE_COMPLETED_FEATURE_NAME = "useSubscription"
         const val PURCHASE_COMPLETED_SUBSCRIPTION_NAME = "onPurchaseUpdate"
         const val PURCHASE_COMPLETED_JSON = """{ type: "completed" }"""
+        const val PURCHASE_CANCELED_JSON = """{ type: "canceled" }"""
     }
 }

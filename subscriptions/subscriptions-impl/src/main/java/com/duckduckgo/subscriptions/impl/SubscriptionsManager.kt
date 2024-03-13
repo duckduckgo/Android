@@ -212,6 +212,9 @@ class RealSubscriptionsManager @Inject constructor(
             playBillingManager.purchaseState.collect {
                 when (it) {
                     is PurchaseState.Purchased -> checkPurchase(it.packageName, it.purchaseToken)
+                    is PurchaseState.Canceled -> {
+                        _currentPurchaseState.emit(CurrentPurchase.Canceled)
+                    }
                     else -> {
                         // NOOP
                     }
@@ -545,5 +548,6 @@ sealed class CurrentPurchase {
     data object InProgress : CurrentPurchase()
     data object Success : CurrentPurchase()
     data object Recovered : CurrentPurchase()
+    data object Canceled : CurrentPurchase()
     data class Failure(val message: String) : CurrentPurchase()
 }
