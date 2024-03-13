@@ -19,7 +19,7 @@ package com.duckduckgo.app.browser.menu
 import android.content.Context
 import android.view.LayoutInflater
 import androidx.core.view.isVisible
-import com.duckduckgo.app.browser.BrowserTabViewModel.BrowserViewState
+import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.PopupWindowBrowserMenuBinding
 import com.duckduckgo.common.ui.menu.PopupMenu
@@ -41,8 +41,8 @@ class BrowserPopupMenu(
     }
 
     fun renderState(
-        browserShowing: Boolean,
-        viewState: BrowserViewState,
+            browserShowing: Boolean,
+            viewState: BrowserViewState,
     ) {
         contentView.apply {
             binding.backMenuItem.isEnabled = viewState.canGoBack
