@@ -18,7 +18,6 @@ package com.duckduckgo.subscriptions.impl
 
 import android.app.Activity
 import android.content.Context
-import com.android.billingclient.api.ProductDetails
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -32,6 +31,9 @@ import com.duckduckgo.subscriptions.impl.SubscriptionStatus.INACTIVE
 import com.duckduckgo.subscriptions.impl.SubscriptionStatus.NOT_AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.impl.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.impl.SubscriptionStatus.WAITING
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTION
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN
 import com.duckduckgo.subscriptions.impl.billing.PlayBillingManager
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState
 import com.duckduckgo.subscriptions.impl.billing.RetryPolicy
@@ -73,13 +75,16 @@ import retrofit2.HttpException
 interface SubscriptionsManager {
 
     /**
-     * Launches the purchase flow for a given product details and token
+     * Returns available purchase options retrieved from Play Store
+     */
+    suspend fun getSubscriptionOffer(): SubscriptionOffer?
+
+    /**
+     * Launches the purchase flow for a given plan id
      */
     suspend fun purchase(
         activity: Activity,
-        productDetails: ProductDetails,
-        offerToken: String,
-        isReset: Boolean = false,
+        planId: String,
     )
 
     /**
@@ -398,11 +403,24 @@ class RealSubscriptionsManager @Inject constructor(
         data class Failure(val message: String) : RecoverSubscriptionResult()
     }
 
+    override suspend fun getSubscriptionOffer(): SubscriptionOffer? =
+        playBillingManager.products
+            .find { it.productId == BASIC_SUBSCRIPTION }
+            ?.run {
+                val monthlyOffer = subscriptionOfferDetails?.find { it.basePlanId == MONTHLY_PLAN } ?: return@run null
+                val yearlyOffer = subscriptionOfferDetails?.find { it.basePlanId == YEARLY_PLAN } ?: return@run null
+
+                SubscriptionOffer(
+                    monthlyPlanId = monthlyOffer.basePlanId,
+                    monthlyFormattedPrice = monthlyOffer.pricingPhases.pricingPhaseList.first().formattedPrice,
+                    yearlyPlanId = yearlyOffer.basePlanId,
+                    yearlyFormattedPrice = yearlyOffer.pricingPhases.pricingPhaseList.first().formattedPrice,
+                )
+            }
+
     override suspend fun purchase(
         activity: Activity,
-        productDetails: ProductDetails,
-        offerToken: String,
-        isReset: Boolean,
+        planId: String,
     ) {
         try {
             _currentPurchaseState.emit(CurrentPurchase.PreFlowInProgress)
@@ -435,8 +453,7 @@ class RealSubscriptionsManager @Inject constructor(
             withContext(dispatcherProvider.main()) {
                 playBillingManager.launchBillingFlow(
                     activity = activity,
-                    productDetails = productDetails,
-                    offerToken = offerToken,
+                    planId = planId,
                     externalId = authRepository.getAccount()!!.externalId,
                 )
             }
@@ -561,3 +578,10 @@ sealed class CurrentPurchase {
     data object Canceled : CurrentPurchase()
     data class Failure(val message: String) : CurrentPurchase()
 }
+
+data class SubscriptionOffer(
+    val monthlyPlanId: String,
+    val monthlyFormattedPrice: String,
+    val yearlyPlanId: String,
+    val yearlyFormattedPrice: String,
+)

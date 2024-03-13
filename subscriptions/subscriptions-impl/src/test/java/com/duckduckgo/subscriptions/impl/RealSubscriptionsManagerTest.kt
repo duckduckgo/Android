@@ -3,6 +3,9 @@ package com.duckduckgo.subscriptions.impl
 import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
+import com.android.billingclient.api.ProductDetails
+import com.android.billingclient.api.ProductDetails.PricingPhase
+import com.android.billingclient.api.ProductDetails.PricingPhases
 import com.android.billingclient.api.PurchaseHistoryRecord
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -10,6 +13,7 @@ import com.duckduckgo.subscriptions.api.Product.NetP
 import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.RecoverSubscriptionResult
 import com.duckduckgo.subscriptions.impl.SubscriptionStatus.*
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN
 import com.duckduckgo.subscriptions.impl.billing.PlayBillingManager
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
@@ -214,7 +218,7 @@ class RealSubscriptionsManagerTest {
     fun whenPurchaseFlowIfUserNotAuthenticatedAndNotPurchaseStoredThenCreateAccount() = runTest {
         givenUserIsNotAuthenticated()
 
-        subscriptionsManager.purchase(mock(), mock(), "", false)
+        subscriptionsManager.purchase(mock(), planId = "")
 
         verify(authService).createAccount(any())
     }
@@ -224,7 +228,7 @@ class RealSubscriptionsManagerTest {
         whenever(emailManager.getToken()).thenReturn("emailToken")
         givenUserIsNotAuthenticated()
 
-        subscriptionsManager.purchase(mock(), mock(), "", false)
+        subscriptionsManager.purchase(mock(), planId = "")
 
         verify(authService).createAccount("Bearer emailToken")
     }
@@ -235,7 +239,7 @@ class RealSubscriptionsManagerTest {
         givenCreateAccountFails()
 
         subscriptionsManager.currentPurchaseState.test {
-            subscriptionsManager.purchase(mock(), mock(), "", false)
+            subscriptionsManager.purchase(mock(), planId = "")
             assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
             assertTrue(awaitItem() is CurrentPurchase.Failure)
             cancelAndConsumeRemainingEvents()
@@ -249,9 +253,9 @@ class RealSubscriptionsManagerTest {
         givenValidateTokenSucceedsNoEntitlements()
         givenAccessTokenSucceeds()
 
-        subscriptionsManager.purchase(mock(), mock(), "", false)
+        subscriptionsManager.purchase(mock(), planId = "")
 
-        verify(playBillingManager).launchBillingFlow(any(), any(), any(), externalId = eq("1234"))
+        verify(playBillingManager).launchBillingFlow(any(), any(), externalId = eq("1234"))
     }
 
     @Test
@@ -262,9 +266,9 @@ class RealSubscriptionsManagerTest {
         givenSubscriptionSucceedsWithoutEntitlements(status = "Expired")
         givenAccessTokenSucceeds()
 
-        subscriptionsManager.purchase(mock(), mock(), "", false)
+        subscriptionsManager.purchase(mock(), "")
 
-        verify(playBillingManager).launchBillingFlow(any(), any(), any(), externalId = eq("1234"))
+        verify(playBillingManager).launchBillingFlow(any(), any(), externalId = eq("1234"))
     }
 
     @Test
@@ -276,9 +280,9 @@ class RealSubscriptionsManagerTest {
         givenAccessTokenSucceeds()
 
         subscriptionsManager.currentPurchaseState.test {
-            subscriptionsManager.purchase(mock(), mock(), "", false)
+            subscriptionsManager.purchase(mock(), planId = "")
             assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
-            verify(playBillingManager, never()).launchBillingFlow(any(), any(), any(), any())
+            verify(playBillingManager, never()).launchBillingFlow(any(), any(), any())
             assertTrue(awaitItem() is CurrentPurchase.Recovered)
             cancelAndConsumeRemainingEvents()
         }
@@ -292,7 +296,7 @@ class RealSubscriptionsManagerTest {
         givenStoreLoginFails()
 
         subscriptionsManager.currentPurchaseState.test {
-            subscriptionsManager.purchase(mock(), mock(), "", false)
+            subscriptionsManager.purchase(mock(), planId = "")
             assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
             assertTrue(awaitItem() is CurrentPurchase.Failure)
             cancelAndConsumeRemainingEvents()
@@ -303,7 +307,7 @@ class RealSubscriptionsManagerTest {
     fun whenPurchaseFlowIfUserAuthenticatedThenValidateToken() = runTest {
         givenUserIsAuthenticated()
 
-        subscriptionsManager.purchase(mock(), mock(), "", false)
+        subscriptionsManager.purchase(mock(), planId = "")
 
         verify(authService).validateToken(any())
     }
@@ -314,9 +318,9 @@ class RealSubscriptionsManagerTest {
         givenSubscriptionSucceedsWithoutEntitlements(status = "Expired")
 
         subscriptionsManager.currentPurchaseState.test {
-            subscriptionsManager.purchase(mock(), mock(), "", false)
+            subscriptionsManager.purchase(mock(), planId = "")
             assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
-            verify(playBillingManager).launchBillingFlow(any(), any(), any(), externalId = eq("1234"))
+            verify(playBillingManager).launchBillingFlow(any(), any(), externalId = eq("1234"))
             assertTrue(awaitItem() is CurrentPurchase.PreFlowFinished)
             cancelAndConsumeRemainingEvents()
         }
@@ -328,7 +332,7 @@ class RealSubscriptionsManagerTest {
         givenValidateTokenFails("failure")
 
         subscriptionsManager.currentPurchaseState.test {
-            subscriptionsManager.purchase(mock(), mock(), "", false)
+            subscriptionsManager.purchase(mock(), planId = "")
             assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
             assertTrue(awaitItem() is CurrentPurchase.Failure)
             cancelAndConsumeRemainingEvents()
@@ -342,7 +346,7 @@ class RealSubscriptionsManagerTest {
         givenSubscriptionSucceedsWithoutEntitlements()
         givenAccessTokenSucceeds()
 
-        subscriptionsManager.purchase(mock(), mock(), "", false)
+        subscriptionsManager.purchase(mock(), planId = "")
         assertEquals("accessToken", authDataStore.accessToken)
         assertEquals("authToken", authDataStore.authToken)
     }
@@ -355,7 +359,7 @@ class RealSubscriptionsManagerTest {
         givenSubscriptionSucceedsWithoutEntitlements()
         givenAccessTokenSucceeds()
 
-        subscriptionsManager.purchase(mock(), mock(), "", false)
+        subscriptionsManager.purchase(mock(), planId = "")
         subscriptionsManager.isSignedIn.test {
             assertTrue(awaitItem())
             assertEquals("accessToken", authDataStore.accessToken)
@@ -754,7 +758,7 @@ class RealSubscriptionsManagerTest {
         givenAccessTokenSucceeds()
 
         subscriptionsManager.currentPurchaseState.test {
-            subscriptionsManager.purchase(mock(), mock(), "", false)
+            subscriptionsManager.purchase(mock(), planId = "")
             assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
             assertTrue(awaitItem() is CurrentPurchase.Recovered)
 
@@ -791,7 +795,7 @@ class RealSubscriptionsManagerTest {
         givenCreateAccountFails()
 
         subscriptionsManager.currentPurchaseState.test {
-            subscriptionsManager.purchase(mock(), mock(), "", false)
+            subscriptionsManager.purchase(mock(), planId = "")
             assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
             assertTrue(awaitItem() is CurrentPurchase.Failure)
 
@@ -800,6 +804,46 @@ class RealSubscriptionsManagerTest {
             verifyNoMoreInteractions(pixelSender)
 
             cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenGetSubscriptionOfferThenReturnValue() = runTest {
+        val productDetails: ProductDetails = mock { productDetails ->
+            whenever(productDetails.productId).thenReturn(SubscriptionsConstants.BASIC_SUBSCRIPTION)
+
+            val pricingPhaseList: List<PricingPhase> = listOf(
+                mock { pricingPhase ->
+                    whenever(pricingPhase.formattedPrice).thenReturn("1$")
+                },
+            )
+
+            val pricingPhases: PricingPhases = mock { pricingPhases ->
+                whenever(pricingPhases.pricingPhaseList).thenReturn(pricingPhaseList)
+            }
+
+            val monthlyOffer: ProductDetails.SubscriptionOfferDetails = mock { offer ->
+                whenever(offer.basePlanId).thenReturn(MONTHLY_PLAN)
+                whenever(offer.pricingPhases).thenReturn(pricingPhases)
+            }
+
+            val yearlyOffer: ProductDetails.SubscriptionOfferDetails = mock { offer ->
+                whenever(offer.basePlanId).thenReturn(YEARLY_PLAN)
+                whenever(offer.pricingPhases).thenReturn(pricingPhases)
+            }
+
+            whenever(productDetails.subscriptionOfferDetails).thenReturn(listOf(monthlyOffer, yearlyOffer))
+        }
+
+        whenever(playBillingManager.products).thenReturn(listOf(productDetails))
+
+        val subscriptionOffer = subscriptionsManager.getSubscriptionOffer()!!
+
+        with(subscriptionOffer) {
+            assertEquals(MONTHLY_PLAN, monthlyPlanId)
+            assertEquals("1$", monthlyFormattedPrice)
+            assertEquals(YEARLY_PLAN, yearlyPlanId)
+            assertEquals("1$", yearlyFormattedPrice)
         }
     }
 
