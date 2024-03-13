@@ -19,7 +19,7 @@ package com.duckduckgo.networkprotection.subscription
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
-import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetPWaitlistInvitedScreenNoParams
+import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenAndEnable
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist
@@ -72,12 +72,9 @@ class NetworkProtectionAccessState @Inject constructor(
 
     override suspend fun getState(): NetPWaitlistState = withContext(dispatcherProvider.io()) {
         if (isTreated()) {
-            val hasValidEntitlementResult = netpSubscriptionManager.hasValidEntitlement()
-            return@withContext if (hasValidEntitlementResult.isSuccess && !hasValidEntitlementResult.getOrDefault(false)) {
+            return@withContext if (!netpSubscriptionManager.hasValidEntitlement()) {
                 // if entitlement check succeeded and no entitlement, reset state and hide access.
                 handleRevokedVPNState()
-                NotUnlocked
-            } else if (hasValidEntitlementResult.isFailure) {
                 NotUnlocked
             } else {
                 InBeta(netPWaitlistRepository.didAcceptWaitlistTerms())
@@ -99,7 +96,7 @@ class NetworkProtectionAccessState @Inject constructor(
                 if (netPWaitlistRepository.didAcceptWaitlistTerms() || networkProtectionState.isOnboarded()) {
                     NetworkProtectionManagementScreenNoParams
                 } else {
-                    NetPWaitlistInvitedScreenNoParams
+                    NetworkProtectionManagementScreenAndEnable(false)
                 }
             }
 
