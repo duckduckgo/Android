@@ -31,7 +31,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.impl.R.string
-import com.duckduckgo.subscriptions.impl.SubscriptionStatus.AutoRenewable
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionSettingsBinding
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
@@ -125,7 +125,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         )
 
         val status = when (viewState.status) {
-            is AutoRenewable -> getString(string.renews)
+            AUTO_RENEWABLE -> getString(string.renews)
             else -> getString(string.expires)
         }
         binding.description.text = getString(string.subscriptionsData, status, viewState.date)

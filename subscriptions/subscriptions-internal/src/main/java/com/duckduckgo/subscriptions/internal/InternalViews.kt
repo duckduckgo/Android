@@ -24,8 +24,6 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.internal.features.api.InternalFeaturePlugin
-import com.duckduckgo.subscriptions.impl.AccessToken
-import com.duckduckgo.subscriptions.impl.SubscriptionsData
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.store.SubscriptionsDataStore
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -66,7 +64,6 @@ class InternalDeleteView @Inject constructor(
 
 @ContributesMultibinding(AppScope::class)
 class CopyDataView @Inject constructor(
-    private val subscriptionsManager: SubscriptionsManager,
     private val subscriptionsDataStore: SubscriptionsDataStore,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     val dispatcherProvider: DispatcherProvider,
@@ -91,18 +88,18 @@ class CopyDataView @Inject constructor(
                 auth
             }
 
-            val access = subscriptionsManager.getAccessToken()
-            val accessToken = if (access is AccessToken.Success) {
-                access.accessToken
-            } else {
+            val access = subscriptionsDataStore.accessToken
+            val accessToken = if (access.isNullOrBlank()) {
                 "No access token found"
+            } else {
+                access
             }
 
-            val external = subscriptionsManager.getSubscriptionData()
-            val externalId = if (external is SubscriptionsData.Success) {
-                external.externalId
-            } else {
+            val external = subscriptionsDataStore.externalId
+            val externalId = if (external.isNullOrBlank()) {
                 "No external id found"
+            } else {
+                external
             }
             val text = "Auth token is $authToken || Access token is $accessToken || External id is $externalId"
 

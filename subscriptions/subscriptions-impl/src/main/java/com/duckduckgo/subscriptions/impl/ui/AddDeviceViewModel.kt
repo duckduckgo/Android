@@ -24,7 +24,6 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.subscriptions.impl.SubscriptionsData
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.AddDeviceViewModel.Command.AddEmail
@@ -60,10 +59,9 @@ class AddDeviceViewModel @Inject constructor(
         super.onResume(owner)
         viewModelScope.launch(dispatcherProvider.io()) {
             var email: String? = null
-            val subs = subscriptionsManager.getSubscriptionData()
-            if (subs is SubscriptionsData.Success) {
-                if (!subs.email.isNullOrBlank()) {
-                    email = subs.email
+            subscriptionsManager.getAccount()?.let {
+                if (!it.email.isNullOrBlank()) {
+                    email = it.email
                 }
             }
             _viewState.emit(viewState.value.copy(email = email))
@@ -74,9 +72,9 @@ class AddDeviceViewModel @Inject constructor(
         pixelSender.reportAddDeviceEnterEmailClick()
 
         viewModelScope.launch(dispatcherProvider.io()) {
-            val subs = subscriptionsManager.getSubscriptionData()
-            if (subs is SubscriptionsData.Success) {
-                if (subs.email.isNullOrBlank()) {
+            val account = subscriptionsManager.getAccount()
+            if (account != null) {
+                if (account.email.isNullOrBlank()) {
                     command.send(AddEmail)
                 } else {
                     command.send(ManageEmail)

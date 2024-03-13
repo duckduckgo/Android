@@ -28,6 +28,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist
 import com.duckduckgo.subscriptions.impl.CurrentPurchase
 import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
+import com.duckduckgo.subscriptions.impl.SubscriptionsChecker
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ITR
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN
@@ -65,6 +66,7 @@ import org.json.JSONObject
 class SubscriptionWebViewViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val subscriptionsManager: SubscriptionsManager,
+    private val subscriptionsChecker: SubscriptionsChecker,
     private val subscriptionsRepository: SubscriptionsRepository,
     private val networkProtectionWaitlist: NetworkProtectionWaitlist,
     private val pixelSender: SubscriptionPixelSender,
@@ -85,13 +87,16 @@ class SubscriptionWebViewViewModel @Inject constructor(
         subscriptionsManager.currentPurchaseState.onEach {
             val state = when (it) {
                 is CurrentPurchase.Failure -> Failure(it.message)
-                is CurrentPurchase.Success -> Success(
-                    SubscriptionEventData(
-                        PURCHASE_COMPLETED_FEATURE_NAME,
-                        PURCHASE_COMPLETED_SUBSCRIPTION_NAME,
-                        JSONObject(PURCHASE_COMPLETED_JSON),
-                    ),
-                )
+                is CurrentPurchase.Success -> {
+                    subscriptionsChecker.runChecker()
+                    Success(
+                        SubscriptionEventData(
+                            PURCHASE_COMPLETED_FEATURE_NAME,
+                            PURCHASE_COMPLETED_SUBSCRIPTION_NAME,
+                            JSONObject(PURCHASE_COMPLETED_JSON),
+                        ),
+                    )
+                }
                 is CurrentPurchase.InProgress, CurrentPurchase.PreFlowInProgress -> InProgress
                 is CurrentPurchase.Recovered -> Recovered
                 is CurrentPurchase.PreFlowFinished -> Inactive
@@ -214,6 +219,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
 
     private fun backToSettings() {
         viewModelScope.launch {
+            subscriptionsManager.fetchAndStoreAllData()
             command.send(BackToSettings)
         }
     }

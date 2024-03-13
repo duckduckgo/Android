@@ -20,8 +20,6 @@ import android.content.Context
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.store.EncryptedSharedPrefsProvider
 import com.duckduckgo.subscriptions.impl.store.SharedPrefsProvider
-import com.duckduckgo.subscriptions.impl.store.SubscriptionsDataStore
-import com.duckduckgo.subscriptions.impl.store.SubscriptionsEncryptedDataStore
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -35,13 +33,5 @@ object SubscriptionsModule {
     @SingleInstanceIn(AppScope::class)
     fun provideSharedPrefsProvider(context: Context): SharedPrefsProvider {
         return EncryptedSharedPrefsProvider(context)
-    }
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun providesSubscriptionsDataStore(
-        sharedPrefsProvider: SharedPrefsProvider,
-    ): SubscriptionsDataStore {
-        return SubscriptionsEncryptedDataStore(sharedPrefsProvider)
     }
 }

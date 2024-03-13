@@ -18,6 +18,7 @@ package com.duckduckgo.subscriptions.impl.services
 
 import com.duckduckgo.anvil.annotations.ContributesNonCachingServiceApi
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.subscriptions.impl.repository.Entitlement
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
@@ -63,3 +64,7 @@ data class ConfirmationEntitlement(
     val product: String,
     val name: String,
 )
+
+fun List<ConfirmationEntitlement>.toEntitlements(): List<Entitlement> {
+    return this.map { Entitlement(it.name, it.product) }
+}
