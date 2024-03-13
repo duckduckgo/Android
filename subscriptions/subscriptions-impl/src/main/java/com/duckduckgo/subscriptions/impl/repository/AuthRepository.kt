@@ -18,6 +18,7 @@ package com.duckduckgo.subscriptions.impl.repository
 
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.impl.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.impl.SubscriptionStatus.GRACE_PERIOD
@@ -182,6 +183,16 @@ data class Subscription(
             AUTO_RENEWABLE, NOT_AUTO_RENEWABLE, GRACE_PERIOD -> true
             else -> false
         }
+    }
+}
+
+fun List<Entitlement>.toProductList(): List<Product> {
+    return try {
+        this.mapNotNull { entitlement ->
+            Product.entries.find { it.value == entitlement.product }
+        }
+    } catch (e: Exception) {
+        emptyList()
     }
 }
 

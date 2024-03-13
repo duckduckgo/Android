@@ -6,6 +6,7 @@ import app.cash.turbine.test
 import com.android.billingclient.api.PurchaseHistoryRecord
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.subscriptions.api.Product.NetP
 import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.RecoverSubscriptionResult
 import com.duckduckgo.subscriptions.impl.SubscriptionStatus.*
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN
@@ -18,6 +19,7 @@ import com.duckduckgo.subscriptions.impl.repository.RealAuthRepository
 import com.duckduckgo.subscriptions.impl.services.AccessTokenResponse
 import com.duckduckgo.subscriptions.impl.services.AccountResponse
 import com.duckduckgo.subscriptions.impl.services.AuthService
+import com.duckduckgo.subscriptions.impl.services.ConfirmationEntitlement
 import com.duckduckgo.subscriptions.impl.services.ConfirmationResponse
 import com.duckduckgo.subscriptions.impl.services.CreateAccountResponse
 import com.duckduckgo.subscriptions.impl.services.EntitlementResponse
@@ -104,7 +106,7 @@ class RealSubscriptionsManagerTest {
 
         verify(authService).storeLogin(any())
         assertEquals("authToken", authDataStore.authToken)
-        assertTrue(subscription.entitlements.firstOrNull { it.product == "testProduct" } != null)
+        assertTrue(subscription.entitlements.firstOrNull { it.product == NetP.value } != null)
     }
 
     @Test
@@ -140,7 +142,7 @@ class RealSubscriptionsManagerTest {
         val subscription = result.subscription
 
         assertEquals("1234", authDataStore.externalId)
-        assertTrue(subscription.entitlements.firstOrNull { it.product == "testProduct" } != null)
+        assertTrue(subscription.entitlements.firstOrNull { it.product == NetP.value } != null)
     }
 
     @Test
@@ -185,7 +187,19 @@ class RealSubscriptionsManagerTest {
 
         val value = subscriptionsManager.fetchAndStoreAllData()
         assertEquals("1234", authDataStore.externalId)
-        assertTrue(value?.entitlements?.firstOrNull { it.product == "testProduct" } != null)
+        assertTrue(value?.entitlements?.firstOrNull { it.product == NetP.value } != null)
+    }
+
+    @Test
+    fun whenFetchAndStoreAllDataIfTokenIsValidThenReturnEmitEntitlements() = runTest {
+        givenUserIsAuthenticated()
+        givenSubscriptionSucceedsWithEntitlements()
+
+        subscriptionsManager.fetchAndStoreAllData()
+        subscriptionsManager.entitlements.test {
+            assertTrue(awaitItem().size == 1)
+            cancelAndConsumeRemainingEvents()
+        }
     }
 
     @Test
@@ -459,7 +473,6 @@ class RealSubscriptionsManagerTest {
     @Test
     fun whenPurchaseSuccessfulThenPurchaseCheckedAndSuccessEmit() = runTest {
         givenUserIsAuthenticated()
-        givenValidateTokenSucceedsWithEntitlements()
         givenConfirmPurchaseSucceeds()
 
         val flowTest: MutableSharedFlow<PurchaseState> = MutableSharedFlow()
@@ -481,6 +494,12 @@ class RealSubscriptionsManagerTest {
             flowTest.emit(PurchaseState.Purchased("validToken", "packageName"))
             assertTrue(awaitItem() is CurrentPurchase.InProgress)
             assertTrue(awaitItem() is CurrentPurchase.Success)
+            cancelAndConsumeRemainingEvents()
+        }
+
+        manager.entitlements.test {
+            flowTest.emit(PurchaseState.Purchased("validToken", "packageName"))
+            assertTrue(awaitItem().size == 1)
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -913,7 +932,7 @@ class RealSubscriptionsManagerTest {
                     email = "email",
                     externalId = "1234",
                     entitlements = listOf(
-                        EntitlementResponse("id", "name", "testProduct"),
+                        EntitlementResponse("id", NetP.value, NetP.value),
                     ),
                 ),
             ),
@@ -977,7 +996,9 @@ class RealSubscriptionsManagerTest {
         whenever(subscriptionsService.confirm(any(), any())).thenReturn(
             ConfirmationResponse(
                 email = "test@duck.com",
-                entitlements = listOf(),
+                entitlements = listOf(
+                    ConfirmationEntitlement(NetP.value, NetP.value),
+                ),
                 subscription = SubscriptionResponse(
                     productId = "id",
                     platform = "google",

@@ -20,10 +20,9 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.api.Product.NetP
 import com.duckduckgo.subscriptions.api.Subscriptions
-import com.duckduckgo.subscriptions.api.Subscriptions.EntitlementStatus.Found
-import com.duckduckgo.subscriptions.api.Subscriptions.EntitlementStatus.NotFound
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
 
 interface NetpSubscriptionManager {
@@ -36,17 +35,13 @@ class RealNetpSubscriptionManager @Inject constructor(
     private val subscriptions: Subscriptions,
     private val dispatcherProvider: DispatcherProvider,
 ) : NetpSubscriptionManager {
+
     override suspend fun getToken(): String? = withContext(dispatcherProvider.io()) {
         subscriptions.getAccessToken()
     }
 
     override suspend fun hasValidEntitlement(): Result<Boolean> = withContext(dispatcherProvider.io()) {
-        subscriptions.getEntitlementStatus(NetP).run {
-            if (isSuccess) {
-                Result.success(getOrDefault(NotFound) == Found)
-            } else {
-                Result.failure(this.exceptionOrNull() ?: RuntimeException())
-            }
-        }
+        val entitlements = subscriptions.getEntitlementStatus().firstOrNull()
+        Result.success(entitlements?.contains(NetP) == true)
     }
 }

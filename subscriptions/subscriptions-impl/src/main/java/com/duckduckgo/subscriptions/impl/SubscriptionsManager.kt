@@ -23,6 +23,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.RecoverSubscriptionResult
 import com.duckduckgo.subscriptions.impl.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.impl.SubscriptionStatus.EXPIRED
@@ -38,6 +39,7 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.Account
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
 import com.duckduckgo.subscriptions.impl.repository.Subscription
+import com.duckduckgo.subscriptions.impl.repository.toProductList
 import com.duckduckgo.subscriptions.impl.services.AuthService
 import com.duckduckgo.subscriptions.impl.services.ConfirmationBody
 import com.duckduckgo.subscriptions.impl.services.ResponseError
@@ -129,6 +131,11 @@ interface SubscriptionsManager {
     val hasSubscription: Flow<Boolean>
 
     /**
+     * Flow to return products user is entitled to
+     */
+    val entitlements: Flow<List<Product>>
+
+    /**
      * Flow to know the state of the current purchase
      */
     val currentPurchaseState: Flow<CurrentPurchase>
@@ -174,8 +181,18 @@ class RealSubscriptionsManager @Inject constructor(
     private val _hasSubscription = MutableStateFlow(false)
     override val hasSubscription = _hasSubscription.asStateFlow().onSubscription { emitHasSubscriptionsValues() }
 
+    private val _entitlements = MutableStateFlow(emptyList<Product>())
+    override val entitlements = _entitlements.asStateFlow().onSubscription { emitEntitlementsValues() }
+
     private var purchaseStateJob: Job? = null
     private suspend fun isUserAuthenticated(): Boolean = authRepository.isUserAuthenticated()
+
+    private suspend fun emitEntitlementsValues() {
+        coroutineScope.launch(dispatcherProvider.io()) {
+            val entitlements: List<Product> = authRepository.getSubscription()?.entitlements?.toProductList() ?: emptyList()
+            _entitlements.emit(entitlements)
+        }
+    }
 
     private suspend fun emitIsSignedInValues() {
         coroutineScope.launch(dispatcherProvider.io()) {
@@ -283,6 +300,7 @@ class RealSubscriptionsManager @Inject constructor(
                 if (subscription?.isActive() == true) {
                     pixelSender.reportPurchaseSuccess()
                     pixelSender.reportSubscriptionActivated()
+                    emitEntitlementsValues()
                     _currentPurchaseState.emit(CurrentPurchase.Success)
                 } else {
                     handlePurchaseFailed()
@@ -322,7 +340,7 @@ class RealSubscriptionsManager @Inject constructor(
             val accountData = validateToken(token).account
             authRepository.saveExternalId(accountData.externalId)
             authRepository.saveSubscriptionData(subscription, accountData.entitlements.toEntitlements(), accountData.email)
-
+            emitEntitlementsValues()
             _hasSubscription.emit(hasSubscription())
             _isSignedIn.emit(isUserAuthenticated())
             return authRepository.getSubscription()
