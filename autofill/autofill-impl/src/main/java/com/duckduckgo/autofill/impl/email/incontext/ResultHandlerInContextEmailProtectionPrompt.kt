@@ -26,12 +26,14 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.AutofillEventListener
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
+import com.duckduckgo.autofill.api.AutofillUrlRequest
 import com.duckduckgo.autofill.api.EmailProtectionInContextSignUpDialog
 import com.duckduckgo.autofill.api.EmailProtectionInContextSignUpDialog.EmailProtectionInContextSignUpResult
 import com.duckduckgo.autofill.api.EmailProtectionInContextSignUpDialog.EmailProtectionInContextSignUpResult.*
 import com.duckduckgo.autofill.impl.email.incontext.store.EmailProtectionInContextDataStore
+import com.duckduckgo.autofill.impl.jsbridge.AutofillMessagePoster
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -39,47 +41,60 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
-@ContributesMultibinding(AppScope::class)
+@ContributesMultibinding(FragmentScope::class)
 class ResultHandlerInContextEmailProtectionPrompt @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
     private val dataStore: EmailProtectionInContextDataStore,
     private val appBuildConfig: AppBuildConfig,
+    private val messagePoster: AutofillMessagePoster,
 ) : AutofillFragmentResultsPlugin {
     override fun processResult(result: Bundle, context: Context, tabId: String, fragment: Fragment, autofillCallback: AutofillEventListener) {
         Timber.d("${this::class.java.simpleName}: processing result")
 
         val userSelection = result.safeGetParcelable<EmailProtectionInContextSignUpResult>(EmailProtectionInContextSignUpDialog.KEY_RESULT) ?: return
+        val autofillUrlRequest = result.safeGetParcelable<AutofillUrlRequest>(EmailProtectionInContextSignUpDialog.KEY_URL) ?: return
 
         appCoroutineScope.launch(dispatchers.io()) {
             when (userSelection) {
-                SignUp -> signUpSelected(autofillCallback)
-                Cancel -> cancelled(autofillCallback)
-                DoNotShowAgain -> doNotAskAgain(autofillCallback)
+                SignUp -> signUpSelected(autofillCallback, autofillUrlRequest)
+                Cancel -> cancelled(autofillUrlRequest)
+                DoNotShowAgain -> doNotAskAgain(autofillUrlRequest)
             }
         }
     }
 
-    private suspend fun signUpSelected(autofillCallback: AutofillEventListener) {
+    private suspend fun signUpSelected(
+        autofillCallback: AutofillEventListener,
+        autofillUrlRequest: AutofillUrlRequest,
+    ) {
         withContext(dispatchers.main()) {
-            autofillCallback.onSelectedToSignUpForInContextEmailProtection()
+            autofillCallback.onSelectedToSignUpForInContextEmailProtection(autofillUrlRequest)
         }
     }
 
-    private suspend fun doNotAskAgain(autofillCallback: AutofillEventListener) {
+    private suspend fun doNotAskAgain(autofillUrlRequest: AutofillUrlRequest) {
         Timber.i("User selected to not show sign up for email protection again")
         dataStore.onUserChoseNeverAskAgain()
-        notifyEndOfFlow(autofillCallback)
+        notifyEndOfFlow(autofillUrlRequest)
     }
 
-    private suspend fun cancelled(autofillCallback: AutofillEventListener) {
+    private suspend fun cancelled(autofillUrlRequest: AutofillUrlRequest) {
         Timber.i("User cancelled sign up for email protection")
-        notifyEndOfFlow(autofillCallback)
+        notifyEndOfFlow(autofillUrlRequest)
     }
 
-    private suspend fun notifyEndOfFlow(autofillCallback: AutofillEventListener) {
+    private suspend fun notifyEndOfFlow(autofillUrlRequest: AutofillUrlRequest) {
         withContext(dispatchers.main()) {
-            autofillCallback.onEndOfEmailProtectionInContextSignupFlow()
+            val message = """
+                {
+                    "success": {
+                        "isSignedIn": false,
+                    }
+                }
+            """.trimIndent()
+            messagePoster.postMessage(message, autofillUrlRequest.requestId)
+            // autofillCallback.onEndOfEmailProtectionInContextSignupFlow()
         }
     }
 

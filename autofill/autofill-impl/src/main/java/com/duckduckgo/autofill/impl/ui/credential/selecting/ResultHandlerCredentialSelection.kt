@@ -27,13 +27,17 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.AutofillEventListener
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
+import com.duckduckgo.autofill.api.AutofillUrlRequest
 import com.duckduckgo.autofill.api.CredentialAutofillPickerDialog
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
+import com.duckduckgo.autofill.impl.domain.javascript.JavascriptCredentials
+import com.duckduckgo.autofill.impl.jsbridge.AutofillMessagePoster
+import com.duckduckgo.autofill.impl.jsbridge.response.AutofillResponseWriter
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -41,7 +45,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
-@ContributesMultibinding(AppScope::class)
+@ContributesMultibinding(FragmentScope::class)
 class ResultHandlerCredentialSelection @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
@@ -49,7 +53,13 @@ class ResultHandlerCredentialSelection @Inject constructor(
     private val deviceAuthenticator: DeviceAuthenticator,
     private val appBuildConfig: AppBuildConfig,
     private val autofillStore: InternalAutofillStore,
+    private val messagePoster: AutofillMessagePoster,
+    private val autofillResponseWriter: AutofillResponseWriter,
 ) : AutofillFragmentResultsPlugin {
+
+    override fun resultKey(tabId: String): String {
+        return CredentialAutofillPickerDialog.resultKey(tabId)
+    }
 
     override fun processResult(
         result: Bundle,
@@ -60,11 +70,11 @@ class ResultHandlerCredentialSelection @Inject constructor(
     ) {
         Timber.d("${this::class.java.simpleName}: processing result")
 
-        val originalUrl = result.getString(CredentialAutofillPickerDialog.KEY_URL) ?: return
+        val autofillUrlRequest = result.safeGetParcelable<AutofillUrlRequest>(CredentialAutofillPickerDialog.KEY_URL_REQUEST) ?: return
 
         if (result.getBoolean(CredentialAutofillPickerDialog.KEY_CANCELLED)) {
             Timber.v("Autofill: User cancelled credential selection")
-            autofillCallback.onNoCredentialsChosenForAutofill(originalUrl)
+            injectNoCredentials(autofillUrlRequest)
             return
         }
 
@@ -72,17 +82,36 @@ class ResultHandlerCredentialSelection @Inject constructor(
             processAutofillCredentialSelectionResult(
                 result = result,
                 browserTabFragment = fragment,
-                autofillCallback = autofillCallback,
-                originalUrl = originalUrl,
+                autofillUrlRequest = autofillUrlRequest,
             )
+        }
+    }
+
+    private fun injectCredentials(
+        credentials: LoginCredentials,
+        autofillUrlRequest: AutofillUrlRequest,
+    ) {
+        Timber.v("Informing JS layer with credentials selected")
+        appCoroutineScope.launch(dispatchers.io()) {
+            val jsCredentials = credentials.asJsCredentials()
+            val jsonResponse = autofillResponseWriter.generateResponseGetAutofillData(jsCredentials)
+            Timber.i("Injecting credentials: %s", jsonResponse)
+            messagePoster.postMessage(jsonResponse, autofillUrlRequest.requestId)
+        }
+    }
+
+    private fun injectNoCredentials(autofillUrlRequest: AutofillUrlRequest) {
+        Timber.v("No credentials selected; informing JS layer")
+        appCoroutineScope.launch(dispatchers.io()) {
+            val jsonResponse = autofillResponseWriter.generateEmptyResponseGetAutofillData()
+            messagePoster.postMessage(jsonResponse, autofillUrlRequest.requestId)
         }
     }
 
     private suspend fun processAutofillCredentialSelectionResult(
         result: Bundle,
         browserTabFragment: Fragment,
-        autofillCallback: AutofillEventListener,
-        originalUrl: String,
+        autofillUrlRequest: AutofillUrlRequest,
     ) {
         val selectedCredentials: LoginCredentials =
             result.safeGetParcelable(CredentialAutofillPickerDialog.KEY_CREDENTIALS) ?: return
@@ -99,19 +128,19 @@ class ResultHandlerCredentialSelection @Inject constructor(
                     DeviceAuthenticator.AuthResult.Success -> {
                         Timber.v("Autofill: user selected credential to use, and successfully authenticated")
                         pixel.fire(AutofillPixelNames.AUTOFILL_AUTHENTICATION_TO_AUTOFILL_AUTH_SUCCESSFUL)
-                        autofillCallback.onShareCredentialsForAutofill(originalUrl, selectedCredentials)
+                        injectCredentials(selectedCredentials, autofillUrlRequest)
                     }
 
                     DeviceAuthenticator.AuthResult.UserCancelled -> {
                         Timber.d("Autofill: user selected credential to use, but cancelled without authenticating")
                         pixel.fire(AutofillPixelNames.AUTOFILL_AUTHENTICATION_TO_AUTOFILL_AUTH_CANCELLED)
-                        autofillCallback.onNoCredentialsChosenForAutofill(originalUrl)
+                        injectNoCredentials(autofillUrlRequest)
                     }
 
                     is DeviceAuthenticator.AuthResult.Error -> {
                         Timber.w("Autofill: user selected credential to use, but there was an error when authenticating: ${it.reason}")
                         pixel.fire(AutofillPixelNames.AUTOFILL_AUTHENTICATION_TO_AUTOFILL_AUTH_FAILURE)
-                        autofillCallback.onNoCredentialsChosenForAutofill(originalUrl)
+                        injectNoCredentials(autofillUrlRequest)
                     }
                 }
             }
@@ -125,6 +154,13 @@ class ResultHandlerCredentialSelection @Inject constructor(
         }
     }
 
+    private fun LoginCredentials.asJsCredentials(): JavascriptCredentials {
+        return JavascriptCredentials(
+            username = username,
+            password = password,
+        )
+    }
+
     @Suppress("DEPRECATION")
     @SuppressLint("NewApi")
     private inline fun <reified T : Parcelable> Bundle.safeGetParcelable(key: String) =
@@ -133,8 +169,4 @@ class ResultHandlerCredentialSelection @Inject constructor(
         } else {
             getParcelable(key)
         }
-
-    override fun resultKey(tabId: String): String {
-        return CredentialAutofillPickerDialog.resultKey(tabId)
-    }
 }

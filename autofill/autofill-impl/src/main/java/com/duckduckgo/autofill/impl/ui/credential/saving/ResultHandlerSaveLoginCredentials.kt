@@ -26,6 +26,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.AutofillEventListener
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
+import com.duckduckgo.autofill.api.AutofillUrlRequest
 import com.duckduckgo.autofill.api.CredentialSavePickerDialog
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
@@ -61,12 +62,12 @@ class ResultHandlerSaveLoginCredentials @Inject constructor(
 
         autofillFireproofDialogSuppressor.autofillSaveOrUpdateDialogVisibilityChanged(visible = false)
 
-        val originalUrl = result.getString(CredentialSavePickerDialog.KEY_URL) ?: return
+        val autofillUrlRequest = result.safeGetParcelable<AutofillUrlRequest>(CredentialSavePickerDialog.KEY_URL) ?: return
         val selectedCredentials =
             result.safeGetParcelable<LoginCredentials>(CredentialSavePickerDialog.KEY_CREDENTIALS) ?: return
 
         appCoroutineScope.launch(dispatchers.io()) {
-            val savedCredentials = autofillStore.saveCredentials(originalUrl, selectedCredentials)
+            val savedCredentials = autofillStore.saveCredentials(autofillUrlRequest.requestOrigin, selectedCredentials)
             if (savedCredentials != null) {
                 declineCounter.disableDeclineCounter()
 

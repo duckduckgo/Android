@@ -16,7 +16,7 @@
 
 package com.duckduckgo.autofill.impl
 
-import com.duckduckgo.autofill.api.AutofillCapabilityChecker
+import com.duckduckgo.autofill.api.AutofillUrlRequest
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
@@ -34,7 +34,7 @@ class RealDuckAddressLoginCreatorTest {
 
     private val autofillStore: InternalAutofillStore = mock()
     private val automaticSavedLoginsMonitor: AutomaticSavedLoginsMonitor = mock()
-    private val autofillCapabilityChecker: AutofillCapabilityChecker = mock()
+    private val autofillCapabilityChecker: InternalAutofillCapabilityChecker = mock()
     private val neverSavedSiteRepository: NeverSavedSiteRepository = mock()
 
     private val testee = RealDuckAddressLoginCreator(
@@ -49,21 +49,21 @@ class RealDuckAddressLoginCreatorTest {
     @Test
     fun whenAutofillCapabilitiesRestrictSavingThenNoLoginCreated() = runTest {
         whenever(autofillCapabilityChecker.canSaveCredentialsFromWebView(URL)).thenReturn(false)
-        testee.createLoginForPrivateDuckAddress(DUCK_ADDRESS, TAB_ID, URL)
+        testee.createLoginForPrivateDuckAddress(DUCK_ADDRESS, TAB_ID, AUTOFILL_URL_REQUEST)
         verifyNotSavedOrUpdated()
     }
 
     @Test
     fun whenNoAutoSavedLoginIdThenNewLoginSaved() = runTest {
         configureReadyToAutoSave()
-        testee.createLoginForPrivateDuckAddress(DUCK_ADDRESS, TAB_ID, URL)
+        testee.createLoginForPrivateDuckAddress(DUCK_ADDRESS, TAB_ID, AUTOFILL_URL_REQUEST)
         verifyLoginSaved()
     }
 
     @Test
     fun whenAutoSavedLoginIdSetButNoMatchingLoginFoundThenNewLoginSaved() = runTest {
         configureReadyToAutoSave()
-        testee.createLoginForPrivateDuckAddress(DUCK_ADDRESS, TAB_ID, URL)
+        testee.createLoginForPrivateDuckAddress(DUCK_ADDRESS, TAB_ID, AUTOFILL_URL_REQUEST)
         verifyLoginSaved()
     }
 
@@ -74,7 +74,7 @@ class RealDuckAddressLoginCreatorTest {
         whenever(automaticSavedLoginsMonitor.getAutoSavedLoginId(TAB_ID)).thenReturn(1)
         whenever(autofillStore.getCredentialsWithId(1)).thenReturn(existingLogin)
 
-        testee.createLoginForPrivateDuckAddress(DUCK_ADDRESS, TAB_ID, URL)
+        testee.createLoginForPrivateDuckAddress(DUCK_ADDRESS, TAB_ID, AUTOFILL_URL_REQUEST)
         verifyNotSavedOrUpdated()
     }
 
@@ -86,7 +86,7 @@ class RealDuckAddressLoginCreatorTest {
         whenever(automaticSavedLoginsMonitor.getAutoSavedLoginId(TAB_ID)).thenReturn(1)
         whenever(autofillStore.getCredentialsWithId(1)).thenReturn(existingLogin)
 
-        testee.createLoginForPrivateDuckAddress(DUCK_ADDRESS, TAB_ID, URL)
+        testee.createLoginForPrivateDuckAddress(DUCK_ADDRESS, TAB_ID, AUTOFILL_URL_REQUEST)
         verifyLoginUpdated()
     }
 
@@ -94,7 +94,7 @@ class RealDuckAddressLoginCreatorTest {
     fun whenSiteIsInNeverSaveListThenDoNotAutoSaveALogin() = runTest {
         configureReadyToAutoSave()
         whenever(neverSavedSiteRepository.isInNeverSaveList(URL)).thenReturn(true)
-        testee.createLoginForPrivateDuckAddress(DUCK_ADDRESS, TAB_ID, URL)
+        testee.createLoginForPrivateDuckAddress(DUCK_ADDRESS, TAB_ID, AUTOFILL_URL_REQUEST)
         verifyNotSavedOrUpdated()
     }
 
@@ -102,7 +102,7 @@ class RealDuckAddressLoginCreatorTest {
     fun whenSiteIsNotInNeverSaveListThenAutoSaveALogin() = runTest {
         configureReadyToAutoSave()
         whenever(neverSavedSiteRepository.isInNeverSaveList(any())).thenReturn(false)
-        testee.createLoginForPrivateDuckAddress(DUCK_ADDRESS, TAB_ID, URL)
+        testee.createLoginForPrivateDuckAddress(DUCK_ADDRESS, TAB_ID, AUTOFILL_URL_REQUEST)
         verifyLoginSaved()
     }
 
@@ -126,6 +126,8 @@ class RealDuckAddressLoginCreatorTest {
     companion object {
         private const val TAB_ID = "tab-id-123"
         private const val URL = "example.com"
+        private const val REQUEST_ID = "request-id-123"
+        private val AUTOFILL_URL_REQUEST = AutofillUrlRequest(URL, URL, REQUEST_ID)
         private const val DUCK_ADDRESS = "foo@duck.com"
     }
 }

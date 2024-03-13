@@ -26,6 +26,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.AutofillEventListener
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
+import com.duckduckgo.autofill.api.AutofillUrlRequest
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.Companion.KEY_CREDENTIALS
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.Companion.KEY_CREDENTIAL_UPDATE_TYPE
@@ -63,11 +64,11 @@ class ResultHandlerUpdateLoginCredentials @Inject constructor(
         autofillFireproofDialogSuppressor.autofillSaveOrUpdateDialogVisibilityChanged(visible = false)
 
         val selectedCredentials = result.safeGetParcelable<LoginCredentials>(KEY_CREDENTIALS) ?: return
-        val originalUrl = result.getString(CredentialUpdateExistingCredentialsDialog.KEY_URL) ?: return
+        val autofillUrlRequest = result.safeGetParcelable<AutofillUrlRequest>(CredentialUpdateExistingCredentialsDialog.KEY_URL) ?: return
         val updateType = result.safeGetParcelable<CredentialUpdateType>(KEY_CREDENTIAL_UPDATE_TYPE) ?: return
 
         appCoroutineScope.launch(dispatchers.io()) {
-            autofillStore.updateCredentials(originalUrl, selectedCredentials, updateType)?.let {
+            autofillStore.updateCredentials(autofillUrlRequest.requestOrigin, selectedCredentials, updateType)?.let {
                 withContext(dispatchers.main()) {
                     autofillCallback.onUpdatedCredentials(it)
                 }

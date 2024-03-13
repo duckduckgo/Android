@@ -16,9 +16,12 @@
 
 package com.duckduckgo.autofill.impl.email.incontext.prompt
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.DialogInterface
+import android.os.Build
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -29,6 +32,8 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.autofill.api.AutofillUrlRequest
 import com.duckduckgo.autofill.api.EmailProtectionInContextSignUpDialog
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.DialogEmailProtectionInContextSignUpBinding
@@ -55,6 +60,9 @@ class EmailProtectionInContextSignUpPromptFragment : BottomSheetDialogFragment()
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
+
+    @Inject
+    lateinit var appBuildConfig: AppBuildConfig
 
     private val viewModel by lazy {
         ViewModelProvider(this, viewModelFactory)[EmailProtectionInContextSignUpPromptViewModel::class.java]
@@ -121,6 +129,7 @@ class EmailProtectionInContextSignUpPromptFragment : BottomSheetDialogFragment()
 
         val result = Bundle().also {
             it.putParcelable(EmailProtectionInContextSignUpDialog.KEY_RESULT, resultType)
+            it.putParcelable(EmailProtectionInContextSignUpDialog.KEY_URL, getAutofillUrlRequest())
         }
 
         parentFragment?.setFragmentResult(EmailProtectionInContextSignUpDialog.resultKey(getTabId()), result)
@@ -133,18 +142,31 @@ class EmailProtectionInContextSignUpPromptFragment : BottomSheetDialogFragment()
     }
 
     private fun getTabId() = arguments?.getString(KEY_TAB_ID)!!
+    private fun getAutofillUrlRequest() = arguments?.safeGetParcelable<AutofillUrlRequest>(KEY_URL)!!
+
+    @Suppress("DEPRECATION")
+    @SuppressLint("NewApi")
+    private inline fun <reified T : Parcelable> Bundle.safeGetParcelable(key: String) =
+        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.TIRAMISU) {
+            getParcelable(key, T::class.java)
+        } else {
+            getParcelable(key)
+        }
 
     companion object {
         fun instance(
             tabId: String,
+            autofillUrlRequest: AutofillUrlRequest,
         ): EmailProtectionInContextSignUpPromptFragment {
             val fragment = EmailProtectionInContextSignUpPromptFragment()
             fragment.arguments = Bundle().also {
                 it.putString(KEY_TAB_ID, tabId)
+                it.putParcelable(KEY_URL, autofillUrlRequest)
             }
             return fragment
         }
 
         private const val KEY_TAB_ID = "tabId"
+        private const val KEY_URL = "url"
     }
 }

@@ -16,9 +16,12 @@
 
 package com.duckduckgo.autofill.impl.ui.credential.updating
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.DialogInterface
+import android.os.Build
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,6 +29,8 @@ import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.ViewModelProvider
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.autofill.api.AutofillUrlRequest
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
@@ -62,6 +67,9 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
 
     @Inject
     lateinit var autofillFireproofDialogSuppressor: AutofillFireproofDialogSuppressor
+
+    @Inject
+    lateinit var appBuildConfig: AppBuildConfig
 
     /**
      * To capture all the ways the BottomSheet can be dismissed, we might end up with onCancel being called when we don't want it
@@ -130,7 +138,7 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
 
     private fun configureUpdateButton(
         binding: ContentAutofillUpdateExistingCredentialsBinding,
-        originalUrl: String,
+        autofillUrlRequest: AutofillUrlRequest,
         credentials: LoginCredentials,
         updateType: CredentialUpdateType,
     ) {
@@ -143,7 +151,7 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
             pixelNameDialogEvent(Updated)?.let { pixel.fire(it) }
 
             val result = Bundle().also {
-                it.putString(CredentialUpdateExistingCredentialsDialog.KEY_URL, originalUrl)
+                it.putParcelable(CredentialUpdateExistingCredentialsDialog.KEY_URL, autofillUrlRequest)
                 it.putParcelable(CredentialUpdateExistingCredentialsDialog.KEY_CREDENTIALS, credentials)
                 it.putParcelable(CredentialUpdateExistingCredentialsDialog.KEY_CREDENTIAL_UPDATE_TYPE, getUpdateType())
             }
@@ -200,16 +208,16 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
         object Updated : DialogEvent
     }
 
-    private fun getCredentialsToSave() = arguments?.getParcelable<LoginCredentials>(CredentialUpdateExistingCredentialsDialog.KEY_CREDENTIALS)!!
+    private fun getCredentialsToSave() = arguments?.safeGetParcelable<LoginCredentials>(CredentialUpdateExistingCredentialsDialog.KEY_CREDENTIALS)!!
     private fun getTabId() = arguments?.getString(CredentialUpdateExistingCredentialsDialog.KEY_TAB_ID)!!
-    private fun getOriginalUrl() = arguments?.getString(CredentialUpdateExistingCredentialsDialog.KEY_URL)!!
+    private fun getOriginalUrl() = arguments?.safeGetParcelable<AutofillUrlRequest>(CredentialUpdateExistingCredentialsDialog.KEY_URL)!!
     private fun getUpdateType() =
-        arguments?.getParcelable<CredentialUpdateType>(CredentialUpdateExistingCredentialsDialog.KEY_CREDENTIAL_UPDATE_TYPE)!!
+        arguments?.safeGetParcelable<CredentialUpdateType>(CredentialUpdateExistingCredentialsDialog.KEY_CREDENTIAL_UPDATE_TYPE)!!
 
     companion object {
 
         fun instance(
-            url: String,
+            autofillUrlRequest: AutofillUrlRequest,
             credentials: LoginCredentials,
             tabId: String,
             credentialUpdateType: CredentialUpdateType,
@@ -217,7 +225,7 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
             val fragment = AutofillUpdatingExistingCredentialsDialogFragment()
             fragment.arguments =
                 Bundle().also {
-                    it.putString(CredentialUpdateExistingCredentialsDialog.KEY_URL, url)
+                    it.putParcelable(CredentialUpdateExistingCredentialsDialog.KEY_URL, autofillUrlRequest)
                     it.putParcelable(CredentialUpdateExistingCredentialsDialog.KEY_CREDENTIALS, credentials)
                     it.putString(CredentialUpdateExistingCredentialsDialog.KEY_TAB_ID, tabId)
                     it.putParcelable(CredentialUpdateExistingCredentialsDialog.KEY_CREDENTIAL_UPDATE_TYPE, credentialUpdateType)
@@ -225,4 +233,13 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
             return fragment
         }
     }
+
+    @Suppress("DEPRECATION")
+    @SuppressLint("NewApi")
+    private inline fun <reified T : Parcelable> Bundle.safeGetParcelable(key: String) =
+        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.TIRAMISU) {
+            getParcelable(key, T::class.java)
+        } else {
+            getParcelable(key)
+        }
 }

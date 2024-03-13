@@ -16,9 +16,12 @@
 
 package com.duckduckgo.autofill.impl.ui.credential.selecting
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.DialogInterface
+import android.os.Build
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,6 +29,8 @@ import androidx.fragment.app.setFragmentResult
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.autofill.api.AutofillUrlRequest
 import com.duckduckgo.autofill.api.CredentialAutofillPickerDialog
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
@@ -75,6 +80,9 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
     @Inject
     lateinit var autofillSelectCredentialsListBuilder: AutofillSelectCredentialsListBuilder
 
+    @Inject
+    lateinit var appBuildConfig: AppBuildConfig
+
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
@@ -103,8 +111,7 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
 
     private fun configureViews(binding: ContentAutofillSelectCredentialsTooltipBinding) {
         (dialog as BottomSheetDialog).behavior.state = BottomSheetBehavior.STATE_EXPANDED
-        val originalUrl = getOriginalUrl()
-        configureRecyclerView(originalUrl, binding)
+        configureRecyclerView(getUrlRequest(), binding)
         configureCloseButton(binding)
     }
 
@@ -113,10 +120,10 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
     }
 
     private fun configureRecyclerView(
-        originalUrl: String,
+        autofillUrlRequest: AutofillUrlRequest,
         binding: ContentAutofillSelectCredentialsTooltipBinding,
     ) {
-        binding.availableCredentialsRecycler.adapter = configureAdapter(getAvailableCredentials(originalUrl))
+        binding.availableCredentialsRecycler.adapter = configureAdapter(getAvailableCredentials(autofillUrlRequest))
     }
 
     private fun configureAdapter(credentials: List<ListItem>): CredentialsPickerRecyclerAdapter {
@@ -131,7 +138,7 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
 
             val result = Bundle().also {
                 it.putBoolean(CredentialAutofillPickerDialog.KEY_CANCELLED, false)
-                it.putString(CredentialAutofillPickerDialog.KEY_URL, getOriginalUrl())
+                it.putParcelable(CredentialAutofillPickerDialog.KEY_URL_REQUEST, getUrlRequest())
                 it.putParcelable(CredentialAutofillPickerDialog.KEY_CREDENTIALS, selectedCredentials)
             }
             parentFragment?.setFragmentResult(CredentialAutofillPickerDialog.resultKey(getTabId()), result)
@@ -153,7 +160,7 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
 
         val result = Bundle().also {
             it.putBoolean(CredentialAutofillPickerDialog.KEY_CANCELLED, true)
-            it.putString(CredentialAutofillPickerDialog.KEY_URL, getOriginalUrl())
+            it.putParcelable(CredentialAutofillPickerDialog.KEY_URL_REQUEST, getUrlRequest())
         }
 
         parentFragment?.setFragmentResult(CredentialAutofillPickerDialog.resultKey(getTabId()), result)
@@ -176,20 +183,20 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
         object Selected : DialogEvent
     }
 
-    private fun getAvailableCredentials(originalUrl: String): List<ListItem> {
+    private fun getAvailableCredentials(autofillUrlRequest: AutofillUrlRequest): List<ListItem> {
         val unsortedCredentials = arguments?.getParcelableArrayList<LoginCredentials>(CredentialAutofillPickerDialog.KEY_CREDENTIALS)!!
-        val grouped = autofillSelectCredentialsGrouper.group(originalUrl, unsortedCredentials)
+        val grouped = autofillSelectCredentialsGrouper.group(autofillUrlRequest.requestOrigin, unsortedCredentials)
         return autofillSelectCredentialsListBuilder.buildFlatList(grouped)
     }
 
-    private fun getOriginalUrl() = arguments?.getString(CredentialAutofillPickerDialog.KEY_URL)!!
+    private fun getUrlRequest() = arguments?.safeGetParcelable<AutofillUrlRequest>(CredentialAutofillPickerDialog.KEY_URL_REQUEST)!!
     private fun getTriggerType() = arguments?.getSerializable(CredentialAutofillPickerDialog.KEY_TRIGGER_TYPE) as LoginTriggerType
     private fun getTabId() = arguments?.getString(CredentialAutofillPickerDialog.KEY_TAB_ID)!!
 
     companion object {
 
         fun instance(
-            url: String,
+            autofillUrlRequest: AutofillUrlRequest,
             credentials: List<LoginCredentials>,
             triggerType: LoginTriggerType,
             tabId: String,
@@ -199,7 +206,7 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
             val fragment = AutofillSelectCredentialsDialogFragment()
             fragment.arguments =
                 Bundle().also {
-                    it.putString(CredentialAutofillPickerDialog.KEY_URL, url)
+                    it.putParcelable(CredentialAutofillPickerDialog.KEY_URL_REQUEST, autofillUrlRequest)
                     it.putParcelableArrayList(CredentialAutofillPickerDialog.KEY_CREDENTIALS, cr)
                     it.putSerializable(CredentialAutofillPickerDialog.KEY_TRIGGER_TYPE, triggerType)
                     it.putString(CredentialAutofillPickerDialog.KEY_TAB_ID, tabId)
@@ -207,4 +214,13 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
             return fragment
         }
     }
+
+    @Suppress("DEPRECATION")
+    @SuppressLint("NewApi")
+    private inline fun <reified T : Parcelable> Bundle.safeGetParcelable(key: String) =
+        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.TIRAMISU) {
+            getParcelable(key, T::class.java)
+        } else {
+            getParcelable(key)
+        }
 }

@@ -30,14 +30,17 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.LAST_USED_DAY
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.AutofillEventListener
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
+import com.duckduckgo.autofill.api.AutofillUrlRequest
 import com.duckduckgo.autofill.api.EmailProtectionChooseEmailDialog
 import com.duckduckgo.autofill.api.EmailProtectionChooseEmailDialog.UseEmailResultType.*
+import com.duckduckgo.autofill.api.credential.saving.DuckAddressLoginCreator
 import com.duckduckgo.autofill.api.email.EmailManager
+import com.duckduckgo.autofill.impl.jsbridge.AutofillMessagePoster
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_TOOLTIP_DISMISSED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_USE_ADDRESS
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_USE_ALIAS
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -45,12 +48,15 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
-@ContributesMultibinding(AppScope::class)
+@ContributesMultibinding(FragmentScope::class)
 class ResultHandlerEmailProtectionChooseEmail @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val emailManager: EmailManager,
     private val dispatchers: DispatcherProvider,
     private val pixel: Pixel,
+    private val messagePoster: AutofillMessagePoster,
+
+    private val loginCreator: DuckAddressLoginCreator,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : AutofillFragmentResultsPlugin {
 
@@ -65,41 +71,62 @@ class ResultHandlerEmailProtectionChooseEmail @Inject constructor(
 
         val userSelection: EmailProtectionChooseEmailDialog.UseEmailResultType =
             result.safeGetParcelable(EmailProtectionChooseEmailDialog.KEY_RESULT) ?: return
-        val originalUrl = result.getString(EmailProtectionChooseEmailDialog.KEY_URL) ?: return
+        val autofillUrlRequest = result.safeGetParcelable<AutofillUrlRequest>(EmailProtectionChooseEmailDialog.KEY_URL) ?: return
 
         when (userSelection) {
-            UsePersonalEmailAddress -> onSelectedToUsePersonalAddress(originalUrl, autofillCallback)
-            UsePrivateAliasAddress -> onSelectedToUsePrivateAlias(originalUrl, autofillCallback)
+            UsePersonalEmailAddress -> onSelectedToUsePersonalAddress(autofillUrlRequest, tabId)
+            UsePrivateAliasAddress -> onSelectedToUsePrivateAlias(autofillUrlRequest, tabId)
             DoNotUseEmailProtection -> onSelectedNotToUseEmailProtection()
         }
     }
 
-    private fun onSelectedToUsePersonalAddress(originalUrl: String, autofillCallback: AutofillEventListener) {
+    private fun onSelectedToUsePersonalAddress(autofillUrlRequest: AutofillUrlRequest, tabId: String) {
         appCoroutineScope.launch(dispatchers.io()) {
             val duckAddress = emailManager.getEmailAddress() ?: return@launch
 
             enqueueEmailProtectionPixel(EMAIL_USE_ADDRESS, includeLastUsedDay = true)
 
-            withContext(dispatchers.main()) {
-                autofillCallback.onUseEmailProtectionPersonalAddress(originalUrl, duckAddress)
+            withContext(dispatchers.io()) {
+                val message = buildResponseMessage(duckAddress)
+                messagePoster.postMessage(message, autofillUrlRequest.requestId)
             }
 
             emailManager.setNewLastUsedDate()
         }
     }
 
-    private fun onSelectedToUsePrivateAlias(originalUrl: String, autofillCallback: AutofillEventListener) {
+    private fun onSelectedToUsePrivateAlias(
+        autofillUrlRequest: AutofillUrlRequest,
+        tabId: String,
+    ) {
         appCoroutineScope.launch(dispatchers.io()) {
             val privateAlias = emailManager.getAlias() ?: return@launch
 
             enqueueEmailProtectionPixel(EMAIL_USE_ALIAS, includeLastUsedDay = true)
 
             withContext(dispatchers.main()) {
-                autofillCallback.onUseEmailProtectionPrivateAlias(originalUrl, privateAlias)
+                val message = buildResponseMessage(privateAlias)
+                messagePoster.postMessage(message, autofillUrlRequest.requestId)
+
+                loginCreator.createLoginForPrivateDuckAddress(
+                    duckAddress = privateAlias,
+                    tabId = tabId,
+                    autofillUrlRequest = autofillUrlRequest,
+                )
             }
 
             emailManager.setNewLastUsedDate()
         }
+    }
+
+    private fun buildResponseMessage(emailAddress: String): String {
+        return """
+            {
+                "success": {
+                    "alias": "${emailAddress.removeSuffix("@duck.com")}"
+                }
+            }
+        """.trimIndent()
     }
 
     private fun onSelectedNotToUseEmailProtection() {

@@ -22,6 +22,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.AutofillEventListener
+import com.duckduckgo.autofill.api.AutofillUrlRequest
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType.Password
@@ -103,7 +104,7 @@ class ResultHandlerUpdateLoginCredentialsTest {
         updateType: CredentialUpdateType,
     ): Bundle {
         return Bundle().also {
-            if (url != null) it.putString(CredentialUpdateExistingCredentialsDialog.KEY_URL, url)
+            if (url != null) it.putParcelable(CredentialUpdateExistingCredentialsDialog.KEY_URL, AutofillUrlRequest(url, url, ""))
             if (credentials != null) it.putParcelable(CredentialUpdateExistingCredentialsDialog.KEY_CREDENTIALS, credentials)
             it.putParcelable(CredentialUpdateExistingCredentialsDialog.KEY_CREDENTIAL_UPDATE_TYPE, updateType)
         }
