@@ -31,7 +31,7 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.di.scopes.QuickSettingsScope
+import com.duckduckgo.di.scopes.ServiceScope
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
@@ -46,7 +46,7 @@ import logcat.logcat
 // exist in all APIs, and so using it DeviceShieldTileService::class as key would compile but immediately crash
 // at startup when Java class loader tries to resolve the TileService::class upon Dagger setup
 @InjectWith(
-    scope = QuickSettingsScope::class,
+    scope = ServiceScope::class,
     bindingKey = TileServiceBingingKey::class,
 )
 class DeviceShieldTileService : TileService() {

@@ -15,4 +15,4 @@
  */
 package com.duckduckgo.di.scopes
 
-abstract class QuickSettingsScope private constructor()
+abstract class ServiceScope private constructor()

@@ -246,7 +246,7 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
             activityScopeFqName.asClassName(module) -> appScopeFqName
             receiverScopeFqName.asClassName(module) -> appScopeFqName
             vpnScopeFqName.asClassName(module) -> appScopeFqName
-            quickSettingsScopeFqName.asClassName(module) -> appScopeFqName
+            serviceScopeFqName.asClassName(module) -> appScopeFqName
             fragmentScopeFqName.asClassName(module) -> activityScopeFqName
             viewScopeFqName.asClassName(module) -> activityScopeFqName
             backupAgentScopeFqName.asClassName(module) -> appScopeFqName
@@ -284,7 +284,7 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
         private val fragmentScopeFqName = FqName("com.duckduckgo.di.scopes.FragmentScope")
         private val receiverScopeFqName = FqName("com.duckduckgo.di.scopes.ReceiverScope")
         private val vpnScopeFqName = FqName("com.duckduckgo.di.scopes.VpnScope")
-        private val quickSettingsScopeFqName = FqName("com.duckduckgo.di.scopes.QuickSettingsScope")
+        private val serviceScopeFqName = FqName("com.duckduckgo.di.scopes.ServiceScope")
         private val viewScopeFqName = FqName("com.duckduckgo.di.scopes.ViewScope")
         private val backupAgentScopeFqName = FqName("com.duckduckgo.di.scopes.BackupAgentScope")
     }
