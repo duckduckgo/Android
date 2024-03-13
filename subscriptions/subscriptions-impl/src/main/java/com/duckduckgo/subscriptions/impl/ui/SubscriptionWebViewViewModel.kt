@@ -194,30 +194,33 @@ class SubscriptionWebViewViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             val offer = subscriptionsManager.getSubscriptionOffer()
 
-            requireNotNull(offer) // TODO: handle no subscription offer
+            val subscriptionOptions = if (offer != null) {
+                val yearlyJson = OptionsJson(
+                    id = offer.yearlyPlanId,
+                    cost = CostJson(displayPrice = offer.yearlyFormattedPrice, recurrence = YEARLY),
+                )
 
-            val yearlyJson = OptionsJson(
-                id = offer.yearlyPlanId,
-                cost = CostJson(displayPrice = offer.yearlyFormattedPrice, recurrence = YEARLY),
-            )
+                val monthlyJson = OptionsJson(
+                    id = offer.monthlyPlanId,
+                    cost = CostJson(displayPrice = offer.monthlyFormattedPrice, recurrence = MONTHLY),
+                )
 
-            val monthlyJson = OptionsJson(
-                id = offer.monthlyPlanId,
-                cost = CostJson(displayPrice = offer.monthlyFormattedPrice, recurrence = MONTHLY),
-            )
-
-            val subscriptionOptions = jsonAdapter.toJson(
                 SubscriptionOptionsJson(
                     options = listOf(yearlyJson, monthlyJson),
                     features = listOf(FeatureJson(NETP), FeatureJson(ITR), FeatureJson(PIR)),
-                ),
-            )
+                )
+            } else {
+                SubscriptionOptionsJson(
+                    options = emptyList(),
+                    features = emptyList(),
+                )
+            }
 
             val response = JsCallbackData(
                 featureName = featureName,
                 method = method,
                 id = id,
-                params = JSONObject(subscriptionOptions),
+                params = JSONObject(jsonAdapter.toJson(subscriptionOptions)),
             )
             command.send(SendResponseToJs(response))
         }

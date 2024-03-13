@@ -199,6 +199,25 @@ class SubscriptionWebViewViewModelTest {
     }
 
     @Test
+    fun whenGetSubscriptionsAndNoSubscriptionOfferThenSendCommandWithEmptyData() = runTest {
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "getSubscriptionOptions", "id", JSONObject("{}"))
+
+            val result = awaitItem()
+            assertTrue(result is Command.SendResponseToJs)
+
+            val response = (result as Command.SendResponseToJs).data
+            assertEquals("id", response.id)
+            assertEquals("test", response.featureName)
+            assertEquals("getSubscriptionOptions", response.method)
+
+            val params = jsonAdapter.fromJson(response.params.toString())!!
+            assertEquals(0, params.options.size)
+            assertEquals(0, params.features.size)
+        }
+    }
+
+    @Test
     fun whenActivateSubscriptionAndSubscriptionActiveThenCommandSent() = runTest {
         whenever(subscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
         viewModel.commands().test {
