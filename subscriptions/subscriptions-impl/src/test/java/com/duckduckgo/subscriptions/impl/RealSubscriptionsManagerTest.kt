@@ -58,7 +58,7 @@ class RealSubscriptionsManagerTest {
     private val authService: AuthService = mock()
     private val subscriptionsService: SubscriptionsService = mock()
     private val authDataStore: SubscriptionsDataStore = FakeSubscriptionsDataStore()
-    private val authRepository = RealAuthRepository(authDataStore)
+    private val authRepository = RealAuthRepository(authDataStore, coroutineRule.testDispatcherProvider)
     private val emailManager: EmailManager = mock()
     private val playBillingManager: PlayBillingManager = mock()
     private val context: Context = mock()
@@ -188,12 +188,12 @@ class RealSubscriptionsManagerTest {
         assertTrue(value?.entitlements?.firstOrNull { it.product == "testProduct" } != null)
     }
 
-    @Test(expected = Exception::class)
-    fun whenFetchAndStoreAllDataIfSubscriptionFailsThenThrow() = runTest {
+    @Test
+    fun whenFetchAndStoreAllDataIfSubscriptionFailsThenReturnNull() = runTest {
         givenUserIsAuthenticated()
         givenSubscriptionFails()
 
-        subscriptionsManager.fetchAndStoreAllData()
+        assertNull(subscriptionsManager.fetchAndStoreAllData())
     }
 
     @Test

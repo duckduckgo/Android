@@ -11,7 +11,7 @@ class RealAuthRepositoryTest {
     val coroutineRule = CoroutineTestRule()
 
     private val authStore = FakeSubscriptionsDataStore()
-    private val authRepository: AuthRepository = RealAuthRepository(authStore)
+    private val authRepository: AuthRepository = RealAuthRepository(authStore, coroutineRule.testDispatcherProvider)
 
     @Test
     fun whenIsAuthenticatedAndNoAccessTokenThenReturnFalse() = runTest {

@@ -56,11 +56,7 @@ class SubscriptionsEncryptedDataStore @Inject constructor(
         get() = encryptedPreferences?.getString(KEY_PRODUCT_ID, null)
         set(value) {
             encryptedPreferences?.edit(commit = true) {
-                if (value == null) {
-                    remove(KEY_PRODUCT_ID)
-                } else {
-                    putString(KEY_PRODUCT_ID, value)
-                }
+                putString(KEY_PRODUCT_ID, value)
             }
         }
 
@@ -68,11 +64,7 @@ class SubscriptionsEncryptedDataStore @Inject constructor(
         get() = encryptedPreferences?.getString(KEY_STATUS, null)
         set(value) {
             encryptedPreferences?.edit(commit = true) {
-                if (value == null) {
-                    remove(KEY_STATUS)
-                } else {
-                    putString(KEY_STATUS, value)
-                }
+                putString(KEY_STATUS, value)
             }
         }
 
@@ -80,11 +72,7 @@ class SubscriptionsEncryptedDataStore @Inject constructor(
         get() = encryptedPreferences?.getString(KEY_ENTITLEMENTS, null)
         set(value) {
             encryptedPreferences?.edit(commit = true) {
-                if (value == null) {
-                    remove(KEY_ENTITLEMENTS)
-                } else {
-                    putString(KEY_ENTITLEMENTS, value)
-                }
+                putString(KEY_ENTITLEMENTS, value)
             }
         }
 
@@ -92,11 +80,7 @@ class SubscriptionsEncryptedDataStore @Inject constructor(
         get() = encryptedPreferences?.getString(KEY_ACCESS_TOKEN, null)
         set(value) {
             encryptedPreferences?.edit(commit = true) {
-                if (value == null) {
-                    remove(KEY_ACCESS_TOKEN)
-                } else {
-                    putString(KEY_ACCESS_TOKEN, value)
-                }
+                putString(KEY_ACCESS_TOKEN, value)
             }
         }
 
@@ -104,11 +88,7 @@ class SubscriptionsEncryptedDataStore @Inject constructor(
         get() = encryptedPreferences?.getString(KEY_AUTH_TOKEN, null)
         set(value) {
             encryptedPreferences?.edit(commit = true) {
-                if (value == null) {
-                    remove(KEY_AUTH_TOKEN)
-                } else {
-                    putString(KEY_AUTH_TOKEN, value)
-                }
+                putString(KEY_AUTH_TOKEN, value)
             }
         }
 
@@ -116,11 +96,7 @@ class SubscriptionsEncryptedDataStore @Inject constructor(
         get() = encryptedPreferences?.getString(KEY_EMAIL, null)
         set(value) {
             encryptedPreferences?.edit(commit = true) {
-                if (value == null) {
-                    remove(KEY_EMAIL)
-                } else {
-                    putString(KEY_EMAIL, value)
-                }
+                putString(KEY_EMAIL, value)
             }
         }
 
@@ -128,11 +104,7 @@ class SubscriptionsEncryptedDataStore @Inject constructor(
         get() = encryptedPreferences?.getString(KEY_PLATFORM, null)
         set(value) {
             encryptedPreferences?.edit(commit = true) {
-                if (value == null) {
-                    remove(KEY_PLATFORM)
-                } else {
-                    putString(KEY_PLATFORM, value)
-                }
+                putString(KEY_PLATFORM, value)
             }
         }
 
@@ -140,16 +112,12 @@ class SubscriptionsEncryptedDataStore @Inject constructor(
         get() = encryptedPreferences?.getString(KEY_EXTERNAL_ID, null)
         set(value) {
             encryptedPreferences?.edit(commit = true) {
-                if (value == null) {
-                    remove(KEY_EXTERNAL_ID)
-                } else {
-                    putString(KEY_EXTERNAL_ID, value)
-                }
+                putString(KEY_EXTERNAL_ID, value)
             }
         }
 
     override var expiresOrRenewsAt: Long?
-        get() = encryptedPreferences?.getLong(KEY_EXPIRES_OR_RENEWS_AT, 0L)
+        get() = encryptedPreferences?.getLong(KEY_EXPIRES_OR_RENEWS_AT, 0L).takeIf { it != 0L }
         set(value) {
             encryptedPreferences?.edit(commit = true) {
                 if (value == null) {
@@ -161,7 +129,7 @@ class SubscriptionsEncryptedDataStore @Inject constructor(
         }
 
     override var startedAt: Long?
-        get() = encryptedPreferences?.getLong(KEY_STARTED_AT, 0L)
+        get() = encryptedPreferences?.getLong(KEY_STARTED_AT, 0L).takeIf { it != 0L }
         set(value) {
             encryptedPreferences?.edit(commit = true) {
                 if (value == null) {

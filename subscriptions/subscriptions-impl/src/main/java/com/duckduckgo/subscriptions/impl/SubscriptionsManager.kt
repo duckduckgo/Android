@@ -314,17 +314,21 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     override suspend fun fetchAndStoreAllData(authToken: String?): Subscription? {
-        authToken?.let { authRepository.saveAuthToken(it) }
-        if (!isUserAuthenticated()) return null
-        val token = (authToken ?: authRepository.getAccessToken()) ?: return null
-        val subscription = subscriptionsService.subscription("Bearer $token")
-        val accountData = validateToken(token).account
-        authRepository.saveExternalId(accountData.externalId)
-        authRepository.saveSubscriptionData(subscription, accountData.entitlements.toEntitlements(), accountData.email)
+        try {
+            authToken?.let { authRepository.saveAuthToken(it) }
+            if (!isUserAuthenticated()) return null
+            val token = (authToken ?: authRepository.getAccessToken()) ?: return null
+            val subscription = subscriptionsService.subscription("Bearer $token")
+            val accountData = validateToken(token).account
+            authRepository.saveExternalId(accountData.externalId)
+            authRepository.saveSubscriptionData(subscription, accountData.entitlements.toEntitlements(), accountData.email)
 
-        _hasSubscription.emit(hasSubscription())
-        _isSignedIn.emit(isUserAuthenticated())
-        return authRepository.getSubscription()
+            _hasSubscription.emit(hasSubscription())
+            _isSignedIn.emit(isUserAuthenticated())
+            return authRepository.getSubscription()
+        } catch (e: Exception) {
+            return null
+        }
     }
 
     private fun extractError(e: Exception): String {
@@ -444,12 +448,10 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     override suspend fun getAccessToken(): AccessToken {
-        return withContext(dispatcherProvider.io()) {
-            if (isUserAuthenticated()) {
-                AccessToken.Success(authRepository.getAccessToken()!!)
-            } else {
-                AccessToken.Failure("Token not found")
-            }
+        return if (isUserAuthenticated()) {
+            AccessToken.Success(authRepository.getAccessToken()!!)
+        } else {
+            AccessToken.Failure("Token not found")
         }
     }
 
