@@ -2,24 +2,19 @@ package com.duckduckgo.subscriptions.impl.ui
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
-import com.android.billingclient.api.ProductDetails.PricingPhase
-import com.android.billingclient.api.ProductDetails.PricingPhases
-import com.android.billingclient.api.ProductDetails.SubscriptionOfferDetails
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetPWaitlistInvitedScreenNoParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist
 import com.duckduckgo.subscriptions.impl.CurrentPurchase
 import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
+import com.duckduckgo.subscriptions.impl.SubscriptionOffer
 import com.duckduckgo.subscriptions.impl.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.impl.SubscriptionStatus.EXPIRED
 import com.duckduckgo.subscriptions.impl.SubscriptionStatus.INACTIVE
 import com.duckduckgo.subscriptions.impl.SubscriptionsChecker
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
-import com.duckduckgo.subscriptions.impl.repository.SubscriptionsRepository
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Companion
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView
@@ -47,7 +42,6 @@ class SubscriptionWebViewViewModelTest {
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
     private val jsonAdapter: JsonAdapter<SubscriptionOptionsJson> = moshi.adapter(SubscriptionOptionsJson::class.java)
     private val subscriptionsManager: SubscriptionsManager = mock()
-    private val subscriptionsRepository: SubscriptionsRepository = mock()
     private val networkProtectionWaitlist: NetworkProtectionWaitlist = mock()
     private val subscriptionsChecker: SubscriptionsChecker = mock()
     private val pixelSender: SubscriptionPixelSender = mock()
@@ -61,7 +55,6 @@ class SubscriptionWebViewViewModelTest {
             coroutineTestRule.testDispatcherProvider,
             subscriptionsManager,
             subscriptionsChecker,
-            subscriptionsRepository,
             networkProtectionWaitlist,
             pixelSender,
         )
@@ -181,9 +174,14 @@ class SubscriptionWebViewViewModelTest {
 
     @Test
     fun whenGetSubscriptionOptionsThenSendCommand() = runTest {
-        val monthly = getSubscriptionOfferDetails("monthly")
-        val yearly = getSubscriptionOfferDetails("yearly")
-        whenever(subscriptionsRepository.offerDetail()).thenReturn(mapOf(MONTHLY_PLAN to monthly, YEARLY_PLAN to yearly))
+        whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(
+            SubscriptionOffer(
+                monthlyPlanId = "monthly",
+                monthlyFormattedPrice = "$1",
+                yearlyPlanId = "yearly",
+                yearlyFormattedPrice = "$10",
+            ),
+        )
 
         viewModel.commands().test {
             viewModel.processJsCallbackMessage("test", "getSubscriptionOptions", "id", JSONObject("{}"))
@@ -356,16 +354,5 @@ class SubscriptionWebViewViewModelTest {
             data = JSONObject("""{"feature":"${SubscriptionsConstants.PIR}"}"""),
         )
         verify(pixelSender).reportOnboardingPirClick()
-    }
-
-    private fun getSubscriptionOfferDetails(planId: String): SubscriptionOfferDetails {
-        val subscriptionOfferDetails: SubscriptionOfferDetails = mock()
-        whenever(subscriptionOfferDetails.basePlanId).thenReturn(planId)
-        val phase: PricingPhase = mock()
-        val phases: PricingPhases = mock()
-        whenever(phase.formattedPrice).thenReturn("$1.1")
-        whenever(phases.pricingPhaseList).thenReturn(listOf(phase))
-        whenever(subscriptionOfferDetails.pricingPhases).thenReturn(phases)
-        return subscriptionOfferDetails
     }
 }

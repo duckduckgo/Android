@@ -31,16 +31,12 @@ import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
 import com.duckduckgo.subscriptions.impl.SubscriptionsChecker
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ITR
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.NETP
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PIR
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PLATFORM
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
-import com.duckduckgo.subscriptions.impl.billing.getPrice
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
-import com.duckduckgo.subscriptions.impl.repository.SubscriptionsRepository
 import com.duckduckgo.subscriptions.impl.repository.isActive
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.*
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView.Failure
@@ -69,7 +65,6 @@ class SubscriptionWebViewViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val subscriptionsManager: SubscriptionsManager,
     private val subscriptionsChecker: SubscriptionsChecker,
-    private val subscriptionsRepository: SubscriptionsRepository,
     private val networkProtectionWaitlist: NetworkProtectionWaitlist,
     private val pixelSender: SubscriptionPixelSender,
 ) : ViewModel() {
@@ -189,27 +184,26 @@ class SubscriptionWebViewViewModel @Inject constructor(
         }
     }
 
-    fun purchaseSubscription(activity: Activity, id: String) {
+    fun purchaseSubscription(activity: Activity, planId: String) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            val offerToken = runCatching { subscriptionsRepository.offerDetail()[id]?.offerToken }.getOrNull() ?: return@launch
-            val productDetails = subscriptionsRepository.subscriptionDetails() ?: return@launch
-            subscriptionsManager.purchase(activity, productDetails, offerToken, false)
+            subscriptionsManager.purchase(activity, planId)
         }
     }
 
     private fun getSubscriptionOptions(featureName: String, method: String, id: String) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            val yearly = subscriptionsRepository.offerDetail()[YEARLY_PLAN]
-            val monthly = subscriptionsRepository.offerDetail()[MONTHLY_PLAN]
+            val offer = subscriptionsManager.getSubscriptionOffer()
+
+            requireNotNull(offer) // TODO: handle no subscription offer
 
             val yearlyJson = OptionsJson(
-                id = yearly?.basePlanId!!,
-                cost = CostJson(displayPrice = yearly.getPrice(), recurrence = YEARLY),
+                id = offer.yearlyPlanId,
+                cost = CostJson(displayPrice = offer.yearlyFormattedPrice, recurrence = YEARLY),
             )
 
             val monthlyJson = OptionsJson(
-                id = monthly?.basePlanId!!,
-                cost = CostJson(displayPrice = monthly.getPrice(), recurrence = MONTHLY),
+                id = offer.monthlyPlanId,
+                cost = CostJson(displayPrice = offer.monthlyFormattedPrice, recurrence = MONTHLY),
             )
 
             val subscriptionOptions = jsonAdapter.toJson(
