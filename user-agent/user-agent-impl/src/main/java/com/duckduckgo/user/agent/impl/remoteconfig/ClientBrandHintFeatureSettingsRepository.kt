@@ -46,6 +46,8 @@ class RealClientBrandHintFeatureSettingsRepository @Inject constructor(
 
     private val dao = database.clientBrandHintDao()
 
+    override val clientBrandHints = CopyOnWriteArrayList<ClientBrandHintDomain>()
+
     init {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             if (isMainProcess) {
@@ -59,8 +61,6 @@ class RealClientBrandHintFeatureSettingsRepository @Inject constructor(
         dao.updateAllDomains(settings.domains.map { ClientHintBrandDomainEntity(it.domain, it.brand.name) })
         loadToMemory()
     }
-
-    override val clientBrandHints = CopyOnWriteArrayList<ClientBrandHintDomain>()
 
     private fun loadToMemory() {
         clientBrandHints.clear()
