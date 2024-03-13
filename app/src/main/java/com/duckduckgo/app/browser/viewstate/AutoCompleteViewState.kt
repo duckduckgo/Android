@@ -20,8 +20,8 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
 
 data class AutoCompleteViewState(
-        val showSuggestions: Boolean = false,
-        val showFavorites: Boolean = false,
-        val searchResults: AutoComplete.AutoCompleteResult = AutoComplete.AutoCompleteResult("", emptyList()),
-        val favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite> = emptyList(),
+    val showSuggestions: Boolean = false,
+    val showFavorites: Boolean = false,
+    val searchResults: AutoComplete.AutoCompleteResult = AutoComplete.AutoCompleteResult("", emptyList()),
+    val favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite> = emptyList(),
 )
