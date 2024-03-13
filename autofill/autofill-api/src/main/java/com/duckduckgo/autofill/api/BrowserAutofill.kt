@@ -16,98 +16,42 @@
 
 package com.duckduckgo.autofill.api
 
+import android.os.Parcelable
 import android.webkit.WebView
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
+import kotlinx.parcelize.Parcelize
 
 /**
  * Public interface for accessing and configuring browser autofill functionality for a WebView instance
  */
 interface BrowserAutofill {
-    interface Configurator {
-        /**
-         * Configures autofill for the current webpage.
-         * This should be called once per page load (e.g., onPageStarted())
-         *
-         * Responsible for injecting the required autofill configuration to the JS layer
-         */
-        fun configureAutofillForCurrentPage(
-            webView: WebView,
-            url: String?,
-        )
-    }
 
     /**
      * Adds the native->JS interface to the given WebView
      * This should be called once per WebView where autofill is to be available in it
      */
-    fun addJsInterface(
+    suspend fun addJsInterface(
         webView: WebView,
         autofillCallback: Callback,
-        emailProtectionInContextCallback: EmailProtectionUserPromptListener? = null,
-        emailProtectionInContextSignupFlowCallback: EmailProtectionInContextSignupFlowListener? = null,
         tabId: String,
     )
 
     /**
      * Removes the JS interface as a clean-up. Recommended to call from onDestroy() of Fragment/Activity containing the WebView
      */
-    fun removeJsInterface()
+    fun removeJsInterface(webView: WebView?)
 
     /**
-     * Communicates with the JS layer to pass the given credentials
-     *
-     * @param credentials The credentials to be passed to the JS layer. Can be null to indicate credentials won't be autofilled.
+     * Notifies that there has been a change in web page, and the autofill state should be re-evaluated
      */
-    fun injectCredentials(credentials: LoginCredentials?)
+    fun notifyPageChanged()
 
     /**
      * Cancels any ongoing autofill operations which would show the user the prompt to choose credentials
      * This would only normally be needed if a user-interaction happened such that showing autofill prompt would be undesirable.
      */
     fun cancelPendingAutofillRequestToChooseCredentials()
-
-    /**
-     * Informs the JS layer to use the generated password and fill it into the password field(s)
-     */
-    fun acceptGeneratedPassword()
-
-    /**
-     * Informs the JS layer not to use the generated password
-     */
-    fun rejectGeneratedPassword()
-
-    /**
-     * Informs the JS layer that the in-context Email Protection flow has finished
-     */
-    fun inContextEmailProtectionFlowFinished()
-}
-
-/**
- * Callback for Email Protection prompts, signalling when to show the native UI to the user
- */
-interface EmailProtectionUserPromptListener {
-
-    /**
-     * Called when the user should be shown prompt to sign up for Email Protection
-     */
-    fun showNativeInContextEmailProtectionSignupPrompt()
-
-    /**
-     * Called when the user should be shown prompt to choose an email address to use for email protection autofill
-     */
-    fun showNativeChooseEmailAddressPrompt()
-}
-
-/**
- * Callback for Email Protection events that might happen during the in-context signup flow
- */
-interface EmailProtectionInContextSignupFlowListener {
-
-    /**
-     * Called when the in-context email protection signup flow should be closed
-     */
-    fun closeInContextSignup()
 }
 
 /**
@@ -120,7 +64,7 @@ interface Callback {
      * When this is called, we should present the list to the user for them to choose which one, if any, to autofill.
      */
     suspend fun onCredentialsAvailableToInject(
-        originalUrl: String,
+        autofillWebMessageRequest: AutofillWebMessageRequest,
         credentials: List<LoginCredentials>,
         triggerType: LoginTriggerType,
     )
@@ -130,7 +74,7 @@ interface Callback {
      * When this is called, we'd typically want to prompt the user if they want to save the credentials.
      */
     suspend fun onCredentialsAvailableToSave(
-        currentUrl: String,
+        autofillWebMessageRequest: AutofillWebMessageRequest,
         credentials: LoginCredentials,
     )
 
@@ -139,18 +83,46 @@ interface Callback {
      * When this is called, we should present the generated password to the user for them to choose whether to use it or not.
      */
     suspend fun onGeneratedPasswordAvailableToUse(
-        originalUrl: String,
+        autofillWebMessageRequest: AutofillWebMessageRequest,
         username: String?,
         generatedPassword: String,
     )
 
     /**
-     * Called when we've been asked which credentials we have available to autofill, but the answer is none.
+     * Called when the user should be shown prompt to choose an email address to use for email protection autofill
      */
-    fun noCredentialsAvailable(originalUrl: String)
+    fun showNativeChooseEmailAddressPrompt(autofillWebMessageRequest: AutofillWebMessageRequest)
+
+    /**
+     * Called when the user should be shown prompt to sign up for Email Protection
+     */
+    fun showNativeInContextEmailProtectionSignupPrompt(autofillWebMessageRequest: AutofillWebMessageRequest)
 
     /**
      * Called when credentials have been saved, and we want to show the user some visual confirmation.
      */
     fun onCredentialsSaved(savedCredentials: LoginCredentials)
 }
+
+/**
+ * When there is an autofill request to be handled that requires user-interaction, we need to know where the request came from when later responding
+ *
+ * This is metadata about the WebMessage request that was received from the JS.
+ */
+@Parcelize
+data class AutofillWebMessageRequest(
+    /**
+     * The origin of the request. Note, this may be a different origin than the page the user is currently on if the request came from an iframe
+     */
+    val requestOrigin: String,
+
+    /**
+     * The user-facing URL of the page where the autofill request originated
+     */
+    val originalPageUrl: String?,
+
+    /**
+     * The ID of the original request from the JS. This request ID is required in order to later provide a response using the web message reply API
+     */
+    val requestId: String,
+) : Parcelable
