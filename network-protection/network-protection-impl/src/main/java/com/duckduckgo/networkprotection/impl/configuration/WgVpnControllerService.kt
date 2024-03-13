@@ -126,7 +126,7 @@ interface WgVpnControllerService {
     suspend fun getEligibleLocations(): List<EligibleLocation>
 }
 
-const val NETP_ENVIRONMENT_URL = "https://controller.netp.duckduckgo.com"
+const val NETP_ENVIRONMENT_URL = "https://staging1.netp.duckduckgo.com"
 
 data class NetPRedeemCodeRequest(
     val code: String,
