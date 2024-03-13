@@ -84,7 +84,7 @@ class NetworkProtectionAccessStateTest {
 
     @Test
     fun whenSubscriptionsEnabledAndHasNoEntitlementAndNetpDisabledThenReturnNotUnlocked() = runTest {
-        whenever(netpSubscriptionManager.hasValidEntitlement()).thenReturn(Result.success(false))
+        whenever(netpSubscriptionManager.hasValidEntitlement()).thenReturn(false)
         whenever(networkProtectionState.isEnabled()).thenReturn(false)
         testee.getState().also {
             assertEquals(NotUnlocked, it)
@@ -94,7 +94,7 @@ class NetworkProtectionAccessStateTest {
 
     @Test
     fun whenSubscriptionsEnabledAndHasNoEntitlementAndNetpEnabledThenReturnNotUnlockedAndResetVpnState() = runTest {
-        whenever(netpSubscriptionManager.hasValidEntitlement()).thenReturn(Result.success(false))
+        whenever(netpSubscriptionManager.hasValidEntitlement()).thenReturn(false)
         whenever(networkProtectionState.isEnabled()).thenReturn(true)
         testee.getState().also {
             assertEquals(NotUnlocked, it)
@@ -105,7 +105,7 @@ class NetworkProtectionAccessStateTest {
 
     @Test
     fun whenSubscriptionsEnabledAndHasEntitlementAndHasAuthTokenAndNotAcceptedTermsReturnInBetaFalse() = runTest {
-        whenever(netpSubscriptionManager.hasValidEntitlement()).thenReturn(Result.success(true))
+        whenever(netpSubscriptionManager.hasValidEntitlement()).thenReturn(true)
         whenever(netPWaitlistRepository.didAcceptWaitlistTerms()).thenReturn(false)
         whenever(netPWaitlistRepository.getAuthenticationToken()).thenReturn("123")
         testee.getState().also {
@@ -115,30 +115,11 @@ class NetworkProtectionAccessStateTest {
 
     @Test
     fun whenSubscriptionsEnabledAndHasEntitlementAndAcceptedTermsReturnInBetaTrue() = runTest {
-        whenever(netpSubscriptionManager.hasValidEntitlement()).thenReturn(Result.success(true))
+        whenever(netpSubscriptionManager.hasValidEntitlement()).thenReturn(true)
         whenever(netPWaitlistRepository.didAcceptWaitlistTerms()).thenReturn(true)
         whenever(netPWaitlistRepository.getAuthenticationToken()).thenReturn("123")
         testee.getState().also {
             assertEquals(InBeta(true), it)
-        }
-    }
-
-    @Test
-    fun whenSubscriptionsEnabledAndEntitlementCheckFailedReturnNotUnlocked() = runTest {
-        whenever(netpSubscriptionManager.hasValidEntitlement()).thenReturn(Result.failure(RuntimeException()))
-        whenever(netPWaitlistRepository.didAcceptWaitlistTerms()).thenReturn(true)
-        whenever(netPWaitlistRepository.getAuthenticationToken()).thenReturn("123")
-        testee.getState().also {
-            assertEquals(NotUnlocked, it)
-        }
-    }
-
-    @Test
-    fun whenSubscriptionsEnabledAndEntitlementCheckFailedAndNetpHasNeverBeenEnabledReturnVerifySubscription() = runTest {
-        whenever(netpSubscriptionManager.hasValidEntitlement()).thenReturn(Result.failure(RuntimeException()))
-        whenever(netPWaitlistRepository.getAuthenticationToken()).thenReturn(null)
-        testee.getState().also {
-            assertEquals(NotUnlocked, it)
         }
     }
 }

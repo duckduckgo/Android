@@ -189,7 +189,7 @@ class SettingsViewModel @Inject constructor(
                     showAutofill = autofillCapabilityChecker.canAccessCredentialManagementScreen(),
                     showSyncSetting = deviceSyncState.isFeatureEnabled(),
                     networkProtectionEntryState = (if (networkProtectionState.isRunning()) CONNECTED else DISCONNECTED).run {
-                        getNetworkProtectionEntryState(this)
+                        if (isPrivacyProEnabled()) Hidden else getNetworkProtectionEntryState(this)
                     },
                     isAutoconsentEnabled = autoconsent.isSettingEnabled(),
                 ),
@@ -198,7 +198,7 @@ class SettingsViewModel @Inject constructor(
                 .onEach {
                     viewState.emit(
                         currentViewState().copy(
-                            networkProtectionEntryState = getNetworkProtectionEntryState(it),
+                            networkProtectionEntryState = if (isPrivacyProEnabled()) Hidden else getNetworkProtectionEntryState(it),
                         ),
                     )
                 }.flowOn(dispatcherProvider.main())
@@ -214,7 +214,7 @@ class SettingsViewModel @Inject constructor(
         appTPPollJob += viewModelScope.launch(dispatcherProvider.io()) {
             while (isActive) {
                 val isDeviceShieldEnabled = appTrackingProtection.isRunning()
-                val isPrivacyProEnabled = subscriptions.isEnabled()
+                val isPrivacyProEnabled = isPrivacyProEnabled()
                 val currentState = currentViewState()
                 viewState.value = currentState.copy(
                     appTrackingProtectionOnboardingShown = appTrackingProtection.isOnboarded(),
@@ -324,6 +324,10 @@ class SettingsViewModel @Inject constructor(
 
     private fun currentViewState(): ViewState {
         return viewState.value
+    }
+
+    private suspend fun isPrivacyProEnabled(): Boolean {
+        return subscriptions.isEnabled()
     }
 
     fun onSyncSettingClicked() {

@@ -56,6 +56,7 @@ import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -181,8 +182,16 @@ class RealSubscriptionsManager @Inject constructor(
     private val _hasSubscription = MutableStateFlow(false)
     override val hasSubscription = _hasSubscription.asStateFlow().onSubscription { emitHasSubscriptionsValues() }
 
-    private val _entitlements = MutableStateFlow(emptyList<Product>())
-    override val entitlements = _entitlements.asStateFlow().onSubscription { emitEntitlementsValues() }
+    // A state flow behaves identically to a shared flow when it is created with the following parameters
+    // See https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/-state-flow/
+    // See also https://github.com/Kotlin/kotlinx.coroutines/issues/2515
+    //
+    // WARNING: only use _state to emit values, for anything else use getState()
+    private val _entitlements: MutableSharedFlow<List<Product>> = MutableSharedFlow(
+        replay = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST,
+    )
+    override val entitlements = _entitlements.onSubscription { emitEntitlementsValues() }
 
     private var purchaseStateJob: Job? = null
     private suspend fun isUserAuthenticated(): Boolean = authRepository.isUserAuthenticated()
