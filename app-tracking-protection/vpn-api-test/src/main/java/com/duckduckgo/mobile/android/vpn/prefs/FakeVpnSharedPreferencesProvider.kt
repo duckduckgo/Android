@@ -23,4 +23,11 @@ class FakeVpnSharedPreferencesProvider : VpnSharedPreferencesProvider {
     override fun getSharedPreferences(name: String, multiprocess: Boolean, migrate: Boolean): SharedPreferences {
         return InMemorySharedPreferences()
     }
+
+    override fun getEncryptedSharedPreferences(
+        name: String,
+        multiprocess: Boolean,
+    ): SharedPreferences {
+        return getSharedPreferences(name, multiprocess)
+    }
 }

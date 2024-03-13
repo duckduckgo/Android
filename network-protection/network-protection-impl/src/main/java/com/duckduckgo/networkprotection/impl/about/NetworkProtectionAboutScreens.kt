@@ -27,5 +27,13 @@ sealed class NetworkProtectionAboutScreens {
     /**
      * Use this model to launch the "Network Protection" terms and conditions screen
      */
+    @Deprecated("This is the old terms and conditions for VPN waitlist beta")
     object NetPTermsScreenNoParams : ActivityParams
+
+    /**
+     * Use this model to launch the "Network Protection" terms and conditions screen
+     */
+    object VpnTermsScreenNoParams : ActivityParams {
+        private fun readResolve(): Any = VpnTermsScreenNoParams
+    }
 }

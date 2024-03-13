@@ -38,6 +38,13 @@ class AppTpRemoteFeaturesStoreTest {
                 ): SharedPreferences {
                     return preferences
                 }
+
+                override fun getEncryptedSharedPreferences(
+                    name: String,
+                    multiprocess: Boolean,
+                ): SharedPreferences? {
+                    return preferences
+                }
             },
             Moshi.Builder().build(),
         )
@@ -80,6 +87,13 @@ class AppTpRemoteFeaturesStoreTest {
                     multiprocess: Boolean,
                     migrate: Boolean,
                 ): SharedPreferences {
+                    return preferences
+                }
+
+                override fun getEncryptedSharedPreferences(
+                    name: String,
+                    multiprocess: Boolean,
+                ): SharedPreferences? {
                     return preferences
                 }
             },
