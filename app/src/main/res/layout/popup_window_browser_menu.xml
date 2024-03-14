@@ -236,6 +236,8 @@
                 android:id="@+id/runningInDdgBrowserMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:textType="secondary"
+                app:typography="body2"
                 app:iconDrawable="@drawable/ic_dax_icon"
                 app:primaryText="@string/runningInDdgMenuItemTitle" />
 

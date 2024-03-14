@@ -48,72 +48,12 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu">
 
-                <androidx.constraintlayout.widget.ConstraintLayout
+                <include
                     android:id="@+id/customTabToolbarContainer"
+                    layout="@layout/include_custom_tab_toolbar"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:visibility="gone">
-
-                    <ImageView
-                        android:id="@+id/customTabCloseIcon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:importantForAccessibility="no"
-                        android:paddingTop="@dimen/keyline_4"
-                        android:paddingBottom="@dimen/keyline_4"
-                        android:paddingStart="@dimen/keyline_4"
-                        android:paddingEnd="@dimen/keyline_0"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:srcCompat="@drawable/ic_close_24"
-                        android:visibility="gone"
-                        tools:visibility="visible"/>
-
-                    <com.airbnb.lottie.LottieAnimationView
-                        android:id="@+id/customTabShieldIcon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:importantForAccessibility="no"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toEndOf="@id/customTabCloseIcon"
-                        app:layout_constraintTop_toTopOf="parent"
-                        android:visibility="gone"
-                        tools:visibility="visible"/>
-
-                    <com.duckduckgo.common.ui.view.text.DaxTextView
-                        android:id="@+id/customTabTitle"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:typography="body1"
-                        android:visibility="gone"
-                        android:layout_marginStart="88dp"
-                        android:layout_marginEnd="@dimen/keyline_4"
-                        android:ellipsize="end"
-                        android:maxLines="1"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toTopOf="@id/customTabDomain"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        tools:visibility="visible"
-                        tools:text="Example"/>
-
-                    <com.duckduckgo.common.ui.view.text.DaxTextView
-                        android:id="@+id/customTabDomain"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:typography="body2"
-                        android:visibility="gone"
-                        android:layout_marginStart="88dp"
-                        android:layout_marginEnd="@dimen/keyline_6"
-                        app:layout_constraintStart_toStartOf="@id/customTabTitle"
-                        app:layout_constraintTop_toBottomOf="@id/customTabTitle"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="@id/customTabTitle"
-                        tools:visibility="visible"
-                        tools:text="www.example.com" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                    android:visibility="gone" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/omniBarContainer"

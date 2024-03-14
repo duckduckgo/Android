@@ -219,6 +219,7 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.api.emailprotection.EmailInjector
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
+import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.store.BrowserAppTheme
 import com.duckduckgo.common.ui.view.DaxDialog
@@ -860,28 +861,28 @@ class BrowserTabFragment :
         omnibar.toolbar.background = ColorDrawable(tabToolbarColor)
         omnibar.toolbarContainer.background = ColorDrawable(tabToolbarColor)
 
-        omnibar.customTabToolbarContainer.show()
+        omnibar.customTabToolbarContainer.customTabToolbar.show()
 
-        omnibar.customTabCloseIcon.show()
-        omnibar.customTabCloseIcon.setOnClickListener {
+        omnibar.customTabToolbarContainer.customTabCloseIcon.setOnClickListener {
             requireActivity().finish()
         }
 
-        omnibar.customTabShieldIcon.show()
-        omnibar.customTabShieldIcon.setOnClickListener { _ ->
+        omnibar.customTabToolbarContainer.customTabShieldIcon.setOnClickListener { _ ->
             val params = PrivacyDashboardHybridScreen.PrivacyDashboardHybridWithTabIdParam(tabId)
             val intent = globalActivityStarter.startIntent(requireContext(), params)
             intent?.let { startActivity(it) }
             pixel.fire(CustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_OPENED)
         }
 
-        omnibar.customTabDomain.text = viewModel.url?.extractDomain()
-        omnibar.customTabDomain.show()
+        omnibar.customTabToolbarContainer.customTabDomain.text = viewModel.url?.extractDomain()
+        omnibar.customTabToolbarContainer.customTabDomainOnly.text = viewModel.url?.extractDomain()
+        omnibar.customTabToolbarContainer.customTabDomainOnly.show()
 
         val foregroundColor = calculateForegroundColor(tabToolbarColor)
-        omnibar.customTabCloseIcon.setColorFilter(foregroundColor)
-        omnibar.customTabDomain.setTextColor(foregroundColor)
-        omnibar.customTabTitle.setTextColor(foregroundColor)
+        omnibar.customTabToolbarContainer.customTabCloseIcon.setColorFilter(foregroundColor)
+        omnibar.customTabToolbarContainer.customTabDomain.setTextColor(foregroundColor)
+        omnibar.customTabToolbarContainer.customTabDomainOnly.setTextColor(foregroundColor)
+        omnibar.customTabToolbarContainer.customTabTitle.setTextColor(foregroundColor)
         omnibar.browserMenuImageView.setColorFilter(foregroundColor)
 
         requireActivity().window.navigationBarColor = tabToolbarColor
@@ -889,6 +890,11 @@ class BrowserTabFragment :
     }
 
     private fun calculateForegroundColor(color: Int): Int {
+        // Handle the case where we did not receive a color.
+        if (color == 0) {
+            return if ((context as DuckDuckGoActivity).isDarkThemeEnabled()) Color.WHITE else Color.BLACK
+        }
+
         if (color == Color.WHITE || Color.alpha(color) < 128) {
             return Color.BLACK
         }
@@ -1463,8 +1469,10 @@ class BrowserTabFragment :
 
     private fun showWebPageTitleInCustomTab(title: String) {
         if (isActiveCustomTab()) {
-            omnibar.customTabTitle.text = title
-            omnibar.customTabTitle.show()
+            omnibar.customTabToolbarContainer.customTabTitle.text = title
+            omnibar.customTabToolbarContainer.customTabTitle.show()
+            omnibar.customTabToolbarContainer.customTabDomainOnly.hide()
+            omnibar.customTabToolbarContainer.customTabDomain.show()
         }
     }
 
@@ -3376,7 +3384,7 @@ class BrowserTabFragment :
             renderIfChanged(viewState, lastSeenPrivacyShieldViewState) {
                 if (viewState.privacyShield != UNKNOWN) {
                     lastSeenPrivacyShieldViewState = viewState
-                    val animationViewHolder = if (isActiveCustomTab()) omnibar.customTabShieldIcon else omnibar.shieldIcon
+                    val animationViewHolder = if (isActiveCustomTab()) omnibar.customTabToolbarContainer.customTabShieldIcon else omnibar.shieldIcon
                     privacyShieldView.setAnimationView(animationViewHolder, viewState.privacyShield)
                     cancelTrackersAnimation()
                 }
