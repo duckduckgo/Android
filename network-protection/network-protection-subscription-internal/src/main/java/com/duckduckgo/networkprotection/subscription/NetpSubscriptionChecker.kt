@@ -109,15 +109,22 @@ class NetpSubscriptionCheckWorker(
     @Inject
     lateinit var netpRepository: NetworkProtectionRepository
 
+    @Inject
+    lateinit var subscriptions: Subscriptions
+
     override suspend fun doWork(): Result {
         logcat { "Sub check: checking entitlement" }
         if (networkProtectionState.isEnabled()) {
-            if (netpSubscriptionManager.hasValidEntitlement()) {
-                netpRepository.vpnAccessRevoked = false
+            if (subscriptions.isEnabled()) {
+                if (netpSubscriptionManager.hasValidEntitlement()) {
+                    netpRepository.vpnAccessRevoked = false
+                } else {
+                    logcat { "Sub check: disabling" }
+                    netpRepository.vpnAccessRevoked = true
+                    networkProtectionState.stop()
+                }
             } else {
-                logcat { "Sub check: disabling" }
-                netpRepository.vpnAccessRevoked = true
-                networkProtectionState.stop()
+                logcat { "Sub check: Privacy Pro is not yet enabled" }
             }
         } else {
             logcat { "Sub check: cancelling scheduled checker" }
