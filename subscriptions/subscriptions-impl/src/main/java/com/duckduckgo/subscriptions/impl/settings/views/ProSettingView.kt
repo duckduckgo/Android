@@ -40,7 +40,7 @@ import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.subscriptions.impl.R
+import com.duckduckgo.subscriptions.impl.R.string
 import com.duckduckgo.subscriptions.impl.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.impl.SubscriptionStatus.GRACE_PERIOD
 import com.duckduckgo.subscriptions.impl.SubscriptionStatus.NOT_AUTO_RENEWABLE
@@ -111,6 +111,8 @@ class ProSettingView @JvmOverloads constructor(
         binding.subscribeSecondary.doOnFullyVisible {
             pixelSender.reportSubscriptionSettingsSectionShown()
         }
+
+        initView()
     }
 
     override fun onDetachedFromWindow() {
@@ -121,49 +123,48 @@ class ProSettingView @JvmOverloads constructor(
         coroutineScope = null
     }
 
+    private fun initView() = with(binding) {
+        listOf(subscriptionSetting, subscriptionBuy, subscriptionRestore, subscriptionGet)
+            .forEach { view ->
+                view.setOnClickListener(null)
+                view.setOnTouchListener(null)
+            }
+
+        binding.subscribeSecondary.text = context.getString(string.subscriptionSettingFeaturesList).html(context)
+
+        subscriptionRestoreContainer.setOnClickListener {
+            viewModel.onRestore()
+        }
+
+        subscriptionBuyContainer.setOnClickListener {
+            viewModel.onBuy()
+        }
+
+        binding.subscriptionSettingContainer.setOnClickListener {
+            viewModel.onSettings()
+        }
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     private fun renderView(viewState: ViewState) {
-        binding.subscriptionSetting.setOnClickListener(null)
-        binding.subscriptionSetting.setOnTouchListener(null)
-        binding.subscriptionBuy.setOnClickListener(null)
-        binding.subscriptionBuy.setOnTouchListener(null)
-        binding.subscriptionGet.setOnClickListener(null)
-        binding.subscriptionGet.setOnTouchListener(null)
-        binding.subscriptionRestore.setOnTouchListener(null)
-        binding.subscriptionRestore.setOnClickListener(null)
-
         when (viewState.status) {
             AUTO_RENEWABLE, NOT_AUTO_RENEWABLE, GRACE_PERIOD -> {
                 binding.subscriptionBuyContainer.gone()
                 binding.subscriptionRestoreContainer.gone()
                 binding.subscriptionWaitingContainer.gone()
                 binding.subscriptionSettingContainer.show()
-                binding.subscriptionSettingContainer.setOnClickListener {
-                    viewModel.onSettings()
-                }
             }
             WAITING -> {
                 binding.subscriptionBuyContainer.gone()
                 binding.subscriptionWaitingContainer.show()
                 binding.subscriptionSettingContainer.gone()
                 binding.subscriptionRestoreContainer.show()
-                binding.subscriptionRestoreContainer.setOnClickListener {
-                    viewModel.onRestore()
-                }
             }
             else -> {
-                val htmlText = context.getString(R.string.subscriptionSettingFeaturesList).html(context)
-                binding.subscribeSecondary.text = htmlText
                 binding.subscriptionBuyContainer.show()
                 binding.subscriptionSettingContainer.gone()
                 binding.subscriptionWaitingContainer.gone()
                 binding.subscriptionRestoreContainer.show()
-                binding.subscriptionBuyContainer.setOnClickListener {
-                    viewModel.onBuy()
-                }
-                binding.subscriptionRestoreContainer.setOnClickListener {
-                    viewModel.onRestore()
-                }
             }
         }
     }
