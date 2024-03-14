@@ -77,6 +77,24 @@
     </com.duckduckgo.subscriptions.impl.settings.views.SubscriptionSettingLayout>
 
     <com.duckduckgo.subscriptions.impl.settings.views.SubscriptionSettingLayout
+            android:id="@+id/subscriptionWaitingContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+            android:id="@+id/subscriptionWaiting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/subscriptionSettingWaiting"
+            app:secondaryText="@string/subscriptionSettingWaitingSubtitle"
+            app:leadingIcon="@drawable/ic_info_16"
+            tools:ignore="RtlSymmetry" />
+    </com.duckduckgo.subscriptions.impl.settings.views.SubscriptionSettingLayout>
+
+    <com.duckduckgo.subscriptions.impl.settings.views.SubscriptionSettingLayout
         android:id="@+id/subscriptionRestoreContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -23,6 +23,8 @@ import com.duckduckgo.subscriptions.impl.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.impl.SubscriptionStatus.GRACE_PERIOD
 import com.duckduckgo.subscriptions.impl.SubscriptionStatus.NOT_AUTO_RENEWABLE
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus.UNKNOWN
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus.WAITING
 import com.duckduckgo.subscriptions.impl.services.SubscriptionResponse
 import com.duckduckgo.subscriptions.impl.store.SubscriptionsDataStore
 import com.duckduckgo.subscriptions.impl.toStatus
@@ -50,6 +52,8 @@ interface AuthRepository {
     suspend fun clearAccount()
     suspend fun setEntitlements(entitlements: List<Entitlement>)
     suspend fun setEmail(email: String?)
+    suspend fun purchaseToWaitingStatus()
+    suspend fun getStatus(): SubscriptionStatus
 }
 
 @ContributesBinding(AppScope::class)
@@ -98,6 +102,14 @@ class RealAuthRepository @Inject constructor(
         subscriptionsDataStore.externalId = null
         subscriptionsDataStore.authToken = null
         subscriptionsDataStore.accessToken = null
+    }
+
+    override suspend fun purchaseToWaitingStatus() = withContext(dispatcherProvider.io()) {
+        subscriptionsDataStore.status = WAITING.statusName
+    }
+
+    override suspend fun getStatus(): SubscriptionStatus = withContext(dispatcherProvider.io()) {
+        subscriptionsDataStore.status?.toStatus() ?: UNKNOWN
     }
 
     override suspend fun clearSubscription() = withContext(dispatcherProvider.io()) {
@@ -177,13 +189,18 @@ data class Subscription(
     val platform: String,
     val entitlements: List<Entitlement>,
 ) {
-    fun isActive(): Boolean {
-        val status = this.status
-        return when (status) {
-            AUTO_RENEWABLE, NOT_AUTO_RENEWABLE, GRACE_PERIOD -> true
-            else -> false
-        }
+    fun isActive(): Boolean = status.isActive()
+}
+
+fun SubscriptionStatus.isActive(): Boolean {
+    return when (this) {
+        AUTO_RENEWABLE, NOT_AUTO_RENEWABLE, GRACE_PERIOD -> true
+        else -> false
     }
+}
+
+fun SubscriptionStatus.isActiveOrWaiting(): Boolean {
+    return this.isActive() || this == WAITING
 }
 
 fun List<Entitlement>.toProductList(): List<Product> {

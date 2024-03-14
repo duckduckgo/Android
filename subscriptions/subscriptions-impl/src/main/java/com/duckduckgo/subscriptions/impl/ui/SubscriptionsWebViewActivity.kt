@@ -28,7 +28,6 @@ import android.webkit.URLUtil
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
-import android.webkit.WebView.WebViewTransport
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.annotation.AnyThread
@@ -432,6 +431,9 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             is PurchaseStateView.InProgress, PurchaseStateView.Inactive -> {
                 // NO OP
             }
+            is PurchaseStateView.Waiting -> {
+                onPurchaseSuccess(null)
+            }
             is PurchaseStateView.Success -> {
                 onPurchaseSuccess(purchaseState.subscriptionEventData)
             }
@@ -459,7 +461,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             .show()
     }
 
-    private fun onPurchaseSuccess(subscriptionEventData: SubscriptionEventData) {
+    private fun onPurchaseSuccess(subscriptionEventData: SubscriptionEventData?) {
         TextAlertDialogBuilder(this)
             .setTitle(getString(string.purchaseCompletedTitle))
             .setMessage(getString(string.purchaseCompletedText))
@@ -467,7 +469,11 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
-                        subscriptionJsMessaging.sendSubscriptionEvent(subscriptionEventData)
+                        if (subscriptionEventData != null) {
+                            subscriptionJsMessaging.sendSubscriptionEvent(subscriptionEventData)
+                        } else {
+                            finish()
+                        }
                     }
                 },
             )
