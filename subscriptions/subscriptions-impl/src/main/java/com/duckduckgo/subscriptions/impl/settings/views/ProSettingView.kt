@@ -41,10 +41,6 @@ import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.impl.R.string
-import com.duckduckgo.subscriptions.impl.SubscriptionStatus.AUTO_RENEWABLE
-import com.duckduckgo.subscriptions.impl.SubscriptionStatus.GRACE_PERIOD
-import com.duckduckgo.subscriptions.impl.SubscriptionStatus.NOT_AUTO_RENEWABLE
-import com.duckduckgo.subscriptions.impl.SubscriptionStatus.WAITING
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.databinding.ViewSettingsBinding
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
@@ -53,6 +49,10 @@ import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Comm
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenRestoreScreen
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenSettings
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.ViewState
+import com.duckduckgo.subscriptions.impl.settings.views.SettingsStateProvider.SettingsState.Empty
+import com.duckduckgo.subscriptions.impl.settings.views.SettingsStateProvider.SettingsState.SubscriptionActivationInProgress
+import com.duckduckgo.subscriptions.impl.settings.views.SettingsStateProvider.SettingsState.SubscriptionActive
+import com.duckduckgo.subscriptions.impl.settings.views.SettingsStateProvider.SettingsState.SubscriptionOfferAvailable
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionActivity.Companion.RestoreSubscriptionScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsActivity.Companion.SubscriptionsSettingsScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams
@@ -147,24 +147,30 @@ class ProSettingView @JvmOverloads constructor(
 
     @SuppressLint("ClickableViewAccessibility")
     private fun renderView(viewState: ViewState) {
-        when (viewState.status) {
-            AUTO_RENEWABLE, NOT_AUTO_RENEWABLE, GRACE_PERIOD -> {
+        when (viewState.settingsState) {
+            SubscriptionActive -> {
                 binding.subscriptionBuyContainer.gone()
                 binding.subscriptionRestoreContainer.gone()
                 binding.subscriptionWaitingContainer.gone()
                 binding.subscriptionSettingContainer.show()
             }
-            WAITING -> {
+            SubscriptionActivationInProgress -> {
                 binding.subscriptionBuyContainer.gone()
                 binding.subscriptionWaitingContainer.show()
                 binding.subscriptionSettingContainer.gone()
                 binding.subscriptionRestoreContainer.show()
             }
-            else -> {
+            SubscriptionOfferAvailable -> {
                 binding.subscriptionBuyContainer.show()
                 binding.subscriptionSettingContainer.gone()
                 binding.subscriptionWaitingContainer.gone()
                 binding.subscriptionRestoreContainer.show()
+            }
+            Empty -> {
+                binding.subscriptionBuyContainer.gone()
+                binding.subscriptionRestoreContainer.gone()
+                binding.subscriptionWaitingContainer.gone()
+                binding.subscriptionSettingContainer.gone()
             }
         }
     }

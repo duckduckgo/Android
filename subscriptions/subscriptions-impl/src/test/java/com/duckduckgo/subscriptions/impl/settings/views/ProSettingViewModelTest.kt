@@ -2,14 +2,14 @@ package com.duckduckgo.subscriptions.impl.settings.views
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.subscriptions.impl.SubscriptionStatus
-import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenBuyScreen
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenRestoreScreen
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenSettings
+import com.duckduckgo.subscriptions.impl.settings.views.SettingsStateProvider.SettingsState.SubscriptionOfferAvailable
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -20,12 +20,12 @@ class ProSettingViewModelTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    private val subscriptionsManager: SubscriptionsManager = mock()
+    private val settingsStateProvider: SettingsStateProvider = mock()
     private lateinit var viewModel: ProSettingViewModel
 
     @Before
     fun before() {
-        viewModel = ProSettingViewModel(subscriptionsManager, coroutineTestRule.testDispatcherProvider)
+        viewModel = ProSettingViewModel(settingsStateProvider, coroutineTestRule.testDispatcherProvider)
     }
 
     @Test
@@ -57,11 +57,11 @@ class ProSettingViewModelTest {
 
     @Test
     fun whenOnResumeEmitViewState() = runTest {
-        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowOf(SubscriptionStatus.EXPIRED))
+        whenever(settingsStateProvider.getSettingsState()).thenReturn(flowOf(SubscriptionOfferAvailable))
 
         viewModel.onResume(mock())
         viewModel.viewState.test {
-            assertEquals(SubscriptionStatus.EXPIRED, awaitItem().status)
+            assertEquals(SubscriptionOfferAvailable, awaitItem().settingsState)
             cancelAndConsumeRemainingEvents()
         }
     }

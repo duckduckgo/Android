@@ -24,25 +24,24 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
-import com.duckduckgo.subscriptions.impl.SubscriptionStatus
-import com.duckduckgo.subscriptions.impl.SubscriptionStatus.UNKNOWN
-import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenBuyScreen
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenRestoreScreen
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenSettings
+import com.duckduckgo.subscriptions.impl.settings.views.SettingsStateProvider.SettingsState
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ViewScope::class)
 class ProSettingViewModel @Inject constructor(
-    private val subscriptionsManager: SubscriptionsManager,
+    private val settingsStateProvider: SettingsStateProvider,
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel(), DefaultLifecycleObserver {
 
@@ -54,7 +53,7 @@ class ProSettingViewModel @Inject constructor(
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
-    data class ViewState(val status: SubscriptionStatus = UNKNOWN)
+    data class ViewState(val settingsState: SettingsState = SettingsState.Empty)
 
     private val _viewState = MutableStateFlow(ViewState())
     val viewState = _viewState.asStateFlow()
@@ -74,9 +73,9 @@ class ProSettingViewModel @Inject constructor(
     override fun onResume(owner: LifecycleOwner) {
         super.onResume(owner)
         viewModelScope.launch(dispatcherProvider.io()) {
-            subscriptionsManager.subscriptionStatus.collect {
-                _viewState.emit(viewState.value.copy(status = it))
-            }
+            settingsStateProvider.getSettingsState()
+                .map(::ViewState)
+                .collect(_viewState)
         }
     }
 
