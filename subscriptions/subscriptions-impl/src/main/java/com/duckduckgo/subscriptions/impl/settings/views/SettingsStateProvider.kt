@@ -62,7 +62,13 @@ class RealSettingsStateProvider @Inject constructor(
                 when (status) {
                     AUTO_RENEWABLE, NOT_AUTO_RENEWABLE, GRACE_PERIOD -> SubscriptionActive
                     WAITING -> SubscriptionActivationInProgress
-                    else -> SubscriptionOfferAvailable
+                    else -> {
+                        if (subscriptionsManager.getSubscriptionOffer() != null) {
+                            SubscriptionOfferAvailable
+                        } else {
+                            Empty
+                        }
+                    }
                 }
             }
             .stateIn(

@@ -3,6 +3,7 @@ package com.duckduckgo.subscriptions.impl.settings.views
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.subscriptions.impl.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
+import com.duckduckgo.subscriptions.impl.settings.views.SettingsStateProvider.SettingsState.Empty
 import com.duckduckgo.subscriptions.impl.settings.views.SettingsStateProvider.SettingsState.SubscriptionActivationInProgress
 import com.duckduckgo.subscriptions.impl.settings.views.SettingsStateProvider.SettingsState.SubscriptionActive
 import com.duckduckgo.subscriptions.impl.settings.views.SettingsStateProvider.SettingsState.SubscriptionOfferAvailable
@@ -37,12 +38,23 @@ class SettingsStateProviderTest {
     }
 
     @Test
-    fun `when subscription expired then returns SubscriptionOfferAvailable`() = runTest {
+    fun `when subscription expired and offer available then returns SubscriptionOfferAvailable`() = runTest {
         whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowOf(SubscriptionStatus.EXPIRED))
+        whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(mock())
 
         val settingsState = subject.getSettingsState().first()
 
         assertEquals(SubscriptionOfferAvailable, settingsState)
+    }
+
+    @Test
+    fun `when subscription expired and offer not available then returns Empty`() = runTest {
+        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowOf(SubscriptionStatus.EXPIRED))
+        whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(null)
+
+        val settingsState = subject.getSettingsState().first()
+
+        assertEquals(Empty, settingsState)
     }
 
     @Test
