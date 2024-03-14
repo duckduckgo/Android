@@ -60,7 +60,6 @@ class ApiRequestInterceptorTest {
             fakeUserAgent,
             fakeToggle,
             fakeUserAllowListRepository,
-            mock(),
         )
 
         testee = ApiRequestInterceptor(
