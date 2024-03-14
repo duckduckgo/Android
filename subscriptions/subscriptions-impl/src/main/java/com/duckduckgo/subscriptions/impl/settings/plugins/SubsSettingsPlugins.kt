@@ -19,13 +19,12 @@ package com.duckduckgo.subscriptions.impl.settings.plugins
 import android.content.Context
 import android.view.View
 import com.duckduckgo.anvil.annotations.PriorityKey
-import com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.settings.api.ProSettingsPlugin
-import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingView
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingView
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingView
+import com.duckduckgo.subscriptions.impl.settings.views.TitleSettingView
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
@@ -33,9 +32,7 @@ import javax.inject.Inject
 @PriorityKey(100)
 class ProSettingsTitle @Inject constructor() : ProSettingsPlugin {
     override fun getView(context: Context): View {
-        return SectionHeaderListItem(context).apply {
-            primaryText = context.getString(R.string.privacyPro)
-        }
+        return TitleSettingView(context)
     }
 }
 
