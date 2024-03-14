@@ -441,7 +441,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                 onPurchaseRecovered()
             }
             is PurchaseStateView.Failure -> {
-                onPurchaseFailure(purchaseState.message)
+                onPurchaseFailure()
             }
         }
     }
@@ -480,16 +480,15 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             .show()
     }
 
-    private fun onPurchaseFailure(message: String) {
+    private fun onPurchaseFailure() {
         TextAlertDialogBuilder(this)
             .setTitle(getString(string.purchaseErrorTitle))
-            .setMessage(message)
-            .setDestructiveButtons(true)
-            .setPositiveButton(string.ok)
+            .setMessage(getString(string.purchaseError))
+            .setPositiveButton(string.backToSettings)
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
-                        // NOOP
+                        finish()
                     }
                 },
             )

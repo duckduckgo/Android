@@ -94,7 +94,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
                 }
                 is CurrentPurchase.Failure -> {
                     enablePurchaseButton()
-                    Failure(it.message)
+                    Failure
                 }
                 is CurrentPurchase.Waiting -> {
                     subscriptionsChecker.runChecker()
@@ -182,7 +182,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
             val id = runCatching { data?.getString("id") }.getOrNull()
             if (id.isNullOrBlank()) {
                 pixelSender.reportPurchaseFailureOther()
-                _currentPurchaseViewState.emit(currentPurchaseViewState.value.copy(purchaseState = Failure("")))
+                _currentPurchaseViewState.emit(currentPurchaseViewState.value.copy(purchaseState = Failure))
             } else {
                 command.send(SubscriptionSelected(id))
             }
@@ -268,7 +268,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
         data class Success(val subscriptionEventData: SubscriptionEventData) : PurchaseStateView()
         data object Waiting : PurchaseStateView()
         data object Recovered : PurchaseStateView()
-        data class Failure(val message: String) : PurchaseStateView()
+        data object Failure : PurchaseStateView()
     }
 
     sealed class Command {

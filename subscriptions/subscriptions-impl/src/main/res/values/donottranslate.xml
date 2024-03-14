@@ -35,7 +35,8 @@
     <string name="addDeviceGooglePlayDescription">Privacy Pro is available on any device signed in to your Google Play Store account.</string>
 
     <!--Restore Subscriptions Activity-->
-    <string name="somethingWentWrong">Something Went Wrong</string>
+    <string name="backToSettings">Back to Settings</string>
+    <string name="somethingWentWrong">Something went wrong</string>
     <string name="somethingWentWrongDescription">Google Play was unable to process your purchase. Please try again later.</string>
     <string name="youAreSet">You\'re all set.</string>
     <string name="viewPlans">View Plans</string>
@@ -75,8 +76,8 @@
     <string name="purchaseCompletedTitle">You\'re all set.</string>
     <string name="purchaseCompletedText">Your purchase was successful</string>
     <string name="purchaseRecoveredText">Your already had a subscription and we\'ve recovered that for you.</string>
-    <string name="purchaseErrorTitle">Something went wrong :(</string>
-    <string name="purchaseIdNotFound">We couldn\'t find the subscription. Please try again.</string>
+    <string name="purchaseErrorTitle">Something went wrong</string>
+    <string name="purchaseError">We\'re having trouble connecting. Please try again later.</string>
 
     <!-- PIR Settings-->
     <string name="pirSettingTitle">Personal Information Removal</string>
