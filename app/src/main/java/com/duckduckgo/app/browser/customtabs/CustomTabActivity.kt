@@ -20,62 +20,65 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserTabFragment
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.customtabs.CustomTabViewModel.ViewState
 import com.duckduckgo.app.browser.databinding.ActivityCustomTabBinding
 import com.duckduckgo.app.global.intentText
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
-import java.util.UUID
-import javax.inject.Inject
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
 class CustomTabActivity : DuckDuckGoActivity() {
 
-    @Inject
-    lateinit var pixel: Pixel
-
-    @Inject
-    lateinit var customTabDetector: CustomTabDetector
-
+    private val viewModel: CustomTabViewModel by bindViewModel()
     private val binding: ActivityCustomTabBinding by viewBinding()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(binding.root)
 
-        Timber.d("TAG_CUSTOM_TAB_IMPL onCreate called in CustomTabActivity")
+        val url = intent.intentText
+        val toolbarColor = intent.getIntExtra(CustomTabsIntent.EXTRA_TOOLBAR_COLOR, 0)
 
-        val tabId = "$CUSTOM_TAB_NAME_PREFIX${UUID.randomUUID()}"
-        val fragment = BrowserTabFragment.newInstanceForCustomTab(
-            tabId = tabId,
-            query = intent.intentText,
-            skipHome = true,
-            toolbarColor = intent.getIntExtra(CustomTabsIntent.EXTRA_TOOLBAR_COLOR, 0),
-        )
-        val transaction = supportFragmentManager.beginTransaction()
-        transaction.replace(R.id.fragmentTabContainer, fragment, tabId)
-        transaction.commit()
+        Timber.d("onCreate called with url=$url and toolbar color=$toolbarColor")
 
-        pixel.fire(CustomTabPixelNames.CUSTOM_TABS_OPENED)
+        viewModel.viewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach {
+            renderView(it)
+        }.launchIn(lifecycleScope)
+
+        viewModel.onCustomTabCreated(url, toolbarColor)
     }
 
     override fun onStart() {
         super.onStart()
-        Timber.d("TAG_CUSTOM_TAB_IMPL onStart called in CustomTabActivity")
-
-        customTabDetector.setCustomTab(true)
+        viewModel.onShowCustomTab()
     }
 
     override fun onStop() {
         super.onStop()
-        Timber.d("TAG_CUSTOM_TAB_IMPL onStop called in CustomTabActivity")
+        viewModel.onCloseCustomTab()
+    }
 
-        customTabDetector.setCustomTab(false)
+    private fun renderView(viewState: ViewState) {
+        val fragment = BrowserTabFragment.newInstanceForCustomTab(
+            tabId = viewState.tabId,
+            query = viewState.url,
+            skipHome = true,
+            toolbarColor = viewState.toolbarColor,
+        )
+        val transaction = supportFragmentManager.beginTransaction()
+        transaction.replace(R.id.fragmentTabContainer, fragment, viewState.tabId)
+        transaction.commit()
     }
 
     companion object {
@@ -86,7 +89,5 @@ class CustomTabActivity : DuckDuckGoActivity() {
                 putExtra(Intent.EXTRA_TEXT, text)
             }
         }
-
-        const val CUSTOM_TAB_NAME_PREFIX = "CustomTab-"
     }
 }
