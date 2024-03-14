@@ -100,6 +100,40 @@ class SubscriptionWebViewViewModelTest {
     }
 
     @Test
+    fun whenPurchaseStateFailedThenSendCanceledMessage() = runTest {
+        val flowTest: MutableSharedFlow<CurrentPurchase> = MutableSharedFlow()
+        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowTest)
+        viewModel.start()
+
+        viewModel.commands().test {
+            flowTest.emit(CurrentPurchase.Failure("test"))
+
+            val result = awaitItem()
+            assertTrue(result is Command.SendJsEvent)
+            assertEquals("{\"type\":\"canceled\"}", (result as Command.SendJsEvent).event.params.toString())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPurchaseStateCanceledThenSendCanceledMessage() = runTest {
+        val flowTest: MutableSharedFlow<CurrentPurchase> = MutableSharedFlow()
+        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowTest)
+        viewModel.start()
+
+        viewModel.commands().test {
+            flowTest.emit(CurrentPurchase.Canceled)
+
+            val result = awaitItem()
+            assertTrue(result is Command.SendJsEvent)
+            assertEquals("{\"type\":\"canceled\"}", (result as Command.SendJsEvent).event.params.toString())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenSubscriptionSelectedAndIdInObjectEmptyThenReturnFailure() = runTest {
         val json = """
             {"id":""}

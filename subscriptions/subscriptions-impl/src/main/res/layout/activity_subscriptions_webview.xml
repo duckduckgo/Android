@@ -28,14 +28,6 @@
             android:id="@+id/includeToolbar"
             layout="@layout/privacy_pro_toolbar"/>
 
-    <com.google.android.material.progressindicator.CircularProgressIndicator
-            android:id="@+id/progress"
-            app:indicatorColor="?attr/daxColorSecondaryText"
-            android:indeterminate="true"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center" />
-
     <WebView
         android:id="@+id/webview"
         android:layout_width="match_parent"
