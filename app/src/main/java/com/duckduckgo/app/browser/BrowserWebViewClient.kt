@@ -415,7 +415,10 @@ class BrowserWebViewClient @Inject constructor(
         handler: SslErrorHandler,
         error: SslError,
     ) {
+        Timber.d("SSL Certificate: onReceivedSslError $error")
+
         var trusted: CertificateValidationState = CertificateValidationState.UntrustedChain
+
         when (error.primaryError) {
             SSL_UNTRUSTED -> {
                 Timber.d("The certificate authority ${error.certificate.issuedBy.dName} is not trusted")
@@ -426,7 +429,8 @@ class BrowserWebViewClient @Inject constructor(
         }
 
         Timber.d("The certificate authority validation result is $trusted")
-        if (trusted is CertificateValidationState.TrustedChain) handler.proceed() else super.onReceivedSslError(view, handler, error)
+        handler.proceed()
+        // if (trusted is CertificateValidationState.TrustedChain) handler.proceed() else super.onReceivedSslError(view, handler, error)
     }
 
     private fun requestAuthentication(
