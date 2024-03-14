@@ -24,6 +24,7 @@ import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
@@ -41,6 +42,7 @@ class NetPWaitlistEndedChecker @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val networkProtectionState: NetworkProtectionState,
     private val vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
+    private val networkProtectionPixels: NetworkProtectionPixels,
 ) : VpnServiceCallbacks {
 
     private val preferences: SharedPreferences by lazy {
@@ -60,6 +62,7 @@ class NetPWaitlistEndedChecker @Inject constructor(
                 }
                 if (!hasEntitlement) {
                     logcat { "VPN enabled and privacy pro enabled but no entitlements, stopping VPN..." }
+                    networkProtectionPixels.reportVpnBetaStoppedWhenPrivacyProUpdatedAndEnabled()
                     networkProtectionState.stop()
                 }
             }

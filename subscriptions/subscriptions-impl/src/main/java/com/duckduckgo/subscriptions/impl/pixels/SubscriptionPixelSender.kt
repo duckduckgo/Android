@@ -44,6 +44,7 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SETTINGS_ADD_D
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SETTINGS_SUBSCRIPTION_SECTION_SHOWN
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_ACTIVATED
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_ACTIVE
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_IS_ENABLED
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_CHANGE_PLAN_OR_BILLING_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_REMOVE_FROM_DEVICE_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_SHOWN
@@ -80,6 +81,7 @@ interface SubscriptionPixelSender {
     fun reportAppSettingsIdtrClick()
     fun reportSubscriptionSettingsChangePlanOrBillingClick()
     fun reportSubscriptionSettingsRemoveFromDeviceClick()
+    fun reportSubscriptionIsEnabled()
 }
 
 @ContributesBinding(AppScope::class)
@@ -173,6 +175,8 @@ class SubscriptionPixelSenderImpl @Inject constructor(
 
     override fun reportSubscriptionSettingsRemoveFromDeviceClick() =
         fire(SUBSCRIPTION_SETTINGS_REMOVE_FROM_DEVICE_CLICK)
+
+    override fun reportSubscriptionIsEnabled() = fire(SUBSCRIPTION_IS_ENABLED)
 
     private fun fire(pixel: SubscriptionPixel) {
         pixel.getPixelNames().forEach { (pixelType, pixelName) ->

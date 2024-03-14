@@ -28,6 +28,7 @@ import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.Subscriptions
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.isActiveOrWaiting
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
@@ -44,6 +45,7 @@ import kotlinx.coroutines.launch
 class RealSubscriptions @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
     private val privacyProFeature: PrivacyProFeature,
+    private val subscriptionPixelSender: SubscriptionPixelSender,
 ) : Subscriptions {
     override suspend fun getAccessToken(): String? {
         if (!isEnabled()) return null
@@ -61,7 +63,11 @@ class RealSubscriptions @Inject constructor(
     }
 
     override suspend fun isEnabled(): Boolean {
-        return privacyProFeature.isLaunched().isEnabled()
+        return privacyProFeature.isLaunched().isEnabled().also { enabled ->
+            if (enabled) {
+                subscriptionPixelSender.reportSubscriptionIsEnabled()
+            }
+        }
     }
 
     override suspend fun isEligible(): Boolean {

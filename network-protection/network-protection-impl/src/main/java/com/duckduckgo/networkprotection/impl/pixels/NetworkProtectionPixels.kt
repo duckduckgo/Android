@@ -302,6 +302,7 @@ interface NetworkProtectionPixels {
 
     fun reportAccessRevokedDialogShown()
     fun reportPrivacyProPromotionDialogShown()
+    fun reportVpnBetaStoppedWhenPrivacyProUpdatedAndEnabled()
 }
 
 @ContributesBinding(AppScope::class)
@@ -571,6 +572,11 @@ class RealNetworkProtectionPixel @Inject constructor(
     override fun reportPrivacyProPromotionDialogShown() {
         firePixel(NETP_PRIVACY_PRO_PROMOTION_DIALOG_SHOWN)
         tryToFireDailyPixel(NETP_PRIVACY_PRO_PROMOTION_DIALOG_SHOWN_DAILY)
+    }
+
+    override fun reportVpnBetaStoppedWhenPrivacyProUpdatedAndEnabled() {
+        firePixel(NETP_BETA_STOPPED_WHEN_PRIVACY_PRO_UPDATED_AND_ENABLED)
+        tryToFireDailyPixel(NETP_BETA_STOPPED_WHEN_PRIVACY_PRO_UPDATED_AND_ENABLED_DAILY)
     }
 
     private fun firePixel(

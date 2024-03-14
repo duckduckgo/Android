@@ -142,6 +142,10 @@ enum class SubscriptionPixel(
         baseName = "m_privacy-pro_settings_remove-from-device_click",
         type = COUNT,
     ),
+    SUBSCRIPTION_IS_ENABLED(
+        baseName = "m_privacy-pro_is-enabled",
+        types = EnumSet.of(COUNT, DAILY),
+    ),
     ;
 
     constructor(
