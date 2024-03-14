@@ -22,7 +22,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenBuyScreen
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenRestoreScreen
@@ -42,7 +41,6 @@ import kotlinx.coroutines.launch
 @ContributesViewModel(ViewScope::class)
 class ProSettingViewModel @Inject constructor(
     private val settingsStateProvider: SettingsStateProvider,
-    private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     sealed class Command {
@@ -72,7 +70,7 @@ class ProSettingViewModel @Inject constructor(
 
     override fun onResume(owner: LifecycleOwner) {
         super.onResume(owner)
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             settingsStateProvider.getSettingsState()
                 .map(::ViewState)
                 .collect(_viewState)

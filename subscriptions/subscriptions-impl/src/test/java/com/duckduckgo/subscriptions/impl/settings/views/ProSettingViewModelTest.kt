@@ -25,7 +25,7 @@ class ProSettingViewModelTest {
 
     @Before
     fun before() {
-        viewModel = ProSettingViewModel(settingsStateProvider, coroutineTestRule.testDispatcherProvider)
+        viewModel = ProSettingViewModel(settingsStateProvider)
     }
 
     @Test
