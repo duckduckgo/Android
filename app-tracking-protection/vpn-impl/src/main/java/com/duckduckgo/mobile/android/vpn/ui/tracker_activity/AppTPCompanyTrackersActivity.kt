@@ -70,7 +70,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 @InjectWith(ActivityScope::class)
 class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
@@ -108,12 +107,6 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
 
     private val toggleAppSwitchListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
         viewModel.onAppPermissionToggled(isChecked, getPackage())
-    }
-
-    private val isAppTPEnabled by lazy {
-        runBlocking {
-            vpnFeaturesRegistry.isFeatureRegistered(APPTP_VPN)
-        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -189,7 +182,7 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
             itemsAdapter.updateData(viewState.trackingCompanies)
         }
 
-        setToggleState(viewState.toggleChecked, viewState.toggleEnabled && isAppTPEnabled)
+        setToggleState(viewState.toggleChecked, viewState.toggleEnabled)
         binding.handleProtectionState(viewState.bannerState)
     }
 
@@ -230,7 +223,9 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
     private fun restartVpn() {
         // we use the app coroutine scope to ensure this call outlives the Activity
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
+            if (vpnFeaturesRegistry.isFeatureRegistered(APPTP_VPN)) {
+                vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
+            }
         }
     }
 
@@ -246,8 +241,8 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         cachedState?.let { vpnState ->
             appEnabledSwitch.quietlySetIsChecked(vpnState.toggleChecked, toggleAppSwitchListener)
-            appEnabledSwitch.isEnabled = vpnState.toggleEnabled && isAppTPEnabled
-            appEnabledSwitch.setEnabledOpacity(vpnState.toggleEnabled && isAppTPEnabled)
+            appEnabledSwitch.isEnabled = vpnState.toggleEnabled
+            appEnabledSwitch.setEnabledOpacity(vpnState.toggleEnabled)
             cachedState = null
         }
 

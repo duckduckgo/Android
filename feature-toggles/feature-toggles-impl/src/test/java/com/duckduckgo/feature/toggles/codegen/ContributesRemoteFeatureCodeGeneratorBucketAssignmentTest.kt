@@ -57,7 +57,7 @@ class ContributesRemoteFeatureCodeGeneratorBucketAssignmentTest(private val test
             appVersionProvider = { appBuildConfig.versionCode },
             flavorNameProvider = { appBuildConfig.flavor.name },
             appVariantProvider = { variantManager.getVariantKey() },
-            forceDefaultVariant = { variantManager.saveVariants(emptyList()) },
+            forceDefaultVariant = { variantManager.updateVariants(emptyList()) },
         ).build().create(TestTriggerFeature::class.java)
     }
 

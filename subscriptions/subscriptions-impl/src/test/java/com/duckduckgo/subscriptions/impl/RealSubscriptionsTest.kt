@@ -17,11 +17,10 @@
 package com.duckduckgo.subscriptions.impl
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.subscriptions.api.Product
-import com.duckduckgo.subscriptions.api.Subscriptions.EntitlementStatus.Found
-import com.duckduckgo.subscriptions.api.Subscriptions.EntitlementStatus.NotFound
-import com.duckduckgo.subscriptions.impl.services.Entitlement
+import com.duckduckgo.subscriptions.api.Product.NetP
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -59,35 +58,22 @@ class RealSubscriptionsTest {
     }
 
     @Test
-    fun whenSubscriptionDataHasEntitlementThenReturnFound() = runTest {
-        whenever(mockSubscriptionsManager.getSubscriptionData()).thenReturn(
-            SubscriptionsData.Success("email", "externalId", listOf(Entitlement("id", "name", Product.NetP.value))),
-        )
+    fun whenSubscriptionDataHasEntitlementThenReturnList() = runTest {
+        whenever(mockSubscriptionsManager.entitlements).thenReturn(flowOf(listOf(NetP)))
 
-        subscriptions.getEntitlementStatus(Product.NetP).also {
-            assertTrue(it.isSuccess)
-            assertEquals(Found, it.getOrNull())
+        subscriptions.getEntitlementStatus().test {
+            assertTrue(awaitItem().isNotEmpty())
+            cancelAndConsumeRemainingEvents()
         }
     }
 
     @Test
-    fun whenSubscriptionDataHasNoEntitlementThenReturnNotFound() = runTest {
-        whenever(mockSubscriptionsManager.getSubscriptionData()).thenReturn(
-            SubscriptionsData.Success("email", "externalId", listOf(Entitlement("id", "name", Product.NetP.value))),
-        )
+    fun whenSubscriptionDataHasNoEntitlementThenReturnEmptyList() = runTest {
+        whenever(mockSubscriptionsManager.entitlements).thenReturn(flowOf(emptyList()))
 
-        subscriptions.getEntitlementStatus(Product.ITR).also {
-            assertTrue(it.isSuccess)
-            assertEquals(NotFound, it.getOrNull())
-        }
-    }
-
-    @Test
-    fun whenSubscriptionDataFailsThenReturnFailure() = runTest {
-        whenever(mockSubscriptionsManager.getSubscriptionData()).thenReturn(SubscriptionsData.Failure("error"))
-
-        subscriptions.getEntitlementStatus(Product.NetP).also {
-            assertTrue(it.isFailure)
+        subscriptions.getEntitlementStatus().test {
+            assertTrue(awaitItem().isEmpty())
+            cancelAndConsumeRemainingEvents()
         }
     }
 }

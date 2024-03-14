@@ -21,7 +21,6 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.api.VariantConfig
 import com.duckduckgo.experiments.api.VariantManager
-import com.duckduckgo.experiments.impl.store.ExperimentVariantEntity
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import timber.log.Timber
@@ -47,11 +46,9 @@ class VariantManagerImpl @Inject constructor(
         experimentVariantRepository.updateAppReferrerVariant(variant)
     }
 
-    override fun saveVariants(variants: List<VariantConfig>) {
-        experimentVariantRepository.saveVariants(variants)
-        Timber.d("Variants update ${experimentVariantRepository.getActiveVariants()}")
-
-        val activeVariants = convertEntitiesToVariants(experimentVariantRepository.getActiveVariants())
+    override fun updateVariants(variantConfig: List<VariantConfig>) {
+        val activeVariants = variantConfig.toVariants()
+        Timber.d("Variants update $activeVariants")
         val currentVariantKey = experimentVariantRepository.getUserVariant()
 
         updateUserVariant(activeVariants, currentVariantKey)
@@ -86,12 +83,12 @@ class VariantManagerImpl @Inject constructor(
         Timber.i("Variant $currentVariantKey is still in use, no need to update")
     }
 
-    private fun convertEntitiesToVariants(activeVariantEntities: List<ExperimentVariantEntity>): List<Variant> {
+    fun List<VariantConfig>.toVariants(): List<Variant> {
         val activeVariants: MutableList<Variant> = mutableListOf()
-        activeVariantEntities.map { entity ->
+        this.map { entity ->
             activeVariants.add(
                 Variant(
-                    key = entity.key,
+                    key = entity.variantKey,
                     weight = entity.weight ?: 0.0,
                     filterBy = experimentFiltersManager.addFilters(entity),
                 ),
@@ -128,7 +125,14 @@ class VariantManagerImpl @Inject constructor(
 
     companion object {
 
-        const val RESERVED_EU_AUCTION_VARIANT = "ml"
+        /**
+         * Since March 7th 2024 there are two choice screens on Android
+         * Once for Search choice (existing since 2021) and Browser Choice (new since 2024)
+         * We want to be able to measure installs and retention from both screens separately
+         * https://app.asana.com/0/0/1206729008769473/f
+         */
+        const val RESERVED_EU_SEARCH_CHOICE_AUCTION_VARIANT = "ml"
+        const val RESERVED_EU_BROWSER_CHOICE_AUCTION_VARIANT = "mm"
 
         // this will be returned when there are no other active experiments
         val DEFAULT_VARIANT = Variant(key = "", filterBy = { noFilter() })

@@ -18,6 +18,7 @@ package com.duckduckgo.subscriptions.impl.services
 
 import com.duckduckgo.anvil.annotations.ContributesNonCachingServiceApi
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.subscriptions.impl.repository.Entitlement
 import com.squareup.moshi.Json
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -84,14 +85,18 @@ data class ValidateTokenResponse(
 data class AccountResponse(
     val email: String,
     @field:Json(name = "external_id") val externalId: String,
-    val entitlements: List<Entitlement>,
+    val entitlements: List<EntitlementResponse>,
 )
 
-data class Entitlement(
+data class EntitlementResponse(
     val id: String,
     val name: String,
     val product: String,
 )
+
+fun List<EntitlementResponse>.toEntitlements(): List<Entitlement> {
+    return this.map { Entitlement(it.name, it.product) }
+}
 
 data class ResponseError(
     val error: String,

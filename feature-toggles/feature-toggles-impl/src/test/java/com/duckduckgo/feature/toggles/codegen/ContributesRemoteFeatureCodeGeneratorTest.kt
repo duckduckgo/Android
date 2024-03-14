@@ -64,7 +64,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             appVersionProvider = { appBuildConfig.versionCode },
             flavorNameProvider = { appBuildConfig.flavor.name },
             appVariantProvider = { variantManager.getVariantKey() },
-            forceDefaultVariant = { variantManager.saveVariants(emptyList()) },
+            forceDefaultVariant = { variantManager.updateVariants(emptyList()) },
         ).build().create(TestTriggerFeature::class.java)
         anotherTestFeature = FeatureToggles.Builder(
             toggleStore,
@@ -72,7 +72,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             appVersionProvider = { appBuildConfig.versionCode },
             flavorNameProvider = { appBuildConfig.flavor.name },
             appVariantProvider = { variantManager.getVariantKey() },
-            forceDefaultVariant = { variantManager.saveVariants(emptyList()) },
+            forceDefaultVariant = { variantManager.updateVariants(emptyList()) },
         ).build().create(AnotherTestTriggerFeature::class.java)
     }
 
@@ -1821,7 +1821,7 @@ internal class FakeVariantManager : VariantManager {
         TODO("Not yet implemented")
     }
 
-    override fun saveVariants(variants: List<VariantConfig>) {
+    override fun updateVariants(variants: List<VariantConfig>) {
         saveVariantsCallCounter++
         variant = ""
     }

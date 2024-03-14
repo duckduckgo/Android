@@ -19,11 +19,9 @@ package com.duckduckgo.user.agent.impl
 import android.os.Build
 import android.webkit.WebSettings
 import androidx.core.net.toUri
-import androidx.webkit.UserAgentMetadata
-import androidx.webkit.UserAgentMetadata.BrandVersion
-import androidx.webkit.WebSettingsCompat
-import androidx.webkit.WebViewFeature
+import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
+import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.common.utils.UriString
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -54,7 +52,6 @@ class RealUserAgentProvider @Inject constructor(
     private val userAgent: UserAgent,
     private val toggle: FeatureToggle,
     private val userAllowListRepository: UserAllowListRepository,
-    private val clientBrandHintFeature: ClientBrandHintFeature,
 ) : UserAgentProvider {
 
     private val baseAgent: String by lazy { concatWithSpaces(mobilePrefix, getWebKitVersionOnwards(false)) }
@@ -65,39 +62,6 @@ class RealUserAgentProvider @Inject constructor(
 
     private val safariComponent: String? by lazy { getSafariComponentFromUserAgent() }
     private val applicationComponent = "DuckDuckGo/${device.majorAppVersion}"
-
-    override fun setHintHeader(settings: WebSettings) {
-        if (WebViewFeature.isFeatureSupported(WebViewFeature.USER_AGENT_METADATA)) {
-            val metadata = WebSettingsCompat.getUserAgentMetadata(settings)
-            val finalBrandList = metadata.brandVersionList.map {
-                if (clientBrandHintFeature.self().isEnabled()) {
-                    if (it.brand.contains("Android")) {
-                        BrandVersion.Builder().setBrand("DuckDuckGo").setFullVersion(it.fullVersion).setMajorVersion(it.majorVersion).build()
-                    } else {
-                        it
-                    }
-                } else {
-                    if (it.brand.contains("DuckDuckGo")) {
-                        BrandVersion.Builder().setBrand("Android WebView").setFullVersion(it.fullVersion).setMajorVersion(it.majorVersion).build()
-                    } else {
-                        it
-                    }
-                }
-            }
-            val ua = UserAgentMetadata.Builder()
-                .setPlatform(metadata.platform)
-                .setPlatformVersion(metadata.platformVersion)
-                .setFullVersion(metadata.fullVersion)
-                .setModel(metadata.model)
-                .setBitness(metadata.bitness)
-                .setArchitecture(metadata.architecture)
-                .setWow64(metadata.isWow64)
-                .setMobile(metadata.isMobile)
-                .setBrandVersionList(finalBrandList)
-                .build()
-            WebSettingsCompat.setUserAgentMetadata(settings, ua)
-        }
-    }
 
     /**
      * Returns, our custom UA, including our application component before Safari
@@ -158,7 +122,7 @@ class RealUserAgentProvider @Inject constructor(
         if (forDesktop) {
             result = result.replace(" Mobile", "")
         }
-        return result
+        return result.replace(AgentRegex.chrome, "$1.0.0.0")
     }
 
     private fun concatWithSpaces(vararg elements: String?): String {
@@ -176,6 +140,7 @@ class RealUserAgentProvider @Inject constructor(
         val safari = Regex("(Safari/[^ ]+) *")
         val version = Regex("(Version/[^ ]+) *")
         val platform = Regex(".*Linux; Android \\d+")
+        val chrome = Regex("(Chrome/\\d+)\\.\\d+\\.\\d+\\.\\d+")
     }
 
     companion object {

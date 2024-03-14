@@ -139,4 +139,30 @@
     <string name="sync_notification_channel_name">Synchronizácia</string>
     <string name="sync_notify_me_title">Oznámenia sú vypnuté</string>
     <string name="sync_notify_me_description">Poslať upozornenie v prípade, že sa pri Synchronizácii a zálohovaní vyskytne chyba.</string>
+
+    <!-- setup errors -->
+    <string name="sync_turn_off_error">Synchronizácia a zálohovanie sa nedá vypnúť.</string>
+    <string name="sync_edit_device_error">Nedá sa aktualizovať názov zariadenia.</string>
+    <string name="sync_remove_device_error">Toto zariadenie nie je možné odstrániť zo Synchronizácie a zálohovania.</string>
+    <string name="sync_delete_data_error">Nie je možné odstrániť údaje na serveri.</string>
+    <string name="sync_login_authenticated_device_error">"Ak chcete tieto zariadenia spárovať, vypnite funkciu Synchronizácia a zálohovanie v jednom zariadení a potom ťuknite na „Synchronizovať s iným zariadením“ v druhom zariadení."</string>
+    <string name="sync_connect_generic_error">Nie je možné sa pripojiť k serveru.</string>
+    <string name="sync_connect_login_error">Nedá sa synchronizovať s iným zariadením.</string>
+    <string name="sync_create_account_generic_error">Nie je možné sa pripojiť k serveru.</string>
+    <string name="sync_invalid_code_error">Žiaľ, tento kód je neplatný. Skontrolujte, či bol zadaný alebo naskenovaný správny kód.</string>
+    <string name="sync_recovery_pdf_error">Nepodarilo sa vytvoriť súbor PDF na obnovenie.</string>
+    <string name="sync_dialog_error_ok">OK</string>
+    <string name="sync_dialog_error_title">Synchronizácia a zálohovanie</string>
+    <string name="sync_encryption_not_supported_error_title">Nepodporované zariadenie</string>
+    <string name="sync_encryption_not_supported_error">Sync &amp; Backup je šifrovaný „end-to-end“ a musí dokázať šifrovať a ukladať údaje vo vašom zariadení. Keďže vaše zariadenie nepodporuje šifrované ukladanie, služba Sync &amp; Backup nie je k dispozícii.</string>
+
+    <!-- Sync Device Authentication -->
+    <string name="sync_auth_text_for_access">Ak chcete získať prístup k službe Sync &amp; Backup, odomknite zariadenie.</string>
+    <string name="sync_biometric_prompt_title">Služba Sync &amp; Backup je uzamknutá</string>
+
+    <!-- Sync Settings -->
+    <string name="sync_delete_server_data_dialog_title">Zmazať údaje servera?</string>
+    <string name="sync_delete_server_data_dialog_content">Všetky zariadenia budú odpojené a vaše synchronizované údaje budú zmazané zo servera.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Zmazať údaje</string>
+    <string name="sync_delete_server_data_dialog_secondary_button">Zrušiť</string>
 </resources>

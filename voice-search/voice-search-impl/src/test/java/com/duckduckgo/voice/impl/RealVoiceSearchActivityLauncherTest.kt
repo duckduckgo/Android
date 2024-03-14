@@ -91,6 +91,7 @@ class RealVoiceSearchActivityLauncherTest {
 
         val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.ResultFromVoiceSearch
         lastKnownRequest.onResult(VoiceSearchActivity.VOICE_SEARCH_ERROR, "1")
+        verify(pixel).fire(VoiceSearchPixelNames.VOICE_SEARCH_ERROR, mapOf("error" to "1"))
 
         assertNull(lastKnownEvent)
     }

@@ -815,4 +815,12 @@
         <item quantity="other">Czy na pewno chcesz usunąć ten folder i %1$d elementu?</item>
     </plurals>
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Czy na pewno chcesz usunąć zakładkę &lt;b&gt;%1$s&lt;/b&gt;?</string>
+
+    <!-- Sync Favicons -->
+    <string name="sync_fetch_icons_title">Pobierz ikony zakładek</string>
+    <string name="sync_fetch_icons_subtitle">Automatycznie pobieraj ikony dla zsynchronizowanych zakładek.</string>
+    <string name="faviconsPromptTitle">Pobrać brakujące ikony?</string>
+    <string name="faviconsPromptMessage">Czy chcesz, aby urządzenie automatycznie pobierało ikony zsynchronizowanych zakładek ze stron internetowych?</string>
+    <string name="faviconsPromptPrimaryCta">Aktualizuj ikony zakładek</string>
+    <string name="faviconsPromptSecondaryCta">Nie teraz</string>
 </resources>

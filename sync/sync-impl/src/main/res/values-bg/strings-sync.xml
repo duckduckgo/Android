@@ -139,4 +139,30 @@
     <string name="sync_notification_channel_name">Синхронизиране</string>
     <string name="sync_notify_me_title">Известията са деактивирани</string>
     <string name="sync_notify_me_description">Получаване на известие, ако възникне грешка при Синхронизиране и архивиране.</string>
+
+    <!-- setup errors -->
+    <string name="sync_turn_off_error">Синхронизиране и архивиране не може да бъде изключено.</string>
+    <string name="sync_edit_device_error">Името на устройството не може да бъде актуализирано.</string>
+    <string name="sync_remove_device_error">Това устройство не може да бъде премахнато от Синхронизиране и архивиране.</string>
+    <string name="sync_delete_data_error">Данните на сървъра не могат да бъдат изтрити.</string>
+    <string name="sync_login_authenticated_device_error">"За да сдвоите тези устройства, изключете функцията Sync &amp; Backup на едното устройство, а след това на другото устройство изберете Синхронизиране с друго устройство."</string>
+    <string name="sync_connect_generic_error">Не може да се осъществи връзка със сървъра.</string>
+    <string name="sync_connect_login_error">Не може да се синхронизира с друго устройство.</string>
+    <string name="sync_create_account_generic_error">Не може да се осъществи връзка със сървъра.</string>
+    <string name="sync_invalid_code_error">Съжаляваме, този код е невалиден. Моля, уверете се, че сте въвели или сканирали правилния код.</string>
+    <string name="sync_recovery_pdf_error">Не може да бъде създаден PDF файл за възстановяване.</string>
+    <string name="sync_dialog_error_ok">ОК</string>
+    <string name="sync_dialog_error_title">Синхронизиране и архивиране</string>
+    <string name="sync_encryption_not_supported_error_title">Устройството не се поддържа</string>
+    <string name="sync_encryption_not_supported_error">Функцията Sync &amp; Backup използва криптиране и трябва да може да криптира и съхранява данни на вашето устройство. Тъй като устройството не поддържа криптирано съхранение, функцията Sync &amp; Backup не е достъпна.</string>
+
+    <!-- Sync Device Authentication -->
+    <string name="sync_auth_text_for_access">Отключете устройството, за да влезете в Sync &amp; Backup.</string>
+    <string name="sync_biometric_prompt_title">Функцията Sync &amp; Backup е заключена</string>
+
+    <!-- Sync Settings -->
+    <string name="sync_delete_server_data_dialog_title">Изтриване на данните от сървъра?</string>
+    <string name="sync_delete_server_data_dialog_content">Връзката на всички устройства ще бъде премахната, а синхронизираните данни ще бъдат изтрити от сървъра.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Изтриване на данни</string>
+    <string name="sync_delete_server_data_dialog_secondary_button">Отмени</string>
 </resources>

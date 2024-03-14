@@ -139,4 +139,30 @@
     <string name="sync_notification_channel_name">Synchronizacja</string>
     <string name="sync_notify_me_title">Powiadomienia są wyłączone</string>
     <string name="sync_notify_me_description">Otrzymuj powiadomienia po wystąpieniu błędu synchronizacji i kopii zapasowej.</string>
+
+    <!-- setup errors -->
+    <string name="sync_turn_off_error">Nie można wyłączyć synchronizacji i kopii zapasowych.</string>
+    <string name="sync_edit_device_error">Nie można zaktualizować nazwy urządzenia.</string>
+    <string name="sync_remove_device_error">Nie można usunąć tego urządzenia z synchronizacji i kopii zapasowej.</string>
+    <string name="sync_delete_data_error">Nie można usunąć danych z serwera.</string>
+    <string name="sync_login_authenticated_device_error">"Aby sparować te urządzenia, wyłącz synchronizację i kopię zapasową na jednym urządzeniu, a następnie dotknij opcji „Synchronizuj z innym urządzeniem” na drugim urządzeniu."</string>
+    <string name="sync_connect_generic_error">Nie można połączyć się z serwerem.</string>
+    <string name="sync_connect_login_error">Nie można zsynchronizować z innym urządzeniem.</string>
+    <string name="sync_create_account_generic_error">Nie można połączyć się z serwerem.</string>
+    <string name="sync_invalid_code_error">Niestety, ten kod jest nieprawidłowy. Upewnij się, że wprowadzono lub zeskanowano prawidłowy kod.</string>
+    <string name="sync_recovery_pdf_error">Nie można utworzyć pliku PDF odzyskiwania.</string>
+    <string name="sync_dialog_error_ok">OK</string>
+    <string name="sync_dialog_error_title">Synchronizacja i kopia zapasowa</string>
+    <string name="sync_encryption_not_supported_error_title">Urządzenie nie jest obsługiwane</string>
+    <string name="sync_encryption_not_supported_error">Funkcja Sync &amp; Backup jest kompleksowo szyfrowana i musi być w stanie szyfrować i przechowywać dane na urządzeniu. Ponieważ urządzenie nie obsługuje szyfrowanej pamięci masowej, aplikacja Sync &amp; Backup jest niedostępna.</string>
+
+    <!-- Sync Device Authentication -->
+    <string name="sync_auth_text_for_access">Odblokuj urządzenie, aby uzyskać dostęp do synchronizacji i kopii zapasowej.</string>
+    <string name="sync_biometric_prompt_title">Synchronizacja i kopia zapasowa zablokowane</string>
+
+    <!-- Sync Settings -->
+    <string name="sync_delete_server_data_dialog_title">Usunąć dane serwera?</string>
+    <string name="sync_delete_server_data_dialog_content">Wszystkie urządzenia zostaną odłączone, a zsynchronizowane dane usunięte z serwera.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Usuń dane</string>
+    <string name="sync_delete_server_data_dialog_secondary_button">Anuluj</string>
 </resources>

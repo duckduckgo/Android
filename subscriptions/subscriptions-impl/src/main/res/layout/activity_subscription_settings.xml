@@ -36,16 +36,62 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:src="@drawable/ic_privacy_pro"/>
+
             <com.duckduckgo.common.ui.view.text.DaxTextView
-                    android:id="@+id/description"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/keyline_4"
-                    android:padding="@dimen/keyline_4"
-                    app:typography="body2"
-                    app:textType="secondary"
-                    android:text="Your monthly subscription renews on April 20, 2027."
-                    tools:ignore="HardcodedText"/>
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/privacyPro"
+                app:textType="primary"
+                app:typography="h1" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/subscriptionDuration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/keyline_3"
+                android:text="@string/privacyPro"
+                app:textType="primary"
+                app:typography="body1_bold"
+                tools:text="Monthly Subscription"/>
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/keyline_3"
+                android:layout_marginBottom="@dimen/keyline_4"
+                android:text="Your subscription renews on April 20, 2027."
+                app:textType="secondary"
+                app:typography="body2"
+                tools:ignore="HardcodedText" />
+
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                app:primaryText="Subscription" />
+
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                android:id="@+id/changePlan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/changePlanTitle" />
+
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
             <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                     android:layout_height="wrap_content"
@@ -71,29 +117,14 @@
             <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent"
-                    app:primaryText="Manage Plan" />
-
-            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-                    android:id="@+id/changePlan"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:primaryText="@string/changePlanTitle" />
-
-            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
-                    android:layout_height="wrap_content"
-                    android:layout_width="match_parent"
                     app:primaryText="Help and Support" />
 
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                     android:id="@+id/faq"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:primaryText="FAQ"
-                    app:secondaryText="Visit our help pages for answers to frequently asked questions"/>
+                    app:primaryText="Privacy Pro FAQ"
+                    app:secondaryText="Get answers to frequently asked questions about Privacy Pro in our help pages."/>
 
         </LinearLayout>
     </ScrollView>

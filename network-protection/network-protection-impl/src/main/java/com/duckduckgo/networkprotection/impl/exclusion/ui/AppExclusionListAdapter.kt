@@ -42,14 +42,9 @@ class AppExclusionListAdapter(val listener: ExclusionListListener) : RecyclerVie
         private const val HEADER_ITEMS = 3
     }
 
-    private var isListEnabled: Boolean = false
     private val exclusionListItems = mutableListOf<AppsProtectionType>()
 
-    fun update(
-        viewState: ViewState,
-        isListStateEnabled: Boolean = true,
-    ) {
-        isListEnabled = isListStateEnabled
+    fun update(viewState: ViewState) {
         val oldData = exclusionListItems
         val newList = viewState.apps
         val diffResult = DiffCallback(oldData, newList).run { DiffUtil.calculateDiff(this) }
@@ -83,7 +78,7 @@ class AppExclusionListAdapter(val listener: ExclusionListListener) : RecyclerVie
         when (holder) {
             is HeaderViewHolder -> {
                 val header = exclusionListItems[position] as HeaderType
-                holder.bind(header.headerContent, isListEnabled)
+                holder.bind(header.headerContent)
             }
 
             is FilterViewHolder -> {
@@ -93,7 +88,7 @@ class AppExclusionListAdapter(val listener: ExclusionListListener) : RecyclerVie
 
             is AppViewHolder -> {
                 val appInfoType = exclusionListItems[position] as AppType
-                holder.bind(isListEnabled, appInfoType.appInfo, position, listener)
+                holder.bind(appInfoType.appInfo, position, listener)
             }
         }
     }
@@ -140,10 +135,7 @@ class AppExclusionListAdapter(val listener: ExclusionListListener) : RecyclerVie
             }
         }
 
-        fun bind(
-            headerContent: HeaderContent,
-            isListEnabled: Boolean,
-        ) {
+        fun bind(headerContent: HeaderContent) {
             when (headerContent) {
                 HeaderContent.DEFAULT -> binding.exclusionItemHeaderText.apply {
                     setText(R.string.netpExclusionListHeaderDefault)
@@ -153,14 +145,8 @@ class AppExclusionListAdapter(val listener: ExclusionListListener) : RecyclerVie
                     setText(context.getString(R.string.netpExclusionListHeaderDisabled))
                 }
             }
-
-            if (isListEnabled) {
-                binding.exclusionItemHeaderText.show()
-                binding.exclusionItemHeaderBanner.gone()
-            } else {
-                binding.exclusionItemHeaderBanner.gone()
-                binding.exclusionItemHeaderText.show()
-            }
+            binding.exclusionItemHeaderText.show()
+            binding.exclusionItemHeaderBanner.gone()
         }
     }
 
@@ -195,7 +181,6 @@ class AppExclusionListAdapter(val listener: ExclusionListListener) : RecyclerVie
         }
 
         fun bind(
-            isListEnabled: Boolean,
             app: NetpExclusionListApp,
             position: Int,
             listener: ExclusionListListener,
@@ -207,14 +192,8 @@ class AppExclusionListAdapter(val listener: ExclusionListListener) : RecyclerVie
 
                 setPrimaryText(app.name)
 
-                if (isListEnabled) {
-                    quietlySetIsChecked(app.isProtected) { _, enabled ->
-                        listener.onAppProtectionChanged(app, enabled, position)
-                    }
-                } else {
-                    isClickable = false
-                    isEnabled = false
-                    quietlySetIsChecked(app.isProtected, null)
+                quietlySetIsChecked(app.isProtected) { _, enabled ->
+                    listener.onAppProtectionChanged(app, enabled, position)
                 }
             }
         }

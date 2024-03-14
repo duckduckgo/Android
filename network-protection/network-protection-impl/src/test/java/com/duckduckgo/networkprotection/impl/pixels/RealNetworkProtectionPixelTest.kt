@@ -22,6 +22,7 @@ import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.duckduckgo.networkprotection.impl.cohort.NetpCohortStore
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_ENABLE_UNIQUE
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
@@ -95,14 +96,64 @@ class RealNetworkProtectionPixelTest {
     fun whenReportEnabledCalledTwiceThenFireDailyPixelOnce() {
         testee.reportEnabled()
         testee.reportEnabled()
+        val baseDate = LocalDate.of(2023, 1, 1)
+        val week = ChronoUnit.WEEKS.between(baseDate, fakeNetpCohortStore.cohortLocalDate!!) + 1
 
         verify(pixel).enqueueFire(
             "m_netp_ev_enabled_d",
-            mapOf("cohort" to fakeNetpCohortStore.cohortLocalDate?.toString().orEmpty(), "ts" to "2000-01-01"),
+            mapOf("cohort" to "week-$week", "ts" to "2000-01-01"),
         )
         verify(pixel).enqueueFire(
             NETP_ENABLE_UNIQUE,
-            mapOf("cohort" to fakeNetpCohortStore.cohortLocalDate?.toString().orEmpty(), "ts" to "2000-01-01"),
+            mapOf("cohort" to "week-$week", "ts" to "2000-01-01"),
+        )
+    }
+
+    @Test
+    fun `whenReportEnabledThenSendCohortFrom2023-01-01`() {
+        testee.reportEnabled()
+        val baseDate = LocalDate.of(2023, 1, 1)
+        val week = ChronoUnit.WEEKS.between(baseDate, fakeNetpCohortStore.cohortLocalDate!!) + 1
+
+        verify(pixel).enqueueFire(
+            "m_netp_ev_enabled_d",
+            mapOf("cohort" to "week-$week", "ts" to "2000-01-01"),
+        )
+        verify(pixel).enqueueFire(
+            NETP_ENABLE_UNIQUE,
+            mapOf("cohort" to "week-$week", "ts" to "2000-01-01"),
+        )
+    }
+
+    @Test
+    fun doNotCoalesceCohortAtTheBoundary() {
+        fakeNetpCohortStore.cohortLocalDate = LocalDate.now().minusWeeks(6)
+        testee.reportEnabled()
+        val baseDate = LocalDate.of(2023, 1, 1)
+        val week = ChronoUnit.WEEKS.between(baseDate, fakeNetpCohortStore.cohortLocalDate!!) + 1
+
+        verify(pixel).enqueueFire(
+            "m_netp_ev_enabled_d",
+            mapOf("cohort" to "week-$week", "ts" to "2000-01-01"),
+        )
+        verify(pixel).enqueueFire(
+            NETP_ENABLE_UNIQUE,
+            mapOf("cohort" to "week-$week", "ts" to "2000-01-01"),
+        )
+    }
+
+    @Test
+    fun coalesceCohortWhenPastTheWeekBoundary() {
+        fakeNetpCohortStore.cohortLocalDate = LocalDate.now().minusWeeks(7)
+        testee.reportEnabled()
+
+        verify(pixel).enqueueFire(
+            "m_netp_ev_enabled_d",
+            mapOf("cohort" to "", "ts" to "2000-01-01"),
+        )
+        verify(pixel).enqueueFire(
+            NETP_ENABLE_UNIQUE,
+            mapOf("cohort" to "", "ts" to "2000-01-01"),
         )
     }
 
@@ -236,15 +287,6 @@ class RealNetworkProtectionPixelTest {
 
         verify(pixel).fire("m_netp_ev_exclusion_list_launch_breakage_report_d")
         verify(pixel, times(2)).fire("m_netp_ev_exclusion_list_launch_breakage_report_c")
-    }
-
-    @Test
-    fun whenReportWhatIsAVpnScreenShownCalledTwiceThenFireDailyPixelOnce() {
-        testee.reportWhatIsAVpnScreenShown()
-        testee.reportWhatIsAVpnScreenShown()
-
-        verify(pixel).fire("m_netp_imp_info_vpn_d")
-        verify(pixel, times(2)).fire("m_netp_imp_info_vpn_c")
     }
 
     @Test

@@ -86,8 +86,6 @@ import com.duckduckgo.app.brokensite.BrokenSiteActivity
 import com.duckduckgo.app.browser.BrowserTabViewModel.AccessibilityViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.AutoCompleteViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.BrowserViewState
-import com.duckduckgo.app.browser.BrowserTabViewModel.Command
-import com.duckduckgo.app.browser.BrowserTabViewModel.Command.ShowBackNavigationHistory
 import com.duckduckgo.app.browser.BrowserTabViewModel.CtaViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.FileChooserRequestedParams
 import com.duckduckgo.app.browser.BrowserTabViewModel.FindInPageViewState
@@ -95,7 +93,6 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.HighlightableButton
 import com.duckduckgo.app.browser.BrowserTabViewModel.LoadingViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.LocationPermission
-import com.duckduckgo.app.browser.BrowserTabViewModel.NavigationCommand
 import com.duckduckgo.app.browser.BrowserTabViewModel.OmnibarViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.PrivacyShieldViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.SavedSiteChangedViewState
@@ -105,6 +102,9 @@ import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.applinks.AppLinksLauncher
 import com.duckduckgo.app.browser.applinks.AppLinksSnackBarConfigurator
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
+import com.duckduckgo.app.browser.commands.Command
+import com.duckduckgo.app.browser.commands.Command.ShowBackNavigationHistory
+import com.duckduckgo.app.browser.commands.NavigationCommand
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.databinding.ContentSiteLocationPermissionDialogBinding
 import com.duckduckgo.app.browser.databinding.ContentSystemLocationPermissionDialogBinding
@@ -134,6 +134,7 @@ import com.duckduckgo.app.browser.menu.BrowserPopupMenu
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
+import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromAutocomplete
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
@@ -210,7 +211,6 @@ import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCrede
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.UsernameMissing
 import com.duckduckgo.autofill.api.UseGeneratedPasswordDialog
 import com.duckduckgo.autofill.api.credential.saving.DuckAddressLoginCreator
-import com.duckduckgo.autofill.api.dialog.AutofillOverlappingDialogDetector
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.api.emailprotection.EmailInjector
@@ -239,8 +239,6 @@ import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.common.utils.plugins.PluginPoint
-import com.duckduckgo.common.utils.webview.enableDarkMode
-import com.duckduckgo.common.utils.webview.enableLightMode
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_DELAY
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_LENGTH
@@ -267,6 +265,7 @@ import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
+import com.duckduckgo.user.agent.api.ClientBrandHintProvider
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.duckduckgo.voice.api.VoiceSearchLauncher
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
@@ -451,9 +450,6 @@ class BrowserTabFragment :
     lateinit var externalCameraLauncher: UploadFromExternalMediaAppLauncher
 
     @Inject
-    lateinit var autofillOverlappingDialogDetector: AutofillOverlappingDialogDetector
-
-    @Inject
     lateinit var downloadConfirmation: DownloadConfirmation
 
     @Inject
@@ -464,6 +460,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var appLinksLauncher: AppLinksLauncher
+
+    @Inject
+    lateinit var clientBrandHintProvider: ClientBrandHintProvider
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -1113,6 +1112,7 @@ class BrowserTabFragment :
         url: String,
         headers: Map<String, String>,
     ) {
+        clientBrandHintProvider.setOn(webView?.settings, url)
         hideKeyboard()
         renderer.hideFindInPage()
         viewModel.registerDaxBubbleCtaDismissed()
@@ -1220,12 +1220,18 @@ class BrowserTabFragment :
 
             is NavigationCommand.NavigateBack -> {
                 dismissAppLinkSnackBar()
+                val navList = webView?.safeCopyBackForwardList()
+                val currentIndex = navList?.currentIndex ?: 0
+                clientBrandHintProvider.setOn(webView?.settings, navList?.getItemAtIndex(currentIndex - 1)?.url.toString())
                 viewModel.refreshBrowserError()
                 webView?.goBackOrForward(-it.steps)
             }
 
             is NavigationCommand.NavigateForward -> {
                 dismissAppLinkSnackBar()
+                val navList = webView?.safeCopyBackForwardList()
+                val currentIndex = navList?.currentIndex ?: 0
+                clientBrandHintProvider.setOn(webView?.settings, navList?.getItemAtIndex(currentIndex + 1)?.url.toString())
                 viewModel.refreshBrowserError()
                 webView?.goForward()
             }
@@ -2082,7 +2088,8 @@ class BrowserTabFragment :
             it.webChromeClient = webChromeClient
 
             it.settings.apply {
-                userAgentProvider.setHintHeader(this)
+                clientBrandHintProvider.setDefault(this)
+                webViewClient.clientProvider = clientBrandHintProvider
                 userAgentString = userAgentProvider.userAgent()
                 javaScriptEnabled = true
                 domStorageEnabled = true
@@ -2095,7 +2102,6 @@ class BrowserTabFragment :
                 setSupportMultipleWindows(true)
                 disableWebSql(this)
                 setSupportZoom(true)
-                configureDarkThemeSupport(this)
                 if (accessibilitySettingsDataStore.overrideSystemFontSize) {
                     textZoom = accessibilitySettingsDataStore.fontSize.toInt()
                 }
@@ -2284,12 +2290,10 @@ class BrowserTabFragment :
     ) {
         // want to ensure lifecycle is at least resumed before attempting to show dialog
         lifecycleScope.launchWhenResumed {
-            val currentUrl = webView?.url
-            val urlMatch = requiredUrl == null || requiredUrl == currentUrl
-
-            autofillOverlappingDialogDetector.detectOverlappingDialogs(childFragmentManager, tag, urlMatch)
             hideDialogWithTag(tag)
 
+            val currentUrl = webView?.url
+            val urlMatch = requiredUrl == null || requiredUrl == currentUrl
             if (isActiveTab && urlMatch) {
                 Timber.i("Showing dialog (%s), hidden=%s, requiredUrl=%s, currentUrl=%s, tabId=%s", tag, isHidden, requiredUrl, currentUrl, tabId)
                 dialog.show(childFragmentManager, tag)
@@ -2317,13 +2321,6 @@ class BrowserTabFragment :
             return
         }
         dialog.show(childFragmentManager, tag)
-    }
-
-    private fun configureDarkThemeSupport(webSettings: WebSettings) {
-        when (appTheme.isLightModeEnabled()) {
-            true -> webSettings.enableLightMode()
-            false -> webSettings.enableDarkMode()
-        }
     }
 
     private fun configureSwipeRefresh() {
@@ -2920,6 +2917,10 @@ class BrowserTabFragment :
 
     private fun navigateBackHistoryStack(index: Int) {
         val stepsToMove = (index + 1) * -1
+        val navList = webView?.safeCopyBackForwardList()
+        val currentIndex = navList?.currentIndex ?: 0
+
+        clientBrandHintProvider.setOn(webView?.settings, navList?.getItemAtIndex(currentIndex + stepsToMove)?.url.toString())
         webView?.goBackOrForward(stepsToMove)
     }
 

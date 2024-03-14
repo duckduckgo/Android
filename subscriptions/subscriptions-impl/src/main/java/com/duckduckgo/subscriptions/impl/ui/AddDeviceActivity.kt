@@ -18,6 +18,7 @@ package com.duckduckgo.subscriptions.impl.ui
 
 import android.os.Bundle
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -68,7 +69,7 @@ class AddDeviceActivity : DuckDuckGoActivity() {
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
 
-        binding.email.setPrimaryButtonClickListener {
+        binding.manageEmailCard.emailButton.setOnClickListener {
             viewModel.useEmail()
         }
     }
@@ -80,11 +81,14 @@ class AddDeviceActivity : DuckDuckGoActivity() {
 
     private fun renderView(viewState: ViewState) {
         if (viewState.email != null) {
-            binding.email.setSecondaryText(String.format(getString(R.string.useEmail), viewState.email))
-            binding.email.setPrimaryButtonText(getString(R.string.manage))
+            binding.manageEmailCard.emailAddress.isVisible = true
+            binding.manageEmailCard.emailAddress.text = viewState.email
+            binding.manageEmailCard.emailSubtitle.setText(R.string.useEmail)
+            binding.manageEmailCard.emailButton.setText(R.string.manage)
         } else {
-            binding.email.setPrimaryButtonText(getString(R.string.addEmailText))
-            binding.email.setSecondaryText(getString(R.string.addEmail))
+            binding.manageEmailCard.emailAddress.isVisible = false
+            binding.manageEmailCard.emailSubtitle.setText(R.string.addEmail)
+            binding.manageEmailCard.emailButton.setText(R.string.addEmailText)
         }
     }
 
@@ -122,8 +126,8 @@ class AddDeviceActivity : DuckDuckGoActivity() {
         }
     }
     companion object {
-        const val ADD_EMAIL_URL = "https://abrown.duckduckgo.com/subscriptions/add-email"
-        const val MANAGE_URL = "https://abrown.duckduckgo.com/subscriptions/manage"
+        const val ADD_EMAIL_URL = "https://duckduckgo.com/subscriptions/add-email?environment=staging"
+        const val MANAGE_URL = "https://duckduckgo.com/subscriptions/manage?environment=staging"
         object AddDeviceScreenWithEmptyParams : GlobalActivityStarter.ActivityParams
     }
 }

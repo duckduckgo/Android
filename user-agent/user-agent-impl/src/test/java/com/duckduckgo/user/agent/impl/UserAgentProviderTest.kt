@@ -17,11 +17,7 @@
 package com.duckduckgo.user.agent.impl
 
 import android.net.Uri
-import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
-import androidx.webkit.WebSettingsCompat
-import androidx.webkit.WebViewFeature
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.device.DeviceInfo
@@ -30,11 +26,13 @@ import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.user.agent.api.UserAgentInterceptor
 import com.duckduckgo.user.agent.api.UserAgentProvider
+import com.duckduckgo.user.agent.impl.remoteconfig.ClientBrandHintFeature
 import com.duckduckgo.user.agent.store.UserAgentFeatureName
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import org.junit.After
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -51,7 +49,7 @@ class UserAgentProviderTest {
     var coroutinesTestRule = CoroutineTestRule()
 
     private lateinit var testee: UserAgentProvider
-    private val context = InstrumentationRegistry.getInstrumentation().targetContext
+
     private var deviceInfo: DeviceInfo = mock()
     private var userAgent: UserAgent = mock()
     private var toggle: FeatureToggle = mock()
@@ -242,37 +240,6 @@ class UserAgentProviderTest {
         assertTrue("$actual does not match expected regex", ValidationRegex.userAgentDesktopArch.matches(actual))
     }
 
-    @Test
-    fun whenHintFeatureDisabledThenMetadataContainsAndroid() {
-        if (WebViewFeature.isFeatureSupported(WebViewFeature.USER_AGENT_METADATA)) {
-            val settings = WebView(context).settings
-            testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
-            testee.setHintHeader(settings)
-
-            val metadata = WebSettingsCompat.getUserAgentMetadata(settings)
-            val result = metadata.brandVersionList.firstOrNull {
-                it.brand.contains("Android")
-            }
-            assertNotNull(result)
-        }
-    }
-
-    @Test
-    fun whenHintFeatureEnabledThenMetadataContainsDuckDuckGo() {
-        if (WebViewFeature.isFeatureSupported(WebViewFeature.USER_AGENT_METADATA)) {
-            whenever(clientBrandHintFeature.self().isEnabled()).thenReturn(true)
-            val settings = WebView(context).settings
-            testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
-            testee.setHintHeader(settings)
-
-            val metadata = WebSettingsCompat.getUserAgentMetadata(settings)
-            val result = metadata.brandVersionList.firstOrNull {
-                it.brand.contains("DuckDuckGo")
-            }
-            assertNotNull(result)
-        }
-    }
-
     private fun getUserAgentProvider(
         defaultUserAgent: String,
         device: DeviceInfo,
@@ -285,7 +252,6 @@ class UserAgentProviderTest {
             userAgent,
             toggle,
             FakeUserAllowListRepo(),
-            clientBrandHintFeature,
         )
     }
 
@@ -343,34 +309,34 @@ class UserAgentProviderTest {
         )
         val converted = Regex(
             "Mozilla/5.0 \\(Linux; Android .*?\\) AppleWebKit/[.0-9]+" +
-                " \\(KHTML, like Gecko\\) Version/[.0-9]+ Chrome/[.0-9]+ Mobile DuckDuckGo/5 Safari/[.0-9]+",
+                " \\(KHTML, like Gecko\\) Version/[.0-9]+ Chrome/(\\d+)\\.0\\.0\\.0 Mobile DuckDuckGo/5 Safari/[.0-9]+",
         )
         val desktop = Regex(
             "Mozilla/5.0 \\(X11; Linux .*?\\) AppleWebKit/[.0-9]+ " +
-                "\\(KHTML, like Gecko\\) Version/[.0-9]+ Chrome/[.0-9]+ DuckDuckGo/5 Safari/[.0-9]+",
+                "\\(KHTML, like Gecko\\) Version/[.0-9]+ Chrome/(\\d+)\\.0\\.0\\.0 DuckDuckGo/5 Safari/[.0-9]+",
         )
         val noVersion = Regex(
             "Mozilla/5.0 \\(Linux; Android .*?\\) AppleWebKit/[.0-9]+ " +
-                "\\(KHTML, like Gecko\\) Chrome/[.0-9]+ Mobile DuckDuckGo/5 Safari/[.0-9]+",
+                "\\(KHTML, like Gecko\\) Chrome/(\\d+)\\.0\\.0\\.0 Mobile DuckDuckGo/5 Safari/[.0-9]+",
         )
         val missingWebKit = Regex(
             "Mozilla/5.0 \\(Linux; Android .*?\\) DuckDuckGo/5 Safari/[.0-9]+",
         )
         val missingSafari = Regex(
             "Mozilla/5.0 \\(Linux; Android .*?\\) AppleWebKit/[.0-9]+ " +
-                "\\(KHTML, like Gecko\\) Version/[.0-9]+ Chrome/[.0-9]+ Mobile DuckDuckGo/5",
+                "\\(KHTML, like Gecko\\) Version/[.0-9]+ Chrome/(\\d+)\\.0\\.0\\.0 Mobile DuckDuckGo/5",
         )
         val userAgent = Regex(
             "Mozilla/5.0 \\(Linux; Android 10; K\\) AppleWebKit/[.0-9]+ " +
-                "\\(KHTML, like Gecko\\) Chrome/[.0-9]+ Mobile Safari/[.0-9]+",
+                "\\(KHTML, like Gecko\\) Chrome/(\\d+)\\.0\\.0\\.0 Mobile Safari/[.0-9]+",
         )
         val userAgentDesktop = Regex(
             "Mozilla/5.0 \\(X11; Linux .*?\\) AppleWebKit/[.0-9]+ " +
-                "\\(KHTML, like Gecko\\) Chrome/[.0-9]+ Safari/[.0-9]+",
+                "\\(KHTML, like Gecko\\) Chrome/(\\d+)\\.0\\.0\\.0 Safari/[.0-9]+",
         )
         val userAgentDesktopArch = Regex(
             "Mozilla/5.0 \\(X11; Linux x86_64\\) AppleWebKit/[.0-9]+ " +
-                "\\(KHTML, like Gecko\\) Chrome/[.0-9]+ Safari/[.0-9]+",
+                "\\(KHTML, like Gecko\\) Chrome/(\\d+)\\.0\\.0\\.0 Safari/[.0-9]+",
         )
     }
 }

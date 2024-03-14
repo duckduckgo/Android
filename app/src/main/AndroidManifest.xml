@@ -37,10 +37,12 @@
         android:label="@string/appName"
         android:networkSecurityConfig="@xml/network_security_config"
         android:roundIcon="${appIconRound}"
+        android:dataExtractionRules="@xml/backup_rules_android_12_upwards"
+        android:fullBackupContent="@xml/backup_rules_android_11_and_older"
         android:supportsRtl="true"
         android:theme="@style/Theme.DuckDuckGo.Light"
         android:requestLegacyExternalStorage="true"
-        tools:ignore="GoogleAppIndexingWarning">
+        tools:ignore="GoogleAppIndexingWarning,UnusedAttribute">
         <meta-data
             android:name="android.webkit.WebView.MetricsOptOut"
             android:value="true" />

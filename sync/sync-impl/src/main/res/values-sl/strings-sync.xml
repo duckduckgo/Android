@@ -139,4 +139,30 @@
     <string name="sync_notification_channel_name">Sinhronizacija</string>
     <string name="sync_notify_me_title">Obvestila so onemogočena</string>
     <string name="sync_notify_me_description">Prejmite obvestilo, če pride do napake pri sinhronizaciji in varnostnem kopiranju.</string>
+
+    <!-- setup errors -->
+    <string name="sync_turn_off_error">Sinhronizacije in varnostnega kopiranja ni bilo mogoče izklopiti.</string>
+    <string name="sync_edit_device_error">Imena naprave ni bilo mogoče posodobiti.</string>
+    <string name="sync_remove_device_error">Te naprave ni bilo mogoče odstraniti iz sinhronizacije in varnostnega kopiranja.</string>
+    <string name="sync_delete_data_error">Podatkov na strežniku ni bilo mogoče izbrisati.</string>
+    <string name="sync_login_authenticated_device_error">"Če želite seznaniti ti napravi, izklopite možnost »Sinhronizacija in varnostno kopiranje« v eni napravi in nato v drugi napravi tapnite »Sinhronizacija z drugo napravo«."</string>
+    <string name="sync_connect_generic_error">Ni bilo mogoče vzpostaviti povezave s strežnikom.</string>
+    <string name="sync_connect_login_error">Ni bilo mogoče sinhronizirati z drugo napravo.</string>
+    <string name="sync_create_account_generic_error">Ni bilo mogoče vzpostaviti povezave s strežnikom.</string>
+    <string name="sync_invalid_code_error">Oprostite, ta koda je neveljavna. Prepričajte se, da je bila vnesena ali optično prebrana pravilna koda.</string>
+    <string name="sync_recovery_pdf_error">PDF-ja za obnovitev ni bilo mogoče ustvariti.</string>
+    <string name="sync_dialog_error_ok">V redu</string>
+    <string name="sync_dialog_error_title">Sinhronizacija in varnostno kopiranje</string>
+    <string name="sync_encryption_not_supported_error_title">Naprava ni podprta</string>
+    <string name="sync_encryption_not_supported_error">Sinhronizacija in varnostno kopiranje je šifrirano v celoti, zato mora šifrirati in shranjevati podatke v vaši napravi. Ker vaša naprava ne podpira šifriranega shranjevanja, funkcija Sinhronizacija in varnostno kopiranje ni na voljo.</string>
+
+    <!-- Sync Device Authentication -->
+    <string name="sync_auth_text_for_access">Odklenite napravo za dostop do sinhronizacije in varnostnega kopiranja.</string>
+    <string name="sync_biometric_prompt_title">Sinhronizacija in varnostno kopiranje je zaklenjeno</string>
+
+    <!-- Sync Settings -->
+    <string name="sync_delete_server_data_dialog_title">Želite izbrisati podatke strežnika?</string>
+    <string name="sync_delete_server_data_dialog_content">Prekinjena bo povezava z vsemi napravami, sinhronizirani podatki pa bodo izbrisani iz strežnika.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Brisanje podatkov</string>
+    <string name="sync_delete_server_data_dialog_secondary_button">Prekliči</string>
 </resources>

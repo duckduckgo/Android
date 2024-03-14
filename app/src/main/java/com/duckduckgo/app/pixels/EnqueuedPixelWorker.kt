@@ -32,6 +32,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.WEBVIEW_VERSION
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
+import com.duckduckgo.verifiedinstallation.IsVerifiedPlayStoreInstall
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import java.util.concurrent.TimeUnit
@@ -54,6 +55,7 @@ class EnqueuedPixelWorker @Inject constructor(
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels,
+    private val isVerifiedPlayStoreInstall: IsVerifiedPlayStoreInstall,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : MainProcessLifecycleObserver {
 
@@ -83,10 +85,18 @@ class EnqueuedPixelWorker @Inject constructor(
         }.toMap()
         appCoroutineScope.launch {
             val popupExperimentParams = privacyProtectionsPopupExperimentExternalPixels.getPixelParams()
+            val parameters = paramsMap + popupExperimentParams
             pixel.get().fire(
                 pixel = AppPixelName.APP_LAUNCH,
-                parameters = paramsMap + popupExperimentParams,
+                parameters = parameters,
             )
+
+            if (isVerifiedPlayStoreInstall()) {
+                pixel.get().fire(
+                    pixel = AppPixelName.APP_LAUNCH_VERIFIED_INSTALL,
+                    parameters = parameters,
+                )
+            }
         }
     }
 

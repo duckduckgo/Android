@@ -16,12 +16,13 @@
 
 package com.duckduckgo.mobile.android.app.tracking
 
+import android.content.Context
 import android.content.pm.PackageManager
 import android.util.LruCache
+import com.duckduckgo.common.utils.extensions.isDdgApp
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
-import com.duckduckgo.mobile.android.vpn.apps.VpnExclusionList
 import com.duckduckgo.mobile.android.vpn.apps.isSystemApp
 import com.duckduckgo.mobile.android.vpn.dao.VpnAppTrackerBlockingDao
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
@@ -44,6 +45,7 @@ class RealAppTrackerDetector constructor(
     private val vpnAppTrackerBlockingDao: VpnAppTrackerBlockingDao,
     private val packageManager: PackageManager,
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
+    private val context: Context,
 ) : AppTrackerDetector {
 
     private fun isAppTpDisabled(): Boolean {
@@ -63,7 +65,7 @@ class RealAppTrackerDetector constructor(
         // `null` package ID means unknown app, return null to not block
         val packageId = appNameResolver.getPackageIdForUid(uid) ?: return null
 
-        if (VpnExclusionList.isDdgApp(packageId) || packageId.isInExclusionList()) {
+        if (context.isDdgApp(packageId) || packageId.isInExclusionList()) {
             logcat { "shouldAllowDomain: $packageId is excluded, allowing packet" }
             return null
         }
@@ -137,6 +139,7 @@ object AppTrackerDetectorModule {
         vpnDatabase: VpnDatabase,
         packageManager: PackageManager,
         vpnFeaturesRegistry: VpnFeaturesRegistry,
+        context: Context,
     ): AppTrackerDetector {
         return RealAppTrackerDetector(
             appTrackerRepository = appTrackerRepository,
@@ -145,6 +148,7 @@ object AppTrackerDetectorModule {
             vpnAppTrackerBlockingDao = vpnDatabase.vpnAppTrackerBlockingDao(),
             packageManager = packageManager,
             vpnFeaturesRegistry = vpnFeaturesRegistry,
+            context = context,
         )
     }
 }

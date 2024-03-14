@@ -36,7 +36,7 @@
                     android:layout_width="@dimen/listItemImageContainerSize"
                     android:layout_height="@dimen/listItemImageContainerSize"
                     android:importantForAccessibility="no"
-                    android:src="@drawable/ic_apptb_default"
+                    android:src="@drawable/ic_apptp_default"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />

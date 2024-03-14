@@ -292,18 +292,24 @@ class AppSyncAccountRepository @Inject constructor(
 
             is Result.Success -> {
                 return Result.Success(
-                    result.data.mapNotNull {
-                        return@mapNotNull kotlin.runCatching {
+                    result.data.mapNotNull { device ->
+                        try {
+                            val decryptedDeviceName = nativeLib.decryptData(device.deviceName, primaryKey).decryptedData
+                            val decryptedDeviceType = device.deviceType.takeUnless { it.isNullOrEmpty() }?.let { encryptedDeviceType ->
+                                DeviceType(nativeLib.decryptData(encryptedDeviceType, primaryKey).decryptedData)
+                            } ?: DeviceType()
+
                             ConnectedDevice(
-                                thisDevice = syncStore.deviceId == it.deviceId,
-                                deviceName = nativeLib.decryptData(it.deviceName, primaryKey).decryptedData,
-                                deviceId = it.deviceId,
-                                deviceType = it.deviceType.takeUnless { it.isNullOrEmpty() }?.let { encryptedDeviceType ->
-                                    DeviceType(nativeLib.decryptData(encryptedDeviceType, primaryKey).decryptedData)
-                                } ?: DeviceType(),
+                                thisDevice = syncStore.deviceId == device.deviceId,
+                                deviceName = decryptedDeviceName,
+                                deviceId = device.deviceId,
+                                deviceType = decryptedDeviceType,
                             )
-                        }.getOrElse { throwable ->
+                        } catch (throwable: Throwable) {
                             throwable.asErrorResult().alsoFireAccountErrorPixel()
+                            if (syncStore.deviceId != device.deviceId) {
+                                logout(device.deviceId)
+                            }
                             null
                         }
                     }.sortedWith { a, b ->

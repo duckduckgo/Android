@@ -51,9 +51,9 @@ import com.duckduckgo.app.browser.mediaplayback.MediaPlayback
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedHandler
+import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedHandler
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.global.model.Site
-import com.duckduckgo.app.pixels.remoteconfig.OptimizeTrackerEvaluationRCWrapper
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.BrowserAutofill
@@ -120,7 +120,7 @@ class BrowserWebViewClientTest {
     private val currentTimeProvider: CurrentTimeProvider = mock()
     private val deviceInfo: DeviceInfo = mock()
     private val pageLoadedHandler: PageLoadedHandler = mock()
-    private val optimizeTrackerEvaluationRCWrapper = TestOptimizeTrackerEvaluationRCWrapper()
+    private val pagePaintedHandler: PagePaintedHandler = mock()
     private val mediaPlayback: MediaPlayback = mock()
 
     @UiThreadTest
@@ -150,7 +150,7 @@ class BrowserWebViewClientTest {
             jsPlugins,
             currentTimeProvider,
             pageLoadedHandler,
-            optimizeTrackerEvaluationRCWrapper,
+            pagePaintedHandler,
             mediaPlayback,
         )
         testee.webViewClientListener = listener
@@ -272,10 +272,9 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenShouldInterceptRequestAndOptimizeEnabledThenShouldInterceptWithUri() {
+    fun whenShouldInterceptRequestThenShouldInterceptWithUri() {
         TestScope().launch {
             val webResourceRequest = mock<WebResourceRequest>()
-            optimizeTrackerEvaluationRCWrapper.value = true
             testee.shouldInterceptRequest(webView, webResourceRequest)
             verify(requestInterceptor).shouldIntercept(any(), any(), any<Uri>(), any())
         }
@@ -789,6 +788,64 @@ class BrowserWebViewClientTest {
         assertEquals(10L, endArgumentCaptor.firstValue)
     }
 
+    @UiThreadTest
+    @Test
+    fun whenOnPageFinishedCalledBeforeCompletionThenJsCodeNotInjected() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.progress).thenReturn(10)
+        whenever(mockWebView.settings).thenReturn(mock())
+
+        assertEquals(0, jsPlugins.plugin.countFinished)
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+        assertEquals(0, jsPlugins.plugin.countFinished)
+        assertEquals(0, jsPlugins.plugin.countStarted)
+    }
+
+    @Test
+    fun whenOnPageFinishedCalledBeforeCompleteThenVerifyVerificationCompletedNotCalled() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.progress).thenReturn(10)
+        whenever(mockWebView.settings).thenReturn(mock())
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+        verifyNoInteractions(internalTestUserChecker)
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnPageFinishedCalledBeforeCompleteThenNavigationStateNotInvoked() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.progress).thenReturn(10)
+        whenever(mockWebView.settings).thenReturn(mock())
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+        verifyNoInteractions(listener)
+    }
+
+    @Test
+    fun whenOnPageFinishedCalledThenPrintInjectorInjected() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.progress).thenReturn(100)
+        whenever(mockWebView.settings).thenReturn(mock())
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+        verify(printInjector).injectPrint(mockWebView)
+    }
+
+    @Test
+    fun whenOnPageFinishedBeforeCompleteThenPrintInjectorNotInjected() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.progress).thenReturn(10)
+        whenever(mockWebView.settings).thenReturn(mock())
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+
+        testee.onPageFinished(mockWebView, EXAMPLE_URL)
+        verifyNoInteractions(printInjector)
+    }
+
     private class TestWebView(context: Context) : WebView(context) {
         override fun getOriginalUrl(): String {
             return EXAMPLE_URL
@@ -849,13 +906,6 @@ class BrowserWebViewClientTest {
         override fun getFavicon(): Bitmap = throw NotImplementedError()
 
         override fun clone(): WebHistoryItem = throw NotImplementedError()
-    }
-
-    private class TestOptimizeTrackerEvaluationRCWrapper : OptimizeTrackerEvaluationRCWrapper {
-
-        var value = false
-        override val enabled: Boolean
-            get() = value
     }
 
     companion object {

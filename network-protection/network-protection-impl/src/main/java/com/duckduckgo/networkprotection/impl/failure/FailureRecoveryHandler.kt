@@ -26,7 +26,6 @@ import com.duckduckgo.networkprotection.impl.configuration.asServerDetails
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.impl.pixels.WireguardHandshakeMonitor
 import com.squareup.anvil.annotations.ContributesMultibinding
-import com.wireguard.crypto.KeyPair
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.delay
@@ -100,10 +99,12 @@ class FailureRecoveryHandler @Inject constructor(
         if (vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)) {
             networkProtectionPixels.reportFailureRecoveryStarted()
             wgTunnel.markTunnelUnhealthy()
-            val currentServer = wgTunnelConfig.getWgConfig()?.asServerDetails()?.serverName
+            val (currentServer, currentTunAddresses) = with(wgTunnelConfig.getWgConfig()) {
+                this?.asServerDetails()?.serverName to this?.`interface`?.addresses.orEmpty()
+            }
 
-            // Create a new config + register a new keypair
-            val config = wgTunnel.createWgConfig(KeyPair())
+            // Create a new config using the same key
+            val config = wgTunnel.createWgConfig()
                 .onFailure {
                     networkProtectionPixels.reportFailureRecoveryFailed()
                     logcat(LogPriority.ERROR) { "Failure recovery: Failed registering the new key:  ${it.asLog()}" }
@@ -112,10 +113,14 @@ class FailureRecoveryHandler @Inject constructor(
                 }
 
             logcat { "Failure recovery: current server: $currentServer config server: ${config.asServerDetails().serverName}" }
-            if (config.asServerDetails().serverName != currentServer) {
+            if (config.asServerDetails().serverName != currentServer || !config.`interface`.addresses.containsAll(currentTunAddresses)) {
                 logcat { "Failure recovery: Restarting VPN to connect to new server" }
                 // Store the created config since it contains a new server
                 networkProtectionPixels.reportFailureRecoveryCompletedWithServerUnhealthy()
+                if (!config.`interface`.addresses.containsAll(currentTunAddresses)) {
+                    networkProtectionPixels.reportFailureRecoveryCompletedWithDifferentTunnelAddress()
+                }
+
                 wgTunnel.markTunnelHealthy()
                 wgTunnelConfig.setWgConfig(config)
                 vpnFeaturesRegistry.refreshFeature(NetPVpnFeature.NETP_VPN)

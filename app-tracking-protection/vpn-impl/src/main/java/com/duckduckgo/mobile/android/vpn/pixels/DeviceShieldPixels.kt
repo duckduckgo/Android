@@ -199,7 +199,15 @@ interface DeviceShieldPixels {
      */
     fun privacyReportOnboardingFAQDisplayed()
 
+    /**
+     * Will fire when the there's an error establishing the TUN interface
+     */
     fun vpnEstablishTunInterfaceError()
+
+    /**
+     * Will fire when the there's an error establishing the null TUN interface
+     */
+    fun vpnEstablishNullTunInterfaceError()
 
     /** Will fire when the process has gone to the expendable list */
     fun vpnProcessExpendableLow(payload: Map<String, String>)
@@ -538,6 +546,11 @@ class RealDeviceShieldPixels @Inject constructor(
     override fun vpnEstablishTunInterfaceError() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_ESTABLISH_TUN_INTERFACE_ERROR_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_ESTABLISH_TUN_INTERFACE_ERROR)
+    }
+
+    override fun vpnEstablishNullTunInterfaceError() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_ESTABLISH_NULL_TUN_INTERFACE_ERROR_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_ESTABLISH_NULL_TUN_INTERFACE_ERROR)
     }
 
     override fun vpnProcessExpendableLow(payload: Map<String, String>) {

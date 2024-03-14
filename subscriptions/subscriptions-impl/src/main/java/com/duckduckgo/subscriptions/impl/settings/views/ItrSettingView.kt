@@ -28,13 +28,13 @@ import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.databinding.ViewItrSettingsBinding
 import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingViewModel.Command
 import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingViewModel.Command.OpenItr
-import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingViewModel.Factory
 import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingViewModel.ViewState
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams
 import dagger.android.support.AndroidSupportInjection
@@ -54,7 +54,7 @@ class ItrSettingView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyle) {
 
     @Inject
-    lateinit var viewModelFactory: Factory
+    lateinit var viewModelFactory: ViewViewModelFactory
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter

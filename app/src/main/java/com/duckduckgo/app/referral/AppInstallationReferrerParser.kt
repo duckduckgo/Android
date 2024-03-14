@@ -17,7 +17,8 @@
 package com.duckduckgo.app.referral
 
 import com.duckduckgo.app.referral.ParsedReferrerResult.CampaignReferrerFound
-import com.duckduckgo.app.referral.ParsedReferrerResult.EuAuctionReferrerFound
+import com.duckduckgo.app.referral.ParsedReferrerResult.EuAuctionBrowserChoiceReferrerFound
+import com.duckduckgo.app.referral.ParsedReferrerResult.EuAuctionSearchChoiceReferrerFound
 import com.duckduckgo.app.referral.ParsedReferrerResult.ReferrerNotFound
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -38,7 +39,7 @@ class QueryParamReferrerParser @Inject constructor() : AppInstallationReferrerPa
         if (referrerParts.isNullOrEmpty()) return ReferrerNotFound(fromCache = false)
 
         val auctionReferrer = extractEuAuctionReferrer(referrerParts)
-        if (auctionReferrer is EuAuctionReferrerFound) {
+        if (auctionReferrer is EuAuctionSearchChoiceReferrerFound || auctionReferrer is EuAuctionBrowserChoiceReferrerFound) {
             return auctionReferrer
         }
 
@@ -49,9 +50,13 @@ class QueryParamReferrerParser @Inject constructor() : AppInstallationReferrerPa
         Timber.d("Looking for Google EU Auction referrer data")
         for (part in referrerParts) {
             Timber.v("Analysing query param part: $part")
-            if (part.startsWith(INSTALLATION_SOURCE_KEY) && part.endsWith(INSTALLATION_SOURCE_EU_AUCTION_VALUE)) {
-                Timber.i("App installed as a result of the EU auction")
-                return EuAuctionReferrerFound()
+            if (part.startsWith(INSTALLATION_SOURCE_KEY) && part.endsWith(INSTALLATION_SEARCH_CHOICE_SOURCE_EU_AUCTION_VALUE)) {
+                Timber.i("App installed as a result of the EU auction - Search Choice")
+                return EuAuctionSearchChoiceReferrerFound()
+            }
+            if (part.startsWith(INSTALLATION_SOURCE_KEY) && part.endsWith(INSTALLATION_BROWSER_CHOICE_SOURCE_EU_AUCTION_VALUE)) {
+                Timber.i("App installed as a result of the EU auction - Browser Choice")
+                return EuAuctionBrowserChoiceReferrerFound()
             }
         }
 
@@ -104,12 +109,14 @@ class QueryParamReferrerParser @Inject constructor() : AppInstallationReferrerPa
         private const val CAMPAIGN_NAME_PREFIX = "DDGRA"
 
         private const val INSTALLATION_SOURCE_KEY = "utm_source"
-        private const val INSTALLATION_SOURCE_EU_AUCTION_VALUE = "eea-search-choice"
+        private const val INSTALLATION_SEARCH_CHOICE_SOURCE_EU_AUCTION_VALUE = "eea-search-choice"
+        private const val INSTALLATION_BROWSER_CHOICE_SOURCE_EU_AUCTION_VALUE = "eea-browser-choice"
     }
 }
 
 sealed class ParsedReferrerResult(open val fromCache: Boolean = false) {
-    data class EuAuctionReferrerFound(override val fromCache: Boolean = false) : ParsedReferrerResult(fromCache)
+    data class EuAuctionSearchChoiceReferrerFound(override val fromCache: Boolean = false) : ParsedReferrerResult(fromCache)
+    data class EuAuctionBrowserChoiceReferrerFound(override val fromCache: Boolean = false) : ParsedReferrerResult(fromCache)
     data class CampaignReferrerFound(
         val campaignSuffix: String,
         override val fromCache: Boolean = false,

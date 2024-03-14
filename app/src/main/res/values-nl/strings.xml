@@ -805,4 +805,12 @@
         <item quantity="other">Weet je zeker dat je deze map en %1$d items wilt verwijderen?</item>
     </plurals>
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Weet je zeker dat je bladwijzer voor &lt;b&gt;%1$s&lt;/b&gt; wilt verwijderen?</string>
+
+    <!-- Sync Favicons -->
+    <string name="sync_fetch_icons_title">Bladwijzerpictogrammen ophalen</string>
+    <string name="sync_fetch_icons_subtitle">Download automatisch pictogrammen voor je gesynchroniseerde bladwijzers.</string>
+    <string name="faviconsPromptTitle">Ontbrekende pictogrammen downloaden?</string>
+    <string name="faviconsPromptMessage">Wil je dat dit apparaat automatisch pictogrammen voor gesynchroniseerde bladwijzers downloadt van de websites die als bladwijzer zijn opgeslagen?</string>
+    <string name="faviconsPromptPrimaryCta">Bladwijzerpictogrammen up-to-date houden</string>
+    <string name="faviconsPromptSecondaryCta">Niet nu</string>
 </resources>

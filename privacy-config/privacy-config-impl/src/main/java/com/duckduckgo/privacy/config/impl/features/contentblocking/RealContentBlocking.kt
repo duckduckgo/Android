@@ -16,7 +16,7 @@
 
 package com.duckduckgo.privacy.config.impl.features.contentblocking
 
-import com.duckduckgo.common.utils.UriString.Companion.sameOrSubdomain
+import com.duckduckgo.app.browser.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.ContentBlocking

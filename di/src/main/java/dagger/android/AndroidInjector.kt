@@ -73,7 +73,9 @@ interface AndroidInjector<T> {
             if ((injector is HasDaggerInjector)) {
                 (injector.daggerFactoryFor(mapKey ?: instance!!::class.java) as Factory<T, R>)
                     .create(instance)
-                    .inject(instance)
+                    .run {
+                        javaClass.getMethod("inject", instance!!::class.java).invoke(this, instance)
+                    }
             } else {
                 throw RuntimeException("${injector.javaClass.canonicalName} class does not extend ${HasDaggerInjector::class.simpleName}")
             }

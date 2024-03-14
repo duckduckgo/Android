@@ -382,7 +382,7 @@ class BookmarksViewModelTest {
     fun whenAddFavoriteCalledThenInsertFavorite() {
         testee.addFavorite(bookmark)
 
-        verify(savedSitesRepository).insertFavorite(bookmark.id, bookmark.url, bookmark.title, bookmark.lastModified)
+        verify(savedSitesRepository).insertFavorite(bookmark.id, bookmark.url, bookmark.title)
     }
 
     @Test

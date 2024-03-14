@@ -139,4 +139,30 @@
     <string name="sync_notification_channel_name">Синхронизация</string>
     <string name="sync_notify_me_title">Уведомления отключены</string>
     <string name="sync_notify_me_description">Позволяет получать уведомления об ошибках при синхронизации и резервном копировании.</string>
+
+    <!-- setup errors -->
+    <string name="sync_turn_off_error">Не удалось отключить синхронизацию и резервное копирование.</string>
+    <string name="sync_edit_device_error">Не удалось обновить имя устройства.</string>
+    <string name="sync_remove_device_error">Не удалось удалить устройство из списка синхронизации и резервного копирования.</string>
+    <string name="sync_delete_data_error">Не удалось удалить данные с сервера.</string>
+    <string name="sync_login_authenticated_device_error">"Чтобы привязать устройства друг к другу, отключите функцию «Синхронизация и резервное копирование» на одном из них и нажмите кнопку «Синхронизировать с другим устройством» на другом."</string>
+    <string name="sync_connect_generic_error">Не удалось подключиться к серверу.</string>
+    <string name="sync_connect_login_error">Не удалось выполнить синхронизацию с другим устройством.</string>
+    <string name="sync_create_account_generic_error">Не удалось подключиться к серверу.</string>
+    <string name="sync_invalid_code_error">К сожалению, этот код недействителен. Введите или отсканируйте правильный код.</string>
+    <string name="sync_recovery_pdf_error">Не удалось создать PDF-файл для восстановления.</string>
+    <string name="sync_dialog_error_ok">Хорошо</string>
+    <string name="sync_dialog_error_title">Синхронизация и резервное копирование</string>
+    <string name="sync_encryption_not_supported_error_title">Устройство не поддерживается</string>
+    <string name="sync_encryption_not_supported_error">При синхронизации и резервном копировании используется сквозное шифрование. Поэтому необходима возможность шифровать и хранить данные на вашем устройстве. Однако данное устройство не поддерживает хранение зашифрованной информации, и по этой причине синхронизация и резервное копирование недоступны.</string>
+
+    <!-- Sync Device Authentication -->
+    <string name="sync_auth_text_for_access">Разблокируйте устройство, чтобы использовать эту функцию.</string>
+    <string name="sync_biometric_prompt_title">Синхронизация и резервное копирование заблокированы</string>
+
+    <!-- Sync Settings -->
+    <string name="sync_delete_server_data_dialog_title">Удалить данные с сервера?</string>
+    <string name="sync_delete_server_data_dialog_content">Привязка устройств будет отключена, а синхронизированные данные — удалены с сервера.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Удалить данные</string>
+    <string name="sync_delete_server_data_dialog_secondary_button">Отменить</string>
 </resources>

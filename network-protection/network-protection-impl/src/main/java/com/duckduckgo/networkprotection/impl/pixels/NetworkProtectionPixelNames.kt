@@ -75,8 +75,6 @@ enum class NetworkProtectionPixelNames(
     NETP_EXCLUSION_LIST_RESTORE_DEFAULTS_DAILY("m_netp_ev_exclusion_list_restore_defaults_d"),
     NETP_EXCLUSION_LIST_LAUNCH_BREAKAGE_REPORT("m_netp_ev_exclusion_list_launch_breakage_report_c"),
     NETP_EXCLUSION_LIST_LAUNCH_BREAKAGE_REPORT_DAILY("m_netp_ev_exclusion_list_launch_breakage_report_d"),
-    NETP_INFO_VPN_SHOWN("m_netp_imp_info_vpn_c"),
-    NETP_INFO_VPN_SHOWN_DAILY("m_netp_imp_info_vpn_d"),
     NETP_FAQS_SHOWN("m_netp_imp_faqs_c"),
     NETP_FAQS_SHOWN_DAILY("m_netp_imp_faqs_d"),
     NETP_TERMS_SHOWN("m_netp_imp_terms_c"),
@@ -116,4 +114,12 @@ enum class NetworkProtectionPixelNames(
     NETP_FAILURE_RECOVERY_COMPLETED_SERVER_UNHEALTHY_DAILY("m_netp_ev_failure_recovery_completed_server_unhealthy_d", enqueue = true),
     NETP_FAILURE_RECOVERY_COMPLETED_SERVER_HEALTHY("m_netp_ev_failure_recovery_completed_server_healthy_c", enqueue = true),
     NETP_FAILURE_RECOVERY_COMPLETED_SERVER_HEALTHY_DAILY("m_netp_ev_failure_recovery_completed_server_healthy_d", enqueue = true),
+    NETP_FAILURE_RECOVERY_COMPLETED_SERVER_HEALTHY_NEW_TUN_ADDRESS(
+        "m_netp_ev_failure_recovery_completed_new_tun_address_server_healthy_c",
+        enqueue = true,
+    ),
+    NETP_FAILURE_RECOVERY_COMPLETED_SERVER_HEALTHY_NEW_TUN_ADDRESS_DAILY(
+        "m_netp_ev_failure_recovery_completed_new_tun_address_server_healthy_d",
+        enqueue = true,
+    ),
 }

@@ -805,4 +805,12 @@
         <item quantity="other">Bu klasörü ve %1$d ögeyi silmek istediğinizden emin misiniz?</item>
     </plurals>
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">&lt;b&gt;%1$s&lt;/b&gt; yer iminizi silmek istediğinizden emin misiniz?</string>
+
+    <!-- Sync Favicons -->
+    <string name="sync_fetch_icons_title">Yer İşareti Simgelerini Getir</string>
+    <string name="sync_fetch_icons_subtitle">Senkronize edilmiş yer imleriniz için simgeleri otomatik olarak indirin.</string>
+    <string name="faviconsPromptTitle">Kayıp Simgeler İndirilsin mi?</string>
+    <string name="faviconsPromptMessage">Bu cihazın yer işareti eklenmiş web sitelerinden senkronize edilmiş yer işaretleri için simgeleri otomatik olarak indirmesini istiyor musunuz?</string>
+    <string name="faviconsPromptPrimaryCta">Yer İşareti Simgelerini Güncel Tut</string>
+    <string name="faviconsPromptSecondaryCta">Şimdi Değil</string>
 </resources>

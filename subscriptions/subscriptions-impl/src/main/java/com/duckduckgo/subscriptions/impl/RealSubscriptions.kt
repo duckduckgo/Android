@@ -19,11 +19,9 @@ package com.duckduckgo.subscriptions.impl
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.Subscriptions
-import com.duckduckgo.subscriptions.api.Subscriptions.EntitlementStatus
-import com.duckduckgo.subscriptions.api.Subscriptions.EntitlementStatus.Found
-import com.duckduckgo.subscriptions.api.Subscriptions.EntitlementStatus.NotFound
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import kotlinx.coroutines.flow.Flow
 
 @ContributesBinding(AppScope::class)
 class RealSubscriptions @Inject constructor(
@@ -36,13 +34,7 @@ class RealSubscriptions @Inject constructor(
         }
     }
 
-    override suspend fun getEntitlementStatus(product: Product): Result<EntitlementStatus> {
-        return when (val result = subscriptionsManager.getSubscriptionData()) {
-            is SubscriptionsData.Success -> result.entitlements.firstOrNull { it.product == product.value }?.run {
-                Result.success(Found)
-            } ?: Result.success(NotFound)
-
-            is SubscriptionsData.Failure -> Result.failure(RuntimeException(result.message))
-        }
+    override fun getEntitlementStatus(): Flow<List<Product>> {
+        return subscriptionsManager.entitlements
     }
 }

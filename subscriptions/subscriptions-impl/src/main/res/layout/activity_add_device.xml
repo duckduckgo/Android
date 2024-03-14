@@ -68,42 +68,10 @@
                     android:text="@string/addDeviceDescription"
                     tools:ignore="HardcodedText"/>
 
-            <com.duckduckgo.common.ui.view.expand.DaxExpandableMenu
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/keyline_5"
-                    android:layout_marginStart="@dimen/keyline_5"
-                    android:layout_marginEnd="@dimen/keyline_5"
-                    android:layout_marginBottom="@dimen/keyline_5"
-                    android:background="@drawable/background_expandable_menu"
-                    android:orientation="vertical">
+            <include
+                android:id="@+id/manageEmailCard"
+                layout="@layout/card_manage_email" />
 
-                <com.duckduckgo.common.ui.view.expand.DaxExpandableMenuItem
-                        android:id="@+id/googlePlay"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:primaryText="@string/addDeviceGooglePlayTitle"
-                        app:leadingIcon="@drawable/ic_google_play"
-                        app:leadingIconSize="small"
-                        app:secondaryText="@string/addDeviceGooglePlayDescription"/>
-
-                <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:fullWidth="false"
-                        app:defaultPadding="false"/>
-
-                <com.duckduckgo.common.ui.view.expand.DaxExpandableMenuItem
-                        android:id="@+id/email"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:primaryText="@string/addDeviceEmail"
-                        app:leadingIcon="@drawable/ic_email_16"
-                        app:leadingIconSize="small"
-                        app:secondaryText="@string/addEmail"
-                        app:primaryButtonText="@string/addEmailText"/>
-
-            </com.duckduckgo.common.ui.view.expand.DaxExpandableMenu>
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

@@ -64,7 +64,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 @InjectWith(ActivityScope::class)
 class TrackingProtectionExclusionListActivity :
@@ -97,12 +96,6 @@ class TrackingProtectionExclusionListActivity :
     lateinit var adapter: ExclusionListAdapter
 
     private val shimmerLayout by lazy { findViewById<ShimmerFrameLayout>(R.id.deviceShieldExclusionAppListSkeleton) }
-
-    private val isAppTPEnabled by lazy {
-        runBlocking {
-            vpnFeaturesRegistry.isFeatureRegistered(APPTP_VPN)
-        }
-    }
 
     private lateinit var reportBreakage: ActivityResultLauncher<ReportBreakageScreen>
 
@@ -148,7 +141,6 @@ class TrackingProtectionExclusionListActivity :
         val spannable = SpannableString(restoreDefault.title)
         spannable.setSpan(ForegroundColorSpan(binding.root.context.getColorFromAttr(textColorAttr)), 0, spannable.length, 0)
         restoreDefault.title = spannable
-        restoreDefault?.isVisible = isAppTPEnabled
 
         return super.onPrepareOptionsMenu(menu)
     }
@@ -199,15 +191,7 @@ class TrackingProtectionExclusionListActivity :
             },
         )
 
-        val recyclerView = binding.excludedAppsRecycler
-
-        if (isAppTPEnabled) {
-            recyclerView.alpha = 1.0f
-        } else {
-            recyclerView.alpha = 0.45f
-        }
-
-        recyclerView.adapter = adapter
+        binding.excludedAppsRecycler.adapter = adapter
     }
 
     private fun observeViewModel() {
@@ -224,7 +208,7 @@ class TrackingProtectionExclusionListActivity :
 
     private fun renderViewState(viewState: ViewState) {
         shimmerLayout.stopShimmer()
-        adapter.update(viewState, isAppTPEnabled)
+        adapter.update(viewState)
         shimmerLayout.gone()
     }
 
@@ -249,7 +233,9 @@ class TrackingProtectionExclusionListActivity :
     private fun restartVpn() {
         // we use the app coroutine scope to ensure this call outlives the Activity
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
+            if (vpnFeaturesRegistry.isFeatureRegistered(APPTP_VPN)) {
+                vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
+            }
         }
     }
 

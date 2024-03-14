@@ -19,7 +19,7 @@
     <string name="netpVerifySubscriptionLabel">Verify Subscription</string>
     <string name="netpVerifySubscriptionInProgress">Please wait while we verify your subscription…</string>
     <string name="netpVerifySubscriptionNoSubscription">Oops! You don’t have any valid subscription.</string>
-    <string name="netpVerifySubscriptionNoEntitlement">Oops! Your subscription is not valid for Network Protection.</string>
+    <string name="netpVerifySubscriptionNoEntitlement">Oops! Your subscription is not valid for DuckDuckGo VPN.</string>
 
     <!-- NetP Settings-->
     <string name="netpSubscriptionSettingsTitle">VPN</string>
@@ -29,7 +29,6 @@
     <string name="netpSubscriptionSettingsNeverEnabled">Secure your network connection anytime, anywhere</string>
 
     <!-- Access revoked-->
-    <string name="netpNotificationVpnAccessRevoked">VPN disconnected due to expired subscription. Subscribe to Privacy Pro to reconnect DuckDuckGo VPN.</string>
     <string name="netpDialogVpnAccessRevokedTitle">VPN disconnected due to expired subscription</string>
     <string name="netpDialogVpnAccessRevokedBody">Subscribe to Privacy Pro to reconnect DuckDuckGo VPN.</string>
     <string name="netpDialogVpnAccessRevokedPositiveAction">Subscribe</string>

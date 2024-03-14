@@ -28,6 +28,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist
 import com.duckduckgo.subscriptions.impl.CurrentPurchase
 import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
+import com.duckduckgo.subscriptions.impl.SubscriptionsChecker
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ITR
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN
@@ -65,6 +66,7 @@ import org.json.JSONObject
 class SubscriptionWebViewViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val subscriptionsManager: SubscriptionsManager,
+    private val subscriptionsChecker: SubscriptionsChecker,
     private val subscriptionsRepository: SubscriptionsRepository,
     private val networkProtectionWaitlist: NetworkProtectionWaitlist,
     private val pixelSender: SubscriptionPixelSender,
@@ -84,14 +86,24 @@ class SubscriptionWebViewViewModel @Inject constructor(
     fun start() {
         subscriptionsManager.currentPurchaseState.onEach {
             val state = when (it) {
-                is CurrentPurchase.Failure -> Failure(it.message)
-                is CurrentPurchase.Success -> Success(
-                    SubscriptionEventData(
-                        PURCHASE_COMPLETED_FEATURE_NAME,
-                        PURCHASE_COMPLETED_SUBSCRIPTION_NAME,
-                        JSONObject(PURCHASE_COMPLETED_JSON),
-                    ),
-                )
+                is CurrentPurchase.Canceled -> {
+                    enablePurchaseButton()
+                    Inactive
+                }
+                is CurrentPurchase.Failure -> {
+                    enablePurchaseButton()
+                    Failure(it.message)
+                }
+                is CurrentPurchase.Success -> {
+                    subscriptionsChecker.runChecker()
+                    Success(
+                        SubscriptionEventData(
+                            PURCHASE_COMPLETED_FEATURE_NAME,
+                            PURCHASE_COMPLETED_SUBSCRIPTION_NAME,
+                            JSONObject(PURCHASE_COMPLETED_JSON),
+                        ),
+                    )
+                }
                 is CurrentPurchase.InProgress, CurrentPurchase.PreFlowInProgress -> InProgress
                 is CurrentPurchase.Recovered -> Recovered
                 is CurrentPurchase.PreFlowFinished -> Inactive
@@ -111,6 +123,17 @@ class SubscriptionWebViewViewModel @Inject constructor(
             else -> {
                 // NOOP
             }
+        }
+    }
+
+    private fun enablePurchaseButton() {
+        viewModelScope.launch {
+            val response = SubscriptionEventData(
+                featureName = PURCHASE_COMPLETED_FEATURE_NAME,
+                subscriptionName = PURCHASE_COMPLETED_SUBSCRIPTION_NAME,
+                params = JSONObject(PURCHASE_CANCELED_JSON),
+            )
+            command.send(SendJsEvent(response))
         }
     }
 
@@ -214,6 +237,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
 
     private fun backToSettings() {
         viewModelScope.launch {
+            subscriptionsManager.fetchAndStoreAllData()
             command.send(BackToSettings)
         }
     }
@@ -242,6 +266,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
 
     sealed class Command {
         data object BackToSettings : Command()
+        data class SendJsEvent(val event: SubscriptionEventData) : Command()
         data class SendResponseToJs(val data: JsCallbackData) : Command()
         data class SubscriptionSelected(val id: String) : Command()
         data object ActivateOnAnotherDevice : Command()
@@ -255,5 +280,6 @@ class SubscriptionWebViewViewModel @Inject constructor(
         const val PURCHASE_COMPLETED_FEATURE_NAME = "useSubscription"
         const val PURCHASE_COMPLETED_SUBSCRIPTION_NAME = "onPurchaseUpdate"
         const val PURCHASE_COMPLETED_JSON = """{ type: "completed" }"""
+        const val PURCHASE_CANCELED_JSON = """{ type: "canceled" }"""
     }
 }

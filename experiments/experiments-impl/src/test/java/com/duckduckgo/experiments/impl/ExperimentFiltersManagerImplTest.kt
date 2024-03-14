@@ -17,7 +17,8 @@
 package com.duckduckgo.experiments.impl
 
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.experiments.impl.store.ExperimentVariantEntity
+import com.duckduckgo.experiments.api.VariantConfig
+import com.duckduckgo.experiments.api.VariantFilters
 import java.util.Locale
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
@@ -106,7 +107,7 @@ class ExperimentFiltersManagerImplTest {
     private fun addActiveVariant(
         localeFilter: List<String> = listOf(),
         androidVersionFilter: List<String> = listOf(),
-    ): ExperimentVariantEntity {
-        return ExperimentVariantEntity("key", 1.0, localeFilter, androidVersionFilter)
+    ): VariantConfig {
+        return VariantConfig("key", 1.0, VariantFilters(localeFilter, androidVersionFilter))
     }
 }

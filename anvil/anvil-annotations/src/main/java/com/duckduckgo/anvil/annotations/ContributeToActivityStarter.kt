@@ -35,6 +35,8 @@ import kotlin.reflect.KClass
 @Retention(AnnotationRetention.RUNTIME)
 @Repeatable
 annotation class ContributeToActivityStarter(
-    /** The type of the input paramters received by the Activity */
+    /** The type of the input parameters received by the Activity */
     val paramsType: KClass<*>,
+    /** Declares the deeplink name for the Activity */
+    val screenName: String = "",
 )

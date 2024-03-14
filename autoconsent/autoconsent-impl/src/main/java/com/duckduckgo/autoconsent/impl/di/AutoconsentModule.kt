@@ -70,7 +70,8 @@ object AutoconsentModule {
         database: AutoconsentDatabase,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
+        @IsMainProcess isMainProcess: Boolean,
     ): AutoconsentFeatureSettingsRepository {
-        return RealAutoconsentFeatureSettingsRepository(appCoroutineScope, dispatcherProvider, database)
+        return RealAutoconsentFeatureSettingsRepository(appCoroutineScope, dispatcherProvider, database, isMainProcess)
     }
 }

@@ -66,12 +66,16 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
 
-        binding.googlePlay.setPrimaryButtonClickListener {
+        binding.googlePlay.setOnClickListener {
             viewModel.restoreFromStore()
         }
 
-        binding.email.setPrimaryButtonClickListener {
-            viewModel.restoreFromEmail()
+        with(binding.manageEmailCard) {
+            emailSubtitle.setText(string.restoreSubscriptionEmailDescription)
+            emailButton.setText(string.restoreSubscriptionEmailButton)
+            emailButton.setOnClickListener {
+                viewModel.restoreFromEmail()
+            }
         }
     }
 
@@ -134,10 +138,10 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
             .show()
     }
 
-    private fun showError(message: String) {
+    private fun showError() {
         TextAlertDialogBuilder(this)
             .setTitle(string.somethingWentWrong)
-            .setMessage(message)
+            .setMessage(string.somethingWentWrongDescription)
             .setDestructiveButtons(false)
             .setPositiveButton(string.ok)
             .show()
@@ -148,7 +152,7 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
             is RestoreFromEmail -> goToRestore()
             is Success -> onPurchaseRestored()
             is SubscriptionNotFound -> subscriptionNotFound()
-            is Error -> showError(command.message)
+            is Error -> showError()
         }
     }
     companion object {
