@@ -68,6 +68,8 @@
     <string name="subscriptionSettingFeaturesList"><![CDATA[<ul><li>&nbsp;VPN</li><li>&nbsp;Personal Information Removal</li><li>&nbsp;Identity Theft Restoration</li></ul>]]></string>
     <string name="subscriptionSettingGet">Get Privacy Pro</string>
     <string name="subscriptionSettingRestore">I Have a Subscription</string>
+    <string name="subscriptionSettingWaiting">Your Subscription is Being Activated</string>
+    <string name="subscriptionSettingWaitingSubtitle">This is taking longer than usual, please check back later.</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">You\'re all set.</string>

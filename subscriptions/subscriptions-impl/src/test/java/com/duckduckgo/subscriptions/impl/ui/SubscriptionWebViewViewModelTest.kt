@@ -10,6 +10,9 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetPWaitlis
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist
 import com.duckduckgo.subscriptions.impl.CurrentPurchase
 import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus.AUTO_RENEWABLE
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus.EXPIRED
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus.INACTIVE
 import com.duckduckgo.subscriptions.impl.SubscriptionsChecker
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN
@@ -199,7 +202,7 @@ class SubscriptionWebViewViewModelTest {
 
     @Test
     fun whenActivateSubscriptionAndSubscriptionActiveThenCommandSent() = runTest {
-        whenever(subscriptionsManager.hasSubscription()).thenReturn(true)
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
         viewModel.commands().test {
             viewModel.processJsCallbackMessage("test", "activateSubscription", null, null)
             assertTrue(awaitItem() is Command.ActivateOnAnotherDevice)
@@ -208,7 +211,7 @@ class SubscriptionWebViewViewModelTest {
 
     @Test
     fun whenActivateSubscriptionAndSubscriptionInactiveThenCommandSent() = runTest {
-        whenever(subscriptionsManager.hasSubscription()).thenReturn(false)
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(INACTIVE)
         viewModel.commands().test {
             viewModel.processJsCallbackMessage("test", "activateSubscription", null, null)
             assertTrue(awaitItem() is Command.RestoreSubscription)
@@ -217,7 +220,7 @@ class SubscriptionWebViewViewModelTest {
 
     @Test
     fun whenFeatureSelectedAndNoDataThenCommandNotSent() = runTest {
-        whenever(subscriptionsManager.hasSubscription()).thenReturn(false)
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(EXPIRED)
         viewModel.commands().test {
             viewModel.processJsCallbackMessage("test", "featureSelected", null, null)
             ensureAllEventsConsumed()
@@ -226,7 +229,7 @@ class SubscriptionWebViewViewModelTest {
 
     @Test
     fun whenFeatureSelectedAndInvalidDataThenCommandNotSent() = runTest {
-        whenever(subscriptionsManager.hasSubscription()).thenReturn(false)
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(EXPIRED)
         viewModel.commands().test {
             viewModel.processJsCallbackMessage("test", "featureSelected", null, JSONObject("{}"))
             ensureAllEventsConsumed()
@@ -235,7 +238,7 @@ class SubscriptionWebViewViewModelTest {
 
     @Test
     fun whenFeatureSelectedAndInvalidFeatureThenCommandNotSent() = runTest {
-        whenever(subscriptionsManager.hasSubscription()).thenReturn(false)
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(EXPIRED)
         viewModel.commands().test {
             viewModel.processJsCallbackMessage("test", "featureSelected", null, JSONObject("""{"feature":"test"}"""))
             ensureAllEventsConsumed()
@@ -244,7 +247,7 @@ class SubscriptionWebViewViewModelTest {
 
     @Test
     fun whenFeatureSelectedAndFeatureIsNetPThenCommandSent() = runTest {
-        whenever(subscriptionsManager.hasSubscription()).thenReturn(false)
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(EXPIRED)
         viewModel.commands().test {
             viewModel.processJsCallbackMessage(
                 "test",
@@ -258,7 +261,7 @@ class SubscriptionWebViewViewModelTest {
 
     @Test
     fun whenFeatureSelectedAndFeatureIsItrThenCommandSent() = runTest {
-        whenever(subscriptionsManager.hasSubscription()).thenReturn(false)
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(EXPIRED)
         viewModel.commands().test {
             viewModel.processJsCallbackMessage(
                 "test",
@@ -272,7 +275,7 @@ class SubscriptionWebViewViewModelTest {
 
     @Test
     fun whenFeatureSelectedAndFeatureIsPirThenCommandSent() = runTest {
-        whenever(subscriptionsManager.hasSubscription()).thenReturn(false)
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(EXPIRED)
         viewModel.commands().test {
             viewModel.processJsCallbackMessage(
                 "test",
@@ -297,7 +300,7 @@ class SubscriptionWebViewViewModelTest {
 
     @Test
     fun whenRestorePurchaseClickedThenPixelIsSent() = runTest {
-        whenever(subscriptionsManager.hasSubscription()).thenReturn(false)
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(EXPIRED)
         viewModel.processJsCallbackMessage(
             featureName = "test",
             method = "activateSubscription",
@@ -309,7 +312,7 @@ class SubscriptionWebViewViewModelTest {
 
     @Test
     fun whenActivateOnAnotherDeviceClickedThenPixelIsSent() = runTest {
-        whenever(subscriptionsManager.hasSubscription()).thenReturn(true)
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
         viewModel.processJsCallbackMessage(
             featureName = "test",
             method = "activateSubscription",
@@ -321,7 +324,7 @@ class SubscriptionWebViewViewModelTest {
 
     @Test
     fun whenFeatureSelectedAndFeatureIsNetPThenPixelSent() = runTest {
-        whenever(subscriptionsManager.hasSubscription()).thenReturn(false)
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(EXPIRED)
         viewModel.processJsCallbackMessage(
             featureName = "test",
             method = "featureSelected",
@@ -333,7 +336,7 @@ class SubscriptionWebViewViewModelTest {
 
     @Test
     fun whenFeatureSelectedAndFeatureIsItrThenPixelIsSent() = runTest {
-        whenever(subscriptionsManager.hasSubscription()).thenReturn(false)
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(EXPIRED)
         viewModel.processJsCallbackMessage(
             featureName = "test",
             method = "featureSelected",
@@ -345,7 +348,7 @@ class SubscriptionWebViewViewModelTest {
 
     @Test
     fun whenFeatureSelectedAndFeatureIsPirThenPixelIsSent() = runTest {
-        whenever(subscriptionsManager.hasSubscription()).thenReturn(false)
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(EXPIRED)
         viewModel.processJsCallbackMessage(
             featureName = "test",
             method = "featureSelected",

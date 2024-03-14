@@ -41,6 +41,10 @@ import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.impl.R
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus.AUTO_RENEWABLE
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus.GRACE_PERIOD
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus.NOT_AUTO_RENEWABLE
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus.WAITING
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.databinding.ViewSettingsBinding
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
@@ -128,24 +132,38 @@ class ProSettingView @JvmOverloads constructor(
         binding.subscriptionRestore.setOnTouchListener(null)
         binding.subscriptionRestore.setOnClickListener(null)
 
-        if (viewState.hasSubscription) {
-            binding.subscriptionBuyContainer.gone()
-            binding.subscriptionRestoreContainer.gone()
-            binding.subscriptionSettingContainer.show()
-            binding.subscriptionSettingContainer.setOnClickListener {
-                viewModel.onSettings()
+        when (viewState.status) {
+            AUTO_RENEWABLE, NOT_AUTO_RENEWABLE, GRACE_PERIOD -> {
+                binding.subscriptionBuyContainer.gone()
+                binding.subscriptionRestoreContainer.gone()
+                binding.subscriptionWaitingContainer.gone()
+                binding.subscriptionSettingContainer.show()
+                binding.subscriptionSettingContainer.setOnClickListener {
+                    viewModel.onSettings()
+                }
             }
-        } else {
-            val htmlText = context.getString(R.string.subscriptionSettingFeaturesList).html(context)
-            binding.subscribeSecondary.text = htmlText
-            binding.subscriptionBuyContainer.show()
-            binding.subscriptionSettingContainer.gone()
-            binding.subscriptionRestoreContainer.show()
-            binding.subscriptionBuyContainer.setOnClickListener {
-                viewModel.onBuy()
+            WAITING -> {
+                binding.subscriptionBuyContainer.gone()
+                binding.subscriptionWaitingContainer.show()
+                binding.subscriptionSettingContainer.gone()
+                binding.subscriptionRestoreContainer.show()
+                binding.subscriptionRestoreContainer.setOnClickListener {
+                    viewModel.onRestore()
+                }
             }
-            binding.subscriptionRestoreContainer.setOnClickListener {
-                viewModel.onRestore()
+            else -> {
+                val htmlText = context.getString(R.string.subscriptionSettingFeaturesList).html(context)
+                binding.subscribeSecondary.text = htmlText
+                binding.subscriptionBuyContainer.show()
+                binding.subscriptionSettingContainer.gone()
+                binding.subscriptionWaitingContainer.gone()
+                binding.subscriptionRestoreContainer.show()
+                binding.subscriptionBuyContainer.setOnClickListener {
+                    viewModel.onBuy()
+                }
+                binding.subscriptionRestoreContainer.setOnClickListener {
+                    viewModel.onRestore()
+                }
             }
         }
     }

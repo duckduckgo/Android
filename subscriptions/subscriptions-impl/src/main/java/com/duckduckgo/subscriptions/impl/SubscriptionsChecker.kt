@@ -32,6 +32,7 @@ import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.RealSubscriptionsChecker.Companion.TAG_WORKER_SUBSCRIPTION_CHECK
+import com.duckduckgo.subscriptions.impl.repository.isActiveOrWaiting
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.util.concurrent.TimeUnit.HOURS
@@ -65,7 +66,7 @@ class RealSubscriptionsChecker @Inject constructor(
     }
 
     override suspend fun runChecker() {
-        if (subscriptionsManager.hasSubscription()) {
+        if (subscriptionsManager.subscriptionStatus().isActiveOrWaiting()) {
             PeriodicWorkRequestBuilder<SubscriptionsCheckWorker>(1, HOURS)
                 .addTag(TAG_WORKER_SUBSCRIPTION_CHECK)
                 .setConstraints(
@@ -100,9 +101,9 @@ class SubscriptionsCheckWorker(
 
     override suspend fun doWork(): Result {
         return try {
-            if (subscriptionsManager.hasSubscription()) {
+            if (subscriptionsManager.subscriptionStatus().isActiveOrWaiting()) {
                 val subscription = subscriptionsManager.fetchAndStoreAllData()
-                if (subscription?.isActive() != true) {
+                if (subscription?.status?.isActiveOrWaiting() != true) {
                     workManager.cancelAllWorkByTag(TAG_WORKER_SUBSCRIPTION_CHECK)
                 }
             } else {

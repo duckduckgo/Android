@@ -24,6 +24,8 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenBuyScreen
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenRestoreScreen
@@ -52,7 +54,7 @@ class ProSettingViewModel @Inject constructor(
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
-    data class ViewState(val hasSubscription: Boolean = false)
+    data class ViewState(val status: SubscriptionStatus = UNKNOWN)
 
     private val _viewState = MutableStateFlow(ViewState())
     val viewState = _viewState.asStateFlow()
@@ -72,8 +74,8 @@ class ProSettingViewModel @Inject constructor(
     override fun onResume(owner: LifecycleOwner) {
         super.onResume(owner)
         viewModelScope.launch(dispatcherProvider.io()) {
-            subscriptionsManager.hasSubscription.collect {
-                _viewState.emit(viewState.value.copy(hasSubscription = it))
+            subscriptionsManager.subscriptionStatus.collect {
+                _viewState.emit(viewState.value.copy(status = it))
             }
         }
     }

@@ -2,6 +2,7 @@ package com.duckduckgo.subscriptions.impl.settings.views
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenBuyScreen
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenRestoreScreen
@@ -55,23 +56,12 @@ class ProSettingViewModelTest {
     }
 
     @Test
-    fun whenOnResumeIfSubscriptionEmitViewState() = runTest {
-        whenever(subscriptionsManager.hasSubscription).thenReturn(flowOf(true))
+    fun whenOnResumeEmitViewState() = runTest {
+        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowOf(SubscriptionStatus.EXPIRED))
 
         viewModel.onResume(mock())
         viewModel.viewState.test {
-            assertTrue(awaitItem().hasSubscription)
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenOnResumeIfNotSubscriptionEmitViewState() = runTest {
-        whenever(subscriptionsManager.hasSubscription).thenReturn(flowOf(false))
-
-        viewModel.onResume(mock())
-        viewModel.viewState.test {
-            assertFalse(awaitItem().hasSubscription)
+            assertEquals(SubscriptionStatus.EXPIRED, awaitItem().status)
             cancelAndConsumeRemainingEvents()
         }
     }

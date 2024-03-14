@@ -1,6 +1,8 @@
 package com.duckduckgo.subscriptions.impl.pixels
 
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus.AUTO_RENEWABLE
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus.EXPIRED
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
@@ -26,7 +28,7 @@ class SubscriptionRefreshRetentionAtbPluginTest {
 
     @Test
     fun `when subscription is active then pixel is sent`() = runTest {
-        whenever(subscriptionsManager.hasSubscription()).thenReturn(true)
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
 
         subject.onAppRetentionAtbRefreshed()
 
@@ -35,7 +37,7 @@ class SubscriptionRefreshRetentionAtbPluginTest {
 
     @Test
     fun `when subscription is not active then pixel is not sent`() = runTest {
-        whenever(subscriptionsManager.hasSubscription()).thenReturn(false)
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(EXPIRED)
 
         subject.onAppRetentionAtbRefreshed()
 

@@ -31,6 +31,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionStatus.GRACE_PERIOD
 import com.duckduckgo.subscriptions.impl.SubscriptionStatus.INACTIVE
 import com.duckduckgo.subscriptions.impl.SubscriptionStatus.NOT_AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.impl.SubscriptionStatus.UNKNOWN
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus.WAITING
 import com.duckduckgo.subscriptions.impl.billing.PlayBillingManager
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState
 import com.duckduckgo.subscriptions.impl.billing.RetryPolicy
@@ -56,6 +57,7 @@ import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -118,7 +120,7 @@ interface SubscriptionsManager {
     /**
      * Returns [true] if the user has an active subscription and [false] otherwise
      */
-    suspend fun hasSubscription(): Boolean
+    suspend fun subscriptionStatus(): SubscriptionStatus
 
     /**
      * Flow to know if a user is signed in or not
@@ -128,7 +130,7 @@ interface SubscriptionsManager {
     /**
      * Flow to know if a user has a subscription or not
      */
-    val hasSubscription: Flow<Boolean>
+    val subscriptionStatus: Flow<SubscriptionStatus>
 
     /**
      * Flow to return products user is entitled to
@@ -178,8 +180,8 @@ class RealSubscriptionsManager @Inject constructor(
     private val _isSignedIn = MutableStateFlow(false)
     override val isSignedIn = _isSignedIn.asStateFlow().onSubscription { emitIsSignedInValues() }
 
-    private val _hasSubscription = MutableStateFlow(false)
-    override val hasSubscription = _hasSubscription.asStateFlow().onSubscription { emitHasSubscriptionsValues() }
+    private val _subscriptionStatus: MutableSharedFlow<SubscriptionStatus> = MutableSharedFlow(replay = 1, onBufferOverflow = DROP_OLDEST)
+    override val subscriptionStatus = _subscriptionStatus.onSubscription { emitHasSubscriptionsValues() }
 
     private val _entitlements = MutableStateFlow(emptyList<Product>())
     override val entitlements = _entitlements.asStateFlow().onSubscription { emitEntitlementsValues() }
@@ -196,13 +198,13 @@ class RealSubscriptionsManager @Inject constructor(
 
     private suspend fun emitIsSignedInValues() {
         coroutineScope.launch(dispatcherProvider.io()) {
-            _hasSubscription.emit(isUserAuthenticated())
+            _isSignedIn.emit(isUserAuthenticated())
         }
     }
 
     private suspend fun emitHasSubscriptionsValues() {
         coroutineScope.launch(dispatcherProvider.io()) {
-            _hasSubscription.emit(hasSubscription())
+            _subscriptionStatus.emit(subscriptionStatus())
         }
     }
 
@@ -253,7 +255,7 @@ class RealSubscriptionsManager @Inject constructor(
         authRepository.clearAccount()
         authRepository.clearSubscription()
         _isSignedIn.emit(false)
-        _hasSubscription.emit(false)
+        _subscriptionStatus.emit(UNKNOWN)
     }
 
     private suspend fun checkPurchase(
@@ -310,7 +312,7 @@ class RealSubscriptionsManager @Inject constructor(
                 }
             }
 
-            _hasSubscription.emit(true)
+            _subscriptionStatus.emit(authRepository.getStatus())
             true
         } catch (e: Exception) {
             logcat { "Subs: failed to confirm purchase $e" }
@@ -319,13 +321,18 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     private suspend fun handlePurchaseFailed() {
+        authRepository.purchaseToWaitingStatus()
         pixelSender.reportPurchaseFailureBackend()
-        _currentPurchaseState.emit(CurrentPurchase.Failure("An error happened, try again"))
-        _hasSubscription.emit(false)
+        _currentPurchaseState.emit(CurrentPurchase.Waiting)
+        _subscriptionStatus.emit(authRepository.getStatus())
     }
 
-    override suspend fun hasSubscription(): Boolean {
-        return isUserAuthenticated() && authRepository.getSubscription()?.isActive() == true
+    override suspend fun subscriptionStatus(): SubscriptionStatus {
+        return if (isUserAuthenticated()) {
+            authRepository.getStatus()
+        } else {
+            UNKNOWN
+        }
     }
 
     override suspend fun exchangeAuthToken(authToken: String): String {
@@ -344,7 +351,7 @@ class RealSubscriptionsManager @Inject constructor(
             authRepository.saveExternalId(accountData.externalId)
             authRepository.saveSubscriptionData(subscription, accountData.entitlements.toEntitlements(), accountData.email)
             emitEntitlementsValues()
-            _hasSubscription.emit(hasSubscription())
+            _subscriptionStatus.emit(authRepository.getStatus())
             _isSignedIn.emit(isUserAuthenticated())
             return authRepository.getSubscription()
         } catch (e: Exception) {
@@ -529,6 +536,7 @@ enum class SubscriptionStatus(val statusName: String) {
     INACTIVE("Inactive"),
     EXPIRED("Expired"),
     UNKNOWN("Unknown"),
+    WAITING("Waiting"),
 }
 
 fun String.toStatus(): SubscriptionStatus {
@@ -538,6 +546,7 @@ fun String.toStatus(): SubscriptionStatus {
         "Grace Period" -> GRACE_PERIOD
         "Inactive" -> INACTIVE
         "Expired" -> EXPIRED
+        "Waiting" -> WAITING
         else -> UNKNOWN
     }
 }
@@ -547,6 +556,7 @@ sealed class CurrentPurchase {
     data object PreFlowFinished : CurrentPurchase()
     data object InProgress : CurrentPurchase()
     data object Success : CurrentPurchase()
+    data object Waiting : CurrentPurchase()
     data object Recovered : CurrentPurchase()
     data object Canceled : CurrentPurchase()
     data class Failure(val message: String) : CurrentPurchase()

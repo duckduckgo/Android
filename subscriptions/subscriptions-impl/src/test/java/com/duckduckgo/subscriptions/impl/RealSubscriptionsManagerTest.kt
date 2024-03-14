@@ -381,10 +381,7 @@ class RealSubscriptionsManagerTest {
     }
 
     @Test
-    fun whenNoEntitlementsThenHasSubscriptionEmitFalse() = runTest {
-        givenUserIsAuthenticated()
-        givenValidateTokenSucceedsNoEntitlements()
-
+    fun whenSubscribedToSubscriptionStatusThenEmit() = runTest {
         val manager = RealSubscriptionsManager(
             authService,
             subscriptionsService,
@@ -397,37 +394,14 @@ class RealSubscriptionsManagerTest {
             pixelSender,
         )
 
-        manager.hasSubscription.test {
-            assertFalse(awaitItem())
+        manager.subscriptionStatus.test {
+            assertEquals(UNKNOWN, awaitItem())
             cancelAndConsumeRemainingEvents()
         }
     }
 
     @Test
-    fun whenErrorThenHasSubscriptionEmitFalse() = runTest {
-        givenUserIsAuthenticated()
-        givenValidateTokenFails("error")
-
-        val manager = RealSubscriptionsManager(
-            authService,
-            subscriptionsService,
-            authRepository,
-            playBillingManager,
-            emailManager,
-            context,
-            TestScope(),
-            coroutineRule.testDispatcherProvider,
-            pixelSender,
-        )
-
-        manager.hasSubscription.test {
-            assertFalse(awaitItem())
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenInitializeIfSubscriptionExistsThenEmitTrue() = runTest {
+    fun whenSubscribedToSubscriptionStatusAndSubscriptionExistsThenEmit() = runTest {
         givenUserIsAuthenticated()
         givenSubscriptionExists()
         val manager = RealSubscriptionsManager(
@@ -442,30 +416,8 @@ class RealSubscriptionsManagerTest {
             pixelSender,
         )
 
-        manager.hasSubscription.test {
-            assertTrue(awaitItem())
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenInitializeIfSubscriptionExistsThenEmitFalse() = runTest {
-        givenUserIsAuthenticated()
-        givenValidateTokenFails("failure")
-        val manager = RealSubscriptionsManager(
-            authService,
-            subscriptionsService,
-            authRepository,
-            playBillingManager,
-            emailManager,
-            context,
-            TestScope(),
-            coroutineRule.testDispatcherProvider,
-            pixelSender,
-        )
-
-        manager.hasSubscription.test {
-            assertFalse(awaitItem())
+        manager.subscriptionStatus.test {
+            assertEquals(AUTO_RENEWABLE, awaitItem())
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -502,10 +454,16 @@ class RealSubscriptionsManagerTest {
             assertTrue(awaitItem().size == 1)
             cancelAndConsumeRemainingEvents()
         }
+
+        manager.subscriptionStatus.test {
+            flowTest.emit(PurchaseState.Purchased("validToken", "packageName"))
+            assertEquals(AUTO_RENEWABLE, awaitItem())
+            cancelAndConsumeRemainingEvents()
+        }
     }
 
     @Test
-    fun whenPurchaseFailedThenPurchaseCheckedAndFailureEmit() = runTest {
+    fun whenPurchaseFailedThenPurchaseCheckedAndWaitingEmit() = runTest {
         givenUserIsAuthenticated()
         givenValidateTokenFails("failure")
         givenConfirmPurchaseFails()
@@ -528,7 +486,13 @@ class RealSubscriptionsManagerTest {
         manager.currentPurchaseState.test {
             flowTest.emit(PurchaseState.Purchased("validateToken", "packageName"))
             assertTrue(awaitItem() is CurrentPurchase.InProgress)
-            assertTrue(awaitItem() is CurrentPurchase.Failure)
+            assertTrue(awaitItem() is CurrentPurchase.Waiting)
+            cancelAndConsumeRemainingEvents()
+        }
+
+        manager.subscriptionStatus.test {
+            flowTest.emit(PurchaseState.Purchased("validateToken", "packageName"))
+            assertEquals(WAITING, awaitItem())
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -729,6 +693,7 @@ class RealSubscriptionsManagerTest {
         givenUserIsAuthenticated()
 
         subscriptionsManager.isSignedIn.test {
+            assertTrue(awaitItem())
             subscriptionsManager.signOut()
             assertFalse(awaitItem())
             cancelAndConsumeRemainingEvents()
@@ -736,7 +701,7 @@ class RealSubscriptionsManagerTest {
     }
 
     @Test
-    fun whenSignOutEmitFalseForHasSubscription() = runTest {
+    fun whenSignOutThenEmitUnknown() = runTest {
         givenUserIsAuthenticated()
         givenSubscriptionExists()
 
@@ -752,10 +717,10 @@ class RealSubscriptionsManagerTest {
             pixelSender,
         )
 
-        manager.hasSubscription.test {
-            assertTrue(awaitItem())
+        manager.subscriptionStatus.test {
+            assertEquals(AUTO_RENEWABLE, awaitItem())
             manager.signOut()
-            assertFalse(awaitItem())
+            assertEquals(UNKNOWN, awaitItem())
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -811,8 +776,8 @@ class RealSubscriptionsManagerTest {
 
         subscriptionsManager.currentPurchaseState.test {
             assertTrue(awaitItem() is CurrentPurchase.InProgress)
-            assertTrue(awaitItem() is CurrentPurchase.Failure)
-
+            assertTrue(awaitItem() is CurrentPurchase.Waiting)
+            assertEquals(WAITING.statusName, authDataStore.status)
             verify(pixelSender).reportPurchaseFailureBackend()
             verifyNoMoreInteractions(pixelSender)
 

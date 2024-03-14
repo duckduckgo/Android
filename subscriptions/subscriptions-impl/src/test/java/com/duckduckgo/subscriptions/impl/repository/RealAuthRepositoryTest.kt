@@ -1,6 +1,13 @@
 package com.duckduckgo.subscriptions.impl.repository
 
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus.AUTO_RENEWABLE
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus.EXPIRED
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus.GRACE_PERIOD
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus.INACTIVE
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus.NOT_AUTO_RENEWABLE
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus.UNKNOWN
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus.WAITING
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Rule
@@ -92,5 +99,29 @@ class RealAuthRepositoryTest {
 
         assertEquals("authToken", authRepository.getAuthToken())
         assertEquals("accessToken", authRepository.getAccessToken())
+    }
+
+    @Test
+    fun whenPurchaseToWaitingStatusThenStoreWaiting() = runTest {
+        authRepository.purchaseToWaitingStatus()
+        assertEquals(WAITING.statusName, authStore.status)
+    }
+
+    @Test
+    fun whenGetStatusReturnCorrectStatus() = runTest {
+        authStore.status = AUTO_RENEWABLE.statusName
+        assertEquals(AUTO_RENEWABLE, authRepository.getStatus())
+        authStore.status = NOT_AUTO_RENEWABLE.statusName
+        assertEquals(NOT_AUTO_RENEWABLE, authRepository.getStatus())
+        authStore.status = GRACE_PERIOD.statusName
+        assertEquals(GRACE_PERIOD, authRepository.getStatus())
+        authStore.status = INACTIVE.statusName
+        assertEquals(INACTIVE, authRepository.getStatus())
+        authStore.status = EXPIRED.statusName
+        assertEquals(EXPIRED, authRepository.getStatus())
+        authStore.status = WAITING.statusName
+        assertEquals(WAITING, authRepository.getStatus())
+        authStore.status = "test"
+        assertEquals(UNKNOWN, authRepository.getStatus())
     }
 }

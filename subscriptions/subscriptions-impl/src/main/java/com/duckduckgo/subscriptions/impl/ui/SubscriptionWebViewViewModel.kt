@@ -41,12 +41,14 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.billing.getPrice
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.SubscriptionsRepository
+import com.duckduckgo.subscriptions.impl.repository.isActive
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.*
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView.Failure
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView.InProgress
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView.Inactive
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView.Recovered
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView.Success
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView.Waiting
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import javax.inject.Inject
@@ -93,6 +95,10 @@ class SubscriptionWebViewViewModel @Inject constructor(
                 is CurrentPurchase.Failure -> {
                     enablePurchaseButton()
                     Failure(it.message)
+                }
+                is CurrentPurchase.Waiting -> {
+                    subscriptionsChecker.runChecker()
+                    Waiting
                 }
                 is CurrentPurchase.Success -> {
                     subscriptionsChecker.runChecker()
@@ -159,7 +165,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
     }
     private fun activateSubscription() {
         viewModelScope.launch(dispatcherProvider.io()) {
-            if (subscriptionsManager.hasSubscription()) {
+            if (subscriptionsManager.subscriptionStatus().isActive()) {
                 pixelSender.reportOnboardingAddDeviceClick()
                 activateOnAnotherDevice()
             } else {
@@ -260,6 +266,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
         data object Inactive : PurchaseStateView()
         data object InProgress : PurchaseStateView()
         data class Success(val subscriptionEventData: SubscriptionEventData) : PurchaseStateView()
+        data object Waiting : PurchaseStateView()
         data object Recovered : PurchaseStateView()
         data class Failure(val message: String) : PurchaseStateView()
     }
