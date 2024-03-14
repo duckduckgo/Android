@@ -19,6 +19,7 @@ package com.duckduckgo.networkprotection.subscription
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
+import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenAndEnable
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist
@@ -27,7 +28,6 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitli
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.JoinedWaitlist
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.NotUnlocked
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.PendingInviteCode
-import com.duckduckgo.networkprotection.impl.about.NetworkProtectionAboutScreens.VpnTermsScreenNoParams
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.duckduckgo.networkprotection.impl.waitlist.NetworkProtectionWaitlistImpl
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
@@ -99,7 +99,7 @@ class NetworkProtectionAccessState @Inject constructor(
                 if (netPWaitlistRepository.didAcceptWaitlistTerms() || networkProtectionState.isOnboarded()) {
                     NetworkProtectionManagementScreenNoParams
                 } else {
-                    VpnTermsScreenNoParams
+                    NetworkProtectionManagementScreenAndEnable(false)
                 }
             }
 

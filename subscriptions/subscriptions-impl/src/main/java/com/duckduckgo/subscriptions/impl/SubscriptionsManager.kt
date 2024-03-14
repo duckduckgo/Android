@@ -61,6 +61,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -182,7 +183,7 @@ class RealSubscriptionsManager @Inject constructor(
     override val hasSubscription = _hasSubscription.asStateFlow().onSubscription { emitHasSubscriptionsValues() }
 
     private val _entitlements = MutableStateFlow(emptyList<Product>())
-    override val entitlements = _entitlements.asStateFlow().onSubscription { emitEntitlementsValues() }
+    override val entitlements = _entitlements.asStateFlow().onStart { emitEntitlementsValues() }
 
     private var purchaseStateJob: Job? = null
     private suspend fun isUserAuthenticated(): Boolean = authRepository.isUserAuthenticated()
