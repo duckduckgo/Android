@@ -163,12 +163,12 @@ class SettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun configureSettings() {
-        if (proSettingsPlugin.isEmpty()) {
-            viewsPro.gone()
-        } else {
-            proSettingsPlugin.forEach { plugin ->
-                viewsPro.addView(plugin.getView(this))
-            }
+        viewsPro.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+            binding.includeSettings.settingsSectionProDivider.isVisible = viewsPro.height > 0
+        }
+
+        proSettingsPlugin.forEach { plugin ->
+            viewsPro.addView(plugin.getView(this))
         }
     }
 
