@@ -20,8 +20,12 @@ import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
+import androidx.security.crypto.MasterKeys
 import com.duckduckgo.di.scopes.AppScope
 import com.frybits.harmony.getHarmonySharedPreferences
+import com.frybits.harmony.secure.getEncryptedHarmonySharedPreferences
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import logcat.LogPriority
@@ -44,6 +48,35 @@ class VpnSharedPreferencesProviderImpl @Inject constructor(
             }
         } else {
             context.getSharedPreferences(name, MODE_PRIVATE)
+        }
+    }
+
+    override fun getEncryptedSharedPreferences(
+        name: String,
+        multiprocess: Boolean,
+    ): SharedPreferences? {
+        return runCatching { getEncryptedSharedPreferencesInternal(name, multiprocess) }.getOrNull()
+    }
+
+    private fun getEncryptedSharedPreferencesInternal(
+        name: String,
+        multiprocess: Boolean,
+    ): SharedPreferences {
+        return if (multiprocess) {
+            context.getEncryptedHarmonySharedPreferences(
+                name,
+                MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC),
+                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
+            )
+        } else {
+            EncryptedSharedPreferences.create(
+                context,
+                name,
+                MasterKey.Builder(context).setKeyScheme(MasterKey.KeyScheme.AES256_GCM).build(),
+                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
+            )
         }
     }
 
