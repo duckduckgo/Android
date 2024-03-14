@@ -31,8 +31,6 @@ import com.duckduckgo.user.agent.store.UserAgentFeatureName
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import org.junit.After
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule

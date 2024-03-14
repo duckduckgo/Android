@@ -16,7 +16,7 @@
 
 package com.duckduckgo.user.agent.impl
 
-import com.duckduckgo.common.utils.UriString
+import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.user.agent.store.UserAgentRepository

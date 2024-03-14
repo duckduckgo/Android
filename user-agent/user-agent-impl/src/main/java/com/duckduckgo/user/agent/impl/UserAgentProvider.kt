@@ -17,12 +17,9 @@
 package com.duckduckgo.user.agent.impl
 
 import android.os.Build
-import android.webkit.WebSettings
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
-import com.duckduckgo.app.statistics.store.StatisticsDataStore
-import com.duckduckgo.common.utils.UriString
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
