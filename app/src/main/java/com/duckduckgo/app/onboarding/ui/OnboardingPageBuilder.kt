@@ -18,19 +18,23 @@ package com.duckduckgo.app.onboarding.ui
 
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage
+import com.duckduckgo.app.onboarding.ui.page.experiment.ExperimentWelcomePage
 
 interface OnboardingPageBuilder {
     fun buildWelcomePage(): WelcomePage
+    fun buildExperimentWelcomePage(): ExperimentWelcomePage
     fun buildDefaultBrowserPage(): DefaultBrowserPage
 
     sealed class OnboardingPageBlueprint {
         object DefaultBrowserBlueprint : OnboardingPageBlueprint()
         object WelcomeBlueprint : OnboardingPageBlueprint()
+        object ExperimentWelcomeBluePrint : OnboardingPageBlueprint()
     }
 }
 
 class OnboardingFragmentPageBuilder : OnboardingPageBuilder {
 
     override fun buildWelcomePage() = WelcomePage()
+    override fun buildExperimentWelcomePage() = ExperimentWelcomePage()
     override fun buildDefaultBrowserPage() = DefaultBrowserPage()
 }

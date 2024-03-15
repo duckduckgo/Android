@@ -22,6 +22,7 @@ import com.duckduckgo.app.onboarding.ui.OnboardingFragmentPageBuilder
 import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder
 import com.duckduckgo.app.onboarding.ui.OnboardingPageManager
 import com.duckduckgo.app.onboarding.ui.OnboardingPageManagerWithTrackerBlocking
+import com.duckduckgo.app.onboarding.ui.page.experiment.ExtendedOnboardingExperimentVariantManager
 import com.duckduckgo.di.scopes.AppScope
 import dagger.Module
 import dagger.Provides
@@ -35,8 +36,14 @@ class OnboardingModule {
         defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
         onboardingPageBuilder: OnboardingPageBuilder,
         defaultBrowserDetector: DefaultBrowserDetector,
+        extendedOnboardingExperimentVariantManager: ExtendedOnboardingExperimentVariantManager,
     ): OnboardingPageManager {
-        return OnboardingPageManagerWithTrackerBlocking(defaultRoleBrowserDialog, onboardingPageBuilder, defaultBrowserDetector)
+        return OnboardingPageManagerWithTrackerBlocking(
+            defaultRoleBrowserDialog,
+            onboardingPageBuilder,
+            defaultBrowserDetector,
+            extendedOnboardingExperimentVariantManager,
+        )
     }
 
     @Provides

@@ -20,10 +20,13 @@ import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint
 import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint.DefaultBrowserBlueprint
+import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint.ExperimentWelcomeBluePrint
 import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint.WelcomeBlueprint
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage
+import com.duckduckgo.app.onboarding.ui.page.experiment.ExperimentWelcomePage
+import com.duckduckgo.app.onboarding.ui.page.experiment.ExtendedOnboardingExperimentVariantManager
 
 interface OnboardingPageManager {
     fun pageCount(): Int
@@ -35,6 +38,7 @@ class OnboardingPageManagerWithTrackerBlocking(
     private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
     private val onboardingPageBuilder: OnboardingPageBuilder,
     private val defaultWebBrowserCapability: DefaultBrowserDetector,
+    private val extendedOnboardingExperimentVariantManager: ExtendedOnboardingExperimentVariantManager,
 ) : OnboardingPageManager {
 
     private val pages = mutableListOf<OnboardingPageBlueprint>()
@@ -44,7 +48,11 @@ class OnboardingPageManagerWithTrackerBlocking(
     override fun buildPageBlueprints() {
         pages.clear()
 
-        pages.add(WelcomeBlueprint)
+        if (extendedOnboardingExperimentVariantManager.isComparisonChartEnabled()) {
+            pages.add(ExperimentWelcomeBluePrint)
+        } else {
+            pages.add(WelcomeBlueprint)
+        }
 
         if (shouldShowDefaultBrowserPage()) {
             pages.add((DefaultBrowserBlueprint))
@@ -54,6 +62,7 @@ class OnboardingPageManagerWithTrackerBlocking(
     override fun buildPage(position: Int): OnboardingPageFragment? {
         return when (pages.getOrNull(position)) {
             is WelcomeBlueprint -> buildWelcomePage()
+            is ExperimentWelcomeBluePrint -> buildExperimentWelcomePage()
             is DefaultBrowserBlueprint -> buildDefaultBrowserPage()
             else -> null
         }
@@ -71,5 +80,9 @@ class OnboardingPageManagerWithTrackerBlocking(
 
     private fun buildWelcomePage(): WelcomePage {
         return onboardingPageBuilder.buildWelcomePage()
+    }
+
+    private fun buildExperimentWelcomePage(): ExperimentWelcomePage {
+        return onboardingPageBuilder.buildExperimentWelcomePage()
     }
 }
