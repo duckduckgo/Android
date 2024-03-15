@@ -208,12 +208,19 @@ class CtaViewModel @Inject constructor(
                     DaxBubbleCta.DaxIntroCta(onboardingStore, appInstallStore)
                 }
             }
+
+            canShowDaxIntroVisitSiteCta() && extendedOnboardingExperimentVariantManager.isExtendedOnboardingEnabled() -> {
+                ExperimentDaxBubbleOptionsCta.ExperimentDaxIntroVisitSiteOptionsCta(onboardingStore, appInstallStore)
+            }
+
             canShowDaxCtaEndOfJourney() -> {
                 DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
             }
+
             canShowWidgetCta() -> {
                 if (widgetCapabilities.supportsAutomaticWidgetAdd) AddWidgetAuto else AddWidgetInstructions
             }
+
             else -> null
         }
     }
@@ -236,9 +243,14 @@ class CtaViewModel @Inject constructor(
     private suspend fun canShowDaxIntroCta(): Boolean = daxOnboardingActive() && !daxDialogIntroShown() && !hideTips()
 
     @WorkerThread
+    private suspend fun canShowDaxIntroVisitSiteCta(): Boolean =
+        daxOnboardingActive() && daxDialogIntroShown() && !daxDialogIntroVisitSiteShown() && !hideTips()
+
+    @WorkerThread
     private suspend fun canShowDaxCtaEndOfJourney(): Boolean = daxOnboardingActive() &&
         !daxDialogEndShown() &&
         daxDialogIntroShown() &&
+        daxDialogIntroVisitSiteShown() &&
         !hideTips() &&
         (daxDialogNetworkShown() || daxDialogOtherShown() || daxDialogSerpShown() || daxDialogTrackersFoundShown())
 
@@ -292,6 +304,8 @@ class CtaViewModel @Inject constructor(
     }
 
     private fun daxDialogIntroShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_INTRO)
+
+    private fun daxDialogIntroVisitSiteShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_INTRO_VISIT_SITE)
 
     private fun daxDialogEndShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_END)
 

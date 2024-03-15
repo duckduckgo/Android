@@ -17,7 +17,9 @@
 package com.duckduckgo.app.cta.ui
 
 import android.view.View
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.core.content.ContextCompat
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.global.install.AppInstallStore
@@ -34,6 +36,7 @@ sealed class ExperimentDaxBubbleOptionsCta(
     override val ctaId: CtaId,
     @StringRes open val title: Int,
     @StringRes open val description: Int,
+    @DrawableRes open val optionsIcon: Int,
     open val options: List<Int>,
     override val shownPixel: Pixel.PixelName?,
     override val okPixel: Pixel.PixelName?,
@@ -46,14 +49,24 @@ sealed class ExperimentDaxBubbleOptionsCta(
     override fun showCta(view: View) {
         val daxTitle = view.context.getString(title)
         val daxText = view.context.getString(description)
+        val daxOptionIcon = ContextCompat.getDrawable(view.context, optionsIcon)
         val daxOptionsText = options.map { view.context.getString(it) }
         view.show()
         view.alpha = 1f
         view.findViewById<DaxTextView>(R.id.hiddenTextCta).text = daxText.html(view.context)
         view.findViewById<DaxTextView>(R.id.experimentDialogTitle).text = daxTitle.html(view.context)
-        view.findViewById<DaxButton>(R.id.daxDialogOption1).text = daxOptionsText[0]
-        view.findViewById<DaxButton>(R.id.daxDialogOption2).text = daxOptionsText[1]
-        view.findViewById<DaxButton>(R.id.daxDialogOption3).text = daxOptionsText[2]
+        view.findViewById<DaxButton>(R.id.daxDialogOption1).apply {
+            text = daxOptionsText[0]
+            icon = daxOptionIcon
+        }
+        view.findViewById<DaxButton>(R.id.daxDialogOption2).apply {
+            text = daxOptionsText[1]
+            icon = daxOptionIcon
+        }
+        view.findViewById<DaxButton>(R.id.daxDialogOption3).apply {
+            text = daxOptionsText[2]
+            icon = daxOptionIcon
+        }
         view.findViewById<DaxButton>(R.id.daxDialogOption4).text = daxOptionsText[3]
         view.findViewById<TypeAnimationTextView>(R.id.dialogTextCta).startTypingAnimation(daxText, true)
     }
@@ -79,6 +92,7 @@ sealed class ExperimentDaxBubbleOptionsCta(
         CtaId.DAX_INTRO,
         R.string.onboardingSearchDaxDialogTitle,
         R.string.onboardingSearchDaxDialogDescription,
+        com.duckduckgo.mobile.android.R.drawable.ic_find_search_16,
         listOf(
             R.string.onboardingSearchDaxDialogOption1,
             R.string.onboardingSearchDaxDialogOption2,
@@ -89,6 +103,28 @@ sealed class ExperimentDaxBubbleOptionsCta(
         AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
         Pixel.PixelValues.DAX_INITIAL_CTA,
+        onboardingStore,
+        appInstallStore,
+    )
+
+    data class ExperimentDaxIntroVisitSiteOptionsCta(
+        override val onboardingStore: OnboardingStore,
+        override val appInstallStore: AppInstallStore,
+    ) : ExperimentDaxBubbleOptionsCta(
+        CtaId.DAX_INTRO_VISIT_SITE,
+        R.string.onboardingSitesDaxDialogTitle,
+        R.string.onboardingSitesDaxDialogDescription,
+        com.duckduckgo.mobile.android.R.drawable.ic_globe_gray_16dp,
+        listOf(
+            R.string.onboardingSitesDaxDialogOption1,
+            R.string.onboardingSitesDaxDialogOption2,
+            R.string.onboardingSitesDaxDialogOption3,
+            R.string.onboardingSitesDaxDialogOption4,
+        ),
+        AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
+        AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
+        null,
+        Pixel.PixelValues.DAX_INITIAL_VISIT_SITE_CTA,
         onboardingStore,
         appInstallStore,
     )
