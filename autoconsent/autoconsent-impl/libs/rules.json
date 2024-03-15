@@ -5201,7 +5201,7 @@
     },
     {
       "name": "Sirdata",
-      "cosmetic": true,
+      "cosmetic": false,
       "prehideSelectors": [
         "#sd-cmp"
       ],
@@ -5222,10 +5222,10 @@
       ],
       "optOut": [
         {
-          "hide": "#sd-cmp"
-        },
-        {
-          "eval": "EVAL_SIRDATA_UNBLOCK_SCROLL"
+          "waitForThenClick": [
+            "#sd-cmp",
+            "xpath///span[contains(., 'Do not accept') or contains(., 'Acceptera inte') or contains(., 'No aceptar') or contains(., 'Ikke acceptere') or contains(., 'Nicht akzeptieren') or contains(., 'Не приемам') or contains(., 'Να μην γίνει αποδοχή') or contains(., 'Niet accepteren') or contains(., 'Nepřijímat') or contains(., 'Nie akceptuj') or contains(., 'Nu acceptați') or contains(., 'Não aceitar') or contains(., 'Continuer sans accepter') or contains(., 'Non accettare') or contains(., 'Nem fogad el')]"
+          ]
         }
       ]
     },
