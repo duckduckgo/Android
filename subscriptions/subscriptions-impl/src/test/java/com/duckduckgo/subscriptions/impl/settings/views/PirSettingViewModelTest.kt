@@ -28,7 +28,7 @@ class PirSettingViewModelTest {
 
     @Before
     fun before() {
-        viewModel = PirSettingViewModel(subscriptions, coroutineTestRule.testDispatcherProvider, pixelSender)
+        viewModel = PirSettingViewModel(subscriptions, pixelSender)
     }
 
     @Test
@@ -50,7 +50,7 @@ class PirSettingViewModelTest {
     fun whenOnResumeIfEntitlementPresentEmitViewState() = runTest {
         whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(PIR)))
 
-        viewModel.onResume(mock())
+        viewModel.onCreate(mock())
 
         viewModel.viewState.test {
             assertTrue(awaitItem().hasSubscription)

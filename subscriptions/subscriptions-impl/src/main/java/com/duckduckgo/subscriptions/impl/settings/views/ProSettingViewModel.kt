@@ -22,7 +22,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.subscriptions.impl.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.SubscriptionStatus.UNKNOWN
@@ -36,6 +35,9 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
@@ -43,7 +45,6 @@ import kotlinx.coroutines.launch
 @ContributesViewModel(ViewScope::class)
 class ProSettingViewModel @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
-    private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     sealed class Command {
@@ -71,13 +72,13 @@ class ProSettingViewModel @Inject constructor(
         sendCommand(OpenRestoreScreen)
     }
 
-    override fun onResume(owner: LifecycleOwner) {
-        super.onResume(owner)
-        viewModelScope.launch(dispatcherProvider.io()) {
-            subscriptionsManager.subscriptionStatus.collect {
+    override fun onCreate(owner: LifecycleOwner) {
+        super.onCreate(owner)
+        subscriptionsManager.subscriptionStatus
+            .distinctUntilChanged()
+            .onEach {
                 _viewState.emit(viewState.value.copy(status = it))
-            }
-        }
+            }.launchIn(viewModelScope)
     }
 
     private fun sendCommand(newCommand: Command) {

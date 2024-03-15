@@ -25,7 +25,7 @@ class ProSettingViewModelTest {
 
     @Before
     fun before() {
-        viewModel = ProSettingViewModel(subscriptionsManager, coroutineTestRule.testDispatcherProvider)
+        viewModel = ProSettingViewModel(subscriptionsManager)
     }
 
     @Test
@@ -59,7 +59,7 @@ class ProSettingViewModelTest {
     fun whenOnResumeEmitViewState() = runTest {
         whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowOf(SubscriptionStatus.EXPIRED))
 
-        viewModel.onResume(mock())
+        viewModel.onCreate(mock())
         viewModel.viewState.test {
             assertEquals(SubscriptionStatus.EXPIRED, awaitItem().status)
             cancelAndConsumeRemainingEvents()
