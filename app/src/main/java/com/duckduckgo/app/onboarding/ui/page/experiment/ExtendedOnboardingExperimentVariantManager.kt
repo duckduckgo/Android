@@ -26,6 +26,7 @@ import javax.inject.Inject
 interface ExtendedOnboardingExperimentVariantManager {
     fun setExperimentVariants()
     fun isComparisonChartEnabled(): Boolean
+    fun isExtendedOnboardingEnabled(): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -48,5 +49,10 @@ class ExtendedOnboardingExperimentVariantManagerImpl @Inject constructor(
         val isRemoteFeatureEnabled = extendedOnboardingFeatureToggles.comparisonChart().isEnabled()
         val isLocalFeatureEnabled = isExtendedOnboardingEnabled && variantManager.getVariantKey() == "mt"
         return isRemoteFeatureEnabled || isLocalFeatureEnabled
+    }
+
+    override fun isExtendedOnboardingEnabled(): Boolean {
+        // TODO Noelia experiment: create new sub-feature
+        return true
     }
 }

@@ -536,6 +536,9 @@ class BrowserTabFragment :
     private val daxDialogCta
         get() = binding.includeNewBrowserTab.includeDaxDialogCta
 
+    private val daxDialogIntroExperimentCta
+        get() = binding.includeNewBrowserTab.includeDaxDialogIntroExperimentCta
+
     private val smoothProgressAnimator by lazy { SmoothProgressAnimator(omnibar.pageLoadingIndicator) }
 
     // Optimization to prevent against excessive work generating WebView previews; an existing job will be cancelled if a new one is launched
@@ -3576,6 +3579,7 @@ class BrowserTabFragment :
             when (configuration) {
                 is HomePanelCta -> showHomeCta(configuration, favorites)
                 is DaxBubbleCta -> showDaxCta(configuration)
+                is ExperimentDaxBubbleOptionsCta -> showDaxExperimentCta(configuration)
                 is BubbleCta -> showBubbleCta(configuration)
                 is DialogCta -> showDaxDialogCta(configuration)
             }
@@ -3627,6 +3631,18 @@ class BrowserTabFragment :
             hideHomeCta()
             configuration.showCta(daxDialogCta.daxCtaContainer)
             newBrowserTab.newTabLayout.setOnClickListener { daxDialogCta.dialogTextCta.finishAnimation() }
+
+            viewModel.onCtaShown()
+        }
+
+        private fun showDaxExperimentCta(configuration: ExperimentDaxBubbleOptionsCta) {
+            hideHomeBackground()
+            hideHomeCta()
+            configuration.apply {
+                showCta(daxDialogIntroExperimentCta.daxCtaContainer)
+                setOnOptionClicked(daxDialogIntroExperimentCta.daxCtaContainer) { userEnteredQuery(it) }
+            }
+            newBrowserTab.newTabLayout.setOnClickListener { daxDialogIntroExperimentCta.dialogTextCta.finishAnimation() }
 
             viewModel.onCtaShown()
         }

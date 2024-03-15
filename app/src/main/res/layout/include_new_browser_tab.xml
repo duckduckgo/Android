@@ -75,6 +75,18 @@
         </LinearLayout>
 
         <include
+            android:id="@+id/includeDaxDialogIntroExperimentCta"
+            layout="@layout/include_dax_dialog_intro_experiment_cta"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_max="600dp" />
+
+        <include
             android:id="@+id/includeDaxDialogCta"
             layout="@layout/include_dax_dialog_cta"
             android:layout_width="0dp"

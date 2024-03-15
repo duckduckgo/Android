@@ -30,6 +30,7 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.onboarding.store.*
+import com.duckduckgo.app.onboarding.ui.page.experiment.ExtendedOnboardingExperimentVariantManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -63,6 +64,7 @@ class CtaViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val surveyRepository: SurveyRepository,
+    private val extendedOnboardingExperimentVariantManager: ExtendedOnboardingExperimentVariantManager,
 ) {
     val surveyLiveData: LiveData<Survey> = surveyRepository.getScheduledLiveSurvey()
 
@@ -127,7 +129,7 @@ class CtaViewModel @Inject constructor(
 
     suspend fun registerDaxBubbleCtaDismissed(cta: Cta) {
         withContext(dispatchers.io()) {
-            if (cta is DaxBubbleCta) {
+            if (cta is DaxBubbleCta || cta is ExperimentDaxBubbleOptionsCta) {
                 dismissedCtaDao.insert(DismissedCta(cta.ctaId))
                 completeStageIfDaxOnboardingCompleted()
             }
@@ -200,7 +202,11 @@ class CtaViewModel @Inject constructor(
     private suspend fun getHomeCta(): Cta? {
         return when {
             canShowDaxIntroCta() -> {
-                DaxBubbleCta.DaxIntroCta(onboardingStore, appInstallStore)
+                if (extendedOnboardingExperimentVariantManager.isExtendedOnboardingEnabled()) {
+                    ExperimentDaxBubbleOptionsCta.ExperimentDaxIntroSearchOptionsCta(onboardingStore, appInstallStore)
+                } else {
+                    DaxBubbleCta.DaxIntroCta(onboardingStore, appInstallStore)
+                }
             }
             canShowDaxCtaEndOfJourney() -> {
                 DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
