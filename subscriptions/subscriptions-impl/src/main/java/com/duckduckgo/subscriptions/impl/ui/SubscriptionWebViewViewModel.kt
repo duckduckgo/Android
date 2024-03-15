@@ -28,6 +28,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist
 import com.duckduckgo.subscriptions.impl.CurrentPurchase
 import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
+import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsChecker
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ITR
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY
@@ -67,6 +68,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
     private val subscriptionsChecker: SubscriptionsChecker,
     private val networkProtectionWaitlist: NetworkProtectionWaitlist,
     private val pixelSender: SubscriptionPixelSender,
+    private val privacyProFeature: PrivacyProFeature,
 ) : ViewModel() {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -192,28 +194,28 @@ class SubscriptionWebViewViewModel @Inject constructor(
 
     private fun getSubscriptionOptions(featureName: String, method: String, id: String) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            val offer = subscriptionsManager.getSubscriptionOffer()
+            var subscriptionOptions = SubscriptionOptionsJson(
+                options = emptyList(),
+                features = emptyList(),
+            )
 
-            val subscriptionOptions = if (offer != null) {
-                val yearlyJson = OptionsJson(
-                    id = offer.yearlyPlanId,
-                    cost = CostJson(displayPrice = offer.yearlyFormattedPrice, recurrence = YEARLY),
-                )
+            if (privacyProFeature.allowPurchase().isEnabled()) {
+                subscriptionsManager.getSubscriptionOffer()?.let { offer ->
+                    val yearlyJson = OptionsJson(
+                        id = offer.yearlyPlanId,
+                        cost = CostJson(displayPrice = offer.yearlyFormattedPrice, recurrence = YEARLY),
+                    )
 
-                val monthlyJson = OptionsJson(
-                    id = offer.monthlyPlanId,
-                    cost = CostJson(displayPrice = offer.monthlyFormattedPrice, recurrence = MONTHLY),
-                )
+                    val monthlyJson = OptionsJson(
+                        id = offer.monthlyPlanId,
+                        cost = CostJson(displayPrice = offer.monthlyFormattedPrice, recurrence = MONTHLY),
+                    )
 
-                SubscriptionOptionsJson(
-                    options = listOf(yearlyJson, monthlyJson),
-                    features = listOf(FeatureJson(NETP), FeatureJson(ITR), FeatureJson(PIR)),
-                )
-            } else {
-                SubscriptionOptionsJson(
-                    options = emptyList(),
-                    features = emptyList(),
-                )
+                    subscriptionOptions = SubscriptionOptionsJson(
+                        options = listOf(yearlyJson, monthlyJson),
+                        features = listOf(FeatureJson(NETP), FeatureJson(ITR), FeatureJson(PIR)),
+                    )
+                }
             }
 
             val response = JsCallbackData(
