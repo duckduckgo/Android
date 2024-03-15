@@ -17,23 +17,57 @@
 package com.duckduckgo.networkprotection.impl.revoked
 
 import android.app.Activity
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder.EventListener
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.impl.R.string
+import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 interface BetaEndedDialog {
     fun show(activity: Activity)
 }
 
 @ContributesBinding(AppScope::class)
-class RealBetaEndedDialog @Inject constructor() : BetaEndedDialog {
+class RealBetaEndedDialog @Inject constructor(
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
+    private val networkProtectionRepository: NetworkProtectionRepository,
+    private val betaEndStore: BetaEndStore,
+) : BetaEndedDialog {
+
+    private var boundActivity: Activity? = null
+
     override fun show(activity: Activity) {
+        if (boundActivity == activity) return
+
+        boundActivity = activity
+
         TextAlertDialogBuilder(activity)
             .setTitle(string.netpWaitlistEndDialogTitle)
             .setMessage(string.netpWaitlistEndDialogSubtitle)
             .setPositiveButton(string.netpWaitlistEndDialogAction)
+            .addEventListener(
+                object : EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        // Commenting this for now since this is still behind the subs build
+                        // globalActivityStarter.start(activity, SubscriptionScreenNoParams)
+                        resetVpnAccessRevokedState()
+                    }
+                },
+            )
             .show()
+    }
+
+    private fun resetVpnAccessRevokedState() {
+        coroutineScope.launch(dispatcherProvider.io()) {
+            networkProtectionRepository.vpnAccessRevoked = false
+            betaEndStore.showBetaEndDialog()
+        }
     }
 }

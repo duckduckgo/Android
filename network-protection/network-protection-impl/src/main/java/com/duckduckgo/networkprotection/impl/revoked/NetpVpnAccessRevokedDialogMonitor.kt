@@ -56,8 +56,6 @@ class NetpVpnAccessRevokedDialogMonitor @Inject constructor(
         coroutineScope.launch(dispatcherProvider.io()) {
             if (shouldShowDialog()) {
                 // Resetting here so we don't show this dialog anymore
-                networkProtectionRepository.vpnAccessRevoked = false
-                betaEndStore.showBetaEndDialog()
                 withContext(dispatcherProvider.main()) {
                     betaEndedDialog.show(activity)
                 }

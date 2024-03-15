@@ -78,7 +78,7 @@ class NetpVpnAccessRevokedDialogMonitorTest {
     }
 
     @Test
-    fun whenUserParticipatedInBetaAndPrivacyProInactiveAndDialogNotShownThenShowBetaEndDialog() = runTest {
+    fun whenUserParticipatedInBetaAndPrivacyProActiveAndDialogNotShownThenShowBetaEndDialog() = runTest {
         whenever(networkProtectionRepository.vpnAccessRevoked).thenReturn(true)
         whenever(betaEndStore.betaEndDialogShown()).thenReturn(false)
         whenever(betaEndStore.didParticipateInBeta()).thenReturn(true)
@@ -87,8 +87,6 @@ class NetpVpnAccessRevokedDialogMonitorTest {
         netpVpnAccessRevokedDialogMonitor.onActivityResumed(mock())
 
         verify(betaEndedDialog).show(any())
-        verify(betaEndStore).showBetaEndDialog()
-        verify(networkProtectionRepository).vpnAccessRevoked = false
         verifyNoInteractions(accessRevokedDialog)
     }
 
