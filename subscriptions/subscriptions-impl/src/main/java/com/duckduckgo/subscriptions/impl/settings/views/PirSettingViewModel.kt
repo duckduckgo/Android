@@ -22,7 +22,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.subscriptions.api.Product.PIR
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -34,7 +33,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -44,7 +42,6 @@ import kotlinx.coroutines.launch
 @ContributesViewModel(ViewScope::class)
 class PirSettingViewModel @Inject constructor(
     private val subscriptions: Subscriptions,
-    private val dispatcherProvider: DispatcherProvider,
     private val pixelSender: SubscriptionPixelSender,
 ) : ViewModel(), DefaultLifecycleObserver {
 
@@ -64,14 +61,11 @@ class PirSettingViewModel @Inject constructor(
         sendCommand(OpenPir)
     }
 
-    override fun onResume(owner: LifecycleOwner) {
-        super.onResume(owner)
-
-        subscriptions.getEntitlementStatus()
-            .onEach {
-                _viewState.emit(viewState.value.copy(hasSubscription = it.contains(PIR)))
-            }.flowOn(dispatcherProvider.main())
-            .launchIn(viewModelScope)
+    override fun onCreate(owner: LifecycleOwner) {
+        super.onCreate(owner)
+        subscriptions.getEntitlementStatus().onEach {
+            _viewState.emit(viewState.value.copy(hasSubscription = it.contains(PIR)))
+        }.launchIn(viewModelScope)
     }
 
     private fun sendCommand(newCommand: Command) {

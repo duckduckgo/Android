@@ -28,7 +28,7 @@ class ItrSettingViewModelTest {
 
     @Before
     fun before() {
-        viewModel = ItrSettingViewModel(subscriptions, coroutineTestRule.testDispatcherProvider, pixelSender)
+        viewModel = ItrSettingViewModel(subscriptions, pixelSender)
     }
 
     @Test
@@ -54,7 +54,7 @@ class ItrSettingViewModelTest {
             ),
         )
 
-        viewModel.onResume(mock())
+        viewModel.onCreate(mock())
         viewModel.viewState.test {
             assertTrue(awaitItem().hasSubscription)
             cancelAndConsumeRemainingEvents()
