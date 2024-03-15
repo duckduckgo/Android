@@ -356,7 +356,7 @@ class RealSubscriptionsManagerTest {
         givenUserIsAuthenticated()
         givenValidateTokenFails("failure")
 
-        subscriptionsManager.purchase(mock(), mock(), "", false)
+        subscriptionsManager.purchase(mock(), "")
 
         verify(authService, never()).createAccount(any())
     }

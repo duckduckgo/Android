@@ -28,6 +28,7 @@ import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.Subscriptions
+import com.duckduckgo.subscriptions.impl.repository.isActiveOrWaiting
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -61,6 +62,12 @@ class RealSubscriptions @Inject constructor(
 
     override suspend fun isEnabled(): Boolean {
         return privacyProFeature.isLaunched().isEnabled()
+    }
+
+    override suspend fun isEligible(): Boolean {
+        val isActive = subscriptionsManager.subscriptionStatus().isActiveOrWaiting()
+        val isEligible = subscriptionsManager.getSubscriptionOffer() != null
+        return isActive || isEligible
     }
 }
 

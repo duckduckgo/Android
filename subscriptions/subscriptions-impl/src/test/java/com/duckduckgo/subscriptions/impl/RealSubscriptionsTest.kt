@@ -23,6 +23,9 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.subscriptions.api.Product.NetP
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus.AUTO_RENEWABLE
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus.UNKNOWN
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus.WAITING
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -82,5 +85,35 @@ class RealSubscriptionsTest {
             assertTrue(awaitItem().isEmpty())
             cancelAndConsumeRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenIsEligibleIfOffersReturnedThenReturnTrueRegardlessOfStatus() = runTest {
+        whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(UNKNOWN)
+        whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(
+            SubscriptionOffer(monthlyPlanId = "test", yearlyFormattedPrice = "test", yearlyPlanId = "test", monthlyFormattedPrice = "test"),
+        )
+        assertTrue(subscriptions.isEligible())
+    }
+
+    @Test
+    fun whenIsEligibleIfNotOffersReturnedThenReturnFalseIfNotActiveOrWaiting() = runTest {
+        whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(UNKNOWN)
+        whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(null)
+        assertFalse(subscriptions.isEligible())
+    }
+
+    @Test
+    fun whenIsEligibleIfNotOffersReturnedThenReturnTrueIfWaiting() = runTest {
+        whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(WAITING)
+        whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(null)
+        assertTrue(subscriptions.isEligible())
+    }
+
+    @Test
+    fun whenIsEligibleIfNotOffersReturnedThenReturnTrueIfActive() = runTest {
+        whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
+        whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(null)
+        assertTrue(subscriptions.isEligible())
     }
 }

@@ -32,4 +32,6 @@ class SubscriptionsDummy @Inject constructor() : Subscriptions {
     }
 
     override suspend fun isEnabled(): Boolean = false
+
+    override suspend fun isEligible(): Boolean = false
 }
