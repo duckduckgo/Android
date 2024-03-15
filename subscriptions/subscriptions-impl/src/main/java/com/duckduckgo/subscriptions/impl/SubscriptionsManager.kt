@@ -388,9 +388,13 @@ class RealSubscriptionsManager @Inject constructor(
                 val subscription = fetchAndStoreAllData()
                 if (subscription != null) {
                     logcat(LogPriority.DEBUG) { "Subs: store login succeeded" }
-                    RecoverSubscriptionResult.Success(subscription)
+                    if (subscription.isActive()) {
+                        RecoverSubscriptionResult.Success(subscription)
+                    } else {
+                        RecoverSubscriptionResult.Failure(SUBSCRIPTION_NOT_FOUND_ERROR)
+                    }
                 } else {
-                    RecoverSubscriptionResult.Failure(SUBSCRIPTION_NOT_FOUND_ERROR)
+                    RecoverSubscriptionResult.Failure("")
                 }
             } else {
                 RecoverSubscriptionResult.Failure(SUBSCRIPTION_NOT_FOUND_ERROR)
@@ -433,7 +437,7 @@ class RealSubscriptionsManager @Inject constructor(
                 return
             }
 
-            if (subscription == null) {
+            if (subscription == null && !isUserAuthenticated()) {
                 createAccount()
                 exchangeAuthToken(authRepository.getAuthToken()!!)
             }

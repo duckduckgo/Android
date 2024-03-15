@@ -146,6 +146,18 @@ class RealSubscriptionsManagerTest {
     }
 
     @Test
+    fun whenRecoverSubscriptionFromStoreIfSubscriptionExpiredThenReturnFailure() = runTest {
+        givenPurchaseStored()
+        givenStoreLoginSucceeds()
+        givenSubscriptionExists(EXPIRED)
+        givenAccessTokenSucceeds()
+
+        val result = subscriptionsManager.recoverSubscriptionFromStore()
+
+        assertTrue(result is RecoverSubscriptionResult.Failure)
+    }
+
+    @Test
     fun whenRecoverSubscriptionFromStoreIfValidateTokenFailsReturnFailure() = runTest {
         givenUserIsAuthenticated()
         givenValidateTokenFails("failure")
@@ -323,9 +335,9 @@ class RealSubscriptionsManagerTest {
     }
 
     @Test
-    fun whenPurchaseFlowIfValidateTokenFailsReturnFailure() = runTest {
-        givenUserIsAuthenticated()
-        givenValidateTokenFails("failure")
+    fun whenPurchaseFlowIfCreateAccountFailsReturnFailure() = runTest {
+        givenUserIsNotAuthenticated()
+        givenCreateAccountFails()
 
         subscriptionsManager.currentPurchaseState.test {
             subscriptionsManager.purchase(mock(), mock(), "", false)
@@ -333,6 +345,16 @@ class RealSubscriptionsManagerTest {
             assertTrue(awaitItem() is CurrentPurchase.Failure)
             cancelAndConsumeRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenPurchaseFlowIfNullSubscriptionAndAuthenticatedThenDoNotCreateAccount() = runTest {
+        givenUserIsAuthenticated()
+        givenValidateTokenFails("failure")
+
+        subscriptionsManager.purchase(mock(), mock(), "", false)
+
+        verify(authService, never()).createAccount(any())
     }
 
     @Test
@@ -868,11 +890,11 @@ class RealSubscriptionsManagerTest {
         )
     }
 
-    private fun givenSubscriptionExists() {
+    private fun givenSubscriptionExists(status: SubscriptionStatus = AUTO_RENEWABLE) {
         authDataStore.platform = "google"
         authDataStore.productId = "productId"
         authDataStore.entitlements = """[{"product":"product", "name":"name"}]"""
-        authDataStore.status = "Auto-Renewable"
+        authDataStore.status = status.statusName
         authDataStore.startedAt = 1000L
         authDataStore.expiresOrRenewsAt = 1000L
     }
