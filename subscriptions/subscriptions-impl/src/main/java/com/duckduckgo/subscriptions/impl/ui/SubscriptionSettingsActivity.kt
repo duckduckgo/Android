@@ -33,6 +33,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.impl.R.string
 import com.duckduckgo.subscriptions.impl.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTION
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.FAQS_URL
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionSettingsBinding
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.AddDeviceActivity.Companion.AddDeviceScreenWithEmptyParams
@@ -106,7 +107,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         }
 
         binding.faq.setClickListener {
-            Toast.makeText(this, "This will take you to FAQs", Toast.LENGTH_SHORT).show()
+            goToFaqs()
         }
 
         if (savedInstanceState == null) {
@@ -172,6 +173,18 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             }
         }
     }
+
+    private fun goToFaqs() {
+        globalActivityStarter.start(
+            this,
+            SubscriptionsWebViewActivityWithParams(
+                url = FAQS_URL,
+                screenTitle = "",
+                defaultToolbar = false,
+            ),
+        )
+    }
+
     companion object {
         const val URL = "https://play.google.com/store/account/subscriptions?sku=%s&package=%s"
         data object SubscriptionsSettingsScreenWithEmptyParams : GlobalActivityStarter.ActivityParams

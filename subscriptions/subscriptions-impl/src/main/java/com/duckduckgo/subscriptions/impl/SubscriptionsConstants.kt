@@ -42,4 +42,5 @@ object SubscriptionsConstants {
     const val BUY_URL = "https://duckduckgo.com/subscriptions?environment=staging"
     const val ACTIVATE_URL = "https://duckduckgo.com/subscriptions/activate?environment=staging"
     const val ITR_URL = "https://duckduckgo.com/identity-theft-restoration?environment=staging"
+    const val FAQS_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/"
 }
