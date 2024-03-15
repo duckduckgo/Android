@@ -67,4 +67,14 @@
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Surprise me!</string>
 
+    <!-- SSL Error -->
+    <string name="sslErrorTitle">Warning: This site may be insecure</string>
+    <string name="sslErrorHeadline">The certificate for this server is invalid. You might be connecting to a server that is pretending to be %1$s which could put your confidential information at risk.</string>
+    <string name="sslErrorLeaveCTA">Leave This Site</string>
+    <string name="sslErrorAdvancedCTA">Advanced</string>
+    <string name="sslErrorExpandedHeadline">DuckDuckGo warns you when a website has an invalid certificate.</string>
+    <string name="sslErrorExpandedCTA"><![CDATA[<u>Accept Risk and Visit Site<u/>]]></string>
+    <string name="sslErrorExpiredMessage">The security certificate for %1$s is expired. It’s possible that the website is misconfigured, that an attacker has compromised your connection, or that your system clock is incorrect.</string>
+    <string name="sslErrorWrongHostMessage">The security certificate for <b>%1$s</b> does not match <b>*.%2$s</b>. It’s possible that the website is misconfigured or that an attacker has compromised your connection.</string>
+    <string name="sslErrorUntrustedMessage">The security certificate for <b>%1$s</b> is not trusted by your computer\'s operating system. It’s possible that the website is misconfigured or that an attacker has compromised your connection.</string>
 </resources>
