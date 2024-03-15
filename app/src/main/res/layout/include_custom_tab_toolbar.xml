@@ -27,6 +27,7 @@
         android:id="@+id/customTabCloseIcon"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
+        android:background="?attr/selectableItemBackgroundBorderless"
         android:importantForAccessibility="no"
         android:paddingStart="@dimen/keyline_4"
         android:paddingTop="@dimen/keyline_4"
