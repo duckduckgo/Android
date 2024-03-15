@@ -119,9 +119,15 @@ class DefaultOnDeviceSpeechRecognizer @Inject constructor(
     @RequiresApi(VERSION_CODES.S)
     override fun start(eventHandler: (Event) -> Unit) {
         _eventHandler = eventHandler
-        speechRecognizer = SpeechRecognizer.createOnDeviceSpeechRecognizer(context)
-        speechRecognizer?.setRecognitionListener(recognitionListener)
-        speechRecognizer?.startListening(speechRecognizerIntent)
+        runCatching {
+            speechRecognizer = SpeechRecognizer.createOnDeviceSpeechRecognizer(context)
+        }.onFailure {
+            _eventHandler(Event.RecognitionFailed(-1))
+            Timber.e(it, "Failed to initialize SpeechRecognizer")
+        }.onSuccess {
+            speechRecognizer?.setRecognitionListener(recognitionListener)
+            speechRecognizer?.startListening(speechRecognizerIntent)
+        }
     }
 
     override fun stop() {
