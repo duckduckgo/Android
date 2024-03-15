@@ -22,7 +22,6 @@ import android.content.Context
 import android.text.Annotation
 import android.text.SpannableString
 import android.text.Spanned
-import android.text.SpannedString
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
@@ -82,9 +81,19 @@ class InfoPanel : FrameLayout {
         fullText: CharSequence,
         onClick: () -> Unit,
     ) {
-        val spannedText = fullText as SpannedString
-        val spannableString = SpannableString(spannedText)
-        val annotations = spannedText.getSpans(0, spannedText.length, Annotation::class.java)
+        setClickableLink(
+            annotation = annotation,
+            spannableFullText = SpannableString(fullText),
+            onClick = onClick,
+        )
+    }
+
+    fun setClickableLink(
+        annotation: String,
+        spannableFullText: SpannableString,
+        onClick: () -> Unit,
+    ) {
+        val annotations = spannableFullText.getSpans(0, spannableFullText.length, Annotation::class.java)
         val clickableSpan = object : ClickableSpan() {
             override fun onClick(widget: View) {
                 onClick()
@@ -92,29 +101,29 @@ class InfoPanel : FrameLayout {
         }
 
         annotations?.find { it.value == annotation }?.let {
-            spannableString.apply {
+            spannableFullText.apply {
                 setSpan(
                     clickableSpan,
-                    fullText.getSpanStart(it),
-                    fullText.getSpanEnd(it),
+                    spannableFullText.getSpanStart(it),
+                    spannableFullText.getSpanEnd(it),
                     Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
                 )
                 setSpan(
                     UnderlineSpan(),
-                    fullText.getSpanStart(it),
-                    fullText.getSpanEnd(it),
+                    spannableFullText.getSpanStart(it),
+                    spannableFullText.getSpanEnd(it),
                     Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
                 )
                 setSpan(
                     ForegroundColorSpan(context.getColorFromAttr(R.attr.daxColorPrimaryText)),
-                    fullText.getSpanStart(it),
-                    fullText.getSpanEnd(it),
+                    spannableFullText.getSpanStart(it),
+                    spannableFullText.getSpanEnd(it),
                     Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
                 )
             }
         }
         binding.infoPanelText.apply {
-            text = spannableString
+            text = spannableFullText
             movementMethod = LinkMovementMethod.getInstance()
         }
     }
