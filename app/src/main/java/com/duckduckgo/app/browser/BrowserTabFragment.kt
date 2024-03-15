@@ -1460,16 +1460,22 @@ class BrowserTabFragment :
             is Command.ScreenLock -> screenLock(it.data)
             is Command.ScreenUnlock -> screenUnlock()
             is Command.ShowFaviconsPrompt -> showFaviconsPrompt()
-            is Command.ShowWebPageTitle -> showWebPageTitleInCustomTab(it.title)
+            is Command.ShowWebPageTitle -> showWebPageTitleInCustomTab(it.title, it.url)
             else -> {
                 // NO OP
             }
         }
     }
 
-    private fun showWebPageTitleInCustomTab(title: String) {
+    private fun showWebPageTitleInCustomTab(title: String, url: String?) {
         if (isActiveCustomTab()) {
             omnibar.customTabToolbarContainer.customTabTitle.text = title
+
+            val redirectedDomain = url?.extractDomain()
+            redirectedDomain?.let {
+                omnibar.customTabToolbarContainer.customTabDomain.text = redirectedDomain
+            }
+
             omnibar.customTabToolbarContainer.customTabTitle.show()
             omnibar.customTabToolbarContainer.customTabDomainOnly.hide()
             omnibar.customTabToolbarContainer.customTabDomain.show()

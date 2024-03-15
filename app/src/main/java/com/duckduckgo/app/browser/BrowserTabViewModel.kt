@@ -1642,9 +1642,9 @@ class BrowserTabViewModel @Inject constructor(
         showErrorWithAction(R.string.dosErrorMessage)
     }
 
-    override fun titleReceived(newTitle: String) {
+    override fun titleReceived(newTitle: String, url: String?) {
         site?.title = newTitle
-        command.postValue(ShowWebPageTitle(newTitle))
+        command.postValue(ShowWebPageTitle(newTitle, url))
         onSiteChanged()
     }
 

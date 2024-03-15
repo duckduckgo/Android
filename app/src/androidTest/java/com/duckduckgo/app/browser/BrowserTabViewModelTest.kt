@@ -1686,7 +1686,7 @@ class BrowserTabViewModelTest {
         )
         whenever(mockSavedSitesRepository.insertBookmark(title = anyString(), url = anyString())).thenReturn(bookmark)
         loadUrl(url = url)
-        testee.titleReceived(newTitle = title)
+        testee.titleReceived(newTitle = title, url = url)
         testee.onBookmarkMenuClicked()
         val command = captureCommands().value as Command.ShowSavedSiteAddedConfirmation
         assertEquals(url, command.savedSiteChangedViewState.savedSite.url)
