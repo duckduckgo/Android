@@ -31,11 +31,9 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitli
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.JoinedWaitlist
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.NotUnlocked
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.PendingInviteCode
-import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.VerifySubscription
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.impl.state.NetPFeatureRemover
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -48,7 +46,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import logcat.logcat
 
-@ContributesBinding(AppScope::class)
 class NetworkProtectionWaitlistImpl @Inject constructor(
     private val netPRemoteFeature: NetPRemoteFeatureWrapper,
     private val appBuildConfig: AppBuildConfig,
@@ -74,7 +71,7 @@ class NetworkProtectionWaitlistImpl @Inject constructor(
         return@withContext NotUnlocked
     }
 
-    override suspend fun getScreenForCurrentState(): ActivityParams = withContext(dispatcherProvider.io()) {
+    override suspend fun getScreenForCurrentState(): ActivityParams? = withContext(dispatcherProvider.io()) {
         return@withContext when (getState()) {
             is InBeta -> {
                 if (netPWaitlistRepository.didAcceptWaitlistTerms() || networkProtectionState.isOnboarded()) {
@@ -83,7 +80,7 @@ class NetworkProtectionWaitlistImpl @Inject constructor(
                     NetPWaitlistInvitedScreenNoParams
                 }
             }
-            JoinedWaitlist, NotUnlocked, PendingInviteCode, VerifySubscription -> NetPWaitlistScreenNoParams
+            JoinedWaitlist, NotUnlocked, PendingInviteCode -> NetPWaitlistScreenNoParams
         }
     }
 

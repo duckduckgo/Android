@@ -32,6 +32,11 @@ interface Subscriptions {
      * @return [Boolean]
      */
     fun getEntitlementStatus(): Flow<List<Product>>
+
+    /**
+     * @return `true` if the Privacy Pro product is enabled and live, `false` otherwise
+     */
+    suspend fun isEnabled(): Boolean
 }
 
 enum class Product(val value: String) {

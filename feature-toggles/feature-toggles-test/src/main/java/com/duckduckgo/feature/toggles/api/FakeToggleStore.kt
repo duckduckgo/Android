@@ -27,3 +27,15 @@ class FakeToggleStore : Toggle.Store {
         return map[key]
     }
 }
+
+class FakeFeatureToggleFactory {
+    companion object {
+        fun <T> create(toggles: Class<T>, store: Toggle.Store = FakeToggleStore()): T {
+            return FeatureToggles.Builder()
+                .store(store)
+                .featureName("fakeFeature")
+                .build()
+                .create(toggles)
+        }
+    }
+}

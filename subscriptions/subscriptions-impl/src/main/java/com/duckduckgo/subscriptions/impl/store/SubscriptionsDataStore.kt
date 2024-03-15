@@ -19,6 +19,7 @@ package com.duckduckgo.subscriptions.impl.store
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -45,11 +46,11 @@ interface SubscriptionsDataStore {
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class SubscriptionsEncryptedDataStore @Inject constructor(
-    private val sharedPrefsProv: SharedPrefsProvider,
+    private val vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
 ) : SubscriptionsDataStore {
     private val encryptedPreferences: SharedPreferences? by lazy { encryptedPreferences() }
     private fun encryptedPreferences(): SharedPreferences? {
-        return sharedPrefsProv.getSharedPrefs(FILENAME)
+        return vpnSharedPreferencesProvider.getEncryptedSharedPreferences(FILENAME, multiprocess = true)
     }
 
     override var productId: String?

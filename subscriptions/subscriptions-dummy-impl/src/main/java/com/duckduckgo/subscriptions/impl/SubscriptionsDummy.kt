@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,22 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.networkprotection.impl.configuration
+package com.duckduckgo.subscriptions.impl
 
-import com.duckduckgo.app.global.api.ApiInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import com.duckduckgo.subscriptions.api.Product
+import com.duckduckgo.subscriptions.api.Subscriptions
+import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-import okhttp3.Interceptor
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
-@ContributesMultibinding(
-    scope = AppScope::class,
-    boundType = ApiInterceptorPlugin::class,
-)
-class NetpRequestInterceptorPlugin @Inject constructor(
-    private val netpRequestInterceptor: NetpRequestInterceptor,
-) : ApiInterceptorPlugin {
-    override fun getInterceptor(): Interceptor = netpRequestInterceptor
+@ContributesBinding(AppScope::class)
+class SubscriptionsDummy @Inject constructor() : Subscriptions {
+    override suspend fun getAccessToken(): String? = null
+    override fun getEntitlementStatus(): Flow<List<Product>> = flow {
+        emptyList<List<Product>>()
+    }
+
+    override suspend fun isEnabled(): Boolean = false
 }
