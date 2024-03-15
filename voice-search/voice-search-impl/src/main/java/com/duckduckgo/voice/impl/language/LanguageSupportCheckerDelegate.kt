@@ -25,9 +25,9 @@ import android.speech.SpeechRecognizer.createOnDeviceSpeechRecognizer
 import androidx.annotation.RequiresApi
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import timber.log.Timber
 import java.util.concurrent.Executors
 import javax.inject.Inject
+import timber.log.Timber
 
 interface LanguageSupportCheckerDelegate {
     fun checkRecognitionSupport(context: Context, languageTag: String, callback: RecognitionSupportCallback)
