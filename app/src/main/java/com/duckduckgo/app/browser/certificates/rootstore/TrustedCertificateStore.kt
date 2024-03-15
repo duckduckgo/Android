@@ -69,17 +69,17 @@ class TrustedCertificateStoreImpl(
             validate(sslCertificate.toX509Certificate(), it.certificate())
             // then check if root
             if (it.type() == CertificateType.Root) {
-                Timber.d("Certificate Trusted anchor validated!")
+                Timber.d("SSL Certificate: Certificate Trusted anchor validated!")
                 return
             }
-            Timber.d("Intermediate certificate validated!")
+            Timber.d("SSL Certificate: Intermediate certificate validated!")
             validateSslCertificateChainInternal(SslCertificate(it.certificate() as X509Certificate))
 
             // certificate chain validated
             return
         }
 
-        throw CertificateException("Unable to find certificate trusted anchor")
+        throw CertificateException("SSL Certificate: Unable to find certificate trusted anchor")
     }
 
     @Throws(CertificateExpiredException::class, CertificateNotYetValidException::class)

@@ -19,6 +19,8 @@ package com.duckduckgo.app.browser
 import android.graphics.Bitmap
 import android.net.Uri
 import android.net.http.SslError
+import android.net.http.SslError.SSL_EXPIRED
+import android.net.http.SslError.SSL_IDMISMATCH
 import android.net.http.SslError.SSL_UNTRUSTED
 import android.webkit.HttpAuthHandler
 import android.webkit.RenderProcessGoneDetail
@@ -34,6 +36,10 @@ import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anrs.api.CrashLogger
+import com.duckduckgo.app.browser.SSLErrorType.EXPIRED
+import com.duckduckgo.app.browser.SSLErrorType.GENERIC
+import com.duckduckgo.app.browser.SSLErrorType.UNTRUSTED_HOST
+import com.duckduckgo.app.browser.SSLErrorType.WRONG_HOST
 import com.duckduckgo.app.browser.WebViewErrorResponse.BAD_URL
 import com.duckduckgo.app.browser.WebViewErrorResponse.CONNECTION
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
@@ -68,6 +74,7 @@ import java.net.URI
 import javax.inject.Inject
 import kotlinx.coroutines.*
 import timber.log.Timber
+import kotlin.reflect.jvm.internal.impl.types.ErrorType
 
 private const val ABOUT_BLANK = "about:blank"
 
@@ -312,7 +319,10 @@ class BrowserWebViewClient @Inject constructor(
         loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
     }
 
-    private fun handleMediaPlayback(webView: WebView, url: String) {
+    private fun handleMediaPlayback(
+        webView: WebView,
+        url: String
+    ) {
         // The default value for this flag is `true`.
         webView.settings.mediaPlaybackRequiresUserGesture = mediaPlayback.doesMediaPlaybackRequireUserGestureForUrl(url)
     }
@@ -421,22 +431,34 @@ class BrowserWebViewClient @Inject constructor(
         handler: SslErrorHandler,
         error: SslError,
     ) {
-        Timber.d("SSL Certificate: onReceivedSslError $error")
-
         var trusted: CertificateValidationState = CertificateValidationState.UntrustedChain
 
         when (error.primaryError) {
             SSL_UNTRUSTED -> {
-                Timber.d("The certificate authority ${error.certificate.issuedBy.dName} is not trusted")
+                Timber.d("SSL Certificate: The certificate authority ${error.certificate.issuedBy.dName} is not trusted")
                 trusted = trustedCertificateStore.validateSslCertificateChain(error.certificate)
             }
 
-            else -> Timber.d("SSL error ${error.primaryError}")
+            else -> Timber.d("SSL Certificate: SSL error ${error.primaryError}")
         }
 
-        Timber.d("The certificate authority validation result is $trusted")
-        handler.proceed()
-        // if (trusted is CertificateValidationState.TrustedChain) handler.proceed() else super.onReceivedSslError(view, handler, error)
+        Timber.d("SSL Certificate: The certificate authority validation result is $trusted")
+        if (trusted is CertificateValidationState.TrustedChain) {
+            handler.proceed()
+        } else {
+            webViewClientListener?.onReceivedSslError(handler, parseSSlErrorResponse(error))
+        }
+    }
+
+    private fun parseSSlErrorResponse(sslError: SslError): SslErrorResponse {
+        Timber.d("SSL Certificate: parseSSlErrorResponse ${sslError.primaryError}")
+        val sslErrorType = when (sslError.primaryError) {
+            SSL_UNTRUSTED -> UNTRUSTED_HOST
+            SSL_EXPIRED -> EXPIRED
+            SSL_IDMISMATCH -> WRONG_HOST
+            else -> GENERIC
+        }
+        return SslErrorResponse(sslError, sslErrorType)
     }
 
     private fun requestAuthentication(
@@ -484,6 +506,7 @@ class BrowserWebViewClient @Inject constructor(
     }
 
     private fun parseErrorResponse(error: WebResourceError): WebViewErrorResponse {
+        Timber.d("SSL Certificate: parseErrorResponse ${error.errorCode} ${error.description}")
         return if (error.errorCode == ERROR_HOST_LOOKUP) {
             when (error.description) {
                 "net::ERR_NAME_NOT_RESOLVED" -> BAD_URL
@@ -556,4 +579,12 @@ enum class WebViewErrorResponse(@StringRes val errorId: Int) {
     OMITTED(R.string.webViewErrorNoConnection),
     LOADING(R.string.webViewErrorNoConnection),
     SSL_PROTOCOL_ERROR(R.string.webViewErrorSslProtocol),
+}
+
+data class SslErrorResponse(val error: SslError, val errorType: SSLErrorType)
+enum class SSLErrorType(@StringRes val errorId: Int) {
+    EXPIRED(R.string.sslErrorExpiredMessage),
+    WRONG_HOST(R.string.sslErrorWrongHostMessage),
+    UNTRUSTED_HOST(R.string.sslErrorUntrustedMessage),
+    GENERIC(R.string.sslErrorUntrustedMessage),
 }
