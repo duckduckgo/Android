@@ -22,11 +22,13 @@ import android.os.Message
 import android.print.PrintAttributes.MediaSize
 import android.view.View
 import android.webkit.PermissionRequest
+import android.webkit.SslErrorHandler
 import android.webkit.ValueCallback
 import com.duckduckgo.app.browser.BrowserTabViewModel.FileChooserRequestedParams
 import com.duckduckgo.app.browser.BrowserTabViewModel.LocationPermission
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.NonHttpAppLink
+import com.duckduckgo.app.browser.SslErrorResponse
 import com.duckduckgo.app.browser.WebViewErrorResponse
 import com.duckduckgo.app.browser.history.NavigationHistoryEntry
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
@@ -229,4 +231,5 @@ sealed class Command {
     object ScreenUnlock : Command()
     data object ShowFaviconsPrompt : Command()
     data class SetBrowserBackground(val backgroundRes: Int) : Command()
+    data class ShowSSLError(val handler: SslErrorHandler, val error: SslErrorResponse): Command()
 }

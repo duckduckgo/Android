@@ -64,6 +64,11 @@
         layout="@layout/include_new_browser_tab"
         android:visibility="gone"/>
 
+    <include
+        android:id="@+id/includeSSLErrorView"
+        layout="@layout/include_ssl_error_view"
+        android:visibility="gone"/>
+
     <FrameLayout
         android:id="@+id/browserLayout"
         android:layout_width="match_parent"
@@ -91,6 +96,7 @@
                         android:id="@+id/includeErrorView"
                         layout="@layout/include_error_view"
                         android:visibility="gone"/>
+
             </FrameLayout>
         </com.duckduckgo.app.browser.ui.ScrollAwareRefreshLayout>
 
