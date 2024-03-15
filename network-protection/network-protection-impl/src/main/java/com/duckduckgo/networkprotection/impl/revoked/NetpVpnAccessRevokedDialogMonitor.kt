@@ -22,8 +22,8 @@ import com.duckduckgo.browser.api.ActivityLifecycleCallbacks
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
-import com.duckduckgo.networkprotection.impl.waitlist.NetPRemoteFeature
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
+import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -39,9 +39,9 @@ class NetpVpnAccessRevokedDialogMonitor @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val betaEndStore: BetaEndStore,
     private val netPWaitlistRepository: NetPWaitlistRepository,
-    private val netPRemoteFeature: NetPRemoteFeature,
     private val betaEndedDialog: BetaEndedDialog,
     private val accessRevokedDialog: AccessRevokedDialog,
+    private val subscriptions: Subscriptions,
 ) : ActivityLifecycleCallbacks {
 
     init {
@@ -73,8 +73,8 @@ class NetpVpnAccessRevokedDialogMonitor @Inject constructor(
         betaEndStore.storeUserParticipatedInBeta(netPWaitlistRepository.getAuthenticationToken() != null)
     }
 
-    private fun shouldShowDialog(): Boolean {
-        // Show dialog only if the beta is closed, user participated in beta AND dialog hasn't been shown before to the user.
-        return !betaEndStore.betaEndDialogShown() && !netPRemoteFeature.waitlistBetaActive().isEnabled() && betaEndStore.didParticipateInBeta()
+    private suspend fun shouldShowDialog(): Boolean {
+        // Show dialog only if the pro is launched, user participated in beta AND dialog hasn't been shown before to the user.
+        return !betaEndStore.betaEndDialogShown() && subscriptions.isEnabled() && betaEndStore.didParticipateInBeta()
     }
 }

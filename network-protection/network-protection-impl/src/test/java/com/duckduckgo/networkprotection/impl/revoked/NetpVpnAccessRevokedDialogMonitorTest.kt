@@ -17,11 +17,9 @@
 package com.duckduckgo.networkprotection.impl.revoked
 
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
-import com.duckduckgo.networkprotection.impl.waitlist.FakeNetPRemoteFeatureFactory
-import com.duckduckgo.networkprotection.impl.waitlist.NetPRemoteFeature
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
+import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -53,8 +51,10 @@ class NetpVpnAccessRevokedDialogMonitorTest {
     @Mock
     private lateinit var accessRevokedDialog: AccessRevokedDialog
 
+    @Mock
+    private lateinit var subscriptions: Subscriptions
+
     private lateinit var netpVpnAccessRevokedDialogMonitor: NetpVpnAccessRevokedDialogMonitor
-    private val netPRemoteFeature: NetPRemoteFeature = FakeNetPRemoteFeatureFactory.create()
 
     @Before
     fun setUp() {
@@ -66,9 +66,9 @@ class NetpVpnAccessRevokedDialogMonitorTest {
             coroutineTestRule.testDispatcherProvider,
             betaEndStore,
             netPWaitlistRepository,
-            netPRemoteFeature,
             betaEndedDialog,
             accessRevokedDialog,
+            subscriptions,
         )
     }
 
@@ -78,11 +78,11 @@ class NetpVpnAccessRevokedDialogMonitorTest {
     }
 
     @Test
-    fun whenUserParticipatedInBetaAndWaitlistInactiveAndDialogNotShownThenShowBetaEndDialog() = runTest {
+    fun whenUserParticipatedInBetaAndPrivacyProInactiveAndDialogNotShownThenShowBetaEndDialog() = runTest {
         whenever(networkProtectionRepository.vpnAccessRevoked).thenReturn(true)
         whenever(betaEndStore.betaEndDialogShown()).thenReturn(false)
         whenever(betaEndStore.didParticipateInBeta()).thenReturn(true)
-        netPRemoteFeature.waitlistBetaActive().setEnabled(Toggle.State(enable = false))
+        whenever(subscriptions.isEnabled()).thenReturn(true)
 
         netpVpnAccessRevokedDialogMonitor.onActivityResumed(mock())
 
@@ -97,7 +97,7 @@ class NetpVpnAccessRevokedDialogMonitorTest {
         whenever(networkProtectionRepository.vpnAccessRevoked).thenReturn(false)
         whenever(betaEndStore.betaEndDialogShown()).thenReturn(true)
         whenever(betaEndStore.didParticipateInBeta()).thenReturn(true)
-        netPRemoteFeature.waitlistBetaActive().setEnabled(Toggle.State(enable = false))
+        whenever(subscriptions.isEnabled()).thenReturn(true)
 
         netpVpnAccessRevokedDialogMonitor.onActivityResumed(mock())
 
@@ -106,11 +106,11 @@ class NetpVpnAccessRevokedDialogMonitorTest {
     }
 
     @Test
-    fun whenWaitlistStillActiveThenDontShowAnyDialog() = runTest {
+    fun whenPrivacyProNotActiveThenDontShowAnyDialog() = runTest {
         whenever(networkProtectionRepository.vpnAccessRevoked).thenReturn(false)
         whenever(betaEndStore.betaEndDialogShown()).thenReturn(false)
         whenever(betaEndStore.didParticipateInBeta()).thenReturn(true)
-        netPRemoteFeature.waitlistBetaActive().setEnabled(Toggle.State(enable = true))
+        whenever(subscriptions.isEnabled()).thenReturn(false)
 
         netpVpnAccessRevokedDialogMonitor.onActivityResumed(mock())
 
@@ -123,7 +123,7 @@ class NetpVpnAccessRevokedDialogMonitorTest {
         whenever(networkProtectionRepository.vpnAccessRevoked).thenReturn(false)
         whenever(betaEndStore.betaEndDialogShown()).thenReturn(false)
         whenever(betaEndStore.didParticipateInBeta()).thenReturn(false)
-        netPRemoteFeature.waitlistBetaActive().setEnabled(Toggle.State(enable = false))
+        whenever(subscriptions.isEnabled()).thenReturn(true)
 
         netpVpnAccessRevokedDialogMonitor.onActivityResumed(mock())
 
@@ -132,11 +132,11 @@ class NetpVpnAccessRevokedDialogMonitorTest {
     }
 
     @Test
-    fun whenUserNotInBetaAndVPNAccessRevokedThenShowAccessRevokedDialog() {
+    fun whenUserNotInBetaAndVPNAccessRevokedThenShowAccessRevokedDialog() = runTest {
         whenever(networkProtectionRepository.vpnAccessRevoked).thenReturn(true)
         whenever(betaEndStore.betaEndDialogShown()).thenReturn(false)
         whenever(betaEndStore.didParticipateInBeta()).thenReturn(false)
-        netPRemoteFeature.waitlistBetaActive().setEnabled(Toggle.State(enable = false))
+        whenever(subscriptions.isEnabled()).thenReturn(true)
 
         netpVpnAccessRevokedDialogMonitor.onActivityResumed(mock())
 
