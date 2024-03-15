@@ -25,6 +25,7 @@ import android.speech.SpeechRecognizer.createOnDeviceSpeechRecognizer
 import androidx.annotation.RequiresApi
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import timber.log.Timber
 import java.util.concurrent.Executors
 import javax.inject.Inject
 
@@ -36,10 +37,14 @@ interface LanguageSupportCheckerDelegate {
 class RealLanguageSupportCheckerDelegate @Inject constructor() : LanguageSupportCheckerDelegate {
     @RequiresApi(VERSION_CODES.TIRAMISU)
     override fun checkRecognitionSupport(context: Context, languageTag: String, callback: RecognitionSupportCallback) {
-        createOnDeviceSpeechRecognizer(context).checkRecognitionSupport(
-            Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH),
-            Executors.newSingleThreadExecutor(),
-            callback,
-        )
+        runCatching {
+            createOnDeviceSpeechRecognizer(context).checkRecognitionSupport(
+                Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH),
+                Executors.newSingleThreadExecutor(),
+                callback,
+            )
+        }.onFailure {
+            Timber.e(it, "Failed to check voice recognition support")
+        }
     }
 }
