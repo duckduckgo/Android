@@ -759,8 +759,7 @@ class BrowserTabFragment :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        Timber.d("TAG_CUSTOM_TAB_IMPL tabId: $tabId")
+        Timber.d("onCreate called for tabId=$tabId")
 
         removeDaxDialogFromActivity()
         renderer = BrowserTabFragmentRenderer()
