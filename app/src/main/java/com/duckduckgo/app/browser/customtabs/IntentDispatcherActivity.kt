@@ -18,62 +18,62 @@ package com.duckduckgo.app.browser.customtabs
 
 import android.content.Intent
 import android.os.Bundle
-import android.provider.Browser
-import androidx.browser.customtabs.CustomTabsIntent
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
-import com.duckduckgo.app.global.intentText
+import com.duckduckgo.app.browser.customtabs.IntentDispatcherViewModel.ViewState
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
-import javax.inject.Inject
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
 class IntentDispatcherActivity : DuckDuckGoActivity() {
 
-    @Inject lateinit var customTabDetector: CustomTabDetector
+    private val viewModel: IntentDispatcherViewModel by bindViewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        Timber.d("TAG_CUSTOM_TAB_IMPL onCreate called in IntentDispatcherActivity -- ${System.identityHashCode(this)}")
+        Timber.d("onCreate called with intent $intent")
 
-        customTabDetector.setCustomTab(false)
+        viewModel.viewState.flowWithLifecycle(lifecycle, Lifecycle.State.CREATED).onEach {
+            dispatch(it)
+        }.launchIn(lifecycleScope)
 
-        if (intent?.hasExtra(CustomTabsIntent.EXTRA_SESSION) == true) {
-            Timber.d("TAG_CUSTOM_TAB_IMPL new intent has session, show custom tab")
-            Timber.d("TAG_CUSTOM_TAB_IMPL intent: $intent -- extras: ${intent.extras}")
-            val pairs = intent.getBundleExtra(Browser.EXTRA_HEADERS)
-            pairs?.keySet()?.forEach { key ->
-                val header = pairs.getString(key)
-                Timber.d("TAG_CUSTOM_TAB_IMPL header: $header -- key: $key")
-            }
-            showCustomTab()
+        viewModel.onIntentReceived(intent)
+    }
+
+    private fun dispatch(viewState: ViewState) {
+        if (viewState.customTabRequested) {
+            showCustomTab(viewState.intentText, viewState.toolbarColor)
         } else {
-            Timber.d("TAG_CUSTOM_TAB_IMPL show browser activity")
-            showBrowserActivity()
+            showBrowserActivity(viewState.intentText)
         }
     }
 
-    private fun showCustomTab() {
+    private fun showCustomTab(intentText: String?, toolbarColor: Int) {
         // As customizations we only support the toolbar color at the moment.
         startActivity(
             CustomTabActivity.intent(
                 context = this,
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK and Intent.FLAG_ACTIVITY_CLEAR_TASK and Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS,
-                text = intent.intentText,
-                toolbarColor = intent.getIntExtra(CustomTabsIntent.EXTRA_TOOLBAR_COLOR, 0),
+                text = intentText,
+                toolbarColor = toolbarColor,
             ),
         )
 
         finish()
     }
 
-    private fun showBrowserActivity() {
+    private fun showBrowserActivity(intentText: String?) {
         startActivity(
             BrowserActivity.intent(
                 context = this,
-                queryExtra = intent.intentText,
+                queryExtra = intentText,
             ),
         )
 

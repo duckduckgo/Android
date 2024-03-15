@@ -52,7 +52,7 @@ class CustomTabActivity : DuckDuckGoActivity() {
 
         Timber.d("onCreate called with url=$url and toolbar color=$toolbarColor")
 
-        viewModel.viewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach {
+        viewModel.viewState.flowWithLifecycle(lifecycle, Lifecycle.State.CREATED).onEach {
             renderView(it)
         }.launchIn(lifecycleScope)
 
