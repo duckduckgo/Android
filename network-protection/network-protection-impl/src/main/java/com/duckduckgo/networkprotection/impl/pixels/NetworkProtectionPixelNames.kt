@@ -122,4 +122,8 @@ enum class NetworkProtectionPixelNames(
         "m_netp_ev_failure_recovery_completed_new_tun_address_server_healthy_d",
         enqueue = true,
     ),
+    NETP_ACCESS_REVOKED_DIALOG_SHOWN("m_netp_ev_vpn_access_revoked_dialog_shown_c", enqueue = true),
+    NETP_ACCESS_REVOKED_DIALOG_SHOWN_DAILY("m._netp_ev_vpn_access_revoked_dialog_shown_d", enqueue = true),
+    NETP_PRIVACY_PRO_PROMOTION_DIALOG_SHOWN("m_netp_ev_privacy_pro_promotion_dialog_shown_c", enqueue = true),
+    NETP_PRIVACY_PRO_PROMOTION_DIALOG_SHOWN_DAILY("m_netp_ev_privacy_pro_promotion_dialog_shown_d", enqueue = true)
 }

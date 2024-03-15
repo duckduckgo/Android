@@ -24,6 +24,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.networkprotection.impl.R
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionScreenNoParams
 import com.squareup.anvil.annotations.ContributesBinding
@@ -41,6 +42,7 @@ class RealAccessRevokedDialog @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val networkProtectionRepository: NetworkProtectionRepository,
     private val globalActivityStarter: GlobalActivityStarter,
+    private val networkProtectionPixels: NetworkProtectionPixels,
 ) : AccessRevokedDialog {
 
     private var boundActivity: Activity? = null
@@ -69,6 +71,8 @@ class RealAccessRevokedDialog @Inject constructor(
                 },
             )
             .show()
+
+        networkProtectionPixels.reportAccessRevokedDialogShown()
     }
 
     private fun resetVpnAccessRevokedState() {

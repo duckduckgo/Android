@@ -23,6 +23,7 @@ import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder.EventListener
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.impl.R.string
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -39,6 +40,7 @@ class RealBetaEndedDialog @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val networkProtectionRepository: NetworkProtectionRepository,
     private val betaEndStore: BetaEndStore,
+    private val networkProtectionPixels: NetworkProtectionPixels,
 ) : BetaEndedDialog {
 
     private var boundActivity: Activity? = null
@@ -62,6 +64,8 @@ class RealBetaEndedDialog @Inject constructor(
                 },
             )
             .show()
+
+        networkProtectionPixels.reportPrivacyProPromotionDialogShown()
     }
 
     private fun resetVpnAccessRevokedState() {
