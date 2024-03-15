@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.net.Uri
 import android.net.http.SslCertificate
+import android.net.http.SslError
 import android.os.Message
 import android.print.PrintAttributes
 import android.provider.MediaStore
@@ -30,6 +31,7 @@ import android.view.View
 import android.webkit.GeolocationPermissions
 import android.webkit.MimeTypeMap
 import android.webkit.PermissionRequest
+import android.webkit.SslErrorHandler
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient.FileChooserParams
 import android.webkit.WebView
@@ -1699,6 +1701,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun onCertificateReceived(certificate: SslCertificate?) {
+        Timber.i("Shield: onCertificateReceived $certificate")
         site?.certificate = certificate
     }
 
@@ -1738,6 +1741,15 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun getSite(): Site? = site
+    override fun onReceivedSslError(
+        handler: SslErrorHandler,
+        errorResponse: SslErrorResponse
+    ) {
+        site?.onSSLCertificateErrorDetected(errorResponse.error)
+        browserViewState.value =
+            currentBrowserViewState().copy(showPrivacyShield = false, showDaxIcon = true, showSearchIcon = false)
+        command.postValue(ShowSSLError(handler, errorResponse))
+    }
 
     override fun showFileChooser(
         filePathCallback: ValueCallback<Array<Uri>>,
@@ -1752,24 +1764,33 @@ class BrowserTabViewModel @Inject constructor(
                 when {
                     acceptsOnly("image/", fileChooserParams.acceptTypes) && cameraHardwareAvailable ->
                         ShowImageCamera(filePathCallback, fileChooserRequestedParams)
+
                     acceptsOnly("video/", fileChooserParams.acceptTypes) && cameraHardwareAvailable ->
                         ShowVideoCamera(filePathCallback, fileChooserRequestedParams)
+
                     acceptsOnly("audio/", fileChooserParams.acceptTypes) ->
                         ShowSoundRecorder(filePathCallback, fileChooserRequestedParams)
+
                     else ->
                         ShowFileChooser(filePathCallback, fileChooserRequestedParams)
                 }
             }
+
             fileChooserParams.acceptTypes.any { it.startsWith("image/") && cameraHardwareAvailable } ->
                 ShowExistingImageOrCameraChooser(filePathCallback, fileChooserRequestedParams, MediaStore.ACTION_IMAGE_CAPTURE)
+
             fileChooserParams.acceptTypes.any { it.startsWith("video/") && cameraHardwareAvailable } ->
                 ShowExistingImageOrCameraChooser(filePathCallback, fileChooserRequestedParams, MediaStore.ACTION_VIDEO_CAPTURE)
+
             else ->
                 ShowFileChooser(filePathCallback, fileChooserRequestedParams)
         }
     }
 
-    private fun acceptsOnly(type: String, acceptTypes: Array<String>): Boolean {
+    private fun acceptsOnly(
+        type: String,
+        acceptTypes: Array<String>
+    ): Boolean {
         return acceptTypes.filter { it.startsWith(type) }.size == acceptTypes.size
     }
 

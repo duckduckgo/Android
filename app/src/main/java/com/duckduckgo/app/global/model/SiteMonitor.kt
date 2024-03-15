@@ -18,6 +18,7 @@ package com.duckduckgo.app.global.model
 
 import android.net.Uri
 import android.net.http.SslCertificate
+import android.net.http.SslError
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.UriString
@@ -72,6 +73,9 @@ class SiteMonitor(
     override var entity: Entity? = null
 
     override var certificate: SslCertificate? = null
+    // might need to do a copyonwritearraylist with a data class of domain/sslerror
+    // navigation seems to be an issue and the ssl error is removed
+    override var certificateError: SslError? = null
 
     override val trackingEvents = CopyOnWriteArrayList<TrackingEvent>()
     override val errorCodeEvents = CopyOnWriteArrayList<String>()
@@ -134,6 +138,7 @@ class SiteMonitor(
     override fun resetErrors() {
         errorCodeEvents.clear()
         httpErrorCodeEvents.clear()
+        certificateError = null
     }
 
     override fun surrogateDetected(surrogate: SurrogateResponse) {
@@ -152,6 +157,11 @@ class SiteMonitor(
         httpErrorCodeEvents.add(errorCode)
     }
 
+    override fun onSSLCertificateErrorDetected(sslError: SslError) {
+        Timber.i("Shield: onSSLCertificateErrorDetected $sslError")
+        certificateError = sslError
+    }
+
     override fun privacyProtection(): PrivacyShield {
         userAllowList = domain?.let { isAllowListed(it) } ?: false
         if (userAllowList || !isHttps) return UNPROTECTED
@@ -160,6 +170,11 @@ class SiteMonitor(
             Timber.i("Shield: not fullSiteDetailsAvailable for $domain")
             Timber.i("Shield: entity is ${entity?.name} for $domain")
             return UNKNOWN
+        }
+
+        if (certificateError != null){
+            Timber.i("Shield: site has certificate error $certificateError")
+            return UNPROTECTED
         }
 
         Timber.i("Shield: isMajor ${entity?.isMajor} prev ${entity?.prevalence} for $domain")

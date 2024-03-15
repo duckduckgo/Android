@@ -41,6 +41,7 @@ import android.view.*
 import android.view.View.*
 import android.view.inputmethod.EditorInfo
 import android.webkit.PermissionRequest
+import android.webkit.SslErrorHandler
 import android.webkit.URLUtil
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient.FileChooserParams
@@ -236,6 +237,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
+import com.duckduckgo.common.utils.extensions.applyBoldSpanTo
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -284,6 +286,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import org.json.JSONObject
 import timber.log.Timber
+import java.util.Locale
 
 @InjectWith(FragmentScope::class)
 class BrowserTabFragment :
@@ -533,6 +536,9 @@ class BrowserTabFragment :
     private val errorView
         get() = binding.includeErrorView
 
+    private val sslErrorView
+        get() = binding.includeSSLErrorView
+
     private val daxDialogCta
         get() = binding.includeNewBrowserTab.includeDaxDialogCta
 
@@ -561,10 +567,12 @@ class BrowserTabFragment :
                 browserAutofill.inContextEmailProtectionFlowFinished()
                 inContextEmailProtectionShowing = false
             }
+
             EmailProtectionInContextSignUpScreenResult.CANCELLED -> {
                 browserAutofill.inContextEmailProtectionFlowFinished()
                 inContextEmailProtectionShowing = false
             }
+
             else -> {
                 // we don't set inContextEmailProtectionShowing to false here because the system is cancelling it
                 // this is likely because of an external link being clicked (e.g., the email protection verification link)
@@ -597,7 +605,7 @@ class BrowserTabFragment :
     }
 
     private val autoconsentCallback = object : AutoconsentCallback {
-        override fun onFirstPopUpHandled() { }
+        override fun onFirstPopUpHandled() {}
 
         override fun onPopUpHandled(isCosmetic: Boolean) {
             launch {
@@ -760,6 +768,7 @@ class BrowserTabFragment :
                     userEnteredQuery(it.result)
                     resumeWebView()
                 }
+
                 is VoiceSearchLauncher.Event.SearchCancelled -> resumeWebView()
                 is VoiceSearchLauncher.Event.VoiceSearchDisabled -> viewModel.voiceSearchDisabled()
             }
@@ -774,6 +783,7 @@ class BrowserTabFragment :
                         externalCameraLauncher.showPermissionRationaleDialog(activity, it.inputAction)
                     }
                 }
+
                 is NoMediaCaptured -> pendingUploadTask?.onReceiveValue(null)
                 is ErrorAccessingMediaApp -> {
                     pendingUploadTask?.onReceiveValue(null)
@@ -1077,6 +1087,7 @@ class BrowserTabFragment :
         webView?.onPause()
         webView?.hide()
         errorView.errorLayout.gone()
+        sslErrorView.errorLayout.gone()
     }
 
     private fun showBrowser() {
@@ -1086,9 +1097,13 @@ class BrowserTabFragment :
         webView?.show()
         webView?.onResume()
         errorView.errorLayout.gone()
+        sslErrorView.errorLayout.gone()
     }
 
-    private fun showError(errorType: WebViewErrorResponse, url: String?) {
+    private fun showError(
+        errorType: WebViewErrorResponse,
+        url: String?
+    ) {
         webViewContainer.gone()
         newBrowserTab.newTabLayout.gone()
         omnibar.appBarLayout.setExpanded(true)
@@ -1102,6 +1117,38 @@ class BrowserTabFragment :
             errorView.yetiIcon?.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_yeti_dark)
         }
         errorView.errorLayout.show()
+    }
+
+    private fun showSSLError(
+        handler: SslErrorHandler,
+        errorResponse: SslErrorResponse
+    ) {
+        webViewContainer.gone()
+        newBrowserTab.newTabLayout.gone()
+        webView?.hide()
+        errorView.errorLayout.gone()
+
+        sslErrorView.sslErrorHeadline.text = getString(R.string.sslErrorHeadline, errorResponse.error.url).applyBoldSpanTo(errorResponse.error.url)
+        sslErrorView.sslErrorExpandedHeadline.text =
+            getString(errorResponse.errorType.errorId, errorResponse.error.url, errorResponse.error.url).applyBoldSpanTo(errorResponse.error.url)
+
+        sslErrorView.sslErrorAcceptCta.text = getString(R.string.sslErrorExpandedCTA).html(requireContext())
+        sslErrorView.sslErrorAcceptCta.setOnClickListener {
+            handler.proceed()
+            showBrowser()
+        }
+        sslErrorView.sslErrorLeaveSiteCTA.setOnClickListener {
+            handler.cancel()
+            showBrowser()
+        }
+        sslErrorView.sslErrorAdvancedCTA.setOnClickListener {
+            if (sslErrorView.sslErrorAdvancedGroup.isVisible){
+                sslErrorView.sslErrorAdvancedGroup.gone()
+            } else {
+                sslErrorView.sslErrorAdvancedGroup.show()
+            }
+        }
+        sslErrorView.errorLayout.show()
     }
 
     fun submitQuery(query: String) {
@@ -1135,11 +1182,17 @@ class BrowserTabFragment :
         acceptGeneratedPassword(originalUrl)
     }
 
-    override fun onUseEmailProtectionPrivateAlias(originalUrl: String, duckAddress: String) {
+    override fun onUseEmailProtectionPrivateAlias(
+        originalUrl: String,
+        duckAddress: String
+    ) {
         viewModel.usePrivateDuckAddress(originalUrl, duckAddress)
     }
 
-    override fun onUseEmailProtectionPersonalAddress(originalUrl: String, duckAddress: String) {
+    override fun onUseEmailProtectionPersonalAddress(
+        originalUrl: String,
+        duckAddress: String
+    ) {
         viewModel.usePersonalDuckAddress(originalUrl, duckAddress)
     }
 
@@ -1165,7 +1218,10 @@ class BrowserTabFragment :
         viewModel.returnNoCredentialsWithPage(originalUrl)
     }
 
-    override fun onShareCredentialsForAutofill(originalUrl: String, selectedCredentials: LoginCredentials) {
+    override fun onShareCredentialsForAutofill(
+        originalUrl: String,
+        selectedCredentials: LoginCredentials
+    ) {
         injectAutofillCredentials(originalUrl, selectedCredentials)
     }
 
@@ -1203,12 +1259,14 @@ class BrowserTabFragment :
             ) {
                 viewModel.onDeleteFavoriteSnackbarDismissed(it)
             }
+
             is Command.DeleteSavedSiteConfirmation -> confirmDeleteSavedSite(
                 it.savedSite,
                 getString(string.bookmarkDeleteConfirmationMessage, it.savedSite.title).html(requireContext()),
             ) {
                 viewModel.onDeleteSavedSiteSnackbarDismissed(it)
             }
+
             is Command.ShowFireproofWebSiteConfirmation -> fireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.DeleteFireproofConfirmation -> removeFireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.ShowPrivacyProtectionEnabledConfirmation -> privacyProtectionEnabledConfirmation(it.domain)
@@ -1387,6 +1445,7 @@ class BrowserTabFragment :
             is Command.ScreenLock -> screenLock(it.data)
             is Command.ScreenUnlock -> screenUnlock()
             is Command.ShowFaviconsPrompt -> showFaviconsPrompt()
+            is Command.ShowSSLError -> showSSLError(it.handler, it.error)
             else -> {
                 // NO OP
             }
@@ -1866,7 +1925,10 @@ class BrowserTabFragment :
         pendingUploadTask?.onReceiveValue(uris)
     }
 
-    private fun showToast(@StringRes messageId: Int, length: Int = Toast.LENGTH_LONG) {
+    private fun showToast(
+        @StringRes messageId: Int,
+        length: Int = Toast.LENGTH_LONG
+    ) {
         Toast.makeText(context?.applicationContext, messageId, length).show()
     }
 
@@ -2086,6 +2148,7 @@ class BrowserTabFragment :
         webView?.let {
             it.webViewClient = webViewClient
             it.webChromeClient = webChromeClient
+            it.clearSslPreferences()
 
             it.settings.apply {
                 clientBrandHintProvider.setDefault(this)
@@ -2139,7 +2202,12 @@ class BrowserTabFragment :
             contentScopeScripts.register(
                 it,
                 object : JsMessageCallback() {
-                    override fun process(featureName: String, method: String, id: String?, data: JSONObject?) {
+                    override fun process(
+                        featureName: String,
+                        method: String,
+                        id: String?,
+                        data: JSONObject?
+                    ) {
                         viewModel.processJsCallbackMessage(featureName, method, id, data)
                     }
                 },
@@ -2473,7 +2541,11 @@ class BrowserTabFragment :
         addBookmarkDialog.deleteBookmarkListener = viewModel
     }
 
-    private fun confirmDeleteSavedSite(savedSite: SavedSite, message: Spanned, onDeleteSnackbarDismissed: (SavedSite) -> Unit) {
+    private fun confirmDeleteSavedSite(
+        savedSite: SavedSite,
+        message: Spanned,
+        onDeleteSnackbarDismissed: (SavedSite) -> Unit
+    ) {
         binding.rootView.makeSnackbarWithNoBottomInset(
             message,
             Snackbar.LENGTH_LONG,
@@ -2530,7 +2602,10 @@ class BrowserTabFragment :
         ).show()
     }
 
-    private fun launchSharePageChooser(url: String, title: String) {
+    private fun launchSharePageChooser(
+        url: String,
+        title: String
+    ) {
         val intent = Intent(Intent.ACTION_SEND).also {
             it.type = "text/plain"
             it.putExtra(Intent.EXTRA_TEXT, url)
@@ -2544,7 +2619,10 @@ class BrowserTabFragment :
         }
     }
 
-    private fun launchSharePromoRMFPageChooser(url: String, shareTitle: String) {
+    private fun launchSharePromoRMFPageChooser(
+        url: String,
+        shareTitle: String
+    ) {
         val share = Intent().apply {
             action = Intent.ACTION_SEND
             putExtra(Intent.EXTRA_TEXT, url)
@@ -2773,14 +2851,21 @@ class BrowserTabFragment :
         showDialogHidingPrevious(downloadConfirmationFragment, DOWNLOAD_CONFIRMATION_TAG)
     }
 
-    private fun launchFilePicker(filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: FileChooserRequestedParams) {
+    private fun launchFilePicker(
+        filePathCallback: ValueCallback<Array<Uri>>,
+        fileChooserParams: FileChooserRequestedParams
+    ) {
         pendingUploadTask = filePathCallback
         val canChooseMultipleFiles = fileChooserParams.filePickingMode == FileChooserParams.MODE_OPEN_MULTIPLE
         val intent = fileChooserIntentBuilder.intent(fileChooserParams.acceptMimeTypes.toTypedArray(), canChooseMultipleFiles)
         startActivityForResult(intent, REQUEST_CODE_CHOOSE_FILE)
     }
 
-    private fun launchCameraCapture(filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: FileChooserRequestedParams, inputAction: String) {
+    private fun launchCameraCapture(
+        filePathCallback: ValueCallback<Array<Uri>>,
+        fileChooserParams: FileChooserRequestedParams,
+        inputAction: String
+    ) {
         if (Intent(inputAction).resolveActivity(requireContext().packageManager) == null) {
             launchFilePicker(filePathCallback, fileChooserParams)
             return
@@ -3751,7 +3836,10 @@ class BrowserTabFragment :
             (!viewState.isEditing || omnibarInput.isNullOrEmpty()) && omnibar.omnibarTextInput.isDifferent(omnibarInput)
     }
 
-    private fun launchPrint(url: String, defaultMediaSize: PrintAttributes.MediaSize) {
+    private fun launchPrint(
+        url: String,
+        defaultMediaSize: PrintAttributes.MediaSize
+    ) {
         (activity?.getSystemService(Context.PRINT_SERVICE) as? PrintManager)?.let { printManager ->
             webView?.createPrintDocumentAdapter(url)?.let { printAdapter ->
                 printManager.print(
@@ -3807,7 +3895,10 @@ private class JsOrientationHandler {
      *
      * @return response data
      */
-    fun updateOrientation(data: JsCallbackData, browserTabFragment: BrowserTabFragment): JsCallbackData {
+    fun updateOrientation(
+        data: JsCallbackData,
+        browserTabFragment: BrowserTabFragment
+    ): JsCallbackData {
         val activity = browserTabFragment.activity
         val response = if (activity == null) {
             NO_ACTIVITY_ERROR
@@ -3833,7 +3924,10 @@ private class JsOrientationHandler {
         )
     }
 
-    private enum class JsToNativeScreenOrientationMap(val jsValue: String, val nativeValue: Int) {
+    private enum class JsToNativeScreenOrientationMap(
+        val jsValue: String,
+        val nativeValue: Int
+    ) {
         ANY("any", ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED),
         NATURAL("natural", ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED),
         LANDSCAPE("landscape", ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE),
