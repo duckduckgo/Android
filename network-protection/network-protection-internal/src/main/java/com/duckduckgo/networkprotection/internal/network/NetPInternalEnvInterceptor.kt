@@ -19,10 +19,10 @@ package com.duckduckgo.networkprotection.internal.network
 import com.duckduckgo.app.global.api.ApiInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.impl.configuration.NETP_ENVIRONMENT_URL
+import com.duckduckgo.networkprotection.internal.feature.NetPInternalFeatureToggles
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import logcat.logcat
-import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Interceptor
 import okhttp3.Interceptor.Chain
 import okhttp3.Response
@@ -32,18 +32,16 @@ import okhttp3.Response
     boundType = ApiInterceptorPlugin::class,
 )
 class NetPInternalEnvInterceptor @Inject constructor(
-    private val netPInternalEnvDataStore: NetPInternalEnvDataStore,
+    private val vpnInternalFeatures: NetPInternalFeatureToggles,
 ) : ApiInterceptorPlugin, Interceptor {
     override fun getInterceptor(): Interceptor = this
     override fun intercept(chain: Chain): Response {
-        val customEnvUrl = getCustomBaseUrl()
-        val useCustomUrl = netPInternalEnvDataStore.useNetpCustomEnvironmentUrl
         val encodedPath = chain.request().url.encodedPath
 
-        if (useCustomUrl && chain.request().url.toString().contains(NETP_ENVIRONMENT_URL)) {
+        if (vpnInternalFeatures.useVpnStagingEnvironment().isEnabled() && chain.request().url.toString().contains(NETP_ENVIRONMENT_URL)) {
             val newRequest = chain.request().newBuilder()
 
-            val changedUrl = customEnvUrl!! + encodedPath
+            val changedUrl = VPN_STAGING_ENV + encodedPath
             logcat { "NetP environment changed to $changedUrl" }
             newRequest.url(changedUrl)
             return chain.proceed(newRequest.build())
@@ -52,9 +50,7 @@ class NetPInternalEnvInterceptor @Inject constructor(
         return chain.proceed(chain.request())
     }
 
-    private fun getCustomBaseUrl(): String? {
-        return netPInternalEnvDataStore.netpCustomEnvironmentUrl?.let { url ->
-            return "https://${url.toHttpUrl().host}"
-        }
+    companion object {
+        private const val VPN_STAGING_ENV = "https://staging1.netp.duckduckgo.com"
     }
 }
