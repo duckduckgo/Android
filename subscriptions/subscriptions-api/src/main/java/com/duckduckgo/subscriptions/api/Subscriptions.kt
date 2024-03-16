@@ -37,6 +37,11 @@ interface Subscriptions {
      * @return `true` if the Privacy Pro product is enabled and live, `false` otherwise
      */
     suspend fun isEnabled(): Boolean
+
+    /**
+     * @return `true` if the Privacy Pro product is available for the user, `false` otherwise
+     */
+    suspend fun isEligible(): Boolean
 }
 
 enum class Product(val value: String) {

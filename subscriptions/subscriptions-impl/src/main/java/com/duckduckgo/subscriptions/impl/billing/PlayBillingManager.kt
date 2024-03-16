@@ -24,6 +24,7 @@ import com.android.billingclient.api.PurchaseHistoryRecord
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LIST_OF_PRODUCTS
 import com.duckduckgo.subscriptions.impl.billing.BillingError.ERROR
 import com.duckduckgo.subscriptions.impl.billing.BillingError.NETWORK_ERROR
@@ -62,8 +63,7 @@ interface PlayBillingManager {
 
     suspend fun launchBillingFlow(
         activity: Activity,
-        productDetails: ProductDetails,
-        offerToken: String,
+        planId: String,
         externalId: String,
     )
 }
@@ -154,13 +154,24 @@ class RealPlayBillingManager @Inject constructor(
 
     override suspend fun launchBillingFlow(
         activity: Activity,
-        productDetails: ProductDetails,
-        offerToken: String,
+        planId: String,
         externalId: String,
     ) {
         if (!billingClient.ready) {
             logcat { "Service not ready" }
             connect()
+        }
+
+        val productDetails = products.find { it.productId == BASIC_SUBSCRIPTION }
+
+        val offerToken = productDetails
+            ?.subscriptionOfferDetails
+            ?.find { it.basePlanId == planId }
+            ?.offerToken
+
+        if (productDetails == null || offerToken == null) {
+            _purchaseState.emit(Canceled)
+            return
         }
 
         val launchBillingFlowResult = billingClient.launchBillingFlow(

@@ -219,7 +219,7 @@ class SettingsViewModel @Inject constructor(
                 viewState.value = currentState.copy(
                     appTrackingProtectionOnboardingShown = appTrackingProtection.isOnboarded(),
                     appTrackingProtectionEnabled = isDeviceShieldEnabled,
-                    isPrivacyProEnabled = isPrivacyProEnabled,
+                    isPrivacyProEnabled = isPrivacyProEnabled && subscriptions.isEligible(),
                     networkProtectionEntryState = if (isPrivacyProEnabled) Hidden else currentState.networkProtectionEntryState,
                 )
                 delay(1_000)

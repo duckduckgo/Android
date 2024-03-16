@@ -11,6 +11,8 @@ import com.android.billingclient.api.PurchaseHistoryRecord
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LIST_OF_PRODUCTS
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN
 import com.duckduckgo.subscriptions.impl.billing.BillingError.BILLING_UNAVAILABLE
 import com.duckduckgo.subscriptions.impl.billing.BillingError.NETWORK_ERROR
 import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMethodInvocation.Connect
@@ -26,6 +28,7 @@ import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -96,19 +99,18 @@ class RealPlayBillingManagerTest {
         billingClientAdapter.methodInvocations.clear()
 
         val productDetails: ProductDetails = subject.products.single()
-        val offerToken = "offer_token"
         val externalId = "external_id"
 
         subject.purchaseState.test {
             expectNoEvents()
 
-            subject.launchBillingFlow(activity = mock(), productDetails, offerToken, externalId)
+            subject.launchBillingFlow(activity = mock(), planId = MONTHLY_PLAN, externalId)
 
             assertEquals(InProgress, awaitItem())
         }
 
         billingClientAdapter.verifyConnectInvoked()
-        billingClientAdapter.verifyLaunchBillingFlowInvoked(productDetails, offerToken, externalId)
+        billingClientAdapter.verifyLaunchBillingFlowInvoked(productDetails, offerToken = "monthly_offer_token", externalId)
     }
 
     @Test
@@ -118,20 +120,18 @@ class RealPlayBillingManagerTest {
         billingClientAdapter.launchBillingFlowResult = LaunchBillingFlowResult.Failure
         billingClientAdapter.methodInvocations.clear()
 
-        val productDetails: ProductDetails = mock()
-        val offerToken = "offer_token"
         val externalId = "external_id"
 
         subject.purchaseState.test {
             expectNoEvents()
 
-            subject.launchBillingFlow(activity = mock(), productDetails, offerToken, externalId)
+            subject.launchBillingFlow(activity = mock(), planId = MONTHLY_PLAN, externalId)
 
             assertEquals(Canceled, awaitItem())
         }
 
         billingClientAdapter.verifyConnectInvoked()
-        billingClientAdapter.verifyLaunchBillingFlowInvoked(productDetails, offerToken, externalId)
+        billingClientAdapter.verifyLaunchBillingFlowNotInvoked()
     }
 
     @Test
@@ -161,6 +161,26 @@ class RealPlayBillingManagerTest {
             runCurrent()
         }
     }
+
+    @Test
+    fun `when launch billing flow then retrieves ProductDetails for provided plan id`() = runTest {
+        processLifecycleOwner.currentState = RESUMED
+        billingClientAdapter.launchBillingFlowResult = LaunchBillingFlowResult.Success
+
+        val productDetails: ProductDetails = subject.products.single()
+        val offerDetails = productDetails.subscriptionOfferDetails!!.first()
+        val externalId = "external_id"
+
+        subject.purchaseState.test {
+            expectNoEvents()
+
+            subject.launchBillingFlow(activity = mock(), planId = offerDetails.basePlanId, externalId)
+
+            assertEquals(InProgress, awaitItem())
+        }
+
+        billingClientAdapter.verifyLaunchBillingFlowInvoked(productDetails, offerToken = offerDetails.offerToken, externalId)
+    }
 }
 
 class FakeBillingClientAdapter : BillingClientAdapter {
@@ -171,6 +191,18 @@ class FakeBillingClientAdapter : BillingClientAdapter {
     var subscriptions: List<ProductDetails> = listOf(
         mock {
             whenever(it.productId).thenReturn(BASIC_SUBSCRIPTION)
+
+            val monthlyOffer: ProductDetails.SubscriptionOfferDetails = mock { offer ->
+                whenever(offer.basePlanId).thenReturn(MONTHLY_PLAN)
+                whenever(offer.offerToken).thenReturn("monthly_offer_token")
+            }
+
+            val yearlyOffer: ProductDetails.SubscriptionOfferDetails = mock { offer ->
+                whenever(offer.basePlanId).thenReturn(YEARLY_PLAN)
+                whenever(offer.offerToken).thenReturn("yearly_offer_token")
+            }
+
+            whenever(it.subscriptionOfferDetails).thenReturn(listOf(monthlyOffer, yearlyOffer))
         },
     )
 
@@ -265,6 +297,10 @@ class FakeBillingClientAdapter : BillingClientAdapter {
                     invocation.externalId == externalId
             }
         assertEquals(times, invocations.count())
+    }
+
+    fun verifyLaunchBillingFlowNotInvoked() {
+        assertTrue(methodInvocations.filterIsInstance<LaunchBillingFlow>().isEmpty())
     }
 
     sealed class FakeMethodInvocation {
