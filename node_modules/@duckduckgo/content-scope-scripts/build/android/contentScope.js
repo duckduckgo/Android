@@ -745,7 +745,8 @@
         'harmfulApis',
         'webCompat',
         'windowsPermissionUsage',
-        'brokerProtection'
+        'brokerProtection',
+        'performanceMetrics'
     ]);
 
     /** @typedef {baseFeatures[number]|otherFeatures[number]} FeatureName */
@@ -757,7 +758,8 @@
         ],
         'apple-isolated': [
             'duckPlayer',
-            'brokerProtection'
+            'brokerProtection',
+            'performanceMetrics'
         ],
         android: [
             ...baseFeatures,
