@@ -26,10 +26,6 @@ enum class SubscriptionPixel(
     private val baseName: String,
     private val types: Set<PixelType>,
 ) {
-    SETTINGS_SUBSCRIPTION_SECTION_SHOWN(
-        baseName = "m_privacy-pro_app-settings_privacy-pro-section_impression",
-        type = COUNT,
-    ),
     SUBSCRIPTION_ACTIVE(
         baseName = "m_privacy-pro_app_subscription_active",
         type = DAILY,

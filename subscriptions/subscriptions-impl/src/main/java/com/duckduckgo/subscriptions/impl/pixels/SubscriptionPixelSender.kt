@@ -41,7 +41,6 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.RESTORE_USING_
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.RESTORE_USING_STORE_FAILURE_SUBSCRIPTION_NOT_FOUND
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.RESTORE_USING_STORE_SUCCESS
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SETTINGS_ADD_DEVICE_CLICK
-import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SETTINGS_SUBSCRIPTION_SECTION_SHOWN
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_ACTIVATED
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_ACTIVE
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_IS_ENABLED
@@ -52,7 +51,6 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 interface SubscriptionPixelSender {
-    fun reportSubscriptionSettingsSectionShown()
     fun reportSubscriptionActive()
     fun reportOfferScreenShown()
     fun reportOfferSubscribeClick()
@@ -88,9 +86,6 @@ interface SubscriptionPixelSender {
 class SubscriptionPixelSenderImpl @Inject constructor(
     private val pixelSender: Pixel,
 ) : SubscriptionPixelSender {
-
-    override fun reportSubscriptionSettingsSectionShown() =
-        fire(SETTINGS_SUBSCRIPTION_SECTION_SHOWN)
 
     override fun reportSubscriptionActive() =
         fire(SUBSCRIPTION_ACTIVE)
