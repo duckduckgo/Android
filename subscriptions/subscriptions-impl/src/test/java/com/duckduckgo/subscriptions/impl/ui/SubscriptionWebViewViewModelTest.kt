@@ -3,10 +3,14 @@ package com.duckduckgo.subscriptions.impl.ui
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.FakeToggleStore
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetPWaitlistInvitedScreenNoParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist
 import com.duckduckgo.subscriptions.impl.CurrentPurchase
 import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
+import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionOffer
 import com.duckduckgo.subscriptions.impl.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.impl.SubscriptionStatus.EXPIRED
@@ -45,6 +49,7 @@ class SubscriptionWebViewViewModelTest {
     private val networkProtectionWaitlist: NetworkProtectionWaitlist = mock()
     private val subscriptionsChecker: SubscriptionsChecker = mock()
     private val pixelSender: SubscriptionPixelSender = mock()
+    private val privacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java, FakeToggleStore())
 
     private lateinit var viewModel: SubscriptionWebViewViewModel
 
@@ -57,6 +62,7 @@ class SubscriptionWebViewViewModelTest {
             subscriptionsChecker,
             networkProtectionWaitlist,
             pixelSender,
+            privacyProFeature,
         )
     }
 
@@ -174,6 +180,8 @@ class SubscriptionWebViewViewModelTest {
 
     @Test
     fun whenGetSubscriptionOptionsThenSendCommand() = runTest {
+        privacyProFeature.allowPurchase().setEnabled(Toggle.State(enable = true))
+
         whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(
             SubscriptionOffer(
                 monthlyPlanId = "monthly",
@@ -200,6 +208,37 @@ class SubscriptionWebViewViewModelTest {
 
     @Test
     fun whenGetSubscriptionsAndNoSubscriptionOfferThenSendCommandWithEmptyData() = runTest {
+        privacyProFeature.allowPurchase().setEnabled(Toggle.State(enable = true))
+
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "getSubscriptionOptions", "id", JSONObject("{}"))
+
+            val result = awaitItem()
+            assertTrue(result is Command.SendResponseToJs)
+
+            val response = (result as Command.SendResponseToJs).data
+            assertEquals("id", response.id)
+            assertEquals("test", response.featureName)
+            assertEquals("getSubscriptionOptions", response.method)
+
+            val params = jsonAdapter.fromJson(response.params.toString())!!
+            assertEquals(0, params.options.size)
+            assertEquals(0, params.features.size)
+        }
+    }
+
+    @Test
+    fun whenGetSubscriptionsAndToggleOffThenSendCommandWithEmptyData() = runTest {
+        privacyProFeature.allowPurchase().setEnabled(Toggle.State(enable = false))
+        whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(
+            SubscriptionOffer(
+                monthlyPlanId = "monthly",
+                monthlyFormattedPrice = "$1",
+                yearlyPlanId = "yearly",
+                yearlyFormattedPrice = "$10",
+            ),
+        )
+
         viewModel.commands().test {
             viewModel.processJsCallbackMessage("test", "getSubscriptionOptions", "id", JSONObject("{}"))
 
