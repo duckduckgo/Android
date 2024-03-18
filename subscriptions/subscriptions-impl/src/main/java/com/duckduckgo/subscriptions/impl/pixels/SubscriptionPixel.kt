@@ -142,6 +142,22 @@ enum class SubscriptionPixel(
         baseName = "m_privacy-pro_is-enabled",
         types = EnumSet.of(COUNT, DAILY),
     ),
+    SUBSCRIPTION_PRICE_MONTHLY_CLICK(
+        baseName = "m_privacy-pro_offer_monthly-price_click",
+        type = COUNT,
+    ),
+    SUBSCRIPTION_PRICE_YEARLY_CLICK(
+        baseName = "m_privacy-pro_offer_yearly-price_click",
+        type = COUNT,
+    ),
+    SUBSCRIPTION_ONBOARDING_FAQ_CLICK(
+        baseName = "m_privacy-pro_welcome_faq_click",
+        type = UNIQUE,
+    ),
+    SUBSCRIPTION_ADD_EMAIL_SUCCESS(
+        baseName = "m_privacy-pro_app_add-email_success",
+        type = UNIQUE,
+    ),
     ;
 
     constructor(

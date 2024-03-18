@@ -124,9 +124,16 @@ class SubscriptionWebViewViewModel @Inject constructor(
             "subscriptionSelected" -> subscriptionSelected(data)
             "activateSubscription" -> activateSubscription()
             "featureSelected" -> data?.let { featureSelected(data) }
+            "subscriptionsWelcomeFaqClicked" -> subscriptionsWelcomeFaqClicked()
             else -> {
                 // NOOP
             }
+        }
+    }
+
+    private fun subscriptionsWelcomeFaqClicked() {
+        if (hasPurchasedSubscription()) {
+            pixelSender.reportOnboardingFaqClick()
         }
     }
 

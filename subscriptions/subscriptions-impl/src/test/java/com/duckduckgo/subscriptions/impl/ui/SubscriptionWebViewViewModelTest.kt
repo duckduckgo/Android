@@ -487,4 +487,32 @@ class SubscriptionWebViewViewModelTest {
         )
         verifyNoInteractions(pixelSender)
     }
+
+    @Test
+    fun whenSubscriptionsWelcomeFaqClickedAndInPurchaseFlowThenPixelIsSent() = runTest {
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
+        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowOf(CurrentPurchase.Success))
+        viewModel.start()
+
+        viewModel.processJsCallbackMessage(
+            featureName = "test",
+            method = "subscriptionsWelcomeFaqClicked",
+            id = null,
+            data = null,
+        )
+        verify(pixelSender).reportOnboardingFaqClick()
+    }
+
+    @Test
+    fun whenSubscriptionsWelcomeFaqClickedAndNotInPurchaseFlowThenPixelIsNotSent() = runTest {
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
+
+        viewModel.processJsCallbackMessage(
+            featureName = "test",
+            method = "subscriptionsWelcomeFaqClicked",
+            id = null,
+            data = null,
+        )
+        verifyNoInteractions(pixelSender)
+    }
 }
