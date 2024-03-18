@@ -37,7 +37,6 @@ class NetpVpnAccessRevokedDialogMonitor @Inject constructor(
     private val networkProtectionRepository: NetworkProtectionRepository,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
-    private val betaEndStore: BetaEndStore,
     private val betaEndedDialog: BetaEndedDialog,
     private val accessRevokedDialog: AccessRevokedDialog,
     private val subscriptions: Subscriptions,
@@ -63,6 +62,6 @@ class NetpVpnAccessRevokedDialogMonitor @Inject constructor(
     private suspend fun shouldShowDialog(): Boolean {
         // Show dialog only if the pro is launched, user participated in beta (authentication was set - which only happens in beta)
         // AND dialog hasn't been shown before to the user.
-        return !betaEndStore.betaEndDialogShown() && subscriptions.isEnabled() && netPWaitlistRepository.getAuthenticationToken() != null
+        return betaEndedDialog.shouldShowDialog() && subscriptions.isEnabled() && netPWaitlistRepository.getAuthenticationToken() != null
     }
 }

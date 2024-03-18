@@ -28,6 +28,7 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -38,9 +39,6 @@ class NetpVpnAccessRevokedDialogMonitorTest {
 
     @Mock
     private lateinit var networkProtectionRepository: NetworkProtectionRepository
-
-    @Mock
-    private lateinit var betaEndStore: BetaEndStore
 
     @Mock
     private lateinit var betaEndedDialog: BetaEndedDialog
@@ -63,7 +61,6 @@ class NetpVpnAccessRevokedDialogMonitorTest {
             networkProtectionRepository,
             coroutineTestRule.testScope,
             coroutineTestRule.testDispatcherProvider,
-            betaEndStore,
             betaEndedDialog,
             accessRevokedDialog,
             subscriptions,
@@ -74,7 +71,7 @@ class NetpVpnAccessRevokedDialogMonitorTest {
     @Test
     fun whenUserParticipatedInBetaAndPrivacyProActiveAndDialogNotShownThenShowBetaEndDialog() = runTest {
         whenever(networkProtectionRepository.vpnAccessRevoked).thenReturn(true)
-        whenever(betaEndStore.betaEndDialogShown()).thenReturn(false)
+        whenever(betaEndedDialog.shouldShowDialog()).thenReturn(true)
         whenever(netPWaitlistRepository.getAuthenticationToken()).thenReturn("123")
         whenever(subscriptions.isEnabled()).thenReturn(true)
 
@@ -87,52 +84,52 @@ class NetpVpnAccessRevokedDialogMonitorTest {
     @Test
     fun whenDialogAlreadyNotShownThenDontShowAnyDialog() = runTest {
         whenever(networkProtectionRepository.vpnAccessRevoked).thenReturn(false)
-        whenever(betaEndStore.betaEndDialogShown()).thenReturn(true)
+        whenever(betaEndedDialog.shouldShowDialog()).thenReturn(false)
         whenever(netPWaitlistRepository.getAuthenticationToken()).thenReturn("123")
         whenever(subscriptions.isEnabled()).thenReturn(true)
 
         netpVpnAccessRevokedDialogMonitor.onActivityResumed(mock())
 
-        verifyNoInteractions(betaEndedDialog)
+        verify(betaEndedDialog, never()).show(any())
         verifyNoInteractions(accessRevokedDialog)
     }
 
     @Test
     fun whenPrivacyProNotActiveThenDontShowAnyDialog() = runTest {
         whenever(networkProtectionRepository.vpnAccessRevoked).thenReturn(false)
-        whenever(betaEndStore.betaEndDialogShown()).thenReturn(false)
+        whenever(betaEndedDialog.shouldShowDialog()).thenReturn(true)
         whenever(netPWaitlistRepository.getAuthenticationToken()).thenReturn("123")
         whenever(subscriptions.isEnabled()).thenReturn(false)
 
         netpVpnAccessRevokedDialogMonitor.onActivityResumed(mock())
 
-        verifyNoInteractions(betaEndedDialog)
+        verify(betaEndedDialog, never()).show(any())
         verifyNoInteractions(accessRevokedDialog)
     }
 
     @Test
     fun whenUserNotInBetaThenDontShowAnyDialog() = runTest {
         whenever(networkProtectionRepository.vpnAccessRevoked).thenReturn(false)
-        whenever(betaEndStore.betaEndDialogShown()).thenReturn(false)
+        whenever(betaEndedDialog.shouldShowDialog()).thenReturn(true)
         whenever(netPWaitlistRepository.getAuthenticationToken()).thenReturn(null)
         whenever(subscriptions.isEnabled()).thenReturn(true)
 
         netpVpnAccessRevokedDialogMonitor.onActivityResumed(mock())
 
-        verifyNoInteractions(betaEndedDialog)
+        verify(betaEndedDialog, never()).show(any())
         verifyNoInteractions(accessRevokedDialog)
     }
 
     @Test
     fun whenUserNotInBetaAndVPNAccessRevokedThenShowAccessRevokedDialog() = runTest {
         whenever(networkProtectionRepository.vpnAccessRevoked).thenReturn(true)
-        whenever(betaEndStore.betaEndDialogShown()).thenReturn(false)
+        whenever(betaEndedDialog.shouldShowDialog()).thenReturn(true)
         whenever(netPWaitlistRepository.getAuthenticationToken()).thenReturn(null)
         whenever(subscriptions.isEnabled()).thenReturn(true)
 
         netpVpnAccessRevokedDialogMonitor.onActivityResumed(mock())
 
-        verifyNoInteractions(betaEndedDialog)
+        verify(betaEndedDialog, never()).show(any())
         verify(accessRevokedDialog).show(any())
     }
 }
