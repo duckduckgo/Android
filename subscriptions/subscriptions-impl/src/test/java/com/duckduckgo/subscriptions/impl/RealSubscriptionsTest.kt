@@ -26,6 +26,7 @@ import com.duckduckgo.subscriptions.api.Product.NetP
 import com.duckduckgo.subscriptions.impl.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.impl.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.impl.SubscriptionStatus.WAITING
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -43,12 +44,13 @@ class RealSubscriptionsTest {
     val coroutineRule = CoroutineTestRule()
 
     private val mockSubscriptionsManager: SubscriptionsManager = mock()
+    private val pixelSender: SubscriptionPixelSender = mock()
     private lateinit var subscriptions: RealSubscriptions
     private val privacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java, FakeToggleStore())
 
     @Before
     fun before() {
-        subscriptions = RealSubscriptions(mockSubscriptionsManager, privacyProFeature)
+        subscriptions = RealSubscriptions(mockSubscriptionsManager, privacyProFeature, pixelSender)
     }
 
     @Test
