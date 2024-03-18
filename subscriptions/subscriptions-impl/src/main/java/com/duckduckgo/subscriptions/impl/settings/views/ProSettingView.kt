@@ -153,7 +153,7 @@ class ProSettingView @JvmOverloads constructor(
             }
             else -> {
                 val htmlText = context.getString(R.string.subscriptionSettingFeaturesList).html(context)
-                binding.subscribeSecondary.text = htmlText
+                binding.subscribeSecondary.text = htmlText.noTrailingWhiteLines()
                 binding.subscriptionBuyContainer.show()
                 binding.subscriptionSettingContainer.gone()
                 binding.subscriptionWaitingContainer.gone()
@@ -246,4 +246,12 @@ private fun View.doOnFullyVisible(action: () -> Unit) {
             listener.unregister()
         }
     }
+}
+
+private fun CharSequence.noTrailingWhiteLines(): CharSequence {
+    var text = this
+    while (text[text.length - 1] == '\n') {
+        text = text.subSequence(0, text.length - 1)
+    }
+    return text
 }

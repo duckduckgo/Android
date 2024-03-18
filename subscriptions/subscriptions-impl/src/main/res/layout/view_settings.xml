@@ -66,13 +66,16 @@
             app:textType="secondary"
             app:typography="body2" />
 
-        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/subscriptionGet"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="56dp"
-            app:primaryText="@string/subscriptionSettingGet"
-            tools:ignore="RtlSymmetry" />
+            android:layout_marginStart="72dp"
+            android:layout_marginTop="@dimen/keyline_3"
+            android:layout_marginBottom="@dimen/keyline_3"
+            app:textType="primary"
+            app:typography="h4"
+            android:text="@string/subscriptionSettingGet" />
 
     </com.duckduckgo.subscriptions.impl.settings.views.SubscriptionSettingLayout>
 
