@@ -181,6 +181,7 @@
     <!-- About -->
     <string name="netpManagementAboutHeader">About</string>
     <string name="netpManagementAboutItemFaqs">Frequently Asked Questions</string>
+    <string name="netpManagementAboutItemShareFeedback">Share VPN Feedback</string>
 
     <!-- FAQS -->
     <string name="netpFaqTitle">Frequently Asked Questions</string>

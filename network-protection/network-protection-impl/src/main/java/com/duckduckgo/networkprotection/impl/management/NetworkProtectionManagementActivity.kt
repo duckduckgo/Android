@@ -36,7 +36,6 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.store.AppTheme
-import com.duckduckgo.common.ui.view.addClickableLink
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -135,10 +134,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         binding.netpToggle.setOnCheckedChangeListener(toggleChangeListener)
         binding.netpToggle.setPrimaryText(getString(R.string.netpManagementToggleTitle))
 
-        binding.netpBetaDescription.addClickableLink(
-            REPORT_ISSUES_ANNOTATION,
-            getText(R.string.netpManagementBetaDescription),
-        ) {
+        binding.about.aboutShareFeedback.setClickListener {
             viewModel.onReportIssuesClicked()
         }
 
