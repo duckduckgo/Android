@@ -94,7 +94,7 @@ class BrowserPopupMenu(
                 if (viewState.isDesktopBrowsingMode) drawable.ic_device_mobile_16 else drawable.ic_device_desktop_16,
             )
 
-            binding.openInAppMenuItem.isVisible = viewState.previousAppLink != null && !displayedInCustomTabScreen
+            binding.openInAppMenuItem.isVisible = viewState.previousAppLink != null
             binding.findInPageMenuItem.isVisible = viewState.canFindInPage
             binding.addToHomeMenuItem.isVisible = viewState.addToHomeVisible && viewState.addToHomeEnabled && !displayedInCustomTabScreen
             binding.privacyProtectionMenuItem.isVisible = viewState.canChangePrivacyProtection
