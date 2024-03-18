@@ -46,8 +46,11 @@ class DevSettingsSharedPreferences @Inject constructor(private val context: Cont
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
 
     private fun selectedUASavedValue(): UAOverride {
-        val savedValue = preferences.getString(KEY_SELECTED_UA, null) ?: return UAOverride.DEFAULT
-        return UAOverride.valueOf(savedValue)
+        runCatching {
+            val savedValue = preferences.getString(KEY_SELECTED_UA, null) ?: return UAOverride.DEFAULT
+            return UAOverride.valueOf(savedValue)
+        }
+        return UAOverride.DEFAULT
     }
     companion object {
         const val FILENAME = "com.duckduckgo.app.dev_settings_activity.dev_settings"
