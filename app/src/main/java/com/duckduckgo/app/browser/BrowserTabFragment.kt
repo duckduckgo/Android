@@ -3640,7 +3640,10 @@ class BrowserTabFragment :
             hideHomeCta()
             configuration.apply {
                 showCta(daxDialogIntroExperimentCta.daxCtaContainer)
-                setOnOptionClicked(daxDialogIntroExperimentCta.daxCtaContainer) { userEnteredQuery(it) }
+                setOnOptionClicked {
+                    userEnteredQuery(it.link)
+                    pixel.fire(it.pixel)
+                }
             }
             newBrowserTab.newTabLayout.setOnClickListener { daxDialogIntroExperimentCta.dialogTextCta.finishAnimation() }
 

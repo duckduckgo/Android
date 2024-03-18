@@ -24,6 +24,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.onboarding.ui.page.experiment.OnboardingExperimentPixel.PixelName
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.view.TypeAnimationTextView
@@ -31,13 +32,13 @@ import com.duckduckgo.common.ui.view.button.DaxButton
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.extensions.html
+import com.duckduckgo.mobile.android.R as commonR
 
 sealed class ExperimentDaxBubbleOptionsCta(
     override val ctaId: CtaId,
     @StringRes open val title: Int,
     @StringRes open val description: Int,
-    @DrawableRes open val optionsIcon: Int,
-    open val options: List<Int>,
+    open val options: List<DaxDialogIntroOption>,
     override val shownPixel: Pixel.PixelName?,
     override val okPixel: Pixel.PixelName?,
     override val cancelPixel: Pixel.PixelName?,
@@ -46,37 +47,30 @@ sealed class ExperimentDaxBubbleOptionsCta(
     override val appInstallStore: AppInstallStore,
 ) : Cta, ViewCta, DaxCta {
 
+    private var ctaView: View? = null
+
     override fun showCta(view: View) {
+        ctaView = view
         val daxTitle = view.context.getString(title)
         val daxText = view.context.getString(description)
-        val daxOptionIcon = ContextCompat.getDrawable(view.context, optionsIcon)
-        val daxOptionsText = options.map { view.context.getString(it) }
         view.show()
         view.alpha = 1f
         view.findViewById<DaxTextView>(R.id.hiddenTextCta).text = daxText.html(view.context)
         view.findViewById<DaxTextView>(R.id.experimentDialogTitle).text = daxTitle.html(view.context)
-        view.findViewById<DaxButton>(R.id.daxDialogOption1).apply {
-            text = daxOptionsText[0]
-            icon = daxOptionIcon
-        }
-        view.findViewById<DaxButton>(R.id.daxDialogOption2).apply {
-            text = daxOptionsText[1]
-            icon = daxOptionIcon
-        }
-        view.findViewById<DaxButton>(R.id.daxDialogOption3).apply {
-            text = daxOptionsText[2]
-            icon = daxOptionIcon
-        }
-        view.findViewById<DaxButton>(R.id.daxDialogOption4).text = daxOptionsText[3]
+        options[0].setOptionView(view.findViewById(R.id.daxDialogOption1))
+        options[1].setOptionView(view.findViewById(R.id.daxDialogOption2))
+        options[2].setOptionView(view.findViewById(R.id.daxDialogOption3))
+        options[3].setOptionView(view.findViewById(R.id.daxDialogOption4))
         view.findViewById<TypeAnimationTextView>(R.id.dialogTextCta).startTypingAnimation(daxText, true)
     }
 
-    fun setOnOptionClicked(view: View, onOptionClicked: (String) -> Unit) {
-        val daxOptionsText = options.map { view.context.getString(it) }
-        view.findViewById<DaxButton>(R.id.daxDialogOption1).setOnClickListener { onOptionClicked.invoke(daxOptionsText[0]) }
-        view.findViewById<DaxButton>(R.id.daxDialogOption2).setOnClickListener { onOptionClicked.invoke(daxOptionsText[1]) }
-        view.findViewById<DaxButton>(R.id.daxDialogOption3).setOnClickListener { onOptionClicked.invoke(daxOptionsText[2]) }
-        view.findViewById<DaxButton>(R.id.daxDialogOption4).setOnClickListener { onOptionClicked.invoke(daxOptionsText[3]) }
+    fun setOnOptionClicked(onOptionClicked: (DaxDialogIntroOption) -> Unit) {
+        ctaView?.let { view ->
+            view.findViewById<DaxButton>(R.id.daxDialogOption1).setOnClickListener { onOptionClicked.invoke(options[0]) }
+            view.findViewById<DaxButton>(R.id.daxDialogOption2).setOnClickListener { onOptionClicked.invoke(options[1]) }
+            view.findViewById<DaxButton>(R.id.daxDialogOption3).setOnClickListener { onOptionClicked.invoke(options[2]) }
+            view.findViewById<DaxButton>(R.id.daxDialogOption4).setOnClickListener { onOptionClicked.invoke(options[3]) }
+        }
     }
 
     override fun pixelCancelParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
@@ -92,13 +86,7 @@ sealed class ExperimentDaxBubbleOptionsCta(
         CtaId.DAX_INTRO,
         R.string.onboardingSearchDaxDialogTitle,
         R.string.onboardingSearchDaxDialogDescription,
-        com.duckduckgo.mobile.android.R.drawable.ic_find_search_16,
-        listOf(
-            R.string.onboardingSearchDaxDialogOption1,
-            R.string.onboardingSearchDaxDialogOption2,
-            R.string.onboardingSearchDaxDialogOption3,
-            R.string.onboardingSearchDaxDialogOption4,
-        ),
+        DaxDialogIntroOption.getSearchOptions(),
         AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
@@ -114,13 +102,7 @@ sealed class ExperimentDaxBubbleOptionsCta(
         CtaId.DAX_INTRO_VISIT_SITE,
         R.string.onboardingSitesDaxDialogTitle,
         R.string.onboardingSitesDaxDialogDescription,
-        com.duckduckgo.mobile.android.R.drawable.ic_globe_gray_16dp,
-        listOf(
-            R.string.onboardingSitesDaxDialogOption1,
-            R.string.onboardingSitesDaxDialogOption2,
-            R.string.onboardingSitesDaxDialogOption3,
-            R.string.onboardingSitesDaxDialogOption4,
-        ),
+        DaxDialogIntroOption.getSitesOptions(),
         AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
@@ -128,4 +110,76 @@ sealed class ExperimentDaxBubbleOptionsCta(
         onboardingStore,
         appInstallStore,
     )
+}
+
+data class DaxDialogIntroOption(
+    @StringRes val textRes: Int,
+    @DrawableRes val iconRes: Int,
+    val link: String,
+    val pixel: PixelName,
+) {
+    fun setOptionView(buttonView: DaxButton) {
+        buttonView.apply {
+            text = this.context.getString(textRes)
+            icon = ContextCompat.getDrawable(this.context, iconRes)
+        }
+    }
+
+    companion object {
+        fun getSearchOptions(): List<DaxDialogIntroOption> =
+            listOf(
+                DaxDialogIntroOption(
+                    R.string.onboardingSearchDaxDialogOption1,
+                    commonR.drawable.ic_find_search_16,
+                    "how to say “duck” in spanish",
+                    PixelName.ONBOARDING_SEARCH_SAY_DUCK,
+                ),
+                DaxDialogIntroOption(
+                    R.string.onboardingSearchDaxDialogOption2,
+                    commonR.drawable.ic_find_search_16,
+                    "mighty ducks cast",
+                    PixelName.ONBOARDING_SEARCH_MIGHTY_DUCK,
+                ),
+                DaxDialogIntroOption(
+                    R.string.onboardingSearchDaxDialogOption3,
+                    commonR.drawable.ic_find_search_16,
+                    "local weather",
+                    PixelName.ONBOARDING_SEARCH_WEATHER,
+                ),
+                DaxDialogIntroOption(
+                    R.string.onboardingSearchDaxDialogOption4,
+                    commonR.drawable.ic_wand_16,
+                    "chocolate chip cookies",
+                    PixelName.ONBOARDING_SEARCH_SURPRISE_ME,
+                ),
+            )
+
+        fun getSitesOptions(): List<DaxDialogIntroOption> =
+            listOf(
+                DaxDialogIntroOption(
+                    R.string.onboardingSitesDaxDialogOption1,
+                    commonR.drawable.ic_globe_gray_16dp,
+                    "espn.com",
+                    PixelName.ONBOARDING_VISIT_SITE_ESPN,
+                ),
+                DaxDialogIntroOption(
+                    R.string.onboardingSitesDaxDialogOption2,
+                    commonR.drawable.ic_globe_gray_16dp,
+                    "yahoo.com",
+                    PixelName.ONBOARDING_VISIT_SITE_YAHOO,
+                ),
+                DaxDialogIntroOption(
+                    R.string.onboardingSitesDaxDialogOption3,
+                    commonR.drawable.ic_globe_gray_16dp,
+                    "ebay.com",
+                    PixelName.ONBOARDING_VISIT_SITE_EBAY,
+                ),
+                DaxDialogIntroOption(
+                    R.string.onboardingSitesDaxDialogOption4,
+                    commonR.drawable.ic_wand_16,
+                    "britannica.com",
+                    PixelName.ONBOARDING_VISIT_SITE_SURPRISE_ME,
+                ),
+            )
+    }
 }
