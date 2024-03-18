@@ -24,8 +24,6 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 interface BetaEndStore {
-    fun didParticipateInBeta(): Boolean
-    fun storeUserParticipatedInBeta(didParticipateInBeta: Boolean)
     fun showBetaEndDialog()
     fun betaEndDialogShown(): Boolean
 }
@@ -42,20 +40,6 @@ class RealBetaEndStore @Inject constructor(
         )
     }
 
-    override fun didParticipateInBeta(): Boolean = preferences.getBoolean(
-        KEY_USER_PARTICIPATED_IN_BETA,
-        false,
-    )
-
-    override fun storeUserParticipatedInBeta(didParticipateInBeta: Boolean) {
-        // We only care if didParticipateInBeta is true since if it has been true, it can't be false
-        if (didParticipateInBeta) {
-            preferences.edit(commit = true) {
-                putBoolean(KEY_USER_PARTICIPATED_IN_BETA, true)
-            }
-        }
-    }
-
     override fun showBetaEndDialog() {
         preferences.edit(commit = true) {
             putBoolean(KEY_END_DIALOG_SHOWN, true)
@@ -67,6 +51,5 @@ class RealBetaEndStore @Inject constructor(
     companion object {
         const val FILENAME = "com.duckduckgo.networkprotection.impl.waitlist.end.store.v1"
         const val KEY_END_DIALOG_SHOWN = "KEY_END_DIALOG_SHOWN"
-        const val KEY_USER_PARTICIPATED_IN_BETA = "KEY_USER_PARTICIPATED_IN_BETA"
     }
 }

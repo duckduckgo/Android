@@ -43,9 +43,6 @@ class NetpVpnAccessRevokedDialogMonitorTest {
     private lateinit var betaEndStore: BetaEndStore
 
     @Mock
-    private lateinit var netPWaitlistRepository: NetPWaitlistRepository
-
-    @Mock
     private lateinit var betaEndedDialog: BetaEndedDialog
 
     @Mock
@@ -54,6 +51,8 @@ class NetpVpnAccessRevokedDialogMonitorTest {
     @Mock
     private lateinit var subscriptions: Subscriptions
 
+    @Mock
+    private lateinit var netPWaitlistRepository: NetPWaitlistRepository
     private lateinit var netpVpnAccessRevokedDialogMonitor: NetpVpnAccessRevokedDialogMonitor
 
     @Before
@@ -65,23 +64,18 @@ class NetpVpnAccessRevokedDialogMonitorTest {
             coroutineTestRule.testScope,
             coroutineTestRule.testDispatcherProvider,
             betaEndStore,
-            netPWaitlistRepository,
             betaEndedDialog,
             accessRevokedDialog,
             subscriptions,
+            netPWaitlistRepository,
         )
-    }
-
-    @Test
-    fun whenMonitorIsCreatedThenStoreParticipatedInBetaValue() {
-        verify(betaEndStore).storeUserParticipatedInBeta(false)
     }
 
     @Test
     fun whenUserParticipatedInBetaAndPrivacyProActiveAndDialogNotShownThenShowBetaEndDialog() = runTest {
         whenever(networkProtectionRepository.vpnAccessRevoked).thenReturn(true)
         whenever(betaEndStore.betaEndDialogShown()).thenReturn(false)
-        whenever(betaEndStore.didParticipateInBeta()).thenReturn(true)
+        whenever(netPWaitlistRepository.getAuthenticationToken()).thenReturn("123")
         whenever(subscriptions.isEnabled()).thenReturn(true)
 
         netpVpnAccessRevokedDialogMonitor.onActivityResumed(mock())
@@ -94,7 +88,7 @@ class NetpVpnAccessRevokedDialogMonitorTest {
     fun whenDialogAlreadyNotShownThenDontShowAnyDialog() = runTest {
         whenever(networkProtectionRepository.vpnAccessRevoked).thenReturn(false)
         whenever(betaEndStore.betaEndDialogShown()).thenReturn(true)
-        whenever(betaEndStore.didParticipateInBeta()).thenReturn(true)
+        whenever(netPWaitlistRepository.getAuthenticationToken()).thenReturn("123")
         whenever(subscriptions.isEnabled()).thenReturn(true)
 
         netpVpnAccessRevokedDialogMonitor.onActivityResumed(mock())
@@ -107,7 +101,7 @@ class NetpVpnAccessRevokedDialogMonitorTest {
     fun whenPrivacyProNotActiveThenDontShowAnyDialog() = runTest {
         whenever(networkProtectionRepository.vpnAccessRevoked).thenReturn(false)
         whenever(betaEndStore.betaEndDialogShown()).thenReturn(false)
-        whenever(betaEndStore.didParticipateInBeta()).thenReturn(true)
+        whenever(netPWaitlistRepository.getAuthenticationToken()).thenReturn("123")
         whenever(subscriptions.isEnabled()).thenReturn(false)
 
         netpVpnAccessRevokedDialogMonitor.onActivityResumed(mock())
@@ -120,7 +114,7 @@ class NetpVpnAccessRevokedDialogMonitorTest {
     fun whenUserNotInBetaThenDontShowAnyDialog() = runTest {
         whenever(networkProtectionRepository.vpnAccessRevoked).thenReturn(false)
         whenever(betaEndStore.betaEndDialogShown()).thenReturn(false)
-        whenever(betaEndStore.didParticipateInBeta()).thenReturn(false)
+        whenever(netPWaitlistRepository.getAuthenticationToken()).thenReturn(null)
         whenever(subscriptions.isEnabled()).thenReturn(true)
 
         netpVpnAccessRevokedDialogMonitor.onActivityResumed(mock())
@@ -133,7 +127,7 @@ class NetpVpnAccessRevokedDialogMonitorTest {
     fun whenUserNotInBetaAndVPNAccessRevokedThenShowAccessRevokedDialog() = runTest {
         whenever(networkProtectionRepository.vpnAccessRevoked).thenReturn(true)
         whenever(betaEndStore.betaEndDialogShown()).thenReturn(false)
-        whenever(betaEndStore.didParticipateInBeta()).thenReturn(false)
+        whenever(netPWaitlistRepository.getAuthenticationToken()).thenReturn(null)
         whenever(subscriptions.isEnabled()).thenReturn(true)
 
         netpVpnAccessRevokedDialogMonitor.onActivityResumed(mock())

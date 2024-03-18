@@ -38,18 +38,11 @@ class NetpVpnAccessRevokedDialogMonitor @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val betaEndStore: BetaEndStore,
-    private val netPWaitlistRepository: NetPWaitlistRepository,
     private val betaEndedDialog: BetaEndedDialog,
     private val accessRevokedDialog: AccessRevokedDialog,
     private val subscriptions: Subscriptions,
+    private val netPWaitlistRepository: NetPWaitlistRepository,
 ) : ActivityLifecycleCallbacks {
-
-    init {
-        coroutineScope.launch(dispatcherProvider.io()) {
-            // We need to copy this value since once beta is not active, all stores are cleared.
-            copyDidJoinBeta()
-        }
-    }
 
     override fun onActivityResumed(activity: Activity) {
         super.onActivityResumed(activity)
@@ -67,12 +60,9 @@ class NetpVpnAccessRevokedDialogMonitor @Inject constructor(
         }
     }
 
-    private suspend fun copyDidJoinBeta() {
-        betaEndStore.storeUserParticipatedInBeta(netPWaitlistRepository.getAuthenticationToken() != null)
-    }
-
     private suspend fun shouldShowDialog(): Boolean {
-        // Show dialog only if the pro is launched, user participated in beta AND dialog hasn't been shown before to the user.
-        return !betaEndStore.betaEndDialogShown() && subscriptions.isEnabled() && betaEndStore.didParticipateInBeta()
+        // Show dialog only if the pro is launched, user participated in beta (authentication was set - which only happens in beta)
+        // AND dialog hasn't been shown before to the user.
+        return !betaEndStore.betaEndDialogShown() && subscriptions.isEnabled() && netPWaitlistRepository.getAuthenticationToken() != null
     }
 }
