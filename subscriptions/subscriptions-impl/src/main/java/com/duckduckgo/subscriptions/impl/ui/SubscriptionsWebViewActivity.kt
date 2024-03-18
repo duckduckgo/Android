@@ -75,10 +75,11 @@ import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionsWebvie
 import com.duckduckgo.subscriptions.impl.pir.PirActivity.Companion.PirScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.AddDeviceActivity.Companion.AddDeviceScreenWithEmptyParams
-import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionActivity.Companion.RestoreSubscriptionScreenWithEmptyParams
+import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionActivity.Companion.RestoreSubscriptionScreenWithParams
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.ActivateOnAnotherDevice
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.BackToSettings
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.BackToSettingsActivateSuccess
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.GoToITR
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.GoToNetP
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.GoToPIR
@@ -391,7 +392,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
 
     private fun processCommand(command: Command) {
         when (command) {
-            is BackToSettings -> backToSettings()
+            is BackToSettings, BackToSettingsActivateSuccess -> backToSettings()
             is SendJsEvent -> sendJsEvent(command.event)
             is SendResponseToJs -> sendResponseToJs(command.data)
             is SubscriptionSelected -> selectSubscription(command.id)
@@ -521,7 +522,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     }
 
     private fun restoreSubscription() {
-        startForResultRestore.launch(globalActivityStarter.startIntent(this, RestoreSubscriptionScreenWithEmptyParams))
+        startForResultRestore.launch(globalActivityStarter.startIntent(this, RestoreSubscriptionScreenWithParams(isOriginWeb = true)))
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

@@ -53,7 +53,7 @@ import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Comm
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenRestoreScreen
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenSettings
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.ViewState
-import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionActivity.Companion.RestoreSubscriptionScreenWithEmptyParams
+import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionActivity.Companion.RestoreSubscriptionScreenWithParams
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsActivity.Companion.SubscriptionsSettingsScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams
 import dagger.android.support.AndroidSupportInjection
@@ -184,7 +184,7 @@ class ProSettingView @JvmOverloads constructor(
                 )
             }
             is OpenRestoreScreen -> {
-                globalActivityStarter.start(context, RestoreSubscriptionScreenWithEmptyParams)
+                globalActivityStarter.start(context, RestoreSubscriptionScreenWithParams(isOriginWeb = false))
             }
         }
     }

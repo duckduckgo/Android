@@ -119,6 +119,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
     fun processJsCallbackMessage(featureName: String, method: String, id: String?, data: JSONObject?) {
         when (method) {
             "backToSettings" -> backToSettings()
+            "backToSettingsActivateSuccess" -> backToSettingsActiveSuccess()
             "getSubscriptionOptions" -> id?.let { getSubscriptionOptions(featureName, method, it) }
             "subscriptionSelected" -> subscriptionSelected(data)
             "activateSubscription" -> activateSubscription()
@@ -240,6 +241,13 @@ class SubscriptionWebViewViewModel @Inject constructor(
         }
     }
 
+    private fun backToSettingsActiveSuccess() {
+        viewModelScope.launch {
+            subscriptionsManager.fetchAndStoreAllData()
+            command.send(BackToSettingsActivateSuccess)
+        }
+    }
+
     private fun backToSettings() {
         viewModelScope.launch {
             subscriptionsManager.fetchAndStoreAllData()
@@ -272,6 +280,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
 
     sealed class Command {
         data object BackToSettings : Command()
+        data object BackToSettingsActivateSuccess : Command()
         data class SendJsEvent(val event: SubscriptionEventData) : Command()
         data class SendResponseToJs(val data: JsCallbackData) : Command()
         data class SubscriptionSelected(val id: String) : Command()

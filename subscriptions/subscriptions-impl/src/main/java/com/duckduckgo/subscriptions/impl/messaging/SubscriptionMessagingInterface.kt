@@ -141,6 +141,7 @@ class SubscriptionMessagingInterface @Inject constructor(
             "backToSettings",
             "activateSubscription",
             "featureSelected",
+            "backToSettingsActivateSuccess",
         )
     }
 

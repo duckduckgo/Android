@@ -179,6 +179,14 @@ class SubscriptionWebViewViewModelTest {
     }
 
     @Test
+    fun whenBackToSettingsActivateSuccessThenCommandSent() = runTest {
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "backToSettingsActivateSuccess", "id", JSONObject("{}"))
+            assertTrue(awaitItem() is Command.BackToSettingsActivateSuccess)
+        }
+    }
+
+    @Test
     fun whenGetSubscriptionOptionsThenSendCommand() = runTest {
         privacyProFeature.allowPurchase().setEnabled(Toggle.State(enable = true))
 
