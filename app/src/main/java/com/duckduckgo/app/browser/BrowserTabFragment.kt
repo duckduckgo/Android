@@ -357,7 +357,7 @@ class BrowserTabFragment :
     lateinit var blobConverterInjector: BlobConverterInjector
 
     val tabId get() = requireArguments()[TAB_ID_ARG] as String
-    private val tabToolbarColor get() = requireArguments().getInt(TAB_TOOLBAR_COLOR_ARG)
+    private val customTabToolbarColor get() = requireArguments().getInt(CUSTOM_TAB_TOOLBAR_COLOR_ARG)
     private val tabDisplayedInCustomTabScreen get() = requireArguments().getBoolean(TAB_DISPLAYED_IN_CUSTOM_TAB_SCREEN_ARG)
 
     @Inject
@@ -857,8 +857,8 @@ class BrowserTabFragment :
         omnibar.fireIconMenu.hide()
         omnibar.tabsMenu.hide()
 
-        omnibar.toolbar.background = ColorDrawable(tabToolbarColor)
-        omnibar.toolbarContainer.background = ColorDrawable(tabToolbarColor)
+        omnibar.toolbar.background = ColorDrawable(customTabToolbarColor)
+        omnibar.toolbarContainer.background = ColorDrawable(customTabToolbarColor)
 
         omnibar.customTabToolbarContainer.customTabToolbar.show()
 
@@ -877,18 +877,18 @@ class BrowserTabFragment :
         omnibar.customTabToolbarContainer.customTabDomainOnly.text = viewModel.url?.extractDomain()
         omnibar.customTabToolbarContainer.customTabDomainOnly.show()
 
-        val foregroundColor = calculateForegroundColor(tabToolbarColor)
+        val foregroundColor = calculateBlackOrWhite(customTabToolbarColor)
         omnibar.customTabToolbarContainer.customTabCloseIcon.setColorFilter(foregroundColor)
         omnibar.customTabToolbarContainer.customTabDomain.setTextColor(foregroundColor)
         omnibar.customTabToolbarContainer.customTabDomainOnly.setTextColor(foregroundColor)
         omnibar.customTabToolbarContainer.customTabTitle.setTextColor(foregroundColor)
         omnibar.browserMenuImageView.setColorFilter(foregroundColor)
 
-        requireActivity().window.navigationBarColor = tabToolbarColor
-        requireActivity().window.statusBarColor = tabToolbarColor
+        requireActivity().window.navigationBarColor = customTabToolbarColor
+        requireActivity().window.statusBarColor = customTabToolbarColor
     }
 
-    private fun calculateForegroundColor(color: Int): Int {
+    private fun calculateBlackOrWhite(color: Int): Int {
         // Handle the case where we did not receive a color.
         if (color == 0) {
             return if ((context as DuckDuckGoActivity).isDarkThemeEnabled()) Color.WHITE else Color.BLACK
@@ -3091,7 +3091,7 @@ class BrowserTabFragment :
     }
 
     companion object {
-        private const val TAB_TOOLBAR_COLOR_ARG = "TAB_TOOLBAR_COLOR_ARG"
+        private const val CUSTOM_TAB_TOOLBAR_COLOR_ARG = "CUSTOM_TAB_TOOLBAR_COLOR_ARG"
         private const val TAB_DISPLAYED_IN_CUSTOM_TAB_SCREEN_ARG = "TAB_DISPLAYED_IN_CUSTOM_TAB_SCREEN_ARG"
         private const val TAB_ID_ARG = "TAB_ID_ARG"
         private const val URL_EXTRA_ARG = "URL_EXTRA_ARG"
@@ -3149,7 +3149,7 @@ class BrowserTabFragment :
             val args = Bundle()
             args.putString(TAB_ID_ARG, tabId)
             args.putBoolean(SKIP_HOME_ARG, skipHome)
-            args.putInt(TAB_TOOLBAR_COLOR_ARG, toolbarColor)
+            args.putInt(CUSTOM_TAB_TOOLBAR_COLOR_ARG, toolbarColor)
             args.putBoolean(TAB_DISPLAYED_IN_CUSTOM_TAB_SCREEN_ARG, true)
             query.let {
                 args.putString(URL_EXTRA_ARG, query)
