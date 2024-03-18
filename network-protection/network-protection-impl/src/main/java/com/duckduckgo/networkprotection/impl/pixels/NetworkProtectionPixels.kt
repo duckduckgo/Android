@@ -299,6 +299,9 @@ interface NetworkProtectionPixels {
     fun reportFailureRecoveryCompletedWithServerHealthy()
     fun reportFailureRecoveryCompletedWithServerUnhealthy()
     fun reportFailureRecoveryCompletedWithDifferentTunnelAddress()
+
+    fun reportAccessRevokedDialogShown()
+    fun reportPrivacyProPromotionDialogShown()
 }
 
 @ContributesBinding(AppScope::class)
@@ -558,6 +561,16 @@ class RealNetworkProtectionPixel @Inject constructor(
     override fun reportFailureRecoveryCompletedWithDifferentTunnelAddress() {
         firePixel(NETP_FAILURE_RECOVERY_COMPLETED_SERVER_HEALTHY_NEW_TUN_ADDRESS)
         tryToFireDailyPixel(NETP_FAILURE_RECOVERY_COMPLETED_SERVER_HEALTHY_NEW_TUN_ADDRESS_DAILY)
+    }
+
+    override fun reportAccessRevokedDialogShown() {
+        firePixel(NETP_ACCESS_REVOKED_DIALOG_SHOWN)
+        tryToFireDailyPixel(NETP_ACCESS_REVOKED_DIALOG_SHOWN_DAILY)
+    }
+
+    override fun reportPrivacyProPromotionDialogShown() {
+        firePixel(NETP_PRIVACY_PRO_PROMOTION_DIALOG_SHOWN)
+        tryToFireDailyPixel(NETP_PRIVACY_PRO_PROMOTION_DIALOG_SHOWN_DAILY)
     }
 
     private fun firePixel(
