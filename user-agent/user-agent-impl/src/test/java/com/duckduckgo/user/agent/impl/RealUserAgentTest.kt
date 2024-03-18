@@ -69,6 +69,27 @@ class RealUserAgentTest {
         assertTrue(testee.isException(url))
     }
 
+    @Test
+    fun whenSiteInLegacySitesListThenUseLegacyUserAgent() {
+        val url = "http://duckduckgo.com"
+
+        assertTrue(testee.useLegacyUserAgent(url))
+    }
+
+    @Test
+    fun whenSubdomainInLegacySitesListThenUseLegacyUserAgent() {
+        val url = "http://test.duckduckgo.com"
+
+        assertTrue(testee.useLegacyUserAgent(url))
+    }
+
+    @Test
+    fun whenSiteNotInLegacySitesListThenDoNotUseLegacyUserAgent() {
+        val url = "http://example.com"
+
+        assertFalse(testee.useLegacyUserAgent(url))
+    }
+
     private fun givenThereAreExceptions() {
         val exceptions =
             CopyOnWriteArrayList<FeatureException>().apply {
