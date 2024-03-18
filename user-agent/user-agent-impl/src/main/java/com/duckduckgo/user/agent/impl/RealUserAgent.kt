@@ -24,6 +24,11 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 interface UserAgent {
+    /**
+     * Determines if a [url] should use the "legacy" DuckDuckGo user agent.
+     * The legacy user agent contains the DuckDuckGo application and Version components.
+     * @return true if the [url] is in the local legacy sites list, otherwise false.
+     */
     fun useLegacyUserAgent(url: String): Boolean
     fun isException(url: String): Boolean
 }
