@@ -39,7 +39,6 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitli
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.JoinedWaitlist
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.NotUnlocked
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.PendingInviteCode
-import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.VerifySubscription
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpWaitlistBinding
 import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistRedeemCodeActivity.Launch.NetPWaitlistRedeemCodeScreenNoParams
@@ -94,7 +93,6 @@ class NetPWaitlistActivity : DuckDuckGoActivity() {
             is NotUnlocked, PendingInviteCode -> renderNotJoinedQueue() // Should not happen
             is JoinedWaitlist -> renderJoinedWaitlist()
             is InBeta -> openInviteCode()
-            is VerifySubscription -> {}
         }
     }
 

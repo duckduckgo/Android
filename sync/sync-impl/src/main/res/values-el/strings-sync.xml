@@ -139,4 +139,30 @@
     <string name="sync_notification_channel_name">Συγχρονισμός</string>
     <string name="sync_notify_me_title">Οι ειδοποιήσεις είναι απενεργοποιημένες</string>
     <string name="sync_notify_me_description">Ειδοποιηθείτε σε περίπτωση που η λειτουργία Συγχρονισμός και δημιουργία αντιγράφων ασφάλειας αντιμετωπίσει κάποιο σφάλμα.</string>
+
+    <!-- setup errors -->
+    <string name="sync_turn_off_error">Δεν είναι δυνατή η απενεργοποίηση της λειτουργίας Συγχρονισμός και δημιουργία αντιγράφων ασφαλείας.</string>
+    <string name="sync_edit_device_error">Δεν είναι δυνατή η ενημέρωση του ονόματος της συσκευής.</string>
+    <string name="sync_remove_device_error">Δεν είναι δυνατή η κατάργηση αυτής της συσκευής από τη λειτουργία Συγχρονισμός και δημιουργία αντιγράφων ασφαλείας.</string>
+    <string name="sync_delete_data_error">Δεν είναι δυνατή η διαγραφή δεδομένων στον διακομιστή.</string>
+    <string name="sync_login_authenticated_device_error">"Για να αντιστοιχίσετε τις συσκευές αυτές, απενεργοποιήστε τη λειτουργία Sync &amp; Backup στη μία συσκευή και έπειτα πατήστε Συγχρονισμός με άλλη συσκευή, στην άλλη συσκευή."</string>
+    <string name="sync_connect_generic_error">Δεν είναι δυνατή η σύνδεση με τον διακομιστή.</string>
+    <string name="sync_connect_login_error">Δεν είναι δυνατός ο συγχρονισμός με άλλη συσκευή.</string>
+    <string name="sync_create_account_generic_error">Δεν είναι δυνατή η σύνδεση με τον διακομιστή.</string>
+    <string name="sync_invalid_code_error">Δυστυχώς, αυτός ο κωδικός δεν είναι έγκυρος. Βεβαιωθείτε ότι ο σωστός κωδικός έχει εισαχθεί ή σαρωθεί.</string>
+    <string name="sync_recovery_pdf_error">Αδυναμία δημιουργίας του PDF ανάκτησης.</string>
+    <string name="sync_dialog_error_ok">Εντάξει</string>
+    <string name="sync_dialog_error_title">Συγχρονισμός και δημιουργία αντιγράφων ασφαλείας</string>
+    <string name="sync_encryption_not_supported_error_title">Η συσκευή δεν υποστηρίζεται</string>
+    <string name="sync_encryption_not_supported_error">Η λειτουργία Sync &amp; Backup είναι κρυπτογραφημένη από άκρο σε άκρο και πρέπει να μπορεί να κρυπτογραφεί και να αποθηκεύει δεδομένα στη συσκευή σας. Επειδή η συσκευή σας δεν υποστηρίζει κρυπτογραφημένη αποθήκευση, η λειτουργία Sync &amp; Backup δεν είναι διαθέσιμη.</string>
+
+    <!-- Sync Device Authentication -->
+    <string name="sync_auth_text_for_access">Ξεκλειδώστε τη συσκευή για πρόσβαση στο Sync &amp; Backup.</string>
+    <string name="sync_biometric_prompt_title">Η λειτουργία Sync &amp; Backup κλειδώθηκε</string>
+
+    <!-- Sync Settings -->
+    <string name="sync_delete_server_data_dialog_title">Διαγραφή δεδομένων διακομιστή;</string>
+    <string name="sync_delete_server_data_dialog_content">Όλες οι συσκευές θα αποσυνδεθούν και τα συγχρονισμένα δεδομένα σας θα διαγραφούν από τον διακομιστή.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Διαγραφή δεδομένων</string>
+    <string name="sync_delete_server_data_dialog_secondary_button">Ακύρωση</string>
 </resources>

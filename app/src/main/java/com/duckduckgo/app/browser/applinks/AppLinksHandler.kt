@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.browser.applinks
 
-import com.duckduckgo.common.utils.UriString
+import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding

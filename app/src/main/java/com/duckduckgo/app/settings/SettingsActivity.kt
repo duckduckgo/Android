@@ -201,6 +201,7 @@ class SettingsActivity : DuckDuckGoActivity() {
                     updateAutofill(it.showAutofill)
                     updateSyncSetting(visible = it.showSyncSetting)
                     updateAutoconsent(it.isAutoconsentEnabled)
+                    updatePrivacyPro(it.isPrivacyProEnabled)
                 }
             }.launchIn(lifecycleScope)
 
@@ -208,6 +209,14 @@ class SettingsActivity : DuckDuckGoActivity() {
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
+    }
+
+    private fun updatePrivacyPro(isPrivacyProEnabled: Boolean) {
+        if (isPrivacyProEnabled) {
+            viewsPro.show()
+        } else {
+            viewsPro.gone()
+        }
     }
 
     private fun updateAutofill(autofillEnabled: Boolean) = with(viewsSettings.autofillLoginsSetting) {

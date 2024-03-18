@@ -68,43 +68,26 @@
                     android:text="@string/restoreSubscriptionDescription"
                     tools:ignore="HardcodedText"/>
 
-            <com.duckduckgo.common.ui.view.expand.DaxExpandableMenu
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/keyline_5"
-                    android:layout_marginStart="@dimen/keyline_5"
-                    android:layout_marginEnd="@dimen/keyline_5"
-                    android:layout_marginBottom="@dimen/keyline_5"
-                    android:background="@drawable/background_expandable_menu"
-                    android:orientation="vertical">
+            <include
+                android:id="@+id/manageEmailCard"
+                layout="@layout/card_manage_email" />
 
-                <com.duckduckgo.common.ui.view.expand.DaxExpandableMenuItem
-                        android:id="@+id/googlePlay"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:primaryText="@string/restoreSubscriptionGooglePlayTitle"
-                        app:leadingIcon="@drawable/ic_google_play"
-                        app:leadingIconSize="small"
-                        app:secondaryText="@string/restoreSubscriptionGooglePlayDescription"
-                        app:primaryButtonText="@string/restoreSubscriptionGooglePlayButton"/>
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/keyline_5"
+                android:text="@string/restoreSubscriptionGooglePlayDescription"
+                app:textType="secondary"
+                app:typography="body2" />
 
-                <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:fullWidth="false"
-                        app:defaultPadding="false"/>
+            <com.duckduckgo.common.ui.view.button.DaxButtonGhost
+                android:id="@+id/googlePlay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/keyline_2"
+                android:text="@string/restoreSubscriptionGooglePlayButton"
+                app:buttonSize="small" />
 
-                <com.duckduckgo.common.ui.view.expand.DaxExpandableMenuItem
-                        android:id="@+id/email"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:primaryText="@string/restoreSubscriptionEmailTitle"
-                        app:leadingIcon="@drawable/ic_email_16"
-                        app:leadingIconSize="small"
-                        app:secondaryText="@string/restoreSubscriptionEmailDescription"
-                        app:primaryButtonText="@string/restoreSubscriptionEmailButton"/>
-
-            </com.duckduckgo.common.ui.view.expand.DaxExpandableMenu>
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

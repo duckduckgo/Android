@@ -407,10 +407,10 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         return runCatching {
             Builder().run {
                 allowFamily(AF_INET6)
-                addAddress(InetAddress.getByName("10.0.0.2"), 32)
+                addAddress(InetAddress.getByName("10.0.100.100"), 32)
                 addAddress(InetAddress.getByName("fd00:1:fd00:1:fd00:1:fd00:1"), 128)
                 // nobody will be listening here we just want to make sure no app has connection
-                addDnsServer("10.0.0.1")
+                addDnsServer("10.0.100.1")
                 // just so that we can connect to our BE
                 // TODO should we protect all comms with our controller BE? other VPNs do that
                 safelyAddDisallowedApps(listOf(this@TrackerBlockingVpnService.packageName))

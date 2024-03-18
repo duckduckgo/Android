@@ -17,8 +17,8 @@
 package com.duckduckgo.app.privacy.model
 
 import android.net.Uri
+import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.common.utils.AppUrl
-import com.duckduckgo.common.utils.UriString
 
 class TrustedSites {
 

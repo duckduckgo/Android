@@ -223,8 +223,7 @@
         <activity
             android:name="com.duckduckgo.app.onboarding.ui.OnboardingActivity"
             android:exported="false"
-            android:label="@string/appName"
-            android:theme="@style/Theme.DuckDuckGo.Light" />
+            android:label="@string/appName" />
 
         <activity
             android:name=".BrowserActivity"

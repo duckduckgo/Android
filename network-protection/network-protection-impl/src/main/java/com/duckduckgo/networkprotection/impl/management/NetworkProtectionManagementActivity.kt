@@ -16,6 +16,8 @@
 
 package com.duckduckgo.networkprotection.impl.management
 
+import android.animation.Animator
+import android.animation.Animator.AnimatorListener
 import android.content.Intent
 import android.net.VpnService
 import android.os.Bundle
@@ -27,15 +29,18 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.airbnb.lottie.LottieDrawable.INFINITE
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
-import com.duckduckgo.common.ui.view.addClickableLink
+import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.launchAlwaysOnSystemSettings
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -52,14 +57,19 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionDetails
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState
+import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Connected
+import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Connecting
+import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Disconnected
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.LocationState
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ViewState
 import com.duckduckgo.networkprotection.impl.management.alwayson.NetworkProtectionAlwaysOnDialogFragment
 import com.duckduckgo.networkprotection.impl.settings.NetPVpnSettingsScreenNoParams
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpGeoswitchingScreenNoParams
+import com.duckduckgo.subscriptions.api.Subscriptions
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(NetworkProtectionManagementScreenNoParams::class)
@@ -71,6 +81,15 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var appTheme: AppTheme
+
+    @Inject
+    lateinit var subscriptions: Subscriptions
+
+    @Inject
+    lateinit var dispatcherProvider: DispatcherProvider
 
     private val binding: ActivityNetpManagementBinding by viewBinding()
     private val viewModel: NetworkProtectionManagementViewModel by bindViewModel()
@@ -86,6 +105,8 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         binding.netpToggle.isEnabled = false
         viewModel.onNetpToggleClicked(isChecked)
     }
+
+    private var previousState: ConnectionState? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -113,10 +134,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         binding.netpToggle.setOnCheckedChangeListener(toggleChangeListener)
         binding.netpToggle.setPrimaryText(getString(R.string.netpManagementToggleTitle))
 
-        binding.netpBetaDescription.addClickableLink(
-            REPORT_ISSUES_ANNOTATION,
-            getText(R.string.netpManagementBetaDescription),
-        ) {
+        binding.about.aboutShareFeedback.setClickListener {
             viewModel.onReportIssuesClicked()
         }
 
@@ -133,8 +151,18 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         }
 
         binding.about.aboutFaq.setClickListener {
-            globalActivityStarter.start(this, NetPFaqsScreenNoParams)
+            lifecycleScope.launch(dispatcherProvider.io()) {
+                if (subscriptions.isEnabled()) {
+                    globalActivityStarter.start(
+                        this@NetworkProtectionManagementActivity,
+                        WebViewActivityWithParams(url = VPN_HELP_CENTER_URL, screenTitle = getString(R.string.netpFaqTitle)),
+                    )
+                } else {
+                    globalActivityStarter.start(this@NetworkProtectionManagementActivity, NetPFaqsScreenNoParams)
+                }
+            }
         }
+        configureHeaderAnimation()
     }
 
     private fun observeViewModel() {
@@ -209,7 +237,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
     }
 
     private fun ActivityNetpManagementBinding.renderConnectedState(connectionDetailsData: ConnectionDetails) {
-        netpStatusImage.setImageResource(R.drawable.illustration_vpn_connected)
+        handleAnimation(Connected)
         netpStatusHeader.setText(R.string.netpManagementHeadlineStatusOn)
         netpStatusDescription.setText(R.string.netpManagementDescriptionOn)
         netpToggle.indicator.setImageDrawable(AppCompatResources.getDrawable(applicationContext, R.drawable.indicator_vpn_connected))
@@ -233,7 +261,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
     }
 
     private fun ActivityNetpManagementBinding.renderDisconnectedState() {
-        netpStatusImage.setImageResource(R.drawable.illustration_vpn_disconnected)
+        handleAnimation(Disconnected)
         netpStatusHeader.setText(R.string.netpManagementHeadlineStatusOff)
         netpStatusDescription.setText(R.string.netpManagementDescriptionOff)
         netpToggle.indicator.setImageDrawable(AppCompatResources.getDrawable(applicationContext, R.drawable.indicator_vpn_disconnected))
@@ -245,7 +273,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
     }
 
     private fun ActivityNetpManagementBinding.renderConnectingState() {
-        netpStatusImage.setImageResource(R.drawable.illustration_vpn_disconnected)
+        handleAnimation(Connecting)
         netpToggle.quietlySetChecked(true)
         netpToggle.indicator.setImageDrawable(AppCompatResources.getDrawable(applicationContext, R.drawable.indicator_vpn_disconnected))
         netpStatusHeader.setText(R.string.netpManagementHeadlineStatusOff)
@@ -254,6 +282,70 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         locationDetails.locationHeader.setText(R.string.netpManagementLocationHeaderVpnOff)
         netpToggle.isEnabled = false
         connectionDetails.root.gone()
+    }
+
+    private fun configureHeaderAnimation() {
+        if (appTheme.isLightModeEnabled()) {
+            binding.netpStatusImage.setAnimation(R.raw.vpn_header)
+        } else {
+            binding.netpStatusImage.setAnimation(R.raw.vpn_header_dark)
+        }
+    }
+
+    private fun handleAnimation(newState: ConnectionState) {
+        if (newState == previousState) {
+            return
+        }
+
+        binding.netpStatusImage.removeAllAnimatorListeners()
+        if (previousState == null) {
+            // This is not a transition state so skip transition
+            if (newState == Connected) {
+                binding.netpStatusImage.setMinAndMaxProgress(0.35f, 1f)
+                binding.netpStatusImage.progress = 0.35f
+                binding.netpStatusImage.repeatCount = INFINITE
+                binding.netpStatusImage.playAnimation()
+            } else {
+                binding.netpStatusImage.setMinAndMaxProgress(0f, 0f)
+                binding.netpStatusImage.progress = 0f
+                binding.netpStatusImage.repeatCount = 0
+                binding.netpStatusImage.playAnimation()
+            }
+        } else {
+            if (newState == Connected) {
+                binding.netpStatusImage.setMinAndMaxProgress(0f, 1f)
+                binding.netpStatusImage.progress = 0f
+                binding.netpStatusImage.speed = 1f
+                binding.netpStatusImage.addAnimatorListener(
+                    object : AnimatorListener {
+                        override fun onAnimationStart(animation: Animator) {
+                        }
+
+                        override fun onAnimationEnd(animation: Animator) {
+                            binding.netpStatusImage.setMinAndMaxProgress(0.35f, 1f)
+                            binding.netpStatusImage.progress = 0.35f
+                            binding.netpStatusImage.repeatCount = INFINITE
+                            binding.netpStatusImage.removeAllAnimatorListeners()
+                            binding.netpStatusImage.playAnimation()
+                        }
+
+                        override fun onAnimationCancel(animation: Animator) {
+                        }
+
+                        override fun onAnimationRepeat(animation: Animator) {
+                        }
+                    },
+                )
+                binding.netpStatusImage.playAnimation()
+            } else if (previousState != Disconnected) {
+                binding.netpStatusImage.setMinAndMaxProgress(0f, 0f)
+                binding.netpStatusImage.progress = 0f
+                binding.netpStatusImage.repeatCount = 0
+                binding.netpStatusImage.playAnimation()
+            }
+        }
+
+        previousState = newState
     }
 
     private fun handleCommand(command: Command) {
@@ -398,5 +490,6 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         private const val REPORT_ISSUES_ANNOTATION = "report_issues_link"
         private const val OPEN_SETTINGS_ANNOTATION = "open_settings_link"
         private const val TAG_ALWAYS_ON_DIALOG = "NETP_ALWAYS_ON_DIALOG"
+        private const val VPN_HELP_CENTER_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/vpn/"
     }
 }

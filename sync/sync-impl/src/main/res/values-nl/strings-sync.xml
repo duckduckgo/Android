@@ -139,4 +139,30 @@
     <string name="sync_notification_channel_name">Synchroniseren</string>
     <string name="sync_notify_me_title">Meldingen zijn uitgeschakeld</string>
     <string name="sync_notify_me_description">Ontvang een melding als \'Synchronisatie en back-up\' op een fout stuit.</string>
+
+    <!-- setup errors -->
+    <string name="sync_turn_off_error">\'Synchronisatie en back-up\' kan niet worden uitgeschakeld.</string>
+    <string name="sync_edit_device_error">De naam van het apparaat kan niet worden bijgewerkt.</string>
+    <string name="sync_remove_device_error">Het apparaat kan niet worden verwijderd uit \'Synchronisatie en back-up\'.</string>
+    <string name="sync_delete_data_error">Kan gegevens niet verwijderen op de server.</string>
+    <string name="sync_login_authenticated_device_error">"Schakel 'Synchronisatie en back-up' uit op één apparaat en tik op 'Synchroniseren met een ander apparaat' op het andere apparaat om de apparaten te koppelen."</string>
+    <string name="sync_connect_generic_error">Er kan geen verbinding worden gemaakt met de server.</string>
+    <string name="sync_connect_login_error">Er kan niet worden gesynchroniseerd met een ander apparaat.</string>
+    <string name="sync_create_account_generic_error">Er kan geen verbinding worden gemaakt met de server.</string>
+    <string name="sync_invalid_code_error">Sorry, deze code is ongeldig. Zorg ervoor dat de juiste code is ingevoerd of gescand.</string>
+    <string name="sync_recovery_pdf_error">Het PDF-bestand voor herstel kan niet worden gemaakt.</string>
+    <string name="sync_dialog_error_ok">OK</string>
+    <string name="sync_dialog_error_title">Synchronisatie en back-up</string>
+    <string name="sync_encryption_not_supported_error_title">Apparaat wordt niet ondersteund</string>
+    <string name="sync_encryption_not_supported_error">\'Sync &amp; Backup\' is end-to-end versleuteld en moet gegevens op je apparaat kunnen versleutelen en opslaan. \'Sync &amp; Backup\' is niet beschikbaar omdat je apparaat geen versleutelde opslag ondersteunt.</string>
+
+    <!-- Sync Device Authentication -->
+    <string name="sync_auth_text_for_access">Ontgrendel het apparaat om toegang te krijgen tot \'Synchronisatie en back-up\'.</string>
+    <string name="sync_biometric_prompt_title">\'Synchronisatie en back-up\' vergrendeld</string>
+
+    <!-- Sync Settings -->
+    <string name="sync_delete_server_data_dialog_title">Wil je de servergegevens verwijderen?</string>
+    <string name="sync_delete_server_data_dialog_content">De verbinding met alle apparaten wordt verbroken en je gesynchroniseerde gegevens worden van de server verwijderd.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Gegevens verwijderen</string>
+    <string name="sync_delete_server_data_dialog_secondary_button">Annuleren</string>
 </resources>

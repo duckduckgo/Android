@@ -80,6 +80,7 @@ dependencies {
 
     // multi-process shared preferences
     implementation "com.frybits.harmony:harmony:_"
+    implementation 'com.frybits.harmony:harmony-crypto:_'
 
     // Security crypto
     implementation AndroidX.security.crypto
@@ -134,4 +135,5 @@ dependencies {
     testImplementation Testing.robolectric
     testImplementation project(':common-test')
     testImplementation project(':vpn-api-test')
+    testImplementation project(':feature-toggles-test')
 }

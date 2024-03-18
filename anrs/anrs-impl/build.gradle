@@ -30,6 +30,7 @@ dependencies {
     implementation project(':di')
     implementation project(':browser-api')
     implementation project(':statistics')
+    implementation project(':verified-installation-api')
 
     implementation AndroidX.core.ktx
     implementation KotlinX.coroutines.core

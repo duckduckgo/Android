@@ -28,24 +28,24 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist
 import com.duckduckgo.subscriptions.impl.CurrentPurchase
 import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
+import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import com.duckduckgo.subscriptions.impl.SubscriptionsChecker
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ITR
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.NETP
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PIR
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PLATFORM
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
-import com.duckduckgo.subscriptions.impl.billing.getPrice
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
-import com.duckduckgo.subscriptions.impl.repository.SubscriptionsRepository
+import com.duckduckgo.subscriptions.impl.repository.isActive
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.*
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView.Failure
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView.InProgress
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView.Inactive
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView.Recovered
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView.Success
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView.Waiting
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import javax.inject.Inject
@@ -65,9 +65,10 @@ import org.json.JSONObject
 class SubscriptionWebViewViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val subscriptionsManager: SubscriptionsManager,
-    private val subscriptionsRepository: SubscriptionsRepository,
+    private val subscriptionsChecker: SubscriptionsChecker,
     private val networkProtectionWaitlist: NetworkProtectionWaitlist,
     private val pixelSender: SubscriptionPixelSender,
+    private val privacyProFeature: PrivacyProFeature,
 ) : ViewModel() {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -84,14 +85,28 @@ class SubscriptionWebViewViewModel @Inject constructor(
     fun start() {
         subscriptionsManager.currentPurchaseState.onEach {
             val state = when (it) {
-                is CurrentPurchase.Failure -> Failure(it.message)
-                is CurrentPurchase.Success -> Success(
-                    SubscriptionEventData(
-                        PURCHASE_COMPLETED_FEATURE_NAME,
-                        PURCHASE_COMPLETED_SUBSCRIPTION_NAME,
-                        JSONObject(PURCHASE_COMPLETED_JSON),
-                    ),
-                )
+                is CurrentPurchase.Canceled -> {
+                    enablePurchaseButton()
+                    Inactive
+                }
+                is CurrentPurchase.Failure -> {
+                    enablePurchaseButton()
+                    Failure
+                }
+                is CurrentPurchase.Waiting -> {
+                    subscriptionsChecker.runChecker()
+                    Waiting
+                }
+                is CurrentPurchase.Success -> {
+                    subscriptionsChecker.runChecker()
+                    Success(
+                        SubscriptionEventData(
+                            PURCHASE_COMPLETED_FEATURE_NAME,
+                            PURCHASE_COMPLETED_SUBSCRIPTION_NAME,
+                            JSONObject(PURCHASE_COMPLETED_JSON),
+                        ),
+                    )
+                }
                 is CurrentPurchase.InProgress, CurrentPurchase.PreFlowInProgress -> InProgress
                 is CurrentPurchase.Recovered -> Recovered
                 is CurrentPurchase.PreFlowFinished -> Inactive
@@ -104,6 +119,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
     fun processJsCallbackMessage(featureName: String, method: String, id: String?, data: JSONObject?) {
         when (method) {
             "backToSettings" -> backToSettings()
+            "backToSettingsActivateSuccess" -> backToSettingsActiveSuccess()
             "getSubscriptionOptions" -> id?.let { getSubscriptionOptions(featureName, method, it) }
             "subscriptionSelected" -> subscriptionSelected(data)
             "activateSubscription" -> activateSubscription()
@@ -114,11 +130,22 @@ class SubscriptionWebViewViewModel @Inject constructor(
         }
     }
 
+    private fun enablePurchaseButton() {
+        viewModelScope.launch {
+            val response = SubscriptionEventData(
+                featureName = PURCHASE_COMPLETED_FEATURE_NAME,
+                subscriptionName = PURCHASE_COMPLETED_SUBSCRIPTION_NAME,
+                params = JSONObject(PURCHASE_CANCELED_JSON),
+            )
+            command.send(SendJsEvent(response))
+        }
+    }
+
     private fun featureSelected(data: JSONObject) {
         val feature = runCatching { data.getString("feature") }.getOrNull() ?: return
         viewModelScope.launch {
             val commandToSend = when (feature) {
-                NETP -> GoToNetP(networkProtectionWaitlist.getScreenForCurrentState())
+                NETP -> networkProtectionWaitlist.getScreenForCurrentState()?.let { GoToNetP(it) }
                 ITR -> GoToITR
                 PIR -> GoToPIR
                 else -> null
@@ -136,7 +163,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
     }
     private fun activateSubscription() {
         viewModelScope.launch(dispatcherProvider.io()) {
-            if (subscriptionsManager.hasSubscription()) {
+            if (subscriptionsManager.subscriptionStatus().isActive()) {
                 pixelSender.reportOnboardingAddDeviceClick()
                 activateOnAnotherDevice()
             } else {
@@ -153,48 +180,50 @@ class SubscriptionWebViewViewModel @Inject constructor(
             val id = runCatching { data?.getString("id") }.getOrNull()
             if (id.isNullOrBlank()) {
                 pixelSender.reportPurchaseFailureOther()
-                _currentPurchaseViewState.emit(currentPurchaseViewState.value.copy(purchaseState = Failure("")))
+                _currentPurchaseViewState.emit(currentPurchaseViewState.value.copy(purchaseState = Failure))
             } else {
                 command.send(SubscriptionSelected(id))
             }
         }
     }
 
-    fun purchaseSubscription(activity: Activity, id: String) {
+    fun purchaseSubscription(activity: Activity, planId: String) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            val offerToken = runCatching { subscriptionsRepository.offerDetail()[id]?.offerToken }.getOrNull() ?: return@launch
-            val productDetails = subscriptionsRepository.subscriptionDetails() ?: return@launch
-            subscriptionsManager.purchase(activity, productDetails, offerToken, false)
+            subscriptionsManager.purchase(activity, planId)
         }
     }
 
     private fun getSubscriptionOptions(featureName: String, method: String, id: String) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            val yearly = subscriptionsRepository.offerDetail()[YEARLY_PLAN]
-            val monthly = subscriptionsRepository.offerDetail()[MONTHLY_PLAN]
-
-            val yearlyJson = OptionsJson(
-                id = yearly?.basePlanId!!,
-                cost = CostJson(displayPrice = yearly.getPrice(), recurrence = YEARLY),
+            var subscriptionOptions = SubscriptionOptionsJson(
+                options = emptyList(),
+                features = emptyList(),
             )
 
-            val monthlyJson = OptionsJson(
-                id = monthly?.basePlanId!!,
-                cost = CostJson(displayPrice = monthly.getPrice(), recurrence = MONTHLY),
-            )
+            if (privacyProFeature.allowPurchase().isEnabled()) {
+                subscriptionsManager.getSubscriptionOffer()?.let { offer ->
+                    val yearlyJson = OptionsJson(
+                        id = offer.yearlyPlanId,
+                        cost = CostJson(displayPrice = offer.yearlyFormattedPrice, recurrence = YEARLY),
+                    )
 
-            val subscriptionOptions = jsonAdapter.toJson(
-                SubscriptionOptionsJson(
-                    options = listOf(yearlyJson, monthlyJson),
-                    features = listOf(FeatureJson(NETP), FeatureJson(ITR), FeatureJson(PIR)),
-                ),
-            )
+                    val monthlyJson = OptionsJson(
+                        id = offer.monthlyPlanId,
+                        cost = CostJson(displayPrice = offer.monthlyFormattedPrice, recurrence = MONTHLY),
+                    )
+
+                    subscriptionOptions = SubscriptionOptionsJson(
+                        options = listOf(yearlyJson, monthlyJson),
+                        features = listOf(FeatureJson(NETP), FeatureJson(ITR), FeatureJson(PIR)),
+                    )
+                }
+            }
 
             val response = JsCallbackData(
                 featureName = featureName,
                 method = method,
                 id = id,
-                params = JSONObject(subscriptionOptions),
+                params = JSONObject(jsonAdapter.toJson(subscriptionOptions)),
             )
             command.send(SendResponseToJs(response))
         }
@@ -212,8 +241,16 @@ class SubscriptionWebViewViewModel @Inject constructor(
         }
     }
 
+    private fun backToSettingsActiveSuccess() {
+        viewModelScope.launch {
+            subscriptionsManager.fetchAndStoreAllData()
+            command.send(BackToSettingsActivateSuccess)
+        }
+    }
+
     private fun backToSettings() {
         viewModelScope.launch {
+            subscriptionsManager.fetchAndStoreAllData()
             command.send(BackToSettings)
         }
     }
@@ -236,12 +273,15 @@ class SubscriptionWebViewViewModel @Inject constructor(
         data object Inactive : PurchaseStateView()
         data object InProgress : PurchaseStateView()
         data class Success(val subscriptionEventData: SubscriptionEventData) : PurchaseStateView()
+        data object Waiting : PurchaseStateView()
         data object Recovered : PurchaseStateView()
-        data class Failure(val message: String) : PurchaseStateView()
+        data object Failure : PurchaseStateView()
     }
 
     sealed class Command {
         data object BackToSettings : Command()
+        data object BackToSettingsActivateSuccess : Command()
+        data class SendJsEvent(val event: SubscriptionEventData) : Command()
         data class SendResponseToJs(val data: JsCallbackData) : Command()
         data class SubscriptionSelected(val id: String) : Command()
         data object ActivateOnAnotherDevice : Command()
@@ -255,5 +295,6 @@ class SubscriptionWebViewViewModel @Inject constructor(
         const val PURCHASE_COMPLETED_FEATURE_NAME = "useSubscription"
         const val PURCHASE_COMPLETED_SUBSCRIPTION_NAME = "onPurchaseUpdate"
         const val PURCHASE_COMPLETED_JSON = """{ type: "completed" }"""
+        const val PURCHASE_CANCELED_JSON = """{ type: "canceled" }"""
     }
 }

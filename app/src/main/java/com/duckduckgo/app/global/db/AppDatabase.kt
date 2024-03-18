@@ -28,6 +28,8 @@ import com.duckduckgo.app.browser.cookies.db.AuthCookieAllowedDomainEntity
 import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsDao
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedPixelDao
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedPixelEntity
+import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedPixelDao
+import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedPixelEntity
 import com.duckduckgo.app.browser.rating.db.*
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.DismissedCta
@@ -68,7 +70,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 
 @Database(
     exportSchema = true,
-    version = 52,
+    version = 54,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -96,6 +98,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
         LocationPermissionEntity::class,
         PixelEntity::class,
         PageLoadedPixelEntity::class,
+        PagePaintedPixelEntity::class,
         WebTrackerBlocked::class,
         AuthCookieAllowedDomainEntity::class,
         Entity::class,
@@ -144,6 +147,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun pixelDao(): PendingPixelDao
 
     abstract fun pageLoadedPixelDao(): PageLoadedPixelDao
+    abstract fun pagePaintedPixelDao(): PagePaintedPixelDao
     abstract fun authCookiesAllowedDomainsDao(): AuthCookiesAllowedDomainsDao
     abstract fun webTrackersBlockedDao(): WebTrackersBlockedDao
 
@@ -641,6 +645,21 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         }
     }
 
+    private val MIGRATION_52_TO_53: Migration = object : Migration(52, 53) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("DELETE FROM `page_loaded_pixel_entity`")
+        }
+    }
+
+    private val MIGRATION_53_TO_54: Migration = object : Migration(53, 54) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL(
+                "CREATE TABLE IF NOT EXISTS `page_painted_pixel_entity` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                    "`appVersion` TEXT NOT NULL, `elapsedTimeFirstPaint` INTEGER NOT NULL, `webViewVersion` TEXT NOT NULL)",
+            )
+        }
+    }
+
     val BOOKMARKS_DB_ON_CREATE = object : RoomDatabase.Callback() {
         override fun onCreate(database: SupportSQLiteDatabase) {
             database.execSQL(
@@ -718,6 +737,8 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             MIGRATION_49_TO_50,
             MIGRATION_50_TO_51,
             MIGRATION_51_TO_52,
+            MIGRATION_52_TO_53,
+            MIGRATION_53_TO_54,
         )
 
     @Deprecated(

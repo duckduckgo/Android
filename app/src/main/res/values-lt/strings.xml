@@ -815,4 +815,12 @@
         <item quantity="other">Ar tikrai norite ištrinti šį aplanką ir %1$d elementų?</item>
     </plurals>
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Ar tikrai norite ištrinti &lt;b&gt;%1$s&lt;/b&gt; žymę?</string>
+
+    <!-- Sync Favicons -->
+    <string name="sync_fetch_icons_title">Gauti žymių piktogramas</string>
+    <string name="sync_fetch_icons_subtitle">Automatiškai atsisiųskite sinchronizuotų žymių piktogramas.</string>
+    <string name="faviconsPromptTitle">Atsisiųsti trūkstamas piktogramas?</string>
+    <string name="faviconsPromptMessage">Ar norite, kad šis įrenginys automatiškai atsisiųstų sinchronizuotų žymų piktogramas iš pažymėtų svetainių?</string>
+    <string name="faviconsPromptPrimaryCta">Nuolat atnaujinti žymų piktogramas</string>
+    <string name="faviconsPromptSecondaryCta">Ne dabar</string>
 </resources>

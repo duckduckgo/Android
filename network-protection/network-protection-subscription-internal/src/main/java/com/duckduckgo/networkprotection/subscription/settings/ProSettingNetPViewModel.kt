@@ -51,6 +51,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import logcat.logcat
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 class ProSettingNetPViewModel(
@@ -106,8 +107,10 @@ class ProSettingNetPViewModel(
     fun onNetPSettingClicked() {
         viewModelScope.launch {
             val screen = networkProtectionWaitlist.getScreenForCurrentState()
-            command.send(Command.OpenNetPScreen(screen))
-            pixel.fire(NETP_SETTINGS_PRESSED)
+            screen?.let {
+                command.send(Command.OpenNetPScreen(screen))
+                pixel.fire(NETP_SETTINGS_PRESSED)
+            } ?: logcat { "Get screen for current NetP state is null" }
         }
     }
 
@@ -136,7 +139,7 @@ class ProSettingNetPViewModel(
                 }
             }
             NetPWaitlistState.NotUnlocked -> Hidden
-            NetPWaitlistState.PendingInviteCode, NetPWaitlistState.JoinedWaitlist, NetPWaitlistState.VerifySubscription -> Pending
+            NetPWaitlistState.PendingInviteCode, NetPWaitlistState.JoinedWaitlist -> Pending
         }
     }
 

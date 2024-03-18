@@ -2,8 +2,10 @@ package com.duckduckgo.subscriptions.impl.settings.views
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenBuyScreen
+import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenRestoreScreen
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenSettings
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -23,7 +25,7 @@ class ProSettingViewModelTest {
 
     @Before
     fun before() {
-        viewModel = ProSettingViewModel(subscriptionsManager, coroutineTestRule.testDispatcherProvider)
+        viewModel = ProSettingViewModel(subscriptionsManager)
     }
 
     @Test
@@ -45,23 +47,21 @@ class ProSettingViewModelTest {
     }
 
     @Test
-    fun whenOnResumeIfSubscriptionEmitViewState() = runTest {
-        whenever(subscriptionsManager.hasSubscription).thenReturn(flowOf(true))
-
-        viewModel.onResume(mock())
-        viewModel.viewState.test {
-            assertTrue(awaitItem().hasSubscription)
+    fun whenOnRestoreThenCommandSent() = runTest {
+        viewModel.commands().test {
+            viewModel.onRestore()
+            assertTrue(awaitItem() is OpenRestoreScreen)
             cancelAndConsumeRemainingEvents()
         }
     }
 
     @Test
-    fun whenOnResumeIfNotSubscriptionEmitViewState() = runTest {
-        whenever(subscriptionsManager.hasSubscription).thenReturn(flowOf(false))
+    fun whenOnResumeEmitViewState() = runTest {
+        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowOf(SubscriptionStatus.EXPIRED))
 
-        viewModel.onResume(mock())
+        viewModel.onCreate(mock())
         viewModel.viewState.test {
-            assertFalse(awaitItem().hasSubscription)
+            assertEquals(SubscriptionStatus.EXPIRED, awaitItem().status)
             cancelAndConsumeRemainingEvents()
         }
     }

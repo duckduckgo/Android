@@ -139,4 +139,30 @@
     <string name="sync_notification_channel_name">Synkronoi</string>
     <string name="sync_notify_me_title">Ilmoitukset on poistettu käytöstä</string>
     <string name="sync_notify_me_description">Saat ilmoituksen, jos synkronointi ja varmuuskopiointi kohtaa virheen.</string>
+
+    <!-- setup errors -->
+    <string name="sync_turn_off_error">Synkronointia ja varmuuskopiointia ei voida poistaa käytöstä.</string>
+    <string name="sync_edit_device_error">Laitteen nimen päivittäminen ei onnistu.</string>
+    <string name="sync_remove_device_error">Tätä laitetta ei voida poistaa synkronoinnista ja varmuuskopioinnista.</string>
+    <string name="sync_delete_data_error">Tietojen poisto palvelimelta epäonnistui.</string>
+    <string name="sync_login_authenticated_device_error">"Jos haluat yhdistää laitteet, poista yhdeltä laitteelta käytöstä Sync &amp; Backup ja napauta toisessa laitteessa \"Synkronoi toisen laitteen kanssa\"."</string>
+    <string name="sync_connect_generic_error">Yhteyden muodostaminen palvelimeen ei onnistu.</string>
+    <string name="sync_connect_login_error">Synkronointi toisen laitteen kanssa ei onnistu.</string>
+    <string name="sync_create_account_generic_error">Yhteyden muodostaminen palvelimeen ei onnistu.</string>
+    <string name="sync_invalid_code_error">Tämä koodi ei kelpaa. Varmista, että oikea koodi annettiin tai skannattiin.</string>
+    <string name="sync_recovery_pdf_error">PDF-palautustiedoston luominen epäonnistui.</string>
+    <string name="sync_dialog_error_ok">OK</string>
+    <string name="sync_dialog_error_title">Synkronoi ja varmuuskopioi</string>
+    <string name="sync_encryption_not_supported_error_title">Laitetta ei tueta</string>
+    <string name="sync_encryption_not_supported_error">Sync &amp; Backup on päästä päähän salattu, ja sen on pystyttävä salaamaan ja tallentamaan tiedot laitteellesi. Koska laitteesi ei tue salattua tallennustilaa, Sync &amp; Backup ei ole käytettävissä.</string>
+
+    <!-- Sync Device Authentication -->
+    <string name="sync_auth_text_for_access">Avaa laitteen lukitus käyttääksesi Sync &amp; Backupia.</string>
+    <string name="sync_biometric_prompt_title">Sync &amp; Backup lukittu</string>
+
+    <!-- Sync Settings -->
+    <string name="sync_delete_server_data_dialog_title">Poista palvelimen tiedot?</string>
+    <string name="sync_delete_server_data_dialog_content">Kaikkien laitteiden yhteys katkaistaan, ja synkronoidut tietosi poistetaan palvelimelta.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Poista tiedot</string>
+    <string name="sync_delete_server_data_dialog_secondary_button">Peruuta</string>
 </resources>

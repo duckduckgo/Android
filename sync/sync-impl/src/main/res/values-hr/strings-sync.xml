@@ -139,4 +139,30 @@
     <string name="sync_notification_channel_name">Sinkronizacija</string>
     <string name="sync_notify_me_title">Obavijesti su onemogućene</string>
     <string name="sync_notify_me_description">Primi obavijest u slučaju da Sinkronizacija i sigurnosno kopiranje nailazi na pogrešku.</string>
+
+    <!-- setup errors -->
+    <string name="sync_turn_off_error">Nije moguće isključiti Sinkronizaciju i sigurnosno kopiranje.</string>
+    <string name="sync_edit_device_error">Nije moguće ažurirati naziv uređaja.</string>
+    <string name="sync_remove_device_error">Nije moguće ukloniti ovaj uređaj iz Sinkronizacije i sigurnosnog kopiranja.</string>
+    <string name="sync_delete_data_error">Nije moguće izbrisati podatke na poslužitelju.</string>
+    <string name="sync_login_authenticated_device_error">"Za uparivanje tih uređaja, isključi opciju Sync &amp; Backup na jednom uređaju, a zatim dodirni \"Sinkroniziraj s drugim uređajem\" (Sync with Another Device) na drugom uređaju."</string>
+    <string name="sync_connect_generic_error">Nije moguće spojiti se na poslužitelj.</string>
+    <string name="sync_connect_login_error">Nije moguće sinkronizirati s drugim uređajem.</string>
+    <string name="sync_create_account_generic_error">Nije moguće spojiti se na poslužitelj.</string>
+    <string name="sync_invalid_code_error">Nažalost, ovaj je kôd nevažeći. Provjeri je li unesen ili skeniran točan kôd.</string>
+    <string name="sync_recovery_pdf_error">Nije moguće izraditi PDF za oporavak.</string>
+    <string name="sync_dialog_error_ok">U redu</string>
+    <string name="sync_dialog_error_title">Sinkronizacija i sigurnosno kopiranje</string>
+    <string name="sync_encryption_not_supported_error_title">Uređaj nije podržan</string>
+    <string name="sync_encryption_not_supported_error">Opcija Sync &amp; Backup šifrirana je metodom \"od kraja do kraja\" (end-to-end) i mora biti u mogućnosti šifrirati i pohranjivati podatke na uređaju. Budući da tvoj uređaj ne podržava šifriranu pohranu, Sync &amp; Backup, tj. sinkronizacija i sigurnosno kopiranje nisu dostupni.</string>
+
+    <!-- Sync Device Authentication -->
+    <string name="sync_auth_text_for_access">Otključaj uređaj za pristup opciji Sync &amp; Backup.</string>
+    <string name="sync_biometric_prompt_title">Opcija Sync &amp; Backup je zaključana</string>
+
+    <!-- Sync Settings -->
+    <string name="sync_delete_server_data_dialog_title">Izbrisati podatke poslužitelja?</string>
+    <string name="sync_delete_server_data_dialog_content">Svi uređaji bit će isključeni i tvoji sinkronizirani podaci bit će izbrisani s poslužitelja.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Izbriši podatke</string>
+    <string name="sync_delete_server_data_dialog_secondary_button">Odustani</string>
 </resources>

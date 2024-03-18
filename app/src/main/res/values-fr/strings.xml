@@ -805,4 +805,12 @@
         <item quantity="other">Voulez-vous vraiment supprimer ce dossier et %1$d éléments ?</item>
     </plurals>
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Voulez-vous vraiment supprimer votre favori pour &lt;b&gt;%1$s&lt;/b&gt; ?</string>
+
+    <!-- Sync Favicons -->
+    <string name="sync_fetch_icons_title">Récupérer les icônes des favoris</string>
+    <string name="sync_fetch_icons_subtitle">Téléchargez automatiquement les icônes de vos signets synchronisés.</string>
+    <string name="faviconsPromptTitle">Télécharger les icônes manquantes ?</string>
+    <string name="faviconsPromptMessage">Voulez-vous que cet appareil télécharge automatiquement les icônes des favoris synchronisés à partir des sites Web ajoutés aux favoris ?</string>
+    <string name="faviconsPromptPrimaryCta">Garder les icônes de favoris à jour</string>
+    <string name="faviconsPromptSecondaryCta">Pas maintenant</string>
 </resources>

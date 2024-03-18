@@ -815,4 +815,12 @@
         <item quantity="other">Opravdu chceš smazat tuhle složku a %1$d položek?</item>
     </plurals>
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Opravdu chceš smazat záložku &lt;b&gt;%1$s&lt;/b&gt;?</string>
+
+    <!-- Sync Favicons -->
+    <string name="sync_fetch_icons_title">Načíst ikony záložek</string>
+    <string name="sync_fetch_icons_subtitle">Automatické stahování ikon synchronizovaných záložek.</string>
+    <string name="faviconsPromptTitle">Stáhnout chybějící ikony?</string>
+    <string name="faviconsPromptMessage">Chceš, aby tohle zařízení automaticky stahovalo ikony webů, které máš v záložkách?</string>
+    <string name="faviconsPromptPrimaryCta">Nechat ikony záložek aktualizované</string>
+    <string name="faviconsPromptSecondaryCta">Teď ne</string>
 </resources>

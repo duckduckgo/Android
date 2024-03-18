@@ -17,11 +17,17 @@
 package com.duckduckgo.subscriptions.impl
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.subscriptions.api.Product
-import com.duckduckgo.subscriptions.api.Subscriptions.EntitlementStatus.Found
-import com.duckduckgo.subscriptions.api.Subscriptions.EntitlementStatus.NotFound
-import com.duckduckgo.subscriptions.impl.services.Entitlement
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.FakeToggleStore
+import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.subscriptions.api.Product.NetP
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus.AUTO_RENEWABLE
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus.UNKNOWN
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus.WAITING
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -38,16 +44,19 @@ class RealSubscriptionsTest {
     val coroutineRule = CoroutineTestRule()
 
     private val mockSubscriptionsManager: SubscriptionsManager = mock()
+    private val pixelSender: SubscriptionPixelSender = mock()
     private lateinit var subscriptions: RealSubscriptions
+    private val privacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java, FakeToggleStore())
 
     @Before
     fun before() {
-        subscriptions = RealSubscriptions(mockSubscriptionsManager)
+        subscriptions = RealSubscriptions(mockSubscriptionsManager, privacyProFeature, pixelSender)
     }
 
     @Test
     fun whenSubscriptionDataSucceedsThenReturnAccessToken() = runTest {
         whenever(mockSubscriptionsManager.getAccessToken()).thenReturn(AccessToken.Success("accessToken"))
+        privacyProFeature.isLaunched().setEnabled(State(enable = true))
         val result = subscriptions.getAccessToken()
         assertEquals("accessToken", result)
     }
@@ -59,35 +68,54 @@ class RealSubscriptionsTest {
     }
 
     @Test
-    fun whenSubscriptionDataHasEntitlementThenReturnFound() = runTest {
-        whenever(mockSubscriptionsManager.getSubscriptionData()).thenReturn(
-            SubscriptionsData.Success("email", "externalId", listOf(Entitlement("id", "name", Product.NetP.value))),
-        )
+    fun whenSubscriptionDataHasEntitlementThenReturnList() = runTest {
+        privacyProFeature.isLaunched().setEnabled(State(enable = true))
+        whenever(mockSubscriptionsManager.entitlements).thenReturn(flowOf(listOf(NetP)))
 
-        subscriptions.getEntitlementStatus(Product.NetP).also {
-            assertTrue(it.isSuccess)
-            assertEquals(Found, it.getOrNull())
+        subscriptions.getEntitlementStatus().test {
+            assertTrue(awaitItem().isNotEmpty())
+            cancelAndConsumeRemainingEvents()
         }
     }
 
     @Test
-    fun whenSubscriptionDataHasNoEntitlementThenReturnNotFound() = runTest {
-        whenever(mockSubscriptionsManager.getSubscriptionData()).thenReturn(
-            SubscriptionsData.Success("email", "externalId", listOf(Entitlement("id", "name", Product.NetP.value))),
-        )
+    fun whenSubscriptionDataHasNoEntitlementThenReturnEmptyList() = runTest {
+        privacyProFeature.isLaunched().setEnabled(State(enable = true))
+        whenever(mockSubscriptionsManager.entitlements).thenReturn(flowOf(emptyList()))
 
-        subscriptions.getEntitlementStatus(Product.ITR).also {
-            assertTrue(it.isSuccess)
-            assertEquals(NotFound, it.getOrNull())
+        subscriptions.getEntitlementStatus().test {
+            assertTrue(awaitItem().isEmpty())
+            cancelAndConsumeRemainingEvents()
         }
     }
 
     @Test
-    fun whenSubscriptionDataFailsThenReturnFailure() = runTest {
-        whenever(mockSubscriptionsManager.getSubscriptionData()).thenReturn(SubscriptionsData.Failure("error"))
+    fun whenIsEligibleIfOffersReturnedThenReturnTrueRegardlessOfStatus() = runTest {
+        whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(UNKNOWN)
+        whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(
+            SubscriptionOffer(monthlyPlanId = "test", yearlyFormattedPrice = "test", yearlyPlanId = "test", monthlyFormattedPrice = "test"),
+        )
+        assertTrue(subscriptions.isEligible())
+    }
 
-        subscriptions.getEntitlementStatus(Product.NetP).also {
-            assertTrue(it.isFailure)
-        }
+    @Test
+    fun whenIsEligibleIfNotOffersReturnedThenReturnFalseIfNotActiveOrWaiting() = runTest {
+        whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(UNKNOWN)
+        whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(null)
+        assertFalse(subscriptions.isEligible())
+    }
+
+    @Test
+    fun whenIsEligibleIfNotOffersReturnedThenReturnTrueIfWaiting() = runTest {
+        whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(WAITING)
+        whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(null)
+        assertTrue(subscriptions.isEligible())
+    }
+
+    @Test
+    fun whenIsEligibleIfNotOffersReturnedThenReturnTrueIfActive() = runTest {
+        whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
+        whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(null)
+        assertTrue(subscriptions.isEligible())
     }
 }

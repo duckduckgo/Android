@@ -53,6 +53,21 @@ interface GlobalActivityStarter {
     fun start(context: Context, params: ActivityParams, options: Bundle? = null)
 
     /**
+     * Starts the activity given [deeplinkActivityParams].
+     *
+     * [deeplinkActivityParams] will be mapped into [ActivityParams] using the [ParamToActivityMapper], and then used to start the activity.
+     * The activity can later retrieve the [Serializable] [params] using the extension function [Bundle.getActivityParams]
+     *
+     * @param deeplinkActivityParams Deeplink activity parameters to be mapped into [ActivityParams]
+     * @param context the context used to start the activity
+     * @param options additional options for how the activity should be started, eg. scene transition animations
+     *
+     * @throws IllegalArgumentException when the Activity can't be found, or when the [deeplinkActivityParams] can't be mapped into [ActivityParams]
+     */
+    @Throws(IllegalArgumentException::class)
+    fun start(context: Context, deeplinkActivityParams: DeeplinkActivityParams, options: Bundle? = null)
+
+    /**
      * Returns  the [Intent] that can be used to start the [Activity], given the [ActivityParams].
      * This method will generally be used to start the activity for result.
      *
@@ -61,10 +76,30 @@ interface GlobalActivityStarter {
     fun startIntent(context: Context, params: ActivityParams): Intent?
 
     /**
+     * Returns  the [Intent] that can be used to start the [Activity], given the [DeeplinkActivityParams].
+     * [deeplinkActivityParams] will be mapped into [ActivityParams] using the [ParamToActivityMapper], which will be added into the [Intent] to start the activity.
+     *
+     * This method will generally be used to start the activity for result.
+     *
+     * @return the [Intent] that can be used to start the [Activity]
+     */
+    fun startIntent(context: Context, deeplinkActivityParams: DeeplinkActivityParams): Intent?
+
+    /**
      * This is a marker class
      * Mark all data classes related to activity arguments with this type
      */
     interface ActivityParams : Serializable
+
+    /**
+     * Class that represents the parameters to start an activity using a deeplink.
+     *
+     * When using this class to navigate to an activity, this class will be mapped into [ActivityParams] using the [ParamToActivityMapper].
+     *
+     * @param screenName to be used into [ParamToActivityMapper] to find the [ActivityParams] to start the activity
+     * @param jsonArguments to be serialized into [ActivityParams] when it has extra params. Empty if no params are needed.
+     */
+    data class DeeplinkActivityParams(val screenName: String, val jsonArguments: String = "")
 
     /**
      * Implement this mapper that will return [Activity] class for the given parameters.
@@ -97,6 +132,11 @@ interface GlobalActivityStarter {
          * @return the [Activity] class if it matches the desired parameters, otherwise return `null`
          */
         fun map(activityParams: ActivityParams): Class<out AppCompatActivity>?
+
+        /**
+         * @return the [ActivityParams] if it matches the desired deeplink parameters, otherwise return `null`
+         */
+        fun map(deeplinkActivityParams: DeeplinkActivityParams): ActivityParams?
     }
 }
 

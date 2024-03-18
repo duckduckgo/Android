@@ -22,9 +22,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.subscriptions.impl.Subscription
 import com.duckduckgo.subscriptions.impl.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
@@ -41,6 +39,9 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
@@ -48,7 +49,6 @@ import kotlinx.coroutines.launch
 @ContributesViewModel(ActivityScope::class)
 class SubscriptionSettingsViewModel @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
-    private val dispatcherProvider: DispatcherProvider,
     private val pixelSender: SubscriptionPixelSender,
 ) : ViewModel(), DefaultLifecycleObserver {
 
@@ -64,20 +64,29 @@ class SubscriptionSettingsViewModel @Inject constructor(
         val platform: String? = null,
     )
 
-    override fun onResume(owner: LifecycleOwner) {
-        viewModelScope.launch(dispatcherProvider.io()) {
-            val subs = subscriptionsManager.getSubscription()
-            if (subs is Subscription.Success) {
-                val formatter = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
-                val date = formatter.format(Date(subs.expiresOrRenewsAt))
-                val type = if (subs.productId == MONTHLY_PLAN) Monthly else Yearly
-                _viewState.emit(viewState.value.copy(date = date, duration = type, status = subs.status, platform = subs.platform))
-            }
+    override fun onCreate(owner: LifecycleOwner) {
+        super.onCreate(owner)
+
+        subscriptionsManager.subscriptionStatus
+            .distinctUntilChanged()
+            .onEach {
+                emitChanges()
+            }.launchIn(viewModelScope)
+    }
+
+    private suspend fun emitChanges() {
+        subscriptionsManager.getSubscription()?.let {
+            val formatter = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
+            val date = formatter.format(Date(it.expiresOrRenewsAt))
+            val type = if (it.productId == MONTHLY_PLAN) Monthly else Yearly
+            _viewState.emit(
+                viewState.value.copy(date = date, duration = type, status = it.status, platform = it.platform),
+            )
         }
     }
 
     fun goToStripe() {
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             val url = subscriptionsManager.getPortalUrl() ?: return@launch
             command.send(GoToPortal(url))
         }

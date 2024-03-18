@@ -35,6 +35,7 @@ android {
 dependencies {
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
+    implementation project(path: ':browser-api')
     implementation project(path: ':ad-click-api')
     implementation project(path: ':di')
     implementation project(path: ':common-utils')

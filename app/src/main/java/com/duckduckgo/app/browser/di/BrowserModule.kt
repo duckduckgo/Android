@@ -40,6 +40,7 @@ import com.duckduckgo.app.browser.mediaplayback.store.ALL_MIGRATIONS
 import com.duckduckgo.app.browser.mediaplayback.store.MediaPlaybackDao
 import com.duckduckgo.app.browser.mediaplayback.store.MediaPlaybackDatabase
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedPixelDao
+import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedPixelDao
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewGenerator
@@ -305,6 +306,12 @@ class BrowserModule {
     @SingleInstanceIn(AppScope::class)
     fun providePageLoadedPixelDao(appDatabase: AppDatabase): PageLoadedPixelDao {
         return appDatabase.pageLoadedPixelDao()
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun providePagePaintedPixelDao(appDatabase: AppDatabase): PagePaintedPixelDao {
+        return appDatabase.pagePaintedPixelDao()
     }
 
     @Provides

@@ -72,6 +72,9 @@ android {
     kotlin {
         jvmToolchain(17)
     }
+    ksp {
+        arg("room.generateKotlin", "true")
+    }
     signingConfigs {
         release
     }
@@ -168,6 +171,9 @@ fladle {
 }
 
 dependencies {
+	implementation project(":verified-installation-impl")
+	implementation project(":verified-installation-api")
+
     implementation project(':navigation-api')
     implementation project(':navigation-impl')
 
@@ -298,11 +304,13 @@ dependencies {
     implementation project(':web-compat-impl')
     implementation project(':web-compat-store')
 
+    implementation project(':subscriptions-api')
+    implementation project(':network-protection-subscription-internal')
     if (project.hasProperty('internal-testing')) {
-        implementation project(':subscriptions-api')
         implementation project(':subscriptions-impl')
         internalImplementation project(':subscriptions-internal')
-        internalImplementation project(':network-protection-subscription-internal')
+    } else {
+        implementation project(":subscriptions-dummy-impl")
     }
 
     implementation project(':user-agent-api')
@@ -349,6 +357,7 @@ dependencies {
     implementation "io.reactivex.rxjava2:rxjava:_"
     implementation "io.reactivex.rxjava2:rxandroid:_"
     implementation JakeWharton.timber
+    implementation 'nl.dionsegijn:konfetti:1.2.5'
 
     // RxRelay
     implementation "com.jakewharton.rxrelay2:rxrelay:_"

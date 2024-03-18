@@ -20,6 +20,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.api.RefreshRetentionAtbPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
+import com.duckduckgo.subscriptions.impl.repository.isActive
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -36,7 +37,7 @@ class SubscriptionRefreshRetentionAtbPlugin @Inject constructor(
 
     override fun onAppRetentionAtbRefreshed() {
         coroutineScope.launch {
-            if (subscriptionsManager.hasSubscription()) {
+            if (subscriptionsManager.subscriptionStatus().isActive()) {
                 pixelSender.reportSubscriptionActive()
             }
         }

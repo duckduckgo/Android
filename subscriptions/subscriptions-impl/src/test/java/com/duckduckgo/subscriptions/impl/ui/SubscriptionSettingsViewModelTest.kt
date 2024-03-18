@@ -2,15 +2,17 @@ package com.duckduckgo.subscriptions.impl.ui
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.subscriptions.impl.Subscription
-import com.duckduckgo.subscriptions.impl.SubscriptionStatus.AutoRenewable
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus.*
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
+import com.duckduckgo.subscriptions.impl.repository.Subscription
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.FinishSignOut
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPortal
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Yearly
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -31,7 +33,7 @@ class SubscriptionSettingsViewModelTest {
 
     @Before
     fun before() {
-        viewModel = SubscriptionSettingsViewModel(subscriptionsManager, coroutineTestRule.testDispatcherProvider, pixelSender)
+        viewModel = SubscriptionSettingsViewModel(subscriptionsManager, pixelSender)
     }
 
     @Test
@@ -45,16 +47,20 @@ class SubscriptionSettingsViewModelTest {
     @Test
     fun whenSubscriptionThenFormatDateCorrectly() = runTest {
         whenever(subscriptionsManager.getSubscription()).thenReturn(
-            Subscription.Success(
+            Subscription(
                 productId = SubscriptionsConstants.MONTHLY_PLAN,
                 startedAt = 1234,
                 expiresOrRenewsAt = 1701694623000,
-                status = AutoRenewable,
+                status = AUTO_RENEWABLE,
                 platform = "android",
+                entitlements = emptyList(),
             ),
         )
+        val flowTest: MutableSharedFlow<SubscriptionStatus> = MutableSharedFlow()
+        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowTest)
 
-        viewModel.onResume(mock())
+        viewModel.onCreate(mock())
+        flowTest.emit(AUTO_RENEWABLE)
         viewModel.viewState.test {
             assertEquals("December 04, 2023", awaitItem().date)
         }
@@ -63,16 +69,20 @@ class SubscriptionSettingsViewModelTest {
     @Test
     fun whenSubscriptionMonthlyThenReturnMonthly() = runTest {
         whenever(subscriptionsManager.getSubscription()).thenReturn(
-            Subscription.Success(
+            Subscription(
                 productId = SubscriptionsConstants.MONTHLY_PLAN,
                 startedAt = 1234,
                 expiresOrRenewsAt = 1701694623000,
-                status = AutoRenewable,
+                status = AUTO_RENEWABLE,
                 platform = "android",
+                entitlements = emptyList(),
             ),
         )
+        val flowTest: MutableSharedFlow<SubscriptionStatus> = MutableSharedFlow()
+        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowTest)
 
-        viewModel.onResume(mock())
+        viewModel.onCreate(mock())
+        flowTest.emit(AUTO_RENEWABLE)
         viewModel.viewState.test {
             assertEquals(Monthly, awaitItem().duration)
         }
@@ -81,16 +91,21 @@ class SubscriptionSettingsViewModelTest {
     @Test
     fun whenSubscriptionYearlyThenReturnYearly() = runTest {
         whenever(subscriptionsManager.getSubscription()).thenReturn(
-            Subscription.Success(
+            Subscription(
                 productId = SubscriptionsConstants.YEARLY_PLAN,
                 startedAt = 1234,
                 expiresOrRenewsAt = 1701694623000,
-                status = AutoRenewable,
+                status = AUTO_RENEWABLE,
                 platform = "android",
+                entitlements = emptyList(),
             ),
         )
 
-        viewModel.onResume(mock())
+        val flowTest: MutableSharedFlow<SubscriptionStatus> = MutableSharedFlow()
+        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowTest)
+
+        viewModel.onCreate(mock())
+        flowTest.emit(AUTO_RENEWABLE)
         viewModel.viewState.test {
             assertEquals(Yearly, awaitItem().duration)
         }

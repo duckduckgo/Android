@@ -139,4 +139,30 @@
     <string name="sync_notification_channel_name">Senkronizasyon</string>
     <string name="sync_notify_me_title">Bildirimler devre dışı bırakıldı</string>
     <string name="sync_notify_me_description">Senkronizasyon ve Yedekleme\'nin bir hatayla karşılaşması durumunda bildirim alın.</string>
+
+    <!-- setup errors -->
+    <string name="sync_turn_off_error">Senkronizasyon ve Yedekleme kapatılamıyor.</string>
+    <string name="sync_edit_device_error">Cihaz adı güncellenemiyor.</string>
+    <string name="sync_remove_device_error">Bu cihaz Senkronizasyon ve Yedekleme\'den kaldırılamıyor.</string>
+    <string name="sync_delete_data_error">Sunucudaki veriler silinemiyor.</string>
+    <string name="sync_login_authenticated_device_error">"Bu cihazları eşleştirmek için bir cihazda Senkronizasyon ve Yedeklemeyi kapattıktan sonra diğer cihazda \"Başka bir Cihazla Senkronizasyon\" ögesine dokunun."</string>
+    <string name="sync_connect_generic_error">Sunucuya bağlanılamıyor.</string>
+    <string name="sync_connect_login_error">Başka bir cihazla senkronize edilemiyor.</string>
+    <string name="sync_create_account_generic_error">Sunucuya bağlanılamıyor.</string>
+    <string name="sync_invalid_code_error">Üzgünüz, bu kod geçersiz. Lütfen doğru kodun girildiğinden veya tarandığından emin olun.</string>
+    <string name="sync_recovery_pdf_error">Kurtarma PDF\'i oluşturulamıyor.</string>
+    <string name="sync_dialog_error_ok">Tamam</string>
+    <string name="sync_dialog_error_title">Senkronizasyon ve Yedekleme</string>
+    <string name="sync_encryption_not_supported_error_title">Cihaz desteklenmiyor</string>
+    <string name="sync_encryption_not_supported_error">Sync &amp; Backup uçtan uca şifrelenir ve cihazınızdaki verileri şifreleyip saklayabilmesi gerekir. Cihazınız şifrelenmiş depolamayı desteklemediği için Sync &amp; Backup kullanılamaz.</string>
+
+    <!-- Sync Device Authentication -->
+    <string name="sync_auth_text_for_access">Sync &amp; Backup\'a erişmek için cihazın kilidini açın.</string>
+    <string name="sync_biometric_prompt_title">Sync &amp; Backup Kilitli</string>
+
+    <!-- Sync Settings -->
+    <string name="sync_delete_server_data_dialog_title">Sunucu Verileri Silinsin mi?</string>
+    <string name="sync_delete_server_data_dialog_content">Tüm cihazların bağlantısı kesilecek ve senkronize edilen verileriniz sunucudan silinecektir.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Verileri Sil</string>
+    <string name="sync_delete_server_data_dialog_secondary_button">Vazgeç</string>
 </resources>

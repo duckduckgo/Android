@@ -28,7 +28,6 @@ import android.webkit.URLUtil
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
-import android.webkit.WebView.WebViewTransport
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.annotation.AnyThread
@@ -44,7 +43,6 @@ import com.duckduckgo.app.browser.SpecialUrlDetector
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
-import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
 import com.duckduckgo.common.ui.view.show
@@ -77,14 +75,16 @@ import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionsWebvie
 import com.duckduckgo.subscriptions.impl.pir.PirActivity.Companion.PirScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.AddDeviceActivity.Companion.AddDeviceScreenWithEmptyParams
-import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionActivity.Companion.RestoreSubscriptionScreenWithEmptyParams
+import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionActivity.Companion.RestoreSubscriptionScreenWithParams
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.ActivateOnAnotherDevice
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.BackToSettings
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.BackToSettingsActivateSuccess
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.GoToITR
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.GoToNetP
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.GoToPIR
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.RestoreSubscription
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SendJsEvent
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SendResponseToJs
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SubscriptionSelected
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView
@@ -392,7 +392,8 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
 
     private fun processCommand(command: Command) {
         when (command) {
-            is BackToSettings -> backToSettings()
+            is BackToSettings, BackToSettingsActivateSuccess -> backToSettings()
+            is SendJsEvent -> sendJsEvent(command.event)
             is SendResponseToJs -> sendResponseToJs(command.data)
             is SubscriptionSelected -> selectSubscription(command.id)
             is ActivateOnAnotherDevice -> activateOnAnotherDevice()
@@ -401,6 +402,10 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             is GoToPIR -> goToPIR()
             is GoToNetP -> goToNetP(command.activityParams)
         }
+    }
+
+    private fun sendJsEvent(event: SubscriptionEventData) {
+        subscriptionJsMessaging.sendSubscriptionEvent(event)
     }
 
     private fun goToITR() {
@@ -424,32 +429,20 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
 
     private fun renderPurchaseState(purchaseState: PurchaseStateView) {
         when (purchaseState) {
-            is PurchaseStateView.InProgress -> {
-                binding.webview.gone()
-                binding.progress.show()
+            is PurchaseStateView.InProgress, PurchaseStateView.Inactive -> {
+                // NO OP
             }
-
-            is PurchaseStateView.Inactive -> {
-                binding.webview.show()
-                binding.progress.gone()
+            is PurchaseStateView.Waiting -> {
+                onPurchaseSuccess(null)
             }
-
             is PurchaseStateView.Success -> {
-                binding.webview.show()
-                binding.progress.gone()
                 onPurchaseSuccess(purchaseState.subscriptionEventData)
             }
-
             is PurchaseStateView.Recovered -> {
-                binding.webview.show()
-                binding.progress.gone()
                 onPurchaseRecovered()
             }
-
             is PurchaseStateView.Failure -> {
-                binding.webview.show()
-                binding.progress.gone()
-                onPurchaseFailure(purchaseState.message)
+                onPurchaseFailure()
             }
         }
     }
@@ -469,7 +462,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             .show()
     }
 
-    private fun onPurchaseSuccess(subscriptionEventData: SubscriptionEventData) {
+    private fun onPurchaseSuccess(subscriptionEventData: SubscriptionEventData?) {
         TextAlertDialogBuilder(this)
             .setTitle(getString(string.purchaseCompletedTitle))
             .setMessage(getString(string.purchaseCompletedText))
@@ -477,23 +470,26 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
-                        subscriptionJsMessaging.sendSubscriptionEvent(subscriptionEventData)
+                        if (subscriptionEventData != null) {
+                            subscriptionJsMessaging.sendSubscriptionEvent(subscriptionEventData)
+                        } else {
+                            finish()
+                        }
                     }
                 },
             )
             .show()
     }
 
-    private fun onPurchaseFailure(message: String) {
+    private fun onPurchaseFailure() {
         TextAlertDialogBuilder(this)
             .setTitle(getString(string.purchaseErrorTitle))
-            .setMessage(message)
-            .setDestructiveButtons(true)
-            .setPositiveButton(string.ok)
+            .setMessage(getString(string.purchaseError))
+            .setPositiveButton(string.backToSettings)
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
-                        // NOOP
+                        finish()
                     }
                 },
             )
@@ -526,7 +522,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     }
 
     private fun restoreSubscription() {
-        startForResultRestore.launch(globalActivityStarter.startIntent(this, RestoreSubscriptionScreenWithEmptyParams))
+        startForResultRestore.launch(globalActivityStarter.startIntent(this, RestoreSubscriptionScreenWithParams(isOriginWeb = true)))
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

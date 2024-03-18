@@ -110,7 +110,6 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
         fakeToggle,
         fakeUserAllowListRepository,
         mock(),
-        mock(),
     )
     private val mockGpc: Gpc = mock()
     private val mockAdClickManager: AdClickManager = mock()
@@ -184,7 +183,7 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
 
         val response = testee.shouldIntercept(
             request = mockRequest,
-            documentUrl = testCase.siteURL,
+            documentUri = testCase.siteURL.toUri(),
             webView = webView,
             webViewClientListener = null,
         )
@@ -229,7 +228,7 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
         val entities = tdsJson.jsonToEntities()
         val domainEntities = tdsJson.jsonToDomainEntities()
         val cnameEntities = tdsJson.jsonToCnameEntities()
-        val client = TdsClient(Client.ClientName.TDS, trackers, RealUrlToTypeMapper())
+        val client = TdsClient(Client.ClientName.TDS, trackers, RealUrlToTypeMapper(), false)
 
         tdsEntityDao.insertAll(entities)
         tdsDomainEntityDao.insertAll(domainEntities)

@@ -61,7 +61,7 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
     }
 
     protected fun daggerInject() {
-        AndroidInjection.inject(this)
+        AndroidInjection.inject(this, bindingKey = DaggerActivity::class.java)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

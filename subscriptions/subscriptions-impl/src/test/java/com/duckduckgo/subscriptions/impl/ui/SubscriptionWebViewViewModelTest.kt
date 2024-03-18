@@ -2,20 +2,23 @@ package com.duckduckgo.subscriptions.impl.ui
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
-import com.android.billingclient.api.ProductDetails.PricingPhase
-import com.android.billingclient.api.ProductDetails.PricingPhases
-import com.android.billingclient.api.ProductDetails.SubscriptionOfferDetails
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.FakeToggleStore
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetPWaitlistInvitedScreenNoParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist
 import com.duckduckgo.subscriptions.impl.CurrentPurchase
 import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
+import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import com.duckduckgo.subscriptions.impl.SubscriptionOffer
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus.AUTO_RENEWABLE
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus.EXPIRED
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus.INACTIVE
+import com.duckduckgo.subscriptions.impl.SubscriptionsChecker
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
-import com.duckduckgo.subscriptions.impl.repository.SubscriptionsRepository
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Companion
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView
@@ -43,9 +46,10 @@ class SubscriptionWebViewViewModelTest {
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
     private val jsonAdapter: JsonAdapter<SubscriptionOptionsJson> = moshi.adapter(SubscriptionOptionsJson::class.java)
     private val subscriptionsManager: SubscriptionsManager = mock()
-    private val subscriptionsRepository: SubscriptionsRepository = mock()
     private val networkProtectionWaitlist: NetworkProtectionWaitlist = mock()
+    private val subscriptionsChecker: SubscriptionsChecker = mock()
     private val pixelSender: SubscriptionPixelSender = mock()
+    private val privacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java, FakeToggleStore())
 
     private lateinit var viewModel: SubscriptionWebViewViewModel
 
@@ -55,9 +59,10 @@ class SubscriptionWebViewViewModelTest {
         viewModel = SubscriptionWebViewViewModel(
             coroutineTestRule.testDispatcherProvider,
             subscriptionsManager,
-            subscriptionsRepository,
+            subscriptionsChecker,
             networkProtectionWaitlist,
             pixelSender,
+            privacyProFeature,
         )
     }
 
@@ -91,6 +96,40 @@ class SubscriptionWebViewViewModelTest {
 
             flowTest.emit(CurrentPurchase.PreFlowFinished)
             assertTrue(awaitItem().purchaseState is PurchaseStateView.Inactive)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPurchaseStateFailedThenSendCanceledMessage() = runTest {
+        val flowTest: MutableSharedFlow<CurrentPurchase> = MutableSharedFlow()
+        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowTest)
+        viewModel.start()
+
+        viewModel.commands().test {
+            flowTest.emit(CurrentPurchase.Failure("test"))
+
+            val result = awaitItem()
+            assertTrue(result is Command.SendJsEvent)
+            assertEquals("{\"type\":\"canceled\"}", (result as Command.SendJsEvent).event.params.toString())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPurchaseStateCanceledThenSendCanceledMessage() = runTest {
+        val flowTest: MutableSharedFlow<CurrentPurchase> = MutableSharedFlow()
+        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowTest)
+        viewModel.start()
+
+        viewModel.commands().test {
+            flowTest.emit(CurrentPurchase.Canceled)
+
+            val result = awaitItem()
+            assertTrue(result is Command.SendJsEvent)
+            assertEquals("{\"type\":\"canceled\"}", (result as Command.SendJsEvent).event.params.toString())
 
             cancelAndConsumeRemainingEvents()
         }
@@ -140,10 +179,25 @@ class SubscriptionWebViewViewModelTest {
     }
 
     @Test
+    fun whenBackToSettingsActivateSuccessThenCommandSent() = runTest {
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "backToSettingsActivateSuccess", "id", JSONObject("{}"))
+            assertTrue(awaitItem() is Command.BackToSettingsActivateSuccess)
+        }
+    }
+
+    @Test
     fun whenGetSubscriptionOptionsThenSendCommand() = runTest {
-        val monthly = getSubscriptionOfferDetails("monthly")
-        val yearly = getSubscriptionOfferDetails("yearly")
-        whenever(subscriptionsRepository.offerDetail()).thenReturn(mapOf(MONTHLY_PLAN to monthly, YEARLY_PLAN to yearly))
+        privacyProFeature.allowPurchase().setEnabled(Toggle.State(enable = true))
+
+        whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(
+            SubscriptionOffer(
+                monthlyPlanId = "monthly",
+                monthlyFormattedPrice = "$1",
+                yearlyPlanId = "yearly",
+                yearlyFormattedPrice = "$10",
+            ),
+        )
 
         viewModel.commands().test {
             viewModel.processJsCallbackMessage("test", "getSubscriptionOptions", "id", JSONObject("{}"))
@@ -161,8 +215,58 @@ class SubscriptionWebViewViewModelTest {
     }
 
     @Test
+    fun whenGetSubscriptionsAndNoSubscriptionOfferThenSendCommandWithEmptyData() = runTest {
+        privacyProFeature.allowPurchase().setEnabled(Toggle.State(enable = true))
+
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "getSubscriptionOptions", "id", JSONObject("{}"))
+
+            val result = awaitItem()
+            assertTrue(result is Command.SendResponseToJs)
+
+            val response = (result as Command.SendResponseToJs).data
+            assertEquals("id", response.id)
+            assertEquals("test", response.featureName)
+            assertEquals("getSubscriptionOptions", response.method)
+
+            val params = jsonAdapter.fromJson(response.params.toString())!!
+            assertEquals(0, params.options.size)
+            assertEquals(0, params.features.size)
+        }
+    }
+
+    @Test
+    fun whenGetSubscriptionsAndToggleOffThenSendCommandWithEmptyData() = runTest {
+        privacyProFeature.allowPurchase().setEnabled(Toggle.State(enable = false))
+        whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(
+            SubscriptionOffer(
+                monthlyPlanId = "monthly",
+                monthlyFormattedPrice = "$1",
+                yearlyPlanId = "yearly",
+                yearlyFormattedPrice = "$10",
+            ),
+        )
+
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "getSubscriptionOptions", "id", JSONObject("{}"))
+
+            val result = awaitItem()
+            assertTrue(result is Command.SendResponseToJs)
+
+            val response = (result as Command.SendResponseToJs).data
+            assertEquals("id", response.id)
+            assertEquals("test", response.featureName)
+            assertEquals("getSubscriptionOptions", response.method)
+
+            val params = jsonAdapter.fromJson(response.params.toString())!!
+            assertEquals(0, params.options.size)
+            assertEquals(0, params.features.size)
+        }
+    }
+
+    @Test
     fun whenActivateSubscriptionAndSubscriptionActiveThenCommandSent() = runTest {
-        whenever(subscriptionsManager.hasSubscription()).thenReturn(true)
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
         viewModel.commands().test {
             viewModel.processJsCallbackMessage("test", "activateSubscription", null, null)
             assertTrue(awaitItem() is Command.ActivateOnAnotherDevice)
@@ -171,7 +275,7 @@ class SubscriptionWebViewViewModelTest {
 
     @Test
     fun whenActivateSubscriptionAndSubscriptionInactiveThenCommandSent() = runTest {
-        whenever(subscriptionsManager.hasSubscription()).thenReturn(false)
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(INACTIVE)
         viewModel.commands().test {
             viewModel.processJsCallbackMessage("test", "activateSubscription", null, null)
             assertTrue(awaitItem() is Command.RestoreSubscription)
@@ -180,7 +284,7 @@ class SubscriptionWebViewViewModelTest {
 
     @Test
     fun whenFeatureSelectedAndNoDataThenCommandNotSent() = runTest {
-        whenever(subscriptionsManager.hasSubscription()).thenReturn(false)
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(EXPIRED)
         viewModel.commands().test {
             viewModel.processJsCallbackMessage("test", "featureSelected", null, null)
             ensureAllEventsConsumed()
@@ -189,7 +293,7 @@ class SubscriptionWebViewViewModelTest {
 
     @Test
     fun whenFeatureSelectedAndInvalidDataThenCommandNotSent() = runTest {
-        whenever(subscriptionsManager.hasSubscription()).thenReturn(false)
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(EXPIRED)
         viewModel.commands().test {
             viewModel.processJsCallbackMessage("test", "featureSelected", null, JSONObject("{}"))
             ensureAllEventsConsumed()
@@ -198,7 +302,7 @@ class SubscriptionWebViewViewModelTest {
 
     @Test
     fun whenFeatureSelectedAndInvalidFeatureThenCommandNotSent() = runTest {
-        whenever(subscriptionsManager.hasSubscription()).thenReturn(false)
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(EXPIRED)
         viewModel.commands().test {
             viewModel.processJsCallbackMessage("test", "featureSelected", null, JSONObject("""{"feature":"test"}"""))
             ensureAllEventsConsumed()
@@ -207,7 +311,7 @@ class SubscriptionWebViewViewModelTest {
 
     @Test
     fun whenFeatureSelectedAndFeatureIsNetPThenCommandSent() = runTest {
-        whenever(subscriptionsManager.hasSubscription()).thenReturn(false)
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(EXPIRED)
         viewModel.commands().test {
             viewModel.processJsCallbackMessage(
                 "test",
@@ -221,7 +325,7 @@ class SubscriptionWebViewViewModelTest {
 
     @Test
     fun whenFeatureSelectedAndFeatureIsItrThenCommandSent() = runTest {
-        whenever(subscriptionsManager.hasSubscription()).thenReturn(false)
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(EXPIRED)
         viewModel.commands().test {
             viewModel.processJsCallbackMessage(
                 "test",
@@ -235,7 +339,7 @@ class SubscriptionWebViewViewModelTest {
 
     @Test
     fun whenFeatureSelectedAndFeatureIsPirThenCommandSent() = runTest {
-        whenever(subscriptionsManager.hasSubscription()).thenReturn(false)
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(EXPIRED)
         viewModel.commands().test {
             viewModel.processJsCallbackMessage(
                 "test",
@@ -260,7 +364,7 @@ class SubscriptionWebViewViewModelTest {
 
     @Test
     fun whenRestorePurchaseClickedThenPixelIsSent() = runTest {
-        whenever(subscriptionsManager.hasSubscription()).thenReturn(false)
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(EXPIRED)
         viewModel.processJsCallbackMessage(
             featureName = "test",
             method = "activateSubscription",
@@ -272,7 +376,7 @@ class SubscriptionWebViewViewModelTest {
 
     @Test
     fun whenActivateOnAnotherDeviceClickedThenPixelIsSent() = runTest {
-        whenever(subscriptionsManager.hasSubscription()).thenReturn(true)
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
         viewModel.processJsCallbackMessage(
             featureName = "test",
             method = "activateSubscription",
@@ -284,7 +388,7 @@ class SubscriptionWebViewViewModelTest {
 
     @Test
     fun whenFeatureSelectedAndFeatureIsNetPThenPixelSent() = runTest {
-        whenever(subscriptionsManager.hasSubscription()).thenReturn(false)
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(EXPIRED)
         viewModel.processJsCallbackMessage(
             featureName = "test",
             method = "featureSelected",
@@ -296,7 +400,7 @@ class SubscriptionWebViewViewModelTest {
 
     @Test
     fun whenFeatureSelectedAndFeatureIsItrThenPixelIsSent() = runTest {
-        whenever(subscriptionsManager.hasSubscription()).thenReturn(false)
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(EXPIRED)
         viewModel.processJsCallbackMessage(
             featureName = "test",
             method = "featureSelected",
@@ -308,7 +412,7 @@ class SubscriptionWebViewViewModelTest {
 
     @Test
     fun whenFeatureSelectedAndFeatureIsPirThenPixelIsSent() = runTest {
-        whenever(subscriptionsManager.hasSubscription()).thenReturn(false)
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(EXPIRED)
         viewModel.processJsCallbackMessage(
             featureName = "test",
             method = "featureSelected",
@@ -316,16 +420,5 @@ class SubscriptionWebViewViewModelTest {
             data = JSONObject("""{"feature":"${SubscriptionsConstants.PIR}"}"""),
         )
         verify(pixelSender).reportOnboardingPirClick()
-    }
-
-    private fun getSubscriptionOfferDetails(planId: String): SubscriptionOfferDetails {
-        val subscriptionOfferDetails: SubscriptionOfferDetails = mock()
-        whenever(subscriptionOfferDetails.basePlanId).thenReturn(planId)
-        val phase: PricingPhase = mock()
-        val phases: PricingPhases = mock()
-        whenever(phase.formattedPrice).thenReturn("$1.1")
-        whenever(phases.pricingPhaseList).thenReturn(listOf(phase))
-        whenever(subscriptionOfferDetails.pricingPhases).thenReturn(phases)
-        return subscriptionOfferDetails
     }
 }

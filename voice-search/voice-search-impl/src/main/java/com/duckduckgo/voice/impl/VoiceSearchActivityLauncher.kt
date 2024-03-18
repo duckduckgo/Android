@@ -58,6 +58,7 @@ class RealVoiceSearchActivityLauncher @Inject constructor(
 
     companion object {
         private const val KEY_PARAM_SOURCE = "source"
+        private const val KEY_PARAM_ERROR = "error"
         private const val SUGGEST_REMOVE_VOICE_SEARCH_AFTER_TIMES = 3
     }
 
@@ -86,6 +87,10 @@ class RealVoiceSearchActivityLauncher @Inject constructor(
                     }
                 } else {
                     if (code == VOICE_SEARCH_ERROR) {
+                        pixel.fire(
+                            pixel = VoiceSearchPixelNames.VOICE_SEARCH_ERROR,
+                            parameters = mapOf(KEY_PARAM_ERROR to data),
+                        )
                         activity.window?.decorView?.rootView?.let {
                             val snackbar = Snackbar.make(it, activity.getString(string.voiceSearchError), Snackbar.LENGTH_LONG)
                             snackbar.view.translationY =

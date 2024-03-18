@@ -16,6 +16,8 @@
 
 package com.duckduckgo.subscriptions.api
 
+import kotlinx.coroutines.flow.Flow
+
 interface Subscriptions {
 
     /**
@@ -29,12 +31,17 @@ interface Subscriptions {
      * This method returns a [true] if a  given [product] can be found in the entitlements list or [false] otherwise
      * @return [Boolean]
      */
-    suspend fun getEntitlementStatus(product: Product): Result<EntitlementStatus>
+    fun getEntitlementStatus(): Flow<List<Product>>
 
-    sealed class EntitlementStatus {
-        data object Found : EntitlementStatus()
-        data object NotFound : EntitlementStatus()
-    }
+    /**
+     * @return `true` if the Privacy Pro product is enabled and live, `false` otherwise
+     */
+    suspend fun isEnabled(): Boolean
+
+    /**
+     * @return `true` if the Privacy Pro product is available for the user, `false` otherwise
+     */
+    suspend fun isEligible(): Boolean
 }
 
 enum class Product(val value: String) {

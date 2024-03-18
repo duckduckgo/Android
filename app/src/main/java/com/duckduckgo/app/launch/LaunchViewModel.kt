@@ -21,6 +21,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.store.isNewUser
+import com.duckduckgo.app.onboarding.ui.page.experiment.ExtendedOnboardingExperimentVariantManager
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener.Companion.MAX_REFERRER_WAIT_TIME_MS
 import com.duckduckgo.di.scopes.ActivityScope
@@ -32,13 +33,14 @@ import timber.log.Timber
 class LaunchViewModel @Inject constructor(
     private val userStageStore: UserStageStore,
     private val appReferrerStateListener: AppInstallationReferrerStateListener,
+    private val extendedOnboardingExperimentVariantManager: ExtendedOnboardingExperimentVariantManager,
 ) :
     ViewModel() {
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     sealed class Command {
-        object Onboarding : Command()
+        data class Onboarding(val forceLightTheme: Boolean = true) : Command()
         data class Home(val replaceExistingSearch: Boolean = false) : Command()
     }
 
@@ -46,7 +48,8 @@ class LaunchViewModel @Inject constructor(
         waitForReferrerData()
 
         if (userStageStore.isNewUser()) {
-            command.value = Command.Onboarding
+            extendedOnboardingExperimentVariantManager.setExperimentVariants()
+            command.value = Command.Onboarding(forceLightTheme = !extendedOnboardingExperimentVariantManager.isComparisonChartEnabled())
         } else {
             command.value = Command.Home()
         }

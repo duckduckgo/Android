@@ -36,18 +36,24 @@ import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.impl.R
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus.AUTO_RENEWABLE
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus.GRACE_PERIOD
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus.NOT_AUTO_RENEWABLE
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus.WAITING
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.databinding.ViewSettingsBinding
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenBuyScreen
+import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenRestoreScreen
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenSettings
-import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Factory
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.ViewState
+import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionActivity.Companion.RestoreSubscriptionScreenWithParams
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsActivity.Companion.SubscriptionsSettingsScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams
 import dagger.android.support.AndroidSupportInjection
@@ -67,7 +73,7 @@ class ProSettingView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyle) {
 
     @Inject
-    lateinit var viewModelFactory: Factory
+    lateinit var viewModelFactory: ViewViewModelFactory
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
@@ -121,22 +127,43 @@ class ProSettingView @JvmOverloads constructor(
         binding.subscriptionSetting.setOnTouchListener(null)
         binding.subscriptionBuy.setOnClickListener(null)
         binding.subscriptionBuy.setOnTouchListener(null)
+        binding.subscriptionGet.setOnClickListener(null)
+        binding.subscriptionGet.setOnTouchListener(null)
+        binding.subscriptionRestore.setOnTouchListener(null)
+        binding.subscriptionRestore.setOnClickListener(null)
 
-        if (viewState.hasSubscription) {
-            binding.subscriptionBuy.gone()
-            binding.subscribeSecondary.gone()
-            binding.subscriptionSetting.show()
-            binding.settingContainer.setOnClickListener {
-                viewModel.onSettings()
+        when (viewState.status) {
+            AUTO_RENEWABLE, NOT_AUTO_RENEWABLE, GRACE_PERIOD -> {
+                binding.subscriptionBuyContainer.gone()
+                binding.subscriptionRestoreContainer.gone()
+                binding.subscriptionWaitingContainer.gone()
+                binding.subscriptionSettingContainer.show()
+                binding.subscriptionSettingContainer.setOnClickListener {
+                    viewModel.onSettings()
+                }
             }
-        } else {
-            val htmlText = context.getString(R.string.subscriptionSettingFeaturesList).html(context)
-            binding.subscribeSecondary.show()
-            binding.subscribeSecondary.text = htmlText
-            binding.subscriptionBuy.show()
-            binding.subscriptionSetting.gone()
-            binding.settingContainer.setOnClickListener {
-                viewModel.onBuy()
+            WAITING -> {
+                binding.subscriptionBuyContainer.gone()
+                binding.subscriptionWaitingContainer.show()
+                binding.subscriptionSettingContainer.gone()
+                binding.subscriptionRestoreContainer.show()
+                binding.subscriptionRestoreContainer.setOnClickListener {
+                    viewModel.onRestore()
+                }
+            }
+            else -> {
+                val htmlText = context.getString(R.string.subscriptionSettingFeaturesList).html(context)
+                binding.subscribeSecondary.text = htmlText.noTrailingWhiteLines()
+                binding.subscriptionBuyContainer.show()
+                binding.subscriptionSettingContainer.gone()
+                binding.subscriptionWaitingContainer.gone()
+                binding.subscriptionRestoreContainer.show()
+                binding.subscriptionBuyContainer.setOnClickListener {
+                    viewModel.onBuy()
+                }
+                binding.subscriptionRestoreContainer.setOnClickListener {
+                    viewModel.onRestore()
+                }
             }
         }
     }
@@ -155,6 +182,9 @@ class ProSettingView @JvmOverloads constructor(
                         defaultToolbar = true,
                     ),
                 )
+            }
+            is OpenRestoreScreen -> {
+                globalActivityStarter.start(context, RestoreSubscriptionScreenWithParams(isOriginWeb = false))
             }
         }
     }
@@ -216,4 +246,12 @@ private fun View.doOnFullyVisible(action: () -> Unit) {
             listener.unregister()
         }
     }
+}
+
+private fun CharSequence.noTrailingWhiteLines(): CharSequence {
+    var text = this
+    while (text[text.length - 1] == '\n') {
+        text = text.subSequence(0, text.length - 1)
+    }
+    return text
 }

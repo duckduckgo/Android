@@ -16,12 +16,15 @@
 
 package com.duckduckgo.networkprotection.impl.configuration
 
+import com.duckduckgo.app.global.api.ApiInterceptorPlugin
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.impl.BuildConfig
+import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
-import com.squareup.anvil.annotations.ContributesBinding
+import com.duckduckgo.subscriptions.api.Subscriptions
+import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
 import logcat.logcat
@@ -29,23 +32,28 @@ import okhttp3.Interceptor
 import okhttp3.Interceptor.Chain
 import okhttp3.Response
 
-interface NetpRequestInterceptor : Interceptor
-
-@ContributesBinding(AppScope::class)
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = ApiInterceptorPlugin::class,
+)
 class NetpWaitlistRequestInterceptor @Inject constructor(
     private val netpWaitlistRepository: NetPWaitlistRepository,
     private val appBuildConfig: AppBuildConfig,
-) : NetpRequestInterceptor {
+    private val networkProtectionRepository: NetworkProtectionRepository,
+    private val subscriptions: Subscriptions,
+) : ApiInterceptorPlugin, Interceptor {
+
+    override fun getInterceptor(): Interceptor = this
 
     override fun intercept(chain: Chain): Response {
         val url = chain.request().url
         val newRequest = chain.request().newBuilder()
-        if (ENDPOINTS_PATTERN_MATCHER.any { url.toString().endsWith(it) }) {
+        return if (ENDPOINTS_PATTERN_MATCHER.any { url.toString().endsWith(it) }) {
             logcat { "Adding Authorization Bearer token to request $url" }
             newRequest.addHeader(
                 name = "Authorization",
                 // this runBlocking is fine as we're already in a background thread
-                value = "bearer ${runBlocking { netpWaitlistRepository.getAuthenticationToken() }}",
+                value = runBlocking { authorizationHeaderValue() },
             )
 
             if (appBuildConfig.isInternalBuild()) {
@@ -54,11 +62,25 @@ class NetpWaitlistRequestInterceptor @Inject constructor(
                     value = BuildConfig.NETP_DEBUG_SERVER_TOKEN,
                 )
             }
-        }
 
-        return chain.proceed(
-            newRequest.build().also { logcat { "headers: ${it.headers}" } },
-        )
+            chain.proceed(
+                newRequest.build().also { logcat { "headers: ${it.headers}" } },
+            ).also {
+                if (runBlocking { subscriptions.isEnabled() }) {
+                    networkProtectionRepository.vpnAccessRevoked = (it.code == 403)
+                }
+            }
+        } else {
+            chain.proceed(newRequest.build())
+        }
+    }
+
+    private suspend fun authorizationHeaderValue(): String {
+        return if (subscriptions.isEnabled()) {
+            "bearer ddg:${subscriptions.getAccessToken()}"
+        } else {
+            "bearer ${netpWaitlistRepository.getAuthenticationToken()}"
+        }
     }
 
     companion object {

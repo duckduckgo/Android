@@ -4,11 +4,10 @@ import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.subscriptions.api.Product.PIR
 import com.duckduckgo.subscriptions.api.Subscriptions
-import com.duckduckgo.subscriptions.api.Subscriptions.EntitlementStatus.Found
-import com.duckduckgo.subscriptions.api.Subscriptions.EntitlementStatus.NotFound
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.Command.OpenPir
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -29,7 +28,7 @@ class PirSettingViewModelTest {
 
     @Before
     fun before() {
-        viewModel = PirSettingViewModel(subscriptions, coroutineTestRule.testDispatcherProvider, pixelSender)
+        viewModel = PirSettingViewModel(subscriptions, pixelSender)
     }
 
     @Test
@@ -49,9 +48,9 @@ class PirSettingViewModelTest {
 
     @Test
     fun whenOnResumeIfEntitlementPresentEmitViewState() = runTest {
-        whenever(subscriptions.getEntitlementStatus(PIR)).thenReturn(Result.success(Found))
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(PIR)))
 
-        viewModel.onResume(mock())
+        viewModel.onCreate(mock())
 
         viewModel.viewState.test {
             assertTrue(awaitItem().hasSubscription)
@@ -61,23 +60,11 @@ class PirSettingViewModelTest {
 
     @Test
     fun whenOnResumeIfEntitlementNotPresentEmitViewState() = runTest {
-        whenever(subscriptions.getEntitlementStatus(PIR)).thenReturn(Result.success(NotFound))
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
 
         viewModel.onResume(mock())
         viewModel.viewState.test {
             assertFalse(awaitItem().hasSubscription)
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenOnResumeEntitlementCheckFailsDoNotEmitViewState() = runTest {
-        whenever(subscriptions.getEntitlementStatus(PIR)).thenReturn(Result.failure(RuntimeException()))
-
-        viewModel.viewState.test {
-            assertFalse(awaitItem().hasSubscription)
-            viewModel.onResume(mock())
-            expectNoEvents()
             cancelAndConsumeRemainingEvents()
         }
     }

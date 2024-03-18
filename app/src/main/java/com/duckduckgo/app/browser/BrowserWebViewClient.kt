@@ -49,9 +49,9 @@ import com.duckduckgo.app.browser.mediaplayback.MediaPlayback
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedHandler
+import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedHandler
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.pixels.remoteconfig.OptimizeTrackerEvaluationRCWrapper
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.BrowserAutofill
@@ -62,6 +62,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.privacy.config.api.AmpLinks
+import com.duckduckgo.user.agent.api.ClientBrandHintProvider
 import java.net.URI
 import javax.inject.Inject
 import kotlinx.coroutines.*
@@ -92,11 +93,12 @@ class BrowserWebViewClient @Inject constructor(
     private val jsPlugins: PluginPoint<JsInjectorPlugin>,
     private val currentTimeProvider: CurrentTimeProvider,
     private val shouldSendPageLoadedPixel: PageLoadedHandler,
-    private val optimizeTrackerEvaluationRCWrapper: OptimizeTrackerEvaluationRCWrapper,
+    private val shouldSendPagePaintedPixel: PagePaintedHandler,
     private val mediaPlayback: MediaPlayback,
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
+    var clientProvider: ClientBrandHintProvider? = null
     private var lastPageStarted: String? = null
     private var start: Long? = null
 
@@ -179,7 +181,19 @@ class BrowserWebViewClient @Inject constructor(
                         }
                     }
                     if (isForMainFrame) {
-                        webViewClientListener?.willOverrideUrl(url.toString())
+                        webViewClientListener?.let { listener ->
+                            listener.willOverrideUrl(url.toString())
+                            clientProvider?.let { provider ->
+                                if (provider.shouldChangeBranding(url.toString())) {
+                                    provider.setOn(webView.settings, url.toString())
+                                    loadUrl(listener, webView, url.toString())
+                                    return true
+                                } else {
+                                    return false
+                                }
+                            }
+                            return false
+                        }
                     }
                     false
                 }
@@ -325,6 +339,7 @@ class BrowserWebViewClient @Inject constructor(
                     // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
                     if (url != ABOUT_BLANK) {
                         shouldSendPageLoadedPixel(it, safeStart, currentTimeProvider.getTimeInMillis())
+                        shouldSendPagePaintedPixel(webView = webView, url = it)
                         start = null
                     }
                 }
@@ -349,11 +364,7 @@ class BrowserWebViewClient @Inject constructor(
                 loginDetector.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, request))
             }
             Timber.v("Intercepting resource ${request.url} type:${request.method} on page $documentUrl")
-            if (optimizeTrackerEvaluationRCWrapper.enabled) {
-                requestInterceptor.shouldIntercept(request, webView, documentUrl?.toUri(), webViewClientListener)
-            } else {
-                requestInterceptor.shouldIntercept(request, webView, documentUrl, webViewClientListener)
-            }
+            requestInterceptor.shouldIntercept(request, webView, documentUrl?.toUri(), webViewClientListener)
         }
     }
 
@@ -526,6 +537,7 @@ enum class WebViewPixelName(override val pixelName: String) : Pixel.PixelName {
     WEB_RENDERER_GONE_CRASH("m_web_view_renderer_gone_crash"),
     WEB_RENDERER_GONE_KILLED("m_web_view_renderer_gone_killed"),
     WEB_PAGE_LOADED("m_web_view_page_loaded"),
+    WEB_PAGE_PAINTED("m_web_view_page_painted"),
 }
 
 enum class WebViewErrorResponse(@StringRes val errorId: Int) {

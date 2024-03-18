@@ -20,34 +20,33 @@
     <string name="cancel">Cancel</string>
     <string name="ok">OK</string>
     <string name="privacyPro">Privacy Pro</string>
+    <string name="email">Email</string>
 
     <!--Add Device Activity-->
     <string name="manage">Manage</string>
     <string name="addEmailText">Add Email</string>
-    <string name="useEmail" instruction="Placeholder is an email address">%1$s You can use this email to activate your subscription on your other devices.</string>
-    <string name="addEmail">Add an email address to activate your subscription on your other devices. We’ll only use this address to verify your subscription.</string>
+    <string name="useEmail">You can use this email to activate your subscription from browser settings in the DuckDuckGo app on your other devices.</string>
+    <string name="addEmail">Add an email address to access your subscription in DuckDuckGo on other devices. We’ll only use this address to verify your subscription.</string>
     <string name="manageEmail">Manage Email</string>
-    <string name="addDeviceEmail">Email</string>
     <string name="randomError">An error happened, try again</string>
-    <string name="addDeviceTitle">Use your subscription on all your devices</string>
-    <string name="addDeviceDescription">Access your subscription on any of your devices Google Play or by adding an email address.</string>
+    <string name="addDeviceTitle">Use your subscription on other devices</string>
+    <string name="addDeviceDescription">Access your Privacy Pro subscription via an email address.</string>
     <string name="addDeviceGooglePlayTitle">Google Play</string>
     <string name="addDeviceGooglePlayDescription">Privacy Pro is available on any device signed in to your Google Play Store account.</string>
 
     <!--Restore Subscriptions Activity-->
-    <string name="somethingWentWrong">Something Went Wrong</string>
+    <string name="backToSettings">Back to Settings</string>
+    <string name="somethingWentWrong">Something went wrong</string>
+    <string name="somethingWentWrongDescription">Google Play was unable to process your purchase. Please try again later.</string>
     <string name="youAreSet">You\'re all set.</string>
     <string name="viewPlans">View Plans</string>
     <string name="subscriptionNotFound">Subscription Not Found</string>
-    <string name="subscriptionNotFoundDescription">The subscription associated with this Google Account is no longer active or could not be found.</string>
-    <string name="purchaseRestored">Your purchase has been restored.</string>
+    <string name="subscriptionNotFoundDescription">The subscription associated with this Google Play account is no longer active.</string>
+    <string name="purchaseRestored">Your purchases have been restored.</string>
     <string name="restoreSubscriptionTitle">Activate your subscription on this device</string>
     <string name="restoreSubscriptionDescription">Access your Privacy Pro subscription on this device via Google Play or an email address.</string>
-    <string name="restoreDeviceDescription">Access your subscription on any of your devices via Google Play or by adding an email address.</string>
-    <string name="restoreSubscriptionGooglePlayTitle">Google Play</string>
-    <string name="restoreSubscriptionGooglePlayDescription">Restore your purchase to activate your subscription on this device.</string>
+    <string name="restoreSubscriptionGooglePlayDescription">Your subscription is automatically available in DuckDuckGo on any device signed in to your Google Play account.</string>
     <string name="restoreSubscriptionGooglePlayButton">Restore Purchase</string>
-    <string name="restoreSubscriptionEmailTitle">Email</string>
     <string name="restoreSubscriptionEmailDescription">Use your email to activate your subscription on this device.</string>
     <string name="restoreSubscriptionEmailButton">Enter Email</string>
     <string name="buySubscriptionTitle">Buy Subscription</string>
@@ -55,11 +54,11 @@
     <!--Settings Subscriptions Activity-->
     <string name="removeSubscription">Remove Subscription</string>
     <string name="subscriptionRemoved">Your subscription has been removed from this device</string>
-    <string name="removeFromDevice">Remove From This Device?</string>
-    <string name="removeFromDeviceDescription">You will no longer be able to access your subscription on this device. This will not cancel your subscription, and it will remain active on your other device.</string>
-    <string name="subscriptionsData" instruction="First placeholder is either monthly or yearly, second is renews or expires, third is a date in format MMMM dd, yyyy">Your %1$s Privacy Pro subscription %2$s on %3$s.</string>
-    <string name="monthly">monthly</string>
-    <string name="yearly">yearly</string>
+    <string name="removeFromDevice">Remove from this device?</string>
+    <string name="removeFromDeviceDescription">You will no longer be able to access your Privacy Pro subscription on this device. This will not cancel your subscription, and it will remain active on your other devices.</string>
+    <string name="subscriptionsData" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Your subscription %1$s on %2$s.</string>
+    <string name="monthlySubscription">Monthly Subscription</string>
+    <string name="yearlySubscription">Yearly Subscription</string>
     <string name="renews">renews</string>
     <string name="expires">expires</string>
 
@@ -67,14 +66,18 @@
     <string name="subscriptionSetting">Subscription Settings</string>
     <string name="subscriptionSettingSubscribe">Subscribe To Privacy Pro</string>
     <string name="subscriptionSettingSubscribeSubtitle">More seamless privacy with three new protections, including:</string>
-    <string name="subscriptionSettingFeaturesList"><![CDATA[<ul><li>&nbsp;VPN (Virtual Private Network)</li><li>&nbsp;Personal Information Removal</li><li>&nbsp;Identity Theft Restoration</li></ul><br/><u><a href="">Learn More</a></u>]]></string>
+    <string name="subscriptionSettingFeaturesList"><![CDATA[<ul><li>&nbsp;VPN</li><li>&nbsp;Personal Information Removal</li><li>&nbsp;Identity Theft Restoration</li></ul>]]></string>
+    <string name="subscriptionSettingGet">Get Privacy Pro</string>
+    <string name="subscriptionSettingRestore">I Have a Subscription</string>
+    <string name="subscriptionSettingWaiting">Your Subscription is Being Activated</string>
+    <string name="subscriptionSettingWaitingSubtitle">This is taking longer than usual, please check back later.</string>
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">You\'re all set.</string>
     <string name="purchaseCompletedText">Your purchase was successful</string>
     <string name="purchaseRecoveredText">Your already had a subscription and we\'ve recovered that for you.</string>
-    <string name="purchaseErrorTitle">Something went wrong :(</string>
-    <string name="purchaseIdNotFound">We couldn\'t find the subscription. Please try again.</string>
+    <string name="purchaseErrorTitle">Something went wrong</string>
+    <string name="purchaseError">We\'re having trouble connecting. Please try again later.</string>
 
     <!-- PIR Settings-->
     <string name="pirSettingTitle">Personal Information Removal</string>

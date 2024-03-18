@@ -19,9 +19,9 @@ package com.duckduckgo.app.browser.omnibar
 import android.net.Uri
 import android.webkit.URLUtil
 import com.duckduckgo.app.browser.RequestRewriter
+import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.AppUrl.Url
-import com.duckduckgo.common.utils.UriString
 import com.duckduckgo.common.utils.UrlScheme.Companion.https
 import com.duckduckgo.common.utils.withScheme
 import com.duckduckgo.di.scopes.AppScope
