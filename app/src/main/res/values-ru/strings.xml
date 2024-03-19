@@ -823,4 +823,8 @@
     <string name="faviconsPromptMessage">Хотите, чтобы это устройство автоматически загружало значки синхронизированных закладок с сохраненных сайтов?</string>
     <string name="faviconsPromptPrimaryCta">Обновлять значки закладок</string>
     <string name="faviconsPromptSecondaryCta">Не сейчас</string>
+
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">Открыть в DuckDuckGo</string>
+    <string name="runningInDdgMenuItemTitle">Выполняется в DuckDuckGo</string>
 </resources>

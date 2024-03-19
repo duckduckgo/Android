@@ -813,4 +813,8 @@
     <string name="faviconsPromptMessage">Queres que este dispositivo transfira automaticamente os ícones dos marcadores sincronizados dos sites nos marcadores?</string>
     <string name="faviconsPromptPrimaryCta">Manter os ícones dos marcadores atualizados</string>
     <string name="faviconsPromptSecondaryCta">Agora não</string>
+
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">Abrir no DuckDuckGo</string>
+    <string name="runningInDdgMenuItemTitle">Em execução no DuckDuckGo</string>
 </resources>

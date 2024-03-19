@@ -226,12 +226,19 @@
             android:label="@string/appName" />
 
         <activity
-            android:name=".BrowserActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize|smallestScreenSize|screenLayout|navigation|keyboard"
-            android:exported="true"
-            android:label="@string/appDescription"
-            android:launchMode="singleTask"
-            android:windowSoftInputMode="adjustResize|stateHidden">
+            android:name="com.duckduckgo.app.browser.customtabs.CustomTabActivity"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden"
+            android:exported="false"
+            android:persistableMode="persistNever"
+            android:excludeFromRecents="true"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize"
+            android:resizeableActivity="true" />
+
+        <activity
+            android:name="com.duckduckgo.app.browser.customtabs.IntentDispatcherActivity"
+            android:theme="@style/Theme.AppCompat.Transparent.NoActionBar"
+            android:excludeFromRecents="true"
+            android:exported="true">
 
             <!-- Allows app to become default browser -->
             <intent-filter>
@@ -278,6 +285,14 @@
             </intent-filter>
 
         </activity>
+
+        <activity
+            android:name=".BrowserActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize|smallestScreenSize|screenLayout|navigation|keyboard"
+            android:exported="true"
+            android:label="@string/appDescription"
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
 
         <activity
             android:name="com.duckduckgo.app.SelectedTextSearchActivity"
@@ -459,6 +474,15 @@
             android:name="com.duckduckgo.widget.EmptyFavoritesWidgetService"
             android:exported="false"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
+
+        <service
+            android:name="com.duckduckgo.app.browser.customtabs.DuckDuckGoCustomTabService"
+            android:exported="true"
+            tools:ignore="ExportedService">
+            <intent-filter>
+                <action android:name="android.support.customtabs.action.CustomTabsService" />
+            </intent-filter>
+        </service>
 
         <service android:name="com.duckduckgo.app.notification.NotificationHandlerService" />
 

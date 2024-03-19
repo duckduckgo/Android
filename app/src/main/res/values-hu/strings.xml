@@ -813,4 +813,8 @@
     <string name="faviconsPromptMessage">Szeretnéd, hogy az eszköz automatikusan letöltse a szinkronizált könyvjelzők ikonjait a könyvjelzővel ellátott webhelyekről?</string>
     <string name="faviconsPromptPrimaryCta">Könyvjelzőikonok frissítése</string>
     <string name="faviconsPromptSecondaryCta">Most nem</string>
+
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">Megnyitás DuckDuckGo-ban</string>
+    <string name="runningInDdgMenuItemTitle">Futtatás a DuckDuckGo-ban</string>
 </resources>
