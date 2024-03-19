@@ -126,8 +126,8 @@ class AddDeviceActivity : DuckDuckGoActivity() {
         }
     }
     companion object {
-        const val ADD_EMAIL_URL = "https://duckduckgo.com/subscriptions/add-email?environment=staging"
-        const val MANAGE_URL = "https://duckduckgo.com/subscriptions/manage?environment=staging"
+        const val ADD_EMAIL_URL = "https://duckduckgo.com/subscriptions/add-email"
+        const val MANAGE_URL = "https://duckduckgo.com/subscriptions/manage"
         object AddDeviceScreenWithEmptyParams : GlobalActivityStarter.ActivityParams
     }
 }

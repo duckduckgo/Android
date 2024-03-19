@@ -26,13 +26,13 @@ import retrofit2.http.POST
 
 @ContributesNonCachingServiceApi(AppScope::class)
 interface SubscriptionsService {
-    @GET("https://subscriptions-dev.duckduckgo.com/api/subscription")
+    @GET("https://subscriptions.duckduckgo.com/api/subscription")
     suspend fun subscription(@Header("Authorization") authorization: String?): SubscriptionResponse
 
-    @GET("https://subscriptions-dev.duckduckgo.com/api/checkout/portal")
+    @GET("https://subscriptions.duckduckgo.com/api/checkout/portal")
     suspend fun portal(@Header("Authorization") authorization: String?): PortalResponse
 
-    @POST("https://subscriptions-dev.duckduckgo.com/api/purchase/confirm/google")
+    @POST("https://subscriptions.duckduckgo.com/api/purchase/confirm/google")
     suspend fun confirm(
         @Header("Authorization") authorization: String?,
         @Body confirmationBody: ConfirmationBody,
