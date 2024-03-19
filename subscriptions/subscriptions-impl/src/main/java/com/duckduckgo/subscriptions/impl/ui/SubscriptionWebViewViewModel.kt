@@ -124,9 +124,16 @@ class SubscriptionWebViewViewModel @Inject constructor(
             "subscriptionSelected" -> subscriptionSelected(data)
             "activateSubscription" -> activateSubscription()
             "featureSelected" -> data?.let { featureSelected(data) }
+            "subscriptionsWelcomeFaqClicked" -> subscriptionsWelcomeFaqClicked()
             else -> {
                 // NOOP
             }
+        }
+    }
+
+    private fun subscriptionsWelcomeFaqClicked() {
+        if (hasPurchasedSubscription()) {
+            pixelSender.reportOnboardingFaqClick()
         }
     }
 
@@ -150,11 +157,13 @@ class SubscriptionWebViewViewModel @Inject constructor(
                 PIR -> GoToPIR
                 else -> null
             }
-            when (commandToSend) {
-                GoToITR -> pixelSender.reportOnboardingIdtrClick()
-                is GoToNetP -> pixelSender.reportOnboardingVpnClick()
-                GoToPIR -> pixelSender.reportOnboardingPirClick()
-                else -> {} // no-op
+            if (hasPurchasedSubscription()) {
+                when (commandToSend) {
+                    GoToITR -> pixelSender.reportOnboardingIdtrClick()
+                    is GoToNetP -> pixelSender.reportOnboardingVpnClick()
+                    GoToPIR -> pixelSender.reportOnboardingPirClick()
+                    else -> {} // no-op
+                }
             }
             commandToSend?.let {
                 command.send(commandToSend)
@@ -164,7 +173,9 @@ class SubscriptionWebViewViewModel @Inject constructor(
     private fun activateSubscription() {
         viewModelScope.launch(dispatcherProvider.io()) {
             if (subscriptionsManager.subscriptionStatus().isActive()) {
-                pixelSender.reportOnboardingAddDeviceClick()
+                if (hasPurchasedSubscription()) {
+                    pixelSender.reportOnboardingAddDeviceClick()
+                }
                 activateOnAnotherDevice()
             } else {
                 pixelSender.reportOfferRestorePurchaseClick()
@@ -172,6 +183,8 @@ class SubscriptionWebViewViewModel @Inject constructor(
             }
         }
     }
+
+    private fun hasPurchasedSubscription() = currentPurchaseViewState.value.purchaseState is Success
 
     private fun subscriptionSelected(data: JSONObject?) {
         pixelSender.reportOfferSubscribeClick()

@@ -41,10 +41,13 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.RESTORE_USING_
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.RESTORE_USING_STORE_FAILURE_SUBSCRIPTION_NOT_FOUND
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.RESTORE_USING_STORE_SUCCESS
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SETTINGS_ADD_DEVICE_CLICK
-import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SETTINGS_SUBSCRIPTION_SECTION_SHOWN
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_ACTIVATED
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_ACTIVE
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_ADD_EMAIL_SUCCESS
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_IS_ENABLED
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_ONBOARDING_FAQ_CLICK
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_PRICE_MONTHLY_CLICK
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_PRICE_YEARLY_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_CHANGE_PLAN_OR_BILLING_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_REMOVE_FROM_DEVICE_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_SHOWN
@@ -52,7 +55,6 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 interface SubscriptionPixelSender {
-    fun reportSubscriptionSettingsSectionShown()
     fun reportSubscriptionActive()
     fun reportOfferScreenShown()
     fun reportOfferSubscribeClick()
@@ -82,15 +84,16 @@ interface SubscriptionPixelSender {
     fun reportSubscriptionSettingsChangePlanOrBillingClick()
     fun reportSubscriptionSettingsRemoveFromDeviceClick()
     fun reportSubscriptionIsEnabled()
+    fun reportMonthlyPriceClick()
+    fun reportYearlyPriceClick()
+    fun reportOnboardingFaqClick()
+    fun reportAddEmailSuccess()
 }
 
 @ContributesBinding(AppScope::class)
 class SubscriptionPixelSenderImpl @Inject constructor(
     private val pixelSender: Pixel,
 ) : SubscriptionPixelSender {
-
-    override fun reportSubscriptionSettingsSectionShown() =
-        fire(SETTINGS_SUBSCRIPTION_SECTION_SHOWN)
 
     override fun reportSubscriptionActive() =
         fire(SUBSCRIPTION_ACTIVE)
@@ -177,6 +180,18 @@ class SubscriptionPixelSenderImpl @Inject constructor(
         fire(SUBSCRIPTION_SETTINGS_REMOVE_FROM_DEVICE_CLICK)
 
     override fun reportSubscriptionIsEnabled() = fire(SUBSCRIPTION_IS_ENABLED)
+
+    override fun reportMonthlyPriceClick() =
+        fire(SUBSCRIPTION_PRICE_MONTHLY_CLICK)
+
+    override fun reportYearlyPriceClick() =
+        fire(SUBSCRIPTION_PRICE_YEARLY_CLICK)
+
+    override fun reportOnboardingFaqClick() =
+        fire(SUBSCRIPTION_ONBOARDING_FAQ_CLICK)
+
+    override fun reportAddEmailSuccess() =
+        fire(SUBSCRIPTION_ADD_EMAIL_SUCCESS)
 
     private fun fire(pixel: SubscriptionPixel) {
         pixel.getPixelNames().forEach { (pixelType, pixelName) ->

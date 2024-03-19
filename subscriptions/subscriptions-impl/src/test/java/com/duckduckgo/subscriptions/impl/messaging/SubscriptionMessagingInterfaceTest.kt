@@ -13,7 +13,6 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.Entitlement
 import com.duckduckgo.subscriptions.impl.repository.Subscription
-import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Assert.*
@@ -27,6 +26,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
@@ -42,7 +42,7 @@ class SubscriptionMessagingInterfaceTest {
         subscriptionsManager,
         jsMessageHelper,
         coroutineRule.testDispatcherProvider,
-        TestScope(),
+        coroutineRule.testScope,
         pixelSender,
         subscriptionsChecker,
     )
@@ -458,6 +458,63 @@ class SubscriptionMessagingInterfaceTest {
         messagingInterface.process(message, "duckduckgo-android-messaging-secret")
 
         assertEquals(1, callback.counter)
+    }
+
+    @Test
+    fun whenProcessAndMonthlyPriceClickedThenPixelSent() = runTest {
+        givenInterfaceIsRegistered()
+
+        val message = """
+            {"context":"subscriptionPages","featureName":"useSubscription","method":"subscriptionsMonthlyPriceClicked","id":"myId","params":{}}
+        """.trimIndent()
+
+        messagingInterface.process(message, "duckduckgo-android-messaging-secret")
+
+        verify(pixelSender).reportMonthlyPriceClick()
+        verifyNoMoreInteractions(pixelSender)
+    }
+
+    @Test
+    fun whenProcessAndYearlyPriceClickedThenPixelSent() = runTest {
+        givenInterfaceIsRegistered()
+
+        val message = """
+            {"context":"subscriptionPages","featureName":"useSubscription","method":"subscriptionsYearlyPriceClicked","id":"myId","params":{}}
+        """.trimIndent()
+
+        messagingInterface.process(message, "duckduckgo-android-messaging-secret")
+
+        verify(pixelSender).reportYearlyPriceClick()
+        verifyNoMoreInteractions(pixelSender)
+    }
+
+    @Test
+    fun whenProcessAndAddEmailSuccessThenPixelSent() = runTest {
+        givenInterfaceIsRegistered()
+
+        val message = """
+            {"context":"subscriptionPages","featureName":"useSubscription","method":"subscriptionsAddEmailSuccess","id":"myId","params":{}}
+        """.trimIndent()
+
+        messagingInterface.process(message, "duckduckgo-android-messaging-secret")
+
+        verify(pixelSender).reportAddEmailSuccess()
+        verifyNoMoreInteractions(pixelSender)
+    }
+
+    @Test
+    fun whenProcessAndFaqClickedThenCallbackExecuted() = runTest {
+        val jsMessageCallback: JsMessageCallback = mock()
+        messagingInterface.register(webView, jsMessageCallback)
+        whenever(webView.url).thenReturn("https://duckduckgo.com/test")
+
+        val message = """
+            {"context":"subscriptionPages","featureName":"useSubscription","method":"subscriptionsWelcomeFaqClicked","id":"myId","params":{}}
+        """.trimIndent()
+
+        messagingInterface.process(message, "duckduckgo-android-messaging-secret")
+
+        verify(jsMessageCallback).process(eq("useSubscription"), eq("subscriptionsWelcomeFaqClicked"), any(), any())
     }
 
     private fun givenInterfaceIsRegistered() {
