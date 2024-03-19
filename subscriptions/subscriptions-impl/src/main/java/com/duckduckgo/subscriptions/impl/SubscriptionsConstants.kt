@@ -23,8 +23,8 @@ object SubscriptionsConstants {
     val LIST_OF_PRODUCTS = listOf(BASIC_SUBSCRIPTION)
 
     // List of plans
-    const val YEARLY_PLAN = "ddg-privacy-pro-sandbox-yearly-renews-us"
-    const val MONTHLY_PLAN = "ddg-privacy-pro-sandbox-monthly-renews-us"
+    const val YEARLY_PLAN = "ddg-privacy-pro-yearly-renews-us"
+    const val MONTHLY_PLAN = "ddg-privacy-pro-monthly-renews-us"
 
     // List of features
     const val NETP = "vpn"
