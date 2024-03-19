@@ -45,11 +45,11 @@ class IntentDispatcherViewModel @Inject constructor(
         val toolbarColor: Int = 0,
     )
 
-    fun onIntentReceived(intent: Intent?) {
+    fun onIntentReceived(intent: Intent?, defaultColor: Int) {
         viewModelScope.launch(dispatcherProvider.io()) {
             val hasSession = intent?.hasExtra(CustomTabsIntent.EXTRA_SESSION) == true
             val intentText = intent?.intentText
-            val toolbarColor = intent?.getIntExtra(CustomTabsIntent.EXTRA_TOOLBAR_COLOR, 0) ?: 0
+            val toolbarColor = intent?.getIntExtra(CustomTabsIntent.EXTRA_TOOLBAR_COLOR, defaultColor) ?: defaultColor
 
             Timber.d("Intent $intent received. Has extra session=$hasSession. Intent text=$intentText. Toolbar color=$toolbarColor")
 
