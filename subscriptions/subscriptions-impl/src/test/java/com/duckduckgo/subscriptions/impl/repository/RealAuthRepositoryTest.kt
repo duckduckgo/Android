@@ -124,4 +124,18 @@ class RealAuthRepositoryTest {
         authStore.status = "test"
         assertEquals(UNKNOWN, authRepository.getStatus())
     }
+
+    @Test
+    fun whenCanSupportEncryptionThenReturnValue() = runTest {
+        assertTrue(authRepository.canSupportEncryption())
+    }
+
+    @Test
+    fun whenCanSupportEncryptionItCannotThenReturnFalse() = runTest {
+        val repository: AuthRepository = RealAuthRepository(
+            FakeSubscriptionsDataStore(supportEncryption = false),
+            coroutineRule.testDispatcherProvider,
+        )
+        assertFalse(repository.canSupportEncryption())
+    }
 }

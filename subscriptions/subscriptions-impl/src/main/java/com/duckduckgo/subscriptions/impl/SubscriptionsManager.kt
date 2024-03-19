@@ -90,7 +90,7 @@ interface SubscriptionsManager {
     /**
      * Recovers a subscription from the store
      */
-    suspend fun recoverSubscriptionFromStore(): RecoverSubscriptionResult
+    suspend fun recoverSubscriptionFromStore(externalId: String? = null): RecoverSubscriptionResult
 
     /**
      * Fetches subscription and account data from the BE and stores it
@@ -161,6 +161,8 @@ interface SubscriptionsManager {
      * Returns a [String] with the URL of the portal or null otherwise
      */
     suspend fun getPortalUrl(): String?
+
+    suspend fun canSupportEncryption(): Boolean
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -237,6 +239,8 @@ class RealSubscriptionsManager @Inject constructor(
             }
         }
     }
+
+    override suspend fun canSupportEncryption(): Boolean = authRepository.canSupportEncryption()
 
     override suspend fun getAccount(): Account? = authRepository.getAccount()
 
@@ -380,7 +384,7 @@ class RealSubscriptionsManager @Inject constructor(
         }
     }
 
-    override suspend fun recoverSubscriptionFromStore(): RecoverSubscriptionResult {
+    override suspend fun recoverSubscriptionFromStore(externalId: String?): RecoverSubscriptionResult {
         return try {
             val purchase = playBillingManager.purchaseHistory.lastOrNull()
             if (purchase != null) {
@@ -388,6 +392,7 @@ class RealSubscriptionsManager @Inject constructor(
                 val body = purchase.originalJson
                 val storeLoginBody = StoreLoginBody(signature = signature, signedData = body, packageName = context.packageName)
                 val response = authService.storeLogin(storeLoginBody)
+                if (externalId != null && externalId != response.externalId) return RecoverSubscriptionResult.Failure("")
                 authRepository.saveAccountData(response.authToken, response.externalId)
                 exchangeAuthToken(response.authToken)
                 val subscription = fetchAndStoreAllData()
@@ -490,7 +495,7 @@ class RealSubscriptionsManager @Inject constructor(
             return when (extractError(e)) {
                 "expired_token" -> {
                     logcat(LogPriority.DEBUG) { "Subs: auth token expired" }
-                    val result = recoverSubscriptionFromStore()
+                    val result = recoverSubscriptionFromStore(authRepository.getAccount()?.externalId)
                     if (result is RecoverSubscriptionResult.Success) {
                         AuthToken.Success(authRepository.getAuthToken()!!)
                     } else {

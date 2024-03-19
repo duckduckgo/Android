@@ -54,6 +54,7 @@ interface AuthRepository {
     suspend fun setEmail(email: String?)
     suspend fun purchaseToWaitingStatus()
     suspend fun getStatus(): SubscriptionStatus
+    suspend fun canSupportEncryption(): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -173,6 +174,10 @@ class RealAuthRepository @Inject constructor(
 
     override suspend fun saveExternalId(externalId: String) = withContext(dispatcherProvider.io()) {
         subscriptionsDataStore.externalId = externalId
+    }
+
+    override suspend fun canSupportEncryption(): Boolean = withContext(dispatcherProvider.io()) {
+        subscriptionsDataStore.canUseEncryption()
     }
 }
 
