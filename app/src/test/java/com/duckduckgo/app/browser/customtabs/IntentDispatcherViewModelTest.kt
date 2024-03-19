@@ -34,11 +34,12 @@ class IntentDispatcherViewModelTest {
         val hasSession = true
         val text = "url"
         val toolbarColor = 100
+        val defaultColor = 0
         whenever(mockIntent.hasExtra(CustomTabsIntent.EXTRA_SESSION)).thenReturn(hasSession)
         whenever(mockIntent.getIntExtra(CustomTabsIntent.EXTRA_TOOLBAR_COLOR, 0)).thenReturn(toolbarColor)
         whenever(mockIntent.intentText).thenReturn(text)
 
-        testee.onIntentReceived(mockIntent)
+        testee.onIntentReceived(mockIntent, defaultColor)
 
         testee.viewState.test {
             val state = awaitItem()
@@ -52,16 +53,17 @@ class IntentDispatcherViewModelTest {
     fun whenIntentReceivedWithoutSessionThenCustomTabIsNotRequested() = runTest {
         val hasSession = false
         val text = "url"
+        val defaultColor = 0
         whenever(mockIntent.hasExtra(CustomTabsIntent.EXTRA_SESSION)).thenReturn(hasSession)
         whenever(mockIntent.intentText).thenReturn(text)
 
-        testee.onIntentReceived(mockIntent)
+        testee.onIntentReceived(mockIntent, defaultColor)
 
         testee.viewState.test {
             val state = awaitItem()
             assertFalse(state.customTabRequested)
             assertEquals(text, state.intentText)
-            assertEquals(0, state.toolbarColor)
+            assertEquals(defaultColor, state.toolbarColor)
         }
     }
 }

@@ -25,6 +25,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.customtabs.IntentDispatcherViewModel.ViewState
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -44,7 +45,8 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
             dispatch(it)
         }.launchIn(lifecycleScope)
 
-        viewModel.onIntentReceived(intent)
+        val surfaceColor = getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorSurface)
+        viewModel.onIntentReceived(intent, surfaceColor)
     }
 
     private fun dispatch(viewState: ViewState) {

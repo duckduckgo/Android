@@ -221,7 +221,7 @@
                 android:id="@+id/openInDdgBrowserMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:iconDrawable="@drawable/ic_open_in_new_24dp"
+                app:iconDrawable="@drawable/ic_open_in_16"
                 app:primaryText="@string/openInDdgMenuItemTitle" />
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
