@@ -42,9 +42,9 @@ import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.connectionclass.ConnectionQualityStore
 import com.duckduckgo.networkprotection.impl.connectionclass.asConnectionQuality
 import com.duckduckgo.networkprotection.internal.databinding.ActivityNetpInternalSettingsBinding
-import com.duckduckgo.networkprotection.internal.feature.NetPEnvironmentSettingActivity.Companion.NetPEnvironmentSettingScreen
 import com.duckduckgo.networkprotection.internal.feature.snooze.VpnDisableOnCall
 import com.duckduckgo.networkprotection.internal.feature.system_apps.NetPSystemAppsExclusionListActivity
+import com.duckduckgo.networkprotection.internal.network.NetPInternalEnvDataStore
 import com.duckduckgo.networkprotection.internal.network.NetPInternalMtuProvider
 import com.duckduckgo.networkprotection.internal.network.netpDeletePcapFile
 import com.duckduckgo.networkprotection.internal.network.netpGetPcapFile
@@ -89,6 +89,8 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
     @Inject lateinit var appBuildConfig: AppBuildConfig
 
     @Inject lateinit var vpnDisableOnCall: VpnDisableOnCall
+
+    @Inject lateinit var netPInternalEnvDataStore: NetPInternalEnvDataStore
 
     private val job = ConflatedJob()
 
@@ -270,8 +272,11 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
             }
         }
 
-        binding.changeEnvironment.setClickListener {
-            globalActivityStarter.start(this, NetPEnvironmentSettingScreen)
+        with(netPInternalFeatureToggles.useVpnStagingEnvironment()) {
+            binding.changeEnvironment.setIsChecked(this.isEnabled())
+            binding.changeEnvironment.setOnCheckedChangeListener { _, isChecked ->
+                this.setEnabled(Toggle.State(enable = isChecked))
+            }
         }
     }
 
