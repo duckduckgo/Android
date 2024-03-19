@@ -39,8 +39,8 @@ object SubscriptionsConstants {
     const val YEARLY = "yearly"
 
     // URLs
-    const val BUY_URL = "https://duckduckgo.com/subscriptions?environment=staging"
-    const val ACTIVATE_URL = "https://duckduckgo.com/subscriptions/activate?environment=staging"
-    const val ITR_URL = "https://duckduckgo.com/identity-theft-restoration?environment=staging"
+    const val BUY_URL = "https://duckduckgo.com/subscriptions"
+    const val ACTIVATE_URL = "https://duckduckgo.com/subscriptions/activate"
+    const val ITR_URL = "https://duckduckgo.com/identity-theft-restoration"
     const val FAQS_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/"
 }
