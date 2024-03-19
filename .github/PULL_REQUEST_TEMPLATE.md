@@ -6,7 +6,7 @@ If your PR involves UI changes:
     2. Add them under the UI changes section (feel free to add more columns if needed)
 If your PR does not involve UI changes, you can remove the **UI changes** section
 
-At a minimum, make sure your changes are tested in API 23 and one of the more recent API levels available.
+At a minimum, make sure your changes are tested in API 26 and one of the more recent API levels available.
 -->
 
 Task/Issue URL: 
