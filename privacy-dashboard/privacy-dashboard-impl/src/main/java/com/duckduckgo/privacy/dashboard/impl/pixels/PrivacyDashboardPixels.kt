@@ -23,3 +23,8 @@ enum class PrivacyDashboardPixels(override val pixelName: String, val enqueue: B
     PRIVACY_DASHBOARD_ALLOWLIST_ADD("mp_wla"),
     PRIVACY_DASHBOARD_ALLOWLIST_REMOVE("mp_wlr"),
 }
+
+enum class PrivacyDashboardCustomTabPixelNames(override val pixelName: String) : Pixel.PixelName {
+    CUSTOM_TABS_PRIVACY_DASHBOARD_ALLOW_LIST_ADD("m_custom_tabs_privacy_dashboard_allow_list_add"),
+    CUSTOM_TABS_PRIVACY_DASHBOARD_ALLOW_LIST_REMOVE("m_custom_tabs_privacy_dashboard_allow_list_remove"),
+}

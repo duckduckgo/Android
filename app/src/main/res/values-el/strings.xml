@@ -813,4 +813,8 @@
     <string name="faviconsPromptMessage">Θέλετε αυτή η συσκευή να πραγματοποιεί αυτόματη λήψη εικονιδίων για συγχρονισμένους σελιδοδείκτες από τους ιστότοπους με σελιδοδείκτες;</string>
     <string name="faviconsPromptPrimaryCta">Διατηρήστε ενημερωμένα τα εικονίδια σελιδοδείκτη</string>
     <string name="faviconsPromptSecondaryCta">Όχι τώρα</string>
+
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">Άνοιγμα στο DuckDuckGo</string>
+    <string name="runningInDdgMenuItemTitle">Εκτέλεση στο DuckDuckGo</string>
 </resources>

@@ -216,6 +216,31 @@
                 app:iconDrawable="@drawable/ic_settings_16"
                 app:primaryText="@string/settingsMenuItemTitle" />
 
+            <com.duckduckgo.common.ui.view.MenuItemView
+                android:visibility="gone"
+                android:id="@+id/openInDdgBrowserMenuItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:iconDrawable="@drawable/ic_open_in_new_24dp"
+                app:primaryText="@string/openInDdgMenuItemTitle" />
+
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:visibility="gone"
+                android:id="@+id/customTabsMenuDivider"
+                style="@style/Widget.DuckDuckGo.PopupMenuHorizontalDivider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <com.duckduckgo.common.ui.view.MenuItemView
+                android:visibility="gone"
+                android:id="@+id/runningInDdgBrowserMenuItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:textType="secondary"
+                app:typography="body2"
+                app:iconDrawable="@drawable/ic_dax_icon"
+                app:primaryText="@string/runningInDdgMenuItemTitle" />
+
         </LinearLayout>
 
     </ScrollView>

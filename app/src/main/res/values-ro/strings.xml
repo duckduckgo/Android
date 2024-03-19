@@ -818,4 +818,8 @@
     <string name="faviconsPromptMessage">Dorești ca acest dispozitiv să descarce automat pictogramele pentru marcajele sincronizate de pe site-urile marcate?</string>
     <string name="faviconsPromptPrimaryCta">Păstrează pictogramele de marcaje actualizate</string>
     <string name="faviconsPromptSecondaryCta">Nu acum</string>
+
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">Deschide în DuckDuckGo</string>
+    <string name="runningInDdgMenuItemTitle">Redare în DuckDuckGo</string>
 </resources>

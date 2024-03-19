@@ -823,4 +823,8 @@
     <string name="faviconsPromptMessage">Czy chcesz, aby urządzenie automatycznie pobierało ikony zsynchronizowanych zakładek ze stron internetowych?</string>
     <string name="faviconsPromptPrimaryCta">Aktualizuj ikony zakładek</string>
     <string name="faviconsPromptSecondaryCta">Nie teraz</string>
+
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">Otwórz w DuckDuckGo</string>
+    <string name="runningInDdgMenuItemTitle">Uruchamianie w DuckDuckGo</string>
 </resources>

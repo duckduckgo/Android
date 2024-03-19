@@ -813,4 +813,8 @@
     <string name="faviconsPromptMessage">Möchtest du, dass dieses Gerät automatisch Symbole für synchronisierte Lesezeichen von den mit Lesezeichen versehenen Websites herunterlädt?</string>
     <string name="faviconsPromptPrimaryCta">Halte die Lesezeichensymbole auf dem neuesten Stand</string>
     <string name="faviconsPromptSecondaryCta">Jetzt nicht</string>
+
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">In DuckDuckGo öffnen</string>
+    <string name="runningInDdgMenuItemTitle">Laufen in DuckDuckGo</string>
 </resources>

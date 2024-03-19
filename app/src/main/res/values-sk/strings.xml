@@ -823,4 +823,8 @@
     <string name="faviconsPromptMessage">Chcete, aby toto zariadenie automaticky preberalo ikony synchronizovaných záložiek z webových stránok so záložkami?</string>
     <string name="faviconsPromptPrimaryCta">Udržujte ikony záložiek aktualizované</string>
     <string name="faviconsPromptSecondaryCta">Teraz nie</string>
+
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">Otvoriť v DuckDuckGo</string>
+    <string name="runningInDdgMenuItemTitle">Spustené v DuckDuckGo</string>
 </resources>

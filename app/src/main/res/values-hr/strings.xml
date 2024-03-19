@@ -823,4 +823,8 @@
     <string name="faviconsPromptMessage">Želiš li da ovaj uređaj automatski preuzima ikone za sinkronizirane oznake s označenih web-mjesta?</string>
     <string name="faviconsPromptPrimaryCta">Održavaj ikone oznaka ažuriranima</string>
     <string name="faviconsPromptSecondaryCta">Ne sad</string>
+
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">Otvori u DuckDuckGou</string>
+    <string name="runningInDdgMenuItemTitle">Izvodi se u DuckDuckGou</string>
 </resources>
