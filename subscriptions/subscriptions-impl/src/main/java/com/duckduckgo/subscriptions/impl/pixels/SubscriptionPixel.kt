@@ -144,7 +144,7 @@ enum class SubscriptionPixel(
     ),
     SUBSCRIPTION_IS_ENABLED(
         baseName = "m_privacy-pro_is-enabled",
-        types = EnumSet.of(COUNT, DAILY),
+        type = DAILY,
     ),
     ;
 

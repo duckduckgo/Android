@@ -35,6 +35,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
@@ -49,7 +51,8 @@ class RealSubscriptionsTest {
     private val privacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java, FakeToggleStore())
 
     @Before
-    fun before() {
+    fun before() = runTest {
+        whenever(mockSubscriptionsManager.canSupportEncryption()).thenReturn(true)
         subscriptions = RealSubscriptions(mockSubscriptionsManager, privacyProFeature, pixelSender)
     }
 
@@ -117,5 +120,39 @@ class RealSubscriptionsTest {
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
         whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(null)
         assertTrue(subscriptions.isEligible())
+    }
+
+    @Test
+    fun whenIsEligibleIfNotEncryptionThenReturnTrueIfActive() = runTest {
+        whenever(mockSubscriptionsManager.canSupportEncryption()).thenReturn(false)
+        whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
+        whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(
+            SubscriptionOffer(monthlyPlanId = "test", yearlyFormattedPrice = "test", yearlyPlanId = "test", monthlyFormattedPrice = "test"),
+        )
+        assertTrue(subscriptions.isEligible())
+    }
+
+    @Test
+    fun whenIsEligibleIfNotEncryptionAndNotActiveThenReturnFalse() = runTest {
+        whenever(mockSubscriptionsManager.canSupportEncryption()).thenReturn(false)
+        whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(UNKNOWN)
+        whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(
+            SubscriptionOffer(monthlyPlanId = "test", yearlyFormattedPrice = "test", yearlyPlanId = "test", monthlyFormattedPrice = "test"),
+        )
+        assertFalse(subscriptions.isEligible())
+    }
+
+    @Test
+    fun whenIsEnabledIfTrueThenSendPixel() = runTest {
+        privacyProFeature.isLaunched().setEnabled(State(enable = true))
+        assertTrue(subscriptions.isEnabled())
+        verify(pixelSender).reportSubscriptionIsEnabled()
+    }
+
+    @Test
+    fun whenIsEnabledIfToggleDisabledThenReturnFalse() = runTest {
+        privacyProFeature.isLaunched().setEnabled(State(enable = false))
+        assertFalse(subscriptions.isEnabled())
+        verify(pixelSender, never()).reportSubscriptionIsEnabled()
     }
 }
