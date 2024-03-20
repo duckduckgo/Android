@@ -149,7 +149,7 @@ data class DaxDialogIntroOption(
                 DaxDialogIntroOption(
                     R.string.onboardingSearchDaxDialogOption4,
                     commonR.drawable.ic_wand_16,
-                    "chocolate chip cookies",
+                    "chocolate chip cookie recipes",
                     PixelName.ONBOARDING_SEARCH_SURPRISE_ME,
                 ),
             )
@@ -177,7 +177,7 @@ data class DaxDialogIntroOption(
                 DaxDialogIntroOption(
                     R.string.onboardingSitesDaxDialogOption4,
                     commonR.drawable.ic_wand_16,
-                    "britannica.com",
+                    "britannica.com/animal/duck",
                     PixelName.ONBOARDING_VISIT_SITE_SURPRISE_ME,
                 ),
             )

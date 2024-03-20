@@ -244,13 +244,13 @@ class CtaViewModel @Inject constructor(
 
     @WorkerThread
     private suspend fun canShowDaxIntroVisitSiteCta(): Boolean =
-        daxOnboardingActive() && daxDialogIntroShown() && !daxDialogIntroVisitSiteShown() && !hideTips()
+        daxOnboardingActive() && daxDialogIntroShown() && !daxDialogIntroVisitSiteShown() && !hideTips() &&
+            !(daxDialogNetworkShown() || daxDialogOtherShown() || daxDialogTrackersFoundShown())
 
     @WorkerThread
     private suspend fun canShowDaxCtaEndOfJourney(): Boolean = daxOnboardingActive() &&
         !daxDialogEndShown() &&
         daxDialogIntroShown() &&
-        daxDialogIntroVisitSiteShown() &&
         !hideTips() &&
         (daxDialogNetworkShown() || daxDialogOtherShown() || daxDialogSerpShown() || daxDialogTrackersFoundShown())
 
