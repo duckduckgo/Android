@@ -46,6 +46,7 @@ import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.WebViewPixelName.WEB_RENDERER_GONE_CRASH
 import com.duckduckgo.app.browser.WebViewPixelName.WEB_RENDERER_GONE_KILLED
 import com.duckduckgo.app.browser.certificates.rootstore.CertificateValidationState
+import com.duckduckgo.app.browser.certificates.rootstore.CertificateValidationState.TrustedChain
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
@@ -73,7 +74,6 @@ import java.net.URI
 import javax.inject.Inject
 import kotlinx.coroutines.*
 import timber.log.Timber
-import kotlin.reflect.jvm.internal.impl.types.ErrorType
 
 private const val ABOUT_BLANK = "about:blank"
 
@@ -315,7 +315,7 @@ class BrowserWebViewClient @Inject constructor(
 
     private fun handleMediaPlayback(
         webView: WebView,
-        url: String
+        url: String,
     ) {
         // The default value for this flag is `true`.
         webView.settings.mediaPlaybackRequiresUserGesture = mediaPlayback.doesMediaPlaybackRequireUserGestureForUrl(url)
@@ -425,18 +425,19 @@ class BrowserWebViewClient @Inject constructor(
         handler: SslErrorHandler,
         error: SslError,
     ) {
+        Timber.d("SSLShield: onReceivedSslError")
         var trusted: CertificateValidationState = CertificateValidationState.UntrustedChain
 
         when (error.primaryError) {
             SSL_UNTRUSTED -> {
-                Timber.d("SSL Certificate: The certificate authority ${error.certificate.issuedBy.dName} is not trusted")
+                Timber.d("The certificate authority ${error.certificate.issuedBy.dName} is not trusted")
                 trusted = trustedCertificateStore.validateSslCertificateChain(error.certificate)
             }
 
-            else -> Timber.d("SSL Certificate: SSL error ${error.primaryError}")
+            else -> Timber.d("SSL error ${error.primaryError}")
         }
 
-        Timber.d("SSL Certificate: The certificate authority validation result is $trusted")
+        Timber.d("The certificate authority validation result is $trusted")
         if (trusted is CertificateValidationState.TrustedChain) {
             handler.proceed()
         } else {
@@ -452,7 +453,7 @@ class BrowserWebViewClient @Inject constructor(
             SSL_IDMISMATCH -> WRONG_HOST
             else -> GENERIC
         }
-        return SslErrorResponse(sslError, sslErrorType)
+        return SslErrorResponse(sslError, sslErrorType, sslError.url)
     }
 
     private fun requestAuthentication(
@@ -500,7 +501,6 @@ class BrowserWebViewClient @Inject constructor(
     }
 
     private fun parseErrorResponse(error: WebResourceError): WebViewErrorResponse {
-        Timber.d("SSL Certificate: parseErrorResponse ${error.errorCode} ${error.description}")
         return if (error.errorCode == ERROR_HOST_LOOKUP) {
             when (error.description) {
                 "net::ERR_NAME_NOT_RESOLVED" -> BAD_URL
@@ -575,7 +575,7 @@ enum class WebViewErrorResponse(@StringRes val errorId: Int) {
     SSL_PROTOCOL_ERROR(R.string.webViewErrorSslProtocol),
 }
 
-data class SslErrorResponse(val error: SslError, val errorType: SSLErrorType)
+data class SslErrorResponse(val error: SslError, val errorType: SSLErrorType, val url: String)
 enum class SSLErrorType(@StringRes val errorId: Int) {
     EXPIRED(R.string.sslErrorExpiredMessage),
     WRONG_HOST(R.string.sslErrorWrongHostMessage),

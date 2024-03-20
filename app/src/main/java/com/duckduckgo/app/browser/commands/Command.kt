@@ -225,5 +225,5 @@ sealed class Command {
     data class ScreenLock(val data: JsCallbackData) : Command()
     object ScreenUnlock : Command()
     data object ShowFaviconsPrompt : Command()
-    data class ShowSSLError(val handler: SslErrorHandler, val error: SslErrorResponse): Command()
+    data class ShowSSLError(val handler: SslErrorHandler, val error: SslErrorResponse) : Command()
 }

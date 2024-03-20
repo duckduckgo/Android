@@ -154,6 +154,8 @@ import com.duckduckgo.app.browser.urlextraction.DOMUrlExtractor
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebView
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
 import com.duckduckgo.app.browser.webshare.WebShareChooser
+import com.duckduckgo.app.browser.webview.SslWarningLayout.Action.LeaveSite
+import com.duckduckgo.app.browser.webview.SslWarningLayout.Action.Proceed
 import com.duckduckgo.app.browser.webview.WebContentDebugging
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.cta.ui.DaxDialogCta.*
@@ -237,7 +239,6 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
-import com.duckduckgo.common.utils.extensions.applyBoldSpanTo
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -286,7 +287,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import org.json.JSONObject
 import timber.log.Timber
-import java.util.Locale
 
 @InjectWith(FragmentScope::class)
 class BrowserTabFragment :
@@ -537,7 +537,7 @@ class BrowserTabFragment :
         get() = binding.includeErrorView
 
     private val sslErrorView
-        get() = binding.includeSSLErrorView
+        get() = binding.sslErrorWarningLayout
 
     private val daxDialogCta
         get() = binding.includeNewBrowserTab.includeDaxDialogCta
@@ -1087,7 +1087,7 @@ class BrowserTabFragment :
         webView?.onPause()
         webView?.hide()
         errorView.errorLayout.gone()
-        sslErrorView.errorLayout.gone()
+        sslErrorView.gone()
     }
 
     private fun showBrowser() {
@@ -1097,15 +1097,16 @@ class BrowserTabFragment :
         webView?.show()
         webView?.onResume()
         errorView.errorLayout.gone()
-        sslErrorView.errorLayout.gone()
+        sslErrorView.gone()
     }
 
     private fun showError(
         errorType: WebViewErrorResponse,
-        url: String?
+        url: String?,
     ) {
         webViewContainer.gone()
         newBrowserTab.newTabLayout.gone()
+        sslErrorView.gone()
         omnibar.appBarLayout.setExpanded(true)
         omnibar.shieldIcon.isInvisible = true
         webView?.onPause()
@@ -1119,36 +1120,22 @@ class BrowserTabFragment :
         errorView.errorLayout.show()
     }
 
-    private fun showSSLError(
+    private fun showSSLWarning(
         handler: SslErrorHandler,
-        errorResponse: SslErrorResponse
+        errorResponse: SslErrorResponse,
     ) {
         webViewContainer.gone()
         newBrowserTab.newTabLayout.gone()
         webView?.hide()
         errorView.errorLayout.gone()
-
-        sslErrorView.sslErrorHeadline.text = getString(R.string.sslErrorHeadline, errorResponse.error.url).applyBoldSpanTo(errorResponse.error.url)
-        sslErrorView.sslErrorExpandedHeadline.text =
-            getString(errorResponse.errorType.errorId, errorResponse.error.url, errorResponse.error.url).applyBoldSpanTo(errorResponse.error.url)
-
-        sslErrorView.sslErrorAcceptCta.text = getString(R.string.sslErrorExpandedCTA).html(requireContext())
-        sslErrorView.sslErrorAcceptCta.setOnClickListener {
-            handler.proceed()
-            showBrowser()
-        }
-        sslErrorView.sslErrorLeaveSiteCTA.setOnClickListener {
-            handler.cancel()
-            showBrowser()
-        }
-        sslErrorView.sslErrorAdvancedCTA.setOnClickListener {
-            if (sslErrorView.sslErrorAdvancedGroup.isVisible){
-                sslErrorView.sslErrorAdvancedGroup.gone()
-            } else {
-                sslErrorView.sslErrorAdvancedGroup.show()
+        binding.browserLayout.gone()
+        sslErrorView.bind(handler, errorResponse) { action ->
+            if (action == Proceed || action == LeaveSite) {
+                showBrowser()
             }
+            viewModel.onSSLCertificateWarningAction(action, errorResponse.url)
         }
-        sslErrorView.errorLayout.show()
+        sslErrorView.show()
     }
 
     fun submitQuery(query: String) {
@@ -1184,14 +1171,14 @@ class BrowserTabFragment :
 
     override fun onUseEmailProtectionPrivateAlias(
         originalUrl: String,
-        duckAddress: String
+        duckAddress: String,
     ) {
         viewModel.usePrivateDuckAddress(originalUrl, duckAddress)
     }
 
     override fun onUseEmailProtectionPersonalAddress(
         originalUrl: String,
-        duckAddress: String
+        duckAddress: String,
     ) {
         viewModel.usePersonalDuckAddress(originalUrl, duckAddress)
     }
@@ -1220,7 +1207,7 @@ class BrowserTabFragment :
 
     override fun onShareCredentialsForAutofill(
         originalUrl: String,
-        selectedCredentials: LoginCredentials
+        selectedCredentials: LoginCredentials,
     ) {
         injectAutofillCredentials(originalUrl, selectedCredentials)
     }
@@ -1445,7 +1432,7 @@ class BrowserTabFragment :
             is Command.ScreenLock -> screenLock(it.data)
             is Command.ScreenUnlock -> screenUnlock()
             is Command.ShowFaviconsPrompt -> showFaviconsPrompt()
-            is Command.ShowSSLError -> showSSLError(it.handler, it.error)
+            is Command.ShowSSLError -> showSSLWarning(it.handler, it.error)
             else -> {
                 // NO OP
             }
@@ -1927,7 +1914,7 @@ class BrowserTabFragment :
 
     private fun showToast(
         @StringRes messageId: Int,
-        length: Int = Toast.LENGTH_LONG
+        length: Int = Toast.LENGTH_LONG,
     ) {
         Toast.makeText(context?.applicationContext, messageId, length).show()
     }
@@ -2206,7 +2193,7 @@ class BrowserTabFragment :
                         featureName: String,
                         method: String,
                         id: String?,
-                        data: JSONObject?
+                        data: JSONObject?,
                     ) {
                         viewModel.processJsCallbackMessage(featureName, method, id, data)
                     }
@@ -2544,7 +2531,7 @@ class BrowserTabFragment :
     private fun confirmDeleteSavedSite(
         savedSite: SavedSite,
         message: Spanned,
-        onDeleteSnackbarDismissed: (SavedSite) -> Unit
+        onDeleteSnackbarDismissed: (SavedSite) -> Unit,
     ) {
         binding.rootView.makeSnackbarWithNoBottomInset(
             message,
@@ -2604,7 +2591,7 @@ class BrowserTabFragment :
 
     private fun launchSharePageChooser(
         url: String,
-        title: String
+        title: String,
     ) {
         val intent = Intent(Intent.ACTION_SEND).also {
             it.type = "text/plain"
@@ -2621,7 +2608,7 @@ class BrowserTabFragment :
 
     private fun launchSharePromoRMFPageChooser(
         url: String,
-        shareTitle: String
+        shareTitle: String,
     ) {
         val share = Intent().apply {
             action = Intent.ACTION_SEND
@@ -2853,7 +2840,7 @@ class BrowserTabFragment :
 
     private fun launchFilePicker(
         filePathCallback: ValueCallback<Array<Uri>>,
-        fileChooserParams: FileChooserRequestedParams
+        fileChooserParams: FileChooserRequestedParams,
     ) {
         pendingUploadTask = filePathCallback
         val canChooseMultipleFiles = fileChooserParams.filePickingMode == FileChooserParams.MODE_OPEN_MULTIPLE
@@ -2864,7 +2851,7 @@ class BrowserTabFragment :
     private fun launchCameraCapture(
         filePathCallback: ValueCallback<Array<Uri>>,
         fileChooserParams: FileChooserRequestedParams,
-        inputAction: String
+        inputAction: String,
     ) {
         if (Intent(inputAction).resolveActivity(requireContext().packageManager) == null) {
             launchFilePicker(filePathCallback, fileChooserParams)
@@ -3838,7 +3825,7 @@ class BrowserTabFragment :
 
     private fun launchPrint(
         url: String,
-        defaultMediaSize: PrintAttributes.MediaSize
+        defaultMediaSize: PrintAttributes.MediaSize,
     ) {
         (activity?.getSystemService(Context.PRINT_SERVICE) as? PrintManager)?.let { printManager ->
             webView?.createPrintDocumentAdapter(url)?.let { printAdapter ->
@@ -3897,7 +3884,7 @@ private class JsOrientationHandler {
      */
     fun updateOrientation(
         data: JsCallbackData,
-        browserTabFragment: BrowserTabFragment
+        browserTabFragment: BrowserTabFragment,
     ): JsCallbackData {
         val activity = browserTabFragment.activity
         val response = if (activity == null) {
@@ -3926,7 +3913,7 @@ private class JsOrientationHandler {
 
     private enum class JsToNativeScreenOrientationMap(
         val jsValue: String,
-        val nativeValue: Int
+        val nativeValue: Int,
     ) {
         ANY("any", ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED),
         NATURAL("natural", ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED),

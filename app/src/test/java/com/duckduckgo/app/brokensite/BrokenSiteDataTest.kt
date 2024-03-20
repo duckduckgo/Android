@@ -17,6 +17,7 @@
 package com.duckduckgo.app.brokensite
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.browser.certificates.TrustedSitesRepository
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteMonitor
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
@@ -43,6 +44,7 @@ class BrokenSiteDataTest {
     private val mockAllowListRepository: UserAllowListRepository = mock()
 
     private val mockContentBlocking: ContentBlocking = mock()
+    private val mockTrustedSitesRepository: TrustedSitesRepository = mock()
 
     @Test
     fun whenSiteIsNullThenDataIsEmptyAndUpgradedIsFalse() {
@@ -194,6 +196,7 @@ class BrokenSiteDataTest {
     private fun buildSite(
         url: String,
         httpsUpgraded: Boolean = false,
+        sslError: Boolean = false,
     ): Site {
         return SiteMonitor(
             url,
@@ -201,6 +204,7 @@ class BrokenSiteDataTest {
             upgradedHttps = httpsUpgraded,
             mockAllowListRepository,
             mockContentBlocking,
+            mockTrustedSitesRepository,
             coroutineRule.testScope,
             coroutineRule.testDispatcherProvider,
         )
