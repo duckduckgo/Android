@@ -202,14 +202,14 @@ class CtaViewModel @Inject constructor(
     private suspend fun getHomeCta(): Cta? {
         return when {
             canShowDaxIntroCta() -> {
-                if (extendedOnboardingExperimentVariantManager.isExtendedOnboardingEnabled()) {
+                if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) {
                     ExperimentDaxBubbleOptionsCta.ExperimentDaxIntroSearchOptionsCta(onboardingStore, appInstallStore)
                 } else {
                     DaxBubbleCta.DaxIntroCta(onboardingStore, appInstallStore)
                 }
             }
 
-            canShowDaxIntroVisitSiteCta() && extendedOnboardingExperimentVariantManager.isExtendedOnboardingEnabled() -> {
+            canShowDaxIntroVisitSiteCta() && extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled() -> {
                 ExperimentDaxBubbleOptionsCta.ExperimentDaxIntroVisitSiteOptionsCta(onboardingStore, appInstallStore)
             }
 

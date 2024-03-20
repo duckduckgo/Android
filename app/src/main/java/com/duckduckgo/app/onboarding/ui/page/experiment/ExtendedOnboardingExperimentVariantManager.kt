@@ -26,7 +26,7 @@ import javax.inject.Inject
 interface ExtendedOnboardingExperimentVariantManager {
     fun setExperimentVariants()
     fun isComparisonChartEnabled(): Boolean
-    fun isExtendedOnboardingEnabled(): Boolean
+    fun isAestheticUpdatesEnabled(): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -51,8 +51,7 @@ class ExtendedOnboardingExperimentVariantManagerImpl @Inject constructor(
         return isRemoteFeatureEnabled || isLocalFeatureEnabled
     }
 
-    override fun isExtendedOnboardingEnabled(): Boolean {
-        // TODO Noelia experiment: create new sub-feature
-        return true
+    override fun isAestheticUpdatesEnabled(): Boolean {
+        return extendedOnboardingFeatureToggles.aestheticUpdates().isEnabled()
     }
 }
