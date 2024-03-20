@@ -125,6 +125,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
             "activateSubscription" -> activateSubscription()
             "featureSelected" -> data?.let { featureSelected(data) }
             "subscriptionsWelcomeFaqClicked" -> subscriptionsWelcomeFaqClicked()
+            "subscriptionsWelcomeAddEmailClicked" -> subscriptionsWelcomeAddEmailClicked()
             else -> {
                 // NOOP
             }
@@ -134,6 +135,12 @@ class SubscriptionWebViewViewModel @Inject constructor(
     private fun subscriptionsWelcomeFaqClicked() {
         if (hasPurchasedSubscription()) {
             pixelSender.reportOnboardingFaqClick()
+        }
+    }
+
+    private fun subscriptionsWelcomeAddEmailClicked() {
+        if (hasPurchasedSubscription()) {
+            pixelSender.reportOnboardingAddDeviceClick()
         }
     }
 
@@ -173,9 +180,6 @@ class SubscriptionWebViewViewModel @Inject constructor(
     private fun activateSubscription() {
         viewModelScope.launch(dispatcherProvider.io()) {
             if (subscriptionsManager.subscriptionStatus().isActive()) {
-                if (hasPurchasedSubscription()) {
-                    pixelSender.reportOnboardingAddDeviceClick()
-                }
                 activateOnAnotherDevice()
             } else {
                 pixelSender.reportOfferRestorePurchaseClick()

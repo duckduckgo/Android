@@ -517,6 +517,21 @@ class SubscriptionMessagingInterfaceTest {
         verify(jsMessageCallback).process(eq("useSubscription"), eq("subscriptionsWelcomeFaqClicked"), any(), any())
     }
 
+    @Test
+    fun whenProcessAndAddEmailClickedThenCallbackExecuted() = runTest {
+        val jsMessageCallback: JsMessageCallback = mock()
+        messagingInterface.register(webView, jsMessageCallback)
+        whenever(webView.url).thenReturn("https://duckduckgo.com/test")
+
+        val message = """
+            {"context":"subscriptionPages","featureName":"useSubscription","method":"subscriptionsWelcomeAddEmailClicked","id":"myId","params":{}}
+        """.trimIndent()
+
+        messagingInterface.process(message, "duckduckgo-android-messaging-secret")
+
+        verify(jsMessageCallback).process(eq("useSubscription"), eq("subscriptionsWelcomeAddEmailClicked"), any(), any())
+    }
+
     private fun givenInterfaceIsRegistered() {
         messagingInterface.register(webView, callback)
         whenever(webView.url).thenReturn("https://duckduckgo.com/test")
