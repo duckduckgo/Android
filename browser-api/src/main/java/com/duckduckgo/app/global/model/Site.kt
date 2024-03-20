@@ -18,7 +18,6 @@ package com.duckduckgo.app.global.model
 
 import android.net.Uri
 import android.net.http.SslCertificate
-import android.net.http.SslError
 import androidx.core.net.toUri
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.surrogates.SurrogateResponse
@@ -47,10 +46,10 @@ interface Site {
     var hasHttpResources: Boolean
     var upgradedHttps: Boolean
     var userAllowList: Boolean
+    var sslError: Boolean
 
     val entity: Entity?
     var certificate: SslCertificate?
-    var certificateError: SslError?
     val trackingEvents: List<TrackingEvent>
     val errorCodeEvents: List<String>
     val httpErrorCodeEvents: List<Int>
@@ -63,8 +62,6 @@ interface Site {
     fun trackerDetected(event: TrackingEvent)
     fun onHttpErrorDetected(errorCode: Int)
     fun onErrorDetected(error: String)
-
-    fun onSSLCertificateErrorDetected(sslError: SslError)
     fun resetErrors()
     fun updatePrivacyData(sitePrivacyData: SitePrivacyData)
     fun surrogateDetected(surrogate: SurrogateResponse)
@@ -77,6 +74,7 @@ interface Site {
     var consentSelfTestFailed: Boolean
     var consentCosmeticHide: Boolean?
     var isDesktopMode: Boolean
+    var nextUrl: String
 }
 
 fun Site.orderedTrackerBlockedEntities(): List<Entity> = trackingEvents

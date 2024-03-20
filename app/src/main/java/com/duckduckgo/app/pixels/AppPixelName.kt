@@ -271,4 +271,12 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     REMOTE_MESSAGE_SHARED("m_remote_message_share"),
 
     PRIVACY_PRO_IS_ENABLED_AND_ELIGIBLE("m_privacy-pro_is-enabled"),
+
+    SSL_CERTIFICATE_WARNING_CLOSE_PRESSED("m_certificate_warning_leave_clicked"),
+    SSL_CERTIFICATE_WARNING_ADVANCED_PRESSED("m_certificate_warning_advanced_clicked"),
+    SSL_CERTIFICATE_WARNING_PROCEED_PRESSED("m_certificate_warning_proceed_clicked"),
+    SSL_CERTIFICATE_WARNING_WRONG_HOST_SHOWN("m_certificate_warning_displayed_wrong_host"),
+    SSL_CERTIFICATE_WARNING_EXPIRED_SHOWN("m_certificate_warning_displayed_expired"),
+    SSL_CERTIFICATE_WARNING_UNTRUSTED_SHOWN("m_certificate_warning_displayed_untrusted"),
+    SSL_CERTIFICATE_WARNING_GENERIC_SHOWN("m_certificate_warning_displayed_generic"),
 }

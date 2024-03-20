@@ -20,10 +20,13 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
+import android.net.http.SslCertificate
+import android.net.http.SslError
 import android.os.Build
 import android.webkit.CookieManager
 import android.webkit.HttpAuthHandler
 import android.webkit.RenderProcessGoneDetail
+import android.webkit.SslErrorHandler
 import android.webkit.WebBackForwardList
 import android.webkit.WebHistoryItem
 import android.webkit.WebResourceError
@@ -67,6 +70,9 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.subscriptions.api.Subscriptions
+import java.math.BigInteger
+import java.security.cert.X509Certificate
+import java.security.interfaces.RSAPublicKey
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
@@ -857,6 +863,20 @@ class BrowserWebViewClientTest {
         verifyNoInteractions(printInjector)
     }
 
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
+    fun whenSSLErrorReceivedForMainURLThenListenerCalled() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.url).thenReturn(EXAMPLE_URL)
+
+        val handler = aHandler()
+        val sslError = SslError(SslError.SSL_EXPIRED, aRSASslCertificate(), EXAMPLE_URL)
+
+        testee.onReceivedSslError(mockWebView, handler, sslError)
+
+        verify(listener).onReceivedSslError(any(), any())
+    }
+
     private class TestWebView(context: Context) : WebView(context) {
         override fun getOriginalUrl(): String {
             return EXAMPLE_URL
@@ -917,6 +937,25 @@ class BrowserWebViewClientTest {
         override fun getFavicon(): Bitmap = throw NotImplementedError()
 
         override fun clone(): WebHistoryItem = throw NotImplementedError()
+    }
+
+    fun aHandler(): SslErrorHandler {
+        val handler = mock<SslErrorHandler>().apply {
+        }
+        return handler
+    }
+
+    private fun aRSASslCertificate(): SslCertificate {
+        val certificate = mock<X509Certificate>().apply {
+            val key = mock<RSAPublicKey>().apply {
+                whenever(this.algorithm).thenReturn("rsa")
+                whenever(this.modulus).thenReturn(BigInteger("1"))
+            }
+            whenever(this.publicKey).thenReturn(key)
+        }
+        return mock<SslCertificate>().apply {
+            whenever(x509Certificate).thenReturn(certificate)
+        }
     }
 
     companion object {
