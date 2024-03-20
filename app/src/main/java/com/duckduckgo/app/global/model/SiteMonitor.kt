@@ -18,10 +18,10 @@ package com.duckduckgo.app.global.model
 
 import android.net.Uri
 import android.net.http.SslCertificate
-import android.net.http.SslError
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.UriString
+import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
 import com.duckduckgo.app.global.model.PrivacyShield.UNPROTECTED
@@ -45,6 +45,7 @@ class SiteMonitor(
     override var upgradedHttps: Boolean = false,
     private val userAllowListRepository: UserAllowListRepository,
     private val contentBlocking: ContentBlocking,
+    private val bypassedSSLCertificatesRepository: BypassedSSLCertificatesRepository,
     private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
 ) : Site {
@@ -70,12 +71,11 @@ class SiteMonitor(
 
     override var hasHttpResources = false
 
+    override var sslError: Boolean = false
+
     override var entity: Entity? = null
 
     override var certificate: SslCertificate? = null
-    // might need to do a copyonwritearraylist with a data class of domain/sslerror
-    // navigation seems to be an issue and the ssl error is removed
-    override var certificateError: SslError? = null
 
     override val trackingEvents = CopyOnWriteArrayList<TrackingEvent>()
     override val errorCodeEvents = CopyOnWriteArrayList<String>()
@@ -138,7 +138,6 @@ class SiteMonitor(
     override fun resetErrors() {
         errorCodeEvents.clear()
         httpErrorCodeEvents.clear()
-        certificateError = null
     }
 
     override fun surrogateDetected(surrogate: SurrogateResponse) {
@@ -157,11 +156,6 @@ class SiteMonitor(
         httpErrorCodeEvents.add(errorCode)
     }
 
-    override fun onSSLCertificateErrorDetected(sslError: SslError) {
-        Timber.i("Shield: onSSLCertificateErrorDetected $sslError")
-        certificateError = sslError
-    }
-
     override fun privacyProtection(): PrivacyShield {
         userAllowList = domain?.let { isAllowListed(it) } ?: false
         if (userAllowList || !isHttps) return UNPROTECTED
@@ -172,8 +166,9 @@ class SiteMonitor(
             return UNKNOWN
         }
 
-        if (certificateError != null){
-            Timber.i("Shield: site has certificate error $certificateError")
+        sslError = isSslCertificateBypassed(url)
+        if (sslError) {
+            Timber.i("Shield: site has certificate error")
             return UNPROTECTED
         }
 
@@ -184,6 +179,10 @@ class SiteMonitor(
     @WorkerThread
     private fun isAllowListed(domain: String): Boolean {
         return userAllowListRepository.isDomainInUserAllowList(domain) || contentBlocking.isAnException(domain)
+    }
+
+    private fun isSslCertificateBypassed(domain: String): Boolean {
+        return bypassedSSLCertificatesRepository.contains(domain)
     }
 
     override var urlParametersRemoved: Boolean = false
@@ -197,6 +196,8 @@ class SiteMonitor(
     override var consentCosmeticHide: Boolean? = false
 
     override var isDesktopMode: Boolean = false
+
+    override var nextUrl: String = url
 
     companion object {
         private val specialDomainTypes = setOf(

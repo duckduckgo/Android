@@ -19,7 +19,6 @@ package com.duckduckgo.app.browser
 import android.graphics.Bitmap
 import android.net.Uri
 import android.net.http.SslCertificate
-import android.net.http.SslError
 import android.os.Message
 import android.view.View
 import android.webkit.GeolocationPermissions
@@ -108,6 +107,6 @@ interface WebViewClientListener {
     fun getSite(): Site?
     fun onReceivedSslError(
         handler: SslErrorHandler,
-        errorResponse: SslErrorResponse
+        errorResponse: SslErrorResponse,
     )
 }

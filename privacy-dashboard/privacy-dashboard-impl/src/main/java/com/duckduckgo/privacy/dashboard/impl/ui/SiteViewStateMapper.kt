@@ -49,8 +49,16 @@ class AppSiteViewStateMapper @Inject constructor(
             domain = site.domain,
             upgradedHttps = site.upgradedHttps,
             parentEntity = entityViewState,
-            secCertificateViewModels = site.certificate?.let { listOf(it.map()) } ?: emptyList(),
+            secCertificateViewModels = mapCertificate(site),
         )
+    }
+
+    private fun mapCertificate(site: Site): List<CertificateViewState> {
+        return if (site.sslError) {
+            emptyList()
+        } else {
+            site.certificate?.let { listOf(it.map()) } ?: emptyList()
+        }
     }
 
     private fun SslCertificate.map(): CertificateViewState {

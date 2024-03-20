@@ -19,18 +19,18 @@
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/errorLayout"
-    android:background="?attr/daxColorBackground"
-    android:fillViewport="true">
+    android:background="?attr/daxColorBackground">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:paddingTop="200dp"
+        android:paddingBottom="50dp">
 
         <ImageView
             android:id="@+id/sslAlertImage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="100dp"
             android:importantForAccessibility="no"
             android:src="@drawable/ic_shield_alert_128"
             app:layout_constraintEnd_toEndOf="parent"
@@ -85,13 +85,13 @@
             app:buttonSize="large"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/sslErrorLeaveSiteCTA"/>
+            app:layout_constraintTop_toBottomOf="@+id/sslErrorLeaveSiteCTA" />
 
         <androidx.constraintlayout.widget.Group
             android:id="@+id/sslErrorAdvancedGroup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="gone"
+            android:visibility="visible"
             app:constraint_referenced_ids="sslErrorAdvancedDivider, sslErrorExpandedHeadline, sslErrorExpandedMessage, sslErrorAcceptCta"  />
 
         <com.duckduckgo.common.ui.view.divider.HorizontalDivider
@@ -116,7 +116,7 @@
             app:layout_constraintTop_toBottomOf="@+id/sslErrorAdvancedDivider"
             app:typography="body2"
             android:textAlignment="center"
-            tools:text="@string/sslErrorExpandedHeadline" />
+            android:text="@string/sslErrorExpandedHeadline" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/sslErrorExpandedMessage"
