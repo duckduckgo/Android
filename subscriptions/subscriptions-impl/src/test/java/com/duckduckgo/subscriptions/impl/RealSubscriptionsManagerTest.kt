@@ -26,6 +26,7 @@ import com.duckduckgo.subscriptions.impl.services.AuthService
 import com.duckduckgo.subscriptions.impl.services.ConfirmationEntitlement
 import com.duckduckgo.subscriptions.impl.services.ConfirmationResponse
 import com.duckduckgo.subscriptions.impl.services.CreateAccountResponse
+import com.duckduckgo.subscriptions.impl.services.DeleteAccountResponse
 import com.duckduckgo.subscriptions.impl.services.EntitlementResponse
 import com.duckduckgo.subscriptions.impl.services.PortalResponse
 import com.duckduckgo.subscriptions.impl.services.StoreLoginResponse
@@ -908,6 +909,46 @@ class RealSubscriptionsManagerTest {
         )
 
         assertFalse(subscriptionsManager.canSupportEncryption())
+    }
+
+    @Test
+    fun whenDeleteAccountIfUserAuthenticatedAndValidTokenThenReturnTrue() = runTest {
+        givenUserIsAuthenticated()
+        givenValidateTokenSucceedsWithEntitlements()
+        givenDeleteAccountSucceeds()
+
+        assertTrue(subscriptionsManager.deleteAccount())
+    }
+
+    @Test
+    fun whenDeleteAccountIfUserNotAuthenticatedThenReturnFalse() = runTest {
+        givenUserIsNotAuthenticated()
+        givenDeleteAccountFails()
+
+        assertFalse(subscriptionsManager.deleteAccount())
+    }
+
+    @Test
+    fun whenDeleteAccountIfUserAuthenticatedWithSubscriptionAndTokenExpiredAndEntitlementsExistsThenReturnTrue() = runTest {
+        authDataStore.externalId = "1234"
+        givenUserIsAuthenticated()
+        givenSubscriptionSucceedsWithEntitlements()
+        givenValidateTokenFailsAndThenSucceeds("""{ "error": "expired_token" }""")
+        givenPurchaseStored()
+        givenStoreLoginSucceeds()
+        givenAccessTokenSucceeds()
+        givenDeleteAccountSucceeds()
+
+        assertTrue(subscriptionsManager.deleteAccount())
+    }
+
+    private suspend fun givenDeleteAccountSucceeds() {
+        whenever(authService.delete(any())).thenReturn(DeleteAccountResponse("deleted"))
+    }
+
+    private suspend fun givenDeleteAccountFails() {
+        val exception = "failure".toResponseBody("text/json".toMediaTypeOrNull())
+        whenever(authService.delete(any())).thenThrow(HttpException(Response.error<String>(400, exception)))
     }
 
     private suspend fun givenUrlPortalSucceeds() {
