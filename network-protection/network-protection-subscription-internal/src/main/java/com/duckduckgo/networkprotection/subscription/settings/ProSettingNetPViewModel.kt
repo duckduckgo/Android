@@ -46,9 +46,9 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import logcat.logcat
@@ -81,27 +81,18 @@ class ProSettingNetPViewModel(
     private val _viewState = MutableStateFlow(ViewState())
     val viewState = _viewState.asStateFlow()
 
-    override fun onResume(owner: LifecycleOwner) {
-        super.onResume(owner)
-        viewModelScope.launch {
-            _viewState.emit(
-                viewState.value.copy(
-                    networkProtectionEntryState = (if (networkProtectionState.isRunning()) CONNECTED else DISCONNECTED).run {
-                        getNetworkProtectionEntryState(this)
-                    },
-                ),
-            )
-        }
+    override fun onStart(owner: LifecycleOwner) {
+        super.onStart(owner)
 
-        networkProtectionState.getConnectionStateFlow()
-            .onEach {
+        viewModelScope.launch {
+            combine(networkProtectionWaitlist.getStateFlow(), networkProtectionState.getConnectionStateFlow()) { accessState, connectionState ->
                 _viewState.emit(
                     viewState.value.copy(
-                        networkProtectionEntryState = getNetworkProtectionEntryState(it),
+                        networkProtectionEntryState = getNetworkProtectionEntryState(accessState, connectionState),
                     ),
                 )
-            }.flowOn(dispatcherProvider.main())
-            .launchIn(viewModelScope)
+            }.flowOn(dispatcherProvider.main()).launchIn(viewModelScope)
+        }
     }
 
     fun onNetPSettingClicked() {
@@ -114,10 +105,13 @@ class ProSettingNetPViewModel(
         }
     }
 
-    private suspend fun getNetworkProtectionEntryState(networkProtectionConnectionState: ConnectionState): NetPEntryState {
-        return when (val networkProtectionWaitlistState = networkProtectionWaitlist.getState()) {
+    private suspend fun getNetworkProtectionEntryState(
+        accessState: NetPWaitlistState,
+        networkProtectionConnectionState: ConnectionState,
+    ): NetPEntryState {
+        return when (accessState) {
             is NetPWaitlistState.InBeta -> {
-                if (networkProtectionWaitlistState.termsAccepted || networkProtectionState.isOnboarded()) {
+                if (accessState.termsAccepted || networkProtectionState.isOnboarded()) {
                     val subtitle = when (networkProtectionConnectionState) {
                         CONNECTED -> R.string.netpSubscriptionSettingsConnected
                         CONNECTING -> R.string.netpSubscriptionSettingsConnecting
@@ -138,6 +132,7 @@ class ProSettingNetPViewModel(
                     Pending
                 }
             }
+
             NetPWaitlistState.NotUnlocked -> Hidden
             NetPWaitlistState.PendingInviteCode, NetPWaitlistState.JoinedWaitlist -> Pending
         }
@@ -159,6 +154,7 @@ class ProSettingNetPViewModel(
                         dispatcherProvider,
                         pixel,
                     )
+
                     else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
                 }
             } as T

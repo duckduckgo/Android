@@ -16,6 +16,7 @@
 
 package com.duckduckgo.networkprotection.subscription
 
+import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.InBeta
@@ -24,6 +25,7 @@ import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -120,6 +122,55 @@ class NetworkProtectionAccessStateTest {
         whenever(netPWaitlistRepository.getAuthenticationToken()).thenReturn("123")
         testee.getState().also {
             assertEquals(InBeta(true), it)
+        }
+    }
+
+    @Test
+    fun whenSubscriptionsDisabledThenReturnFlowEmitsNotUnlocked() = runTest {
+        whenever(subscriptions.isEnabled()).thenReturn(false)
+        testee.getStateFlow().test {
+            assertEquals(NotUnlocked, expectMostRecentItem())
+        }
+    }
+
+    @Test
+    fun whenSubscriptionsEnabledAndHasNoEntitlementAndNetpDisabledThenReturnFlowEmitsNotUnlocked() = runTest {
+        whenever(netpSubscriptionManager.hasValidEntitlementFlow()).thenReturn(flowOf(false))
+        whenever(networkProtectionState.isEnabled()).thenReturn(false)
+        testee.getStateFlow().test {
+            assertEquals(NotUnlocked, expectMostRecentItem())
+            verifyNoInteractions(networkProtectionRepository)
+        }
+    }
+
+    @Test
+    fun whenSubscriptionsEnabledAndHasNoEntitlementAndNetpEnabledThenReturnFlowEmitNotUnlockedAndResetVpnState() = runTest {
+        whenever(netpSubscriptionManager.hasValidEntitlementFlow()).thenReturn(flowOf(false))
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
+        testee.getStateFlow().test {
+            assertEquals(NotUnlocked, expectMostRecentItem())
+            verify(networkProtectionRepository).vpnAccessRevoked = true
+            verify(networkProtectionState).stop()
+        }
+    }
+
+    @Test
+    fun whenSubscriptionsEnabledAndHasEntitlementAndHasAuthTokenAndNotAcceptedTermsReturnFlowEmitInBetaFalse() = runTest {
+        whenever(netpSubscriptionManager.hasValidEntitlementFlow()).thenReturn(flowOf(true))
+        whenever(netPWaitlistRepository.didAcceptWaitlistTerms()).thenReturn(false)
+        whenever(netPWaitlistRepository.getAuthenticationToken()).thenReturn("123")
+        testee.getStateFlow().test {
+            assertEquals(InBeta(false), expectMostRecentItem())
+        }
+    }
+
+    @Test
+    fun whenSubscriptionsEnabledAndHasEntitlementAndAcceptedTermsReturnFlowEmitInBetaTrue() = runTest {
+        whenever(netpSubscriptionManager.hasValidEntitlementFlow()).thenReturn(flowOf(true))
+        whenever(netPWaitlistRepository.didAcceptWaitlistTerms()).thenReturn(true)
+        whenever(netPWaitlistRepository.getAuthenticationToken()).thenReturn("123")
+        testee.getStateFlow().test {
+            assertEquals(InBeta(true), expectMostRecentItem())
         }
     }
 }

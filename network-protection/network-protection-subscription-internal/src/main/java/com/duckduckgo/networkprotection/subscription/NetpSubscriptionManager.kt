@@ -22,12 +22,16 @@ import com.duckduckgo.subscriptions.api.Product.NetP
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 interface NetpSubscriptionManager {
     suspend fun getToken(): String?
     suspend fun hasValidEntitlement(): Boolean
+
+    fun hasValidEntitlementFlow(): Flow<Boolean>
 }
 
 @ContributesBinding(AppScope::class)
@@ -44,4 +48,6 @@ class RealNetpSubscriptionManager @Inject constructor(
         val entitlements = subscriptions.getEntitlementStatus().firstOrNull()
         return@withContext (entitlements?.contains(NetP) == true)
     }
+
+    override fun hasValidEntitlementFlow(): Flow<Boolean> = subscriptions.getEntitlementStatus().map { it.contains(NetP) }
 }

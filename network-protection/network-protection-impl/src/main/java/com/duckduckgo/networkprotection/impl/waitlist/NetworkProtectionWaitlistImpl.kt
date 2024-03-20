@@ -41,6 +41,8 @@ import java.util.*
 import javax.inject.Inject
 import javax.inject.Qualifier
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -69,6 +71,11 @@ class NetworkProtectionWaitlistImpl @Inject constructor(
         }
 
         return@withContext NotUnlocked
+    }
+
+    override suspend fun getStateFlow(): Flow<NetPWaitlistState> {
+        // NO_OP for waitlist as this is not used
+        return emptyFlow()
     }
 
     override suspend fun getScreenForCurrentState(): ActivityParams? = withContext(dispatcherProvider.io()) {

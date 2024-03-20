@@ -34,6 +34,9 @@ import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistReposito
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 @ContributesBinding(AppScope::class)
@@ -48,6 +51,14 @@ class NetworkProtectionState @Inject constructor(
             subscriptionState.getState()
         } else {
             waitlistState.getState()
+        }
+    }
+
+    override suspend fun getStateFlow(): Flow<NetPWaitlistState> {
+        return if (subscriptions.isEnabled()) {
+            subscriptionState.getStateFlow()
+        } else {
+            waitlistState.getStateFlow()
         }
     }
 
@@ -83,6 +94,22 @@ class NetworkProtectionAccessState @Inject constructor(
         return@withContext NotUnlocked
     }
 
+    override suspend fun getStateFlow(): Flow<NetPWaitlistState> = withContext(dispatcherProvider.io()) {
+        if (isTreated()) {
+            netpSubscriptionManager.hasValidEntitlementFlow().map {
+                if (!it) {
+                    // if entitlement check succeeded and no entitlement, reset state and hide access.
+                    handleRevokedVPNState()
+                    NotUnlocked
+                } else {
+                    InBeta(netPWaitlistRepository.didAcceptWaitlistTerms())
+                }
+            }
+        } else {
+            flowOf(NotUnlocked)
+        }
+    }
+
     private suspend fun handleRevokedVPNState() {
         if (networkProtectionState.isEnabled()) {
             networkProtectionRepository.vpnAccessRevoked = true
@@ -91,7 +118,7 @@ class NetworkProtectionAccessState @Inject constructor(
     }
 
     override suspend fun getScreenForCurrentState(): ActivityParams? {
-        return when (val state = getState()) {
+        return when (getState()) {
             is InBeta -> {
                 if (netPWaitlistRepository.didAcceptWaitlistTerms() || networkProtectionState.isOnboarded()) {
                     NetworkProtectionManagementScreenNoParams
