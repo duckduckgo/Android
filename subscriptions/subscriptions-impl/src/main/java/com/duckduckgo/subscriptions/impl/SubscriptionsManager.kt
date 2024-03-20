@@ -246,8 +246,13 @@ class RealSubscriptionsManager @Inject constructor(
 
     override suspend fun deleteAccount(): Boolean {
         return try {
-            val state = authService.delete("Bearer ${authRepository.getAuthToken()}")
-            (state.status == "deleted")
+            val token = getAuthToken()
+            if (token is AuthToken.Success) {
+                val state = authService.delete("Bearer $token")
+                (state.status == "deleted")
+            } else {
+                false
+            }
         } catch (e: Exception) {
             false
         }
