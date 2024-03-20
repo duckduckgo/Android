@@ -74,10 +74,8 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BUY_URL
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionsWebviewBinding
 import com.duckduckgo.subscriptions.impl.pir.PirActivity.Companion.PirScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
-import com.duckduckgo.subscriptions.impl.ui.AddDeviceActivity.Companion.AddDeviceScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionActivity.Companion.RestoreSubscriptionScreenWithParams
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
-import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.ActivateOnAnotherDevice
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.BackToSettings
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.BackToSettingsActivateSuccess
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.GoToITR
@@ -396,7 +394,6 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             is SendJsEvent -> sendJsEvent(command.event)
             is SendResponseToJs -> sendResponseToJs(command.data)
             is SubscriptionSelected -> selectSubscription(command.id)
-            is ActivateOnAnotherDevice -> activateOnAnotherDevice()
             is RestoreSubscription -> restoreSubscription()
             is GoToITR -> goToITR()
             is GoToPIR -> goToPIR()
@@ -509,10 +506,6 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             setResult(RESULT_OK)
         }
         finish()
-    }
-
-    private fun activateOnAnotherDevice() {
-        globalActivityStarter.start(this, AddDeviceScreenWithEmptyParams)
     }
 
     private val startForResultRestore = registerForActivityResult(StartActivityForResult()) { result: ActivityResult ->

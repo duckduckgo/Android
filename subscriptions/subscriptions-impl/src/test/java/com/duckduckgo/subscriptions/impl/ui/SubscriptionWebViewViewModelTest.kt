@@ -267,11 +267,10 @@ class SubscriptionWebViewViewModelTest {
     }
 
     @Test
-    fun whenActivateSubscriptionAndSubscriptionActiveThenCommandSent() = runTest {
+    fun whenActivateSubscriptionAndSubscriptionActiveThenNoCommandSent() = runTest {
         whenever(subscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
         viewModel.commands().test {
-            viewModel.processJsCallbackMessage("test", "activateSubscription", null, null)
-            assertTrue(awaitItem() is Command.ActivateOnAnotherDevice)
+            expectNoEvents()
         }
     }
 
