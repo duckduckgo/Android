@@ -20,12 +20,16 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
+import android.net.http.SslCertificate
+import android.net.http.SslError
+import android.os.Build
 import android.print.PrintAttributes
 import android.view.MenuItem
 import android.view.View
 import android.webkit.GeolocationPermissions
 import android.webkit.HttpAuthHandler
 import android.webkit.PermissionRequest
+import android.webkit.SslErrorHandler
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient.FileChooserParams
 import android.webkit.WebView
@@ -34,6 +38,7 @@ import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.room.Room
+import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.ValueCaptorObserver
@@ -47,12 +52,18 @@ import com.duckduckgo.app.autocomplete.api.AutoCompleteService
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
+import com.duckduckgo.app.browser.SSLErrorType.EXPIRED
+import com.duckduckgo.app.browser.SSLErrorType.GENERIC
+import com.duckduckgo.app.browser.SSLErrorType.NONE
+import com.duckduckgo.app.browser.SSLErrorType.UNTRUSTED_HOST
+import com.duckduckgo.app.browser.SSLErrorType.WRONG_HOST
 import com.duckduckgo.app.browser.WebViewErrorResponse.BAD_URL
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
 import com.duckduckgo.app.browser.camera.CameraHardwareChecker
+import com.duckduckgo.app.browser.certificates.TrustedSitesRepository
 import com.duckduckgo.app.browser.commands.Command
 import com.duckduckgo.app.browser.commands.Command.LaunchPrivacyPro
 import com.duckduckgo.app.browser.commands.Command.LoadExtractedUrl
@@ -84,6 +95,7 @@ import com.duckduckgo.app.browser.viewstate.FindInPageViewState
 import com.duckduckgo.app.browser.viewstate.GlobalLayoutViewState
 import com.duckduckgo.app.browser.viewstate.HighlightableButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
+import com.duckduckgo.app.browser.webview.SslWarningLayout.Action
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
@@ -174,6 +186,9 @@ import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import dagger.Lazy
 import io.reactivex.Observable
 import java.io.File
+import java.math.BigInteger
+import java.security.cert.X509Certificate
+import java.security.interfaces.RSAPublicKey
 import java.util.Locale
 import java.util.UUID
 import java.util.concurrent.CopyOnWriteArrayList
@@ -384,8 +399,6 @@ class BrowserTabViewModelTest {
 
     private val selectedTabLiveData = MutableLiveData<TabEntity>()
 
-    private val tabsLiveData = MutableLiveData<List<TabEntity>>()
-
     private val loginEventLiveData = MutableLiveData<LoginDetected>()
 
     private val fireproofDialogsEventHandlerLiveData = MutableLiveData<FireproofDialogsEventHandler.Event>()
@@ -433,7 +446,7 @@ class BrowserTabViewModelTest {
     }
 
     private val mockFaviconFetchingPrompt: FaviconsFetchingPrompt = mock()
-
+    private val mockTrustedSitesRepository: TrustedSitesRepository = mock()
     private val mockExtendedOnboardingExperimentVariantManager: ExtendedOnboardingExperimentVariantManager = mock()
 
     @Before
@@ -485,6 +498,7 @@ class BrowserTabViewModelTest {
             mockEntityLookup,
             mockContentBlocking,
             mockUserAllowListRepository,
+            mockTrustedSitesRepository,
             coroutineRule.testScope,
             coroutineRule.testDispatcherProvider,
         )
@@ -566,8 +580,9 @@ class BrowserTabViewModelTest {
             privacyProtectionsToggleUsageListener = mockPrivacyProtectionsToggleUsageListener,
             privacyProtectionsPopupExperimentExternalPixels = privacyProtectionsPopupExperimentExternalPixels,
             faviconsFetchingPrompt = mockFaviconFetchingPrompt,
-            extendedOnboardingExperimentVariantManager = mockExtendedOnboardingExperimentVariantManager,
             subscriptions = subscriptions,
+            trustedSitesRepository = mockTrustedSitesRepository,
+            extendedOnboardingExperimentVariantManager = mockExtendedOnboardingExperimentVariantManager,
         )
 
         testee.loadData("abc", null, false, false)
@@ -5028,6 +5043,119 @@ class BrowserTabViewModelTest {
 
         assertCommandIssued<Command.SetBrowserBackground> {
             assertEquals(0, this.backgroundRes)
+        }
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
+    fun whenSslCertificateIssueReceivedThenShowSslWarningCommandSentAndViewStatesUpdated() {
+        val url = "http://example.com"
+        val certificate = aRSASslCertificate()
+        val sslErrorResponse = SslErrorResponse(SslError(SslError.SSL_EXPIRED, certificate, url), EXPIRED, url)
+        testee.onReceivedSslError(aHandler(), sslErrorResponse)
+
+        assertCommandIssued<Command.ShowSSLError>()
+
+        assertEquals(EXPIRED, browserViewState().sslError)
+        assertEquals(false, browserViewState().showPrivacyShield)
+        assertEquals(false, browserViewState().showDaxIcon)
+        assertEquals(false, browserViewState().showSearchIcon)
+        assertEquals(false, loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenSslCertificateBypassedThenUrlAddedToRepository() {
+        val url = "http://example.com"
+
+        testee.onSSLCertificateWarningAction(Action.Proceed, url)
+
+        verify(mockTrustedSitesRepository).add(url)
+
+        verify(mockPixel).fire(AppPixelName.SSL_CERTIFICATE_WARNING_PROCEED_PRESSED)
+    }
+
+    @Test
+    fun whenSslCertificateActionShownThenPixelsFired() {
+        val url = "http://example.com"
+
+        testee.onSSLCertificateWarningAction(Action.Shown(EXPIRED), url)
+        verify(mockPixel).fire(AppPixelName.SSL_CERTIFICATE_WARNING_EXPIRED_SHOWN)
+
+        testee.onSSLCertificateWarningAction(Action.Shown(WRONG_HOST), url)
+        verify(mockPixel).fire(AppPixelName.SSL_CERTIFICATE_WARNING_WRONG_HOST_SHOWN)
+
+        testee.onSSLCertificateWarningAction(Action.Shown(UNTRUSTED_HOST), url)
+        verify(mockPixel).fire(AppPixelName.SSL_CERTIFICATE_WARNING_UNTRUSTED_SHOWN)
+
+        testee.onSSLCertificateWarningAction(Action.Shown(GENERIC), url)
+        verify(mockPixel).fire(AppPixelName.SSL_CERTIFICATE_WARNING_GENERIC_SHOWN)
+    }
+
+    @Test
+    fun whenSslCertificateActionAdvanceThenPixelsFired() {
+        val url = "http://example.com"
+        testee.onSSLCertificateWarningAction(Action.Advance, url)
+
+        verify(mockPixel).fire(AppPixelName.SSL_CERTIFICATE_WARNING_ADVANCED_PRESSED)
+    }
+
+    @Test
+    fun whenSslCertificateActionLeaveSiteThenPixelsFiredAndViewStatesUpdated() {
+        val url = "http://example.com"
+        testee.onSSLCertificateWarningAction(Action.LeaveSite, url)
+
+        verify(mockPixel).fire(AppPixelName.SSL_CERTIFICATE_WARNING_CLOSE_PRESSED)
+        assertEquals(NONE, browserViewState().sslError)
+    }
+
+    @Test
+    fun whenSslCertificateActionProceedThenPixelsFiredAndViewStatesUpdated() {
+        val url = "http://example.com"
+        testee.onSSLCertificateWarningAction(Action.Proceed, url)
+
+        assertCommandIssued<Command.HideSSLError>()
+        verify(mockPixel).fire(AppPixelName.SSL_CERTIFICATE_WARNING_PROCEED_PRESSED)
+        verify(mockTrustedSitesRepository).add(url)
+        assertEquals(NONE, browserViewState().sslError)
+    }
+
+    @Test
+    fun whenWebViewRefreshedThenSSLErrorStateIsNone() {
+        testee.onWebViewRefreshed()
+
+        assertEquals(NONE, browserViewState().sslError)
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
+    fun whenResetSSLErrorThenBrowserErrorStateIsLoading() {
+        val url = "http://example.com"
+        val certificate = aRSASslCertificate()
+        val sslErrorResponse = SslErrorResponse(SslError(SslError.SSL_EXPIRED, certificate, url), EXPIRED, url)
+
+        testee.onReceivedSslError(aHandler(), sslErrorResponse)
+        assertEquals(EXPIRED, browserViewState().sslError)
+
+        testee.refreshBrowserError()
+        assertEquals(NONE, browserViewState().sslError)
+    }
+
+    fun aHandler(): SslErrorHandler {
+        val handler = mock<SslErrorHandler>().apply {
+        }
+        return handler
+    }
+
+    private fun aRSASslCertificate(): SslCertificate {
+        val certificate = mock<X509Certificate>().apply {
+            val key = mock<RSAPublicKey>().apply {
+                whenever(this.algorithm).thenReturn("rsa")
+                whenever(this.modulus).thenReturn(BigInteger("1"))
+            }
+            whenever(this.publicKey).thenReturn(key)
+        }
+        return mock<SslCertificate>().apply {
+            whenever(x509Certificate).thenReturn(certificate)
         }
     }
 

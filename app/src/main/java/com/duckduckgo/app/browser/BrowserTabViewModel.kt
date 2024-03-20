@@ -20,7 +20,6 @@ import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.net.Uri
 import android.net.http.SslCertificate
-import android.net.http.SslError
 import android.os.Message
 import android.print.PrintAttributes
 import android.provider.MediaStore
@@ -51,6 +50,11 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.A
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.DeleteBookmarkListener
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.EditSavedSiteListener
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
+import com.duckduckgo.app.browser.SSLErrorType.EXPIRED
+import com.duckduckgo.app.browser.SSLErrorType.GENERIC
+import com.duckduckgo.app.browser.SSLErrorType.NONE
+import com.duckduckgo.app.browser.SSLErrorType.UNTRUSTED_HOST
+import com.duckduckgo.app.browser.SSLErrorType.WRONG_HOST
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.NonHttpAppLink
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.ShouldLaunchPrivacyProLink
@@ -59,6 +63,7 @@ import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
 import com.duckduckgo.app.browser.camera.CameraHardwareChecker
+import com.duckduckgo.app.browser.certificates.TrustedSitesRepository
 import com.duckduckgo.app.browser.commands.Command
 import com.duckduckgo.app.browser.commands.Command.*
 import com.duckduckgo.app.browser.commands.NavigationCommand
@@ -95,6 +100,7 @@ import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
+import com.duckduckgo.app.browser.webview.SslWarningLayout.Action
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
@@ -243,6 +249,7 @@ class BrowserTabViewModel @Inject constructor(
     private val faviconsFetchingPrompt: FaviconsFetchingPrompt,
     private val extendedOnboardingExperimentVariantManager: ExtendedOnboardingExperimentVariantManager,
     private val subscriptions: Subscriptions,
+    private val trustedSitesRepository: TrustedSitesRepository,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -766,6 +773,7 @@ class BrowserTabViewModel @Inject constructor(
             showClearButton = false,
             showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(urlLoaded = urlToNavigate),
             browserError = OMITTED,
+            sslError = NONE,
         )
         autoCompleteViewState.value =
             currentAutoCompleteViewState().copy(showSuggestions = false, showFavorites = false, searchResults = AutoCompleteResult("", emptyList()))
@@ -933,6 +941,11 @@ class BrowserTabViewModel @Inject constructor(
 
         if (!currentBrowserViewState().browserShowing) {
             return false
+        }
+
+        if (currentBrowserViewState().sslError != NONE) {
+            recoverFromSSLWarningPage()
+            return true
         }
 
         if (navigation.canGoBack) {
@@ -1653,11 +1666,10 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun onReceivedSslError(
         handler: SslErrorHandler,
-        errorResponse: SslErrorResponse
+        errorResponse: SslErrorResponse,
     ) {
-        site?.onSSLCertificateErrorDetected(errorResponse.error)
         browserViewState.value =
-            currentBrowserViewState().copy(showPrivacyShield = false, showDaxIcon = true, showSearchIcon = false)
+            currentBrowserViewState().copy(browserShowing = false, showPrivacyShield = false, showDaxIcon = false, showSearchIcon = false, sslError = errorResponse.errorType)
         command.postValue(ShowSSLError(handler, errorResponse))
     }
 
@@ -3048,6 +3060,48 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch {
             command.value = SetBrowserBackground(backgroundRes)
         }
+    }
+
+    fun onSSLCertificateWarningAction(action: Action, url: String) {
+        when (action) {
+            is Action.Shown -> {
+                when (action.errorType) {
+                    EXPIRED -> pixel.fire(AppPixelName.SSL_CERTIFICATE_WARNING_EXPIRED_SHOWN)
+                    WRONG_HOST -> pixel.fire(AppPixelName.SSL_CERTIFICATE_WARNING_WRONG_HOST_SHOWN)
+                    UNTRUSTED_HOST -> pixel.fire(AppPixelName.SSL_CERTIFICATE_WARNING_UNTRUSTED_SHOWN)
+                    GENERIC -> pixel.fire(AppPixelName.SSL_CERTIFICATE_WARNING_GENERIC_SHOWN)
+                    else -> {} // nothing to report
+                }
+            }
+
+            Action.Advance -> {
+                pixel.fire(AppPixelName.SSL_CERTIFICATE_WARNING_ADVANCED_PRESSED)
+            }
+
+            Action.LeaveSite -> {
+                recoverFromSSLWarningPage()
+                pixel.fire(AppPixelName.SSL_CERTIFICATE_WARNING_CLOSE_PRESSED)
+            }
+
+            Action.Proceed -> {
+                command.postValue(HideSSLError(showBrowser = true))
+                refreshBrowserError()
+                trustedSitesRepository.add(url)
+                site?.sslError = true
+                pixel.fire(AppPixelName.SSL_CERTIFICATE_WARNING_PROCEED_PRESSED)
+            }
+        }
+    }
+
+    private fun recoverFromSSLWarningPage() {
+        val navigationState = webNavigationState
+        if (navigationState != null) {
+            Timber.d("SSL Certificate: recoverFromSSLPage $navigationState")
+            command.postValue(HideSSLError(showBrowser = navigationState.canGoBack))
+        } else {
+            command.postValue(HideSSLError(showBrowser = false))
+        }
+        refreshBrowserError()
     }
 
     companion object {

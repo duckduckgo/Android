@@ -23,6 +23,7 @@ import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
 import com.duckduckgo.app.blockingObserve
+import com.duckduckgo.app.browser.certificates.TrustedSitesRepository
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.global.db.AppDatabase
@@ -408,6 +409,7 @@ class TabDataRepositoryTest {
         dao: TabsDao = mockDatabase(),
         entityLookup: EntityLookup = mock(),
         allowListRepository: UserAllowListRepository = mock(),
+        trustedSitesRepository: TrustedSitesRepository = mock(),
         contentBlocking: ContentBlocking = mock(),
         webViewPreviewPersister: WebViewPreviewPersister = mock(),
         faviconManager: FaviconManager = mock(),
@@ -418,6 +420,7 @@ class TabDataRepositoryTest {
                 entityLookup,
                 contentBlocking,
                 allowListRepository,
+                trustedSitesRepository,
                 coroutinesTestRule.testScope,
                 coroutinesTestRule.testDispatcherProvider,
             ),

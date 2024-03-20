@@ -30,7 +30,7 @@
             android:id="@+id/sslAlertImage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="100dp"
+            android:layout_marginTop="150dp"
             android:importantForAccessibility="no"
             android:src="@drawable/ic_shield_alert_128"
             app:layout_constraintEnd_toEndOf="parent"
@@ -91,7 +91,7 @@
             android:id="@+id/sslErrorAdvancedGroup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="gone"
+            android:visibility="visible"
             app:constraint_referenced_ids="sslErrorAdvancedDivider, sslErrorExpandedHeadline, sslErrorExpandedMessage, sslErrorAcceptCta"  />
 
         <com.duckduckgo.common.ui.view.divider.HorizontalDivider
@@ -116,7 +116,7 @@
             app:layout_constraintTop_toBottomOf="@+id/sslErrorAdvancedDivider"
             app:typography="body2"
             android:textAlignment="center"
-            tools:text="@string/sslErrorExpandedHeadline" />
+            android:text="@string/sslErrorExpandedHeadline" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/sslErrorExpandedMessage"

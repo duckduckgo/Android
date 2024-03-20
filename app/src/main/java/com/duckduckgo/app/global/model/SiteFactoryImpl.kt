@@ -19,6 +19,7 @@ package com.duckduckgo.app.global.model
 import android.util.LruCache
 import androidx.annotation.AnyThread
 import androidx.annotation.WorkerThread
+import com.duckduckgo.app.browser.certificates.TrustedSitesRepository
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.trackerdetection.EntityLookup
@@ -29,7 +30,6 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
-import timber.log.Timber
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
@@ -37,6 +37,7 @@ class SiteFactoryImpl @Inject constructor(
     private val entityLookup: EntityLookup,
     private val contentBlocking: ContentBlocking,
     private val userAllowListRepository: UserAllowListRepository,
+    private val trustedSitesRepository: TrustedSitesRepository,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
 ) : SiteFactory {
@@ -56,12 +57,19 @@ class SiteFactoryImpl @Inject constructor(
     ): Site {
         val cachedSite = siteCache.get(url)
         return if (cachedSite == null) {
-            Timber.d("buildSite for $url")
-            SiteMonitor(url, title, httpUpgraded, userAllowListRepository, contentBlocking, appCoroutineScope, dispatcherProvider).also {
+            SiteMonitor(
+                url,
+                title,
+                httpUpgraded,
+                userAllowListRepository,
+                contentBlocking,
+                trustedSitesRepository,
+                appCoroutineScope,
+                dispatcherProvider,
+            ).also {
                 siteCache.put(url, it)
             }
         } else {
-            Timber.d("buildSite cached site for $url")
             cachedSite.upgradedHttps = httpUpgraded
             cachedSite.title = title
 
