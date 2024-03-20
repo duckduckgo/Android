@@ -21,9 +21,13 @@ import androidx.annotation.UiThread
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistorySearchSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistorySuggestion
 import com.duckduckgo.app.browser.autocomplete.AutoCompleteViewHolder.EmptySuggestionViewHolder
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.BOOKMARK_TYPE
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.EMPTY_TYPE
+import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.HISTORY_SEARCH_TYPE
+import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.HISTORY_TYPE
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.SUGGESTION_TYPE
 
 class BrowserAutoCompleteSuggestionsAdapter(
@@ -35,6 +39,8 @@ class BrowserAutoCompleteSuggestionsAdapter(
         EMPTY_TYPE to EmptySuggestionViewHolderFactory(),
         SUGGESTION_TYPE to SearchSuggestionViewHolderFactory(),
         BOOKMARK_TYPE to BookmarkSuggestionViewHolderFactory(),
+        HISTORY_TYPE to HistorySuggestionViewHolderFactory(),
+        HISTORY_SEARCH_TYPE to HistorySearchSuggestionViewHolderFactory(),
     )
 
     private var phrase = ""
@@ -50,6 +56,8 @@ class BrowserAutoCompleteSuggestionsAdapter(
         return when {
             suggestions.isEmpty() -> EMPTY_TYPE
             suggestions[position] is AutoCompleteBookmarkSuggestion -> BOOKMARK_TYPE
+            suggestions[position] is AutoCompleteHistorySuggestion -> HISTORY_TYPE
+            suggestions[position] is AutoCompleteHistorySearchSuggestion -> HISTORY_SEARCH_TYPE
             else -> SUGGESTION_TYPE
         }
     }
@@ -92,5 +100,7 @@ class BrowserAutoCompleteSuggestionsAdapter(
         const val EMPTY_TYPE = 1
         const val SUGGESTION_TYPE = 2
         const val BOOKMARK_TYPE = 3
+        const val HISTORY_TYPE = 4
+        const val HISTORY_SEARCH_TYPE = 5
     }
 }
