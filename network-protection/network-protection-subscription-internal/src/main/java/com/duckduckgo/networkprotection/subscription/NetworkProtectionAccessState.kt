@@ -35,7 +35,7 @@ import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
@@ -106,7 +106,7 @@ class NetworkProtectionAccessState @Inject constructor(
                 }
             }
         } else {
-            emptyFlow()
+            flowOf(NotUnlocked)
         }
     }
 
