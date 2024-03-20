@@ -52,6 +52,16 @@ interface AutoComplete {
             val url: String,
         ) :
             AutoCompleteSuggestion(phrase)
+
+        data class AutoCompleteHistorySuggestion(
+            override val phrase: String,
+            val title: String,
+            val url: String,
+        ) : AutoCompleteSuggestion(phrase)
+
+        data class AutoCompleteHistorySearchSuggestion(
+            override val phrase: String,
+        ) : AutoCompleteSuggestion(phrase)
     }
 }
 
