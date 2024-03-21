@@ -2,12 +2,15 @@ package com.duckduckgo.subscriptions.impl.ui
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.Account
 import com.duckduckgo.subscriptions.impl.ui.AddDeviceViewModel.Command.AddEmail
 import com.duckduckgo.subscriptions.impl.ui.AddDeviceViewModel.Command.Error
 import com.duckduckgo.subscriptions.impl.ui.AddDeviceViewModel.Command.ManageEmail
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -82,22 +85,30 @@ class AddDeviceViewModelTest {
     }
 
     @Test
-    fun whenOnResumeIfEmailExistsThenEmitIt() = runTest {
+    fun whenOnCreateIfEmailExistsThenEmitIt() = runTest {
         whenever(subscriptionsManager.getAccount()).thenReturn(
             Account(email = "email@email.com", externalId = "externalId"),
         )
+
+        val flowTest: MutableSharedFlow<SubscriptionStatus> = MutableSharedFlow()
+        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowTest)
+
+        viewModel.onCreate(mock())
+        flowTest.emit(AUTO_RENEWABLE)
         viewModel.viewState.test {
-            viewModel.onResume(mock())
-            assertNull(awaitItem().email)
-            viewModel.onResume(mock())
             assertEquals("email@email.com", awaitItem().email)
         }
     }
 
     @Test
-    fun whenOnResumeIfEmailBlankThenEmitIt() = runTest {
+    fun whenOnCreateIfEmailBlankThenEmitIt() = runTest {
+        val flowTest: MutableSharedFlow<SubscriptionStatus> = MutableSharedFlow()
+        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowTest)
+
+        viewModel.onCreate(mock())
+        flowTest.emit(AUTO_RENEWABLE)
+
         viewModel.viewState.test {
-            viewModel.onResume(mock())
             assertNull(awaitItem().email)
         }
     }
