@@ -43,15 +43,14 @@ interface AutoComplete {
         data class AutoCompleteSearchSuggestion(
             override val phrase: String,
             val isUrl: Boolean,
-        ) :
-            AutoCompleteSuggestion(phrase)
+        ) : AutoCompleteSuggestion(phrase)
 
         data class AutoCompleteBookmarkSuggestion(
             override val phrase: String,
             val title: String,
             val url: String,
-        ) :
-            AutoCompleteSuggestion(phrase)
+            val isFavorite: Boolean = false,
+        ) : AutoCompleteSuggestion(phrase)
 
         data class AutoCompleteHistorySuggestion(
             override val phrase: String,
@@ -108,7 +107,7 @@ class AutoCompleteApi @Inject constructor(
             .map { rankBookmarks(query, it) }
             .flattenAsObservable { it }
             .map {
-                AutoCompleteBookmarkSuggestion(phrase = it.url.toUri().toStringDropScheme(), title = it.title.orEmpty(), url = it.url)
+                AutoCompleteBookmarkSuggestion(phrase = it.url.toUri().toStringDropScheme(), title = it.title, url = it.url, isFavorite = false)
             }
             .distinctUntilChanged()
             .take(2)
@@ -121,7 +120,7 @@ class AutoCompleteApi @Inject constructor(
             .map { rankFavorites(query, it) }
             .flattenAsObservable { it }
             .map {
-                AutoCompleteBookmarkSuggestion(phrase = it.url.toUri().toStringDropScheme(), title = it.title.orEmpty(), url = it.url)
+                AutoCompleteBookmarkSuggestion(phrase = it.url.toUri().toStringDropScheme(), title = it.title, url = it.url, isFavorite = true)
             }
             .distinctUntilChanged()
             .take(2)
