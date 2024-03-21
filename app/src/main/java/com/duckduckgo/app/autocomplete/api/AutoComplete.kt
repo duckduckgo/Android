@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.autocomplete.api
 
+import android.net.Uri
 import androidx.core.net.toUri
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
@@ -30,6 +31,7 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.squareup.anvil.annotations.ContributesBinding
 import io.reactivex.Observable
 import javax.inject.Inject
+import org.jetbrains.annotations.VisibleForTesting
 
 interface AutoComplete {
     fun autoComplete(query: String): Observable<AutoCompleteResult>
@@ -141,6 +143,105 @@ class AutoCompleteApi @Inject constructor(
         favorites: List<SavedSite.Favorite>,
     ): List<SavedSite> {
         return favorites.asSequence().sortByRank(query)
+    }
+
+    @VisibleForTesting
+    fun score(
+        title: String?,
+        url: Uri,
+        visitCount: Int,
+        query: String,
+        queryTokens: List<String>? = null,
+    ): Int {
+        // To optimize, query tokens can be precomputed
+        val tokens = queryTokens ?: tokensFrom(query)
+
+        var score = 0
+        val lowercasedTitle = title?.lowercase() ?: ""
+        val queryCount = query.count()
+        val nakedUrl = url.naked()
+        val domain = url.host?.removePrefix("www.") ?: ""
+
+        // Full matches
+        if (nakedUrl.startsWith(query)) {
+            score += 300
+            // Prioritize root URLs most
+            if (url.isRoot()) score += 2000
+        } else if (lowercasedTitle.startsWith(query)) {
+            score += 200
+            if (url.isRoot()) score += 2000
+        } else if (queryCount > 2 && domain.contains(query)) {
+            score += 150
+        } else if (queryCount > 2 && lowercasedTitle.contains(" $query")) { // Exact match from the beginning of the word within string.
+            score += 100
+        } else {
+            // Tokenized matches
+            if (tokens.size > 1) {
+                var matchesAllTokens = true
+                for (token in tokens) {
+                    // Match only from the beginning of the word to avoid unintuitive matches.
+                    if (!lowercasedTitle.startsWith(token) && !lowercasedTitle.contains(" $token") && !nakedUrl.startsWith(token)) {
+                        matchesAllTokens = false
+                        break
+                    }
+                }
+
+                if (matchesAllTokens) {
+                    // Score tokenized matches
+                    score += 10
+
+                    // Boost score if first token matches:
+                    val firstToken = tokens.firstOrNull()
+                    if (firstToken != null) { // nakedUrlString - high score boost
+                        if (nakedUrl.startsWith(firstToken)) {
+                            score += 70
+                        } else if (lowercasedTitle.startsWith(firstToken)) { // beginning of the title - moderate score boost
+                            score += 50
+                        }
+                    }
+                }
+            }
+        }
+
+        if (score > 0) {
+            // Second sort based on visitCount
+            score *= 1000
+            score += visitCount
+        }
+
+        return score
+    }
+
+    private fun Uri.isRoot(): Boolean {
+        return (path.isNullOrEmpty() || path == "/") &&
+            query == null &&
+            fragment == null &&
+            userInfo == null
+    }
+
+    @VisibleForTesting
+    fun tokensFrom(query: String): List<String> {
+        return query
+            .split(Regex("\\s+"))
+            .filter { it.isNotEmpty() }
+            .map { it.lowercase() }
+    }
+
+    private fun Uri.naked(): String {
+        if (host == null) {
+            return toString().removePrefix("//")
+        }
+
+        val builder = buildUpon()
+
+        builder.scheme(null)
+        builder.authority(host!!.removePrefix("www."))
+
+        if (path?.lastOrNull() == '/') {
+            builder.path(path!!.dropLast(1))
+        }
+
+        return builder.build().toString().removePrefix("//")
     }
 
     private fun Sequence<SavedSite>.sortByRank(query: String): List<SavedSite> {
