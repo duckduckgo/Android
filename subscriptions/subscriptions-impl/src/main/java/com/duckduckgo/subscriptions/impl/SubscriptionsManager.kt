@@ -248,7 +248,7 @@ class RealSubscriptionsManager @Inject constructor(
         return try {
             val token = getAuthToken()
             if (token is AuthToken.Success) {
-                val state = authService.delete("Bearer $token")
+                val state = authService.delete("Bearer ${token.authToken}")
                 (state.status == "deleted")
             } else {
                 false
