@@ -125,6 +125,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
             "activateSubscription" -> activateSubscription()
             "featureSelected" -> data?.let { featureSelected(data) }
             "subscriptionsWelcomeFaqClicked" -> subscriptionsWelcomeFaqClicked()
+            "subscriptionsWelcomeAddEmailClicked" -> subscriptionsWelcomeAddEmailClicked()
             else -> {
                 // NOOP
             }
@@ -134,6 +135,12 @@ class SubscriptionWebViewViewModel @Inject constructor(
     private fun subscriptionsWelcomeFaqClicked() {
         if (hasPurchasedSubscription()) {
             pixelSender.reportOnboardingFaqClick()
+        }
+    }
+
+    private fun subscriptionsWelcomeAddEmailClicked() {
+        if (hasPurchasedSubscription()) {
+            pixelSender.reportOnboardingAddDeviceClick()
         }
     }
 
@@ -172,12 +179,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
     }
     private fun activateSubscription() {
         viewModelScope.launch(dispatcherProvider.io()) {
-            if (subscriptionsManager.subscriptionStatus().isActive()) {
-                if (hasPurchasedSubscription()) {
-                    pixelSender.reportOnboardingAddDeviceClick()
-                }
-                activateOnAnotherDevice()
-            } else {
+            if (!subscriptionsManager.subscriptionStatus().isActive()) {
                 pixelSender.reportOfferRestorePurchaseClick()
                 recoverSubscription()
             }
@@ -248,12 +250,6 @@ class SubscriptionWebViewViewModel @Inject constructor(
         }
     }
 
-    private fun activateOnAnotherDevice() {
-        viewModelScope.launch {
-            command.send(ActivateOnAnotherDevice)
-        }
-    }
-
     private fun backToSettingsActiveSuccess() {
         viewModelScope.launch {
             subscriptionsManager.fetchAndStoreAllData()
@@ -297,7 +293,6 @@ class SubscriptionWebViewViewModel @Inject constructor(
         data class SendJsEvent(val event: SubscriptionEventData) : Command()
         data class SendResponseToJs(val data: JsCallbackData) : Command()
         data class SubscriptionSelected(val id: String) : Command()
-        data object ActivateOnAnotherDevice : Command()
         data object RestoreSubscription : Command()
         data object GoToITR : Command()
         data object GoToPIR : Command()

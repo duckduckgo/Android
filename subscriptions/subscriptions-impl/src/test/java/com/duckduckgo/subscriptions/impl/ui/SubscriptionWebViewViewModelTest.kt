@@ -267,11 +267,10 @@ class SubscriptionWebViewViewModelTest {
     }
 
     @Test
-    fun whenActivateSubscriptionAndSubscriptionActiveThenCommandSent() = runTest {
+    fun whenActivateSubscriptionAndSubscriptionActiveThenNoCommandSent() = runTest {
         whenever(subscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
         viewModel.commands().test {
-            viewModel.processJsCallbackMessage("test", "activateSubscription", null, null)
-            assertTrue(awaitItem() is Command.ActivateOnAnotherDevice)
+            expectNoEvents()
         }
     }
 
@@ -377,14 +376,14 @@ class SubscriptionWebViewViewModelTest {
     }
 
     @Test
-    fun whenActivateOnAnotherDeviceClickedAndInPurchaseFlowThenPixelIsSent() = runTest {
+    fun whenAddEmailClickedAndInPurchaseFlowThenPixelIsSent() = runTest {
         whenever(subscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
         whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowOf(CurrentPurchase.Success))
         viewModel.start()
 
         viewModel.processJsCallbackMessage(
             featureName = "test",
-            method = "activateSubscription",
+            method = "subscriptionsWelcomeAddEmailClicked",
             id = null,
             data = null,
         )
@@ -392,12 +391,12 @@ class SubscriptionWebViewViewModelTest {
     }
 
     @Test
-    fun whenActivateOnAnotherDeviceClickedAndNotInPurchaseFlowThenPixelIsNotSent() = runTest {
+    fun whenAddEmailClickedAndNotInPurchaseFlowThenPixelIsNotSent() = runTest {
         whenever(subscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
 
         viewModel.processJsCallbackMessage(
             featureName = "test",
-            method = "activateSubscription",
+            method = "subscriptionsWelcomeAddEmailClicked",
             id = null,
             data = null,
         )

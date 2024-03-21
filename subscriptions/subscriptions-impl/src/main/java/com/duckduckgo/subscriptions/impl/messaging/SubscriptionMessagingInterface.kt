@@ -230,7 +230,9 @@ class SubscriptionMessagingInterface @Inject constructor(
                     "subscriptionsMonthlyPriceClicked" -> pixelSender.reportMonthlyPriceClick()
                     "subscriptionsYearlyPriceClicked" -> pixelSender.reportYearlyPriceClick()
                     "subscriptionsAddEmailSuccess" -> pixelSender.reportAddEmailSuccess()
-                    "subscriptionsWelcomeFaqClicked" -> {
+                    "subscriptionsWelcomeAddEmailClicked",
+                    "subscriptionsWelcomeFaqClicked",
+                    -> {
                         jsMessageCallback?.process(featureName, jsMessage.method, jsMessage.id, jsMessage.params)
                     }
 
@@ -246,6 +248,7 @@ class SubscriptionMessagingInterface @Inject constructor(
             "subscriptionsYearlyPriceClicked",
             "subscriptionsUnknownPriceClicked",
             "subscriptionsAddEmailSuccess",
+            "subscriptionsWelcomeAddEmailClicked",
             "subscriptionsWelcomeFaqClicked",
         )
     }
