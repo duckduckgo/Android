@@ -26,6 +26,7 @@
     tools:showIn="@layout/fragment_browser_tab">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/browserBackground"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingTop="?attr/actionBarSize"

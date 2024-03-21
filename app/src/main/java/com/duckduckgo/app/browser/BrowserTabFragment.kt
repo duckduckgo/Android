@@ -1390,6 +1390,7 @@ class BrowserTabFragment :
             is Command.ScreenLock -> screenLock(it.data)
             is Command.ScreenUnlock -> screenUnlock()
             is Command.ShowFaviconsPrompt -> showFaviconsPrompt()
+            is Command.SetBrowserBackground -> setBrowserBackground(it.backgroundRes)
             else -> {
                 // NO OP
             }
@@ -2080,6 +2081,7 @@ class BrowserTabFragment :
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun configureWebView() {
+        viewModel.configureBrowserBackground()
         webView = layoutInflater.inflate(
             R.layout.include_duckduckgo_browser_webview,
             binding.webViewContainer,
@@ -2171,6 +2173,10 @@ class BrowserTabFragment :
                 },
             )
         faviconPrompt.show()
+    }
+
+    private fun setBrowserBackground(backgroundRes: Int) {
+        newBrowserTab.browserBackground.setBackgroundResource(backgroundRes)
     }
 
     private fun configureWebViewForAutofill(it: DuckDuckGoWebView) {

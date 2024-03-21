@@ -223,4 +223,5 @@ sealed class Command {
     data class ScreenLock(val data: JsCallbackData) : Command()
     object ScreenUnlock : Command()
     data object ShowFaviconsPrompt : Command()
+    data class SetBrowserBackground(val backgroundRes: Int) : Command()
 }
