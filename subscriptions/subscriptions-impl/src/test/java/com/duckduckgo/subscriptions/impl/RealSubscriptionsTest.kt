@@ -27,7 +27,6 @@ import com.duckduckgo.subscriptions.impl.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.impl.SubscriptionStatus.INACTIVE
 import com.duckduckgo.subscriptions.impl.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.impl.SubscriptionStatus.WAITING
-import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -36,7 +35,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -47,14 +45,13 @@ class RealSubscriptionsTest {
     val coroutineRule = CoroutineTestRule()
 
     private val mockSubscriptionsManager: SubscriptionsManager = mock()
-    private val pixelSender: SubscriptionPixelSender = mock()
     private lateinit var subscriptions: RealSubscriptions
     private val privacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java, FakeToggleStore())
 
     @Before
     fun before() = runTest {
         whenever(mockSubscriptionsManager.canSupportEncryption()).thenReturn(true)
-        subscriptions = RealSubscriptions(mockSubscriptionsManager, privacyProFeature, pixelSender)
+        subscriptions = RealSubscriptions(mockSubscriptionsManager, privacyProFeature)
     }
 
     @Test
@@ -168,19 +165,5 @@ class RealSubscriptionsTest {
             SubscriptionOffer(monthlyPlanId = "test", yearlyFormattedPrice = "test", yearlyPlanId = "test", monthlyFormattedPrice = "test"),
         )
         assertFalse(subscriptions.isEligible())
-    }
-
-    @Test
-    fun whenIsEnabledIfTrueThenSendPixel() = runTest {
-        privacyProFeature.isLaunched().setEnabled(State(enable = true))
-        assertTrue(subscriptions.isEnabled())
-        verify(pixelSender).reportSubscriptionIsEnabled()
-    }
-
-    @Test
-    fun whenIsEnabledIfToggleDisabledThenReturnFalse() = runTest {
-        privacyProFeature.isLaunched().setEnabled(State(enable = false))
-        assertFalse(subscriptions.isEnabled())
-        verify(pixelSender, never()).reportSubscriptionIsEnabled()
     }
 }

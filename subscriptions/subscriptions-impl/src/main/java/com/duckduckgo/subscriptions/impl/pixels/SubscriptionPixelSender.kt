@@ -44,7 +44,6 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SETTINGS_ADD_D
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_ACTIVATED
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_ACTIVE
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_ADD_EMAIL_SUCCESS
-import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_IS_ENABLED
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_ONBOARDING_FAQ_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_PRICE_MONTHLY_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_PRICE_YEARLY_CLICK
@@ -83,7 +82,6 @@ interface SubscriptionPixelSender {
     fun reportAppSettingsIdtrClick()
     fun reportSubscriptionSettingsChangePlanOrBillingClick()
     fun reportSubscriptionSettingsRemoveFromDeviceClick()
-    fun reportSubscriptionIsEnabled()
     fun reportMonthlyPriceClick()
     fun reportYearlyPriceClick()
     fun reportOnboardingFaqClick()
@@ -178,8 +176,6 @@ class SubscriptionPixelSenderImpl @Inject constructor(
 
     override fun reportSubscriptionSettingsRemoveFromDeviceClick() =
         fire(SUBSCRIPTION_SETTINGS_REMOVE_FROM_DEVICE_CLICK)
-
-    override fun reportSubscriptionIsEnabled() = fire(SUBSCRIPTION_IS_ENABLED)
 
     override fun reportMonthlyPriceClick() =
         fire(SUBSCRIPTION_PRICE_MONTHLY_CLICK)

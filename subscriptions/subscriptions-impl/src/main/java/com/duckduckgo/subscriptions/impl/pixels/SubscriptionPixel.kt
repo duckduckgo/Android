@@ -138,10 +138,6 @@ enum class SubscriptionPixel(
         baseName = "m_privacy-pro_settings_remove-from-device_click",
         type = COUNT,
     ),
-    SUBSCRIPTION_IS_ENABLED(
-        baseName = "m_privacy-pro_is-enabled",
-        type = DAILY,
-    ),
     SUBSCRIPTION_PRICE_MONTHLY_CLICK(
         baseName = "m_privacy-pro_offer_monthly-price_click",
         type = COUNT,
