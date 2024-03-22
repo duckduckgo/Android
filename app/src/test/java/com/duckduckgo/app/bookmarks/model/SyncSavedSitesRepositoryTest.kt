@@ -37,8 +37,10 @@ import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
+import com.duckduckgo.savedsites.impl.MissingEntitiesRelationReconciler
 import com.duckduckgo.savedsites.impl.RealFavoritesDelegate
 import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
+import com.duckduckgo.savedsites.impl.sync.RealSavedSitesSyncStore
 import com.duckduckgo.savedsites.impl.sync.RealSyncSavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.SyncSavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.store.SavedSitesSyncMetadataDao
@@ -85,6 +87,11 @@ class SyncSavedSitesRepositoryTest {
     private lateinit var savedSitesDatabase: SavedSitesSyncMetadataDatabase
     private lateinit var repository: SyncSavedSitesRepository
     private lateinit var savedSitesRepository: SavedSitesRepository
+    private val store = RealSavedSitesSyncStore(
+        InstrumentationRegistry.getInstrumentation().context,
+        coroutinesTestRule.testScope,
+        coroutinesTestRule.testDispatcherProvider,
+    )
 
     val stringListType = Types.newParameterizedType(List::class.java, String::class.java)
     val stringListAdapter: JsonAdapter<List<String>> = Moshi.Builder().build().adapter(stringListType)
@@ -131,6 +138,7 @@ class SyncSavedSitesRepositoryTest {
             savedSitesEntitiesDao,
             savedSitesRelationsDao,
             savedSitesMetadataDao,
+            store,
         )
 
         val favoritesDisplayModeSettings = FakeDisplayModeSettingsRepository()
@@ -144,6 +152,7 @@ class SyncSavedSitesRepositoryTest {
             savedSitesEntitiesDao,
             savedSitesRelationsDao,
             favoritesDelegate,
+            MissingEntitiesRelationReconciler(savedSitesEntitiesDao),
             coroutinesTestRule.testDispatcherProvider,
         )
 
@@ -843,6 +852,27 @@ class SyncSavedSitesRepositoryTest {
             firstBatch.map { it.entityId }.plus(secondBatch.map { it.entityId }),
             savedSitesRelationsDao.relationsByFolderId(favouritesRoot.entityId).map { it.entityId },
         )
+    }
+
+    @Test
+    fun whenMarkSavedSitesIdsAsInvalidThenIdsStored() = runTest {
+        val ids = listOf("id1", "id2", "id3")
+        repository.markSavedSitesAsInvalid(ids)
+        val invalidIds = store.invalidEntitiesIds
+
+        assertTrue(invalidIds.containsAll(ids))
+        assertTrue(invalidIds.size == ids.size)
+    }
+
+    @Test
+    fun whenGetInvalidSavedSitesThenExpectedSavedSitesReturned() = runTest {
+        val bookmarks = BookmarkTestUtils.givenSomeBookmarks(10)
+        savedSitesEntitiesDao.insertList(bookmarks)
+        val ids = bookmarks.map { it.entityId }
+        repository.markSavedSitesAsInvalid(ids)
+        val invalidIds = repository.getInvalidSavedSites().map { it.id }
+        assertTrue(invalidIds.containsAll(ids))
+        assertTrue(invalidIds.size == ids.size)
     }
 
     private fun givenInitialFolderState() {
