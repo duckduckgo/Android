@@ -26,6 +26,7 @@ import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.subscriptions.impl.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenBuyScreen
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenRestoreScreen
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenSettings
@@ -45,6 +46,7 @@ import kotlinx.coroutines.launch
 @ContributesViewModel(ViewScope::class)
 class ProSettingViewModel @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
+    private val pixelSender: SubscriptionPixelSender,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     sealed class Command {
@@ -69,6 +71,7 @@ class ProSettingViewModel @Inject constructor(
     }
 
     fun onRestore() {
+        pixelSender.reportAppSettingsRestorePurchaseClick()
         sendCommand(OpenRestoreScreen)
     }
 

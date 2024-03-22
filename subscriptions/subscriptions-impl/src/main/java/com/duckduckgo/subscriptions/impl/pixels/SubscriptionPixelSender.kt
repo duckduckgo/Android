@@ -23,6 +23,7 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.ACTIVATE_SUBSC
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.ADD_DEVICE_ENTER_EMAIL_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_IDTR_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_PIR_CLICK
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_RESTORE_PURCHASE_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.OFFER_RESTORE_PURCHASE_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.OFFER_SCREEN_SHOWN
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.OFFER_SUBSCRIBE_CLICK
@@ -80,6 +81,7 @@ interface SubscriptionPixelSender {
     fun reportSubscriptionSettingsShown()
     fun reportAppSettingsPirClick()
     fun reportAppSettingsIdtrClick()
+    fun reportAppSettingsRestorePurchaseClick()
     fun reportSubscriptionSettingsChangePlanOrBillingClick()
     fun reportSubscriptionSettingsRemoveFromDeviceClick()
     fun reportMonthlyPriceClick()
@@ -170,6 +172,9 @@ class SubscriptionPixelSenderImpl @Inject constructor(
 
     override fun reportAppSettingsIdtrClick() =
         fire(APP_SETTINGS_IDTR_CLICK)
+
+    override fun reportAppSettingsRestorePurchaseClick() =
+        fire(APP_SETTINGS_RESTORE_PURCHASE_CLICK)
 
     override fun reportSubscriptionSettingsChangePlanOrBillingClick() =
         fire(SUBSCRIPTION_SETTINGS_CHANGE_PLAN_OR_BILLING_CLICK)
