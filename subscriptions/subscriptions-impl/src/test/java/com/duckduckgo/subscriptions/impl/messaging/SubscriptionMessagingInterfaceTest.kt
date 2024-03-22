@@ -286,6 +286,7 @@ class SubscriptionMessagingInterfaceTest {
         verify(subscriptionsManager).exchangeAuthToken("authToken")
         verify(pixelSender).reportRestoreUsingEmailSuccess()
         verify(pixelSender).reportSubscriptionActivated()
+        assertEquals(1, callback.counter)
     }
 
     @Test
