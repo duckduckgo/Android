@@ -74,7 +74,7 @@
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">You\'re all set.</string>
-    <string name="purchaseCompletedText">Your purchase was successful</string>
+    <string name="purchaseCompletedText">Your purchase was successful.</string>
     <string name="purchaseRecoveredText">Your already had a subscription and we\'ve recovered that for you.</string>
     <string name="purchaseErrorTitle">Something went wrong</string>
     <string name="purchaseError">We\'re having trouble connecting. Please try again later.</string>

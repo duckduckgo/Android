@@ -58,10 +58,18 @@ class RealSubscriptions @Inject constructor(
 
     override fun getEntitlementStatus(): Flow<List<Product>> {
         return subscriptionsManager.entitlements.map {
-            if (!isEnabled()) emptyList() else it
+            if (!isEnabled() || !checkIfActive()) emptyList() else it
         }
     }
 
+    private suspend fun checkIfActive(): Boolean {
+        return if (subscriptionsManager.subscriptionStatus().isActiveOrWaiting()) {
+            true
+        } else {
+            subscriptionsManager.removeEntitlements()
+            false
+        }
+    }
     override suspend fun isEnabled(): Boolean {
         return privacyProFeature.isLaunched().isEnabled().also { enabled ->
             if (enabled) {
