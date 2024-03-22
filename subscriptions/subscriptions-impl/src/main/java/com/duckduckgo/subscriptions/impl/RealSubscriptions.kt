@@ -27,6 +27,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.duckduckgo.subscriptions.api.Product
+import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.repository.isActiveOrWaiting
 import com.squareup.anvil.annotations.ContributesBinding
@@ -77,6 +78,10 @@ class RealSubscriptions @Inject constructor(
         val isActive = subscriptionsManager.subscriptionStatus().isActiveOrWaiting()
         val isEligible = subscriptionsManager.getSubscriptionOffer() != null
         return isActive || (isEligible && supportsEncryption)
+    }
+
+    override suspend fun getSubscriptionStatus(): SubscriptionStatus {
+        return subscriptionsManager.subscriptionStatus()
     }
 }
 
