@@ -130,6 +130,10 @@ enum class SubscriptionPixel(
         baseName = "m_privacy-pro_app-settings_identity-theft-restoration_click",
         type = COUNT,
     ),
+    APP_SETTINGS_RESTORE_PURCHASE_CLICK(
+        baseName = "m_privacy-pro_app-settings_restore-purchase_click",
+        type = COUNT,
+    ),
     SUBSCRIPTION_SETTINGS_CHANGE_PLAN_OR_BILLING_CLICK(
         baseName = "m_privacy-pro_settings_change-plan-or-billing_click",
         type = COUNT,
