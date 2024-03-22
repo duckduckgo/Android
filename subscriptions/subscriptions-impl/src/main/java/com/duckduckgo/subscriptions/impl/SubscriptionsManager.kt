@@ -163,6 +163,8 @@ interface SubscriptionsManager {
     suspend fun getPortalUrl(): String?
 
     suspend fun canSupportEncryption(): Boolean
+
+    suspend fun removeEntitlements()
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -240,6 +242,9 @@ class RealSubscriptionsManager @Inject constructor(
         }
     }
 
+    override suspend fun removeEntitlements() {
+        authRepository.setEntitlements(emptyList())
+    }
     override suspend fun canSupportEncryption(): Boolean = authRepository.canSupportEncryption()
 
     override suspend fun getAccount(): Account? = authRepository.getAccount()

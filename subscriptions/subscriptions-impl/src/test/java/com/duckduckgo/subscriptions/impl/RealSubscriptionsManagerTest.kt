@@ -942,6 +942,15 @@ class RealSubscriptionsManagerTest {
         assertTrue(subscriptionsManager.deleteAccount())
     }
 
+    @Test
+    fun whenRemoveEntitlementsThenEntitlementsDeleted() = runTest {
+        givenSubscriptionExists()
+        assertEquals("""[{"product":"product", "name":"name"}]""", authDataStore.entitlements)
+
+        subscriptionsManager.removeEntitlements()
+        assertEquals("""[]""", authDataStore.entitlements)
+    }
+
     private suspend fun givenDeleteAccountSucceeds() {
         whenever(authService.delete(any())).thenReturn(DeleteAccountResponse("deleted"))
     }

@@ -24,6 +24,7 @@ import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.subscriptions.api.Product.NetP
 import com.duckduckgo.subscriptions.impl.SubscriptionStatus.AUTO_RENEWABLE
+import com.duckduckgo.subscriptions.impl.SubscriptionStatus.INACTIVE
 import com.duckduckgo.subscriptions.impl.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.impl.SubscriptionStatus.WAITING
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
@@ -57,7 +58,7 @@ class RealSubscriptionsTest {
     }
 
     @Test
-    fun whenSubscriptionDataSucceedsThenReturnAccessToken() = runTest {
+    fun whenGetAccessTokenSucceedsThenReturnAccessToken() = runTest {
         whenever(mockSubscriptionsManager.getAccessToken()).thenReturn(AccessToken.Success("accessToken"))
         privacyProFeature.isLaunched().setEnabled(State(enable = true))
         val result = subscriptions.getAccessToken()
@@ -65,13 +66,14 @@ class RealSubscriptionsTest {
     }
 
     @Test
-    fun whenSubscriptionDataFailsThenReturnNull() = runTest {
+    fun whenGetAccessTokenFailsThenReturnNull() = runTest {
         whenever(mockSubscriptionsManager.getAccessToken()).thenReturn(AccessToken.Failure("error"))
         assertNull(subscriptions.getAccessToken())
     }
 
     @Test
-    fun whenSubscriptionDataHasEntitlementThenReturnList() = runTest {
+    fun whenGetEntitlementStatusHasEntitlementAndEnabledAndActiveThenReturnList() = runTest {
+        whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
         privacyProFeature.isLaunched().setEnabled(State(enable = true))
         whenever(mockSubscriptionsManager.entitlements).thenReturn(flowOf(listOf(NetP)))
 
@@ -82,9 +84,35 @@ class RealSubscriptionsTest {
     }
 
     @Test
-    fun whenSubscriptionDataHasNoEntitlementThenReturnEmptyList() = runTest {
+    fun whenGetEntitlementStatusHasEntitlementAndEnabledAndInactiveThenReturnEmptyList() = runTest {
+        whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(INACTIVE)
+        privacyProFeature.isLaunched().setEnabled(State(enable = true))
+        whenever(mockSubscriptionsManager.entitlements).thenReturn(flowOf(listOf(NetP)))
+
+        subscriptions.getEntitlementStatus().test {
+            assertTrue(awaitItem().isEmpty())
+            verify(mockSubscriptionsManager).removeEntitlements()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenGetEntitlementStatusHasNoEntitlementAndEnabledAndActiveThenReturnEmptyList() = runTest {
+        whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
         privacyProFeature.isLaunched().setEnabled(State(enable = true))
         whenever(mockSubscriptionsManager.entitlements).thenReturn(flowOf(emptyList()))
+
+        subscriptions.getEntitlementStatus().test {
+            assertTrue(awaitItem().isEmpty())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenGetEntitlementStatusHasEntitlementsAndNotEnabledAndActiveThenReturnEmptyList() = runTest {
+        whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
+        privacyProFeature.isLaunched().setEnabled(State(enable = false))
+        whenever(mockSubscriptionsManager.entitlements).thenReturn(flowOf(listOf(NetP)))
 
         subscriptions.getEntitlementStatus().test {
             assertTrue(awaitItem().isEmpty())
