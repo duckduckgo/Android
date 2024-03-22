@@ -28,8 +28,10 @@ import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
-import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.duckduckgo.networkprotection.impl.waitlist.NetPRemoteFeature
+import com.duckduckgo.networkprotection.subscription.NetpSubscriptionManager
+import com.duckduckgo.networkprotection.subscription.isActive
+import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
@@ -47,7 +49,8 @@ class NetPDisabledNotificationScheduler @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val netPRemoteFeature: NetPRemoteFeature,
-    private val networkProtectionRepository: NetworkProtectionRepository,
+    private val netpSubscriptionManager: NetpSubscriptionManager,
+    private val subscriptions: Subscriptions,
 ) : VpnServiceCallbacks {
 
     private var isNetPEnabled: AtomicReference<Boolean> = AtomicReference(false)
@@ -82,13 +85,12 @@ class NetPDisabledNotificationScheduler @Inject constructor(
 
     override fun onVpnStartFailed(coroutineScope: CoroutineScope) {
         coroutineScope.launch(dispatcherProvider.io()) {
-            if (networkProtectionRepository.vpnAccessRevoked) {
+            if (subscriptions.isEnabled() && !netpSubscriptionManager.getVpnStatus().isActive()) {
                 notificationManager.checkPermissionAndNotify(
                     context,
                     NETP_REMINDER_NOTIFICATION_ID,
                     netPDisabledNotificationBuilder.buildVpnAccessRevokedNotification(context),
                 )
-                // This is to clear the registered features and remove VPN
                 networkProtectionState.stop()
             }
         }
@@ -140,11 +142,13 @@ class NetPDisabledNotificationScheduler @Inject constructor(
         coroutineScope.launch(dispatcherProvider.io()) {
             logcat { "Showing disabled notification for NetP" }
             if (!netPSettingsLocalConfig.vpnNotificationAlerts().isEnabled()) return@launch
-            notificationManager.checkPermissionAndNotify(
-                context,
-                NETP_REMINDER_NOTIFICATION_ID,
-                netPDisabledNotificationBuilder.buildDisabledNotification(context),
-            )
+            netPDisabledNotificationBuilder.buildDisabledNotification(context)?.let { notification ->
+                notificationManager.checkPermissionAndNotify(
+                    context,
+                    NETP_REMINDER_NOTIFICATION_ID,
+                    notification,
+                )
+            }
         }
     }
 

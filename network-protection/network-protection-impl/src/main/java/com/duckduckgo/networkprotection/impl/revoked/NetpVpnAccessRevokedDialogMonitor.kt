@@ -19,44 +19,63 @@ package com.duckduckgo.networkprotection.impl.revoked
 import android.app.Activity
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.browser.api.ActivityLifecycleCallbacks
+import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
+import com.duckduckgo.networkprotection.subscription.NetpSubscriptionManager
+import com.duckduckgo.networkprotection.subscription.isExpired
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import logcat.logcat
 
 @ContributesMultibinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class NetpVpnAccessRevokedDialogMonitor @Inject constructor(
-    private val networkProtectionRepository: NetworkProtectionRepository,
+    private val netpSubscriptionManager: NetpSubscriptionManager,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val betaEndedDialog: BetaEndedDialog,
     private val accessRevokedDialog: AccessRevokedDialog,
     private val subscriptions: Subscriptions,
     private val netPWaitlistRepository: NetPWaitlistRepository,
+    private val networkProtectionState: NetworkProtectionState,
 ) : ActivityLifecycleCallbacks {
+
+    private val conflatedJob = ConflatedJob()
 
     override fun onActivityResumed(activity: Activity) {
         super.onActivityResumed(activity)
-        coroutineScope.launch(dispatcherProvider.io()) {
+        conflatedJob += coroutineScope.launch(dispatcherProvider.io()) {
+            delay(500) // debounce fast screen state changes, eg. resume -> pause -> resume
             if (shouldShowDialog()) {
+                logcat { "VPN beta ended" }
                 // Resetting here so we don't show this dialog anymore
                 withContext(dispatcherProvider.main()) {
                     betaEndedDialog.show(activity)
                 }
-            } else if (networkProtectionRepository.vpnAccessRevoked) {
+            } else if (netpSubscriptionManager.getVpnStatus().isExpired() && networkProtectionState.isOnboarded()) {
+                // we don't want to show this dialog in eg. fresh installs
                 withContext(dispatcherProvider.main()) {
-                    accessRevokedDialog.show(activity)
+                    accessRevokedDialog.showOnce(activity)
                 }
+            } else {
+                logcat { "VPN access revoke dialog clear shown state" }
+                accessRevokedDialog.clearIsShown()
             }
         }
+    }
+
+    override fun onActivityPaused(activity: Activity) {
+        super.onActivityPaused(activity)
+        conflatedJob.cancel()
     }
 
     private suspend fun shouldShowDialog(): Boolean {

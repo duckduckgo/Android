@@ -25,7 +25,6 @@ import javax.inject.Inject
 
 interface NetworkProtectionRepository {
     var enabledTimeInMillis: Long
-    var vpnAccessRevoked: Boolean
 }
 
 @ContributesBinding(
@@ -50,14 +49,7 @@ class RealNetworkProtectionRepository @Inject constructor(
         networkProtectionPrefs.clear()
     }
 
-    override var vpnAccessRevoked: Boolean
-        get() = networkProtectionPrefs.getBoolean(KEY_VPN_ACCESS_REVOKED, false)
-        set(value) {
-            networkProtectionPrefs.putBoolean(KEY_VPN_ACCESS_REVOKED, value)
-        }
-
     companion object {
         private const val KEY_WG_SERVER_ENABLE_TIME = "wg_server_enable_time"
-        private const val KEY_VPN_ACCESS_REVOKED = "key_vpn_access_revoked"
     }
 }

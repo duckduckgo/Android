@@ -23,6 +23,10 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitli
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.NotUnlocked
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
+import com.duckduckgo.networkprotection.subscription.NetpSubscriptionManager.VpnStatus.ACTIVE
+import com.duckduckgo.networkprotection.subscription.NetpSubscriptionManager.VpnStatus.EXPIRED
+import com.duckduckgo.networkprotection.subscription.NetpSubscriptionManager.VpnStatus.INACTIVE
+import com.duckduckgo.networkprotection.subscription.NetpSubscriptionManager.VpnStatus.SIGNED_OUT
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
@@ -71,7 +75,6 @@ class NetworkProtectionAccessStateTest {
             networkProtectionState,
             coroutineTestRule.testDispatcherProvider,
             netpSubscriptionManager,
-            networkProtectionRepository,
             subscriptions,
         )
     }
@@ -85,8 +88,8 @@ class NetworkProtectionAccessStateTest {
     }
 
     @Test
-    fun whenSubscriptionsEnabledAndHasNoEntitlementAndNetpDisabledThenReturnNotUnlocked() = runTest {
-        whenever(netpSubscriptionManager.hasValidEntitlement()).thenReturn(false)
+    fun whenSubscriptionsEnabledAndVpnInactiveAndNetpDisabledThenReturnNotUnlocked() = runTest {
+        whenever(netpSubscriptionManager.getVpnStatus()).thenReturn(INACTIVE)
         whenever(networkProtectionState.isEnabled()).thenReturn(false)
         testee.getState().also {
             assertEquals(NotUnlocked, it)
@@ -95,19 +98,58 @@ class NetworkProtectionAccessStateTest {
     }
 
     @Test
-    fun whenSubscriptionsEnabledAndHasNoEntitlementAndNetpEnabledThenReturnNotUnlockedAndResetVpnState() = runTest {
-        whenever(netpSubscriptionManager.hasValidEntitlement()).thenReturn(false)
+    fun whenSubscriptionsEnabledAndVpnExpiredAndNetpDisabledThenReturnNotUnlocked() = runTest {
+        whenever(netpSubscriptionManager.getVpnStatus()).thenReturn(EXPIRED)
+        whenever(networkProtectionState.isEnabled()).thenReturn(false)
+        testee.getState().also {
+            assertEquals(NotUnlocked, it)
+            verifyNoInteractions(networkProtectionRepository)
+        }
+    }
+
+    @Test
+    fun whenSubscriptionsEnabledAndVpnSignedOutAndNetpDisabledThenReturnNotUnlocked() = runTest {
+        whenever(netpSubscriptionManager.getVpnStatus()).thenReturn(SIGNED_OUT)
+        whenever(networkProtectionState.isEnabled()).thenReturn(false)
+        testee.getState().also {
+            assertEquals(NotUnlocked, it)
+            verifyNoInteractions(networkProtectionRepository)
+        }
+    }
+
+    @Test
+    fun whenSubscriptionsEnabledAndVpnInactiveAndNetpEnabledThenReturnNotUnlockedAndResetVpnState() = runTest {
+        whenever(netpSubscriptionManager.getVpnStatus()).thenReturn(INACTIVE)
         whenever(networkProtectionState.isEnabled()).thenReturn(true)
         testee.getState().also {
             assertEquals(NotUnlocked, it)
-            verify(networkProtectionRepository).vpnAccessRevoked = true
             verify(networkProtectionState).stop()
         }
     }
 
     @Test
-    fun whenSubscriptionsEnabledAndHasEntitlementAndHasAuthTokenAndNotAcceptedTermsReturnInBetaFalse() = runTest {
-        whenever(netpSubscriptionManager.hasValidEntitlement()).thenReturn(true)
+    fun whenSubscriptionsEnabledAndVpnExpiredAndNetpEnabledThenReturnNotUnlockedAndResetVpnState() = runTest {
+        whenever(netpSubscriptionManager.getVpnStatus()).thenReturn(EXPIRED)
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
+        testee.getState().also {
+            assertEquals(NotUnlocked, it)
+            verify(networkProtectionState).stop()
+        }
+    }
+
+    @Test
+    fun whenSubscriptionsEnabledAndVpnSignedOutAndNetpEnabledThenReturnNotUnlockedAndResetVpnState() = runTest {
+        whenever(netpSubscriptionManager.getVpnStatus()).thenReturn(SIGNED_OUT)
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
+        testee.getState().also {
+            assertEquals(NotUnlocked, it)
+            verify(networkProtectionState).stop()
+        }
+    }
+
+    @Test
+    fun whenSubscriptionsEnabledAndVpnActiveAndHasAuthTokenAndNotAcceptedTermsReturnInBetaFalse() = runTest {
+        whenever(netpSubscriptionManager.getVpnStatus()).thenReturn(ACTIVE)
         whenever(netPWaitlistRepository.didAcceptWaitlistTerms()).thenReturn(false)
         whenever(netPWaitlistRepository.getAuthenticationToken()).thenReturn("123")
         testee.getState().also {
@@ -116,8 +158,8 @@ class NetworkProtectionAccessStateTest {
     }
 
     @Test
-    fun whenSubscriptionsEnabledAndHasEntitlementAndAcceptedTermsReturnInBetaTrue() = runTest {
-        whenever(netpSubscriptionManager.hasValidEntitlement()).thenReturn(true)
+    fun whenSubscriptionsEnabledAndVpnActiveAndAcceptedTermsReturnInBetaTrue() = runTest {
+        whenever(netpSubscriptionManager.getVpnStatus()).thenReturn(ACTIVE)
         whenever(netPWaitlistRepository.didAcceptWaitlistTerms()).thenReturn(true)
         whenever(netPWaitlistRepository.getAuthenticationToken()).thenReturn("123")
         testee.getState().also {
@@ -134,8 +176,8 @@ class NetworkProtectionAccessStateTest {
     }
 
     @Test
-    fun whenSubscriptionsEnabledAndHasNoEntitlementAndNetpDisabledThenReturnFlowEmitsNotUnlocked() = runTest {
-        whenever(netpSubscriptionManager.hasValidEntitlementFlow()).thenReturn(flowOf(false))
+    fun whenSubscriptionsEnabledAndVpnInactiveAndNetpDisabledThenReturnFlowEmitsNotUnlocked() = runTest {
+        whenever(netpSubscriptionManager.vpnStatus()).thenReturn(flowOf(INACTIVE))
         whenever(networkProtectionState.isEnabled()).thenReturn(false)
         testee.getStateFlow().test {
             assertEquals(NotUnlocked, expectMostRecentItem())
@@ -144,19 +186,58 @@ class NetworkProtectionAccessStateTest {
     }
 
     @Test
-    fun whenSubscriptionsEnabledAndHasNoEntitlementAndNetpEnabledThenReturnFlowEmitNotUnlockedAndResetVpnState() = runTest {
-        whenever(netpSubscriptionManager.hasValidEntitlementFlow()).thenReturn(flowOf(false))
+    fun whenSubscriptionsEnabledAndVpnExpiredAndNetpDisabledThenReturnFlowEmitsNotUnlocked() = runTest {
+        whenever(netpSubscriptionManager.vpnStatus()).thenReturn(flowOf(EXPIRED))
+        whenever(networkProtectionState.isEnabled()).thenReturn(false)
+        testee.getStateFlow().test {
+            assertEquals(NotUnlocked, expectMostRecentItem())
+            verifyNoInteractions(networkProtectionRepository)
+        }
+    }
+
+    @Test
+    fun whenSubscriptionsEnabledAndVpnSingedOutAndNetpDisabledThenReturnFlowEmitsNotUnlocked() = runTest {
+        whenever(netpSubscriptionManager.vpnStatus()).thenReturn(flowOf(SIGNED_OUT))
+        whenever(networkProtectionState.isEnabled()).thenReturn(false)
+        testee.getStateFlow().test {
+            assertEquals(NotUnlocked, expectMostRecentItem())
+            verifyNoInteractions(networkProtectionRepository)
+        }
+    }
+
+    @Test
+    fun whenSubscriptionsEnabledAndVpnInactiveAndNetpEnabledThenReturnFlowEmitNotUnlockedAndResetVpnState() = runTest {
+        whenever(netpSubscriptionManager.vpnStatus()).thenReturn(flowOf(INACTIVE))
         whenever(networkProtectionState.isEnabled()).thenReturn(true)
         testee.getStateFlow().test {
             assertEquals(NotUnlocked, expectMostRecentItem())
-            verify(networkProtectionRepository).vpnAccessRevoked = true
             verify(networkProtectionState).stop()
         }
     }
 
     @Test
-    fun whenSubscriptionsEnabledAndHasEntitlementAndHasAuthTokenAndNotAcceptedTermsReturnFlowEmitInBetaFalse() = runTest {
-        whenever(netpSubscriptionManager.hasValidEntitlementFlow()).thenReturn(flowOf(true))
+    fun whenSubscriptionsEnabledAndVpnExpiredAndNetpEnabledThenReturnFlowEmitNotUnlockedAndResetVpnState() = runTest {
+        whenever(netpSubscriptionManager.vpnStatus()).thenReturn(flowOf(EXPIRED))
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
+        testee.getStateFlow().test {
+            assertEquals(NotUnlocked, expectMostRecentItem())
+            verify(networkProtectionState).stop()
+        }
+    }
+
+    @Test
+    fun whenSubscriptionsEnabledAndVpnSignedOutAndNetpEnabledThenReturnFlowEmitNotUnlockedAndResetVpnState() = runTest {
+        whenever(netpSubscriptionManager.vpnStatus()).thenReturn(flowOf(SIGNED_OUT))
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
+        testee.getStateFlow().test {
+            assertEquals(NotUnlocked, expectMostRecentItem())
+            verify(networkProtectionState).stop()
+        }
+    }
+
+    @Test
+    fun whenSubscriptionsEnabledAndVpnActiveAndHasAuthTokenAndNotAcceptedTermsReturnFlowEmitInBetaFalse() = runTest {
+        whenever(netpSubscriptionManager.vpnStatus()).thenReturn(flowOf(ACTIVE))
         whenever(netPWaitlistRepository.didAcceptWaitlistTerms()).thenReturn(false)
         whenever(netPWaitlistRepository.getAuthenticationToken()).thenReturn("123")
         testee.getStateFlow().test {
@@ -165,8 +246,8 @@ class NetworkProtectionAccessStateTest {
     }
 
     @Test
-    fun whenSubscriptionsEnabledAndHasEntitlementAndAcceptedTermsReturnFlowEmitInBetaTrue() = runTest {
-        whenever(netpSubscriptionManager.hasValidEntitlementFlow()).thenReturn(flowOf(true))
+    fun whenSubscriptionsEnabledAndVpnActiveAndAcceptedTermsReturnFlowEmitInBetaTrue() = runTest {
+        whenever(netpSubscriptionManager.vpnStatus()).thenReturn(flowOf(ACTIVE))
         whenever(netPWaitlistRepository.didAcceptWaitlistTerms()).thenReturn(true)
         whenever(netPWaitlistRepository.getAuthenticationToken()).thenReturn("123")
         testee.getStateFlow().test {

@@ -56,7 +56,7 @@ class NetPWaitlistEndedChecker @Inject constructor(
                 var hasEntitlement = false
                 // I know, I don't like it either, but it seems we can't ensure a race otherwise
                 for (retries in 1..5) {
-                    hasEntitlement = netpSubscriptionManager.hasValidEntitlement()
+                    hasEntitlement = netpSubscriptionManager.getVpnStatus().isActive()
                     if (hasEntitlement) return@launch
                     delay(200)
                 }

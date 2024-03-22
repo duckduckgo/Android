@@ -21,15 +21,14 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle.State
-import com.duckduckgo.mobile.android.vpn.prefs.FakeVpnSharedPreferencesProvider
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.settings.FakeNetPSettingsLocalConfigFactory
 import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
-import com.duckduckgo.networkprotection.impl.store.RealNetworkProtectionRepository
 import com.duckduckgo.networkprotection.impl.waitlist.FakeNetPRemoteFeatureFactory
 import com.duckduckgo.networkprotection.impl.waitlist.NetPRemoteFeature
-import com.duckduckgo.networkprotection.store.RealNetworkProtectionPrefs
+import com.duckduckgo.networkprotection.subscription.NetpSubscriptionManager
+import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -59,6 +58,12 @@ class NetPDisabledNotificationSchedulerTest {
     @Mock
     private lateinit var networkProtectionState: NetworkProtectionState
 
+    @Mock
+    private lateinit var netpSubscriptionManager: NetpSubscriptionManager
+
+    @Mock
+    private lateinit var subscriptions: Subscriptions
+
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
@@ -75,9 +80,8 @@ class NetPDisabledNotificationSchedulerTest {
             TestScope(),
             coroutineRule.testDispatcherProvider,
             netPRemoteFeature,
-            RealNetworkProtectionRepository(
-                RealNetworkProtectionPrefs(FakeVpnSharedPreferencesProvider()),
-            ),
+            netpSubscriptionManager,
+            subscriptions,
         )
     }
 
