@@ -19,7 +19,10 @@ package com.duckduckgo.app.autocomplete.api
 import android.net.Uri
 import androidx.core.net.toUri
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistorySearchSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistorySuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.common.utils.baseHost
@@ -28,6 +31,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
+import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.squareup.anvil.annotations.ContributesBinding
 import io.reactivex.Observable
 import javax.inject.Inject
@@ -51,6 +55,7 @@ interface AutoComplete {
             override val phrase: String,
             val title: String,
             val url: String,
+            val isAllowedInTopHits: Boolean = false,
             val isFavorite: Boolean = false,
         ) : AutoCompleteSuggestion(phrase)
 
@@ -76,20 +81,43 @@ class AutoCompleteApi @Inject constructor(
         if (query.isBlank()) {
             return Observable.just(AutoCompleteResult(query = query, suggestions = emptyList()))
         }
-
-        val savedSitesObservable = getAutoCompleteBookmarkResults(query)
-            .zipWith(
-                getAutoCompleteFavoritesResults(query),
-            ) { bookmarks, favorites ->
-                (favorites + bookmarks).take(2)
-            }
+        val savedSitesObservable: Observable<List<AutoCompleteSuggestion>> =
+            getAutoCompleteBookmarkResults(query)
+                .zipWith(
+                    getAutoCompleteFavoritesResults(query),
+                ) { bookmarks, favorites ->
+                    (favorites + bookmarks)
+                }.map {
+                    it.sortedByDescending { it.score }.mapNotNull {
+                        val savedSite = it.savedSite
+                        AutoCompleteBookmarkSuggestion(
+                            phrase = savedSite.url.toUri().toStringDropScheme(),
+                            title = savedSite.title,
+                            url = savedSite.url,
+                            isAllowedInTopHits = savedSite is Favorite,
+                            isFavorite = savedSite is Favorite,
+                        )
+                    }
+                }
 
         return savedSitesObservable.zipWith(
             getAutoCompleteSearchResults(query),
         ) { bookmarksResults, searchResults ->
+
+            val topHits = bookmarksResults.filter {
+                when (it) {
+                    is AutoCompleteHistorySearchSuggestion -> true
+                    is AutoCompleteHistorySuggestion -> false // TODO (cbarreiro) add logic
+                    is AutoCompleteBookmarkSuggestion -> it.isAllowedInTopHits
+                    else -> false
+                }
+            }.take(2)
+
+            val filteredSearchResults = searchResults.filterNot { bookmarksResults.any { bookmark -> it.phrase == bookmark.phrase } }
+
             AutoCompleteResult(
                 query = query,
-                suggestions = (bookmarksResults + searchResults).distinctBy { it.phrase },
+                suggestions = (topHits + filteredSearchResults + bookmarksResults.subtract(topHits.toSet())).distinctBy { it.phrase },
             )
         }
     }
@@ -104,15 +132,11 @@ class AutoCompleteApi @Inject constructor(
             .onErrorReturn { emptyList() }
             .toObservable()
 
-    private fun getAutoCompleteBookmarkResults(query: String) =
+    private fun getAutoCompleteBookmarkResults(query: String): Observable<MutableList<RankedBookmark>> =
         repository.getBookmarksObservable()
             .map { rankBookmarks(query, it) }
             .flattenAsObservable { it }
-            .map {
-                AutoCompleteBookmarkSuggestion(phrase = it.url.toUri().toStringDropScheme(), title = it.title, url = it.url, isFavorite = false)
-            }
             .distinctUntilChanged()
-            .take(2)
             .toList()
             .onErrorReturn { emptyList() }
             .toObservable()
@@ -121,11 +145,7 @@ class AutoCompleteApi @Inject constructor(
         repository.getFavoritesObservable()
             .map { rankFavorites(query, it) }
             .flattenAsObservable { it }
-            .map {
-                AutoCompleteBookmarkSuggestion(phrase = it.url.toUri().toStringDropScheme(), title = it.title, url = it.url, isFavorite = true)
-            }
             .distinctUntilChanged()
-            .take(2)
             .toList()
             .onErrorReturn { emptyList() }
             .toObservable()
@@ -133,15 +153,15 @@ class AutoCompleteApi @Inject constructor(
     private fun rankBookmarks(
         query: String,
         bookmarks: List<Bookmark>,
-    ): List<SavedSite> {
+    ): List<RankedBookmark> {
         return bookmarks.asSequence()
             .sortByRank(query)
     }
 
     private fun rankFavorites(
         query: String,
-        favorites: List<SavedSite.Favorite>,
-    ): List<SavedSite> {
+        favorites: List<Favorite>,
+    ): List<RankedBookmark> {
         return favorites.asSequence().sortByRank(query)
     }
 
@@ -244,13 +264,12 @@ class AutoCompleteApi @Inject constructor(
         return builder.build().toString().removePrefix("//")
     }
 
-    private fun Sequence<SavedSite>.sortByRank(query: String): List<SavedSite> {
+    private fun Sequence<SavedSite>.sortByRank(query: String): List<RankedBookmark> {
         return this.map { RankedBookmark(savedSite = it) }
             .map { scoreTitle(it, query) }
             .map { scoreTokens(it, query) }
             .filter { it.score >= 0 }
             .sortedByDescending { it.score }
-            .map { it.savedSite }
             .toList()
     }
 
