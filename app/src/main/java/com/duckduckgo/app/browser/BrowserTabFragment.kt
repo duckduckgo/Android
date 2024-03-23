@@ -2091,6 +2091,7 @@ class BrowserTabFragment :
                 clientBrandHintProvider.setDefault(this)
                 webViewClient.clientProvider = clientBrandHintProvider
                 userAgentString = userAgentProvider.userAgent()
+                layoutAlgorithm = WebSettings.LayoutAlgorithm.TEXT_AUTOSIZING
                 javaScriptEnabled = true
                 domStorageEnabled = true
                 loadWithOverviewMode = true
