@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.networkprotection.subscription.settings
+package com.duckduckgo.networkprotection.impl.subscription.settings
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -29,15 +29,15 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.networkprotection.subscription.R
-import com.duckduckgo.networkprotection.subscription.databinding.ViewSettingsNetpBinding
-import com.duckduckgo.networkprotection.subscription.settings.ProSettingNetPViewModel.Command
-import com.duckduckgo.networkprotection.subscription.settings.ProSettingNetPViewModel.Command.OpenNetPScreen
-import com.duckduckgo.networkprotection.subscription.settings.ProSettingNetPViewModel.Factory
-import com.duckduckgo.networkprotection.subscription.settings.ProSettingNetPViewModel.NetPEntryState
-import com.duckduckgo.networkprotection.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Hidden
-import com.duckduckgo.networkprotection.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Pending
-import com.duckduckgo.networkprotection.subscription.settings.ProSettingNetPViewModel.NetPEntryState.ShowState
+import com.duckduckgo.networkprotection.impl.R
+import com.duckduckgo.networkprotection.impl.databinding.ViewSettingsNetpBinding
+import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.Command
+import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.Command.OpenNetPScreen
+import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.Factory
+import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState
+import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Hidden
+import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Pending
+import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.ShowState
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope

@@ -18,12 +18,12 @@ package com.duckduckgo.networkprotection.impl.revoked
 
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
+import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager
+import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager.VpnStatus.ACTIVE
+import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager.VpnStatus.EXPIRED
+import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager.VpnStatus.INACTIVE
+import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager.VpnStatus.SIGNED_OUT
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
-import com.duckduckgo.networkprotection.subscription.NetpSubscriptionManager
-import com.duckduckgo.networkprotection.subscription.NetpSubscriptionManager.VpnStatus.ACTIVE
-import com.duckduckgo.networkprotection.subscription.NetpSubscriptionManager.VpnStatus.EXPIRED
-import com.duckduckgo.networkprotection.subscription.NetpSubscriptionManager.VpnStatus.INACTIVE
-import com.duckduckgo.networkprotection.subscription.NetpSubscriptionManager.VpnStatus.SIGNED_OUT
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking

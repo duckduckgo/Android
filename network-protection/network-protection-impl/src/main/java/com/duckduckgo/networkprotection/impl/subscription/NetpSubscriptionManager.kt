@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.networkprotection.subscription
+package com.duckduckgo.networkprotection.impl.subscription
 
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.networkprotection.subscription.NetpSubscriptionManager.VpnStatus
+import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager.VpnStatus
 import com.duckduckgo.subscriptions.api.Product.NetP
-import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
-import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
-import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
+import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -30,6 +28,26 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+
+interface NetpSubscriptionManager {
+    suspend fun getToken(): String?
+    suspend fun getVpnStatus(): VpnStatus
+    suspend fun vpnStatus(): Flow<VpnStatus>
+    enum class VpnStatus {
+        ACTIVE,
+        EXPIRED,
+        SIGNED_OUT,
+        INACTIVE,
+    }
+}
+
+fun VpnStatus.isActive(): Boolean {
+    return this == VpnStatus.ACTIVE
+}
+
+fun VpnStatus.isExpired(): Boolean {
+    return this == VpnStatus.EXPIRED
+}
 
 @ContributesBinding(AppScope::class)
 class RealNetpSubscriptionManager @Inject constructor(
@@ -60,8 +78,8 @@ class RealNetpSubscriptionManager @Inject constructor(
     private suspend fun getVpnStatusInternal(hasValidEntitlement: Boolean): VpnStatus {
         val subscriptionState = subscriptions.getSubscriptionStatus()
         return when (subscriptionState) {
-            INACTIVE, EXPIRED -> VpnStatus.EXPIRED
-            UNKNOWN -> VpnStatus.SIGNED_OUT
+            SubscriptionStatus.INACTIVE, SubscriptionStatus.EXPIRED -> VpnStatus.EXPIRED
+            SubscriptionStatus.UNKNOWN -> VpnStatus.SIGNED_OUT
             else -> {
                 if (hasValidEntitlement) {
                     VpnStatus.ACTIVE
