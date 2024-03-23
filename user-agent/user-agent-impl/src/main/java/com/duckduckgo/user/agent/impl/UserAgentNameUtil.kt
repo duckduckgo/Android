@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.fakes
+package com.duckduckgo.user.agent.impl
 
-import com.duckduckgo.user.agent.impl.UserAgent
+import com.duckduckgo.user.agent.store.UserAgentFeatureName
 
-class UserAgentFake : UserAgent {
-    override fun useLegacyUserAgent(url: String): Boolean = false
-    override fun isException(url: String): Boolean = false
+fun userAgentFeatureValueOf(value: String): UserAgentFeatureName? {
+    return UserAgentFeatureName.values().find { it.value == value }
 }

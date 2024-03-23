@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,33 +14,29 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.store.features.useragent
+package com.duckduckgo.user.agent.store
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.duckduckgo.privacy.config.store.UserAgentVersionsEntity
 
 @Dao
-abstract class UserAgentVersionsDao {
+abstract class UserAgentExceptionsDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insertAll(versions: List<UserAgentVersionsEntity>)
+    abstract fun insertAll(domains: List<UserAgentExceptionEntity>)
 
     @Transaction
-    open fun updateAll(versions: List<UserAgentVersionsEntity>) {
+    open fun updateAll(domains: List<UserAgentExceptionEntity>) {
         deleteAll()
-        insertAll(versions)
+        insertAll(domains)
     }
 
-    @Query("select * from user_agent_versions where closestUserAgent = 1")
-    abstract fun getClosestUserAgentVersions(): List<UserAgentVersionsEntity>
+    @Query("select * from user_agent_exceptions")
+    abstract fun getAll(): List<UserAgentExceptionEntity>
 
-    @Query("select * from user_agent_versions where ddgFixedUserAgent = 1")
-    abstract fun getDdgFixedUserAgentVerions(): List<UserAgentVersionsEntity>
-
-    @Query("delete from user_agent_versions")
+    @Query("delete from user_agent_exceptions")
     abstract fun deleteAll()
 }

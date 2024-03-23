@@ -14,11 +14,18 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.fakes
+package com.duckduckgo.user.agent.store
 
-import com.duckduckgo.user.agent.impl.UserAgent
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 
-class UserAgentFake : UserAgent {
-    override fun useLegacyUserAgent(url: String): Boolean = false
-    override fun isException(url: String): Boolean = false
+@Entity(tableName = "user_agent_exceptions")
+data class UserAgentExceptionEntity(
+    @PrimaryKey val domain: String,
+    val reason: String,
+)
+
+fun UserAgentExceptionEntity.toFeatureException(): FeatureException {
+    return FeatureException(domain = this.domain, reason = this.reason)
 }

@@ -49,8 +49,6 @@ import com.duckduckgo.privacy.config.store.features.trackingparameters.RealTrack
 import com.duckduckgo.privacy.config.store.features.trackingparameters.TrackingParametersRepository
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.RealUnprotectedTemporaryRepository
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
-import com.duckduckgo.privacy.config.store.features.useragent.RealUserAgentRepository
-import com.duckduckgo.privacy.config.store.features.useragent.UserAgentRepository
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -188,16 +186,5 @@ object DatabaseModule {
         @IsMainProcess isMainProcess: Boolean,
     ): TrackingParametersRepository {
         return RealTrackingParametersRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
-    }
-
-    @SingleInstanceIn(AppScope::class)
-    @Provides
-    fun provideUserAgentRepository(
-        database: PrivacyConfigDatabase,
-        @AppCoroutineScope appCoroutineScope: CoroutineScope,
-        dispatcherProvider: DispatcherProvider,
-        @IsMainProcess isMainProcess: Boolean,
-    ): UserAgentRepository {
-        return RealUserAgentRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
     }
 }
