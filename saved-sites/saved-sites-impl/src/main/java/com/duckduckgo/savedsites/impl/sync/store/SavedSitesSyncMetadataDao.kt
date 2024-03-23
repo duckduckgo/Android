@@ -51,6 +51,9 @@ interface SavedSitesSyncMetadataDao {
     @Query("update saved_sites_sync_meta set childrenResponse = childrenRequest where childrenRequest is not null")
     fun copyAllRequestsToResponse()
 
+    @Query("update saved_sites_sync_meta set childrenRequest = null where childrenRequest is not null")
+    fun discardRequestMetadata()
+
     @Transaction
     fun addResponseMetadata(folders: List<SavedSitesSyncMetadataEntity>) {
         addOrUpdate(folders)

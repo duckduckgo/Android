@@ -157,6 +157,12 @@ interface SyncSavedSitesRepository {
     fun addRequestMetadata(folders: List<SyncSavedSitesRequestEntry>)
 
     /**
+     * Discards the request metadata.
+     * Client might need to call this method when sync engine didn't send changes to the server (e.g: first sync).
+     */
+    fun discardRequestMetadata()
+
+    /**
      * Stores the BE children state for each folder after receiving it
      * @param entities list of entities received in the BE response
      */
