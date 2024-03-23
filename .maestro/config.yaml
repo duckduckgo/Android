@@ -5,3 +5,9 @@ appSize:
 
 flows:
  - "**"
+
+executionOrder:
+  continueOnFailure: false
+  flowsOrder:
+    - "Sync Critical Path test: Data can be synced - Add data"
+    - "Sync Critical Path test: Data can be synced - Verify data"
