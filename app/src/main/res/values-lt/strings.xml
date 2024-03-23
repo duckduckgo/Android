@@ -823,4 +823,8 @@
     <string name="faviconsPromptMessage">Ar norite, kad šis įrenginys automatiškai atsisiųstų sinchronizuotų žymų piktogramas iš pažymėtų svetainių?</string>
     <string name="faviconsPromptPrimaryCta">Nuolat atnaujinti žymų piktogramas</string>
     <string name="faviconsPromptSecondaryCta">Ne dabar</string>
+
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">Atidaryti „DuckDuckGo“</string>
+    <string name="runningInDdgMenuItemTitle">Veikia sistemoje „DuckDuckGo“</string>
 </resources>

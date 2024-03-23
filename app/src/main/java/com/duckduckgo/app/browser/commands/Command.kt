@@ -151,6 +151,10 @@ sealed class Command {
     object LaunchTabSwitcher : Command()
     object HideWebContent : Command()
     object ShowWebContent : Command()
+    class ShowWebPageTitle(
+        val title: String,
+        val url: String?,
+    ) : Command()
     class CheckSystemLocationPermission(
         val domain: String,
         val deniedForever: Boolean,

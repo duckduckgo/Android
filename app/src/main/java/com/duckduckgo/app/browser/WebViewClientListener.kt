@@ -49,7 +49,7 @@ interface WebViewClientListener {
         callback: GeolocationPermissions.Callback,
     )
 
-    fun titleReceived(newTitle: String)
+    fun titleReceived(newTitle: String, url: String?)
     fun trackerDetected(event: TrackingEvent)
     fun pageHasHttpResources(page: String)
     fun pageHasHttpResources(page: Uri)

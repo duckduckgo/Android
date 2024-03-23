@@ -813,4 +813,8 @@
     <string name="faviconsPromptMessage">Wil je dat dit apparaat automatisch pictogrammen voor gesynchroniseerde bladwijzers downloadt van de websites die als bladwijzer zijn opgeslagen?</string>
     <string name="faviconsPromptPrimaryCta">Bladwijzerpictogrammen up-to-date houden</string>
     <string name="faviconsPromptSecondaryCta">Niet nu</string>
+
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">Openen in DuckDuckGo</string>
+    <string name="runningInDdgMenuItemTitle">Uitgevoerd in DuckDuckGo</string>
 </resources>

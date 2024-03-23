@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.lifecycle.LifecycleOwner
 import androidx.work.*
 import com.duckduckgo.anvil.annotations.ContributesWorker
+import com.duckduckgo.app.browser.customtabs.CustomTabDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
@@ -53,6 +54,7 @@ class EnqueuedPixelWorker @Inject constructor(
     private val unsentForgetAllPixelStore: UnsentForgetAllPixelStore,
     private val webViewVersionProvider: WebViewVersionProvider,
     private val defaultBrowserDetector: DefaultBrowserDetector,
+    private val customTabDetector: CustomTabDetector,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels,
     private val isVerifiedPlayStoreInstall: IsVerifiedPlayStoreInstall,
@@ -67,6 +69,8 @@ class EnqueuedPixelWorker @Inject constructor(
     }
 
     override fun onStart(owner: LifecycleOwner) {
+        Timber.d("onStart called")
+
         if (launchedByFireAction) {
             // skip the next on_start if branch
             Timber.i("Suppressing app launch pixel")
@@ -86,12 +90,14 @@ class EnqueuedPixelWorker @Inject constructor(
         appCoroutineScope.launch {
             val popupExperimentParams = privacyProtectionsPopupExperimentExternalPixels.getPixelParams()
             val parameters = paramsMap + popupExperimentParams
-            pixel.get().fire(
-                pixel = AppPixelName.APP_LAUNCH,
-                parameters = parameters,
-            )
+            if (!customTabDetector.isCustomTab()) {
+                pixel.get().fire(
+                    pixel = AppPixelName.APP_LAUNCH,
+                    parameters = parameters,
+                )
+            }
 
-            if (isVerifiedPlayStoreInstall()) {
+            if (isVerifiedPlayStoreInstall() && !customTabDetector.isCustomTab()) {
                 pixel.get().fire(
                     pixel = AppPixelName.APP_LAUNCH_VERIFIED_INSTALL,
                     parameters = parameters,

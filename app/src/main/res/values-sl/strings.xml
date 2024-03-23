@@ -823,4 +823,8 @@
     <string name="faviconsPromptMessage">Ali želite, da naprava samodejno prenese ikone za sinhronizirane zaznamke s spletnih mest z zaznamki?</string>
     <string name="faviconsPromptPrimaryCta">Posodobi ikone zaznamkov</string>
     <string name="faviconsPromptSecondaryCta">Ne zdaj</string>
+
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">Odpri v DuckDuckGo</string>
+    <string name="runningInDdgMenuItemTitle">Izvaja se v DuckDuckGo</string>
 </resources>

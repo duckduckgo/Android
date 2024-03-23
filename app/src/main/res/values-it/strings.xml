@@ -813,4 +813,8 @@
     <string name="faviconsPromptMessage">Vuoi che questo dispositivo scarichi automaticamente le icone per i segnalibri sincronizzati dai siti web preferiti?</string>
     <string name="faviconsPromptPrimaryCta">Tieni aggiornate le icone dei segnalibri</string>
     <string name="faviconsPromptSecondaryCta">Non adesso</string>
+
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">Apri in DuckDuckGo</string>
+    <string name="runningInDdgMenuItemTitle">Esecuzione in DuckDuckGo</string>
 </resources>
