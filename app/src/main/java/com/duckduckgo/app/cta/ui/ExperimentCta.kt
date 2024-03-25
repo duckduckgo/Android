@@ -20,6 +20,7 @@ import android.view.View
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.global.install.AppInstallStore
@@ -57,11 +58,17 @@ sealed class ExperimentDaxBubbleOptionsCta(
         view.alpha = 1f
         view.findViewById<DaxTextView>(R.id.hiddenTextCta).text = daxText.html(view.context)
         view.findViewById<DaxTextView>(R.id.experimentDialogTitle).text = daxTitle.html(view.context)
-        options[0].setOptionView(view.findViewById(R.id.daxDialogOption1))
-        options[1].setOptionView(view.findViewById(R.id.daxDialogOption2))
-        options[2].setOptionView(view.findViewById(R.id.daxDialogOption3))
-        options[3].setOptionView(view.findViewById(R.id.daxDialogOption4))
         view.findViewById<TypeAnimationTextView>(R.id.dialogTextCta).startTypingAnimation(daxText, true)
+        val optionsViews = listOf<DaxButton>(
+            view.findViewById(R.id.daxDialogOption1),
+            view.findViewById(R.id.daxDialogOption2),
+            view.findViewById(R.id.daxDialogOption3),
+            view.findViewById(R.id.daxDialogOption4),
+        )
+        optionsViews.forEachIndexed { index, buttonView ->
+            options[index].setOptionView(buttonView)
+            ViewCompat.animate(buttonView).alpha(1f).setDuration(400L).startDelay = 800L
+        }
     }
 
     fun setOnOptionClicked(onOptionClicked: (DaxDialogIntroOption) -> Unit) {

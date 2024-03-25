@@ -20,8 +20,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:alpha="0"
-    android:clipToPadding="false"
     android:clipChildren="false"
+    android:clipToPadding="false"
     android:paddingBottom="@dimen/keyline_4"
     tools:alpha="1">
 
@@ -59,9 +59,9 @@
 
             <FrameLayout
                 android:id="@+id/cardContainer"
-                android:layout_marginTop="@dimen/keyline_1"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_1">
 
                 <com.duckduckgo.common.ui.view.text.DaxTextView
                     android:id="@+id/hiddenTextCta"
@@ -87,36 +87,44 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/keyline_2"
+                android:alpha="0"
                 android:text="@string/onboardingSearchDaxDialogOption1"
                 android:textAlignment="textStart"
-                app:icon="@drawable/ic_find_search_16" />
+                app:icon="@drawable/ic_find_search_16"
+                tools:alpha="1" />
 
             <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
                 android:id="@+id/daxDialogOption2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="-4dp"
+                android:alpha="0"
                 android:text="@string/onboardingSearchDaxDialogOption2"
                 android:textAlignment="textStart"
-                app:icon="@drawable/ic_find_search_16" />
+                app:icon="@drawable/ic_find_search_16"
+                tools:alpha="1" />
 
             <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
                 android:id="@+id/daxDialogOption3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="-4dp"
+                android:alpha="0"
                 android:text="@string/onboardingSearchDaxDialogOption3"
                 android:textAlignment="textStart"
-                app:icon="@drawable/ic_find_search_16" />
+                app:icon="@drawable/ic_find_search_16"
+                tools:alpha="1" />
 
             <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
                 android:id="@+id/daxDialogOption4"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="-4dp"
+                android:alpha="0"
                 android:text="@string/onboardingSearchDaxDialogOption4"
                 android:textAlignment="textStart"
-                app:icon="@drawable/ic_wand_16" />
+                app:icon="@drawable/ic_wand_16"
+                tools:alpha="1" />
 
         </LinearLayout>
     </com.duckduckgo.common.ui.view.shape.DaxBubbleCardView>
