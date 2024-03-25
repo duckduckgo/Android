@@ -102,6 +102,7 @@ import com.duckduckgo.app.location.data.LocationPermissionsRepositoryImpl
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
+import com.duckduckgo.app.onboarding.ui.page.experiment.ExtendedOnboardingExperimentVariantManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
@@ -422,6 +423,8 @@ class BrowserTabViewModelTest {
 
     private val mockFaviconFetchingPrompt: FaviconsFetchingPrompt = mock()
 
+    private val mockExtendedOnboardingExperimentVariantManager: ExtendedOnboardingExperimentVariantManager = mock()
+
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
@@ -447,6 +450,7 @@ class BrowserTabViewModelTest {
         whenever(mockRemoteMessagingRepository.messageFlow()).thenReturn(remoteMessageFlow.consumeAsFlow())
         whenever(mockSettingsDataStore.automaticFireproofSetting).thenReturn(AutomaticFireproofSetting.ASK_EVERY_TIME)
         whenever(androidBrowserConfig.screenLock()).thenReturn(mockToggle)
+        whenever(mockExtendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()).thenReturn(false)
 
         remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
 
@@ -463,6 +467,7 @@ class BrowserTabViewModelTest {
             dispatchers = coroutineRule.testDispatcherProvider,
             duckDuckGoUrlDetector = DuckDuckGoUrlDetectorImpl(),
             surveyRepository = mockSurveyRepository,
+            extendedOnboardingExperimentVariantManager = mockExtendedOnboardingExperimentVariantManager,
         )
 
         val siteFactory = SiteFactoryImpl(
@@ -550,6 +555,7 @@ class BrowserTabViewModelTest {
             privacyProtectionsToggleUsageListener = mockPrivacyProtectionsToggleUsageListener,
             privacyProtectionsPopupExperimentExternalPixels = privacyProtectionsPopupExperimentExternalPixels,
             faviconsFetchingPrompt = mockFaviconFetchingPrompt,
+            extendedOnboardingExperimentVariantManager = mockExtendedOnboardingExperimentVariantManager,
         )
 
         testee.loadData("abc", null, false, false)
@@ -4891,6 +4897,28 @@ class BrowserTabViewModelTest {
         testee.onHomeShown()
 
         assertCommandNotIssued<Command.ShowFaviconsPrompt>()
+    }
+
+    @Test
+    fun whenOnboardingExperimentEnabledThenSetBrowserBackgroundWithNewDrawable() = runTest {
+        whenever(mockExtendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()).thenReturn(true)
+
+        testee.configureBrowserBackground()
+
+        assertCommandIssued<Command.SetBrowserBackground> {
+            assertEquals(R.drawable.onboarding_experiment_background, this.backgroundRes)
+        }
+    }
+
+    @Test
+    fun whenOnboardingExperimentDisabledThenSetBrowserBackgroundWithNoDrawable() = runTest {
+        whenever(mockExtendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()).thenReturn(false)
+
+        testee.configureBrowserBackground()
+
+        assertCommandIssued<Command.SetBrowserBackground> {
+            assertEquals(0, this.backgroundRes)
+        }
     }
 
     private fun aCredential(): LoginCredentials {
