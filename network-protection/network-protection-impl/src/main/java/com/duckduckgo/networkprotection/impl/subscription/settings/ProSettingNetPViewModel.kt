@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.networkprotection.subscription.settings
+package com.duckduckgo.networkprotection.impl.subscription.settings
 
 import android.annotation.SuppressLint
 import androidx.annotation.StringRes
@@ -35,11 +35,12 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionSta
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.DISCONNECTED
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState
+import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_SETTINGS_PRESSED
-import com.duckduckgo.networkprotection.subscription.R
-import com.duckduckgo.networkprotection.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Hidden
-import com.duckduckgo.networkprotection.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Pending
-import com.duckduckgo.networkprotection.subscription.settings.ProSettingNetPViewModel.NetPEntryState.ShowState
+import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.Command.OpenNetPScreen
+import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Hidden
+import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Pending
+import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.ShowState
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -99,7 +100,7 @@ class ProSettingNetPViewModel(
         viewModelScope.launch {
             val screen = networkProtectionWaitlist.getScreenForCurrentState()
             screen?.let {
-                command.send(Command.OpenNetPScreen(screen))
+                command.send(OpenNetPScreen(screen))
                 pixel.fire(NETP_SETTINGS_PRESSED)
             } ?: logcat { "Get screen for current NetP state is null" }
         }

@@ -123,7 +123,7 @@ subprojects {
                         if (dependencyPath == projectPath) continue
                         // internal modules have to use internalImplementation
                         // when a non internal configuration is built (i.e. PlayDebug) no internal dependencies should be found
-                        def internalExceptions = [":network-protection-subscription-internal"]
+                        def internalExceptions = []
                         if (dependencyPath.endsWith('internal') && !internalExceptions.contains(dependencyPath) && !name.toLowerCase().contains("internal")) {
                             throw new GradleException("Invalid dependency $projectPath -> $dependencyPath. " +
                                     "'internal' modules must use internalImplementation")

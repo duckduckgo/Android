@@ -23,9 +23,9 @@ import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
+import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager
+import com.duckduckgo.networkprotection.impl.subscription.isExpired
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
-import com.duckduckgo.networkprotection.subscription.NetpSubscriptionManager
-import com.duckduckgo.networkprotection.subscription.isExpired
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn

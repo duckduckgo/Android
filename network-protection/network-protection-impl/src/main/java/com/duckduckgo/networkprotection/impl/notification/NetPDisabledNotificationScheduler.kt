@@ -28,9 +28,9 @@ import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
+import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager
+import com.duckduckgo.networkprotection.impl.subscription.isActive
 import com.duckduckgo.networkprotection.impl.waitlist.NetPRemoteFeature
-import com.duckduckgo.networkprotection.subscription.NetpSubscriptionManager
-import com.duckduckgo.networkprotection.subscription.isActive
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.util.concurrent.atomic.AtomicReference
