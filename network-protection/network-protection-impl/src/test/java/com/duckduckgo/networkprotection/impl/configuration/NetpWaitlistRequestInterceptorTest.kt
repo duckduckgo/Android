@@ -6,13 +6,9 @@ import com.duckduckgo.appbuildconfig.api.BuildFlavor.INTERNAL
 import com.duckduckgo.appbuildconfig.api.BuildFlavor.PLAY
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.api.FakeChain
-import com.duckduckgo.mobile.android.vpn.prefs.FakeVpnSharedPreferencesProvider
 import com.duckduckgo.networkprotection.impl.fakes.FakeNetPWaitlistDataStore
-import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
-import com.duckduckgo.networkprotection.impl.store.RealNetworkProtectionRepository
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
 import com.duckduckgo.networkprotection.impl.waitlist.store.RealNetPWaitlistRepository
-import com.duckduckgo.networkprotection.store.RealNetworkProtectionPrefs
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
@@ -22,7 +18,6 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
@@ -31,9 +26,6 @@ class NetpWaitlistRequestInterceptorTest {
     private val coroutineRule = CoroutineTestRule()
     private val appBuildConfig: AppBuildConfig = mock()
     private val subscriptions: Subscriptions = mock()
-    private val networkProtectionRepository: NetworkProtectionRepository = RealNetworkProtectionRepository(
-        RealNetworkProtectionPrefs(FakeVpnSharedPreferencesProvider()),
-    )
     private lateinit var netPWaitlistRepository: NetPWaitlistRepository
     private lateinit var interceptor: NetpWaitlistRequestInterceptor
 
@@ -54,7 +46,6 @@ class NetpWaitlistRequestInterceptorTest {
         interceptor = NetpWaitlistRequestInterceptor(
             netPWaitlistRepository,
             appBuildConfig,
-            networkProtectionRepository,
             subscriptions,
         )
     }
@@ -206,43 +197,5 @@ class NetpWaitlistRequestInterceptorTest {
             Assert.assertEquals("bearer ddg:token123", headers["Authorization"])
             assertTrue(headers.names().contains("NetP-Debug-Code"))
         }
-    }
-
-    @Test
-    fun whenUrlIsNotNetpThenDoNothingWithVPNAccessRevoked() = runTest {
-        whenever(subscriptions.isEnabled()).thenReturn(true)
-        val fakeChain = FakeChain(url = "https://improving.duckduckgo.com/t/m_netp_ev_enabled_android_phone?atb=v336-7&appVersion=5.131.0&test=1")
-
-        interceptor.intercept(fakeChain)
-
-        assertFalse(networkProtectionRepository.vpnAccessRevoked)
-    }
-
-    @Test
-    fun whenUrlIsNetPAndResponseCodeIs200ThenSetVPNAccessRevokedFalse() = runTest {
-        val fakeChain = FakeChain(url = "https://controller.netp.duckduckgo.com/servers")
-        whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
-        whenever(subscriptions.isEnabled()).thenReturn(true)
-        whenever(subscriptions.getAccessToken()).thenReturn("token123")
-
-        interceptor.intercept(fakeChain)
-
-        assertFalse(networkProtectionRepository.vpnAccessRevoked)
-    }
-
-    @Test
-    fun whenUrlIsNetPAndResponseCodeIs403ThenSetVPNAccessRevokedFalse() = runTest {
-        val url = "https://controller.netp.duckduckgo.com/servers"
-        val fakeChain = FakeChain(
-            url = url,
-            expectedResponseCode = 403,
-        )
-        whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
-        whenever(subscriptions.isEnabled()).thenReturn(true)
-        whenever(subscriptions.getAccessToken()).thenReturn("token123")
-
-        interceptor.intercept(fakeChain)
-
-        assertTrue(networkProtectionRepository.vpnAccessRevoked)
     }
 }

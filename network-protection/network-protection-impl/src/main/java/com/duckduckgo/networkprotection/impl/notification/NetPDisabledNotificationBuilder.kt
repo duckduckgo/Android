@@ -29,7 +29,9 @@ import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.networkprotection.impl.R
-import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
+import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager
+import com.duckduckgo.networkprotection.impl.subscription.isActive
+import com.duckduckgo.networkprotection.impl.subscription.isExpired
 import com.squareup.anvil.annotations.ContributesBinding
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -37,7 +39,7 @@ import java.util.Date
 import javax.inject.Inject
 
 interface NetPDisabledNotificationBuilder {
-    fun buildDisabledNotification(context: Context): Notification
+    suspend fun buildDisabledNotification(context: Context): Notification?
 
     fun buildSnoozeNotification(
         context: Context,
@@ -55,7 +57,7 @@ interface NetPDisabledNotificationBuilder {
 class RealNetPDisabledNotificationBuilder @Inject constructor(
     private val netPNotificationActions: NetPNotificationActions,
     private val globalActivityStarter: GlobalActivityStarter,
-    private val netpRepository: NetworkProtectionRepository,
+    private val netpSubscriptionManager: NetpSubscriptionManager,
 ) : NetPDisabledNotificationBuilder {
     private val defaultDateTimeFormatter = SimpleDateFormat.getTimeInstance(DateFormat.SHORT)
 
@@ -72,11 +74,14 @@ class RealNetPDisabledNotificationBuilder @Inject constructor(
         }
     }
 
-    override fun buildDisabledNotification(context: Context): Notification {
-        return if (netpRepository.vpnAccessRevoked) {
+    override suspend fun buildDisabledNotification(context: Context): Notification? {
+        val vpnStatus = netpSubscriptionManager.getVpnStatus()
+        return if (vpnStatus.isExpired()) {
             buildVpnAccessRevokedNotification(context)
-        } else {
+        } else if (vpnStatus.isActive()) {
             buildVpnDisabledNotification(context)
+        } else {
+            null
         }
     }
 

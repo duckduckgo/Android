@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.networkprotection.subscription
+package com.duckduckgo.networkprotection.impl.subscription
 
 import android.content.Context
 import androidx.work.BackoffPolicy
@@ -32,7 +32,6 @@ import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
-import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.util.concurrent.TimeUnit.MINUTES
@@ -107,20 +106,16 @@ class NetpSubscriptionCheckWorker(
     lateinit var workManager: WorkManager
 
     @Inject
-    lateinit var netpRepository: NetworkProtectionRepository
-
-    @Inject
     lateinit var subscriptions: Subscriptions
 
     override suspend fun doWork(): Result {
         logcat { "Sub check: checking entitlement" }
         if (networkProtectionState.isEnabled()) {
             if (subscriptions.isEnabled()) {
-                if (netpSubscriptionManager.hasValidEntitlement()) {
-                    netpRepository.vpnAccessRevoked = false
+                if (netpSubscriptionManager.getVpnStatus().isActive()) {
+                    logcat { "Sub check: has entitlements" }
                 } else {
                     logcat { "Sub check: disabling" }
-                    netpRepository.vpnAccessRevoked = true
                     networkProtectionState.stop()
                 }
             } else {

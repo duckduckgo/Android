@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.networkprotection.subscription
+package com.duckduckgo.networkprotection.impl.subscription
 
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -28,7 +28,6 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitli
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.JoinedWaitlist
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.NotUnlocked
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.PendingInviteCode
-import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.duckduckgo.networkprotection.impl.waitlist.NetworkProtectionWaitlistImpl
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -77,13 +76,12 @@ class NetworkProtectionAccessState @Inject constructor(
     private val networkProtectionState: NetworkProtectionState,
     private val dispatcherProvider: DispatcherProvider,
     private val netpSubscriptionManager: NetpSubscriptionManager,
-    private val networkProtectionRepository: NetworkProtectionRepository,
     private val subscriptions: Subscriptions,
 ) : NetworkProtectionWaitlist {
 
     override suspend fun getState(): NetPWaitlistState = withContext(dispatcherProvider.io()) {
         if (isTreated()) {
-            return@withContext if (!netpSubscriptionManager.hasValidEntitlement()) {
+            return@withContext if (!netpSubscriptionManager.getVpnStatus().isActive()) {
                 // if entitlement check succeeded and no entitlement, reset state and hide access.
                 handleRevokedVPNState()
                 NotUnlocked
@@ -96,8 +94,8 @@ class NetworkProtectionAccessState @Inject constructor(
 
     override suspend fun getStateFlow(): Flow<NetPWaitlistState> = withContext(dispatcherProvider.io()) {
         if (isTreated()) {
-            netpSubscriptionManager.hasValidEntitlementFlow().map {
-                if (!it) {
+            netpSubscriptionManager.vpnStatus().map { status ->
+                if (!status.isActive()) {
                     // if entitlement check succeeded and no entitlement, reset state and hide access.
                     handleRevokedVPNState()
                     NotUnlocked
@@ -112,7 +110,6 @@ class NetworkProtectionAccessState @Inject constructor(
 
     private suspend fun handleRevokedVPNState() {
         if (networkProtectionState.isEnabled()) {
-            networkProtectionRepository.vpnAccessRevoked = true
             networkProtectionState.stop()
         }
     }
