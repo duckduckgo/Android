@@ -498,7 +498,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     private fun subscriptionNotFound() {
         TextAlertDialogBuilder(this)
             .setTitle(string.subscriptionNotFound)
-            .setMessage(string.subscriptionNotFoundDescription)
+            .setMessage(string.subscriptionNotFoundEmailDescription)
             .setDestructiveButtons(false)
             .setPositiveButton(string.ok)
             .addEventListener(
