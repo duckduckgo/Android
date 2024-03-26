@@ -30,6 +30,7 @@ import android.view.View
 import android.webkit.GeolocationPermissions
 import android.webkit.MimeTypeMap
 import android.webkit.PermissionRequest
+import android.webkit.SslErrorHandler
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient.FileChooserParams
 import android.webkit.WebView
@@ -53,6 +54,10 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState.Brow
 import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState.Invalidated
 import com.duckduckgo.app.browser.BrowserTabViewModel.HighlightableButton.Visible
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
+import com.duckduckgo.app.browser.SSLErrorType.EXPIRED
+import com.duckduckgo.app.browser.SSLErrorType.GENERIC
+import com.duckduckgo.app.browser.SSLErrorType.UNTRUSTED_HOST
+import com.duckduckgo.app.browser.SSLErrorType.WRONG_HOST
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.NonHttpAppLink
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
@@ -60,6 +65,7 @@ import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
 import com.duckduckgo.app.browser.camera.CameraHardwareChecker
+import com.duckduckgo.app.browser.certificates.TrustedSitesRepository
 import com.duckduckgo.app.browser.commands.Command
 import com.duckduckgo.app.browser.commands.Command.*
 import com.duckduckgo.app.browser.commands.NavigationCommand
@@ -82,6 +88,7 @@ import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
 import com.duckduckgo.app.browser.remotemessage.asBrowserTabCommand
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.urlextraction.UrlExtractionListener
+import com.duckduckgo.app.browser.webview.SslWarningLayout.Action
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
@@ -228,6 +235,7 @@ class BrowserTabViewModel @Inject constructor(
     private val privacyProtectionsToggleUsageListener: PrivacyProtectionsToggleUsageListener,
     private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels,
     private val faviconsFetchingPrompt: FaviconsFetchingPrompt,
+    private val trustedSitesRepository: TrustedSitesRepository,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -1129,7 +1137,7 @@ class BrowserTabViewModel @Inject constructor(
         url: String,
         title: String?,
     ) {
-        Timber.v("Page changed: $url")
+        Timber.v("SSLShield: Page changed: $url")
         hasCtaBeenShownForCurrentPage.set(false)
         buildSiteFactory(url, title)
         setAdClickActiveTabData(url)
@@ -1699,6 +1707,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun onCertificateReceived(certificate: SslCertificate?) {
+        Timber.v("SSLShield: onCertificateReceived $certificate")
         site?.certificate = certificate
     }
 
@@ -1726,7 +1735,6 @@ class BrowserTabViewModel @Inject constructor(
             val privacyProtection: PrivacyShield = withContext(dispatchers.io()) {
                 site?.privacyProtection() ?: PrivacyShield.UNKNOWN
             }
-            Timber.i("Shield: privacyProtection $privacyProtection")
             withContext(dispatchers.main()) {
                 siteLiveData.value = site
                 privacyShieldViewState.value = currentPrivacyShieldState().copy(privacyShield = privacyProtection)
@@ -1738,6 +1746,14 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun getSite(): Site? = site
+    override fun onReceivedSslError(
+        handler: SslErrorHandler,
+        errorResponse: SslErrorResponse,
+    ) {
+        browserViewState.value =
+            currentBrowserViewState().copy(showPrivacyShield = false, showDaxIcon = true, showSearchIcon = false)
+        command.postValue(ShowSSLError(handler, errorResponse))
+    }
 
     override fun showFileChooser(
         filePathCallback: ValueCallback<Array<Uri>>,
@@ -1752,24 +1768,33 @@ class BrowserTabViewModel @Inject constructor(
                 when {
                     acceptsOnly("image/", fileChooserParams.acceptTypes) && cameraHardwareAvailable ->
                         ShowImageCamera(filePathCallback, fileChooserRequestedParams)
+
                     acceptsOnly("video/", fileChooserParams.acceptTypes) && cameraHardwareAvailable ->
                         ShowVideoCamera(filePathCallback, fileChooserRequestedParams)
+
                     acceptsOnly("audio/", fileChooserParams.acceptTypes) ->
                         ShowSoundRecorder(filePathCallback, fileChooserRequestedParams)
+
                     else ->
                         ShowFileChooser(filePathCallback, fileChooserRequestedParams)
                 }
             }
+
             fileChooserParams.acceptTypes.any { it.startsWith("image/") && cameraHardwareAvailable } ->
                 ShowExistingImageOrCameraChooser(filePathCallback, fileChooserRequestedParams, MediaStore.ACTION_IMAGE_CAPTURE)
+
             fileChooserParams.acceptTypes.any { it.startsWith("video/") && cameraHardwareAvailable } ->
                 ShowExistingImageOrCameraChooser(filePathCallback, fileChooserRequestedParams, MediaStore.ACTION_VIDEO_CAPTURE)
+
             else ->
                 ShowFileChooser(filePathCallback, fileChooserRequestedParams)
         }
     }
 
-    private fun acceptsOnly(type: String, acceptTypes: Array<String>): Boolean {
+    private fun acceptsOnly(
+        type: String,
+        acceptTypes: Array<String>,
+    ): Boolean {
         return acceptTypes.filter { it.startsWith(type) }.size == acceptTypes.size
     }
 
@@ -3092,6 +3117,33 @@ class BrowserTabViewModel @Inject constructor(
     ) {
         viewModelScope.launch(dispatchers.io()) {
             faviconsFetchingPrompt.onPromptAnswered(fetchingEnabled)
+        }
+    }
+
+    fun onSSLCertificateWarningAction(action: Action, url: String) {
+        when (action) {
+            is Action.Shown -> {
+                when (action.errorType) {
+                    EXPIRED -> pixel.fire(AppPixelName.SSL_CERTIFICATE_WARNING_EXPIRED_SHOWN)
+                    WRONG_HOST -> pixel.fire(AppPixelName.SSL_CERTIFICATE_WARNING_WRONG_HOST_SHOWN)
+                    UNTRUSTED_HOST -> pixel.fire(AppPixelName.SSL_CERTIFICATE_WARNING_UNTRUSTED_SHOWN)
+                    GENERIC -> pixel.fire(AppPixelName.SSL_CERTIFICATE_WARNING_GENERIC_SHOWN)
+                }
+            }
+
+            Action.Advance -> {
+                pixel.fire(AppPixelName.SSL_CERTIFICATE_WARNING_ADVANCED_PRESSED)
+            }
+
+            Action.LeaveSite -> {
+                pixel.fire(AppPixelName.SSL_CERTIFICATE_WARNING_CLOSE_PRESSED)
+            }
+
+            Action.Proceed -> {
+                trustedSitesRepository.add(url)
+                site?.sslError = true
+                pixel.fire(AppPixelName.SSL_CERTIFICATE_WARNING_PROCEED_PRESSED)
+            }
         }
     }
 

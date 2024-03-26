@@ -46,6 +46,7 @@ interface Site {
     var hasHttpResources: Boolean
     var upgradedHttps: Boolean
     var userAllowList: Boolean
+    var sslError: Boolean
 
     val entity: Entity?
     var certificate: SslCertificate?
