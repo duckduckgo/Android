@@ -41,6 +41,7 @@ import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsSharedPreferences
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistorySearchSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteService
@@ -110,6 +111,7 @@ import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.survey.api.SurveyRepository
@@ -2021,7 +2023,43 @@ class BrowserTabViewModelTest {
         val suggestion = AutoCompleteBookmarkSuggestion("example", "Example", "https://example.com")
         testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteResult("", listOf(suggestion)))
         testee.fireAutocompletePixel(suggestion)
-        verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_BOOKMARK_SELECTION, pixelParams(showedBookmarks = true, bookmarkCapable = true))
+        val argumentCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(AppPixelName.AUTOCOMPLETE_BOOKMARK_SELECTION), argumentCaptor.capture(), any(), any())
+
+        assertEquals("true", argumentCaptor.firstValue[PixelParameter.SHOWED_BOOKMARKS])
+        assertEquals("true", argumentCaptor.firstValue[PixelParameter.BOOKMARK_CAPABLE])
+    }
+
+    @Test
+    fun whenBookmarkFavoriteSubmittedThenAutoCompleteFavoriteSelectionPixelSent() = runTest {
+        whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(true)
+        whenever(mockSavedSitesRepository.hasFavorites()).thenReturn(true)
+        val suggestion = AutoCompleteBookmarkSuggestion("example", "Example", "https://example.com", isFavorite = true)
+        testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteResult("", listOf(suggestion)))
+        testee.fireAutocompletePixel(suggestion)
+
+        val argumentCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(AppPixelName.AUTOCOMPLETE_FAVORITE_SELECTION), argumentCaptor.capture(), any(), any())
+
+        assertEquals("false", argumentCaptor.firstValue[PixelParameter.SHOWED_BOOKMARKS])
+        assertEquals("true", argumentCaptor.firstValue[PixelParameter.SHOWED_FAVORITES])
+        assertEquals("true", argumentCaptor.firstValue[PixelParameter.BOOKMARK_CAPABLE])
+        assertEquals("true", argumentCaptor.firstValue[PixelParameter.FAVORITE_CAPABLE])
+    }
+
+    @Test
+    fun whenHistorySubmittedThenAutoCompleteHistorySelectionPixelSent() = runTest {
+        whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(true)
+        val suggestion = AutoCompleteHistorySearchSuggestion("example")
+        testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteResult("", listOf(suggestion)))
+        testee.fireAutocompletePixel(suggestion)
+
+        val argumentCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(AppPixelName.AUTOCOMPLETE_HISTORY_SELECTION), argumentCaptor.capture(), any(), any())
+
+        assertEquals("false", argumentCaptor.firstValue[PixelParameter.SHOWED_BOOKMARKS])
+        assertEquals("true", argumentCaptor.firstValue[PixelParameter.BOOKMARK_CAPABLE])
+        assertEquals("true", argumentCaptor.firstValue[PixelParameter.SHOWED_HISTORY])
     }
 
     @Test
@@ -2031,7 +2069,11 @@ class BrowserTabViewModelTest {
         testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteResult("", suggestions))
         testee.fireAutocompletePixel(AutoCompleteSearchSuggestion("example", false))
 
-        verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_SEARCH_SELECTION, pixelParams(showedBookmarks = true, bookmarkCapable = true))
+        val argumentCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(AppPixelName.AUTOCOMPLETE_SEARCH_SELECTION), argumentCaptor.capture(), any(), any())
+
+        assertEquals("true", argumentCaptor.firstValue[PixelParameter.SHOWED_BOOKMARKS])
+        assertEquals("true", argumentCaptor.firstValue[PixelParameter.BOOKMARK_CAPABLE])
     }
 
     @Test
@@ -2040,7 +2082,11 @@ class BrowserTabViewModelTest {
         testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteResult("", emptyList()))
         testee.fireAutocompletePixel(AutoCompleteSearchSuggestion("example", false))
 
-        verify(mockPixel).fire(AppPixelName.AUTOCOMPLETE_SEARCH_SELECTION, pixelParams(showedBookmarks = false, bookmarkCapable = false))
+        val argumentCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(AppPixelName.AUTOCOMPLETE_SEARCH_SELECTION), argumentCaptor.capture(), any(), any())
+
+        assertEquals("false", argumentCaptor.firstValue[PixelParameter.SHOWED_BOOKMARKS])
+        assertEquals("false", argumentCaptor.firstValue[PixelParameter.BOOKMARK_CAPABLE])
     }
 
     @Test
@@ -5001,9 +5047,11 @@ class BrowserTabViewModelTest {
     private fun pixelParams(
         showedBookmarks: Boolean,
         bookmarkCapable: Boolean,
+        showedHistory: Boolean = false,
     ) = mapOf(
         Pixel.PixelParameter.SHOWED_BOOKMARKS to showedBookmarks.toString(),
         Pixel.PixelParameter.BOOKMARK_CAPABLE to bookmarkCapable.toString(),
+        Pixel.PixelParameter.SHOWED_HISTORY to showedHistory.toString(),
     )
 
     private fun givenExpectedCtaAddWidgetInstructions() {
