@@ -25,10 +25,8 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.settings.FakeNetPSettingsLocalConfigFactory
 import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
-import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager
 import com.duckduckgo.networkprotection.impl.waitlist.FakeNetPRemoteFeatureFactory
 import com.duckduckgo.networkprotection.impl.waitlist.NetPRemoteFeature
-import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -58,12 +56,6 @@ class NetPDisabledNotificationSchedulerTest {
     @Mock
     private lateinit var networkProtectionState: NetworkProtectionState
 
-    @Mock
-    private lateinit var netpSubscriptionManager: NetpSubscriptionManager
-
-    @Mock
-    private lateinit var subscriptions: Subscriptions
-
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
@@ -80,8 +72,6 @@ class NetPDisabledNotificationSchedulerTest {
             TestScope(),
             coroutineRule.testDispatcherProvider,
             netPRemoteFeature,
-            netpSubscriptionManager,
-            subscriptions,
         )
     }
 
