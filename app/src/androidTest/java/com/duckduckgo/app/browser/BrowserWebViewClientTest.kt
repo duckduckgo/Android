@@ -18,7 +18,6 @@ package com.duckduckgo.app.browser
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.webkit.CookieManager
@@ -78,6 +77,7 @@ import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -708,7 +708,7 @@ class BrowserWebViewClientTest {
     fun whenPageFinishesBeforeStartingThenPixelIsNotFired() {
         val mockWebView = getImmediatelyInvokedMockWebView()
         testee.onPageFinished(mockWebView, EXAMPLE_URL)
-        verify(pageLoadedHandler, never()).invoke(any(), any(), any())
+        verify(pageLoadedHandler, never()).onPageLoaded(any(), any(), any(), any())
     }
 
     @Test
@@ -722,7 +722,7 @@ class BrowserWebViewClientTest {
         testee.onPageFinished(mockWebView, EXAMPLE_URL)
         val startArgumentCaptor = argumentCaptor<Long>()
         val endArgumentCaptor = argumentCaptor<Long>()
-        verify(pageLoadedHandler).invoke(any(), startArgumentCaptor.capture(), endArgumentCaptor.capture())
+        verify(pageLoadedHandler).onPageLoaded(any(), eq(null), startArgumentCaptor.capture(), endArgumentCaptor.capture())
         assertEquals(0L, startArgumentCaptor.firstValue)
         assertEquals(10L, endArgumentCaptor.firstValue)
     }
@@ -735,7 +735,7 @@ class BrowserWebViewClientTest {
         whenever(mockWebView.settings).thenReturn(mock())
         testee.onPageStarted(mockWebView, "about:blank", null)
         testee.onPageFinished(mockWebView, "about:blank")
-        verify(pageLoadedHandler, never()).invoke(any(), any(), any())
+        verify(pageLoadedHandler, never()).onPageLoaded(any(), any(), any(), any())
     }
 
     @Test
@@ -744,7 +744,7 @@ class BrowserWebViewClientTest {
         whenever(mockWebView.settings).thenReturn(mock())
         testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
         testee.onPageFinished(mockWebView, EXAMPLE_URL)
-        verify(pageLoadedHandler, never()).invoke(any(), any(), any())
+        verify(pageLoadedHandler, never()).onPageLoaded(any(), any(), any(), any())
     }
 
     @Test
@@ -761,7 +761,7 @@ class BrowserWebViewClientTest {
 
         val startArgumentCaptor = argumentCaptor<Long>()
         val endArgumentCaptor = argumentCaptor<Long>()
-        verify(pageLoadedHandler).invoke(any(), startArgumentCaptor.capture(), endArgumentCaptor.capture())
+        verify(pageLoadedHandler).onPageLoaded(any(), eq(null), startArgumentCaptor.capture(), endArgumentCaptor.capture())
         assertEquals(0L, startArgumentCaptor.firstValue)
         assertEquals(10L, endArgumentCaptor.firstValue)
     }
@@ -783,7 +783,7 @@ class BrowserWebViewClientTest {
         testee.onPageFinished(mockWebView, EXAMPLE_URL)
         val startArgumentCaptor = argumentCaptor<Long>()
         val endArgumentCaptor = argumentCaptor<Long>()
-        verify(pageLoadedHandler).invoke(any(), startArgumentCaptor.capture(), endArgumentCaptor.capture())
+        verify(pageLoadedHandler).onPageLoaded(any(), eq(null), startArgumentCaptor.capture(), endArgumentCaptor.capture())
         assertEquals(5L, startArgumentCaptor.firstValue)
         assertEquals(10L, endArgumentCaptor.firstValue)
     }
@@ -877,11 +877,6 @@ class BrowserWebViewClientTest {
         private val fakeHistory: MutableList<WebHistoryItem> = mutableListOf()
         private var fakeCurrentIndex = -1
 
-        fun addPageToHistory(webHistoryItem: WebHistoryItem) {
-            fakeHistory.add(webHistoryItem)
-            fakeCurrentIndex++
-        }
-
         override fun getSize() = fakeHistory.size
 
         override fun getItemAtIndex(index: Int): WebHistoryItem = fakeHistory[index]
@@ -891,21 +886,6 @@ class BrowserWebViewClientTest {
         override fun getCurrentIndex(): Int = fakeCurrentIndex
 
         override fun clone(): WebBackForwardList = throw NotImplementedError()
-    }
-
-    private class TestHistoryItem(
-        private val url: String,
-    ) : WebHistoryItem() {
-
-        override fun getUrl(): String = url
-
-        override fun getOriginalUrl(): String = url
-
-        override fun getTitle(): String = url
-
-        override fun getFavicon(): Bitmap = throw NotImplementedError()
-
-        override fun clone(): WebHistoryItem = throw NotImplementedError()
     }
 
     companion object {

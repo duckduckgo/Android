@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.pageloadpixel
 import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedSites.Companion.sites
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.history.SaveToHistory
 import com.duckduckgo.app.pixels.remoteconfig.OptimizeTrackerEvaluationRCWrapper
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.browser.api.WebViewVersionProvider
@@ -31,7 +32,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 interface PageLoadedHandler {
-    operator fun invoke(url: String, start: Long, end: Long)
+    fun onPageLoaded(url: String, title: String?, start: Long, end: Long)
 }
 
 @ContributesBinding(AppScope::class)
@@ -43,9 +44,10 @@ class RealPageLoadedHandler @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val autoconsent: Autoconsent,
     private val optimizeTrackerEvaluationRCWrapper: OptimizeTrackerEvaluationRCWrapper,
+    private val saveToHistory: SaveToHistory,
 ) : PageLoadedHandler {
 
-    override operator fun invoke(url: String, start: Long, end: Long) {
+    override fun onPageLoaded(url: String, title: String?, start: Long, end: Long) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             if (sites.any { UriString.sameOrSubdomain(url, it) }) {
                 pageLoadedPixelDao.add(
@@ -58,6 +60,7 @@ class RealPageLoadedHandler @Inject constructor(
                     ),
                 )
             }
+            saveToHistory.saveToHistory(url, title)
         }
     }
 }
