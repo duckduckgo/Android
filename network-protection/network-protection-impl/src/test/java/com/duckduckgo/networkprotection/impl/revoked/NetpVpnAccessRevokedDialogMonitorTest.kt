@@ -67,6 +67,7 @@ class NetpVpnAccessRevokedDialogMonitorTest {
         MockitoAnnotations.openMocks(this)
 
         runBlocking { whenever(networkProtectionState.isOnboarded()) }.thenReturn(true)
+        runBlocking { whenever(networkProtectionState.isEnabled()) }.thenReturn(false)
 
         netpVpnAccessRevokedDialogMonitor = NetpVpnAccessRevokedDialogMonitor(
             netpSubscriptionManager,
@@ -91,6 +92,7 @@ class NetpVpnAccessRevokedDialogMonitorTest {
             netpVpnAccessRevokedDialogMonitor.onActivityResumed(mock())
 
             verify(betaEndedDialog).show(any())
+            verify(networkProtectionState, never()).stop()
             verifyNoInteractions(accessRevokedDialog)
         }
     }
@@ -106,6 +108,7 @@ class NetpVpnAccessRevokedDialogMonitorTest {
             netpVpnAccessRevokedDialogMonitor.onActivityResumed(mock())
 
             verify(betaEndedDialog, never()).show(any())
+            verify(networkProtectionState, never()).stop()
             verify(accessRevokedDialog).clearIsShown()
         }
     }
@@ -121,6 +124,7 @@ class NetpVpnAccessRevokedDialogMonitorTest {
             netpVpnAccessRevokedDialogMonitor.onActivityResumed(mock())
 
             verify(betaEndedDialog, never()).show(any())
+            verify(networkProtectionState, never()).stop()
             verify(accessRevokedDialog).clearIsShown()
         }
     }
@@ -136,6 +140,24 @@ class NetpVpnAccessRevokedDialogMonitorTest {
             netpVpnAccessRevokedDialogMonitor.onActivityResumed(mock())
 
             verify(betaEndedDialog, never()).show(any())
+            verify(networkProtectionState, never()).stop()
+            verify(accessRevokedDialog).clearIsShown()
+        }
+    }
+
+    @Test
+    fun whenUserNotInBetaVPNEnabledThenDontShowAnyDialog() {
+        coroutineTestRule.testScope.launch {
+            whenever(networkProtectionState.isEnabled()).thenReturn(true)
+            whenever(netpSubscriptionManager.getVpnStatus()).thenReturn(ACTIVE)
+            whenever(betaEndedDialog.shouldShowDialog()).thenReturn(true)
+            whenever(netPWaitlistRepository.getAuthenticationToken()).thenReturn(null)
+            whenever(subscriptions.isEnabled()).thenReturn(true)
+
+            netpVpnAccessRevokedDialogMonitor.onActivityResumed(mock())
+
+            verify(betaEndedDialog, never()).show(any())
+            verify(networkProtectionState, never()).stop()
             verify(accessRevokedDialog).clearIsShown()
         }
     }
@@ -151,6 +173,24 @@ class NetpVpnAccessRevokedDialogMonitorTest {
             netpVpnAccessRevokedDialogMonitor.onActivityResumed(mock())
 
             verify(betaEndedDialog, never()).show(any())
+            verify(networkProtectionState, never()).stop()
+            verify(accessRevokedDialog).clearIsShown()
+        }
+    }
+
+    @Test
+    fun whenUserNotInBetaAndVPNEnabledAndInactiveThenClearShownAccessRevokedDialog() {
+        coroutineTestRule.testScope.launch {
+            whenever(networkProtectionState.isEnabled()).thenReturn(true)
+            whenever(netpSubscriptionManager.getVpnStatus()).thenReturn(INACTIVE)
+            whenever(betaEndedDialog.shouldShowDialog()).thenReturn(true)
+            whenever(netPWaitlistRepository.getAuthenticationToken()).thenReturn(null)
+            whenever(subscriptions.isEnabled()).thenReturn(true)
+
+            netpVpnAccessRevokedDialogMonitor.onActivityResumed(mock())
+
+            verify(betaEndedDialog, never()).show(any())
+            verify(networkProtectionState, never()).stop()
             verify(accessRevokedDialog).clearIsShown()
         }
     }
@@ -166,6 +206,24 @@ class NetpVpnAccessRevokedDialogMonitorTest {
             netpVpnAccessRevokedDialogMonitor.onActivityResumed(mock())
 
             verify(betaEndedDialog, never()).show(any())
+            verify(networkProtectionState, never()).stop()
+            verify(accessRevokedDialog).clearIsShown()
+        }
+    }
+
+    @Test
+    fun whenUserNotInBetaAndVPNEnabledAndSignedOutThenClearShownAccessRevokedDialog() {
+        coroutineTestRule.testScope.launch {
+            whenever(networkProtectionState.isEnabled()).thenReturn(true)
+            whenever(netpSubscriptionManager.getVpnStatus()).thenReturn(SIGNED_OUT)
+            whenever(betaEndedDialog.shouldShowDialog()).thenReturn(true)
+            whenever(netPWaitlistRepository.getAuthenticationToken()).thenReturn(null)
+            whenever(subscriptions.isEnabled()).thenReturn(true)
+
+            netpVpnAccessRevokedDialogMonitor.onActivityResumed(mock())
+
+            verify(betaEndedDialog, never()).show(any())
+            verify(networkProtectionState).stop()
             verify(accessRevokedDialog).clearIsShown()
         }
     }
@@ -181,6 +239,24 @@ class NetpVpnAccessRevokedDialogMonitorTest {
             netpVpnAccessRevokedDialogMonitor.onActivityResumed(mock())
 
             verify(betaEndedDialog, never()).show(any())
+            verify(networkProtectionState, never()).stop()
+            verify(accessRevokedDialog).clearIsShown()
+        }
+    }
+
+    @Test
+    fun whenUserNotInBetaAndVPNEnabledActiveThenClearShownAccessRevokedDialog() {
+        coroutineTestRule.testScope.launch {
+            whenever(networkProtectionState.isEnabled()).thenReturn(true)
+            whenever(netpSubscriptionManager.getVpnStatus()).thenReturn(ACTIVE)
+            whenever(betaEndedDialog.shouldShowDialog()).thenReturn(true)
+            whenever(netPWaitlistRepository.getAuthenticationToken()).thenReturn(null)
+            whenever(subscriptions.isEnabled()).thenReturn(true)
+
+            netpVpnAccessRevokedDialogMonitor.onActivityResumed(mock())
+
+            verify(betaEndedDialog, never()).show(any())
+            verify(networkProtectionState, never()).stop()
             verify(accessRevokedDialog).clearIsShown()
         }
     }
@@ -197,6 +273,24 @@ class NetpVpnAccessRevokedDialogMonitorTest {
 
             verify(betaEndedDialog, never()).show(any())
             verify(accessRevokedDialog).showOnce(any())
+            verify(networkProtectionState, never()).stop()
+        }
+    }
+
+    @Test
+    fun whenUserNotInBetaAndVPNEnabledExpiredThenShowAccessRevokedDialog() {
+        coroutineTestRule.testScope.launch {
+            whenever(networkProtectionState.isEnabled()).thenReturn(true)
+            whenever(netpSubscriptionManager.getVpnStatus()).thenReturn(EXPIRED)
+            whenever(betaEndedDialog.shouldShowDialog()).thenReturn(true)
+            whenever(netPWaitlistRepository.getAuthenticationToken()).thenReturn(null)
+            whenever(subscriptions.isEnabled()).thenReturn(true)
+
+            netpVpnAccessRevokedDialogMonitor.onActivityResumed(mock())
+
+            verify(betaEndedDialog, never()).show(any())
+            verify(accessRevokedDialog).showOnce(any())
+            verify(networkProtectionState).stop()
         }
     }
 
@@ -213,6 +307,26 @@ class NetpVpnAccessRevokedDialogMonitorTest {
 
             verify(betaEndedDialog, never()).show(any())
             verify(accessRevokedDialog, never()).showOnce(any())
+            verify(networkProtectionState, never()).stop()
+            verify(accessRevokedDialog.clearIsShown())
+        }
+    }
+
+    @Test
+    fun whenUserNotInBetaAndVPNEanbledAndExpiredAndVpnNotOnboardedThenNoDialog() {
+        coroutineTestRule.testScope.launch {
+            whenever(networkProtectionState.isOnboarded()).thenReturn(false)
+            whenever(networkProtectionState.isEnabled()).thenReturn(true)
+            whenever(netpSubscriptionManager.getVpnStatus()).thenReturn(EXPIRED)
+            whenever(betaEndedDialog.shouldShowDialog()).thenReturn(true)
+            whenever(netPWaitlistRepository.getAuthenticationToken()).thenReturn(null)
+            whenever(subscriptions.isEnabled()).thenReturn(true)
+
+            netpVpnAccessRevokedDialogMonitor.onActivityResumed(mock())
+
+            verify(betaEndedDialog, never()).show(any())
+            verify(accessRevokedDialog, never()).showOnce(any())
+            verify(networkProtectionState, never()).stop()
             verify(accessRevokedDialog.clearIsShown())
         }
     }

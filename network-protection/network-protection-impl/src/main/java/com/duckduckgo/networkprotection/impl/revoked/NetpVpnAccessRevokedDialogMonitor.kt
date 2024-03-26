@@ -66,6 +66,9 @@ class NetpVpnAccessRevokedDialogMonitor @Inject constructor(
                 withContext(dispatcherProvider.main()) {
                     accessRevokedDialog.showOnce(activity)
                 }
+                if (networkProtectionState.isEnabled()) {
+                    networkProtectionState.stop()
+                }
             } else {
                 logcat { "VPN access revoke dialog clear shown state" }
                 accessRevokedDialog.clearIsShown()
