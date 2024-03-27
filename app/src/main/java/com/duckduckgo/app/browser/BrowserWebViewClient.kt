@@ -92,7 +92,7 @@ class BrowserWebViewClient @Inject constructor(
     private val crashLogger: CrashLogger,
     private val jsPlugins: PluginPoint<JsInjectorPlugin>,
     private val currentTimeProvider: CurrentTimeProvider,
-    private val shouldSendPageLoadedPixel: PageLoadedHandler,
+    private val pageLoadedHandler: PageLoadedHandler,
     private val shouldSendPagePaintedPixel: PagePaintedHandler,
     private val mediaPlayback: MediaPlayback,
 ) : WebViewClient() {
@@ -317,6 +317,7 @@ class BrowserWebViewClient @Inject constructor(
         url: String?,
     ) {
         Timber.v("onPageFinished webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}")
+        // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
         if (webView.progress == 100) {
             jsPlugins.getPlugins().forEach {
                 it.onPageFinished(webView, url, webViewClientListener?.getSite())
@@ -334,11 +335,9 @@ class BrowserWebViewClient @Inject constructor(
             printInjector.injectPrint(webView)
 
             url?.let {
-                start?.let { safeStart ->
-                    val progress = webView.progress
-                    // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
-                    if (url != ABOUT_BLANK) {
-                        shouldSendPageLoadedPixel(it, safeStart, currentTimeProvider.getTimeInMillis())
+                if (url != ABOUT_BLANK) {
+                    start?.let { safeStart ->
+                        pageLoadedHandler.onPageLoaded(it, navigationList.currentItem?.title, safeStart, currentTimeProvider.getTimeInMillis())
                         shouldSendPagePaintedPixel(webView = webView, url = it)
                         start = null
                     }
