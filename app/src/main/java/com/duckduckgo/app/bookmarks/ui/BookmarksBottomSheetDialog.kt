@@ -26,6 +26,7 @@ import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import com.duckduckgo.app.browser.databinding.BottomSheetAddBookmarkBinding
 import com.duckduckgo.common.ui.view.show
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
 @SuppressLint("NoBottomSheetDialog")
@@ -164,6 +165,7 @@ class BookmarksBottomSheetDialog(builder: Builder) : BottomSheetDialog(builder.c
         /** Start the dialog and display it on screen */
         fun show() {
             dialog = BookmarksBottomSheetDialog(this)
+            dialog?.behavior?.state = BottomSheetBehavior.STATE_EXPANDED
             dialog?.show()
         }
     }
