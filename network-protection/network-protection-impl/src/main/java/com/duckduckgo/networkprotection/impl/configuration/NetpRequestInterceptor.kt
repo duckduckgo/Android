@@ -21,7 +21,6 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.impl.BuildConfig
-import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -39,7 +38,6 @@ import okhttp3.Response
 class NetpWaitlistRequestInterceptor @Inject constructor(
     private val netpWaitlistRepository: NetPWaitlistRepository,
     private val appBuildConfig: AppBuildConfig,
-    private val networkProtectionRepository: NetworkProtectionRepository,
     private val subscriptions: Subscriptions,
 ) : ApiInterceptorPlugin, Interceptor {
 
@@ -65,11 +63,7 @@ class NetpWaitlistRequestInterceptor @Inject constructor(
 
             chain.proceed(
                 newRequest.build().also { logcat { "headers: ${it.headers}" } },
-            ).also {
-                if (runBlocking { subscriptions.isEnabled() }) {
-                    networkProtectionRepository.vpnAccessRevoked = (it.code == 403)
-                }
-            }
+            )
         } else {
             chain.proceed(newRequest.build())
         }

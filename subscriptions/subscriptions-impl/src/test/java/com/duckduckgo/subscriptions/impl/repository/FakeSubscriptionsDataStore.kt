@@ -18,7 +18,7 @@ package com.duckduckgo.subscriptions.impl.repository
 
 import com.duckduckgo.subscriptions.impl.store.SubscriptionsDataStore
 
-class FakeSubscriptionsDataStore : SubscriptionsDataStore {
+class FakeSubscriptionsDataStore(private val supportEncryption: Boolean = true) : SubscriptionsDataStore {
 
     // Auth
     override var accessToken: String? = null
@@ -33,5 +33,5 @@ class FakeSubscriptionsDataStore : SubscriptionsDataStore {
     override var status: String? = null
     override var entitlements: String? = null
     override var productId: String? = null
-    override fun canUseEncryption(): Boolean = true
+    override fun canUseEncryption(): Boolean = supportEncryption
 }

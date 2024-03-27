@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.networkprotection.subscription
+package com.duckduckgo.networkprotection.impl.subscription
 
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -28,12 +28,14 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitli
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.JoinedWaitlist
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.NotUnlocked
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.PendingInviteCode
-import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.duckduckgo.networkprotection.impl.waitlist.NetworkProtectionWaitlistImpl
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 @ContributesBinding(AppScope::class)
@@ -48,6 +50,14 @@ class NetworkProtectionState @Inject constructor(
             subscriptionState.getState()
         } else {
             waitlistState.getState()
+        }
+    }
+
+    override suspend fun getStateFlow(): Flow<NetPWaitlistState> {
+        return if (subscriptions.isEnabled()) {
+            subscriptionState.getStateFlow()
+        } else {
+            waitlistState.getStateFlow()
         }
     }
 
@@ -66,13 +76,12 @@ class NetworkProtectionAccessState @Inject constructor(
     private val networkProtectionState: NetworkProtectionState,
     private val dispatcherProvider: DispatcherProvider,
     private val netpSubscriptionManager: NetpSubscriptionManager,
-    private val networkProtectionRepository: NetworkProtectionRepository,
     private val subscriptions: Subscriptions,
 ) : NetworkProtectionWaitlist {
 
     override suspend fun getState(): NetPWaitlistState = withContext(dispatcherProvider.io()) {
         if (isTreated()) {
-            return@withContext if (!netpSubscriptionManager.hasValidEntitlement()) {
+            return@withContext if (!netpSubscriptionManager.getVpnStatus().isActive()) {
                 // if entitlement check succeeded and no entitlement, reset state and hide access.
                 handleRevokedVPNState()
                 NotUnlocked
@@ -83,15 +92,30 @@ class NetworkProtectionAccessState @Inject constructor(
         return@withContext NotUnlocked
     }
 
+    override suspend fun getStateFlow(): Flow<NetPWaitlistState> = withContext(dispatcherProvider.io()) {
+        if (isTreated()) {
+            netpSubscriptionManager.vpnStatus().map { status ->
+                if (!status.isActive()) {
+                    // if entitlement check succeeded and no entitlement, reset state and hide access.
+                    handleRevokedVPNState()
+                    NotUnlocked
+                } else {
+                    InBeta(netPWaitlistRepository.didAcceptWaitlistTerms())
+                }
+            }
+        } else {
+            flowOf(NotUnlocked)
+        }
+    }
+
     private suspend fun handleRevokedVPNState() {
         if (networkProtectionState.isEnabled()) {
-            networkProtectionRepository.vpnAccessRevoked = true
             networkProtectionState.stop()
         }
     }
 
     override suspend fun getScreenForCurrentState(): ActivityParams? {
-        return when (val state = getState()) {
+        return when (getState()) {
             is InBeta -> {
                 if (netPWaitlistRepository.didAcceptWaitlistTerms() || networkProtectionState.isOnboarded()) {
                     NetworkProtectionManagementScreenNoParams

@@ -27,28 +27,28 @@ import retrofit2.http.POST
 
 @ContributesNonCachingServiceApi(AppScope::class)
 interface AuthService {
-    @POST("https://quackdev.duckduckgo.com/api/auth/account/create")
+    @POST("https://quack.duckduckgo.com/api/auth/account/create")
     suspend fun createAccount(@Header("Authorization") authorization: String?): CreateAccountResponse
 
-    @POST("https://quackdev.duckduckgo.com/api/auth/store-login")
+    @POST("https://quack.duckduckgo.com/api/auth/store-login")
     suspend fun storeLogin(@Body storeLoginBody: StoreLoginBody): StoreLoginResponse
 
     /**
      * Validate token takes either an access token or an auth token
      */
-    @GET("https://quackdev.duckduckgo.com/api/auth/validate-token")
+    @GET("https://quack.duckduckgo.com/api/auth/validate-token")
     suspend fun validateToken(@Header("Authorization") authorization: String): ValidateTokenResponse
 
     /**
      * Exchanges an auth token for an access token
      */
-    @GET("https://quackdev.duckduckgo.com/api/auth/access-token")
+    @GET("https://quack.duckduckgo.com/api/auth/access-token")
     suspend fun accessToken(@Header("Authorization") authorization: String): AccessTokenResponse
 
     /**
      * Deletes an account
      */
-    @POST("https://quackdev.duckduckgo.com/api/auth/account/delete")
+    @POST("https://quack.duckduckgo.com/api/auth/account/delete")
     suspend fun delete(@Header("Authorization") authorization: String): DeleteAccountResponse
 }
 

@@ -74,10 +74,8 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BUY_URL
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionsWebviewBinding
 import com.duckduckgo.subscriptions.impl.pir.PirActivity.Companion.PirScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
-import com.duckduckgo.subscriptions.impl.ui.AddDeviceActivity.Companion.AddDeviceScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionActivity.Companion.RestoreSubscriptionScreenWithParams
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
-import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.ActivateOnAnotherDevice
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.BackToSettings
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.BackToSettingsActivateSuccess
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.GoToITR
@@ -86,6 +84,7 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.RestoreSubscription
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SendJsEvent
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SendResponseToJs
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SubscriptionRecoveredExpired
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SubscriptionSelected
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView
 import com.duckduckgo.user.agent.api.UserAgentProvider
@@ -396,11 +395,11 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             is SendJsEvent -> sendJsEvent(command.event)
             is SendResponseToJs -> sendResponseToJs(command.data)
             is SubscriptionSelected -> selectSubscription(command.id)
-            is ActivateOnAnotherDevice -> activateOnAnotherDevice()
             is RestoreSubscription -> restoreSubscription()
             is GoToITR -> goToITR()
             is GoToPIR -> goToPIR()
             is GoToNetP -> goToNetP(command.activityParams)
+            is SubscriptionRecoveredExpired -> subscriptionNotFound()
         }
     }
 
@@ -496,6 +495,22 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             .show()
     }
 
+    private fun subscriptionNotFound() {
+        TextAlertDialogBuilder(this)
+            .setTitle(string.subscriptionNotFound)
+            .setMessage(string.subscriptionNotFoundEmailDescription)
+            .setDestructiveButtons(false)
+            .setPositiveButton(string.ok)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        finish()
+                    }
+                },
+            )
+            .show()
+    }
+
     private fun selectSubscription(id: String) {
         viewModel.purchaseSubscription(this, id)
     }
@@ -509,10 +524,6 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             setResult(RESULT_OK)
         }
         finish()
-    }
-
-    private fun activateOnAnotherDevice() {
-        globalActivityStarter.start(this, AddDeviceScreenWithEmptyParams)
     }
 
     private val startForResultRestore = registerForActivityResult(StartActivityForResult()) { result: ActivityResult ->

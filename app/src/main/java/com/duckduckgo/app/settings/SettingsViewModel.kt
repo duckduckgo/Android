@@ -192,6 +192,7 @@ class SettingsViewModel @Inject constructor(
                         if (isPrivacyProEnabled()) Hidden else getNetworkProtectionEntryState(this)
                     },
                     isAutoconsentEnabled = autoconsent.isSettingEnabled(),
+                    isPrivacyProEnabled = isPrivacyProEnabled() && subscriptions.isEligible(),
                 ),
             )
             networkProtectionState.getConnectionStateFlow()

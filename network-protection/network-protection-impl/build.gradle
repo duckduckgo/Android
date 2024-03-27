@@ -42,6 +42,7 @@ dependencies {
     implementation project(':privacy-config-api')
     implementation project(':navigation-api')
     implementation project(':subscriptions-api')
+    implementation project(':settings-api')
 
     implementation AndroidX.appCompat
     implementation AndroidX.constraintLayout

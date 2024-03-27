@@ -19,12 +19,12 @@ package com.duckduckgo.subscriptions.impl.repository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.api.Product
-import com.duckduckgo.subscriptions.impl.SubscriptionStatus
-import com.duckduckgo.subscriptions.impl.SubscriptionStatus.AUTO_RENEWABLE
-import com.duckduckgo.subscriptions.impl.SubscriptionStatus.GRACE_PERIOD
-import com.duckduckgo.subscriptions.impl.SubscriptionStatus.NOT_AUTO_RENEWABLE
-import com.duckduckgo.subscriptions.impl.SubscriptionStatus.UNKNOWN
-import com.duckduckgo.subscriptions.impl.SubscriptionStatus.WAITING
+import com.duckduckgo.subscriptions.api.SubscriptionStatus
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.GRACE_PERIOD
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
 import com.duckduckgo.subscriptions.impl.services.SubscriptionResponse
 import com.duckduckgo.subscriptions.impl.store.SubscriptionsDataStore
 import com.duckduckgo.subscriptions.impl.toStatus
@@ -54,6 +54,7 @@ interface AuthRepository {
     suspend fun setEmail(email: String?)
     suspend fun purchaseToWaitingStatus()
     suspend fun getStatus(): SubscriptionStatus
+    suspend fun canSupportEncryption(): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -173,6 +174,10 @@ class RealAuthRepository @Inject constructor(
 
     override suspend fun saveExternalId(externalId: String) = withContext(dispatcherProvider.io()) {
         subscriptionsDataStore.externalId = externalId
+    }
+
+    override suspend fun canSupportEncryption(): Boolean = withContext(dispatcherProvider.io()) {
+        subscriptionsDataStore.canUseEncryption()
     }
 }
 

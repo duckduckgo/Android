@@ -10,8 +10,9 @@ import com.android.billingclient.api.PurchaseHistoryRecord
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.subscriptions.api.Product.NetP
+import com.duckduckgo.subscriptions.api.SubscriptionStatus
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.*
 import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.RecoverSubscriptionResult
-import com.duckduckgo.subscriptions.impl.SubscriptionStatus.*
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN
 import com.duckduckgo.subscriptions.impl.billing.PlayBillingManager
@@ -26,6 +27,7 @@ import com.duckduckgo.subscriptions.impl.services.AuthService
 import com.duckduckgo.subscriptions.impl.services.ConfirmationEntitlement
 import com.duckduckgo.subscriptions.impl.services.ConfirmationResponse
 import com.duckduckgo.subscriptions.impl.services.CreateAccountResponse
+import com.duckduckgo.subscriptions.impl.services.DeleteAccountResponse
 import com.duckduckgo.subscriptions.impl.services.EntitlementResponse
 import com.duckduckgo.subscriptions.impl.services.PortalResponse
 import com.duckduckgo.subscriptions.impl.services.StoreLoginResponse
@@ -72,7 +74,7 @@ class RealSubscriptionsManagerTest {
     private lateinit var subscriptionsManager: SubscriptionsManager
 
     @Before
-    fun before() {
+    fun before() = runTest {
         whenever(emailManager.getToken()).thenReturn(null)
         whenever(context.packageName).thenReturn("packageName")
         subscriptionsManager = RealSubscriptionsManager(
@@ -588,6 +590,7 @@ class RealSubscriptionsManagerTest {
 
     @Test
     fun whenGetAuthTokenIfUserAuthenticatedWithSubscriptionAndTokenExpiredAndEntitlementsExistsThenReturnSuccess() = runTest {
+        authDataStore.externalId = "1234"
         givenUserIsAuthenticated()
         givenSubscriptionSucceedsWithEntitlements()
         givenValidateTokenFailsAndThenSucceeds("""{ "error": "expired_token" }""")
@@ -600,6 +603,22 @@ class RealSubscriptionsManagerTest {
         verify(authService).storeLogin(any())
         assertTrue(result is AuthToken.Success)
         assertEquals("authToken", (result as AuthToken.Success).authToken)
+    }
+
+    @Test
+    fun whenGetAuthTokenIfUserAuthenticatedWithSubscriptionAndTokenExpiredAndEntitlementsExistsAndExternalIdDifferentThenReturnFailure() = runTest {
+        authDataStore.externalId = "test"
+        givenUserIsAuthenticated()
+        givenSubscriptionSucceedsWithEntitlements()
+        givenValidateTokenFailsAndThenSucceeds("""{ "error": "expired_token" }""")
+        givenPurchaseStored()
+        givenStoreLoginSucceeds()
+        givenAccessTokenSucceeds()
+
+        val result = subscriptionsManager.getAuthToken()
+
+        verify(authService).storeLogin(any())
+        assertTrue(result is AuthToken.Failure)
     }
 
     @Test
@@ -867,6 +886,79 @@ class RealSubscriptionsManagerTest {
             assertEquals(YEARLY_PLAN, yearlyPlanId)
             assertEquals("1$", yearlyFormattedPrice)
         }
+    }
+
+    @Test
+    fun whenCanSupportEncryptionThenReturnTrue() = runTest {
+        assertTrue(subscriptionsManager.canSupportEncryption())
+    }
+
+    @Test
+    fun whenCanSupportEncryptionIfCannotThenReturnFalse() = runTest {
+        val authDataStore: SubscriptionsDataStore = FakeSubscriptionsDataStore(supportEncryption = false)
+        val authRepository = RealAuthRepository(authDataStore, coroutineRule.testDispatcherProvider)
+        subscriptionsManager = RealSubscriptionsManager(
+            authService,
+            subscriptionsService,
+            authRepository,
+            playBillingManager,
+            emailManager,
+            context,
+            TestScope(),
+            coroutineRule.testDispatcherProvider,
+            pixelSender,
+        )
+
+        assertFalse(subscriptionsManager.canSupportEncryption())
+    }
+
+    @Test
+    fun whenDeleteAccountIfUserAuthenticatedAndValidTokenThenReturnTrue() = runTest {
+        givenUserIsAuthenticated()
+        givenValidateTokenSucceedsWithEntitlements()
+        givenDeleteAccountSucceeds()
+
+        assertTrue(subscriptionsManager.deleteAccount())
+    }
+
+    @Test
+    fun whenDeleteAccountIfUserNotAuthenticatedThenReturnFalse() = runTest {
+        givenUserIsNotAuthenticated()
+        givenDeleteAccountFails()
+
+        assertFalse(subscriptionsManager.deleteAccount())
+    }
+
+    @Test
+    fun whenDeleteAccountIfUserAuthenticatedWithSubscriptionAndTokenExpiredAndEntitlementsExistsThenReturnTrue() = runTest {
+        authDataStore.externalId = "1234"
+        givenUserIsAuthenticated()
+        givenSubscriptionSucceedsWithEntitlements()
+        givenValidateTokenFailsAndThenSucceeds("""{ "error": "expired_token" }""")
+        givenPurchaseStored()
+        givenStoreLoginSucceeds()
+        givenAccessTokenSucceeds()
+        givenDeleteAccountSucceeds()
+
+        assertTrue(subscriptionsManager.deleteAccount())
+    }
+
+    @Test
+    fun whenRemoveEntitlementsThenEntitlementsDeleted() = runTest {
+        givenSubscriptionExists()
+        assertEquals("""[{"product":"product", "name":"name"}]""", authDataStore.entitlements)
+
+        subscriptionsManager.removeEntitlements()
+        assertEquals("""[]""", authDataStore.entitlements)
+    }
+
+    private suspend fun givenDeleteAccountSucceeds() {
+        whenever(authService.delete(any())).thenReturn(DeleteAccountResponse("deleted"))
+    }
+
+    private suspend fun givenDeleteAccountFails() {
+        val exception = "failure".toResponseBody("text/json".toMediaTypeOrNull())
+        whenever(authService.delete(any())).thenThrow(HttpException(Response.error<String>(400, exception)))
     }
 
     private suspend fun givenUrlPortalSucceeds() {

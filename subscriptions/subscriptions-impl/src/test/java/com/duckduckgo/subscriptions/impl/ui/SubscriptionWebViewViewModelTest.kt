@@ -8,13 +8,13 @@ import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetPWaitlistInvitedScreenNoParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
 import com.duckduckgo.subscriptions.impl.CurrentPurchase
 import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
 import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionOffer
-import com.duckduckgo.subscriptions.impl.SubscriptionStatus.AUTO_RENEWABLE
-import com.duckduckgo.subscriptions.impl.SubscriptionStatus.EXPIRED
-import com.duckduckgo.subscriptions.impl.SubscriptionStatus.INACTIVE
 import com.duckduckgo.subscriptions.impl.SubscriptionsChecker
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
@@ -27,6 +27,7 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Subscri
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Assert.*
@@ -36,6 +37,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
@@ -265,11 +267,10 @@ class SubscriptionWebViewViewModelTest {
     }
 
     @Test
-    fun whenActivateSubscriptionAndSubscriptionActiveThenCommandSent() = runTest {
+    fun whenActivateSubscriptionAndSubscriptionActiveThenNoCommandSent() = runTest {
         whenever(subscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
         viewModel.commands().test {
-            viewModel.processJsCallbackMessage("test", "activateSubscription", null, null)
-            assertTrue(awaitItem() is Command.ActivateOnAnotherDevice)
+            expectNoEvents()
         }
     }
 
@@ -279,6 +280,24 @@ class SubscriptionWebViewViewModelTest {
         viewModel.commands().test {
             viewModel.processJsCallbackMessage("test", "activateSubscription", null, null)
             assertTrue(awaitItem() is Command.RestoreSubscription)
+        }
+    }
+
+    @Test
+    fun whenSetSubscriptionAndExpiredSubscriptionThenCommandNotSent() = runTest {
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(EXPIRED)
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "setSubscription", null, null)
+            assertTrue(awaitItem() is Command.SubscriptionRecoveredExpired)
+        }
+    }
+
+    @Test
+    fun whenSetSubscriptionAndActiveSubscriptionThenCommandNotSent() = runTest {
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "setSubscription", null, null)
+            ensureAllEventsConsumed()
         }
     }
 
@@ -375,11 +394,14 @@ class SubscriptionWebViewViewModelTest {
     }
 
     @Test
-    fun whenActivateOnAnotherDeviceClickedThenPixelIsSent() = runTest {
+    fun whenAddEmailClickedAndInPurchaseFlowThenPixelIsSent() = runTest {
         whenever(subscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
+        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowOf(CurrentPurchase.Success))
+        viewModel.start()
+
         viewModel.processJsCallbackMessage(
             featureName = "test",
-            method = "activateSubscription",
+            method = "subscriptionsWelcomeAddEmailClicked",
             id = null,
             data = null,
         )
@@ -387,8 +409,24 @@ class SubscriptionWebViewViewModelTest {
     }
 
     @Test
-    fun whenFeatureSelectedAndFeatureIsNetPThenPixelSent() = runTest {
-        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(EXPIRED)
+    fun whenAddEmailClickedAndNotInPurchaseFlowThenPixelIsNotSent() = runTest {
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
+
+        viewModel.processJsCallbackMessage(
+            featureName = "test",
+            method = "subscriptionsWelcomeAddEmailClicked",
+            id = null,
+            data = null,
+        )
+        verifyNoInteractions(pixelSender)
+    }
+
+    @Test
+    fun whenFeatureSelectedAndFeatureIsNetPAndInPurchaseFlowThenPixelIsSent() = runTest {
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
+        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowOf(CurrentPurchase.Success))
+        viewModel.start()
+
         viewModel.processJsCallbackMessage(
             featureName = "test",
             method = "featureSelected",
@@ -399,8 +437,24 @@ class SubscriptionWebViewViewModelTest {
     }
 
     @Test
-    fun whenFeatureSelectedAndFeatureIsItrThenPixelIsSent() = runTest {
-        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(EXPIRED)
+    fun whenFeatureSelectedAndFeatureIsNetPAndNotInPurchaseFlowThenPixelIsNotSent() = runTest {
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
+
+        viewModel.processJsCallbackMessage(
+            featureName = "test",
+            method = "featureSelected",
+            id = null,
+            data = JSONObject("""{"feature":"${SubscriptionsConstants.NETP}"}"""),
+        )
+        verifyNoInteractions(pixelSender)
+    }
+
+    @Test
+    fun whenFeatureSelectedAndFeatureIsItrAndInPurchaseFlowThenPixelIsSent() = runTest {
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
+        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowOf(CurrentPurchase.Success))
+        viewModel.start()
+
         viewModel.processJsCallbackMessage(
             featureName = "test",
             method = "featureSelected",
@@ -411,8 +465,24 @@ class SubscriptionWebViewViewModelTest {
     }
 
     @Test
-    fun whenFeatureSelectedAndFeatureIsPirThenPixelIsSent() = runTest {
-        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(EXPIRED)
+    fun whenFeatureSelectedAndFeatureIsItrAndNotInPurchaseFlowThenPixelIsNotSent() = runTest {
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
+
+        viewModel.processJsCallbackMessage(
+            featureName = "test",
+            method = "featureSelected",
+            id = null,
+            data = JSONObject("""{"feature":"${SubscriptionsConstants.ITR}"}"""),
+        )
+        verifyNoInteractions(pixelSender)
+    }
+
+    @Test
+    fun whenFeatureSelectedAndFeatureIsPirAndInPurchaseFlowThenPixelIsSent() = runTest {
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
+        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowOf(CurrentPurchase.Success))
+        viewModel.start()
+
         viewModel.processJsCallbackMessage(
             featureName = "test",
             method = "featureSelected",
@@ -420,5 +490,46 @@ class SubscriptionWebViewViewModelTest {
             data = JSONObject("""{"feature":"${SubscriptionsConstants.PIR}"}"""),
         )
         verify(pixelSender).reportOnboardingPirClick()
+    }
+
+    @Test
+    fun whenFeatureSelectedAndFeatureIsPirAndNotInPurchaseFlowThenPixelIsNotSent() = runTest {
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
+
+        viewModel.processJsCallbackMessage(
+            featureName = "test",
+            method = "featureSelected",
+            id = null,
+            data = JSONObject("""{"feature":"${SubscriptionsConstants.PIR}"}"""),
+        )
+        verifyNoInteractions(pixelSender)
+    }
+
+    @Test
+    fun whenSubscriptionsWelcomeFaqClickedAndInPurchaseFlowThenPixelIsSent() = runTest {
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
+        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowOf(CurrentPurchase.Success))
+        viewModel.start()
+
+        viewModel.processJsCallbackMessage(
+            featureName = "test",
+            method = "subscriptionsWelcomeFaqClicked",
+            id = null,
+            data = null,
+        )
+        verify(pixelSender).reportOnboardingFaqClick()
+    }
+
+    @Test
+    fun whenSubscriptionsWelcomeFaqClickedAndNotInPurchaseFlowThenPixelIsNotSent() = runTest {
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
+
+        viewModel.processJsCallbackMessage(
+            featureName = "test",
+            method = "subscriptionsWelcomeFaqClicked",
+            id = null,
+            data = null,
+        )
+        verifyNoInteractions(pixelSender)
     }
 }

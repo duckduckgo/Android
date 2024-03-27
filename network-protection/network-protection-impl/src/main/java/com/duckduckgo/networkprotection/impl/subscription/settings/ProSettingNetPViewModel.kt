@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.networkprotection.subscription.settings
+package com.duckduckgo.networkprotection.impl.subscription.settings
 
 import android.annotation.SuppressLint
 import androidx.annotation.StringRes
@@ -35,20 +35,21 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionSta
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.DISCONNECTED
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState
+import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_SETTINGS_PRESSED
-import com.duckduckgo.networkprotection.subscription.R
-import com.duckduckgo.networkprotection.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Hidden
-import com.duckduckgo.networkprotection.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Pending
-import com.duckduckgo.networkprotection.subscription.settings.ProSettingNetPViewModel.NetPEntryState.ShowState
+import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.Command.OpenNetPScreen
+import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Hidden
+import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Pending
+import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.ShowState
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import logcat.logcat
@@ -81,43 +82,37 @@ class ProSettingNetPViewModel(
     private val _viewState = MutableStateFlow(ViewState())
     val viewState = _viewState.asStateFlow()
 
-    override fun onResume(owner: LifecycleOwner) {
-        super.onResume(owner)
-        viewModelScope.launch {
-            _viewState.emit(
-                viewState.value.copy(
-                    networkProtectionEntryState = (if (networkProtectionState.isRunning()) CONNECTED else DISCONNECTED).run {
-                        getNetworkProtectionEntryState(this)
-                    },
-                ),
-            )
-        }
+    override fun onStart(owner: LifecycleOwner) {
+        super.onStart(owner)
 
-        networkProtectionState.getConnectionStateFlow()
-            .onEach {
+        viewModelScope.launch {
+            combine(networkProtectionWaitlist.getStateFlow(), networkProtectionState.getConnectionStateFlow()) { accessState, connectionState ->
                 _viewState.emit(
                     viewState.value.copy(
-                        networkProtectionEntryState = getNetworkProtectionEntryState(it),
+                        networkProtectionEntryState = getNetworkProtectionEntryState(accessState, connectionState),
                     ),
                 )
-            }.flowOn(dispatcherProvider.main())
-            .launchIn(viewModelScope)
+            }.flowOn(dispatcherProvider.main()).launchIn(viewModelScope)
+        }
     }
 
     fun onNetPSettingClicked() {
         viewModelScope.launch {
             val screen = networkProtectionWaitlist.getScreenForCurrentState()
             screen?.let {
-                command.send(Command.OpenNetPScreen(screen))
+                command.send(OpenNetPScreen(screen))
                 pixel.fire(NETP_SETTINGS_PRESSED)
             } ?: logcat { "Get screen for current NetP state is null" }
         }
     }
 
-    private suspend fun getNetworkProtectionEntryState(networkProtectionConnectionState: ConnectionState): NetPEntryState {
-        return when (val networkProtectionWaitlistState = networkProtectionWaitlist.getState()) {
+    private suspend fun getNetworkProtectionEntryState(
+        accessState: NetPWaitlistState,
+        networkProtectionConnectionState: ConnectionState,
+    ): NetPEntryState {
+        return when (accessState) {
             is NetPWaitlistState.InBeta -> {
-                if (networkProtectionWaitlistState.termsAccepted || networkProtectionState.isOnboarded()) {
+                if (accessState.termsAccepted || networkProtectionState.isOnboarded()) {
                     val subtitle = when (networkProtectionConnectionState) {
                         CONNECTED -> R.string.netpSubscriptionSettingsConnected
                         CONNECTING -> R.string.netpSubscriptionSettingsConnecting
@@ -138,6 +133,7 @@ class ProSettingNetPViewModel(
                     Pending
                 }
             }
+
             NetPWaitlistState.NotUnlocked -> Hidden
             NetPWaitlistState.PendingInviteCode, NetPWaitlistState.JoinedWaitlist -> Pending
         }
@@ -159,6 +155,7 @@ class ProSettingNetPViewModel(
                         dispatcherProvider,
                         pixel,
                     )
+
                     else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
                 }
             } as T

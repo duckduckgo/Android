@@ -18,16 +18,10 @@ package com.duckduckgo.subscriptions.impl.settings.views
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.MotionEvent
-import android.view.View
-import android.view.ViewTreeObserver.OnGlobalLayoutListener
-import android.view.ViewTreeObserver.OnScrollChangedListener
 import android.widget.FrameLayout
 import android.widget.LinearLayout
-import androidx.core.view.doOnAttach
-import androidx.core.view.doOnDetach
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
@@ -40,14 +34,13 @@ import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.GRACE_PERIOD
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
 import com.duckduckgo.subscriptions.impl.R
-import com.duckduckgo.subscriptions.impl.SubscriptionStatus.AUTO_RENEWABLE
-import com.duckduckgo.subscriptions.impl.SubscriptionStatus.GRACE_PERIOD
-import com.duckduckgo.subscriptions.impl.SubscriptionStatus.NOT_AUTO_RENEWABLE
-import com.duckduckgo.subscriptions.impl.SubscriptionStatus.WAITING
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.databinding.ViewSettingsBinding
-import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenBuyScreen
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenRestoreScreen
@@ -78,9 +71,6 @@ class ProSettingView @JvmOverloads constructor(
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
-    @Inject
-    lateinit var pixelSender: SubscriptionPixelSender
-
     private var coroutineScope: CoroutineScope? = null
 
     private val binding: ViewSettingsBinding by viewBinding()
@@ -107,10 +97,6 @@ class ProSettingView @JvmOverloads constructor(
         viewModel.viewState
             .onEach { renderView(it) }
             .launchIn(coroutineScope!!)
-
-        binding.subscribeSecondary.doOnFullyVisible {
-            pixelSender.reportSubscriptionSettingsSectionShown()
-        }
     }
 
     override fun onDetachedFromWindow() {
@@ -197,54 +183,6 @@ class SubscriptionSettingLayout @JvmOverloads constructor(
 ) : LinearLayout(context, attrs, defStyleAttr) {
     override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
         return true
-    }
-}
-
-private fun View.doOnFullyVisible(action: () -> Unit) {
-    val listener = object : OnGlobalLayoutListener, OnScrollChangedListener {
-        var actionInvoked = false
-
-        override fun onGlobalLayout() {
-            onPotentialVisibilityChange()
-        }
-
-        override fun onScrollChanged() {
-            onPotentialVisibilityChange()
-        }
-
-        fun onPotentialVisibilityChange() {
-            if (!actionInvoked && isViewFullyVisible()) {
-                actionInvoked = true
-                action()
-            }
-
-            if (actionInvoked) {
-                unregister()
-            }
-        }
-
-        fun isViewFullyVisible(): Boolean {
-            val visibleRect = Rect()
-            val isGlobalVisible = getGlobalVisibleRect(visibleRect)
-            return isGlobalVisible && width == visibleRect.width() && height == visibleRect.height()
-        }
-
-        fun register() {
-            viewTreeObserver.addOnGlobalLayoutListener(this)
-            viewTreeObserver.addOnScrollChangedListener(this)
-        }
-
-        fun unregister() {
-            viewTreeObserver.removeOnGlobalLayoutListener(this)
-            viewTreeObserver.removeOnScrollChangedListener(this)
-        }
-    }
-
-    doOnAttach {
-        listener.register()
-        doOnDetach {
-            listener.unregister()
-        }
     }
 }
 

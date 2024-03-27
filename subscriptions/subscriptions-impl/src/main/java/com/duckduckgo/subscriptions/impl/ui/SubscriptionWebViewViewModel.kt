@@ -39,6 +39,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.isActive
+import com.duckduckgo.subscriptions.impl.repository.isActiveOrWaiting
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.*
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView.Failure
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView.InProgress
@@ -123,10 +124,33 @@ class SubscriptionWebViewViewModel @Inject constructor(
             "getSubscriptionOptions" -> id?.let { getSubscriptionOptions(featureName, method, it) }
             "subscriptionSelected" -> subscriptionSelected(data)
             "activateSubscription" -> activateSubscription()
+            "setSubscription" -> setSubscription()
             "featureSelected" -> data?.let { featureSelected(data) }
+            "subscriptionsWelcomeFaqClicked" -> subscriptionsWelcomeFaqClicked()
+            "subscriptionsWelcomeAddEmailClicked" -> subscriptionsWelcomeAddEmailClicked()
             else -> {
                 // NOOP
             }
+        }
+    }
+
+    private fun setSubscription() {
+        viewModelScope.launch {
+            if (!subscriptionsManager.subscriptionStatus().isActiveOrWaiting()) {
+                command.send(SubscriptionRecoveredExpired)
+            }
+        }
+    }
+
+    private fun subscriptionsWelcomeFaqClicked() {
+        if (hasPurchasedSubscription()) {
+            pixelSender.reportOnboardingFaqClick()
+        }
+    }
+
+    private fun subscriptionsWelcomeAddEmailClicked() {
+        if (hasPurchasedSubscription()) {
+            pixelSender.reportOnboardingAddDeviceClick()
         }
     }
 
@@ -150,11 +174,13 @@ class SubscriptionWebViewViewModel @Inject constructor(
                 PIR -> GoToPIR
                 else -> null
             }
-            when (commandToSend) {
-                GoToITR -> pixelSender.reportOnboardingIdtrClick()
-                is GoToNetP -> pixelSender.reportOnboardingVpnClick()
-                GoToPIR -> pixelSender.reportOnboardingPirClick()
-                else -> {} // no-op
+            if (hasPurchasedSubscription()) {
+                when (commandToSend) {
+                    GoToITR -> pixelSender.reportOnboardingIdtrClick()
+                    is GoToNetP -> pixelSender.reportOnboardingVpnClick()
+                    GoToPIR -> pixelSender.reportOnboardingPirClick()
+                    else -> {} // no-op
+                }
             }
             commandToSend?.let {
                 command.send(commandToSend)
@@ -163,15 +189,14 @@ class SubscriptionWebViewViewModel @Inject constructor(
     }
     private fun activateSubscription() {
         viewModelScope.launch(dispatcherProvider.io()) {
-            if (subscriptionsManager.subscriptionStatus().isActive()) {
-                pixelSender.reportOnboardingAddDeviceClick()
-                activateOnAnotherDevice()
-            } else {
+            if (!subscriptionsManager.subscriptionStatus().isActive()) {
                 pixelSender.reportOfferRestorePurchaseClick()
                 recoverSubscription()
             }
         }
     }
+
+    private fun hasPurchasedSubscription() = currentPurchaseViewState.value.purchaseState is Success
 
     private fun subscriptionSelected(data: JSONObject?) {
         pixelSender.reportOfferSubscribeClick()
@@ -235,12 +260,6 @@ class SubscriptionWebViewViewModel @Inject constructor(
         }
     }
 
-    private fun activateOnAnotherDevice() {
-        viewModelScope.launch {
-            command.send(ActivateOnAnotherDevice)
-        }
-    }
-
     private fun backToSettingsActiveSuccess() {
         viewModelScope.launch {
             subscriptionsManager.fetchAndStoreAllData()
@@ -280,11 +299,11 @@ class SubscriptionWebViewViewModel @Inject constructor(
 
     sealed class Command {
         data object BackToSettings : Command()
+        data object SubscriptionRecoveredExpired : Command()
         data object BackToSettingsActivateSuccess : Command()
         data class SendJsEvent(val event: SubscriptionEventData) : Command()
         data class SendResponseToJs(val data: JsCallbackData) : Command()
         data class SubscriptionSelected(val id: String) : Command()
-        data object ActivateOnAnotherDevice : Command()
         data object RestoreSubscription : Command()
         data object GoToITR : Command()
         data object GoToPIR : Command()

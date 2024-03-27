@@ -23,14 +23,15 @@ import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.api.Product
+import com.duckduckgo.subscriptions.api.SubscriptionStatus
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.GRACE_PERIOD
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
 import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.RecoverSubscriptionResult
-import com.duckduckgo.subscriptions.impl.SubscriptionStatus.AUTO_RENEWABLE
-import com.duckduckgo.subscriptions.impl.SubscriptionStatus.EXPIRED
-import com.duckduckgo.subscriptions.impl.SubscriptionStatus.GRACE_PERIOD
-import com.duckduckgo.subscriptions.impl.SubscriptionStatus.INACTIVE
-import com.duckduckgo.subscriptions.impl.SubscriptionStatus.NOT_AUTO_RENEWABLE
-import com.duckduckgo.subscriptions.impl.SubscriptionStatus.UNKNOWN
-import com.duckduckgo.subscriptions.impl.SubscriptionStatus.WAITING
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN
@@ -90,7 +91,7 @@ interface SubscriptionsManager {
     /**
      * Recovers a subscription from the store
      */
-    suspend fun recoverSubscriptionFromStore(): RecoverSubscriptionResult
+    suspend fun recoverSubscriptionFromStore(externalId: String? = null): RecoverSubscriptionResult
 
     /**
      * Fetches subscription and account data from the BE and stores it
@@ -161,6 +162,10 @@ interface SubscriptionsManager {
      * Returns a [String] with the URL of the portal or null otherwise
      */
     suspend fun getPortalUrl(): String?
+
+    suspend fun canSupportEncryption(): Boolean
+
+    suspend fun removeEntitlements()
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -238,12 +243,22 @@ class RealSubscriptionsManager @Inject constructor(
         }
     }
 
+    override suspend fun removeEntitlements() {
+        authRepository.setEntitlements(emptyList())
+    }
+    override suspend fun canSupportEncryption(): Boolean = authRepository.canSupportEncryption()
+
     override suspend fun getAccount(): Account? = authRepository.getAccount()
 
     override suspend fun deleteAccount(): Boolean {
         return try {
-            val state = authService.delete("Bearer ${authRepository.getAuthToken()}")
-            (state.status == "deleted")
+            val token = getAuthToken()
+            if (token is AuthToken.Success) {
+                val state = authService.delete("Bearer ${token.authToken}")
+                (state.status == "deleted")
+            } else {
+                false
+            }
         } catch (e: Exception) {
             false
         }
@@ -380,7 +395,7 @@ class RealSubscriptionsManager @Inject constructor(
         }
     }
 
-    override suspend fun recoverSubscriptionFromStore(): RecoverSubscriptionResult {
+    override suspend fun recoverSubscriptionFromStore(externalId: String?): RecoverSubscriptionResult {
         return try {
             val purchase = playBillingManager.purchaseHistory.lastOrNull()
             if (purchase != null) {
@@ -388,6 +403,7 @@ class RealSubscriptionsManager @Inject constructor(
                 val body = purchase.originalJson
                 val storeLoginBody = StoreLoginBody(signature = signature, signedData = body, packageName = context.packageName)
                 val response = authService.storeLogin(storeLoginBody)
+                if (externalId != null && externalId != response.externalId) return RecoverSubscriptionResult.Failure("")
                 authRepository.saveAccountData(response.authToken, response.externalId)
                 exchangeAuthToken(response.authToken)
                 val subscription = fetchAndStoreAllData()
@@ -490,7 +506,7 @@ class RealSubscriptionsManager @Inject constructor(
             return when (extractError(e)) {
                 "expired_token" -> {
                     logcat(LogPriority.DEBUG) { "Subs: auth token expired" }
-                    val result = recoverSubscriptionFromStore()
+                    val result = recoverSubscriptionFromStore(authRepository.getAccount()?.externalId)
                     if (result is RecoverSubscriptionResult.Success) {
                         AuthToken.Success(authRepository.getAuthToken()!!)
                     } else {
@@ -556,16 +572,6 @@ sealed class AccessToken {
 sealed class AuthToken {
     data class Success(val authToken: String) : AuthToken()
     data class Failure(val message: String) : AuthToken()
-}
-
-enum class SubscriptionStatus(val statusName: String) {
-    AUTO_RENEWABLE("Auto-Renewable"),
-    NOT_AUTO_RENEWABLE("Not Auto-Renewable"),
-    GRACE_PERIOD("Grace Period"),
-    INACTIVE("Inactive"),
-    EXPIRED("Expired"),
-    UNKNOWN("Unknown"),
-    WAITING("Waiting"),
 }
 
 fun String.toStatus(): SubscriptionStatus {

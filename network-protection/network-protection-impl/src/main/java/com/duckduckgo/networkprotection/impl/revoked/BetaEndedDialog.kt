@@ -27,7 +27,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.duckduckgo.networkprotection.impl.R.string
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
-import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -42,7 +41,6 @@ interface BetaEndedDialog {
 class RealBetaEndedDialog @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
-    private val networkProtectionRepository: NetworkProtectionRepository,
     private val networkProtectionPixels: NetworkProtectionPixels,
     private val vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
 ) : BetaEndedDialog {
@@ -83,7 +81,6 @@ class RealBetaEndedDialog @Inject constructor(
 
     private fun resetVpnAccessRevokedState() {
         coroutineScope.launch(dispatcherProvider.io()) {
-            networkProtectionRepository.vpnAccessRevoked = false
             storeBetaEndDialogShown()
         }
     }
@@ -96,7 +93,7 @@ class RealBetaEndedDialog @Inject constructor(
     private fun hasShownBetaEndDialog(): Boolean = preferences.getBoolean(KEY_END_DIALOG_SHOWN, false)
 
     companion object {
-        const val FILENAME = "com.duckduckgo.networkprotection.impl.waitlist.end.store.v1"
-        const val KEY_END_DIALOG_SHOWN = "KEY_END_DIALOG_SHOWN"
+        private const val FILENAME = "com.duckduckgo.networkprotection.impl.waitlist.end.store.v1"
+        private const val KEY_END_DIALOG_SHOWN = "KEY_END_DIALOG_SHOWN"
     }
 }

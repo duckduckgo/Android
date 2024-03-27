@@ -1,4 +1,20 @@
-package com.duckduckgo.networkprotection.subscription.settings
+/*
+ * Copyright (c) 2024 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.networkprotection.impl.subscription.settings
 
 import app.cash.turbine.test
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -7,6 +23,7 @@ import com.duckduckgo.common.ui.view.listitem.CheckListItem.CheckItemStatus.ENAB
 import com.duckduckgo.common.ui.view.listitem.CheckListItem.CheckItemStatus.WARNING
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
+import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.CONNECTED
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.CONNECTING
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.DISCONNECTED
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist
@@ -14,16 +31,13 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitli
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.JoinedWaitlist
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.NotUnlocked
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.PendingInviteCode
+import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_SETTINGS_PRESSED
-import com.duckduckgo.networkprotection.subscription.R
-import com.duckduckgo.networkprotection.subscription.settings.ProSettingNetPViewModel.Command
-import com.duckduckgo.networkprotection.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Hidden
-import com.duckduckgo.networkprotection.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Pending
-import com.duckduckgo.networkprotection.subscription.settings.ProSettingNetPViewModel.NetPEntryState.ShowState
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.emptyFlow
+import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.Command
+import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Hidden
+import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.Pending
+import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.NetPEntryState.ShowState
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -33,7 +47,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class ProSettingNetPViewModelTest {
 
     @get:Rule
@@ -46,12 +59,6 @@ class ProSettingNetPViewModelTest {
 
     @Before
     fun before() {
-        runBlocking {
-            whenever(networkProtectionWaitlist.getState()).thenReturn(NotUnlocked)
-            whenever(networkProtectionState.isRunning()).thenReturn(false)
-            whenever(networkProtectionState.isEnabled()).thenReturn(false)
-            whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(emptyFlow())
-        }
         proSettingNetPViewModel = ProSettingNetPViewModel(
             networkProtectionWaitlist,
             networkProtectionState,
@@ -77,10 +84,10 @@ class ProSettingNetPViewModelTest {
 
     @Test
     fun whenNetPIsNotUnlockedThenNetPEntryStateShouldShowHidden() = runTest {
-        whenever(networkProtectionState.isRunning()).thenReturn(false)
-        whenever(networkProtectionWaitlist.getState()).thenReturn(NotUnlocked)
+        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(DISCONNECTED))
+        whenever(networkProtectionWaitlist.getStateFlow()).thenReturn(flowOf(NotUnlocked))
 
-        proSettingNetPViewModel.onResume(mock())
+        proSettingNetPViewModel.onStart(mock())
 
         proSettingNetPViewModel.viewState.test {
             assertEquals(
@@ -92,10 +99,10 @@ class ProSettingNetPViewModelTest {
 
     @Test
     fun whenNetPStateIsPendingInviteCodeThenNetPEntryStateShouldShowPending() = runTest {
-        whenever(networkProtectionState.isRunning()).thenReturn(false)
-        whenever(networkProtectionWaitlist.getState()).thenReturn(PendingInviteCode)
+        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(DISCONNECTED))
+        whenever(networkProtectionWaitlist.getStateFlow()).thenReturn(flowOf(PendingInviteCode))
 
-        proSettingNetPViewModel.onResume(mock())
+        proSettingNetPViewModel.onStart(mock())
 
         proSettingNetPViewModel.viewState.test {
             assertEquals(
@@ -107,10 +114,10 @@ class ProSettingNetPViewModelTest {
 
     @Test
     fun whenNetPStateIsJoinedWaitlistThenNetPEntryStateShouldShowPending() = runTest {
-        whenever(networkProtectionState.isRunning()).thenReturn(false)
-        whenever(networkProtectionWaitlist.getState()).thenReturn(JoinedWaitlist)
+        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(DISCONNECTED))
+        whenever(networkProtectionWaitlist.getStateFlow()).thenReturn(flowOf(JoinedWaitlist))
 
-        proSettingNetPViewModel.onResume(mock())
+        proSettingNetPViewModel.onStart(mock())
 
         proSettingNetPViewModel.viewState.test {
             assertEquals(
@@ -122,11 +129,11 @@ class ProSettingNetPViewModelTest {
 
     @Test
     fun whenNetPStateIsInBetaButNotAcceptedTermsThenNetPEntryStateShouldShowPending() = runTest {
-        whenever(networkProtectionState.isRunning()).thenReturn(false)
+        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(DISCONNECTED))
+        whenever(networkProtectionWaitlist.getStateFlow()).thenReturn(flowOf(InBeta(false)))
         whenever(networkProtectionState.isOnboarded()).thenReturn(false)
-        whenever(networkProtectionWaitlist.getState()).thenReturn(InBeta(false))
 
-        proSettingNetPViewModel.onResume(mock())
+        proSettingNetPViewModel.onStart(mock())
 
         proSettingNetPViewModel.viewState.test {
             assertEquals(
@@ -138,11 +145,10 @@ class ProSettingNetPViewModelTest {
 
     @Test
     fun whenNetPStateIsInBetaWithTermsAcceptedAndEnabledThenNetPEntryStateShouldCorrectShowState() = runTest {
-        whenever(networkProtectionState.isRunning()).thenReturn(true)
-        whenever(networkProtectionState.isOnboarded()).thenReturn(false)
-        whenever(networkProtectionWaitlist.getState()).thenReturn(InBeta(true))
+        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(CONNECTED))
+        whenever(networkProtectionWaitlist.getStateFlow()).thenReturn(flowOf(InBeta(true)))
 
-        proSettingNetPViewModel.onResume(mock())
+        proSettingNetPViewModel.onStart(mock())
 
         proSettingNetPViewModel.viewState.test {
             assertEquals(
@@ -157,11 +163,11 @@ class ProSettingNetPViewModelTest {
 
     @Test
     fun whenNetPStateIsInBetaOnboardedAndEnabledThenNetPEntryStateShouldCorrectShowState() = runTest {
-        whenever(networkProtectionState.isRunning()).thenReturn(true)
+        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(CONNECTED))
+        whenever(networkProtectionWaitlist.getStateFlow()).thenReturn(flowOf(InBeta(false)))
         whenever(networkProtectionState.isOnboarded()).thenReturn(true)
-        whenever(networkProtectionWaitlist.getState()).thenReturn(InBeta(false))
 
-        proSettingNetPViewModel.onResume(mock())
+        proSettingNetPViewModel.onStart(mock())
 
         proSettingNetPViewModel.viewState.test {
             assertEquals(
@@ -176,12 +182,10 @@ class ProSettingNetPViewModelTest {
 
     @Test
     fun whenNetPStateIsInBetaAndConnectingThenNetPEntryStateShouldCorrectShowState() = runTest {
-        whenever(networkProtectionState.isRunning()).thenReturn(false)
         whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(CONNECTING))
-        whenever(networkProtectionState.isOnboarded()).thenReturn(false)
-        whenever(networkProtectionWaitlist.getState()).thenReturn(InBeta(true))
+        whenever(networkProtectionWaitlist.getStateFlow()).thenReturn(flowOf(InBeta(true)))
 
-        proSettingNetPViewModel.onResume(mock())
+        proSettingNetPViewModel.onStart(mock())
 
         proSettingNetPViewModel.viewState.test {
             assertEquals(
@@ -196,12 +200,11 @@ class ProSettingNetPViewModelTest {
 
     @Test
     fun whenNetPStateIsInBetaAndDisabledThenNetPEntryStateShouldCorrectShowState() = runTest {
-        whenever(networkProtectionState.isRunning()).thenReturn(false)
         whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(DISCONNECTED))
+        whenever(networkProtectionWaitlist.getStateFlow()).thenReturn(flowOf(InBeta(false)))
         whenever(networkProtectionState.isOnboarded()).thenReturn(true)
-        whenever(networkProtectionWaitlist.getState()).thenReturn(InBeta(false))
 
-        proSettingNetPViewModel.onResume(mock())
+        proSettingNetPViewModel.onStart(mock())
 
         proSettingNetPViewModel.viewState.test {
             assertEquals(

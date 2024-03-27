@@ -26,10 +26,6 @@ enum class SubscriptionPixel(
     private val baseName: String,
     private val types: Set<PixelType>,
 ) {
-    SETTINGS_SUBSCRIPTION_SECTION_SHOWN(
-        baseName = "m_privacy-pro_app-settings_privacy-pro-section_impression",
-        type = COUNT,
-    ),
     SUBSCRIPTION_ACTIVE(
         baseName = "m_privacy-pro_app_subscription_active",
         type = DAILY,
@@ -134,6 +130,10 @@ enum class SubscriptionPixel(
         baseName = "m_privacy-pro_app-settings_identity-theft-restoration_click",
         type = COUNT,
     ),
+    APP_SETTINGS_RESTORE_PURCHASE_CLICK(
+        baseName = "m_privacy-pro_app-settings_restore-purchase_click",
+        type = COUNT,
+    ),
     SUBSCRIPTION_SETTINGS_CHANGE_PLAN_OR_BILLING_CLICK(
         baseName = "m_privacy-pro_settings_change-plan-or-billing_click",
         type = COUNT,
@@ -142,9 +142,21 @@ enum class SubscriptionPixel(
         baseName = "m_privacy-pro_settings_remove-from-device_click",
         type = COUNT,
     ),
-    SUBSCRIPTION_IS_ENABLED(
-        baseName = "m_privacy-pro_is-enabled",
-        types = EnumSet.of(COUNT, DAILY),
+    SUBSCRIPTION_PRICE_MONTHLY_CLICK(
+        baseName = "m_privacy-pro_offer_monthly-price_click",
+        type = COUNT,
+    ),
+    SUBSCRIPTION_PRICE_YEARLY_CLICK(
+        baseName = "m_privacy-pro_offer_yearly-price_click",
+        type = COUNT,
+    ),
+    SUBSCRIPTION_ONBOARDING_FAQ_CLICK(
+        baseName = "m_privacy-pro_welcome_faq_click",
+        type = UNIQUE,
+    ),
+    SUBSCRIPTION_ADD_EMAIL_SUCCESS(
+        baseName = "m_privacy-pro_app_add-email_success",
+        type = UNIQUE,
     ),
     ;
 

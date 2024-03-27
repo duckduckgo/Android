@@ -66,6 +66,7 @@ class SubscriptionMessagingInterface @Inject constructor(
         SubscriptionsHandler(),
         GetSubscriptionMessage(subscriptionsManager, dispatcherProvider),
         SetSubscriptionMessage(subscriptionsManager, appCoroutineScope, dispatcherProvider, pixelSender, subscriptionsChecker),
+        InformationalEventsMessage(appCoroutineScope, pixelSender),
     )
 
     @JavascriptInterface
@@ -204,6 +205,7 @@ class SubscriptionMessagingInterface @Inject constructor(
                     subscriptionsChecker.runChecker()
                     pixelSender.reportRestoreUsingEmailSuccess()
                     pixelSender.reportSubscriptionActivated()
+                    jsMessageCallback?.process(featureName, jsMessage.method, jsMessage.id, jsMessage.params)
                 }
             } catch (e: Exception) {
                 logcat { "Error parsing the token" }
@@ -213,5 +215,42 @@ class SubscriptionMessagingInterface @Inject constructor(
         override val allowedDomains: List<String> = emptyList()
         override val featureName: String = "useSubscription"
         override val methods: List<String> = listOf("setSubscription")
+    }
+
+    private class InformationalEventsMessage(
+        @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+        private val pixelSender: SubscriptionPixelSender,
+    ) : JsMessageHandler {
+        override fun process(
+            jsMessage: JsMessage,
+            secret: String,
+            jsMessageCallback: JsMessageCallback?,
+        ) {
+            appCoroutineScope.launch {
+                when (jsMessage.method) {
+                    "subscriptionsMonthlyPriceClicked" -> pixelSender.reportMonthlyPriceClick()
+                    "subscriptionsYearlyPriceClicked" -> pixelSender.reportYearlyPriceClick()
+                    "subscriptionsAddEmailSuccess" -> pixelSender.reportAddEmailSuccess()
+                    "subscriptionsWelcomeAddEmailClicked",
+                    "subscriptionsWelcomeFaqClicked",
+                    -> {
+                        jsMessageCallback?.process(featureName, jsMessage.method, jsMessage.id, jsMessage.params)
+                    }
+
+                    else -> {} // no-op
+                }
+            }
+        }
+
+        override val allowedDomains: List<String> = emptyList()
+        override val featureName: String = "useSubscription"
+        override val methods: List<String> = listOf(
+            "subscriptionsMonthlyPriceClicked",
+            "subscriptionsYearlyPriceClicked",
+            "subscriptionsUnknownPriceClicked",
+            "subscriptionsAddEmailSuccess",
+            "subscriptionsWelcomeAddEmailClicked",
+            "subscriptionsWelcomeFaqClicked",
+        )
     }
 }

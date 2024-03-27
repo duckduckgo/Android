@@ -130,8 +130,8 @@
                 android:id="@+id/changeEnvironment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:primaryText="@string/netpEnvironmentSetting"
-                app:showSwitch="false"
+                app:primaryText="@string/netpStagingEnvironment"
+                app:showSwitch="true"
                 />
 
             <!-- Section PCAP -->
