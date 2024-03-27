@@ -152,8 +152,8 @@ class AutoCompleteApiTest {
 
         assertEquals(
             listOf(
-                AutoCompleteBookmarkSuggestion(phrase = "favexample.com", "title", "https://favexample.com"),
-                AutoCompleteBookmarkSuggestion(phrase = "favfoo.com", "title", "https://favfoo.com"),
+                AutoCompleteBookmarkSuggestion(phrase = "favexample.com", "title", "https://favexample.com", true),
+                AutoCompleteBookmarkSuggestion(phrase = "favfoo.com", "title", "https://favfoo.com", true),
             ),
             value.suggestions,
         )
@@ -197,11 +197,12 @@ class AutoCompleteApiTest {
 
         assertEquals(
             listOf(
-                AutoCompleteBookmarkSuggestion(phrase = "example.com", "title example", "https://example.com"),
+                AutoCompleteBookmarkSuggestion(phrase = "example.com", "title example", "https://example.com", true),
                 AutoCompleteBookmarkSuggestion(
                     phrase = "foo.com/path/to/foo",
                     "title foo",
                     "https://foo.com/path/to/foo",
+                    true,
                 ),
                 AutoCompleteSearchSuggestion(phrase = "foo.com", true),
                 AutoCompleteSearchSuggestion(phrase = "bar.com", true),
@@ -240,8 +241,8 @@ class AutoCompleteApiTest {
 
         assertEquals(
             listOf(
-                AutoCompleteBookmarkSuggestion(phrase = "favexample.com", "title", "https://favexample.com"),
-                AutoCompleteBookmarkSuggestion(phrase = "example.com", "title", "https://example.com"),
+                AutoCompleteBookmarkSuggestion(phrase = "favexample.com", "title", "https://favexample.com", true),
+                AutoCompleteBookmarkSuggestion(phrase = "example.com", "title", "https://example.com", false),
             ),
             value.suggestions,
         )
