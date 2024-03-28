@@ -42,6 +42,8 @@ class RealAppBuildConfig @Inject constructor(
             "internal" -> BuildFlavor.INTERNAL
             "fdroid" -> BuildFlavor.FDROID
             "play" -> BuildFlavor.PLAY
+            "default" -> BuildFlavor.PLAY
+            "nojs" -> BuildFlavor.PLAY
             else -> throw IllegalStateException("Unknown app flavor")
         }
     override val sdkInt: Int = Build.VERSION.SDK_INT
