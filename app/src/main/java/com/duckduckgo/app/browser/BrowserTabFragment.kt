@@ -549,6 +549,9 @@ class BrowserTabFragment :
     private val daxDialogIntroExperimentCta
         get() = binding.includeNewBrowserTab.includeDaxDialogIntroExperimentCta
 
+    private val daxDialogExperimentOnboardingCta
+        get() = binding.includeOnboardingDaxDialogExperiment
+
     private val smoothProgressAnimator by lazy { SmoothProgressAnimator(omnibar.pageLoadingIndicator) }
 
     // Optimization to prevent against excessive work generating WebView previews; an existing job will be cancelled if a new one is launched
@@ -1502,6 +1505,7 @@ class BrowserTabFragment :
             is Command.ShowSSLError -> showSSLWarning(it.handler, it.error)
             is Command.HideSSLError -> hideSSLWarning()
             is Command.LaunchScreen -> launchScreen(it.screen, it.payload)
+            is Command.DismissExperimentOnboardingDialog -> dismissOnboardingDaxDialog()
             else -> {
                 // NO OP
             }
@@ -2297,6 +2301,12 @@ class BrowserTabFragment :
 
     private fun setBrowserBackground(backgroundRes: Int) {
         newBrowserTab.browserBackground.setBackgroundResource(backgroundRes)
+    }
+
+    private fun dismissOnboardingDaxDialog() {
+        binding.overlayView.gone()
+        daxDialogExperimentOnboardingCta.daxCtaContainer.gone()
+        viewModel.onDaxDialogDismissed()
     }
 
     private fun configureWebViewForAutofill(it: DuckDuckGoWebView) {
@@ -3723,6 +3733,7 @@ class BrowserTabFragment :
                 is ExperimentDaxBubbleOptionsCta -> showDaxExperimentCta(configuration)
                 is BubbleCta -> showBubbleCta(configuration)
                 is DialogCta -> showDaxDialogCta(configuration)
+                is ExperimentOnboardingDaxDialogCta -> showExperimentDialogCta(configuration)
             }
             newBrowserTab.messageCta.gone()
         }
@@ -3787,6 +3798,17 @@ class BrowserTabFragment :
                 }
             }
             newBrowserTab.newTabLayout.setOnClickListener { daxDialogIntroExperimentCta.dialogTextCta.finishAnimation() }
+
+            viewModel.onCtaShown()
+        }
+
+        private fun showExperimentDialogCta(configuration: ExperimentOnboardingDaxDialogCta) {
+            hideHomeBackground()
+            hideHomeCta()
+            configuration.showOnboardingCta(binding) { viewModel.onUserClickCtaOkButton() }
+            binding.webViewContainer.setOnClickListener { daxDialogIntroExperimentCta.dialogTextCta.finishAnimation() }
+            binding.overlayView.show()
+            binding.overlayView.setOnTouchListener { _, _ -> true }
 
             viewModel.onCtaShown()
         }

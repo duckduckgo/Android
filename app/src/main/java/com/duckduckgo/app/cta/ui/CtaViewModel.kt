@@ -280,7 +280,7 @@ class CtaViewModel @Inject constructor(
             // Trackers blocked
             if (!daxDialogTrackersFoundShown() && !isSerpUrl(it.url) && it.orderedTrackerBlockedEntities().isNotEmpty()) {
                 return if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) {
-                    ExperimentOnboardingTrackersDaxDialogCta.DaxTrackersBlockedCta(
+                    ExperimentOnboardingDaxDialogCta.DaxTrackersBlockedCta(
                         onboardingStore,
                         appInstallStore,
                         it.orderedTrackerBlockedEntities(),

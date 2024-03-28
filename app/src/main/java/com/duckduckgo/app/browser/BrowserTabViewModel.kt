@@ -2433,6 +2433,7 @@ class BrowserTabViewModel @Inject constructor(
         command.value = when (cta) {
             is HomePanelCta.Survey -> LaunchSurvey(cta.survey)
             is HomePanelCta.AddWidgetAuto, is HomePanelCta.AddWidgetInstructions -> LaunchAddWidget
+            is ExperimentOnboardingDaxDialogCta -> DismissExperimentOnboardingDialog
             else -> return
         }
     }

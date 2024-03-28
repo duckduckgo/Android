@@ -23,6 +23,7 @@ import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
@@ -193,6 +194,10 @@ sealed class ExperimentDaxBubbleOptionsCta(
     }
 }
 
+interface ExperimentDaxCta {
+    fun showOnboardingCta(binding: FragmentBrowserTabBinding, onPrimaryCtaClicked: () -> Unit)
+}
+
 sealed class ExperimentOnboardingDaxDialogCta(
     override val ctaId: CtaId,
     @StringRes open val description: Int?,
@@ -203,17 +208,7 @@ sealed class ExperimentOnboardingDaxDialogCta(
     override var ctaPixelParam: String,
     override val onboardingStore: OnboardingStore,
     override val appInstallStore: AppInstallStore,
-) : Cta, ViewCta, DaxCta {
-
-    override fun showCta(view: View) {
-        val daxText = description?.let { view.context.getString(it) }.orEmpty()
-        val buttonText = view.context.getString(buttonText)
-        view.show()
-        view.alpha = 1f
-        view.findViewById<DaxButton>(R.id.primaryCta).text = buttonText
-        view.findViewById<DaxTextView>(R.id.hiddenTextCta).text = daxText.html(view.context)
-        view.findViewById<TypeAnimationTextView>(R.id.dialogTextCta).startTypingAnimation(daxText, true)
-    }
+) : Cta, ExperimentDaxCta, DaxCta {
 
     override fun pixelCancelParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
 
@@ -234,7 +229,20 @@ sealed class ExperimentOnboardingDaxDialogCta(
         Pixel.PixelValues.DAX_SERP_CTA,
         onboardingStore,
         appInstallStore,
-    )
+    ) {
+        override fun showOnboardingCta(binding: FragmentBrowserTabBinding, onPrimaryCtaClicked: () -> Unit) {
+            val context = binding.root.context
+            val daxDialog = binding.includeOnboardingDaxDialogExperiment
+            val daxText = description?.let { context.getString(it) }.orEmpty()
+            val buttonText = context.getString(buttonText)
+            daxDialog.root.show()
+            daxDialog.root.alpha = 1f
+            daxDialog.primaryCta.text = buttonText
+            daxDialog.primaryCta.setOnClickListener { onPrimaryCtaClicked.invoke() }
+            daxDialog.hiddenTextCta.text = daxText.html(context)
+            daxDialog.dialogTextCta.startTypingAnimation(daxText, true)
+        }
+    }
 
     class DaxFireButtonCta(
         override val onboardingStore: OnboardingStore,
@@ -249,68 +257,29 @@ sealed class ExperimentOnboardingDaxDialogCta(
         Pixel.PixelValues.DAX_FIRE_DIALOG_CTA,
         onboardingStore,
         appInstallStore,
-    )
-}
-
-sealed class ExperimentOnboardingTrackersDaxDialogCta(
-    override val ctaId: CtaId,
-    open val trackers: List<Entity>,
-    @StringRes open val buttonText: Int,
-    override val shownPixel: Pixel.PixelName?,
-    override val okPixel: Pixel.PixelName?,
-    override val cancelPixel: Pixel.PixelName?,
-    override var ctaPixelParam: String,
-    override val onboardingStore: OnboardingStore,
-    override val appInstallStore: AppInstallStore,
-) : Cta, ViewCta, DaxCta {
-
-    override fun showCta(view: View) {
-        val daxText = getTrackersDescription(view.context, trackers)
-        val buttonText = view.context.getString(buttonText)
-        view.show()
-        view.alpha = 1f
-        view.findViewById<DaxButton>(R.id.primaryCta).text = buttonText
-        view.findViewById<DaxTextView>(R.id.hiddenTextCta).text = daxText.html(view.context)
-        view.findViewById<TypeAnimationTextView>(R.id.dialogTextCta).startTypingAnimation(daxText, true)
-    }
-
-    private fun getTrackersDescription(
-        context: Context,
-        trackersEntities: List<Entity>,
-    ): String {
-        val trackers = trackersEntities
-            .map { it.displayName }
-            .distinct()
-
-        val trackersFiltered = trackers.take(MAX_TRACKERS_SHOWS)
-        val trackersText = trackersFiltered.joinToString(", ")
-        val size = trackers.size - trackersFiltered.size
-        val quantityString =
-            if (size == 0) {
-                context.resources.getQuantityString(R.plurals.onboardingTrackersBlockedZeroDialogDescription, trackersFiltered.size)
-            } else {
-                context.resources.getQuantityString(R.plurals.onboardingTrackersBlockedDialogDescription, size, size)
-            }
-        return "<b>$trackersText</b>$quantityString"
-    }
-
-    override fun pixelCancelParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
-
-    override fun pixelOkParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
-
-    override fun pixelShownParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to addCtaToHistory(ctaPixelParam))
-
-    companion object {
-        private const val MAX_TRACKERS_SHOWS = 2
+    ) {
+        override fun showOnboardingCta(binding: FragmentBrowserTabBinding, onPrimaryCtaClicked: () -> Unit) {
+            val context = binding.root.context
+            val daxDialog = binding.includeOnboardingDaxDialogExperiment
+            val daxText = description?.let { context.getString(it) }.orEmpty()
+            val buttonText = context.getString(buttonText)
+            daxDialog.root.show()
+            daxDialog.root.alpha = 1f
+            daxDialog.primaryCta.text = buttonText
+            daxDialog.primaryCta.setOnClickListener { onPrimaryCtaClicked.invoke() }
+            daxDialog.hiddenTextCta.text = daxText.html(context)
+            daxDialog.dialogTextCta.startTypingAnimation(daxText, true)
+            // TODO add fire button highlight
+        }
     }
 
     class DaxTrackersBlockedCta(
         override val onboardingStore: OnboardingStore,
         override val appInstallStore: AppInstallStore,
-        override val trackers: List<Entity>,
-    ) : ExperimentOnboardingTrackersDaxDialogCta(
+        val trackers: List<Entity>,
+    ) : ExperimentOnboardingDaxDialogCta(
         CtaId.DAX_DIALOG_TRACKERS_FOUND,
-        trackers,
+        null,
         R.string.onboardingTrackersBlockedDaxDialogButton,
         AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
@@ -318,5 +287,44 @@ sealed class ExperimentOnboardingTrackersDaxDialogCta(
         Pixel.PixelValues.DAX_TRACKERS_BLOCKED_CTA,
         onboardingStore,
         appInstallStore,
-    )
+    ) {
+        override fun showOnboardingCta(binding: FragmentBrowserTabBinding, onPrimaryCtaClicked: () -> Unit) {
+            val context = binding.root.context
+            val daxDialog = binding.includeOnboardingDaxDialogExperiment
+            val daxText = getTrackersDescription(context, trackers)
+            val buttonText = context.getString(buttonText)
+            daxDialog.root.show()
+            daxDialog.root.alpha = 1f
+            daxDialog.primaryCta.text = buttonText
+            daxDialog.primaryCta.setOnClickListener { onPrimaryCtaClicked.invoke() }
+            daxDialog.hiddenTextCta.text = daxText.html(context)
+            daxDialog.dialogTextCta.startTypingAnimation(daxText, true)
+
+            // TODO add privacyShield highlight
+        }
+
+        private fun getTrackersDescription(
+            context: Context,
+            trackersEntities: List<Entity>,
+        ): String {
+            val trackers = trackersEntities
+                .map { it.displayName }
+                .distinct()
+
+            val trackersFiltered = trackers.take(MAX_TRACKERS_SHOWS)
+            val trackersText = trackersFiltered.joinToString(", ")
+            val size = trackers.size - trackersFiltered.size
+            val quantityString =
+                if (size == 0) {
+                    context.resources.getQuantityString(R.plurals.onboardingTrackersBlockedZeroDialogDescription, trackersFiltered.size)
+                } else {
+                    context.resources.getQuantityString(R.plurals.onboardingTrackersBlockedDialogDescription, size, size)
+                }
+            return "<b>$trackersText</b>$quantityString"
+        }
+    }
+
+    companion object {
+        private const val MAX_TRACKERS_SHOWS = 2
+    }
 }

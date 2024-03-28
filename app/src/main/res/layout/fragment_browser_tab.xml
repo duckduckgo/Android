@@ -84,9 +84,8 @@
             android:layout_height="match_parent">
 
             <LinearLayout
-                android:id="@+id/backgroundWebViewNoe"
                 android:layout_width="match_parent"
-                android:layout_height="300dp"
+                android:layout_height="wrap_content"
                 android:orientation="vertical">
 
                 <include
@@ -104,6 +103,14 @@
                         android:layout_height="match_parent"
                         app:layout_behavior="@string/appbar_scrolling_view_behavior"
                         tools:background="#4F00" />
+
+                    <!-- Semi-transparent overlay -->
+                    <View
+                        android:id="@+id/overlayView"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="#80000000"
+                        android:visibility="gone" />
 
                     <include
                         android:id="@+id/includeErrorView"
