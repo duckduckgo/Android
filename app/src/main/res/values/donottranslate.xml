@@ -66,4 +66,18 @@
     <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
     <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
     <string name="onboardingSitesDaxDialogOption4">Surprise me!</string>
+    <string name="onboardingSerpDaxDialogDescription">That’s DuckDuckGo Search. Private. Fast. Fewer ads.</string>
+    <string name="onboardingSerpDaxDialogButton">High Five!</string>
+    <plurals name="onboardingTrackersBlockedDialogDescription">
+        <item quantity="one" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 1 other..."><![CDATA[&#160;and <b>%1$d other</b> were trying to track you here. <br/><br/>I blocked them!<br/><br/>☝️ Tap the shield on any site to see who\'s trying to track you there.️]]></item>
+        <item quantity="other" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 3 others..."><![CDATA[&#160;and <b>%1$d others</b> were trying to track you here. <br/><br/>I blocked them!<br/><br/>☝️ Tap the shield on any site to see who\'s trying to track you there.️]]></item>
+    </plurals>
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one" instruction="This sentence is preceded by the name of a company, i.e. Facebook was trying to track..."><![CDATA[&#160;was trying to track you here. <br/><br/>I blocked them!<br/><br/>☝️ Tap the shield on any site to see who\'s trying to track you there.️]]></item>
+        <item quantity="other" instruction="This sentence is preceded by the name of several companies, i.e. Facebook and Google were trying to track..."><![CDATA[&#160;were trying to track you here. <br/><br/>I blocked them!<br/><br/>☝️ Tap the shield on any site to see who\'s trying to track you there.️]]></item>
+    </plurals>
+    <string name="onboardingTrackersBlockedDaxDialogButton">Got It!</string>
+    <string name="onboardingFireButtonDaxDialogDescription">Personal data can build up in your browser. Yuck.\n\nUse the Fire Button to burn it all away. Give it a try now! ☝️</string>
+    <string name="onboardingFireButtonDaxDialogButton">Not Now</string>
+
 </resources>

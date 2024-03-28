@@ -83,23 +83,34 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <FrameLayout
+            <LinearLayout
+                android:id="@+id/backgroundWebViewNoe"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <FrameLayout
-                    android:id="@+id/webViewContainer"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-                    tools:background="#4F00" />
+                android:layout_height="300dp"
+                android:orientation="vertical">
 
                 <include
-                    android:id="@+id/includeErrorView"
-                    layout="@layout/include_error_view"
+                    android:id="@+id/includeOnboardingDaxDialogExperiment"
+                    layout="@layout/include_experiment_view_dax_dialog"
                     android:visibility="gone" />
 
-            </FrameLayout>
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <FrameLayout
+                        android:id="@+id/webViewContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                        tools:background="#4F00" />
+
+                    <include
+                        android:id="@+id/includeErrorView"
+                        layout="@layout/include_error_view"
+                        android:visibility="gone" />
+                </FrameLayout>
+            </LinearLayout>
         </com.duckduckgo.app.browser.ui.ScrollAwareRefreshLayout>
 
         <View
