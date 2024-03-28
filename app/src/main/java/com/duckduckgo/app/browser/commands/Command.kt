@@ -35,6 +35,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.survey.model.Survey
+import com.duckduckgo.autofill.api.AutofillUrlRequest
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -184,24 +185,19 @@ sealed class Command {
     object ChildTabClosed : Command()
 
     class CopyAliasToClipboard(val alias: String) : Command()
-    class InjectEmailAddress(
-        val duckAddress: String,
-        val originalUrl: String,
-        val autoSaveLogin: Boolean,
+    class ShowEmailProtectionChooseEmailPrompt(
+        val address: String,
+        val autofillUrlRequest: AutofillUrlRequest,
     ) : Command()
 
-    class ShowEmailProtectionChooseEmailPrompt(val address: String) : Command()
-    object ShowEmailProtectionInContextSignUpPrompt : Command()
+    object NotifyAutofillPageChanged : Command()
     sealed class DaxCommand : Command() {
         object FinishPartialTrackerAnimation : DaxCommand()
         class HideDaxDialog(val cta: Cta) : DaxCommand()
     }
-
-    class CancelIncomingAutofillRequest(val url: String) : Command()
     object LaunchAutofillSettings : Command()
     class EditWithSelectedQuery(val query: String) : Command()
     class ShowBackNavigationHistory(val history: List<NavigationHistoryEntry>) : Command()
-    object EmailSignEvent : Command()
     class ShowSitePermissionsDialog(
         val permissionsToRequest: SitePermissions,
         val request: PermissionRequest,

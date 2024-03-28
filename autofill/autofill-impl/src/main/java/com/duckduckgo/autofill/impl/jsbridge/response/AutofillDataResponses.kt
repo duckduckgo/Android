@@ -44,6 +44,10 @@ data class RejectGeneratedPasswordResponse(
     data class RejectGeneratedPassword(val action: String = "rejectGeneratedPassword")
 }
 
+data class EmailProtectionSignedInResponse(
+    val success: Boolean,
+)
+
 data class EmptyResponse(
     val type: String = "getAutofillDataResponse",
     val success: EmptyCredentialResponse,

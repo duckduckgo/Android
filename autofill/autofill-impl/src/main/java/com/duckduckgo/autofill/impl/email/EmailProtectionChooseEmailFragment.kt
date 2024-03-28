@@ -16,14 +16,19 @@
 
 package com.duckduckgo.autofill.impl.email
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.DialogInterface
+import android.os.Build
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.setFragmentResult
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.autofill.api.AutofillUrlRequest
 import com.duckduckgo.autofill.api.EmailProtectionChooseEmailDialog
 import com.duckduckgo.autofill.api.EmailProtectionChooseEmailDialog.UseEmailResultType
 import com.duckduckgo.autofill.impl.R
@@ -34,10 +39,14 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
+import javax.inject.Inject
 import timber.log.Timber
 
 @InjectWith(FragmentScope::class)
 class EmailProtectionChooseEmailFragment : BottomSheetDialogFragment(), EmailProtectionChooseEmailDialog {
+
+    @Inject
+    lateinit var appBuildConfig: AppBuildConfig
 
     override fun getTheme(): Int = R.style.AutofillBottomSheetDialogTheme
 
@@ -89,7 +98,7 @@ class EmailProtectionChooseEmailFragment : BottomSheetDialogFragment(), EmailPro
         Timber.v("User action: %s", resultType::class.java.simpleName)
 
         val result = Bundle().also {
-            it.putString(EmailProtectionChooseEmailDialog.KEY_URL, getOriginalUrl())
+            it.putParcelable(EmailProtectionChooseEmailDialog.KEY_URL, getOriginalUrl())
             it.putParcelable(EmailProtectionChooseEmailDialog.KEY_RESULT, resultType)
         }
 
@@ -109,19 +118,19 @@ class EmailProtectionChooseEmailFragment : BottomSheetDialogFragment(), EmailPro
     }
 
     private fun getPersonalAddress() = arguments?.getString(KEY_ADDRESS)!!
-    private fun getOriginalUrl() = arguments?.getString(EmailProtectionChooseEmailDialog.KEY_URL)!!
+    private fun getOriginalUrl() = arguments?.safeGetParcelable<AutofillUrlRequest>(EmailProtectionChooseEmailDialog.KEY_URL)!!
     private fun getTabId() = arguments?.getString(KEY_TAB_ID)!!
 
     companion object {
         fun instance(
             personalDuckAddress: String,
-            url: String,
+            url: AutofillUrlRequest,
             tabId: String,
         ): EmailProtectionChooseEmailFragment {
             val fragment = EmailProtectionChooseEmailFragment()
             fragment.arguments = Bundle().also {
                 it.putString(KEY_ADDRESS, personalDuckAddress)
-                it.putString(EmailProtectionChooseEmailDialog.KEY_URL, url)
+                it.putParcelable(EmailProtectionChooseEmailDialog.KEY_URL, url)
                 it.putString(KEY_TAB_ID, tabId)
             }
             return fragment
@@ -130,4 +139,13 @@ class EmailProtectionChooseEmailFragment : BottomSheetDialogFragment(), EmailPro
         private const val KEY_TAB_ID = "tabId"
         private const val KEY_ADDRESS = "address"
     }
+
+    @Suppress("DEPRECATION")
+    @SuppressLint("NewApi")
+    private inline fun <reified T : Parcelable> Bundle.safeGetParcelable(key: String) =
+        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.TIRAMISU) {
+            getParcelable(key, T::class.java)
+        } else {
+            getParcelable(key)
+        }
 }

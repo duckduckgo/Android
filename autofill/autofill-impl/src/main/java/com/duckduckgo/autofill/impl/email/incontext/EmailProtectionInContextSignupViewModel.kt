@@ -23,6 +23,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignupViewModel.BackButtonAction.NavigateBack
 import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignupViewModel.Companion.Urls.CHOOSE_ADDRESS
 import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignupViewModel.Companion.Urls.DEFAULT_URL_ACTIONS
+import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignupViewModel.Companion.Urls.EMAIL_SETTINGS_URL
 import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignupViewModel.Companion.Urls.EMAIL_VERIFICATION_LINK_URL
 import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignupViewModel.Companion.Urls.IN_CONTEXT_SUCCESS
 import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignupViewModel.Companion.Urls.REVIEW_INPUT
@@ -115,10 +116,10 @@ class EmailProtectionInContextSignupViewModel @Inject constructor(
     ) {
         Timber.i("Now signed in: %s. Current URL is %s", signedIn, url)
 
-        if (!signedIn) return
+        if (!signedIn || url == null) return
 
-        if (url?.contains(EMAIL_VERIFICATION_LINK_URL) == true) {
-            Timber.d("Detected email verification link")
+        if (url.contains(EMAIL_VERIFICATION_LINK_URL) || url.contains(EMAIL_SETTINGS_URL)) {
+            Timber.d("Detected email verification link or signed in state")
             _viewState.value = ExitingAsSuccess
         }
     }
@@ -168,6 +169,7 @@ class EmailProtectionInContextSignupViewModel @Inject constructor(
             const val IN_CONTEXT_SUCCESS = "https://duckduckgo.com/email/welcome-incontext"
 
             const val EMAIL_VERIFICATION_LINK_URL = "https://duckduckgo.com/email/login?"
+            const val EMAIL_SETTINGS_URL = "https://duckduckgo.com/email/settings"
 
             val DEFAULT_URL_ACTIONS = UrlActions(backButton = NavigateBack, exitButton = ExitWithoutConfirmation)
         }

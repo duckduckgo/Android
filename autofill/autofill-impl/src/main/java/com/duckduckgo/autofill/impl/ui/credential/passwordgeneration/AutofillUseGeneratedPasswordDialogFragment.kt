@@ -16,11 +16,14 @@
 
 package com.duckduckgo.autofill.impl.ui.credential.passwordgeneration
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.DialogInterface
 import android.graphics.Rect
+import android.os.Build
 import android.os.Build.VERSION_CODES
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.TouchDelegate
 import android.view.View
@@ -30,6 +33,7 @@ import androidx.fragment.app.setFragmentResult
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.autofill.api.AutofillUrlRequest
 import com.duckduckgo.autofill.api.UseGeneratedPasswordDialog
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ContentAutofillGeneratePasswordDialogBinding
@@ -99,9 +103,9 @@ class AutofillUseGeneratedPasswordDialogFragment : BottomSheetDialogFragment(), 
 
     private fun configureViews(binding: ContentAutofillGeneratePasswordDialogBinding) {
         (dialog as BottomSheetDialog).behavior.state = BottomSheetBehavior.STATE_EXPANDED
-        val originalUrl = getOriginalUrl()
+        val autofillUrlRequest = getAutofillUrlRequest()
         configureCloseButton(binding)
-        configureGeneratePasswordButton(binding, originalUrl)
+        configureGeneratePasswordButton(binding, autofillUrlRequest)
         configurePasswordField(binding)
     }
 
@@ -142,13 +146,13 @@ class AutofillUseGeneratedPasswordDialogFragment : BottomSheetDialogFragment(), 
 
     private fun configureGeneratePasswordButton(
         binding: ContentAutofillGeneratePasswordDialogBinding,
-        originalUrl: String,
+        autofillUrlRequest: AutofillUrlRequest,
     ) {
         binding.useSecurePasswordButton.setOnClickListener {
             pixelNameDialogEvent(GeneratedPasswordAccepted)?.let { pixel.fire(it) }
 
             val result = Bundle().also {
-                it.putString(UseGeneratedPasswordDialog.KEY_URL, originalUrl)
+                it.putParcelable(UseGeneratedPasswordDialog.KEY_URL, autofillUrlRequest)
                 it.putBoolean(UseGeneratedPasswordDialog.KEY_ACCEPTED, true)
                 it.putString(UseGeneratedPasswordDialog.KEY_USERNAME, getUsername())
                 it.putString(UseGeneratedPasswordDialog.KEY_PASSWORD, getGeneratedPassword())
@@ -177,7 +181,7 @@ class AutofillUseGeneratedPasswordDialogFragment : BottomSheetDialogFragment(), 
 
         val result = Bundle().also {
             it.putBoolean(UseGeneratedPasswordDialog.KEY_ACCEPTED, false)
-            it.putString(UseGeneratedPasswordDialog.KEY_URL, getOriginalUrl())
+            it.putParcelable(UseGeneratedPasswordDialog.KEY_URL, getAutofillUrlRequest())
         }
 
         parentFragment?.setFragmentResult(UseGeneratedPasswordDialog.resultKey(getTabId()), result)
@@ -202,7 +206,7 @@ class AutofillUseGeneratedPasswordDialogFragment : BottomSheetDialogFragment(), 
         object GeneratedPasswordAccepted : DialogEvent
     }
 
-    private fun getOriginalUrl() = arguments?.getString(UseGeneratedPasswordDialog.KEY_URL)!!
+    private fun getAutofillUrlRequest() = arguments?.safeGetParcelable<AutofillUrlRequest>(UseGeneratedPasswordDialog.KEY_URL)!!
     private fun getUsername() = arguments?.getString(UseGeneratedPasswordDialog.KEY_USERNAME)
     private fun getGeneratedPassword() = arguments?.getString(UseGeneratedPasswordDialog.KEY_PASSWORD)!!
     private fun getTabId() = arguments?.getString(UseGeneratedPasswordDialog.KEY_TAB_ID)!!
@@ -210,7 +214,7 @@ class AutofillUseGeneratedPasswordDialogFragment : BottomSheetDialogFragment(), 
     companion object {
 
         fun instance(
-            url: String,
+            autofillUrlRequest: AutofillUrlRequest,
             username: String?,
             generatedPassword: String,
             tabId: String,
@@ -218,7 +222,7 @@ class AutofillUseGeneratedPasswordDialogFragment : BottomSheetDialogFragment(), 
             val fragment = AutofillUseGeneratedPasswordDialogFragment()
             fragment.arguments =
                 Bundle().also {
-                    it.putString(UseGeneratedPasswordDialog.KEY_URL, url)
+                    it.putParcelable(UseGeneratedPasswordDialog.KEY_URL, autofillUrlRequest)
                     it.putString(UseGeneratedPasswordDialog.KEY_USERNAME, username)
                     it.putString(UseGeneratedPasswordDialog.KEY_PASSWORD, generatedPassword)
                     it.putString(UseGeneratedPasswordDialog.KEY_TAB_ID, tabId)
@@ -226,4 +230,13 @@ class AutofillUseGeneratedPasswordDialogFragment : BottomSheetDialogFragment(), 
             return fragment
         }
     }
+
+    @Suppress("DEPRECATION")
+    @SuppressLint("NewApi")
+    private inline fun <reified T : Parcelable> Bundle.safeGetParcelable(key: String) =
+        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.TIRAMISU) {
+            getParcelable(key, T::class.java)
+        } else {
+            getParcelable(key)
+        }
 }

@@ -17,48 +17,35 @@
 package com.duckduckgo.autofill.impl.jsbridge
 
 import android.annotation.SuppressLint
-import android.webkit.WebView
-import androidx.core.net.toUri
-import androidx.webkit.WebMessageCompat
-import androidx.webkit.WebViewCompat
-import androidx.webkit.WebViewFeature
-import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.autofill.impl.configuration.integration.modern.listener.AutofillWebMessageListener
+import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
 import javax.inject.Inject
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 interface AutofillMessagePoster {
+
     suspend fun postMessage(
-        webView: WebView?,
         message: String,
+        requestId: String,
     )
 }
 
-@ContributesBinding(AppScope::class)
+@SuppressLint("RequiresFeature")
+@SingleInstanceIn(FragmentScope::class)
+@ContributesBinding(FragmentScope::class)
 class AutofillWebViewMessagePoster @Inject constructor(
-    private val dispatchers: DispatcherProvider,
+    private val webMessageListeners: PluginPoint<AutofillWebMessageListener>,
 ) : AutofillMessagePoster {
 
-    @SuppressLint("RequiresFeature")
     override suspend fun postMessage(
-        webView: WebView?,
         message: String,
+        requestId: String,
     ) {
-        webView?.let { wv ->
-            withContext(dispatchers.main()) {
-                if (!WebViewFeature.isFeatureSupported(WebViewFeature.POST_WEB_MESSAGE)) {
-                    Timber.e("Unable to post web message")
-                    return@withContext
-                }
-
-                WebViewCompat.postWebMessage(wv, WebMessageCompat(message), WILDCARD_ORIGIN_URL)
-            }
+        webMessageListeners.getPlugins().firstOrNull { it.onResponse(message, requestId) } ?: {
+            Timber.w("No listener found for requestId: $requestId")
         }
-    }
-
-    companion object {
-        private val WILDCARD_ORIGIN_URL = "*".toUri()
     }
 }

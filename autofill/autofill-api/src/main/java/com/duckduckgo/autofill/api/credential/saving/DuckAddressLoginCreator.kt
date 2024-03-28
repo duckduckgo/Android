@@ -16,6 +16,8 @@
 
 package com.duckduckgo.autofill.api.credential.saving
 
+import com.duckduckgo.autofill.api.AutofillUrlRequest
+
 /**
  * Allows for the creation of a login when a private duck address alias is used
  */
@@ -30,6 +32,6 @@ interface DuckAddressLoginCreator {
     fun createLoginForPrivateDuckAddress(
         duckAddress: String,
         tabId: String,
-        originalUrl: String,
+        autofillUrlRequest: AutofillUrlRequest,
     )
 }

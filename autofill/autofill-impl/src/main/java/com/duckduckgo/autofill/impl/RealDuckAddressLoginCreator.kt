@@ -17,25 +17,25 @@
 package com.duckduckgo.autofill.impl
 
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.autofill.api.AutofillCapabilityChecker
+import com.duckduckgo.autofill.api.AutofillUrlRequest
 import com.duckduckgo.autofill.api.credential.saving.DuckAddressLoginCreator
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-@ContributesBinding(FragmentScope::class)
+@ContributesBinding(AppScope::class)
 class RealDuckAddressLoginCreator @Inject constructor(
     private val autofillStore: InternalAutofillStore,
     private val autoSavedLoginsMonitor: AutomaticSavedLoginsMonitor,
-    private val autofillCapabilityChecker: AutofillCapabilityChecker,
+    private val autofillCapabilityChecker: InternalAutofillCapabilityChecker,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
     private val neverSavedSiteRepository: NeverSavedSiteRepository,
@@ -44,21 +44,21 @@ class RealDuckAddressLoginCreator @Inject constructor(
     override fun createLoginForPrivateDuckAddress(
         duckAddress: String,
         tabId: String,
-        originalUrl: String,
+        autofillUrlRequest: AutofillUrlRequest,
     ) {
         appCoroutineScope.launch(dispatchers.io()) {
-            if (!canCreateLoginForThisSite(originalUrl)) {
+            if (!canCreateLoginForThisSite(autofillUrlRequest.requestOrigin)) {
                 return@launch
             }
 
             val autologinId = autoSavedLoginsMonitor.getAutoSavedLoginId(tabId)
             if (autologinId == null) {
-                saveDuckAddressForCurrentSite(duckAddress = duckAddress, tabId = tabId, url = originalUrl)
+                saveDuckAddressForCurrentSite(duckAddress = duckAddress, tabId = tabId, url = autofillUrlRequest.requestOrigin)
             } else {
                 val existingAutoSavedLogin = autofillStore.getCredentialsWithId(autologinId)
                 if (existingAutoSavedLogin == null) {
                     Timber.w("Can't find saved login with autosavedLoginId: $autologinId")
-                    saveDuckAddressForCurrentSite(duckAddress = duckAddress, tabId = tabId, url = originalUrl)
+                    saveDuckAddressForCurrentSite(duckAddress = duckAddress, tabId = tabId, url = autofillUrlRequest.requestOrigin)
                 } else {
                     updateUsernameIfDifferent(existingAutoSavedLogin, duckAddress)
                 }

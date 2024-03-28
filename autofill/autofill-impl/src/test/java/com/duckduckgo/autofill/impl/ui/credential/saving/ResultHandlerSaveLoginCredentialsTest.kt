@@ -22,6 +22,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.AutofillEventListener
+import com.duckduckgo.autofill.api.AutofillUrlRequest
 import com.duckduckgo.autofill.api.CredentialSavePickerDialog
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
@@ -108,7 +109,9 @@ class ResultHandlerSaveLoginCredentialsTest {
         credentials: LoginCredentials?,
     ): Bundle {
         return Bundle().also {
-            it.putString(CredentialSavePickerDialog.KEY_URL, url)
+            if (url != null) {
+                it.putParcelable(CredentialSavePickerDialog.KEY_URL, AutofillUrlRequest(url, url, ""))
+            }
             it.putParcelable(CredentialSavePickerDialog.KEY_CREDENTIALS, credentials)
         }
     }
