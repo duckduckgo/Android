@@ -10267,16 +10267,6 @@
         ];
         elementToReplace.style.setProperty('display', 'none', 'important');
 
-        // When iframes are blocked by the declarativeNetRequest API, they are
-        // collapsed (hidden) automatically. Unfortunately however, there's a bug
-        // that stops them from being uncollapsed (shown again) if they are removed
-        // from the DOM after they are collapsed. As a workaround, have the iframe
-        // load a benign data URI, so that it's uncollapsed, before removing it from
-        // the DOM. See https://crbug.com/1428971
-        const originalSrc = elementToReplace.src || elementToReplace.getAttribute('data-src');
-        elementToReplace.src =
-            'data:text/plain;charset=utf-8;base64,' + btoa('https://crbug.com/1428971');
-
         // Add the placeholder element to the page.
         elementToReplace.parentElement.insertBefore(
             placeholderElement, elementToReplace
@@ -10296,7 +10286,6 @@
             // placeholder) can finally be removed from the DOM.
             elementToReplace.remove();
             elementToReplace.style.setProperty('display', ...originalDisplay);
-            elementToReplace.src = originalSrc;
         });
     }
 
