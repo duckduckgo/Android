@@ -82,7 +82,7 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.resetNetPEasterEggCounter()
+        viewModel.resetEasterEggCounter()
     }
 
     private fun configureClickableLinks() {
@@ -194,7 +194,6 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
             is Command.LaunchBrowserWithLearnMoreUrl -> launchBrowserScreen()
             is Command.LaunchWebViewWithPrivacyPolicyUrl -> launchWebViewScreen()
             is Command.LaunchBrowserWithPrivacyProtectionsUrl -> launchPrivacyProtectionsScreen()
-            is Command.ShowNetPUnlockedSnackbar -> showNetPUnlockedSnackbar()
             is Command.LaunchNetPWaitlist -> launchNetPWaitlist()
             is Command.LaunchFeedback -> launchFeedback()
         }
@@ -223,17 +222,6 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
                 screenTitle = getString(R.string.settingsAboutDuckduckgo),
             ),
         )
-    }
-
-    private fun showNetPUnlockedSnackbar() {
-        Snackbar.make(
-            binding.root,
-            R.string.netpUnlockedSnackbar,
-            Snackbar.LENGTH_LONG,
-        ).setAction(R.string.netpUnlockedSnackbarAction) {
-            viewModel.onNetPUnlockedActionClicked()
-        }.setDuration(3500) // LENGTH_LONG is not long enough, increase to 3.5 sec
-            .show()
     }
 
     private fun launchFeedback() {

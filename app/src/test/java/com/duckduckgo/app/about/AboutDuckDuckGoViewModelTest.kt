@@ -24,9 +24,6 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist
-import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.NotUnlocked
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -56,21 +53,14 @@ internal class AboutDuckDuckGoViewModelTest {
     @Mock
     private lateinit var mockPixel: Pixel
 
-    @Mock
-    private lateinit var networkProtectionWaitlist: NetworkProtectionWaitlist
-
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
 
         whenever(mockAppBuildConfig.versionName).thenReturn("name")
         whenever(mockAppBuildConfig.versionCode).thenReturn(1)
-        runBlocking {
-            whenever(networkProtectionWaitlist.getState()).thenReturn(NotUnlocked)
-        }
 
         testee = AboutDuckDuckGoViewModel(
-            networkProtectionWaitlist,
             mockAppBuildConfig,
             mockPixel,
         )
@@ -138,7 +128,7 @@ internal class AboutDuckDuckGoViewModelTest {
                 testee.onVersionClicked()
             }
 
-            assertTrue(testee.hasResetNetPEasterEggCounter())
+            assertTrue(testee.hasResetEasterEggCounter())
             verify(mockPixel).fire(AppPixelName.SETTINGS_ABOUT_DDG_VERSION_EASTER_EGG_PRESSED)
 
             cancelAndConsumeRemainingEvents()
@@ -160,10 +150,10 @@ internal class AboutDuckDuckGoViewModelTest {
     @Test
     fun whenResetNetPEasterEggCounterIsCalledThenEasterEggCounterIsZero() = runTest {
         testee.onVersionClicked()
-        assertFalse(testee.hasResetNetPEasterEggCounter())
+        assertFalse(testee.hasResetEasterEggCounter())
 
-        testee.resetNetPEasterEggCounter()
+        testee.resetEasterEggCounter()
 
-        assertTrue(testee.hasResetNetPEasterEggCounter())
+        assertTrue(testee.hasResetEasterEggCounter())
     }
 }
