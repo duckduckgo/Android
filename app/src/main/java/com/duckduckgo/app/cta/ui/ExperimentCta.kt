@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.cta.ui
 
+import android.content.Context
 import android.view.View
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -28,6 +29,7 @@ import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.experiment.OnboardingExperimentPixel.PixelName
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.view.TypeAnimationTextView
 import com.duckduckgo.common.ui.view.button.DaxButton
 import com.duckduckgo.common.ui.view.show
@@ -117,76 +119,204 @@ sealed class ExperimentDaxBubbleOptionsCta(
         onboardingStore,
         appInstallStore,
     )
-}
 
-data class DaxDialogIntroOption(
-    @StringRes val textRes: Int,
-    @DrawableRes val iconRes: Int,
-    val link: String,
-    val pixel: PixelName,
-) {
-    fun setOptionView(buttonView: DaxButton) {
-        buttonView.apply {
-            text = this.context.getString(textRes)
-            icon = ContextCompat.getDrawable(this.context, iconRes)
+    data class DaxDialogIntroOption(
+        @StringRes val textRes: Int,
+        @DrawableRes val iconRes: Int,
+        val link: String,
+        val pixel: PixelName,
+    ) {
+        fun setOptionView(buttonView: DaxButton) {
+            buttonView.apply {
+                text = this.context.getString(textRes)
+                icon = ContextCompat.getDrawable(this.context, iconRes)
+            }
+        }
+
+        companion object {
+            fun getSearchOptions(): List<DaxDialogIntroOption> =
+                listOf(
+                    DaxDialogIntroOption(
+                        R.string.onboardingSearchDaxDialogOption1,
+                        commonR.drawable.ic_find_search_16,
+                        "how to say “duck” in spanish",
+                        PixelName.ONBOARDING_SEARCH_SAY_DUCK,
+                    ),
+                    DaxDialogIntroOption(
+                        R.string.onboardingSearchDaxDialogOption2,
+                        commonR.drawable.ic_find_search_16,
+                        "mighty ducks cast",
+                        PixelName.ONBOARDING_SEARCH_MIGHTY_DUCK,
+                    ),
+                    DaxDialogIntroOption(
+                        R.string.onboardingSearchDaxDialogOption3,
+                        commonR.drawable.ic_find_search_16,
+                        "local weather",
+                        PixelName.ONBOARDING_SEARCH_WEATHER,
+                    ),
+                    DaxDialogIntroOption(
+                        R.string.onboardingSearchDaxDialogOption4,
+                        commonR.drawable.ic_wand_16,
+                        "chocolate chip cookie recipes",
+                        PixelName.ONBOARDING_SEARCH_SURPRISE_ME,
+                    ),
+                )
+
+            fun getSitesOptions(): List<DaxDialogIntroOption> =
+                listOf(
+                    DaxDialogIntroOption(
+                        R.string.onboardingSitesDaxDialogOption1,
+                        commonR.drawable.ic_globe_gray_16dp,
+                        "espn.com",
+                        PixelName.ONBOARDING_VISIT_SITE_ESPN,
+                    ),
+                    DaxDialogIntroOption(
+                        R.string.onboardingSitesDaxDialogOption2,
+                        commonR.drawable.ic_globe_gray_16dp,
+                        "yahoo.com",
+                        PixelName.ONBOARDING_VISIT_SITE_YAHOO,
+                    ),
+                    DaxDialogIntroOption(
+                        R.string.onboardingSitesDaxDialogOption3,
+                        commonR.drawable.ic_globe_gray_16dp,
+                        "ebay.com",
+                        PixelName.ONBOARDING_VISIT_SITE_EBAY,
+                    ),
+                    DaxDialogIntroOption(
+                        R.string.onboardingSitesDaxDialogOption4,
+                        commonR.drawable.ic_wand_16,
+                        "britannica.com/animal/duck",
+                        PixelName.ONBOARDING_VISIT_SITE_SURPRISE_ME,
+                    ),
+                )
         }
     }
+}
+
+sealed class ExperimentOnboardingDaxDialogCta(
+    override val ctaId: CtaId,
+    @StringRes open val description: Int?,
+    @StringRes open val buttonText: Int,
+    override val shownPixel: Pixel.PixelName?,
+    override val okPixel: Pixel.PixelName?,
+    override val cancelPixel: Pixel.PixelName?,
+    override var ctaPixelParam: String,
+    override val onboardingStore: OnboardingStore,
+    override val appInstallStore: AppInstallStore,
+) : Cta, ViewCta, DaxCta {
+
+    override fun showCta(view: View) {
+        val daxText = description?.let { view.context.getString(it) }.orEmpty()
+        val buttonText = view.context.getString(buttonText)
+        view.show()
+        view.alpha = 1f
+        view.findViewById<DaxButton>(R.id.primaryCta).text = buttonText
+        view.findViewById<DaxTextView>(R.id.hiddenTextCta).text = daxText.html(view.context)
+        view.findViewById<TypeAnimationTextView>(R.id.dialogTextCta).startTypingAnimation(daxText, true)
+    }
+
+    override fun pixelCancelParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
+
+    override fun pixelOkParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
+
+    override fun pixelShownParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to addCtaToHistory(ctaPixelParam))
+
+    class DaxSerpCta(
+        override val onboardingStore: OnboardingStore,
+        override val appInstallStore: AppInstallStore,
+    ) : ExperimentOnboardingDaxDialogCta(
+        CtaId.DAX_DIALOG_SERP,
+        R.string.onboardingSerpDaxDialogDescription,
+        R.string.onboardingSerpDaxDialogButton,
+        AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
+        AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
+        null,
+        Pixel.PixelValues.DAX_SERP_CTA,
+        onboardingStore,
+        appInstallStore,
+    )
+
+    class DaxFireButtonCta(
+        override val onboardingStore: OnboardingStore,
+        override val appInstallStore: AppInstallStore,
+    ) : ExperimentOnboardingDaxDialogCta(
+        CtaId.DAX_FIRE_BUTTON,
+        R.string.onboardingFireButtonDaxDialogDescription,
+        R.string.onboardingFireButtonDaxDialogButton,
+        AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
+        AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
+        null,
+        Pixel.PixelValues.DAX_FIRE_DIALOG_CTA,
+        onboardingStore,
+        appInstallStore,
+    )
+}
+
+sealed class ExperimentOnboardingTrackersDaxDialogCta(
+    override val ctaId: CtaId,
+    open val trackers: List<Entity>,
+    @StringRes open val buttonText: Int,
+    override val shownPixel: Pixel.PixelName?,
+    override val okPixel: Pixel.PixelName?,
+    override val cancelPixel: Pixel.PixelName?,
+    override var ctaPixelParam: String,
+    override val onboardingStore: OnboardingStore,
+    override val appInstallStore: AppInstallStore,
+) : Cta, ViewCta, DaxCta {
+
+    override fun showCta(view: View) {
+        val daxText = getTrackersDescription(view.context, trackers)
+        val buttonText = view.context.getString(buttonText)
+        view.show()
+        view.alpha = 1f
+        view.findViewById<DaxButton>(R.id.primaryCta).text = buttonText
+        view.findViewById<DaxTextView>(R.id.hiddenTextCta).text = daxText.html(view.context)
+        view.findViewById<TypeAnimationTextView>(R.id.dialogTextCta).startTypingAnimation(daxText, true)
+    }
+
+    private fun getTrackersDescription(
+        context: Context,
+        trackersEntities: List<Entity>,
+    ): String {
+        val trackers = trackersEntities
+            .map { it.displayName }
+            .distinct()
+
+        val trackersFiltered = trackers.take(MAX_TRACKERS_SHOWS)
+        val trackersText = trackersFiltered.joinToString(", ")
+        val size = trackers.size - trackersFiltered.size
+        val quantityString =
+            if (size == 0) {
+                context.resources.getQuantityString(R.plurals.onboardingTrackersBlockedZeroDialogDescription, trackersFiltered.size)
+            } else {
+                context.resources.getQuantityString(R.plurals.onboardingTrackersBlockedDialogDescription, size, size)
+            }
+        return "<b>$trackersText</b>$quantityString"
+    }
+
+    override fun pixelCancelParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
+
+    override fun pixelOkParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
+
+    override fun pixelShownParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to addCtaToHistory(ctaPixelParam))
 
     companion object {
-        fun getSearchOptions(): List<DaxDialogIntroOption> =
-            listOf(
-                DaxDialogIntroOption(
-                    R.string.onboardingSearchDaxDialogOption1,
-                    commonR.drawable.ic_find_search_16,
-                    "how to say “duck” in spanish",
-                    PixelName.ONBOARDING_SEARCH_SAY_DUCK,
-                ),
-                DaxDialogIntroOption(
-                    R.string.onboardingSearchDaxDialogOption2,
-                    commonR.drawable.ic_find_search_16,
-                    "mighty ducks cast",
-                    PixelName.ONBOARDING_SEARCH_MIGHTY_DUCK,
-                ),
-                DaxDialogIntroOption(
-                    R.string.onboardingSearchDaxDialogOption3,
-                    commonR.drawable.ic_find_search_16,
-                    "local weather",
-                    PixelName.ONBOARDING_SEARCH_WEATHER,
-                ),
-                DaxDialogIntroOption(
-                    R.string.onboardingSearchDaxDialogOption4,
-                    commonR.drawable.ic_wand_16,
-                    "chocolate chip cookie recipes",
-                    PixelName.ONBOARDING_SEARCH_SURPRISE_ME,
-                ),
-            )
-
-        fun getSitesOptions(): List<DaxDialogIntroOption> =
-            listOf(
-                DaxDialogIntroOption(
-                    R.string.onboardingSitesDaxDialogOption1,
-                    commonR.drawable.ic_globe_gray_16dp,
-                    "espn.com",
-                    PixelName.ONBOARDING_VISIT_SITE_ESPN,
-                ),
-                DaxDialogIntroOption(
-                    R.string.onboardingSitesDaxDialogOption2,
-                    commonR.drawable.ic_globe_gray_16dp,
-                    "yahoo.com",
-                    PixelName.ONBOARDING_VISIT_SITE_YAHOO,
-                ),
-                DaxDialogIntroOption(
-                    R.string.onboardingSitesDaxDialogOption3,
-                    commonR.drawable.ic_globe_gray_16dp,
-                    "ebay.com",
-                    PixelName.ONBOARDING_VISIT_SITE_EBAY,
-                ),
-                DaxDialogIntroOption(
-                    R.string.onboardingSitesDaxDialogOption4,
-                    commonR.drawable.ic_wand_16,
-                    "britannica.com/animal/duck",
-                    PixelName.ONBOARDING_VISIT_SITE_SURPRISE_ME,
-                ),
-            )
+        private const val MAX_TRACKERS_SHOWS = 2
     }
+
+    class DaxTrackersBlockedCta(
+        override val onboardingStore: OnboardingStore,
+        override val appInstallStore: AppInstallStore,
+        override val trackers: List<Entity>,
+    ) : ExperimentOnboardingTrackersDaxDialogCta(
+        CtaId.DAX_DIALOG_TRACKERS_FOUND,
+        trackers,
+        R.string.onboardingTrackersBlockedDaxDialogButton,
+        AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
+        AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
+        null,
+        Pixel.PixelValues.DAX_TRACKERS_BLOCKED_CTA,
+        onboardingStore,
+        appInstallStore,
+    )
 }

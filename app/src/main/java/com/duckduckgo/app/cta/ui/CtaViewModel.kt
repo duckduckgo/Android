@@ -279,7 +279,15 @@ class CtaViewModel @Inject constructor(
 
             // Trackers blocked
             if (!daxDialogTrackersFoundShown() && !isSerpUrl(it.url) && it.orderedTrackerBlockedEntities().isNotEmpty()) {
-                return DaxDialogCta.DaxTrackersBlockedCta(onboardingStore, appInstallStore, it.orderedTrackerBlockedEntities(), host)
+                return if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) {
+                    ExperimentOnboardingTrackersDaxDialogCta.DaxTrackersBlockedCta(
+                        onboardingStore,
+                        appInstallStore,
+                        it.orderedTrackerBlockedEntities(),
+                    )
+                } else {
+                    DaxDialogCta.DaxTrackersBlockedCta(onboardingStore, appInstallStore, it.orderedTrackerBlockedEntities(), host)
+                }
             }
 
             // Is major network
@@ -293,7 +301,11 @@ class CtaViewModel @Inject constructor(
 
             // SERP
             if (isSerpUrl(it.url) && !daxDialogSerpShown()) {
-                return DaxDialogCta.DaxSerpCta(onboardingStore, appInstallStore)
+                return if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) {
+                    ExperimentOnboardingDaxDialogCta.DaxSerpCta(onboardingStore, appInstallStore)
+                } else {
+                    DaxDialogCta.DaxSerpCta(onboardingStore, appInstallStore)
+                }
             }
 
             if (!isSerpUrl(it.url) && !daxDialogOtherShown() && !daxDialogTrackersFoundShown() && !daxDialogNetworkShown()) {
