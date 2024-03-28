@@ -24,13 +24,32 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.internal.features.api.InternalFeaturePlugin
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.store.SubscriptionsDataStore
+import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionActivity.Companion.RestoreSubscriptionScreenWithParams
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+
+@ContributesMultibinding(AppScope::class)
+class InternalRecoverView @Inject constructor(
+    private val globalActivityStarter: GlobalActivityStarter,
+) : InternalFeaturePlugin {
+    override fun internalFeatureTitle(): String {
+        return "Already have a subscription"
+    }
+
+    override fun internalFeatureSubtitle(): String {
+        return "To recover an existing subscription regardless of your location"
+    }
+
+    override fun onInternalFeatureClicked(activityContext: Context) {
+        globalActivityStarter.start(activityContext, RestoreSubscriptionScreenWithParams(isOriginWeb = false))
+    }
+}
 
 @ContributesMultibinding(AppScope::class)
 class InternalDeleteView @Inject constructor(
