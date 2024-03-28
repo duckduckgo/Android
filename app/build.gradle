@@ -110,6 +110,14 @@ android {
         play {
             dimension "store"
         }
+        nojs {
+            dimension 'store'
+            applicationIdSuffix '.nojs'
+        }
+        'default' {
+            dimension 'store'
+            applicationIdSuffix '.default'
+        }
     }
     variantFilter { variant ->
         def names = variant.flavors*.name

@@ -28,4 +28,4 @@ enum class PrivacyFeatureName(val value: String) {
     UserAgentFeatureName("customUserAgent"),
 }
 
-const val PRIVACY_REMOTE_CONFIG_URL = "https://mink-unbiased-chimp.ngrok-free.app/config"
+const val PRIVACY_REMOTE_CONFIG_URL = "https://x.zok.pw/ddg-config-test/android-config-disabled.json"
