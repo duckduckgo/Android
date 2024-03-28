@@ -536,6 +536,9 @@ class BrowserTabFragment :
     private val daxDialogCta
         get() = binding.includeNewBrowserTab.includeDaxDialogCta
 
+    private val daxDialogIntroExperimentCta
+        get() = binding.includeNewBrowserTab.includeDaxDialogIntroExperimentCta
+
     private val smoothProgressAnimator by lazy { SmoothProgressAnimator(omnibar.pageLoadingIndicator) }
 
     // Optimization to prevent against excessive work generating WebView previews; an existing job will be cancelled if a new one is launched
@@ -1387,6 +1390,7 @@ class BrowserTabFragment :
             is Command.ScreenLock -> screenLock(it.data)
             is Command.ScreenUnlock -> screenUnlock()
             is Command.ShowFaviconsPrompt -> showFaviconsPrompt()
+            is Command.SetBrowserBackground -> setBrowserBackground(it.backgroundRes)
             else -> {
                 // NO OP
             }
@@ -2077,6 +2081,7 @@ class BrowserTabFragment :
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun configureWebView() {
+        viewModel.configureBrowserBackground()
         webView = layoutInflater.inflate(
             R.layout.include_duckduckgo_browser_webview,
             binding.webViewContainer,
@@ -2168,6 +2173,10 @@ class BrowserTabFragment :
                 },
             )
         faviconPrompt.show()
+    }
+
+    private fun setBrowserBackground(backgroundRes: Int) {
+        newBrowserTab.browserBackground.setBackgroundResource(backgroundRes)
     }
 
     private fun configureWebViewForAutofill(it: DuckDuckGoWebView) {
@@ -3576,6 +3585,7 @@ class BrowserTabFragment :
             when (configuration) {
                 is HomePanelCta -> showHomeCta(configuration, favorites)
                 is DaxBubbleCta -> showDaxCta(configuration)
+                is ExperimentDaxBubbleOptionsCta -> showDaxExperimentCta(configuration)
                 is BubbleCta -> showBubbleCta(configuration)
                 is DialogCta -> showDaxDialogCta(configuration)
             }
@@ -3627,6 +3637,21 @@ class BrowserTabFragment :
             hideHomeCta()
             configuration.showCta(daxDialogCta.daxCtaContainer)
             newBrowserTab.newTabLayout.setOnClickListener { daxDialogCta.dialogTextCta.finishAnimation() }
+
+            viewModel.onCtaShown()
+        }
+
+        private fun showDaxExperimentCta(configuration: ExperimentDaxBubbleOptionsCta) {
+            hideHomeBackground()
+            hideHomeCta()
+            configuration.apply {
+                showCta(daxDialogIntroExperimentCta.daxCtaContainer)
+                setOnOptionClicked {
+                    userEnteredQuery(it.link)
+                    pixel.fire(it.pixel)
+                }
+            }
+            newBrowserTab.newTabLayout.setOnClickListener { daxDialogIntroExperimentCta.dialogTextCta.finishAnimation() }
 
             viewModel.onCtaShown()
         }

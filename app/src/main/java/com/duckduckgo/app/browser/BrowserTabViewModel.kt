@@ -99,6 +99,7 @@ import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
+import com.duckduckgo.app.onboarding.ui.page.experiment.ExtendedOnboardingExperimentVariantManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
@@ -228,6 +229,7 @@ class BrowserTabViewModel @Inject constructor(
     private val privacyProtectionsToggleUsageListener: PrivacyProtectionsToggleUsageListener,
     private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels,
     private val faviconsFetchingPrompt: FaviconsFetchingPrompt,
+    private val extendedOnboardingExperimentVariantManager: ExtendedOnboardingExperimentVariantManager,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -1752,24 +1754,33 @@ class BrowserTabViewModel @Inject constructor(
                 when {
                     acceptsOnly("image/", fileChooserParams.acceptTypes) && cameraHardwareAvailable ->
                         ShowImageCamera(filePathCallback, fileChooserRequestedParams)
+
                     acceptsOnly("video/", fileChooserParams.acceptTypes) && cameraHardwareAvailable ->
                         ShowVideoCamera(filePathCallback, fileChooserRequestedParams)
+
                     acceptsOnly("audio/", fileChooserParams.acceptTypes) ->
                         ShowSoundRecorder(filePathCallback, fileChooserRequestedParams)
+
                     else ->
                         ShowFileChooser(filePathCallback, fileChooserRequestedParams)
                 }
             }
+
             fileChooserParams.acceptTypes.any { it.startsWith("image/") && cameraHardwareAvailable } ->
                 ShowExistingImageOrCameraChooser(filePathCallback, fileChooserRequestedParams, MediaStore.ACTION_IMAGE_CAPTURE)
+
             fileChooserParams.acceptTypes.any { it.startsWith("video/") && cameraHardwareAvailable } ->
                 ShowExistingImageOrCameraChooser(filePathCallback, fileChooserRequestedParams, MediaStore.ACTION_VIDEO_CAPTURE)
+
             else ->
                 ShowFileChooser(filePathCallback, fileChooserRequestedParams)
         }
     }
 
-    private fun acceptsOnly(type: String, acceptTypes: Array<String>): Boolean {
+    private fun acceptsOnly(
+        type: String,
+        acceptTypes: Array<String>,
+    ): Boolean {
         return acceptTypes.filter { it.startsWith(type) }.size == acceptTypes.size
     }
 
@@ -3092,6 +3103,14 @@ class BrowserTabViewModel @Inject constructor(
     ) {
         viewModelScope.launch(dispatchers.io()) {
             faviconsFetchingPrompt.onPromptAnswered(fetchingEnabled)
+        }
+    }
+
+    fun configureBrowserBackground() {
+        val backgroundRes: Int =
+            if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) R.drawable.onboarding_experiment_background else 0
+        viewModelScope.launch {
+            command.value = SetBrowserBackground(backgroundRes)
         }
     }
 
