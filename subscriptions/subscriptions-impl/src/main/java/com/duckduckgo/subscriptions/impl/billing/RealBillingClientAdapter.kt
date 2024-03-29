@@ -43,6 +43,8 @@ import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.withContext
+import logcat.LogPriority.WARN
+import logcat.logcat
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
@@ -83,7 +85,11 @@ class RealBillingClientAdapter @Inject constructor(
                             else -> Failure(billingError = p0.responseCode.toBillingError())
                         }
 
-                        continuation.resume(result)
+                        try {
+                            continuation.resume(result)
+                        } catch (e: IllegalStateException) {
+                            logcat(priority = WARN) { "onBillingSetupFinished() invoked more than once" }
+                        }
                     }
                 },
             )
