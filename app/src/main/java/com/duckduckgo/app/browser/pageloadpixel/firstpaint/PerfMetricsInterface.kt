@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,25 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.pageloadpixel
+package com.duckduckgo.app.browser.pageloadpixel.firstpaint
 
-class PageLoadedSites {
+import android.util.Log
+import android.webkit.JavascriptInterface
 
-    companion object {
-        val sites = listOf(
-            "bbc.com",
-            "cnn.com",
-            "ebay.com",
-            "espn.com",
-            "espn.nl",
-            "reddit.com",
-            "twitch.tv",
-            "twitter.com",
-            "wikipedia.org",
-            "weather.com",
-            "usatoday.com",
-            "okcupid.com",
-            "roboform.com",
-        )
+class PerfMetricsInterface() {
+    @JavascriptInterface
+    fun onMetrics(message: String) {
+        Log.i("PerfMetricsInterface", "DDG PERF METRICS: $message")
+
     }
 }
