@@ -33,6 +33,7 @@ dependencies {
     implementation project(':browser-api')
     implementation project(':feature-toggles-api')
     implementation project(':js-messaging-api')
+    implementation "androidx.webkit:webkit:_"
 
     anvil project(':anvil-compiler')
     implementation project(':anvil-annotations')

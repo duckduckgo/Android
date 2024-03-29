@@ -311,6 +311,12 @@ class BrowserWebViewClient @Inject constructor(
         webView.settings.mediaPlaybackRequiresUserGesture = mediaPlayback.doesMediaPlaybackRequireUserGestureForUrl(url)
     }
 
+    fun triggerJSInit (webView: WebView) {
+        jsPlugins.getPlugins().forEach {
+            it.onInit(webView)
+        }
+    }
+
     @UiThread
     override fun onPageFinished(
         webView: WebView,

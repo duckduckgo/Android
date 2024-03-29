@@ -17,6 +17,8 @@
 package com.duckduckgo.contentscopescripts.impl
 
 import android.webkit.WebView
+import androidx.webkit.ScriptHandler
+import androidx.webkit.WebViewCompat
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.browser.api.JsInjectorPlugin
 import com.duckduckgo.di.scopes.AppScope
@@ -27,13 +29,33 @@ import javax.inject.Inject
 class ContentScopeScriptsJsInjectorPlugin @Inject constructor(
     private val coreContentScopeScripts: CoreContentScopeScripts,
 ) : JsInjectorPlugin {
-    override fun onPageStarted(webView: WebView, url: String?, site: Site?) {
+    private var script: ScriptHandler? = null
+    private var currentScriptString: String? = null
+
+    fun reloadJSIfNeeded(webView: WebView) {
+        var scriptString = coreContentScopeScripts.getScript()
+        if (scriptString == currentScriptString) {
+            return
+        }
+        script?.let {
+            it.remove()
+            script = null
+        }
         if (coreContentScopeScripts.isEnabled()) {
-            webView.evaluateJavascript("javascript:${coreContentScopeScripts.getScript(site)}", null)
+            currentScriptString = scriptString
+            script = WebViewCompat.addDocumentStartJavaScript(webView, scriptString, setOf("*"))
         }
     }
 
-    override fun onPageFinished(webView: WebView, url: String?, site: Site?) {
+    override fun onInit(webView: WebView) {
+        reloadJSIfNeeded(webView)
+    }
+
+    override fun onPageStarted(webView: WebView, url: String?, site: Site?) {
         // NOOP
+    }
+
+    override fun onPageFinished(webView: WebView, url: String?, site: Site?) {
+        reloadJSIfNeeded(webView)
     }
 }

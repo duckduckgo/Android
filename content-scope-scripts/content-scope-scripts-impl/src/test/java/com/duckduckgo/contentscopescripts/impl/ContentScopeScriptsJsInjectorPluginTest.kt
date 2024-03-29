@@ -28,10 +28,10 @@ class ContentScopeScriptsJsInjectorPluginTest {
     @Test
     fun whenEnabledAndInjectContentScopeScriptsThenPopulateMessagingParameters() {
         whenever(mockCoreContentScopeScripts.isEnabled()).thenReturn(true)
-        whenever(mockCoreContentScopeScripts.getScript(null)).thenReturn("")
+        whenever(mockCoreContentScopeScripts.getScript()).thenReturn("")
         contentScopeScriptsJsInjectorPlugin.onPageStarted(mockWebView, null, null)
 
-        verify(mockCoreContentScopeScripts).getScript(null)
+        verify(mockCoreContentScopeScripts).getScript()
         verify(mockWebView).evaluateJavascript(any(), anyOrNull())
     }
 
@@ -47,9 +47,9 @@ class ContentScopeScriptsJsInjectorPluginTest {
     fun whenEnabledAndInjectContentScopeScriptsThenUseSite() {
         val site: Site = mock()
         whenever(mockCoreContentScopeScripts.isEnabled()).thenReturn(true)
-        whenever(mockCoreContentScopeScripts.getScript(site)).thenReturn("")
+        whenever(mockCoreContentScopeScripts.getScript()).thenReturn("")
         contentScopeScriptsJsInjectorPlugin.onPageStarted(mockWebView, null, site)
 
-        verify(mockCoreContentScopeScripts).getScript(site)
+        verify(mockCoreContentScopeScripts).getScript()
     }
 }

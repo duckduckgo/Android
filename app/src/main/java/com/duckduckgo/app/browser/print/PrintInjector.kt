@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser.print
 
 import android.webkit.WebView
+import androidx.webkit.WebViewCompat
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -34,6 +35,8 @@ interface PrintInjector {
 
 @ContributesBinding(AppScope::class)
 class PrintInjectorJS @Inject constructor() : PrintInjector {
+    private var initted = false
+
     override fun addJsInterface(
         webView: WebView,
         onPrintDetected: () -> Unit,
@@ -42,6 +45,9 @@ class PrintInjectorJS @Inject constructor() : PrintInjector {
     }
 
     override fun injectPrint(webView: WebView) {
-        webView.loadUrl("javascript:window.print = function() { ${PrintJavascriptInterface.JAVASCRIPT_INTERFACE_NAME}.print() }")
+        if (!this.initted) {
+            this.initted = true
+            WebViewCompat.addDocumentStartJavaScript(webView, "window.print = function() { ${PrintJavascriptInterface.JAVASCRIPT_INTERFACE_NAME}.print() }", setOf("*"))
+        }
     }
 }

@@ -862,6 +862,8 @@ class BrowserWebViewClientTest {
     private class FakeJsInjectorPlugin : JsInjectorPlugin {
         var countFinished = 0
         var countStarted = 0
+        override fun onInit(webView: WebView) {
+        }
 
         override fun onPageStarted(webView: WebView, url: String?, site: Site?) {
             countStarted++

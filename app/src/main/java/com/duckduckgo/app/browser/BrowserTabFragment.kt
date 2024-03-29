@@ -2090,6 +2090,8 @@ class BrowserTabFragment :
 
         webView?.let {
             it.webViewClient = webViewClient
+            webViewClient.triggerJSInit(it)
+
             it.webChromeClient = webChromeClient
 
             it.settings.apply {
