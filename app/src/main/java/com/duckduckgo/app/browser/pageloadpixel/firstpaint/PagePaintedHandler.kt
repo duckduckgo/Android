@@ -79,8 +79,8 @@ class RealPagePaintedHandler @Inject constructor(
     private suspend fun WebView.extractPagePaintDurations(): String {
         return withContext(dispatcherProvider.main()) {
             suspendCoroutine { continuation ->
-                evaluateJavascript("$PAGE_PAINT_JS") { value ->
-                    Log.i("PagePainterHandler", "DDG NOJS PERF METRICS INJECTED")
+                evaluateJavascript(PAGE_PAINT_JS) { value ->
+                    Log.i("PagePainterHandler", "DDG ADDDOCUMENTSTARTJS PERF METRICS INJECTED")
                     continuation.resume(value)
                 }
             }
