@@ -109,6 +109,26 @@ android {
             dimension 'store'
             applicationIdSuffix '.nojs'
         }
+        'cssonly' {
+            dimension 'store'
+            applicationIdSuffix '.cssonly'
+        }
+        'elementhidingonly' {
+            dimension 'store'
+            applicationIdSuffix '.elementhidingonly'
+        }
+        'cpmonly' {
+            dimension 'store'
+            applicationIdSuffix '.cpmonly'
+        }
+        'autofillonly' {
+            dimension 'store'
+            applicationIdSuffix '.autofillonly'
+        }
+        'defaultadddocumentstart' {
+            dimension 'store'
+            applicationIdSuffix '.defaultadddocumentstart'
+        }
         'default' {
             dimension 'store'
             applicationIdSuffix '.default'
