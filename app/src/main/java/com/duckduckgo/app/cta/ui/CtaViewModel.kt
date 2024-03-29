@@ -294,7 +294,11 @@ class CtaViewModel @Inject constructor(
             if (it.entity != null) {
                 it.entity?.let { entity ->
                     if (!daxDialogNetworkShown() && DaxDialogCta.mainTrackerNetworks.contains(entity.displayName)) {
-                        return DaxDialogCta.DaxMainNetworkCta(onboardingStore, appInstallStore, entity.displayName, host)
+                        return if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) {
+                            ExperimentOnboardingDaxDialogCta.DaxMainNetworkCta(onboardingStore, appInstallStore, entity.displayName, host)
+                        } else {
+                            DaxDialogCta.DaxMainNetworkCta(onboardingStore, appInstallStore, entity.displayName, host)
+                        }
                     }
                 }
             }
@@ -309,7 +313,11 @@ class CtaViewModel @Inject constructor(
             }
 
             if (!isSerpUrl(it.url) && !daxDialogOtherShown() && !daxDialogTrackersFoundShown() && !daxDialogNetworkShown()) {
-                return DaxDialogCta.DaxNoSerpCta(onboardingStore, appInstallStore)
+                return if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) {
+                    ExperimentOnboardingDaxDialogCta.DaxNoTrackersCta(onboardingStore, appInstallStore)
+                } else {
+                    DaxDialogCta.DaxNoSerpCta(onboardingStore, appInstallStore)
+                }
             }
             return null
         }

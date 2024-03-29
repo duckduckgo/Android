@@ -17,9 +17,11 @@
 package com.duckduckgo.app.cta.ui
 
 import android.content.Context
+import android.net.Uri
 import android.view.View
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.annotation.VisibleForTesting
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import com.duckduckgo.app.browser.R
@@ -35,6 +37,7 @@ import com.duckduckgo.common.ui.view.TypeAnimationTextView
 import com.duckduckgo.common.ui.view.button.DaxButton
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
+import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.mobile.android.R as commonR
 
@@ -269,7 +272,6 @@ sealed class ExperimentOnboardingDaxDialogCta(
             daxDialog.primaryCta.setOnClickListener { onPrimaryCtaClicked.invoke() }
             daxDialog.hiddenTextCta.text = daxText.html(context)
             daxDialog.dialogTextCta.startTypingAnimation(daxText, true)
-            // TODO add fire button highlight
         }
     }
 
@@ -299,8 +301,6 @@ sealed class ExperimentOnboardingDaxDialogCta(
             daxDialog.primaryCta.setOnClickListener { onPrimaryCtaClicked.invoke() }
             daxDialog.hiddenTextCta.text = daxText.html(context)
             daxDialog.dialogTextCta.startTypingAnimation(daxText, true)
-
-            // TODO add privacyShield highlight
         }
 
         private fun getTrackersDescription(
@@ -324,7 +324,88 @@ sealed class ExperimentOnboardingDaxDialogCta(
         }
     }
 
+    class DaxMainNetworkCta(
+        override val onboardingStore: OnboardingStore,
+        override val appInstallStore: AppInstallStore,
+        val network: String,
+        private val siteHost: String,
+    ) : ExperimentOnboardingDaxDialogCta(
+        CtaId.DAX_DIALOG_NETWORK,
+        null,
+        R.string.daxDialogGotIt,
+        AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
+        AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
+        null,
+        Pixel.PixelValues.DAX_NETWORK_CTA_1,
+        onboardingStore,
+        appInstallStore,
+    ) {
+
+        override fun showOnboardingCta(binding: FragmentBrowserTabBinding, onPrimaryCtaClicked: () -> Unit) {
+            val context = binding.root.context
+            val daxDialog = binding.includeOnboardingDaxDialogExperiment
+            val daxText = getTrackersDescription(context)
+            val buttonText = context.getString(buttonText)
+            daxDialog.root.show()
+            daxDialog.root.alpha = 1f
+            daxDialog.primaryCta.text = buttonText
+            daxDialog.primaryCta.setOnClickListener { onPrimaryCtaClicked.invoke() }
+            daxDialog.hiddenTextCta.text = daxText.html(context)
+            daxDialog.dialogTextCta.startTypingAnimation(daxText, true)
+        }
+
+        @VisibleForTesting
+        fun getTrackersDescription(context: Context): String {
+            return if (isFromSameNetworkDomain()) {
+                context.resources.getString(
+                    R.string.daxMainNetworkCtaText,
+                    network,
+                    Uri.parse(siteHost).baseHost?.removePrefix("m."),
+                    network,
+                )
+            } else {
+                context.resources.getString(
+                    R.string.daxMainNetworkOwnedCtaText,
+                    network,
+                    Uri.parse(siteHost).baseHost?.removePrefix("m."),
+                    network,
+                )
+            }
+        }
+
+        private fun isFromSameNetworkDomain(): Boolean = mainTrackerDomains.any { siteHost.contains(it) }
+    }
+
+    class DaxNoTrackersCta(
+        override val onboardingStore: OnboardingStore,
+        override val appInstallStore: AppInstallStore,
+    ) : ExperimentOnboardingDaxDialogCta(
+        CtaId.DAX_DIALOG_OTHER,
+        R.string.daxNonSerpCtaText,
+        R.string.daxDialogGotIt,
+        AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
+        AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
+        null,
+        Pixel.PixelValues.DAX_NO_TRACKERS_CTA,
+        onboardingStore,
+        appInstallStore,
+    ) {
+        override fun showOnboardingCta(binding: FragmentBrowserTabBinding, onPrimaryCtaClicked: () -> Unit) {
+            val context = binding.root.context
+            val daxDialog = binding.includeOnboardingDaxDialogExperiment
+            val daxText = description?.let { context.getString(it) }.orEmpty()
+            val buttonText = context.getString(buttonText)
+            daxDialog.root.show()
+            daxDialog.root.alpha = 1f
+            daxDialog.primaryCta.text = buttonText
+            daxDialog.primaryCta.setOnClickListener { onPrimaryCtaClicked.invoke() }
+            daxDialog.hiddenTextCta.text = daxText.html(context)
+            daxDialog.dialogTextCta.startTypingAnimation(daxText, true)
+        }
+    }
+
     companion object {
         private const val MAX_TRACKERS_SHOWS = 2
+        private val mainTrackerDomains = listOf("facebook", "google")
     }
 }
