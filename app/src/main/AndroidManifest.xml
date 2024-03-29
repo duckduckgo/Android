@@ -451,11 +451,6 @@
             android:parentActivityName=".BrowserActivity" />
 
         <service
-            android:name="com.duckduckgo.app.job.AppConfigurationJobService"
-            android:exported="false"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
-
-        <service
             android:name="com.duckduckgo.widget.FavoritesWidgetService"
             android:exported="false"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
