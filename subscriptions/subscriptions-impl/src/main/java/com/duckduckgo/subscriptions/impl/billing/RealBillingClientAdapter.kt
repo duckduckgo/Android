@@ -40,11 +40,12 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import java.lang.IllegalArgumentException
 import javax.inject.Inject
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.withContext
+import logcat.LogPriority.WARN
+import logcat.logcat
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class RealBillingClientAdapter @Inject constructor(
@@ -71,7 +72,7 @@ class RealBillingClientAdapter @Inject constructor(
             }
             .build()
 
-        return suspendCancellableCoroutine { continuation ->
+        return suspendCoroutine { continuation ->
             billingClient?.startConnection(
                 object : BillingClientStateListener {
                     override fun onBillingServiceDisconnected() {
@@ -84,7 +85,11 @@ class RealBillingClientAdapter @Inject constructor(
                             else -> Failure(billingError = p0.responseCode.toBillingError())
                         }
 
-                        continuation.resume(result, onCancellation = null)
+                        try {
+                            continuation.resume(result)
+                        } catch (e: IllegalStateException) {
+                            logcat(priority = WARN) { "onBillingSetupFinished() invoked more than once" }
+                        }
                     }
                 },
             )
