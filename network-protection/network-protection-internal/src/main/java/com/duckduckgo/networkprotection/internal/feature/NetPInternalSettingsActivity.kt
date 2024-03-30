@@ -97,7 +97,8 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
     private val exportPcapFile = registerForActivityResult(ExportPcapContract()) { data ->
         data?.let { uri ->
             lifecycleScope.launch(dispatcherProvider.io()) {
-                contentResolver.openOutputStream(uri)?.let { out ->
+                // "w" mode does not truncate on Android 10/11, use "rwt" mode workaround
+                contentResolver.openOutputStream(uri, "rwt")?.let { out ->
                     if (netpGetPcapFile().length() > 0) {
                         val input = FileInputStream(netpGetPcapFile())
 
