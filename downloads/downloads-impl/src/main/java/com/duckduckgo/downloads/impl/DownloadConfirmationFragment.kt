@@ -16,6 +16,7 @@
 
 package com.duckduckgo.downloads.impl
 
+import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -27,6 +28,7 @@ import com.duckduckgo.downloads.api.DownloadConfirmationDialogListener
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.downloads.impl.RealDownloadConfirmation.Companion.PENDING_DOWNLOAD_BUNDLE_KEY
 import com.duckduckgo.downloads.impl.databinding.DownloadConfirmationBinding
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
 import java.io.File
@@ -68,6 +70,15 @@ class DownloadConfirmationFragment : BottomSheetDialogFragment() {
         setupDownload()
         setupViews(binding)
         return binding.root
+    }
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog = super.onCreateDialog(savedInstanceState) as BottomSheetDialog
+        dialog.behavior.apply {
+            isFitToContents = true
+            peekHeight = resources.displayMetrics.heightPixels / 2
+        }
+        return dialog
     }
 
     private fun setupDownload() {
