@@ -44,6 +44,11 @@ class RealAppBuildConfig @Inject constructor(
             "play" -> BuildFlavor.PLAY
             "default" -> BuildFlavor.PLAY
             "nojs" -> BuildFlavor.PLAY
+            "cssonly" -> BuildFlavor.PLAY
+            "elementhidingonly" -> BuildFlavor.PLAY
+            "cpmonly" -> BuildFlavor.PLAY
+            "autofillonly" -> BuildFlavor.PLAY
+            "defaultadddocumentstart" -> BuildFlavor.PLAY
             else -> throw IllegalStateException("Unknown app flavor")
         }
     override val sdkInt: Int = Build.VERSION.SDK_INT
