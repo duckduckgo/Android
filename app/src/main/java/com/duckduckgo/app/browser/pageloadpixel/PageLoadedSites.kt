@@ -21,8 +21,10 @@ class PageLoadedSites {
     companion object {
         val sites = listOf(
             "bbc.com",
+            "cnn.com",
             "ebay.com",
             "espn.com",
+            "espn.nl",
             "reddit.com",
             "twitch.tv",
             "twitter.com",
