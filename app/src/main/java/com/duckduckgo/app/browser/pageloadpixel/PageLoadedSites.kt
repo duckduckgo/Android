@@ -30,6 +30,9 @@ class PageLoadedSites {
             "twitter.com",
             "wikipedia.org",
             "weather.com",
+            "usatoday.com",
+            "okcupid.com",
+            "roboform.com",
         )
     }
 }
