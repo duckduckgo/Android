@@ -1,0 +1,20 @@
+{
+  "version": 3,
+  "artifactType": {
+    "type": "APK",
+    "kind": "Directory"
+  },
+  "applicationId": "com.duckduckgo.mobile.android.default",
+  "variantName": "defaultRelease",
+  "elements": [
+    {
+      "type": "SINGLE",
+      "filters": [],
+      "attributes": [],
+      "versionCode": 51940000,
+      "versionName": "5.194.0",
+      "outputFile": "duckduckgo-5.194.0-default-release.apk"
+    }
+  ],
+  "elementType": "File"
+}
