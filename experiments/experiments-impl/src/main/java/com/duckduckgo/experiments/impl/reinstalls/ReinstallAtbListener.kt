@@ -90,7 +90,7 @@ private annotation class ReinstallSharedPrefs
 
 @Module
 @ContributesTo(AppScope::class)
-class IgnoringBatteryOptimizationsModule {
+class ReinstallAtbListenerModule {
     @Provides
     @ReinstallSharedPrefs
     fun provideReinstallSharedPrefs(context: Context): SharedPreferences {
