@@ -818,4 +818,8 @@
     <string name="faviconsPromptMessage">Vai vēlies, lai šī ierīce automātiski lejupielādētu sinhronizēto grāmatzīmju ikonas no vietnēm, kuru grāmatzīmes ir saglabātas?</string>
     <string name="faviconsPromptPrimaryCta">Pastāvīgi atjaunināt grāmatzīmju ikonas</string>
     <string name="faviconsPromptSecondaryCta">Ne tagad</string>
+
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">Atvērt vietnē DuckDuckGo</string>
+    <string name="runningInDdgMenuItemTitle">Darbojas programmā DuckDuckGo</string>
 </resources>

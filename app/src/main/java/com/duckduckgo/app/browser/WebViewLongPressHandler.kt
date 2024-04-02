@@ -23,6 +23,7 @@ import android.webkit.URLUtil
 import android.webkit.WebView
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.*
+import com.duckduckgo.app.browser.customtabs.CustomTabDetector
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -54,6 +55,7 @@ interface LongPressHandler {
 class WebViewLongPressHandler @Inject constructor(
     private val context: Context,
     private val pixel: Pixel,
+    private val customTabDetector: CustomTabDetector,
 ) : LongPressHandler {
 
     override fun handleLongPress(
@@ -68,8 +70,8 @@ class WebViewLongPressHandler @Inject constructor(
             WebView.HitTestResult.IMAGE_TYPE -> {
                 if (isLinkSupported(longPressTargetUrl)) {
                     addDownloadImageMenuOptions(menu)
-                    if (!URLUtil.isDataUrl(longPressTargetUrl)) {
-                        addImageMenuOptions(menu)
+                    if (!URLUtil.isDataUrl(longPressTargetUrl) && !customTabDetector.isCustomTab()) {
+                        addImageMenuOpenInTabOptions(menu)
                     }
                 }
             }
@@ -77,14 +79,20 @@ class WebViewLongPressHandler @Inject constructor(
                 if (isLinkSupported(longPressTargetUrl)) {
                     addDownloadImageMenuOptions(menu)
                     if (!URLUtil.isDataUrl(longPressTargetUrl)) {
-                        addImageMenuOptions(menu)
-                        addLinkMenuOptions(menu)
+                        if (!customTabDetector.isCustomTab()) {
+                            addImageMenuOpenInTabOptions(menu)
+                            addLinkMenuOpenInTabOptions(menu)
+                        }
+                        addLinkMenuOtherOptions(menu)
                     }
                 }
             }
             WebView.HitTestResult.SRC_ANCHOR_TYPE -> {
                 if (isLinkSupported(longPressTargetUrl)) {
-                    addLinkMenuOptions(menu)
+                    if (!customTabDetector.isCustomTab()) {
+                        addLinkMenuOpenInTabOptions(menu)
+                    }
+                    addLinkMenuOtherOptions(menu)
                 }
             }
             else -> {
@@ -102,13 +110,16 @@ class WebViewLongPressHandler @Inject constructor(
         menu.add(0, CONTEXT_MENU_ID_DOWNLOAD_IMAGE, CONTEXT_MENU_ID_DOWNLOAD_IMAGE, R.string.downloadImage)
     }
 
-    private fun addImageMenuOptions(menu: ContextMenu) {
+    private fun addImageMenuOpenInTabOptions(menu: ContextMenu) {
         menu.add(0, CONTEXT_MENU_ID_OPEN_IMAGE_IN_NEW_BACKGROUND_TAB, CONTEXT_MENU_ID_OPEN_IMAGE_IN_NEW_BACKGROUND_TAB, R.string.openImageInNewTab)
     }
 
-    private fun addLinkMenuOptions(menu: ContextMenu) {
+    private fun addLinkMenuOpenInTabOptions(menu: ContextMenu) {
         menu.add(0, CONTEXT_MENU_ID_OPEN_IN_NEW_TAB, CONTEXT_MENU_ID_OPEN_IN_NEW_TAB, R.string.openInNewTab)
         menu.add(0, CONTEXT_MENU_ID_OPEN_IN_NEW_BACKGROUND_TAB, CONTEXT_MENU_ID_OPEN_IN_NEW_BACKGROUND_TAB, R.string.openInNewBackgroundTab)
+    }
+
+    private fun addLinkMenuOtherOptions(menu: ContextMenu) {
         menu.add(0, CONTEXT_MENU_ID_COPY, CONTEXT_MENU_ID_COPY, R.string.copyUrl)
         menu.add(0, CONTEXT_MENU_ID_SHARE_LINK, CONTEXT_MENU_ID_SHARE_LINK, R.string.shareLink)
     }

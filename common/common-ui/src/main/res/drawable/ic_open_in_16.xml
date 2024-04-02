@@ -1,0 +1,12 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="16dp"
+    android:height="16dp"
+    android:viewportWidth="16"
+    android:viewportHeight="16">
+  <path
+      android:pathData="M4.25,2.5A1.75,1.75 0,0 0,2.5 4.25v7.5c0,0.966 0.784,1.75 1.75,1.75h7.5a1.75,1.75 0,0 0,1.75 -1.75v-3a0.75,0.75 0,0 1,1.5 0v3A3.25,3.25 0,0 1,11.75 15h-7.5A3.25,3.25 0,0 1,1 11.75v-7.5A3.25,3.25 0,0 1,4.25 1h3a0.75,0.75 0,0 1,0 1.5z"
+      android:fillColor="?attr/daxColorPrimaryIcon"/>
+  <path
+      android:pathData="M10,1.75a0.75,0.75 0,0 1,0.75 -0.75h3.5a0.75,0.75 0,0 1,0.75 0.75v3.5a0.75,0.75 0,0 1,-1.5 0V3.56L9.28,7.78a0.75,0.75 0,0 1,-1.06 -1.06l4.22,-4.22h-1.69a0.75,0.75 0,0 1,-0.75 -0.75"
+      android:fillColor="?attr/daxColorPrimaryIcon"/>
+</vector>

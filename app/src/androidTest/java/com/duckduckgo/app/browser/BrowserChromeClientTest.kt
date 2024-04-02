@@ -163,7 +163,7 @@ class BrowserChromeClientTest {
     fun whenOnReceivedTitleThenTitleReceived() {
         val title = "title"
         testee.onReceivedTitle(webView, title)
-        verify(mockWebViewClientListener).titleReceived(title)
+        verify(mockWebViewClientListener).titleReceived(title, webView.url)
     }
 
     @Test

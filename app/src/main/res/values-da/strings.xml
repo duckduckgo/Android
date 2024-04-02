@@ -813,4 +813,8 @@
     <string name="faviconsPromptMessage">Vil du have enheden til automatisk at downloade ikoner til synkroniserede bogmærker fra hjemmesiderne på listen?</string>
     <string name="faviconsPromptPrimaryCta">Hold bogmærkeikoner opdaterede</string>
     <string name="faviconsPromptSecondaryCta">Ikke nu</string>
+
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">Åben i DuckDuckGo</string>
+    <string name="runningInDdgMenuItemTitle">Kører i DuckDuckGo</string>
 </resources>
