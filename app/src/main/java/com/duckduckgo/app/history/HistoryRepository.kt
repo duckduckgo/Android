@@ -35,8 +35,15 @@ class RealHistoryRepository(
     private val currentTimeProvider: CurrentTimeProvider,
 ) : HistoryRepository {
 
-    override fun getHistoryObservable(): Single<List<HistoryEntry>> =
-        historyDao.getHistoryEntriesWithVisits().map { it.map { historyEntryWithVisits -> historyEntryWithVisits.toHistoryEntry() } }
+    private var cachedHistoryEntries: List<HistoryEntry>? = null
+
+    override fun getHistoryObservable(): Single<List<HistoryEntry>> {
+        return if (cachedHistoryEntries != null) {
+            Single.just(cachedHistoryEntries)
+        } else {
+            fetchAndCacheHistoryEntries()
+        }
+    }
 
     override fun saveToHistory(
         url: String,
@@ -45,5 +52,14 @@ class RealHistoryRepository(
         isSerp: Boolean,
     ) {
         historyDao.updateOrInsertVisit(url, title ?: "", query, isSerp, currentTimeProvider.currentTimeMillis())
+        fetchAndCacheHistoryEntries()
+    }
+    private fun fetchAndCacheHistoryEntries(): Single<List<HistoryEntry>> {
+        return historyDao.getHistoryEntriesWithVisits()
+            .map { entries ->
+                entries.map { it.toHistoryEntry() }.also {
+                    cachedHistoryEntries = it
+                }
+            }
     }
 }
