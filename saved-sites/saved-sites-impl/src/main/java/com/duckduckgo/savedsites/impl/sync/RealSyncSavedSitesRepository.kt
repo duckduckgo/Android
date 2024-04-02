@@ -20,6 +20,7 @@ import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.savedsites.api.models.*
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.impl.sync.store.SavedSitesSyncEntitiesStore
 import com.duckduckgo.savedsites.impl.sync.store.SavedSitesSyncMetadataDao
 import com.duckduckgo.savedsites.impl.sync.store.SavedSitesSyncMetadataEntity
 import com.duckduckgo.savedsites.store.*
@@ -36,7 +37,7 @@ class RealSyncSavedSitesRepository(
     private val savedSitesEntitiesDao: SavedSitesEntitiesDao,
     private val savedSitesRelationsDao: SavedSitesRelationsDao,
     private val savedSitesSyncMetadataDao: SavedSitesSyncMetadataDao,
-    private val savedSitesSyncStore: SavedSitesSyncStore,
+    private val savedSitesEntitiesStore: SavedSitesSyncEntitiesStore,
 ) : SyncSavedSitesRepository {
 
     private val stringListType = Types.newParameterizedType(List::class.java, String::class.java)
@@ -393,14 +394,14 @@ class RealSyncSavedSitesRepository(
     }
 
     override fun getInvalidSavedSites(): List<SavedSite> {
-        return savedSitesSyncStore.invalidEntitiesIds.takeIf { it.isNotEmpty() }?.let { ids ->
+        return savedSitesEntitiesStore.invalidEntitiesIds.takeIf { it.isNotEmpty() }?.let { ids ->
             getSavedSites(ids)
         } ?: emptyList()
     }
 
     override fun markSavedSitesAsInvalid(ids: List<String>) {
         Timber.i("Sync-Bookmarks: Storing invalid items: $ids")
-        savedSitesSyncStore.invalidEntitiesIds = ids
+        savedSitesEntitiesStore.invalidEntitiesIds = ids
     }
 
     private fun getSavedSites(ids: List<String>): List<SavedSite> {

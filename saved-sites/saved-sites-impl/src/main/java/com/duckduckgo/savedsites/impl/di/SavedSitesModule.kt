@@ -35,6 +35,7 @@ import com.duckduckgo.savedsites.impl.service.RealSavedSitesParser
 import com.duckduckgo.savedsites.impl.service.SavedSitesParser
 import com.duckduckgo.savedsites.impl.sync.*
 import com.duckduckgo.savedsites.impl.sync.store.ALL_MIGRATIONS
+import com.duckduckgo.savedsites.impl.sync.store.SavedSitesSyncEntitiesStore
 import com.duckduckgo.savedsites.impl.sync.store.SavedSitesSyncMetadataDao
 import com.duckduckgo.savedsites.impl.sync.store.SavedSitesSyncMetadataDatabase
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
@@ -108,9 +109,9 @@ class SavedSitesModule {
         savedSitesEntitiesDao: SavedSitesEntitiesDao,
         savedSitesRelationsDao: SavedSitesRelationsDao,
         savedSitesSyncMetadataDao: SavedSitesSyncMetadataDao,
-        savedSitesSyncStore: SavedSitesSyncStore,
+        savedSitesSyncEntitiesStore: SavedSitesSyncEntitiesStore,
     ): SyncSavedSitesRepository {
-        return RealSyncSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao, savedSitesSyncMetadataDao, savedSitesSyncStore)
+        return RealSyncSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao, savedSitesSyncMetadataDao, savedSitesSyncEntitiesStore)
     }
 
     @Provides

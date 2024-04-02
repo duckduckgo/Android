@@ -46,6 +46,7 @@ import com.duckduckgo.savedsites.impl.sync.SyncFolderChildren
 import com.duckduckgo.savedsites.impl.sync.SyncSavedSiteRequestFolder
 import com.duckduckgo.savedsites.impl.sync.SyncSavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.SyncSavedSitesRequestEntry
+import com.duckduckgo.savedsites.impl.sync.store.RealSavedSitesSyncEntitiesStore
 import com.duckduckgo.savedsites.impl.sync.store.SavedSitesSyncMetadataDao
 import com.duckduckgo.savedsites.impl.sync.store.SavedSitesSyncMetadataDatabase
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
@@ -82,7 +83,10 @@ class SavedSitesSyncDataProviderTest {
     private lateinit var savedSitesRelationsDao: SavedSitesRelationsDao
     private lateinit var savedSitesMetadataDao: SavedSitesSyncMetadataDao
     private lateinit var savedSitesFormFactorSyncMigration: SavedSitesFormFactorSyncMigration
-    private val store = RealSavedSitesSyncStore(
+    private val syncEntitiesStore = RealSavedSitesSyncEntitiesStore(
+        InstrumentationRegistry.getInstrumentation().context,
+    )
+    private val syncFeatureStore = RealSavedSitesSyncStore(
         InstrumentationRegistry.getInstrumentation().context,
         coroutinesTestRule.testScope,
         coroutinesTestRule.testDispatcherProvider,
@@ -131,7 +135,7 @@ class SavedSitesSyncDataProviderTest {
             coroutinesTestRule.testDispatcherProvider,
         )
 
-        syncRepository = RealSyncSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao, savedSitesMetadataDao, store)
+        syncRepository = RealSyncSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao, savedSitesMetadataDao, syncEntitiesStore)
         repository = RealSavedSitesRepository(
             savedSitesEntitiesDao,
             savedSitesRelationsDao,
@@ -145,7 +149,7 @@ class SavedSitesSyncDataProviderTest {
             savedSitesRelationsDao,
             savedSitesSettingsRepository,
         )
-        parser = SavedSitesSyncDataProvider(repository, syncRepository, store, FakeCrypto(), savedSitesFormFactorSyncMigration)
+        parser = SavedSitesSyncDataProvider(repository, syncRepository, syncFeatureStore, FakeCrypto(), savedSitesFormFactorSyncMigration)
 
         favoritesFolder = repository.insert(favoritesFolder)
         bookmarksRootFolder = repository.insert(bookmarksRootFolder)
@@ -490,8 +494,8 @@ class SavedSitesSyncDataProviderTest {
         lastServerSyncTimestamp: String,
         lastClientSyncTimestmp: String = lastServerSyncTimestamp,
     ) {
-        store.serverModifiedSince = lastServerSyncTimestamp
-        store.clientModifiedSince = lastClientSyncTimestmp
+        syncFeatureStore.serverModifiedSince = lastServerSyncTimestamp
+        syncFeatureStore.clientModifiedSince = lastClientSyncTimestmp
     }
 
     private fun fromSavedSite(savedSite: SavedSite): SyncSavedSitesRequestEntry {

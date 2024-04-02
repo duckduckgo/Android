@@ -33,12 +33,12 @@ import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.impl.MissingEntitiesRelationReconciler
 import com.duckduckgo.savedsites.impl.RealFavoritesDelegate
 import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
-import com.duckduckgo.savedsites.impl.sync.RealSavedSitesSyncStore
 import com.duckduckgo.savedsites.impl.sync.RealSyncSavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.SyncSavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.algorithm.RealSavedSitesDuplicateFinder
 import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesDeduplicationPersister
 import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesDuplicateFinder
+import com.duckduckgo.savedsites.impl.sync.store.RealSavedSitesSyncEntitiesStore
 import com.duckduckgo.savedsites.impl.sync.store.SavedSitesSyncMetadataDao
 import com.duckduckgo.savedsites.impl.sync.store.SavedSitesSyncMetadataDatabase
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
@@ -69,10 +69,8 @@ class SavedSitesDeduplicationPersisterTest {
     private lateinit var savedSitesMetadataDao: SavedSitesSyncMetadataDao
     private lateinit var duplicateFinder: SavedSitesDuplicateFinder
     private lateinit var persister: SavedSitesDeduplicationPersister
-    private val store = RealSavedSitesSyncStore(
+    private val store = RealSavedSitesSyncEntitiesStore(
         InstrumentationRegistry.getInstrumentation().context,
-        coroutinesTestRule.testScope,
-        coroutinesTestRule.testDispatcherProvider,
     )
 
     @Before
