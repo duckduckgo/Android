@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.reinstalls
+package com.duckduckgo.experiments.impl.reinstalls
 
 import android.content.Context
 import android.content.SharedPreferences

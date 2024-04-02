@@ -21,6 +21,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.api.VariantConfig
 import com.duckduckgo.experiments.api.VariantManager
+import com.duckduckgo.experiments.impl.reinstalls.REINSTALL_VARIANT
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import timber.log.Timber
@@ -136,8 +137,6 @@ class VariantManagerImpl @Inject constructor(
 
         // this will be returned when there are no other active experiments
         val DEFAULT_VARIANT = Variant(key = "", filterBy = { noFilter() })
-
-        const val REINSTALL_VARIANT = "ru"
 
         private fun noFilter(): Boolean = true
     }

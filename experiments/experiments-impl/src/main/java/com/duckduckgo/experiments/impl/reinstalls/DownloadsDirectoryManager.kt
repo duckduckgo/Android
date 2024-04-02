@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.reinstalls
+package com.duckduckgo.experiments.impl.reinstalls
 
 import android.os.Environment
 import com.duckduckgo.di.scopes.AppScope
