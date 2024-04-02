@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.browser
 
-import com.duckduckgo.app.browser.BrowserTabViewModel.BrowserViewState
-import com.duckduckgo.app.browser.BrowserTabViewModel.HighlightableButton
+import com.duckduckgo.app.browser.viewstate.BrowserViewState
+import com.duckduckgo.app.browser.viewstate.HighlightableButton
 import io.reactivex.annotations.CheckReturnValue
 
 class BrowserStateModifier {

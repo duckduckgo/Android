@@ -44,7 +44,6 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.A
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteService
-import com.duckduckgo.app.browser.BrowserTabViewModel.HighlightableButton
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
 import com.duckduckgo.app.browser.WebViewErrorResponse.BAD_URL
@@ -76,6 +75,12 @@ import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
+import com.duckduckgo.app.browser.viewstate.BrowserViewState
+import com.duckduckgo.app.browser.viewstate.CtaViewState
+import com.duckduckgo.app.browser.viewstate.FindInPageViewState
+import com.duckduckgo.app.browser.viewstate.GlobalLayoutViewState
+import com.duckduckgo.app.browser.viewstate.HighlightableButton
+import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
@@ -641,7 +646,7 @@ class BrowserTabViewModelTest {
     fun whenViewBecomesVisibleAndHomeShowingThenRefreshCtaIsCalled() {
         runTest {
             setBrowserShowing(false)
-            val observer = ValueCaptorObserver<BrowserTabViewModel.CtaViewState>()
+            val observer = ValueCaptorObserver<CtaViewState>()
             testee.ctaViewState.observeForever(observer)
 
             testee.onViewVisible()
@@ -655,7 +660,7 @@ class BrowserTabViewModelTest {
     fun whenViewBecomesVisibleAndBrowserShowingThenRefreshCtaIsNotCalled() {
         runTest {
             setBrowserShowing(true)
-            val observer = ValueCaptorObserver<BrowserTabViewModel.CtaViewState>()
+            val observer = ValueCaptorObserver<CtaViewState>()
             testee.ctaViewState.observeForever(observer)
 
             testee.onViewVisible()
@@ -1918,21 +1923,21 @@ class BrowserTabViewModelTest {
     fun whenRecoveringFromProcessGoneThenGlobalLayoutIsInvalidated() {
         testee.recoverFromRenderProcessGone()
 
-        assertTrue(globalLayoutViewState() is BrowserTabViewModel.GlobalLayoutViewState.Invalidated)
+        assertTrue(globalLayoutViewState() is GlobalLayoutViewState.Invalidated)
     }
 
     @Test
     fun whenRecoveringFromProcessGoneThenLoadingIsReset() {
         testee.recoverFromRenderProcessGone()
 
-        assertEquals(loadingViewState(), BrowserTabViewModel.LoadingViewState())
+        assertEquals(loadingViewState(), LoadingViewState())
     }
 
     @Test
     fun whenRecoveringFromProcessGoneThenFindInPageIsReset() {
         testee.recoverFromRenderProcessGone()
 
-        assertEquals(findInPageViewState(), BrowserTabViewModel.FindInPageViewState())
+        assertEquals(findInPageViewState(), FindInPageViewState())
     }
 
     @Test
@@ -2173,7 +2178,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenCtaShownThenFirePixel() = runTest {
         val cta = HomePanelCta.Survey(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
-        testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
+        testee.ctaViewState.value = CtaViewState(cta = cta)
 
         testee.onCtaShown()
         verify(mockPixel).fire(cta.shownPixel!!, cta.pixelShownParameters())
@@ -2182,7 +2187,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenRegisterDaxBubbleCtaDismissedThenRegisterInDatabase() = runTest {
         val cta = DaxBubbleCta.DaxIntroCta(mockOnboardingStore, mockAppInstallStore)
-        testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
+        testee.ctaViewState.value = CtaViewState(cta = cta)
 
         testee.registerDaxBubbleCtaDismissed()
         verify(mockDismissedCtaDao).insert(DismissedCta(cta.ctaId))
@@ -2191,7 +2196,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenRegisterDaxBubbleCtaDismissedThenCtaChangedToNull() = runTest {
         val cta = DaxBubbleCta.DaxIntroCta(mockOnboardingStore, mockAppInstallStore)
-        testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
+        testee.ctaViewState.value = CtaViewState(cta = cta)
 
         testee.registerDaxBubbleCtaDismissed()
         assertNull(testee.ctaViewState.value!!.cta)
@@ -3430,7 +3435,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenFirePulsingAnimationStartsThenItStopsAfterMoreThanOneHour() = runTest {
         givenFireButtonPulsing()
-        val observer = ValueCaptorObserver<BrowserTabViewModel.BrowserViewState>(false)
+        val observer = ValueCaptorObserver<BrowserViewState>(false)
         testee.browserViewState.observeForever(observer)
 
         testee.onViewVisible()
@@ -5047,7 +5052,7 @@ class BrowserTabViewModelTest {
     }
 
     private fun givenInvalidatedGlobalLayout() {
-        testee.globalLayoutState.value = BrowserTabViewModel.GlobalLayoutViewState.Invalidated
+        testee.globalLayoutState.value = GlobalLayoutViewState.Invalidated
     }
 
     private fun givenOneActiveTabSelected() {
@@ -5206,7 +5211,7 @@ class BrowserTabViewModelTest {
     private fun autoCompleteViewState() = testee.autoCompleteViewState.value!!
     private fun findInPageViewState() = testee.findInPageViewState.value!!
     private fun globalLayoutViewState() = testee.globalLayoutState.value!!
-    private fun browserGlobalLayoutViewState() = testee.globalLayoutState.value!! as BrowserTabViewModel.GlobalLayoutViewState.Browser
+    private fun browserGlobalLayoutViewState() = testee.globalLayoutState.value!! as GlobalLayoutViewState.Browser
     private fun accessibilityViewState() = testee.accessibilityViewState.value!!
 
     class FakeCapabilityChecker(var enabled: Boolean) : AutofillCapabilityChecker {
