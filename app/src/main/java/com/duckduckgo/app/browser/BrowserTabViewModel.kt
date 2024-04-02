@@ -103,6 +103,7 @@ import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.app.browser.webview.SslWarningLayout.Action
 import com.duckduckgo.app.cta.ui.*
+import com.duckduckgo.app.cta.ui.ExperimentOnboardingDaxDialogCta
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
@@ -355,8 +356,8 @@ class BrowserTabViewModel @Inject constructor(
     private val favoritesOnboardingObserver = Observer<BrowserViewState> { state ->
         val shouldShowAnimation = state.browserShowing
         val menuButton = currentBrowserViewState().showMenuButton
-        if (menuButton is HighlightableButton.Visible && menuButton.highlighted != shouldShowAnimation) {
-            browserViewState.value = currentBrowserViewState().copy(showMenuButton = HighlightableButton.Visible(highlighted = shouldShowAnimation))
+        if (menuButton is Visible && menuButton.highlighted != shouldShowAnimation) {
+            browserViewState.value = currentBrowserViewState().copy(showMenuButton = Visible(highlighted = shouldShowAnimation))
         }
     }
 
@@ -370,8 +371,8 @@ class BrowserTabViewModel @Inject constructor(
     @ExperimentalCoroutinesApi
     private val fireButtonAnimation = Observer<Boolean> { shouldShowAnimation ->
         Timber.i("shouldShowAnimation $shouldShowAnimation")
-        if (currentBrowserViewState().fireButton is HighlightableButton.Visible) {
-            browserViewState.value = currentBrowserViewState().copy(fireButton = HighlightableButton.Visible(highlighted = shouldShowAnimation))
+        if (currentBrowserViewState().fireButton is Visible) {
+            browserViewState.value = currentBrowserViewState().copy(fireButton = Visible(highlighted = shouldShowAnimation))
         }
 
         if (shouldShowAnimation) {
@@ -1075,7 +1076,7 @@ class BrowserTabViewModel @Inject constructor(
         val currentBrowserViewState = currentBrowserViewState()
         val domain = site?.domain
         val addFavorite = if (!currentBrowserViewState.addFavorite.isEnabled()) {
-            HighlightableButton.Visible(enabled = true)
+            Visible(enabled = true)
         } else {
             currentBrowserViewState.addFavorite
         }
@@ -1087,7 +1088,7 @@ class BrowserTabViewModel @Inject constructor(
             addFavorite = addFavorite,
             addToHomeEnabled = domain != null,
             canSharePage = domain != null,
-            showPrivacyShield = true,
+            showPrivacyShield = Visible(enabled = true),
             canReportSite = domain != null,
             canChangePrivacyProtection = domain != null,
             isPrivacyProtectionDisabled = false,
@@ -1316,10 +1317,10 @@ class BrowserTabViewModel @Inject constructor(
         val currentBrowserViewState = currentBrowserViewState()
         browserViewState.value = currentBrowserViewState.copy(
             canSaveSite = false,
-            addFavorite = HighlightableButton.Visible(enabled = false),
+            addFavorite = Visible(enabled = false),
             addToHomeEnabled = false,
             canSharePage = false,
-            showPrivacyShield = false,
+            showPrivacyShield = Visible(enabled = false),
             canReportSite = false,
             showSearchIcon = true,
             showClearButton = true,
@@ -1819,16 +1820,16 @@ class BrowserTabViewModel @Inject constructor(
 
         val currentBrowserViewState = currentBrowserViewState()
         browserViewState.value = currentBrowserViewState.copy(
-            showPrivacyShield = showPrivacyShield,
+            showPrivacyShield = Visible(enabled = showPrivacyShield),
             showSearchIcon = showSearchIcon,
             showTabsButton = showControls,
             fireButton = if (showControls) {
-                HighlightableButton.Visible(highlighted = showPulseAnimation.value ?: false)
+                Visible(highlighted = showPulseAnimation.value ?: false)
             } else {
                 HighlightableButton.Gone
             },
             showMenuButton = if (showControls) {
-                HighlightableButton.Visible()
+                Visible()
             } else {
                 HighlightableButton.Gone
             },
@@ -2340,8 +2341,8 @@ class BrowserTabViewModel @Inject constructor(
         if (menuHighlighted) {
             this.showFavoritesOnboarding = false
             browserViewState.value = currentBrowserViewState().copy(
-                showMenuButton = HighlightableButton.Visible(highlighted = false),
-                addFavorite = HighlightableButton.Visible(highlighted = true),
+                showMenuButton = Visible(highlighted = false),
+                addFavorite = Visible(highlighted = true),
             )
         }
     }
@@ -2351,7 +2352,7 @@ class BrowserTabViewModel @Inject constructor(
             Timber.i("favoritesOnboarding onBrowserMenuClosed")
             if (currentBrowserViewState().addFavorite.isHighlighted()) {
                 browserViewState.value = currentBrowserViewState().copy(
-                    addFavorite = HighlightableButton.Visible(highlighted = false),
+                    addFavorite = Visible(highlighted = false),
                 )
             }
         }
@@ -2385,6 +2386,9 @@ class BrowserTabViewModel @Inject constructor(
         val cta = ctaViewState.value?.cta ?: return
         viewModelScope.launch(dispatchers.io()) {
             ctaViewModel.onCtaShown(cta)
+        }
+        if (cta is ExperimentOnboardingDaxDialogCta.DaxTrackersBlockedCta) {
+            browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = Visible(highlighted = true))
         }
     }
 
@@ -2433,9 +2437,22 @@ class BrowserTabViewModel @Inject constructor(
         command.value = when (cta) {
             is HomePanelCta.Survey -> LaunchSurvey(cta.survey)
             is HomePanelCta.AddWidgetAuto, is HomePanelCta.AddWidgetInstructions -> LaunchAddWidget
-            is ExperimentOnboardingDaxDialogCta -> DismissExperimentOnboardingDialog
+            is ExperimentOnboardingDaxDialogCta -> experimentOnboardingDialogDismiss(cta)
             else -> return
         }
+    }
+
+    private fun experimentOnboardingDialogDismiss(cta: ExperimentOnboardingDaxDialogCta): Command {
+        if (cta is ExperimentOnboardingDaxDialogCta.DaxTrackersBlockedCta) {
+            browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = Visible(highlighted = false))
+            viewModelScope.launch {
+                if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) {
+                    refreshCta()
+                }
+            }
+        }
+
+        return DismissExperimentOnboardingDialog
     }
 
     fun onUserClickCtaSecondaryButton() {
@@ -2860,7 +2877,12 @@ class BrowserTabViewModel @Inject constructor(
         url: String,
     ) {
         browserViewState.value =
-            currentBrowserViewState().copy(browserError = errorType, showPrivacyShield = false, showDaxIcon = false, showSearchIcon = false)
+            currentBrowserViewState().copy(
+                browserError = errorType,
+                showPrivacyShield = Visible(enabled = false),
+                showDaxIcon = false,
+                showSearchIcon = false,
+            )
         command.postValue(WebViewError(errorType, url))
     }
 

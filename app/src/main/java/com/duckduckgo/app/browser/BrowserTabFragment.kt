@@ -3203,6 +3203,8 @@ class BrowserTabFragment :
                 omnibar.browserMenuImageView
             } else if (viewState.fireButton.isHighlighted()) {
                 omnibar.fireIconImageView
+            } else if (viewState.showPrivacyShield.isHighlighted()) {
+                omnibar.placeholder
             } else {
                 null
             }
@@ -3637,7 +3639,7 @@ class BrowserTabFragment :
         private fun renderToolbarMenus(viewState: BrowserViewState) {
             if (viewState.browserShowing) {
                 omnibar.daxIcon?.isVisible = viewState.showDaxIcon
-                omnibar.shieldIcon?.isInvisible = !viewState.showPrivacyShield || viewState.showDaxIcon
+                omnibar.shieldIcon?.isInvisible = !viewState.showPrivacyShield.isEnabled() || viewState.showDaxIcon
                 omnibar.clearTextButton?.isVisible = viewState.showClearButton
                 omnibar.searchIcon?.isVisible = viewState.showSearchIcon
             } else {

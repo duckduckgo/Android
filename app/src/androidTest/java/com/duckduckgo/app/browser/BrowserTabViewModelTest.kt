@@ -104,6 +104,7 @@ import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.DaxDialogCta
+import com.duckduckgo.app.cta.ui.ExperimentOnboardingDaxDialogCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
@@ -1202,19 +1203,19 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenInitialisedThenPrivacyGradeIsNotShown() {
-        assertFalse(browserViewState().showPrivacyShield)
+        assertFalse(browserViewState().showPrivacyShield.isEnabled())
     }
 
     @Test
     fun whenUrlUpdatedThenPrivacyGradeIsShown() {
         loadUrl("")
-        assertTrue(browserViewState().showPrivacyShield)
+        assertTrue(browserViewState().showPrivacyShield.isEnabled())
     }
 
     @Test
     fun whenOmnibarDoesNotHaveFocusThenPrivacyGradeIsShownAndSearchIconIsHidden() {
         testee.onOmnibarInputStateChanged(query = "", hasFocus = false, hasQueryChanged = false)
-        assertTrue(browserViewState().showPrivacyShield)
+        assertTrue(browserViewState().showPrivacyShield.isEnabled())
         assertFalse(browserViewState().showSearchIcon)
     }
 
@@ -1223,14 +1224,14 @@ class BrowserTabViewModelTest {
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
         testee.onUserSubmittedQuery("foo")
         testee.onOmnibarInputStateChanged(query = "", hasFocus = false, hasQueryChanged = false)
-        assertTrue(browserViewState().showPrivacyShield)
+        assertTrue(browserViewState().showPrivacyShield.isEnabled())
         assertFalse(browserViewState().showSearchIcon)
     }
 
     @Test
     fun whenBrowserNotShownAndOmnibarInputHasFocusThenPrivacyGradeIsNotShown() {
         testee.onOmnibarInputStateChanged("", true, hasQueryChanged = false)
-        assertFalse(browserViewState().showPrivacyShield)
+        assertFalse(browserViewState().showPrivacyShield.isEnabled())
     }
 
     @Test
@@ -1238,7 +1239,7 @@ class BrowserTabViewModelTest {
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
         testee.onUserSubmittedQuery("foo")
         testee.onOmnibarInputStateChanged("", true, hasQueryChanged = false)
-        assertFalse(browserViewState().showPrivacyShield)
+        assertFalse(browserViewState().showPrivacyShield.isEnabled())
         assertTrue(browserViewState().showSearchIcon)
     }
 
@@ -2816,7 +2817,7 @@ class BrowserTabViewModelTest {
         val url = "https://example.com"
         loadUrl(url, isBrowserShowing = true)
         assertFalse(browserViewState().showDaxIcon)
-        assertTrue(browserViewState().showPrivacyShield)
+        assertTrue(browserViewState().showPrivacyShield.isEnabled())
     }
 
     @Test
@@ -5005,6 +5006,7 @@ class BrowserTabViewModelTest {
 
         assertCommandIssued<Command.SetBrowserBackground> {
             assertEquals(0, this.backgroundRes)
+            assertEquals(0, this.backgroundRes)
         }
     }
 
@@ -5220,6 +5222,34 @@ class BrowserTabViewModelTest {
         return mock<SslCertificate>().apply {
             whenever(x509Certificate).thenReturn(certificate)
         }
+    }
+
+    @Test
+    fun givenOnboardingExperimentEnabledWhenTrackersBlockedCtaShownThenPrivacyShieldIsHighlighted() = runTest {
+        val cta = ExperimentOnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList())
+        testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
+
+        testee.onCtaShown()
+        assertTrue(browserViewState().showPrivacyShield.isHighlighted())
+    }
+
+    @Test
+    fun givenOnboardingExperimentEnabledWhenUserDismissDaxTrackersBlockedDialogThenFinishPrivacyShieldPulse() {
+        val cta = ExperimentOnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList())
+        setCta(cta)
+
+        testee.onDaxDialogDismissed()
+        assertFalse(browserViewState().showPrivacyShield.isHighlighted())
+    }
+
+    @Test
+    fun givenOnboardingExperimentEnabledWhenUserDismissDaxTrackersBlockedDialogThenFireButtonDialogIsDisplayed() {
+        // TODO Noelia
+    }
+
+    @Test
+    fun givenOnboardingExperimentEnabledWhenUserDismissFireButtonDialogThenFireButtonHighlightFinished() {
+        // TODO Noelia
     }
 
     private fun aCredential(): LoginCredentials {
