@@ -62,6 +62,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.privacy.config.api.AmpLinks
+import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.user.agent.api.ClientBrandHintProvider
 import java.net.URI
 import javax.inject.Inject
@@ -95,6 +96,7 @@ class BrowserWebViewClient @Inject constructor(
     private val shouldSendPageLoadedPixel: PageLoadedHandler,
     private val shouldSendPagePaintedPixel: PagePaintedHandler,
     private val mediaPlayback: MediaPlayback,
+    private val subscriptions: Subscriptions,
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -130,6 +132,10 @@ class BrowserWebViewClient @Inject constructor(
             }
 
             return when (val urlType = specialUrlDetector.determineType(initiatingUrl = webView.originalUrl, uri = url)) {
+                is SpecialUrlDetector.UrlType.PrivacyProLink -> {
+                    subscriptions.launchPrivacyPro(webView.context)
+                    true
+                }
                 is SpecialUrlDetector.UrlType.Email -> {
                     webViewClientListener?.sendEmailRequested(urlType.emailAddress)
                     true

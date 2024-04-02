@@ -22,11 +22,13 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.Product.NetP
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -45,13 +47,15 @@ class RealSubscriptionsTest {
     val coroutineRule = CoroutineTestRule()
 
     private val mockSubscriptionsManager: SubscriptionsManager = mock()
+    private val globalActivityStarter: GlobalActivityStarter = mock()
+    private val pixel: SubscriptionPixelSender = mock()
     private lateinit var subscriptions: RealSubscriptions
     private val privacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java, FakeToggleStore())
 
     @Before
     fun before() = runTest {
         whenever(mockSubscriptionsManager.canSupportEncryption()).thenReturn(true)
-        subscriptions = RealSubscriptions(mockSubscriptionsManager, privacyProFeature)
+        subscriptions = RealSubscriptions(mockSubscriptionsManager, privacyProFeature, globalActivityStarter, pixel)
     }
 
     @Test
@@ -165,5 +169,41 @@ class RealSubscriptionsTest {
             SubscriptionOffer(monthlyPlanId = "test", yearlyFormattedPrice = "test", yearlyPlanId = "test", monthlyFormattedPrice = "test"),
         )
         assertFalse(subscriptions.isEligible())
+    }
+
+    @Test
+    fun whenCanTakeOverPrivacyProThenReturnCorrectValue() = runTest {
+        privacyProFeature.isLaunched().setEnabled(State(enable = true))
+        whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(
+            SubscriptionOffer(monthlyPlanId = "test", yearlyFormattedPrice = "test", yearlyPlanId = "test", monthlyFormattedPrice = "test"),
+        )
+        whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(UNKNOWN)
+
+        assertTrue(subscriptions.canTakeOverPrivacyPro("https://duckduckgo.com/pro"))
+        assertTrue(subscriptions.canTakeOverPrivacyPro("https://test.duckduckgo.com/pro"))
+        assertTrue(subscriptions.canTakeOverPrivacyPro("https://test.duckduckgo.com/pro?test=test"))
+        assertFalse(subscriptions.canTakeOverPrivacyPro("https://test.duckduckgo.com/pro/test"))
+        assertFalse(subscriptions.canTakeOverPrivacyPro("https://duckduckgo.test.com/pro"))
+        assertFalse(subscriptions.canTakeOverPrivacyPro("https://example.com"))
+        assertFalse(subscriptions.canTakeOverPrivacyPro("duckduckgo.com/pro"))
+    }
+
+    @Test
+    fun whenCanTakeOverPrivacyProAndNotEnableThenReturnFalse() = runTest {
+        privacyProFeature.isLaunched().setEnabled(State(enable = false))
+        whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(
+            SubscriptionOffer(monthlyPlanId = "test", yearlyFormattedPrice = "test", yearlyPlanId = "test", monthlyFormattedPrice = "test"),
+        )
+        whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(UNKNOWN)
+
+        assertFalse(subscriptions.canTakeOverPrivacyPro("https://duckduckgo.com/pro"))
+    }
+
+    @Test
+    fun whenCanTakeOverPrivacyProAndNotEligibleThenReturnFalse() = runTest {
+        privacyProFeature.isLaunched().setEnabled(State(enable = true))
+        whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(UNKNOWN)
+
+        assertFalse(subscriptions.canTakeOverPrivacyPro("https://duckduckgo.com/pro"))
     }
 }

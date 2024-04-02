@@ -16,20 +16,32 @@
 
 package com.duckduckgo.subscriptions.impl
 
+import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
+import androidx.core.content.ContextCompat
 import androidx.core.content.edit
+import androidx.core.net.toUri
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.toTldPlusOne
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
+import com.duckduckgo.subscriptions.impl.R.string
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PRIVACY_PRO_ETLD
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PRIVACY_PRO_PATH
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.isActiveOrWaiting
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -40,11 +52,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 @ContributesBinding(AppScope::class)
 class RealSubscriptions @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
     private val privacyProFeature: PrivacyProFeature,
+    private val globalActivityStarter: GlobalActivityStarter,
+    private val pixel: SubscriptionPixelSender,
 ) : Subscriptions {
     override suspend fun getAccessToken(): String? {
         if (!isEnabled()) return null
@@ -82,6 +97,38 @@ class RealSubscriptions @Inject constructor(
 
     override suspend fun getSubscriptionStatus(): SubscriptionStatus {
         return subscriptionsManager.subscriptionStatus()
+    }
+
+    override fun launchPrivacyPro(context: Context) {
+        val settings = globalActivityStarter.startIntent(context, SettingsScreenNoParams) ?: return
+        val privacyPro = globalActivityStarter.startIntent(
+            context,
+            SubscriptionsWebViewActivityWithParams(
+                url = SubscriptionsConstants.BUY_URL,
+                screenTitle = context.getString(string.buySubscriptionTitle),
+                defaultToolbar = true,
+            ),
+        ) ?: return
+        val intents: Array<Intent> = listOf(settings, privacyPro).toTypedArray<Intent>()
+        intents[0] = Intent(intents[0])
+        if (!ContextCompat.startActivities(context, intents)) {
+            val topIntent = Intent(intents[intents.size - 1])
+            context.startActivity(topIntent)
+        }
+        pixel.reportPrivacyProRedirect()
+    }
+    override fun canTakeOverPrivacyPro(url: String): Boolean {
+        val uri = url.toUri()
+        val eTld = uri.host?.toTldPlusOne() ?: return false
+        val size = uri.pathSegments.size
+        val path = uri.pathSegments.firstOrNull()
+        return if (eTld == PRIVACY_PRO_ETLD && size == 1 && path == PRIVACY_PRO_PATH) {
+            runBlocking {
+                isEligible() && isEnabled()
+            }
+        } else {
+            false
+        }
     }
 }
 

@@ -88,6 +88,7 @@ interface SubscriptionPixelSender {
     fun reportYearlyPriceClick()
     fun reportOnboardingFaqClick()
     fun reportAddEmailSuccess()
+    fun reportPrivacyProRedirect()
 }
 
 @ContributesBinding(AppScope::class)
@@ -192,6 +193,9 @@ class SubscriptionPixelSenderImpl @Inject constructor(
         fire(SUBSCRIPTION_ONBOARDING_FAQ_CLICK)
 
     override fun reportAddEmailSuccess() =
+        fire(SUBSCRIPTION_ADD_EMAIL_SUCCESS)
+
+    override fun reportPrivacyProRedirect() =
         fire(SUBSCRIPTION_ADD_EMAIL_SUCCESS)
 
     private fun fire(pixel: SubscriptionPixel) {

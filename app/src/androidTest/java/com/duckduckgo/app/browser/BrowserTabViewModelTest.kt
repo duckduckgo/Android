@@ -44,6 +44,7 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.A
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteService
+import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
 import com.duckduckgo.app.browser.WebViewErrorResponse.BAD_URL
@@ -53,6 +54,7 @@ import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
 import com.duckduckgo.app.browser.camera.CameraHardwareChecker
 import com.duckduckgo.app.browser.commands.Command
+import com.duckduckgo.app.browser.commands.Command.LaunchPrivacyPro
 import com.duckduckgo.app.browser.commands.Command.LoadExtractedUrl
 import com.duckduckgo.app.browser.commands.Command.ShowBackNavigationHistory
 import com.duckduckgo.app.browser.commands.Command.ShowPrivacyProtectionDisabledConfirmation
@@ -163,6 +165,7 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
+import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
@@ -423,6 +426,8 @@ class BrowserTabViewModelTest {
 
     private val mockPrivacyProtectionsToggleUsageListener: PrivacyProtectionsToggleUsageListener = mock()
 
+    private val subscriptions: Subscriptions = mock()
+
     private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels = mock {
         runBlocking { whenever(mock.getPixelParams()).thenReturn(emptyMap()) }
     }
@@ -456,6 +461,7 @@ class BrowserTabViewModelTest {
         whenever(mockSettingsDataStore.automaticFireproofSetting).thenReturn(AutomaticFireproofSetting.ASK_EVERY_TIME)
         whenever(androidBrowserConfig.screenLock()).thenReturn(mockToggle)
         whenever(mockExtendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()).thenReturn(false)
+        whenever(subscriptions.canTakeOverPrivacyPro(any())).thenReturn(false)
 
         remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
 
@@ -561,6 +567,7 @@ class BrowserTabViewModelTest {
             privacyProtectionsPopupExperimentExternalPixels = privacyProtectionsPopupExperimentExternalPixels,
             faviconsFetchingPrompt = mockFaviconFetchingPrompt,
             extendedOnboardingExperimentVariantManager = mockExtendedOnboardingExperimentVariantManager,
+            subscriptions = subscriptions,
         )
 
         testee.loadData("abc", null, false, false)
@@ -676,6 +683,60 @@ class BrowserTabViewModelTest {
         setBrowserShowing(true)
         testee.onViewResumed()
         assertCommandIssued<Command.ShowErrorWithAction>()
+    }
+
+    @Test
+    fun whenSubmittedQueryIsPrivacyProThenSendLaunchPrivacyProComment() {
+        whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.PrivacyProLink)
+        whenever(mockOmnibarConverter.convertQueryToUrl("https://duckduckgo.com/pro", null)).thenReturn("https://duckduckgo.com/pro")
+        whenever(subscriptions.canTakeOverPrivacyPro(any())).thenReturn(true)
+        testee.onUserSubmittedQuery("https://duckduckgo.com/pro")
+        assertCommandIssued<LaunchPrivacyPro>()
+    }
+
+    @Test
+    fun whenSubmittedQueryIsPrivacyProAndNavigationStateNullThenCloseTab() = runTest {
+        givenOneActiveTabSelected()
+        whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.PrivacyProLink)
+        whenever(mockOmnibarConverter.convertQueryToUrl("https://duckduckgo.com/pro", null)).thenReturn("https://duckduckgo.com/pro")
+        whenever(subscriptions.canTakeOverPrivacyPro(any())).thenReturn(true)
+
+        testee.onUserSubmittedQuery("https://duckduckgo.com/pro")
+        assertCommandIssued<LaunchPrivacyPro>()
+        verify(mockAdClickManager).clearTabId(any())
+        verify(mockTabRepository).deleteTabAndSelectSource(any())
+    }
+
+    @Test
+    fun whenSubmittedQueryIsPrivacyProAndNoNavigationHistoryThenCloseTab() = runTest {
+        givenOneActiveTabSelected()
+        whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.PrivacyProLink)
+        whenever(mockOmnibarConverter.convertQueryToUrl("https://duckduckgo.com/pro", null)).thenReturn("https://duckduckgo.com/pro")
+        whenever(subscriptions.canTakeOverPrivacyPro(any())).thenReturn(true)
+        val nav: WebNavigationState = mock()
+        whenever(nav.hasNavigationHistory).thenReturn(false)
+
+        testee.navigationStateChanged(nav)
+        testee.onUserSubmittedQuery("https://duckduckgo.com/pro")
+        assertCommandIssued<LaunchPrivacyPro>()
+        verify(mockAdClickManager).clearTabId(any())
+        verify(mockTabRepository).deleteTabAndSelectSource(any())
+    }
+
+    @Test
+    fun whenSubmittedQueryIsPrivacyProAndNavigationHistoryThenDoNotCloseTab() = runTest {
+        givenOneActiveTabSelected()
+        whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.PrivacyProLink)
+        whenever(mockOmnibarConverter.convertQueryToUrl("https://duckduckgo.com/pro", null)).thenReturn("https://duckduckgo.com/pro")
+        whenever(subscriptions.canTakeOverPrivacyPro(any())).thenReturn(true)
+        val nav: WebNavigationState = mock()
+        whenever(nav.hasNavigationHistory).thenReturn(true)
+
+        testee.navigationStateChanged(nav)
+        testee.onUserSubmittedQuery("https://duckduckgo.com/pro")
+        assertCommandIssued<LaunchPrivacyPro>()
+        verify(mockAdClickManager, never()).clearTabId(any())
+        verify(mockTabRepository, never()).deleteTabAndSelectSource(any())
     }
 
     @Test
@@ -1667,6 +1728,32 @@ class BrowserTabViewModelTest {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val ultimateCommand = commandCaptor.lastValue
         assertTrue(ultimateCommand == NavigationCommand.Refresh)
+    }
+
+    @Test
+    fun whenUserSelectsOpenTabAndItIsPrivacyProThenLaunchPrivacyProCommandSent() {
+        whenever(mockLongPressHandler.userSelectedMenuItem(any(), any())).thenReturn(OpenInNewTab("http://example.com"))
+        whenever(subscriptions.canTakeOverPrivacyPro(any())).thenReturn(true)
+
+        val mockMenItem: MenuItem = mock()
+        val longPressTarget = LongPressTarget(url = "http://example.com", type = WebView.HitTestResult.SRC_ANCHOR_TYPE)
+        testee.userSelectedItemFromLongPressMenu(longPressTarget, mockMenItem)
+
+        assertCommandIssued<LaunchPrivacyPro>()
+        assertCommandNotIssued<Command.OpenInNewTab>()
+    }
+
+    @Test
+    fun whenUserSelectsOpenInBackgroundTabAndItIsPrivacyProThenLaunchPrivacyProCommandSent() {
+        whenever(mockLongPressHandler.userSelectedMenuItem(any(), any())).thenReturn(RequiredAction.OpenInNewBackgroundTab("http://example.com"))
+        whenever(subscriptions.canTakeOverPrivacyPro(any())).thenReturn(true)
+
+        val mockMenItem: MenuItem = mock()
+        val longPressTarget = LongPressTarget(url = "http://example.com", type = WebView.HitTestResult.SRC_ANCHOR_TYPE)
+        testee.userSelectedItemFromLongPressMenu(longPressTarget, mockMenItem)
+
+        assertCommandIssued<LaunchPrivacyPro>()
+        assertCommandNotIssued<Command.OpenInNewBackgroundTab>()
     }
 
     @Test

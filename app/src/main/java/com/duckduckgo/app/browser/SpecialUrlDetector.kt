@@ -27,6 +27,7 @@ import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType
 import com.duckduckgo.privacy.config.api.AmpLinkType
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.TrackingParameters
+import com.duckduckgo.subscriptions.api.Subscriptions
 import java.net.URISyntaxException
 import timber.log.Timber
 
@@ -34,6 +35,7 @@ class SpecialUrlDetectorImpl(
     private val packageManager: PackageManager,
     private val ampLinks: AmpLinks,
     private val trackingParameters: TrackingParameters,
+    private val subscriptions: Subscriptions,
 ) : SpecialUrlDetector {
 
     override fun determineType(initiatingUrl: String?, uri: Uri): UrlType {
@@ -65,6 +67,10 @@ class SpecialUrlDetectorImpl(
 
     @Suppress("NewApi") // we use appBuildConfig
     override fun processUrl(initiatingUrl: String?, uriString: String): UrlType {
+        if (subscriptions.canTakeOverPrivacyPro(uriString)) {
+            return UrlType.PrivacyProLink
+        }
+
         trackingParameters.cleanTrackingParameters(initiatingUrl = initiatingUrl, url = uriString)?.let { cleanedUrl ->
             return UrlType.TrackingParameterLink(cleanedUrl = cleanedUrl)
         }

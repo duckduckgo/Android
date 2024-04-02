@@ -31,6 +31,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.privacy.config.api.AmpLinkType
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.TrackingParameters
+import com.duckduckgo.subscriptions.api.Subscriptions
 import java.net.URISyntaxException
 import junit.framework.TestCase.assertNull
 import junit.framework.TestCase.assertTrue
@@ -61,6 +62,9 @@ class SpecialUrlDetectorImplTest {
     @Mock
     lateinit var appBuildConfig: AppBuildConfig
 
+    @Mock
+    lateinit var subscriptions: Subscriptions
+
     @Before
     fun setup() {
         MockitoAnnotations.openMocks(this)
@@ -68,6 +72,7 @@ class SpecialUrlDetectorImplTest {
             packageManager = mockPackageManager,
             ampLinks = mockAmpLinks,
             trackingParameters = mockTrackingParameters,
+            subscriptions = subscriptions,
         )
         whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(emptyList())
     }
@@ -358,6 +363,15 @@ class SpecialUrlDetectorImplTest {
             testee.determineType(initiatingUrl = "https://www.example.com", uri = "https://www.example.com/query.html?utm_example=something".toUri())
         assertEquals(expected, actual::class)
         assertEquals("https://www.example.com/query.html", (actual as TrackingParameterLink).cleanedUrl)
+    }
+
+    @Test
+    fun whenUrlIsPrivacyProThenPrivacyProLinkDetected() {
+        whenever(subscriptions.canTakeOverPrivacyPro(any())).thenReturn(true)
+
+        val actual =
+            testee.determineType(initiatingUrl = "https://www.example.com", uri = "https://www.example.com".toUri())
+        assertTrue(actual is PrivacyProLink)
     }
 
     private fun randomString(length: Int): String {
