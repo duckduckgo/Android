@@ -816,4 +816,15 @@
     <!-- Custom Tab -->
     <string name="openInDdgMenuItemTitle">Open in DuckDuckGo</string>
     <string name="runningInDdgMenuItemTitle">Running in DuckDuckGo</string>
+
+    <!-- SSL Error -->
+    <string name="sslErrorTitle">Warning: This site may be insecure</string>
+    <string name="sslErrorHeadline">The certificate for this site is invalid. You might be connecting to a server that is pretending to be %1$s which could put your confidential information at risk.</string>
+    <string name="sslErrorLeaveCTA">Leave This Site</string>
+    <string name="sslErrorAdvancedCTA">Advanced</string>
+    <string name="sslErrorExpandedHeadline">DuckDuckGo warns you when a website has an invalid certificate.</string>
+    <string name="sslErrorExpandedCTA"><![CDATA[<u>Accept Risk and Visit Site<u/>]]></string>
+    <string name="sslErrorExpiredMessage">The security certificate for %1$s is expired. It’s possible that the website is misconfigured, that an attacker has compromised your connection, or that your system clock is incorrect.</string>
+    <string name="sslErrorWrongHostMessage">The security certificate for %1$s does not match *.%2$s. It’s possible that the website is misconfigured or that an attacker has compromised your connection, or that your system clock is incorrect.</string>
+    <string name="sslErrorUntrustedMessage">The security certificate for %1$s is not trusted by your device\'s operating system. It’s possible that the website is misconfigured or that an attacker has compromised your connection, or that your system clock is incorrect.</string>
 </resources>
