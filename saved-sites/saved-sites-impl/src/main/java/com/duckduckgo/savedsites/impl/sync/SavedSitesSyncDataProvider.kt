@@ -40,6 +40,7 @@ class SavedSitesSyncDataProvider @Inject constructor(
     private val savedSitesSyncStore: SavedSitesSyncStore,
     private val syncCrypto: SyncCrypto,
     private val savedSitesFormFactorSyncMigration: SavedSitesFormFactorSyncMigration,
+    private val bookmarksSyncLocalValidationFeature: BookmarksSyncLocalValidationFeature,
 ) : SyncableDataProvider {
     override fun getType(): SyncableType = BOOKMARKS
 
@@ -220,6 +221,8 @@ class SavedSitesSyncDataProvider @Inject constructor(
     }
 
     private fun isValid(syncSavedSite: SyncSavedSitesRequestEntry): Boolean {
+        if (bookmarksSyncLocalValidationFeature.self().isEnabled().not()) return true // no validation required
+
         val titleLength = syncSavedSite.title?.length ?: 0
         val urlLength = syncSavedSite.page?.url?.length ?: 0
 
@@ -227,6 +230,8 @@ class SavedSitesSyncDataProvider @Inject constructor(
     }
 
     private fun fixFolderIfNecessary(folder: BookmarkFolder): BookmarkFolder {
+        if (bookmarksSyncLocalValidationFeature.self().isEnabled().not()) return folder
+
         val fixedName = folder.name.take(MAX_FOLDER_TITLE_LENGTH)
         return folder.copy(name = fixedName)
     }

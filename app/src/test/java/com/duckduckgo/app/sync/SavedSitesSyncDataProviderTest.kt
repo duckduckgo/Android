@@ -26,6 +26,7 @@ import com.duckduckgo.app.bookmarks.BookmarkTestUtils.createInvalidFolder
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
@@ -34,6 +35,7 @@ import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.impl.MissingEntitiesRelationReconciler
 import com.duckduckgo.savedsites.impl.RealFavoritesDelegate
 import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
+import com.duckduckgo.savedsites.impl.sync.BookmarksSyncLocalValidationFeature
 import com.duckduckgo.savedsites.impl.sync.RealSavedSitesFormFactorSyncMigration
 import com.duckduckgo.savedsites.impl.sync.RealSavedSitesSyncStore
 import com.duckduckgo.savedsites.impl.sync.RealSyncSavedSitesRepository
@@ -143,13 +145,26 @@ class SavedSitesSyncDataProviderTest {
             MissingEntitiesRelationReconciler(savedSitesEntitiesDao),
             coroutinesTestRule.testDispatcherProvider,
         )
+        val featureFlag = mock<BookmarksSyncLocalValidationFeature>().apply {
+            val enabledToggle = mock<Toggle>().apply {
+                whenever(isEnabled()).thenReturn(true)
+            }
+            whenever(self()).thenReturn(enabledToggle)
+        }
 
         savedSitesFormFactorSyncMigration = RealSavedSitesFormFactorSyncMigration(
             savedSitesEntitiesDao,
             savedSitesRelationsDao,
             savedSitesSettingsRepository,
         )
-        parser = SavedSitesSyncDataProvider(repository, syncRepository, syncFeatureStore, FakeCrypto(), savedSitesFormFactorSyncMigration)
+        parser = SavedSitesSyncDataProvider(
+            repository,
+            syncRepository,
+            syncFeatureStore,
+            FakeCrypto(),
+            savedSitesFormFactorSyncMigration,
+            featureFlag,
+        )
 
         favoritesFolder = repository.insert(favoritesFolder)
         bookmarksRootFolder = repository.insert(bookmarksRootFolder)
