@@ -37,6 +37,10 @@ import io.reactivex.Observable
 import javax.inject.Inject
 import org.jetbrains.annotations.VisibleForTesting
 
+const val maximumNumberOfSuggestions = 12
+const val maximumNumberOfTopHits = 2
+const val minimumNumberInSuggestionGroup = 5
+
 interface AutoComplete {
     fun autoComplete(query: String): Observable<AutoCompleteResult>
 
@@ -111,13 +115,21 @@ class AutoCompleteApi @Inject constructor(
                     is AutoCompleteBookmarkSuggestion -> it.isAllowedInTopHits
                     else -> false
                 }
-            }.take(2)
+            }.take(maximumNumberOfTopHits)
 
-            val filteredSearchResults = searchResults.filterNot { bookmarksResults.any { bookmark -> it.phrase == bookmark.phrase } }
+            val maxBottomSection = maximumNumberOfSuggestions - (topHits.size + minimumNumberInSuggestionGroup)
+            val filteredBookmarks =
+                bookmarksResults
+                    .filter { bookmarkSuggestion -> topHits.none { it.phrase == bookmarkSuggestion.phrase } }
+                    .take(maxBottomSection)
+            val maxSearchResults = maximumNumberOfSuggestions - (topHits.size + filteredBookmarks.size)
+            val filteredSearchResults = searchResults
+                .filter { searchSuggestion -> filteredBookmarks.none { it.phrase == searchSuggestion.phrase } }
+                .take(maxSearchResults)
 
             AutoCompleteResult(
                 query = query,
-                suggestions = (topHits + filteredSearchResults + bookmarksResults.subtract(topHits.toSet())).distinctBy { it.phrase },
+                suggestions = (topHits + filteredSearchResults + filteredBookmarks).distinctBy { it.phrase },
             )
         }
     }

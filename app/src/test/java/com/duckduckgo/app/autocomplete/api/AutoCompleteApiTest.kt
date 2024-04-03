@@ -208,9 +208,6 @@ class AutoCompleteApiTest {
         assertTrue((value.suggestions[2] as AutoCompleteBookmarkSuggestion).isAllowedInTopHits)
         assertTrue((value.suggestions[3] as AutoCompleteBookmarkSuggestion).isAllowedInTopHits)
         assertFalse((value.suggestions[4] as AutoCompleteBookmarkSuggestion).isAllowedInTopHits)
-        assertFalse((value.suggestions[5] as AutoCompleteBookmarkSuggestion).isAllowedInTopHits)
-        assertFalse((value.suggestions[6] as AutoCompleteBookmarkSuggestion).isAllowedInTopHits)
-        assertFalse((value.suggestions[7] as AutoCompleteBookmarkSuggestion).isAllowedInTopHits)
     }
 
     @Test
