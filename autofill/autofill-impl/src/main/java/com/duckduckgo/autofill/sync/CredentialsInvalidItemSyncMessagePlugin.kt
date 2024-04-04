@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,16 @@
 
 package com.duckduckgo.autofill.sync
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
+import android.content.Context
+import android.view.View
+import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.sync.api.SyncMessagePlugin
+import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 
-class FakeCredentialsSyncStore : CredentialsSyncStore {
-    override var serverModifiedSince: String = "0"
-    override var startTimeStamp: String = "0"
-    override var clientModifiedSince: String = "0"
-    override var isSyncPaused: Boolean = false
-    override fun isSyncPausedFlow(): Flow<Boolean> = emptyFlow()
-    override var invalidEntitiesIds: List<String> = emptyList()
+@ContributesMultibinding(scope = ActivityScope::class)
+class CredentialsInvalidItemSyncMessagePlugin @Inject constructor() : SyncMessagePlugin {
+    override fun getView(context: Context): View {
+        return CredentialsInvalidItemsView(context)
+    }
 }
