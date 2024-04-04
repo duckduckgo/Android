@@ -47,7 +47,7 @@
             android:layout_height="wrap_content"
             android:paddingTop="24dp"
             android:text="@string/emailNotSupported"
-            android:textAlignment="center"/>
+            android:gravity="center"/>
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/emailPrivacyDescription"
@@ -59,7 +59,7 @@
             android:layout_marginEnd="24dp"
             android:paddingTop="8dp"
             android:text="@string/emailNotSupportedExplanation"
-            android:textAlignment="center"/>
+            android:gravity="center"/>
 
     </LinearLayout>
 

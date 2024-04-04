@@ -45,7 +45,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="26dp"
         android:text="@string/onboardingDefaultBrowserTitle"
-        android:textAlignment="center"
+        android:gravity="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/defaultBrowserImage" />
@@ -57,7 +57,7 @@
         android:layout_height="0dp"
         android:layout_marginTop="@dimen/keyline_4"
         android:text="@string/defaultBrowserDescriptionNoDefault"
-        android:textAlignment="center"
+        android:gravity="center"
         app:layout_constraintEnd_toEndOf="@id/browserProtectionTitle"
         app:layout_constraintStart_toStartOf="@id/browserProtectionTitle"
         app:layout_constraintTop_toBottomOf="@id/browserProtectionTitle"

@@ -58,7 +58,7 @@
                 android:layout_marginStart="@dimen/keyline_4"
                 android:layout_marginEnd="@dimen/keyline_4"
                 android:text="@string/netpBetaFeature"
-                android:textAlignment="center"
+                android:gravity="center"
             />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
@@ -71,7 +71,7 @@
                 android:layout_marginEnd="@dimen/keyline_4"
                 android:layout_marginTop="@dimen/keyline_4"
                 android:text="@string/netpBetaFeatureByline"
-                android:textAlignment="center"
+                android:gravity="center"
             />
 
             <FrameLayout

@@ -53,7 +53,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/keyline_4"
                 android:text="@string/netpWaitlistRedeemedCodeStatus"
-                android:textAlignment="center"
+                android:gravity="center"
             />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
@@ -64,7 +64,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/keyline_4"
                 android:text="@string/netpWaitlistInBetaDescription"
-                android:textAlignment="center"
+                android:gravity="center"
             />
 
             <LinearLayout

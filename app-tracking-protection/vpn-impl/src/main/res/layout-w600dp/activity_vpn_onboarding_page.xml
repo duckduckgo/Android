@@ -72,7 +72,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/atp_OnboardingLastPageOneTitle"
-                android:textAlignment="center"
+                android:gravity="center"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/onboarding_page_header"/>
@@ -81,7 +81,7 @@
                 android:id="@+id/onboarding_page_text"
                 app:typography="body2"
                 app:textType="secondary"
-                android:textAlignment="center"
+                android:gravity="center"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="30dp"
