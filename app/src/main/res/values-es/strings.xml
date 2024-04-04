@@ -820,12 +820,12 @@
 
     <!-- SSL Error -->
     <string name="sslErrorTitle">Advertencia: este sitio puede ser inseguro</string>
-    <string name="sslErrorHeadline" instruction="Placeholder is domain with certificate issues">El certificado de este servidor no es válido. Puede que te estés conectando a un servidor que se hace pasar por %1$s, lo que podría poner en riesgo tu información confidencial.</string>
+    <string name="sslErrorHeadline" instruction="Placeholder is domain with certificate issues">El certificado de este sitio no es válido. Puede que te estés conectando a un servidor que se hace pasar por %1$s, lo que podría poner en riesgo tu información confidencial.</string>
     <string name="sslErrorLeaveCTA">Salir de este sitio</string>
     <string name="sslErrorAdvancedCTA">Avanzado</string>
     <string name="sslErrorExpandedHeadline">DuckDuckGo te avisa cuando un sitio web tiene un certificado no válido.</string>
     <string name="sslErrorExpandedCTA"><![CDATA[<u>Aceptar el riesgo y visitar el sitio<u/>]]></string>
-    <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">DuckDuckGo te avisa cuando un sitio web tiene un certificado no válido. El certificado de seguridad de %1$s ha caducado. Es posible que el sitio web esté mal configurado, que un atacante haya comprometido tu conexión o que el reloj del sistema no sea correcto.</string>
-    <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">DuckDuckGo te avisa cuando un sitio web tiene un certificado no válido. El certificado de seguridad de %1$s no coincide con *.%2$s. Es posible que el sitio web esté mal configurado o que un atacante haya comprometido tu conexión.</string>
-    <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">DuckDuckGo te avisa cuando un sitio web tiene un certificado no válido. El sistema operativo del dispositivo no confía en el certificado de seguridad de %1$s. Es posible que el sitio web esté mal configurado o que un atacante haya comprometido tu conexión.</string>
+    <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">El certificado de seguridad de %1$s ha caducado. Es posible que el sitio web esté mal configurado, que un atacante haya comprometido tu conexión o que el reloj del sistema no sea correcto.</string>
+    <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">El certificado de seguridad de %1$s no coincide con *.%2$s. Es posible que el sitio web esté mal configurado, que un atacante haya comprometido tu conexión o que el reloj del sistema no sea correcto.</string>
+    <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">El sistema operativo del dispositivo no confía en el certificado de seguridad de %1$s. Es posible que el sitio web esté mal configurado, que un atacante haya comprometido tu conexión o que el reloj del sistema no sea correcto.</string>
 </resources>
