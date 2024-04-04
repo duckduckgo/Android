@@ -21,94 +21,71 @@ import android.content.Context
 import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.lifecycle.LifecycleOwner
 import androidx.work.*
 import com.duckduckgo.anvil.annotations.ContributesWorker
-import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.dao.VpnNotification
-import com.duckduckgo.mobile.android.vpn.dao.VpnNotificationsDao
+import com.duckduckgo.mobile.android.vpn.cohort.CohortStore
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
+import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
-import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationScheduler.Companion
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
+import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationScheduler.Companion.VPN_DAILY_NOTIFICATION_ID
+import com.squareup.anvil.annotations.ContributesMultibinding
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.*
 import logcat.logcat
 
-@Module
-@ContributesTo(AppScope::class)
-object DeviceShieldNotificationSchedulerModule {
-    @Provides
-    @IntoSet
-    fun provideDeviceShieldNotificationScheduler(
-        @AppCoroutineScope appCoroutineScope: CoroutineScope,
-        workManager: WorkManager,
-        vpnDatabase: VpnDatabase,
-        dispatchers: DispatcherProvider,
-    ): MainProcessLifecycleObserver {
-        return DeviceShieldNotificationScheduler(appCoroutineScope, workManager, vpnDatabase, dispatchers)
-    }
-
-    @Provides
-    fun provideVpnNotificationsDao(vpnDatabase: VpnDatabase): VpnNotificationsDao = vpnDatabase.vpnNotificationsDao()
-}
-
-class DeviceShieldNotificationScheduler(
-    private val coroutineScope: CoroutineScope,
+@ContributesMultibinding(AppScope::class)
+class DeviceShieldNotificationScheduler @Inject constructor(
     private val workManager: WorkManager,
-    private val vpnDatabase: VpnDatabase,
+    private val cohortStore: CohortStore,
     private val dispatchers: DispatcherProvider,
-) : MainProcessLifecycleObserver {
+) : VpnServiceCallbacks {
 
-    override fun onCreate(owner: LifecycleOwner) {
-        scheduleDailyNotification()
-        scheduleWeeklyNotification()
+    override fun onVpnStarted(coroutineScope: CoroutineScope) {
+        coroutineScope.launch(dispatchers.io()) {
+            scheduleDailyNotification()
+            scheduleWeeklyNotification()
+        }
     }
 
-    private fun scheduleDailyNotification() {
-        val vpnNotificationsDao = vpnDatabase.vpnNotificationsDao()
-        coroutineScope.launch(dispatchers.io()) {
-            val exists = withContext(dispatchers.io()) {
-                vpnNotificationsDao.exists(VPN_DAILY_NOTIFICATION_ID)
-            }
-            if (exists) {
-                val timesRun = withContext(dispatchers.io()) {
-                    vpnNotificationsDao.get(VPN_DAILY_NOTIFICATION_ID).timesRun
-                }
-                if (timesRun > TOTAL_DAILY_NOTIFICATIONS) {
-                    logcat { "Vpn Daily notification has ran $timesRun times, we don't need to ran it anymore" }
+    override fun onVpnStopped(
+        coroutineScope: CoroutineScope,
+        vpnStopReason: VpnStopReason,
+    ) {
+        // noop
+    }
 
-                    val workQuery = WorkQuery.Builder
-                        .fromUniqueWorkNames(listOf(WORKER_VPN_DAILY_NOTIFICATION_NAME))
-                        .build()
+    private suspend fun scheduleDailyNotification() = withContext(dispatchers.io()) {
+        val daysRun = cohortStore.getCohortStoredLocalDate()?.daysUntilNow() ?: return@withContext
 
-                    val workInfo = workManager.getWorkInfos(workQuery).get()
-                    if (workInfo.isEmpty()) {
-                        logcat { "Vpn Daily notification has already been removed from WorkManager, nothing to do" }
-                    } else {
-                        workManager.cancelUniqueWork(WORKER_VPN_DAILY_NOTIFICATION_NAME)
-                        logcat { "Vpn Daily notification has now been removed from WorkManager" }
-                    }
-                } else {
-                    logcat { "Vpn Daily notification has ran $timesRun times out of $TOTAL_DAILY_NOTIFICATIONS" }
-                }
+        if (daysRun > TOTAL_DAILY_NOTIFICATIONS) {
+            logcat { "Vpn Daily notification has ran $daysRun times, we don't need to ran it anymore" }
+
+            val workQuery = WorkQuery.Builder
+                .fromUniqueWorkNames(listOf(WORKER_VPN_DAILY_NOTIFICATION_NAME))
+                .build()
+
+            val workInfo = workManager.getWorkInfos(workQuery).get()
+            if (workInfo.isEmpty()) {
+                logcat { "Vpn Daily notification has already been removed from WorkManager, nothing to do" }
             } else {
-                logcat { "Scheduling the Vpn Daily notifications worker" }
-                val dailyNotificationRequest = PeriodicWorkRequestBuilder<DeviceShieldDailyNotificationWorker>(24, TimeUnit.HOURS)
-                    .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.MINUTES)
-                    .setInitialDelay(24, TimeUnit.HOURS)
-                    .build()
-                vpnNotificationsDao.increment(VPN_DAILY_NOTIFICATION_ID)
-                workManager.enqueueUniquePeriodicWork(WORKER_VPN_DAILY_NOTIFICATION_NAME, ExistingPeriodicWorkPolicy.KEEP, dailyNotificationRequest)
+                workManager.cancelUniqueWork(WORKER_VPN_DAILY_NOTIFICATION_NAME)
+                logcat { "Vpn Daily notification has now been removed from WorkManager" }
             }
+        } else {
+            logcat { "Scheduling the Vpn Daily notifications worker" }
+            val dailyNotificationRequest = PeriodicWorkRequestBuilder<DeviceShieldDailyNotificationWorker>(24, TimeUnit.HOURS)
+                .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.MINUTES)
+                .setInitialDelay(24, TimeUnit.HOURS)
+                .addTag(WORKER_VPN_DAILY_NOTIFICATION_NAME)
+                .build()
+            workManager.enqueueUniquePeriodicWork(WORKER_VPN_DAILY_NOTIFICATION_NAME, ExistingPeriodicWorkPolicy.KEEP, dailyNotificationRequest)
         }
     }
 
@@ -125,16 +102,18 @@ class DeviceShieldNotificationScheduler(
     }
 
     companion object {
-        private const val WORKER_VPN_DAILY_NOTIFICATION_NAME = "VpnDailyNotification"
-        private const val WORKER_VPN_WEEKLY_NOTIFICATION_TAG = "VpnWeeklyNotificationWorker"
+        internal const val WORKER_VPN_DAILY_NOTIFICATION_NAME = "VpnDailyNotification"
+        internal const val WORKER_VPN_WEEKLY_NOTIFICATION_TAG = "VpnWeeklyNotificationWorker"
         private const val WORKER_VPN_WEEKLY_NOTIFICATION_NAME = "VpnWeeklyNotification"
+        private const val FIRST_WEEKLY_NOTIFICATION_DELAY = 14L
 
-        const val TOTAL_DAILY_NOTIFICATIONS = 7L
-        const val FIRST_WEEKLY_NOTIFICATION_DELAY = 14L
-
-        const val VPN_DAILY_NOTIFICATION_ID = 998
-        const val VPN_WEEKLY_NOTIFICATION_ID = 997
+        internal const val VPN_DAILY_NOTIFICATION_ID = 998
+        internal const val VPN_WEEKLY_NOTIFICATION_ID = 997
     }
+}
+
+private fun LocalDate.daysUntilNow(): Long {
+    return ChronoUnit.DAYS.between(this, LocalDate.now())
 }
 
 @ContributesWorker(AppScope::class)
@@ -158,32 +137,23 @@ class DeviceShieldDailyNotificationWorker(
     lateinit var deviceShieldNotificationFactory: DeviceShieldNotificationFactory
 
     @Inject
-    lateinit var vpnNotificationsDao: VpnNotificationsDao
+    lateinit var deviceShieldAlertNotificationBuilder: DeviceShieldAlertNotificationBuilder
 
     @Inject
-    lateinit var deviceShieldAlertNotificationBuilder: DeviceShieldAlertNotificationBuilder
+    lateinit var cohortStore: CohortStore
 
     override suspend fun doWork(): Result {
         logcat { "Vpn Daily notification worker is now awake" }
 
-        if (vpnNotificationsDao.exists(DeviceShieldNotificationScheduler.VPN_DAILY_NOTIFICATION_ID)) {
-            vpnNotificationsDao.increment(DeviceShieldNotificationScheduler.VPN_DAILY_NOTIFICATION_ID)
-            val timesRun = vpnNotificationsDao.get(DeviceShieldNotificationScheduler.VPN_DAILY_NOTIFICATION_ID).timesRun
-            if (timesRun >= DeviceShieldNotificationScheduler.TOTAL_DAILY_NOTIFICATIONS) {
-                logcat {
-                    "Vpn Daily notification has ran $timesRun times out of" +
-                        " ${DeviceShieldNotificationScheduler.TOTAL_DAILY_NOTIFICATIONS}, we don't need to ran it anymore"
-                }
-                return Result.success()
-            } else {
-                logcat { "Vpn Daily notification has ran $timesRun times out of ${DeviceShieldNotificationScheduler.TOTAL_DAILY_NOTIFICATIONS}" }
-            }
+        val daysRun = cohortStore.getCohortStoredLocalDate()?.daysUntilNow() ?: return Result.success()
+
+        if (daysRun >= TOTAL_DAILY_NOTIFICATIONS) {
+            logcat { "Vpn Daily notification has ran more than $TOTAL_DAILY_NOTIFICATIONS, we don't need to ran it anymore" }
         } else {
-            logcat { "Vpn Daily notification running for the first time" }
-            vpnNotificationsDao.insert(VpnNotification(DeviceShieldNotificationScheduler.VPN_DAILY_NOTIFICATION_ID, 1))
+            logcat { "Vpn Daily notification has ran $daysRun times out of $TOTAL_DAILY_NOTIFICATIONS" }
+            showNotification()
         }
 
-        showNotification()
         return Result.success()
     }
 
@@ -197,7 +167,7 @@ class DeviceShieldDailyNotificationWorker(
                 val notification =
                     deviceShieldAlertNotificationBuilder.buildStatusNotification(context, deviceShieldNotification, notificationPressedHandler)
                 deviceShieldPixels.didShowDailyNotification(deviceShieldNotification.notificationVariant)
-                notificationManager.notify(DeviceShieldNotificationScheduler.VPN_DAILY_NOTIFICATION_ID, notification)
+                notificationManager.notify(VPN_DAILY_NOTIFICATION_ID, notification)
                 logcat { "Vpn Daily notification is now shown" }
             } else {
                 logcat { "Vpn Daily notification won't be shown because there is no data to show" }
@@ -248,3 +218,5 @@ class DeviceShieldWeeklyNotificationWorker(
         return Result.success()
     }
 }
+
+private const val TOTAL_DAILY_NOTIFICATIONS = 7L

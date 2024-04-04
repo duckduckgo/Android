@@ -41,7 +41,6 @@ import androidx.lifecycle.Observer
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
-import com.duckduckgo.app.accessibility.data.AccessibilitySettingsSharedPreferences.Companion.FONT_SIZE_DEFAULT
 import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
@@ -49,12 +48,10 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.A
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.DeleteBookmarkListener
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.EditSavedSiteListener
-import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState.Browser
-import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState.Invalidated
-import com.duckduckgo.app.browser.BrowserTabViewModel.HighlightableButton.Visible
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.NonHttpAppLink
+import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.ShouldLaunchPrivacyProLink
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
@@ -63,6 +60,7 @@ import com.duckduckgo.app.browser.camera.CameraHardwareChecker
 import com.duckduckgo.app.browser.commands.Command
 import com.duckduckgo.app.browser.commands.Command.*
 import com.duckduckgo.app.browser.commands.NavigationCommand
+import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource.ImageFavicon
 import com.duckduckgo.app.browser.favicon.FaviconSource.UrlFavicon
@@ -82,6 +80,19 @@ import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
 import com.duckduckgo.app.browser.remotemessage.asBrowserTabCommand
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.urlextraction.UrlExtractionListener
+import com.duckduckgo.app.browser.viewstate.AccessibilityViewState
+import com.duckduckgo.app.browser.viewstate.AutoCompleteViewState
+import com.duckduckgo.app.browser.viewstate.BrowserViewState
+import com.duckduckgo.app.browser.viewstate.CtaViewState
+import com.duckduckgo.app.browser.viewstate.FindInPageViewState
+import com.duckduckgo.app.browser.viewstate.GlobalLayoutViewState
+import com.duckduckgo.app.browser.viewstate.GlobalLayoutViewState.Browser
+import com.duckduckgo.app.browser.viewstate.GlobalLayoutViewState.Invalidated
+import com.duckduckgo.app.browser.viewstate.HighlightableButton
+import com.duckduckgo.app.browser.viewstate.LoadingViewState
+import com.duckduckgo.app.browser.viewstate.OmnibarViewState
+import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
+import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
@@ -99,6 +110,7 @@ import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
+import com.duckduckgo.app.onboarding.ui.page.experiment.ExtendedOnboardingExperimentVariantManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
@@ -140,9 +152,7 @@ import com.duckduckgo.privacy.config.api.*
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupManager
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent
-import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupViewState
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsToggleUsageListener
-import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
@@ -151,6 +161,7 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
+import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
@@ -228,6 +239,8 @@ class BrowserTabViewModel @Inject constructor(
     private val privacyProtectionsToggleUsageListener: PrivacyProtectionsToggleUsageListener,
     private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels,
     private val faviconsFetchingPrompt: FaviconsFetchingPrompt,
+    private val extendedOnboardingExperimentVariantManager: ExtendedOnboardingExperimentVariantManager,
+    private val subscriptions: Subscriptions,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -236,120 +249,6 @@ class BrowserTabViewModel @Inject constructor(
     NavigationHistoryListener {
 
     private var buildingSiteFactoryJob: Job? = null
-
-    sealed class GlobalLayoutViewState {
-        data class Browser(val isNewTabState: Boolean = true) : GlobalLayoutViewState()
-        object Invalidated : GlobalLayoutViewState()
-    }
-
-    data class CtaViewState(
-        val cta: Cta? = null,
-        val message: RemoteMessage? = null,
-        val favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite> = emptyList(),
-    )
-
-    data class SavedSiteChangedViewState(
-        val savedSite: SavedSite,
-        val bookmarkFolder: BookmarkFolder?,
-    )
-
-    data class BrowserViewState(
-        val browserShowing: Boolean = false,
-        val isFullScreen: Boolean = false,
-        val isDesktopBrowsingMode: Boolean = false,
-        val canChangeBrowsingMode: Boolean = false,
-        val showPrivacyShield: Boolean = false,
-        val showSearchIcon: Boolean = false,
-        val showClearButton: Boolean = false,
-        val showVoiceSearch: Boolean = false,
-        val showTabsButton: Boolean = true,
-        val fireButton: HighlightableButton = Visible(),
-        val showMenuButton: HighlightableButton = Visible(),
-        val canSharePage: Boolean = false,
-        val canSaveSite: Boolean = false,
-        val bookmark: Bookmark? = null,
-        val addFavorite: HighlightableButton = Visible(enabled = false),
-        val favorite: Favorite? = null,
-        val canFireproofSite: Boolean = false,
-        val isFireproofWebsite: Boolean = false,
-        val canGoBack: Boolean = false,
-        val canGoForward: Boolean = false,
-        val canChangePrivacyProtection: Boolean = false,
-        val isPrivacyProtectionDisabled: Boolean = false,
-        val canReportSite: Boolean = false,
-        val addToHomeEnabled: Boolean = false,
-        val addToHomeVisible: Boolean = false,
-        val showDaxIcon: Boolean = false,
-        val isEmailSignedIn: Boolean = false,
-        var previousAppLink: AppLink? = null,
-        val canFindInPage: Boolean = false,
-        val forceRenderingTicker: Long = System.currentTimeMillis(),
-        val canPrintPage: Boolean = false,
-        val showAutofill: Boolean = false,
-        val browserError: WebViewErrorResponse = OMITTED,
-        val privacyProtectionsPopupViewState: PrivacyProtectionsPopupViewState = PrivacyProtectionsPopupViewState.Gone,
-    )
-
-    sealed class HighlightableButton {
-        data class Visible(
-            val enabled: Boolean = true,
-            val highlighted: Boolean = false,
-        ) : HighlightableButton()
-
-        object Gone : HighlightableButton()
-
-        fun isHighlighted(): Boolean {
-            return when (this) {
-                is Visible -> this.highlighted
-                is Gone -> false
-            }
-        }
-
-        fun isEnabled(): Boolean {
-            return when (this) {
-                is Visible -> this.enabled
-                is Gone -> false
-            }
-        }
-    }
-
-    data class OmnibarViewState(
-        val omnibarText: String = "",
-        val isEditing: Boolean = false,
-        val shouldMoveCaretToEnd: Boolean = false,
-        val forceExpand: Boolean = true,
-    )
-
-    data class LoadingViewState(
-        val isLoading: Boolean = false,
-        val privacyOn: Boolean = true,
-        val progress: Int = 0,
-    )
-
-    data class AccessibilityViewState(
-        val fontSize: Float = FONT_SIZE_DEFAULT,
-        val forceZoom: Boolean = false,
-        val refreshWebView: Boolean = false,
-    )
-
-    data class FindInPageViewState(
-        val visible: Boolean = false,
-        val showNumberMatches: Boolean = false,
-        val activeMatchIndex: Int = 0,
-        val searchTerm: String = "",
-        val numberMatches: Int = 0,
-    )
-
-    data class PrivacyShieldViewState(
-        val privacyShield: PrivacyShield = PrivacyShield.UNKNOWN,
-    )
-
-    data class AutoCompleteViewState(
-        val showSuggestions: Boolean = false,
-        val showFavorites: Boolean = false,
-        val searchResults: AutoCompleteResult = AutoCompleteResult("", emptyList()),
-        val favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite> = emptyList(),
-    )
 
     data class LocationPermission(
         val origin: String,
@@ -374,7 +273,7 @@ class BrowserTabViewModel @Inject constructor(
 
     var skipHome = false
     var hasCtaBeenShownForCurrentPage: AtomicBoolean = AtomicBoolean(false)
-    val tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
+    val tabs: Flow<List<TabEntity>> = tabRepository.flowTabs
     val liveSelectedTab: LiveData<TabEntity> = tabRepository.liveSelectedTab
     val survey: LiveData<Survey> = ctaViewModel.surveyLiveData
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
@@ -811,6 +710,14 @@ class BrowserTabViewModel @Inject constructor(
         var urlToNavigate = queryUrlConverter.convertQueryToUrl(trimmedInput, verticalParameter, queryOrigin)
 
         when (val type = specialUrlDetector.determineType(trimmedInput)) {
+            is ShouldLaunchPrivacyProLink -> {
+                if (webNavigationState == null || webNavigationState?.hasNavigationHistory == false) {
+                    closeCurrentTab()
+                }
+                command.value = LaunchPrivacyPro
+                return
+            }
+
             is NonHttpAppLink -> {
                 nonHttpAppLinkClicked(type)
             }
@@ -1221,9 +1128,11 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun setAdClickActiveTabData(url: String?) {
-        val sourceTabId = tabRepository.liveSelectedTab.value?.sourceTabId
-        val sourceTabUrl = tabRepository.liveTabs.value?.firstOrNull { it.tabId == sourceTabId }?.url
-        adClickManager.setActiveTabId(tabId, url, sourceTabId, sourceTabUrl)
+        viewModelScope.launch {
+            val sourceTabId = tabRepository.liveSelectedTab.value?.sourceTabId
+            val sourceTabUrl = tabRepository.flowTabs.firstOrNull()?.firstOrNull { it.tabId == sourceTabId }?.url
+            adClickManager.setActiveTabId(tabId, url, sourceTabId, sourceTabUrl)
+        }
     }
 
     private fun cacheAppLink(url: String?) {
@@ -1641,8 +1550,9 @@ class BrowserTabViewModel @Inject constructor(
         showErrorWithAction(R.string.dosErrorMessage)
     }
 
-    override fun titleReceived(newTitle: String) {
+    override fun titleReceived(newTitle: String, url: String?) {
         site?.title = newTitle
+        command.postValue(ShowWebPageTitle(newTitle, url))
         onSiteChanged()
     }
 
@@ -1752,24 +1662,33 @@ class BrowserTabViewModel @Inject constructor(
                 when {
                     acceptsOnly("image/", fileChooserParams.acceptTypes) && cameraHardwareAvailable ->
                         ShowImageCamera(filePathCallback, fileChooserRequestedParams)
+
                     acceptsOnly("video/", fileChooserParams.acceptTypes) && cameraHardwareAvailable ->
                         ShowVideoCamera(filePathCallback, fileChooserRequestedParams)
+
                     acceptsOnly("audio/", fileChooserParams.acceptTypes) ->
                         ShowSoundRecorder(filePathCallback, fileChooserRequestedParams)
+
                     else ->
                         ShowFileChooser(filePathCallback, fileChooserRequestedParams)
                 }
             }
+
             fileChooserParams.acceptTypes.any { it.startsWith("image/") && cameraHardwareAvailable } ->
                 ShowExistingImageOrCameraChooser(filePathCallback, fileChooserRequestedParams, MediaStore.ACTION_IMAGE_CAPTURE)
+
             fileChooserParams.acceptTypes.any { it.startsWith("video/") && cameraHardwareAvailable } ->
                 ShowExistingImageOrCameraChooser(filePathCallback, fileChooserRequestedParams, MediaStore.ACTION_VIDEO_CAPTURE)
+
             else ->
                 ShowFileChooser(filePathCallback, fileChooserRequestedParams)
         }
     }
 
-    private fun acceptsOnly(type: String, acceptTypes: Array<String>): Boolean {
+    private fun acceptsOnly(
+        type: String,
+        acceptTypes: Array<String>,
+    ): Boolean {
         return acceptTypes.filter { it.startsWith(type) }.size == acceptTypes.size
     }
 
@@ -2081,22 +2000,26 @@ class BrowserTabViewModel @Inject constructor(
         command.value = BrokenSiteFeedback(BrokenSiteData.fromSite(site, reportFlow = MENU))
     }
 
-    fun onPrivacyProtectionMenuClicked() {
+    fun onPrivacyProtectionMenuClicked(clickedFromCustomTab: Boolean = false) {
         val domain = site?.domain ?: return
         appCoroutineScope.launch(dispatchers.io()) {
             if (isPrivacyProtectionDisabled(domain)) {
-                removeFromAllowList(domain)
+                removeFromAllowList(domain, clickedFromCustomTab)
             } else {
-                addToAllowList(domain)
+                addToAllowList(domain, clickedFromCustomTab)
             }
 
             privacyProtectionsToggleUsageListener.onPrivacyProtectionsToggleUsed()
         }
     }
 
-    private suspend fun addToAllowList(domain: String) {
+    private suspend fun addToAllowList(domain: String, clickedFromCustomTab: Boolean) {
         val pixelParams = privacyProtectionsPopupExperimentExternalPixels.getPixelParams()
-        pixel.fire(AppPixelName.BROWSER_MENU_ALLOWLIST_ADD, pixelParams, type = COUNT)
+        if (clickedFromCustomTab) {
+            pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_DISABLE_PROTECTIONS_ALLOW_LIST_ADD)
+        } else {
+            pixel.fire(AppPixelName.BROWSER_MENU_ALLOWLIST_ADD, pixelParams, type = COUNT)
+        }
         privacyProtectionsPopupExperimentExternalPixels.tryReportProtectionsToggledFromBrowserMenu(protectionsEnabled = false)
         userAllowListRepository.addDomainToUserAllowList(domain)
         withContext(dispatchers.main()) {
@@ -2105,9 +2028,13 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    private suspend fun removeFromAllowList(domain: String) {
+    private suspend fun removeFromAllowList(domain: String, clickedFromCustomTab: Boolean) {
         val pixelParams = privacyProtectionsPopupExperimentExternalPixels.getPixelParams()
-        pixel.fire(AppPixelName.BROWSER_MENU_ALLOWLIST_REMOVE, pixelParams, type = COUNT)
+        if (clickedFromCustomTab) {
+            pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_DISABLE_PROTECTIONS_ALLOW_LIST_REMOVE)
+        } else {
+            pixel.fire(AppPixelName.BROWSER_MENU_ALLOWLIST_REMOVE, pixelParams, type = COUNT)
+        }
         privacyProtectionsPopupExperimentExternalPixels.tryReportProtectionsToggledFromBrowserMenu(protectionsEnabled = true)
         userAllowListRepository.removeDomainFromUserAllowList(domain)
         withContext(dispatchers.main()) {
@@ -2137,12 +2064,20 @@ class BrowserTabViewModel @Inject constructor(
 
         return when (requiredAction) {
             is RequiredAction.OpenInNewTab -> {
+                if (subscriptions.shouldLaunchPrivacyProForUrl(requiredAction.url)) {
+                    command.value = LaunchPrivacyPro
+                    return true
+                }
                 command.value = GenerateWebViewPreviewImage
                 command.value = OpenInNewTab(query = requiredAction.url, sourceTabId = tabId)
                 true
             }
 
             is RequiredAction.OpenInNewBackgroundTab -> {
+                if (subscriptions.shouldLaunchPrivacyProForUrl(requiredAction.url)) {
+                    command.value = LaunchPrivacyPro
+                    return true
+                }
                 command.value = GenerateWebViewPreviewImage
                 viewModelScope.launch { openInNewBackgroundTab(requiredAction.url) }
                 true
@@ -3092,6 +3027,14 @@ class BrowserTabViewModel @Inject constructor(
     ) {
         viewModelScope.launch(dispatchers.io()) {
             faviconsFetchingPrompt.onPromptAnswered(fetchingEnabled)
+        }
+    }
+
+    fun configureBrowserBackground() {
+        val backgroundRes: Int =
+            if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) R.drawable.onboarding_experiment_background else 0
+        viewModelScope.launch {
+            command.value = SetBrowserBackground(backgroundRes)
         }
     }
 

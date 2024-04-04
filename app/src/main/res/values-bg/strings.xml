@@ -813,4 +813,8 @@
     <string name="faviconsPromptMessage">Искате ли това устройство автоматично да изтегля икони за синхронизираните отметки от отбелязаните уебсайтове?</string>
     <string name="faviconsPromptPrimaryCta">Актуализиране на иконите на отметките</string>
     <string name="faviconsPromptSecondaryCta">Не сега</string>
+
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">Отваряне в DuckDuckGo</string>
+    <string name="runningInDdgMenuItemTitle">Работи в DuckDuckGo</string>
 </resources>

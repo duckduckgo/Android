@@ -75,6 +75,7 @@ interface Pixel {
         const val DEFAULT_BROWSER_JUST_ONCE_MAX = "jom"
         const val DEFAULT_BROWSER_EXTERNAL = "e"
         const val DAX_INITIAL_CTA = "i"
+        const val DAX_INITIAL_VISIT_SITE_CTA = "visit_site"
         const val DAX_END_CTA = "e"
         const val DAX_SERP_CTA = "s"
         const val DAX_NETWORK_CTA_1 = "n"

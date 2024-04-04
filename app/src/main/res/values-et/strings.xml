@@ -813,4 +813,8 @@
     <string name="faviconsPromptMessage">Kas soovite, et see seade laadiks automaatselt alla sünkroonitud järjehoidjate ikoone järjehoidjatesse lisatud veebilehtedelt?</string>
     <string name="faviconsPromptPrimaryCta">Hoidke järjehoidjate ikoonid ajakohastatud</string>
     <string name="faviconsPromptSecondaryCta">Mitte praegu</string>
+
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">Ava saidil DuckDuckGo</string>
+    <string name="runningInDdgMenuItemTitle">DuckDuckGo-s käivitamine</string>
 </resources>

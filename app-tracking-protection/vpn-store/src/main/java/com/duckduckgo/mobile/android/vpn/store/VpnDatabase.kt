@@ -30,12 +30,11 @@ import java.time.format.DateTimeFormatter
 
 @Database(
     exportSchema = true,
-    version = 32,
+    version = 33,
     entities = [
         VpnTracker::class,
         VpnServiceStateStats::class,
         HeartBeatEntity::class,
-        VpnNotification::class,
         AppTracker::class,
         AppTrackerMetadata::class,
         AppTrackerExcludedPackage::class,
@@ -56,7 +55,6 @@ abstract class VpnDatabase : RoomDatabase() {
 
     internal abstract fun vpnTrackerDao(): VpnTrackerDao
     abstract fun vpnHeartBeatDao(): VpnHeartBeatDao
-    abstract fun vpnNotificationsDao(): VpnNotificationsDao
     abstract fun vpnAppTrackerBlockingDao(): VpnAppTrackerBlockingDao
     abstract fun vpnServiceStateDao(): VpnServiceStateStatsDao
     abstract fun vpnSystemAppsOverridesDao(): VpnAppTrackerSystemAppsOverridesDao
@@ -210,6 +208,12 @@ abstract class VpnDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_32_TO_33: Migration = object : Migration(32, 33) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("DROP TABLE IF EXISTS `vpn_notification`")
+            }
+        }
+
         val ALL_MIGRATIONS: List<Migration>
             get() = listOf(
                 MIGRATION_18_TO_19,
@@ -226,6 +230,7 @@ abstract class VpnDatabase : RoomDatabase() {
                 MIGRATION_29_TO_30,
                 MIGRATION_30_TO_31,
                 MIGRATION_31_TO_32,
+                MIGRATION_32_TO_33,
             )
     }
 }

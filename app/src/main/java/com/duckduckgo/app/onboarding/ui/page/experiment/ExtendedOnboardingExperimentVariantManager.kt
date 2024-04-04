@@ -26,6 +26,7 @@ import javax.inject.Inject
 interface ExtendedOnboardingExperimentVariantManager {
     fun setExperimentVariants()
     fun isComparisonChartEnabled(): Boolean
+    fun isAestheticUpdatesEnabled(): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -48,5 +49,9 @@ class ExtendedOnboardingExperimentVariantManagerImpl @Inject constructor(
         val isRemoteFeatureEnabled = extendedOnboardingFeatureToggles.comparisonChart().isEnabled()
         val isLocalFeatureEnabled = isExtendedOnboardingEnabled && variantManager.getVariantKey() == "mt"
         return isRemoteFeatureEnabled || isLocalFeatureEnabled
+    }
+
+    override fun isAestheticUpdatesEnabled(): Boolean {
+        return extendedOnboardingFeatureToggles.aestheticUpdates().isEnabled()
     }
 }

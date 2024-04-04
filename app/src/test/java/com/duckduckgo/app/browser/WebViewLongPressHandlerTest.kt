@@ -21,6 +21,7 @@ import android.view.ContextMenu
 import android.view.MenuItem
 import android.webkit.WebView.HitTestResult
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.browser.customtabs.CustomTabDetector
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -56,12 +57,15 @@ class WebViewLongPressHandlerTest {
     private lateinit var mockPixel: Pixel
 
     @Mock
+    private lateinit var mockCustomTabDetector: CustomTabDetector
+
+    @Mock
     private lateinit var context: Context
 
     @Before
     fun setup() {
         MockitoAnnotations.openMocks(this)
-        testee = WebViewLongPressHandler(context, mockPixel)
+        testee = WebViewLongPressHandler(context, mockPixel, mockCustomTabDetector)
     }
 
     @Test
@@ -95,49 +99,110 @@ class WebViewLongPressHandlerTest {
     }
 
     @Test
-    fun whenUserLongPressesWithAnchorImageTypeThenTabOptionsHeaderAddedToMenu() {
-        testee.handleLongPress(HitTestResult.SRC_IMAGE_ANCHOR_TYPE, HTTPS_IMAGE_URL, mockMenu)
-        verifyNewForegroundTabItemAdded()
-    }
-
-    @Test
-    fun whenUserLongPressesWithAnchorImageTypeThenBgTabOptionsHeaderAddedToMenu() {
-        testee.handleLongPress(HitTestResult.SRC_IMAGE_ANCHOR_TYPE, HTTPS_IMAGE_URL, mockMenu)
-        verifyNewBackgroundTabItemAdded()
-    }
-
-    @Test
-    fun whenUserLongPressesWithImageTypeThenDownloadImageMenuAddedAndOpenImageInBackgroundItemAdded() {
+    fun whenUserLongPressesWithImageTypeAndHttpsThenCorrectOptionsAddedToMenu() {
         testee.handleLongPress(HitTestResult.IMAGE_TYPE, HTTPS_IMAGE_URL, mockMenu)
-        verifyDownloadImageItemAdded()
-        verifyOpenImageInBackgroundItemAdded()
+        // Show "Download Image" and "Open Image in Background Tab"
+        verifyDownloadImageMenuOptionsAdded()
+        verifyImageMenuOpenInTabOptionsAdded()
+        // Options not shown: "Open In New Tab", "Open in Background Tab", "Copy Link Address", "Share Link"
+        verifyLinkMenuOpenInTabOptionsNotAdded()
+        verifyLinkMenuOtherOptionsNotAdded()
     }
 
     @Test
-    fun whenUserLongPressesWithAnchorImageTypeThenDownloadImageMenuAddedOpenImageInBackgroundItemAdded() {
+    fun whenUserLongPressesWithImageTypeAndDataUrlThenCorrectOptionsAddedToMenu() {
+        testee.handleLongPress(HitTestResult.IMAGE_TYPE, DATA_URI_IMAGE_URL, mockMenu)
+        // Show "Download Image"
+        verifyDownloadImageMenuOptionsAdded()
+        // Options not shown: "Open Image in Background Tab", "Open In New Tab", "Open in Background Tab", "Copy Link Address", "Share Link"
+        verifyImageMenuOpenInTabOptionsNotAdded()
+        verifyLinkMenuOpenInTabOptionsNotAdded()
+        verifyLinkMenuOtherOptionsNotAdded()
+    }
+
+    @Test
+    fun whenInCustomTabAndUserLongPressesWithImageTypeAndHttpsThenCorrectOptionsAddedToMenu() {
+        whenever(mockCustomTabDetector.isCustomTab()).thenReturn(true)
+        testee.handleLongPress(HitTestResult.IMAGE_TYPE, HTTPS_IMAGE_URL, mockMenu)
+        // Show "Download Image"
+        verifyDownloadImageMenuOptionsAdded()
+        // Options not shown: "Open Image in Background Tab", "Open In New Tab", "Open in Background Tab", "Copy Link Address", "Share Link"
+        verifyImageMenuOpenInTabOptionsNotAdded()
+        verifyLinkMenuOpenInTabOptionsNotAdded()
+        verifyLinkMenuOtherOptionsNotAdded()
+    }
+
+    @Test
+    fun whenUserLongPressesWithAnchorImageTypeAndHttpsThenCorrectOptionsAddedToMenu() {
         testee.handleLongPress(HitTestResult.SRC_IMAGE_ANCHOR_TYPE, HTTPS_IMAGE_URL, mockMenu)
-        verifyDownloadImageItemAdded()
-        verifyOpenImageInBackgroundItemAdded()
+        // Show "Download Image", "Open Image in Background Tab", "Open In New Tab", "Open in Background Tab",
+        // "Copy Link Address", "Share Link"
+        verifyDownloadImageMenuOptionsAdded()
+        verifyImageMenuOpenInTabOptionsAdded()
+        verifyLinkMenuOpenInTabOptionsAdded()
+        verifyLinkMenuOtherOptionsAdded()
+    }
+
+    @Test
+    fun whenUserLongPressesWithAnchorImageTypeAndDataUrlThenCorrectOptionsAddedToMenu() {
+        testee.handleLongPress(HitTestResult.SRC_IMAGE_ANCHOR_TYPE, DATA_URI_IMAGE_URL, mockMenu)
+        // Show "Download Image"
+        verifyDownloadImageMenuOptionsAdded()
+        // Options not shown: "Open Image in Background Tab", "Open In New Tab", "Open in Background Tab", "Copy Link Address", "Share Link"
+        verifyImageMenuOpenInTabOptionsNotAdded()
+        verifyLinkMenuOpenInTabOptionsNotAdded()
+        verifyLinkMenuOtherOptionsNotAdded()
+    }
+
+    @Test
+    fun whenInCustomTabAndUserLongPressesWithAnchorImageTypeAndHttpsThenCorrectOptionsAddedToMenu() {
+        testee.handleLongPress(HitTestResult.SRC_IMAGE_ANCHOR_TYPE, DATA_URI_IMAGE_URL, mockMenu)
+        // Show "Download Image"
+        verifyDownloadImageMenuOptionsAdded()
+        // Options not shown: "Open Image in Background Tab", "Open In New Tab", "Open in Background Tab", "Copy Link Address", "Share Link"
+        verifyImageMenuOpenInTabOptionsNotAdded()
+        verifyLinkMenuOpenInTabOptionsNotAdded()
+        verifyLinkMenuOtherOptionsNotAdded()
+    }
+
+    @Test
+    fun whenUserLongPressesWithAnchorTypeAndHttpsThenCorrectOptionsAddedToMenu() {
+        testee.handleLongPress(HitTestResult.SRC_ANCHOR_TYPE, HTTPS_IMAGE_URL, mockMenu)
+        // Show "Open In New Tab", "Open in Background Tab", "Copy Link Address", "Share Link"
+        verifyLinkMenuOpenInTabOptionsAdded()
+        verifyLinkMenuOtherOptionsAdded()
+        // Options not shown: "Download Image", "Open Image in Background Tab"
+        verifyDownloadImageMenuOptionsNotAdded()
+        verifyImageMenuOpenInTabOptionsNotAdded()
+    }
+
+    @Test
+    fun whenUserLongPressesWithAnchorTypeAndDataUrlThenCorrectOptionsAddedToMenu() {
+        testee.handleLongPress(HitTestResult.SRC_ANCHOR_TYPE, DATA_URI_IMAGE_URL, mockMenu)
+        // Show "Open In New Tab", "Open in Background Tab", "Copy Link Address", "Share Link"
+        verifyLinkMenuOpenInTabOptionsAdded()
+        verifyLinkMenuOtherOptionsAdded()
+        // Options not shown: "Download Image", "Open Image in Background Tab"
+        verifyDownloadImageMenuOptionsNotAdded()
+        verifyImageMenuOpenInTabOptionsNotAdded()
+    }
+
+    @Test
+    fun whenInCustomTabAndUserLongPressesWithAnchorTypeAndHttpsThenCorrectOptionsAddedToMenu() {
+        whenever(mockCustomTabDetector.isCustomTab()).thenReturn(true)
+        testee.handleLongPress(HitTestResult.SRC_ANCHOR_TYPE, HTTPS_IMAGE_URL, mockMenu)
+        // Show "Copy Link Address", "Share Link"
+        verifyLinkMenuOtherOptionsAdded()
+        // Options not shown: "Download Image", "Open Image in Background Tab", "Open In New Tab", "Open in Background Tab"
+        verifyDownloadImageMenuOptionsNotAdded()
+        verifyImageMenuOpenInTabOptionsNotAdded()
+        verifyLinkMenuOpenInTabOptionsNotAdded()
     }
 
     @Test
     fun whenUserLongPressesWithOtherImageTypeThenMenuNotAltered() {
         testee.handleLongPress(HitTestResult.UNKNOWN_TYPE, HTTPS_IMAGE_URL, mockMenu)
         verifyMenuNotAltered()
-    }
-
-    @Test
-    fun whenUserLongPressesWithImageTypeWhichIsADataUriThenDownloadImageMenuAddedAndOpenImageInBackgroundItemNotAdded() {
-        testee.handleLongPress(HitTestResult.IMAGE_TYPE, DATA_URI_IMAGE_URL, mockMenu)
-        verifyDownloadImageItemAdded()
-        verifyOpenImageInBackgroundItemNotAdded()
-    }
-
-    @Test
-    fun whenUserLongPressesWithAnchorImageTypeWhichIsADataUriThenDownloadImageMenuAddedAndOpenImageInBackgroundItemNotAdded() {
-        testee.handleLongPress(HitTestResult.SRC_IMAGE_ANCHOR_TYPE, DATA_URI_IMAGE_URL, mockMenu)
-        verifyDownloadImageItemAdded()
-        verifyOpenImageInBackgroundItemNotAdded()
     }
 
     @Test
@@ -173,11 +238,24 @@ class WebViewLongPressHandlerTest {
         assertTrue(action == LongPressHandler.RequiredAction.None)
     }
 
-    private fun verifyDownloadImageItemAdded() {
+    private fun verifyDownloadImageMenuOptionsAdded() {
         verify(mockMenu).add(anyInt(), eq(WebViewLongPressHandler.CONTEXT_MENU_ID_DOWNLOAD_IMAGE), anyInt(), eq(R.string.downloadImage))
     }
 
-    private fun verifyOpenImageInBackgroundItemNotAdded() {
+    private fun verifyDownloadImageMenuOptionsNotAdded() {
+        verify(mockMenu, never()).add(anyInt(), eq(WebViewLongPressHandler.CONTEXT_MENU_ID_DOWNLOAD_IMAGE), anyInt(), eq(R.string.downloadImage))
+    }
+
+    private fun verifyImageMenuOpenInTabOptionsAdded() {
+        verify(mockMenu).add(
+            anyInt(),
+            eq(WebViewLongPressHandler.CONTEXT_MENU_ID_OPEN_IMAGE_IN_NEW_BACKGROUND_TAB),
+            anyInt(),
+            eq(R.string.openImageInNewTab),
+        )
+    }
+
+    private fun verifyImageMenuOpenInTabOptionsNotAdded() {
         verify(mockMenu, never()).add(
             anyInt(),
             eq(WebViewLongPressHandler.CONTEXT_MENU_ID_OPEN_IMAGE_IN_NEW_BACKGROUND_TAB),
@@ -186,25 +264,67 @@ class WebViewLongPressHandlerTest {
         )
     }
 
-    private fun verifyOpenImageInBackgroundItemAdded() {
+    private fun verifyLinkMenuOpenInTabOptionsAdded() {
         verify(mockMenu).add(
             anyInt(),
-            eq(WebViewLongPressHandler.CONTEXT_MENU_ID_OPEN_IMAGE_IN_NEW_BACKGROUND_TAB),
+            eq(WebViewLongPressHandler.CONTEXT_MENU_ID_OPEN_IN_NEW_TAB),
             anyInt(),
-            eq(R.string.openImageInNewTab),
+            eq(R.string.openInNewTab),
         )
-    }
 
-    private fun verifyNewForegroundTabItemAdded() {
-        verify(mockMenu).add(anyInt(), eq(WebViewLongPressHandler.CONTEXT_MENU_ID_OPEN_IN_NEW_TAB), anyInt(), eq(R.string.openInNewTab))
-    }
-
-    private fun verifyNewBackgroundTabItemAdded() {
         verify(mockMenu).add(
             anyInt(),
             eq(WebViewLongPressHandler.CONTEXT_MENU_ID_OPEN_IN_NEW_BACKGROUND_TAB),
             anyInt(),
             eq(R.string.openInNewBackgroundTab),
+        )
+    }
+
+    private fun verifyLinkMenuOpenInTabOptionsNotAdded() {
+        verify(mockMenu, never()).add(
+            anyInt(),
+            eq(WebViewLongPressHandler.CONTEXT_MENU_ID_OPEN_IN_NEW_TAB),
+            anyInt(),
+            eq(R.string.openInNewTab),
+        )
+
+        verify(mockMenu, never()).add(
+            anyInt(),
+            eq(WebViewLongPressHandler.CONTEXT_MENU_ID_OPEN_IN_NEW_BACKGROUND_TAB),
+            anyInt(),
+            eq(R.string.openInNewBackgroundTab),
+        )
+    }
+
+    private fun verifyLinkMenuOtherOptionsAdded() {
+        verify(mockMenu).add(
+            anyInt(),
+            eq(WebViewLongPressHandler.CONTEXT_MENU_ID_COPY),
+            anyInt(),
+            eq(R.string.copyUrl),
+        )
+
+        verify(mockMenu).add(
+            anyInt(),
+            eq(WebViewLongPressHandler.CONTEXT_MENU_ID_SHARE_LINK),
+            anyInt(),
+            eq(R.string.shareLink),
+        )
+    }
+
+    private fun verifyLinkMenuOtherOptionsNotAdded() {
+        verify(mockMenu, never()).add(
+            anyInt(),
+            eq(WebViewLongPressHandler.CONTEXT_MENU_ID_COPY),
+            anyInt(),
+            eq(R.string.copyUrl),
+        )
+
+        verify(mockMenu, never()).add(
+            anyInt(),
+            eq(WebViewLongPressHandler.CONTEXT_MENU_ID_SHARE_LINK),
+            anyInt(),
+            eq(R.string.shareLink),
         )
     }
 

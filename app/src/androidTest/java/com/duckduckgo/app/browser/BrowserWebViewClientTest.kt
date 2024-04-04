@@ -66,6 +66,7 @@ import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.privacy.config.api.AmpLinks
+import com.duckduckgo.subscriptions.api.Subscriptions
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
@@ -122,6 +123,7 @@ class BrowserWebViewClientTest {
     private val pageLoadedHandler: PageLoadedHandler = mock()
     private val pagePaintedHandler: PagePaintedHandler = mock()
     private val mediaPlayback: MediaPlayback = mock()
+    private val subscriptions: Subscriptions = mock()
 
     @UiThreadTest
     @Before
@@ -152,6 +154,7 @@ class BrowserWebViewClientTest {
             pageLoadedHandler,
             pagePaintedHandler,
             mediaPlayback,
+            subscriptions,
         )
         testee.webViewClientListener = listener
         whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
@@ -341,6 +344,14 @@ class BrowserWebViewClientTest {
         whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenThrow(exception)
         testee.shouldOverrideUrlLoading(webView, webResourceRequest)
         verify(crashLogger).logCrash(Crash(shortName = "m_webview_should_override", t = exception))
+    }
+
+    @Test
+    fun whenPrivacyProLinkDetectedThenLaunchPrivacyProAndReturnTrue() {
+        val urlType = SpecialUrlDetector.UrlType.ShouldLaunchPrivacyProLink
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
+        assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+        verify(subscriptions).launchPrivacyPro(any())
     }
 
     @Test

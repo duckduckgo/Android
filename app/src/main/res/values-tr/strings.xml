@@ -813,4 +813,8 @@
     <string name="faviconsPromptMessage">Bu cihazın yer işareti eklenmiş web sitelerinden senkronize edilmiş yer işaretleri için simgeleri otomatik olarak indirmesini istiyor musunuz?</string>
     <string name="faviconsPromptPrimaryCta">Yer İşareti Simgelerini Güncel Tut</string>
     <string name="faviconsPromptSecondaryCta">Şimdi Değil</string>
+
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">DuckDuckGo\'da aç</string>
+    <string name="runningInDdgMenuItemTitle">DuckDuckGo\'da Çalışıyor</string>
 </resources>

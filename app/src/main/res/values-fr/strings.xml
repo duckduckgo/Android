@@ -813,4 +813,8 @@
     <string name="faviconsPromptMessage">Voulez-vous que cet appareil télécharge automatiquement les icônes des favoris synchronisés à partir des sites Web ajoutés aux favoris ?</string>
     <string name="faviconsPromptPrimaryCta">Garder les icônes de favoris à jour</string>
     <string name="faviconsPromptSecondaryCta">Pas maintenant</string>
+
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">Ouvrir dans DuckDuckGo</string>
+    <string name="runningInDdgMenuItemTitle">S\'exécute dans DuckDuckGo</string>
 </resources>

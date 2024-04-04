@@ -111,7 +111,7 @@ class BrowserChromeClient @Inject constructor(
         view: WebView,
         title: String,
     ) {
-        webViewClientListener?.titleReceived(title)
+        webViewClientListener?.titleReceived(title, view.url)
     }
 
     override fun onShowFileChooser(

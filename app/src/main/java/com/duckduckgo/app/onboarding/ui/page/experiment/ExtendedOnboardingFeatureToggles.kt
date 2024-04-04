@@ -32,4 +32,8 @@ interface ExtendedOnboardingFeatureToggles {
     @Toggle.DefaultValue(false)
     @Experiment
     fun comparisonChart(): Toggle
+
+    @Toggle.DefaultValue(false)
+    @Experiment
+    fun aestheticUpdates(): Toggle
 }

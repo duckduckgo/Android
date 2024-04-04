@@ -29,6 +29,7 @@ import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.AppThirdPartyCookieManager
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsRepository
+import com.duckduckgo.app.browser.customtabs.CustomTabDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserObserver
 import com.duckduckgo.app.browser.downloader.*
@@ -81,6 +82,7 @@ import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.request.filterer.api.RequestFilterer
+import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import dagger.Module
 import dagger.Provides
@@ -129,8 +131,9 @@ class BrowserModule {
     fun webViewLongPressHandler(
         context: Context,
         pixel: Pixel,
+        customTabDetector: CustomTabDetector,
     ): LongPressHandler {
-        return WebViewLongPressHandler(context, pixel)
+        return WebViewLongPressHandler(context, pixel, customTabDetector)
     }
 
     @Provides
@@ -174,7 +177,8 @@ class BrowserModule {
         packageManager: PackageManager,
         ampLinks: AmpLinks,
         trackingParameters: TrackingParameters,
-    ): SpecialUrlDetector = SpecialUrlDetectorImpl(packageManager, ampLinks, trackingParameters)
+        subscriptions: Subscriptions,
+    ): SpecialUrlDetector = SpecialUrlDetectorImpl(packageManager, ampLinks, trackingParameters, subscriptions)
 
     @Provides
     fun webViewRequestInterceptor(

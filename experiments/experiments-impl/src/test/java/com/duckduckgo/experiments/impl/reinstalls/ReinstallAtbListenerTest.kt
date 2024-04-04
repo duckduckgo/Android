@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.reinstalls
+package com.duckduckgo.experiments.impl.reinstalls
 
 import android.os.Build
-import com.duckduckgo.app.global.install.AppInstallStore
-import com.duckduckgo.app.reinstalls.ReinstallAtbListener.Companion.REINSTALL_VARIANT
+import androidx.core.content.edit
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import java.io.File
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -39,9 +40,9 @@ class ReinstallAtbListenerTest {
 
     private val mockBackupDataStore: BackupServiceDataStore = mock()
     private val mockStatisticsDataStore: StatisticsDataStore = mock()
-    private val mockAppInstallStore: AppInstallStore = mock()
     private val mockAppBuildConfig: AppBuildConfig = mock()
     private val mockDownloadsDirectoryManager: DownloadsDirectoryManager = mock()
+    private val preferences = InMemorySharedPreferences()
 
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
@@ -51,9 +52,10 @@ class ReinstallAtbListenerTest {
         testee = ReinstallAtbListener(
             mockBackupDataStore,
             mockStatisticsDataStore,
-            mockAppInstallStore,
             mockAppBuildConfig,
             mockDownloadsDirectoryManager,
+            { preferences },
+            coroutineTestRule.testDispatcherProvider,
         )
     }
 
@@ -76,7 +78,7 @@ class ReinstallAtbListenerTest {
     @Test
     fun whenReturningUserHasBeenAlreadyCheckedThenDontCheckForDownloadsDirectory() = runTest {
         whenever(mockAppBuildConfig.sdkInt).thenReturn(Build.VERSION_CODES.R)
-        whenever(mockAppInstallStore.returningUserChecked).thenReturn(true)
+        setReturningUserChecked()
 
         testee.beforeAtbInit()
 
@@ -86,7 +88,6 @@ class ReinstallAtbListenerTest {
     @Test
     fun whenDDGDirectoryIsFoundThenUpdateVariantForReturningUser() = runTest {
         whenever(mockAppBuildConfig.sdkInt).thenReturn(Build.VERSION_CODES.R)
-        whenever(mockAppInstallStore.returningUserChecked).thenReturn(false)
         val mockDownloadsDirectory: File = mock {
             on { list() } doReturn arrayOf("DuckDuckGo")
         }
@@ -95,12 +96,12 @@ class ReinstallAtbListenerTest {
         testee.beforeAtbInit()
 
         verify(mockStatisticsDataStore).variant = REINSTALL_VARIANT
+        assertTrue(isReturningUserChecked())
     }
 
     @Test
     fun whenDDGDirectoryIsNotFoundThenVariantForReturningUserIsNotSet() = runTest {
         whenever(mockAppBuildConfig.sdkInt).thenReturn(Build.VERSION_CODES.R)
-        whenever(mockAppInstallStore.returningUserChecked).thenReturn(false)
         val mockDownloadsDirectory: File = mock {
             on { list() } doReturn emptyArray()
         }
@@ -109,12 +110,12 @@ class ReinstallAtbListenerTest {
         testee.beforeAtbInit()
 
         verify(mockStatisticsDataStore, never()).variant = REINSTALL_VARIANT
+        assertTrue(isReturningUserChecked())
     }
 
     @Test
     fun whenDDGDirectoryIsNotFoundThenCreateIt() = runTest {
         whenever(mockAppBuildConfig.sdkInt).thenReturn(Build.VERSION_CODES.R)
-        whenever(mockAppInstallStore.returningUserChecked).thenReturn(false)
         val mockDownloadsDirectory: File = mock {
             on { list() } doReturn emptyArray()
         }
@@ -123,5 +124,14 @@ class ReinstallAtbListenerTest {
         testee.beforeAtbInit()
 
         verify(mockDownloadsDirectoryManager).createNewDirectory("DuckDuckGo")
+        assertTrue(isReturningUserChecked())
+    }
+
+    private fun isReturningUserChecked(): Boolean {
+        return preferences.getBoolean("RETURNING_USER_CHECKED_TAG", false)
+    }
+
+    private fun setReturningUserChecked() {
+        preferences.edit(commit = true) { putBoolean("RETURNING_USER_CHECKED_TAG", true) }
     }
 }

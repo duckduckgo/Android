@@ -24,9 +24,6 @@ import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist
-import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState
-import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.NotUnlocked
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -35,16 +32,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @ContributesViewModel(ActivityScope::class)
 class AboutDuckDuckGoViewModel @Inject constructor(
-    private val networkProtectionWaitlist: NetworkProtectionWaitlist,
     private val appBuildConfig: AppBuildConfig,
     private val pixel: Pixel,
 ) : ViewModel() {
 
     data class ViewState(
-        val networkProtectionWaitlistState: NetPWaitlistState = NotUnlocked,
         val version: String = "",
     )
 
@@ -52,7 +48,6 @@ class AboutDuckDuckGoViewModel @Inject constructor(
         object LaunchBrowserWithLearnMoreUrl : Command()
         object LaunchBrowserWithPrivacyProtectionsUrl : Command()
         object LaunchWebViewWithPrivacyPolicyUrl : Command()
-        object ShowNetPUnlockedSnackbar : Command()
         object LaunchNetPWaitlist : Command()
         object LaunchFeedback : Command()
     }
@@ -60,13 +55,12 @@ class AboutDuckDuckGoViewModel @Inject constructor(
     private val viewState = MutableStateFlow(ViewState())
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
 
-    private var netPEasterEggCounter = 0
+    private var easterEggCounter = 0
 
     fun viewState(): Flow<ViewState> = viewState.onStart {
         viewModelScope.launch {
             viewState.emit(
                 currentViewState().copy(
-                    networkProtectionWaitlistState = networkProtectionWaitlist.getState(),
                     version = obtainVersion(),
                 ),
             )
@@ -92,13 +86,11 @@ class AboutDuckDuckGoViewModel @Inject constructor(
     }
 
     fun onVersionClicked() {
-        if (viewState.value.networkProtectionWaitlistState == NetPWaitlistState.NotUnlocked) {
-            netPEasterEggCounter++
-            if (netPEasterEggCounter >= MAX_EASTER_EGG_COUNT) {
-                viewModelScope.launch { command.send(Command.ShowNetPUnlockedSnackbar) }
-                resetNetPEasterEggCounter()
-                pixel.fire(SETTINGS_ABOUT_DDG_VERSION_EASTER_EGG_PRESSED)
-            }
+        easterEggCounter++
+        if (easterEggCounter >= MAX_EASTER_EGG_COUNT) {
+            Timber.v("Easter egg triggered")
+            resetEasterEggCounter()
+            pixel.fire(SETTINGS_ABOUT_DDG_VERSION_EASTER_EGG_PRESSED)
         }
     }
 
@@ -107,19 +99,14 @@ class AboutDuckDuckGoViewModel @Inject constructor(
         pixel.fire(SETTINGS_ABOUT_DDG_SHARE_FEEDBACK_PRESSED)
     }
 
-    fun onNetPUnlockedActionClicked() {
-        viewModelScope.launch { command.send(Command.LaunchNetPWaitlist) }
-        pixel.fire(SETTINGS_ABOUT_DDG_NETP_UNLOCK_PRESSED)
-    }
-
-    fun resetNetPEasterEggCounter() {
-        netPEasterEggCounter = 0
+    fun resetEasterEggCounter() {
+        easterEggCounter = 0
     }
 
     // This is used for testing only to check the `netPEasterEggCounter` is reset without
     // exposing it.
     @VisibleForTesting(otherwise = VisibleForTesting.NONE)
-    internal fun hasResetNetPEasterEggCounter() = netPEasterEggCounter == 0
+    internal fun hasResetEasterEggCounter() = easterEggCounter == 0
 
     private fun currentViewState(): ViewState {
         return viewState.value

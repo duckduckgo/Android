@@ -48,11 +48,23 @@
 
     <!-- Onboarding Experiment-->
     <string name="preOnboardingDaxDialog1Title">Hi there. Ready for a better, more private internet?</string>
-    <string name="preOnboardingDaxDialog1Button">Let’s Do It!</string>
+    <string name="preOnboardingDaxDialog1Button">Let\'s do it!</string>
     <string name="preOnboardingDaxDialog2Title">A better internet starts with a more private browser.</string>
     <string name="preOnboardingDaxDialog2Button">Choose Your Browser</string>
-    <string name="preOnboardingDaxDialog3Title">Awesome.</string>
+    <string name="preOnboardingDaxDialog3Title">Awesome!</string>
     <string name="preOnboardingDaxDialog3Content">Your privacy is our top priority. Welcome to the duck side.</string>
-    <string name="preOnboardingDaxDialog3Button">Get Started</string>
+    <string name="preOnboardingDaxDialog3Button">Start Browsing</string>
+    <string name="onboardingSearchDaxDialogTitle">Try a search!</string>
+    <string name="onboardingSearchDaxDialogDescription">Your DuckDuckGo searches are always anonymous.</string>
+    <string name="onboardingSearchDaxDialogOption1">how to say “duck” in spanish</string>
+    <string name="onboardingSearchDaxDialogOption2">mighty ducks cast</string>
+    <string name="onboardingSearchDaxDialogOption3">local weather</string>
+    <string name="onboardingSearchDaxDialogOption4">Surprise me!</string>
+    <string name="onboardingSitesDaxDialogTitle">Try visiting a site!</string>
+    <string name="onboardingSitesDaxDialogDescription">We\'ll block trackers so they can\'t spy on you.</string>
+    <string name="onboardingSitesDaxDialogOption1">espn.com</string>
+    <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
+    <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
+    <string name="onboardingSitesDaxDialogOption4">Surprise me!</string>
 
 </resources>
