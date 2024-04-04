@@ -132,7 +132,7 @@ class BrowserWebViewClient @Inject constructor(
             }
 
             return when (val urlType = specialUrlDetector.determineType(initiatingUrl = webView.originalUrl, uri = url)) {
-                is SpecialUrlDetector.UrlType.PrivacyProLink -> {
+                is SpecialUrlDetector.UrlType.ShouldLaunchPrivacyProLink -> {
                     subscriptions.launchPrivacyPro(webView.context)
                     true
                 }

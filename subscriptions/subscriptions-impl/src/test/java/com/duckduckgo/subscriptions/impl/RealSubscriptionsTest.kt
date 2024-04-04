@@ -172,38 +172,39 @@ class RealSubscriptionsTest {
     }
 
     @Test
-    fun whenCanTakeOverPrivacyProThenReturnCorrectValue() = runTest {
+    fun whenShouldLaunchPrivacyProForUrlThenReturnCorrectValue() = runTest {
         privacyProFeature.isLaunched().setEnabled(State(enable = true))
         whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(
             SubscriptionOffer(monthlyPlanId = "test", yearlyFormattedPrice = "test", yearlyPlanId = "test", monthlyFormattedPrice = "test"),
         )
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(UNKNOWN)
 
-        assertTrue(subscriptions.canTakeOverPrivacyPro("https://duckduckgo.com/pro"))
-        assertTrue(subscriptions.canTakeOverPrivacyPro("https://test.duckduckgo.com/pro"))
-        assertTrue(subscriptions.canTakeOverPrivacyPro("https://test.duckduckgo.com/pro?test=test"))
-        assertFalse(subscriptions.canTakeOverPrivacyPro("https://test.duckduckgo.com/pro/test"))
-        assertFalse(subscriptions.canTakeOverPrivacyPro("https://duckduckgo.test.com/pro"))
-        assertFalse(subscriptions.canTakeOverPrivacyPro("https://example.com"))
-        assertFalse(subscriptions.canTakeOverPrivacyPro("duckduckgo.com/pro"))
+        assertTrue(subscriptions.shouldLaunchPrivacyProForUrl("https://duckduckgo.com/pro"))
+        assertTrue(subscriptions.shouldLaunchPrivacyProForUrl("https://duckduckgo.com/pro?test=test"))
+        assertTrue(subscriptions.shouldLaunchPrivacyProForUrl("https://test.duckduckgo.com/pro"))
+        assertTrue(subscriptions.shouldLaunchPrivacyProForUrl("https://test.duckduckgo.com/pro?test=test"))
+        assertFalse(subscriptions.shouldLaunchPrivacyProForUrl("https://test.duckduckgo.com/pro/test"))
+        assertFalse(subscriptions.shouldLaunchPrivacyProForUrl("https://duckduckgo.test.com/pro"))
+        assertFalse(subscriptions.shouldLaunchPrivacyProForUrl("https://example.com"))
+        assertFalse(subscriptions.shouldLaunchPrivacyProForUrl("duckduckgo.com/pro"))
     }
 
     @Test
-    fun whenCanTakeOverPrivacyProAndNotEnableThenReturnFalse() = runTest {
+    fun whenShouldLaunchPrivacyProForUrlAndNotEnableThenReturnFalse() = runTest {
         privacyProFeature.isLaunched().setEnabled(State(enable = false))
         whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(
             SubscriptionOffer(monthlyPlanId = "test", yearlyFormattedPrice = "test", yearlyPlanId = "test", monthlyFormattedPrice = "test"),
         )
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(UNKNOWN)
 
-        assertFalse(subscriptions.canTakeOverPrivacyPro("https://duckduckgo.com/pro"))
+        assertFalse(subscriptions.shouldLaunchPrivacyProForUrl("https://duckduckgo.com/pro"))
     }
 
     @Test
-    fun whenCanTakeOverPrivacyProAndNotEligibleThenReturnFalse() = runTest {
+    fun whenShouldLaunchPrivacyProForUrlAndNotEligibleThenReturnFalse() = runTest {
         privacyProFeature.isLaunched().setEnabled(State(enable = true))
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(UNKNOWN)
 
-        assertFalse(subscriptions.canTakeOverPrivacyPro("https://duckduckgo.com/pro"))
+        assertFalse(subscriptions.shouldLaunchPrivacyProForUrl("https://duckduckgo.com/pro"))
     }
 }

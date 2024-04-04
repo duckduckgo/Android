@@ -242,6 +242,20 @@ class SpecialUrlDetectorImplTest {
     }
 
     @Test
+    fun whenUrlIsNotPrivacyProThenQueryTypeDetected() {
+        whenever(subscriptions.shouldLaunchPrivacyProForUrl(any())).thenReturn(false)
+        val result = testee.determineType("duckduckgo.com")
+        assertTrue(result is SearchQuery)
+    }
+
+    @Test
+    fun whenUrlIsPrivacyProThenPrivacyProTypeDetected() {
+        whenever(subscriptions.shouldLaunchPrivacyProForUrl(any())).thenReturn(true)
+        val result = testee.determineType("duckduckgo.com")
+        assertTrue(result is ShouldLaunchPrivacyProLink)
+    }
+
+    @Test
     fun whenUrlIsParametrizedQueryThenSearchQueryTypeDetected() {
         val type = testee.determineType("foo site:duckduckgo.com") as SearchQuery
         assertEquals("foo site:duckduckgo.com", type.query)
@@ -367,11 +381,11 @@ class SpecialUrlDetectorImplTest {
 
     @Test
     fun whenUrlIsPrivacyProThenPrivacyProLinkDetected() {
-        whenever(subscriptions.canTakeOverPrivacyPro(any())).thenReturn(true)
+        whenever(subscriptions.shouldLaunchPrivacyProForUrl(any())).thenReturn(true)
 
         val actual =
             testee.determineType(initiatingUrl = "https://www.example.com", uri = "https://www.example.com".toUri())
-        assertTrue(actual is PrivacyProLink)
+        assertTrue(actual is ShouldLaunchPrivacyProLink)
     }
 
     private fun randomString(length: Int): String {

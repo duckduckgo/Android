@@ -461,7 +461,7 @@ class BrowserTabViewModelTest {
         whenever(mockSettingsDataStore.automaticFireproofSetting).thenReturn(AutomaticFireproofSetting.ASK_EVERY_TIME)
         whenever(androidBrowserConfig.screenLock()).thenReturn(mockToggle)
         whenever(mockExtendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()).thenReturn(false)
-        whenever(subscriptions.canTakeOverPrivacyPro(any())).thenReturn(false)
+        whenever(subscriptions.shouldLaunchPrivacyProForUrl(any())).thenReturn(false)
 
         remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
 
@@ -687,9 +687,9 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenSubmittedQueryIsPrivacyProThenSendLaunchPrivacyProComment() {
-        whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.PrivacyProLink)
+        whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.ShouldLaunchPrivacyProLink)
         whenever(mockOmnibarConverter.convertQueryToUrl("https://duckduckgo.com/pro", null)).thenReturn("https://duckduckgo.com/pro")
-        whenever(subscriptions.canTakeOverPrivacyPro(any())).thenReturn(true)
+        whenever(subscriptions.shouldLaunchPrivacyProForUrl(any())).thenReturn(true)
         testee.onUserSubmittedQuery("https://duckduckgo.com/pro")
         assertCommandIssued<LaunchPrivacyPro>()
     }
@@ -697,9 +697,9 @@ class BrowserTabViewModelTest {
     @Test
     fun whenSubmittedQueryIsPrivacyProAndNavigationStateNullThenCloseTab() = runTest {
         givenOneActiveTabSelected()
-        whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.PrivacyProLink)
+        whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.ShouldLaunchPrivacyProLink)
         whenever(mockOmnibarConverter.convertQueryToUrl("https://duckduckgo.com/pro", null)).thenReturn("https://duckduckgo.com/pro")
-        whenever(subscriptions.canTakeOverPrivacyPro(any())).thenReturn(true)
+        whenever(subscriptions.shouldLaunchPrivacyProForUrl(any())).thenReturn(true)
 
         testee.onUserSubmittedQuery("https://duckduckgo.com/pro")
         assertCommandIssued<LaunchPrivacyPro>()
@@ -710,9 +710,9 @@ class BrowserTabViewModelTest {
     @Test
     fun whenSubmittedQueryIsPrivacyProAndNoNavigationHistoryThenCloseTab() = runTest {
         givenOneActiveTabSelected()
-        whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.PrivacyProLink)
+        whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.ShouldLaunchPrivacyProLink)
         whenever(mockOmnibarConverter.convertQueryToUrl("https://duckduckgo.com/pro", null)).thenReturn("https://duckduckgo.com/pro")
-        whenever(subscriptions.canTakeOverPrivacyPro(any())).thenReturn(true)
+        whenever(subscriptions.shouldLaunchPrivacyProForUrl(any())).thenReturn(true)
         val nav: WebNavigationState = mock()
         whenever(nav.hasNavigationHistory).thenReturn(false)
 
@@ -726,9 +726,9 @@ class BrowserTabViewModelTest {
     @Test
     fun whenSubmittedQueryIsPrivacyProAndNavigationHistoryThenDoNotCloseTab() = runTest {
         givenOneActiveTabSelected()
-        whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.PrivacyProLink)
+        whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.ShouldLaunchPrivacyProLink)
         whenever(mockOmnibarConverter.convertQueryToUrl("https://duckduckgo.com/pro", null)).thenReturn("https://duckduckgo.com/pro")
-        whenever(subscriptions.canTakeOverPrivacyPro(any())).thenReturn(true)
+        whenever(subscriptions.shouldLaunchPrivacyProForUrl(any())).thenReturn(true)
         val nav: WebNavigationState = mock()
         whenever(nav.hasNavigationHistory).thenReturn(true)
 
@@ -1733,7 +1733,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserSelectsOpenTabAndItIsPrivacyProThenLaunchPrivacyProCommandSent() {
         whenever(mockLongPressHandler.userSelectedMenuItem(any(), any())).thenReturn(OpenInNewTab("http://example.com"))
-        whenever(subscriptions.canTakeOverPrivacyPro(any())).thenReturn(true)
+        whenever(subscriptions.shouldLaunchPrivacyProForUrl(any())).thenReturn(true)
 
         val mockMenItem: MenuItem = mock()
         val longPressTarget = LongPressTarget(url = "http://example.com", type = WebView.HitTestResult.SRC_ANCHOR_TYPE)
@@ -1746,7 +1746,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserSelectsOpenInBackgroundTabAndItIsPrivacyProThenLaunchPrivacyProCommandSent() {
         whenever(mockLongPressHandler.userSelectedMenuItem(any(), any())).thenReturn(RequiredAction.OpenInNewBackgroundTab("http://example.com"))
-        whenever(subscriptions.canTakeOverPrivacyPro(any())).thenReturn(true)
+        whenever(subscriptions.shouldLaunchPrivacyProForUrl(any())).thenReturn(true)
 
         val mockMenItem: MenuItem = mock()
         val longPressTarget = LongPressTarget(url = "http://example.com", type = WebView.HitTestResult.SRC_ANCHOR_TYPE)

@@ -51,7 +51,7 @@ import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.EditSavedSite
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.NonHttpAppLink
-import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.PrivacyProLink
+import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.ShouldLaunchPrivacyProLink
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
@@ -710,14 +710,12 @@ class BrowserTabViewModel @Inject constructor(
         var urlToNavigate = queryUrlConverter.convertQueryToUrl(trimmedInput, verticalParameter, queryOrigin)
 
         when (val type = specialUrlDetector.determineType(trimmedInput)) {
-            is PrivacyProLink -> {
-                if (subscriptions.canTakeOverPrivacyPro(query)) {
-                    if (webNavigationState == null || webNavigationState?.hasNavigationHistory == false) {
-                        closeCurrentTab()
-                    }
-                    command.value = LaunchPrivacyPro
-                    return
+            is ShouldLaunchPrivacyProLink -> {
+                if (webNavigationState == null || webNavigationState?.hasNavigationHistory == false) {
+                    closeCurrentTab()
                 }
+                command.value = LaunchPrivacyPro
+                return
             }
 
             is NonHttpAppLink -> {
@@ -2066,7 +2064,7 @@ class BrowserTabViewModel @Inject constructor(
 
         return when (requiredAction) {
             is RequiredAction.OpenInNewTab -> {
-                if (subscriptions.canTakeOverPrivacyPro(requiredAction.url)) {
+                if (subscriptions.shouldLaunchPrivacyProForUrl(requiredAction.url)) {
                     command.value = LaunchPrivacyPro
                     return true
                 }
@@ -2076,7 +2074,7 @@ class BrowserTabViewModel @Inject constructor(
             }
 
             is RequiredAction.OpenInNewBackgroundTab -> {
-                if (subscriptions.canTakeOverPrivacyPro(requiredAction.url)) {
+                if (subscriptions.shouldLaunchPrivacyProForUrl(requiredAction.url)) {
                     command.value = LaunchPrivacyPro
                     return true
                 }

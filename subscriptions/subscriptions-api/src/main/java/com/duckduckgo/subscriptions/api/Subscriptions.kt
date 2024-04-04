@@ -52,7 +52,7 @@ interface Subscriptions {
     /**
      * @return `true` if the given URL can be handled internally or `false` otherwise
      */
-    fun canTakeOverPrivacyPro(url: String): Boolean
+    fun shouldLaunchPrivacyProForUrl(url: String): Boolean
 
     /**
      * Launches Privacy Pro with Settings as the parent activity

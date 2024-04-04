@@ -117,7 +117,7 @@ class RealSubscriptions @Inject constructor(
         }
         pixel.reportPrivacyProRedirect()
     }
-    override fun canTakeOverPrivacyPro(url: String): Boolean {
+    override fun shouldLaunchPrivacyProForUrl(url: String): Boolean {
         val uri = url.toUri()
         val eTld = uri.host?.toTldPlusOne() ?: return false
         val size = uri.pathSegments.size

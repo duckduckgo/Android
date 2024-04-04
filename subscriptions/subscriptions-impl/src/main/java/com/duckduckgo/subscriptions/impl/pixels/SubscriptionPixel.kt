@@ -158,7 +158,7 @@ enum class SubscriptionPixel(
         baseName = "m_privacy-pro_app_add-email_success",
         type = UNIQUE,
     ),
-    SUBSCRIPTION_PRIVACY_PRO_PATH(
+    SUBSCRIPTION_PRIVACY_PRO_REDIRECT(
         baseName = "m_privacy-pro_app_redirect",
         type = COUNT,
     ),

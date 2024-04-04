@@ -48,6 +48,6 @@ interface SpecialUrlDetector {
         class ExtractedAmpLink(val extractedUrl: String) : UrlType()
         class CloakedAmpLink(val ampUrl: String) : UrlType()
         class TrackingParameterLink(val cleanedUrl: String) : UrlType()
-        data object PrivacyProLink : UrlType()
+        data object ShouldLaunchPrivacyProLink : UrlType()
     }
 }

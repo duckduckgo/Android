@@ -49,7 +49,14 @@ class SpecialUrlDetectorImpl(
             SMSTO_SCHEME -> buildSmsTo(uriString)
             HTTP_SCHEME, HTTPS_SCHEME, DATA_SCHEME -> processUrl(initiatingUrl, uriString)
             JAVASCRIPT_SCHEME, ABOUT_SCHEME, FILE_SCHEME, SITE_SCHEME -> UrlType.SearchQuery(uriString)
-            null, FILETYPE_SCHEME, IN_TITLE_SCHEME, IN_URL_SCHEME -> UrlType.SearchQuery(uriString)
+            FILETYPE_SCHEME, IN_TITLE_SCHEME, IN_URL_SCHEME -> UrlType.SearchQuery(uriString)
+            null -> {
+                if (subscriptions.shouldLaunchPrivacyProForUrl("https://$uriString")) {
+                    UrlType.ShouldLaunchPrivacyProLink
+                } else {
+                    UrlType.SearchQuery(uriString)
+                }
+            }
             else -> checkForIntent(scheme, uriString)
         }
     }
@@ -67,10 +74,6 @@ class SpecialUrlDetectorImpl(
 
     @Suppress("NewApi") // we use appBuildConfig
     override fun processUrl(initiatingUrl: String?, uriString: String): UrlType {
-        if (subscriptions.canTakeOverPrivacyPro(uriString)) {
-            return UrlType.PrivacyProLink
-        }
-
         trackingParameters.cleanTrackingParameters(initiatingUrl = initiatingUrl, url = uriString)?.let { cleanedUrl ->
             return UrlType.TrackingParameterLink(cleanedUrl = cleanedUrl)
         }
@@ -98,6 +101,11 @@ class SpecialUrlDetectorImpl(
                 return UrlType.CloakedAmpLink(ampUrl = ampLinkType.ampUrl)
             }
         }
+
+        if (subscriptions.shouldLaunchPrivacyProForUrl(uriString)) {
+            return UrlType.ShouldLaunchPrivacyProLink
+        }
+
         return UrlType.Web(uriString)
     }
 
