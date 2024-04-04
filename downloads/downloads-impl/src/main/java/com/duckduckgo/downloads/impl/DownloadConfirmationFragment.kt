@@ -38,6 +38,8 @@ import logcat.logcat
 @InjectWith(FragmentScope::class)
 class DownloadConfirmationFragment : BottomSheetDialogFragment() {
 
+    override fun getTheme(): Int = R.style.DownloadsBottomSheetDialogTheme
+
     val listener: DownloadConfirmationDialogListener
         get() {
             return if (parentFragment != null) {
@@ -84,9 +86,7 @@ class DownloadConfirmationFragment : BottomSheetDialogFragment() {
     }
 
     private fun setupViews(binding: DownloadConfirmationBinding) {
-        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            (dialog as BottomSheetDialog).behavior.state = BottomSheetBehavior.STATE_EXPANDED
-        }
+        (dialog as BottomSheetDialog).behavior.state = BottomSheetBehavior.STATE_EXPANDED
         val fileName = file?.name ?: ""
         binding.downloadMessage.text = fileName
         binding.continueDownload.setOnClickListener {
