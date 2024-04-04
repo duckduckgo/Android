@@ -39,7 +39,13 @@ class CredentialsInvalidItemsViewModelTest {
     private val secureStorage = FakeSecureStorage()
     private val credentialsSyncStore = FakeCredentialsSyncStore()
     private val credentialsSyncMetadata = CredentialsSyncMetadata(db.credentialsSyncDao())
-    private val credentialsSync = CredentialsSync(secureStorage, credentialsSyncStore, credentialsSyncMetadata, FakeCrypto())
+    private val credentialsSync = CredentialsSync(
+        secureStorage,
+        credentialsSyncStore,
+        credentialsSyncMetadata,
+        FakeCrypto(),
+        FakeCredentialsSyncLocalValidationFeature(),
+    )
 
     private val viewModel = CredentialsInvalidItemsViewModel(
         dispatcherProvider = coroutineRule.testDispatcherProvider,

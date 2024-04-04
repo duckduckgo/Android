@@ -44,7 +44,13 @@ internal class CredentialsSyncTest {
     private val secureStorage = FakeSecureStorage()
     private val credentialsSyncStore = FakeCredentialsSyncStore()
     private val credentialsSyncMetadata = CredentialsSyncMetadata(db.credentialsSyncDao())
-    private val credentialsSync = CredentialsSync(secureStorage, credentialsSyncStore, credentialsSyncMetadata, FakeCrypto())
+    private val credentialsSync = CredentialsSync(
+        secureStorage,
+        credentialsSyncStore,
+        credentialsSyncMetadata,
+        FakeCrypto(),
+        FakeCredentialsSyncLocalValidationFeature(),
+    )
 
     @After fun after() = runBlocking {
         db.close()
