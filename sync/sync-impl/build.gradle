@@ -37,6 +37,7 @@ dependencies {
     implementation project(path: ':saved-sites-api')
     implementation project(':feature-toggles-api')
     implementation project(':navigation-api')
+    implementation project(':remote-messaging-api')
 
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':privacy-config-api')
