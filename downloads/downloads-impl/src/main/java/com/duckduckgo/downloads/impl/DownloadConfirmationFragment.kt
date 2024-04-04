@@ -84,7 +84,9 @@ class DownloadConfirmationFragment : BottomSheetDialogFragment() {
     }
 
     private fun setupViews(binding: DownloadConfirmationBinding) {
-        (dialog as BottomSheetDialog).behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            (dialog as BottomSheetDialog).behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        }
         val fileName = file?.name ?: ""
         binding.downloadMessage.text = fileName
         binding.continueDownload.setOnClickListener {
