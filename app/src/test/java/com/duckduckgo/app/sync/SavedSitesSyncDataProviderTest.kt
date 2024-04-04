@@ -20,30 +20,35 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.bookmarks.BookmarkTestUtils.aBookmark
+import com.duckduckgo.app.bookmarks.BookmarkTestUtils.createInvalidBookmark
+import com.duckduckgo.app.bookmarks.BookmarkTestUtils.createInvalidFolder
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
-import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.impl.MissingEntitiesRelationReconciler
 import com.duckduckgo.savedsites.impl.RealFavoritesDelegate
 import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
+import com.duckduckgo.savedsites.impl.sync.BookmarksSyncLocalValidationFeature
 import com.duckduckgo.savedsites.impl.sync.RealSavedSitesFormFactorSyncMigration
 import com.duckduckgo.savedsites.impl.sync.RealSavedSitesSyncStore
 import com.duckduckgo.savedsites.impl.sync.RealSyncSavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.SavedSitesFormFactorSyncMigration
 import com.duckduckgo.savedsites.impl.sync.SavedSitesSyncDataProvider
-import com.duckduckgo.savedsites.impl.sync.SavedSitesSyncStore
+import com.duckduckgo.savedsites.impl.sync.SavedSitesSyncDataProvider.Companion.MAX_FOLDER_TITLE_LENGTH
 import com.duckduckgo.savedsites.impl.sync.SyncBookmarkPage
 import com.duckduckgo.savedsites.impl.sync.SyncBookmarksRequest
 import com.duckduckgo.savedsites.impl.sync.SyncFolderChildren
 import com.duckduckgo.savedsites.impl.sync.SyncSavedSiteRequestFolder
 import com.duckduckgo.savedsites.impl.sync.SyncSavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.SyncSavedSitesRequestEntry
+import com.duckduckgo.savedsites.impl.sync.store.RealSavedSitesSyncEntitiesStore
 import com.duckduckgo.savedsites.impl.sync.store.SavedSitesSyncMetadataDao
 import com.duckduckgo.savedsites.impl.sync.store.SavedSitesSyncMetadataDatabase
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
@@ -80,7 +85,14 @@ class SavedSitesSyncDataProviderTest {
     private lateinit var savedSitesRelationsDao: SavedSitesRelationsDao
     private lateinit var savedSitesMetadataDao: SavedSitesSyncMetadataDao
     private lateinit var savedSitesFormFactorSyncMigration: SavedSitesFormFactorSyncMigration
-    private lateinit var store: SavedSitesSyncStore
+    private val syncEntitiesStore = RealSavedSitesSyncEntitiesStore(
+        InstrumentationRegistry.getInstrumentation().context,
+    )
+    private val syncFeatureStore = RealSavedSitesSyncStore(
+        InstrumentationRegistry.getInstrumentation().context,
+        coroutinesTestRule.testScope,
+        coroutinesTestRule.testDispatcherProvider,
+    )
 
     private lateinit var parser: SavedSitesSyncDataProvider
 
@@ -92,6 +104,8 @@ class SavedSitesSyncDataProviderTest {
     private val bookmark2 = aBookmark("bookmark2", "Bookmark 2", "https://bookmark2.com")
     private val bookmark3 = aBookmark("bookmark3", "Bookmark 3", "https://bookmark3.com")
     private val bookmark4 = aBookmark("bookmark4", "Bookmark 4", "https://bookmark4.com")
+    private val invalidBookmark = createInvalidBookmark()
+    private val invalidFolder = createInvalidFolder()
 
     private val threeHoursAgo = OffsetDateTime.now(ZoneOffset.UTC).minusHours(3)
     private val twoHoursAgo = OffsetDateTime.now(ZoneOffset.UTC).minusHours(2)
@@ -123,7 +137,7 @@ class SavedSitesSyncDataProviderTest {
             coroutinesTestRule.testDispatcherProvider,
         )
 
-        syncRepository = RealSyncSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao, savedSitesMetadataDao)
+        syncRepository = RealSyncSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao, savedSitesMetadataDao, syncEntitiesStore)
         repository = RealSavedSitesRepository(
             savedSitesEntitiesDao,
             savedSitesRelationsDao,
@@ -131,18 +145,26 @@ class SavedSitesSyncDataProviderTest {
             MissingEntitiesRelationReconciler(savedSitesEntitiesDao),
             coroutinesTestRule.testDispatcherProvider,
         )
-        store = RealSavedSitesSyncStore(
-            InstrumentationRegistry.getInstrumentation().context,
-            coroutinesTestRule.testScope,
-            coroutinesTestRule.testDispatcherProvider,
-        )
+        val featureFlag = mock<BookmarksSyncLocalValidationFeature>().apply {
+            val enabledToggle = mock<Toggle>().apply {
+                whenever(isEnabled()).thenReturn(true)
+            }
+            whenever(self()).thenReturn(enabledToggle)
+        }
 
         savedSitesFormFactorSyncMigration = RealSavedSitesFormFactorSyncMigration(
             savedSitesEntitiesDao,
             savedSitesRelationsDao,
             savedSitesSettingsRepository,
         )
-        parser = SavedSitesSyncDataProvider(repository, syncRepository, store, FakeCrypto(), savedSitesFormFactorSyncMigration)
+        parser = SavedSitesSyncDataProvider(
+            repository,
+            syncRepository,
+            syncFeatureStore,
+            FakeCrypto(),
+            savedSitesFormFactorSyncMigration,
+            featureFlag,
+        )
 
         favoritesFolder = repository.insert(favoritesFolder)
         bookmarksRootFolder = repository.insert(bookmarksRootFolder)
@@ -210,6 +232,77 @@ class SavedSitesSyncDataProviderTest {
         assertTrue(changes.bookmarks.updates[0].id == "bookmark3")
         assertTrue(changes.bookmarks.updates[1].id == "bookmark4")
         assertTrue(changes.bookmarks.updates[2].id == "bookmarks_root")
+    }
+
+    @Test
+    fun whenOnFirstSyncBookmarkIsInvalidThenChangesDoesNotContainInvalidEntity() {
+        repository.insert(invalidBookmark)
+
+        val syncChanges = parser.getChanges()
+
+        val changes = Adapters.adapter.fromJson(syncChanges.jsonString)!!
+        assertTrue(changes.bookmarks.updates.size == 1)
+        assertTrue(changes.bookmarks.updates[0].id == "bookmarks_root")
+        assertTrue(changes.bookmarks.updates[0].folder?.children?.current?.contains(invalidBookmark.id) ?: false)
+    }
+
+    @Test
+    fun whenOnFirstSyncFolderIsInvalidThenChangesContainDataFixed() {
+        repository.insert(invalidBookmark)
+        repository.insert(invalidFolder)
+
+        val syncChanges = parser.getChanges()
+
+        val changes = Adapters.adapter.fromJson(syncChanges.jsonString)!!
+        assertTrue(changes.bookmarks.updates.size == 2)
+        assertTrue(changes.bookmarks.updates[0].id == invalidFolder.id)
+        assertTrue(changes.bookmarks.updates[0].title?.length == MAX_FOLDER_TITLE_LENGTH)
+        assertTrue(changes.bookmarks.updates[1].id == "bookmarks_root")
+        assertTrue(changes.bookmarks.updates[1].folder?.children?.current?.contains(invalidFolder.id) ?: false)
+    }
+
+    @Test
+    fun whenNewBookmarkIsInvalidThenChangesDoesNotContainInvalidEntity() {
+        setLastSyncTime(DatabaseDateFormatter.iso8601(twoHoursAgo))
+        repository.insert(invalidBookmark.copy(lastModified = DatabaseDateFormatter.iso8601(oneHourAgo)))
+
+        val syncChanges = parser.getChanges()
+
+        val changes = Adapters.adapter.fromJson(syncChanges.jsonString)!!
+        assertTrue(changes.bookmarks.updates.size == 1)
+        assertTrue(changes.bookmarks.updates[0].id == "bookmarks_root")
+        assertTrue(changes.bookmarks.updates[0].folder?.children?.current?.contains(invalidBookmark.id) ?: false)
+    }
+
+    @Test
+    fun whenNewFolderIsInvalidThenChangesContainDataFixed() {
+        setLastSyncTime(DatabaseDateFormatter.iso8601(twoHoursAgo))
+        repository.insert(invalidBookmark.copy(lastModified = DatabaseDateFormatter.iso8601(oneHourAgo)))
+        repository.insert(invalidFolder.copy(lastModified = DatabaseDateFormatter.iso8601(oneHourAgo)))
+
+        val syncChanges = parser.getChanges()
+
+        val changes = Adapters.adapter.fromJson(syncChanges.jsonString)!!
+        assertTrue(changes.bookmarks.updates.size == 2)
+        assertTrue(changes.bookmarks.updates.find { it.id == invalidFolder.id }!!.title?.length == MAX_FOLDER_TITLE_LENGTH)
+        assertTrue(changes.bookmarks.updates.find { it.id == "bookmarks_root" }!!.folder?.children?.current?.contains(invalidFolder.id) ?: false)
+    }
+
+    @Test
+    fun whenInvalidBookmarkPresentAndValidBookmarkAddedThenOnlyValidBookmarkIncluded() {
+        repository.insert(invalidBookmark)
+        syncRepository.markSavedSitesAsInvalid(listOf(invalidBookmark.id))
+        setLastSyncTime(DatabaseDateFormatter.iso8601(twoHoursAgo))
+        repository.insert(bookmark1.copy(lastModified = DatabaseDateFormatter.iso8601(oneHourAgo)))
+
+        val syncChanges = parser.getChanges()
+
+        val changes = Adapters.adapter.fromJson(syncChanges.jsonString)!!
+        assertTrue(changes.bookmarks.updates.size == 2)
+        assertTrue(changes.bookmarks.updates.find { it.id == "bookmarks_root" }!!.folder?.children?.current?.contains(invalidBookmark.id) ?: false)
+        assertTrue(changes.bookmarks.updates.find { it.id == "bookmarks_root" }!!.folder?.children?.current?.contains(bookmark1.id) ?: false)
+        assertTrue(changes.bookmarks.updates.find { it.id == bookmark1.id } != null)
+        assertTrue(syncRepository.getInvalidSavedSites().size == 1)
     }
 
     @Test
@@ -416,8 +509,8 @@ class SavedSitesSyncDataProviderTest {
         lastServerSyncTimestamp: String,
         lastClientSyncTimestmp: String = lastServerSyncTimestamp,
     ) {
-        store.serverModifiedSince = lastServerSyncTimestamp
-        store.clientModifiedSince = lastClientSyncTimestmp
+        syncFeatureStore.serverModifiedSince = lastServerSyncTimestamp
+        syncFeatureStore.clientModifiedSince = lastClientSyncTimestmp
     }
 
     private fun fromSavedSite(savedSite: SavedSite): SyncSavedSitesRequestEntry {
@@ -462,15 +555,6 @@ class SavedSitesSyncDataProviderTest {
         timestamp: String = "2023-05-10T16:10:32.338Z",
     ): Favorite {
         return Favorite(id, title, url, lastModified = timestamp, position)
-    }
-
-    private fun aBookmark(
-        id: String,
-        title: String,
-        url: String,
-        timestamp: String = "2023-05-10T16:10:32.338Z",
-    ): Bookmark {
-        return Bookmark(id, title, url, lastModified = timestamp)
     }
 
     private class Adapters {

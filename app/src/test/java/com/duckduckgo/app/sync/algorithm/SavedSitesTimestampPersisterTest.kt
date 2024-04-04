@@ -35,6 +35,7 @@ import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.RealSyncSavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.SyncSavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesTimestampPersister
+import com.duckduckgo.savedsites.impl.sync.store.RealSavedSitesSyncEntitiesStore
 import com.duckduckgo.savedsites.impl.sync.store.SavedSitesSyncMetadataDao
 import com.duckduckgo.savedsites.impl.sync.store.SavedSitesSyncMetadataDatabase
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
@@ -65,8 +66,10 @@ class SavedSitesTimestampPersisterTest {
     private lateinit var savedSitesEntitiesDao: SavedSitesEntitiesDao
     private lateinit var savedSitesRelationsDao: SavedSitesRelationsDao
     private lateinit var savedSitesMetadataDao: SavedSitesSyncMetadataDao
-
     private lateinit var persister: SavedSitesTimestampPersister
+    private val store = RealSavedSitesSyncEntitiesStore(
+        InstrumentationRegistry.getInstrumentation().context,
+    )
 
     private val threeHoursAgo = DatabaseDateFormatter.iso8601(OffsetDateTime.now(ZoneOffset.UTC).minusHours(3))
     private val twoHoursAgo = DatabaseDateFormatter.iso8601(OffsetDateTime.now(ZoneOffset.UTC).minusHours(2))
@@ -95,7 +98,7 @@ class SavedSitesTimestampPersisterTest {
             MissingEntitiesRelationReconciler(savedSitesEntitiesDao),
             coroutinesTestRule.testDispatcherProvider,
         )
-        syncRepository = RealSyncSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao, savedSitesMetadataDao)
+        syncRepository = RealSyncSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao, savedSitesMetadataDao, store)
         repository = RealSavedSitesRepository(
             savedSitesEntitiesDao,
             savedSitesRelationsDao,
