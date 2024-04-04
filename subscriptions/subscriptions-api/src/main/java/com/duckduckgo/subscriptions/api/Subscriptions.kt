@@ -16,6 +16,7 @@
 
 package com.duckduckgo.subscriptions.api
 
+import android.content.Context
 import kotlinx.coroutines.flow.Flow
 
 interface Subscriptions {
@@ -47,6 +48,16 @@ interface Subscriptions {
      * @return `SubscriptionStatus` with the current subscription status
      */
     suspend fun getSubscriptionStatus(): SubscriptionStatus
+
+    /**
+     * @return `true` if the given URL can be handled internally or `false` otherwise
+     */
+    fun shouldLaunchPrivacyProForUrl(url: String): Boolean
+
+    /**
+     * Launches Privacy Pro with Settings as the parent activity
+     */
+    fun launchPrivacyPro(context: Context)
 }
 
 enum class Product(val value: String) {

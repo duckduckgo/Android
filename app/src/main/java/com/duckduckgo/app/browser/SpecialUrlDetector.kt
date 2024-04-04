@@ -27,6 +27,7 @@ import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType
 import com.duckduckgo.privacy.config.api.AmpLinkType
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.TrackingParameters
+import com.duckduckgo.subscriptions.api.Subscriptions
 import java.net.URISyntaxException
 import timber.log.Timber
 
@@ -34,6 +35,7 @@ class SpecialUrlDetectorImpl(
     private val packageManager: PackageManager,
     private val ampLinks: AmpLinks,
     private val trackingParameters: TrackingParameters,
+    private val subscriptions: Subscriptions,
 ) : SpecialUrlDetector {
 
     override fun determineType(initiatingUrl: String?, uri: Uri): UrlType {
@@ -47,7 +49,14 @@ class SpecialUrlDetectorImpl(
             SMSTO_SCHEME -> buildSmsTo(uriString)
             HTTP_SCHEME, HTTPS_SCHEME, DATA_SCHEME -> processUrl(initiatingUrl, uriString)
             JAVASCRIPT_SCHEME, ABOUT_SCHEME, FILE_SCHEME, SITE_SCHEME -> UrlType.SearchQuery(uriString)
-            null, FILETYPE_SCHEME, IN_TITLE_SCHEME, IN_URL_SCHEME -> UrlType.SearchQuery(uriString)
+            FILETYPE_SCHEME, IN_TITLE_SCHEME, IN_URL_SCHEME -> UrlType.SearchQuery(uriString)
+            null -> {
+                if (subscriptions.shouldLaunchPrivacyProForUrl("https://$uriString")) {
+                    UrlType.ShouldLaunchPrivacyProLink
+                } else {
+                    UrlType.SearchQuery(uriString)
+                }
+            }
             else -> checkForIntent(scheme, uriString)
         }
     }
@@ -92,6 +101,11 @@ class SpecialUrlDetectorImpl(
                 return UrlType.CloakedAmpLink(ampUrl = ampLinkType.ampUrl)
             }
         }
+
+        if (subscriptions.shouldLaunchPrivacyProForUrl(uriString)) {
+            return UrlType.ShouldLaunchPrivacyProLink
+        }
+
         return UrlType.Web(uriString)
     }
 

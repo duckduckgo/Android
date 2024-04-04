@@ -55,6 +55,7 @@ sealed class Command {
     class OpenInNewBackgroundTab(val query: String) : Command()
     object LaunchNewTab : Command()
     object ResetHistory : Command()
+    object LaunchPrivacyPro : Command()
     class DialNumber(val telephoneNumber: String) : Command()
     class SendSms(val telephoneNumber: String) : Command()
     class SendEmail(val emailAddress: String) : Command()

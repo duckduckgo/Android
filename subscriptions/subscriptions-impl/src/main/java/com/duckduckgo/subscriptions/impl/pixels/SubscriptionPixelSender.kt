@@ -48,6 +48,7 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_A
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_ONBOARDING_FAQ_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_PRICE_MONTHLY_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_PRICE_YEARLY_CLICK
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_PRIVACY_PRO_REDIRECT
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_CHANGE_PLAN_OR_BILLING_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_REMOVE_FROM_DEVICE_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_SHOWN
@@ -88,6 +89,7 @@ interface SubscriptionPixelSender {
     fun reportYearlyPriceClick()
     fun reportOnboardingFaqClick()
     fun reportAddEmailSuccess()
+    fun reportPrivacyProRedirect()
 }
 
 @ContributesBinding(AppScope::class)
@@ -193,6 +195,9 @@ class SubscriptionPixelSenderImpl @Inject constructor(
 
     override fun reportAddEmailSuccess() =
         fire(SUBSCRIPTION_ADD_EMAIL_SUCCESS)
+
+    override fun reportPrivacyProRedirect() =
+        fire(SUBSCRIPTION_PRIVACY_PRO_REDIRECT)
 
     private fun fire(pixel: SubscriptionPixel) {
         pixel.getPixelNames().forEach { (pixelType, pixelName) ->
