@@ -268,6 +268,9 @@ interface NetworkProtectionPixels {
     fun reportAccessRevokedDialogShown()
     fun reportPrivacyProPromotionDialogShown()
     fun reportVpnBetaStoppedWhenPrivacyProUpdatedAndEnabled()
+
+    fun reportVpnEnabledFromQuickSettingsTile()
+    fun reportVpnDisabledFromQuickSettingsTile()
 }
 
 @ContributesBinding(AppScope::class)
@@ -518,6 +521,17 @@ class RealNetworkProtectionPixel @Inject constructor(
     override fun reportVpnBetaStoppedWhenPrivacyProUpdatedAndEnabled() {
         firePixel(NETP_BETA_STOPPED_WHEN_PRIVACY_PRO_UPDATED_AND_ENABLED)
         tryToFireDailyPixel(NETP_BETA_STOPPED_WHEN_PRIVACY_PRO_UPDATED_AND_ENABLED_DAILY)
+    }
+
+    override fun reportVpnEnabledFromQuickSettingsTile() {
+        firePixel(NETP_ENABLE_FROM_SETTINGS_TILE)
+        tryToFireUniquePixel(NETP_ENABLE_FROM_SETTINGS_TILE_UNIQUE)
+        tryToFireDailyPixel(NETP_ENABLE_FROM_SETTINGS_TILE_DAILY)
+    }
+
+    override fun reportVpnDisabledFromQuickSettingsTile() {
+        firePixel(NETP_DISABLE_FROM_SETTINGS_TILE)
+        tryToFireDailyPixel(NETP_DISABLE_FROM_SETTINGS_TILE_DAILY)
     }
 
     private fun firePixel(

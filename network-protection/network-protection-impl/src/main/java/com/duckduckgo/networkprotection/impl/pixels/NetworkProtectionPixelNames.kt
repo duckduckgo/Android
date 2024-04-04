@@ -117,4 +117,9 @@ enum class NetworkProtectionPixelNames(
     NETP_PRIVACY_PRO_PROMOTION_DIALOG_SHOWN_DAILY("m_netp_ev_privacy_pro_promotion_dialog_shown_d", enqueue = true),
     NETP_BETA_STOPPED_WHEN_PRIVACY_PRO_UPDATED_AND_ENABLED("m_netp_ev_vpn_beta_stopped_when_privacy_pro_enabled_c", enqueue = true),
     NETP_BETA_STOPPED_WHEN_PRIVACY_PRO_UPDATED_AND_ENABLED_DAILY("m_netp_ev_vpn_beta_stopped_when_privacy_pro_enabled_d", enqueue = true),
+    NETP_ENABLE_FROM_SETTINGS_TILE("m_netp_ev_enable_from_settings_tile_c", enqueue = true),
+    NETP_ENABLE_FROM_SETTINGS_TILE_UNIQUE("m_netp_ev_enable_from_settings_tile_u", enqueue = true),
+    NETP_ENABLE_FROM_SETTINGS_TILE_DAILY("m_netp_ev_enable_from_settings_tile_d", enqueue = true),
+    NETP_DISABLE_FROM_SETTINGS_TILE("m_netp_ev_disable_from_settings_tile_c", enqueue = true),
+    NETP_DISABLE_FROM_SETTINGS_TILE_DAILY("m_netp_ev_disable_from_settings_tile_d", enqueue = true),
 }
