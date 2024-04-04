@@ -969,10 +969,13 @@
               "click": "div[role=\"dialog\"] button:nth-child(2)"
             },
             {
-              "waitFor": "div[role=\"dialog\"] a[data-anchor-id=\"privacy-policy\"]"
+              "waitFor": "div[role=\"dialog\"] a[data-anchor-id=\"cookie-policy\"]"
             },
             {
-              "click": "div[role=\"dialog\"] button:nth-child(2)"
+              "waitFor": "div[role=\"dialog\"] button[role=switch]"
+            },
+            {
+              "click": "div[role=\"dialog\"] button:nth-child(2):not([role])"
             },
             {
               "click": "div[role=\"dialog\"] div:last-child button:only-child"
@@ -1528,6 +1531,53 @@
       ]
     },
     {
+      "name": "Complianz opt-out",
+      "prehideSelectors": [
+        "[aria-describedby=\"cookieconsent:desc\"].cc-type-opt-out"
+      ],
+      "detectCmp": [
+        {
+          "exists": "[aria-describedby=\"cookieconsent:desc\"].cc-type-opt-out"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "[aria-describedby=\"cookieconsent:desc\"].cc-type-opt-out"
+        }
+      ],
+      "optIn": [
+        {
+          "click": ".cc-accept-all",
+          "optional": true
+        },
+        {
+          "click": ".cc-allow",
+          "optional": true
+        },
+        {
+          "click": ".cc-dismiss",
+          "optional": true
+        }
+      ],
+      "optOut": [
+        {
+          "if": {
+            "exists": ".cc-deny"
+          },
+          "then": [
+            {
+              "click": ".cc-deny"
+            }
+          ],
+          "else": [
+            {
+              "hide": "[aria-describedby=\"cookieconsent:desc\"]"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "Complianz optin",
       "prehideSelectors": [
         ".cc-type-opt-in[aria-describedby=\"cookieconsent:desc\"]"
@@ -1740,7 +1790,28 @@
       ],
       "optOut": [
         {
-          "click": "#cookiescript_reject"
+          "if": {
+            "exists": "#cookiescript_reject"
+          },
+          "then": [
+            {
+              "wait": 100
+            },
+            {
+              "click": "#cookiescript_reject"
+            }
+          ],
+          "else": [
+            {
+              "click": "#cookiescript_manage"
+            },
+            {
+              "waitForVisible": ".cookiescript_fsd_main"
+            },
+            {
+              "waitForThenClick": "#cookiescript_reject"
+            }
+          ]
         }
       ],
       "optIn": [
@@ -2110,7 +2181,7 @@
     {
       "name": "csu-landtag-de",
       "runContext": {
-        "urlPattern": "^https://(www|)?\\.csu-landtag\\.de"
+        "urlPattern": "^https://(www\\.|)?csu-landtag\\.de"
       },
       "prehideSelectors": [
         "#cookie-disclaimer"
@@ -2478,6 +2549,62 @@
       "optOut": [
         {
           "waitForThenClick": "[data-test-id=cookie-notice-reject]"
+        }
+      ]
+    },
+    {
+      "name": "Ensighten ensModal",
+      "prehideSelectors": [
+        ".ensModal"
+      ],
+      "detectCmp": [
+        {
+          "exists": ".ensModal"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": ".ensModal"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": "#modalAcceptButton"
+        }
+      ],
+      "optOut": [
+        {
+          "waitForThenClick": ".ensCheckbox:checked",
+          "all": true
+        },
+        {
+          "waitForThenClick": "#ensSave"
+        }
+      ]
+    },
+    {
+      "name": "Ensighten ensNotifyBanner",
+      "prehideSelectors": [
+        "#ensNotifyBanner"
+      ],
+      "detectCmp": [
+        {
+          "exists": "#ensNotifyBanner"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "#ensNotifyBanner"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": "#ensCloseBanner"
+        }
+      ],
+      "optOut": [
+        {
+          "waitForThenClick": "#ensRejectAll,#rejectAll,#ensRejectBanner"
         }
       ]
     },
@@ -4057,7 +4184,7 @@
       ],
       "detectPopup": [
         {
-          "visible": "#moove_gdpr_cookie_info_bar"
+          "visible": "#moove_gdpr_cookie_info_bar:not(.moove-gdpr-info-bar-hidden)"
         }
       ],
       "optIn": [
@@ -4337,6 +4464,9 @@
     },
     {
       "name": "onlyFans.com",
+      "runContext": {
+        "urlPattern": "^https://onlyfans\\.com/"
+      },
       "prehideSelectors": [
         "div.b-cookies-informer"
       ],
@@ -4360,10 +4490,18 @@
           "click": "div.b-cookies-informer__nav > button:nth-child(1)"
         },
         {
-          "click": "div.b-cookies-informer__switchers > div:nth-child(2) > div[at-attr=\"checkbox\"] > span.b-input-radio__container > input[type=\"checkbox\"]"
-        },
-        {
-          "click": "div.b-cookies-informer__nav > button"
+          "if": {
+            "exists": "div.b-cookies-informer__switchers"
+          },
+          "then": [
+            {
+              "click": "div.b-cookies-informer__switchers input:not([disabled])",
+              "all": true
+            },
+            {
+              "click": "div.b-cookies-informer__nav > button"
+            }
+          ]
         }
       ]
     },
@@ -5297,33 +5435,32 @@
     {
       "name": "strato.de",
       "prehideSelectors": [
-        "#cookie_initial_modal",
-        ".modal-backdrop"
+        ".consent__wrapper"
       ],
       "runContext": {
         "urlPattern": "^https://www\\.strato\\.de/"
       },
       "detectCmp": [
         {
-          "exists": "#cookie_initial_modal"
+          "exists": ".consent"
         }
       ],
       "detectPopup": [
         {
-          "visible": "#cookie_initial_modal"
+          "visible": ".consent"
         }
       ],
       "optIn": [
         {
-          "click": "button#jss_consent_all_initial_modal"
+          "click": "button.consentAgree"
         }
       ],
       "optOut": [
         {
-          "click": "button#jss_open_settings_modal"
+          "click": "button.consentSettings"
         },
         {
-          "click": "button#jss_consent_checked"
+          "waitForThenClick": "button#consentSubmit"
         }
       ]
     },
@@ -6104,33 +6241,6 @@
       "optOut": [
         {
           "click": "button#declineAllCookieButton"
-        }
-      ]
-    },
-    {
-      "name": "tumblr-com",
-      "cosmetic": true,
-      "prehideSelectors": [
-        "#cmp-app-container"
-      ],
-      "detectCmp": [
-        {
-          "exists": "#cmp-app-container"
-        }
-      ],
-      "detectPopup": [
-        {
-          "visible": "#cmp-app-container"
-        }
-      ],
-      "optIn": [
-        {
-          "click": "#tumblr #cmp-app-container div.components-modal__frame > iframe > html body > div > div > div.cmp__dialog-footer > div > button.components-button.white-space-normal.is-primary"
-        }
-      ],
-      "optOut": [
-        {
-          "hide": "#cmp-app-container"
         }
       ]
     },
