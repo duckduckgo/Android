@@ -233,5 +233,5 @@ sealed class Command {
         val screen: String,
         val payload: String,
     ) : Command()
-    data object DismissExperimentOnboardingDialog : Command()
+    data object HideExperimentOnboardingDialog : Command()
 }

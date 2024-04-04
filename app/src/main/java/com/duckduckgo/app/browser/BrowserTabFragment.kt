@@ -1505,7 +1505,7 @@ class BrowserTabFragment :
             is Command.ShowSSLError -> showSSLWarning(it.handler, it.error)
             is Command.HideSSLError -> hideSSLWarning()
             is Command.LaunchScreen -> launchScreen(it.screen, it.payload)
-            is Command.DismissExperimentOnboardingDialog -> dismissOnboardingDaxDialog()
+            is Command.HideExperimentOnboardingDialog -> hideOnboardingDaxDialog()
             else -> {
                 // NO OP
             }
@@ -2303,10 +2303,9 @@ class BrowserTabFragment :
         newBrowserTab.browserBackground.setBackgroundResource(backgroundRes)
     }
 
-    private fun dismissOnboardingDaxDialog() {
+    private fun hideOnboardingDaxDialog() {
         binding.overlayView.gone()
         daxDialogExperimentOnboardingCta.daxCtaContainer.gone()
-        viewModel.onDaxDialogDismissed()
     }
 
     private fun configureWebViewForAutofill(it: DuckDuckGoWebView) {
@@ -3239,6 +3238,7 @@ class BrowserTabFragment :
                     AppPixelName.MENU_ACTION_FIRE_PRESSED.pixelName,
                     mapOf(FIRE_BUTTON_STATE to pulseAnimation.isActive.toString()),
                 )
+                viewModel.onFireMenuSelected()
             }
 
             tabsButton?.show()
@@ -3804,14 +3804,17 @@ class BrowserTabFragment :
             viewModel.onCtaShown()
         }
 
+        @SuppressLint("ClickableViewAccessibility")
         private fun showExperimentDialogCta(configuration: ExperimentOnboardingDaxDialogCta) {
             hideHomeBackground()
             hideHomeCta()
             configuration.showOnboardingCta(binding) { viewModel.onUserClickCtaOkButton() }
             binding.webViewContainer.setOnClickListener { daxDialogIntroExperimentCta.dialogTextCta.finishAnimation() }
             binding.overlayView.show()
-            binding.overlayView.setOnTouchListener { _, _ -> true }
-
+            binding.overlayView.setOnTouchListener { _, _ ->
+                viewModel.onExperimentDaxDialogDismissed()
+                true
+            }
             viewModel.onCtaShown()
         }
 
