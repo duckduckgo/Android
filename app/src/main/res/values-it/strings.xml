@@ -817,4 +817,15 @@
     <!-- Custom Tab -->
     <string name="openInDdgMenuItemTitle">Apri in DuckDuckGo</string>
     <string name="runningInDdgMenuItemTitle">Esecuzione in DuckDuckGo</string>
+
+    <!-- SSL Error -->
+    <string name="sslErrorTitle">Attenzione: questo sito potrebbe non essere sicuro</string>
+    <string name="sslErrorHeadline" instruction="Placeholder is domain with certificate issues">Il certificato di questo sito non è valido. Potresti collegarti a un server che finge di essere %1$s e che potrebbe mettere a rischio le tue informazioni riservate.</string>
+    <string name="sslErrorLeaveCTA">Esci da questo sito</string>
+    <string name="sslErrorAdvancedCTA">Avanzate</string>
+    <string name="sslErrorExpandedHeadline">DuckDuckGo ti avverte quando un sito web ha un certificato non valido.</string>
+    <string name="sslErrorExpandedCTA"><![CDATA[<u>Accetta il rischio e visita il sito<u/>]]></string>
+    <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">Il certificato di protezione per %1$s è scaduto. È possibile che il sito web non sia configurato correttamente, che un aggressore abbia compromesso la tua connessione o che l\'orologio del tuo sistema non sia corretto.</string>
+    <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Il certificato di protezione per %1$s non corrisponde a *.%2$s. È possibile che il sito web non sia configurato correttamente, che un aggressore abbia compromesso la tua connessione o che l\'orologio del tuo sistema non sia corretto.</string>
+    <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Il certificato di sicurezza di %1$s non è considerato attendibile dal sistema operativo del tuo dispositivo. È possibile che il sito web non sia configurato correttamente, che un aggressore abbia compromesso la tua connessione o che l\'orologio del tuo sistema non sia corretto.</string>
 </resources>
