@@ -77,6 +77,7 @@ class SavedSitesSyncPersister @Inject constructor(
         savedSitesFormFactorSyncMigration.onFormFactorFavouritesDisabled()
         savedSitesSyncState.onSyncDisabled()
         savedSitesSyncRepository.removeMetadata()
+        savedSitesSyncRepository.markSavedSitesAsInvalid(emptyList())
     }
 
     fun process(

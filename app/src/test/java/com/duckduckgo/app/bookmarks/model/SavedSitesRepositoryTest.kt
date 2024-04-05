@@ -34,6 +34,7 @@ import com.duckduckgo.savedsites.api.models.FolderBranch
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
+import com.duckduckgo.savedsites.impl.MissingEntitiesRelationReconciler
 import com.duckduckgo.savedsites.impl.RealFavoritesDelegate
 import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
 import com.duckduckgo.savedsites.store.Entity
@@ -80,9 +81,17 @@ class SavedSitesRepositoryTest {
             savedSitesEntitiesDao,
             savedSitesRelationsDao,
             favoritesDisplayModeSettings,
+            MissingEntitiesRelationReconciler(savedSitesEntitiesDao),
             coroutineRule.testDispatcherProvider,
         )
-        repository = RealSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao, favoritesDelegate, coroutineRule.testDispatcherProvider)
+        val relationsReconciler = MissingEntitiesRelationReconciler(savedSitesEntitiesDao)
+        repository = RealSavedSitesRepository(
+            savedSitesEntitiesDao,
+            savedSitesRelationsDao,
+            favoritesDelegate,
+            relationsReconciler,
+            coroutineRule.testDispatcherProvider,
+        )
     }
 
     @After

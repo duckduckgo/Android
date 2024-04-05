@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,12 @@
 
 package com.duckduckgo.autofill.sync
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
+import com.duckduckgo.autofill.sync.provider.CredentialsSyncLocalValidationFeature
+import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.toggle.TestToggle
 
-class FakeCredentialsSyncStore : CredentialsSyncStore {
-    override var serverModifiedSince: String = "0"
-    override var startTimeStamp: String = "0"
-    override var clientModifiedSince: String = "0"
-    override var isSyncPaused: Boolean = false
-    override fun isSyncPausedFlow(): Flow<Boolean> = emptyFlow()
-    override var invalidEntitiesIds: List<String> = emptyList()
+class FakeCredentialsSyncLocalValidationFeature : CredentialsSyncLocalValidationFeature {
+    var enabled = true
+
+    override fun self(): Toggle = TestToggle(enabled)
 }
