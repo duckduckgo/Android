@@ -97,12 +97,13 @@ class RealCohortStore @Inject constructor(
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
         coroutineScope.launch(dispatcherProvider.io()) {
-            if (vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)) {
-                // skip if already stored
-                getCohortStoredLocalDate()?.let { return@launch }
+            attemptAssignCohort()
+        }
+    }
 
-                setCohortLocalDate(LocalDate.now())
-            }
+    override fun onVpnReconfigured(coroutineScope: CoroutineScope) {
+        coroutineScope.launch(dispatcherProvider.io()) {
+            attemptAssignCohort()
         }
     }
 
@@ -111,6 +112,15 @@ class RealCohortStore @Inject constructor(
         vpnStopReason: VpnStopReason,
     ) {
         // noop
+    }
+
+    private suspend fun attemptAssignCohort() {
+        if (vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)) {
+            // skip if already stored
+            getCohortStoredLocalDate()?.let { return }
+
+            setCohortLocalDate(LocalDate.now())
+        }
     }
 
     companion object {
