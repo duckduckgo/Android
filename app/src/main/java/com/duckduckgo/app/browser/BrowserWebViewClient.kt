@@ -279,6 +279,7 @@ class BrowserWebViewClient @Inject constructor(
             if (url != null && url == lastPageStarted) {
                 webViewClientListener?.pageRefreshed(url)
             }
+            lastPageStarted = url
         }
     }
 
@@ -317,7 +318,6 @@ class BrowserWebViewClient @Inject constructor(
                 thirdPartyCookieManager.processUriForThirdPartyCookies(webView, url.toUri())
             }
         }
-        lastPageStarted = url
         jsPlugins.getPlugins().forEach {
             it.onPageStarted(webView, url, webViewClientListener?.getSite())
         }
