@@ -16,10 +16,12 @@
 
 package com.duckduckgo.app.accessibility
 
+import android.animation.ValueAnimator
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.View
 import android.widget.CompoundButton
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -27,9 +29,11 @@ import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.databinding.ActivityAccessibilitySettingsBinding
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.quietlySetValue
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.navigation.api.getActivityParams
 import com.google.android.material.slider.Slider
 import java.text.NumberFormat
 import kotlinx.coroutines.flow.launchIn
@@ -38,6 +42,7 @@ import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(AccessibilityScreenNoParams::class)
+@ContributeToActivityStarter(AccessibilityScreenParams::class, screenName = "accessibility")
 class AccessibilityActivity : DuckDuckGoActivity() {
 
     private val binding: ActivityAccessibilitySettingsBinding by viewBinding()
@@ -67,6 +72,37 @@ class AccessibilityActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(toolbar)
         observeViewModel()
+        scrollToHighlightedItem()
+    }
+
+    private fun scrollToHighlightedItem() {
+        intent.getActivityParams(AccessibilityScreenParams::class.java)?.let { params ->
+            if (params.highlightedItem == "voiceSearchToggle") {
+                binding.voiceSearchToggle.post {
+                    scrollToVoiceSearchToggle()
+                    highlightVoiceSearchToggle()
+                }
+            }
+        }
+    }
+
+    private fun scrollToVoiceSearchToggle() {
+        val scrollTo = binding.voiceSearchToggle.top
+        binding.scrollView.smoothScrollTo(0, scrollTo)
+    }
+    private fun highlightVoiceSearchToggle() {
+        val highlightColor = getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorContainer)
+        val transparentColor = ContextCompat.getColor(applicationContext, android.R.color.transparent)
+
+        val flickerDuration = 300L
+        val totalAnimationDuration = flickerDuration * 5
+
+        val colorAnimator = ValueAnimator.ofArgb(transparentColor, highlightColor, transparentColor, highlightColor, transparentColor, highlightColor)
+        colorAnimator.duration = totalAnimationDuration
+        colorAnimator.addUpdateListener { animator ->
+            binding.voiceSearchToggle.setBackgroundColor(animator.animatedValue as Int)
+        }
+        colorAnimator.start()
     }
 
     override fun onStart() {

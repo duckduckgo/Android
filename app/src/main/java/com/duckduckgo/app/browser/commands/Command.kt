@@ -229,4 +229,8 @@ sealed class Command {
     object ScreenUnlock : Command()
     data object ShowFaviconsPrompt : Command()
     data class SetBrowserBackground(val backgroundRes: Int) : Command()
+    class LaunchScreen(
+        val screen: String,
+        val payload: String,
+    ) : Command()
 }

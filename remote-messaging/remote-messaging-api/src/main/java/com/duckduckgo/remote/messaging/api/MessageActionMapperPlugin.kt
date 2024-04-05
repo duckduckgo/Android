@@ -33,4 +33,5 @@ sealed class JsonActionType(val jsonValue: String) {
     object DISMISS : JsonActionType("dismiss")
     object APP_TP_ONBOARDING : JsonActionType("atpOnboarding")
     object SHARE : JsonActionType("share")
+    object NAVIGATION : JsonActionType("navigation")
 }

@@ -148,7 +148,7 @@ private const val ACTIVITY_SERIALIZABLE_PARAMETERS_ARG = "ACTIVITY_SERIALIZABLE_
  * @ContributeToActivityStarter(ExampleActivityParams::class)
  * class ExampleActivity() : DuckDuckGoActivity() {
  *   fun onCreate(...) {
- *     val params = intent.getActivityParams(ExampleActivityParams::class)
+ *     val params = intent.getActivityParams(ExampleActivityParams::class.java)
  *     ...
  *   }
  * }
