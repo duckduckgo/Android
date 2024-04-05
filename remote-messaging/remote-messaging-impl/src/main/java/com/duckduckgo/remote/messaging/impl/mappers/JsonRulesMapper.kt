@@ -199,6 +199,13 @@ private val daysUsedSinceMapper: (JsonMatchingAttribute) -> MatchingAttribute = 
     )
 }
 
+private val voiceSearchSupported: (JsonMatchingAttribute) -> MatchingAttribute<Boolean> = { jsonMatchingAttribute ->
+    VoiceSearchSupported(
+        value = jsonMatchingAttribute.value as Boolean,
+        fallback = jsonMatchingAttribute.fallback,
+    )
+}
+
 // plugin point ?
 private val attributesMappers = mapOf(
     Pair("locale", localeMapper),
@@ -223,6 +230,7 @@ private val attributesMappers = mapOf(
     Pair("daysUsedSince", daysUsedSinceMapper),
     Pair("atpOnboarded", appTrackingProtectionOnboarded),
     Pair("netpOnboarded", networkProtectionOnboarded),
+    Pair("voiceSearchSupported", voiceSearchSupported),
 )
 
 fun List<JsonMatchingRule>.mapToMatchingRules(

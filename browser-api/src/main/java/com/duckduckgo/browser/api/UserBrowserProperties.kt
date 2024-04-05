@@ -30,6 +30,6 @@ interface UserBrowserProperties {
     fun searchCount(): Long
     fun widgetAdded(): Boolean
     suspend fun appTpOnboarded(): Boolean
-
     suspend fun networkProtectionOnboarded(): Boolean
+    fun voiceSearchSupported(): Boolean
 }
