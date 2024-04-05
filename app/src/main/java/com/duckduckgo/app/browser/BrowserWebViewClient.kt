@@ -113,6 +113,7 @@ class BrowserWebViewClient @Inject constructor(
     /**
      * This is the method of url overriding available from API 24 onwards
      */
+    @UiThread
     override fun shouldOverrideUrlLoading(
         view: WebView,
         request: WebResourceRequest,
@@ -129,8 +130,8 @@ class BrowserWebViewClient @Inject constructor(
         url: Uri,
         isForMainFrame: Boolean,
     ): Boolean {
-        Timber.v("shouldOverride webViewUrl: ${webView.url} URL: $url")
         try {
+            Timber.v("shouldOverride webViewUrl: ${webView.url} URL: $url")
             if (isForMainFrame && dosDetector.isUrlGeneratingDos(url)) {
                 webView.loadUrl("about:blank")
                 webViewClientListener?.dosAttackDetected()
@@ -270,7 +271,8 @@ class BrowserWebViewClient @Inject constructor(
         }
     }
 
-    override fun onPageCommitVisible (webView: WebView, url: String) {
+    @UiThread
+    override fun onPageCommitVisible(webView: WebView, url: String) {
         // Show only when the commit matches the tab state
         if (webView.url == url) {
             Timber.v("onPageCommitVisible webViewUrl: ${webView.url} URL: $url")
