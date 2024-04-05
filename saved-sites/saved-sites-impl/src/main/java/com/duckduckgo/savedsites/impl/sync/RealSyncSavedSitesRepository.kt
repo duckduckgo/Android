@@ -315,6 +315,11 @@ class RealSyncSavedSitesRepository(
         savedSitesSyncMetadataDao.addOrUpdate(children)
     }
 
+    override fun discardRequestMetadata() {
+        Timber.d("Sync-Bookmarks-Metadata: removing all local metadata.")
+        savedSitesSyncMetadataDao.discardRequestMetadata()
+    }
+
     // for all folders in the payload that are not deleted
     // add children to children column
     // for all items in the metadata table
