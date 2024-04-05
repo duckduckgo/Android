@@ -39,6 +39,7 @@ dependencies {
     implementation project(path: ':browser-api')
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':statistics')
+    implementation project(path: ':navigation-api')
 
     implementation KotlinX.coroutines.core
     androidTestImplementation (KotlinX.coroutines.test) {

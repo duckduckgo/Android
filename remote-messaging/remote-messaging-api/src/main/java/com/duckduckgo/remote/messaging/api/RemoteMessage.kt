@@ -26,6 +26,7 @@ import com.duckduckgo.remote.messaging.api.Content.MessageType.SMALL
 import com.duckduckgo.remote.messaging.api.JsonActionType.APP_TP_ONBOARDING
 import com.duckduckgo.remote.messaging.api.JsonActionType.DEFAULT_BROWSER
 import com.duckduckgo.remote.messaging.api.JsonActionType.DISMISS
+import com.duckduckgo.remote.messaging.api.JsonActionType.NAVIGATION
 import com.duckduckgo.remote.messaging.api.JsonActionType.PLAYSTORE
 import com.duckduckgo.remote.messaging.api.JsonActionType.SHARE
 import com.duckduckgo.remote.messaging.api.JsonActionType.URL
@@ -107,4 +108,8 @@ sealed class Action(val actionType: String, open val value: String, open val add
             TITLE("title"),
         }
     }
+    data class Navigation(
+        override val value: String,
+        override val additionalParameters: Map<String, String>?,
+    ) : Action(NAVIGATION.jsonValue, value, additionalParameters)
 }
