@@ -36,6 +36,8 @@ dependencies {
     implementation project(':broken-site-api')
 
     testImplementation Testing.junit4
+
+    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 android {
     defaultConfig {
