@@ -64,6 +64,8 @@ dependencies {
 
     implementation AndroidX.work.runtimeKtx
     testImplementation AndroidX.work.testing
+
+    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 
 android {
