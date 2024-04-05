@@ -254,6 +254,7 @@ import com.duckduckgo.js.messaging.api.JsMessageHelper
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParams
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopup
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupFactory
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupViewState
@@ -1391,9 +1392,19 @@ class BrowserTabFragment :
             is Command.ScreenUnlock -> screenUnlock()
             is Command.ShowFaviconsPrompt -> showFaviconsPrompt()
             is Command.SetBrowserBackground -> setBrowserBackground(it.backgroundRes)
+            is Command.LaunchScreen -> launchScreen(it.screen, it.payload)
             else -> {
                 // NO OP
             }
+        }
+    }
+
+    private fun launchScreen(
+        screen: String,
+        payload: String,
+    ) {
+        context?.let {
+            globalActivityStarter.start(it, DeeplinkActivityParams(screenName = screen, jsonArguments = payload), null)
         }
     }
 
