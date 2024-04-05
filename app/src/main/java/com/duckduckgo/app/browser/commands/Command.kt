@@ -233,4 +233,8 @@ sealed class Command {
     data class SetBrowserBackground(val backgroundRes: Int) : Command()
     data class ShowSSLError(val handler: SslErrorHandler, val error: SslErrorResponse) : Command()
     data object HideSSLError : Command()
+    class LaunchScreen(
+        val screen: String,
+        val payload: String,
+    ) : Command()
 }
