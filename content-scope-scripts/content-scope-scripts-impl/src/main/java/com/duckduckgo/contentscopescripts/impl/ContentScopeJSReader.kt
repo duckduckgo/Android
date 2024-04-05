@@ -33,7 +33,7 @@ class RealContentScopeJSReader @Inject constructor() : ContentScopeJSReader {
 
     override fun getContentScopeJS(): String {
         if (!this::contentScopeJS.isInitialized) {
-            contentScopeJS = loadJs("contentScopeDefault.js")
+            contentScopeJS = loadJs("contentScopeAllDisabled.js")
         }
         return contentScopeJS
     }

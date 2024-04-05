@@ -44,6 +44,7 @@ class RealAppBuildConfig @Inject constructor(
             "play" -> BuildFlavor.PLAY
             "default" -> BuildFlavor.PLAY
             "nojs" -> BuildFlavor.PLAY
+            "nojsadddocumentstart" -> BuildFlavor.PLAY
             "cssonly" -> BuildFlavor.PLAY
             "elementhidingonly" -> BuildFlavor.PLAY
             "cpmonly" -> BuildFlavor.PLAY

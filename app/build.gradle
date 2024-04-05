@@ -109,6 +109,10 @@ android {
             dimension 'store'
             applicationIdSuffix '.nojs'
         }
+        nojsadddocumentstart {
+            dimension 'store'
+            applicationIdSuffix '.nojsadddocumentstart'
+        }
         'cssonly' {
             dimension 'store'
             applicationIdSuffix '.cssonly'
