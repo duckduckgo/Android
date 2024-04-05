@@ -356,8 +356,8 @@ class BrowserTabViewModel @Inject constructor(
     private val favoritesOnboardingObserver = Observer<BrowserViewState> { state ->
         val shouldShowAnimation = state.browserShowing
         val menuButton = currentBrowserViewState().showMenuButton
-        if (menuButton is Visible && menuButton.highlighted != shouldShowAnimation) {
-            browserViewState.value = currentBrowserViewState().copy(showMenuButton = Visible(highlighted = shouldShowAnimation))
+        if (menuButton is HighlightableButton.Visible && menuButton.highlighted != shouldShowAnimation) {
+            browserViewState.value = currentBrowserViewState().copy(showMenuButton = HighlightableButton.Visible(highlighted = shouldShowAnimation))
         }
     }
 
@@ -371,8 +371,8 @@ class BrowserTabViewModel @Inject constructor(
     @ExperimentalCoroutinesApi
     private val fireButtonAnimation = Observer<Boolean> { shouldShowAnimation ->
         Timber.i("shouldShowAnimation $shouldShowAnimation")
-        if (currentBrowserViewState().fireButton is Visible) {
-            browserViewState.value = currentBrowserViewState().copy(fireButton = Visible(highlighted = shouldShowAnimation))
+        if (currentBrowserViewState().fireButton is HighlightableButton.Visible) {
+            browserViewState.value = currentBrowserViewState().copy(fireButton = HighlightableButton.Visible(highlighted = shouldShowAnimation))
         }
 
         if (shouldShowAnimation) {
@@ -1076,7 +1076,7 @@ class BrowserTabViewModel @Inject constructor(
         val currentBrowserViewState = currentBrowserViewState()
         val domain = site?.domain
         val addFavorite = if (!currentBrowserViewState.addFavorite.isEnabled()) {
-            Visible(enabled = true)
+            HighlightableButton.Visible(enabled = true)
         } else {
             currentBrowserViewState.addFavorite
         }
@@ -1088,7 +1088,7 @@ class BrowserTabViewModel @Inject constructor(
             addFavorite = addFavorite,
             addToHomeEnabled = domain != null,
             canSharePage = domain != null,
-            showPrivacyShield = Visible(enabled = true),
+            showPrivacyShield = HighlightableButton.Visible(enabled = true),
             canReportSite = domain != null,
             canChangePrivacyProtection = domain != null,
             isPrivacyProtectionDisabled = false,
@@ -1317,10 +1317,10 @@ class BrowserTabViewModel @Inject constructor(
         val currentBrowserViewState = currentBrowserViewState()
         browserViewState.value = currentBrowserViewState.copy(
             canSaveSite = false,
-            addFavorite = Visible(enabled = false),
+            addFavorite = HighlightableButton.Visible(enabled = false),
             addToHomeEnabled = false,
             canSharePage = false,
-            showPrivacyShield = Visible(enabled = false),
+            showPrivacyShield = HighlightableButton.Visible(enabled = false),
             canReportSite = false,
             showSearchIcon = true,
             showClearButton = true,
@@ -1820,16 +1820,16 @@ class BrowserTabViewModel @Inject constructor(
 
         val currentBrowserViewState = currentBrowserViewState()
         browserViewState.value = currentBrowserViewState.copy(
-            showPrivacyShield = Visible(enabled = showPrivacyShield),
+            showPrivacyShield = HighlightableButton.Visible(enabled = showPrivacyShield),
             showSearchIcon = showSearchIcon,
             showTabsButton = showControls,
             fireButton = if (showControls) {
-                Visible(highlighted = showPulseAnimation.value ?: false)
+                HighlightableButton.Visible(highlighted = showPulseAnimation.value ?: false)
             } else {
                 HighlightableButton.Gone
             },
             showMenuButton = if (showControls) {
-                Visible()
+                HighlightableButton.Visible()
             } else {
                 HighlightableButton.Gone
             },
@@ -2341,8 +2341,8 @@ class BrowserTabViewModel @Inject constructor(
         if (menuHighlighted) {
             this.showFavoritesOnboarding = false
             browserViewState.value = currentBrowserViewState().copy(
-                showMenuButton = Visible(highlighted = false),
-                addFavorite = Visible(highlighted = true),
+                showMenuButton = HighlightableButton.Visible(highlighted = false),
+                addFavorite = HighlightableButton.Visible(highlighted = true),
             )
         }
     }
@@ -2352,7 +2352,7 @@ class BrowserTabViewModel @Inject constructor(
             Timber.i("favoritesOnboarding onBrowserMenuClosed")
             if (currentBrowserViewState().addFavorite.isHighlighted()) {
                 browserViewState.value = currentBrowserViewState().copy(
-                    addFavorite = Visible(highlighted = false),
+                    addFavorite = HighlightableButton.Visible(highlighted = false),
                 )
             }
         }
@@ -2388,7 +2388,7 @@ class BrowserTabViewModel @Inject constructor(
             ctaViewModel.onCtaShown(cta)
         }
         if (cta is ExperimentOnboardingDaxDialogCta.DaxTrackersBlockedCta) {
-            browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = Visible(highlighted = true))
+            browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = true))
         }
     }
 
@@ -2866,7 +2866,7 @@ class BrowserTabViewModel @Inject constructor(
         browserViewState.value =
             currentBrowserViewState().copy(
                 browserError = errorType,
-                showPrivacyShield = Visible(enabled = false),
+                showPrivacyShield = HighlightableButton.Visible(enabled = false),
                 showDaxIcon = false,
                 showSearchIcon = false,
             )
@@ -3137,7 +3137,7 @@ class BrowserTabViewModel @Inject constructor(
             is ExperimentOnboardingDaxDialogCta.DaxNoTrackersCta,
             is ExperimentOnboardingDaxDialogCta.DaxMainNetworkCta,
             -> {
-                browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = Visible(highlighted = false))
+                browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
                 viewModelScope.launch {
                     if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) {
                         val cta = withContext(dispatchers.io()) { ctaViewModel.getExperimentFireDialogCta() }
@@ -3147,7 +3147,7 @@ class BrowserTabViewModel @Inject constructor(
             }
 
             is ExperimentOnboardingDaxDialogCta.DaxFireButtonCta -> {
-                browserViewState.value = currentBrowserViewState().copy(fireButton = Visible(highlighted = false))
+                browserViewState.value = currentBrowserViewState().copy(fireButton = HighlightableButton.Visible(highlighted = false))
             }
         }
 
@@ -3163,7 +3163,7 @@ class BrowserTabViewModel @Inject constructor(
             is ExperimentOnboardingDaxDialogCta.DaxSerpCta -> {
             }
             is ExperimentOnboardingDaxDialogCta.DaxTrackersBlockedCta -> {
-                browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = Visible(highlighted = false))
+                browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
             }
             is ExperimentOnboardingDaxDialogCta.DaxFireButtonCta -> {
             }
@@ -3179,7 +3179,7 @@ class BrowserTabViewModel @Inject constructor(
                 command.value = HideExperimentOnboardingDialog
             }
             if (currentBrowserViewState().fireButton.isHighlighted()) {
-                browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = Visible(highlighted = false))
+                browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
             }
         }
     }
