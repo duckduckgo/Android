@@ -28,6 +28,7 @@ import com.duckduckgo.common.ui.store.ThemingDataStore
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.voice.api.VoiceSearchAvailability
 import java.util.*
 
 class AndroidUserBrowserProperties(
@@ -40,6 +41,7 @@ class AndroidUserBrowserProperties(
     private val appDaysUsedRepository: AppDaysUsedRepository,
     private val appTrackingProtection: AppTrackingProtection,
     private val networkProtectionState: NetworkProtectionState,
+    private val voiceSearchAvailability: VoiceSearchAvailability,
 ) : UserBrowserProperties {
     override fun appTheme(): DuckDuckGoTheme {
         return themingDataStore.theme
@@ -83,5 +85,9 @@ class AndroidUserBrowserProperties(
 
     override suspend fun networkProtectionOnboarded(): Boolean {
         return networkProtectionState.isOnboarded()
+    }
+
+    override fun voiceSearchSupported(): Boolean {
+        return voiceSearchAvailability.isVoiceSearchSupported
     }
 }

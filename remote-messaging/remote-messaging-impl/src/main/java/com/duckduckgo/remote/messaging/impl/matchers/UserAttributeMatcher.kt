@@ -60,6 +60,9 @@ class UserAttributeMatcher(
             is NetPOnboarded -> {
                 matchingAttribute.matches(userBrowserProperties.networkProtectionOnboarded())
             }
+            is VoiceSearchSupported -> {
+                matchingAttribute.matches(userBrowserProperties.voiceSearchSupported())
+            }
             else -> return null
         }
     }

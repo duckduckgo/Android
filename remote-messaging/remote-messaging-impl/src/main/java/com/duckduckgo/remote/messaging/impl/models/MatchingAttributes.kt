@@ -271,6 +271,15 @@ data class Unknown(val fallback: Boolean?) : MatchingAttribute {
     }
 }
 
+data class VoiceSearchSupported(
+    override val value: Boolean,
+    val fallback: Boolean? = null,
+) : MatchingAttribute<Boolean>, BooleanMatchingAttribute {
+    override fun matches(matchingValue: Boolean): Boolean? {
+        return (this as BooleanMatchingAttribute).matches(matchingValue)
+    }
+}
+
 interface RangeIntMatchingAttribute {
     val min: Int
     val max: Int
