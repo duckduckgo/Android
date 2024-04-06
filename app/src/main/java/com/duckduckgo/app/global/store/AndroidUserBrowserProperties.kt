@@ -29,6 +29,7 @@ import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.voice.api.VoiceSearchAvailability
+import com.duckduckgo.voice.store.VoiceSearchRepository
 import java.util.*
 
 class AndroidUserBrowserProperties(
@@ -42,6 +43,7 @@ class AndroidUserBrowserProperties(
     private val appTrackingProtection: AppTrackingProtection,
     private val networkProtectionState: NetworkProtectionState,
     private val voiceSearchAvailability: VoiceSearchAvailability,
+    private val voiceSearchRepository: VoiceSearchRepository,
 ) : UserBrowserProperties {
     override fun appTheme(): DuckDuckGoTheme {
         return themingDataStore.theme
@@ -89,5 +91,9 @@ class AndroidUserBrowserProperties(
 
     override fun voiceSearchSupported(): Boolean {
         return voiceSearchAvailability.isVoiceSearchSupported
+    }
+
+    override fun voiceSearchEnabled(): Boolean {
+        return voiceSearchRepository.isVoiceSearchUserEnabled(voiceSearchRepository.getHasAcceptedRationaleDialog())
     }
 }
