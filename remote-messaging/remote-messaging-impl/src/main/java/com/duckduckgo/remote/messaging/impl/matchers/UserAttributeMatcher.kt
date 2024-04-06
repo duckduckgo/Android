@@ -63,6 +63,9 @@ class UserAttributeMatcher(
             is VoiceSearchSupported -> {
                 matchingAttribute.matches(userBrowserProperties.voiceSearchSupported())
             }
+            is VoiceSearchEnabled -> {
+                matchingAttribute.matches(userBrowserProperties.voiceSearchEnabled())
+            }
             else -> return null
         }
     }
