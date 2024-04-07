@@ -47,20 +47,24 @@ class IntentDispatcherViewModel @Inject constructor(
 
     fun onIntentReceived(intent: Intent?, defaultColor: Int) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            val hasSession = intent?.hasExtra(CustomTabsIntent.EXTRA_SESSION) == true
-            val intentText = intent?.intentText
-            val toolbarColor = intent?.getIntExtra(CustomTabsIntent.EXTRA_TOOLBAR_COLOR, defaultColor) ?: defaultColor
+            runCatching {
+                val hasSession = intent?.hasExtra(CustomTabsIntent.EXTRA_SESSION) == true
+                val intentText = intent?.intentText
+                val toolbarColor = intent?.getIntExtra(CustomTabsIntent.EXTRA_TOOLBAR_COLOR, defaultColor) ?: defaultColor
 
-            Timber.d("Intent $intent received. Has extra session=$hasSession. Intent text=$intentText. Toolbar color=$toolbarColor")
+                Timber.d("Intent $intent received. Has extra session=$hasSession. Intent text=$intentText. Toolbar color=$toolbarColor")
 
-            customTabDetector.setCustomTab(false)
-            _viewState.emit(
-                viewState.value.copy(
-                    customTabRequested = hasSession,
-                    intentText = intentText,
-                    toolbarColor = toolbarColor,
-                ),
-            )
+                customTabDetector.setCustomTab(false)
+                _viewState.emit(
+                    viewState.value.copy(
+                        customTabRequested = hasSession,
+                        intentText = intentText,
+                        toolbarColor = toolbarColor,
+                    ),
+                )
+            }.onFailure {
+                Timber.w("Error handling custom tab intent %s", it.message)
+            }
         }
     }
 }
