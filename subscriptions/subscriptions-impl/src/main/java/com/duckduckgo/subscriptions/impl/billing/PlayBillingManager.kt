@@ -55,6 +55,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import logcat.logcat
 
 interface PlayBillingManager {
@@ -62,6 +63,11 @@ interface PlayBillingManager {
     val purchaseHistory: List<PurchaseHistoryRecord>
     val purchaseState: Flow<PurchaseState>
 
+    /**
+     * Launches the billing flow
+     *
+     * It is safe to call this method without specifying dispatcher as it's handled internally
+     */
     suspend fun launchBillingFlow(
         activity: Activity,
         planId: String,
@@ -156,7 +162,7 @@ class RealPlayBillingManager @Inject constructor(
         activity: Activity,
         planId: String,
         externalId: String,
-    ) {
+    ) = withContext(dispatcherProvider.io()) {
         if (!billingClient.ready) {
             logcat { "Service not ready" }
             connect()
@@ -171,7 +177,7 @@ class RealPlayBillingManager @Inject constructor(
 
         if (productDetails == null || offerToken == null) {
             _purchaseState.emit(Canceled)
-            return
+            return@withContext
         }
 
         val launchBillingFlowResult = billingClient.launchBillingFlow(
