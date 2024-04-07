@@ -27,8 +27,7 @@ import androidx.work.WorkerParameters
 import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
-import com.duckduckgo.networkprotection.impl.NetPVpnFeature
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -78,10 +77,10 @@ class NetworkProtectionStatusReportingWorker(
     lateinit var netpPixels: NetworkProtectionPixels
 
     @Inject
-    lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
+    lateinit var networkProtectionState: NetworkProtectionState
 
     override suspend fun doWork(): Result {
-        if (vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)) {
+        if (networkProtectionState.isEnabled()) {
             netpPixels.reportEnabled()
         } else {
             netpPixels.reportDisabled()

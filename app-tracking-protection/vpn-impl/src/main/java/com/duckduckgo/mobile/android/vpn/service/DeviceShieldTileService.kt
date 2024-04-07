@@ -32,8 +32,7 @@ import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.ServiceScope
-import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
+import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import dagger.android.AndroidInjection
 import dagger.binding.TileServiceBingingKey
@@ -53,7 +52,7 @@ class DeviceShieldTileService : TileService() {
 
     @Inject lateinit var deviceShieldPixels: DeviceShieldPixels
 
-    @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
+    @Inject lateinit var appTrackingProtection: AppTrackingProtection
 
     @Inject lateinit var dispatcherProvider: DispatcherProvider
 
@@ -73,9 +72,9 @@ class DeviceShieldTileService : TileService() {
 
     private fun respondToTile() {
         serviceScope.launch(dispatcherProvider.io()) {
-            if (vpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN)) {
+            if (appTrackingProtection.isRunning()) {
                 deviceShieldPixels.disableFromQuickSettingsTile()
-                vpnFeaturesRegistry.unregisterFeature(AppTpVpnFeature.APPTP_VPN)
+                appTrackingProtection.stop()
             } else {
                 deviceShieldPixels.enableFromQuickSettingsTile()
                 if (hasVpnPermission()) {
@@ -119,7 +118,7 @@ class DeviceShieldTileService : TileService() {
                 while (isActive) {
                     val tile = qsTile
                     tile?.let {
-                        val isDeviceShieldEnabled = vpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN)
+                        val isDeviceShieldEnabled = appTrackingProtection.isRunning()
                         it.state = if (isDeviceShieldEnabled) STATE_ACTIVE else STATE_INACTIVE
                         it.updateTile()
                     }
@@ -137,13 +136,13 @@ class DeviceShieldTileService : TileService() {
     }
 
     private suspend fun startDeviceShield() {
-        vpnFeaturesRegistry.registerFeature(AppTpVpnFeature.APPTP_VPN)
+        appTrackingProtection.start()
     }
 }
 
 @InjectWith(ActivityScope::class)
 class VpnPermissionRequesterActivity : DuckDuckGoActivity() {
-    @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
+    @Inject lateinit var appTrackingProtection: AppTrackingProtection
 
     @Inject lateinit var dispatcherProvider: DispatcherProvider
 
@@ -197,7 +196,7 @@ class VpnPermissionRequesterActivity : DuckDuckGoActivity() {
 
     private fun startDeviceShield() {
         lifecycleScope.launch(dispatcherProvider.io()) {
-            vpnFeaturesRegistry.registerFeature(AppTpVpnFeature.APPTP_VPN)
+            appTrackingProtection.start()
         }
     }
 

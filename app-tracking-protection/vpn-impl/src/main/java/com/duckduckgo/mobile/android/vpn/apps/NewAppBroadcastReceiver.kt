@@ -26,8 +26,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.registerExportedReceiver
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.VpnScope
-import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
+import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.service.goAsync
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
@@ -48,7 +47,7 @@ class NewAppBroadcastReceiver @Inject constructor(
     private val applicationContext: Context,
     private val appTrackerRepository: AppTrackerRepository,
     private val dispatcherProvider: DispatcherProvider,
-    private val vpnFeaturesRegistry: VpnFeaturesRegistry,
+    private val appTrackingProtection: AppTrackingProtection,
 ) : BroadcastReceiver(), VpnServiceCallbacks {
 
     @MainThread
@@ -68,7 +67,7 @@ class NewAppBroadcastReceiver @Inject constructor(
         goAsync(pendingResult) {
             if (isInExclusionList(packageName)) {
                 logcat { "Newly installed package $packageName is in exclusion list, disabling/re-enabling vpn" }
-                vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
+                appTrackingProtection.restart()
             } else {
                 logcat { "Newly installed package $packageName not in exclusion list" }
             }

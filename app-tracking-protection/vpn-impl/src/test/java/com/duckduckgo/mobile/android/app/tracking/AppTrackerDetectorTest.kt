@@ -20,8 +20,6 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.dao.VpnAppTrackerBlockingDao
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.AppTrackerRecorder
@@ -46,7 +44,7 @@ class AppTrackerDetectorTest {
     private val appTrackerRecorder: AppTrackerRecorder = mock()
     private val vpnAppTrackerBlockingDao: VpnAppTrackerBlockingDao = mock()
     private val packageManager: PackageManager = mock()
-    private val vpnFeaturesRegistry: VpnFeaturesRegistry = mock()
+    private val appTrackingProtection: AppTrackingProtection = mock()
 
     private lateinit var appTrackerDetector: AppTrackerDetector
 
@@ -56,7 +54,7 @@ class AppTrackerDetectorTest {
         whenever(appNameResolver.getAppNameForPackageId(AppNameResolver.OriginatingApp.unknown().packageId))
             .thenReturn(AppNameResolver.OriginatingApp.unknown())
         whenever(packageManager.getApplicationInfo(any(), eq(0))).thenReturn(ApplicationInfo())
-        runBlocking { whenever(vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)).thenReturn(true) }
+        runBlocking { whenever(appTrackingProtection.isEnabled()).thenReturn(true) }
 
         appTrackerDetector = RealAppTrackerDetector(
             appTrackerRepository,
@@ -64,7 +62,7 @@ class AppTrackerDetectorTest {
             appTrackerRecorder,
             vpnAppTrackerBlockingDao,
             packageManager,
-            vpnFeaturesRegistry,
+            appTrackingProtection,
             InstrumentationRegistry.getInstrumentation().targetContext,
         )
     }
@@ -335,7 +333,7 @@ class AppTrackerDetectorTest {
 
     @Test
     fun whenAppTpDisabledReturnNull() = runTest {
-        whenever(vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)).thenReturn(false)
+        whenever(appTrackingProtection.isEnabled()).thenReturn(false)
 
         val appTrackerDetectorDisabled = RealAppTrackerDetector(
             appTrackerRepository,
@@ -343,7 +341,7 @@ class AppTrackerDetectorTest {
             appTrackerRecorder,
             vpnAppTrackerBlockingDao,
             packageManager,
-            vpnFeaturesRegistry,
+            appTrackingProtection,
             InstrumentationRegistry.getInstrumentation().targetContext,
         )
 

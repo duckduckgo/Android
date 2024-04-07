@@ -18,9 +18,8 @@ package com.duckduckgo.networkprotection.impl.integration
 
 import com.duckduckgo.common.utils.network.isCGNATed
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
-import com.duckduckgo.networkprotection.impl.NetPVpnFeature
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.configuration.asServerDetails
 import com.duckduckgo.networkprotection.impl.connectionclass.ConnectionQualityStore
@@ -36,7 +35,7 @@ import org.json.JSONObject
 
 @ContributesMultibinding(ActivityScope::class)
 class NetPStateCollector @Inject constructor(
-    private val vpnFeaturesRegistry: VpnFeaturesRegistry,
+    private val networkProtectionState: NetworkProtectionState,
     private val wgTunnelConfig: WgTunnelConfig,
     private val netPExclusionListRepository: NetPExclusionListRepository,
     private val connectionQualityStore: ConnectionQualityStore,
@@ -45,7 +44,7 @@ class NetPStateCollector @Inject constructor(
 ) : VpnStateCollectorPlugin {
 
     override suspend fun collectVpnRelatedState(appPackageId: String?): JSONObject {
-        val isNetpRunning = vpnFeaturesRegistry.isFeatureRunning(NetPVpnFeature.NETP_VPN)
+        val isNetpRunning = networkProtectionState.isRunning()
         return JSONObject().apply {
             put("enabled", isNetpRunning)
             put("CGNATed", isCGNATed())
