@@ -23,6 +23,8 @@ import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.PurchaseHistoryRecord
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LIST_OF_PRODUCTS
@@ -47,7 +49,6 @@ import javax.inject.Inject
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -75,10 +76,11 @@ class RealPlayBillingManager @Inject constructor(
     @AppCoroutineScope val coroutineScope: CoroutineScope,
     private val pixelSender: SubscriptionPixelSender,
     private val billingClient: BillingClientAdapter,
+    private val dispatcherProvider: DispatcherProvider,
 ) : PlayBillingManager, MainProcessLifecycleObserver {
 
     private val connectionMutex = Mutex()
-    private var connectionJob: Job? = null
+    private var connectionJob = ConflatedJob()
     private var billingFlowInProgress = false
 
     // PurchaseState
@@ -99,7 +101,7 @@ class RealPlayBillingManager @Inject constructor(
         // Will call on resume coming back from a purchase flow
         if (!billingFlowInProgress) {
             if (billingClient.ready) {
-                owner.lifecycleScope.launch {
+                owner.lifecycleScope.launch(dispatcherProvider.io()) {
                     loadProducts()
                     loadPurchaseHistory()
                 }
@@ -108,9 +110,7 @@ class RealPlayBillingManager @Inject constructor(
     }
 
     private fun connectAsyncWithRetry() {
-        if (connectionJob?.isActive == true) return
-
-        connectionJob = coroutineScope.launch {
+        connectionJob += coroutineScope.launch(dispatcherProvider.io()) {
             connect(
                 retryPolicy = RetryPolicy(
                     retryCount = 5,

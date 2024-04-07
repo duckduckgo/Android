@@ -49,6 +49,7 @@ class RealPlayBillingManagerTest {
         coroutineScope = coroutineRule.testScope,
         pixelSender = mock(),
         billingClient = billingClientAdapter,
+        dispatcherProvider = coroutineRule.testDispatcherProvider,
     )
 
     @Before
