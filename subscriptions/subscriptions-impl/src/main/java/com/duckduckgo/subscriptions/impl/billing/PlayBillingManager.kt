@@ -23,7 +23,6 @@ import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.PurchaseHistoryRecord
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
-import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTION
@@ -49,6 +48,7 @@ import javax.inject.Inject
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -86,7 +86,7 @@ class RealPlayBillingManager @Inject constructor(
 ) : PlayBillingManager, MainProcessLifecycleObserver {
 
     private val connectionMutex = Mutex()
-    private var connectionJob = ConflatedJob()
+    private var connectionJob: Job? = null
     private var billingFlowInProgress = false
 
     // PurchaseState
@@ -116,7 +116,9 @@ class RealPlayBillingManager @Inject constructor(
     }
 
     private fun connectAsyncWithRetry() {
-        connectionJob += coroutineScope.launch(dispatcherProvider.io()) {
+        if (connectionJob?.isActive == true) return
+
+        connectionJob = coroutineScope.launch(dispatcherProvider.io()) {
             connect(
                 retryPolicy = RetryPolicy(
                     retryCount = 5,
