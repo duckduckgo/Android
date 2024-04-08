@@ -117,6 +117,10 @@ android {
             dimension 'store'
             applicationIdSuffix '.cssonly'
         }
+        'nativecssonly' {
+            dimension 'store'
+            applicationIdSuffix '.nativecssonly'
+        }
         'elementhidingonly' {
             dimension 'store'
             applicationIdSuffix '.elementhidingonly'

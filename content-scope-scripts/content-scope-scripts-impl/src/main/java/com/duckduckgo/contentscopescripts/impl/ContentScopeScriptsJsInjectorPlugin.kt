@@ -29,7 +29,8 @@ class ContentScopeScriptsJsInjectorPlugin @Inject constructor(
 ) : JsInjectorPlugin {
     override fun onPageStarted(webView: WebView, url: String?, site: Site?) {
         if (coreContentScopeScripts.isEnabled()) {
-            webView.evaluateJavascript("javascript:${coreContentScopeScripts.getScript(site)}", null)
+            coreContentScopeScripts.getScript(site)
+            // webView.evaluateJavascript("javascript:${coreContentScopeScripts.getScript(site)}", null)
         }
     }
 

@@ -80,7 +80,7 @@ class RealPagePaintedHandler @Inject constructor(
         return withContext(dispatcherProvider.main()) {
             suspendCoroutine { continuation ->
                 evaluateJavascript(PAGE_PAINT_JS) { value ->
-                    Log.i("PagePainterHandler", "DDG CSSONLY PERF METRICS INJECTED")
+                    Log.i("PagePainterHandler", "DDG NATIVECSSHARNESSONLY PERF METRICS INJECTED")
                     continuation.resume(value)
                 }
             }
