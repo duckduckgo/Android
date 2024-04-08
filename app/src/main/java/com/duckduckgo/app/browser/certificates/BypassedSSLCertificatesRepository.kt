@@ -20,7 +20,7 @@ import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 
-interface TrustedSitesRepository {
+interface BypassedSSLCertificatesRepository {
 
     fun add(domain: String)
 
@@ -28,7 +28,7 @@ interface TrustedSitesRepository {
 }
 
 @SingleInstanceIn(AppScope::class)
-class RealTrustedSitesRepository @Inject constructor() : TrustedSitesRepository {
+class RealBypassedSSLCertificatesRepository @Inject constructor() : BypassedSSLCertificatesRepository {
 
     private val trustedSites: MutableList<String> = mutableListOf()
     override fun add(domain: String) {

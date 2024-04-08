@@ -21,7 +21,7 @@ import android.net.http.SslCertificate
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.UriString
-import com.duckduckgo.app.browser.certificates.TrustedSitesRepository
+import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
 import com.duckduckgo.app.global.model.PrivacyShield.UNPROTECTED
@@ -45,7 +45,7 @@ class SiteMonitor(
     override var upgradedHttps: Boolean = false,
     private val userAllowListRepository: UserAllowListRepository,
     private val contentBlocking: ContentBlocking,
-    private val trustedSitesRepository: TrustedSitesRepository,
+    private val bypassedSSLCertificatesRepository: BypassedSSLCertificatesRepository,
     private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
 ) : Site {
@@ -182,7 +182,7 @@ class SiteMonitor(
     }
 
     private fun isSslCertificateBypassed(domain: String): Boolean {
-        return trustedSitesRepository.contains(domain)
+        return bypassedSSLCertificatesRepository.contains(domain)
     }
 
     override var urlParametersRemoved: Boolean = false
@@ -196,6 +196,8 @@ class SiteMonitor(
     override var consentCosmeticHide: Boolean? = false
 
     override var isDesktopMode: Boolean = false
+
+    override var nextUrl: String = url
 
     companion object {
         private val specialDomainTypes = setOf(

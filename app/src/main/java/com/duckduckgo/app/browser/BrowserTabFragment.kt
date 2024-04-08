@@ -1196,13 +1196,14 @@ class BrowserTabFragment :
         handler: SslErrorHandler,
         errorResponse: SslErrorResponse,
     ) {
-        Timber.i("SSL Certificate: showSSLWarning")
         webViewContainer.gone()
         newBrowserTab.newTabLayout.gone()
         webView?.onPause()
         webView?.hide()
         omnibar.appBarLayout.setExpanded(true)
         omnibar.shieldIcon.isInvisible = true
+        omnibar.searchIcon.isInvisible = true
+        omnibar.daxIcon.isInvisible = true
         errorView.errorLayout.gone()
         binding.browserLayout.gone()
         sslErrorView.bind(handler, errorResponse) { action ->
@@ -1211,13 +1212,17 @@ class BrowserTabFragment :
         sslErrorView.show()
     }
 
-    private fun hideSSLWarning(showBrowser: Boolean) {
-        Timber.d("SSL Certificate: hideSSLWarning showBrowser $showBrowser")
-        omnibar.shieldIcon.isVisible = true
-        if (showBrowser) {
-            showBrowser()
+    private fun hideSSLWarning() {
+        val navList = webView?.safeCopyBackForwardList()
+        val currentIndex = navList?.currentIndex ?: 0
+
+        if (currentIndex >= 0) {
+            Timber.d("SSLError: hiding warning page and triggering a reload of the previous")
+            viewModel.recoverFromSSLWarningPage(true)
+            refresh()
         } else {
-            showHome()
+            Timber.d("SSLError: no previous page to load, showing home")
+            viewModel.recoverFromSSLWarningPage(false)
         }
     }
 
@@ -1524,7 +1529,7 @@ class BrowserTabFragment :
             is Command.SetBrowserBackground -> setBrowserBackground(it.backgroundRes)
             is Command.ShowWebPageTitle -> showWebPageTitleInCustomTab(it.title, it.url)
             is Command.ShowSSLError -> showSSLWarning(it.handler, it.error)
-            is Command.HideSSLError -> hideSSLWarning(it.showBrowser)
+            is Command.HideSSLError -> hideSSLWarning()
             else -> {
                 // NO OP
             }

@@ -63,7 +63,8 @@ import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
 import com.duckduckgo.app.browser.camera.CameraHardwareChecker
-import com.duckduckgo.app.browser.certificates.TrustedSitesRepository
+import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
+import com.duckduckgo.app.browser.certificates.remoteconfig.SSLCertificatesFeature
 import com.duckduckgo.app.browser.commands.Command
 import com.duckduckgo.app.browser.commands.Command.*
 import com.duckduckgo.app.browser.commands.NavigationCommand
@@ -249,7 +250,8 @@ class BrowserTabViewModel @Inject constructor(
     private val faviconsFetchingPrompt: FaviconsFetchingPrompt,
     private val extendedOnboardingExperimentVariantManager: ExtendedOnboardingExperimentVariantManager,
     private val subscriptions: Subscriptions,
-    private val trustedSitesRepository: TrustedSitesRepository,
+    private val sslCertificatesFeature: SSLCertificatesFeature,
+    private val bypassedSSLCertificatesRepository: BypassedSSLCertificatesRepository,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -757,6 +759,8 @@ class BrowserTabViewModel @Inject constructor(
                     clearPreviousUrl()
                 }
 
+                Timber.w("SSLError: navigate to $urlToNavigate")
+                site?.nextUrl = urlToNavigate
                 command.value = NavigationCommand.Navigate(urlToNavigate, getUrlHeaders(urlToNavigate))
             }
         }
@@ -823,6 +827,8 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun willOverrideUrl(newUrl: String) {
+        site?.nextUrl = newUrl
+        Timber.d("SSLError: willOverride is $newUrl")
         navigationAwareLoginDetector.onEvent(NavigationEvent.Redirect(newUrl))
         val previousSiteStillLoading = currentLoadingViewState().isLoading
         if (previousSiteStillLoading) {
@@ -939,13 +945,13 @@ class BrowserTabViewModel @Inject constructor(
             return true
         }
 
-        if (!currentBrowserViewState().browserShowing) {
-            return false
+        if (currentBrowserViewState().sslError != NONE) {
+            command.postValue(HideSSLError)
+            return true
         }
 
-        if (currentBrowserViewState().sslError != NONE) {
-            recoverFromSSLWarningPage()
-            return true
+        if (!currentBrowserViewState().browserShowing) {
+            return false
         }
 
         if (navigation.canGoBack) {
@@ -1014,7 +1020,7 @@ class BrowserTabViewModel @Inject constructor(
             canGoForward = newWebNavigationState.canGoForward,
         )
 
-        Timber.v("navigationStateChanged: $stateChange")
+        Timber.v("SSL Error: navigationStateChanged: $stateChange")
         when (stateChange) {
             is WebNavigationStateChange.NewPage -> pageChanged(stateChange.url, stateChange.title)
             is WebNavigationStateChange.PageCleared -> pageCleared()
@@ -1668,9 +1674,26 @@ class BrowserTabViewModel @Inject constructor(
         handler: SslErrorHandler,
         errorResponse: SslErrorResponse,
     ) {
-        browserViewState.value =
-            currentBrowserViewState().copy(browserShowing = false, showPrivacyShield = false, showDaxIcon = false, showSearchIcon = false, sslError = errorResponse.errorType)
-        command.postValue(ShowSSLError(handler, errorResponse))
+        if (sslCertificatesFeature.allowBypass().isEnabled()) {
+            Timber.d("SSLError: error received for ${errorResponse.url} and nextUrl is ${site?.nextUrl} and currentUrl is ${site?.url}")
+            if (site?.nextUrl != null && errorResponse.url != site?.nextUrl) {
+                Timber.d("SSLError: received ssl error for a page we are not loading, cancelling request")
+                handler.cancel()
+            } else {
+                browserViewState.value =
+                    currentBrowserViewState().copy(
+                        browserShowing = false,
+                        showPrivacyShield = false,
+                        showDaxIcon = false,
+                        showSearchIcon = false,
+                        sslError = errorResponse.errorType,
+                    )
+                command.postValue(ShowSSLError(handler, errorResponse))
+            }
+        } else {
+            Timber.d("SSLError: allow bypass certificates feature disabled, cancelling request")
+            handler.cancel()
+        }
     }
 
     override fun showFileChooser(
@@ -2789,6 +2812,9 @@ class BrowserTabViewModel @Inject constructor(
         if (currentBrowserViewState().browserError != OMITTED && currentBrowserViewState().browserError != LOADING) {
             browserViewState.value = currentBrowserViewState().copy(browserError = LOADING)
         }
+        if (currentBrowserViewState().sslError != NONE) {
+            browserViewState.value = currentBrowserViewState().copy(browserShowing = true, sslError = NONE)
+        }
     }
 
     fun onWebViewRefreshed() {
@@ -3079,29 +3105,37 @@ class BrowserTabViewModel @Inject constructor(
             }
 
             Action.LeaveSite -> {
-                recoverFromSSLWarningPage()
+                command.postValue(HideSSLError)
                 pixel.fire(AppPixelName.SSL_CERTIFICATE_WARNING_CLOSE_PRESSED)
             }
 
             Action.Proceed -> {
-                command.postValue(HideSSLError(showBrowser = true))
                 refreshBrowserError()
-                trustedSitesRepository.add(url)
+                bypassedSSLCertificatesRepository.add(url)
                 site?.sslError = true
                 pixel.fire(AppPixelName.SSL_CERTIFICATE_WARNING_PROCEED_PRESSED)
             }
         }
     }
 
-    private fun recoverFromSSLWarningPage() {
-        val navigationState = webNavigationState
-        if (navigationState != null) {
-            Timber.d("SSL Certificate: recoverFromSSLPage $navigationState")
-            command.postValue(HideSSLError(showBrowser = navigationState.canGoBack))
+    fun recoverFromSSLWarningPage(showBrowser: Boolean) {
+        if (showBrowser) {
+            browserViewState.value = currentBrowserViewState().copy(browserShowing = true, sslError = NONE)
         } else {
-            command.postValue(HideSSLError(showBrowser = false))
+            omnibarViewState.value = currentOmnibarViewState().copy(
+                omnibarText = "",
+                shouldMoveCaretToEnd = false,
+                forceExpand = true,
+            )
+            loadingViewState.value = currentLoadingViewState().copy(isLoading = false)
+            browserViewState.value = currentBrowserViewState().copy(
+                showPrivacyShield = false,
+                showSearchIcon = true,
+                showDaxIcon = false,
+                browserShowing = showBrowser,
+                sslError = NONE,
+            )
         }
-        refreshBrowserError()
     }
 
     companion object {

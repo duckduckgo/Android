@@ -63,7 +63,8 @@ import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
 import com.duckduckgo.app.browser.camera.CameraHardwareChecker
-import com.duckduckgo.app.browser.certificates.TrustedSitesRepository
+import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
+import com.duckduckgo.app.browser.certificates.remoteconfig.SSLCertificatesFeature
 import com.duckduckgo.app.browser.commands.Command
 import com.duckduckgo.app.browser.commands.Command.LaunchPrivacyPro
 import com.duckduckgo.app.browser.commands.Command.LoadExtractedUrl
@@ -446,7 +447,8 @@ class BrowserTabViewModelTest {
     }
 
     private val mockFaviconFetchingPrompt: FaviconsFetchingPrompt = mock()
-    private val mockTrustedSitesRepository: TrustedSitesRepository = mock()
+    private val mockSSLCertificatesFeature: SSLCertificatesFeature = mock()
+    private val mockBypassedSSLCertificatesRepository: BypassedSSLCertificatesRepository = mock()
     private val mockExtendedOnboardingExperimentVariantManager: ExtendedOnboardingExperimentVariantManager = mock()
 
     @Before
@@ -473,6 +475,7 @@ class BrowserTabViewModelTest {
         whenever(mockRemoteMessagingRepository.messageFlow()).thenReturn(remoteMessageFlow.consumeAsFlow())
         whenever(mockSettingsDataStore.automaticFireproofSetting).thenReturn(AutomaticFireproofSetting.ASK_EVERY_TIME)
         whenever(androidBrowserConfig.screenLock()).thenReturn(mockToggle)
+        whenever(mockSSLCertificatesFeature.allowBypass()).thenReturn(mockToggle)
         whenever(mockExtendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()).thenReturn(false)
         whenever(subscriptions.shouldLaunchPrivacyProForUrl(any())).thenReturn(false)
 
@@ -498,7 +501,7 @@ class BrowserTabViewModelTest {
             mockEntityLookup,
             mockContentBlocking,
             mockUserAllowListRepository,
-            mockTrustedSitesRepository,
+            mockBypassedSSLCertificatesRepository,
             coroutineRule.testScope,
             coroutineRule.testDispatcherProvider,
         )
@@ -581,7 +584,8 @@ class BrowserTabViewModelTest {
             privacyProtectionsPopupExperimentExternalPixels = privacyProtectionsPopupExperimentExternalPixels,
             faviconsFetchingPrompt = mockFaviconFetchingPrompt,
             subscriptions = subscriptions,
-            trustedSitesRepository = mockTrustedSitesRepository,
+            sslCertificatesFeature = mockSSLCertificatesFeature,
+            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             extendedOnboardingExperimentVariantManager = mockExtendedOnboardingExperimentVariantManager,
         )
 
@@ -5048,8 +5052,67 @@ class BrowserTabViewModelTest {
 
     @Test
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
-    fun whenSslCertificateIssueReceivedThenShowSslWarningCommandSentAndViewStatesUpdated() {
+    fun whenAllowBypassSSLCertificatesFeatureDisabledThenSSLCertificateErrorsAreIgnored() {
+        whenever(mockToggle.isEnabled()).thenReturn(false)
+
         val url = "http://example.com"
+        givenCurrentSite(url)
+
+        val certificate = aRSASslCertificate()
+        val sslErrorResponse = SslErrorResponse(SslError(SslError.SSL_EXPIRED, certificate, url), EXPIRED, url)
+        testee.onReceivedSslError(aHandler(), sslErrorResponse)
+
+        assertCommandNotIssued<Command.ShowSSLError>()
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
+    fun whenSslCertificateIssueReceivedForLoadingSiteThenShowSslWarningCommandSentAndViewStatesUpdated() {
+        whenever(mockToggle.isEnabled()).thenReturn(true)
+
+        val url = "http://example.com"
+        givenCurrentSite(url)
+
+        val certificate = aRSASslCertificate()
+        val sslErrorResponse = SslErrorResponse(SslError(SslError.SSL_EXPIRED, certificate, url), EXPIRED, url)
+        testee.onReceivedSslError(aHandler(), sslErrorResponse)
+
+        assertCommandIssued<Command.ShowSSLError>()
+
+        assertEquals(EXPIRED, browserViewState().sslError)
+        assertEquals(false, browserViewState().showPrivacyShield)
+        assertEquals(false, browserViewState().showDaxIcon)
+        assertEquals(false, browserViewState().showSearchIcon)
+        assertEquals(false, loadingViewState().isLoading)
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
+    fun whenSslCertificateIssueReceivedForAnotherSiteThenShowSslWarningCommandNotSentAndViewStatesNotUpdated() {
+        whenever(mockToggle.isEnabled()).thenReturn(true)
+        val url = "http://example.com"
+        givenCurrentSite(url)
+
+        val certificate = aRSASslCertificate()
+        val sslErrorResponse = SslErrorResponse(SslError(SslError.SSL_EXPIRED, certificate, url), EXPIRED, "another.com")
+        testee.onReceivedSslError(aHandler(), sslErrorResponse)
+
+        assertCommandNotIssued<Command.ShowSSLError>()
+
+        assertEquals(NONE, browserViewState().sslError)
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
+    fun whenInFreshStartAndSslCertificateIssueReceivedThenShowSslWarningCommandSentAndViewStatesUpdated() = runTest {
+        whenever(mockToggle.isEnabled()).thenReturn(true)
+        val url = "http://example.com"
+        val site: Site = mock()
+        whenever(site.url).thenReturn(url)
+        whenever(site.nextUrl).thenReturn(null)
+        val siteLiveData = MutableLiveData<Site>()
+        siteLiveData.value = site
+
         val certificate = aRSASslCertificate()
         val sslErrorResponse = SslErrorResponse(SslError(SslError.SSL_EXPIRED, certificate, url), EXPIRED, url)
         testee.onReceivedSslError(aHandler(), sslErrorResponse)
@@ -5069,7 +5132,7 @@ class BrowserTabViewModelTest {
 
         testee.onSSLCertificateWarningAction(Action.Proceed, url)
 
-        verify(mockTrustedSitesRepository).add(url)
+        verify(mockBypassedSSLCertificatesRepository).add(url)
 
         verify(mockPixel).fire(AppPixelName.SSL_CERTIFICATE_WARNING_PROCEED_PRESSED)
     }
@@ -5109,18 +5172,34 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     fun whenSslCertificateActionProceedThenPixelsFiredAndViewStatesUpdated() {
+        whenever(mockToggle.isEnabled()).thenReturn(true)
         val url = "http://example.com"
+        val certificate = aRSASslCertificate()
+        val sslErrorResponse = SslErrorResponse(SslError(SslError.SSL_EXPIRED, certificate, url), EXPIRED, url)
+
+        testee.onReceivedSslError(aHandler(), sslErrorResponse)
+
         testee.onSSLCertificateWarningAction(Action.Proceed, url)
 
-        assertCommandIssued<Command.HideSSLError>()
+        assertCommandNotIssued<Command.HideSSLError>()
         verify(mockPixel).fire(AppPixelName.SSL_CERTIFICATE_WARNING_PROCEED_PRESSED)
-        verify(mockTrustedSitesRepository).add(url)
+        verify(mockBypassedSSLCertificatesRepository).add(url)
         assertEquals(NONE, browserViewState().sslError)
+        assertEquals(true, browserViewState().browserShowing)
     }
 
     @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     fun whenWebViewRefreshedThenSSLErrorStateIsNone() {
+        whenever(mockToggle.isEnabled()).thenReturn(true)
+        val url = "http://example.com"
+        val certificate = aRSASslCertificate()
+        val sslErrorResponse = SslErrorResponse(SslError(SslError.SSL_EXPIRED, certificate, url), EXPIRED, url)
+
+        testee.onReceivedSslError(aHandler(), sslErrorResponse)
+
         testee.onWebViewRefreshed()
 
         assertEquals(NONE, browserViewState().sslError)
@@ -5129,6 +5208,7 @@ class BrowserTabViewModelTest {
     @Test
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     fun whenResetSSLErrorThenBrowserErrorStateIsLoading() {
+        whenever(mockToggle.isEnabled()).thenReturn(true)
         val url = "http://example.com"
         val certificate = aRSASslCertificate()
         val sslErrorResponse = SslErrorResponse(SslError(SslError.SSL_EXPIRED, certificate, url), EXPIRED, url)
@@ -5138,6 +5218,31 @@ class BrowserTabViewModelTest {
 
         testee.refreshBrowserError()
         assertEquals(NONE, browserViewState().sslError)
+    }
+
+    @Test
+    fun whenRecoveringFromSSLWarningPageAndBrowserShouldShowThenViewStatesUpdated() {
+        testee.recoverFromSSLWarningPage(true)
+
+        assertEquals(NONE, browserViewState().sslError)
+        assertEquals(true, browserViewState().browserShowing)
+    }
+
+    @Test
+    fun whenRecoveringFromSSLWarningPageAndBrowserShouldNotShowThenViewStatesUpdated() = runTest {
+        testee.recoverFromSSLWarningPage(false)
+
+        assertEquals(NONE, browserViewState().sslError)
+        assertEquals(false, browserViewState().browserShowing)
+        assertEquals(false, browserViewState().showPrivacyShield)
+        assertEquals(true, browserViewState().showSearchIcon)
+        assertEquals(false, browserViewState().showDaxIcon)
+
+        assertEquals(false, loadingViewState().isLoading)
+
+        assertEquals("", omnibarViewState().omnibarText)
+        assertEquals(false, omnibarViewState().shouldMoveCaretToEnd)
+        assertEquals(true, omnibarViewState().forceExpand)
     }
 
     fun aHandler(): SslErrorHandler {
@@ -5304,6 +5409,7 @@ class BrowserTabViewModelTest {
     private fun givenCurrentSite(domain: String): Site {
         val site: Site = mock()
         whenever(site.url).thenReturn(domain)
+        whenever(site.nextUrl).thenReturn(domain)
         whenever(site.uri).thenReturn(Uri.parse(domain))
         val siteLiveData = MutableLiveData<Site>()
         siteLiveData.value = site

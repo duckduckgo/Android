@@ -432,7 +432,6 @@ class BrowserWebViewClient @Inject constructor(
         handler: SslErrorHandler,
         error: SslError,
     ) {
-        Timber.d("SSLShield: onReceivedSslError")
         var trusted: CertificateValidationState = CertificateValidationState.UntrustedChain
 
         when (error.primaryError) {

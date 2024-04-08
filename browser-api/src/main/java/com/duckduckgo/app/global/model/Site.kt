@@ -74,6 +74,7 @@ interface Site {
     var consentSelfTestFailed: Boolean
     var consentCosmeticHide: Boolean?
     var isDesktopMode: Boolean
+    var nextUrl: String
 }
 
 fun Site.orderedTrackerBlockedEntities(): List<Entity> = trackingEvents

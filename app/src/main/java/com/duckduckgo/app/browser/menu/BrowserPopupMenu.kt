@@ -20,6 +20,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import androidx.core.view.isVisible
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.SSLErrorType.NONE
 import com.duckduckgo.app.browser.databinding.PopupWindowBrowserMenuBinding
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.common.ui.menu.PopupMenu
@@ -121,6 +122,17 @@ class BrowserPopupMenu(
             binding.openInDdgBrowserMenuItem.isVisible = displayedInCustomTabScreen
             binding.customTabsMenuDivider.isVisible = displayedInCustomTabScreen
             binding.runningInDdgBrowserMenuItem.isVisible = displayedInCustomTabScreen
+            overrideForSSlError(binding, viewState)
+        }
+    }
+
+    private fun overrideForSSlError(
+        binding: PopupWindowBrowserMenuBinding,
+        viewState: BrowserViewState,
+    ) {
+        if (viewState.sslError != NONE) {
+            binding.newTabMenuItem.isVisible = true
+            binding.siteOptionsMenuDivider.isVisible = true
         }
     }
 }

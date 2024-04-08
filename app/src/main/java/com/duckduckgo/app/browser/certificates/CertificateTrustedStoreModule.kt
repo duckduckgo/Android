@@ -51,7 +51,7 @@ class CertificateTrustedStoreModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun trustedSitesRepository(): TrustedSitesRepository {
-        return RealTrustedSitesRepository()
+    fun trustedSitesRepository(): BypassedSSLCertificatesRepository {
+        return RealBypassedSSLCertificatesRepository()
     }
 }

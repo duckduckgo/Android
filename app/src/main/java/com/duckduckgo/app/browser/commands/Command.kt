@@ -232,5 +232,5 @@ sealed class Command {
     data object ShowFaviconsPrompt : Command()
     data class SetBrowserBackground(val backgroundRes: Int) : Command()
     data class ShowSSLError(val handler: SslErrorHandler, val error: SslErrorResponse) : Command()
-    data class HideSSLError(val showBrowser: Boolean) : Command()
+    data object HideSSLError : Command()
 }

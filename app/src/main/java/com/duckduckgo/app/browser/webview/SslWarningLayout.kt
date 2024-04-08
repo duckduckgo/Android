@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser.webview
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.View
 import android.webkit.SslErrorHandler
 import android.widget.FrameLayout
 import com.duckduckgo.app.browser.R
@@ -120,6 +121,9 @@ class SslWarningLayout @JvmOverloads constructor(
                 actionHandler.invoke(Advance)
                 sslErrorAdvancedCTA.gone()
                 sslErrorAdvancedGroup.show()
+                errorLayout.post {
+                    errorLayout.fullScroll(View.FOCUS_DOWN)
+                }
             }
         }
     }

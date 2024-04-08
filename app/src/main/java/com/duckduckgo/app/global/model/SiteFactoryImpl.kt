@@ -19,7 +19,7 @@ package com.duckduckgo.app.global.model
 import android.util.LruCache
 import androidx.annotation.AnyThread
 import androidx.annotation.WorkerThread
-import com.duckduckgo.app.browser.certificates.TrustedSitesRepository
+import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.trackerdetection.EntityLookup
@@ -37,7 +37,7 @@ class SiteFactoryImpl @Inject constructor(
     private val entityLookup: EntityLookup,
     private val contentBlocking: ContentBlocking,
     private val userAllowListRepository: UserAllowListRepository,
-    private val trustedSitesRepository: TrustedSitesRepository,
+    private val bypassedSSLCertificatesRepository: BypassedSSLCertificatesRepository,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
 ) : SiteFactory {
@@ -63,7 +63,7 @@ class SiteFactoryImpl @Inject constructor(
                 httpUpgraded,
                 userAllowListRepository,
                 contentBlocking,
-                trustedSitesRepository,
+                bypassedSSLCertificatesRepository,
                 appCoroutineScope,
                 dispatcherProvider,
             ).also {
