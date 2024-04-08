@@ -817,4 +817,15 @@
     <!-- Custom Tab -->
     <string name="openInDdgMenuItemTitle">Avaa DuckDuckGo:ssa</string>
     <string name="runningInDdgMenuItemTitle">Käynnissä DuckDuckGossa</string>
+
+    <!-- SSL Error -->
+    <string name="sslErrorTitle">Varoitus: Tämä sivusto ei välttämättä ole turvallinen</string>
+    <string name="sslErrorHeadline" instruction="Placeholder is domain with certificate issues">Tämän sivuston varmenne on virheellinen. Saatat olla yhteydessä palvelimeen, joka teeskentelee olevansa %1$s, mikä voi vaarantaa luottamukselliset tietosi.</string>
+    <string name="sslErrorLeaveCTA">Poistu sivustolta</string>
+    <string name="sslErrorAdvancedCTA">Lisäasetukset</string>
+    <string name="sslErrorExpandedHeadline">DuckDuckGo varoittaa, jos verkkosivustolla on virheellinen sertifikaatti.</string>
+    <string name="sslErrorExpandedCTA"><![CDATA[<u>Hyväksy riski ja mene sivustolle<u/>]]></string>
+    <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">Verkkotunnuksen %1$s turvasertifikaatti on vanhentunut. Verkkosivusto on ehkä väärin määritetty, hyökkäys on saattanut vaarantaa yhteytesi tai järjestelmäsi kellossa on virhe.</string>
+    <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Verkkotunnuksen %1$s suojausvarmenne ei vastaa *.%2$s. Verkkosivusto on ehkä väärin määritetty, hyökkäys on saattanut vaarantaa yhteytesi tai järjestelmäsi kellossa on virhe.</string>
+    <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Laitteesi käyttöjärjestelmä ei luota verkkotunnuksen %1$s suojausvarmenteeseen. Verkkosivusto on ehkä väärin määritetty, hyökkäys on saattanut vaarantaa yhteytesi tai järjestelmäsi kellossa on virhe.</string>
 </resources>

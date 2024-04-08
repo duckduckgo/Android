@@ -817,4 +817,15 @@
     <!-- Custom Tab -->
     <string name="openInDdgMenuItemTitle">Ouvrir dans DuckDuckGo</string>
     <string name="runningInDdgMenuItemTitle">S\'exécute dans DuckDuckGo</string>
+
+    <!-- SSL Error -->
+    <string name="sslErrorTitle">Avertissement : ce site n\'est peut-être pas sécurisé</string>
+    <string name="sslErrorHeadline" instruction="Placeholder is domain with certificate issues">Le certificat de ce site n\'est pas valide. Vous vous connectez peut-être à un serveur qui se fait passer pour %1$s, ce qui pourrait mettre vos informations confidentielles en danger.</string>
+    <string name="sslErrorLeaveCTA">Quitter ce site</string>
+    <string name="sslErrorAdvancedCTA">Options avancées</string>
+    <string name="sslErrorExpandedHeadline">DuckDuckGo vous avertit lorsque le certificat d\'un site Web n\'est pas valide.</string>
+    <string name="sslErrorExpandedCTA"><![CDATA[<u>Accepter le risque et visiter le site<u/>]]></string>
+    <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">Le certificat de sécurité de %1$s a expiré. Il est possible que le site soit mal configuré, qu\'un pirate ait compromis votre connexion ou que l\'horloge de votre système soit incorrecte.</string>
+    <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Le certificat de sécurité de %1$s ne correspond pas à *.%2$s. Il est possible que le site soit mal configuré, qu\'un pirate ait compromis votre connexion ou que l\'horloge de votre système soit incorrecte.</string>
+    <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Le certificat de sécurité de %1$s n\'est pas approuvé par le système d\'exploitation de votre appareil. Il est possible que le site soit mal configuré, qu\'un pirate ait compromis votre connexion ou que l\'horloge de votre système soit incorrecte.</string>
 </resources>
