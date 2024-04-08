@@ -83,19 +83,22 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <LinearLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_height="wrap_content">
 
                 <include
                     android:id="@+id/includeOnboardingDaxDialogExperiment"
                     layout="@layout/include_experiment_view_dax_dialog"
-                    android:visibility="gone" />
+                    app:layout_constraintBottom_toTopOf="parent" />
 
                 <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:id="@+id/browserContainer"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/includeOnboardingDaxDialogExperiment">
 
                     <FrameLayout
                         android:id="@+id/webViewContainer"
@@ -117,7 +120,7 @@
                         layout="@layout/include_error_view"
                         android:visibility="gone" />
                 </FrameLayout>
-            </LinearLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </com.duckduckgo.app.browser.ui.ScrollAwareRefreshLayout>
 
         <View

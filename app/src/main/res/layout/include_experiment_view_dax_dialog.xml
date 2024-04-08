@@ -21,9 +21,10 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:alpha="0"
-    tools:alpha="1"
     android:background="@drawable/onboarding_experiment_background"
-    android:clipChildren="false">
+    android:clipChildren="false"
+    app:layout_constraintBottom_toTopOf="parent"
+    tools:alpha="1">
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/logo"
@@ -71,9 +72,9 @@
                     android:layout_height="match_parent"
                     android:clickable="true"
                     android:focusable="true"
-                    android:text="That’s private search. Fast, clean results. No trackers. Fewer ads.
-                                    👆 Next, try visiting a site! I’ll block trackers so they can’t spy on you."
-                    android:textColor="?attr/daxColorPrimaryText" />
+                    android:textColor="?attr/daxColorPrimaryText"
+                    tools:text="That’s private search. Fast, clean results. No trackers. Fewer ads.
+                                    👆 Next, try visiting a site! I’ll block trackers so they can’t spy on you." />
             </FrameLayout>
 
             <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
@@ -81,8 +82,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/daxDialogButtonSpacing"
-                android:text="Button"
-                app:buttonSize="small" />
+                app:buttonSize="small"
+                tools:text="Button" />
 
         </LinearLayout>
     </com.duckduckgo.app.onboarding.ui.page.experiment.ExperimentDaxBubbleCardView>

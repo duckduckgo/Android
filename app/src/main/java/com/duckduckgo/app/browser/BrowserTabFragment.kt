@@ -1505,7 +1505,7 @@ class BrowserTabFragment :
             is Command.ShowSSLError -> showSSLWarning(it.handler, it.error)
             is Command.HideSSLError -> hideSSLWarning()
             is Command.LaunchScreen -> launchScreen(it.screen, it.payload)
-            is Command.HideExperimentOnboardingDialog -> hideOnboardingDaxDialog()
+            is Command.HideExperimentOnboardingDialog -> hideOnboardingDaxDialog(it.experimentCta)
             else -> {
                 // NO OP
             }
@@ -2303,9 +2303,8 @@ class BrowserTabFragment :
         newBrowserTab.browserBackground.setBackgroundResource(backgroundRes)
     }
 
-    private fun hideOnboardingDaxDialog() {
-        binding.overlayView.gone()
-        daxDialogExperimentOnboardingCta.daxCtaContainer.gone()
+    private fun hideOnboardingDaxDialog(experimentCta: ExperimentOnboardingDaxDialogCta) {
+        experimentCta.hideOnboardingCta(binding)
     }
 
     private fun configureWebViewForAutofill(it: DuckDuckGoWebView) {
