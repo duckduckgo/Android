@@ -21,13 +21,19 @@ import android.content.Context
 import android.text.SpannableString
 import android.view.LayoutInflater
 import android.view.WindowManager
+import android.widget.FrameLayout
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import com.duckduckgo.app.browser.databinding.BottomSheetAddBookmarkBinding
 import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.mobile.android.R as CommonR
+import com.google.android.material.R
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.shape.CornerFamily
+import com.google.android.material.shape.MaterialShapeDrawable
+import com.google.android.material.shape.ShapeAppearanceModel
 
 @SuppressLint("NoBottomSheetDialog")
 class BookmarksBottomSheetDialog(builder: Builder) : BottomSheetDialog(builder.context) {
@@ -164,9 +170,26 @@ class BookmarksBottomSheetDialog(builder: Builder) : BottomSheetDialog(builder.c
 
         /** Start the dialog and display it on screen */
         fun show() {
-            dialog = BookmarksBottomSheetDialog(this)
-            dialog?.behavior?.state = BottomSheetBehavior.STATE_EXPANDED
+            dialog = BookmarksBottomSheetDialog(this).apply {
+                this.behavior.state = BottomSheetBehavior.STATE_EXPANDED
+                this.behavior.isDraggable = false
+                roundCornersAlways(this)
+            }
             dialog?.show()
+        }
+
+        // TODO: Use a style when bookmarks is moved to its own module
+        private fun roundCornersAlways(dialog: BottomSheetDialog) {
+            dialog.setOnShowListener { dialogInterface ->
+                val bottomSheetDialog = dialogInterface as BottomSheetDialog
+                val bottomSheet = bottomSheetDialog.findViewById<FrameLayout>(R.id.design_bottom_sheet)
+                bottomSheet?.background = MaterialShapeDrawable(
+                    ShapeAppearanceModel.builder().apply {
+                        setTopLeftCorner(CornerFamily.ROUNDED, context.resources.getDimension(CommonR.dimen.dialogBorderRadius))
+                        setTopRightCorner(CornerFamily.ROUNDED, context.resources.getDimension(CommonR.dimen.dialogBorderRadius))
+                    }.build(),
+                )
+            }
         }
     }
 }
