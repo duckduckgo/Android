@@ -68,7 +68,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import logcat.LogPriority
 import logcat.logcat
 import retrofit2.HttpException
@@ -478,13 +477,11 @@ class RealSubscriptionsManager @Inject constructor(
 
             logcat(LogPriority.DEBUG) { "Subs: external id is ${authRepository.getAccount()!!.externalId}" }
             _currentPurchaseState.emit(CurrentPurchase.PreFlowFinished)
-            withContext(dispatcherProvider.main()) {
-                playBillingManager.launchBillingFlow(
-                    activity = activity,
-                    planId = planId,
-                    externalId = authRepository.getAccount()!!.externalId,
-                )
-            }
+            playBillingManager.launchBillingFlow(
+                activity = activity,
+                planId = planId,
+                externalId = authRepository.getAccount()!!.externalId,
+            )
         } catch (e: Exception) {
             val error = extractError(e)
             logcat(LogPriority.ERROR) { "Subs: $error" }
