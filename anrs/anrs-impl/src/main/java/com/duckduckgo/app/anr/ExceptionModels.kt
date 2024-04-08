@@ -121,5 +121,5 @@ internal fun String.sanitizeStackTrace(): String {
         sanitizedStackTrace = sanitizedStackTrace.replace(ipv4Regex, "[REDACTED_IPV4]")
 
         return sanitizedStackTrace
-    }.getOrDefault("")
+    }.getOrDefault(this)
 }
