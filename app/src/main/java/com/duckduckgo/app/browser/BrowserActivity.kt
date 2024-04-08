@@ -30,8 +30,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.VisibleForTesting
-import androidx.lifecycle.Lifecycle.State.STARTED
-import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.webkit.ServiceWorkerClientCompat
 import androidx.webkit.ServiceWorkerControllerCompat
@@ -79,8 +77,6 @@ import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreen.Priv
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -375,17 +371,17 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 selectTab(it)
             }
         }
-        viewModel.tabs.onEach {
+        viewModel.tabs.observe(this) {
             clearStaleTabs(it)
             removeOldTabs()
-            viewModel.onTabsUpdated(it)
-        }.flowWithLifecycle(lifecycle, STARTED)
-            .launchIn(lifecycleScope)
+            lifecycleScope.launch { viewModel.onTabsUpdated(it) }
+        }
     }
 
     private fun removeObservers() {
         viewModel.command.removeObservers(this)
         viewModel.selectedTab.removeObservers(this)
+        viewModel.tabs.removeObservers(this)
     }
 
     private fun clearStaleTabs(updatedTabs: List<TabEntity>?) {
