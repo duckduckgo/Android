@@ -19,6 +19,7 @@
 package com.duckduckgo.app.tabs.ui
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
@@ -27,7 +28,6 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -69,7 +69,7 @@ class TabSwitcherViewModelTest {
     private lateinit var testee: TabSwitcherViewModel
 
     private val repoDeletableTabs = Channel<List<TabEntity>>()
-    private val tabs = MutableStateFlow<List<TabEntity>>(emptyList())
+    private val tabs = MutableLiveData<List<TabEntity>>()
 
     @Before
     fun before() {
@@ -77,7 +77,7 @@ class TabSwitcherViewModelTest {
         runBlocking {
             whenever(mockTabRepository.flowDeletableTabs)
                 .thenReturn(repoDeletableTabs.consumeAsFlow())
-            whenever(mockTabRepository.flowTabs)
+            whenever(mockTabRepository.liveTabs)
                 .thenReturn(tabs)
             whenever(mockTabRepository.add()).thenReturn("TAB_ID")
             testee = TabSwitcherViewModel(
@@ -180,12 +180,16 @@ class TabSwitcherViewModelTest {
     @Test
     fun whenOnCloseAllTabsConfirmedThenTabDeletedAndTabIdClearedAndSessionDeleted() = runTest {
         val tab = TabEntity("ID", position = 0)
-        tabs.emit(listOf(tab))
+        tabs.postValue(listOf(tab))
 
         testee.onCloseAllTabsConfirmed()
 
-        verify(mockTabRepository).delete(tab)
-        verify(mockAdClickManager).clearTabId(tab.tabId)
-        verify(mockWebViewSessionStorage).deleteSession(tab.tabId)
+        testee.tabs.observeForever {
+            runBlocking {
+                verify(mockTabRepository).delete(tab)
+            }
+            verify(mockAdClickManager).clearTabId(tab.tabId)
+            verify(mockWebViewSessionStorage).deleteSession(tab.tabId)
+        }
     }
 }
