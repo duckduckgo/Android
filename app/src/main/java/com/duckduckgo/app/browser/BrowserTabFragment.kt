@@ -3808,6 +3808,15 @@ class BrowserTabFragment :
             hideHomeBackground()
             hideHomeCta()
             configuration.showOnboardingCta(binding) { viewModel.onUserClickCtaOkButton() }
+            if (configuration is ExperimentOnboardingDaxDialogCta.DaxSiteSuggestionsCta) {
+                configuration.setOnOptionClicked(
+                    daxDialogExperimentOnboardingCta,
+                ) {
+                    userEnteredQuery(it.link)
+                    pixel.fire(it.pixel)
+                    viewModel.onUserClickCtaOkButton()
+                }
+            }
             binding.webViewContainer.setOnClickListener { daxDialogIntroExperimentCta.dialogTextCta.finishAnimation() }
             binding.overlayView.show()
             binding.overlayView.setOnTouchListener { _, _ ->

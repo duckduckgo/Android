@@ -208,6 +208,13 @@ class CtaViewModel @Inject constructor(
         }
     }
 
+    suspend fun getExperimentSiteSuggestionsDialogCta(): ExperimentOnboardingDaxDialogCta.DaxSiteSuggestionsCta? {
+        if (!daxOnboardingActive() || !canShowDaxIntroVisitSiteCta()) return null
+        return withContext(dispatchers.io()) {
+            return@withContext ExperimentOnboardingDaxDialogCta.DaxSiteSuggestionsCta(onboardingStore, appInstallStore)
+        }
+    }
+
     private suspend fun getHomeCta(): Cta? {
         return when {
             canShowDaxIntroCta() -> {

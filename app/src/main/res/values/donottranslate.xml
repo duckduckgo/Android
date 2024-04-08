@@ -60,7 +60,7 @@
     <string name="onboardingSearchDaxDialogOption2">mighty ducks cast</string>
     <string name="onboardingSearchDaxDialogOption3">local weather</string>
     <string name="onboardingSearchDaxDialogOption4">Surprise me!</string>
-    <string name="onboardingSitesDaxDialogTitle">Try visiting a site!</string>
+    <string name="onboardingSitesDaxDialogTitle">Next, try visiting a site!</string>
     <string name="onboardingSitesDaxDialogDescription">We\'ll block trackers so they can\'t spy on you.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
     <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
@@ -77,7 +77,6 @@
         <item quantity="other" instruction="This sentence is preceded by the name of several companies, i.e. Facebook and Google were trying to track..."><![CDATA[&#160;were trying to track you here. <br/><br/>I blocked them!<br/><br/>☝️ Tap the shield on any site to see who\'s trying to track you there.️]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Got It!</string>
-    <string name="onboardingFireButtonDaxDialogDescription">Personal data can build up in your browser. Yuck.\n\nUse the Fire Button to burn it all away. Give it a try now! ☝️</string>
-    <string name="onboardingFireButtonDaxDialogButton">Not Now</string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[The <b>Fire Button</b> instantly clears your browsing activity.<br/><br/>Give it a try! ☝️️]]></string>
 
 </resources>
