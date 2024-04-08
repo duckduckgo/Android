@@ -1266,7 +1266,13 @@ class BrowserTabFragment :
             }
 
             is Command.OpenMessageInNewTab -> {
-                browserActivity?.openMessageInNewTab(it.message, it.sourceTabId)
+                if (isActiveCustomTab()) {
+                    webView?.hitTestResult?.extra?.let { data ->
+                        webView?.loadUrl(Uri.parse(data).toString())
+                    }
+                } else {
+                    browserActivity?.openMessageInNewTab(it.message, it.sourceTabId)
+                }
             }
 
             is Command.OpenInNewBackgroundTab -> {
