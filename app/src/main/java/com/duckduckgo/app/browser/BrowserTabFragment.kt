@@ -1109,11 +1109,14 @@ class BrowserTabFragment :
     }
 
     private fun addTabsObserver() {
-        viewModel.tabs.flowWithLifecycle(viewLifecycleOwner.lifecycle)
-            .onEach {
-                decorator.renderTabIcon(it)
-            }
-            .launchIn(viewLifecycleOwner.lifecycleScope)
+        viewModel.tabs.observe(
+            viewLifecycleOwner,
+            Observer {
+                it?.let {
+                    decorator.renderTabIcon(it)
+                }
+            },
+        )
 
         viewModel.liveSelectedTab.distinctUntilChanged().observe(
             viewLifecycleOwner,
@@ -1721,6 +1724,7 @@ class BrowserTabFragment :
 
     private fun openInNewBackgroundTab() {
         omnibar.appBarLayout.setExpanded(true, true)
+        viewModel.tabs.removeObservers(this)
         decorator.incrementTabs()
     }
 

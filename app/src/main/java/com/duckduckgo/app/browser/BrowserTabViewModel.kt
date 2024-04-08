@@ -273,7 +273,7 @@ class BrowserTabViewModel @Inject constructor(
 
     var skipHome = false
     var hasCtaBeenShownForCurrentPage: AtomicBoolean = AtomicBoolean(false)
-    val tabs: Flow<List<TabEntity>> = tabRepository.flowTabs
+    val tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
     val liveSelectedTab: LiveData<TabEntity> = tabRepository.liveSelectedTab
     val survey: LiveData<Survey> = ctaViewModel.surveyLiveData
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
@@ -1128,11 +1128,9 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun setAdClickActiveTabData(url: String?) {
-        viewModelScope.launch {
-            val sourceTabId = tabRepository.liveSelectedTab.value?.sourceTabId
-            val sourceTabUrl = tabRepository.flowTabs.firstOrNull()?.firstOrNull { it.tabId == sourceTabId }?.url
-            adClickManager.setActiveTabId(tabId, url, sourceTabId, sourceTabUrl)
-        }
+        val sourceTabId = tabRepository.liveSelectedTab.value?.sourceTabId
+        val sourceTabUrl = tabRepository.liveTabs.value?.firstOrNull { it.tabId == sourceTabId }?.url
+        adClickManager.setActiveTabId(tabId, url, sourceTabId, sourceTabUrl)
     }
 
     private fun cacheAppLink(url: String?) {
