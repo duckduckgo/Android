@@ -400,6 +400,8 @@ class BrowserTabViewModelTest {
 
     private val selectedTabLiveData = MutableLiveData<TabEntity>()
 
+    private val tabsLiveData = MutableLiveData<List<TabEntity>>()
+
     private val loginEventLiveData = MutableLiveData<LoginDetected>()
 
     private val fireproofDialogsEventHandlerLiveData = MutableLiveData<FireproofDialogsEventHandler.Event>()
