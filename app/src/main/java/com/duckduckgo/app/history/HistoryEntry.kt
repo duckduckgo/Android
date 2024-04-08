@@ -44,9 +44,11 @@ sealed class HistoryEntry(
     ) : HistoryEntry(url = url, title, visits = visits)
 }
 
-fun HistoryEntryWithVisits.toHistoryEntry(): HistoryEntry {
-    return when (historyEntry.isSerp) {
-        true -> VisitedSERP(historyEntry.url.toUri(), historyEntry.title, historyEntry.query ?: "", visits = visits.map { Date(it.date) })
-        false -> VisitedPage(historyEntry.url.toUri(), historyEntry.title, visits.map { Date(it.date) })
+fun HistoryEntryWithVisits.toHistoryEntry(): HistoryEntry? {
+    if (historyEntry.url.isBlank()) return null
+    return if (historyEntry.isSerp && !historyEntry.query.isNullOrBlank()) {
+        VisitedSERP(historyEntry.url.toUri(), historyEntry.title, historyEntry.query, visits = visits.map { Date(it.date) })
+    } else {
+        VisitedPage(historyEntry.url.toUri(), historyEntry.title, visits.map { Date(it.date) })
     }
 }

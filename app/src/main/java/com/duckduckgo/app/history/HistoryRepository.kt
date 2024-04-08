@@ -57,7 +57,7 @@ class RealHistoryRepository(
     private fun fetchAndCacheHistoryEntries(): Single<List<HistoryEntry>> {
         return historyDao.getHistoryEntriesWithVisits()
             .map { entries ->
-                entries.map { it.toHistoryEntry() }.also {
+                entries.mapNotNull { it.toHistoryEntry() }.also {
                     cachedHistoryEntries = it
                 }
             }
