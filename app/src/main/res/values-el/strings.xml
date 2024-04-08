@@ -817,4 +817,15 @@
     <!-- Custom Tab -->
     <string name="openInDdgMenuItemTitle">Άνοιγμα στο DuckDuckGo</string>
     <string name="runningInDdgMenuItemTitle">Εκτέλεση στο DuckDuckGo</string>
+
+    <!-- SSL Error -->
+    <string name="sslErrorTitle">Προειδοποίηση: Αυτός ο ιστότοπος ενδέχεται να μην είναι ασφαλής</string>
+    <string name="sslErrorHeadline" instruction="Placeholder is domain with certificate issues">Το πιστοποιητικό για τον ιστότοπο αυτόν δεν είναι έγκυρο. Ίσως συνδέεστε σε διακομιστή που προσποιείται ότι είναι ο τομέας %1$s, γεγονός που θα μπορούσε να θέσει σε κίνδυνο τις εμπιστευτικές πληροφορίες σας.</string>
+    <string name="sslErrorLeaveCTA">Αποχωρήστε από τον ιστότοπο αυτόν</string>
+    <string name="sslErrorAdvancedCTA">Προχωρημένο</string>
+    <string name="sslErrorExpandedHeadline">Το DuckDuckGo σάς προειδοποιεί όταν ένας ιστότοπος έχει μη έγκυρο πιστοποιητικό.</string>
+    <string name="sslErrorExpandedCTA"><![CDATA[<u>Αποδεχτείτε τον κίνδυνο και επισκεφτείτε τον ιστότοπο<u/>]]></string>
+    <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">Το πιστοποιητικό ασφαλείας για τον τομέα %1$s έχει λήξει. Είναι πιθανόν ο ιστότοπος να μην έχει διαμορφωθεί σωστά, κάποιος εισβολέας να έχει παραβιάσει τη σύνδεσή σας ή το ρολόι του συστήματός σας να είναι λανθασμένο.</string>
+    <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Το πιστοποιητικό ασφάλειας για τον τομέα %1$s δεν ταιριάζει με το *.%2$s. Είναι πιθανόν ο ιστότοπος να μην έχει διαμορφωθεί σωστά ή κάποιος εισβολέας να έχει παραβιάσει τη σύνδεσή σας, ή το ρολόι του συστήματός σας να είναι λανθασμένο.</string>
+    <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Το πιστοποιητικό ασφαλείας για τον τομέα %1$s δεν εκλαμβάνεται ως αξιόπιστο από το λειτουργικό σύστημα της συσκευής σας. Είναι πιθανόν ο ιστότοπος να μην έχει διαμορφωθεί σωστά ή κάποιος εισβολέας να έχει παραβιάσει τη σύνδεσή σας, ή το ρολόι του συστήματός σας να είναι λανθασμένο.</string>
 </resources>
