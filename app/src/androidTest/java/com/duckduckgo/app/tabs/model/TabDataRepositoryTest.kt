@@ -19,9 +19,9 @@
 package com.duckduckgo.app.tabs.model
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.MutableLiveData
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
-import app.cash.turbine.test
 import com.duckduckgo.app.blockingObserve
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
@@ -216,9 +216,7 @@ class TabDataRepositoryTest {
 
         testee.addDefaultTab()
 
-        testee.flowTabs.test {
-            assertTrue(awaitItem().size == 1)
-        }
+        assertTrue(testee.liveTabs.blockingObserve()?.size == 1)
     }
 
     @Test
@@ -229,9 +227,7 @@ class TabDataRepositoryTest {
 
         testee.addDefaultTab()
 
-        testee.flowTabs.test {
-            assertTrue(awaitItem().size == 1)
-        }
+        assertTrue(testee.liveTabs.blockingObserve()?.size == 1)
     }
 
     @Test
@@ -437,6 +433,8 @@ class TabDataRepositoryTest {
     private fun mockDatabase(): TabsDao {
         whenever(mockDao.flowDeletableTabs())
             .thenReturn(daoDeletableTabs.consumeAsFlow())
+        whenever(mockDao.liveTabs())
+            .thenReturn(MutableLiveData())
 
         return mockDao
     }

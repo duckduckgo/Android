@@ -23,9 +23,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
-import androidx.lifecycle.Lifecycle.State.STARTED
-import androidx.lifecycle.flowWithLifecycle
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -57,11 +54,7 @@ import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 @InjectWith(ActivityScope::class)
 class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, CoroutineScope {
@@ -159,11 +152,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     private fun configureObservers() {
-        viewModel.tabs.onEach {
+        viewModel.tabs.observe(this) {
             render(it)
-        }.flowWithLifecycle(lifecycle, STARTED)
-            .launchIn(lifecycleScope)
-
+        }
         viewModel.deletableTabs.observe(this) {
             if (it.isNotEmpty()) {
                 onDeletableTab(it.last())
@@ -214,7 +205,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
         val closeAllTabsMenuItem = menu?.findItem(R.id.closeAllTabs)
-        runBlocking { closeAllTabsMenuItem?.isVisible = viewModel.tabs.firstOrNull()?.isNotEmpty() == true }
+        closeAllTabsMenuItem?.isVisible = viewModel.tabs.value?.isNotEmpty() == true
         return super.onPrepareOptionsMenu(menu)
     }
 
@@ -311,6 +302,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     private fun clearObserversEarlyToStopViewUpdates() {
+        viewModel.tabs.removeObservers(this)
         viewModel.deletableTabs.removeObservers(this)
     }
 

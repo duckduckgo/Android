@@ -52,7 +52,6 @@ import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -93,7 +92,7 @@ class BrowserViewModel @Inject constructor(
     private val currentViewState: ViewState
         get() = viewState.value!!
 
-    var tabs: Flow<List<TabEntity>> = tabRepository.flowTabs
+    var tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
     var selectedTab: LiveData<TabEntity> = tabRepository.liveSelectedTab
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
