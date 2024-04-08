@@ -103,4 +103,12 @@ class RealCohortStoreTest {
 
         assertNull(cohortStore.getCohortStoredLocalDate())
     }
+
+    @Test
+    fun whenVpnReconfiguredCalledThenStoreInitialCohort() = runTest {
+        vpnFeaturesRegistry.registerFeature(AppTpVpnFeature.APPTP_VPN)
+        (cohortStore as RealCohortStore).onVpnReconfigured(TestScope())
+
+        assertEquals(LocalDate.now(), cohortStore.getCohortStoredLocalDate())
+    }
 }
