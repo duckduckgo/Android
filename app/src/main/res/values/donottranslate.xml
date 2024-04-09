@@ -47,12 +47,11 @@
     <string name="audioCaptureSoundRecorderPermissionDeniedMessage">Sites can only use the sound recorder if you allow DuckDuckGo to ask for access.</string>
 
     <!-- Onboarding Experiment-->
-    <string name="preOnboardingDaxDialog1Title">Hi there. Ready for a better, more private internet?</string>
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Hi there.<br/><br/>Ready for a better, more private internet?]]></string>
     <string name="preOnboardingDaxDialog1Button">Let\'s do it!</string>
-    <string name="preOnboardingDaxDialog2Title">A better internet starts with a more private browser.</string>
+    <string name="preOnboardingDaxDialog2Title">Privacy protections activated!</string>
     <string name="preOnboardingDaxDialog2Button">Choose Your Browser</string>
-    <string name="preOnboardingDaxDialog3Title">Awesome!</string>
-    <string name="preOnboardingDaxDialog3Content">Your privacy is our top priority. Welcome to the duck side.</string>
+    <string name="preOnboardingDaxDialog3Title">Awesome! Welcome to the duck side.</string>
     <string name="preOnboardingDaxDialog3Button">Start Browsing</string>
     <string name="onboardingSearchDaxDialogTitle">Try a search!</string>
     <string name="onboardingSearchDaxDialogDescription">Your DuckDuckGo searches are always anonymous.</string>
@@ -69,14 +68,16 @@
     <string name="onboardingSerpDaxDialogDescription">That’s DuckDuckGo Search. Private. Fast. Fewer ads.</string>
     <string name="onboardingSerpDaxDialogButton">High Five!</string>
     <plurals name="onboardingTrackersBlockedDialogDescription">
-        <item quantity="one" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 1 other..."><![CDATA[&#160;and <b>%1$d other</b> were trying to track you here. <br/><br/>I blocked them!<br/><br/>☝️ Tap the shield on any site to see who\'s trying to track you there.️]]></item>
-        <item quantity="other" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 3 others..."><![CDATA[&#160;and <b>%1$d others</b> were trying to track you here. <br/><br/>I blocked them!<br/><br/>☝️ Tap the shield on any site to see who\'s trying to track you there.️]]></item>
+        <item quantity="one" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 1 other..."><![CDATA[&#160;and <b>%1$d other</b> were trying to track you here. Not to worry, we blocked them!<br/><br/>☝️ Tap the shield on any site to see who\'s trying to track you there.️]]></item>
+        <item quantity="other" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 3 others..."><![CDATA[&#160;and <b>%1$d others</b> were trying to track you here. Not to worry, we blocked them!<br/><br/>☝️ Tap the shield on any site to see who\'s trying to track you there.️]]></item>
     </plurals>
     <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
-        <item quantity="one" instruction="This sentence is preceded by the name of a company, i.e. Facebook was trying to track..."><![CDATA[&#160;was trying to track you here. <br/><br/>I blocked them!<br/><br/>☝️ Tap the shield on any site to see who\'s trying to track you there.️]]></item>
-        <item quantity="other" instruction="This sentence is preceded by the name of several companies, i.e. Facebook and Google were trying to track..."><![CDATA[&#160;were trying to track you here. <br/><br/>I blocked them!<br/><br/>☝️ Tap the shield on any site to see who\'s trying to track you there.️]]></item>
+        <item quantity="one" instruction="This sentence is preceded by the name of a company, i.e. Facebook was trying to track..."><![CDATA[&#160;was trying to track you here. Not to worry, we blocked them!<br/><br/>☝️ Tap the shield on any site to see who\'s trying to track you there.️]]></item>
+        <item quantity="other" instruction="This sentence is preceded by the name of several companies, i.e. Facebook and Google were trying to track..."><![CDATA[&#160;were trying to track you here. Not to worry, we blocked them!<br/><br/>☝️ Tap the shield on any site to see who\'s trying to track you there.️]]></item>
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Got It!</string>
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[The <b>Fire Button</b> instantly clears your browsing activity.<br/><br/>Give it a try! ☝️️]]></string>
+    <string name="onboardingEndDaxDialogTitle">You\'ve got this!"></string>
+    <string name="onboardingEndDaxDialogDescription">Remember every time you browse with me a creepy ad loses its wings. 👌🏼</string>
 
 </resources>

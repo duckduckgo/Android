@@ -84,14 +84,6 @@
                     android:adjustViewBounds="true"
                     android:visibility="gone" />
 
-                <com.duckduckgo.common.ui.view.text.DaxTextView
-                    android:id="@+id/experimentDialogContentText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:alpha="0"
-                    android:visibility="gone"
-                    app:typography="body1" />
-
                 <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                     android:id="@+id/primaryCta"
                     android:layout_width="match_parent"
