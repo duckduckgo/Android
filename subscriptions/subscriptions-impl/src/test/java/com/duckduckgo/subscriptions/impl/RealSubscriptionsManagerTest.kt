@@ -38,6 +38,7 @@ import com.duckduckgo.subscriptions.impl.store.SubscriptionsDataStore
 import java.lang.Exception
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -876,7 +877,7 @@ class RealSubscriptionsManagerTest {
             whenever(productDetails.subscriptionOfferDetails).thenReturn(listOf(monthlyOffer, yearlyOffer))
         }
 
-        whenever(playBillingManager.products).thenReturn(listOf(productDetails))
+        whenever(playBillingManager.getProducts()).thenReturn(listOf(productDetails))
 
         val subscriptionOffer = subscriptionsManager.getSubscriptionOffer()!!
 
@@ -1103,15 +1104,15 @@ class RealSubscriptionsManagerTest {
         whenever(authService.validateToken(any())).thenThrow(HttpException(Response.error<String>(400, exception)))
     }
 
-    private fun givenPurchaseStored() {
+    private fun givenPurchaseStored() = runBlocking {
         val purchaseRecord = PurchaseHistoryRecord(
             """
         {"purchaseToken": "validToken", "productId": "test", "purchaseTime":1, "quantity":1}
         """,
             "signature",
         )
-        whenever(playBillingManager.products).thenReturn(emptyList())
-        whenever(playBillingManager.purchaseHistory).thenReturn(listOf(purchaseRecord))
+        whenever(playBillingManager.getProducts()).thenReturn(emptyList())
+        whenever(playBillingManager.getPurchaseHistory()).thenReturn(listOf(purchaseRecord))
     }
 
     private suspend fun givenStoreLoginSucceeds() {

@@ -396,7 +396,7 @@ class RealSubscriptionsManager @Inject constructor(
 
     override suspend fun recoverSubscriptionFromStore(externalId: String?): RecoverSubscriptionResult {
         return try {
-            val purchase = playBillingManager.purchaseHistory.lastOrNull()
+            val purchase = playBillingManager.getPurchaseHistory().lastOrNull()
             if (purchase != null) {
                 val signature = purchase.signature
                 val body = purchase.originalJson
@@ -431,7 +431,7 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     override suspend fun getSubscriptionOffer(): SubscriptionOffer? =
-        playBillingManager.products
+        playBillingManager.getProducts()
             .find { it.productId == BASIC_SUBSCRIPTION }
             ?.run {
                 val monthlyOffer = subscriptionOfferDetails?.find { it.basePlanId == MONTHLY_PLAN } ?: return@run null

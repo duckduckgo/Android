@@ -59,9 +59,11 @@ import kotlinx.coroutines.withContext
 import logcat.logcat
 
 interface PlayBillingManager {
-    val products: List<ProductDetails>
-    val purchaseHistory: List<PurchaseHistoryRecord>
     val purchaseState: Flow<PurchaseState>
+
+    suspend fun getProducts(): List<ProductDetails>
+
+    suspend fun getPurchaseHistory(): List<PurchaseHistoryRecord>
 
     /**
      * Launches the billing flow
@@ -94,10 +96,10 @@ class RealPlayBillingManager @Inject constructor(
     override val purchaseState = _purchaseState.asSharedFlow()
 
     // New Subscription ProductDetails
-    override var products = emptyList<ProductDetails>()
+    private var products = emptyList<ProductDetails>()
 
     // Purchase History
-    override var purchaseHistory = emptyList<PurchaseHistoryRecord>()
+    private var purchaseHistory = emptyList<PurchaseHistoryRecord>()
 
     override fun onCreate(owner: LifecycleOwner) {
         connectAsyncWithRetry()
@@ -158,6 +160,14 @@ class RealPlayBillingManager @Inject constructor(
                 }
             }
         }
+    }
+
+    override suspend fun getProducts(): List<ProductDetails> {
+        return products
+    }
+
+    override suspend fun getPurchaseHistory(): List<PurchaseHistoryRecord> {
+        return purchaseHistory
     }
 
     override suspend fun launchBillingFlow(

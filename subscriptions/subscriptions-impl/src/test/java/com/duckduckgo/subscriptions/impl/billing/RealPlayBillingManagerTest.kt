@@ -88,8 +88,8 @@ class RealPlayBillingManagerTest {
 
         processLifecycleOwner.currentState = RESUMED
 
-        assertEquals(1, subject.products.size)
-        assertEquals("test-sub", subject.products.single().productId)
+        assertEquals(1, subject.getProducts().size)
+        assertEquals("test-sub", subject.getProducts().single().productId)
     }
 
     @Test
@@ -99,7 +99,7 @@ class RealPlayBillingManagerTest {
         billingClientAdapter.launchBillingFlowResult = LaunchBillingFlowResult.Success
         billingClientAdapter.methodInvocations.clear()
 
-        val productDetails: ProductDetails = subject.products.single()
+        val productDetails: ProductDetails = subject.getProducts().single()
         val externalId = "external_id"
 
         subject.purchaseState.test {
@@ -168,7 +168,7 @@ class RealPlayBillingManagerTest {
         processLifecycleOwner.currentState = RESUMED
         billingClientAdapter.launchBillingFlowResult = LaunchBillingFlowResult.Success
 
-        val productDetails: ProductDetails = subject.products.single()
+        val productDetails: ProductDetails = subject.getProducts().single()
         val offerDetails = productDetails.subscriptionOfferDetails!!.first()
         val externalId = "external_id"
 
