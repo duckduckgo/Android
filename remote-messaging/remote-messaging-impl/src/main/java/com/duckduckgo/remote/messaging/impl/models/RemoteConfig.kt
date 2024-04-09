@@ -21,5 +21,5 @@ import com.duckduckgo.remote.messaging.api.RemoteMessage
 
 data class RemoteConfig(
     val messages: List<RemoteMessage>,
-    val rules: Map<Int, List<MatchingAttribute<*>>>,
+    val rules: Map<Int, List<MatchingAttribute>>,
 )
