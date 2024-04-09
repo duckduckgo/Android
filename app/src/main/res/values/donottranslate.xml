@@ -77,7 +77,7 @@
     </plurals>
     <string name="onboardingTrackersBlockedDaxDialogButton">Got It!</string>
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[The <b>Fire Button</b> instantly clears your browsing activity.<br/><br/>Give it a try! ☝️️]]></string>
-    <string name="onboardingEndDaxDialogTitle">You\'ve got this!"></string>
-    <string name="onboardingEndDaxDialogDescription">Remember every time you browse with me a creepy ad loses its wings. 👌🏼</string>
+    <string name="onboardingEndDaxDialogTitle">You\'ve got this!"</string>
+    <string name="onboardingEndDaxDialogDescription">Remember every time you browse with me a creepy ad loses its wings. 👌</string>
 
 </resources>

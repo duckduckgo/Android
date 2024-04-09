@@ -54,7 +54,7 @@ sealed class ExperimentDaxBubbleOptionsCta(
     override val ctaId: CtaId,
     @StringRes open val title: Int,
     @StringRes open val description: Int,
-    open val options: List<DaxDialogIntroOption>,
+    open val options: List<DaxDialogIntroOption>?,
     override val shownPixel: Pixel.PixelName?,
     override val okPixel: Pixel.PixelName?,
     override val cancelPixel: Pixel.PixelName?,
@@ -69,29 +69,39 @@ sealed class ExperimentDaxBubbleOptionsCta(
         ctaView = view
         val daxTitle = view.context.getString(title)
         val daxText = view.context.getString(description)
+
+        if (options.isNullOrEmpty()) {
+            view.findViewById<DaxButton>(R.id.daxDialogOption1).gone()
+            view.findViewById<DaxButton>(R.id.daxDialogOption2).gone()
+            view.findViewById<DaxButton>(R.id.daxDialogOption3).gone()
+            view.findViewById<DaxButton>(R.id.daxDialogOption4).gone()
+        } else {
+            options?.let {
+                val optionsViews = listOf<DaxButton>(
+                    view.findViewById(R.id.daxDialogOption1),
+                    view.findViewById(R.id.daxDialogOption2),
+                    view.findViewById(R.id.daxDialogOption3),
+                    view.findViewById(R.id.daxDialogOption4),
+                )
+                optionsViews.forEachIndexed { index, buttonView ->
+                    it[index].setOptionView(buttonView)
+                    ViewCompat.animate(buttonView).alpha(1f).setDuration(400L).startDelay = 800L
+                }
+            }
+        }
         view.show()
         view.alpha = 1f
         view.findViewById<DaxTextView>(R.id.hiddenTextCta).text = daxText.html(view.context)
         view.findViewById<DaxTextView>(R.id.experimentDialogTitle).text = daxTitle.html(view.context)
         view.findViewById<TypeAnimationTextView>(R.id.dialogTextCta).startTypingAnimation(daxText, true)
-        val optionsViews = listOf<DaxButton>(
-            view.findViewById(R.id.daxDialogOption1),
-            view.findViewById(R.id.daxDialogOption2),
-            view.findViewById(R.id.daxDialogOption3),
-            view.findViewById(R.id.daxDialogOption4),
-        )
-        optionsViews.forEachIndexed { index, buttonView ->
-            options[index].setOptionView(buttonView)
-            ViewCompat.animate(buttonView).alpha(1f).setDuration(400L).startDelay = 800L
-        }
     }
 
     fun setOnOptionClicked(onOptionClicked: (DaxDialogIntroOption) -> Unit) {
-        ctaView?.let { view ->
-            view.findViewById<DaxButton>(R.id.daxDialogOption1).setOnClickListener { onOptionClicked.invoke(options[0]) }
-            view.findViewById<DaxButton>(R.id.daxDialogOption2).setOnClickListener { onOptionClicked.invoke(options[1]) }
-            view.findViewById<DaxButton>(R.id.daxDialogOption3).setOnClickListener { onOptionClicked.invoke(options[2]) }
-            view.findViewById<DaxButton>(R.id.daxDialogOption4).setOnClickListener { onOptionClicked.invoke(options[3]) }
+        options?.let { options ->
+            ctaView?.findViewById<DaxButton>(R.id.daxDialogOption1)?.setOnClickListener { onOptionClicked.invoke(options[0]) }
+            ctaView?.findViewById<DaxButton>(R.id.daxDialogOption2)?.setOnClickListener { onOptionClicked.invoke(options[1]) }
+            ctaView?.findViewById<DaxButton>(R.id.daxDialogOption3)?.setOnClickListener { onOptionClicked.invoke(options[2]) }
+            ctaView?.findViewById<DaxButton>(R.id.daxDialogOption4)?.setOnClickListener { onOptionClicked.invoke(options[3]) }
         }
     }
 
@@ -129,6 +139,22 @@ sealed class ExperimentDaxBubbleOptionsCta(
         AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
         Pixel.PixelValues.DAX_INITIAL_VISIT_SITE_CTA,
+        onboardingStore,
+        appInstallStore,
+    )
+
+    data class ExperimentDaxEndCta(
+        override val onboardingStore: OnboardingStore,
+        override val appInstallStore: AppInstallStore,
+    ) : ExperimentDaxBubbleOptionsCta(
+        CtaId.DAX_END,
+        R.string.onboardingEndDaxDialogTitle,
+        R.string.onboardingEndDaxDialogDescription,
+        null,
+        AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
+        AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
+        null,
+        Pixel.PixelValues.DAX_END_CTA,
         onboardingStore,
         appInstallStore,
     )
@@ -531,7 +557,10 @@ sealed class ExperimentOnboardingDaxDialogCta(
             }
         }
 
-        fun setOnOptionClicked(daxDialog: IncludeExperimentViewDaxDialogBinding, onOptionClicked: (DaxDialogIntroOption) -> Unit) {
+        fun setOnOptionClicked(
+            daxDialog: IncludeExperimentViewDaxDialogBinding,
+            onOptionClicked: (DaxDialogIntroOption) -> Unit,
+        ) {
             val options = DaxDialogIntroOption.getSitesOptions()
             daxDialog.daxDialogOption1.setOnClickListener { onOptionClicked.invoke(options[0]) }
             daxDialog.daxDialogOption2.setOnClickListener { onOptionClicked.invoke(options[1]) }

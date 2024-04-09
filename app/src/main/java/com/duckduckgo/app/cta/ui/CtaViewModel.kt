@@ -230,7 +230,11 @@ class CtaViewModel @Inject constructor(
             }
 
             canShowDaxCtaEndOfJourney() -> {
-                DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
+                if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) {
+                    ExperimentDaxBubbleOptionsCta.ExperimentDaxEndCta(onboardingStore, appInstallStore)
+                } else {
+                    DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
+                }
             }
 
             canShowWidgetCta() -> {
