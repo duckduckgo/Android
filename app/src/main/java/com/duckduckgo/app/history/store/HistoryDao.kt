@@ -21,13 +21,12 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import io.reactivex.Single
 
 @Dao
 interface HistoryDao {
     @Transaction
     @Query("SELECT * FROM history_entries")
-    fun getHistoryEntriesWithVisits(): Single<List<HistoryEntryWithVisits>>
+    fun getHistoryEntriesWithVisits(): List<HistoryEntryWithVisits>
 
     @Transaction
     fun updateOrInsertVisit(url: String, title: String, query: String?, isSerp: Boolean, date: Long) {

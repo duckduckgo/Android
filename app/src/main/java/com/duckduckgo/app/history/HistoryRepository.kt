@@ -22,6 +22,7 @@ import io.reactivex.Single
 
 interface HistoryRepository {
     fun getHistoryObservable(): Single<List<HistoryEntry>>
+
     fun saveToHistory(
         url: String,
         title: String?,
@@ -38,11 +39,7 @@ class RealHistoryRepository(
     private var cachedHistoryEntries: List<HistoryEntry>? = null
 
     override fun getHistoryObservable(): Single<List<HistoryEntry>> {
-        return if (cachedHistoryEntries != null) {
-            Single.just(cachedHistoryEntries)
-        } else {
-            fetchAndCacheHistoryEntries()
-        }
+        return Single.just(cachedHistoryEntries ?: fetchAndCacheHistoryEntries())
     }
 
     override fun saveToHistory(
@@ -51,15 +48,20 @@ class RealHistoryRepository(
         query: String?,
         isSerp: Boolean,
     ) {
-        historyDao.updateOrInsertVisit(url, title ?: "", query, isSerp, currentTimeProvider.currentTimeMillis())
+        historyDao.updateOrInsertVisit(
+            url,
+            title ?: "",
+            query,
+            isSerp,
+            currentTimeProvider.currentTimeMillis(),
+        )
         fetchAndCacheHistoryEntries()
     }
-    private fun fetchAndCacheHistoryEntries(): Single<List<HistoryEntry>> {
-        return historyDao.getHistoryEntriesWithVisits()
-            .map { entries ->
-                entries.mapNotNull { it.toHistoryEntry() }.also {
-                    cachedHistoryEntries = it
-                }
-            }
+
+    private fun fetchAndCacheHistoryEntries(): List<HistoryEntry> {
+        return historyDao
+            .getHistoryEntriesWithVisits()
+            .mapNotNull { it.toHistoryEntry() }
+            .also { cachedHistoryEntries = it }
     }
 }
