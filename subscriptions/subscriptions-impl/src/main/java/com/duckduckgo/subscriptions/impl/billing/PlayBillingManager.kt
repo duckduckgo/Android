@@ -17,12 +17,9 @@
 package com.duckduckgo.subscriptions.impl.billing
 
 import android.app.Activity
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.lifecycleScope
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.PurchaseHistoryRecord
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTION
@@ -41,7 +38,6 @@ import com.duckduckgo.subscriptions.impl.billing.PurchasesUpdateResult.PurchaseP
 import com.duckduckgo.subscriptions.impl.billing.PurchasesUpdateResult.UserCancelled
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import java.util.EnumSet
 import javax.inject.Inject
@@ -79,43 +75,19 @@ interface PlayBillingManager {
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class, boundType = PlayBillingManager::class)
-@ContributesMultibinding(scope = AppScope::class, boundType = MainProcessLifecycleObserver::class)
 class RealPlayBillingManager @Inject constructor(
     @AppCoroutineScope val coroutineScope: CoroutineScope,
     private val pixelSender: SubscriptionPixelSender,
     private val billingClient: BillingClientAdapter,
     private val dispatcherProvider: DispatcherProvider,
-) : PlayBillingManager, MainProcessLifecycleObserver {
+) : PlayBillingManager {
 
     private val connectionMutex = Mutex()
     private var connectionJob: Job? = null
-    private var billingFlowInProgress = false
 
     // PurchaseState
     private val _purchaseState = MutableSharedFlow<PurchaseState>()
     override val purchaseState = _purchaseState.asSharedFlow()
-
-    // New Subscription ProductDetails
-    private var products = emptyList<ProductDetails>()
-
-    // Purchase History
-    private var purchaseHistory = emptyList<PurchaseHistoryRecord>()
-
-    override fun onCreate(owner: LifecycleOwner) {
-        connectAsyncWithRetry()
-    }
-
-    override fun onResume(owner: LifecycleOwner) {
-        // Will call on resume coming back from a purchase flow
-        if (!billingFlowInProgress) {
-            if (billingClient.ready) {
-                owner.lifecycleScope.launch(dispatcherProvider.io()) {
-                    loadProducts()
-                    loadPurchaseHistory()
-                }
-            }
-        }
-    }
 
     private fun connectAsyncWithRetry() {
         if (connectionJob?.isActive == true) return
@@ -142,11 +114,7 @@ class RealPlayBillingManager @Inject constructor(
             )
 
             when (result) {
-                Success -> {
-                    loadProducts()
-                    loadPurchaseHistory()
-                    true // success, don't retry
-                }
+                Success -> true // success, don't retry
 
                 is Failure -> {
                     logcat { "Service error" }
@@ -163,11 +131,36 @@ class RealPlayBillingManager @Inject constructor(
     }
 
     override suspend fun getProducts(): List<ProductDetails> {
-        return products
+        if (!billingClient.ready) {
+            logcat { "Service not ready" }
+            connect()
+        }
+
+        return when (val result = billingClient.getSubscriptions(LIST_OF_PRODUCTS)) {
+            is SubscriptionsResult.Success -> {
+                if (result.products.isEmpty()) {
+                    logcat { "No products found" }
+                }
+                result.products
+            }
+
+            is SubscriptionsResult.Failure -> {
+                logcat { "onProductDetailsResponse: ${result.billingError} ${result.debugMessage}" }
+                emptyList()
+            }
+        }
     }
 
     override suspend fun getPurchaseHistory(): List<PurchaseHistoryRecord> {
-        return purchaseHistory
+        if (!billingClient.ready) {
+            logcat { "Service not ready" }
+            connect()
+        }
+
+        return when (val result = billingClient.getSubscriptionsPurchaseHistory()) {
+            is SubscriptionsPurchaseHistoryResult.Success -> result.history
+            SubscriptionsPurchaseHistoryResult.Failure -> emptyList()
+        }
     }
 
     override suspend fun launchBillingFlow(
@@ -180,7 +173,7 @@ class RealPlayBillingManager @Inject constructor(
             connect()
         }
 
-        val productDetails = products.find { it.productId == BASIC_SUBSCRIPTION }
+        val productDetails = getProducts().find { it.productId == BASIC_SUBSCRIPTION }
 
         val offerToken = productDetails
             ?.subscriptionOfferDetails
@@ -202,7 +195,6 @@ class RealPlayBillingManager @Inject constructor(
         when (launchBillingFlowResult) {
             LaunchBillingFlowResult.Success -> {
                 _purchaseState.emit(InProgress)
-                billingFlowInProgress = true
             }
 
             LaunchBillingFlowResult.Failure -> {
@@ -235,38 +227,11 @@ class RealPlayBillingManager @Inject constructor(
                 }
             }
         }
-
-        billingFlowInProgress = false
     }
 
     private fun onBillingClientDisconnected() {
         logcat { "Service disconnected" }
         connectAsyncWithRetry()
-    }
-
-    private suspend fun loadProducts() {
-        when (val result = billingClient.getSubscriptions(LIST_OF_PRODUCTS)) {
-            is SubscriptionsResult.Success -> {
-                if (result.products.isEmpty()) {
-                    logcat { "No products found" }
-                }
-                this.products = result.products
-            }
-
-            is SubscriptionsResult.Failure -> {
-                logcat { "onProductDetailsResponse: ${result.billingError} ${result.debugMessage}" }
-            }
-        }
-    }
-
-    private suspend fun loadPurchaseHistory() {
-        when (val result = billingClient.getSubscriptionsPurchaseHistory()) {
-            is SubscriptionsPurchaseHistoryResult.Success -> {
-                purchaseHistory = result.history
-            }
-            SubscriptionsPurchaseHistoryResult.Failure -> {
-            }
-        }
     }
 }
 
