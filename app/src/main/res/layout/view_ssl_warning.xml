@@ -39,7 +39,7 @@
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/sslErrorTitle"
-            android:layout_width="0dp"
+            android:layout_width="@dimen/sslWarningTextWidth"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_5"
             android:breakStrategy="balanced"
@@ -52,7 +52,7 @@
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/sslErrorHeadline"
-            android:layout_width="0dp"
+            android:layout_width="@dimen/sslWarningTextWidth"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_4"
             android:gravity="center"
@@ -66,7 +66,7 @@
 
         <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
             android:id="@+id/sslErrorLeaveSiteCTA"
-            android:layout_width="0dp"
+            android:layout_width="360dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_6"
             android:layout_marginHorizontal="@dimen/keyline_5"
@@ -78,7 +78,7 @@
 
         <com.duckduckgo.common.ui.view.button.DaxButtonGhost
             android:id="@+id/sslErrorAdvancedCTA"
-            android:layout_width="0dp"
+            android:layout_width="360dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/keyline_5"
             android:text="@string/sslErrorAdvancedCTA"
@@ -106,7 +106,7 @@
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/sslErrorExpandedHeadline"
-            android:layout_width="0dp"
+            android:layout_width="@dimen/sslWarningTextWidth"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_5"
             android:layout_marginHorizontal="@dimen/keyline_5"
@@ -120,7 +120,7 @@
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/sslErrorExpandedMessage"
-            android:layout_width="0dp"
+            android:layout_width="@dimen/sslWarningTextWidth"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_4"
             android:layout_marginHorizontal="@dimen/keyline_5"
@@ -134,7 +134,7 @@
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/sslErrorAcceptCta"
-            android:layout_width="0dp"
+            android:layout_width="@dimen/sslWarningTextWidth"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_4"
             android:layout_marginHorizontal="@dimen/keyline_5"
