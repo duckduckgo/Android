@@ -61,7 +61,7 @@ class RealBillingClientAdapter @Inject constructor(
     override suspend fun connect(
         purchasesListener: (PurchasesUpdateResult) -> Unit,
         disconnectionListener: () -> Unit,
-    ): BillingInitResult {
+    ): BillingInitResult = withContext(coroutineDispatchers.io()) {
         reset()
 
         billingClient = BillingClient.newBuilder(context)
@@ -72,7 +72,7 @@ class RealBillingClientAdapter @Inject constructor(
             }
             .build()
 
-        return suspendCoroutine { continuation ->
+        suspendCoroutine { continuation ->
             billingClient?.startConnection(
                 object : BillingClientStateListener {
                     override fun onBillingServiceDisconnected() {
@@ -111,7 +111,9 @@ class RealBillingClientAdapter @Inject constructor(
             )
             .build()
 
-        val (billingResult, productDetails) = client.queryProductDetails(queryParams)
+        val (billingResult, productDetails) = withContext(coroutineDispatchers.io()) {
+            client.queryProductDetails(queryParams)
+        }
 
         return when (billingResult.responseCode) {
             BillingResponseCode.OK -> SubscriptionsResult.Success(productDetails.orEmpty())
@@ -127,7 +129,9 @@ class RealBillingClientAdapter @Inject constructor(
             .setProductType(ProductType.SUBS)
             .build()
 
-        val (billingResult, purchaseHistory) = client.queryPurchaseHistory(queryParams)
+        val (billingResult, purchaseHistory) = withContext(coroutineDispatchers.io()) {
+            client.queryPurchaseHistory(queryParams)
+        }
 
         return when (billingResult.responseCode) {
             BillingResponseCode.OK -> SubscriptionsPurchaseHistoryResult.Success(history = purchaseHistory.orEmpty())
