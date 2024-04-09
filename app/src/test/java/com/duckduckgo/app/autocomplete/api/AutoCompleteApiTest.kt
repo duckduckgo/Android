@@ -23,6 +23,7 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
@@ -47,12 +48,16 @@ class AutoCompleteApiTest {
     @Mock
     private lateinit var mockSavedSitesRepository: SavedSitesRepository
 
+    @Mock
+    private lateinit var mockNavigationHistory: NavigationHistory
+
     private lateinit var testee: AutoCompleteApi
 
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
-        testee = AutoCompleteApi(mockAutoCompleteService, mockSavedSitesRepository)
+        whenever(mockNavigationHistory.getHistorySingle()).thenReturn(Single.just(listOf()))
+        testee = AutoCompleteApi(mockAutoCompleteService, mockSavedSitesRepository, mockNavigationHistory)
     }
 
     @Test

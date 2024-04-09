@@ -24,10 +24,16 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.A
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistorySearchSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistorySuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.RankedItem.RankedBookmark
+import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.RankedItem.RankedHistoryEntry
 import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.toStringDropScheme
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.history.api.HistoryEntry
+import com.duckduckgo.history.api.HistoryEntry.VisitedPage
+import com.duckduckgo.history.api.HistoryEntry.VisitedSERP
+import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
@@ -67,6 +73,7 @@ interface AutoComplete {
             override val phrase: String,
             val title: String,
             val url: String,
+            val isAllowedInTopHits: Boolean,
         ) : AutoCompleteSuggestion(phrase)
 
         data class AutoCompleteHistorySearchSuggestion(
@@ -79,6 +86,7 @@ interface AutoComplete {
 class AutoCompleteApi @Inject constructor(
     private val autoCompleteService: AutoCompleteService,
     private val repository: SavedSitesRepository,
+    private val navigationHistory: NavigationHistory,
 ) : AutoComplete {
 
     override fun autoComplete(query: String): Observable<AutoCompleteResult> {
@@ -102,6 +110,30 @@ class AutoCompleteApi @Inject constructor(
                             isFavorite = savedSite is Favorite,
                         )
                     }
+                }.zipWith(
+                    getHistoryResults(query).map {
+                        it.sortedByDescending { it.score }.mapNotNull {
+                            it.historyEntry.let { entry ->
+                                when (entry) {
+                                    is VisitedPage -> {
+                                        AutoCompleteHistorySuggestion(
+                                            phrase = entry.url.toStringDropScheme(),
+                                            title = entry.title,
+                                            url = entry.url.toString(),
+                                            isAllowedInTopHits = isAllowedInTopHits(entry),
+                                        )
+                                    }
+                                    is VisitedSERP -> {
+                                        AutoCompleteHistorySearchSuggestion(
+                                            phrase = entry.query,
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    },
+                ) { bookmarksAndFavorites, historyItems ->
+                    (bookmarksAndFavorites + historyItems)
                 }
 
         return savedSitesObservable.zipWith(
@@ -111,7 +143,7 @@ class AutoCompleteApi @Inject constructor(
             val topHits = bookmarksResults.filter {
                 when (it) {
                     is AutoCompleteHistorySearchSuggestion -> true
-                    is AutoCompleteHistorySuggestion -> false // TODO (cbarreiro) add logic
+                    is AutoCompleteHistorySuggestion -> it.isAllowedInTopHits
                     is AutoCompleteBookmarkSuggestion -> it.isAllowedInTopHits
                     else -> false
                 }
@@ -132,6 +164,10 @@ class AutoCompleteApi @Inject constructor(
                 suggestions = (topHits + filteredSearchResults + filteredBookmarks).distinctBy { it.phrase },
             )
         }
+    }
+
+    private fun isAllowedInTopHits(entry: HistoryEntry): Boolean {
+        return entry.visits.size > 3 || entry.url.isRoot()
     }
 
     private fun getAutoCompleteSearchResults(query: String) =
@@ -162,6 +198,15 @@ class AutoCompleteApi @Inject constructor(
             .onErrorReturn { emptyList() }
             .toObservable()
 
+    private fun getHistoryResults(query: String) =
+        navigationHistory.getHistorySingle()
+            .map { rankHistory(query, it) }
+            .flattenAsObservable { it }
+            .distinctUntilChanged()
+            .toList()
+            .onErrorReturn { emptyList() }
+            .toObservable()
+
     private fun rankBookmarks(
         query: String,
         bookmarks: List<Bookmark>,
@@ -175,6 +220,13 @@ class AutoCompleteApi @Inject constructor(
         favorites: List<Favorite>,
     ): List<RankedBookmark> {
         return favorites.asSequence().sortByRank(query)
+    }
+
+    private fun rankHistory(
+        query: String,
+        history: List<HistoryEntry>,
+    ): List<RankedHistoryEntry> {
+        return history.asSequence().sortHistoryByRank(query)
     }
 
     @VisibleForTesting
@@ -285,6 +337,14 @@ class AutoCompleteApi @Inject constructor(
             .toList()
     }
 
+    private fun Sequence<HistoryEntry>.sortHistoryByRank(query: String): List<RankedHistoryEntry> {
+        return this
+            .map { RankedHistoryEntry(it, score(it.title, it.url, it.visits.size, query)) }
+            .filter { it.score > 0 }
+            .sortedByDescending { it.score }
+            .toList()
+    }
+
     private fun scoreTitle(
         rankedBookmark: RankedBookmark,
         query: String,
@@ -333,12 +393,20 @@ class AutoCompleteApi @Inject constructor(
         return this.toUri().toStringDropScheme().removePrefix("www.")
     }
 
-    private data class RankedBookmark(
-        val savedSite: SavedSite,
-        var score: Int = BOOKMARK_SCORE,
-    )
+    private sealed class RankedItem(open var score: Int) {
+        data class RankedBookmark(
+            val savedSite: SavedSite,
+            override var score: Int = BOOKMARK_SCORE,
+        ) : RankedItem(score)
+
+        data class RankedHistoryEntry(
+            val historyEntry: HistoryEntry,
+            override var score: Int = HISTORY_ENTRY_SCORE,
+        ) : RankedItem(score)
+    }
 
     companion object {
         private const val BOOKMARK_SCORE = -1
+        private const val HISTORY_ENTRY_SCORE = -1
     }
 }

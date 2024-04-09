@@ -162,6 +162,7 @@ import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.privacy.config.api.*
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
@@ -260,6 +261,9 @@ class BrowserTabViewModelTest {
 
     @Mock
     private lateinit var mockSavedSitesRepository: SavedSitesRepository
+
+    @Mock
+    private lateinit var mockNavigationHistory: NavigationHistory
 
     @Mock
     private lateinit var mockLongPressHandler: LongPressHandler
@@ -465,7 +469,7 @@ class BrowserTabViewModelTest {
         fireproofWebsiteDao = db.fireproofWebsiteDao()
         locationPermissionsDao = db.locationPermissionsDao()
 
-        mockAutoCompleteApi = AutoCompleteApi(mockAutoCompleteService, mockSavedSitesRepository)
+        mockAutoCompleteApi = AutoCompleteApi(mockAutoCompleteService, mockSavedSitesRepository, mockNavigationHistory)
         val fireproofWebsiteRepositoryImpl = FireproofWebsiteRepositoryImpl(
             fireproofWebsiteDao,
             coroutineRule.testDispatcherProvider,
