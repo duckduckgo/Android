@@ -220,6 +220,12 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
                         binding.credentialToggleGroup.gone()
                         binding.logins.updateTopMargin(resources.getDimensionPixelSize(CommonR.dimen.keyline_4))
                     }
+
+                    if (state.webViewCompatible) {
+                        binding.webViewUnsupportedWarningPanel.gone()
+                    } else {
+                        binding.webViewUnsupportedWarningPanel.show()
+                    }
                 }
             }
         }
