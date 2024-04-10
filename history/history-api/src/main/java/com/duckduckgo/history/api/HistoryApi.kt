@@ -14,22 +14,23 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.history.store
+package com.duckduckgo.history.api
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
-import androidx.room.migration.Migration
+import io.reactivex.Single
 
-@Database(
-    exportSchema = true,
-    version = 1,
-    entities = [
-        HistoryEntryEntity::class,
-        VisitEntity::class,
-    ],
-)
-abstract class HistoryDatabase : RoomDatabase() {
-    abstract fun historyDao(): HistoryDao
+interface HistoryApi {
+
+    /**
+     * Stores a history entry.
+     * @param url The URL of the history entry.
+     * @param title The title of the history entry. Can be null.
+     */
+
+    fun saveToHistory(url: String, title: String?)
+
+    /**
+     * Retrieves history entries.
+     * @return [Single] of all sites stored in history.
+     */
+    fun getHistorySingle(): Single<List<HistoryEntry>>
 }
-
-val ALL_MIGRATIONS = emptyArray<Migration>()

@@ -14,34 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.history
+package com.duckduckgo.history.impl
 
-import android.net.Uri
 import androidx.core.net.toUri
-import com.duckduckgo.app.history.HistoryEntry.VisitedPage
-import com.duckduckgo.app.history.HistoryEntry.VisitedSERP
-import com.duckduckgo.app.history.store.HistoryEntryWithVisits
-import java.util.Date
-
-sealed class HistoryEntry(
-    open val url: Uri,
-    open val title: String,
-    open val visits: List<Date>,
-) {
-
-    data class VisitedPage(
-        override val url: Uri,
-        override val title: String,
-        override val visits: List<Date>,
-    ) : HistoryEntry(url = url, title = title, visits = visits)
-
-    data class VisitedSERP(
-        override val url: Uri,
-        override val title: String,
-        val query: String,
-        override val visits: List<Date>,
-    ) : HistoryEntry(url = url, title, visits = visits)
-}
+import com.duckduckgo.history.api.HistoryEntry
+import com.duckduckgo.history.api.HistoryEntry.VisitedPage
+import com.duckduckgo.history.api.HistoryEntry.VisitedSERP
+import com.duckduckgo.history.impl.store.HistoryEntryWithVisits
+import java.time.LocalDateTime
 
 fun HistoryEntryWithVisits.toHistoryEntry(): HistoryEntry? {
     if (historyEntry.url.isBlank()) return null

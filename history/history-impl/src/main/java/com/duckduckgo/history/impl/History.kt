@@ -14,27 +14,25 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.history
+package com.duckduckgo.history.impl
 
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.history.api.HistoryApi
+import com.duckduckgo.history.api.HistoryEntry
 import com.squareup.anvil.annotations.ContributesBinding
+import io.reactivex.Single
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-interface SaveToHistory {
-
-    fun saveToHistory(url: String, title: String?)
-}
-
 @ContributesBinding(AppScope::class)
-class RealSaveToHistory @Inject constructor(
+class History @Inject constructor(
     private val historyRepository: HistoryRepository,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-) : SaveToHistory {
+) : HistoryApi {
     override fun saveToHistory(
         url: String,
         title: String?,
@@ -45,5 +43,9 @@ class RealSaveToHistory @Inject constructor(
 
             historyRepository.saveToHistory(url, title, query, query != null)
         }
+    }
+
+    override fun getHistorySingle(): Single<List<HistoryEntry>> {
+        return historyRepository.getHistoryObservable()
     }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.history.store
+package com.duckduckgo.history.impl.store
 
 import androidx.room.Embedded
 import androidx.room.Entity

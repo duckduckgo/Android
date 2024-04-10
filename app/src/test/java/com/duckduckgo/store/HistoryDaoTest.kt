@@ -19,9 +19,9 @@ package com.duckduckgo.store
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.history.store.HistoryDao
-import com.duckduckgo.app.history.store.HistoryDatabase
-import com.duckduckgo.app.history.store.HistoryEntryEntity
+import com.duckduckgo.history.impl.store.HistoryDao
+import com.duckduckgo.history.impl.store.HistoryDatabase
+import com.duckduckgo.history.impl.store.HistoryEntryEntity
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before

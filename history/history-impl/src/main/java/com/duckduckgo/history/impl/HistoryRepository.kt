@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.history
+package com.duckduckgo.history.impl
 
-import com.duckduckgo.app.history.store.HistoryDao
 import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.history.api.HistoryEntry
+import com.duckduckgo.history.impl.store.HistoryDao
 import io.reactivex.Single
 
 interface HistoryRepository {
@@ -57,11 +58,9 @@ class RealHistoryRepository(
         )
         fetchAndCacheHistoryEntries()
     }
-
     private fun fetchAndCacheHistoryEntries(): List<HistoryEntry> {
-        return historyDao
-            .getHistoryEntriesWithVisits()
-            .mapNotNull { it.toHistoryEntry() }
-            .also { cachedHistoryEntries = it }
+        return historyDao.getHistoryEntriesWithVisits().mapNotNull { it.toHistoryEntry() }.also {
+            cachedHistoryEntries = it
+        }
     }
 }

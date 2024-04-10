@@ -1,11 +1,11 @@
 package com.duckduckgo.app.browser.pageloadpixel
 
-import com.duckduckgo.app.history.SaveToHistory
 import com.duckduckgo.app.pixels.remoteconfig.OptimizeTrackerEvaluationRCWrapper
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.device.DeviceInfo
+import com.duckduckgo.history.api.HistoryApi
 import kotlinx.coroutines.test.TestScope
 import org.junit.Assert
 import org.junit.Before
@@ -29,7 +29,7 @@ class PageLoadedHandlerTest {
     private val webViewVersionProvider: WebViewVersionProvider = mock()
     private val pageLoadedPixelDao: PageLoadedPixelDao = mock()
     private val autoconsent: Autoconsent = mock()
-    private val saveToHistory: SaveToHistory = mock()
+    private val historyApi: HistoryApi = mock()
 
     private val testee = RealPageLoadedHandler(
         deviceInfo,
@@ -42,7 +42,7 @@ class PageLoadedHandlerTest {
             override val enabled: Boolean
                 get() = true
         },
-        saveToHistory,
+        historyApi,
     )
 
     @Before
