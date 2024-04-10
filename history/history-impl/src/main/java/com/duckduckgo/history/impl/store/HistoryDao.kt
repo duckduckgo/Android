@@ -21,6 +21,8 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
+import java.time.LocalDateTime
 
 @Dao
 interface HistoryDao {
@@ -29,17 +31,17 @@ interface HistoryDao {
     fun getHistoryEntriesWithVisits(): List<HistoryEntryWithVisits>
 
     @Transaction
-    fun updateOrInsertVisit(url: String, title: String, query: String?, isSerp: Boolean, date: Long) {
+    fun updateOrInsertVisit(url: String, title: String, query: String?, isSerp: Boolean, date: LocalDateTime) {
         val existingHistoryEntry = getHistoryEntryByUrl(url)
 
         if (existingHistoryEntry != null) {
-            val newVisit = VisitEntity(date = date, historyEntryId = existingHistoryEntry.id)
+            val newVisit = VisitEntity(timestamp = DatabaseDateFormatter.timestamp(date), historyEntryId = existingHistoryEntry.id)
             insertVisit(newVisit)
         } else {
             val newHistoryEntry = HistoryEntryEntity(url = url, title = title, query = query, isSerp = isSerp)
             val historyEntryId = insertHistoryEntry(newHistoryEntry)
 
-            val newVisit = VisitEntity(date = date, historyEntryId = historyEntryId)
+            val newVisit = VisitEntity(timestamp = DatabaseDateFormatter.timestamp(date), historyEntryId = historyEntryId)
             insertVisit(newVisit)
         }
     }

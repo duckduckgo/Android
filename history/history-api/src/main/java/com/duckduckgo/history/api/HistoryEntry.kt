@@ -17,7 +17,7 @@
 package com.duckduckgo.history.api
 
 import android.net.Uri
-import java.util.Date
+import java.time.LocalDateTime
 
 /**
  * A sealed class representing a history entry.
@@ -28,7 +28,7 @@ import java.util.Date
 sealed class HistoryEntry {
     abstract val url: Uri
     abstract val title: String
-    abstract val visits: List<Date>
+    abstract val visits: List<LocalDateTime>
 
     /**
      * Data class representing a visited page history entry.
@@ -39,7 +39,7 @@ sealed class HistoryEntry {
     data class VisitedPage(
         override val url: Uri,
         override val title: String,
-        override val visits: List<Date>,
+        override val visits: List<LocalDateTime>,
     ) : HistoryEntry()
 
     /**
@@ -47,13 +47,12 @@ sealed class HistoryEntry {
      * @property url The URL of the SERP.
      * @property title The title of the SERP.
      * @property query The search query used for the SERP.
-     * @property queryTokens The list of query tokens extracted from the search query. Can be null.
      * @property visits List of [LocalDateTime] objects representing the visit times.
      */
     data class VisitedSERP(
         override val url: Uri,
         override val title: String,
         val query: String,
-        override val visits: List<Date>,
+        override val visits: List<LocalDateTime>,
     ) : HistoryEntry()
 }

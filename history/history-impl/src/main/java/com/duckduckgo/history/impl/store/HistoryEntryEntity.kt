@@ -39,10 +39,10 @@ data class HistoryEntryEntity(
     }
 }
 
-@Entity(tableName = "visits_list", primaryKeys = ["date", "historyEntryId"])
+@Entity(tableName = "visits_list", primaryKeys = ["timestamp", "historyEntryId"])
 data class VisitEntity(
     val historyEntryId: Long,
-    val date: Long,
+    val timestamp: String,
 )
 
 data class HistoryEntryWithVisits(

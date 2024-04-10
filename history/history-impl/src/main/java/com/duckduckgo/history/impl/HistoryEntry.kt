@@ -26,8 +26,8 @@ import java.time.LocalDateTime
 fun HistoryEntryWithVisits.toHistoryEntry(): HistoryEntry? {
     if (historyEntry.url.isBlank()) return null
     return if (historyEntry.isSerp && !historyEntry.query.isNullOrBlank()) {
-        VisitedSERP(historyEntry.url.toUri(), historyEntry.title, historyEntry.query, visits = visits.map { Date(it.date) })
+        VisitedSERP(historyEntry.url.toUri(), historyEntry.title, historyEntry.query, visits = visits.map { LocalDateTime.parse(it.timestamp) })
     } else {
-        VisitedPage(historyEntry.url.toUri(), historyEntry.title, visits.map { Date(it.date) })
+        VisitedPage(historyEntry.url.toUri(), historyEntry.title, visits.map { LocalDateTime.parse(it.timestamp) })
     }
 }

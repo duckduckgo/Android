@@ -16,10 +16,10 @@
 
 package com.duckduckgo.history.impl
 
-import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.history.api.HistoryEntry
 import com.duckduckgo.history.impl.store.HistoryDao
 import io.reactivex.Single
+import java.time.LocalDateTime
 
 interface HistoryRepository {
     fun getHistoryObservable(): Single<List<HistoryEntry>>
@@ -34,7 +34,6 @@ interface HistoryRepository {
 
 class RealHistoryRepository(
     private val historyDao: HistoryDao,
-    private val currentTimeProvider: CurrentTimeProvider,
 ) : HistoryRepository {
 
     private var cachedHistoryEntries: List<HistoryEntry>? = null
@@ -54,7 +53,7 @@ class RealHistoryRepository(
             title ?: "",
             query,
             isSerp,
-            currentTimeProvider.currentTimeMillis(),
+            LocalDateTime.now(),
         )
         fetchAndCacheHistoryEntries()
     }

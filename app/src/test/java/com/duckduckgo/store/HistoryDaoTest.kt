@@ -22,6 +22,8 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.history.impl.store.HistoryDao
 import com.duckduckgo.history.impl.store.HistoryDatabase
 import com.duckduckgo.history.impl.store.HistoryEntryEntity
+import java.time.LocalDateTime
+import java.time.Month.JANUARY
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
@@ -58,8 +60,8 @@ class HistoryDaoTest {
 
     @Test
     fun whenInsertSameUrlWithSameDateTwiceThenOnlyOneEntryAndOneVisitAreStored() {
-        historyDao.updateOrInsertVisit("url", "title", "query", false, 1L)
-        historyDao.updateOrInsertVisit("url", "title", "query", false, 1L)
+        historyDao.updateOrInsertVisit("url", "title", "query", false, LocalDateTime.of(2000, JANUARY, 1, 0, 0))
+        historyDao.updateOrInsertVisit("url", "title", "query", false, LocalDateTime.of(2000, JANUARY, 1, 0, 0))
 
         val historyEntriesWithVisits = historyDao.getHistoryEntriesWithVisits()
         Assert.assertEquals(1, historyEntriesWithVisits.count())
@@ -68,8 +70,8 @@ class HistoryDaoTest {
 
     @Test
     fun whenInsertSameUrlWithDifferentDateTwiceThenOneEntryAndTwoVisitsAreStored() {
-        historyDao.updateOrInsertVisit("url", "title", "query", false, 1L)
-        historyDao.updateOrInsertVisit("url", "title", "query", false, 2L)
+        historyDao.updateOrInsertVisit("url", "title", "query", false, LocalDateTime.of(2000, JANUARY, 1, 0, 0))
+        historyDao.updateOrInsertVisit("url", "title", "query", false, LocalDateTime.of(2000, JANUARY, 2, 0, 0))
 
         val historyEntriesWithVisits = historyDao.getHistoryEntriesWithVisits()
         Assert.assertEquals(1, historyEntriesWithVisits.count())

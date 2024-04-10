@@ -32,7 +32,6 @@ package com.duckduckgo.history.impl/*
 
 import android.content.Context
 import androidx.room.Room
-import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.history.impl.store.ALL_MIGRATIONS
 import com.duckduckgo.history.impl.store.HistoryDatabase
@@ -47,8 +46,8 @@ class HistoryModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun provideHistoryRepository(historyDatabase: HistoryDatabase, currentTimeProvider: CurrentTimeProvider): HistoryRepository {
-        return RealHistoryRepository(historyDatabase.historyDao(), currentTimeProvider)
+    fun provideHistoryRepository(historyDatabase: HistoryDatabase): HistoryRepository {
+        return RealHistoryRepository(historyDatabase.historyDao())
     }
 
     @SingleInstanceIn(AppScope::class)
