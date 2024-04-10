@@ -41,6 +41,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import java.util.EnumSet
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -112,10 +113,7 @@ class RealPlayBillingManager @Inject constructor(
     }
 
     override suspend fun getProducts(): List<ProductDetails> {
-        if (!billingClient.ready) {
-            logcat { "Service not ready" }
-            connect()
-        }
+        connectIfNotReady()
 
         return when (val result = billingClient.getSubscriptions(LIST_OF_PRODUCTS)) {
             is SubscriptionsResult.Success -> {
@@ -133,10 +131,7 @@ class RealPlayBillingManager @Inject constructor(
     }
 
     override suspend fun getPurchaseHistory(): List<PurchaseHistoryRecord> {
-        if (!billingClient.ready) {
-            logcat { "Service not ready" }
-            connect()
-        }
+        connectIfNotReady()
 
         return when (val result = billingClient.getSubscriptionsPurchaseHistory()) {
             is SubscriptionsPurchaseHistoryResult.Success -> result.history
@@ -149,10 +144,7 @@ class RealPlayBillingManager @Inject constructor(
         planId: String,
         externalId: String,
     ) = withContext(dispatcherProvider.io()) {
-        if (!billingClient.ready) {
-            logcat { "Service not ready" }
-            connect()
-        }
+        connectIfNotReady()
 
         val productDetails = getProducts().find { it.productId == BASIC_SUBSCRIPTION }
 
@@ -181,6 +173,21 @@ class RealPlayBillingManager @Inject constructor(
             LaunchBillingFlowResult.Failure -> {
                 _purchaseState.emit(Canceled)
             }
+        }
+    }
+
+    private suspend fun connectIfNotReady() {
+        if (!billingClient.ready) {
+            logcat { "Service not ready" }
+
+            connect(
+                retryPolicy = RetryPolicy(
+                    retryCount = 2,
+                    initialDelay = 1.seconds,
+                    maxDelay = 4.seconds,
+                    delayIncrementFactor = 4.0,
+                ),
+            )
         }
     }
 
