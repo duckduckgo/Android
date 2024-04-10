@@ -660,6 +660,12 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         }
     }
 
+    /**
+     * WARNING ⚠️
+     * This needs to happen because Room doesn't support UNIQUE (...) ON CONFLICT REPLACE when creating the bookmarks table.
+     * When updating the bookmarks table, you will need to update this creation script in order to properly maintain the above
+     * constraint.
+     */
     val BOOKMARKS_DB_ON_CREATE = object : RoomDatabase.Callback() {
         override fun onCreate(database: SupportSQLiteDatabase) {
             database.execSQL(
@@ -672,12 +678,6 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         }
     }
 
-    /**
-     * WARNING ⚠️
-     * This needs to happen because Room doesn't support UNIQUE (...) ON CONFLICT REPLACE when creating the bookmarks table.
-     * When updating the bookmarks table, you will need to update this creation script in order to properly maintain the above
-     * constraint.
-     */
     val CHANGE_JOURNAL_ON_OPEN = object : RoomDatabase.Callback() {
         override fun onOpen(db: SupportSQLiteDatabase) {
             db.query("PRAGMA journal_mode=DELETE;").use { cursor -> cursor.moveToFirst() }
