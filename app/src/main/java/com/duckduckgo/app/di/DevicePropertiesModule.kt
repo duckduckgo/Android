@@ -34,8 +34,6 @@ import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.savedsites.api.SavedSitesRepository
-import com.duckduckgo.voice.api.VoiceSearchAvailability
-import com.duckduckgo.voice.store.VoiceSearchRepository
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -73,8 +71,6 @@ object DevicePropertiesModule {
         appDaysUsedRepository: AppDaysUsedRepository,
         appTrackingProtection: AppTrackingProtection,
         networkProtectionState: NetworkProtectionState,
-        voiceSearchAvailability: VoiceSearchAvailability,
-        voiceSearchRepository: VoiceSearchRepository,
     ): UserBrowserProperties {
         return AndroidUserBrowserProperties(
             themingDataStore,
@@ -86,8 +82,6 @@ object DevicePropertiesModule {
             appDaysUsedRepository,
             appTrackingProtection,
             networkProtectionState,
-            voiceSearchAvailability,
-            voiceSearchRepository,
         )
     }
 }
