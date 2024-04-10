@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser
 
 import android.Manifest
+import android.animation.LayoutTransition
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.app.ActivityOptions
@@ -2205,6 +2206,8 @@ class BrowserTabFragment :
     @SuppressLint("SetJavaScriptEnabled")
     private fun configureWebView() {
         viewModel.configureBrowserBackground()
+        binding.browserContentLayout.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
+
         webView = layoutInflater.inflate(
             R.layout.include_duckduckgo_browser_webview,
             binding.webViewContainer,
@@ -2784,6 +2787,10 @@ class BrowserTabFragment :
     }
 
     fun onBackPressed(): Boolean {
+        if (binding.overlayView.isVisible) {
+            viewModel.onExperimentDaxDialogDismissed()
+            return true
+        }
         if (!isAdded) return false
         return viewModel.onUserPressedBack()
     }

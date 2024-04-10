@@ -21,9 +21,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:alpha="0"
-    android:background="@drawable/onboarding_experiment_background"
+    android:background="@drawable/onboarding_experiment_background_bitmap"
     android:clipChildren="false"
-    app:layout_constraintBottom_toTopOf="parent"
     tools:alpha="1">
 
     <androidx.appcompat.widget.AppCompatImageView

@@ -18,14 +18,11 @@ package com.duckduckgo.app.cta.ui
 
 import android.content.Context
 import android.net.Uri
-import android.os.Handler
-import android.os.Looper
 import android.view.View
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.ContextCompat
-import androidx.core.os.postDelayed
 import androidx.core.view.ViewCompat
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
@@ -43,7 +40,6 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.view.TypeAnimationTextView
 import com.duckduckgo.common.ui.view.button.DaxButton
 import com.duckduckgo.common.ui.view.gone
-import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.baseHost
@@ -262,16 +258,8 @@ sealed class ExperimentOnboardingDaxDialogCta(
     override fun pixelShownParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to addCtaToHistory(ctaPixelParam))
 
     override fun hideOnboardingCta(binding: FragmentBrowserTabBinding) {
-        binding.includeOnboardingDaxDialogExperiment.daxCtaContainer.animate()
-            .translationY(0f)
-            .alpha(MIN_ALPHA)
-            .setDuration(DAX_DIALOG_APPEARANCE_ANIMATION)
-            .withStartAction {
-                binding.browserContainer.animate().translationY(MIN_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
-            }
-            .withEndAction {
-                binding.overlayView.gone()
-            }
+        binding.includeOnboardingDaxDialogExperiment.root.gone()
+        binding.overlayView.gone()
     }
 
     internal fun setOnboardingDialogView(
@@ -281,26 +269,19 @@ sealed class ExperimentOnboardingDaxDialogCta(
     ) {
         val daxDialog = binding.includeOnboardingDaxDialogExperiment
 
+        daxDialog.root.show()
         daxDialog.dialogTextCta.text = ""
         daxDialog.hiddenTextCta.text = daxText.html(binding.root.context)
         buttonText?.let {
-            daxDialog.primaryCta.hide()
+            daxDialog.primaryCta.show()
+            daxDialog.primaryCta.alpha = MIN_ALPHA
             daxDialog.primaryCta.text = buttonText
         } ?: daxDialog.primaryCta.gone()
         binding.includeOnboardingDaxDialogExperiment.onboardingDialogSuggestionsContent.gone()
         binding.includeOnboardingDaxDialogExperiment.onboardingDialogContent.show()
-        Handler(Looper.getMainLooper()).postDelayed(delayInMillis = DAX_DIALOG_APPEARANCE_DELAY) {
-            daxDialog.root.animate()
-                .translationY(daxDialog.root.height.toFloat())
-                .alpha(MAX_ALPHA)
-                .setDuration(DAX_DIALOG_APPEARANCE_ANIMATION)
-                .withStartAction {
-                    binding.browserContainer.animate()
-                        .translationY(daxDialog.root.height.toFloat()).duration = DAX_DIALOG_APPEARANCE_ANIMATION
-                }
-                .withEndAction {
-                    daxDialog.dialogTextCta.startTypingAnimation(daxText, true) { daxDialog.primaryCta.show() }
-                }
+        daxDialog.root.alpha = MAX_ALPHA
+        daxDialog.dialogTextCta.startTypingAnimation(daxText, true) {
+            ViewCompat.animate(daxDialog.primaryCta).alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
         }
     }
 
@@ -483,22 +464,11 @@ sealed class ExperimentOnboardingDaxDialogCta(
             val daxDialog = binding.includeOnboardingDaxDialogExperiment
             val daxText = description?.let { context.getString(it) }.orEmpty()
 
-            daxDialog.hiddenTextCta.text = daxText.html(binding.root.context)
             daxDialog.primaryCta.gone()
             daxDialog.dialogTextCta.text = ""
-
-            Handler(Looper.getMainLooper()).postDelayed(delayInMillis = DAX_DIALOG_APPEARANCE_DELAY) {
-                daxDialog.root.animate()
-                    .translationY(daxDialog.root.height.toFloat())
-                    .alpha(MAX_ALPHA)
-                    .setDuration(DAX_DIALOG_APPEARANCE_ANIMATION)
-                    .withStartAction {
-                        binding.browserContainer.animate().translationY(daxDialog.root.height.toFloat()).duration = DAX_DIALOG_APPEARANCE_ANIMATION
-                    }
-                    .withEndAction {
-                        daxDialog.dialogTextCta.startTypingAnimation(daxText, true)
-                    }
-            }
+            daxDialog.hiddenTextCta.text = daxText.html(binding.root.context)
+            TransitionManager.beginDelayedTransition(binding.includeOnboardingDaxDialogExperiment.cardView, AutoTransition())
+            daxDialog.dialogTextCta.startTypingAnimation(daxText, true)
         }
     }
 
@@ -529,31 +499,19 @@ sealed class ExperimentOnboardingDaxDialogCta(
             daxDialog.suggestionsDialogTextCta.text = ""
             daxDialog.suggestionsHiddenTextCta.text = daxText.html(context)
             TransitionManager.beginDelayedTransition(binding.includeOnboardingDaxDialogExperiment.cardView, AutoTransition())
+            daxDialog.suggestionsDialogTextCta.startTypingAnimation(daxText, true) {
+                val optionsViews = listOf<DaxButton>(
+                    daxDialog.daxDialogOption1,
+                    daxDialog.daxDialogOption2,
+                    daxDialog.daxDialogOption3,
+                    daxDialog.daxDialogOption4,
+                )
 
-            Handler(Looper.getMainLooper()).postDelayed(delayInMillis = DAX_DIALOG_APPEARANCE_DELAY) {
-                daxDialog.root.animate()
-                    .translationY(daxDialog.root.height.toFloat())
-                    .alpha(MAX_ALPHA)
-                    .setDuration(DAX_DIALOG_APPEARANCE_ANIMATION)
-                    .withStartAction {
-                        binding.browserContainer.animate().translationY(daxDialog.root.height.toFloat()).duration = DAX_DIALOG_APPEARANCE_ANIMATION
-                    }
-                    .withEndAction {
-                        daxDialog.suggestionsDialogTextCta.startTypingAnimation(daxText, true) {
-                            val optionsViews = listOf<DaxButton>(
-                                daxDialog.daxDialogOption1,
-                                daxDialog.daxDialogOption2,
-                                daxDialog.daxDialogOption3,
-                                daxDialog.daxDialogOption4,
-                            )
-
-                            optionsViews.forEachIndexed { index, buttonView ->
-                                val options = DaxDialogIntroOption.getSitesOptions()
-                                options[index].setOptionView(buttonView)
-                                ViewCompat.animate(buttonView).alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
-                            }
-                        }
-                    }
+                optionsViews.forEachIndexed { index, buttonView ->
+                    val options = DaxDialogIntroOption.getSitesOptions()
+                    options[index].setOptionView(buttonView)
+                    ViewCompat.animate(buttonView).alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
+                }
             }
         }
 
@@ -573,7 +531,6 @@ sealed class ExperimentOnboardingDaxDialogCta(
         private const val MAX_TRACKERS_SHOWS = 2
         private val mainTrackerDomains = listOf("facebook", "google")
         private const val DAX_DIALOG_APPEARANCE_ANIMATION = 400L
-        private const val DAX_DIALOG_APPEARANCE_DELAY = 300L
         private const val MAX_ALPHA = 1.0f
         private const val MIN_ALPHA = 0.0f
     }

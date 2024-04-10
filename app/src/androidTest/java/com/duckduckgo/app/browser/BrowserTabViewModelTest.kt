@@ -5006,7 +5006,6 @@ class BrowserTabViewModelTest {
 
         assertCommandIssued<Command.SetBrowserBackground> {
             assertEquals(0, this.backgroundRes)
-            assertEquals(0, this.backgroundRes)
         }
     }
 
@@ -5227,7 +5226,7 @@ class BrowserTabViewModelTest {
     @Test
     fun givenOnboardingExperimentEnabledWhenTrackersBlockedCtaShownThenPrivacyShieldIsHighlighted() = runTest {
         val cta = ExperimentOnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList())
-        testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
+        testee.ctaViewState.value = ctaViewState().copy(cta = cta)
 
         testee.onCtaShown()
         assertTrue(browserViewState().showPrivacyShield.isHighlighted())
