@@ -18,11 +18,14 @@ package com.duckduckgo.app.cta.ui
 
 import android.content.Context
 import android.net.Uri
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.ContextCompat
+import androidx.core.os.postDelayed
 import androidx.core.view.ViewCompat
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
@@ -81,15 +84,22 @@ sealed class ExperimentDaxBubbleOptionsCta(
                 )
                 optionsViews.forEachIndexed { index, buttonView ->
                     it[index].setOptionView(buttonView)
-                    ViewCompat.animate(buttonView).alpha(1f).setDuration(400L).startDelay = 800L
+                    ViewCompat.animate(buttonView).alpha(1f).setDuration(500L).startDelay = 2800L
                 }
             }
         }
         view.show()
-        view.alpha = 1f
-        view.findViewById<DaxTextView>(R.id.hiddenTextCta).text = daxText.html(view.context)
-        view.findViewById<DaxTextView>(R.id.experimentDialogTitle).text = daxTitle.html(view.context)
-        view.findViewById<TypeAnimationTextView>(R.id.dialogTextCta).startTypingAnimation(daxText, true)
+        view.findViewById<DaxTextView>(R.id.experimentDialogTitle).apply {
+            alpha = 0f
+            text = daxTitle.html(view.context)
+        }
+        ViewCompat.animate(view).alpha(1f).setDuration(500).setStartDelay(600)
+            .withEndAction {
+                ViewCompat.animate(view.findViewById<DaxTextView>(R.id.experimentDialogTitle)).alpha(1f).setDuration(500)
+                    .withEndAction {
+                        view.findViewById<TypeAnimationTextView>(R.id.dialogTextCta).startTypingAnimation(daxText, true)
+                    }
+            }
     }
 
     fun setOnOptionClicked(onOptionClicked: (DaxDialogIntroOption) -> Unit) {
@@ -174,7 +184,7 @@ sealed class ExperimentDaxBubbleOptionsCta(
                     DaxDialogIntroOption(
                         R.string.onboardingSearchDaxDialogOption1,
                         commonR.drawable.ic_find_search_16,
-                        "how to say “duck” in spanish",
+                        "how to say duck in spanish",
                         PixelName.ONBOARDING_SEARCH_SAY_DUCK,
                     ),
                     DaxDialogIntroOption(
@@ -269,19 +279,22 @@ sealed class ExperimentOnboardingDaxDialogCta(
     ) {
         val daxDialog = binding.includeOnboardingDaxDialogExperiment
 
-        daxDialog.root.show()
-        daxDialog.dialogTextCta.text = ""
-        daxDialog.hiddenTextCta.text = daxText.html(binding.root.context)
-        buttonText?.let {
-            daxDialog.primaryCta.show()
-            daxDialog.primaryCta.alpha = MIN_ALPHA
-            daxDialog.primaryCta.text = buttonText
-        } ?: daxDialog.primaryCta.gone()
-        binding.includeOnboardingDaxDialogExperiment.onboardingDialogSuggestionsContent.gone()
-        binding.includeOnboardingDaxDialogExperiment.onboardingDialogContent.show()
-        daxDialog.root.alpha = MAX_ALPHA
-        daxDialog.dialogTextCta.startTypingAnimation(daxText, true) {
-            ViewCompat.animate(daxDialog.primaryCta).alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
+        Handler(Looper.getMainLooper()).postDelayed(delayInMillis = DAX_DIALOG_APPEARANCE_DELAY) {
+            binding.overlayView.show()
+            daxDialog.root.show()
+            daxDialog.dialogTextCta.text = ""
+            daxDialog.hiddenTextCta.text = daxText.html(binding.root.context)
+            buttonText?.let {
+                daxDialog.primaryCta.show()
+                daxDialog.primaryCta.alpha = MIN_ALPHA
+                daxDialog.primaryCta.text = buttonText
+            } ?: daxDialog.primaryCta.gone()
+            binding.includeOnboardingDaxDialogExperiment.onboardingDialogSuggestionsContent.gone()
+            binding.includeOnboardingDaxDialogExperiment.onboardingDialogContent.show()
+            daxDialog.root.alpha = MAX_ALPHA
+            daxDialog.dialogTextCta.startTypingAnimation(daxText, true) {
+                ViewCompat.animate(daxDialog.primaryCta).alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
+            }
         }
     }
 
@@ -530,6 +543,7 @@ sealed class ExperimentOnboardingDaxDialogCta(
     companion object {
         private const val MAX_TRACKERS_SHOWS = 2
         private val mainTrackerDomains = listOf("facebook", "google")
+        private const val DAX_DIALOG_APPEARANCE_DELAY = 1000L
         private const val DAX_DIALOG_APPEARANCE_ANIMATION = 400L
         private const val MAX_ALPHA = 1.0f
         private const val MIN_ALPHA = 0.0f

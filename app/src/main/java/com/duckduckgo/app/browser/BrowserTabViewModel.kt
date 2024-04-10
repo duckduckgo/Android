@@ -20,6 +20,8 @@ import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.net.Uri
 import android.net.http.SslCertificate
+import android.os.Handler
+import android.os.Looper
 import android.os.Message
 import android.print.PrintAttributes
 import android.provider.MediaStore
@@ -37,6 +39,7 @@ import android.webkit.WebView
 import androidx.annotation.AnyThread
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
+import androidx.core.os.postDelayed
 import androidx.lifecycle.*
 import androidx.lifecycle.Observer
 import com.duckduckgo.adclick.api.AdClickManager
@@ -103,6 +106,7 @@ import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.app.browser.webview.SslWarningLayout.Action
 import com.duckduckgo.app.cta.ui.*
+import com.duckduckgo.app.cta.ui.ExperimentDaxBubbleOptionsCta.DaxDialogIntroOption
 import com.duckduckgo.app.cta.ui.ExperimentOnboardingDaxDialogCta
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
@@ -121,6 +125,7 @@ import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.onboarding.ui.page.experiment.ExtendedOnboardingExperimentVariantManager
+import com.duckduckgo.app.onboarding.ui.page.experiment.OnboardingExperimentPixel
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
@@ -709,6 +714,26 @@ class BrowserTabViewModel @Inject constructor(
         if (currentGlobalLayoutState() is Invalidated) {
             recoverTabWithQuery(query)
             return
+        }
+
+        if (currentCtaViewState().cta is ExperimentOnboardingDaxDialogCta) {
+            onExperimentDaxDialogDismissed()
+        }
+
+        when (currentCtaViewState().cta) {
+            is ExperimentDaxBubbleOptionsCta.ExperimentDaxIntroSearchOptionsCta -> {
+                if (!DaxDialogIntroOption.getSearchOptions().map { it.link }.contains(query)) {
+                    pixel.fire(OnboardingExperimentPixel.PixelName.ONBOARDING_SEARCH_CUSTOM)
+                }
+            }
+
+            is ExperimentDaxBubbleOptionsCta.ExperimentDaxIntroVisitSiteOptionsCta,
+            is ExperimentOnboardingDaxDialogCta.DaxSiteSuggestionsCta,
+            -> {
+                if (!DaxDialogIntroOption.getSitesOptions().map { it.link }.contains(query)) {
+                    pixel.fire(OnboardingExperimentPixel.PixelName.ONBOARDING_VISIT_SITE_CUSTOM)
+                }
+            }
         }
 
         command.value = HideKeyboard
@@ -2388,7 +2413,9 @@ class BrowserTabViewModel @Inject constructor(
             ctaViewModel.onCtaShown(cta)
         }
         if (cta is ExperimentOnboardingDaxDialogCta.DaxTrackersBlockedCta) {
-            browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = true))
+            Handler(Looper.getMainLooper()).postDelayed(delayInMillis = 4000L) {
+                browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = true))
+            }
         }
     }
 
@@ -3138,7 +3165,9 @@ class BrowserTabViewModel @Inject constructor(
                     if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) {
                         val cta = withContext(dispatchers.io()) { ctaViewModel.getExperimentSiteSuggestionsDialogCta() }
                         ctaViewState.value = currentCtaViewState().copy(cta = cta)
-                        if (cta == null) { command.value = HideExperimentOnboardingDialog(experimentCta) }
+                        if (cta == null) {
+                            command.value = HideExperimentOnboardingDialog(experimentCta)
+                        }
                     }
                 }
                 null
@@ -3155,7 +3184,9 @@ class BrowserTabViewModel @Inject constructor(
                     if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) {
                         val cta = withContext(dispatchers.io()) { ctaViewModel.getExperimentFireDialogCta() }
                         ctaViewState.value = currentCtaViewState().copy(cta = cta)
-                        if (cta == null) { command.value = HideExperimentOnboardingDialog(experimentCta) }
+                        if (cta == null) {
+                            command.value = HideExperimentOnboardingDialog(experimentCta)
+                        }
                     }
                 }
                 null
@@ -3170,11 +3201,14 @@ class BrowserTabViewModel @Inject constructor(
         when (cta) {
             is ExperimentOnboardingDaxDialogCta.DaxSerpCta -> {
             }
+
             is ExperimentOnboardingDaxDialogCta.DaxTrackersBlockedCta -> {
                 browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
             }
+
             is ExperimentOnboardingDaxDialogCta.DaxFireButtonCta -> {
             }
+
             else -> {
             }
         }
@@ -3190,7 +3224,9 @@ class BrowserTabViewModel @Inject constructor(
                 command.value = HideExperimentOnboardingDialog(cta)
             }
             if (currentBrowserViewState().fireButton.isHighlighted()) {
-                browserViewState.value = currentBrowserViewState().copy(fireButton = HighlightableButton.Visible(highlighted = false))
+                viewModelScope.launch {
+                    ctaViewModel.dismissPulseAnimation()
+                }
             }
         }
     }

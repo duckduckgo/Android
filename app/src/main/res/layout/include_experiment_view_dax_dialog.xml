@@ -103,7 +103,7 @@
                     android:id="@+id/experimentDialogTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/onboardingSitesDaxDialogTitle"
+                    android:text="@string/onboardingSitesSuggestionsDaxDialogTitle"
                     app:typography="h2" />
 
                 <FrameLayout

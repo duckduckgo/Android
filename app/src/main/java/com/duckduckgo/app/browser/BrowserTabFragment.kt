@@ -3825,7 +3825,6 @@ class BrowserTabFragment :
                 }
             }
             binding.webViewContainer.setOnClickListener { daxDialogIntroExperimentCta.dialogTextCta.finishAnimation() }
-            binding.overlayView.show()
             binding.overlayView.setOnTouchListener { _, _ ->
                 viewModel.onExperimentDaxDialogDismissed()
                 true

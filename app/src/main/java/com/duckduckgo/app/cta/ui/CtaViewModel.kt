@@ -264,7 +264,7 @@ class CtaViewModel @Inject constructor(
 
     @WorkerThread
     private suspend fun canShowDaxIntroVisitSiteCta(): Boolean =
-        daxOnboardingActive() && daxDialogIntroShown() && !daxDialogIntroVisitSiteShown() && !hideTips() &&
+        daxOnboardingActive() && daxDialogIntroShown() && !hideTips() &&
             !(daxDialogNetworkShown() || daxDialogOtherShown() || daxDialogTrackersFoundShown())
 
     @WorkerThread

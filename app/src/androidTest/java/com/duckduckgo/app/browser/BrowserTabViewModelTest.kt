@@ -66,6 +66,7 @@ import com.duckduckgo.app.browser.camera.CameraHardwareChecker
 import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
 import com.duckduckgo.app.browser.certificates.remoteconfig.SSLCertificatesFeature
 import com.duckduckgo.app.browser.commands.Command
+import com.duckduckgo.app.browser.commands.Command.HideExperimentOnboardingDialog
 import com.duckduckgo.app.browser.commands.Command.LaunchPrivacyPro
 import com.duckduckgo.app.browser.commands.Command.LoadExtractedUrl
 import com.duckduckgo.app.browser.commands.Command.ShowBackNavigationHistory
@@ -104,6 +105,7 @@ import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.DaxDialogCta
+import com.duckduckgo.app.cta.ui.ExperimentDaxBubbleOptionsCta
 import com.duckduckgo.app.cta.ui.ExperimentOnboardingDaxDialogCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
@@ -125,6 +127,7 @@ import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.experiment.ExtendedOnboardingExperimentVariantManager
+import com.duckduckgo.app.onboarding.ui.page.experiment.OnboardingExperimentPixel
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
@@ -5249,6 +5252,48 @@ class BrowserTabViewModelTest {
     @Test
     fun givenOnboardingExperimentEnabledWhenUserDismissFireButtonDialogThenFireButtonHighlightFinished() {
         // TODO Noelia
+    }
+
+    @Test
+    fun givenOnboardingExperimentCtaShownWhenUserSubmittedQueryThenDismissCta() {
+        val cta = ExperimentOnboardingDaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore)
+        testee.ctaViewState.value = CtaViewState(cta = cta)
+
+        testee.onUserSubmittedQuery("foo")
+
+        assertCommandIssued<HideExperimentOnboardingDialog> {
+            assertEquals(cta, this.experimentCta)
+        }
+    }
+
+    @Test
+    fun givenSuggestedSearchesDialogShownWhenUserSubmittedQueryThenCustomSearchPixelIsSent() {
+        val cta = ExperimentDaxBubbleOptionsCta.ExperimentDaxIntroSearchOptionsCta(mockOnboardingStore, mockAppInstallStore)
+        testee.ctaViewState.value = CtaViewState(cta = cta)
+
+        testee.onUserSubmittedQuery("foo")
+
+        verify(mockPixel).fire(OnboardingExperimentPixel.PixelName.ONBOARDING_SEARCH_CUSTOM)
+    }
+
+    @Test
+    fun givenSuggestedSearchesDialogShownWhenUserSubmittedQueryDifferentFromOptionsThenPixelIsNotSent() {
+        val cta = ExperimentDaxBubbleOptionsCta.ExperimentDaxIntroSearchOptionsCta(mockOnboardingStore, mockAppInstallStore)
+        testee.ctaViewState.value = CtaViewState(cta = cta)
+
+        testee.onUserSubmittedQuery("mighty ducks cast")
+
+        verify(mockPixel, never()).fire(OnboardingExperimentPixel.PixelName.ONBOARDING_SEARCH_CUSTOM)
+    }
+
+    @Test
+    fun givenSuggestedSitesDialogShownWhenUserSubmittedQueryThenCustomSitePixelIsSent() {
+        val cta = ExperimentDaxBubbleOptionsCta.ExperimentDaxIntroVisitSiteOptionsCta(mockOnboardingStore, mockAppInstallStore)
+        testee.ctaViewState.value = CtaViewState(cta = cta)
+
+        testee.onUserSubmittedQuery("foo")
+
+        verify(mockPixel).fire(OnboardingExperimentPixel.PixelName.ONBOARDING_VISIT_SITE_CUSTOM)
     }
 
     private fun aCredential(): LoginCredentials {
