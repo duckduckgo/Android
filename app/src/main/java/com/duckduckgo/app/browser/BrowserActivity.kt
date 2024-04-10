@@ -330,8 +330,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
             return
         }
 
-        if (emailProtectionLinkVerifier.shouldDelegateToInContextView(intent.dataString, currentTab?.inContextEmailProtectionShowing)) {
-            currentTab?.showEmailProtectionInContextWebFlow(intent.dataString)
+        if (emailProtectionLinkVerifier.shouldDelegateToInContextView(intent.intentText, currentTab?.inContextEmailProtectionShowing)) {
+            currentTab?.showEmailProtectionInContextWebFlow(intent.intentText)
             Timber.v("Verification link was consumed, so don't allow it to open in a new tab")
             return
         }
