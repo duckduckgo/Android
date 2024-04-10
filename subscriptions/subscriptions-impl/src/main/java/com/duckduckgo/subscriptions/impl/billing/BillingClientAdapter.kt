@@ -72,7 +72,7 @@ sealed class PurchasesUpdateResult {
 
     data object PurchaseAbsent : PurchasesUpdateResult()
     data object UserCancelled : PurchasesUpdateResult()
-    data object Failure : PurchasesUpdateResult()
+    data class Failure(val errorType: String) : PurchasesUpdateResult()
 }
 
 enum class BillingError {

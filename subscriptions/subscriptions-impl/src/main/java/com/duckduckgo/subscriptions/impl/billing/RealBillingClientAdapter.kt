@@ -175,8 +175,27 @@ class RealBillingClientAdapter @Inject constructor(
     private fun mapToPurchasesUpdateResult(
         billingResult: BillingResult,
         purchases: List<Purchase>?,
-    ): PurchasesUpdateResult =
-        when (billingResult.responseCode) {
+    ): PurchasesUpdateResult {
+        fun Int.asString(): String {
+            return when (this) {
+                BillingResponseCode.SERVICE_TIMEOUT -> "SERVICE_TIMEOUT"
+                BillingResponseCode.FEATURE_NOT_SUPPORTED -> "FEATURE_NOT_SUPPORTED"
+                BillingResponseCode.SERVICE_DISCONNECTED -> "SERVICE_DISCONNECTED"
+                BillingResponseCode.OK -> "OK"
+                BillingResponseCode.USER_CANCELED -> "USER_CANCELED"
+                BillingResponseCode.SERVICE_UNAVAILABLE -> "SERVICE_UNAVAILABLE"
+                BillingResponseCode.BILLING_UNAVAILABLE -> "BILLING_UNAVAILABLE"
+                BillingResponseCode.ITEM_UNAVAILABLE -> "ITEM_UNAVAILABLE"
+                BillingResponseCode.DEVELOPER_ERROR -> "DEVELOPER_ERROR"
+                BillingResponseCode.ERROR -> "ERROR"
+                BillingResponseCode.ITEM_ALREADY_OWNED -> "ITEM_ALREADY_OWNED"
+                BillingResponseCode.ITEM_NOT_OWNED -> "ITEM_NOT_OWNED"
+                BillingResponseCode.NETWORK_ERROR -> "NETWORK_ERROR"
+                else -> "UNKNOWN"
+            }
+        }
+
+        return when (billingResult.responseCode) {
             BillingResponseCode.OK -> {
                 val purchase = purchases?.lastOrNull { it.purchaseState == PurchaseState.PURCHASED }
                 if (purchase != null) {
@@ -190,8 +209,9 @@ class RealBillingClientAdapter @Inject constructor(
             }
 
             BillingResponseCode.USER_CANCELED -> PurchasesUpdateResult.UserCancelled
-            else -> PurchasesUpdateResult.Failure
+            else -> PurchasesUpdateResult.Failure(billingResult.responseCode.asString())
         }
+    }
 }
 
 private fun Int.toBillingError(): BillingError = when (this) {
