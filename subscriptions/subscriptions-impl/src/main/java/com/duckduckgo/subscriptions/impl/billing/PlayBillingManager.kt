@@ -219,8 +219,8 @@ class RealPlayBillingManager @Inject constructor(
                     // Handle an error caused by a user cancelling the purchase flow.
                 }
 
-                PurchasesUpdateResult.Failure -> {
-                    pixelSender.reportPurchaseFailureStore()
+                is PurchasesUpdateResult.Failure -> {
+                    pixelSender.reportPurchaseFailureStore(result.errorType)
                     _purchaseState.emit(Canceled)
                 }
             }
