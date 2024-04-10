@@ -60,7 +60,7 @@ interface SubscriptionPixelSender {
     fun reportOfferScreenShown()
     fun reportOfferSubscribeClick()
     fun reportPurchaseFailureOther()
-    fun reportPurchaseFailureStore()
+    fun reportPurchaseFailureStore(errorType: String)
     fun reportPurchaseFailureBackend()
     fun reportPurchaseFailureAccountCreation()
     fun reportPurchaseSuccess()
@@ -109,8 +109,8 @@ class SubscriptionPixelSenderImpl @Inject constructor(
     override fun reportPurchaseFailureOther() =
         fire(PURCHASE_FAILURE_OTHER)
 
-    override fun reportPurchaseFailureStore() =
-        fire(PURCHASE_FAILURE_STORE)
+    override fun reportPurchaseFailureStore(errorType: String) =
+        fire(PURCHASE_FAILURE_STORE, mapOf("errorType" to errorType))
 
     override fun reportPurchaseFailureBackend() =
         fire(PURCHASE_FAILURE_BACKEND)
@@ -199,9 +199,9 @@ class SubscriptionPixelSenderImpl @Inject constructor(
     override fun reportPrivacyProRedirect() =
         fire(SUBSCRIPTION_PRIVACY_PRO_REDIRECT)
 
-    private fun fire(pixel: SubscriptionPixel) {
+    private fun fire(pixel: SubscriptionPixel, params: Map<String, String> = emptyMap()) {
         pixel.getPixelNames().forEach { (pixelType, pixelName) ->
-            pixelSender.fire(pixelName = pixelName, type = pixelType)
+            pixelSender.fire(pixelName = pixelName, type = pixelType, parameters = params)
         }
     }
 }
