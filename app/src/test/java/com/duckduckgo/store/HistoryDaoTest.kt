@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.history
+package com.duckduckgo.store
 
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -22,8 +22,6 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.history.store.HistoryDao
 import com.duckduckgo.app.history.store.HistoryDatabase
 import com.duckduckgo.app.history.store.HistoryEntryEntity
-import com.duckduckgo.app.history.store.HistoryEntryWithVisits
-import io.reactivex.observers.TestObserver
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
@@ -39,7 +37,7 @@ class HistoryDaoTest {
     @Before
     fun setup() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        db = Room.inMemoryDatabaseBuilder(context, HistoryDatabase::class.java).build()
+        db = Room.inMemoryDatabaseBuilder(context, HistoryDatabase::class.java).allowMainThreadQueries().build()
         historyDao = db.historyDao()
     }
 
@@ -64,10 +62,8 @@ class HistoryDaoTest {
         historyDao.updateOrInsertVisit("url", "title", "query", false, 1L)
 
         val historyEntriesWithVisits = historyDao.getHistoryEntriesWithVisits()
-        val testObserver = TestObserver<List<HistoryEntryWithVisits>>()
-        historyEntriesWithVisits.subscribe(testObserver)
-        Assert.assertEquals(1, testObserver.valueCount())
-        Assert.assertEquals(1, testObserver.values().first().first().visits.count())
+        Assert.assertEquals(1, historyEntriesWithVisits.count())
+        Assert.assertEquals(1, historyEntriesWithVisits.first().visits.count())
     }
 
     @Test
@@ -76,9 +72,7 @@ class HistoryDaoTest {
         historyDao.updateOrInsertVisit("url", "title", "query", false, 2L)
 
         val historyEntriesWithVisits = historyDao.getHistoryEntriesWithVisits()
-        val testObserver = TestObserver<List<HistoryEntryWithVisits>>()
-        historyEntriesWithVisits.subscribe(testObserver)
-        Assert.assertEquals(1, testObserver.valueCount())
-        Assert.assertEquals(2, testObserver.values().first().first().visits.count())
+        Assert.assertEquals(1, historyEntriesWithVisits.count())
+        Assert.assertEquals(2, historyEntriesWithVisits.first().visits.count())
     }
 }
