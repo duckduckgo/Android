@@ -98,7 +98,7 @@ class AutoCompleteApi @Inject constructor(
                 .zipWith(
                     getAutoCompleteFavoritesResults(query),
                 ) { bookmarks, favorites ->
-                    (favorites + bookmarks)
+                    (favorites + bookmarks.filter { favorites.none { favorite -> it.savedSite.url == favorite.savedSite.url } })
                 }.map {
                     it.sortedByDescending { it.score }.mapNotNull {
                         val savedSite = it.savedSite
@@ -133,14 +133,15 @@ class AutoCompleteApi @Inject constructor(
                         }
                     },
                 ) { bookmarksAndFavorites, historyItems ->
-                    (bookmarksAndFavorites + historyItems)
+                    val searchHistory = historyItems.filterIsInstance<AutoCompleteHistorySearchSuggestion>()
+                    val navigationHistory = historyItems.filterIsInstance<AutoCompleteHistorySuggestion>()
+                    removeDuplicates(navigationHistory, bookmarksAndFavorites) + searchHistory
                 }
 
         return savedSitesObservable.zipWith(
             getAutoCompleteSearchResults(query),
-        ) { bookmarksResults, searchResults ->
-
-            val topHits = bookmarksResults.filter {
+        ) { bookmarksAndHistory, searchResults ->
+            val topHits = (searchResults + bookmarksAndHistory).filter {
                 when (it) {
                     is AutoCompleteHistorySearchSuggestion -> true
                     is AutoCompleteHistorySuggestion -> it.isAllowedInTopHits
@@ -151,8 +152,8 @@ class AutoCompleteApi @Inject constructor(
 
             val maxBottomSection = maximumNumberOfSuggestions - (topHits.size + minimumNumberInSuggestionGroup)
             val filteredBookmarks =
-                bookmarksResults
-                    .filter { bookmarkSuggestion -> topHits.none { it.phrase == bookmarkSuggestion.phrase } }
+                bookmarksAndHistory
+                    .filter { suggestion -> topHits.none { it.phrase == suggestion.phrase } }
                     .take(maxBottomSection)
             val maxSearchResults = maximumNumberOfSuggestions - (topHits.size + filteredBookmarks.size)
             val filteredSearchResults = searchResults
@@ -164,6 +165,25 @@ class AutoCompleteApi @Inject constructor(
                 suggestions = (topHits + filteredSearchResults + filteredBookmarks).distinctBy { it.phrase },
             )
         }
+    }
+
+    private fun removeDuplicates(
+        historySuggestions: List<AutoCompleteHistorySuggestion>,
+        bookmarkSuggestions: List<AutoCompleteBookmarkSuggestion>,
+    ): List<AutoCompleteSuggestion> {
+        val bookmarkMap = bookmarkSuggestions.associateBy { it.phrase }
+
+        val uniqueHistorySuggestions = historySuggestions.filter { !bookmarkMap.containsKey(it.phrase) }
+        val updatedBookmarkSuggestions = bookmarkSuggestions.map { bookmarkSuggestion ->
+            val historySuggestion = historySuggestions.find { it.phrase == bookmarkSuggestion.phrase }
+            if (historySuggestion != null) {
+                bookmarkSuggestion.copy(isAllowedInTopHits = historySuggestion.isAllowedInTopHits)
+            } else {
+                bookmarkSuggestion
+            }
+        }
+
+        return uniqueHistorySuggestions + updatedBookmarkSuggestions
     }
 
     private fun isAllowedInTopHits(entry: HistoryEntry): Boolean {
