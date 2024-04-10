@@ -24,8 +24,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="150dp"
-        android:paddingBottom="50dp" >
+        android:layout_gravity="center">
 
         <ImageView
             android:id="@+id/sslAlertImage"
