@@ -43,6 +43,7 @@ import android.view.*
 import android.view.View.*
 import android.view.inputmethod.EditorInfo
 import android.webkit.PermissionRequest
+import android.webkit.SslErrorHandler
 import android.webkit.URLUtil
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient.FileChooserParams
@@ -88,6 +89,7 @@ import com.duckduckgo.app.brokensite.BrokenSiteActivity
 import com.duckduckgo.app.browser.BrowserTabViewModel.FileChooserRequestedParams
 import com.duckduckgo.app.browser.BrowserTabViewModel.LocationPermission
 import com.duckduckgo.app.browser.R.string
+import com.duckduckgo.app.browser.SSLErrorType.NONE
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.applinks.AppLinksLauncher
@@ -546,6 +548,9 @@ class BrowserTabFragment :
     private val errorView
         get() = binding.includeErrorView
 
+    private val sslErrorView
+        get() = binding.sslErrorWarningLayout
+
     private val daxDialogCta
         get() = binding.includeNewBrowserTab.includeDaxDialogCta
 
@@ -577,10 +582,12 @@ class BrowserTabFragment :
                 browserAutofill.inContextEmailProtectionFlowFinished()
                 inContextEmailProtectionShowing = false
             }
+
             EmailProtectionInContextSignUpScreenResult.CANCELLED -> {
                 browserAutofill.inContextEmailProtectionFlowFinished()
                 inContextEmailProtectionShowing = false
             }
+
             else -> {
                 // we don't set inContextEmailProtectionShowing to false here because the system is cancelling it
                 // this is likely because of an external link being clicked (e.g., the email protection verification link)
@@ -613,7 +620,7 @@ class BrowserTabFragment :
     }
 
     private val autoconsentCallback = object : AutoconsentCallback {
-        override fun onFirstPopUpHandled() { }
+        override fun onFirstPopUpHandled() {}
 
         override fun onPopUpHandled(isCosmetic: Boolean) {
             launch {
@@ -778,6 +785,7 @@ class BrowserTabFragment :
                     userEnteredQuery(it.result)
                     resumeWebView()
                 }
+
                 is VoiceSearchLauncher.Event.SearchCancelled -> resumeWebView()
                 is VoiceSearchLauncher.Event.VoiceSearchDisabled -> viewModel.voiceSearchDisabled()
             }
@@ -792,6 +800,7 @@ class BrowserTabFragment :
                         externalCameraLauncher.showPermissionRationaleDialog(activity, it.inputAction)
                     }
                 }
+
                 is NoMediaCaptured -> pendingUploadTask?.onReceiveValue(null)
                 is ErrorAccessingMediaApp -> {
                     pendingUploadTask?.onReceiveValue(null)
@@ -1156,6 +1165,7 @@ class BrowserTabFragment :
         webView?.onPause()
         webView?.hide()
         errorView.errorLayout.gone()
+        sslErrorView.gone()
     }
 
     private fun showBrowser() {
@@ -1165,11 +1175,13 @@ class BrowserTabFragment :
         webView?.show()
         webView?.onResume()
         errorView.errorLayout.gone()
+        sslErrorView.gone()
     }
 
     private fun showError(errorType: WebViewErrorResponse, url: String?) {
         webViewContainer.gone()
         newBrowserTab.newTabLayout.gone()
+        sslErrorView.gone()
         omnibar.appBarLayout.setExpanded(true)
         omnibar.shieldIcon.isInvisible = true
         webView?.onPause()
@@ -1181,6 +1193,40 @@ class BrowserTabFragment :
             errorView.yetiIcon?.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_yeti_dark)
         }
         errorView.errorLayout.show()
+    }
+
+    private fun showSSLWarning(
+        handler: SslErrorHandler,
+        errorResponse: SslErrorResponse,
+    ) {
+        webViewContainer.gone()
+        newBrowserTab.newTabLayout.gone()
+        webView?.onPause()
+        webView?.hide()
+        omnibar.appBarLayout.setExpanded(true)
+        omnibar.shieldIcon.isInvisible = true
+        omnibar.searchIcon.isInvisible = true
+        omnibar.daxIcon.isInvisible = true
+        errorView.errorLayout.gone()
+        binding.browserLayout.gone()
+        sslErrorView.bind(handler, errorResponse) { action ->
+            viewModel.onSSLCertificateWarningAction(action, errorResponse.url)
+        }
+        sslErrorView.show()
+    }
+
+    private fun hideSSLWarning() {
+        val navList = webView?.safeCopyBackForwardList()
+        val currentIndex = navList?.currentIndex ?: 0
+
+        if (currentIndex >= 0) {
+            Timber.d("SSLError: hiding warning page and triggering a reload of the previous")
+            viewModel.recoverFromSSLWarningPage(true)
+            refresh()
+        } else {
+            Timber.d("SSLError: no previous page to load, showing home")
+            viewModel.recoverFromSSLWarningPage(false)
+        }
     }
 
     fun submitQuery(query: String) {
@@ -1214,11 +1260,17 @@ class BrowserTabFragment :
         acceptGeneratedPassword(originalUrl)
     }
 
-    override fun onUseEmailProtectionPrivateAlias(originalUrl: String, duckAddress: String) {
+    override fun onUseEmailProtectionPrivateAlias(
+        originalUrl: String,
+        duckAddress: String,
+    ) {
         viewModel.usePrivateDuckAddress(originalUrl, duckAddress)
     }
 
-    override fun onUseEmailProtectionPersonalAddress(originalUrl: String, duckAddress: String) {
+    override fun onUseEmailProtectionPersonalAddress(
+        originalUrl: String,
+        duckAddress: String,
+    ) {
         viewModel.usePersonalDuckAddress(originalUrl, duckAddress)
     }
 
@@ -1244,7 +1296,10 @@ class BrowserTabFragment :
         viewModel.returnNoCredentialsWithPage(originalUrl)
     }
 
-    override fun onShareCredentialsForAutofill(originalUrl: String, selectedCredentials: LoginCredentials) {
+    override fun onShareCredentialsForAutofill(
+        originalUrl: String,
+        selectedCredentials: LoginCredentials,
+    ) {
         injectAutofillCredentials(originalUrl, selectedCredentials)
     }
 
@@ -1288,12 +1343,14 @@ class BrowserTabFragment :
             ) {
                 viewModel.onDeleteFavoriteSnackbarDismissed(it)
             }
+
             is Command.DeleteSavedSiteConfirmation -> confirmDeleteSavedSite(
                 it.savedSite,
                 getString(string.bookmarkDeleteConfirmationMessage, it.savedSite.title).html(requireContext()),
             ) {
                 viewModel.onDeleteSavedSiteSnackbarDismissed(it)
             }
+
             is Command.ShowFireproofWebSiteConfirmation -> fireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.DeleteFireproofConfirmation -> removeFireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.ShowPrivacyProtectionEnabledConfirmation -> privacyProtectionEnabledConfirmation(it.domain)
@@ -1480,6 +1537,8 @@ class BrowserTabFragment :
             is Command.ShowFaviconsPrompt -> showFaviconsPrompt()
             is Command.SetBrowserBackground -> setBrowserBackground(it.backgroundRes)
             is Command.ShowWebPageTitle -> showWebPageTitleInCustomTab(it.title, it.url)
+            is Command.ShowSSLError -> showSSLWarning(it.handler, it.error)
+            is Command.HideSSLError -> hideSSLWarning()
             else -> {
                 // NO OP
             }
@@ -1974,7 +2033,10 @@ class BrowserTabFragment :
         pendingUploadTask?.onReceiveValue(uris)
     }
 
-    private fun showToast(@StringRes messageId: Int, length: Int = Toast.LENGTH_LONG) {
+    private fun showToast(
+        @StringRes messageId: Int,
+        length: Int = Toast.LENGTH_LONG,
+    ) {
         Toast.makeText(context?.applicationContext, messageId, length).show()
     }
 
@@ -2195,6 +2257,7 @@ class BrowserTabFragment :
         webView?.let {
             it.webViewClient = webViewClient
             it.webChromeClient = webChromeClient
+            it.clearSslPreferences()
 
             it.settings.apply {
                 clientBrandHintProvider.setDefault(this)
@@ -2248,7 +2311,12 @@ class BrowserTabFragment :
             contentScopeScripts.register(
                 it,
                 object : JsMessageCallback() {
-                    override fun process(featureName: String, method: String, id: String?, data: JSONObject?) {
+                    override fun process(
+                        featureName: String,
+                        method: String,
+                        id: String?,
+                        data: JSONObject?,
+                    ) {
                         viewModel.processJsCallbackMessage(featureName, method, id, data)
                     }
                 },
@@ -2586,7 +2654,11 @@ class BrowserTabFragment :
         addBookmarkDialog.deleteBookmarkListener = viewModel
     }
 
-    private fun confirmDeleteSavedSite(savedSite: SavedSite, message: Spanned, onDeleteSnackbarDismissed: (SavedSite) -> Unit) {
+    private fun confirmDeleteSavedSite(
+        savedSite: SavedSite,
+        message: Spanned,
+        onDeleteSnackbarDismissed: (SavedSite) -> Unit,
+    ) {
         binding.rootView.makeSnackbarWithNoBottomInset(
             message,
             Snackbar.LENGTH_LONG,
@@ -3573,6 +3645,7 @@ class BrowserTabFragment :
                 val browserShowing = viewState.browserShowing
                 val browserShowingChanged = viewState.browserShowing != lastSeenBrowserViewState?.browserShowing
                 val errorChanged = viewState.browserError != lastSeenBrowserViewState?.browserError
+                val sslErrorChanged = viewState.sslError != lastSeenBrowserViewState?.sslError
 
                 lastSeenBrowserViewState = viewState
                 if (browserShowingChanged) {
@@ -3585,6 +3658,14 @@ class BrowserTabFragment :
                     if (viewState.browserError != OMITTED) {
                         showError(viewState.browserError, webView?.url)
                     } else {
+                        if (browserShowing) {
+                            showBrowser()
+                        } else {
+                            showHome()
+                        }
+                    }
+                } else if (sslErrorChanged) {
+                    if (viewState.sslError == NONE) {
                         if (browserShowing) {
                             showBrowser()
                         } else {

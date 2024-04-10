@@ -46,6 +46,7 @@ interface Site {
     var hasHttpResources: Boolean
     var upgradedHttps: Boolean
     var userAllowList: Boolean
+    var sslError: Boolean
 
     val entity: Entity?
     var certificate: SslCertificate?
@@ -73,6 +74,7 @@ interface Site {
     var consentSelfTestFailed: Boolean
     var consentCosmeticHide: Boolean?
     var isDesktopMode: Boolean
+    var nextUrl: String
 }
 
 fun Site.orderedTrackerBlockedEntities(): List<Entity> = trackingEvents

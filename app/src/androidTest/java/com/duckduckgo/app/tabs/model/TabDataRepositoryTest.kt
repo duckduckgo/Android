@@ -23,6 +23,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.blockingObserve
+import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.global.db.AppDatabase
@@ -404,6 +405,7 @@ class TabDataRepositoryTest {
         dao: TabsDao = mockDatabase(),
         entityLookup: EntityLookup = mock(),
         allowListRepository: UserAllowListRepository = mock(),
+        bypassedSSLCertificatesRepository: BypassedSSLCertificatesRepository = mock(),
         contentBlocking: ContentBlocking = mock(),
         webViewPreviewPersister: WebViewPreviewPersister = mock(),
         faviconManager: FaviconManager = mock(),
@@ -414,6 +416,7 @@ class TabDataRepositoryTest {
                 entityLookup,
                 contentBlocking,
                 allowListRepository,
+                bypassedSSLCertificatesRepository,
                 coroutinesTestRule.testScope,
                 coroutinesTestRule.testDispatcherProvider,
             ),

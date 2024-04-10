@@ -817,4 +817,15 @@
     <!-- Custom Tab -->
     <string name="openInDdgMenuItemTitle">Megnyitás DuckDuckGo-ban</string>
     <string name="runningInDdgMenuItemTitle">Futtatás a DuckDuckGo-ban</string>
+
+    <!-- SSL Error -->
+    <string name="sslErrorTitle">Figyelmeztetés: Lehet, hogy ez a webhely nem biztonságos</string>
+    <string name="sslErrorHeadline" instruction="Placeholder is domain with certificate issues">A webhely tanúsítványa érvénytelen. Előfordulhat, hogy olyan szerverhez csatlakozol, amely megpróbál %1$s címűként viselkedni, veszélybe sodorva ezzel bizalmas adataidat.</string>
+    <string name="sslErrorLeaveCTA">Webhely elhagyása</string>
+    <string name="sslErrorAdvancedCTA">Haladó</string>
+    <string name="sslErrorExpandedHeadline">A DuckDuckGo figyelmeztet, ha egy webhely érvénytelen tanúsítvánnyal rendelkezik.</string>
+    <string name="sslErrorExpandedCTA"><![CDATA[<u>Kockázat elfogadása és a webhely megnyitása<u/>]]></string>
+    <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">A megnyitni kívánt %1$s biztonsági tanúsítványa lejárt. Lehetséges, hogy a webhely nincs megfelelően konfigurálva, esetleg egy támadó feltörte a kapcsolatodat, vagy a rendszeróra beállítása helytelen.</string>
+    <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">A megnyitni kívánt %1$s biztonsági tanúsítványa nem egyezik ezzel: *.%2$s. Lehetséges, hogy a webhely nincs megfelelően konfigurálva, esetleg egy támadó feltörte a kapcsolatodat, vagy a rendszeróra beállítása helytelen.</string>
+    <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">A megnyitni kívánt %1$s biztonsági tanúsítványát az eszköz operációs rendszere nem ítéli meg biztonságosnak. Lehetséges, hogy a webhely nincs megfelelően konfigurálva, esetleg egy támadó feltörte a kapcsolatodat, vagy a rendszeróra beállítása helytelen.</string>
 </resources>

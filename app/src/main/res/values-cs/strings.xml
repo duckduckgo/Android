@@ -827,4 +827,15 @@
     <!-- Custom Tab -->
     <string name="openInDdgMenuItemTitle">Otevřít v DuckDuckGo</string>
     <string name="runningInDdgMenuItemTitle">Spuštěno v DuckDuckGo</string>
+
+    <!-- SSL Error -->
+    <string name="sslErrorTitle">Pozor: Tenhle web může být nezabezpečený</string>
+    <string name="sslErrorHeadline" instruction="Placeholder is domain with certificate issues">Tenhle web nemá platný certifikát. Možná se dokonce připojuješ k serveru, který předstírá, že je %1$s. Tvoje důvěrné informace by mohly být ohrožené.</string>
+    <string name="sslErrorLeaveCTA">Opustit tuhle stránku</string>
+    <string name="sslErrorAdvancedCTA">Pokročilé</string>
+    <string name="sslErrorExpandedHeadline">DuckDuckGo tě upozorní, když má web neplatný certifikát.</string>
+    <string name="sslErrorExpandedCTA"><![CDATA[<u>Přijmout riziko a přejít na stránku<u/>]]></string>
+    <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">Platnost bezpečnostního certifikátu pro %1$s vypršela. Je možné, že web je nesprávně nakonfigurovaný, že útočník prolomil tvoje připojení nebo že tvoje systémové hodiny jsou nesprávné.</string>
+    <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Bezpečnostní certifikát pro %1$s neodpovídá *.%2$s. Je možné, že web je nesprávně nakonfigurovaný, že útočník prolomil tvoje připojení nebo že tvoje systémové hodiny jsou nesprávné.</string>
+    <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Operační systém tvého zařízení nedůvěřuje bezpečnostnímu certifikátu %1$s. Je možné, že web je nesprávně nakonfigurovaný, že útočník prolomil tvoje připojení nebo že tvoje systémové hodiny jsou nesprávné.</string>
 </resources>

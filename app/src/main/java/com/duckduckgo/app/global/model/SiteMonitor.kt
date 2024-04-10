@@ -21,6 +21,7 @@ import android.net.http.SslCertificate
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.UriString
+import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
 import com.duckduckgo.app.global.model.PrivacyShield.UNPROTECTED
@@ -44,6 +45,7 @@ class SiteMonitor(
     override var upgradedHttps: Boolean = false,
     private val userAllowListRepository: UserAllowListRepository,
     private val contentBlocking: ContentBlocking,
+    private val bypassedSSLCertificatesRepository: BypassedSSLCertificatesRepository,
     private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
 ) : Site {
@@ -68,6 +70,8 @@ class SiteMonitor(
         get() = httpsStatus()
 
     override var hasHttpResources = false
+
+    override var sslError: Boolean = false
 
     override var entity: Entity? = null
 
@@ -162,6 +166,12 @@ class SiteMonitor(
             return UNKNOWN
         }
 
+        sslError = isSslCertificateBypassed(url)
+        if (sslError) {
+            Timber.i("Shield: site has certificate error")
+            return UNPROTECTED
+        }
+
         Timber.i("Shield: isMajor ${entity?.isMajor} prev ${entity?.prevalence} for $domain")
         return PROTECTED
     }
@@ -169,6 +179,10 @@ class SiteMonitor(
     @WorkerThread
     private fun isAllowListed(domain: String): Boolean {
         return userAllowListRepository.isDomainInUserAllowList(domain) || contentBlocking.isAnException(domain)
+    }
+
+    private fun isSslCertificateBypassed(domain: String): Boolean {
+        return bypassedSSLCertificatesRepository.contains(domain)
     }
 
     override var urlParametersRemoved: Boolean = false
@@ -182,6 +196,8 @@ class SiteMonitor(
     override var consentCosmeticHide: Boolean? = false
 
     override var isDesktopMode: Boolean = false
+
+    override var nextUrl: String = url
 
     companion object {
         private val specialDomainTypes = setOf(

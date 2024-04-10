@@ -817,4 +817,15 @@
     <!-- Custom Tab -->
     <string name="openInDdgMenuItemTitle">Ava saidil DuckDuckGo</string>
     <string name="runningInDdgMenuItemTitle">DuckDuckGo-s käivitamine</string>
+
+    <!-- SSL Error -->
+    <string name="sslErrorTitle">Hoiatus: see sait võib olla ebaturvaline</string>
+    <string name="sslErrorHeadline" instruction="Placeholder is domain with certificate issues">Selle saidi sertifikaat on vale. Võimalik, et lood ühenduse serveriga, mis teeskleb olevat %1$s ja see võib sinu konfidentsiaalse teabe ohtu seada.</string>
+    <string name="sslErrorLeaveCTA">Lahku sellelt saidilt</string>
+    <string name="sslErrorAdvancedCTA">Täiustatud</string>
+    <string name="sslErrorExpandedHeadline">DuckDuckGo hoiatab sind, kui veebisaidil on vale sertifikaat.</string>
+    <string name="sslErrorExpandedCTA"><![CDATA[<u>Nõustu riskiga ja külasta saiti<u/>]]></string>
+    <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">%1$s turvasertifikaat on aegunud. Võimalik, et veebisait on valesti konfigureeritud, ründaja on sinu ühenduse ohtu seadnud või sinu süsteemi kell on vale.</string>
+    <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">%1$s turvasertifikaat ei ühti *.%2$s. Võimalik, et veebisait on valesti konfigureeritud, ründaja on sinu ühenduse ohtu seadnud või sinu süsteemi kell on vale.</string>
+    <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Sinu seadme operatsioonisüsteem ei usalda %1$s turvasertifikaati. Võimalik, et veebisait on valesti konfigureeritud, ründaja on sinu ühenduse ohtu seadnud või sinu süsteemi kell on vale.</string>
 </resources>

@@ -817,4 +817,15 @@
     <!-- Custom Tab -->
     <string name="openInDdgMenuItemTitle">DuckDuckGo\'da aç</string>
     <string name="runningInDdgMenuItemTitle">DuckDuckGo\'da Çalışıyor</string>
+
+    <!-- SSL Error -->
+    <string name="sslErrorTitle">Uyarı: Bu site güvenli olmayabilir</string>
+    <string name="sslErrorHeadline" instruction="Placeholder is domain with certificate issues">Bu sitenin sertifikası geçersiz. %1$s gibi görünen ve gizli bilgilerinizi riske atabilecek bir sunucuya bağlanıyor olabilirsiniz.</string>
+    <string name="sslErrorLeaveCTA">Bu Siteden Ayrılın</string>
+    <string name="sslErrorAdvancedCTA">Gelişmiş</string>
+    <string name="sslErrorExpandedHeadline">DuckDuckGo, bir web sitesinin sertifikası geçersiz olduğunda sizi uyarır.</string>
+    <string name="sslErrorExpandedCTA"><![CDATA[<u>Riski Kabul Edin ve Siteyi Ziyaret Edin<u/>]]></string>
+    <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">%1$s için güvenlik sertifikasının süresi doldu. Web sitesi yanlış yapılandırılmış, bir saldırgan bağlantınızı tehlikeye atmış veya sistem saatiniz yanlış ayarlanmış olabilir.</string>
+    <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">%1$s için güvenlik sertifikası eşleşmiyor *.%2$s. Web sitesi yanlış yapılandırılmış, bir saldırgan bağlantınızı tehlikeye atmış veya sistem saatiniz yanlış ayarlanmış olabilir.</string>
+    <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Cihazınızın işletim sistemi, %1$s güvenlik sertifikasına güvenmiyor. Web sitesi yanlış yapılandırılmış, bir saldırgan bağlantınızı tehlikeye atmış veya sistem saatiniz yanlış ayarlanmış olabilir.</string>
 </resources>

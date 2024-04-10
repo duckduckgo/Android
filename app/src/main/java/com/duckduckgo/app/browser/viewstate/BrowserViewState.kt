@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser.viewstate
 
+import com.duckduckgo.app.browser.SSLErrorType
 import com.duckduckgo.app.browser.SpecialUrlDetector
 import com.duckduckgo.app.browser.WebViewErrorResponse
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupViewState
@@ -55,6 +56,7 @@ data class BrowserViewState(
     val canPrintPage: Boolean = false,
     val showAutofill: Boolean = false,
     val browserError: WebViewErrorResponse = WebViewErrorResponse.OMITTED,
+    val sslError: SSLErrorType = SSLErrorType.NONE,
     val privacyProtectionsPopupViewState: PrivacyProtectionsPopupViewState = PrivacyProtectionsPopupViewState.Gone,
 )
 
