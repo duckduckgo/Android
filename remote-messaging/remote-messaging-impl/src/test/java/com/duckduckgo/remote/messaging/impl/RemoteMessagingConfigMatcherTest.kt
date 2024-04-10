@@ -353,7 +353,7 @@ class RemoteMessagingConfigMatcherTest {
     }
 
     private suspend fun givenDeviceMatches(
-        vararg matchingAttributes: MatchingAttribute<*>,
+        vararg matchingAttributes: MatchingAttribute,
     ) {
         whenever(deviceAttributeMatcher.evaluate(any())).thenReturn(false)
         whenever(androidAppAttributeMatcher.evaluate(any())).thenReturn(false)
@@ -372,7 +372,7 @@ class RemoteMessagingConfigMatcherTest {
 
     private fun rule(
         id: Int,
-        vararg matchingAttributes: MatchingAttribute<*>,
+        vararg matchingAttributes: MatchingAttribute,
     ) = Pair(id, matchingAttributes.asList())
 
     private fun rules(vararg ids: Int) = ids.asList()
