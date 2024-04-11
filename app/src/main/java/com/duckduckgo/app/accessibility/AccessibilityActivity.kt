@@ -94,7 +94,7 @@ class AccessibilityActivity : DuckDuckGoActivity() {
         val highlightColor = getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorContainer)
         val transparentColor = ContextCompat.getColor(applicationContext, android.R.color.transparent)
 
-        val totalAnimationDuration = FLICKER_DURATION * TRANSITIONS
+        val totalAnimationDuration = FADE_DURATION * TRANSITIONS
 
         val colorAnimator = ValueAnimator.ofArgb(transparentColor, highlightColor, transparentColor, highlightColor, transparentColor, highlightColor)
         colorAnimator.duration = totalAnimationDuration
@@ -143,7 +143,7 @@ class AccessibilityActivity : DuckDuckGoActivity() {
 
     companion object {
         private const val VOICE_SEARCH = "voiceSearch"
-        private const val FLICKER_DURATION = 300L
+        private const val FADE_DURATION = 300L
         private const val TRANSITIONS = 5
     }
 }
