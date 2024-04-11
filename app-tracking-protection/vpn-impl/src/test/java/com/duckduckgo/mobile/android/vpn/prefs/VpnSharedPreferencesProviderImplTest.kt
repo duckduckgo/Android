@@ -77,4 +77,21 @@ class VpnSharedPreferencesProviderImplTest {
         assertNotEquals(1f, harmony.getFloat("float", 0f))
         assertNotEquals(1L, harmony.getLong("long", 0L))
     }
+
+    @Test
+    fun testSafeSharedPreferences() {
+        val prefs = SafeSharedPreferences(vpnPreferencesProvider.getSharedPreferences(NAME))
+
+        prefs.edit(commit = true) { putBoolean("bool", true) }
+        prefs.edit(commit = true) { putString("string", "true") }
+        prefs.edit(commit = true) { putInt("int", 1) }
+        prefs.edit(commit = true) { putFloat("float", 1f) }
+        prefs.edit(commit = true) { putLong("long", 1L) }
+
+        assertEquals(true, prefs.getBoolean("bool", false))
+        assertEquals("true", prefs.getString("string", "false"))
+        assertEquals(1, prefs.getInt("int", 0))
+        assertEquals(1f, prefs.getFloat("float", 0f))
+        assertEquals(1L, prefs.getLong("long", 0L))
+    }
 }

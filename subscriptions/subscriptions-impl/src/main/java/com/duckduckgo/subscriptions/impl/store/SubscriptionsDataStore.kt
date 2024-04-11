@@ -141,7 +141,10 @@ class SubscriptionsEncryptedDataStore @Inject constructor(
             }
         }
 
-    override fun canUseEncryption(): Boolean = encryptedPreferences != null
+    override fun canUseEncryption(): Boolean {
+        encryptedPreferences?.edit(commit = true) { putBoolean("test", true) }
+        return encryptedPreferences?.getBoolean("test", false) == true
+    }
 
     companion object {
         const val FILENAME = "com.duckduckgo.subscriptions.store"
