@@ -106,10 +106,9 @@ class NavigationActionMapper @Inject constructor(
 ) : MessageActionMapperPlugin {
     override fun evaluate(jsonMessageAction: JsonMessageAction): Action? {
         if (jsonMessageAction.type == NAVIGATION.jsonValue) {
-            jsonMessageAction.additionalParameters?.get("payload")?.let { payload ->
-                globalActivityStarter.startIntent(context, DeeplinkActivityParams(jsonMessageAction.value, payload))?.let { _ ->
-                    return Action.Navigation(jsonMessageAction.value, jsonMessageAction.additionalParameters)
-                }
+            val payload = jsonMessageAction.additionalParameters?.get("payload") ?: ""
+            globalActivityStarter.startIntent(context, DeeplinkActivityParams(jsonMessageAction.value, payload))?.let {
+                return Action.Navigation(jsonMessageAction.value, jsonMessageAction.additionalParameters)
             }
         }
         return null
