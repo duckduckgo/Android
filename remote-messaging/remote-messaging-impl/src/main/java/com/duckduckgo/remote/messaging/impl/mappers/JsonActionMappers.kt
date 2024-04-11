@@ -105,13 +105,13 @@ class NavigationActionMapper @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,
 ) : MessageActionMapperPlugin {
     override fun evaluate(jsonMessageAction: JsonMessageAction): Action? {
-        val payload = jsonMessageAction.additionalParameters?.get("payload") ?: return null
-        val intent = globalActivityStarter.startIntent(context, DeeplinkActivityParams(jsonMessageAction.value, payload))
-
-        return if (jsonMessageAction.type == NAVIGATION.jsonValue && intent != null) {
-            Action.Navigation(jsonMessageAction.value, jsonMessageAction.additionalParameters)
-        } else {
-            null
+        if (jsonMessageAction.type == NAVIGATION.jsonValue) {
+            jsonMessageAction.additionalParameters?.get("payload")?.let { payload ->
+                globalActivityStarter.startIntent(context, DeeplinkActivityParams(jsonMessageAction.value, payload))?.let { _ ->
+                    return Action.Navigation(jsonMessageAction.value, jsonMessageAction.additionalParameters)
+                }
+            }
         }
+        return null
     }
 }
