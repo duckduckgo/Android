@@ -39,7 +39,6 @@ sealed class HistoryEntry(
         override val url: Uri,
         override val title: String,
         val query: String,
-        val queryTokens: List<String>? = null,
         override val visits: List<Date>,
     ) : HistoryEntry(url = url, title, visits = visits)
 }
