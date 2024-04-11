@@ -39,6 +39,7 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.squareup.anvil.annotations.ContributesBinding
 import io.reactivex.Observable
+import java.io.InterruptedIOException
 import javax.inject.Inject
 import kotlin.math.max
 import org.jetbrains.annotations.VisibleForTesting
@@ -109,9 +110,7 @@ class AutoCompleteApi @Inject constructor(
                     (removeDuplicates(navigationHistory, bookmarksAndFavorites) + searchHistory).sortedByDescending { it.score }.map { it.suggestion }
                 }
 
-        return savedSitesObservable.zipWith(
-            getAutoCompleteSearchResults(query),
-        ) { bookmarksAndHistory, searchResults ->
+        return savedSitesObservable.zipWith(getAutoCompleteSearchResults(query)) { bookmarksAndHistory, searchResults ->
             val topHits = (searchResults + bookmarksAndHistory).filter {
                 when (it) {
                     is AutoCompleteHistorySearchSuggestion -> true
@@ -135,7 +134,7 @@ class AutoCompleteApi @Inject constructor(
                 query = query,
                 suggestions = (topHits + filteredSearchResults + filteredBookmarks).distinctBy { it.phrase },
             )
-        }
+        }.onErrorResumeNext(Observable.empty())
     }
 
     private fun removeDuplicates(
@@ -173,7 +172,9 @@ class AutoCompleteApi @Inject constructor(
                 AutoCompleteSearchSuggestion(phrase = it.phrase, isUrl = (it.isNav ?: UriString.isWebUrl(it.phrase)))
             }
             .toList()
-            .onErrorReturn { emptyList() }
+            .onErrorReturn {
+                if (it is InterruptedIOException) throw it else emptyList<AutoCompleteSearchSuggestion>()
+            }
             .toObservable()
 
     private fun getAutoCompleteBookmarkResults(query: String): Observable<MutableList<RankedSuggestion<AutoCompleteBookmarkSuggestion>>> =
