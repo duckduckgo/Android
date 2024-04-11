@@ -62,7 +62,7 @@ class VpnSharedPreferencesProviderImpl @Inject constructor(
         name: String,
         multiprocess: Boolean,
     ): SharedPreferences {
-        return if (multiprocess) {
+        val prefs = if (multiprocess) {
             context.getEncryptedHarmonySharedPreferences(
                 name,
                 MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC),
@@ -78,6 +78,8 @@ class VpnSharedPreferencesProviderImpl @Inject constructor(
                 EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
             )
         }
+
+        return SafeSharedPreferences(prefs)
     }
 
     private fun migrateToHarmonyIfNecessary(name: String): SharedPreferences {
