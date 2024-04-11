@@ -36,19 +36,22 @@ import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenURL
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsToggleUsageListener
-import java.util.*
+import java.util.Locale
 import javax.inject.Inject
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
@@ -56,6 +59,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @ContributesViewModel(ActivityScope::class)
 class PrivacyDashboardHybridViewModel @Inject constructor(
     private val userAllowListRepository: UserAllowListRepository,
@@ -199,14 +203,17 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
             .onEach(::updateSite)
             .launchIn(viewModelScope)
 
-        combine(site.filterNotNull(), userAllowListRepository.domainsInUserAllowListFlow()) { site, domains -> site to domains }
-            .map { (site, allowlistedDomains) ->
-                // Checking if site was added to / removed from allowlist since the screen was initialized
-                site.userAllowList != site.domain in allowlistedDomains
+        site.filterNotNull()
+            .mapNotNull { it.domain }
+            .distinctUntilChanged()
+            .flatMapLatest { domain ->
+                userAllowListRepository.domainsInUserAllowListFlow()
+                    .map { allowlistedDomains -> domain in allowlistedDomains }
+                    .distinctUntilChanged()
+                    .drop(1) // Emit only when domain was added to or removed from the allowlist
             }
-            .drop(1)
             .onEach { allowlistChanged ->
-                // Closing the Privacy Dashboard screen
+                // Setting userChangedValues to true will trigger closing the screen
                 viewState.update { it?.copy(userChangedValues = allowlistChanged) }
             }
             .launchIn(viewModelScope)
