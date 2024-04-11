@@ -14,14 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.store
+package com.duckduckgo.history.impl.store
 
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.history.impl.store.HistoryDao
-import com.duckduckgo.history.impl.store.HistoryDatabase
-import com.duckduckgo.history.impl.store.HistoryEntryEntity
 import java.time.LocalDateTime
 import java.time.Month.JANUARY
 import org.junit.After

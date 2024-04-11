@@ -44,7 +44,7 @@ dependencies {
     implementation AndroidX.room.rxJava2
     implementation AndroidX.room.ktx
 
-
+    testImplementation AndroidX.test.ext.junit
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation project(path: ':common-test')
