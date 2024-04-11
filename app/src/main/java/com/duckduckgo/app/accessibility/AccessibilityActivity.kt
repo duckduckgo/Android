@@ -77,7 +77,7 @@ class AccessibilityActivity : DuckDuckGoActivity() {
 
     private fun scrollToHighlightedItem() {
         intent.getActivityParams(AccessibilityScreenParams::class.java)?.let { params ->
-            if (params.highlightedItem == "voiceSearch") {
+            if (params.highlightedItem == VOICE_SEARCH) {
                 binding.voiceSearchToggle.post {
                     scrollToVoiceSearchToggle()
                     highlightVoiceSearchToggle()
@@ -94,8 +94,7 @@ class AccessibilityActivity : DuckDuckGoActivity() {
         val highlightColor = getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorContainer)
         val transparentColor = ContextCompat.getColor(applicationContext, android.R.color.transparent)
 
-        val flickerDuration = 300L
-        val totalAnimationDuration = flickerDuration * 5
+        val totalAnimationDuration = FLICKER_DURATION * TRANSITIONS
 
         val colorAnimator = ValueAnimator.ofArgb(transparentColor, highlightColor, transparentColor, highlightColor, transparentColor, highlightColor)
         colorAnimator.duration = totalAnimationDuration
@@ -140,5 +139,11 @@ class AccessibilityActivity : DuckDuckGoActivity() {
 
         binding.fontSizeSettingsGroup.alpha = if (overrideSystemFontSize) 1.0f else 0.40f
         binding.accessibilitySlider.isEnabled = overrideSystemFontSize
+    }
+
+    companion object {
+        private const val VOICE_SEARCH = "voiceSearch"
+        private const val FLICKER_DURATION = 300L
+        private const val TRANSITIONS = 5
     }
 }
