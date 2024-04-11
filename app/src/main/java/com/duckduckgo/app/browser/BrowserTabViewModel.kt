@@ -1710,7 +1710,7 @@ class BrowserTabViewModel @Inject constructor(
                 browserViewState.value =
                     currentBrowserViewState().copy(
                         browserShowing = false,
-                        showPrivacyShield = false,
+                        showPrivacyShield = HighlightableButton.Visible(enabled = false),
                         showDaxIcon = false,
                         showSearchIcon = false,
                         sslError = errorResponse.errorType,
@@ -3097,14 +3097,6 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun configureBrowserBackground() {
-        val backgroundRes: Int =
-            if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) R.drawable.onboarding_experiment_background else 0
-        viewModelScope.launch {
-            command.value = SetBrowserBackground(backgroundRes)
-        }
-    }
-
     fun onSSLCertificateWarningAction(action: Action, url: String) {
         when (action) {
             is Action.Shown -> {
@@ -3146,12 +3138,20 @@ class BrowserTabViewModel @Inject constructor(
             )
             loadingViewState.value = currentLoadingViewState().copy(isLoading = false)
             browserViewState.value = currentBrowserViewState().copy(
-                showPrivacyShield = false,
+                showPrivacyShield = HighlightableButton.Visible(enabled = false),
                 showSearchIcon = true,
                 showDaxIcon = false,
                 browserShowing = showBrowser,
                 sslError = NONE,
             )
+        }
+    }
+
+    fun configureBrowserBackground() {
+        val backgroundRes: Int =
+            if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) R.drawable.onboarding_experiment_background else 0
+        viewModelScope.launch {
+            command.value = SetBrowserBackground(backgroundRes)
         }
     }
 

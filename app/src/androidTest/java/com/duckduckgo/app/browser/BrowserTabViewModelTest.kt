@@ -4991,28 +4991,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnboardingExperimentEnabledThenSetBrowserBackgroundWithNewDrawable() = runTest {
-        whenever(mockExtendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()).thenReturn(true)
-
-        testee.configureBrowserBackground()
-
-        assertCommandIssued<Command.SetBrowserBackground> {
-            assertEquals(R.drawable.onboarding_experiment_background, this.backgroundRes)
-        }
-    }
-
-    @Test
-    fun whenOnboardingExperimentDisabledThenSetBrowserBackgroundWithNoDrawable() = runTest {
-        whenever(mockExtendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()).thenReturn(false)
-
-        testee.configureBrowserBackground()
-
-        assertCommandIssued<Command.SetBrowserBackground> {
-            assertEquals(0, this.backgroundRes)
-        }
-    }
-
-    @Test
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     fun whenAllowBypassSSLCertificatesFeatureDisabledThenSSLCertificateErrorsAreIgnored() {
         whenever(mockToggle.isEnabled()).thenReturn(false)
@@ -5223,6 +5201,28 @@ class BrowserTabViewModelTest {
         }
         return mock<SslCertificate>().apply {
             whenever(x509Certificate).thenReturn(certificate)
+        }
+    }
+
+    @Test
+    fun whenOnboardingExperimentEnabledThenSetBrowserBackgroundWithNewDrawable() = runTest {
+        whenever(mockExtendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()).thenReturn(true)
+
+        testee.configureBrowserBackground()
+
+        assertCommandIssued<Command.SetBrowserBackground> {
+            assertEquals(R.drawable.onboarding_experiment_background, this.backgroundRes)
+        }
+    }
+
+    @Test
+    fun whenOnboardingExperimentDisabledThenSetBrowserBackgroundWithNoDrawable() = runTest {
+        whenever(mockExtendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()).thenReturn(false)
+
+        testee.configureBrowserBackground()
+
+        assertCommandIssued<Command.SetBrowserBackground> {
+            assertEquals(0, this.backgroundRes)
         }
     }
 
