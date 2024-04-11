@@ -80,7 +80,10 @@ class ExperimentWelcomePage : OnboardingPageFragment(R.layout.content_onboarding
     private var typingAnimation: ViewPropertyAnimatorCompat? = null
     private var welcomeAnimationFinished = false
 
-    private val requestPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+    private val requestPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { permissionGranted ->
+        if (permissionGranted) {
+            viewModel.notificationRuntimePermissionGranted()
+        }
         if (view?.windowVisibility == View.VISIBLE) {
             scheduleWelcomeAnimation(ANIMATION_DELAY_AFTER_NOTIFICATIONS_PERMISSIONS_HANDLED)
         }
@@ -142,6 +145,7 @@ class ExperimentWelcomePage : OnboardingPageFragment(R.layout.content_onboarding
     @SuppressLint("InlinedApi")
     private fun requestNotificationsPermissions() {
         if (appBuildConfig.sdkInt >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            viewModel.notificationRuntimePermissionRequested()
             requestPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
         } else {
             scheduleWelcomeAnimation()
@@ -150,6 +154,7 @@ class ExperimentWelcomePage : OnboardingPageFragment(R.layout.content_onboarding
 
     private fun configureDaxCta(onboardingDialogType: PreOnboardingDialogType) {
         context?.let {
+            viewModel.onDialogShown(onboardingDialogType)
             when (onboardingDialogType) {
                 INITIAL -> {
                     ctaText = it.getString(R.string.preOnboardingDaxDialog1Title)
