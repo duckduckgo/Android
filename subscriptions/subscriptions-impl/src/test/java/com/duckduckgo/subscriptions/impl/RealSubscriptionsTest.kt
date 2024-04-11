@@ -73,6 +73,15 @@ class RealSubscriptionsTest {
     }
 
     @Test
+    fun whenGetAccessTokenSucceedsAndNoEncryptionThenReturnNull() = runTest {
+        whenever(mockSubscriptionsManager.canSupportEncryption()).thenReturn(false)
+        whenever(mockSubscriptionsManager.getAccessToken()).thenReturn(AccessToken.Success("accessToken"))
+        privacyProFeature.isLaunched().setEnabled(State(enable = true))
+        val result = subscriptions.getAccessToken()
+        assertNull(result)
+    }
+
+    @Test
     fun whenGetEntitlementStatusHasEntitlementAndEnabledAndActiveThenReturnList() = runTest {
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
         privacyProFeature.isLaunched().setEnabled(State(enable = true))
@@ -122,6 +131,19 @@ class RealSubscriptionsTest {
     }
 
     @Test
+    fun whenGetEntitlementStatusHasEntitlementAndEnabledAndActiveAndNoEncryptionThenReturnList() = runTest {
+        whenever(mockSubscriptionsManager.canSupportEncryption()).thenReturn(false)
+        whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
+        privacyProFeature.isLaunched().setEnabled(State(enable = true))
+        whenever(mockSubscriptionsManager.entitlements).thenReturn(flowOf(listOf(NetP)))
+
+        subscriptions.getEntitlementStatus().test {
+            assertTrue(awaitItem().isEmpty())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenIsEligibleIfOffersReturnedThenReturnTrueRegardlessOfStatus() = runTest {
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(UNKNOWN)
         whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(
@@ -152,19 +174,29 @@ class RealSubscriptionsTest {
     }
 
     @Test
-    fun whenIsEligibleIfNotEncryptionThenReturnTrueIfActive() = runTest {
+    fun whenIsEligibleIfNotEncryptionThenReturnFalseIfActive() = runTest {
         whenever(mockSubscriptionsManager.canSupportEncryption()).thenReturn(false)
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
         whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(
             SubscriptionOffer(monthlyPlanId = "test", yearlyFormattedPrice = "test", yearlyPlanId = "test", monthlyFormattedPrice = "test"),
         )
-        assertTrue(subscriptions.isEligible())
+        assertFalse(subscriptions.isEligible())
     }
 
     @Test
     fun whenIsEligibleIfNotEncryptionAndNotActiveThenReturnFalse() = runTest {
         whenever(mockSubscriptionsManager.canSupportEncryption()).thenReturn(false)
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(UNKNOWN)
+        whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(
+            SubscriptionOffer(monthlyPlanId = "test", yearlyFormattedPrice = "test", yearlyPlanId = "test", monthlyFormattedPrice = "test"),
+        )
+        assertFalse(subscriptions.isEligible())
+    }
+
+    @Test
+    fun whenIsEligibleIfNotEncryptionAndActiveThenReturnFalse() = runTest {
+        whenever(mockSubscriptionsManager.canSupportEncryption()).thenReturn(false)
+        whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
         whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(
             SubscriptionOffer(monthlyPlanId = "test", yearlyFormattedPrice = "test", yearlyPlanId = "test", monthlyFormattedPrice = "test"),
         )

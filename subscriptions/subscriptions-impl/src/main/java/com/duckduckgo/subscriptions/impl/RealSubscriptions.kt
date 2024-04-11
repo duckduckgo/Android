@@ -35,6 +35,7 @@ import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.R.string
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PRIVACY_PRO_ETLD
@@ -85,17 +86,20 @@ class RealSubscriptions @Inject constructor(
         }
     }
     override suspend fun isEnabled(): Boolean {
-        return privacyProFeature.isLaunched().isEnabled()
+        val supportsEncryption = subscriptionsManager.canSupportEncryption()
+        return privacyProFeature.isLaunched().isEnabled() && supportsEncryption
     }
 
     override suspend fun isEligible(): Boolean {
         val supportsEncryption = subscriptionsManager.canSupportEncryption()
         val isActive = subscriptionsManager.subscriptionStatus().isActiveOrWaiting()
         val isEligible = subscriptionsManager.getSubscriptionOffer() != null
-        return isActive || (isEligible && supportsEncryption)
+        return supportsEncryption && (isActive || isEligible)
     }
 
     override suspend fun getSubscriptionStatus(): SubscriptionStatus {
+        val supportsEncryption = subscriptionsManager.canSupportEncryption()
+        if (!supportsEncryption) return UNKNOWN
         return subscriptionsManager.subscriptionStatus()
     }
 
