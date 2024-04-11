@@ -41,7 +41,7 @@ import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(AccessibilityScreenNoParams::class)
+@ContributeToActivityStarter(AccessibilityScreenNoParams::class, screenName = "accessibility")
 @ContributeToActivityStarter(AccessibilityScreenParams::class, screenName = "accessibility")
 class AccessibilityActivity : DuckDuckGoActivity() {
 
