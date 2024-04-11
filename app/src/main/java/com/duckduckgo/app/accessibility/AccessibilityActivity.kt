@@ -27,6 +27,8 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.accessibility.AccessibilityScreens.Default
+import com.duckduckgo.app.accessibility.AccessibilityScreens.HighlightedItem
 import com.duckduckgo.app.browser.databinding.ActivityAccessibilitySettingsBinding
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.getColorFromAttr
@@ -41,8 +43,8 @@ import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(AccessibilityScreenNoParams::class, screenName = "accessibility")
-@ContributeToActivityStarter(AccessibilityScreenParams::class, screenName = "accessibility")
+@ContributeToActivityStarter(Default::class, screenName = "accessibility")
+@ContributeToActivityStarter(HighlightedItem::class, screenName = "accessibility")
 class AccessibilityActivity : DuckDuckGoActivity() {
 
     private val binding: ActivityAccessibilitySettingsBinding by viewBinding()
@@ -76,7 +78,7 @@ class AccessibilityActivity : DuckDuckGoActivity() {
     }
 
     private fun scrollToHighlightedItem() {
-        intent.getActivityParams(AccessibilityScreenParams::class.java)?.let { params ->
+        intent.getActivityParams(HighlightedItem::class.java)?.let { params ->
             if (params.highlightedItem == VOICE_SEARCH) {
                 binding.voiceSearchToggle.post {
                     scrollToVoiceSearchToggle()

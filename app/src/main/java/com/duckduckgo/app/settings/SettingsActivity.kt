@@ -28,7 +28,7 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.about.AboutScreenNoParams
-import com.duckduckgo.app.accessibility.AccessibilityScreenNoParams
+import com.duckduckgo.app.accessibility.AccessibilityScreens
 import com.duckduckgo.app.appearance.AppearanceScreenNoParams
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
@@ -347,7 +347,7 @@ class SettingsActivity : DuckDuckGoActivity() {
 
     private fun launchAccessibilitySettings() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        globalActivityStarter.start(this, AccessibilityScreenNoParams, options)
+        globalActivityStarter.start(this, AccessibilityScreens.Default, options)
     }
 
     private fun launchEmailProtectionScreen(url: String) {
