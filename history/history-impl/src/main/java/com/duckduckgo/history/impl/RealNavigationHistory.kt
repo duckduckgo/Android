@@ -19,8 +19,8 @@ package com.duckduckgo.history.impl
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.history.api.HistoryApi
 import com.duckduckgo.history.api.HistoryEntry
+import com.duckduckgo.history.api.NavigationHistory
 import com.squareup.anvil.annotations.ContributesBinding
 import io.reactivex.Single
 import javax.inject.Inject
@@ -28,11 +28,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @ContributesBinding(AppScope::class)
-class History @Inject constructor(
+class RealNavigationHistory @Inject constructor(
     private val historyRepository: HistoryRepository,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-) : HistoryApi {
+) : NavigationHistory {
     override fun saveToHistory(
         url: String,
         title: String?,

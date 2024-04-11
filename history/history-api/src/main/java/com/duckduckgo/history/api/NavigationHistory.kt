@@ -18,7 +18,7 @@ package com.duckduckgo.history.api
 
 import io.reactivex.Single
 
-interface HistoryApi {
+interface NavigationHistory {
 
     /**
      * Stores a history entry.
@@ -29,8 +29,9 @@ interface HistoryApi {
     fun saveToHistory(url: String, title: String?)
 
     /**
-     * Retrieves history entries.
-     * @return [Single] of all sites stored in history.
+     * Retrieves all [HistoryEntry].
+     * @return [Single] of all [HistoryEntry].
      */
+    @Deprecated("RxJava is deprecated, except for Auto-Complete")
     fun getHistorySingle(): Single<List<HistoryEntry>>
 }

@@ -32,7 +32,7 @@ class HistoryTest {
     private val mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
     private val testScope = TestScope()
 
-    val testee = History(mockHistoryRepository, mockDuckDuckGoUrlDetector, testScope)
+    val testee = RealNavigationHistory(mockHistoryRepository, mockDuckDuckGoUrlDetector, testScope)
 
     @Test
     fun whenUrlIsSerpThenSaveToHistoryWithQueryAndSerpIsTrue() {

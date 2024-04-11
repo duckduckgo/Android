@@ -25,7 +25,7 @@ import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.history.api.HistoryApi
+import com.duckduckgo.history.api.NavigationHistory
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -44,7 +44,7 @@ class RealPageLoadedHandler @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val autoconsent: Autoconsent,
     private val optimizeTrackerEvaluationRCWrapper: OptimizeTrackerEvaluationRCWrapper,
-    private val historyApi: HistoryApi,
+    private val navigationHistory: NavigationHistory,
 ) : PageLoadedHandler {
 
     override fun onPageLoaded(url: String, title: String?, start: Long, end: Long) {
@@ -60,7 +60,7 @@ class RealPageLoadedHandler @Inject constructor(
                     ),
                 )
             }
-            historyApi.saveToHistory(url, title)
+            navigationHistory.saveToHistory(url, title)
         }
     }
 }
