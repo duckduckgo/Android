@@ -22,3 +22,8 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
  * Use this model to launch the Accessibility screen
  */
 object AccessibilityScreenNoParams : ActivityParams
+
+/**
+ * Use this model to launch the Accessibility screen with a highlighted item
+ */
+data class AccessibilityScreenParams(val highlightedItem: String) : ActivityParams
