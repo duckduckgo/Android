@@ -28,13 +28,13 @@ import com.duckduckgo.common.ui.view.listitem.CheckListItem
 import com.duckduckgo.common.ui.view.listitem.CheckListItem.CheckItemStatus
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
+import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState
+import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.NetPAccessState
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.CONNECTED
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.CONNECTING
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.DISCONNECTED
-import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist
-import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_SETTINGS_PRESSED
 import com.duckduckgo.networkprotection.impl.subscription.settings.ProSettingNetPViewModel.Command.OpenNetPScreen
@@ -56,7 +56,7 @@ import logcat.logcat
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 class ProSettingNetPViewModel(
-    private val networkProtectionWaitlist: NetworkProtectionWaitlist,
+    private val networkProtectionAccessState: NetworkProtectionAccessState,
     private val networkProtectionState: NetworkProtectionState,
     private val dispatcherProvider: DispatcherProvider,
     private val pixel: Pixel,
@@ -86,7 +86,7 @@ class ProSettingNetPViewModel(
         super.onStart(owner)
 
         viewModelScope.launch {
-            combine(networkProtectionWaitlist.getStateFlow(), networkProtectionState.getConnectionStateFlow()) { accessState, connectionState ->
+            combine(networkProtectionAccessState.getStateFlow(), networkProtectionState.getConnectionStateFlow()) { accessState, connectionState ->
                 _viewState.emit(
                     viewState.value.copy(
                         networkProtectionEntryState = getNetworkProtectionEntryState(accessState, connectionState),
@@ -98,7 +98,7 @@ class ProSettingNetPViewModel(
 
     fun onNetPSettingClicked() {
         viewModelScope.launch {
-            val screen = networkProtectionWaitlist.getScreenForCurrentState()
+            val screen = networkProtectionAccessState.getScreenForCurrentState()
             screen?.let {
                 command.send(OpenNetPScreen(screen))
                 pixel.fire(NETP_SETTINGS_PRESSED)
@@ -107,11 +107,11 @@ class ProSettingNetPViewModel(
     }
 
     private suspend fun getNetworkProtectionEntryState(
-        accessState: NetPWaitlistState,
+        accessState: NetPAccessState,
         networkProtectionConnectionState: ConnectionState,
     ): NetPEntryState {
         return when (accessState) {
-            is NetPWaitlistState.InBeta -> {
+            is NetPAccessState.InBeta -> {
                 if (accessState.termsAccepted || networkProtectionState.isOnboarded()) {
                     val subtitle = when (networkProtectionConnectionState) {
                         CONNECTED -> R.string.netpSubscriptionSettingsConnected
@@ -134,14 +134,13 @@ class ProSettingNetPViewModel(
                 }
             }
 
-            NetPWaitlistState.NotUnlocked -> Hidden
-            NetPWaitlistState.PendingInviteCode, NetPWaitlistState.JoinedWaitlist -> Pending
+            NetPAccessState.NotUnlocked -> Hidden
         }
     }
 
     @Suppress("UNCHECKED_CAST")
     class Factory @Inject constructor(
-        private val networkProtectionWaitlist: NetworkProtectionWaitlist,
+        private val networkProtectionAccessState: NetworkProtectionAccessState,
         private val networkProtectionState: NetworkProtectionState,
         private val dispatcherProvider: DispatcherProvider,
         private val pixel: Pixel,
@@ -150,7 +149,7 @@ class ProSettingNetPViewModel(
             return with(modelClass) {
                 when {
                     isAssignableFrom(ProSettingNetPViewModel::class.java) -> ProSettingNetPViewModel(
-                        networkProtectionWaitlist,
+                        networkProtectionAccessState,
                         networkProtectionState,
                         dispatcherProvider,
                         pixel,

@@ -19,19 +19,19 @@ package com.duckduckgo.networkprotection.api
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import kotlinx.coroutines.flow.Flow
 
-interface NetworkProtectionWaitlist {
+interface NetworkProtectionAccessState {
 
     /**
      * Returns the state of the NetP waitlist
      * The caller DOES NOT need to specify the dispatcher when calling this method
      */
-    suspend fun getState(): NetPWaitlistState
+    suspend fun getState(): NetPAccessState
 
     /**
      * Returns a flow of the states of the NetP access
      * The caller DOES NOT need to specify the dispatcher when calling this method
      */
-    suspend fun getStateFlow(): Flow<NetPWaitlistState>
+    suspend fun getStateFlow(): Flow<NetPAccessState>
 
     /**
      * Call this method to get the [ActivityParams] corresponding to the activity to launch for the current
@@ -43,10 +43,8 @@ interface NetworkProtectionWaitlist {
      */
     suspend fun getScreenForCurrentState(): ActivityParams?
 
-    sealed class NetPWaitlistState {
-        object NotUnlocked : NetPWaitlistState()
-        object JoinedWaitlist : NetPWaitlistState()
-        object PendingInviteCode : NetPWaitlistState()
-        data class InBeta(val termsAccepted: Boolean) : NetPWaitlistState()
+    sealed class NetPAccessState {
+        object NotUnlocked : NetPAccessState()
+        data class InBeta(val termsAccepted: Boolean) : NetPAccessState()
     }
 }

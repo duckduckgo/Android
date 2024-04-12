@@ -41,13 +41,13 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
+import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState
+import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.NetPAccessState
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.CONNECTED
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.CONNECTING
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.DISCONNECTED
-import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist
-import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.sync.api.DeviceSyncState
 import javax.inject.Inject
@@ -75,7 +75,7 @@ class SettingsViewModel @Inject constructor(
     private val autofillCapabilityChecker: AutofillCapabilityChecker,
     private val networkProtectionState: NetworkProtectionState,
     private val deviceSyncState: DeviceSyncState,
-    private val networkProtectionWaitlist: NetworkProtectionWaitlist,
+    private val networkProtectionAccessState: NetworkProtectionAccessState,
     private val dispatcherProvider: DispatcherProvider,
     private val autoconsent: Autoconsent,
     private val subscriptions: Subscriptions,
@@ -146,8 +146,8 @@ class SettingsViewModel @Inject constructor(
     }
 
     private suspend fun getNetworkProtectionEntryState(networkProtectionConnectionState: ConnectionState): NetPEntryState {
-        return when (val networkProtectionWaitlistState = networkProtectionWaitlist.getState()) {
-            is NetPWaitlistState.InBeta -> {
+        return when (val networkProtectionWaitlistState = networkProtectionAccessState.getState()) {
+            is NetPAccessState.InBeta -> {
                 if (networkProtectionWaitlistState.termsAccepted || networkProtectionState.isOnboarded()) {
                     val subtitle = when (networkProtectionConnectionState) {
                         CONNECTED -> R.string.netpSettingsConnected
@@ -169,8 +169,7 @@ class SettingsViewModel @Inject constructor(
                     Pending
                 }
             }
-            NetPWaitlistState.NotUnlocked -> Hidden
-            NetPWaitlistState.PendingInviteCode, NetPWaitlistState.JoinedWaitlist -> Pending
+            NetPAccessState.NotUnlocked -> Hidden
         }
     }
 
@@ -315,7 +314,7 @@ class SettingsViewModel @Inject constructor(
 
     fun onNetPSettingClicked() {
         viewModelScope.launch {
-            val screen = networkProtectionWaitlist.getScreenForCurrentState()
+            val screen = networkProtectionAccessState.getScreenForCurrentState()
             screen?.let {
                 command.send(Command.LaunchNetPWaitlist(screen))
                 pixel.fire(SETTINGS_NETP_PRESSED)

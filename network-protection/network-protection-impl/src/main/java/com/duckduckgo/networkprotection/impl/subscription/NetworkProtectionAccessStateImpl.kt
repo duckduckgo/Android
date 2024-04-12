@@ -19,16 +19,13 @@ package com.duckduckgo.networkprotection.impl.subscription
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
+import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState
+import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.NetPAccessState
+import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.NetPAccessState.InBeta
+import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.NetPAccessState.NotUnlocked
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenAndEnable
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
-import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist
-import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState
-import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.InBeta
-import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.JoinedWaitlist
-import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.NotUnlocked
-import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.PendingInviteCode
-import com.duckduckgo.networkprotection.impl.waitlist.NetworkProtectionWaitlistImpl
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesBinding
@@ -39,47 +36,15 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 @ContributesBinding(AppScope::class)
-class NetworkProtectionState @Inject constructor(
-    private val waitlistState: NetworkProtectionWaitlistImpl,
-    private val subscriptionState: NetworkProtectionAccessState,
-    private val subscriptions: Subscriptions,
-) : NetworkProtectionWaitlist {
-
-    override suspend fun getState(): NetPWaitlistState {
-        return if (subscriptions.isEnabled()) {
-            subscriptionState.getState()
-        } else {
-            waitlistState.getState()
-        }
-    }
-
-    override suspend fun getStateFlow(): Flow<NetPWaitlistState> {
-        return if (subscriptions.isEnabled()) {
-            subscriptionState.getStateFlow()
-        } else {
-            waitlistState.getStateFlow()
-        }
-    }
-
-    override suspend fun getScreenForCurrentState(): ActivityParams? {
-        return if (subscriptions.isEnabled()) {
-            subscriptionState.getScreenForCurrentState()
-        } else {
-            waitlistState.getScreenForCurrentState()
-        }
-    }
-}
-
-// TODO after Privacy pro launch this will become the NetworkProtectionState
-class NetworkProtectionAccessState @Inject constructor(
+class NetworkProtectionAccessStateImpl @Inject constructor(
     private val netPWaitlistRepository: NetPWaitlistRepository,
     private val networkProtectionState: NetworkProtectionState,
     private val dispatcherProvider: DispatcherProvider,
     private val netpSubscriptionManager: NetpSubscriptionManager,
     private val subscriptions: Subscriptions,
-) : NetworkProtectionWaitlist {
+) : NetworkProtectionAccessState {
 
-    override suspend fun getState(): NetPWaitlistState = withContext(dispatcherProvider.io()) {
+    override suspend fun getState(): NetPAccessState = withContext(dispatcherProvider.io()) {
         if (isTreated()) {
             return@withContext if (!netpSubscriptionManager.getVpnStatus().isActive()) {
                 // if entitlement check succeeded and no entitlement, reset state and hide access.
@@ -92,7 +57,7 @@ class NetworkProtectionAccessState @Inject constructor(
         return@withContext NotUnlocked
     }
 
-    override suspend fun getStateFlow(): Flow<NetPWaitlistState> = withContext(dispatcherProvider.io()) {
+    override suspend fun getStateFlow(): Flow<NetPAccessState> = withContext(dispatcherProvider.io()) {
         if (isTreated()) {
             netpSubscriptionManager.vpnStatus().map { status ->
                 if (!status.isActive()) {
@@ -124,7 +89,7 @@ class NetworkProtectionAccessState @Inject constructor(
                 }
             }
 
-            JoinedWaitlist, NotUnlocked, PendingInviteCode -> null
+            NotUnlocked -> null
         }
     }
 

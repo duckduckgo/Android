@@ -6,8 +6,8 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetPWaitlistInvitedScreenNoParams
-import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
@@ -48,7 +48,7 @@ class SubscriptionWebViewViewModelTest {
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
     private val jsonAdapter: JsonAdapter<SubscriptionOptionsJson> = moshi.adapter(SubscriptionOptionsJson::class.java)
     private val subscriptionsManager: SubscriptionsManager = mock()
-    private val networkProtectionWaitlist: NetworkProtectionWaitlist = mock()
+    private val networkProtectionAccessState: NetworkProtectionAccessState = mock()
     private val subscriptionsChecker: SubscriptionsChecker = mock()
     private val pixelSender: SubscriptionPixelSender = mock()
     private val privacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java, FakeToggleStore())
@@ -57,12 +57,12 @@ class SubscriptionWebViewViewModelTest {
 
     @Before
     fun setup() = runTest {
-        whenever(networkProtectionWaitlist.getScreenForCurrentState()).thenReturn(NetPWaitlistInvitedScreenNoParams)
+        whenever(networkProtectionAccessState.getScreenForCurrentState()).thenReturn(NetPWaitlistInvitedScreenNoParams)
         viewModel = SubscriptionWebViewViewModel(
             coroutineTestRule.testDispatcherProvider,
             subscriptionsManager,
             subscriptionsChecker,
-            networkProtectionWaitlist,
+            networkProtectionAccessState,
             pixelSender,
             privacyProFeature,
         )

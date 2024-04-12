@@ -18,9 +18,9 @@ package com.duckduckgo.networkprotection.impl.subscription
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.NetPAccessState.InBeta
+import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.NetPAccessState.NotUnlocked
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
-import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.InBeta
-import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.NotUnlocked
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager.VpnStatus.ACTIVE
 import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager.VpnStatus.EXPIRED
@@ -43,8 +43,8 @@ import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
-class NetworkProtectionAccessStateTest {
-    private lateinit var testee: NetworkProtectionAccessState
+class NetworkProtectionAccessStateImplTest {
+    private lateinit var testee: NetworkProtectionAccessStateImpl
 
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
@@ -70,7 +70,7 @@ class NetworkProtectionAccessStateTest {
 
         runBlocking { whenever(subscriptions.isEnabled()) }.thenReturn(true)
 
-        testee = NetworkProtectionAccessState(
+        testee = NetworkProtectionAccessStateImpl(
             netPWaitlistRepository,
             networkProtectionState,
             coroutineTestRule.testDispatcherProvider,

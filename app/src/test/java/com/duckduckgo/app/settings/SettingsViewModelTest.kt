@@ -34,14 +34,12 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.view.listitem.CheckListItem
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
+import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState
+import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.NetPAccessState.InBeta
+import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.NetPAccessState.NotUnlocked
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.CONNECTING
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.DISCONNECTED
-import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist
-import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.InBeta
-import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.JoinedWaitlist
-import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.NotUnlocked
-import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.PendingInviteCode
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.sync.api.DeviceSyncState
 import kotlin.time.ExperimentalTime
@@ -88,7 +86,7 @@ class SettingsViewModelTest {
     private lateinit var deviceSyncState: DeviceSyncState
 
     @Mock
-    private lateinit var networkProtectionWaitlist: NetworkProtectionWaitlist
+    private lateinit var networkProtectionAccessState: NetworkProtectionAccessState
 
     @Mock
     private lateinit var mockAutoconsent: Autoconsent
@@ -104,7 +102,7 @@ class SettingsViewModelTest {
         MockitoAnnotations.openMocks(this)
 
         runBlocking {
-            whenever(networkProtectionWaitlist.getState()).thenReturn(NotUnlocked)
+            whenever(networkProtectionAccessState.getState()).thenReturn(NotUnlocked)
             whenever(networkProtectionState.isRunning()).thenReturn(false)
             whenever(networkProtectionState.isEnabled()).thenReturn(false)
             whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(emptyFlow())
@@ -122,7 +120,7 @@ class SettingsViewModelTest {
             autofillCapabilityChecker,
             networkProtectionState,
             deviceSyncState,
-            networkProtectionWaitlist,
+            networkProtectionAccessState,
             coroutineTestRule.testDispatcherProvider,
             mockAutoconsent,
             subscriptions,
@@ -421,7 +419,7 @@ class SettingsViewModelTest {
     @Test
     fun whenNetPSettingClickedThenReturnScreenForCurrentState() = runTest {
         val testScreen = object : ActivityParams {}
-        whenever(networkProtectionWaitlist.getScreenForCurrentState()).thenReturn(testScreen)
+        whenever(networkProtectionAccessState.getScreenForCurrentState()).thenReturn(testScreen)
 
         testee.commands().test {
             testee.onNetPSettingClicked()
@@ -530,7 +528,7 @@ class SettingsViewModelTest {
     @Test
     fun whenNetPIsNotUnlockedThenNetPEntryStateShouldShowHidden() = runTest {
         whenever(networkProtectionState.isRunning()).thenReturn(false)
-        whenever(networkProtectionWaitlist.getState()).thenReturn(NotUnlocked)
+        whenever(networkProtectionAccessState.getState()).thenReturn(NotUnlocked)
 
         testee.start()
 
@@ -543,40 +541,10 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenNetPStateIsPendingInviteCodeThenNetPEntryStateShouldShowPending() = runTest {
-        whenever(networkProtectionState.isRunning()).thenReturn(false)
-        whenever(networkProtectionWaitlist.getState()).thenReturn(PendingInviteCode)
-
-        testee.start()
-
-        testee.viewState().test {
-            assertEquals(
-                Pending,
-                expectMostRecentItem().networkProtectionEntryState,
-            )
-        }
-    }
-
-    @Test
-    fun whenNetPStateIsJoinedWaitlistThenNetPEntryStateShouldShowPending() = runTest {
-        whenever(networkProtectionState.isRunning()).thenReturn(false)
-        whenever(networkProtectionWaitlist.getState()).thenReturn(JoinedWaitlist)
-
-        testee.start()
-
-        testee.viewState().test {
-            assertEquals(
-                Pending,
-                expectMostRecentItem().networkProtectionEntryState,
-            )
-        }
-    }
-
-    @Test
     fun whenNetPStateIsInBetaButNotAcceptedTermsThenNetPEntryStateShouldShowPending() = runTest {
         whenever(networkProtectionState.isRunning()).thenReturn(false)
         whenever(networkProtectionState.isOnboarded()).thenReturn(false)
-        whenever(networkProtectionWaitlist.getState()).thenReturn(InBeta(false))
+        whenever(networkProtectionAccessState.getState()).thenReturn(InBeta(false))
 
         testee.start()
 
@@ -592,7 +560,7 @@ class SettingsViewModelTest {
     fun whenNetPStateIsInBetaWithTermsAcceptedAndEnabledThenNetPEntryStateShouldCorrectShowState() = runTest {
         whenever(networkProtectionState.isRunning()).thenReturn(true)
         whenever(networkProtectionState.isOnboarded()).thenReturn(false)
-        whenever(networkProtectionWaitlist.getState()).thenReturn(InBeta(true))
+        whenever(networkProtectionAccessState.getState()).thenReturn(InBeta(true))
 
         testee.start()
 
@@ -611,7 +579,7 @@ class SettingsViewModelTest {
     fun whenNetPStateIsInBetaOnboardedAndEnabledThenNetPEntryStateShouldCorrectShowState() = runTest {
         whenever(networkProtectionState.isRunning()).thenReturn(true)
         whenever(networkProtectionState.isOnboarded()).thenReturn(true)
-        whenever(networkProtectionWaitlist.getState()).thenReturn(InBeta(false))
+        whenever(networkProtectionAccessState.getState()).thenReturn(InBeta(false))
 
         testee.start()
 
@@ -631,7 +599,7 @@ class SettingsViewModelTest {
         whenever(networkProtectionState.isRunning()).thenReturn(false)
         whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(CONNECTING))
         whenever(networkProtectionState.isOnboarded()).thenReturn(false)
-        whenever(networkProtectionWaitlist.getState()).thenReturn(InBeta(true))
+        whenever(networkProtectionAccessState.getState()).thenReturn(InBeta(true))
 
         testee.start()
 
@@ -651,7 +619,7 @@ class SettingsViewModelTest {
         whenever(networkProtectionState.isRunning()).thenReturn(false)
         whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(DISCONNECTED))
         whenever(networkProtectionState.isOnboarded()).thenReturn(true)
-        whenever(networkProtectionWaitlist.getState()).thenReturn(InBeta(false))
+        whenever(networkProtectionAccessState.getState()).thenReturn(InBeta(false))
 
         testee.start()
 
