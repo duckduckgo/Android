@@ -25,8 +25,6 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.settings.FakeNetPSettingsLocalConfigFactory
 import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
-import com.duckduckgo.networkprotection.impl.waitlist.FakeNetPRemoteFeatureFactory
-import com.duckduckgo.networkprotection.impl.waitlist.NetPRemoteFeature
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -48,7 +46,6 @@ class NetPDisabledNotificationSchedulerTest {
     private lateinit var testee: NetPDisabledNotificationScheduler
     private lateinit var notificationManager: NotificationManagerCompat
     private lateinit var netPSettingsLocalConfig: NetPSettingsLocalConfig
-    private lateinit var netPRemoteFeature: NetPRemoteFeature
 
     @Mock
     private lateinit var netPDisabledNotificationBuilder: NetPDisabledNotificationBuilder
@@ -60,7 +57,6 @@ class NetPDisabledNotificationSchedulerTest {
     fun setUp() {
         MockitoAnnotations.openMocks(this)
         notificationManager = NotificationManagerCompat.from(context)
-        netPRemoteFeature = FakeNetPRemoteFeatureFactory.create()
         netPSettingsLocalConfig = FakeNetPSettingsLocalConfigFactory.create()
 
         testee = NetPDisabledNotificationScheduler(
@@ -71,13 +67,11 @@ class NetPDisabledNotificationSchedulerTest {
             netPSettingsLocalConfig,
             TestScope(),
             coroutineRule.testDispatcherProvider,
-            netPRemoteFeature,
         )
     }
 
     @Test
     fun whenVpnManuallyStoppedThenDoNotShowSnooze() = runTest {
-        netPRemoteFeature.waitlistBetaActive().setEnabled(State(enable = true))
         netPSettingsLocalConfig.vpnNotificationAlerts().setEnabled(State(enable = true))
         whenever(networkProtectionState.isEnabled()).thenReturn(true)
         whenever(networkProtectionState.isOnboarded()).thenReturn(true)
@@ -89,7 +83,6 @@ class NetPDisabledNotificationSchedulerTest {
 
     @Test
     fun whenVpnManuallyStoppedWithSnoozeButNoTriggerTimeThenDoNotShowSnooze() = runTest {
-        netPRemoteFeature.waitlistBetaActive().setEnabled(State(enable = true))
         netPSettingsLocalConfig.vpnNotificationAlerts().setEnabled(State(enable = true))
         whenever(networkProtectionState.isEnabled()).thenReturn(true)
         whenever(networkProtectionState.isOnboarded()).thenReturn(true)
@@ -102,7 +95,6 @@ class NetPDisabledNotificationSchedulerTest {
 
     @Test
     fun whenVpnSnoozedThenShowSnoozeNotification() = runTest {
-        netPRemoteFeature.waitlistBetaActive().setEnabled(State(enable = true))
         netPSettingsLocalConfig.vpnNotificationAlerts().setEnabled(State(enable = true))
         whenever(networkProtectionState.isEnabled()).thenReturn(true)
         whenever(networkProtectionState.isOnboarded()).thenReturn(true)
