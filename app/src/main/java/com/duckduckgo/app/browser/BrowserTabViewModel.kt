@@ -3149,7 +3149,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun configureBrowserBackground() {
         val backgroundRes: Int =
-            if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) R.drawable.onboarding_experiment_background else 0
+            if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) R.drawable.onboarding_experiment_background_small else 0
         viewModelScope.launch {
             command.value = SetBrowserBackground(backgroundRes)
         }

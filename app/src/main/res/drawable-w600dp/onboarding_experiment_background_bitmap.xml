@@ -15,5 +15,5 @@
   -->
 
 <bitmap xmlns:android="http://schemas.android.com/apk/res/android"
-    android:src="@drawable/onboarding_background_experiment_large"
+    android:src="@drawable/onboarding_experiment_background_large"
     android:tileMode="clamp" />

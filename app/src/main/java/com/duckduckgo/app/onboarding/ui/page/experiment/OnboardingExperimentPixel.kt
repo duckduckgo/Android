@@ -36,14 +36,11 @@ class OnboardingExperimentPixel {
         ONBOARDING_VISIT_SITE_EBAY("m_onboarding_visit_site_ebay"),
         ONBOARDING_VISIT_SITE_SURPRISE_ME("m_onboarding_visit_site_surprise_me"),
         ONBOARDING_VISIT_SITE_CUSTOM("m_onboarding_visit_site_custom"),
-        ONBOARDING_FIRE_BUTTON_PROMPT_NOT_NOW_PRESSED("m_onboarding_fire_button_prompt_not_now_pressed"),
-        ONBOARDING_FINISHED("m_onboarding_finished"),
     }
 
     object PixelParameter {
         const val FROM_ONBOARDING = "from_onboarding"
         const val DEFAULT_BROWSER = "default_browser"
         const val DAX_INITIAL_VISIT_SITE_CTA = "visit_site"
-        const val DURATION_IN_SECOND = "duration_in_seconds"
     }
 }

@@ -198,7 +198,8 @@ class ExperimentWelcomePage : OnboardingPageFragment(R.layout.content_onboarding
                         .setDuration(ANIMATION_DURATION).startDelay = DIALOG_CONTENT_DELAY
                     binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog3Button)
                     binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(CELEBRATION) }
-                    ViewCompat.animate(binding.daxDialogCta.primaryCta).alpha(MAX_ALPHA).setDuration(ANIMATION_DURATION).startDelay = DIALOG_CONTENT_DELAY
+                    ViewCompat.animate(binding.daxDialogCta.primaryCta).alpha(MAX_ALPHA).setDuration(ANIMATION_DURATION).startDelay =
+                        DIALOG_CONTENT_DELAY
                     scheduleTypingAnimation()
                     launchKonfetti()
                 }

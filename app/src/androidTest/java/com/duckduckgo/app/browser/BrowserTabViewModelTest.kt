@@ -23,6 +23,8 @@ import android.net.Uri
 import android.net.http.SslCertificate
 import android.net.http.SslError
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.print.PrintAttributes
 import android.view.MenuItem
 import android.view.View
@@ -35,6 +37,7 @@ import android.webkit.WebChromeClient.FileChooserParams
 import android.webkit.WebView
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.core.net.toUri
+import androidx.core.os.postDelayed
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.room.Room
@@ -5020,7 +5023,7 @@ class BrowserTabViewModelTest {
         assertCommandIssued<Command.ShowSSLError>()
 
         assertEquals(EXPIRED, browserViewState().sslError)
-        assertEquals(false, browserViewState().showPrivacyShield)
+        assertEquals(false, browserViewState().showPrivacyShield.isEnabled())
         assertEquals(false, browserViewState().showDaxIcon)
         assertEquals(false, browserViewState().showSearchIcon)
         assertEquals(false, loadingViewState().isLoading)
@@ -5060,7 +5063,7 @@ class BrowserTabViewModelTest {
         assertCommandIssued<Command.ShowSSLError>()
 
         assertEquals(EXPIRED, browserViewState().sslError)
-        assertEquals(false, browserViewState().showPrivacyShield)
+        assertEquals(false, browserViewState().showPrivacyShield.isEnabled())
         assertEquals(false, browserViewState().showDaxIcon)
         assertEquals(false, browserViewState().showSearchIcon)
         assertEquals(false, loadingViewState().isLoading)
@@ -5174,7 +5177,7 @@ class BrowserTabViewModelTest {
 
         assertEquals(NONE, browserViewState().sslError)
         assertEquals(false, browserViewState().browserShowing)
-        assertEquals(false, browserViewState().showPrivacyShield)
+        assertEquals(false, browserViewState().showPrivacyShield.isEnabled())
         assertEquals(true, browserViewState().showSearchIcon)
         assertEquals(false, browserViewState().showDaxIcon)
 
@@ -5211,7 +5214,7 @@ class BrowserTabViewModelTest {
         testee.configureBrowserBackground()
 
         assertCommandIssued<Command.SetBrowserBackground> {
-            assertEquals(R.drawable.onboarding_experiment_background, this.backgroundRes)
+            assertEquals(R.drawable.onboarding_experiment_background_small, this.backgroundRes)
         }
     }
 
@@ -5228,11 +5231,14 @@ class BrowserTabViewModelTest {
 
     @Test
     fun givenOnboardingExperimentEnabledWhenTrackersBlockedCtaShownThenPrivacyShieldIsHighlighted() = runTest {
+        whenever(mockExtendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()).thenReturn(true)
         val cta = ExperimentOnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList())
         testee.ctaViewState.value = ctaViewState().copy(cta = cta)
 
         testee.onCtaShown()
-        assertTrue(browserViewState().showPrivacyShield.isHighlighted())
+        Handler(Looper.getMainLooper()).postDelayed(delayInMillis = 5000L) {
+            assertTrue(browserViewState().showPrivacyShield.isHighlighted())
+        }
     }
 
     @Test
@@ -5256,6 +5262,8 @@ class BrowserTabViewModelTest {
 
     @Test
     fun givenOnboardingExperimentCtaShownWhenUserSubmittedQueryThenDismissCta() {
+        whenever(mockExtendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()).thenReturn(true)
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
         val cta = ExperimentOnboardingDaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore)
         testee.ctaViewState.value = CtaViewState(cta = cta)
 
@@ -5268,6 +5276,8 @@ class BrowserTabViewModelTest {
 
     @Test
     fun givenSuggestedSearchesDialogShownWhenUserSubmittedQueryThenCustomSearchPixelIsSent() {
+        whenever(mockExtendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()).thenReturn(true)
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
         val cta = ExperimentDaxBubbleOptionsCta.ExperimentDaxIntroSearchOptionsCta(mockOnboardingStore, mockAppInstallStore)
         testee.ctaViewState.value = CtaViewState(cta = cta)
 
@@ -5278,6 +5288,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun givenSuggestedSearchesDialogShownWhenUserSubmittedQueryDifferentFromOptionsThenPixelIsNotSent() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("mighty ducks cast", null)).thenReturn("mighty ducks cast")
         val cta = ExperimentDaxBubbleOptionsCta.ExperimentDaxIntroSearchOptionsCta(mockOnboardingStore, mockAppInstallStore)
         testee.ctaViewState.value = CtaViewState(cta = cta)
 
@@ -5288,6 +5299,8 @@ class BrowserTabViewModelTest {
 
     @Test
     fun givenSuggestedSitesDialogShownWhenUserSubmittedQueryThenCustomSitePixelIsSent() {
+        whenever(mockExtendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()).thenReturn(true)
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
         val cta = ExperimentDaxBubbleOptionsCta.ExperimentDaxIntroVisitSiteOptionsCta(mockOnboardingStore, mockAppInstallStore)
         testee.ctaViewState.value = CtaViewState(cta = cta)
 
