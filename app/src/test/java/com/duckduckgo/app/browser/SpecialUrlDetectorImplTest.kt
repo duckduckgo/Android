@@ -113,7 +113,7 @@ class SpecialUrlDetectorImplTest {
     }
 
     @Test
-    fun whenOneNonBrowserActivityFoundThenReturnAppLinkWithIntent() {
+    fun whenDefaultNonBrowserActivityFoundThenReturnAppLinkWithIntent() {
         whenever(mockPackageManager.resolveActivity(any(), eq(PackageManager.MATCH_DEFAULT_ONLY))).thenReturn(buildAppResolveInfo())
         whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(
             listOf(
@@ -132,6 +132,46 @@ class SpecialUrlDetectorImplTest {
         assertEquals("https://example.com", appLinkType.uriString)
         assertEquals(EXAMPLE_APP_PACKAGE, appLinkType.appIntent!!.component!!.packageName)
         assertEquals(EXAMPLE_APP_ACTIVITY_NAME, appLinkType.appIntent!!.component!!.className)
+    }
+
+    @Test
+    fun whenFirstNonBrowserActivityFoundThenReturnAppLinkWithIntent() {
+        whenever(mockPackageManager.resolveActivity(any(), eq(PackageManager.MATCH_DEFAULT_ONLY))).thenReturn(null)
+        whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(
+            listOf(
+                buildAppResolveInfo(),
+                buildBrowserResolveInfo(),
+                ResolveInfo(),
+            ),
+        )
+        val type = testee.determineType("https://example.com")
+        verify(mockPackageManager).queryIntentActivities(
+            argThat { hasCategory(Intent.CATEGORY_BROWSABLE) },
+            eq(PackageManager.GET_RESOLVED_FILTER),
+        )
+        assertTrue(type is AppLink)
+        val appLinkType = type as AppLink
+        assertEquals("https://example.com", appLinkType.uriString)
+        assertEquals(EXAMPLE_APP_PACKAGE, appLinkType.appIntent!!.component!!.packageName)
+        assertEquals(EXAMPLE_APP_ACTIVITY_NAME, appLinkType.appIntent!!.component!!.className)
+    }
+
+    @Test
+    fun whenNoNonBrowserActivityFoundThenReturnWebType() {
+        whenever(mockPackageManager.resolveActivity(any(), eq(PackageManager.MATCH_DEFAULT_ONLY))).thenReturn(null)
+        whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(
+            listOf(
+                buildBrowserResolveInfo(),
+                buildAppResolveInfo(),
+                ResolveInfo(),
+            ),
+        )
+        val type = testee.determineType("https://example.com")
+        verify(mockPackageManager).queryIntentActivities(
+            argThat { hasCategory(Intent.CATEGORY_BROWSABLE) },
+            eq(PackageManager.GET_RESOLVED_FILTER),
+        )
+        assertTrue(type is Web)
     }
 
     @Test
