@@ -21,7 +21,6 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.impl.BuildConfig
-import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -36,7 +35,6 @@ import okhttp3.Response
     boundType = ApiInterceptorPlugin::class,
 )
 class NetpWaitlistRequestInterceptor @Inject constructor(
-    private val netpWaitlistRepository: NetPWaitlistRepository,
     private val appBuildConfig: AppBuildConfig,
     private val subscriptions: Subscriptions,
 ) : ApiInterceptorPlugin, Interceptor {
@@ -70,11 +68,7 @@ class NetpWaitlistRequestInterceptor @Inject constructor(
     }
 
     private suspend fun authorizationHeaderValue(): String {
-        return if (subscriptions.isEnabled()) {
-            "bearer ddg:${subscriptions.getAccessToken()}"
-        } else {
-            "bearer ${netpWaitlistRepository.getAuthenticationToken()}"
-        }
+        return "bearer ddg:${subscriptions.getAccessToken()}"
     }
 
     companion object {

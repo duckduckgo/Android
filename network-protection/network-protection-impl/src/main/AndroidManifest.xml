@@ -34,11 +34,6 @@
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
             android:exported="false" />
         <activity
-            android:name=".about.NetPTermsActivity"
-            android:label="@string/netpTermsTitle"
-            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
-            android:exported="false" />
-        <activity
             android:name=".settings.NetPVpnSettingsActivity"
             android:label="@string/netpVpnSettingsTitle"
             android:parentActivityName=".management.NetworkProtectionManagementActivity"

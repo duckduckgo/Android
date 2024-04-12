@@ -45,12 +45,6 @@ interface NetPRemoteFeature {
     fun self(): Toggle
 
     /**
-     * Incrementally rolled out
-     */
-    @Toggle.DefaultValue(false)
-    fun waitlist(): Toggle
-
-    /**
      *
      */
     @Toggle.DefaultValue(true)

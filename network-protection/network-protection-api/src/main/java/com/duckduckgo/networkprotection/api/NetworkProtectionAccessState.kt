@@ -22,7 +22,7 @@ import kotlinx.coroutines.flow.Flow
 interface NetworkProtectionAccessState {
 
     /**
-     * Returns the state of the NetP waitlist
+     * Returns the state of the NetP
      * The caller DOES NOT need to specify the dispatcher when calling this method
      */
     suspend fun getState(): NetPAccessState
@@ -35,10 +35,10 @@ interface NetworkProtectionAccessState {
 
     /**
      * Call this method to get the [ActivityParams] corresponding to the activity to launch for the current
-     * state of the waitlist beta
+     * state of the VPN
      * The caller DOES NOT need to specify the dispatcher when calling this method
      *
-     * @return the [ActivityParams] for the activity to launch that corresponds to the current waitlist beta or `null` if no screen is available
+     * @return the [ActivityParams] for the activity to launch that corresponds to the current VPN or `null` if no screen is available
      * for that state
      */
     suspend fun getScreenForCurrentState(): ActivityParams?
