@@ -17,7 +17,6 @@
 package com.duckduckgo.app.browser.applinks
 
 import android.content.ActivityNotFoundException
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
@@ -42,23 +41,8 @@ class DuckDuckGoAppLinksLauncher @Inject constructor() : AppLinksLauncher {
         appLink.appIntent?.let {
             it.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             startActivityOrQuietlyFail(context, it)
-        } ?: run {
-            if (appLink.excludedComponents != null) {
-                val title = context.getString(R.string.appLinkIntentChooserTitle)
-                val chooserIntent = getChooserIntent(appLink.uriString, title, appLink.excludedComponents!!)
-                startActivityOrQuietlyFail(context, chooserIntent)
-            }
         }
         viewModel.clearPreviousUrl()
-    }
-
-    private fun getChooserIntent(url: String?, title: String, excludedComponents: List<ComponentName>): Intent {
-        val urlIntent = Intent.parseUri(url, Intent.URI_ANDROID_APP_SCHEME).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        }
-        return Intent.createChooser(urlIntent, title).apply {
-            putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, excludedComponents.toTypedArray())
-        }
     }
 
     private fun startActivityOrQuietlyFail(context: Context, intent: Intent) {
