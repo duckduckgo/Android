@@ -13,12 +13,11 @@ tags:
 - tapOn: "Got It"
 - tapOn: "Start"
 - tapOn: "Phew!"
-# This test should reject trying to load
-# This test is expected to load duckduckgo.com, not remain on the current page with spoofed content.
-- assertVisible: "Privacy, simplified." # DuckDuckGo home page
+# This test is expected to load spreadprivacy.com, not remain on the current page with spoofed content.
+- assertVisible: "Spread Privacy" # DuckDuckGo blog homepage
 - copyTextFrom:
     id: "omnibarTextInput"
-- assertTrue: ${maestro.copiedText == "https://duckduckgo.com/"} # DuckDuckGo home page
+- assertTrue: ${maestro.copiedText == "https://spreadprivacy.com/"} # DuckDuckGo blog home page
 - tapOn:
     id: "omnibarTextInput"
 # Test 2
