@@ -89,6 +89,8 @@ sealed class ExperimentDaxBubbleOptionsCta(
             }
         }
         view.show()
+        view.findViewById<TypeAnimationTextView>(R.id.dialogTextCta).text = ""
+        view.findViewById<DaxTextView>(R.id.hiddenTextCta).text = daxText.html(view.context)
         view.findViewById<DaxTextView>(R.id.experimentDialogTitle).apply {
             alpha = 0f
             text = daxTitle.html(view.context)

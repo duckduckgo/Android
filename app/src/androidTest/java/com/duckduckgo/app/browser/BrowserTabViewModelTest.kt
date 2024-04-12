@@ -5214,7 +5214,7 @@ class BrowserTabViewModelTest {
         testee.configureBrowserBackground()
 
         assertCommandIssued<Command.SetBrowserBackground> {
-            assertEquals(R.drawable.onboarding_experiment_background_small, this.backgroundRes)
+            assertEquals(R.drawable.onboarding_experiment_background_bitmap, this.backgroundRes)
         }
     }
 
@@ -5236,7 +5236,7 @@ class BrowserTabViewModelTest {
         testee.ctaViewState.value = ctaViewState().copy(cta = cta)
 
         testee.onCtaShown()
-        Handler(Looper.getMainLooper()).postDelayed(delayInMillis = 5000L) {
+        Handler(Looper.getMainLooper()).postDelayed(delayInMillis = 3000L) {
             assertTrue(browserViewState().showPrivacyShield.isHighlighted())
         }
     }

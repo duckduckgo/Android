@@ -2413,7 +2413,7 @@ class BrowserTabViewModel @Inject constructor(
             ctaViewModel.onCtaShown(cta)
         }
         if (cta is ExperimentOnboardingDaxDialogCta.DaxTrackersBlockedCta) {
-            Handler(Looper.getMainLooper()).postDelayed(delayInMillis = 4000L) {
+            Handler(Looper.getMainLooper()).postDelayed(delayInMillis = 3000L) {
                 browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = true))
             }
         }
@@ -3149,7 +3149,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun configureBrowserBackground() {
         val backgroundRes: Int =
-            if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) R.drawable.onboarding_experiment_background_small else 0
+            if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) R.drawable.onboarding_experiment_background_bitmap else 0
         viewModelScope.launch {
             command.value = SetBrowserBackground(backgroundRes)
         }
