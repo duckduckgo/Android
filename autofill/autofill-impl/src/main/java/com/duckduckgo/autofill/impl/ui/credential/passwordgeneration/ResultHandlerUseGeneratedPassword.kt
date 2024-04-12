@@ -18,18 +18,23 @@ package com.duckduckgo.autofill.impl.ui.credential.passwordgeneration
 
 import android.content.Context
 import android.os.Bundle
+import androidx.core.os.BundleCompat
 import androidx.fragment.app.Fragment
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autofill.api.AutofillEventListener
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
+import com.duckduckgo.autofill.api.AutofillWebMessageRequest
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult
 import com.duckduckgo.autofill.api.UseGeneratedPasswordDialog
+import com.duckduckgo.autofill.api.UseGeneratedPasswordDialog.Companion.KEY_URL
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
+import com.duckduckgo.autofill.impl.jsbridge.AutofillMessagePoster
+import com.duckduckgo.autofill.impl.jsbridge.response.AutofillResponseWriter
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -37,12 +42,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
-@ContributesMultibinding(AppScope::class)
+@ContributesMultibinding(FragmentScope::class)
 class ResultHandlerUseGeneratedPassword @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val autofillStore: InternalAutofillStore,
     private val autoSavedLoginsMonitor: AutomaticSavedLoginsMonitor,
     private val existingCredentialMatchDetector: ExistingCredentialMatchDetector,
+    private val messagePoster: AutofillMessagePoster,
+    private val responseWriter: AutofillResponseWriter,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : AutofillFragmentResultsPlugin {
 
@@ -55,28 +62,43 @@ class ResultHandlerUseGeneratedPassword @Inject constructor(
     ) {
         Timber.d("${this::class.java.simpleName}: processing result")
 
-        val originalUrl = result.getString(UseGeneratedPasswordDialog.KEY_URL) ?: return
+        val autofillWebMessageRequest = BundleCompat.getParcelable(result, KEY_URL, AutofillWebMessageRequest::class.java) ?: return
         if (result.getBoolean(UseGeneratedPasswordDialog.KEY_ACCEPTED)) {
             appCoroutineScope.launch(dispatchers.io()) {
-                onUserAcceptedToUseGeneratedPassword(result, tabId, originalUrl, autofillCallback)
+                onUserAcceptedToUseGeneratedPassword(result, tabId, autofillWebMessageRequest)
             }
         } else {
             appCoroutineScope.launch(dispatchers.main()) {
-                autofillCallback.onRejectGeneratedPassword(originalUrl)
+                rejectGeneratedPassword(autofillWebMessageRequest)
             }
+        }
+    }
+
+    fun acceptGeneratedPassword(autofillWebMessageRequest: AutofillWebMessageRequest) {
+        Timber.v("Accepting generated password")
+        appCoroutineScope.launch(dispatchers.io()) {
+            val message = responseWriter.generateResponseForAcceptingGeneratedPassword()
+            messagePoster.postMessage(message, autofillWebMessageRequest.requestId)
+        }
+    }
+
+    private fun rejectGeneratedPassword(autofillWebMessageRequest: AutofillWebMessageRequest) {
+        Timber.v("Rejecting generated password")
+        appCoroutineScope.launch(dispatchers.io()) {
+            val message = responseWriter.generateResponseForRejectingGeneratedPassword()
+            messagePoster.postMessage(message, autofillWebMessageRequest.requestId)
         }
     }
 
     private suspend fun onUserAcceptedToUseGeneratedPassword(
         result: Bundle,
         tabId: String,
-        originalUrl: String,
-        callback: AutofillEventListener,
+        autofillWebMessageRequest: AutofillWebMessageRequest,
     ) {
         val username = result.getString(UseGeneratedPasswordDialog.KEY_USERNAME)
         val password = result.getString(UseGeneratedPasswordDialog.KEY_PASSWORD) ?: return
         val autologinId = autoSavedLoginsMonitor.getAutoSavedLoginId(tabId)
-        val matchType = existingCredentialMatchDetector.determine(originalUrl, username, password)
+        val matchType = existingCredentialMatchDetector.determine(autofillWebMessageRequest.requestOrigin, username, password)
         Timber.v(
             "autoSavedLoginId: %s. Match type against existing entries: %s",
             autologinId,
@@ -84,18 +106,18 @@ class ResultHandlerUseGeneratedPassword @Inject constructor(
         )
 
         if (autologinId == null) {
-            saveLoginIfNotAlreadySaved(matchType, originalUrl, username, password, tabId)
+            saveLoginIfNotAlreadySaved(matchType, autofillWebMessageRequest.requestOrigin, username, password, tabId)
         } else {
             val existingAutoSavedLogin = autofillStore.getCredentialsWithId(autologinId)
             if (existingAutoSavedLogin == null) {
                 Timber.w("Can't find saved login with autosavedLoginId: $autologinId")
-                saveLoginIfNotAlreadySaved(matchType, originalUrl, username, password, tabId)
+                saveLoginIfNotAlreadySaved(matchType, autofillWebMessageRequest.requestOrigin, username, password, tabId)
             } else {
                 updateLoginIfDifferent(existingAutoSavedLogin, username, password)
             }
         }
         withContext(dispatchers.main()) {
-            callback.onAcceptGeneratedPassword(originalUrl)
+            acceptGeneratedPassword(autofillWebMessageRequest)
         }
     }
 

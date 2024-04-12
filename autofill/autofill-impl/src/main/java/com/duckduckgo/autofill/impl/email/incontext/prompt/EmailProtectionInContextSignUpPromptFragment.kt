@@ -22,6 +22,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.BundleCompat
 import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -29,6 +30,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.autofill.api.AutofillWebMessageRequest
 import com.duckduckgo.autofill.api.EmailProtectionInContextSignUpDialog
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.DialogEmailProtectionInContextSignUpBinding
@@ -121,6 +123,7 @@ class EmailProtectionInContextSignUpPromptFragment : BottomSheetDialogFragment()
 
         val result = Bundle().also {
             it.putParcelable(EmailProtectionInContextSignUpDialog.KEY_RESULT, resultType)
+            it.putParcelable(EmailProtectionInContextSignUpDialog.KEY_URL, getAutofillWebMessageRequest())
         }
 
         parentFragment?.setFragmentResult(EmailProtectionInContextSignUpDialog.resultKey(getTabId()), result)
@@ -133,18 +136,22 @@ class EmailProtectionInContextSignUpPromptFragment : BottomSheetDialogFragment()
     }
 
     private fun getTabId() = arguments?.getString(KEY_TAB_ID)!!
+    private fun getAutofillWebMessageRequest() = BundleCompat.getParcelable(requireArguments(), KEY_URL, AutofillWebMessageRequest::class.java)!!
 
     companion object {
         fun instance(
             tabId: String,
+            autofillWebMessageRequest: AutofillWebMessageRequest,
         ): EmailProtectionInContextSignUpPromptFragment {
             val fragment = EmailProtectionInContextSignUpPromptFragment()
             fragment.arguments = Bundle().also {
                 it.putString(KEY_TAB_ID, tabId)
+                it.putParcelable(KEY_URL, autofillWebMessageRequest)
             }
             return fragment
         }
 
         private const val KEY_TAB_ID = "tabId"
+        private const val KEY_URL = "url"
     }
 }

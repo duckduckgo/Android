@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 package com.duckduckgo.autofill.impl.configuration
 
-import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
+import com.duckduckgo.autofill.impl.InternalAutofillCapabilityChecker
 import com.duckduckgo.autofill.impl.email.incontext.availability.EmailProtectionInContextAvailabilityRules
 import com.duckduckgo.autofill.impl.jsbridge.response.AvailableInputTypeCredentials
 import com.duckduckgo.autofill.impl.sharedcreds.ShareableCredentials
@@ -30,10 +30,7 @@ import javax.inject.Inject
 import timber.log.Timber
 
 interface AutofillRuntimeConfigProvider {
-    suspend fun getRuntimeConfiguration(
-        rawJs: String,
-        url: String?,
-    ): String
+    suspend fun getRuntimeConfiguration(url: String?): String
 }
 
 @ContributesBinding(AppScope::class)
@@ -41,13 +38,13 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
     private val emailManager: EmailManager,
     private val autofillStore: InternalAutofillStore,
     private val runtimeConfigurationWriter: RuntimeConfigurationWriter,
-    private val autofillCapabilityChecker: AutofillCapabilityChecker,
+    private val autofillCapabilityChecker: InternalAutofillCapabilityChecker,
     private val shareableCredentials: ShareableCredentials,
     private val emailProtectionInContextAvailabilityRules: EmailProtectionInContextAvailabilityRules,
     private val neverSavedSiteRepository: NeverSavedSiteRepository,
 ) : AutofillRuntimeConfigProvider {
+
     override suspend fun getRuntimeConfiguration(
-        rawJs: String,
         url: String?,
     ): String {
         Timber.v("BrowserAutofill: getRuntimeConfiguration called")
@@ -63,11 +60,17 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
         )
         val availableInputTypes = generateAvailableInputTypes(url)
 
-        return rawJs
-            .replace("// INJECT contentScope HERE", contentScope)
-            .replace("// INJECT userUnprotectedDomains HERE", userUnprotectedDomains)
-            .replace("// INJECT userPreferences HERE", userPreferences)
-            .replace("// INJECT availableInputTypes HERE", availableInputTypes)
+        return """
+            {
+                "type": "getRuntimeConfigurationResponse",
+                "success": {
+                    $contentScope,
+                    $userPreferences,
+                    $availableInputTypes,
+                    $userUnprotectedDomains
+                }
+            }
+        """.trimIndent()
     }
 
     private suspend fun generateAvailableInputTypes(url: String?): String {
@@ -77,7 +80,7 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
         val json = runtimeConfigurationWriter.generateResponseGetAvailableInputTypes(credentialsAvailable, emailAvailable).also {
             Timber.v("availableInputTypes for %s: \n%s", url, it)
         }
-        return "availableInputTypes = $json"
+        return """"availableInputTypes" : $json"""
     }
 
     private suspend fun determineIfCredentialsAvailable(url: String?): AvailableInputTypeCredentials {

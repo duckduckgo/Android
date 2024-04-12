@@ -59,7 +59,7 @@ jobs:
           api-key: ${{ secrets.MOBILE_DEV_API_KEY }}
           name: ${{ github.sha }}
           app-file: apk/release.apk
-          android-api-level: 30
+          android-api-level: 33
           workspace: .maestro
           include-tags: autofillNoAuthTests
 
