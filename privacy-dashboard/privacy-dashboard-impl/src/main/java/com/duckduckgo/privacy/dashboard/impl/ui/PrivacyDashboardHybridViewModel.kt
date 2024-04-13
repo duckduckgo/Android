@@ -212,9 +212,9 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                     .distinctUntilChanged()
                     .drop(1) // Emit only when domain was added to or removed from the allowlist
             }
-            .onEach { allowlistChanged ->
+            .onEach {
                 // Setting userChangedValues to true will trigger closing the screen
-                viewState.update { it?.copy(userChangedValues = allowlistChanged) }
+                viewState.update { it?.copy(userChangedValues = true) }
             }
             .launchIn(viewModelScope)
     }
