@@ -18,33 +18,19 @@ package com.duckduckgo.app.settings
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
-import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.SettingsViewModel.Command
 import com.duckduckgo.app.settings.SettingsViewModel.Companion.EMAIL_PROTECTION_URL
-import com.duckduckgo.app.settings.SettingsViewModel.NetPEntryState.Hidden
-import com.duckduckgo.app.settings.SettingsViewModel.NetPEntryState.Pending
-import com.duckduckgo.app.settings.SettingsViewModel.NetPEntryState.ShowState
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.common.ui.view.listitem.CheckListItem
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
-import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
-import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState
-import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.NetPAccessState.InBeta
-import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.NetPAccessState.NotUnlocked
-import com.duckduckgo.networkprotection.api.NetworkProtectionState
-import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.CONNECTING
-import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.DISCONNECTED
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.sync.api.DeviceSyncState
 import kotlin.time.ExperimentalTime
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -74,9 +60,6 @@ class SettingsViewModelTest {
     private lateinit var appTrackingProtection: AppTrackingProtection
 
     @Mock
-    private lateinit var networkProtectionState: NetworkProtectionState
-
-    @Mock
     private lateinit var mockEmailManager: EmailManager
 
     @Mock
@@ -84,9 +67,6 @@ class SettingsViewModelTest {
 
     @Mock
     private lateinit var deviceSyncState: DeviceSyncState
-
-    @Mock
-    private lateinit var networkProtectionAccessState: NetworkProtectionAccessState
 
     @Mock
     private lateinit var mockAutoconsent: Autoconsent
@@ -102,10 +82,6 @@ class SettingsViewModelTest {
         MockitoAnnotations.openMocks(this)
 
         runBlocking {
-            whenever(networkProtectionAccessState.getState()).thenReturn(NotUnlocked)
-            whenever(networkProtectionState.isRunning()).thenReturn(false)
-            whenever(networkProtectionState.isEnabled()).thenReturn(false)
-            whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(emptyFlow())
             whenever(appTrackingProtection.isRunning()).thenReturn(false)
             whenever(appTrackingProtection.isEnabled()).thenReturn(false)
             whenever(appTrackingProtection.isOnboarded()).thenReturn(false)
@@ -118,9 +94,7 @@ class SettingsViewModelTest {
             mockPixel,
             mockEmailManager,
             autofillCapabilityChecker,
-            networkProtectionState,
             deviceSyncState,
-            networkProtectionAccessState,
             coroutineTestRule.testDispatcherProvider,
             mockAutoconsent,
             subscriptions,
@@ -417,21 +391,6 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenNetPSettingClickedThenReturnScreenForCurrentState() = runTest {
-        val testScreen = object : ActivityParams {}
-        whenever(networkProtectionAccessState.getScreenForCurrentState()).thenReturn(testScreen)
-
-        testee.commands().test {
-            testee.onNetPSettingClicked()
-
-            assertEquals(Command.LaunchNetPWaitlist(testScreen), awaitItem())
-            verify(mockPixel).fire(AppPixelName.SETTINGS_NETP_PRESSED)
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
     fun whenSyncSettingClickedThenEmitCommandLaunchSyncSettingsAndPixelFired() = runTest {
         testee.commands().test {
             testee.onSyncSettingClicked()
@@ -522,115 +481,6 @@ class SettingsViewModelTest {
 
         testee.viewState().test {
             assertFalse(awaitItem().isAutoconsentEnabled)
-        }
-    }
-
-    @Test
-    fun whenNetPIsNotUnlockedThenNetPEntryStateShouldShowHidden() = runTest {
-        whenever(networkProtectionState.isRunning()).thenReturn(false)
-        whenever(networkProtectionAccessState.getState()).thenReturn(NotUnlocked)
-
-        testee.start()
-
-        testee.viewState().test {
-            assertEquals(
-                Hidden,
-                expectMostRecentItem().networkProtectionEntryState,
-            )
-        }
-    }
-
-    @Test
-    fun whenNetPStateIsInBetaButNotAcceptedTermsThenNetPEntryStateShouldShowPending() = runTest {
-        whenever(networkProtectionState.isRunning()).thenReturn(false)
-        whenever(networkProtectionState.isOnboarded()).thenReturn(false)
-        whenever(networkProtectionAccessState.getState()).thenReturn(InBeta(false))
-
-        testee.start()
-
-        testee.viewState().test {
-            assertEquals(
-                Pending,
-                expectMostRecentItem().networkProtectionEntryState,
-            )
-        }
-    }
-
-    @Test
-    fun whenNetPStateIsInBetaWithTermsAcceptedAndEnabledThenNetPEntryStateShouldCorrectShowState() = runTest {
-        whenever(networkProtectionState.isRunning()).thenReturn(true)
-        whenever(networkProtectionState.isOnboarded()).thenReturn(false)
-        whenever(networkProtectionAccessState.getState()).thenReturn(InBeta(true))
-
-        testee.start()
-
-        testee.viewState().test {
-            assertEquals(
-                ShowState(
-                    icon = CheckListItem.CheckItemStatus.ENABLED,
-                    subtitle = R.string.netpSettingsConnected,
-                ),
-                expectMostRecentItem().networkProtectionEntryState,
-            )
-        }
-    }
-
-    @Test
-    fun whenNetPStateIsInBetaOnboardedAndEnabledThenNetPEntryStateShouldCorrectShowState() = runTest {
-        whenever(networkProtectionState.isRunning()).thenReturn(true)
-        whenever(networkProtectionState.isOnboarded()).thenReturn(true)
-        whenever(networkProtectionAccessState.getState()).thenReturn(InBeta(false))
-
-        testee.start()
-
-        testee.viewState().test {
-            assertEquals(
-                ShowState(
-                    icon = CheckListItem.CheckItemStatus.ENABLED,
-                    subtitle = R.string.netpSettingsConnected,
-                ),
-                expectMostRecentItem().networkProtectionEntryState,
-            )
-        }
-    }
-
-    @Test
-    fun whenNetPStateIsInBetaAndConnectingThenNetPEntryStateShouldCorrectShowState() = runTest {
-        whenever(networkProtectionState.isRunning()).thenReturn(false)
-        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(CONNECTING))
-        whenever(networkProtectionState.isOnboarded()).thenReturn(false)
-        whenever(networkProtectionAccessState.getState()).thenReturn(InBeta(true))
-
-        testee.start()
-
-        testee.viewState().test {
-            assertEquals(
-                ShowState(
-                    icon = CheckListItem.CheckItemStatus.ENABLED,
-                    subtitle = R.string.netpSettingsConnecting,
-                ),
-                expectMostRecentItem().networkProtectionEntryState,
-            )
-        }
-    }
-
-    @Test
-    fun whenNetPStateIsInBetaAndDisabledThenNetPEntryStateShouldCorrectShowState() = runTest {
-        whenever(networkProtectionState.isRunning()).thenReturn(false)
-        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(DISCONNECTED))
-        whenever(networkProtectionState.isOnboarded()).thenReturn(true)
-        whenever(networkProtectionAccessState.getState()).thenReturn(InBeta(false))
-
-        testee.start()
-
-        testee.viewState().test {
-            assertEquals(
-                ShowState(
-                    icon = CheckListItem.CheckItemStatus.WARNING,
-                    subtitle = R.string.netpSettingsDisconnected,
-                ),
-                expectMostRecentItem().networkProtectionEntryState,
-            )
         }
     }
 }
