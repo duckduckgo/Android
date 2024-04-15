@@ -7,7 +7,7 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState
-import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetPWaitlistInvitedScreenNoParams
+import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
@@ -57,7 +57,7 @@ class SubscriptionWebViewViewModelTest {
 
     @Before
     fun setup() = runTest {
-        whenever(networkProtectionAccessState.getScreenForCurrentState()).thenReturn(NetPWaitlistInvitedScreenNoParams)
+        whenever(networkProtectionAccessState.getScreenForCurrentState()).thenReturn(NetworkProtectionManagementScreenNoParams)
         viewModel = SubscriptionWebViewViewModel(
             coroutineTestRule.testDispatcherProvider,
             subscriptionsManager,
