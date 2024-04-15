@@ -175,7 +175,6 @@
                         android:selectAllOnFocus="true"
                         android:textColor="?attr/daxColorPrimaryText"
                         android:textColorHint="?attr/daxColorSecondaryText"
-                        android:textColorHighlight="?attr/daxColorAccentBlueShadow"
                         android:textCursorDrawable="@drawable/text_cursor"
                         android:textSize="16sp"
                         android:textStyle="normal"
