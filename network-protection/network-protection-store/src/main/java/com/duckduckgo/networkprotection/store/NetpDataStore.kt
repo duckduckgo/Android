@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.networkprotection.store.waitlist
+package com.duckduckgo.networkprotection.store
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 
-interface NetPWaitlistDataStore {
+interface NetpDataStore {
     var authToken: String?
     var didAcceptedTerms: Boolean
 
     fun clear()
 }
 
-class NetPWaitlistDataStoreSharedPreferences constructor(
+class NetpDataStoreSharedPreferences constructor(
     private val vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
-) : NetPWaitlistDataStore {
+) : NetpDataStore {
 
     private val preferences: SharedPreferences by lazy {
         vpnSharedPreferencesProvider.getSharedPreferences(

@@ -19,7 +19,7 @@ package com.duckduckgo.networkprotection.impl.waitlist.store
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.impl.state.NetPFeatureRemover
-import com.duckduckgo.networkprotection.store.waitlist.NetPWaitlistDataStore
+import com.duckduckgo.networkprotection.store.NetpDataStore
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -39,7 +39,7 @@ interface NetPWaitlistRepository {
     boundType = NetPFeatureRemover.NetPStoreRemovalPlugin::class,
 )
 class RealNetPWaitlistRepository @Inject constructor(
-    private val dataStore: NetPWaitlistDataStore,
+    private val dataStore: NetpDataStore,
     private val dispatcherProvider: DispatcherProvider,
 ) : NetPWaitlistRepository, NetPFeatureRemover.NetPStoreRemovalPlugin {
 
