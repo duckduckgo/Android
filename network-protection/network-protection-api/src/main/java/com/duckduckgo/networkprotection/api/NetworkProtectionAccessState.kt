@@ -44,7 +44,7 @@ interface NetworkProtectionAccessState {
     suspend fun getScreenForCurrentState(): ActivityParams?
 
     sealed class NetPAccessState {
-        object NotUnlocked : NetPAccessState()
-        data class InBeta(val termsAccepted: Boolean) : NetPAccessState()
+        data object NotUnlocked : NetPAccessState()
+        data object InBeta : NetPAccessState()
     }
 }

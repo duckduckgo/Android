@@ -112,7 +112,7 @@ class ProSettingNetPViewModel(
     ): NetPEntryState {
         return when (accessState) {
             is NetPAccessState.InBeta -> {
-                if (accessState.termsAccepted || networkProtectionState.isOnboarded()) {
+                if (networkProtectionState.isOnboarded()) {
                     val subtitle = when (networkProtectionConnectionState) {
                         CONNECTED -> R.string.netpSubscriptionSettingsConnected
                         CONNECTING -> R.string.netpSubscriptionSettingsConnecting

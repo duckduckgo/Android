@@ -26,7 +26,6 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.NetPAcc
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenAndEnable
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
-import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -37,7 +36,6 @@ import kotlinx.coroutines.withContext
 
 @ContributesBinding(AppScope::class)
 class NetworkProtectionAccessStateImpl @Inject constructor(
-    private val netPWaitlistRepository: NetPWaitlistRepository,
     private val networkProtectionState: NetworkProtectionState,
     private val dispatcherProvider: DispatcherProvider,
     private val netpSubscriptionManager: NetpSubscriptionManager,
@@ -51,7 +49,7 @@ class NetworkProtectionAccessStateImpl @Inject constructor(
                 handleRevokedVPNState()
                 NotUnlocked
             } else {
-                InBeta(netPWaitlistRepository.didAcceptWaitlistTerms())
+                InBeta
             }
         }
         return@withContext NotUnlocked
@@ -65,7 +63,7 @@ class NetworkProtectionAccessStateImpl @Inject constructor(
                     handleRevokedVPNState()
                     NotUnlocked
                 } else {
-                    InBeta(netPWaitlistRepository.didAcceptWaitlistTerms())
+                    InBeta
                 }
             }
         } else {
@@ -82,7 +80,7 @@ class NetworkProtectionAccessStateImpl @Inject constructor(
     override suspend fun getScreenForCurrentState(): ActivityParams? {
         return when (getState()) {
             is InBeta -> {
-                if (netPWaitlistRepository.didAcceptWaitlistTerms() || networkProtectionState.isOnboarded()) {
+                if (networkProtectionState.isOnboarded()) {
                     NetworkProtectionManagementScreenNoParams
                 } else {
                     NetworkProtectionManagementScreenAndEnable(false)

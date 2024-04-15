@@ -27,7 +27,6 @@ import kotlinx.coroutines.withContext
 
 interface NetPWaitlistRepository {
     suspend fun getAuthenticationToken(): String?
-    fun didAcceptWaitlistTerms(): Boolean
 }
 
 @ContributesBinding(
@@ -45,10 +44,6 @@ class RealNetPWaitlistRepository @Inject constructor(
 
     override suspend fun getAuthenticationToken(): String? = withContext(dispatcherProvider.io()) {
         dataStore.authToken
-    }
-
-    override fun didAcceptWaitlistTerms(): Boolean {
-        return dataStore.didAcceptedTerms
     }
 
     override fun clearStore() {
