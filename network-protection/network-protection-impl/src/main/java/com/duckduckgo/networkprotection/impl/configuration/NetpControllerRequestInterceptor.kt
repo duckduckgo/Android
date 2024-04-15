@@ -34,7 +34,7 @@ import okhttp3.Response
     scope = AppScope::class,
     boundType = ApiInterceptorPlugin::class,
 )
-class NetpWaitlistRequestInterceptor @Inject constructor(
+class NetpControllerRequestInterceptor @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val subscriptions: Subscriptions,
 ) : ApiInterceptorPlugin, Interceptor {

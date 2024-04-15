@@ -17,11 +17,11 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
-class NetpWaitlistRequestInterceptorTest {
+class NetpControllerRequestInterceptorTest {
 
     private val appBuildConfig: AppBuildConfig = mock()
     private val subscriptions: Subscriptions = mock()
-    private lateinit var interceptor: NetpWaitlistRequestInterceptor
+    private lateinit var interceptor: NetpControllerRequestInterceptor
 
     @Before
     fun setup() {
@@ -32,7 +32,7 @@ class NetpWaitlistRequestInterceptorTest {
             whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
         }
 
-        interceptor = NetpWaitlistRequestInterceptor(
+        interceptor = NetpControllerRequestInterceptor(
             appBuildConfig,
             subscriptions,
         )
