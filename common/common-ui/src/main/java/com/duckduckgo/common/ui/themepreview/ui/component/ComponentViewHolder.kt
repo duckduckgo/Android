@@ -67,6 +67,10 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
         parent: ViewGroup,
     ) : ComponentViewHolder(inflate(parent, R.layout.component_info_panel))
 
+    class AppTPBannerComponentViewHolder(
+        parent: ViewGroup,
+    ) : ComponentViewHolder(inflate(parent, R.layout.component_apptp_banner))
+
     class RemoteMessageComponentViewHolder(
         parent: ViewGroup,
     ) : ComponentViewHolder(inflate(parent, R.layout.component_remote_message)) {
@@ -390,6 +394,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 Component.SNACKBAR -> SnackbarComponentViewHolder(parent)
                 Component.INFO_PANEL -> InfoPanelComponentViewHolder(parent)
                 Component.REMOTE_MESSAGE -> RemoteMessageComponentViewHolder(parent)
+                Component.APPTP_BANNER -> AppTPBannerComponentViewHolder(parent)
                 Component.SEARCH_BAR -> SearchBarComponentViewHolder(parent)
                 Component.MENU_ITEM -> MenuItemComponentViewHolder(parent)
                 Component.POPUP_MENU_ITEM -> PopupMenuItemComponentViewHolder(parent)

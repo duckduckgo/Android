@@ -47,17 +47,9 @@
         tools:listitem="@layout/item_autocomplete_search_suggestion"
         tools:visibility="visible" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/quickAccessSuggestionsRecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="?attr/daxColorSurface"
-        android:clipToPadding="false"
-        android:elevation="4dp"
-        android:paddingTop="15dp"
-        android:visibility="gone"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:visibility="visible" />
+    <include
+        android:id="@+id/includeFocusedView"
+        layout="@layout/include_focused_quick_access_items" />
 
     <include
         android:id="@+id/includeNewBrowserTab"

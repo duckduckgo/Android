@@ -57,6 +57,7 @@
     <attr name="daxColorDestructive" format="color"/>
     <attr name="daxColorLines" format="color"/>
     <attr name="daxColorAccentBlue" format="color"/>
+    <attr name="daxColorAccentBlueShadow" format="color"/>
     <attr name="daxColorAccentYellow" format="color"/>
     <attr name="daxColorContainerDisabled" format="color"/>
     <attr name="daxColorTextDisabled" format="color"/>
@@ -142,8 +143,10 @@
     <color name="blue0_50">#80CCDAFF</color>
     <color name="blue20">#8FABF9</color>
     <color name="blue30">#7295F6</color>
+    <color name="blue30_20">#337295F6</color>
     <color name="blue50">#3969EF</color>
     <color name="blue50_14">#243969EF</color>
+    <color name="blue50_20">#333969EF</color>
     <color name="blue60">#2B55CA</color>
     <color name="blue70">#1E42A4</color>
 

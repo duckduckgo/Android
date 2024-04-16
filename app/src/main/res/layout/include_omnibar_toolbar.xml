@@ -61,7 +61,7 @@
                     android:layout_height="match_parent"
                     android:layout_margin="8dp"
                     android:paddingEnd="6dp"
-                    android:background="@drawable/omnibar_field_background_layer_list">
+                    android:background="@drawable/omnibar_field_selector">
 
                     <com.airbnb.lottie.LottieAnimationView
                         android:id="@+id/trackersAnimation"
@@ -175,7 +175,7 @@
                         android:selectAllOnFocus="true"
                         android:textColor="?attr/daxColorPrimaryText"
                         android:textColorHint="?attr/daxColorSecondaryText"
-                        android:textColorHighlight="#803969EF"
+                        android:textColorHighlight="?attr/daxColorAccentBlueShadow"
                         android:textCursorDrawable="@drawable/text_cursor"
                         android:textSize="16sp"
                         android:textStyle="normal"

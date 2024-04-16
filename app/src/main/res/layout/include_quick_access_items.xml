@@ -21,16 +21,53 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/quickAccessRecyclerView"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:clipToPadding="false"
-        android:overScrollMode="never"
-        android:paddingTop="15dp"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:itemCount="8"
-        tools:listItem="@layout/view_quick_access_item"
-        tools:showIn="@layout/activity_system_search"
-        tools:spanCount="4" />
+        android:orientation="vertical"
+        android:layout_marginTop="@dimen/keyline_2">
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:typography="h4"
+            android:layout_marginStart="@dimen/keyline_5"
+            android:layout_marginEnd="@dimen/keyline_5"
+            app:textType="primary"
+            android:text="@string/newTabPageFavorites" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/quickAccessRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipToPadding="false"
+            android:overScrollMode="never"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            tools:itemCount="8"
+            android:layout_marginStart="@dimen/keyline_2"
+            android:layout_marginEnd="@dimen/keyline_2"
+            tools:listItem="@layout/view_quick_access_item"
+            tools:showIn="@layout/activity_system_search"
+            tools:spanCount="4" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:typography="h4"
+            android:layout_marginStart="@dimen/keyline_5"
+            android:layout_marginEnd="@dimen/keyline_5"
+            android:layout_marginTop="@dimen/keyline_4"
+            app:textType="primary"
+            android:text="@string/newTabPageShortcuts" />
+
+        <com.duckduckgo.common.ui.view.DaxNewTabGridItem
+            android:id="@+id/newTabShortcutBookmarks"
+            android:layout_marginStart="@dimen/keyline_2"
+            app:primaryText="@string/newTabPageShortcutBookmarks"
+            app:leadingIcon="@drawable/ic_folder_24"
+            app:placeholder="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
 </merge>

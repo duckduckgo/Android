@@ -45,4 +45,5 @@ enum class Component {
     SINGLE_LINE_LIST_ITEM,
     TWO_LINE_LIST_ITEM,
     SECTION_DIVIDER,
+    APPTP_BANNER,
 }

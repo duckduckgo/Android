@@ -27,13 +27,13 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.databinding.ViewQuickAccessItemBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessViewHolder
 import com.duckduckgo.app.browser.favorites.QuickAccessAdapterDiffCallback.Companion.DIFF_KEY_TITLE
 import com.duckduckgo.app.browser.favorites.QuickAccessAdapterDiffCallback.Companion.DIFF_KEY_URL
 import com.duckduckgo.common.ui.menu.PopupMenu
+import com.duckduckgo.mobile.android.databinding.ViewGridListItemBinding
 import com.duckduckgo.savedsites.api.models.SavedSite
 import kotlin.math.absoluteValue
 import kotlinx.coroutines.launch
@@ -57,7 +57,7 @@ class FavoritesQuickAccessAdapter(
 
     class QuickAccessViewHolder(
         private val inflater: LayoutInflater,
-        private val binding: ViewQuickAccessItemBinding,
+        private val binding: ViewGridListItemBinding,
         private val lifecycleOwner: LifecycleOwner,
         private val faviconManager: FaviconManager,
         private val onMoveListener: (RecyclerView.ViewHolder) -> Unit,
@@ -213,7 +213,7 @@ class FavoritesQuickAccessAdapter(
         viewType: Int,
     ): QuickAccessViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val binding = ViewQuickAccessItemBinding.inflate(inflater, parent, false)
+        val binding = ViewGridListItemBinding.inflate(inflater, parent, false)
         return QuickAccessViewHolder(
             inflater,
             binding,

@@ -157,6 +157,7 @@
         <item name="daxColorTextDisabled">@color/white36</item>
         <item name="daxColorLines">@color/white9</item>
         <item name="daxColorAccentBlue">@color/blue30</item>
+        <item name="daxColorAccentBlueShadow">@color/blue30_20</item>
         <item name="daxColorAccentYellow">@color/yellow50</item>
         <item name="daxColorRipple">@color/white12</item>
         <item name="daxLogoTitleText">@color/white</item>
@@ -230,6 +231,7 @@
         <item name="daxColorTextDisabled">@color/black36</item>
         <item name="daxColorLines">@color/black9</item>
         <item name="daxColorAccentBlue">@color/blue50</item>
+        <item name="daxColorAccentBlueShadow">@color/blue50_20</item>
         <item name="daxColorAccentYellow">@color/yellow50</item>
         <item name="daxColorRipple">@color/black6</item>
         <item name="daxLogoTitleText">@color/gray85</item>
@@ -268,7 +270,6 @@
         <!-- Info Panel -->
         <item name="daxInfoPanelTooltipBackgroundColor">@color/daxInfoPanelTooltipBackgroundColorLight</item>
         <item name="daxInfoPanelAlertBackgroundColor">@color/daxInfoPanelAlertBackgroundColorLight</item>
-
     </style>
 
     <style name="Theme.DuckDuckGo.Survey" parent="Theme.DuckDuckGo.Light">

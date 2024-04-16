@@ -115,6 +115,9 @@
     <!-- CheckListItem -->
     <dimen name="checkListItemHeight">58dp</dimen>
 
+    <!-- GridItem -->
+    <dimen name="gridItemImageSize">64dp</dimen>
+
     <!-- Legacy Dimensions -->
     <dimen name="omnibarCookieAnimationBannerHeight">38dp</dimen>
     <dimen name="changeAppIconSize">75dp</dimen>

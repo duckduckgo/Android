@@ -81,4 +81,8 @@
     <string name="onboardingEndDaxDialogTitle">You\'ve got this!"</string>
     <string name="onboardingEndDaxDialogDescription">Remember: every time you browse with me a creepy ad loses its wings. 👌</string>
 
+    <!-- New Tab Page -->
+    <string name="newTabPageFavorites">Favorites</string>
+    <string name="newTabPageShortcuts">Shortcuts</string>
+    <string name="newTabPageShortcutBookmarks">Bookmarks</string>
 </resources>

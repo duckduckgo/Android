@@ -92,4 +92,11 @@
         <attr name="switchEnabled"/>
     </declare-styleable>
 
+    <!-- Grid Item-->
+    <declare-styleable name="DaxNewTabGridItem">
+        <attr name="primaryText"/>
+        <attr name="leadingIcon"/>
+        <attr name="placeholder" format="boolean"/>
+    </declare-styleable>
+
 </resources>
