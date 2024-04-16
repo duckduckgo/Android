@@ -383,6 +383,18 @@
         <item name="thumbTint">@color/switch_thumb_tint</item>
     </style>
 
+    <style name="Widget.DuckDuckGo.v3.Switch" parent="Widget.Material3.CompoundButton.MaterialSwitch">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.DuckDuckGo.v3.Switch</item>
+    </style>
+
+    <style name="ThemeOverlay.DuckDuckGo.v3.Switch" parent="">
+        <item name="colorPrimary">?daxColorSwitchOn</item>
+        <item name="colorSurfaceVariant">?daxColorSwitchOff</item>
+        <item name="colorOutline">?daxColorSwitchThumb</item>
+        <item name="colorOnPrimary">?daxColorSwitchThumb</item>
+        <item name="colorOnPrimaryContainer">?daxColorSwitchThumb</item>
+    </style>
+
     <!-- Slider -->
     <style name="Widget.DuckDuckGo.Slider" parent="Widget.MaterialComponents.Slider">
         <item name="trackHeight">@dimen/sliderTrackHeight</item>
