@@ -405,17 +405,6 @@
         <item name="shapeAppearance">@style/ShapeAppearance.DuckDuckGo.MediumComponent</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.Card">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:background">@drawable/background_message_cta</item>
-        <item name="android:elevation">4dp</item>
-        <item name="android:layout_marginTop">@dimen/keyline_2</item>
-        <item name="android:layout_marginBottom">@dimen/keyline_2</item>
-        <item name="android:layout_marginHorizontal">@dimen/keyline_4</item>
-        <item name="android:paddingBottom">@dimen/keyline_4</item>
-    </style>
-
     <!-- Expandable Menu Item Items -->
     <style name="Widget.DuckDuckGo.DaxExpandableItem">
         <item name="android:layout_width">match_parent</item>
