@@ -88,6 +88,7 @@ enum class BillingError {
     ITEM_ALREADY_OWNED,
     ITEM_NOT_OWNED,
     NETWORK_ERROR,
-    UNKNOWN_ERROR,
+    UNKNOWN_ERROR, // for when billing returns something we don't understand
+    BILLING_CRASH_ERROR, // This is our own error
     ;
 }
