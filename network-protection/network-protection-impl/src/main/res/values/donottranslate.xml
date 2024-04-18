@@ -269,11 +269,6 @@
     <string name="netpGeoswitchingHeaderCustom">Custom</string>
     <string name="netpGeoswitchingHeaderCountrySubtitle" instruction="Placeholder is a number greater than 1">%1$d cities</string>
 
-    <!-- Beta end -->
-    <string name="netpWaitlistEndDialogTitle">DuckDuckGo VPN is no longer in beta</string>
-    <string name="netpWaitlistEndDialogSubtitle">Thank you for being a beta tester! To continue using the VPN, subscribe to DuckDuckGo Privacy Pro and get 40% off with promo code <b>THANKYOU</b>\n\nOffer redeemable for a limited time only in the desktop version of the DuckDuckGo browser by U.S. beta testers who install from <b>duckduckgo.com/app</b></string>
-    <string name="netpWaitlistEndDialogAction">Close</string>
-
     <!-- Access revoked-->
     <string name="netpDialogVpnAccessRevokedTitle">VPN disconnected due to expired subscription</string>
     <string name="netpDialogVpnAccessRevokedBody">Subscribe to Privacy Pro to reconnect DuckDuckGo VPN.</string>
