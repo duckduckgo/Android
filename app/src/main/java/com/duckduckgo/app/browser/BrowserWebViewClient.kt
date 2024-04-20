@@ -47,7 +47,6 @@ import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.WebViewPixelName.WEB_RENDERER_GONE_CRASH
 import com.duckduckgo.app.browser.WebViewPixelName.WEB_RENDERER_GONE_KILLED
 import com.duckduckgo.app.browser.certificates.rootstore.CertificateValidationState
-import com.duckduckgo.app.browser.certificates.rootstore.CertificateValidationState.TrustedChain
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
@@ -273,15 +272,12 @@ class BrowserWebViewClient @Inject constructor(
 
     @UiThread
     override fun onPageCommitVisible(webView: WebView, url: String) {
+        Timber.v("onPageCommitVisible webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}")
         // Show only when the commit matches the tab state
         if (webView.url == url) {
-            Timber.v("onPageCommitVisible webViewUrl: ${webView.url} URL: $url")
             val navigationList = webView.safeCopyBackForwardList() ?: return
             webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList))
-            if (url != null && url == lastPageStarted) {
-                webViewClientListener?.pageRefreshed(url)
-            }
-            lastPageStarted = url
+            webViewClientListener?.onPageContentStart(url)
         }
     }
 
@@ -305,7 +301,7 @@ class BrowserWebViewClient @Inject constructor(
         url: String?,
         favicon: Bitmap?,
     ) {
-        Timber.v("onPageStarted webViewUrl: ${webView.url} URL: $url")
+        Timber.v("onPageStarted webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}")
 
         url?.let {
             // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
@@ -320,6 +316,12 @@ class BrowserWebViewClient @Inject constructor(
                 thirdPartyCookieManager.processUriForThirdPartyCookies(webView, url.toUri())
             }
         }
+        val navigationList = webView.safeCopyBackForwardList() ?: return
+        webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList))
+        if (url != null && url == lastPageStarted) {
+            webViewClientListener?.pageRefreshed(url)
+        }
+        lastPageStarted = url
         jsPlugins.getPlugins().forEach {
             it.onPageStarted(webView, url, webViewClientListener?.getSite())
         }

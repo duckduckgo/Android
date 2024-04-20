@@ -176,6 +176,29 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
+    fun whenOnPageStartedCalledThenListenerInstructedToUpdateNavigationState() {
+        testee.onPageStarted(webView, EXAMPLE_URL, null)
+        verify(listener).navigationStateChanged(any())
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnPageStartedCalledWithSameUrlAsPreviousThenListenerNotifiedOfRefresh() {
+        testee.onPageStarted(webView, EXAMPLE_URL, null)
+        testee.onPageStarted(webView, EXAMPLE_URL, null)
+        verify(listener).pageRefreshed(EXAMPLE_URL)
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnPageStartedCalledWithDifferentUrlToPreviousThenListenerNotNotifiedOfRefresh() {
+        testee.onPageStarted(webView, EXAMPLE_URL, null)
+        testee.onPageStarted(webView, "foo.com", null)
+        verify(listener, never()).pageRefreshed(any())
+    }
+
+    @UiThreadTest
+    @Test
     fun whenOnPageCommitVisibleCalledThenListenerInstructedToUpdateNavigationState() {
         val mockWebView: WebView = mock()
         whenever(mockWebView.url).thenReturn(EXAMPLE_URL)
@@ -186,24 +209,13 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenOnPageCommitVisibleCalledWithSameUrlAsPreviousThenListenerNotifiedOfRefresh() {
+    fun whenOnPageCommitVisibleCalledWithDifferentUrlToPreviousThenListenerNotNotified() {
         val mockWebView: WebView = mock()
         whenever(mockWebView.url).thenReturn(EXAMPLE_URL)
         whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
         testee.onPageCommitVisible(mockWebView, EXAMPLE_URL)
-        testee.onPageCommitVisible(mockWebView, EXAMPLE_URL)
-        verify(listener).pageRefreshed(EXAMPLE_URL)
-    }
-
-    @UiThreadTest
-    @Test
-    fun whenOnPageCommitVisibleCalledWithDifferentUrlToPreviousThenListenerNotNotifiedOfRefresh() {
-        val mockWebView: WebView = mock()
-        whenever(mockWebView.url).thenReturn(EXAMPLE_URL)
-        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
-        testee.onPageCommitVisible(webView, EXAMPLE_URL)
-        testee.onPageCommitVisible(webView, "foo.com")
-        verify(listener, never()).pageRefreshed(any())
+        testee.onPageCommitVisible(mockWebView, "foo.com")
+        verify(listener).navigationStateChanged(any())
     }
 
     @UiThreadTest
@@ -343,6 +355,7 @@ class BrowserWebViewClientTest {
         verify(cookieManager).flush()
     }
 
+    @UiThreadTest
     @Test
     fun whenShouldOverrideThrowsExceptionThenRecordException() {
         val exception = RuntimeException()

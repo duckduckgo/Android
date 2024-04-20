@@ -1029,10 +1029,14 @@ class BrowserTabViewModel @Inject constructor(
             else -> {}
         }
 
-        if (newWebNavigationState.progress ?: 0 >= SHOW_CONTENT_MIN_PROGRESS) {
+        if ((newWebNavigationState.progress ?: 0) >= SHOW_CONTENT_MIN_PROGRESS) {
             showWebContent()
         }
         navigationAwareLoginDetector.onEvent(NavigationEvent.WebNavigationEvent(stateChange))
+    }
+
+    override fun onPageContentStart(url: String) {
+        showWebContent()
     }
 
     private fun showBlankContentfNewContentDelayed() {
