@@ -146,6 +146,24 @@
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Delete All Passwords</string>
 
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSynced">
+        <item quantity="one">Your password will be deleted from this device.</item>
+        <item quantity="other">Your passwords will be deleted from this device.</item>
+    </plurals>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSynced">
+        <item quantity="one">Your password will be deleted from all synced devices.</item>
+        <item quantity="other">Your passwords will be deleted from all synced devices.</item>
+    </plurals>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Are you sure you want to delete this password?</item>
+        <item quantity="other">Are you sure you want to delete %1$d passwords?</item>
+    </plurals>
+
+    <plurals name="credentialManagementDeleteAllSecondInstruction">
+        <item quantity="one">Make sure you still have a way to access your account.</item>
+        <item quantity="other">Make sure you still have a way to access your accounts.</item>
+    </plurals>
+
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
         <item quantity="one">%1$d password deleted</item>
         <item quantity="other">%1$d passwords deleted</item>
