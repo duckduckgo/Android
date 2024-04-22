@@ -97,6 +97,28 @@ class IntentDispatcherViewModelTest {
         }
     }
 
+    @Test
+    fun whenIntentReceivedWithSessionAndUrlContainingSpacesThenSpacesAreReplacedAndCustomTabIsRequested() = runTest {
+        val urlWithSpaces =
+            """
+                https://mastodon.social/oauth/authorize?client_id=AcfPDZlcKUjwIatVtMt8B8cmdW-w1CSOR6_rYS_6Kxs&scope=read write push&redirect_uri=mastify://oauth&response_type=code
+            """.trimIndent()
+        val expectedUrl =
+            """
+                https://mastodon.social/oauth/authorize?client_id=AcfPDZlcKUjwIatVtMt8B8cmdW-w1CSOR6_rYS_6Kxs&scope=read%20write%20push&redirect_uri=mastify://oauth&response_type=code
+            """.trimIndent()
+        whenever(mockIntent.intentText).thenReturn(urlWithSpaces)
+        configureHasSession(true)
+
+        testee.onIntentReceived(mockIntent, DEFAULT_COLOR)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertTrue(state.customTabRequested)
+            assertEquals(expectedUrl, state.intentText)
+        }
+    }
+
     private fun configureHasSession(returnValue: Boolean) {
         whenever(mockIntent.hasExtra(CustomTabsIntent.EXTRA_SESSION)).thenReturn(returnValue)
     }
