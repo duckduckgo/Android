@@ -2787,10 +2787,6 @@ class BrowserTabFragment :
     }
 
     fun onBackPressed(): Boolean {
-        if (binding.overlayView.isVisible) {
-            viewModel.onExperimentDaxDialogDismissed()
-            return true
-        }
         if (!isAdded) return false
         return viewModel.onUserPressedBack()
     }
@@ -3825,10 +3821,6 @@ class BrowserTabFragment :
                 }
             }
             binding.webViewContainer.setOnClickListener { daxDialogIntroExperimentCta.dialogTextCta.finishAnimation() }
-            binding.overlayView.setOnTouchListener { _, _ ->
-                viewModel.onExperimentDaxDialogDismissed()
-                true
-            }
             viewModel.onCtaShown()
         }
 

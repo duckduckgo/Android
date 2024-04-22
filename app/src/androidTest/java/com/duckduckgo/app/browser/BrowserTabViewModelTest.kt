@@ -5236,7 +5236,7 @@ class BrowserTabViewModelTest {
         testee.ctaViewState.value = ctaViewState().copy(cta = cta)
 
         testee.onCtaShown()
-        Handler(Looper.getMainLooper()).postDelayed(delayInMillis = 3000L) {
+        Handler(Looper.getMainLooper()).postDelayed(delayInMillis = 2000L) {
             assertTrue(browserViewState().showPrivacyShield.isHighlighted())
         }
     }
@@ -5248,16 +5248,6 @@ class BrowserTabViewModelTest {
 
         testee.onDaxDialogDismissed()
         assertFalse(browserViewState().showPrivacyShield.isHighlighted())
-    }
-
-    @Test
-    fun givenOnboardingExperimentEnabledWhenUserDismissDaxTrackersBlockedDialogThenFireButtonDialogIsDisplayed() {
-        // TODO Noelia
-    }
-
-    @Test
-    fun givenOnboardingExperimentEnabledWhenUserDismissFireButtonDialogThenFireButtonHighlightFinished() {
-        // TODO Noelia
     }
 
     @Test

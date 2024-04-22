@@ -717,7 +717,7 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         if (currentCtaViewState().cta is ExperimentOnboardingDaxDialogCta) {
-            onExperimentDaxDialogDismissed()
+            onDismissExperimentDaxDialog()
         }
 
         when (currentCtaViewState().cta) {
@@ -2413,7 +2413,7 @@ class BrowserTabViewModel @Inject constructor(
             ctaViewModel.onCtaShown(cta)
         }
         if (cta is ExperimentOnboardingDaxDialogCta.DaxTrackersBlockedCta) {
-            Handler(Looper.getMainLooper()).postDelayed(delayInMillis = 3000L) {
+            Handler(Looper.getMainLooper()).postDelayed(delayInMillis = 2000L) {
                 browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = true))
             }
         }
@@ -3196,32 +3196,21 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun onExperimentDaxDialogDismissed() {
+    private fun onDismissExperimentDaxDialog() {
         val cta = currentCtaViewState().cta as? ExperimentOnboardingDaxDialogCta? ?: return
-        when (cta) {
-            is ExperimentOnboardingDaxDialogCta.DaxSerpCta -> {
-            }
-
-            is ExperimentOnboardingDaxDialogCta.DaxTrackersBlockedCta -> {
-                browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
-            }
-
-            is ExperimentOnboardingDaxDialogCta.DaxFireButtonCta -> {
-            }
-
-            else -> {
-            }
+        if (cta is ExperimentOnboardingDaxDialogCta.DaxTrackersBlockedCta) {
+            browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
         }
-        command.value = HideExperimentOnboardingDialog(cta)
+
         onUserDismissedCta()
+        command.value = HideExperimentOnboardingDialog(cta)
     }
 
     fun onFireMenuSelected() {
         if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) {
             val cta = currentCtaViewState().cta
             if (cta is ExperimentOnboardingDaxDialogCta.DaxFireButtonCta) {
-                onUserDismissedCta()
-                command.value = HideExperimentOnboardingDialog(cta)
+                onDismissExperimentDaxDialog()
             }
             if (currentBrowserViewState().fireButton.isHighlighted()) {
                 viewModelScope.launch {

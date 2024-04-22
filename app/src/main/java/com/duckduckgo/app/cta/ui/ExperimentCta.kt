@@ -18,14 +18,11 @@ package com.duckduckgo.app.cta.ui
 
 import android.content.Context
 import android.net.Uri
-import android.os.Handler
-import android.os.Looper
 import android.view.View
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.ContextCompat
-import androidx.core.os.postDelayed
 import androidx.core.view.ViewCompat
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
@@ -271,7 +268,6 @@ sealed class ExperimentOnboardingDaxDialogCta(
 
     override fun hideOnboardingCta(binding: FragmentBrowserTabBinding) {
         binding.includeOnboardingDaxDialogExperiment.root.gone()
-        binding.overlayView.gone()
     }
 
     internal fun setOnboardingDialogView(
@@ -281,22 +277,19 @@ sealed class ExperimentOnboardingDaxDialogCta(
     ) {
         val daxDialog = binding.includeOnboardingDaxDialogExperiment
 
-        Handler(Looper.getMainLooper()).postDelayed(delayInMillis = DAX_DIALOG_APPEARANCE_DELAY) {
-            binding.overlayView.show()
-            daxDialog.root.show()
-            daxDialog.dialogTextCta.text = ""
-            daxDialog.hiddenTextCta.text = daxText.html(binding.root.context)
-            buttonText?.let {
-                daxDialog.primaryCta.show()
-                daxDialog.primaryCta.alpha = MIN_ALPHA
-                daxDialog.primaryCta.text = buttonText
-            } ?: daxDialog.primaryCta.gone()
-            binding.includeOnboardingDaxDialogExperiment.onboardingDialogSuggestionsContent.gone()
-            binding.includeOnboardingDaxDialogExperiment.onboardingDialogContent.show()
-            daxDialog.root.alpha = MAX_ALPHA
-            daxDialog.dialogTextCta.startTypingAnimation(daxText, true) {
-                ViewCompat.animate(daxDialog.primaryCta).alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
-            }
+        daxDialog.root.show()
+        daxDialog.dialogTextCta.text = ""
+        daxDialog.hiddenTextCta.text = daxText.html(binding.root.context)
+        buttonText?.let {
+            daxDialog.primaryCta.show()
+            daxDialog.primaryCta.alpha = MIN_ALPHA
+            daxDialog.primaryCta.text = buttonText
+        } ?: daxDialog.primaryCta.gone()
+        binding.includeOnboardingDaxDialogExperiment.onboardingDialogSuggestionsContent.gone()
+        binding.includeOnboardingDaxDialogExperiment.onboardingDialogContent.show()
+        daxDialog.root.alpha = MAX_ALPHA
+        daxDialog.dialogTextCta.startTypingAnimation(daxText, true) {
+            ViewCompat.animate(daxDialog.primaryCta).alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
         }
     }
 
@@ -545,7 +538,6 @@ sealed class ExperimentOnboardingDaxDialogCta(
     companion object {
         private const val MAX_TRACKERS_SHOWS = 2
         private val mainTrackerDomains = listOf("facebook", "google")
-        private const val DAX_DIALOG_APPEARANCE_DELAY = 1000L
         private const val DAX_DIALOG_APPEARANCE_ANIMATION = 400L
         private const val MAX_ALPHA = 1.0f
         private const val MIN_ALPHA = 0.0f
