@@ -21,6 +21,7 @@ import android.content.Context
 import android.os.Build.VERSION_CODES
 import android.speech.SpeechRecognizer
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.utils.extensions.toSanitizedLanguageTag
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -46,7 +47,7 @@ class DefaultVoiceSearchAvailabilityConfigProvider @Inject constructor(
     override fun get(): VoiceSearchAvailabilityConfig = VoiceSearchAvailabilityConfig(
         deviceManufacturer = appBuildConfig.manufacturer,
         sdkInt = appBuildConfig.sdkInt,
-        languageTag = appBuildConfig.deviceLocale.toLanguageTag(),
+        languageTag = appBuildConfig.deviceLocale.toSanitizedLanguageTag(),
         isOnDeviceSpeechRecognitionSupported = if (appBuildConfig.sdkInt >= VERSION_CODES.S) {
             SpeechRecognizer.isOnDeviceRecognitionAvailable(context)
         } else {
