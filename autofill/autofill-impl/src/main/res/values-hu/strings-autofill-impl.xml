@@ -145,9 +145,23 @@
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Mégsem</string>
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Minden jelszó törlése</string>
-    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
+
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSynced">
+        <item quantity="one">A jelszavad törölve lesz erről az eszközről.</item>
+        <item quantity="other">A jelszavaid törölve lesznek erről az eszközről.</item>
+    </plurals>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSynced">
+        <item quantity="one">A jelszavad törölve lesz minden szinkronizált eszközről.</item>
+        <item quantity="other">A jelszavaid törölve lesznek minden szinkronizált eszközről.</item>
+    </plurals>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
         <item quantity="one">Biztosan törölni szeretnél %1$d jelszót?</item>
         <item quantity="other">Biztosan törölni szeretnél %1$d jelszót?</item>
+    </plurals>
+
+    <plurals name="credentialManagementDeleteAllSecondInstruction">
+        <item quantity="one">Győződj meg róla, hogy továbbra is hozzáférsz a fiókodhoz.</item>
+        <item quantity="other">Győződj meg róla, hogy továbbra is hozzáférsz a fiókjaidhoz.</item>
     </plurals>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
