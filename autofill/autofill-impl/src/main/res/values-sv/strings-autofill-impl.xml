@@ -145,9 +145,23 @@
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Avbryt</string>
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Radera alla lösenord</string>
-    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
+
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSynced">
+        <item quantity="one">Ditt lösenord kommer att raderas från denna enhet.</item>
+        <item quantity="other">Dina lösenord kommer att raderas från denna enhet.</item>
+    </plurals>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSynced">
+        <item quantity="one">Ditt lösenord kommer att raderas från alla synkroniserade enheter.</item>
+        <item quantity="other">Dina lösenord kommer att raderas från alla synkroniserade enheter.</item>
+    </plurals>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
         <item quantity="one">Är du säker på att du vill radera %1$d lösenord?</item>
         <item quantity="other">Är du säker på att du vill radera %1$d lösenord?</item>
+    </plurals>
+
+    <plurals name="credentialManagementDeleteAllSecondInstruction">
+        <item quantity="one">Se till att du har kvar ett sätt att komma åt ditt konto.</item>
+        <item quantity="other">Se till att du har kvar ett sätt att komma åt dina konton.</item>
     </plurals>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">

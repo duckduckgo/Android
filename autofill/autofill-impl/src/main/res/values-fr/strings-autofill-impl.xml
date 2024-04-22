@@ -145,9 +145,23 @@
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Annuler</string>
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Supprimer tous les mots de passe</string>
-    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
+
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSynced">
+        <item quantity="one">Votre mot de passe sera supprimé de cet appareil.</item>
+        <item quantity="other">Vos mots de passe seront supprimés de cet appareil.</item>
+    </plurals>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSynced">
+        <item quantity="one">Votre mot de passe sera supprimé de tous les appareils synchronisés.</item>
+        <item quantity="other">Vos mots de passe seront supprimés de tous les appareils synchronisés.</item>
+    </plurals>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
         <item quantity="one">Voulez-vous vraiment supprimer %1$d mot de passe ?</item>
         <item quantity="other">Voulez-vous vraiment supprimer %1$d mots de passe ?</item>
+    </plurals>
+
+    <plurals name="credentialManagementDeleteAllSecondInstruction">
+        <item quantity="one">Assurez-vous d\'avoir toujours un moyen d\'accéder à votre compte.</item>
+        <item quantity="other">Assurez-vous d\'avoir toujours un moyen d\'accéder à vos comptes.</item>
     </plurals>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">

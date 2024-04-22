@@ -145,9 +145,23 @@
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Cancelar</string>
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Borrar todas las contraseñas</string>
-    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
+
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSynced">
+        <item quantity="one">Tu contraseña se borrará de este dispositivo.</item>
+        <item quantity="other">Tus contraseñas se borrarán de este dispositivo.</item>
+    </plurals>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSynced">
+        <item quantity="one">Tu contraseña se borrará en todos los dispositivos sincronizados.</item>
+        <item quantity="other">Tus contraseñas se borrarán en todos los dispositivos sincronizados.</item>
+    </plurals>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
         <item quantity="one">¿Seguro de que quieres borrar %1$d contraseña?</item>
         <item quantity="other">¿Seguro de que quieres borrar %1$d contraseñas?</item>
+    </plurals>
+
+    <plurals name="credentialManagementDeleteAllSecondInstruction">
+        <item quantity="one">Asegúrate de seguir teniendo una forma de acceder a tu cuenta.</item>
+        <item quantity="other">Asegúrate de seguir teniendo una forma de acceder a tus cuentas.</item>
     </plurals>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
