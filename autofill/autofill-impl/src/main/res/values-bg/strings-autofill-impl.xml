@@ -56,6 +56,8 @@
 
     <string name="credentialManagementSuggestionsLabel">Предложения</string>
 
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">Автоматичното попълване за пароли не е достъпно, защото Вашата версия на Android WebView е твърде стара.</string>
+
     <string name="autofillManagementSearchClearDescription">Изчистване на въведеното търсене</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Няма резултати за \'%1$s\'</string>
 
