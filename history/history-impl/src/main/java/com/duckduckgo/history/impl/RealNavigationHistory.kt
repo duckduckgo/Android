@@ -42,4 +42,8 @@ class RealNavigationHistory @Inject constructor(
     override fun getHistorySingle(): Single<List<HistoryEntry>> {
         return historyRepository.getHistoryObservable()
     }
+
+    override suspend fun clearHistory() {
+        historyRepository.clearHistory()
+    }
 }

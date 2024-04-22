@@ -34,4 +34,9 @@ interface NavigationHistory {
      */
     @Deprecated("RxJava is deprecated, except for Auto-Complete")
     fun getHistorySingle(): Single<List<HistoryEntry>>
+
+    /**
+     * Clears all history entries.
+     */
+    suspend fun clearHistory()
 }

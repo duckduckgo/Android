@@ -34,6 +34,8 @@ interface HistoryRepository {
         query: String?,
         isSerp: Boolean,
     )
+
+    suspend fun clearHistory()
 }
 
 class RealHistoryRepository(
@@ -74,6 +76,14 @@ class RealHistoryRepository(
                 isSerp,
                 LocalDateTime.now(),
             )
+            fetchAndCacheHistoryEntries()
+        }
+    }
+
+    override suspend fun clearHistory() {
+        withContext(dispatcherProvider.io()) {
+            cachedHistoryEntries = null
+            historyDao.deleteAll()
             fetchAndCacheHistoryEntries()
         }
     }
