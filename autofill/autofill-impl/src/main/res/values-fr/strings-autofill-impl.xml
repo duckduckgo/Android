@@ -122,7 +122,6 @@
     <string name="saveLoginDialogSubtitle">Les mots de passe sont stockés en toute sécurité sur votre appareil.</string>
     <string name="autofillManagementAddLogin">Ajouter un mot de passe</string>
     <string name="credentialManagementEditLoginTitleHint">Titre</string>
-    <string name="autofillDeleteLoginDialogTitle">Voulez-vous vraiment supprimer ce mot de passe ?</string>
     <string name="autofillManagementDeletedConfirmation">Le mot de passe a été supprimé</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Dernière modification : %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">Voulez-vous continuer à enregistrer vos mots de passe ?</string>
@@ -150,9 +149,6 @@
         <item quantity="one">Voulez-vous vraiment supprimer %1$d mot de passe ?</item>
         <item quantity="other">Voulez-vous vraiment supprimer %1$d mots de passe ?</item>
     </plurals>
-
-    <string name="credentialManagementDeletePasswordConfirmationMessage">Votre mot de passe sera supprimé de tous les appareils synchronisés. Assurez-vous d\'avoir toujours un moyen d\'accéder à votre compte.</string>
-    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Vos mots de passe seront supprimés de tous les appareils synchronisés. Assurez-vous d\'avoir toujours un moyen d\'accéder à vos comptes.</string>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
         <item quantity="one">%1$d mot de passe supprimé</item>

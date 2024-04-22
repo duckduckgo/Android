@@ -122,7 +122,6 @@
     <string name="saveLoginDialogSubtitle">Paroolid salvestatakse turvaliselt sinu seadmesse.</string>
     <string name="autofillManagementAddLogin">Parooli lisamine</string>
     <string name="credentialManagementEditLoginTitleHint">Pealkiri</string>
-    <string name="autofillDeleteLoginDialogTitle">Kas oled kindel, et soovid selle parooli kustutada?</string>
     <string name="autofillManagementDeletedConfirmation">Parool on kustutatud</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Viimati uuendatud %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">Kas soovid jätkata paroolide salvestamist?</string>
@@ -150,9 +149,6 @@
         <item quantity="one">Kas soovid kindlasti %1$d parooli kustutada?</item>
         <item quantity="other">Kas soovid kindlasti %1$d parooli kustutada?</item>
     </plurals>
-
-    <string name="credentialManagementDeletePasswordConfirmationMessage">Sinu parool kustutatakse kõigist sünkroonitud seadmetest. Veendu, et sulle jääks endiselt mõni viis oma kontole pääsemiseks.</string>
-    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Sinu paroolid kustutatakse kõikidest sünkroonitud seadmetest. Veendu, et sulle jääks endiselt mõni viis oma kontodele pääsemiseks.</string>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
         <item quantity="one">%1$d parool kustutatud</item>

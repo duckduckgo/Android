@@ -122,7 +122,6 @@
     <string name="saveLoginDialogSubtitle">Slaptažodžiai saugiai saugomi jūsų įrenginyje.</string>
     <string name="autofillManagementAddLogin">Pridėti slaptažodį</string>
     <string name="credentialManagementEditLoginTitleHint">Pavadinimas</string>
-    <string name="autofillDeleteLoginDialogTitle">Ar tikrai norite ištrinti šį slaptažodį?</string>
     <string name="autofillManagementDeletedConfirmation">Slaptažodis ištrintas</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Paskutinį kartą atnaujinta %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">Ar norite toliau saugoti slaptažodžius?</string>
@@ -152,9 +151,6 @@
         <item quantity="many">Ar tikrai norite ištrinti %1$d slaptažodžio?</item>
         <item quantity="other">Ar tikrai norite ištrinti %1$d slaptažodžių?</item>
     </plurals>
-
-    <string name="credentialManagementDeletePasswordConfirmationMessage">Jūsų slaptažodis bus ištrintas iš visų sinchronizuojamų įrenginių. Įsitikinkite, kad vis dar turite būdą, kaip pasiekti paskyrą.</string>
-    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Jūsų slaptažodžiai bus ištrinti iš visų sinchronizuojamų įrenginių. Įsitikinkite, kad vis dar turite būdą, kaip pasiekti paskyras.</string>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
         <item quantity="one">%1$d slaptažodis ištrintas</item>

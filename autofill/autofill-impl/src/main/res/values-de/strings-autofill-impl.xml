@@ -122,7 +122,6 @@
     <string name="saveLoginDialogSubtitle">Passwörter werden sicher auf deinem Gerät gespeichert.</string>
     <string name="autofillManagementAddLogin">Passwort hinzufügen</string>
     <string name="credentialManagementEditLoginTitleHint">Titel</string>
-    <string name="autofillDeleteLoginDialogTitle">Möchtest du dieses Passwort wirklich löschen?</string>
     <string name="autofillManagementDeletedConfirmation">Passwort gelöscht</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Zuletzt aktualisiert %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">Möchtest du weiterhin Passwörter speichern?</string>
@@ -150,9 +149,6 @@
         <item quantity="one">Möchtest du dieses %1$d Passwort wirklich löschen?</item>
         <item quantity="other">Möchtest du diese %1$d Passwörter wirklich löschen?</item>
     </plurals>
-
-    <string name="credentialManagementDeletePasswordConfirmationMessage">Dein Passwort wird von allen synchronisierten Geräten gelöscht. Vergewissere dich, dass du weiterhin eine Möglichkeit hast, auf dein Konto zuzugreifen.</string>
-    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Deine Passwörter werden von allen synchronisierten Geräten gelöscht. Vergewissere dich, dass du weiterhin eine Möglichkeit hast, auf deine Konten zuzugreifen.</string>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
         <item quantity="one">%1$d Passwort gelöscht</item>

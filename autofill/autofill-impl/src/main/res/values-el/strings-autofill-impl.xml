@@ -122,7 +122,6 @@
     <string name="saveLoginDialogSubtitle">Οι κωδικοί πρόσβασης αποθηκεύονται με ασφάλεια στη συσκευή σας.</string>
     <string name="autofillManagementAddLogin">Προσθήκη κωδικού πρόσβασης</string>
     <string name="credentialManagementEditLoginTitleHint">Τίτλος</string>
-    <string name="autofillDeleteLoginDialogTitle">Θέλετε σίγουρα να διαγράψετε αυτόν τον κωδικό πρόσβασης;</string>
     <string name="autofillManagementDeletedConfirmation">Διαγραφή κωδικού πρόσβασης</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Τελευταία ενημέρωση %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">Θέλετε να συνεχίσετε να αποθηκεύετε κωδικούς πρόσβασης;</string>
@@ -150,9 +149,6 @@
         <item quantity="one">Θέλετε σίγουρα να διαγράψετε %1$d κωδικούς πρόσβασης;</item>
         <item quantity="other">Θέλετε σίγουρα να διαγράψετε %1$d κωδικούς πρόσβασης;</item>
     </plurals>
-
-    <string name="credentialManagementDeletePasswordConfirmationMessage">Ο κωδικός πρόσβασής σας θα διαγραφεί από όλες τις συγχρονισμένες συσκευές. Βεβαιωθείτε ότι έχετε ακόμα τρόπο πρόσβασης στον λογαριασμό σας.</string>
-    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Οι κωδικοί πρόσβασής σας θα διαγραφούν από όλες τις συγχρονισμένες συσκευές. Βεβαιωθείτε ότι έχετε ακόμα τρόπο πρόσβασης στους λογαριασμούς σας.</string>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
         <item quantity="one">%1$d κωδικός πρόσβασης διαγράφηκε</item>

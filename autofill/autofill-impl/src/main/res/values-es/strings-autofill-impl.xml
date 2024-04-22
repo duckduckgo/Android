@@ -122,7 +122,6 @@
     <string name="saveLoginDialogSubtitle">Las contraseñas se almacenan de forma segura en tu dispositivo.</string>
     <string name="autofillManagementAddLogin">Añadir contraseña</string>
     <string name="credentialManagementEditLoginTitleHint">Título</string>
-    <string name="autofillDeleteLoginDialogTitle">¿Seguro de que quieres borrar esta contraseña?</string>
     <string name="autofillManagementDeletedConfirmation">Contraseña borrada</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Última actualización %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">¿Quieres seguir guardando contraseñas?</string>
@@ -150,9 +149,6 @@
         <item quantity="one">¿Seguro de que quieres borrar %1$d contraseña?</item>
         <item quantity="other">¿Seguro de que quieres borrar %1$d contraseñas?</item>
     </plurals>
-
-    <string name="credentialManagementDeletePasswordConfirmationMessage">Tu contraseña se borrará en todos los dispositivos sincronizados. Asegúrate de seguir teniendo una forma de acceder a tu cuenta.</string>
-    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Tus contraseñas se borrarán en todos los dispositivos sincronizados. Asegúrate de seguir teniendo una forma de acceder a tus cuentas.</string>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
         <item quantity="one">%1$d contraseña borrada</item>

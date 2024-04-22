@@ -122,7 +122,6 @@
     <string name="saveLoginDialogSubtitle">A jelszavakat az eszközöd biztonságosan tárolja.</string>
     <string name="autofillManagementAddLogin">Jelszó hozzáadása</string>
     <string name="credentialManagementEditLoginTitleHint">Cím</string>
-    <string name="autofillDeleteLoginDialogTitle">Biztosan törlöd ezt a jelszót?</string>
     <string name="autofillManagementDeletedConfirmation">Jelszó törölve</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Utolsó frissítés: %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">Továbbra is szeretnéd menteni a jelszavakat?</string>
@@ -150,9 +149,6 @@
         <item quantity="one">Biztosan törölni szeretnél %1$d jelszót?</item>
         <item quantity="other">Biztosan törölni szeretnél %1$d jelszót?</item>
     </plurals>
-
-    <string name="credentialManagementDeletePasswordConfirmationMessage">A jelszó az összes szinkronizált eszközről törölve lesz. Győződj meg róla, hogy továbbra is hozzáférsz a fiókodhoz.</string>
-    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">A jelszavak az összes szinkronizált eszközről törölve lesznek. Győződj meg róla, hogy továbbra is hozzáférsz a fiókjaidhoz.</string>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
         <item quantity="one">%1$d jelszó törölve</item>

@@ -122,7 +122,6 @@
     <string name="saveLoginDialogSubtitle">Gesla so varno shranjena v vaši napravi.</string>
     <string name="autofillManagementAddLogin">Dodajte geslo</string>
     <string name="credentialManagementEditLoginTitleHint">Naslov</string>
-    <string name="autofillDeleteLoginDialogTitle">Ali ste prepričani, da želite izbrisati to geslo?</string>
     <string name="autofillManagementDeletedConfirmation">Geslo je izbrisano</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Nazadnje posodobljeno dne %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">Ali želite še naprej shranjevati gesla?</string>
@@ -152,9 +151,6 @@
         <item quantity="few">Ali ste prepričani, da želite izbrisati %1$d gesla?</item>
         <item quantity="other">Ali ste prepričani, da želite izbrisati %1$d gesel?</item>
     </plurals>
-
-    <string name="credentialManagementDeletePasswordConfirmationMessage">Vaše geslo bo izbrisano iz vseh sinhroniziranih naprav. Prepričajte se, da imate še vedno možnost dostopa do svojega računa.</string>
-    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Vaša gesla bodo izbrisana iz vseh sinhroniziranih naprav. Prepričajte se, da imate še vedno možnost dostopa do svojih računov.</string>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
         <item quantity="one">%1$d geslo je bilo izbrisano</item>
