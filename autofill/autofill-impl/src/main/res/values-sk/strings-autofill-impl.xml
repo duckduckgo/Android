@@ -145,11 +145,31 @@
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Zrušiť</string>
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Odstránenie všetkých hesiel</string>
-    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
+
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSynced">
+        <item quantity="one">Vaše heslo bude z tohto zariadenia odstránené.</item>
+        <item quantity="few">Vaše heslá budú z tohto zariadenia odstránené.</item>
+        <item quantity="many">Vaše heslá budú z tohto zariadenia odstránené.</item>
+        <item quantity="other">Vaše heslá budú z tohto zariadenia odstránené.</item>
+    </plurals>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSynced">
+        <item quantity="one">Vaše heslo sa odstráni zo všetkých synchronizovaných zariadení.</item>
+        <item quantity="few">Vaše heslá sa odstránia zo všetkých synchronizovaných zariadení.</item>
+        <item quantity="many">Vaše heslá sa odstránia zo všetkých synchronizovaných zariadení.</item>
+        <item quantity="other">Vaše heslá sa odstránia zo všetkých synchronizovaných zariadení.</item>
+    </plurals>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
         <item quantity="one">Naozaj chcete odstrániť %1$d heslo?</item>
         <item quantity="few">Naozaj chcete odstrániť %1$d heslá?</item>
         <item quantity="many">Naozaj chcete odstrániť %1$d hesla?</item>
         <item quantity="other">Naozaj chcete odstrániť %1$d hesiel?</item>
+    </plurals>
+
+    <plurals name="credentialManagementDeleteAllSecondInstruction">
+        <item quantity="one">Zabezpečte si prístup k svojmu účtu.</item>
+        <item quantity="few">Zabezpečte si prístup k svojim účtom.</item>
+        <item quantity="many">Zabezpečte si prístup k svojim účtom.</item>
+        <item quantity="other">Zabezpečte si prístup k svojim účtom.</item>
     </plurals>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
