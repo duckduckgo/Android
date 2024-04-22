@@ -196,20 +196,6 @@ interface NetworkProtectionPixels {
     fun reportFaqsShown()
 
     /**
-     * This fun will fire two pixels when the NetP Terms and Conditions screen is shown
-     * daily -> fire only once a day no matter how many times we call this fun
-     * count -> fire a pixel on every call
-     */
-    fun reportTermsShown()
-
-    /**
-     * This fun will fire two pixels when the NetP Terms and Conditions screen are accepted
-     * daily -> fire only once a day no matter how many times we call this fun
-     * count -> fire a pixel on every call
-     */
-    fun reportTermsAccepted()
-
-    /**
      * This fun will fire one pixel
      */
     fun reportGeoswitchingScreenShown()
@@ -439,16 +425,6 @@ class RealNetworkProtectionPixel @Inject constructor(
     override fun reportFaqsShown() {
         tryToFireDailyPixel(NETP_FAQS_SHOWN_DAILY)
         firePixel(NETP_FAQS_SHOWN)
-    }
-
-    override fun reportTermsShown() {
-        tryToFireDailyPixel(NETP_TERMS_SHOWN_DAILY)
-        firePixel(NETP_TERMS_SHOWN)
-    }
-
-    override fun reportTermsAccepted() {
-        tryToFireDailyPixel(NETP_TERMS_ACCEPTED_DAILY)
-        firePixel(NETP_TERMS_ACCEPTED)
     }
 
     override fun reportGeoswitchingScreenShown() {
