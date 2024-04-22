@@ -126,7 +126,6 @@
     <string name="saveLoginDialogSubtitle">Passwords are stored securely on your device.</string>
     <string name="autofillManagementAddLogin">Add Password</string>
     <string name="credentialManagementEditLoginTitleHint">Title</string>
-    <string name="autofillDeleteLoginDialogTitle">Are you sure you want to delete this password?</string>
     <string name="autofillManagementDeletedConfirmation">Password deleted</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Last updated %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">Do you want to keep saving passwords?</string>
@@ -150,12 +149,6 @@
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Cancel</string>
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Delete All Passwords</string>
-    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
-        <item quantity="other">Are you sure you want to delete %1$d passwords?</item>
-    </plurals>
-
-    <string name="credentialManagementDeletePasswordConfirmationMessage">Your password will be deleted from all synced devices. Make sure you still have a way to access your account.</string>
-    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Your passwords will be deleted from all synced devices. Make sure you still have a way to access your accounts.</string>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
         <item quantity="one">%1$d password deleted</item>

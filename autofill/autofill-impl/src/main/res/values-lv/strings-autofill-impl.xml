@@ -122,7 +122,6 @@
     <string name="saveLoginDialogSubtitle">Paroles tiek droši glabātas tavā ierīcē.</string>
     <string name="autofillManagementAddLogin">Pievienot paroli</string>
     <string name="credentialManagementEditLoginTitleHint">Nosaukums</string>
-    <string name="autofillDeleteLoginDialogTitle">Vai tiešām vēlies dzēst šo paroli?</string>
     <string name="autofillManagementDeletedConfirmation">Parole dzēsta</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Pēdējoreiz atjaunināts %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">Vai vēlaties turpināt saglabāt paroles?</string>
@@ -146,14 +145,6 @@
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Atcelt</string>
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Dzēst visas paroles</string>
-    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
-        <item quantity="zero">Vai tiešām vēlies dzēst %1$d paroles?</item>
-        <item quantity="one">Vai tiešām vēlies dzēst %1$d paroli?</item>
-        <item quantity="other">Vai tiešām vēlies dzēst %1$d paroles?</item>
-    </plurals>
-
-    <string name="credentialManagementDeletePasswordConfirmationMessage">Parole tiks dzēsta no visām sinhronizētajām ierīcēm. Pārliecinies, vai joprojām varēsi piekļūt savam kontam.</string>
-    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Paroles tiks dzēstas no visām sinhronizētajām ierīcēm. Pārliecinies, vai joprojām varēsi piekļūt savam kontam.</string>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
         <item quantity="zero">%1$d paroles izdzēstas</item>
