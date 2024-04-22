@@ -56,6 +56,8 @@
 
     <string name="credentialManagementSuggestionsLabel">Förslag</string>
 
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">Automatisk ifyllning för lösenord är inte tillgängligt eftersom din version av Android WebView är för gammal.</string>
+
     <string name="autofillManagementSearchClearDescription">Rensa sökfältet</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Inga resultat för ”%1$s”</string>
 
