@@ -29,6 +29,7 @@ fun NotificationManagerCompat.checkPermissionAndNotify(
     notification: Notification,
 ) {
     if (ActivityCompat.checkSelfPermission(context, POST_NOTIFICATIONS) == PERMISSION_GRANTED) {
+        cancel(id) // ensure previous notifications with same ID are dismissed
         notify(id, notification)
     }
 }
