@@ -145,9 +145,23 @@
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Cancelar</string>
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Eliminar todas as palavras-passe</string>
-    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
+
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSynced">
+        <item quantity="one">A tua palavra-passe será eliminada deste dispositivo.</item>
+        <item quantity="other">As tuas palavras-passe serão eliminadas deste dispositivo.</item>
+    </plurals>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSynced">
+        <item quantity="one">A tua palavra-passe será eliminada de todos os dispositivos sincronizados.</item>
+        <item quantity="other">As tuas palavras-passe serão eliminadas de todos os dispositivos sincronizados.</item>
+    </plurals>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
         <item quantity="one">Tens a certeza de que pretendes eliminar %1$d palavra-passe?</item>
         <item quantity="other">Tens a certeza de que pretendes eliminar %1$d palavras-passe?</item>
+    </plurals>
+
+    <plurals name="credentialManagementDeleteAllSecondInstruction">
+        <item quantity="one">Confirma que ainda tens uma forma de aceder à conta.</item>
+        <item quantity="other">Confirma que ainda tens uma forma de aceder às contas.</item>
     </plurals>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
