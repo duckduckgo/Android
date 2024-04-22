@@ -145,9 +145,23 @@
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Отмени</string>
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Изтриване на всички пароли</string>
-    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
+
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSynced">
+        <item quantity="one">Вашата парола ще бъде изтрита от това устройство.</item>
+        <item quantity="other">Вашите пароли ще бъдат изтрити от това устройство.</item>
+    </plurals>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSynced">
+        <item quantity="one">Вашата парола ще бъде изтрита от всички синхронизирани устройства.</item>
+        <item quantity="other">Вашите пароли ще бъдат изтрити от всички синхронизирани устройства.</item>
+    </plurals>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
         <item quantity="one">Сигурни ли сте, че искате да изтриете %1$d парола?</item>
         <item quantity="other">Сигурни ли сте, че искате да изтриете %1$d пароли?</item>
+    </plurals>
+
+    <plurals name="credentialManagementDeleteAllSecondInstruction">
+        <item quantity="one">Уверете се, че все още имате друг начин за достъп до Вашия акаунт.</item>
+        <item quantity="other">Уверете се, че все още имате друг начин за достъп до Вашите акаунти.</item>
     </plurals>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
