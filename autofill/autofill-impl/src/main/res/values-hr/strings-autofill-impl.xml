@@ -56,6 +56,8 @@
 
     <string name="credentialManagementSuggestionsLabel">Predloženo</string>
 
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">Automatsko popunjavanje lozinki nije dostupno jer je vaša verzija Android WebViewa prestara.</string>
+
     <string name="autofillManagementSearchClearDescription">Obriši unos pretraživanja</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Nema rezultata za \"%1$s\"</string>
 
