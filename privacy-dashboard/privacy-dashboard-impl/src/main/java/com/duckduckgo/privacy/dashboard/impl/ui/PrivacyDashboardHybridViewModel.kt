@@ -24,6 +24,8 @@ import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.UNIQUE
+import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.DASHBOARD
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -72,6 +74,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     private val autoconsentStatusViewStateMapper: AutoconsentStatusViewStateMapper,
     private val protectionsToggleUsageListener: PrivacyProtectionsToggleUsageListener,
     private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels,
+    private val userBrowserProperties: UserBrowserProperties,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -196,6 +199,11 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         viewModelScope.launch {
             val pixelParams = privacyProtectionsPopupExperimentExternalPixels.getPixelParams()
             pixel.fire(PRIVACY_DASHBOARD_OPENED, pixelParams, type = COUNT)
+            pixel.fire(
+                pixel = PRIVACY_DASHBOARD_FIRST_TIME_OPENED,
+                parameters = mapOf("daysSinceInstall" to userBrowserProperties.daysSinceInstalled().toString()),
+                type = UNIQUE,
+            )
         }
         privacyProtectionsPopupExperimentExternalPixels.tryReportPrivacyDashboardOpened()
 
@@ -251,7 +259,10 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         }
     }
 
-    fun onPrivacyProtectionsClicked(enabled: Boolean, dashboardOpenedFromCustomTab: Boolean = false) {
+    fun onPrivacyProtectionsClicked(
+        enabled: Boolean,
+        dashboardOpenedFromCustomTab: Boolean = false,
+    ) {
         Timber.i("PrivacyDashboard: onPrivacyProtectionsClicked $enabled")
 
         viewModelScope.launch(dispatcher.io()) {

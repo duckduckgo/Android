@@ -36,11 +36,12 @@ class OnboardingExperimentPixel {
         ONBOARDING_VISIT_SITE_EBAY("m_onboarding_visit_site_ebay"),
         ONBOARDING_VISIT_SITE_SURPRISE_ME("m_onboarding_visit_site_surprise_me"),
         ONBOARDING_VISIT_SITE_CUSTOM("m_onboarding_visit_site_custom"),
+        // Added new PRIVACY_DASHBOARD_FIRST_TIME_OPENED("m_privacy_dashboard_first_time_used") pixel in PrivacyDashboardPixel.kt class
     }
 
     object PixelParameter {
         const val FROM_ONBOARDING = "from_onboarding"
         const val DEFAULT_BROWSER = "default_browser"
-        const val DAX_INITIAL_VISIT_SITE_CTA = "visit_site"
+        // Added new val DAX_INITIAL_VISIT_SITE_CTA = "visit_site" parameter in Pixel.kt class
     }
 }
