@@ -1808,15 +1808,20 @@ class BrowserTabFragment :
             return
         }
 
-        if (activities.size == 1 || useFirstActivityFound) {
-            val activity = activities.first()
-            val appTitle = activity.loadLabel(pm)
-            Timber.i("Exactly one app available for intent: $appTitle")
-            launchExternalAppDialog(context) { context.startActivity(intent) }
-        } else {
-            val title = getString(R.string.openExternalApp)
-            val intentChooser = Intent.createChooser(intent, title)
-            launchExternalAppDialog(context) { context.startActivity(intentChooser) }
+        runCatching {
+            if (activities.size == 1 || useFirstActivityFound) {
+                val activity = activities.first()
+                val appTitle = activity.loadLabel(pm)
+                Timber.i("Exactly one app available for intent: $appTitle")
+                launchExternalAppDialog(context) { context.startActivity(intent) }
+            } else {
+                val title = getString(R.string.openExternalApp)
+                val intentChooser = Intent.createChooser(intent, title)
+                launchExternalAppDialog(context) { context.startActivity(intentChooser) }
+            }
+        }.onFailure { exception ->
+            Timber.e(exception, "Failed to launch external app")
+            showToast(R.string.unableToOpenLink)
         }
     }
 
