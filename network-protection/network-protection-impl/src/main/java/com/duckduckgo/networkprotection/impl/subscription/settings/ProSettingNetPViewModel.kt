@@ -111,7 +111,7 @@ class ProSettingNetPViewModel(
         networkProtectionConnectionState: ConnectionState,
     ): NetPEntryState {
         return when (accessState) {
-            is NetPAccessState.InBeta -> {
+            is NetPAccessState.UnLocked -> {
                 if (networkProtectionState.isOnboarded()) {
                     val subtitle = when (networkProtectionConnectionState) {
                         CONNECTED -> R.string.netpSubscriptionSettingsConnected
@@ -134,7 +134,7 @@ class ProSettingNetPViewModel(
                 }
             }
 
-            NetPAccessState.NotUnlocked -> Hidden
+            NetPAccessState.Locked -> Hidden
         }
     }
 
