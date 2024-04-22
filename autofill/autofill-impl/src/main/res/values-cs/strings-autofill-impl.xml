@@ -56,6 +56,8 @@
 
     <string name="credentialManagementSuggestionsLabel">Navrhované</string>
 
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">Automatické vyplňování hesel není dostupné, protože tvoje verze Android WebView je moc stará.</string>
+
     <string name="autofillManagementSearchClearDescription">Vymazat vyhledávací vstup</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Žádné výsledky pro dotaz „%1$s“</string>
 
