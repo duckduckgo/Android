@@ -126,7 +126,6 @@
     <string name="saveLoginDialogSubtitle">Lozinke su sigurno pohranjene na tvom uređaju.</string>
     <string name="autofillManagementAddLogin">Dodaj lozinku</string>
     <string name="credentialManagementEditLoginTitleHint">Naslov</string>
-    <string name="autofillDeleteLoginDialogTitle">Sigurno želiš izbrisati ovu lozinku?</string>
     <string name="autofillManagementDeletedConfirmation">Lozinka je izbrisana</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Posljednje ažuriranje: %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">Želiš li nastaviti spremati lozinke?</string>
@@ -152,15 +151,6 @@
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Odustani</string>
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Izbriši sve lozinke</string>
-    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
-        <item quantity="one">Sigurno želiš izbrisati %1$d lozinku?</item>
-        <item quantity="few">Sigurno želiš izbrisati %1$d lozinke?</item>
-        <item quantity="many">Sigurno želiš izbrisati %1$d lozinki?</item>
-        <item quantity="other">Sigurno želiš izbrisati %1$d lozinki?</item>
-    </plurals>
-
-    <string name="credentialManagementDeletePasswordConfirmationMessage">Tvoja lozinka bit će izbrisana sa svih sinkroniziranih uređaja. Uvjeri se da i dalje imaš način pristupa svom računu.</string>
-    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Tvoje lozinke bit će izbrisane sa svih sinkroniziranih uređaja. Uvjeri se da i dalje imaš način pristupa svojim računima.</string>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
         <item quantity="one">Izbrisana je %1$d lozinka</item>

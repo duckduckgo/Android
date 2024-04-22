@@ -126,7 +126,6 @@
     <string name="saveLoginDialogSubtitle">Пароли надежно защищены и хранятся на вашем устройстве.</string>
     <string name="autofillManagementAddLogin">Добавление пароля</string>
     <string name="credentialManagementEditLoginTitleHint">Название</string>
-    <string name="autofillDeleteLoginDialogTitle">Вы точно хотите удалить этот пароль?</string>
     <string name="autofillManagementDeletedConfirmation">Пароль удален</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Последнее обновление: %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">Продолжить сохранять пароли?</string>
@@ -152,15 +151,6 @@
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Отменить</string>
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Удалить все пароли</string>
-    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
-        <item quantity="one">Вы точно хотите удалить %1$d пароль?</item>
-        <item quantity="few">Вы точно хотите удалить %1$d пароля?</item>
-        <item quantity="many">Вы точно хотите удалить %1$d паролей?</item>
-        <item quantity="other">Вы точно хотите удалить пароли (%1$d)?</item>
-    </plurals>
-
-    <string name="credentialManagementDeletePasswordConfirmationMessage">Пароль будет удален со всех синхронизированных устройств. Обязательно убедитесь, что вы можете войти в свою учетную запись другим способом.</string>
-    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Пароли будут удалены со всех синхронизированных устройств. Убедитесь, что вы по-прежнему можете войти в свои учетные записи.</string>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
         <item quantity="one">Удален %1$d пароль</item>
