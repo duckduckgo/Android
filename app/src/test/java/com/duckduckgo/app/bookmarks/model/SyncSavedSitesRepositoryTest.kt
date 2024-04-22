@@ -37,10 +37,12 @@ import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
+import com.duckduckgo.savedsites.impl.MissingEntitiesRelationReconciler
 import com.duckduckgo.savedsites.impl.RealFavoritesDelegate
 import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.RealSyncSavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.SyncSavedSitesRepository
+import com.duckduckgo.savedsites.impl.sync.store.RealSavedSitesSyncEntitiesStore
 import com.duckduckgo.savedsites.impl.sync.store.SavedSitesSyncMetadataDao
 import com.duckduckgo.savedsites.impl.sync.store.SavedSitesSyncMetadataDatabase
 import com.duckduckgo.savedsites.impl.sync.store.SavedSitesSyncMetadataEntity
@@ -58,6 +60,7 @@ import java.time.ZoneOffset
 import junit.framework.TestCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Assert
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -84,6 +87,9 @@ class SyncSavedSitesRepositoryTest {
     private lateinit var savedSitesDatabase: SavedSitesSyncMetadataDatabase
     private lateinit var repository: SyncSavedSitesRepository
     private lateinit var savedSitesRepository: SavedSitesRepository
+    private val store = RealSavedSitesSyncEntitiesStore(
+        InstrumentationRegistry.getInstrumentation().context,
+    )
 
     val stringListType = Types.newParameterizedType(List::class.java, String::class.java)
     val stringListAdapter: JsonAdapter<List<String>> = Moshi.Builder().build().adapter(stringListType)
@@ -130,6 +136,7 @@ class SyncSavedSitesRepositoryTest {
             savedSitesEntitiesDao,
             savedSitesRelationsDao,
             savedSitesMetadataDao,
+            store,
         )
 
         val favoritesDisplayModeSettings = FakeDisplayModeSettingsRepository()
@@ -137,16 +144,23 @@ class SyncSavedSitesRepositoryTest {
             savedSitesEntitiesDao,
             savedSitesRelationsDao,
             favoritesDisplayModeSettings,
+            MissingEntitiesRelationReconciler(savedSitesEntitiesDao),
             coroutinesTestRule.testDispatcherProvider,
         )
         savedSitesRepository = RealSavedSitesRepository(
             savedSitesEntitiesDao,
             savedSitesRelationsDao,
             favoritesDelegate,
+            MissingEntitiesRelationReconciler(savedSitesEntitiesDao),
             coroutinesTestRule.testDispatcherProvider,
         )
 
         givenInitialFolderState()
+    }
+
+    @After
+    fun after() {
+        appDatabase.close()
     }
 
     @Test
@@ -243,6 +257,27 @@ class SyncSavedSitesRepositoryTest {
     }
 
     @Test
+    fun whenFolderMetadataPresentAndLocalContentHasMissingRelationsThenFolderDiffDoesNotContainDeletedItem() = runTest {
+        val entities = BookmarkTestUtils.givenSomeBookmarks(5)
+        savedSitesEntitiesDao.insertList(entities.dropLast(1))
+
+        val relation = BookmarkTestUtils.givenFolderWithContent(folder.id, entities)
+        savedSitesRelationsDao.insertList(relation)
+
+        val serverEntities = entities.map { it.entityId }
+        val childrenJSON = stringListAdapter.toJson(serverEntities)
+        val metadata = SavedSitesSyncMetadataEntity(folder.id, childrenJSON, "[]")
+        savedSitesMetadataDao.addOrUpdate(metadata)
+
+        val folderChildren = repository.getFolderDiff(folder.id)
+
+        Assert.assertEquals(entities.map { it.entityId }, folderChildren.current)
+        Assert.assertEquals(5, folderChildren.current.size)
+        Assert.assertEquals(0, folderChildren.insert.size)
+        Assert.assertEquals(0, folderChildren.remove.size)
+    }
+
+    @Test
     fun whenFolderIsReplacedThenChildrenAreUpdated() {
         val bookmarks = BookmarkTestUtils.givenSomeBookmarks(10)
         savedSitesEntitiesDao.insertList(bookmarks)
@@ -307,7 +342,7 @@ class SyncSavedSitesRepositoryTest {
         repository.replaceBookmarkFolder(folder, updatedFolderContent.map { it.entityId })
 
         val orphans = savedSitesRelationsDao.getOrphans()
-        Assert.assertTrue(orphans.isEmpty())
+        assertTrue(orphans.isEmpty())
     }
 
     @Test
@@ -334,7 +369,7 @@ class SyncSavedSitesRepositoryTest {
 
         // then fixing orphans will attach those to the root
         val orphansPresent = repository.fixOrphans()
-        Assert.assertTrue(orphansPresent)
+        assertTrue(orphansPresent)
 
         // root should now contain the original folder plus the original children of the folder
         val attachedChildren = savedSitesRelationsDao.relationsByFolderId(bookmarksRoot.entityId)
@@ -389,7 +424,7 @@ class SyncSavedSitesRepositoryTest {
 
         // then fixing orphans will attach those to the root
         val orphansPresent = repository.fixOrphans()
-        Assert.assertTrue(orphansPresent)
+        assertTrue(orphansPresent)
         Assert.assertEquals(11, savedSitesRelationsDao.relationsByFolderId(bookmarksRoot.entityId).size)
 
         // and favourites won't be affected
@@ -407,17 +442,17 @@ class SyncSavedSitesRepositoryTest {
         // given some content in the subfolder
         givenSomeContentIn(folderId = folder.id, children = 5, saveMetadata = true)
         Assert.assertEquals(5, savedSitesRelationsDao.relationsByFolderId(folder.id).size)
-        Assert.assertTrue(savedSitesMetadataDao.get(folder.id) != null)
+        assertTrue(savedSitesMetadataDao.get(folder.id) != null)
 
         // when we soft delete it
         savedSitesEntitiesDao.delete(folder.id)
-        Assert.assertTrue(savedSitesMetadataDao.get(folder.id) != null)
+        assertTrue(savedSitesMetadataDao.get(folder.id) != null)
 
         // and permanently delete it
         repository.pruneDeleted()
 
         // then metadata is also deleted
-        Assert.assertTrue(savedSitesMetadataDao.get(folder.id) == null)
+        assertTrue(savedSitesMetadataDao.get(folder.id) == null)
     }
 
     @Test
@@ -432,17 +467,17 @@ class SyncSavedSitesRepositoryTest {
 
         repository.addRequestMetadata(expectedContent)
 
-        Assert.assertTrue(savedSitesMetadataDao.all().isNotEmpty())
+        assertTrue(savedSitesMetadataDao.all().isNotEmpty())
 
-        Assert.assertTrue(savedSitesMetadataDao.get(favoritesFolder.id) != null)
-        Assert.assertTrue(savedSitesMetadataDao.get(favoritesFolder.id)!!.childrenRequest != null)
-        Assert.assertTrue(savedSitesMetadataDao.get(favoritesFolder.id)!!.childrenResponse == null)
+        assertTrue(savedSitesMetadataDao.get(favoritesFolder.id) != null)
+        assertTrue(savedSitesMetadataDao.get(favoritesFolder.id)!!.childrenRequest != null)
+        assertTrue(savedSitesMetadataDao.get(favoritesFolder.id)!!.childrenResponse == null)
     }
 
     @Test
     fun whenGeneratingLocalChangesAreEmptyThenMetadataRequestIsNotUpdated() {
         repository.addRequestMetadata(emptyList())
-        Assert.assertTrue(savedSitesMetadataDao.all().isEmpty())
+        assertTrue(savedSitesMetadataDao.all().isEmpty())
     }
 
     @Test
@@ -450,9 +485,9 @@ class SyncSavedSitesRepositoryTest {
         val storedMetadata = SavedSitesSyncMetadataEntity(favoritesFolder.id, "previousResponse", null)
         savedSitesMetadataDao.addOrUpdate(storedMetadata)
 
-        Assert.assertTrue(savedSitesMetadataDao.get(favoritesFolder.id) != null)
-        Assert.assertTrue(savedSitesMetadataDao.get(favoritesFolder.id)!!.childrenResponse == storedMetadata.childrenResponse)
-        Assert.assertTrue(savedSitesMetadataDao.get(favoritesFolder.id)!!.childrenRequest == null)
+        assertTrue(savedSitesMetadataDao.get(favoritesFolder.id) != null)
+        assertTrue(savedSitesMetadataDao.get(favoritesFolder.id)!!.childrenResponse == storedMetadata.childrenResponse)
+        assertTrue(savedSitesMetadataDao.get(favoritesFolder.id)!!.childrenRequest == null)
 
         val expectedContent = listOf(
             getRequestEntryFromBookmarkFolder(favoritesFolder, listOf(bookmark1).map { it.id }),
@@ -460,29 +495,29 @@ class SyncSavedSitesRepositoryTest {
 
         repository.addRequestMetadata(expectedContent)
 
-        Assert.assertTrue(savedSitesMetadataDao.get(favoritesFolder.id) != null)
-        Assert.assertTrue(savedSitesMetadataDao.get(favoritesFolder.id)!!.childrenResponse == storedMetadata.childrenResponse)
-        Assert.assertTrue(savedSitesMetadataDao.get(favoritesFolder.id)!!.childrenRequest != null)
+        assertTrue(savedSitesMetadataDao.get(favoritesFolder.id) != null)
+        assertTrue(savedSitesMetadataDao.get(favoritesFolder.id)!!.childrenResponse == storedMetadata.childrenResponse)
+        assertTrue(savedSitesMetadataDao.get(favoritesFolder.id)!!.childrenRequest != null)
     }
 
     @Test
     fun whenResponseHasNoEntitiesThenMetadataIsNotUpdated() {
         repository.addResponseMetadata(emptyList())
-        Assert.assertTrue(savedSitesMetadataDao.all().isEmpty())
+        assertTrue(savedSitesMetadataDao.all().isEmpty())
     }
 
     @Test
     fun whenResponseHasNoEntitiesAfterAPatchRequestThenMetadataIsCopiedAsResponse() {
         givenSomeContentIn(folderId = bookmarksRootFolder.id, children = 5)
-        Assert.assertTrue(savedSitesMetadataDao.get(bookmarksRootFolder.id) != null)
-        Assert.assertTrue(savedSitesMetadataDao.get(bookmarksRootFolder.id)!!.childrenRequest != null)
-        Assert.assertTrue(savedSitesMetadataDao.get(bookmarksRootFolder.id)!!.childrenResponse == null)
+        assertTrue(savedSitesMetadataDao.get(bookmarksRootFolder.id) != null)
+        assertTrue(savedSitesMetadataDao.get(bookmarksRootFolder.id)!!.childrenRequest != null)
+        assertTrue(savedSitesMetadataDao.get(bookmarksRootFolder.id)!!.childrenResponse == null)
 
         repository.addResponseMetadata(emptyList())
 
-        Assert.assertTrue(savedSitesMetadataDao.get(bookmarksRootFolder.id) != null)
-        Assert.assertTrue(savedSitesMetadataDao.get(bookmarksRootFolder.id)!!.childrenRequest != null)
-        Assert.assertTrue(savedSitesMetadataDao.get(bookmarksRootFolder.id)!!.childrenResponse != null)
+        assertTrue(savedSitesMetadataDao.get(bookmarksRootFolder.id) != null)
+        assertTrue(savedSitesMetadataDao.get(bookmarksRootFolder.id)!!.childrenRequest != null)
+        assertTrue(savedSitesMetadataDao.get(bookmarksRootFolder.id)!!.childrenResponse != null)
     }
 
     @Test
@@ -495,11 +530,60 @@ class SyncSavedSitesRepositoryTest {
 
         repository.addResponseMetadata(responseEntries)
 
-        Assert.assertTrue(savedSitesMetadataDao.all().isNotEmpty())
+        assertTrue(savedSitesMetadataDao.all().isNotEmpty())
 
-        Assert.assertTrue(savedSitesMetadataDao.get(bookmarksRootFolder.id) != null)
-        Assert.assertTrue(savedSitesMetadataDao.get(bookmarksRootFolder.id)!!.childrenResponse != null)
-        Assert.assertTrue(savedSitesMetadataDao.get(bookmarksRootFolder.id)!!.childrenRequest == null)
+        assertTrue(savedSitesMetadataDao.get(bookmarksRootFolder.id) != null)
+        assertTrue(savedSitesMetadataDao.get(bookmarksRootFolder.id)!!.childrenResponse != null)
+        assertTrue(savedSitesMetadataDao.get(bookmarksRootFolder.id)!!.childrenRequest == null)
+    }
+
+    @Test
+    fun whenDiscardRequestMetadataThenMetadataRequestIsRemoved() {
+        val requestContent = listOf(
+            getRequestEntryFromSavedSite(bookmark1),
+            getRequestEntryFromSavedSite(bookmark3),
+            getRequestEntryFromSavedSite(bookmark4),
+            getRequestEntryFromBookmarkFolder(favoritesFolder, listOf(bookmark1).map { it.id }),
+            getRequestEntryFromBookmarkFolder(bookmarksRootFolder, listOf(bookmark1, bookmark3, bookmark4).map { it.id }),
+        )
+        repository.addRequestMetadata(requestContent)
+
+        repository.discardRequestMetadata()
+
+        assertTrue(savedSitesMetadataDao.get(favoritesFolder.id)?.childrenRequest == null)
+        assertTrue(savedSitesMetadataDao.get(bookmarksRootFolder.id)!!.childrenRequest == null)
+    }
+
+    @Test
+    fun whenDiscardRequestMetadataAndStoreResponseMetadataThenMetadataStatusOnlyReflectsResponse() {
+        val requestContent = listOf(
+            getRequestEntryFromBookmarkFolder(favoritesFolder, listOf(bookmark1).map { it.id }),
+            getRequestEntryFromSavedSite(bookmark1),
+            getRequestEntryFromSavedSite(bookmark3),
+            getRequestEntryFromSavedSite(bookmark4),
+            getRequestEntryFromBookmarkFolder(bookmarksRootFolder, listOf(bookmark1, bookmark3, bookmark4).map { it.id }),
+        )
+        repository.addRequestMetadata(requestContent)
+
+        val responseEntries = listOf(
+            getResponseEntryFromSavedSite(bookmark),
+            getResponseEntryFromBookmarkFolder(folder, listOf(bookmark.id)),
+            getResponseEntryFromBookmarkFolder(bookmarksRootFolder, listOf(folder.id)),
+        )
+
+        repository.discardRequestMetadata()
+        repository.addResponseMetadata(responseEntries)
+
+        assertTrue(savedSitesMetadataDao.all().isNotEmpty())
+
+        assertTrue(savedSitesMetadataDao.get(favoritesFolder.id)?.childrenRequest == null)
+        assertTrue(savedSitesMetadataDao.get(favoritesFolder.id)?.childrenResponse == null)
+
+        assertTrue(savedSitesMetadataDao.get(bookmarksRootFolder.id)!!.childrenRequest == null)
+        Assert.assertEquals("[\"folder1\"]", savedSitesMetadataDao.get(bookmarksRootFolder.id)!!.childrenResponse)
+
+        assertTrue(savedSitesMetadataDao.get(folder.id)!!.childrenRequest == null)
+        Assert.assertEquals("[\"bookmark1\"]", savedSitesMetadataDao.get(folder.id)!!.childrenResponse)
     }
 
     @Test
@@ -510,15 +594,15 @@ class SyncSavedSitesRepositoryTest {
 
         repository.addResponseMetadata(responseEntries)
 
-        Assert.assertTrue(savedSitesMetadataDao.all().isEmpty())
+        assertTrue(savedSitesMetadataDao.all().isEmpty())
     }
 
     @Test
     fun whenResponseHasNoFoldersAfterAPatchRequestThenMetadataIsCopiedAsResponse() {
         givenSomeContentIn(folderId = bookmarksRootFolder.id, children = 5)
-        Assert.assertTrue(savedSitesMetadataDao.get(bookmarksRootFolder.id) != null)
-        Assert.assertTrue(savedSitesMetadataDao.get(bookmarksRootFolder.id)!!.childrenRequest != null)
-        Assert.assertTrue(savedSitesMetadataDao.get(bookmarksRootFolder.id)!!.childrenResponse == null)
+        assertTrue(savedSitesMetadataDao.get(bookmarksRootFolder.id) != null)
+        assertTrue(savedSitesMetadataDao.get(bookmarksRootFolder.id)!!.childrenRequest != null)
+        assertTrue(savedSitesMetadataDao.get(bookmarksRootFolder.id)!!.childrenResponse == null)
 
         val responseEntries = listOf(
             getResponseEntryFromSavedSite(bookmark),
@@ -526,20 +610,20 @@ class SyncSavedSitesRepositoryTest {
 
         repository.addResponseMetadata(responseEntries)
 
-        Assert.assertTrue(savedSitesMetadataDao.get(bookmarksRootFolder.id) != null)
-        Assert.assertTrue(savedSitesMetadataDao.get(bookmarksRootFolder.id)!!.childrenRequest != null)
-        Assert.assertTrue(savedSitesMetadataDao.get(bookmarksRootFolder.id)!!.childrenResponse != null)
+        assertTrue(savedSitesMetadataDao.get(bookmarksRootFolder.id) != null)
+        assertTrue(savedSitesMetadataDao.get(bookmarksRootFolder.id)!!.childrenRequest != null)
+        assertTrue(savedSitesMetadataDao.get(bookmarksRootFolder.id)!!.childrenResponse != null)
     }
 
     @Test
     fun whenResponseHasDeletedFoldersThenMetadataIsDeleted() {
         givenSomeContentIn(folderId = bookmarksRootFolder.id, children = 5)
-        Assert.assertTrue(savedSitesMetadataDao.get(bookmarksRootFolder.id) != null)
+        assertTrue(savedSitesMetadataDao.get(bookmarksRootFolder.id) != null)
 
         val response = listOf(getResponseEntryFromBookmarkFolder(bookmarksRootFolder, listOf(folder.id), deleted = true))
         repository.addResponseMetadata(response)
 
-        Assert.assertTrue(savedSitesMetadataDao.get(bookmarksRootFolder.id) == null)
+        assertTrue(savedSitesMetadataDao.get(bookmarksRootFolder.id) == null)
     }
 
     @Test
@@ -560,7 +644,7 @@ class SyncSavedSitesRepositoryTest {
         val oneHourAgo = DatabaseDateFormatter.iso8601(OffsetDateTime.now(ZoneOffset.UTC).minusHours(1))
         repository.setLocalEntitiesForNextSync(oneHourAgo)
 
-        Assert.assertTrue(savedSitesEntitiesDao.entityById(bookmarksRootFolder.id)!!.lastModified != oneHourAgo)
+        assertTrue(savedSitesEntitiesDao.entityById(bookmarksRootFolder.id)!!.lastModified != oneHourAgo)
     }
 
     @Test
@@ -573,8 +657,8 @@ class SyncSavedSitesRepositoryTest {
         repository.replaceBookmark(remoteBookmark1, bookmark1.id)
 
         // entities have been replaced
-        Assert.assertTrue(savedSitesEntitiesDao.entityById(bookmark1.id) == null)
-        Assert.assertTrue(savedSitesEntitiesDao.entityById(remoteBookmark1.id) != null)
+        assertTrue(savedSitesEntitiesDao.entityById(bookmark1.id) == null)
+        assertTrue(savedSitesEntitiesDao.entityById(remoteBookmark1.id) != null)
     }
 
     @Test
@@ -598,9 +682,9 @@ class SyncSavedSitesRepositoryTest {
 
         val bookmarkUpdated = savedSitesRepository.getBookmark(bookmark.url)!!
 
-        Assert.assertTrue(updatedBookmark.id == bookmarkUpdated.id)
-        Assert.assertTrue(bookmark.url == bookmarkUpdated.url)
-        Assert.assertTrue(bookmark.title == bookmarkUpdated.title)
+        assertTrue(updatedBookmark.id == bookmarkUpdated.id)
+        assertTrue(bookmark.url == bookmarkUpdated.url)
+        assertTrue(bookmark.title == bookmarkUpdated.title)
     }
 
     @Test
@@ -624,9 +708,9 @@ class SyncSavedSitesRepositoryTest {
 
         val bookmarkUpdated = savedSitesRepository.getBookmark(bookmark.url)!!
 
-        Assert.assertTrue(bookmark.id == bookmarkUpdated.id)
-        Assert.assertTrue(bookmark.url == bookmarkUpdated.url)
-        Assert.assertTrue("title2" == bookmarkUpdated.title)
+        assertTrue(bookmark.id == bookmarkUpdated.id)
+        assertTrue(bookmark.url == bookmarkUpdated.url)
+        assertTrue("title2" == bookmarkUpdated.title)
     }
 
     @Test
@@ -652,8 +736,8 @@ class SyncSavedSitesRepositoryTest {
 
         val bookmarkUpdated = savedSitesRepository.getBookmarkById(bookmark.id)!!
 
-        Assert.assertTrue(bookmark.id == bookmarkUpdated.id)
-        Assert.assertTrue(rootFolder.id == bookmarkUpdated.parentId)
+        assertTrue(bookmark.id == bookmarkUpdated.id)
+        assertTrue(rootFolder.id == bookmarkUpdated.parentId)
     }
 
     @Test
@@ -681,8 +765,8 @@ class SyncSavedSitesRepositoryTest {
 
         val bookmarkUpdated = savedSitesRepository.getBookmarkById(bookmark.id)!!
 
-        Assert.assertTrue(bookmark.id == bookmarkUpdated.id)
-        Assert.assertTrue(subFolder.id == bookmarkUpdated.parentId)
+        assertTrue(bookmark.id == bookmarkUpdated.id)
+        assertTrue(subFolder.id == bookmarkUpdated.parentId)
     }
 
     @Test
@@ -816,6 +900,27 @@ class SyncSavedSitesRepositoryTest {
             firstBatch.map { it.entityId }.plus(secondBatch.map { it.entityId }),
             savedSitesRelationsDao.relationsByFolderId(favouritesRoot.entityId).map { it.entityId },
         )
+    }
+
+    @Test
+    fun whenMarkSavedSitesIdsAsInvalidThenIdsStored() = runTest {
+        val ids = listOf("id1", "id2", "id3")
+        repository.markSavedSitesAsInvalid(ids)
+        val invalidIds = store.invalidEntitiesIds
+
+        assertTrue(invalidIds.containsAll(ids))
+        assertTrue(invalidIds.size == ids.size)
+    }
+
+    @Test
+    fun whenGetInvalidSavedSitesThenExpectedSavedSitesReturned() = runTest {
+        val bookmarks = BookmarkTestUtils.givenSomeBookmarks(10)
+        savedSitesEntitiesDao.insertList(bookmarks)
+        val ids = bookmarks.map { it.entityId }
+        repository.markSavedSitesAsInvalid(ids)
+        val invalidIds = repository.getInvalidSavedSites().map { it.id }
+        assertTrue(invalidIds.containsAll(ids))
+        assertTrue(invalidIds.size == ids.size)
     }
 
     private fun givenInitialFolderState() {

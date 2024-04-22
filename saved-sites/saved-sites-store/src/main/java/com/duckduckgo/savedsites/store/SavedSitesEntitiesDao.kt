@@ -41,6 +41,9 @@ interface SavedSitesEntitiesDao {
     @Query("select * from entities where deleted=0")
     fun entities(): List<Entity>
 
+    @Query("select * from entities where entities.entityId IN (:ids)")
+    fun entities(ids: List<String>): List<Entity>
+
     @Query(
         "select * from entities inner join relations on entities.entityId = relations.entityId " +
             "and entities.type = :type and relations.folderId = :folderId and entities.deleted = 0",

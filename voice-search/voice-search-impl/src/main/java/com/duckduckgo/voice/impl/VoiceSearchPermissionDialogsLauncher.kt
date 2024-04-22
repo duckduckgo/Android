@@ -17,6 +17,7 @@
 package com.duckduckgo.voice.impl
 
 import android.content.Context
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.di.scopes.ActivityScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -43,7 +44,9 @@ interface VoiceSearchPermissionDialogsLauncher {
 }
 
 @ContributesBinding(ActivityScope::class)
-class RealVoiceSearchPermissionDialogsLauncher @Inject constructor() : VoiceSearchPermissionDialogsLauncher {
+class RealVoiceSearchPermissionDialogsLauncher @Inject constructor(
+    val pixel: Pixel,
+) : VoiceSearchPermissionDialogsLauncher {
     override fun showNoMicAccessDialog(
         context: Context,
         onSettingsLaunchSelected: () -> Unit,
@@ -106,13 +109,17 @@ class RealVoiceSearchPermissionDialogsLauncher @Inject constructor() : VoiceSear
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
                         onRemoveVoiceSearch()
+                        pixel.fire(pixel = VoiceSearchPixelNames.VOICE_SEARCH_REMOVE_DIALOG_REMOVE)
                     }
 
                     override fun onNegativeButtonClicked() {
                         onRemoveVoiceSearchCancelled()
+                        pixel.fire(pixel = VoiceSearchPixelNames.VOICE_SEARCH_REMOVE_DIALOG_CANCEL)
                     }
                 },
             )
             .show()
+
+        pixel.fire(pixel = VoiceSearchPixelNames.VOICE_SEARCH_REMOVE_DIALOG_SEEN)
     }
 }

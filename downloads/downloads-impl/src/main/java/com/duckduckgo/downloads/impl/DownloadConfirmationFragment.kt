@@ -27,6 +27,8 @@ import com.duckduckgo.downloads.api.DownloadConfirmationDialogListener
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.downloads.impl.RealDownloadConfirmation.Companion.PENDING_DOWNLOAD_BUNDLE_KEY
 import com.duckduckgo.downloads.impl.databinding.DownloadConfirmationBinding
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
 import java.io.File
@@ -35,6 +37,8 @@ import logcat.logcat
 
 @InjectWith(FragmentScope::class)
 class DownloadConfirmationFragment : BottomSheetDialogFragment() {
+
+    override fun getTheme(): Int = R.style.DownloadsBottomSheetDialogTheme
 
     val listener: DownloadConfirmationDialogListener
         get() {
@@ -82,6 +86,7 @@ class DownloadConfirmationFragment : BottomSheetDialogFragment() {
     }
 
     private fun setupViews(binding: DownloadConfirmationBinding) {
+        (dialog as BottomSheetDialog).behavior.state = BottomSheetBehavior.STATE_EXPANDED
         val fileName = file?.name ?: ""
         binding.downloadMessage.text = fileName
         binding.continueDownload.setOnClickListener {

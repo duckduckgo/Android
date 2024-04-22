@@ -196,41 +196,6 @@ interface NetworkProtectionPixels {
     fun reportFaqsShown()
 
     /**
-     * This fun will fire two pixels when the NetP Terms and Conditions screen is shown
-     * daily -> fire only once a day no matter how many times we call this fun
-     * count -> fire a pixel on every call
-     */
-    fun reportTermsShown()
-
-    /**
-     * This fun will fire two pixels when the NetP Terms and Conditions screen are accepted
-     * daily -> fire only once a day no matter how many times we call this fun
-     * count -> fire a pixel on every call
-     */
-    fun reportTermsAccepted()
-
-    /**
-     * This fun will fire two pixels
-     * daily -> fire only once a day no matter how many times we call this fun
-     * count -> fire a pixel on every call
-     */
-    fun waitlistNotificationShown()
-
-    /**
-     * This fun will fire two pixels
-     * daily -> fire only once a day no matter how many times we call this fun
-     * count -> fire a pixel on every call
-     */
-    fun waitlistNotificationCancelled()
-
-    /**
-     * This fun will fire daily -> fire only once a day no matter how many times we call this fun
-     *
-     * The pixels fire when the waitlist beta is enabled for th user. This is gated by a remote feature flag
-     */
-    fun waitlistBetaIsEnabled()
-
-    /**
      * This fun will fire one pixel
      */
     fun reportGeoswitchingScreenShown()
@@ -303,6 +268,9 @@ interface NetworkProtectionPixels {
     fun reportAccessRevokedDialogShown()
     fun reportPrivacyProPromotionDialogShown()
     fun reportVpnBetaStoppedWhenPrivacyProUpdatedAndEnabled()
+
+    fun reportVpnEnabledFromQuickSettingsTile()
+    fun reportVpnDisabledFromQuickSettingsTile()
 }
 
 @ContributesBinding(AppScope::class)
@@ -462,30 +430,6 @@ class RealNetworkProtectionPixel @Inject constructor(
         firePixel(NETP_FAQS_SHOWN)
     }
 
-    override fun reportTermsShown() {
-        tryToFireDailyPixel(NETP_TERMS_SHOWN_DAILY)
-        firePixel(NETP_TERMS_SHOWN)
-    }
-
-    override fun reportTermsAccepted() {
-        tryToFireDailyPixel(NETP_TERMS_ACCEPTED_DAILY)
-        firePixel(NETP_TERMS_ACCEPTED)
-    }
-
-    override fun waitlistNotificationShown() {
-        tryToFireDailyPixel(NETP_WAITLIST_NOTIFICATION_SHOWN_DAILY)
-        firePixel(NETP_WAITLIST_NOTIFICATION_SHOWN)
-    }
-
-    override fun waitlistNotificationCancelled() {
-        tryToFireDailyPixel(NETP_WAITLIST_NOTIFICATION_CANCELLED_DAILY)
-        firePixel(NETP_WAITLIST_NOTIFICATION_CANCELLED)
-    }
-
-    override fun waitlistBetaIsEnabled() {
-        tryToFireDailyPixel(NETP_WAITLIST_BETA_ENABLED_DAILY)
-    }
-
     override fun reportGeoswitchingScreenShown() {
         firePixel(NETP_GEOSWITCHING_PAGE_SHOWN)
     }
@@ -577,6 +521,17 @@ class RealNetworkProtectionPixel @Inject constructor(
     override fun reportVpnBetaStoppedWhenPrivacyProUpdatedAndEnabled() {
         firePixel(NETP_BETA_STOPPED_WHEN_PRIVACY_PRO_UPDATED_AND_ENABLED)
         tryToFireDailyPixel(NETP_BETA_STOPPED_WHEN_PRIVACY_PRO_UPDATED_AND_ENABLED_DAILY)
+    }
+
+    override fun reportVpnEnabledFromQuickSettingsTile() {
+        firePixel(NETP_ENABLE_FROM_SETTINGS_TILE)
+        tryToFireUniquePixel(NETP_ENABLE_FROM_SETTINGS_TILE_UNIQUE)
+        tryToFireDailyPixel(NETP_ENABLE_FROM_SETTINGS_TILE_DAILY)
+    }
+
+    override fun reportVpnDisabledFromQuickSettingsTile() {
+        firePixel(NETP_DISABLE_FROM_SETTINGS_TILE)
+        tryToFireDailyPixel(NETP_DISABLE_FROM_SETTINGS_TILE_DAILY)
     }
 
     private fun firePixel(

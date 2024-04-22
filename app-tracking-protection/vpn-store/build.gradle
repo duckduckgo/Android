@@ -79,4 +79,6 @@ dependencies {
     testImplementation AndroidX.test.ext.junit
 
     androidTestUtil AndroidX.test.orchestrator
+
+    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }

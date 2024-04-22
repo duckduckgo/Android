@@ -26,6 +26,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.LOCALE
 import com.duckduckgo.app.statistics.pixels.Pixel.StatisticsPixelName
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.toSanitizedLanguageTag
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -87,7 +88,7 @@ class FeatureRetentionPixelSender @Inject constructor(
     }
 
     private fun getLocale(): String {
-        return appBuildConfig.deviceLocale.toLanguageTag()
+        return appBuildConfig.deviceLocale.toSanitizedLanguageTag()
     }
 
     companion object {

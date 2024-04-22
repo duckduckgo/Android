@@ -79,16 +79,18 @@ class SpecialUrlDetectorImpl(
         }
 
         try {
-            val activities = queryActivities(uriString)
-            val nonBrowserActivities = keepNonBrowserActivities(activities)
+            val browsableIntent = Intent.parseUri(uriString, URI_ANDROID_APP_SCHEME).apply {
+                addCategory(Intent.CATEGORY_BROWSABLE)
+            }
+            val activities = queryActivities(browsableIntent)
+            val activity = getDefaultActivity(browsableIntent) ?: activities.firstOrNull()
 
-            if (nonBrowserActivities.isNotEmpty()) {
-                nonBrowserActivities.singleOrNull()?.let { resolveInfo ->
-                    val nonBrowserIntent = buildNonBrowserIntent(resolveInfo, uriString)
-                    return UrlType.AppLink(appIntent = nonBrowserIntent, uriString = uriString)
-                }
-                val excludedComponents = getExcludedComponents(activities)
-                return UrlType.AppLink(excludedComponents = excludedComponents, uriString = uriString)
+            val nonBrowserActivities = keepNonBrowserActivities(activities)
+                .filter { it.activityInfo.packageName == activity?.activityInfo?.packageName }
+
+            nonBrowserActivities.singleOrNull()?.let { resolveInfo ->
+                val nonBrowserIntent = buildNonBrowserIntent(resolveInfo, uriString)
+                return UrlType.AppLink(appIntent = nonBrowserIntent, uriString = uriString)
             }
         } catch (e: URISyntaxException) {
             Timber.w(e, "Failed to parse uri $uriString")
@@ -110,16 +112,18 @@ class SpecialUrlDetectorImpl(
     }
 
     @Throws(URISyntaxException::class)
-    private fun queryActivities(uriString: String): MutableList<ResolveInfo> {
-        val browsableIntent = Intent.parseUri(uriString, URI_ANDROID_APP_SCHEME)
-        browsableIntent.addCategory(Intent.CATEGORY_BROWSABLE)
-        return packageManager.queryIntentActivities(browsableIntent, PackageManager.GET_RESOLVED_FILTER)
+    private fun queryActivities(intent: Intent): List<ResolveInfo> {
+        return packageManager.queryIntentActivities(intent, PackageManager.GET_RESOLVED_FILTER)
     }
 
     private fun keepNonBrowserActivities(activities: List<ResolveInfo>): List<ResolveInfo> {
         return activities.filter { resolveInfo ->
             resolveInfo.filter != null && !(isBrowserFilter(resolveInfo.filter))
         }
+    }
+
+    private fun getDefaultActivity(intent: Intent): ResolveInfo? {
+        return packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY)
     }
 
     @Throws(URISyntaxException::class)
@@ -130,12 +134,6 @@ class SpecialUrlDetectorImpl(
         val intent = Intent.parseUri(uriString, URI_ANDROID_APP_SCHEME)
         intent.component = ComponentName(nonBrowserActivity.activityInfo.packageName, nonBrowserActivity.activityInfo.name)
         return intent
-    }
-
-    private fun getExcludedComponents(activities: List<ResolveInfo>): List<ComponentName> {
-        return activities.filter { resolveInfo ->
-            resolveInfo.filter != null && isBrowserFilter(resolveInfo.filter)
-        }.map { ComponentName(it.activityInfo.packageName, it.activityInfo.name) }
     }
 
     private fun isBrowserFilter(filter: IntentFilter) =

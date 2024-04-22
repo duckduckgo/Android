@@ -40,6 +40,7 @@ class SavedSitesSyncDataProvider @Inject constructor(
     private val savedSitesSyncStore: SavedSitesSyncStore,
     private val syncCrypto: SyncCrypto,
     private val savedSitesFormFactorSyncMigration: SavedSitesFormFactorSyncMigration,
+    private val bookmarksSyncLocalValidationFeature: BookmarksSyncLocalValidationFeature,
 ) : SyncableDataProvider {
     override fun getType(): SyncableType = BOOKMARKS
 
@@ -73,20 +74,33 @@ class SavedSitesSyncDataProvider @Inject constructor(
             if (folder.isDeleted()) {
                 updates.add(deletedEntry(folder.id))
             } else {
-                updates.add(encryptedFolder(folder))
+                updates.add(encryptedFolder(fixFolderIfNecessary(folder)))
             }
         }
+
+        // retry invalid items
+        val newInvalidItems = mutableListOf<String>()
+        val oldInvalidSavedSites = syncSavedSitesRepository.getInvalidSavedSites()
+        Timber.i("Sync-Bookmarks: invalid items to retry: $oldInvalidSavedSites")
 
         // then we add individual bookmarks that have been modified
         val bookmarks = syncSavedSitesRepository.getBookmarksModifiedSince(since)
-        bookmarks.forEach { bookmark ->
+        (oldInvalidSavedSites + bookmarks).forEach { bookmark ->
+            Timber.i("Sync-Bookmarks: processing bookmark ${bookmark.id}")
             if (bookmark.isDeleted()) {
                 updates.add(deletedEntry(bookmark.id))
             } else {
-                updates.add(encryptedSavedSite(bookmark))
+                encryptedSavedSite(bookmark).also {
+                    if (isValid(it)) {
+                        updates.add(it)
+                    } else {
+                        newInvalidItems.add(bookmark.id)
+                    }
+                }
             }
         }
 
+        syncSavedSitesRepository.markSavedSitesAsInvalid(newInvalidItems)
         return updates.distinct()
     }
 
@@ -120,6 +134,7 @@ class SavedSitesSyncDataProvider @Inject constructor(
         folderId: String,
         requestEntries: MutableList<SyncSavedSitesRequestEntry>,
     ): List<SyncSavedSitesRequestEntry> {
+        val invalidItems = mutableListOf<String>()
         syncSavedSitesRepository.getAllFolderContentSync(folderId).apply {
             val folder = repository.getFolder(folderId)
             if (folder != null) {
@@ -127,7 +142,14 @@ class SavedSitesSyncDataProvider @Inject constructor(
                     if (bookmark.deleted != null) {
                         requestEntries.add(deletedEntry(bookmark.id))
                     } else {
-                        requestEntries.add(encryptedSavedSite(bookmark))
+                        encryptedSavedSite(bookmark).also {
+                                encryptedSavedSite ->
+                            if (isValid(encryptedSavedSite)) {
+                                requestEntries.add(encryptedSavedSite)
+                            } else {
+                                invalidItems.add(bookmark.id)
+                            }
+                        }
                     }
                 }
                 for (eachFolder in this.second) {
@@ -137,9 +159,10 @@ class SavedSitesSyncDataProvider @Inject constructor(
                         getRequestEntriesFor(eachFolder.id, requestEntries)
                     }
                 }
-                requestEntries.add(encryptedFolder(folder))
+                requestEntries.add(encryptedFolder(fixFolderIfNecessary(folder)))
             }
         }
+        syncSavedSitesRepository.markSavedSitesAsInvalid(invalidItems)
         return requestEntries
     }
 
@@ -197,11 +220,33 @@ class SavedSitesSyncDataProvider @Inject constructor(
         }
     }
 
+    private fun isValid(syncSavedSite: SyncSavedSitesRequestEntry): Boolean {
+        if (bookmarksSyncLocalValidationFeature.self().isEnabled().not()) return true // no validation required
+
+        val titleLength = syncSavedSite.title?.length ?: 0
+        val urlLength = syncSavedSite.page?.url?.length ?: 0
+
+        return (titleLength >= MAX_ENCRYPTED_TITLE_LENGTH || urlLength >= MAX_ENCRYPTED_URL_LENGTH).not()
+    }
+
+    private fun fixFolderIfNecessary(folder: BookmarkFolder): BookmarkFolder {
+        if (bookmarksSyncLocalValidationFeature.self().isEnabled().not()) return folder
+
+        val fixedName = folder.name.take(MAX_FOLDER_TITLE_LENGTH)
+        return folder.copy(name = fixedName)
+    }
+
     private class Adapters {
         companion object {
             private val moshi = Moshi.Builder().build()
             val patchAdapter: JsonAdapter<SyncBookmarksRequest> =
                 moshi.adapter(SyncBookmarksRequest::class.java)
         }
+    }
+
+    companion object {
+        const val MAX_ENCRYPTED_TITLE_LENGTH = 3000
+        const val MAX_FOLDER_TITLE_LENGTH = 2000
+        const val MAX_ENCRYPTED_URL_LENGTH = 3000
     }
 }

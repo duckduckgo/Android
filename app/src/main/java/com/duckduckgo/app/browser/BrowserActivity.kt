@@ -330,14 +330,18 @@ open class BrowserActivity : DuckDuckGoActivity() {
             return
         }
 
-        if (emailProtectionLinkVerifier.shouldDelegateToInContextView(intent.dataString, currentTab?.inContextEmailProtectionShowing)) {
-            currentTab?.showEmailProtectionInContextWebFlow(intent.dataString)
+        val inContextSignupState = currentTab?.inContextEmailProtectionSignupState
+        if (emailProtectionLinkVerifier.shouldDelegateToInContextView(intent.intentText, inContextSignupState?.showing)) {
+            currentTab?.resumeEmailProtectionInContextWebFlow(
+                verificationUrl = intent.intentText,
+                messageRequestId = inContextSignupState?.requestId!!,
+            )
             Timber.v("Verification link was consumed, so don't allow it to open in a new tab")
             return
         }
 
         // the BrowserActivity will automatically clear its stack of activities when being brought to the foreground, so this can no longer be true
-        currentTab?.inContextEmailProtectionShowing = false
+        currentTab?.inContextEmailProtectionSignupState = InProgressEmailProtectionSignupState(showing = false)
 
         if (launchNewSearch(intent)) {
             Timber.w("new tab requested")
@@ -711,3 +715,9 @@ private class TabList() : ArrayList<String>() {
         return super.add(element)
     }
 }
+
+// Needed to keep track of in-context email protection signup state
+data class InProgressEmailProtectionSignupState(
+    val showing: Boolean = false,
+    val requestId: String? = null,
+)

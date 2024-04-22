@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.browser
 
-import android.content.ComponentName
 import android.content.Intent
 import android.net.Uri
 
@@ -32,7 +31,6 @@ interface SpecialUrlDetector {
         class Sms(val telephoneNumber: String) : UrlType()
         class AppLink(
             val appIntent: Intent? = null,
-            val excludedComponents: List<ComponentName>? = null,
             val uriString: String,
         ) : UrlType()
 

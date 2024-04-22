@@ -77,6 +77,7 @@ class SavedSitesSyncPersister @Inject constructor(
         savedSitesFormFactorSyncMigration.onFormFactorFavouritesDisabled()
         savedSitesSyncState.onSyncDisabled()
         savedSitesSyncRepository.removeMetadata()
+        savedSitesSyncRepository.markSavedSitesAsInvalid(emptyList())
     }
 
     fun process(
@@ -138,12 +139,15 @@ class SavedSitesSyncPersister @Inject constructor(
             algorithm.processEntries(bookmarks, conflictResolution, savedSitesSyncStore.clientModifiedSince)
         }
 
-        // we need to update the metadata of the entities
-        savedSitesSyncRepository.addResponseMetadata(bookmarks.entries)
-
         if (conflictResolution == DEDUPLICATION) {
             savedSitesSyncRepository.setLocalEntitiesForNextSync(savedSitesSyncStore.startTimeStamp)
+            // if conflict resolution is deduplication, response comes from /get (instead of /patch).
+            // If deduplication, we override metadata only with the response data. Discarding any request info stored.
+            savedSitesSyncRepository.discardRequestMetadata()
         }
+
+        // we need to update the metadata of the entities
+        savedSitesSyncRepository.addResponseMetadata(bookmarks.entries)
 
         return result
     }

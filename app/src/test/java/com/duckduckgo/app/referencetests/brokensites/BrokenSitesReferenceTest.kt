@@ -33,6 +33,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyConfig
 import com.duckduckgo.privacy.config.api.PrivacyConfigData
@@ -82,6 +83,8 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
 
     private val mockUserAllowListRepository: UserAllowListRepository = mock()
 
+    private val networkProtectionState: NetworkProtectionState = mock()
+
     private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels = mock {
         runBlocking { whenever(mock.getPixelParams()).thenReturn(emptyMap()) }
     }
@@ -110,6 +113,8 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
     fun before() {
         MockitoAnnotations.openMocks(this)
         whenever(mockAppBuildConfig.deviceLocale).thenReturn(Locale.ENGLISH)
+        runBlocking { whenever(networkProtectionState.isRunning()) }.thenReturn(false)
+
         testee = BrokenSiteSubmitter(
             mockStatisticsDataStore,
             mockVariantManager,
@@ -126,6 +131,7 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
             mock(),
             mock(),
             privacyProtectionsPopupExperimentExternalPixels,
+            networkProtectionState,
         )
     }
 

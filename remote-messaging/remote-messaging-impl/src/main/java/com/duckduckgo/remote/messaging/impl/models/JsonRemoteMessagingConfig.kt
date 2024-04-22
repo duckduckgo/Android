@@ -16,6 +16,7 @@
 
 package com.duckduckgo.remote.messaging.impl.models
 
+import com.duckduckgo.remote.messaging.api.JsonMatchingAttribute
 import com.duckduckgo.remote.messaging.api.JsonMessageAction
 
 data class JsonRemoteMessagingConfig(
@@ -57,14 +58,6 @@ data class JsonContentTranslations(
 data class JsonMatchingRule(
     val id: Int,
     val attributes: Map<String, JsonMatchingAttribute>,
-)
-
-data class JsonMatchingAttribute(
-    val value: Any? = null,
-    val min: Any? = null,
-    val max: Any? = null,
-    val since: Any? = null,
-    val fallback: Boolean? = null,
 )
 
 sealed class JsonMessageType(val jsonValue: String) {

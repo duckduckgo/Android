@@ -21,7 +21,8 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:paddingTop="@dimen/actionBottomSheetVerticalPadding"
-    android:paddingBottom="@dimen/actionBottomSheetVerticalPadding">
+    android:paddingBottom="@dimen/actionBottomSheetVerticalPadding"
+    android:background="@drawable/rounded_top_corners_bottom_sheet_drawable">
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/bookmarksBottomSheetDialogTitle"

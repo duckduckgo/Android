@@ -827,4 +827,15 @@
     <!-- Custom Tab -->
     <string name="openInDdgMenuItemTitle">Открыть в DuckDuckGo</string>
     <string name="runningInDdgMenuItemTitle">Выполняется в DuckDuckGo</string>
+
+    <!-- SSL Error -->
+    <string name="sslErrorTitle">Внимание! Возможно, сайт небезопасен</string>
+    <string name="sslErrorHeadline" instruction="Placeholder is domain with certificate issues">Сертификат этого сайта недействителен. Возможно, вы пытаетесь подключиться к серверу, который выдает себя за %1$s, что ставит под угрозу вашу конфиденциальную информацию.</string>
+    <string name="sslErrorLeaveCTA">Покинуть сайт</string>
+    <string name="sslErrorAdvancedCTA">Дополнительно</string>
+    <string name="sslErrorExpandedHeadline">DuckDuckGo предупредит вас, если у сайта окажется недействительный сертификат.</string>
+    <string name="sslErrorExpandedCTA"><![CDATA[<u>Принять риск и перейти на сайт<u/>]]></string>
+    <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">Срок действия сертификата безопасности сайта %1$s истек. Возможно, неверно задана конфигурация сайта, соединение перехвачено злоумышленником либо неправильно настроены системные часы.</string>
+    <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Сертификат безопасности сайта %1$s не подходит для домена *.%2$s. Возможно, неверно задана конфигурация сайта, соединение перехвачено злоумышленником либо неправильно настроены системные часы.</string>
+    <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Операционная система вашего устройства не доверяет сертификату безопасности сайта %1$s. Возможно, неверно задана конфигурация сайта, соединение перехвачено злоумышленником либо неправильно настроены системные часы.</string>
 </resources>

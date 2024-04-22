@@ -16,10 +16,12 @@
 
 package com.duckduckgo.remote.messaging.impl
 
+import com.duckduckgo.remote.messaging.api.JsonMatchingAttribute
 import com.duckduckgo.remote.messaging.api.MatchingAttribute
+import com.duckduckgo.remote.messaging.fixtures.FakeMatchingAttribute
+import com.duckduckgo.remote.messaging.fixtures.jsonMatchingAttributeMappers
 import com.duckduckgo.remote.messaging.impl.mappers.mapToMatchingRules
 import com.duckduckgo.remote.messaging.impl.models.*
-import com.duckduckgo.remote.messaging.impl.models.JsonMatchingAttribute
 import com.duckduckgo.remote.messaging.impl.models.JsonMatchingRule
 import java.text.SimpleDateFormat
 import org.junit.Assert.assertEquals
@@ -32,7 +34,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
 
     @Test
     fun whenJsonMatchingAttributeThenReturnMatchingAttribute() {
-        val matchingRule = listOf(testCase.jsonMatchingRule).mapToMatchingRules()
+        val matchingRule = listOf(testCase.jsonMatchingRule).mapToMatchingRules(jsonMatchingAttributeMappers)
 
         assertEquals(testCase.matchingRules, matchingRule)
     }
@@ -41,6 +43,16 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
         @JvmStatic
         @Parameterized.Parameters()
         fun parameters() = arrayOf(
+            TestCase(
+                givenJsonRule(
+                    Pair("Fake", JsonMatchingAttribute(value = false)),
+                    Pair("flavor", JsonMatchingAttribute(value = emptyList<String>())),
+                ),
+                matchingRule(
+                    FakeMatchingAttribute(value = false),
+                    Flavor(value = emptyList(), fallback = null),
+                ),
+            ),
             TestCase(
                 givenJsonRule(
                     Pair("locale", JsonMatchingAttribute(value = listOf("ES"))),
@@ -624,10 +636,10 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
             )
         }
 
-        private fun matchingRule(vararg matchingAttribute: MatchingAttribute<*>): Map<Int, List<MatchingAttribute<*>>> {
+        private fun matchingRule(vararg matchingAttribute: MatchingAttribute): Map<Int, List<MatchingAttribute>> {
             return mapOf(Pair(5, matchingAttribute.toList()))
         }
     }
 
-    data class TestCase(val jsonMatchingRule: JsonMatchingRule, val matchingRules: Map<Int, List<MatchingAttribute<*>>>)
+    data class TestCase(val jsonMatchingRule: JsonMatchingRule, val matchingRules: Map<Int, List<MatchingAttribute>>)
 }

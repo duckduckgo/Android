@@ -83,6 +83,8 @@ dependencies {
 
     // Shimmer
     implementation "com.facebook.shimmer:shimmer:_"
+
+    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 
 ext {

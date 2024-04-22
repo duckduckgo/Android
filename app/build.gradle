@@ -72,8 +72,15 @@ android {
     ksp {
         arg("room.generateKotlin", "true")
     }
+
     signingConfigs {
         release
+        debug {
+            keyAlias 'android'
+            keyPassword 'pwpwpw'
+            storeFile file('debug-dummy.keystore')
+            storePassword 'pwpwpw'
+        }
     }
     buildTypes {
         debug {

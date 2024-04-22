@@ -19,7 +19,7 @@
     font-family: 'SF Pro Text', system-ui, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
     'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 }
-:not(.top-autofill) .tooltip {
+.wrapper:not(.top-autofill) .tooltip {
     position: absolute;
     width: 300px;
     max-width: calc(100vw - 25px);
@@ -50,7 +50,7 @@
 .tooltip--data.tooltip--incontext-signup {
     width: 360px;
 }
-:not(.top-autofill) .tooltip--data {
+.wrapper:not(.top-autofill) .tooltip--data {
     top: 100%;
     left: 100%;
     border: 0.5px solid rgba(255, 255, 255, 0.2);
@@ -58,11 +58,11 @@
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.32);
 }
 @media (prefers-color-scheme: dark) {
-    :not(.top-autofill) .tooltip--data {
+    .wrapper:not(.top-autofill) .tooltip--data {
         border: 1px solid rgba(255, 255, 255, 0.2);
     }
 }
-:not(.top-autofill) .tooltip--email {
+.wrapper:not(.top-autofill) .tooltip--email {
     top: calc(100% + 6px);
     right: calc(100% - 48px);
     padding: 8px;

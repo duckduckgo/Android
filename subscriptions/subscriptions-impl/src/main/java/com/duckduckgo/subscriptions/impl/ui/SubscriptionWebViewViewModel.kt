@@ -25,7 +25,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
-import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist
+import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState
 import com.duckduckgo.subscriptions.impl.CurrentPurchase
 import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
 import com.duckduckgo.subscriptions.impl.PrivacyProFeature
@@ -67,7 +67,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val subscriptionsManager: SubscriptionsManager,
     private val subscriptionsChecker: SubscriptionsChecker,
-    private val networkProtectionWaitlist: NetworkProtectionWaitlist,
+    private val networkProtectionAccessState: NetworkProtectionAccessState,
     private val pixelSender: SubscriptionPixelSender,
     private val privacyProFeature: PrivacyProFeature,
 ) : ViewModel() {
@@ -169,7 +169,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
         val feature = runCatching { data.getString("feature") }.getOrNull() ?: return
         viewModelScope.launch {
             val commandToSend = when (feature) {
-                NETP -> networkProtectionWaitlist.getScreenForCurrentState()?.let { GoToNetP(it) }
+                NETP -> networkProtectionAccessState.getScreenForCurrentState()?.let { GoToNetP(it) }
                 ITR -> GoToITR
                 PIR -> GoToPIR
                 else -> null

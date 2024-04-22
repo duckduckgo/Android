@@ -16,17 +16,17 @@
 
 package com.duckduckgo.autofill.impl.ui.credential.saving
 
-import android.annotation.SuppressLint
 import android.content.Context
-import android.os.Build
 import android.os.Bundle
-import android.os.Parcelable
+import androidx.core.os.BundleCompat
 import androidx.fragment.app.Fragment
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.AutofillEventListener
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
+import com.duckduckgo.autofill.api.AutofillWebMessageRequest
 import com.duckduckgo.autofill.api.CredentialSavePickerDialog
+import com.duckduckgo.autofill.api.CredentialSavePickerDialog.Companion.KEY_CREDENTIALS
+import com.duckduckgo.autofill.api.CredentialSavePickerDialog.Companion.KEY_URL
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
@@ -46,7 +46,6 @@ class ResultHandlerSaveLoginCredentials @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val declineCounter: AutofillDeclineCounter,
     private val autofillStore: InternalAutofillStore,
-    private val appBuildConfig: AppBuildConfig,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : AutofillFragmentResultsPlugin {
 
@@ -61,12 +60,11 @@ class ResultHandlerSaveLoginCredentials @Inject constructor(
 
         autofillFireproofDialogSuppressor.autofillSaveOrUpdateDialogVisibilityChanged(visible = false)
 
-        val originalUrl = result.getString(CredentialSavePickerDialog.KEY_URL) ?: return
-        val selectedCredentials =
-            result.safeGetParcelable<LoginCredentials>(CredentialSavePickerDialog.KEY_CREDENTIALS) ?: return
+        val autofillWebMessageRequest = BundleCompat.getParcelable(result, KEY_URL, AutofillWebMessageRequest::class.java) ?: return
+        val selectedCredentials = BundleCompat.getParcelable(result, KEY_CREDENTIALS, LoginCredentials::class.java) ?: return
 
         appCoroutineScope.launch(dispatchers.io()) {
-            val savedCredentials = autofillStore.saveCredentials(originalUrl, selectedCredentials)
+            val savedCredentials = autofillStore.saveCredentials(autofillWebMessageRequest.requestOrigin, selectedCredentials)
             if (savedCredentials != null) {
                 declineCounter.disableDeclineCounter()
 
@@ -76,15 +74,6 @@ class ResultHandlerSaveLoginCredentials @Inject constructor(
             }
         }
     }
-
-    @Suppress("DEPRECATION")
-    @SuppressLint("NewApi")
-    private inline fun <reified T : Parcelable> Bundle.safeGetParcelable(key: String) =
-        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.TIRAMISU) {
-            getParcelable(key, T::class.java)
-        } else {
-            getParcelable(key)
-        }
 
     override fun resultKey(tabId: String): String {
         return CredentialSavePickerDialog.resultKeyUserChoseToSaveCredentials(tabId)
