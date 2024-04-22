@@ -122,7 +122,6 @@
     <string name="saveLoginDialogSubtitle">Le password sono archiviate in modo sicuro sul tuo dispositivo.</string>
     <string name="autofillManagementAddLogin">Aggiungi password</string>
     <string name="credentialManagementEditLoginTitleHint">Titolo</string>
-    <string name="autofillDeleteLoginDialogTitle">Eliminare questa password?</string>
     <string name="autofillManagementDeletedConfirmation">Password eliminata</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Ultimo aggiornamento %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">Continuare a salvare le password?</string>
@@ -146,13 +145,6 @@
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Annulla</string>
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Elimina tutte le password</string>
-    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
-        <item quantity="one">Eliminare %1$d password?</item>
-        <item quantity="other">Eliminare %1$d password?</item>
-    </plurals>
-
-    <string name="credentialManagementDeletePasswordConfirmationMessage">La password verrà eliminata da tutti i dispositivi sincronizzati. Assicurati di avere ancora la possibilità di accedere al tuo account.</string>
-    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Le password verranno eliminate da tutti i dispositivi sincronizzati. Assicurati di avere ancora la possibilità di accedere ai tuoi account.</string>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
         <item quantity="one">%1$d password eliminata</item>

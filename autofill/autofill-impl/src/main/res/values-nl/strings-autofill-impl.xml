@@ -122,7 +122,6 @@
     <string name="saveLoginDialogSubtitle">Wachtwoorden worden veilig opgeslagen op je apparaat.</string>
     <string name="autofillManagementAddLogin">Wachtwoord toevoegen</string>
     <string name="credentialManagementEditLoginTitleHint">Titel</string>
-    <string name="autofillDeleteLoginDialogTitle">Weet je zeker dat je dit wachtwoord wilt verwijderen?</string>
     <string name="autofillManagementDeletedConfirmation">Wachtwoord verwijderd</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Laatst bijgewerkt op %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">Wil je wachtwoorden blijven opslaan?</string>
@@ -146,13 +145,6 @@
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Annuleren</string>
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Alle wachtwoorden verwijderen</string>
-    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
-        <item quantity="one">Weet je zeker dat je %1$d wachtwoord wilt verwijderen?</item>
-        <item quantity="other">Weet je zeker dat je %1$d wachtwoorden wilt verwijderen?</item>
-    </plurals>
-
-    <string name="credentialManagementDeletePasswordConfirmationMessage">Je wachtwoord wordt verwijderd van alle gesynchroniseerde apparaten. Zorg ervoor dat je nog steeds toegang hebt tot je account.</string>
-    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Je wachtwoorden worden verwijderd van alle gesynchroniseerde apparaten. Zorg ervoor dat je nog steeds toegang hebt tot je accounts.</string>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
         <item quantity="one">%1$d wachtwoord verwijderd</item>

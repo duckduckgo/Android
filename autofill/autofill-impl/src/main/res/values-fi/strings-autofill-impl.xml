@@ -122,7 +122,6 @@
     <string name="saveLoginDialogSubtitle">Salasanat tallennetaan laitteellesi turvallisesti.</string>
     <string name="autofillManagementAddLogin">Lisää salasana</string>
     <string name="credentialManagementEditLoginTitleHint">Otsikko</string>
-    <string name="autofillDeleteLoginDialogTitle">Haluatko varmasti poistaa tämän salasanan?</string>
     <string name="autofillManagementDeletedConfirmation">Salasana poistettu</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Viimeksi päivitetty %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">Haluatko jatkaa salasanojen tallentamista?</string>
@@ -146,13 +145,6 @@
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Peruuta</string>
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Poista kaikki salasanat</string>
-    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
-        <item quantity="one">Haluatko varmasti poistaa %1$d salasanan?</item>
-        <item quantity="other">Haluatko varmasti poistaa %1$d salasanaa?</item>
-    </plurals>
-
-    <string name="credentialManagementDeletePasswordConfirmationMessage">Salasanasi poistetaan kaikista synkronoiduista laitteista. Varmista, että pääset yhä käyttämään tiliäsi.</string>
-    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Salasanasi poistetaan kaikista synkronoiduista laitteista. Varmista, että pääset yhä käyttämään tilejäsi.</string>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
         <item quantity="one">%1$d salasana poistettu</item>

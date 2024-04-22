@@ -122,7 +122,6 @@
     <string name="saveLoginDialogSubtitle">Hasła są bezpiecznie przechowywane na Twoim urządzeniu.</string>
     <string name="autofillManagementAddLogin">Dodaj hasło</string>
     <string name="credentialManagementEditLoginTitleHint">Tytuł</string>
-    <string name="autofillDeleteLoginDialogTitle">Czy na pewno chcesz usunąć to hasło?</string>
     <string name="autofillManagementDeletedConfirmation">Hasło usunięte</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Ostatnia aktualizacja %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">Czy chcesz nadal zapisywać hasła?</string>
@@ -146,15 +145,6 @@
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Anuluj</string>
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Usuń wszystkie hasła</string>
-    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
-        <item quantity="one">Czy na pewno chcesz usunąć %1$d hasło?</item>
-        <item quantity="few">Czy na pewno chcesz usunąć %1$d hasła?</item>
-        <item quantity="many">Czy na pewno chcesz usunąć %1$d haseł?</item>
-        <item quantity="other">Czy na pewno chcesz usunąć %1$d hasła?</item>
-    </plurals>
-
-    <string name="credentialManagementDeletePasswordConfirmationMessage">Twoje hasło zostanie usunięte ze wszystkich zsynchronizowanych urządzeń. Upewnij się, że nadal masz możliwość dostępu do swojego konta.</string>
-    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Twoje hasła zostaną usunięte ze wszystkich zsynchronizowanych urządzeń. Upewnij się, że nadal masz możliwość dostępu do swoich kont.</string>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
         <item quantity="one">Usunięto %1$d hasło</item>
