@@ -25,8 +25,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager
 import com.duckduckgo.networkprotection.impl.subscription.isExpired
-import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
-import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -42,10 +40,7 @@ class NetpVpnAccessRevokedDialogMonitor @Inject constructor(
     private val netpSubscriptionManager: NetpSubscriptionManager,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
-    private val betaEndedDialog: BetaEndedDialog,
     private val accessRevokedDialog: AccessRevokedDialog,
-    private val subscriptions: Subscriptions,
-    private val netPWaitlistRepository: NetPWaitlistRepository,
     private val networkProtectionState: NetworkProtectionState,
 ) : ActivityLifecycleCallbacks {
 
@@ -55,13 +50,7 @@ class NetpVpnAccessRevokedDialogMonitor @Inject constructor(
         super.onActivityResumed(activity)
         conflatedJob += coroutineScope.launch(dispatcherProvider.io()) {
             delay(500) // debounce fast screen state changes, eg. resume -> pause -> resume
-            if (shouldShowDialog()) {
-                logcat { "VPN beta ended" }
-                // Resetting here so we don't show this dialog anymore
-                withContext(dispatcherProvider.main()) {
-                    betaEndedDialog.show(activity)
-                }
-            } else if (netpSubscriptionManager.getVpnStatus().isExpired() && networkProtectionState.isOnboarded()) {
+            if (netpSubscriptionManager.getVpnStatus().isExpired() && networkProtectionState.isOnboarded()) {
                 // we don't want to show this dialog in eg. fresh installs
                 withContext(dispatcherProvider.main()) {
                     accessRevokedDialog.showOnce(activity)
@@ -79,11 +68,5 @@ class NetpVpnAccessRevokedDialogMonitor @Inject constructor(
     override fun onActivityPaused(activity: Activity) {
         super.onActivityPaused(activity)
         conflatedJob.cancel()
-    }
-
-    private suspend fun shouldShowDialog(): Boolean {
-        // Show dialog only if the pro is launched, user participated in beta (authentication was set - which only happens in beta)
-        // AND dialog hasn't been shown before to the user.
-        return betaEndedDialog.shouldShowDialog() && subscriptions.isEnabled() && netPWaitlistRepository.getAuthenticationToken() != null
     }
 }

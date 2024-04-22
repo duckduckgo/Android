@@ -4,11 +4,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.appbuildconfig.api.BuildFlavor.INTERNAL
 import com.duckduckgo.appbuildconfig.api.BuildFlavor.PLAY
-import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.api.FakeChain
-import com.duckduckgo.networkprotection.impl.fakes.FakeNetPWaitlistDataStore
-import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
-import com.duckduckgo.networkprotection.impl.waitlist.store.RealNetPWaitlistRepository
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
@@ -21,21 +17,14 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
-class NetpWaitlistRequestInterceptorTest {
+class NetpControllerRequestInterceptorTest {
 
-    private val coroutineRule = CoroutineTestRule()
     private val appBuildConfig: AppBuildConfig = mock()
     private val subscriptions: Subscriptions = mock()
-    private lateinit var netPWaitlistRepository: NetPWaitlistRepository
-    private lateinit var interceptor: NetpWaitlistRequestInterceptor
+    private lateinit var interceptor: NetpControllerRequestInterceptor
 
     @Before
     fun setup() {
-        netPWaitlistRepository = RealNetPWaitlistRepository(
-            FakeNetPWaitlistDataStore(),
-            coroutineRule.testDispatcherProvider,
-            coroutineRule.testScope,
-        )
         runBlocking {
             // default values
             whenever(subscriptions.isEnabled()).thenReturn(false)
@@ -43,8 +32,7 @@ class NetpWaitlistRequestInterceptorTest {
             whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
         }
 
-        interceptor = NetpWaitlistRequestInterceptor(
-            netPWaitlistRepository,
+        interceptor = NetpControllerRequestInterceptor(
             appBuildConfig,
             subscriptions,
         )

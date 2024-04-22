@@ -23,8 +23,6 @@ import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManage
 import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager.VpnStatus.EXPIRED
 import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager.VpnStatus.INACTIVE
 import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager.VpnStatus.SIGNED_OUT
-import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
-import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
@@ -36,7 +34,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 class NetpVpnAccessRevokedDialogMonitorTest {
@@ -47,16 +44,7 @@ class NetpVpnAccessRevokedDialogMonitorTest {
     private lateinit var netpSubscriptionManager: NetpSubscriptionManager
 
     @Mock
-    private lateinit var betaEndedDialog: BetaEndedDialog
-
-    @Mock
     private lateinit var accessRevokedDialog: AccessRevokedDialog
-
-    @Mock
-    private lateinit var subscriptions: Subscriptions
-
-    @Mock
-    private lateinit var netPWaitlistRepository: NetPWaitlistRepository
 
     @Mock lateinit var networkProtectionState: NetworkProtectionState
 
@@ -73,239 +61,119 @@ class NetpVpnAccessRevokedDialogMonitorTest {
             netpSubscriptionManager,
             coroutineTestRule.testScope,
             coroutineTestRule.testDispatcherProvider,
-            betaEndedDialog,
             accessRevokedDialog,
-            subscriptions,
-            netPWaitlistRepository,
             networkProtectionState,
         )
     }
 
     @Test
-    fun whenUserParticipatedInBetaAndPrivacyProActiveAndDialogNotShownThenShowBetaEndDialog() {
+    fun whenVPNStateIsInactiveThenDontShowDialogs() {
         coroutineTestRule.testScope.launch {
             whenever(netpSubscriptionManager.getVpnStatus()).thenReturn(INACTIVE)
-            whenever(betaEndedDialog.shouldShowDialog()).thenReturn(true)
-            whenever(netPWaitlistRepository.getAuthenticationToken()).thenReturn("123")
-            whenever(subscriptions.isEnabled()).thenReturn(true)
 
             netpVpnAccessRevokedDialogMonitor.onActivityResumed(mock())
 
-            verify(betaEndedDialog).show(any())
-            verify(networkProtectionState, never()).stop()
-            verifyNoInteractions(accessRevokedDialog)
-        }
-    }
-
-    @Test
-    fun whenDialogAlreadyNotShownThenDontShowAnyDialog() {
-        coroutineTestRule.testScope.launch {
-            whenever(netpSubscriptionManager.getVpnStatus()).thenReturn(ACTIVE)
-            whenever(betaEndedDialog.shouldShowDialog()).thenReturn(false)
-            whenever(netPWaitlistRepository.getAuthenticationToken()).thenReturn("123")
-            whenever(subscriptions.isEnabled()).thenReturn(true)
-
-            netpVpnAccessRevokedDialogMonitor.onActivityResumed(mock())
-
-            verify(betaEndedDialog, never()).show(any())
             verify(networkProtectionState, never()).stop()
             verify(accessRevokedDialog).clearIsShown()
         }
     }
 
     @Test
-    fun whenPrivacyProNotActiveThenDontShowAnyDialog() {
+    fun whenVPNStateIsActiveThenDontShowDialogs() {
         coroutineTestRule.testScope.launch {
             whenever(netpSubscriptionManager.getVpnStatus()).thenReturn(ACTIVE)
-            whenever(betaEndedDialog.shouldShowDialog()).thenReturn(true)
-            whenever(netPWaitlistRepository.getAuthenticationToken()).thenReturn("123")
-            whenever(subscriptions.isEnabled()).thenReturn(false)
 
             netpVpnAccessRevokedDialogMonitor.onActivityResumed(mock())
 
-            verify(betaEndedDialog, never()).show(any())
             verify(networkProtectionState, never()).stop()
             verify(accessRevokedDialog).clearIsShown()
         }
     }
 
     @Test
-    fun whenUserNotInBetaThenDontShowAnyDialog() {
-        coroutineTestRule.testScope.launch {
-            whenever(netpSubscriptionManager.getVpnStatus()).thenReturn(ACTIVE)
-            whenever(betaEndedDialog.shouldShowDialog()).thenReturn(true)
-            whenever(netPWaitlistRepository.getAuthenticationToken()).thenReturn(null)
-            whenever(subscriptions.isEnabled()).thenReturn(true)
-
-            netpVpnAccessRevokedDialogMonitor.onActivityResumed(mock())
-
-            verify(betaEndedDialog, never()).show(any())
-            verify(networkProtectionState, never()).stop()
-            verify(accessRevokedDialog).clearIsShown()
-        }
-    }
-
-    @Test
-    fun whenUserNotInBetaVPNEnabledThenDontShowAnyDialog() {
+    fun whenVPNEnabledAndStateIsActiveThenDontShowDialogs() {
         coroutineTestRule.testScope.launch {
             whenever(networkProtectionState.isEnabled()).thenReturn(true)
             whenever(netpSubscriptionManager.getVpnStatus()).thenReturn(ACTIVE)
-            whenever(betaEndedDialog.shouldShowDialog()).thenReturn(true)
-            whenever(netPWaitlistRepository.getAuthenticationToken()).thenReturn(null)
-            whenever(subscriptions.isEnabled()).thenReturn(true)
 
             netpVpnAccessRevokedDialogMonitor.onActivityResumed(mock())
 
-            verify(betaEndedDialog, never()).show(any())
             verify(networkProtectionState, never()).stop()
             verify(accessRevokedDialog).clearIsShown()
         }
     }
 
     @Test
-    fun whenUserNotInBetaAndVPNInactiveThenClearShownAccessRevokedDialog() {
-        coroutineTestRule.testScope.launch {
-            whenever(netpSubscriptionManager.getVpnStatus()).thenReturn(INACTIVE)
-            whenever(betaEndedDialog.shouldShowDialog()).thenReturn(true)
-            whenever(netPWaitlistRepository.getAuthenticationToken()).thenReturn(null)
-            whenever(subscriptions.isEnabled()).thenReturn(true)
-
-            netpVpnAccessRevokedDialogMonitor.onActivityResumed(mock())
-
-            verify(betaEndedDialog, never()).show(any())
-            verify(networkProtectionState, never()).stop()
-            verify(accessRevokedDialog).clearIsShown()
-        }
-    }
-
-    @Test
-    fun whenUserNotInBetaAndVPNEnabledAndInactiveThenClearShownAccessRevokedDialog() {
+    fun whenVPNEnabledAndStateIsInactiveThenDontShowDialogs() {
         coroutineTestRule.testScope.launch {
             whenever(networkProtectionState.isEnabled()).thenReturn(true)
             whenever(netpSubscriptionManager.getVpnStatus()).thenReturn(INACTIVE)
-            whenever(betaEndedDialog.shouldShowDialog()).thenReturn(true)
-            whenever(netPWaitlistRepository.getAuthenticationToken()).thenReturn(null)
-            whenever(subscriptions.isEnabled()).thenReturn(true)
 
             netpVpnAccessRevokedDialogMonitor.onActivityResumed(mock())
 
-            verify(betaEndedDialog, never()).show(any())
             verify(networkProtectionState, never()).stop()
             verify(accessRevokedDialog).clearIsShown()
         }
     }
 
     @Test
-    fun whenUserNotInBetaAndVPNSignedOutThenClearShownAccessRevokedDialog() {
+    fun whenVPNStateIsSignedOutThenDontShowDialogs() {
         coroutineTestRule.testScope.launch {
             whenever(netpSubscriptionManager.getVpnStatus()).thenReturn(SIGNED_OUT)
-            whenever(betaEndedDialog.shouldShowDialog()).thenReturn(true)
-            whenever(netPWaitlistRepository.getAuthenticationToken()).thenReturn(null)
-            whenever(subscriptions.isEnabled()).thenReturn(true)
 
             netpVpnAccessRevokedDialogMonitor.onActivityResumed(mock())
 
-            verify(betaEndedDialog, never()).show(any())
             verify(networkProtectionState, never()).stop()
             verify(accessRevokedDialog).clearIsShown()
         }
     }
 
     @Test
-    fun whenUserNotInBetaAndVPNEnabledAndSignedOutThenClearShownAccessRevokedDialog() {
+    fun whenVPNEnabledAndStateIsSignedOutThenDontShowDialogs() {
         coroutineTestRule.testScope.launch {
             whenever(networkProtectionState.isEnabled()).thenReturn(true)
             whenever(netpSubscriptionManager.getVpnStatus()).thenReturn(SIGNED_OUT)
-            whenever(betaEndedDialog.shouldShowDialog()).thenReturn(true)
-            whenever(netPWaitlistRepository.getAuthenticationToken()).thenReturn(null)
-            whenever(subscriptions.isEnabled()).thenReturn(true)
 
             netpVpnAccessRevokedDialogMonitor.onActivityResumed(mock())
 
-            verify(betaEndedDialog, never()).show(any())
             verify(networkProtectionState).stop()
             verify(accessRevokedDialog).clearIsShown()
         }
     }
 
     @Test
-    fun whenUserNotInBetaAndVPNActiveThenClearShownAccessRevokedDialog() {
-        coroutineTestRule.testScope.launch {
-            whenever(netpSubscriptionManager.getVpnStatus()).thenReturn(ACTIVE)
-            whenever(betaEndedDialog.shouldShowDialog()).thenReturn(true)
-            whenever(netPWaitlistRepository.getAuthenticationToken()).thenReturn(null)
-            whenever(subscriptions.isEnabled()).thenReturn(true)
-
-            netpVpnAccessRevokedDialogMonitor.onActivityResumed(mock())
-
-            verify(betaEndedDialog, never()).show(any())
-            verify(networkProtectionState, never()).stop()
-            verify(accessRevokedDialog).clearIsShown()
-        }
-    }
-
-    @Test
-    fun whenUserNotInBetaAndVPNEnabledActiveThenClearShownAccessRevokedDialog() {
-        coroutineTestRule.testScope.launch {
-            whenever(networkProtectionState.isEnabled()).thenReturn(true)
-            whenever(netpSubscriptionManager.getVpnStatus()).thenReturn(ACTIVE)
-            whenever(betaEndedDialog.shouldShowDialog()).thenReturn(true)
-            whenever(netPWaitlistRepository.getAuthenticationToken()).thenReturn(null)
-            whenever(subscriptions.isEnabled()).thenReturn(true)
-
-            netpVpnAccessRevokedDialogMonitor.onActivityResumed(mock())
-
-            verify(betaEndedDialog, never()).show(any())
-            verify(networkProtectionState, never()).stop()
-            verify(accessRevokedDialog).clearIsShown()
-        }
-    }
-
-    @Test
-    fun whenUserNotInBetaAndVPNExpiredThenShowAccessRevokedDialog() {
+    fun whenVPNStateIsExpiredThenShowAccessRevokedDialog() {
         coroutineTestRule.testScope.launch {
             whenever(netpSubscriptionManager.getVpnStatus()).thenReturn(EXPIRED)
-            whenever(betaEndedDialog.shouldShowDialog()).thenReturn(true)
-            whenever(netPWaitlistRepository.getAuthenticationToken()).thenReturn(null)
-            whenever(subscriptions.isEnabled()).thenReturn(true)
 
             netpVpnAccessRevokedDialogMonitor.onActivityResumed(mock())
 
-            verify(betaEndedDialog, never()).show(any())
             verify(accessRevokedDialog).showOnce(any())
             verify(networkProtectionState, never()).stop()
         }
     }
 
     @Test
-    fun whenUserNotInBetaAndVPNEnabledExpiredThenShowAccessRevokedDialog() {
+    fun whenVPNEnabledStateIsExpiredThenShowAccessRevokedDialog() {
         coroutineTestRule.testScope.launch {
             whenever(networkProtectionState.isEnabled()).thenReturn(true)
             whenever(netpSubscriptionManager.getVpnStatus()).thenReturn(EXPIRED)
-            whenever(betaEndedDialog.shouldShowDialog()).thenReturn(true)
-            whenever(netPWaitlistRepository.getAuthenticationToken()).thenReturn(null)
-            whenever(subscriptions.isEnabled()).thenReturn(true)
 
             netpVpnAccessRevokedDialogMonitor.onActivityResumed(mock())
 
-            verify(betaEndedDialog, never()).show(any())
             verify(accessRevokedDialog).showOnce(any())
             verify(networkProtectionState).stop()
         }
     }
 
     @Test
-    fun whenUserNotInBetaAndVPNExpiredAndVpnNotOnboardedThenNoDialog() {
+    fun whenVPNNotOnboardedAndStateIsExpiredThenDontShowDialogs() {
         coroutineTestRule.testScope.launch {
             whenever(networkProtectionState.isOnboarded()).thenReturn(false)
             whenever(netpSubscriptionManager.getVpnStatus()).thenReturn(EXPIRED)
-            whenever(betaEndedDialog.shouldShowDialog()).thenReturn(true)
-            whenever(netPWaitlistRepository.getAuthenticationToken()).thenReturn(null)
-            whenever(subscriptions.isEnabled()).thenReturn(true)
 
             netpVpnAccessRevokedDialogMonitor.onActivityResumed(mock())
 
-            verify(betaEndedDialog, never()).show(any())
             verify(accessRevokedDialog, never()).showOnce(any())
             verify(networkProtectionState, never()).stop()
             verify(accessRevokedDialog.clearIsShown())
@@ -313,18 +181,14 @@ class NetpVpnAccessRevokedDialogMonitorTest {
     }
 
     @Test
-    fun whenUserNotInBetaAndVPNEanbledAndExpiredAndVpnNotOnboardedThenNoDialog() {
+    fun whenVPNEnabledNotOnboardedAndStateIsExpiredThenDontShowDialogs() {
         coroutineTestRule.testScope.launch {
             whenever(networkProtectionState.isOnboarded()).thenReturn(false)
             whenever(networkProtectionState.isEnabled()).thenReturn(true)
             whenever(netpSubscriptionManager.getVpnStatus()).thenReturn(EXPIRED)
-            whenever(betaEndedDialog.shouldShowDialog()).thenReturn(true)
-            whenever(netPWaitlistRepository.getAuthenticationToken()).thenReturn(null)
-            whenever(subscriptions.isEnabled()).thenReturn(true)
 
             netpVpnAccessRevokedDialogMonitor.onActivityResumed(mock())
 
-            verify(betaEndedDialog, never()).show(any())
             verify(accessRevokedDialog, never()).showOnce(any())
             verify(networkProtectionState, never()).stop()
             verify(accessRevokedDialog.clearIsShown())

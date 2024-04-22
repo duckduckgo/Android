@@ -25,14 +25,14 @@ import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
+import com.duckduckgo.networkprotection.store.NetpDataStore
+import com.duckduckgo.networkprotection.store.NetpDataStoreSharedPreferences
 import com.duckduckgo.networkprotection.store.NetworkProtectionPrefs
 import com.duckduckgo.networkprotection.store.RealNetPExclusionListRepository
 import com.duckduckgo.networkprotection.store.RealNetPGeoswitchingRepository
 import com.duckduckgo.networkprotection.store.RealNetworkProtectionPrefs
 import com.duckduckgo.networkprotection.store.db.NetPDatabase
 import com.duckduckgo.networkprotection.store.remote_config.NetPConfigTogglesDao
-import com.duckduckgo.networkprotection.store.waitlist.NetPWaitlistDataStore
-import com.duckduckgo.networkprotection.store.waitlist.NetPWaitlistDataStoreSharedPreferences
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -106,9 +106,9 @@ object NetPBreakageCategoriesModule {
 
 @Module
 @ContributesTo(AppScope::class)
-object NetPWaitlistDataModule {
+object NetPDataStoreModule {
     @Provides
-    fun provideNetPWaitlistDataStore(
+    fun provideNetPDataStore(
         vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
-    ): NetPWaitlistDataStore = NetPWaitlistDataStoreSharedPreferences(vpnSharedPreferencesProvider)
+    ): NetpDataStore = NetpDataStoreSharedPreferences(vpnSharedPreferencesProvider)
 }

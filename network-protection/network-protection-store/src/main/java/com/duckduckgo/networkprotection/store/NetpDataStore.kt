@@ -14,25 +14,22 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.networkprotection.store.waitlist
+package com.duckduckgo.networkprotection.store
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 
-interface NetPWaitlistDataStore {
-    var settingUnlocked: Boolean
+interface NetpDataStore {
     var authToken: String?
-    var waitlistToken: String?
-    var waitlistTimestamp: Int
     var didAcceptedTerms: Boolean
 
     fun clear()
 }
 
-class NetPWaitlistDataStoreSharedPreferences constructor(
+class NetpDataStoreSharedPreferences constructor(
     private val vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
-) : NetPWaitlistDataStore {
+) : NetpDataStore {
 
     private val preferences: SharedPreferences by lazy {
         vpnSharedPreferencesProvider.getSharedPreferences(
@@ -41,14 +38,6 @@ class NetPWaitlistDataStoreSharedPreferences constructor(
             migrate = false,
         )
     }
-
-    override var settingUnlocked: Boolean
-        get() = preferences.getBoolean(KEY_SETTING_UNLOCKED, false)
-        set(value) {
-            preferences.edit(commit = true) {
-                putBoolean(KEY_SETTING_UNLOCKED, value)
-            }
-        }
 
     override var authToken: String?
         get() = preferences.getString(KEY_AUTH_TOKEN, null)
@@ -61,26 +50,6 @@ class NetPWaitlistDataStoreSharedPreferences constructor(
                 }
             }
         }
-    override var waitlistToken: String?
-        get() = preferences.getString(KEY_WAITLIST_TOKEN, null)
-        set(value) {
-            preferences.edit(commit = true) {
-                if (value == null) {
-                    remove(KEY_WAITLIST_TOKEN)
-                } else {
-                    putString(KEY_WAITLIST_TOKEN, value)
-                }
-            }
-        }
-
-    override var waitlistTimestamp: Int
-        get() = preferences.getInt(KEY_WAITLIST_TIMESTAMP, -1)
-        set(value) {
-            preferences.edit(commit = true) {
-                putInt(KEY_WAITLIST_TIMESTAMP, value)
-            }
-        }
-
     override var didAcceptedTerms: Boolean
         get() = preferences.getBoolean(KEY_WAITLIST_ACCEPTED_TERMS, false)
         set(value) {
@@ -95,10 +64,7 @@ class NetPWaitlistDataStoreSharedPreferences constructor(
 
     companion object {
         const val FILENAME = "com.duckduckgo.netp.store.waitlist"
-        const val KEY_SETTING_UNLOCKED = "KEY_SETTING_UNLOCKED"
         const val KEY_AUTH_TOKEN = "KEY_AUTH_TOKEN"
-        const val KEY_WAITLIST_TOKEN = "KEY_WAITLIST_TOKEN"
-        const val KEY_WAITLIST_TIMESTAMP = "KEY_WAITLIST_TIMESTAMP"
         const val KEY_WAITLIST_ACCEPTED_TERMS = "KEY_WAITLIST_ACCEPTED_TERMS"
     }
 }

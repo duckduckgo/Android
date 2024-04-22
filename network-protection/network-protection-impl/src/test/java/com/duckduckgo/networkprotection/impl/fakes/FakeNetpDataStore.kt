@@ -16,20 +16,14 @@
 
 package com.duckduckgo.networkprotection.impl.fakes
 
-import com.duckduckgo.networkprotection.store.waitlist.NetPWaitlistDataStore
+import com.duckduckgo.networkprotection.store.NetpDataStore
 
-class FakeNetPWaitlistDataStore(
-    override var settingUnlocked: Boolean = false,
+class FakeNetpDataStore(
     override var authToken: String? = null,
-    override var waitlistToken: String? = null,
-    override var waitlistTimestamp: Int = -1,
     override var didAcceptedTerms: Boolean = false,
-) : NetPWaitlistDataStore {
+) : NetpDataStore {
     override fun clear() {
-        settingUnlocked = false
         authToken = null
-        waitlistToken = null
-        waitlistTimestamp = -1
         didAcceptedTerms = false
     }
 }
