@@ -26,6 +26,8 @@ import com.duckduckgo.networkprotection.impl.configuration.asServerDetails
 import com.duckduckgo.networkprotection.impl.connectionclass.ConnectionQualityStore
 import com.duckduckgo.networkprotection.impl.connectionclass.asConnectionQuality
 import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
+import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager
+import com.duckduckgo.networkprotection.impl.subscription.isActive
 import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -42,6 +44,7 @@ class NetPStateCollector @Inject constructor(
     private val connectionQualityStore: ConnectionQualityStore,
     private val netPSettingsLocalConfig: NetPSettingsLocalConfig,
     private val netPGeoswitchingRepository: NetPGeoswitchingRepository,
+    private val netpSubscriptionManager: NetpSubscriptionManager,
 ) : VpnStateCollectorPlugin {
 
     override suspend fun collectVpnRelatedState(appPackageId: String?): JSONObject {
@@ -49,6 +52,7 @@ class NetPStateCollector @Inject constructor(
         return JSONObject().apply {
             put("enabled", isNetpRunning)
             put("CGNATed", isCGNATed())
+            put("subscriptionActive", netpSubscriptionManager.getVpnStatus().isActive())
             if (isNetpRunning) {
                 appPackageId?.let {
                     put("reportedAppProtected", !netPExclusionListRepository.getExcludedAppPackages().contains(it))
