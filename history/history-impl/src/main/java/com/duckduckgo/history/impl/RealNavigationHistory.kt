@@ -17,6 +17,7 @@
 package com.duckduckgo.history.impl
 
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.history.api.HistoryEntry
 import com.duckduckgo.history.api.NavigationHistory
@@ -24,11 +25,17 @@ import com.squareup.anvil.annotations.ContributesBinding
 import io.reactivex.Single
 import javax.inject.Inject
 
-@ContributesBinding(AppScope::class)
+interface InternalNavigationHistory : NavigationHistory {
+    suspend fun clearOldEntries()
+}
+
+@ContributesBinding(AppScope::class, boundType = NavigationHistory::class)
+@ContributesBinding(AppScope::class, boundType = InternalNavigationHistory::class)
 class RealNavigationHistory @Inject constructor(
     private val historyRepository: HistoryRepository,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
-) : NavigationHistory {
+    private val currentTimeProvider: CurrentTimeProvider,
+) : InternalNavigationHistory {
     override suspend fun saveToHistory(
         url: String,
         title: String?,
@@ -45,5 +52,9 @@ class RealNavigationHistory @Inject constructor(
 
     override suspend fun clearHistory() {
         historyRepository.clearHistory()
+    }
+
+    override suspend fun clearOldEntries() {
+        historyRepository.clearEntriesOlderThan(currentTimeProvider.localDateTimeNow().minusDays(30))
     }
 }

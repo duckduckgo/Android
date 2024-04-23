@@ -44,6 +44,11 @@ dependencies {
     implementation AndroidX.room.rxJava2
     implementation AndroidX.room.ktx
 
+    implementation AndroidX.work.runtimeKtx
+
+    implementation JakeWharton.timber
+
+    testImplementation AndroidX.work.testing
     testImplementation AndroidX.test.ext.junit
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
