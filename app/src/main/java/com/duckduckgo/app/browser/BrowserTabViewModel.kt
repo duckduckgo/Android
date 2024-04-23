@@ -1029,17 +1029,20 @@ class BrowserTabViewModel @Inject constructor(
             else -> {}
         }
 
-        if (newWebNavigationState.progress ?: 0 >= SHOW_CONTENT_MIN_PROGRESS) {
+        if ((newWebNavigationState.progress ?: 0) >= SHOW_CONTENT_MIN_PROGRESS) {
             showWebContent()
         }
         navigationAwareLoginDetector.onEvent(NavigationEvent.WebNavigationEvent(stateChange))
+    }
+
+    override fun onPageContentStart(url: String) {
+        showWebContent()
     }
 
     private fun showBlankContentfNewContentDelayed() {
         Timber.i("Blank: cancel job $deferredBlankSite")
         deferredBlankSite?.cancel()
         deferredBlankSite = viewModelScope.launch(dispatchers.io()) {
-            delay(timeMillis = NEW_CONTENT_MAX_DELAY_MS)
             withContext(dispatchers.main()) {
                 command.value = HideWebContent
             }
