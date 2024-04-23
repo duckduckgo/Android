@@ -145,11 +145,31 @@
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Prekliči</string>
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Brisanje vseh gesel</string>
-    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
+
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSynced">
+        <item quantity="one">Vaše geslo bo izbrisano iz te naprave.</item>
+        <item quantity="two">Vaši gesli bosta izbrisani iz te naprave.</item>
+        <item quantity="few">Vaša gesla bodo izbrisana iz te naprave.</item>
+        <item quantity="other">Vaša gesla bodo izbrisana iz te naprave.</item>
+    </plurals>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSynced">
+        <item quantity="one">Vaše geslo bo izbrisano iz vseh sinhroniziranih naprav.</item>
+        <item quantity="two">Vaši gesli bosta izbrisani iz vseh sinhroniziranih naprav.</item>
+        <item quantity="few">Vaša gesla bodo izbrisana iz vseh sinhroniziranih naprav.</item>
+        <item quantity="other">Vaša gesla bodo izbrisana iz vseh sinhroniziranih naprav.</item>
+    </plurals>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
         <item quantity="one">Ali ste prepričani, da želite izbrisati %1$d geslo?</item>
         <item quantity="two">Ali ste prepričani, da želite izbrisati %1$d gesli?</item>
         <item quantity="few">Ali ste prepričani, da želite izbrisati %1$d gesla?</item>
         <item quantity="other">Ali ste prepričani, da želite izbrisati %1$d gesel?</item>
+    </plurals>
+
+    <plurals name="credentialManagementDeleteAllSecondInstruction">
+        <item quantity="one">Prepričajte se, da imate še vedno možnost dostopa do svojega računa.</item>
+        <item quantity="two">Prepričajte se, da imate še vedno možnost dostopa do svojih računov.</item>
+        <item quantity="few">Prepričajte se, da imate še vedno možnost dostopa do svojih računov.</item>
+        <item quantity="other">Prepričajte se, da imate še vedno možnost dostopa do svojih računov.</item>
     </plurals>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
