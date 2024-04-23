@@ -717,7 +717,7 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         if (currentCtaViewState().cta is ExperimentOnboardingDaxDialogCta) {
-            onDismissExperimentDaxDialog()
+            onDismissExperimentDaxDialog(currentCtaViewState().cta as ExperimentOnboardingDaxDialogCta)
         }
 
         when (currentCtaViewState().cta) {
@@ -3196,8 +3196,7 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    private fun onDismissExperimentDaxDialog() {
-        val cta = currentCtaViewState().cta as? ExperimentOnboardingDaxDialogCta? ?: return
+    private fun onDismissExperimentDaxDialog(cta: ExperimentOnboardingDaxDialogCta) {
         if (cta is ExperimentOnboardingDaxDialogCta.DaxTrackersBlockedCta) {
             browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
         }
@@ -3210,13 +3209,21 @@ class BrowserTabViewModel @Inject constructor(
         if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) {
             val cta = currentCtaViewState().cta
             if (cta is ExperimentOnboardingDaxDialogCta.DaxFireButtonCta) {
-                onDismissExperimentDaxDialog()
+                onUserDismissedCta()
+                command.value = HideExperimentOnboardingDialog(cta)
             }
             if (currentBrowserViewState().fireButton.isHighlighted()) {
                 viewModelScope.launch {
                     ctaViewModel.dismissPulseAnimation()
                 }
             }
+        }
+    }
+
+    override fun onWebUpdateRequested() {
+        val cta = currentCtaViewState().cta
+        if (cta is ExperimentOnboardingDaxDialogCta) {
+            onDismissExperimentDaxDialog(cta)
         }
     }
 
