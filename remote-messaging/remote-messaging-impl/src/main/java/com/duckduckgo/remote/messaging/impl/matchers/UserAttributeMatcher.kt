@@ -54,12 +54,6 @@ class UserAttributeMatcher(
             is WidgetAdded -> {
                 matchingAttribute.matches(userBrowserProperties.widgetAdded())
             }
-            is AppTpOnboarded -> {
-                matchingAttribute.matches(userBrowserProperties.appTpOnboarded())
-            }
-            is NetPOnboarded -> {
-                matchingAttribute.matches(userBrowserProperties.networkProtectionOnboarded())
-            }
             else -> return null
         }
     }
