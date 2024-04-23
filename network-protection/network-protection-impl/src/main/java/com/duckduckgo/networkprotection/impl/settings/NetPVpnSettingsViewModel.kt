@@ -29,6 +29,7 @@ import com.duckduckgo.common.utils.extensions.isIgnoringBatteryOptimizations
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
+import com.duckduckgo.networkprotection.impl.snooze.VpnDisableOnCall
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -49,6 +50,7 @@ class NetPVpnSettingsViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val netPSettingsLocalConfig: NetPSettingsLocalConfig,
     private val networkProtectionState: NetworkProtectionState,
+    private val vpnDisableOnCall: VpnDisableOnCall,
     @InternalApi private val isIgnoringBatteryOptimizations: () -> Boolean,
 ) : ViewModel(), DefaultLifecycleObserver {
 
@@ -64,10 +66,12 @@ class NetPVpnSettingsViewModel @Inject constructor(
         replay = 1,
         onBufferOverflow = DROP_OLDEST,
     )
+
     internal fun viewState(): Flow<ViewState> = _viewState.asStateFlow()
 
     internal data class ViewState(
         val excludeLocalNetworks: Boolean = false,
+        val pauseDuringWifiCalls: Boolean = false,
     )
 
     init {
@@ -84,7 +88,12 @@ class NetPVpnSettingsViewModel @Inject constructor(
         super.onStart(owner)
         viewModelScope.launch(dispatcherProvider.io()) {
             val excludeLocalRoutes = netPSettingsLocalConfig.vpnExcludeLocalNetworkRoutes().isEnabled()
-            _viewState.emit(_viewState.value.copy(excludeLocalNetworks = excludeLocalRoutes))
+            _viewState.emit(
+                _viewState.value.copy(
+                    excludeLocalNetworks = excludeLocalRoutes,
+                    pauseDuringWifiCalls = vpnDisableOnCall.isEnabled(),
+                ),
+            )
         }
     }
 
@@ -113,6 +122,14 @@ class NetPVpnSettingsViewModel @Inject constructor(
             _viewState.emit(_viewState.value.copy(excludeLocalNetworks = enabled))
             shouldRestartVpn.set(enabled != oldValue)
         }
+    }
+
+    internal fun onEnablePauseDuringWifiCalls() {
+        vpnDisableOnCall.enable()
+    }
+
+    internal fun onDisablePauseDuringWifiCalls() {
+        vpnDisableOnCall.disable()
     }
 
     data class RecommendedSettings(val isIgnoringBatteryOptimizations: Boolean)

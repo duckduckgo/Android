@@ -5,7 +5,7 @@ import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
-import com.duckduckgo.networkprotection.impl.settings.geoswitching.DisplayablePreferredLocationProvider
+import com.duckduckgo.networkprotection.impl.snooze.VpnDisableOnCall
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -15,6 +15,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class NetPVpnSettingsViewModelTest {
@@ -22,6 +23,7 @@ class NetPVpnSettingsViewModelTest {
     var coroutineRule = CoroutineTestRule()
 
     private val networkProtectionState = mock<NetworkProtectionState>()
+    private val vpnDisableOnCall = mock<VpnDisableOnCall>()
     private lateinit var netPSettingsLocalConfig: NetPSettingsLocalConfig
     private var isIgnoringBatteryOptimizations: Boolean = false
 
@@ -36,6 +38,7 @@ class NetPVpnSettingsViewModelTest {
             coroutineRule.testDispatcherProvider,
             netPSettingsLocalConfig,
             networkProtectionState,
+            vpnDisableOnCall,
         ) { isIgnoringBatteryOptimizations }
     }
 
@@ -59,23 +62,31 @@ class NetPVpnSettingsViewModelTest {
 
     @Test
     fun onStartEmitDefaultState() = runTest {
+        whenever(vpnDisableOnCall.isEnabled()).thenReturn(false)
         viewModel.viewState().test {
             viewModel.onStart(mock())
 
-            assertEquals(NetPVpnSettingsViewModel.ViewState(false), awaitItem())
+            assertEquals(
+                NetPVpnSettingsViewModel.ViewState(
+                    excludeLocalNetworks = false,
+                    pauseDuringWifiCalls = false,
+                ),
+                awaitItem(),
+            )
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
     fun onStartEmitCorrectState() = runTest {
+        whenever(vpnDisableOnCall.isEnabled()).thenReturn(true)
         viewModel.viewState().test {
             netPSettingsLocalConfig.vpnExcludeLocalNetworkRoutes().setEnabled(Toggle.State(remoteEnableState = true))
 
             viewModel.onStart(mock())
 
-            assertEquals(NetPVpnSettingsViewModel.ViewState(false), awaitItem())
-            assertEquals(NetPVpnSettingsViewModel.ViewState(true), awaitItem())
+            assertEquals(NetPVpnSettingsViewModel.ViewState(excludeLocalNetworks = false, pauseDuringWifiCalls = false), awaitItem())
+            assertEquals(NetPVpnSettingsViewModel.ViewState(excludeLocalNetworks = true, pauseDuringWifiCalls = true), awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -94,6 +105,7 @@ class NetPVpnSettingsViewModelTest {
 
     @Test
     fun onPauseDoNotRestartVpn() = runTest {
+        whenever(vpnDisableOnCall.isEnabled()).thenReturn(false)
         viewModel.onStart(mock())
         verify(networkProtectionState, never()).restart()
     }
@@ -116,11 +128,18 @@ class NetPVpnSettingsViewModelTest {
         viewModel.onPause(mock())
         verify(networkProtectionState).restart()
     }
-}
 
-private class FakeDisplayablePreferredLocationProvider : DisplayablePreferredLocationProvider {
-    var location: String? = null
-    override suspend fun getDisplayablePreferredLocation(): String? {
-        return location
+    @Test
+    fun whenOnEnablePauseDuringWifiCallsThenEnableFeature() {
+        viewModel.onEnablePauseDuringWifiCalls()
+
+        verify(vpnDisableOnCall).enable()
+    }
+
+    @Test
+    fun whenOnDisablePauseDuringWifiCallsThenDisableFeature() {
+        viewModel.onDisablePauseDuringWifiCalls()
+
+        verify(vpnDisableOnCall).disable()
     }
 }

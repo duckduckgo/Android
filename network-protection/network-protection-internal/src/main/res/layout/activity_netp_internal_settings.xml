@@ -76,15 +76,6 @@
             />
 
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-                    android:id="@+id/snoozeWhileCalling"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:primaryText="@string/netpSnoozeWhileCalling"
-                    app:secondaryText="@string/netpSnoozeWhileCallingByline"
-                    app:showSwitch="true"
-            />
-
-            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/overrideMtuSelector"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

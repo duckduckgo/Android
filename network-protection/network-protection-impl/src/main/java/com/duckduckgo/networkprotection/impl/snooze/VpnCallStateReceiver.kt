@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.networkprotection.internal.feature.snooze
+package com.duckduckgo.networkprotection.impl.snooze
 
 import android.annotation.SuppressLint
 import android.content.*
