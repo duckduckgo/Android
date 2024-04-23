@@ -145,9 +145,23 @@
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Avbryt</string>
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Slett alle passord</string>
-    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
+
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSynced">
+        <item quantity="one">Passordet ditt blir slettet fra denne enheten.</item>
+        <item quantity="other">Passordene dine blir slettet fra denne enheten.</item>
+    </plurals>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSynced">
+        <item quantity="one">Passordet ditt blir slettet fra alle synkroniserte enheter.</item>
+        <item quantity="other">Passordene dine blir slettet fra alle synkroniserte enheter.</item>
+    </plurals>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
         <item quantity="one">Er du sikker på at du vil slette %1$d passord?</item>
         <item quantity="other">Er du sikker på at du vil slette %1$d passord?</item>
+    </plurals>
+
+    <plurals name="credentialManagementDeleteAllSecondInstruction">
+        <item quantity="one">Sørg for at du fortsatt har tilgang til kontoen din.</item>
+        <item quantity="other">Sørg for at du fortsatt har tilgang til kontoene dine.</item>
     </plurals>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
