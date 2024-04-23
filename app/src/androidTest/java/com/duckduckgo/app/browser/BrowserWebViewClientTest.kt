@@ -427,7 +427,6 @@ class BrowserWebViewClientTest {
         whenever(listener.handleNonHttpAppLink(any())).thenReturn(true)
         whenever(webResourceRequest.isForMainFrame).thenReturn(false)
         assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
-        verifyNoInteractions(listener)
     }
 
     @UiThreadTest

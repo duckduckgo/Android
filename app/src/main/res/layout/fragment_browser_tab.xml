@@ -105,14 +105,6 @@
                         app:layout_behavior="@string/appbar_scrolling_view_behavior"
                         tools:background="#4F00" />
 
-                    <!-- Semi-transparent overlay -->
-                    <View
-                        android:id="@+id/overlayView"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="?attr/daxColorWebViewDisabled"
-                        android:visibility="gone" />
-
                     <include
                         android:id="@+id/includeErrorView"
                         layout="@layout/include_error_view"
