@@ -325,6 +325,12 @@ class SpecialUrlDetectorImplTest {
     }
 
     @Test
+    fun whenUrlIsBlobSchemeThenFullQueryRetained() {
+        val type = testee.determineType("blob:example.com") as SearchQuery
+        assertEquals("blob:example.com", type.query)
+    }
+
+    @Test
     fun whenSmsContentIsLongerThanMaxAllowedThenTruncateToMax() {
         val longSms = randomString(SMS_MAX_LENGTH + 1)
         val type = testee.determineType("sms:$longSms") as Sms
