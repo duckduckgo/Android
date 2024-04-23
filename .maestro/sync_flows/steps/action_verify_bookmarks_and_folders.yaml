@@ -9,5 +9,3 @@ appId: com.duckduckgo.mobile.android
 - assertVisible: "${output.bookmarks.folders[0]}"
 - tapOn: "${output.bookmarks.folders[0]}"
 - assertVisible: "${output.bookmarks.titles[2]}"
-- tapOn: "Navigate up"
-- tapOn: "Navigate up"
