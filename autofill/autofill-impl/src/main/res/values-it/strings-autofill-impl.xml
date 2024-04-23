@@ -56,6 +56,8 @@
 
     <string name="credentialManagementSuggestionsLabel">Suggerimenti</string>
 
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">La compilazione automatica delle password non è disponibile perché la versione di Android WebView in uso è troppo vecchia.</string>
+
     <string name="autofillManagementSearchClearDescription">Elimina input di ricerca</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Nessun risultato per \"%1$s\"</string>
 
