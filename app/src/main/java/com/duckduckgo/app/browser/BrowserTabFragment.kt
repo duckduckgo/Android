@@ -1641,7 +1641,7 @@ class BrowserTabFragment :
     }
 
     private fun askSiteLocationPermission(locationPermission: LocationPermission) {
-        if (!isActiveTab) {
+        if (!isActiveCustomTab() && !isActiveTab) {
             Timber.v("Will not launch a dialog for an inactive tab")
             return
         }
@@ -1994,7 +1994,7 @@ class BrowserTabFragment :
     }
 
     private fun showAuthenticationDialog(request: BasicAuthenticationRequest) {
-        if (!isActiveTab) {
+        if (!isActiveCustomTab() && !isActiveTab) {
             Timber.v("Will not launch a dialog for an inactive tab")
             return
         }
@@ -3927,7 +3927,7 @@ class BrowserTabFragment :
         permissionsToRequest: SitePermissions,
         request: PermissionRequest,
     ) {
-        if (!isActiveTab) {
+        if (!isActiveCustomTab() && !isActiveTab) {
             Timber.v("Will not launch a dialog for an inactive tab")
             return
         }
