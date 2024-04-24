@@ -105,11 +105,11 @@
     <string name="netpVpnSettingExcludeLocalNetworksBatteryUsage">Unrestricted Battery Usage</string>
     <string name="netpVpnSettingExcludeLocalNetworksBatteryUsageByline">Prevents Android from stopping the VPN.</string>
 
-    <string name="netpVpnSettingsPauseDuringCalls">Pause VPN during Wi-Fi calls</string>
-    <string name="netpVpnSettingsPauseDuringCallsByline">Detects when the phone is making a call and temporarily snoozes the VPN.</string>
+    <string name="netpVpnSettingsPauseDuringCalls">Pause VPN During Wi-Fi Calls</string>
+    <string name="netpVpnSettingsPauseDuringCallsByline">Temporarily snooze the VPN when Wi-Fi calls are in progress and automatically reconnect after</string>
 
     <!-- Pause during calls -->
-    <string name="netpGrantPhonePermissionByline">Please grant PHONE permission.</string>
+    <string name="netpGrantPhonePermissionByline">This setting requires PHONE permissions</string>
     <string name="netpGrantPhonePermissionAction">Grant Permission</string>
 
     <!-- VPN Notification settings -->

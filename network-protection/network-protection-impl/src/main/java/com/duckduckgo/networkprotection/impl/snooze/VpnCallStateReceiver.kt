@@ -20,18 +20,18 @@ import android.annotation.SuppressLint
 import android.content.*
 import android.telephony.PhoneStateListener
 import android.telephony.TelephonyManager
-import androidx.core.content.edit
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.ProcessName
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.extensions.registerNotExportedReceiver
+import com.duckduckgo.common.utils.extensions.registerExportedReceiver
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ReceiverScope
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.mobile.android.vpn.Vpn
-import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
+import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -62,13 +62,9 @@ class VpnCallStateReceiver @Inject constructor(
     private val vpn: Vpn,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val sharedPreferencesProvider: VpnSharedPreferencesProvider,
+    private val netPSettingsLocalConfig: NetPSettingsLocalConfig,
     @ProcessName private val processName: String,
 ) : BroadcastReceiver(), MainProcessLifecycleObserver, VpnDisableOnCall {
-
-    private val preferences: SharedPreferences by lazy {
-        sharedPreferencesProvider.getSharedPreferences(PREFS_FILENAME, multiprocess = true, migrate = false)
-    }
 
     private val telephonyManager by lazy {
         context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager?
@@ -102,7 +98,7 @@ class VpnCallStateReceiver @Inject constructor(
 
     override fun enable() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            preferences.edit { putBoolean(PREFS_ENABLED_PARAM, true) }
+            netPSettingsLocalConfig.vpnPauseDuringCalls().setEnabled(Toggle.State(enable = true))
             context.sendBroadcast(Intent(ACTION_REGISTER_STATE_CALL_LISTENER))
         }
     }
@@ -110,12 +106,12 @@ class VpnCallStateReceiver @Inject constructor(
     override fun disable() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             context.sendBroadcast(Intent(ACTION_UNREGISTER_STATE_CALL_LISTENER))
-            preferences.edit { putBoolean(PREFS_ENABLED_PARAM, false) }
+            netPSettingsLocalConfig.vpnPauseDuringCalls().setEnabled(Toggle.State(enable = false))
         }
     }
 
     override suspend fun isEnabled(): Boolean = withContext(dispatcherProvider.io()) {
-        return@withContext preferences.getBoolean(PREFS_ENABLED_PARAM, false)
+        return@withContext netPSettingsLocalConfig.vpnPauseDuringCalls().isEnabled()
     }
 
     override fun onReceive(
@@ -161,7 +157,7 @@ class VpnCallStateReceiver @Inject constructor(
     private fun register() {
         unregister()
         logcat { "Registering vpn call state receiver" }
-        context.registerNotExportedReceiver(
+        context.registerExportedReceiver(
             this,
             IntentFilter().apply {
                 addAction(ACTION_REGISTER_STATE_CALL_LISTENER)
@@ -187,10 +183,8 @@ class VpnCallStateReceiver @Inject constructor(
     }
 
     companion object {
-        private const val ACTION_REGISTER_STATE_CALL_LISTENER = "com.duckduckgo.netp.internal.feature.snooze.ACTION_REGISTER_STATE_CALL_LISTENER"
-        private const val ACTION_UNREGISTER_STATE_CALL_LISTENER = "com.duckduckgo.netp.internal.feature.snooze.ACTION_UNREGISTER_STATE_CALL_LISTENER"
-        private const val PREFS_FILENAME = "com.duckduckgo.netp.internal.feature.call.listener.v1"
-        private const val PREFS_ENABLED_PARAM = "enabled"
+        private const val ACTION_REGISTER_STATE_CALL_LISTENER = "com.duckduckgo.netp.feature.snooze.ACTION_REGISTER_STATE_CALL_LISTENER"
+        private const val ACTION_UNREGISTER_STATE_CALL_LISTENER = "com.duckduckgo.netp.feature.snooze.ACTION_UNREGISTER_STATE_CALL_LISTENER"
     }
 }
 
