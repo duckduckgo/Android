@@ -22,12 +22,11 @@ import com.duckduckgo.networkprotection.impl.configuration.WgServerDebugProvider
 import com.duckduckgo.networkprotection.store.remote_config.NetPEgressServer
 import com.duckduckgo.networkprotection.store.remote_config.NetPServerRepository
 import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesBinding.Priority.HIGHEST
 import javax.inject.Inject
 
 @ContributesBinding(
     scope = AppScope::class,
-    priority = HIGHEST, // binding for internal build wins
+    rank = ContributesBinding.RANK_HIGHEST, // binding for internal build wins
 )
 class WgServerInternalProvider @Inject constructor(
     private val netPServerRepository: NetPServerRepository,

@@ -32,7 +32,7 @@ import logcat.logcat
 
 @ContributesBinding(
     scope = VpnScope::class,
-    priority = ContributesBinding.Priority.HIGHEST,
+    rank = ContributesBinding.RANK_HIGHEST,
 )
 class NetPInternalDefaultConfigProvider @Inject constructor(
     private val realNetPConfigProvider: RealNetPDefaultConfigProvider,
