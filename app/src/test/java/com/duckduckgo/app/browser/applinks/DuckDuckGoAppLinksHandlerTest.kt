@@ -230,7 +230,7 @@ class DuckDuckGoAppLinksHandlerTest {
         testee.isAUserQuery = false
         testee.hasTriggeredForDomain = true
         testee.previousUrl = "digid.nl/something"
-        assertFalse(
+        assertTrue(
             testee.handleAppLink(
                 isForMainFrame = true,
                 urlString = "app.digid.nl/something",
