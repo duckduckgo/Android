@@ -52,7 +52,7 @@
         <!-- Large 32dp -->
         <enum name="large" value="2" />
         <!-- Extra Large 40dp -->
-        <enum name="extralarge" value="3" />
+        <enum name="extra_large" value="3" />
     </attr>
     <attr name="textColorOverride" format="color"/>
     <attr name="showOverflowMenu" format="boolean"/>
