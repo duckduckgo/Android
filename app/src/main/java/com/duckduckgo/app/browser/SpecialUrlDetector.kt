@@ -48,7 +48,7 @@ class SpecialUrlDetectorImpl(
             SMS_SCHEME -> buildSms(uriString)
             SMSTO_SCHEME -> buildSmsTo(uriString)
             HTTP_SCHEME, HTTPS_SCHEME, DATA_SCHEME -> processUrl(initiatingUrl, uriString)
-            JAVASCRIPT_SCHEME, ABOUT_SCHEME, FILE_SCHEME, SITE_SCHEME -> UrlType.SearchQuery(uriString)
+            JAVASCRIPT_SCHEME, ABOUT_SCHEME, FILE_SCHEME, SITE_SCHEME, BLOB_SCHEME -> UrlType.SearchQuery(uriString)
             FILETYPE_SCHEME, IN_TITLE_SCHEME, IN_URL_SCHEME -> UrlType.SearchQuery(uriString)
             null -> {
                 if (subscriptions.shouldLaunchPrivacyProForUrl("https://$uriString")) {
@@ -191,6 +191,7 @@ class SpecialUrlDetectorImpl(
         private const val JAVASCRIPT_SCHEME = "javascript"
         private const val FILE_SCHEME = "file"
         private const val SITE_SCHEME = "site"
+        private const val BLOB_SCHEME = "blob"
         private const val EXTRA_FALLBACK_URL = "browser_fallback_url"
         private const val FILETYPE_SCHEME = "filetype"
         private const val IN_TITLE_SCHEME = "intitle"
