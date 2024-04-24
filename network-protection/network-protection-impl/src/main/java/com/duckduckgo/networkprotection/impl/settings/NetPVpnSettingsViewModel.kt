@@ -29,6 +29,7 @@ import com.duckduckgo.common.utils.extensions.isIgnoringBatteryOptimizations
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.impl.snooze.VpnDisableOnCall
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -51,6 +52,7 @@ class NetPVpnSettingsViewModel @Inject constructor(
     private val netPSettingsLocalConfig: NetPSettingsLocalConfig,
     private val networkProtectionState: NetworkProtectionState,
     private val vpnDisableOnCall: VpnDisableOnCall,
+    private val networkProtectionPixels: NetworkProtectionPixels,
     @InternalApi private val isIgnoringBatteryOptimizations: () -> Boolean,
 ) : ViewModel(), DefaultLifecycleObserver {
 
@@ -82,6 +84,11 @@ class NetPVpnSettingsViewModel @Inject constructor(
 
     internal fun recommendedSettings(): Flow<RecommendedSettings> {
         return _recommendedSettingsState.distinctUntilChanged()
+    }
+
+    override fun onCreate(owner: LifecycleOwner) {
+        super.onCreate(owner)
+        networkProtectionPixels.reportVpnSettingsShown()
     }
 
     override fun onStart(owner: LifecycleOwner) {
@@ -125,10 +132,12 @@ class NetPVpnSettingsViewModel @Inject constructor(
     }
 
     internal fun onEnablePauseDuringWifiCalls() {
+        networkProtectionPixels.reportEnabledPauseDuringCalls()
         vpnDisableOnCall.enable()
     }
 
     internal fun onDisablePauseDuringWifiCalls() {
+        networkProtectionPixels.reportDisabledPauseDuringCalls()
         vpnDisableOnCall.disable()
     }
 

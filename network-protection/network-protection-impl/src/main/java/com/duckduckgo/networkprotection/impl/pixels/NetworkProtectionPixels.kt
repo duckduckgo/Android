@@ -271,6 +271,14 @@ interface NetworkProtectionPixels {
 
     fun reportVpnEnabledFromQuickSettingsTile()
     fun reportVpnDisabledFromQuickSettingsTile()
+
+    fun reportVpnScreenShown()
+
+    fun reportVpnSettingsShown()
+
+    fun reportEnabledPauseDuringCalls()
+
+    fun reportDisabledPauseDuringCalls()
 }
 
 @ContributesBinding(AppScope::class)
@@ -532,6 +540,26 @@ class RealNetworkProtectionPixel @Inject constructor(
     override fun reportVpnDisabledFromQuickSettingsTile() {
         firePixel(NETP_DISABLE_FROM_SETTINGS_TILE)
         tryToFireDailyPixel(NETP_DISABLE_FROM_SETTINGS_TILE_DAILY)
+    }
+
+    override fun reportVpnScreenShown() {
+        firePixel(NETP_VPN_SCREEN_SHOWN)
+        tryToFireDailyPixel(NETP_VPN_SCREEN_SHOWN_DAILY)
+    }
+
+    override fun reportVpnSettingsShown() {
+        firePixel(NETP_VPN_SETTINGS_SHOWN)
+        tryToFireDailyPixel(NETP_VPN_SETTINGS_SHOWN_DAILY)
+    }
+
+    override fun reportEnabledPauseDuringCalls() {
+        firePixel(NETP_PAUSE_ON_CALL_ENABLED)
+        tryToFireDailyPixel(NETP_PAUSE_ON_CALL_ENABLED_DAILY)
+    }
+
+    override fun reportDisabledPauseDuringCalls() {
+        firePixel(NETP_PAUSE_ON_CALL_DISABLED)
+        tryToFireDailyPixel(NETP_PAUSE_ON_CALL_ENABLED_DAILY)
     }
 
     private fun firePixel(

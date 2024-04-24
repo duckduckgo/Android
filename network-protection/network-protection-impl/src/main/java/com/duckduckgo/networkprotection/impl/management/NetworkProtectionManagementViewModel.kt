@@ -158,6 +158,10 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         )
     }
 
+    override fun onCreate(owner: LifecycleOwner) {
+        networkProtectionPixels.reportVpnScreenShown()
+    }
+
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
         viewModelScope.launch(dispatcherProvider.io()) {

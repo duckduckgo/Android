@@ -5,6 +5,7 @@ import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.impl.snooze.VpnDisableOnCall
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -24,6 +25,7 @@ class NetPVpnSettingsViewModelTest {
 
     private val networkProtectionState = mock<NetworkProtectionState>()
     private val vpnDisableOnCall = mock<VpnDisableOnCall>()
+    private val networkProtectionPixels = mock<NetworkProtectionPixels>()
     private lateinit var netPSettingsLocalConfig: NetPSettingsLocalConfig
     private var isIgnoringBatteryOptimizations: Boolean = false
 
@@ -39,7 +41,15 @@ class NetPVpnSettingsViewModelTest {
             netPSettingsLocalConfig,
             networkProtectionState,
             vpnDisableOnCall,
+            networkProtectionPixels,
         ) { isIgnoringBatteryOptimizations }
+    }
+
+    @Test
+    fun whenVpnSettingsScreenShownThenEmitImpressionPixels() {
+        viewModel.onCreate(mock())
+
+        verify(networkProtectionPixels).reportVpnSettingsShown()
     }
 
     @Test
