@@ -48,7 +48,7 @@ class DuckDuckGoAppLinksLauncher @Inject constructor() : AppLinksLauncher {
 
     private fun configureIntent(
         intent: Intent,
-        context: Context
+        context: Context,
     ) {
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
 
