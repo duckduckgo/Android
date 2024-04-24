@@ -232,6 +232,7 @@ dependencies {
     implementation project(':remote-messaging-api')
     implementation project(':remote-messaging-impl')
     implementation project(':remote-messaging-store')
+    internalImplementation project(":remote-messaging-internal")
 
     implementation project(':voice-search-api')
     implementation project(':voice-search-impl')
