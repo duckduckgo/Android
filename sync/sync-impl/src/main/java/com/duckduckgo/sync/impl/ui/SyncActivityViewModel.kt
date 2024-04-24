@@ -34,6 +34,7 @@ import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncFeatureToggle
+import com.duckduckgo.sync.impl.auth.DeviceAuthenticator
 import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
 import com.duckduckgo.sync.impl.pixels.SyncAccountOperation
@@ -45,6 +46,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroCreateAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RequestSetupAuthentication
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowDeviceUnsupported
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.LoadingItem
@@ -66,6 +68,7 @@ import kotlinx.coroutines.withContext
 
 @ContributesViewModel(ActivityScope::class)
 class SyncActivityViewModel @Inject constructor(
+    private val deviceAuthenticator: DeviceAuthenticator,
     private val recoveryCodePDF: RecoveryCodePDF,
     private val syncAccountRepository: SyncAccountRepository,
     private val syncStateMonitor: SyncStateMonitor,
@@ -162,29 +165,38 @@ class SyncActivityViewModel @Inject constructor(
         data class AskEditDevice(val device: ConnectedDevice) : Command()
         data class ShowError(@StringRes val message: Int, val reason: String = "") : Command()
         object ShowDeviceUnsupported : Command()
+        object RequestSetupAuthentication : Command()
     }
 
     fun onSyncWithAnotherDevice() {
         viewModelScope.launch {
-            command.send(Command.SyncWithAnotherDevice)
+            requiresSetupAuthentication {
+                command.send(Command.SyncWithAnotherDevice)
+            }
         }
     }
 
     fun onAddAnotherDevice() {
         viewModelScope.launch {
-            command.send(Command.AddAnotherDevice)
+            requiresSetupAuthentication {
+                command.send(Command.AddAnotherDevice)
+            }
         }
     }
 
     fun onSyncThisDevice() {
-        viewModelScope.launch {
-            command.send(IntroCreateAccount)
+        viewModelScope.launch(dispatchers.io()) {
+            requiresSetupAuthentication {
+                command.send(IntroCreateAccount)
+            }
         }
     }
 
     fun onRecoverYourSyncedData() {
         viewModelScope.launch {
-            command.send(Command.IntroRecoverSyncData)
+            requiresSetupAuthentication {
+                command.send(Command.IntroRecoverSyncData)
+            }
         }
     }
 
@@ -267,7 +279,9 @@ class SyncActivityViewModel @Inject constructor(
 
     fun onSaveRecoveryCodeClicked() {
         viewModelScope.launch {
-            command.send(CheckIfUserHasStoragePermission)
+            requiresSetupAuthentication {
+                command.send(CheckIfUserHasStoragePermission)
+            }
         }
     }
 
@@ -355,6 +369,15 @@ class SyncActivityViewModel @Inject constructor(
     private fun signedOutState(): ViewState = ViewState(
         disabledSetupFlows = disabledSetupFlows(),
     )
+
+    private suspend fun requiresSetupAuthentication(action: suspend () -> Unit) {
+        val hasValidDeviceAuthentication = deviceAuthenticator.hasValidDeviceAuthentication()
+        if (hasValidDeviceAuthentication.not()) {
+            command.send(RequestSetupAuthentication)
+        } else {
+            action()
+        }
+    }
     private fun ViewState.setDevices(devices: List<SyncDeviceListItem>) = copy(syncedDevices = devices)
     private fun ViewState.hideDeviceListItemLoading() = copy(syncedDevices = syncedDevices.filterNot { it is LoadingItem })
     private fun ViewState.showDeviceListItemLoading() = copy(syncedDevices = syncedDevices + LoadingItem)

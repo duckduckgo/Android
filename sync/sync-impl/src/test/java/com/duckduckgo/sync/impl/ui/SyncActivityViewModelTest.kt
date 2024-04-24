@@ -35,6 +35,7 @@ import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncFeatureToggle
+import com.duckduckgo.sync.impl.auth.DeviceAuthenticator
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
@@ -42,6 +43,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasS
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroCreateAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroRecoverSyncData
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RequestSetupAuthentication
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.CreateAccountFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows.SignInFlow
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.SyncedDevice
@@ -77,6 +79,7 @@ class SyncActivityViewModelTest {
     private val syncEngine: SyncEngine = mock()
     private val syncFeatureToggle: SyncFeatureToggle = mock()
     private val syncPixels: SyncPixels = mock()
+    private val deviceAuthenticator: DeviceAuthenticator = mock()
 
     private val stateFlow = MutableStateFlow(SyncState.READY)
 
@@ -92,6 +95,7 @@ class SyncActivityViewModelTest {
             recoveryCodePDF = recoveryPDF,
             syncFeatureToggle = syncFeatureToggle,
             syncPixels = syncPixels,
+            deviceAuthenticator = deviceAuthenticator,
         )
 
         whenever(syncStateMonitor.syncState()).thenReturn(emptyFlow())
@@ -151,6 +155,7 @@ class SyncActivityViewModelTest {
 
     @Test
     fun whenSyncWithAnotherDeviceThenEmitCommandSyncWithAnotherDevice() = runTest {
+        givenUserHasDeviceAuthentication(true)
         testee.onSyncWithAnotherDevice()
 
         testee.commands().test {
@@ -160,7 +165,19 @@ class SyncActivityViewModelTest {
     }
 
     @Test
+    fun whenSyncWithAnotherDeviceWithoutDeviceAuthenticationThenEmitCommandRequestSetupAuthentication() = runTest {
+        givenUserHasDeviceAuthentication(false)
+        testee.onSyncWithAnotherDevice()
+
+        testee.commands().test {
+            awaitItem().assertCommandType(Command.RequestSetupAuthentication::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenScanAnotherDeviceQRCodeThenEmitCommandAddAnotherDevice() = runTest {
+        givenUserHasDeviceAuthentication(true)
         testee.onAddAnotherDevice()
 
         testee.commands().test {
@@ -170,7 +187,19 @@ class SyncActivityViewModelTest {
     }
 
     @Test
+    fun whenScanAnotherDeviceQRCodeWithoutDeviceAuthenticationThenEmitCommandRequestSetupAuthentication() = runTest {
+        givenUserHasDeviceAuthentication(false)
+        testee.onAddAnotherDevice()
+
+        testee.commands().test {
+            awaitItem().assertCommandType(Command.RequestSetupAuthentication::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenSyncThisDeviceThenLaunchCreateAccountFlow() = runTest {
+        givenUserHasDeviceAuthentication(true)
         testee.commands().test {
             testee.onSyncThisDevice()
             awaitItem().assertCommandType(IntroCreateAccount::class)
@@ -179,11 +208,33 @@ class SyncActivityViewModelTest {
     }
 
     @Test
+    fun whenSyncThisDeviceWithoutDeviceAuthenticationThenEmitCommandRequestSetupAuthentication() = runTest {
+        givenUserHasDeviceAuthentication(false)
+        testee.commands().test {
+            testee.onSyncThisDevice()
+            awaitItem().assertCommandType(RequestSetupAuthentication::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenRecoverDataThenRecoverDataCommandSent() = runTest {
+        givenUserHasDeviceAuthentication(true)
         testee.onRecoverYourSyncedData()
 
         testee.commands().test {
             awaitItem().assertCommandType(IntroRecoverSyncData::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenRecoverDataWithoutDeviceAuthenticationThenEmitCommandRequestSetupAuthentication() = runTest {
+        givenUserHasDeviceAuthentication(false)
+        testee.onRecoverYourSyncedData()
+
+        testee.commands().test {
+            awaitItem().assertCommandType(RequestSetupAuthentication::class)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -398,11 +449,24 @@ class SyncActivityViewModelTest {
 
     @Test
     fun whenUserClicksOnSaveRecoveryCodeThenEmitCheckIfUserHasPermissionCommand() = runTest {
+        givenUserHasDeviceAuthentication(true)
         whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(jsonRecoveryKeyEncoded))
         testee.commands().test {
             testee.onSaveRecoveryCodeClicked()
             val command = awaitItem()
             assertTrue(command is CheckIfUserHasStoragePermission)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUserClicksOnSaveRecoveryCodeWithoutDeviceAuthenticationThenEmitCommandRequestSetupAuthentication() = runTest {
+        givenUserHasDeviceAuthentication(false)
+        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(jsonRecoveryKeyEncoded))
+        testee.commands().test {
+            testee.onSaveRecoveryCodeClicked()
+            val command = awaitItem()
+            assertTrue(command is RequestSetupAuthentication)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -552,5 +616,9 @@ class SyncActivityViewModelTest {
         whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(jsonRecoveryKeyEncoded))
         whenever(syncAccountRepository.getThisConnectedDevice()).thenReturn(connectedDevice)
         whenever(syncAccountRepository.getConnectedDevices()).thenReturn(Success(listOf(connectedDevice)))
+    }
+
+    private fun givenUserHasDeviceAuthentication(hasDeviceAuthentication: Boolean) {
+        whenever(deviceAuthenticator.hasValidDeviceAuthentication()).thenReturn(hasDeviceAuthentication)
     }
 }

@@ -16,7 +16,12 @@
 
 package com.duckduckgo.sync.impl.auth
 
+import android.annotation.SuppressLint
+import android.content.ActivityNotFoundException
+import android.content.Context
+import android.content.Intent
 import android.os.Build
+import android.provider.Settings
 import androidx.annotation.UiThread
 import androidx.fragment.app.FragmentActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -26,6 +31,7 @@ import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthConfiguration
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthResult
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import timber.log.Timber
 
 interface DeviceAuthenticator {
     /**
@@ -43,6 +49,11 @@ interface DeviceAuthenticator {
         config: AuthConfiguration = AuthConfiguration(),
         onResult: (AuthResult) -> Unit,
     )
+
+    /**
+     * Launches the device authentication enrollment screen from system settings.
+     */
+    fun launchDeviceAuthEnrollment(context: Context)
 
     sealed class AuthResult {
         object Success : AuthResult()
@@ -91,5 +102,46 @@ class RealDeviceAuthenticator @Inject constructor(
         } else {
             onResult(AuthResult.Success)
         }
+    }
+
+    @SuppressLint("InlinedApi", "DEPRECATION")
+    override fun launchDeviceAuthEnrollment(context: Context) {
+        when {
+            appBuildConfig.manufacturer == "Xiaomi" -> {
+                // Issue on Xiaomi: https://stackoverflow.com/questions/68484485/intent-action-fingerprint-enroll-on-redmi-results-in-exception
+                SYSTEM_SETTINGS_ACTION.safeLaunchSettingsActivity(context, tryFallback = false)
+            }
+
+            appBuildConfig.sdkInt >= Build.VERSION_CODES.R -> {
+                Settings.ACTION_BIOMETRIC_ENROLL.safeLaunchSettingsActivity(context, tryFallback = true)
+            }
+
+            appBuildConfig.sdkInt >= Build.VERSION_CODES.P -> {
+                Settings.ACTION_FINGERPRINT_ENROLL.safeLaunchSettingsActivity(context, tryFallback = true)
+            }
+
+            else -> {
+                Settings.ACTION_SECURITY_SETTINGS.safeLaunchSettingsActivity(context, tryFallback = true)
+            }
+        }
+    }
+
+    /**
+     * Attempt to launch the given activity.
+     * If it fails because the activity wasn't found, try launching the main settings activity if tryFallback=true.
+     */
+    private fun String.safeLaunchSettingsActivity(context: Context, tryFallback: Boolean) {
+        try {
+            context.startActivity(Intent(this))
+        } catch (e: ActivityNotFoundException) {
+            Timber.w("%s. Trying fallback? %s", e.message, tryFallback)
+            if (tryFallback) {
+                SYSTEM_SETTINGS_ACTION.safeLaunchSettingsActivity(context, tryFallback = false)
+            }
+        }
+    }
+
+    companion object {
+        private const val SYSTEM_SETTINGS_ACTION = Settings.ACTION_SETTINGS
     }
 }
