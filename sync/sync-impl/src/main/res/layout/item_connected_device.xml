@@ -31,8 +31,7 @@
         android:layout_marginStart="10dp"
         android:ellipsize="end"
         android:gravity="center_vertical|start"
-        android:maxLines="1"
-        android:textAlignment="textStart"/>
+        android:maxLines="1"/>
 
     <com.duckduckgo.common.ui.view.button.DaxButtonGhost
         android:id="@+id/logoutButton"

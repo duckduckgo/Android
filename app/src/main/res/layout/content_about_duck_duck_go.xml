@@ -49,7 +49,7 @@
             android:layout_marginStart="@dimen/keyline_4"
             android:layout_marginEnd="@dimen/keyline_4"
             android:text="@string/aboutHeader"
-            android:textAlignment="center"
+            android:gravity="center"
             app:typography="h3" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
@@ -57,7 +57,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="..."
-            android:textAlignment="center"
+            android:gravity="center"
             app:textType="secondary"
             app:typography="title"
             android:layout_marginTop="@dimen/keyline_3"
@@ -73,7 +73,7 @@
             android:paddingEnd="@dimen/keyline_6"
             android:paddingBottom="@dimen/keyline_4"
             android:text="@string/aboutDescription"
-            android:textAlignment="viewStart"
+            android:gravity="start"
             app:textType="secondary"
             app:typography="body1"
             tools:text="Long description would go here\n\nLots and lots of words" />

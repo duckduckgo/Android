@@ -42,7 +42,6 @@
         android:gravity="center_vertical|start"
         android:includeFontPadding="false"
         android:maxLines="1"
-        android:textAlignment="textStart"
         app:layout_constraintBottom_toBottomOf="@id/icon"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/icon"

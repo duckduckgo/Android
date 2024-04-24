@@ -89,7 +89,7 @@
                 android:layout_marginTop="@dimen/keyline_2"
                 android:alpha="0"
                 android:text="@string/onboardingSearchDaxDialogOption1"
-                android:textAlignment="textStart"
+                android:gravity="start"
                 app:icon="@drawable/ic_find_search_16"
                 tools:alpha="1" />
 
@@ -100,7 +100,7 @@
                 android:layout_marginTop="-4dp"
                 android:alpha="0"
                 android:text="@string/onboardingSearchDaxDialogOption2"
-                android:textAlignment="textStart"
+                android:gravity="start"
                 app:icon="@drawable/ic_find_search_16"
                 tools:alpha="1" />
 
@@ -111,7 +111,7 @@
                 android:layout_marginTop="-4dp"
                 android:alpha="0"
                 android:text="@string/onboardingSearchDaxDialogOption3"
-                android:textAlignment="textStart"
+                android:gravity="start"
                 app:icon="@drawable/ic_find_search_16"
                 tools:alpha="1" />
 
@@ -122,7 +122,7 @@
                 android:layout_marginTop="-4dp"
                 android:alpha="0"
                 android:text="@string/onboardingSearchDaxDialogOption4"
-                android:textAlignment="textStart"
+                android:gravity="start"
                 app:icon="@drawable/ic_wand_16"
                 tools:alpha="1" />
 

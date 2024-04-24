@@ -97,7 +97,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:text="@string/surveyLoadingErrorTitle"
-                android:textAlignment="center"
+                android:gravity="center"
                 android:textColor="?daxColorWhite"
                 app:typography="h1" />
 
@@ -105,7 +105,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/surveyLoadingErrorText"
-                android:textAlignment="center"
+                android:gravity="center"
                 android:textColor="?daxColorWhite"
                 app:typography="body1" />
 

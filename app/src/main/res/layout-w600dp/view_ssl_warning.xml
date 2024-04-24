@@ -60,7 +60,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/sslErrorTitle"
             app:typography="body1"
-            android:textAlignment="center"
             tools:text="@string/sslErrorHeadline" />
 
         <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
@@ -114,7 +113,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/sslErrorAdvancedDivider"
             app:typography="body2"
-            android:textAlignment="center"
             android:text="@string/sslErrorExpandedHeadline" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
@@ -128,7 +126,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/sslErrorExpandedHeadline"
             app:typography="body2"
-            android:textAlignment="center"
             tools:text="@string/sslErrorExpiredMessage" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
@@ -142,7 +139,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/sslErrorExpandedMessage"
             app:typography="body2"
-            android:textAlignment="center"
             tools:text="@string/sslErrorExpandedCTA" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

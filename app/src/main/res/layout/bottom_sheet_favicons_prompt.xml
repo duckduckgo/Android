@@ -80,7 +80,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/keyline_5"
                 android:text="@string/faviconsPromptMessage"
-                android:textAlignment="center"
+                android:gravity="center"
                 app:typography="body2"
                 app:layout_constraintEnd_toEndOf="@id/faviconsPromptPrimaryCta"
                 app:layout_constraintStart_toStartOf="@id/faviconsPromptPrimaryCta"

@@ -50,7 +50,7 @@
                     app:typography="h1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textAlignment="viewStart"
+                    android:gravity="start"
                     android:paddingTop="@dimen/keyline_4"
                     android:text="App Components"
                     app:drawableStartCompat="@drawable/ic_dax_icon"
