@@ -97,7 +97,7 @@
         app:leadingIcon="@drawable/ic_dax_icon"
         app:leadingIconSize="extralarge"
         app:primaryText="Two Line Item"
-        app:secondaryText="With Large Leading and Trailing Image"
+        app:secondaryText="With Extra Large Leading and Trailing Image"
         app:trailingIcon="@drawable/ic_menu_vertical_24"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
