@@ -145,10 +145,27 @@
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Atcelt</string>
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Dzēst visas paroles</string>
-    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
+
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSynced">
+        <item quantity="zero">Tavas paroles tiks dzēstas no šīs ierīces.</item>
+        <item quantity="one">Tava parole tiks dzēsta no šīs ierīces.</item>
+        <item quantity="other">Tavas paroles tiks dzēstas no šīs ierīces.</item>
+    </plurals>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSynced">
+        <item quantity="zero">Tavas paroles tiks dzēstas no visām sinhronizētajām ierīcēm.</item>
+        <item quantity="one">Tava parole tiks dzēsta no visām sinhronizētajām ierīcēm.</item>
+        <item quantity="other">Tavas paroles tiks dzēstas no visām sinhronizētajām ierīcēm.</item>
+    </plurals>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
         <item quantity="zero">Vai tiešām vēlies dzēst %1$d paroles?</item>
         <item quantity="one">Vai tiešām vēlies dzēst %1$d paroli?</item>
         <item quantity="other">Vai tiešām vēlies dzēst %1$d paroles?</item>
+    </plurals>
+
+    <plurals name="credentialManagementDeleteAllSecondInstruction">
+        <item quantity="zero">Pārliecinies, vai joprojām varēsi piekļūt savam kontam.</item>
+        <item quantity="one">Pārliecinies, vai joprojām varēsi piekļūt savam kontam.</item>
+        <item quantity="other">Pārliecinies, vai joprojām varēsi piekļūt savam kontam.</item>
     </plurals>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
