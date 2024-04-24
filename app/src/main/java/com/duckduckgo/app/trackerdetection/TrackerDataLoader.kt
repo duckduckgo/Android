@@ -38,6 +38,8 @@ import com.squareup.moshi.Moshi
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import okio.buffer
+import okio.source
 import timber.log.Timber
 
 @WorkerThread
@@ -80,11 +82,16 @@ class TrackerDataLoader @Inject constructor(
 
     private fun updateTdsFromFile() {
         Timber.d("Updating tds from file")
-        val json = runCatching { context.resources.openRawResource(R.raw.tds).bufferedReader().use { it.readText() } }.getOrNull() ?: return
-        val adapter = moshi.adapter(TdsJson::class.java)
-        persistTds(DEFAULT_ETAG, adapter.fromJson(json)!!)
-    }
+        runCatching {
+            val adapter = moshi.adapter(TdsJson::class.java)
+            val inputStream = context.resources.openRawResource(R.raw.tds).source()
 
+            val tdsJson = adapter.fromJson(inputStream.buffer())
+            tdsJson?.let {
+                persistTds(DEFAULT_ETAG, it)
+            }
+        }
+    }
     fun persistTds(
         eTag: String,
         tdsJson: TdsJson,
