@@ -56,6 +56,8 @@
 
     <string name="credentialManagementSuggestionsLabel">Προτεινόμενο</string>
 
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">Η αυτόματη συμπλήρωση κωδικών πρόσβασης δεν είναι διαθέσιμη καθώς η έκδοση του Android WebView είναι πολύ παλιά.</string>
+
     <string name="autofillManagementSearchClearDescription">Εκκαθάριση εισαγωγής αναζήτησης</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Δεν υπάρχουν αποτελέσματα για «%1$s»</string>
 
