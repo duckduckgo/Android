@@ -79,12 +79,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_2"
-        app:leadingIconSize="extralarge"
+        app:leadingIconSize="extra_large"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithLargeImage"
         app:leadingIcon="@drawable/ic_dax_icon"
-        app:primaryText="Item with Large Leading Image " />
+        app:primaryText="Item with Extra Large Leading Image " />
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/oneLineListItemWithTrailingIcon"

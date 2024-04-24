@@ -95,7 +95,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:leadingIcon="@drawable/ic_dax_icon"
-        app:leadingIconSize="extralarge"
+        app:leadingIconSize="extra_large"
         app:primaryText="Two Line Item"
         app:secondaryText="With Extra Large Leading and Trailing Image"
         app:trailingIcon="@drawable/ic_menu_vertical_24"
