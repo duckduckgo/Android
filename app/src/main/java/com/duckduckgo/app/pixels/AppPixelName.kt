@@ -121,7 +121,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SETTINGS_WINDOWS_APP_PRESSED("ms_windows_app_setting_pressed"),
     SETTINGS_EMAIL_PROTECTION_PRESSED("ms_email_protection_setting_pressed"),
     SETTINGS_APPTP_PRESSED("ms_apptp_setting_pressed"),
-    SETTINGS_NETP_PRESSED("ms_netp_setting_pressed"),
     SETTINGS_GPC_PRESSED("ms_gpc_pressed"),
     SETTINGS_FIREPROOF_WEBSITES_PRESSED("ms_fireproof_websites_pressed"),
     SETTINGS_AUTOMATICALLY_CLEAR_WHAT_PRESSED("ms_automatically_clear_what_pressed"),
@@ -254,9 +253,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_EMAIL_OVERRIDE_PIXEL("m_sync_duck_address_override"),
 
     EMAIL_COPIED_TO_CLIPBOARD("email_generated_button"),
-    EMAIL_DID_SHOW_WAITLIST_DIALOG("email_did_show_waitlist_dialog"),
-    EMAIL_DID_PRESS_WAITLIST_DIALOG_NOTIFY_ME("email_did_press_waitlist_dialog_notify_me"),
-    EMAIL_DID_PRESS_WAITLIST_DIALOG_NO_THANKS("email_did_press_waitlist_dialog_dismiss"),
 
     ENCRYPTION_UNABLE_TO_DECRYPT_SECURE_EMAIL_DATA("m_unable_to_decrypt_secure_email_data"),
     ENCRYPTED_IO_EXCEPTION("m_e_io_e"),
@@ -271,4 +267,12 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     REMOTE_MESSAGE_SHARED("m_remote_message_share"),
 
     PRIVACY_PRO_IS_ENABLED_AND_ELIGIBLE("m_privacy-pro_is-enabled"),
+
+    SSL_CERTIFICATE_WARNING_CLOSE_PRESSED("m_certificate_warning_leave_clicked"),
+    SSL_CERTIFICATE_WARNING_ADVANCED_PRESSED("m_certificate_warning_advanced_clicked"),
+    SSL_CERTIFICATE_WARNING_PROCEED_PRESSED("m_certificate_warning_proceed_clicked"),
+    SSL_CERTIFICATE_WARNING_WRONG_HOST_SHOWN("m_certificate_warning_displayed_wrong_host"),
+    SSL_CERTIFICATE_WARNING_EXPIRED_SHOWN("m_certificate_warning_displayed_expired"),
+    SSL_CERTIFICATE_WARNING_UNTRUSTED_SHOWN("m_certificate_warning_displayed_untrusted"),
+    SSL_CERTIFICATE_WARNING_GENERIC_SHOWN("m_certificate_warning_displayed_generic"),
 }

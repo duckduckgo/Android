@@ -15,5 +15,13 @@
   -->
 
 <resources>
+    <!-- Sync settings screen -->
+    <plurals name="syncCredentialInvalidItemsWarning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="one">Your password for %1$s can’t sync because one of its fields exceeds the character limit.\n\n</item>
+        <item quantity="other">Your passwords for %1$s and %2$d other sites can’t sync because some of their fields exceed the character limit.\n\n</item>
+    </plurals>
+    <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Manage Passwords</annotation></string>
+
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">Autofill for passwords is unavailable because your version of Android WebView is too old.</string>
 
 </resources>

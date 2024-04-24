@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.browser
 
-import android.content.ComponentName
 import android.content.Intent
 import android.net.Uri
 
@@ -32,7 +31,6 @@ interface SpecialUrlDetector {
         class Sms(val telephoneNumber: String) : UrlType()
         class AppLink(
             val appIntent: Intent? = null,
-            val excludedComponents: List<ComponentName>? = null,
             val uriString: String,
         ) : UrlType()
 
@@ -48,5 +46,6 @@ interface SpecialUrlDetector {
         class ExtractedAmpLink(val extractedUrl: String) : UrlType()
         class CloakedAmpLink(val ampUrl: String) : UrlType()
         class TrackingParameterLink(val cleanedUrl: String) : UrlType()
+        data object ShouldLaunchPrivacyProLink : UrlType()
     }
 }

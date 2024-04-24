@@ -43,6 +43,7 @@ import android.view.*
 import android.view.View.*
 import android.view.inputmethod.EditorInfo
 import android.webkit.PermissionRequest
+import android.webkit.SslErrorHandler
 import android.webkit.URLUtil
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient.FileChooserParams
@@ -88,6 +89,7 @@ import com.duckduckgo.app.brokensite.BrokenSiteActivity
 import com.duckduckgo.app.browser.BrowserTabViewModel.FileChooserRequestedParams
 import com.duckduckgo.app.browser.BrowserTabViewModel.LocationPermission
 import com.duckduckgo.app.browser.R.string
+import com.duckduckgo.app.browser.SSLErrorType.NONE
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.applinks.AppLinksLauncher
@@ -190,11 +192,11 @@ import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
-import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.AutofillEventListener
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreenDirectlyViewCredentialsParams
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreenShowSuggestionsForSiteParams
+import com.duckduckgo.autofill.api.AutofillWebMessageRequest
 import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.Callback
 import com.duckduckgo.autofill.api.CredentialAutofillDialogFactory
@@ -204,9 +206,8 @@ import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog
 import com.duckduckgo.autofill.api.EmailProtectionChooseEmailDialog
 import com.duckduckgo.autofill.api.EmailProtectionInContextSignUpDialog
 import com.duckduckgo.autofill.api.EmailProtectionInContextSignUpHandleVerificationLink
-import com.duckduckgo.autofill.api.EmailProtectionInContextSignUpScreenNoParams
 import com.duckduckgo.autofill.api.EmailProtectionInContextSignUpScreenResult
-import com.duckduckgo.autofill.api.EmailProtectionUserPromptListener
+import com.duckduckgo.autofill.api.EmailProtectionInContextSignUpStartScreen
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.ExactMatch
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.NoMatch
@@ -214,10 +215,9 @@ import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCrede
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.UsernameMatch
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.UsernameMissing
 import com.duckduckgo.autofill.api.UseGeneratedPasswordDialog
-import com.duckduckgo.autofill.api.credential.saving.DuckAddressLoginCreator
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
-import com.duckduckgo.autofill.api.emailprotection.EmailInjector
+import com.duckduckgo.autofill.impl.jsbridge.AutofillMessagePoster
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
@@ -260,6 +260,7 @@ import com.duckduckgo.js.messaging.api.JsMessageHelper
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParams
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreen
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopup
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupFactory
@@ -272,6 +273,7 @@ import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
+import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.user.agent.api.ClientBrandHintProvider
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.duckduckgo.voice.api.VoiceSearchLauncher
@@ -300,8 +302,7 @@ class BrowserTabFragment :
     TrackersAnimatorListener,
     DownloadConfirmationDialogListener,
     SitePermissionsGrantedListener,
-    AutofillEventListener,
-    EmailProtectionUserPromptListener {
+    AutofillEventListener {
 
     private val supervisorJob = SupervisorJob()
 
@@ -370,9 +371,6 @@ class BrowserTabFragment :
     lateinit var thirdPartyCookieManager: ThirdPartyCookieManager
 
     @Inject
-    lateinit var emailInjector: EmailInjector
-
-    @Inject
     lateinit var browserAutofill: BrowserAutofill
 
     @Inject
@@ -422,9 +420,6 @@ class BrowserTabFragment :
     lateinit var credentialAutofillDialogFactory: CredentialAutofillDialogFactory
 
     @Inject
-    lateinit var duckAddressInjectedResultHandler: DuckAddressLoginCreator
-
-    @Inject
     lateinit var existingCredentialMatchDetector: ExistingCredentialMatchDetector
 
     @Inject
@@ -435,9 +430,6 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var autoconsent: Autoconsent
-
-    @Inject
-    lateinit var autofillCapabilityChecker: AutofillCapabilityChecker
 
     @Inject
     lateinit var sitePermissionsDialogLauncher: SitePermissionsDialogLauncher
@@ -473,12 +465,18 @@ class BrowserTabFragment :
     @Inject
     lateinit var clientBrandHintProvider: ClientBrandHintProvider
 
+    @Inject
+    lateinit var autofillMessagePoster: AutofillMessagePoster
+
+    @Inject
+    lateinit var subscriptions: Subscriptions
+
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
      * This is needed because the activity stack will be cleared if an external link is opened in our browser
      * We need to be able to determine if inContextEmailProtection view was showing. If it was, it will consume email verification links.
      */
-    var inContextEmailProtectionShowing: Boolean = false
+    var inContextEmailProtectionSignupState = InProgressEmailProtectionSignupState()
 
     private var urlExtractingWebView: UrlExtractingWebView? = null
 
@@ -542,6 +540,9 @@ class BrowserTabFragment :
     private val errorView
         get() = binding.includeErrorView
 
+    private val sslErrorView
+        get() = binding.sslErrorWarningLayout
+
     private val daxDialogCta
         get() = binding.includeNewBrowserTab.includeDaxDialogCta
 
@@ -570,18 +571,26 @@ class BrowserTabFragment :
     private val activityResultHandlerEmailProtectionInContextSignup = registerForActivityResult(StartActivityForResult()) { result: ActivityResult ->
         when (result.resultCode) {
             EmailProtectionInContextSignUpScreenResult.SUCCESS -> {
-                browserAutofill.inContextEmailProtectionFlowFinished()
-                inContextEmailProtectionShowing = false
+                postEmailProtectionFlowFinishedResult(result.data)
+                inContextEmailProtectionSignupState = InProgressEmailProtectionSignupState(showing = false)
             }
+
             EmailProtectionInContextSignUpScreenResult.CANCELLED -> {
-                browserAutofill.inContextEmailProtectionFlowFinished()
-                inContextEmailProtectionShowing = false
+                postEmailProtectionFlowFinishedResult(result.data)
+                inContextEmailProtectionSignupState = InProgressEmailProtectionSignupState(showing = false)
             }
+
             else -> {
                 // we don't set inContextEmailProtectionShowing to false here because the system is cancelling it
                 // this is likely because of an external link being clicked (e.g., the email protection verification link)
             }
         }
+    }
+
+    private fun postEmailProtectionFlowFinishedResult(result: Intent?) {
+        val requestId = result?.getStringExtra(EmailProtectionInContextSignUpScreenResult.RESULT_KEY_REQUEST_ID) ?: return
+        val message = result.getStringExtra(EmailProtectionInContextSignUpScreenResult.RESULT_KEY_MESSAGE) ?: return
+        autofillMessagePoster.postMessage(message, requestId)
     }
 
     private val errorSnackbar: Snackbar by lazy {
@@ -609,7 +618,7 @@ class BrowserTabFragment :
     }
 
     private val autoconsentCallback = object : AutoconsentCallback {
-        override fun onFirstPopUpHandled() { }
+        override fun onFirstPopUpHandled() {}
 
         override fun onPopUpHandled(isCosmetic: Boolean) {
             launch {
@@ -641,17 +650,17 @@ class BrowserTabFragment :
 
     private val autofillCallback = object : Callback {
         override suspend fun onCredentialsAvailableToInject(
-            originalUrl: String,
+            autofillWebMessageRequest: AutofillWebMessageRequest,
             credentials: List<LoginCredentials>,
             triggerType: LoginTriggerType,
         ) {
             withContext(dispatchers.main()) {
-                showAutofillDialogChooseCredentials(originalUrl, credentials, triggerType)
+                showAutofillDialogChooseCredentials(autofillWebMessageRequest, credentials, triggerType)
             }
         }
 
         override suspend fun onGeneratedPasswordAvailableToUse(
-            originalUrl: String,
+            autofillWebMessageRequest: AutofillWebMessageRequest,
             username: String?,
             generatedPassword: String,
         ) {
@@ -659,20 +668,32 @@ class BrowserTabFragment :
             delay(100)
 
             withContext(dispatchers.main()) {
-                showUserAutoGeneratedPasswordDialog(originalUrl, username, generatedPassword)
+                showUserAutoGeneratedPasswordDialog(autofillWebMessageRequest, username, generatedPassword)
             }
-        }
-
-        override fun noCredentialsAvailable(originalUrl: String) {
-            viewModel.returnNoCredentialsWithPage(originalUrl)
         }
 
         override fun onCredentialsSaved(savedCredentials: LoginCredentials) {
             viewModel.onShowUserCredentialsSaved(savedCredentials)
         }
 
+        override fun showNativeChooseEmailAddressPrompt(autofillWebMessageRequest: AutofillWebMessageRequest) {
+            viewModel.showEmailProtectionChooseEmailPrompt(autofillWebMessageRequest)
+        }
+
+        override fun showNativeInContextEmailProtectionSignupPrompt(autofillWebMessageRequest: AutofillWebMessageRequest) {
+            context?.let {
+                val url = webView?.url ?: return
+
+                val dialog = credentialAutofillDialogFactory.emailProtectionInContextSignUpDialog(
+                    tabId = tabId,
+                    autofillWebMessageRequest = autofillWebMessageRequest,
+                )
+                showDialogHidingPrevious(dialog, EmailProtectionInContextSignUpDialog.TAG, url)
+            }
+        }
+
         override suspend fun onCredentialsAvailableToSave(
-            currentUrl: String,
+            autofillWebMessageRequest: AutofillWebMessageRequest,
             credentials: LoginCredentials,
         ) {
             val username = credentials.username
@@ -683,6 +704,8 @@ class BrowserTabFragment :
                 return
             }
 
+            val currentUrl = autofillWebMessageRequest.requestOrigin
+
             val matchType = existingCredentialMatchDetector.determine(currentUrl, username, password)
             Timber.v("MatchType is %s", matchType.javaClass.simpleName)
 
@@ -692,30 +715,30 @@ class BrowserTabFragment :
             withContext(dispatchers.main()) {
                 when (matchType) {
                     ExactMatch -> Timber.w("Credentials already exist for %s", currentUrl)
-                    UsernameMatch -> showAutofillDialogUpdatePassword(currentUrl, credentials)
-                    UsernameMissing -> showAutofillDialogUpdateUsername(currentUrl, credentials)
-                    NoMatch -> showAutofillDialogSaveCredentials(currentUrl, credentials)
-                    UrlOnlyMatch -> showAutofillDialogSaveCredentials(currentUrl, credentials)
+                    UsernameMatch -> showAutofillDialogUpdatePassword(autofillWebMessageRequest, credentials)
+                    UsernameMissing -> showAutofillDialogUpdateUsername(autofillWebMessageRequest, credentials)
+                    NoMatch -> showAutofillDialogSaveCredentials(autofillWebMessageRequest, credentials)
+                    UrlOnlyMatch -> showAutofillDialogSaveCredentials(autofillWebMessageRequest, credentials)
                 }
             }
         }
 
         private fun showUserAutoGeneratedPasswordDialog(
-            originalUrl: String,
+            autofillWebMessageRequest: AutofillWebMessageRequest,
             username: String?,
             generatedPassword: String,
         ) {
             val url = webView?.url ?: return
-            if (url != originalUrl) {
+            if (url != autofillWebMessageRequest.originalPageUrl) {
                 Timber.w("WebView url has changed since autofill request; bailing")
                 return
             }
-            val dialog = credentialAutofillDialogFactory.autofillGeneratePasswordDialog(url, username, generatedPassword, tabId)
-            showDialogHidingPrevious(dialog, UseGeneratedPasswordDialog.TAG, originalUrl)
+            val dialog = credentialAutofillDialogFactory.autofillGeneratePasswordDialog(autofillWebMessageRequest, username, generatedPassword, tabId)
+            showDialogHidingPrevious(dialog, UseGeneratedPasswordDialog.TAG, autofillWebMessageRequest.originalPageUrl)
         }
 
         private fun showAutofillDialogChooseCredentials(
-            originalUrl: String,
+            autofillWebMessageRequest: AutofillWebMessageRequest,
             credentials: List<LoginCredentials>,
             triggerType: LoginTriggerType,
         ) {
@@ -724,12 +747,12 @@ class BrowserTabFragment :
                 return
             }
             val url = webView?.url ?: return
-            if (url != originalUrl) {
+            if (url != autofillWebMessageRequest.originalPageUrl) {
                 Timber.w("WebView url has changed since autofill request; bailing")
                 return
             }
-            val dialog = credentialAutofillDialogFactory.autofillSelectCredentialsDialog(url, credentials, triggerType, tabId)
-            showDialogHidingPrevious(dialog, CredentialAutofillPickerDialog.TAG, originalUrl)
+            val dialog = credentialAutofillDialogFactory.autofillSelectCredentialsDialog(autofillWebMessageRequest, credentials, triggerType, tabId)
+            showDialogHidingPrevious(dialog, CredentialAutofillPickerDialog.TAG, autofillWebMessageRequest.originalPageUrl)
         }
     }
 
@@ -774,6 +797,7 @@ class BrowserTabFragment :
                     userEnteredQuery(it.result)
                     resumeWebView()
                 }
+
                 is VoiceSearchLauncher.Event.SearchCancelled -> resumeWebView()
                 is VoiceSearchLauncher.Event.VoiceSearchDisabled -> viewModel.voiceSearchDisabled()
             }
@@ -788,6 +812,7 @@ class BrowserTabFragment :
                         externalCameraLauncher.showPermissionRationaleDialog(activity, it.inputAction)
                     }
                 }
+
                 is NoMediaCaptured -> pendingUploadTask?.onReceiveValue(null)
                 is ErrorAccessingMediaApp -> {
                     pendingUploadTask?.onReceiveValue(null)
@@ -1105,11 +1130,14 @@ class BrowserTabFragment :
     }
 
     private fun addTabsObserver() {
-        viewModel.tabs.flowWithLifecycle(viewLifecycleOwner.lifecycle)
-            .onEach {
-                decorator.renderTabIcon(it)
-            }
-            .launchIn(viewLifecycleOwner.lifecycleScope)
+        viewModel.tabs.observe(
+            viewLifecycleOwner,
+            Observer {
+                it?.let {
+                    decorator.renderTabIcon(it)
+                }
+            },
+        )
 
         viewModel.liveSelectedTab.distinctUntilChanged().observe(
             viewLifecycleOwner,
@@ -1149,6 +1177,7 @@ class BrowserTabFragment :
         webView?.onPause()
         webView?.hide()
         errorView.errorLayout.gone()
+        sslErrorView.gone()
     }
 
     private fun showBrowser() {
@@ -1158,11 +1187,13 @@ class BrowserTabFragment :
         webView?.show()
         webView?.onResume()
         errorView.errorLayout.gone()
+        sslErrorView.gone()
     }
 
     private fun showError(errorType: WebViewErrorResponse, url: String?) {
         webViewContainer.gone()
         newBrowserTab.newTabLayout.gone()
+        sslErrorView.gone()
         omnibar.appBarLayout.setExpanded(true)
         omnibar.shieldIcon.isInvisible = true
         webView?.onPause()
@@ -1174,6 +1205,40 @@ class BrowserTabFragment :
             errorView.yetiIcon?.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_yeti_dark)
         }
         errorView.errorLayout.show()
+    }
+
+    private fun showSSLWarning(
+        handler: SslErrorHandler,
+        errorResponse: SslErrorResponse,
+    ) {
+        webViewContainer.gone()
+        newBrowserTab.newTabLayout.gone()
+        webView?.onPause()
+        webView?.hide()
+        omnibar.appBarLayout.setExpanded(true)
+        omnibar.shieldIcon.isInvisible = true
+        omnibar.searchIcon.isInvisible = true
+        omnibar.daxIcon.isInvisible = true
+        errorView.errorLayout.gone()
+        binding.browserLayout.gone()
+        sslErrorView.bind(handler, errorResponse) { action ->
+            viewModel.onSSLCertificateWarningAction(action, errorResponse.url)
+        }
+        sslErrorView.show()
+    }
+
+    private fun hideSSLWarning() {
+        val navList = webView?.safeCopyBackForwardList()
+        val currentIndex = navList?.currentIndex ?: 0
+
+        if (currentIndex >= 0) {
+            Timber.d("SSLError: hiding warning page and triggering a reload of the previous")
+            viewModel.recoverFromSSLWarningPage(true)
+            refresh()
+        } else {
+            Timber.d("SSLError: no previous page to load, showing home")
+            viewModel.recoverFromSSLWarningPage(false)
+        }
     }
 
     fun submitQuery(query: String) {
@@ -1199,30 +1264,8 @@ class BrowserTabFragment :
         viewModel.onRefreshRequested(triggeredByUser = false)
     }
 
-    override fun onRejectGeneratedPassword(originalUrl: String) {
-        rejectGeneratedPassword(originalUrl)
-    }
-
-    override fun onAcceptGeneratedPassword(originalUrl: String) {
-        acceptGeneratedPassword(originalUrl)
-    }
-
-    override fun onUseEmailProtectionPrivateAlias(originalUrl: String, duckAddress: String) {
-        viewModel.usePrivateDuckAddress(originalUrl, duckAddress)
-    }
-
-    override fun onUseEmailProtectionPersonalAddress(originalUrl: String, duckAddress: String) {
-        viewModel.usePersonalDuckAddress(originalUrl, duckAddress)
-    }
-
-    override fun onSelectedToSignUpForInContextEmailProtection() {
-        showEmailProtectionInContextWebFlow()
-    }
-
-    override fun onEndOfEmailProtectionInContextSignupFlow() {
-        webView?.let {
-            browserAutofill.inContextEmailProtectionFlowFinished()
-        }
+    override fun onSelectedToSignUpForInContextEmailProtection(autofillWebMessageRequest: AutofillWebMessageRequest) {
+        showEmailProtectionInContextWebFlow(autofillWebMessageRequest = autofillWebMessageRequest)
     }
 
     override fun onSavedCredentials(credentials: LoginCredentials) {
@@ -1231,14 +1274,6 @@ class BrowserTabFragment :
 
     override fun onUpdatedCredentials(credentials: LoginCredentials) {
         viewModel.onShowUserCredentialsUpdated(credentials)
-    }
-
-    override fun onNoCredentialsChosenForAutofill(originalUrl: String) {
-        viewModel.returnNoCredentialsWithPage(originalUrl)
-    }
-
-    override fun onShareCredentialsForAutofill(originalUrl: String, selectedCredentials: LoginCredentials) {
-        injectAutofillCredentials(originalUrl, selectedCredentials)
     }
 
     fun refresh() {
@@ -1259,7 +1294,13 @@ class BrowserTabFragment :
             }
 
             is Command.OpenMessageInNewTab -> {
-                browserActivity?.openMessageInNewTab(it.message, it.sourceTabId)
+                if (isActiveCustomTab()) {
+                    webView?.hitTestResult?.extra?.let { data ->
+                        webView?.loadUrl(Uri.parse(data).toString())
+                    }
+                } else {
+                    browserActivity?.openMessageInNewTab(it.message, it.sourceTabId)
+                }
             }
 
             is Command.OpenInNewBackgroundTab -> {
@@ -1275,12 +1316,14 @@ class BrowserTabFragment :
             ) {
                 viewModel.onDeleteFavoriteSnackbarDismissed(it)
             }
+
             is Command.DeleteSavedSiteConfirmation -> confirmDeleteSavedSite(
                 it.savedSite,
                 getString(string.bookmarkDeleteConfirmationMessage, it.savedSite.title).html(requireContext()),
             ) {
                 viewModel.onDeleteSavedSiteSnackbarDismissed(it)
             }
+
             is Command.ShowFireproofWebSiteConfirmation -> fireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.DeleteFireproofConfirmation -> removeFireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.ShowPrivacyProtectionEnabledConfirmation -> privacyProtectionEnabledConfirmation(it.domain)
@@ -1310,6 +1353,12 @@ class BrowserTabFragment :
 
             is Command.ResetHistory -> {
                 resetWebView()
+            }
+
+            is Command.LaunchPrivacyPro -> {
+                activity?.let {
+                    subscriptions.launchPrivacyPro(it)
+                }
             }
 
             is Command.DialNumber -> {
@@ -1423,16 +1472,8 @@ class BrowserTabFragment :
             is Command.RequestFileDownload -> requestFileDownload(it.url, it.contentDisposition, it.mimeType, it.requestUserConfirmation)
             is Command.ChildTabClosed -> processUriForThirdPartyCookies()
             is Command.CopyAliasToClipboard -> copyAliasToClipboard(it.alias)
-            is Command.InjectEmailAddress -> injectEmailAddress(
-                alias = it.duckAddress,
-                originalUrl = it.originalUrl,
-                autoSaveLogin = it.autoSaveLogin,
-            )
-
-            is Command.ShowEmailProtectionChooseEmailPrompt -> showEmailProtectionChooseEmailDialog(it.address)
-            is Command.ShowEmailProtectionInContextSignUpPrompt -> showNativeInContextEmailProtectionSignupPrompt()
-
-            is Command.CancelIncomingAutofillRequest -> injectAutofillCredentials(it.url, null)
+            is Command.ShowEmailProtectionChooseEmailPrompt -> showEmailProtectionChooseEmailDialog(it.duckAddress, it.autofillWebMessageRequest)
+            is Command.PageChanged -> onPageChanged()
             is Command.LaunchAutofillSettings -> launchAutofillManagementScreen()
             is Command.EditWithSelectedQuery -> {
                 omnibar.omnibarTextInput.setText(it.query)
@@ -1441,9 +1482,6 @@ class BrowserTabFragment :
 
             is ShowBackNavigationHistory -> showBackNavigationHistory(it)
             is NavigationCommand.NavigateToHistory -> navigateBackHistoryStack(it.historyStackIndex)
-            is Command.EmailSignEvent -> {
-                notifyEmailSignEvent()
-            }
 
             is Command.PrintLink -> launchPrint(it.url, it.mediaSize)
             is Command.ShowSitePermissionsDialog -> showSitePermissionsDialog(it.permissionsToRequest, it.request)
@@ -1461,9 +1499,21 @@ class BrowserTabFragment :
             is Command.ShowFaviconsPrompt -> showFaviconsPrompt()
             is Command.SetBrowserBackground -> setBrowserBackground(it.backgroundRes)
             is Command.ShowWebPageTitle -> showWebPageTitleInCustomTab(it.title, it.url)
+            is Command.ShowSSLError -> showSSLWarning(it.handler, it.error)
+            is Command.HideSSLError -> hideSSLWarning()
+            is Command.LaunchScreen -> launchScreen(it.screen, it.payload)
             else -> {
                 // NO OP
             }
+        }
+    }
+
+    private fun launchScreen(
+        screen: String,
+        payload: String,
+    ) {
+        context?.let {
+            globalActivityStarter.start(it, DeeplinkActivityParams(screenName = screen, jsonArguments = payload), null)
         }
     }
 
@@ -1480,6 +1530,11 @@ class BrowserTabFragment :
             omnibar.customTabToolbarContainer.customTabDomainOnly.hide()
             omnibar.customTabToolbarContainer.customTabDomain.show()
         }
+    }
+
+    private fun onPageChanged() {
+        browserAutofill.notifyPageChanged()
+        hideDialogWithTag(CredentialAutofillPickerDialog.TAG)
     }
 
     private fun extractUrlFromAmpLink(initialUrl: String) {
@@ -1500,35 +1555,6 @@ class BrowserTabFragment :
     private fun destroyUrlExtractingWebView() {
         urlExtractingWebView?.destroyWebView()
         urlExtractingWebView = null
-    }
-
-    private fun injectEmailAddress(
-        alias: String,
-        originalUrl: String,
-        autoSaveLogin: Boolean,
-    ) {
-        webView?.let {
-            if (it.url != originalUrl) {
-                Timber.w("WebView url has changed since autofill request; bailing")
-                return
-            }
-
-            emailInjector.injectAddressInEmailField(it, alias, it.url)
-
-            if (autoSaveLogin) {
-                duckAddressInjectedResultHandler.createLoginForPrivateDuckAddress(
-                    duckAddress = alias,
-                    tabId = tabId,
-                    originalUrl = originalUrl,
-                )
-            }
-        }
-    }
-
-    private fun notifyEmailSignEvent() {
-        webView?.let {
-            emailInjector.notifyWebAppSignEvent(it, it.url)
-        }
     }
 
     private fun copyAliasToClipboard(alias: String) {
@@ -1711,6 +1737,7 @@ class BrowserTabFragment :
 
     private fun openInNewBackgroundTab() {
         omnibar.appBarLayout.setExpanded(true, true)
+        viewModel.tabs.removeObservers(this)
         decorator.incrementTabs()
     }
 
@@ -1781,15 +1808,20 @@ class BrowserTabFragment :
             return
         }
 
-        if (activities.size == 1 || useFirstActivityFound) {
-            val activity = activities.first()
-            val appTitle = activity.loadLabel(pm)
-            Timber.i("Exactly one app available for intent: $appTitle")
-            launchExternalAppDialog(context) { context.startActivity(intent) }
-        } else {
-            val title = getString(R.string.openExternalApp)
-            val intentChooser = Intent.createChooser(intent, title)
-            launchExternalAppDialog(context) { context.startActivity(intentChooser) }
+        runCatching {
+            if (activities.size == 1 || useFirstActivityFound) {
+                val activity = activities.first()
+                val appTitle = activity.loadLabel(pm)
+                Timber.i("Exactly one app available for intent: $appTitle")
+                launchExternalAppDialog(context) { context.startActivity(intent) }
+            } else {
+                val title = getString(R.string.openExternalApp)
+                val intentChooser = Intent.createChooser(intent, title)
+                launchExternalAppDialog(context) { context.startActivity(intentChooser) }
+            }
+        }.onFailure { exception ->
+            Timber.e(exception, "Failed to launch external app")
+            showToast(R.string.unableToOpenLink)
         }
     }
 
@@ -1954,7 +1986,10 @@ class BrowserTabFragment :
         pendingUploadTask?.onReceiveValue(uris)
     }
 
-    private fun showToast(@StringRes messageId: Int, length: Int = Toast.LENGTH_LONG) {
+    private fun showToast(
+        @StringRes messageId: Int,
+        length: Int = Toast.LENGTH_LONG,
+    ) {
         Toast.makeText(context?.applicationContext, messageId, length).show()
     }
 
@@ -2175,6 +2210,7 @@ class BrowserTabFragment :
         webView?.let {
             it.webViewClient = webViewClient
             it.webChromeClient = webChromeClient
+            it.clearSslPreferences()
 
             it.settings.apply {
                 clientBrandHintProvider.setDefault(this)
@@ -2217,18 +2253,18 @@ class BrowserTabFragment :
             it.setFindListener(this)
             loginDetector.addLoginDetection(it) { viewModel.loginDetected() }
             blobConverterInjector.addJsInterface(it) { url, mimeType -> viewModel.requestFileDownload(url, null, mimeType, true) }
-            emailInjector.addJsInterface(
-                it,
-                onSignedInEmailProtectionPromptShown = { viewModel.showEmailProtectionChooseEmailPrompt() },
-                onInContextEmailProtectionSignupPromptShown = { showNativeInContextEmailProtectionSignupPrompt() },
-            )
             configureWebViewForAutofill(it)
             printInjector.addJsInterface(it) { viewModel.printFromWebView() }
             autoconsent.addJsInterface(it, autoconsentCallback)
             contentScopeScripts.register(
                 it,
                 object : JsMessageCallback() {
-                    override fun process(featureName: String, method: String, id: String?, data: JSONObject?) {
+                    override fun process(
+                        featureName: String,
+                        method: String,
+                        id: String?,
+                        data: JSONObject?,
+                    ) {
                         viewModel.processJsCallbackMessage(featureName, method, id, data)
                     }
                 },
@@ -2264,53 +2300,22 @@ class BrowserTabFragment :
     }
 
     private fun configureWebViewForAutofill(it: DuckDuckGoWebView) {
-        browserAutofill.addJsInterface(it, autofillCallback, this, null, tabId)
+        launch(dispatchers.main()) {
+            browserAutofill.addJsInterface(it, autofillCallback, tabId)
 
-        autofillFragmentResultListeners.getPlugins().forEach { plugin ->
-            setFragmentResultListener(plugin.resultKey(tabId)) { _, result ->
-                context?.let {
-                    plugin.processResult(
-                        result = result,
-                        context = it,
-                        tabId = tabId,
-                        fragment = this@BrowserTabFragment,
-                        autofillCallback = this@BrowserTabFragment,
-                    )
+            autofillFragmentResultListeners.getPlugins().forEach { plugin ->
+                setFragmentResultListener(plugin.resultKey(tabId)) { _, result ->
+                    context?.let {
+                        plugin.processResult(
+                            result = result,
+                            context = it,
+                            tabId = tabId,
+                            fragment = this@BrowserTabFragment,
+                            autofillCallback = this@BrowserTabFragment,
+                        )
+                    }
                 }
             }
-        }
-    }
-
-    private fun injectAutofillCredentials(
-        url: String,
-        credentials: LoginCredentials?,
-    ) {
-        webView?.let {
-            if (it.url != url) {
-                Timber.w("WebView url has changed since autofill request; bailing")
-                return
-            }
-            browserAutofill.injectCredentials(credentials)
-        }
-    }
-
-    private fun acceptGeneratedPassword(url: String) {
-        webView?.let {
-            if (it.url != url) {
-                Timber.w("WebView url has changed since autofill request; bailing")
-                return
-            }
-            browserAutofill.acceptGeneratedPassword()
-        }
-    }
-
-    private fun rejectGeneratedPassword(url: String) {
-        webView?.let {
-            if (it.url != url) {
-                Timber.w("WebView url has changed since autofill request; bailing")
-                return
-            }
-            browserAutofill.rejectGeneratedPassword()
         }
     }
 
@@ -2320,35 +2325,26 @@ class BrowserTabFragment :
     }
 
     private fun showAutofillDialogSaveCredentials(
-        currentUrl: String,
+        autofillWebMessageRequest: AutofillWebMessageRequest,
         credentials: LoginCredentials,
     ) {
-        val url = webView?.url ?: return
-        if (url != currentUrl) return
-
-        val dialog = credentialAutofillDialogFactory.autofillSavingCredentialsDialog(url, credentials, tabId)
+        val dialog = credentialAutofillDialogFactory.autofillSavingCredentialsDialog(autofillWebMessageRequest, credentials, tabId)
         showDialogHidingPrevious(dialog, CredentialSavePickerDialog.TAG)
     }
 
     private fun showAutofillDialogUpdatePassword(
-        currentUrl: String,
+        autofillWebMessageRequest: AutofillWebMessageRequest,
         credentials: LoginCredentials,
     ) {
-        val url = webView?.url ?: return
-        if (url != currentUrl) return
-
-        val dialog = credentialAutofillDialogFactory.autofillSavingUpdatePasswordDialog(url, credentials, tabId)
+        val dialog = credentialAutofillDialogFactory.autofillSavingUpdatePasswordDialog(autofillWebMessageRequest, credentials, tabId)
         showDialogHidingPrevious(dialog, CredentialUpdateExistingCredentialsDialog.TAG)
     }
 
     private fun showAutofillDialogUpdateUsername(
-        currentUrl: String,
+        autofillWebMessageRequest: AutofillWebMessageRequest,
         credentials: LoginCredentials,
     ) {
-        val url = webView?.url ?: return
-        if (url != currentUrl) return
-
-        val dialog = credentialAutofillDialogFactory.autofillSavingUpdateUsernameDialog(url, credentials, tabId)
+        val dialog = credentialAutofillDialogFactory.autofillSavingUpdateUsernameDialog(autofillWebMessageRequest, credentials, tabId)
         showDialogHidingPrevious(dialog, CredentialUpdateExistingCredentialsDialog.TAG)
     }
 
@@ -2566,7 +2562,11 @@ class BrowserTabFragment :
         addBookmarkDialog.deleteBookmarkListener = viewModel
     }
 
-    private fun confirmDeleteSavedSite(savedSite: SavedSite, message: Spanned, onDeleteSnackbarDismissed: (SavedSite) -> Unit) {
+    private fun confirmDeleteSavedSite(
+        savedSite: SavedSite,
+        message: Spanned,
+        onDeleteSnackbarDismissed: (SavedSite) -> Unit,
+    ) {
         binding.rootView.makeSnackbarWithNoBottomInset(
             message,
             Snackbar.LENGTH_LONG,
@@ -2793,7 +2793,7 @@ class BrowserTabFragment :
         popupMenu.dismiss()
         loginDetectionDialog?.dismiss()
         automaticFireproofDialog?.dismiss()
-        browserAutofill.removeJsInterface()
+        browserAutofill.removeJsInterface(webView)
         destroyWebView()
         super.onDestroy()
     }
@@ -3054,12 +3054,15 @@ class BrowserTabFragment :
         // NO OP
     }
 
-    private fun showEmailProtectionChooseEmailDialog(address: String) {
+    private fun showEmailProtectionChooseEmailDialog(
+        address: String,
+        autofillWebMessageRequest: AutofillWebMessageRequest,
+    ) {
         context?.let {
             val url = webView?.url ?: return
 
             val dialog = credentialAutofillDialogFactory.autofillEmailProtectionEmailChooserDialog(
-                url = url,
+                autofillWebMessageRequest = autofillWebMessageRequest,
                 personalDuckAddress = address,
                 tabId = tabId,
             )
@@ -3067,32 +3070,26 @@ class BrowserTabFragment :
         }
     }
 
-    override fun showNativeInContextEmailProtectionSignupPrompt() {
+    private fun showEmailProtectionInContextWebFlow(autofillWebMessageRequest: AutofillWebMessageRequest) {
         context?.let {
-            val url = webView?.url ?: return
-
-            val dialog = credentialAutofillDialogFactory.emailProtectionInContextSignUpDialog(
-                tabId = tabId,
-            )
-            showDialogHidingPrevious(dialog, EmailProtectionInContextSignUpDialog.TAG, url)
-        }
-    }
-
-    fun showEmailProtectionInContextWebFlow(verificationUrl: String? = null) {
-        context?.let {
-            val params = if (verificationUrl == null) {
-                EmailProtectionInContextSignUpScreenNoParams
-            } else {
-                EmailProtectionInContextSignUpHandleVerificationLink(verificationUrl)
-            }
+            val params = EmailProtectionInContextSignUpStartScreen(messageRequestId = autofillWebMessageRequest.requestId)
             val intent = globalActivityStarter.startIntent(it, params)
             activityResultHandlerEmailProtectionInContextSignup.launch(intent)
-            inContextEmailProtectionShowing = true
+            inContextEmailProtectionSignupState = InProgressEmailProtectionSignupState(
+                showing = true,
+                requestId = autofillWebMessageRequest.requestId,
+            )
         }
     }
 
-    override fun showNativeChooseEmailAddressPrompt() {
-        viewModel.showEmailProtectionChooseEmailPrompt()
+    fun resumeEmailProtectionInContextWebFlow(verificationUrl: String?, messageRequestId: String) {
+        if (verificationUrl == null) return
+        context?.let {
+            val params = EmailProtectionInContextSignUpHandleVerificationLink(url = verificationUrl, messageRequestId = messageRequestId)
+            val intent = globalActivityStarter.startIntent(it, params)
+            activityResultHandlerEmailProtectionInContextSignup.launch(intent)
+            inContextEmailProtectionSignupState = InProgressEmailProtectionSignupState(showing = true, requestId = messageRequestId)
+        }
     }
 
     companion object {
@@ -3553,6 +3550,7 @@ class BrowserTabFragment :
                 val browserShowing = viewState.browserShowing
                 val browserShowingChanged = viewState.browserShowing != lastSeenBrowserViewState?.browserShowing
                 val errorChanged = viewState.browserError != lastSeenBrowserViewState?.browserError
+                val sslErrorChanged = viewState.sslError != lastSeenBrowserViewState?.sslError
 
                 lastSeenBrowserViewState = viewState
                 if (browserShowingChanged) {
@@ -3565,6 +3563,14 @@ class BrowserTabFragment :
                     if (viewState.browserError != OMITTED) {
                         showError(viewState.browserError, webView?.url)
                     } else {
+                        if (browserShowing) {
+                            showBrowser()
+                        } else {
+                            showHome()
+                        }
+                    }
+                } else if (sslErrorChanged) {
+                    if (viewState.sslError == NONE) {
                         if (browserShowing) {
                             showBrowser()
                         } else {

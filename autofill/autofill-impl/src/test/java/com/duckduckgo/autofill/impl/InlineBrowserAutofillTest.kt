@@ -1,161 +1,120 @@
-/*
- * Copyright (c) 2022 DuckDuckGo
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.duckduckgo.autofill.impl
 
 import android.webkit.WebView
-import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.autofill.api.Callback
-import com.duckduckgo.autofill.api.EmailProtectionInContextSignupFlowListener
-import com.duckduckgo.autofill.api.EmailProtectionUserPromptListener
-import com.duckduckgo.autofill.api.domain.app.LoginCredentials
-import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
-import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
-import com.duckduckgo.autofill.impl.InlineBrowserAutofillTest.FakeAutofillJavascriptInterface.Actions.*
+import com.duckduckgo.autofill.impl.configuration.integration.modern.listener.AutofillWebMessageListener
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.feature.toggles.api.toggle.AutofillTestFeature
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class InlineBrowserAutofillTest {
 
-    private lateinit var testee: InlineBrowserAutofill
-    private val automaticSavedLoginsMonitor: AutomaticSavedLoginsMonitor = mock()
-    private lateinit var autofillJavascriptInterface: FakeAutofillJavascriptInterface
+    @get:Rule
+    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    private lateinit var testWebView: WebView
-
-    private val emailProtectionInContextCallback: EmailProtectionUserPromptListener = mock()
-    private val emailProtectionInContextSignupFlowCallback: EmailProtectionInContextSignupFlowListener = mock()
-
-    private val testCallback = object : Callback {
-        override suspend fun onCredentialsAvailableToInject(
-            originalUrl: String,
-            credentials: List<LoginCredentials>,
-            triggerType: LoginTriggerType,
-        ) {
-        }
-
-        override suspend fun onCredentialsAvailableToSave(
-            currentUrl: String,
-            credentials: LoginCredentials,
-        ) {
-        }
-
-        override suspend fun onGeneratedPasswordAvailableToUse(
-            originalUrl: String,
-            username: String?,
-            generatedPassword: String,
-        ) {
-        }
-
-        override fun noCredentialsAvailable(originalUrl: String) {
-        }
-
-        override fun onCredentialsSaved(savedCredentials: LoginCredentials) {
-        }
+    private val mockWebView: WebView = mock()
+    private val autofillCallback: Callback = mock()
+    private val capabilityChecker: InternalAutofillCapabilityChecker = mock()
+    private val autofillJavascriptInjector: AutofillJavascriptInjector = mock()
+    private val autofillFeature = AutofillTestFeature()
+    private val webMessageAttacher: AutofillWebMessageAttacher = mock()
+    private val webMessageListeners = mutableListOf<AutofillWebMessageListener>()
+    private val webMessageListenersPlugin: PluginPoint<AutofillWebMessageListener> = object : PluginPoint<AutofillWebMessageListener> {
+        override fun getPlugins(): Collection<AutofillWebMessageListener> = webMessageListeners
     }
+
+    private val testee = InlineBrowserAutofill(
+        autofillCapabilityChecker = capabilityChecker,
+        dispatchers = coroutineTestRule.testDispatcherProvider,
+        autofillJavascriptInjector = autofillJavascriptInjector,
+        webMessageListeners = webMessageListenersPlugin,
+        autofillFeature = autofillFeature,
+        webMessageAttacher = webMessageAttacher,
+    )
 
     @Before
-    fun setUp() {
-        MockitoAnnotations.openMocks(this)
-        autofillJavascriptInterface = FakeAutofillJavascriptInterface()
-        testWebView = WebView(getApplicationContext())
-        testee = InlineBrowserAutofill(autofillInterface = autofillJavascriptInterface, autoSavedLoginsMonitor = automaticSavedLoginsMonitor)
+    fun setup() {
+        whenever(capabilityChecker.webViewSupportsAutofill()).thenReturn(true)
+        with(autofillFeature) {
+            topLevelFeatureEnabled = true
+            canInjectCredentials = true
+            canSaveCredentials = true
+            canGeneratePassword = true
+            canAccessCredentialManagement = true
+            onByDefault = true
+        }
     }
 
     @Test
-    fun whenRemoveJsInterfaceThenRemoveReferenceToWebview() {
-        testee.addJsInterface(testWebView, testCallback, emailProtectionInContextCallback, emailProtectionInContextSignupFlowCallback, "tabId")
+    fun whenAutofillFeatureFlagDisabledThenDoNotAddJsInterface() = runTest {
+        autofillFeature.topLevelFeatureEnabled = false
+        testee.addJsInterface()
+        verifyJavascriptNotAdded()
+    }
 
-        assertNotNull(autofillJavascriptInterface.webView)
+    @Test
+    fun whenWebViewDoesNotSupportIntegrationThenDoNotAddJsInterface() = runTest {
+        whenever(capabilityChecker.webViewSupportsAutofill()).thenReturn(false)
+        testee.addJsInterface()
+        verifyJavascriptNotAdded()
+    }
 
+    @Test
+    fun whenWebViewSupportsIntegrationAndFeatureEnabledThenJsInterfaceIsAdded() = runTest {
+        testee.addJsInterface()
+        verifyJavascriptIsAdded()
+    }
+
+    @Test
+    fun whenPluginsIsEmptyThenJsInterfaceIsAdded() = runTest {
+        webMessageListeners.clear()
+        testee.addJsInterface()
+        verifyJavascriptIsAdded()
+    }
+
+    @Test
+    fun whenPluginsIsNotEmptyThenIsRegisteredWithWebView() = runTest {
+        val mockMessageListener: AutofillWebMessageListener = mock()
+        webMessageListeners.add(mockMessageListener)
+        testee.addJsInterface()
+        verify(webMessageAttacher).addListener(any(), eq(mockMessageListener))
+    }
+
+    @Test
+    fun whenPluginsIsNotEmptyThenIsDeregisteredWithWebView() = runTest {
+        val mockMessageListener: AutofillWebMessageListener = mock()
+        webMessageListeners.add(mockMessageListener)
         testee.removeJsInterface()
-
-        assertNull(autofillJavascriptInterface.webView)
+        verify(webMessageAttacher).removeListener(any(), eq(mockMessageListener))
     }
 
-    @Test
-    fun whenInjectCredentialsNullThenInterfaceInjectNoCredentials() {
-        testee.injectCredentials(null)
-
-        assertEquals(NoCredentialsInjected, autofillJavascriptInterface.lastAction)
+    private suspend fun verifyJavascriptNotAdded() {
+        verify(autofillJavascriptInjector, never()).addDocumentStartJavascript(any())
     }
 
-    @Test
-    fun whenInjectCredentialsThenInterfaceCredentialsInjected() {
-        val toInject = LoginCredentials(
-            id = 1,
-            domain = "hello.com",
-            username = "test",
-            password = "test123",
-        )
-        testee.injectCredentials(toInject)
-
-        assertEquals(CredentialsInjected(toInject), autofillJavascriptInterface.lastAction)
+    private suspend fun verifyJavascriptIsAdded() {
+        verify(autofillJavascriptInjector).addDocumentStartJavascript(any())
     }
 
-    class FakeAutofillJavascriptInterface : AutofillJavascriptInterface {
-        sealed class Actions {
-            data class GetAutoFillData(val requestString: String) : Actions()
-            data class CredentialsInjected(val credentials: LoginCredentials) : Actions()
-            object NoCredentialsInjected : Actions()
-        }
+    private suspend fun InlineBrowserAutofill.addJsInterface() {
+        addJsInterface(mockWebView, autofillCallback, "tab-id-123")
+    }
 
-        var lastAction: Actions? = null
-
-        override fun getAutofillData(requestString: String) {
-            lastAction = GetAutoFillData(requestString)
-        }
-
-        override fun injectCredentials(credentials: LoginCredentials) {
-            lastAction = CredentialsInjected(credentials)
-        }
-
-        override fun injectNoCredentials() {
-            lastAction = NoCredentialsInjected
-        }
-
-        override fun closeEmailProtectionTab(data: String) {
-        }
-
-        override fun getIncontextSignupDismissedAt(data: String) {
-        }
-
-        override fun cancelRetrievingStoredLogins() {
-        }
-
-        override fun acceptGeneratedPassword() {
-        }
-
-        override fun rejectGeneratedPassword() {
-        }
-
-        override fun inContextEmailProtectionFlowFinished() {
-        }
-
-        override var callback: Callback? = null
-        override var emailProtectionInContextCallback: EmailProtectionUserPromptListener? = null
-        override var emailProtectionInContextSignupFlowCallback: EmailProtectionInContextSignupFlowListener? = null
-        override var webView: WebView? = null
-        override var autoSavedLoginsMonitor: AutomaticSavedLoginsMonitor? = null
-        override var tabId: String? = null
+    private fun InlineBrowserAutofill.removeJsInterface() {
+        removeJsInterface(mockWebView)
     }
 }

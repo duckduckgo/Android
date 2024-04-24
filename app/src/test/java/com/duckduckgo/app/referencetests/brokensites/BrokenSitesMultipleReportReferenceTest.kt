@@ -32,6 +32,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyConfig
 import com.duckduckgo.privacy.config.api.PrivacyConfigData
@@ -84,6 +85,8 @@ class BrokenSitesMultipleReportReferenceTest(private val testCase: MultipleRepor
 
     private val mockBrokenSiteLastSentReport: BrokenSiteLastSentReport = mock()
 
+    private val networkProtectionState: NetworkProtectionState = mock()
+
     private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels = mock {
         runBlocking { whenever(mock.getPixelParams()).thenReturn(emptyMap()) }
     }
@@ -113,6 +116,8 @@ class BrokenSitesMultipleReportReferenceTest(private val testCase: MultipleRepor
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
+        runBlocking { whenever(networkProtectionState.isRunning()) }.thenReturn(false)
+
         testee = BrokenSiteSubmitter(
             mockStatisticsDataStore,
             mockVariantManager,
@@ -129,6 +134,7 @@ class BrokenSitesMultipleReportReferenceTest(private val testCase: MultipleRepor
             mock(),
             mockBrokenSiteLastSentReport,
             privacyProtectionsPopupExperimentExternalPixels,
+            networkProtectionState,
         )
     }
 

@@ -48,7 +48,6 @@ class AboutDuckDuckGoViewModel @Inject constructor(
         object LaunchBrowserWithLearnMoreUrl : Command()
         object LaunchBrowserWithPrivacyProtectionsUrl : Command()
         object LaunchWebViewWithPrivacyPolicyUrl : Command()
-        object LaunchNetPWaitlist : Command()
         object LaunchFeedback : Command()
     }
 

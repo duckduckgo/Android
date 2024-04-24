@@ -26,11 +26,17 @@ import android.view.TouchDelegate
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.os.BundleCompat
 import androidx.fragment.app.setFragmentResult
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.autofill.api.AutofillWebMessageRequest
 import com.duckduckgo.autofill.api.UseGeneratedPasswordDialog
+import com.duckduckgo.autofill.api.UseGeneratedPasswordDialog.Companion.KEY_PASSWORD
+import com.duckduckgo.autofill.api.UseGeneratedPasswordDialog.Companion.KEY_TAB_ID
+import com.duckduckgo.autofill.api.UseGeneratedPasswordDialog.Companion.KEY_URL
+import com.duckduckgo.autofill.api.UseGeneratedPasswordDialog.Companion.KEY_USERNAME
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ContentAutofillGeneratePasswordDialogBinding
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
@@ -99,9 +105,8 @@ class AutofillUseGeneratedPasswordDialogFragment : BottomSheetDialogFragment(), 
 
     private fun configureViews(binding: ContentAutofillGeneratePasswordDialogBinding) {
         (dialog as BottomSheetDialog).behavior.state = BottomSheetBehavior.STATE_EXPANDED
-        val originalUrl = getOriginalUrl()
         configureCloseButton(binding)
-        configureGeneratePasswordButton(binding, originalUrl)
+        configureGeneratePasswordButton(binding)
         configurePasswordField(binding)
     }
 
@@ -140,18 +145,15 @@ class AutofillUseGeneratedPasswordDialogFragment : BottomSheetDialogFragment(), 
         return appBuildConfig.sdkInt <= VERSION_CODES.S_V2
     }
 
-    private fun configureGeneratePasswordButton(
-        binding: ContentAutofillGeneratePasswordDialogBinding,
-        originalUrl: String,
-    ) {
+    private fun configureGeneratePasswordButton(binding: ContentAutofillGeneratePasswordDialogBinding) {
         binding.useSecurePasswordButton.setOnClickListener {
             pixelNameDialogEvent(GeneratedPasswordAccepted)?.let { pixel.fire(it) }
 
             val result = Bundle().also {
-                it.putString(UseGeneratedPasswordDialog.KEY_URL, originalUrl)
+                it.putParcelable(KEY_URL, getAutofillWebMessageRequest())
                 it.putBoolean(UseGeneratedPasswordDialog.KEY_ACCEPTED, true)
-                it.putString(UseGeneratedPasswordDialog.KEY_USERNAME, getUsername())
-                it.putString(UseGeneratedPasswordDialog.KEY_PASSWORD, getGeneratedPassword())
+                it.putString(KEY_USERNAME, getUsername())
+                it.putString(KEY_PASSWORD, getGeneratedPassword())
             }
             parentFragment?.setFragmentResult(UseGeneratedPasswordDialog.resultKey(getTabId()), result)
 
@@ -177,7 +179,7 @@ class AutofillUseGeneratedPasswordDialogFragment : BottomSheetDialogFragment(), 
 
         val result = Bundle().also {
             it.putBoolean(UseGeneratedPasswordDialog.KEY_ACCEPTED, false)
-            it.putString(UseGeneratedPasswordDialog.KEY_URL, getOriginalUrl())
+            it.putParcelable(KEY_URL, getAutofillWebMessageRequest())
         }
 
         parentFragment?.setFragmentResult(UseGeneratedPasswordDialog.resultKey(getTabId()), result)
@@ -202,15 +204,15 @@ class AutofillUseGeneratedPasswordDialogFragment : BottomSheetDialogFragment(), 
         object GeneratedPasswordAccepted : DialogEvent
     }
 
-    private fun getOriginalUrl() = arguments?.getString(UseGeneratedPasswordDialog.KEY_URL)!!
-    private fun getUsername() = arguments?.getString(UseGeneratedPasswordDialog.KEY_USERNAME)
-    private fun getGeneratedPassword() = arguments?.getString(UseGeneratedPasswordDialog.KEY_PASSWORD)!!
-    private fun getTabId() = arguments?.getString(UseGeneratedPasswordDialog.KEY_TAB_ID)!!
+    private fun getAutofillWebMessageRequest() = BundleCompat.getParcelable(requireArguments(), KEY_URL, AutofillWebMessageRequest::class.java)!!
+    private fun getUsername() = arguments?.getString(KEY_USERNAME)
+    private fun getGeneratedPassword() = arguments?.getString(KEY_PASSWORD)!!
+    private fun getTabId() = arguments?.getString(KEY_TAB_ID)!!
 
     companion object {
 
         fun instance(
-            url: String,
+            autofillWebMessageRequest: AutofillWebMessageRequest,
             username: String?,
             generatedPassword: String,
             tabId: String,
@@ -218,10 +220,10 @@ class AutofillUseGeneratedPasswordDialogFragment : BottomSheetDialogFragment(), 
             val fragment = AutofillUseGeneratedPasswordDialogFragment()
             fragment.arguments =
                 Bundle().also {
-                    it.putString(UseGeneratedPasswordDialog.KEY_URL, url)
-                    it.putString(UseGeneratedPasswordDialog.KEY_USERNAME, username)
-                    it.putString(UseGeneratedPasswordDialog.KEY_PASSWORD, generatedPassword)
-                    it.putString(UseGeneratedPasswordDialog.KEY_TAB_ID, tabId)
+                    it.putParcelable(KEY_URL, autofillWebMessageRequest)
+                    it.putString(KEY_USERNAME, username)
+                    it.putString(KEY_PASSWORD, generatedPassword)
+                    it.putString(KEY_TAB_ID, tabId)
                 }
             return fragment
         }

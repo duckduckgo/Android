@@ -72,7 +72,7 @@ sealed class PurchasesUpdateResult {
 
     data object PurchaseAbsent : PurchasesUpdateResult()
     data object UserCancelled : PurchasesUpdateResult()
-    data object Failure : PurchasesUpdateResult()
+    data class Failure(val errorType: String) : PurchasesUpdateResult()
 }
 
 enum class BillingError {
@@ -88,6 +88,7 @@ enum class BillingError {
     ITEM_ALREADY_OWNED,
     ITEM_NOT_OWNED,
     NETWORK_ERROR,
-    UNKNOWN_ERROR,
+    UNKNOWN_ERROR, // for when billing returns something we don't understand
+    BILLING_CRASH_ERROR, // This is our own error
     ;
 }

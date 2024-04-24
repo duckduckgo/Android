@@ -28,7 +28,7 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.about.AboutScreenNoParams
-import com.duckduckgo.app.accessibility.AccessibilityScreenNoParams
+import com.duckduckgo.app.accessibility.AccessibilityScreens
 import com.duckduckgo.app.appearance.AppearanceScreenNoParams
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
@@ -41,10 +41,6 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.PRIVACY_PRO_IS_ENABLED_AND_ELIGIBLE
 import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
 import com.duckduckgo.app.settings.SettingsViewModel.Command
-import com.duckduckgo.app.settings.SettingsViewModel.NetPEntryState
-import com.duckduckgo.app.settings.SettingsViewModel.NetPEntryState.Hidden
-import com.duckduckgo.app.settings.SettingsViewModel.NetPEntryState.Pending
-import com.duckduckgo.app.settings.SettingsViewModel.NetPEntryState.ShowState
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DAILY
 import com.duckduckgo.app.webtrackingprotection.WebTrackingProtectionScreenNoParams
@@ -66,7 +62,6 @@ import com.duckduckgo.macos.api.MacOsScreenWithEmptyParams
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerActivityWithEmptyParams
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.settings.api.ProSettingsPlugin
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.duckduckgo.windows.api.ui.WindowsScreenWithEmptyParams
@@ -144,7 +139,6 @@ class SettingsActivity : DuckDuckGoActivity() {
             cookiePopupProtectionSetting.setClickListener { viewModel.onCookiePopupProtectionSettingClicked() }
             emailSetting.setClickListener { viewModel.onEmailProtectionSettingClicked() }
             vpnSetting.setClickListener { viewModel.onAppTPSettingClicked() }
-            netpPSetting.setClickListener { viewModel.onNetPSettingClicked() }
         }
 
         with(viewsSettings) {
@@ -198,7 +192,6 @@ class SettingsActivity : DuckDuckGoActivity() {
                         it.appTrackingProtectionEnabled,
                         it.appTrackingProtectionOnboardingShown,
                     )
-                    updateNetPSettings(it.networkProtectionEntryState)
                     updateEmailSubtitle(it.emailAddress)
                     updateAutofill(it.showAutofill)
                     updateSyncSetting(visible = it.showSyncSetting)
@@ -262,7 +255,6 @@ class SettingsActivity : DuckDuckGoActivity() {
             is Command.LaunchAutofillSettings -> launchAutofillSettings()
             is Command.LaunchAccessibilitySettings -> launchAccessibilitySettings()
             is Command.LaunchAppTPTrackersScreen -> launchAppTPTrackersScreen()
-            is Command.LaunchNetPWaitlist -> launchNetpWaitlist(it.screen)
             is Command.LaunchAppTPOnboarding -> launchAppTPOnboardingScreen()
             is Command.LaunchEmailProtection -> launchEmailProtectionScreen(it.url)
             is Command.LaunchEmailProtectionNotSupported -> launchEmailProtectionNotSupported()
@@ -318,24 +310,6 @@ class SettingsActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun updateNetPSettings(networkProtectionEntryState: NetPEntryState) {
-        with(viewsPrivacy) {
-            when (networkProtectionEntryState) {
-                Hidden -> netpPSetting.gone()
-                Pending -> {
-                    netpPSetting.show()
-                    netpPSetting.setSecondaryText(getString(R.string.netpSettingsNeverEnabled))
-                    netpPSetting.setItemStatus(CheckListItem.CheckItemStatus.DISABLED)
-                }
-                is ShowState -> {
-                    netpPSetting.show()
-                    netpPSetting.setSecondaryText(getString(networkProtectionEntryState.subtitle))
-                    netpPSetting.setItemStatus(networkProtectionEntryState.icon)
-                }
-            }
-        }
-    }
-
     private fun launchDefaultAppScreen() {
         launchDefaultAppActivity()
     }
@@ -347,7 +321,7 @@ class SettingsActivity : DuckDuckGoActivity() {
 
     private fun launchAccessibilitySettings() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        globalActivityStarter.start(this, AccessibilityScreenNoParams, options)
+        globalActivityStarter.start(this, AccessibilityScreens.Default, options)
     }
 
     private fun launchEmailProtectionScreen(url: String) {
@@ -379,11 +353,6 @@ class SettingsActivity : DuckDuckGoActivity() {
     private fun launchAppTPTrackersScreen() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
         globalActivityStarter.start(this, AppTrackerActivityWithEmptyParams, options)
-    }
-
-    private fun launchNetpWaitlist(screen: ActivityParams) {
-        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        globalActivityStarter.start(this, screen, options)
     }
 
     private fun launchAppTPOnboardingScreen() {

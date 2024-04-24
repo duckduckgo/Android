@@ -36,6 +36,7 @@ import com.duckduckgo.common.utils.domain
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyConfig
@@ -70,6 +71,7 @@ class BrokenSiteSubmitter @Inject constructor(
     private val contentBlocking: ContentBlocking,
     private val brokenSiteLastSentReport: BrokenSiteLastSentReport,
     private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels,
+    private val networkProtectionState: NetworkProtectionState,
 ) : BrokenSiteSender {
 
     override fun submitBrokenSiteFeedback(brokenSite: BrokenSite) {
@@ -82,6 +84,8 @@ class BrokenSiteSubmitter @Inject constructor(
                 !unprotectedTemporary.isAnException(brokenSite.siteUrl) &&
                 featureToggle.isFeatureEnabled(PrivacyFeatureName.ContentBlockingFeatureName.value) &&
                 !contentBlocking.isAnException(brokenSite.siteUrl)
+
+            val vpnOn = runCatching { networkProtectionState.isRunning() }.getOrNull()
 
             val params = mutableMapOf(
                 CATEGORY_KEY to brokenSite.category.orEmpty(),
@@ -106,6 +110,7 @@ class BrokenSiteSubmitter @Inject constructor(
                 ERROR_CODES_KEY to brokenSite.errorCodes,
                 HTTP_ERROR_CODES_KEY to brokenSite.httpErrorCodes,
                 PROTECTIONS_STATE to protectionsState.toString(),
+                VPN_ON to vpnOn.toString(),
             )
 
             brokenSite.reportFlow?.let { reportFlow ->
@@ -172,6 +177,7 @@ class BrokenSiteSubmitter @Inject constructor(
         private const val LAST_SENT_DAY = "lastSentDay"
         private const val LOGIN_SITE = "loginSite"
         private const val REPORT_FLOW = "reportFlow"
+        private const val VPN_ON = "vpnOn"
     }
 }
 

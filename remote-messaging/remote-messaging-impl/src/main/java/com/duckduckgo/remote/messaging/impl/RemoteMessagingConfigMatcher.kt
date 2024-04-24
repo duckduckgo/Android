@@ -47,7 +47,7 @@ class RemoteMessagingConfigMatcher(
         return null
     }
 
-    private suspend fun Iterable<Int>.evaluateMatchingRules(rules: Map<Int, List<MatchingAttribute<*>>>): EvaluationResult {
+    private suspend fun Iterable<Int>.evaluateMatchingRules(rules: Map<Int, List<MatchingAttribute>>): EvaluationResult {
         var result: EvaluationResult = EvaluationResult.Match
 
         for (rule in this) {
@@ -68,7 +68,7 @@ class RemoteMessagingConfigMatcher(
         return result
     }
 
-    private suspend fun Iterable<Int>.evaluateExclusionRules(rules: Map<Int, List<MatchingAttribute<*>>>): EvaluationResult {
+    private suspend fun Iterable<Int>.evaluateExclusionRules(rules: Map<Int, List<MatchingAttribute>>): EvaluationResult {
         var result: EvaluationResult = EvaluationResult.Fail
 
         for (rule in this) {
@@ -89,7 +89,7 @@ class RemoteMessagingConfigMatcher(
         return result
     }
 
-    private suspend fun evaluateAttribute(matchingAttribute: MatchingAttribute<*>): EvaluationResult {
+    private suspend fun evaluateAttribute(matchingAttribute: MatchingAttribute): EvaluationResult {
         if (matchingAttribute is Unknown) {
             return matchingAttribute.fallback.toResult()
         } else {

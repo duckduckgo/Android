@@ -21,6 +21,7 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.securestorage.WebsiteLoginDetails
 import com.duckduckgo.autofill.impl.securestorage.WebsiteLoginDetailsWithCredentials
 import com.duckduckgo.autofill.store.CredentialsSyncMetadataEntity
+import com.duckduckgo.autofill.sync.CredentialsFixtures.invalidCredentials
 import com.duckduckgo.autofill.sync.CredentialsFixtures.spotifyCredentials
 import com.duckduckgo.autofill.sync.CredentialsFixtures.toLoginCredentials
 import com.duckduckgo.autofill.sync.CredentialsFixtures.twitterCredentials
@@ -43,7 +44,13 @@ internal class CredentialsSyncTest {
     private val secureStorage = FakeSecureStorage()
     private val credentialsSyncStore = FakeCredentialsSyncStore()
     private val credentialsSyncMetadata = CredentialsSyncMetadata(db.credentialsSyncDao())
-    private val credentialsSync = CredentialsSync(secureStorage, credentialsSyncStore, credentialsSyncMetadata, FakeCrypto())
+    private val credentialsSync = CredentialsSync(
+        secureStorage,
+        credentialsSyncStore,
+        credentialsSyncMetadata,
+        FakeCrypto(),
+        FakeCredentialsSyncLocalValidationFeature(),
+    )
 
     @After fun after() = runBlocking {
         db.close()
@@ -143,6 +150,59 @@ internal class CredentialsSyncTest {
             ),
             updates,
         )
+    }
+
+    @Test
+    fun whenOnFirstWithInvalidCredentialsThenChangesDoesNotContainInvalidEntities() = runTest {
+        givenLocalCredentials(
+            invalidCredentials,
+        )
+
+        val syncChanges = credentialsSync.getUpdatesSince("0")
+
+        assertTrue(syncChanges.isEmpty())
+        assertTrue(credentialsSyncStore.invalidEntitiesIds.size == 1)
+    }
+
+    @Test
+    fun whenNewCredentialsIsInvalidThenChangesDoesNotContainInvalidEntity() = runTest {
+        givenLocalCredentials(
+            spotifyCredentials,
+            invalidCredentials.copy(lastUpdatedMillis = 1689592358516),
+        )
+
+        val syncChanges = credentialsSync.getUpdatesSince("2022-08-30T00:00:00Z")
+
+        assertTrue(syncChanges.isEmpty())
+        assertTrue(credentialsSyncStore.invalidEntitiesIds.size == 1)
+    }
+
+    @Test
+    fun whenInvalidCredentialsPresentThenAlwaysRetryItemsAndUpdateInvalidList() = runTest {
+        givenLocalCredentials(
+            invalidCredentials,
+            spotifyCredentials.copy(lastUpdatedMillis = 1689592358516),
+        )
+        credentialsSyncStore.invalidEntitiesIds = listOf(credentialsSyncMetadata.getSyncMetadata(invalidCredentials.id!!)!!.syncId)
+
+        val syncChanges = credentialsSync.getUpdatesSince("2022-08-30T00:00:00Z")
+
+        assertTrue(syncChanges.size == 1)
+        assertTrue(syncChanges.first().title == spotifyCredentials.domainTitle)
+        assertTrue(credentialsSyncStore.invalidEntitiesIds.size == 1)
+    }
+
+    @Test
+    fun whenInvalidCredentialsThenReturnInvalidCredentials() = runTest {
+        givenLocalCredentials(
+            invalidCredentials,
+        )
+        credentialsSyncStore.invalidEntitiesIds = listOf(credentialsSyncMetadata.getSyncMetadata(invalidCredentials.id!!)!!.syncId)
+
+        val invalidItems = credentialsSync.getInvalidCredentials()
+
+        assertTrue(invalidItems.isNotEmpty())
+        assertEquals(invalidCredentials, invalidItems.first())
     }
 
     @Test
@@ -294,6 +354,7 @@ internal class CredentialsSyncTest {
     private suspend fun givenLocalCredentials(vararg credentials: LoginCredentials) {
         credentials.forEach { credential ->
             val loginDetails = WebsiteLoginDetails(
+                id = credential.id,
                 domain = credential.domain,
                 username = credential.username,
                 domainTitle = credential.domainTitle,

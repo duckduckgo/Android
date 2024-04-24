@@ -594,6 +594,10 @@ a.link-action--rounded {
   text-align: center;
 }
 
+.height-full {
+  height: 100%;
+}
+
 .text--left {
   text-align: left;
 }
@@ -649,6 +653,11 @@ a.link-action--rounded {
 .padding-x-double {
   padding-left: 32px;
   padding-right: 32px;
+}
+
+.padding-x-xl {
+  padding-left: 44px;
+  padding-right: 44px;
 }
 
 .padded--top {

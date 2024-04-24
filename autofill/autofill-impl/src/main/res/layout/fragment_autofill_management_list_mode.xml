@@ -26,6 +26,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <com.duckduckgo.common.ui.view.InfoPanel
+            android:id="@+id/webViewUnsupportedWarningPanel"
+            style="@style/Widget.DuckDuckGo.InfoPanel"
+            android:visibility="gone"
+            android:layout_margin="@dimen/keyline_4"
+            app:panelText="@string/credentialManagementWebViewIncompatibleErrorMessage"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:panelBackground="@drawable/info_panel_alert_background"
+            app:panelDrawable="@drawable/ic_info_panel_alert" />
+
         <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
             android:id="@+id/enabledToggle"
             android:layout_width="0dp"
@@ -36,7 +48,7 @@
             app:showSwitch="true"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/webViewUnsupportedWarningPanel"/>
 
         <com.duckduckgo.common.ui.view.divider.HorizontalDivider
             android:id="@+id/topDivider"

@@ -822,4 +822,15 @@
     <!-- Custom Tab -->
     <string name="openInDdgMenuItemTitle">Deschide în DuckDuckGo</string>
     <string name="runningInDdgMenuItemTitle">Redare în DuckDuckGo</string>
+
+    <!-- SSL Error -->
+    <string name="sslErrorTitle">Avertisment: acest site poate fi nesigur</string>
+    <string name="sslErrorHeadline" instruction="Placeholder is domain with certificate issues">Certificatul pentru acest site este nevalid. S-ar putea să te conectezi la un server care pretinde a fi %1$s, ceea ce ar putea pune în pericol informațiile tale confidențiale.</string>
+    <string name="sslErrorLeaveCTA">Părăsește acest site</string>
+    <string name="sslErrorAdvancedCTA">Avansat</string>
+    <string name="sslErrorExpandedHeadline">DuckDuckGo te avertizează când un site web are un certificat nevalid.</string>
+    <string name="sslErrorExpandedCTA"><![CDATA[<u>Acceptă riscul și accesează site-ul<u/>]]></string>
+    <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">Certificatul de securitate pentru %1$s a expirat. Este posibil ca site-ul web să fie configurat greșit, ca un atacator să-ți fi compromis conexiunea sau ca ceasul sistemului tău să fie incorect.</string>
+    <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Certificatul de securitate pentru %1$s nu se potrivește cu *.%2$s. Este posibil ca site-ul web să fie configurat greșit, ca un atacator să-ți fi compromis conexiunea sau ca ceasul sistemului tău să fie incorect.</string>
+    <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Sistemul de operare al dispozitivului tău nu are încredere în certificatul de securitate pentru %1$s. Este posibil ca site-ul web să fie configurat greșit, ca un atacator să-ți fi compromis conexiunea sau ca ceasul sistemului tău să fie incorect.</string>
 </resources>

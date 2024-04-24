@@ -29,8 +29,6 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
 @ContributesViewModel(ActivityScope::class)
@@ -41,7 +39,7 @@ class TabSwitcherViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
-    var tabs: Flow<List<TabEntity>> = tabRepository.flowTabs
+    var tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
     var deletableTabs: LiveData<List<TabEntity>> = tabRepository.flowDeletableTabs.asLiveData(
         context = viewModelScope.coroutineContext,
     )
@@ -87,7 +85,7 @@ class TabSwitcherViewModel @Inject constructor(
 
     fun onCloseAllTabsConfirmed() {
         viewModelScope.launch(dispatcherProvider.io()) {
-            tabs.firstOrNull()?.forEach {
+            tabs.value?.forEach {
                 onTabDeleted(it)
             }
         }

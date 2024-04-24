@@ -30,8 +30,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.VisibleForTesting
-import androidx.lifecycle.Lifecycle.State.STARTED
-import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.webkit.ServiceWorkerClientCompat
 import androidx.webkit.ServiceWorkerControllerCompat
@@ -79,8 +77,6 @@ import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreen.Priv
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -334,14 +330,18 @@ open class BrowserActivity : DuckDuckGoActivity() {
             return
         }
 
-        if (emailProtectionLinkVerifier.shouldDelegateToInContextView(intent.dataString, currentTab?.inContextEmailProtectionShowing)) {
-            currentTab?.showEmailProtectionInContextWebFlow(intent.dataString)
+        val inContextSignupState = currentTab?.inContextEmailProtectionSignupState
+        if (emailProtectionLinkVerifier.shouldDelegateToInContextView(intent.intentText, inContextSignupState?.showing)) {
+            currentTab?.resumeEmailProtectionInContextWebFlow(
+                verificationUrl = intent.intentText,
+                messageRequestId = inContextSignupState?.requestId!!,
+            )
             Timber.v("Verification link was consumed, so don't allow it to open in a new tab")
             return
         }
 
         // the BrowserActivity will automatically clear its stack of activities when being brought to the foreground, so this can no longer be true
-        currentTab?.inContextEmailProtectionShowing = false
+        currentTab?.inContextEmailProtectionSignupState = InProgressEmailProtectionSignupState(showing = false)
 
         if (launchNewSearch(intent)) {
             Timber.w("new tab requested")
@@ -375,17 +375,17 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 selectTab(it)
             }
         }
-        viewModel.tabs.onEach {
+        viewModel.tabs.observe(this) {
             clearStaleTabs(it)
             removeOldTabs()
-            viewModel.onTabsUpdated(it)
-        }.flowWithLifecycle(lifecycle, STARTED)
-            .launchIn(lifecycleScope)
+            lifecycleScope.launch { viewModel.onTabsUpdated(it) }
+        }
     }
 
     private fun removeObservers() {
         viewModel.command.removeObservers(this)
         viewModel.selectedTab.removeObservers(this)
+        viewModel.tabs.removeObservers(this)
     }
 
     private fun clearStaleTabs(updatedTabs: List<TabEntity>?) {
@@ -715,3 +715,9 @@ private class TabList() : ArrayList<String>() {
         return super.add(element)
     }
 }
+
+// Needed to keep track of in-context email protection signup state
+data class InProgressEmailProtectionSignupState(
+    val showing: Boolean = false,
+    val requestId: String? = null,
+)

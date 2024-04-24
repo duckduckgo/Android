@@ -31,4 +31,16 @@ interface InternalFeaturePlugin {
      * [activityContext] is the Activity context that hosted the feature
      */
     fun onInternalFeatureClicked(activityContext: Context)
+
+    // Every time you want to add a setting add the priority (order) to the list below and use it in the plugin
+    companion object {
+        const val DEVELOPER_SETTINGS_PRIO_KEY = 100
+        const val SYNC_SETTINGS_PRIO_KEY = 200
+        const val APPTP_SETTINGS_PRIO_KEY = 300
+        const val VPN_SETTINGS_PRIO_KEY = 400
+        const val SUBS_SETTINGS_PRIO_KEY = 500
+        const val AUTOFILL_SETTINGS_PRIO_KEY = 600
+        const val AUDIT_SETTINGS_PRIO_KEY = 700
+        const val ADS_SETTINGS_PRIO_KEY = 800
+    }
 }

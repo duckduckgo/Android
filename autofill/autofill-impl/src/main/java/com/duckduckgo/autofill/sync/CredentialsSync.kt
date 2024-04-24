@@ -21,6 +21,7 @@ import com.duckduckgo.autofill.impl.securestorage.SecureStorage
 import com.duckduckgo.autofill.impl.securestorage.WebsiteLoginDetails
 import com.duckduckgo.autofill.impl.securestorage.WebsiteLoginDetailsWithCredentials
 import com.duckduckgo.autofill.store.CredentialsSyncMetadataEntity
+import com.duckduckgo.autofill.sync.provider.CredentialsSyncLocalValidationFeature
 import com.duckduckgo.autofill.sync.provider.LoginCredentialEntry
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.AppScope
@@ -38,6 +39,7 @@ class CredentialsSync @Inject constructor(
     private val credentialsSyncStore: CredentialsSyncStore,
     private val credentialsSyncMetadata: CredentialsSyncMetadata,
     private val syncCrypto: SyncCrypto,
+    private val credentialsSyncLocalValidationFeature: CredentialsSyncLocalValidationFeature,
 ) {
 
     suspend fun initMetadata() {
@@ -55,11 +57,21 @@ class CredentialsSync @Inject constructor(
 
     suspend fun getUpdatesSince(since: Iso8601String): List<LoginCredentialEntry> {
         credentialsSyncStore.startTimeStamp = SyncDateProvider.now()
-        return if (since == "0") {
+        val changes = if (since == "0") {
             allContentAsUpdates()
         } else {
             changesSince(since)
         }
+        val toRetryItems = getInvalidCredentialsLocalId()
+            .mapNotNull { localId -> secureStorage.getWebsiteLoginDetailsWithCredentials(localId) }
+            .mapToLoginCredentialEntry()
+
+        val allChanges = changes + toRetryItems
+
+        val filteredChanges = allChanges.validItems()
+        markSavedSitesAsInvalid((allChanges - filteredChanges.toSet()).map { it.id })
+
+        return filteredChanges
     }
 
     suspend fun getCredentialWithSyncId(syncId: String): LoginCredentials? {
@@ -131,6 +143,15 @@ class CredentialsSync @Inject constructor(
         credentialsSyncMetadata.removeEntityWith(localId)
     }
 
+    suspend fun getInvalidCredentials(): List<LoginCredentials> {
+        return getInvalidCredentialsLocalId().mapNotNull { localId -> getCredentialWithId(localId) }
+    }
+
+    private fun markSavedSitesAsInvalid(ids: List<String>) {
+        Timber.i("CredentialsSync: Storing invalid items: $ids")
+        credentialsSyncStore.invalidEntitiesIds = ids
+    }
+
     private suspend fun allContentAsUpdates() = secureStorage.websiteLoginDetailsWithCredentials().firstOrNull().mapToLoginCredentialEntry()
 
     private suspend fun changesSince(since: Iso8601String): List<LoginCredentialEntry> {
@@ -150,7 +171,15 @@ class CredentialsSync @Inject constructor(
         Timber.d("CredentialsSync: modifiedSince changes: $changes")
         Timber.d("CredentialsSync: modifiedSince removed: $removedItems")
 
-        return changes.mapToLoginCredentialEntry() + removedItems
+        val changesEntries = changes.mapToLoginCredentialEntry()
+
+        return changesEntries + removedItems
+    }
+
+    private fun getInvalidCredentialsLocalId(): List<Long> {
+        return credentialsSyncStore.invalidEntitiesIds.takeIf { it.isNotEmpty() }?.mapNotNull { id ->
+            credentialsSyncMetadata.getLocalId(id)
+        } ?: emptyList()
     }
 
     private fun String?.encrypt(): String? {
@@ -186,5 +215,25 @@ class CredentialsSync @Inject constructor(
             notes = notes,
             lastUpdatedMillis = details.lastUpdatedMillis,
         )
+    }
+
+    private fun List<LoginCredentialEntry>.validItems(): List<LoginCredentialEntry> {
+        if (credentialsSyncLocalValidationFeature.self().isEnabled().not()) return this // Skip validation if feature is disabled
+
+        return this.filter {
+            (it.title?.length ?: 0) < MAX_ENCRYPTED_TITLE_LENGTH &&
+                (it.domain?.length ?: 0) < MAX_ENCRYPTED_DOMAIN_LENGTH &&
+                (it.notes?.length ?: 0) < MAX_ENCRYPTED_NOTES_LENGTH &&
+                (it.username?.length ?: 0) < MAX_ENCRYPTED_USERNAME_LENGTH &&
+                (it.password?.length ?: 0) < MAX_ENCRYPTED_PASSWORD_LENGTH
+        }
+    }
+
+    companion object {
+        const val MAX_ENCRYPTED_TITLE_LENGTH = 3_000
+        const val MAX_ENCRYPTED_DOMAIN_LENGTH = 1_000
+        const val MAX_ENCRYPTED_USERNAME_LENGTH = 1_000
+        const val MAX_ENCRYPTED_PASSWORD_LENGTH = 1_000
+        const val MAX_ENCRYPTED_NOTES_LENGTH = 10_000
     }
 }

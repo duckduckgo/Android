@@ -30,6 +30,7 @@ import android.view.View
 import android.webkit.GeolocationPermissions
 import android.webkit.MimeTypeMap
 import android.webkit.PermissionRequest
+import android.webkit.SslErrorHandler
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient.FileChooserParams
 import android.webkit.WebView
@@ -49,13 +50,21 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.A
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.DeleteBookmarkListener
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.EditSavedSiteListener
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
+import com.duckduckgo.app.browser.SSLErrorType.EXPIRED
+import com.duckduckgo.app.browser.SSLErrorType.GENERIC
+import com.duckduckgo.app.browser.SSLErrorType.NONE
+import com.duckduckgo.app.browser.SSLErrorType.UNTRUSTED_HOST
+import com.duckduckgo.app.browser.SSLErrorType.WRONG_HOST
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.NonHttpAppLink
+import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.ShouldLaunchPrivacyProLink
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
 import com.duckduckgo.app.browser.camera.CameraHardwareChecker
+import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
+import com.duckduckgo.app.browser.certificates.remoteconfig.SSLCertificatesFeature
 import com.duckduckgo.app.browser.commands.Command
 import com.duckduckgo.app.browser.commands.Command.*
 import com.duckduckgo.app.browser.commands.NavigationCommand
@@ -92,6 +101,7 @@ import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
+import com.duckduckgo.app.browser.webview.SslWarningLayout.Action
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
@@ -128,6 +138,7 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
+import com.duckduckgo.autofill.api.AutofillWebMessageRequest
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
@@ -160,6 +171,7 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
+import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
@@ -238,6 +250,9 @@ class BrowserTabViewModel @Inject constructor(
     private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels,
     private val faviconsFetchingPrompt: FaviconsFetchingPrompt,
     private val extendedOnboardingExperimentVariantManager: ExtendedOnboardingExperimentVariantManager,
+    private val subscriptions: Subscriptions,
+    private val sslCertificatesFeature: SSLCertificatesFeature,
+    private val bypassedSSLCertificatesRepository: BypassedSSLCertificatesRepository,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -270,7 +285,7 @@ class BrowserTabViewModel @Inject constructor(
 
     var skipHome = false
     var hasCtaBeenShownForCurrentPage: AtomicBoolean = AtomicBoolean(false)
-    val tabs: Flow<List<TabEntity>> = tabRepository.flowTabs
+    val tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
     val liveSelectedTab: LiveData<TabEntity> = tabRepository.liveSelectedTab
     val survey: LiveData<Survey> = ctaViewModel.surveyLiveData
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
@@ -425,7 +440,6 @@ class BrowserTabViewModel @Inject constructor(
 
         emailManager.signedInFlow().onEach { isSignedIn ->
             browserViewState.value = currentBrowserViewState().copy(isEmailSignedIn = isSignedIn)
-            command.value = EmailSignEvent
         }.launchIn(viewModelScope)
 
         observeAccessibilitySettings()
@@ -707,6 +721,14 @@ class BrowserTabViewModel @Inject constructor(
         var urlToNavigate = queryUrlConverter.convertQueryToUrl(trimmedInput, verticalParameter, queryOrigin)
 
         when (val type = specialUrlDetector.determineType(trimmedInput)) {
+            is ShouldLaunchPrivacyProLink -> {
+                if (webNavigationState == null || webNavigationState?.hasNavigationHistory == false) {
+                    closeCurrentTab()
+                }
+                command.value = LaunchPrivacyPro
+                return
+            }
+
             is NonHttpAppLink -> {
                 nonHttpAppLinkClicked(type)
             }
@@ -737,6 +759,8 @@ class BrowserTabViewModel @Inject constructor(
                     clearPreviousUrl()
                 }
 
+                Timber.w("SSLError: navigate to $urlToNavigate")
+                site?.nextUrl = urlToNavigate
                 command.value = NavigationCommand.Navigate(urlToNavigate, getUrlHeaders(urlToNavigate))
             }
         }
@@ -753,6 +777,7 @@ class BrowserTabViewModel @Inject constructor(
             showClearButton = false,
             showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(urlLoaded = urlToNavigate),
             browserError = OMITTED,
+            sslError = NONE,
         )
         autoCompleteViewState.value =
             currentAutoCompleteViewState().copy(showSuggestions = false, showFavorites = false, searchResults = AutoCompleteResult("", emptyList()))
@@ -802,6 +827,8 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun willOverrideUrl(newUrl: String) {
+        site?.nextUrl = newUrl
+        Timber.d("SSLError: willOverride is $newUrl")
         navigationAwareLoginDetector.onEvent(NavigationEvent.Redirect(newUrl))
         val previousSiteStillLoading = currentLoadingViewState().isLoading
         if (previousSiteStillLoading) {
@@ -918,6 +945,11 @@ class BrowserTabViewModel @Inject constructor(
             return true
         }
 
+        if (currentBrowserViewState().sslError != NONE) {
+            command.postValue(HideSSLError)
+            return true
+        }
+
         if (!currentBrowserViewState().browserShowing) {
             return false
         }
@@ -988,7 +1020,7 @@ class BrowserTabViewModel @Inject constructor(
             canGoForward = newWebNavigationState.canGoForward,
         )
 
-        Timber.v("navigationStateChanged: $stateChange")
+        Timber.v("SSL Error: navigationStateChanged: $stateChange")
         when (stateChange) {
             is WebNavigationStateChange.NewPage -> pageChanged(stateChange.url, stateChange.title)
             is WebNavigationStateChange.PageCleared -> pageCleared()
@@ -997,17 +1029,20 @@ class BrowserTabViewModel @Inject constructor(
             else -> {}
         }
 
-        if (newWebNavigationState.progress ?: 0 >= SHOW_CONTENT_MIN_PROGRESS) {
+        if ((newWebNavigationState.progress ?: 0) >= SHOW_CONTENT_MIN_PROGRESS) {
             showWebContent()
         }
         navigationAwareLoginDetector.onEvent(NavigationEvent.WebNavigationEvent(stateChange))
+    }
+
+    override fun onPageContentStart(url: String) {
+        showWebContent()
     }
 
     private fun showBlankContentfNewContentDelayed() {
         Timber.i("Blank: cancel job $deferredBlankSite")
         deferredBlankSite?.cancel()
         deferredBlankSite = viewModelScope.launch(dispatchers.io()) {
-            delay(timeMillis = NEW_CONTENT_MAX_DELAY_MS)
             withContext(dispatchers.main()) {
                 command.value = HideWebContent
             }
@@ -1109,7 +1144,7 @@ class BrowserTabViewModel @Inject constructor(
         isLinkOpenedInNewTab = false
 
         automaticSavedLoginsMonitor.clearAutoSavedLoginId(tabId)
-
+        command.value = PageChanged
         site?.run {
             val hasBrowserError = currentBrowserViewState().browserError != OMITTED
             privacyProtectionsPopupManager.onPageLoaded(url, httpErrorCodeEvents, hasBrowserError)
@@ -1117,11 +1152,9 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun setAdClickActiveTabData(url: String?) {
-        viewModelScope.launch {
-            val sourceTabId = tabRepository.liveSelectedTab.value?.sourceTabId
-            val sourceTabUrl = tabRepository.flowTabs.firstOrNull()?.firstOrNull { it.tabId == sourceTabId }?.url
-            adClickManager.setActiveTabId(tabId, url, sourceTabId, sourceTabUrl)
-        }
+        val sourceTabId = tabRepository.liveSelectedTab.value?.sourceTabId
+        val sourceTabUrl = tabRepository.liveTabs.value?.firstOrNull { it.tabId == sourceTabId }?.url
+        adClickManager.setActiveTabId(tabId, url, sourceTabId, sourceTabUrl)
     }
 
     private fun cacheAppLink(url: String?) {
@@ -1638,6 +1671,32 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun getSite(): Site? = site
 
+    override fun onReceivedSslError(
+        handler: SslErrorHandler,
+        errorResponse: SslErrorResponse,
+    ) {
+        if (sslCertificatesFeature.allowBypass().isEnabled()) {
+            Timber.d("SSLError: error received for ${errorResponse.url} and nextUrl is ${site?.nextUrl} and currentUrl is ${site?.url}")
+            if (site?.nextUrl != null && errorResponse.url != site?.nextUrl) {
+                Timber.d("SSLError: received ssl error for a page we are not loading, cancelling request")
+                handler.cancel()
+            } else {
+                browserViewState.value =
+                    currentBrowserViewState().copy(
+                        browserShowing = false,
+                        showPrivacyShield = false,
+                        showDaxIcon = false,
+                        showSearchIcon = false,
+                        sslError = errorResponse.errorType,
+                    )
+                command.postValue(ShowSSLError(handler, errorResponse))
+            }
+        } else {
+            Timber.d("SSLError: allow bypass certificates feature disabled, cancelling request")
+            handler.cancel()
+        }
+    }
+
     override fun showFileChooser(
         filePathCallback: ValueCallback<Array<Uri>>,
         fileChooserParams: FileChooserParams,
@@ -2053,12 +2112,20 @@ class BrowserTabViewModel @Inject constructor(
 
         return when (requiredAction) {
             is RequiredAction.OpenInNewTab -> {
+                if (subscriptions.shouldLaunchPrivacyProForUrl(requiredAction.url)) {
+                    command.value = LaunchPrivacyPro
+                    return true
+                }
                 command.value = GenerateWebViewPreviewImage
                 command.value = OpenInNewTab(query = requiredAction.url, sourceTabId = tabId)
                 true
             }
 
             is RequiredAction.OpenInNewBackgroundTab -> {
+                if (subscriptions.shouldLaunchPrivacyProForUrl(requiredAction.url)) {
+                    command.value = LaunchPrivacyPro
+                    return true
+                }
                 command.value = GenerateWebViewPreviewImage
                 viewModelScope.launch { openInNewBackgroundTab(requiredAction.url) }
                 true
@@ -2623,9 +2690,9 @@ class BrowserTabViewModel @Inject constructor(
         command.postValue(RequestFileDownload(url, contentDisposition, mimeType, requestUserConfirmation))
     }
 
-    fun showEmailProtectionChooseEmailPrompt() {
+    fun showEmailProtectionChooseEmailPrompt(autofillWebMessageRequest: AutofillWebMessageRequest) {
         emailManager.getEmailAddress()?.let {
-            command.postValue(ShowEmailProtectionChooseEmailPrompt(it))
+            command.postValue(ShowEmailProtectionChooseEmailPrompt(it, autofillWebMessageRequest))
         }
     }
 
@@ -2641,23 +2708,6 @@ class BrowserTabViewModel @Inject constructor(
             )
             emailManager.setNewLastUsedDate()
         }
-    }
-
-    /**
-     * API called after user selected to autofill a private alias into a form
-     */
-    fun usePrivateDuckAddress(
-        originalUrl: String,
-        duckAddress: String,
-    ) {
-        command.postValue(InjectEmailAddress(duckAddress = duckAddress, originalUrl = originalUrl, autoSaveLogin = true))
-    }
-
-    fun usePersonalDuckAddress(
-        originalUrl: String,
-        duckAddress: String,
-    ) {
-        command.postValue(InjectEmailAddress(duckAddress = duckAddress, originalUrl = originalUrl, autoSaveLogin = false))
     }
 
     fun download(pendingFileDownload: PendingFileDownload) {
@@ -2746,6 +2796,9 @@ class BrowserTabViewModel @Inject constructor(
         if (currentBrowserViewState().browserError != OMITTED && currentBrowserViewState().browserError != LOADING) {
             browserViewState.value = currentBrowserViewState().copy(browserError = LOADING)
         }
+        if (currentBrowserViewState().sslError != NONE) {
+            browserViewState.value = currentBrowserViewState().copy(browserShowing = true, sslError = NONE)
+        }
     }
 
     fun onWebViewRefreshed() {
@@ -2777,10 +2830,6 @@ class BrowserTabViewModel @Inject constructor(
     ) {
         val destinationUrl = ampLinks.processDestinationUrl(initialUrl, extractedUrl)
         command.postValue(LoadExtractedUrl(extractedUrl = destinationUrl))
-    }
-
-    fun returnNoCredentialsWithPage(originalUrl: String) {
-        command.postValue(CancelIncomingAutofillRequest(originalUrl))
     }
 
     fun onConfigurationChanged() {
@@ -3016,6 +3065,56 @@ class BrowserTabViewModel @Inject constructor(
             if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) R.drawable.onboarding_experiment_background else 0
         viewModelScope.launch {
             command.value = SetBrowserBackground(backgroundRes)
+        }
+    }
+
+    fun onSSLCertificateWarningAction(action: Action, url: String) {
+        when (action) {
+            is Action.Shown -> {
+                when (action.errorType) {
+                    EXPIRED -> pixel.fire(AppPixelName.SSL_CERTIFICATE_WARNING_EXPIRED_SHOWN)
+                    WRONG_HOST -> pixel.fire(AppPixelName.SSL_CERTIFICATE_WARNING_WRONG_HOST_SHOWN)
+                    UNTRUSTED_HOST -> pixel.fire(AppPixelName.SSL_CERTIFICATE_WARNING_UNTRUSTED_SHOWN)
+                    GENERIC -> pixel.fire(AppPixelName.SSL_CERTIFICATE_WARNING_GENERIC_SHOWN)
+                    else -> {} // nothing to report
+                }
+            }
+
+            Action.Advance -> {
+                pixel.fire(AppPixelName.SSL_CERTIFICATE_WARNING_ADVANCED_PRESSED)
+            }
+
+            Action.LeaveSite -> {
+                command.postValue(HideSSLError)
+                pixel.fire(AppPixelName.SSL_CERTIFICATE_WARNING_CLOSE_PRESSED)
+            }
+
+            Action.Proceed -> {
+                refreshBrowserError()
+                bypassedSSLCertificatesRepository.add(url)
+                site?.sslError = true
+                pixel.fire(AppPixelName.SSL_CERTIFICATE_WARNING_PROCEED_PRESSED)
+            }
+        }
+    }
+
+    fun recoverFromSSLWarningPage(showBrowser: Boolean) {
+        if (showBrowser) {
+            browserViewState.value = currentBrowserViewState().copy(browserShowing = true, sslError = NONE)
+        } else {
+            omnibarViewState.value = currentOmnibarViewState().copy(
+                omnibarText = "",
+                shouldMoveCaretToEnd = false,
+                forceExpand = true,
+            )
+            loadingViewState.value = currentLoadingViewState().copy(isLoading = false)
+            browserViewState.value = currentBrowserViewState().copy(
+                showPrivacyShield = false,
+                showSearchIcon = true,
+                showDaxIcon = false,
+                browserShowing = showBrowser,
+                sslError = NONE,
+            )
         }
     }
 

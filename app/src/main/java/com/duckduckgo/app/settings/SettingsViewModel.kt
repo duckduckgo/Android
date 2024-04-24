@@ -17,37 +17,22 @@
 package com.duckduckgo.app.settings
 
 import android.annotation.SuppressLint
-import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.pixels.AppPixelName.*
-import com.duckduckgo.app.settings.SettingsViewModel.NetPEntryState.Hidden
-import com.duckduckgo.app.settings.SettingsViewModel.NetPEntryState.Pending
-import com.duckduckgo.app.settings.SettingsViewModel.NetPEntryState.ShowState
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.email.EmailManager
-import com.duckduckgo.common.ui.view.listitem.CheckListItem
-import com.duckduckgo.common.ui.view.listitem.CheckListItem.CheckItemStatus
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
-import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
-import com.duckduckgo.networkprotection.api.NetworkProtectionState
-import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState
-import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.CONNECTED
-import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.CONNECTING
-import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.DISCONNECTED
-import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist
-import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.sync.api.DeviceSyncState
 import javax.inject.Inject
@@ -57,13 +42,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @SuppressLint("NoLifecycleObserver")
 @ContributesViewModel(ActivityScope::class)
@@ -73,9 +54,7 @@ class SettingsViewModel @Inject constructor(
     private val pixel: Pixel,
     private val emailManager: EmailManager,
     private val autofillCapabilityChecker: AutofillCapabilityChecker,
-    private val networkProtectionState: NetworkProtectionState,
     private val deviceSyncState: DeviceSyncState,
-    private val networkProtectionWaitlist: NetworkProtectionWaitlist,
     private val dispatcherProvider: DispatcherProvider,
     private val autoconsent: Autoconsent,
     private val subscriptions: Subscriptions,
@@ -89,19 +68,9 @@ class SettingsViewModel @Inject constructor(
         val emailAddress: String? = null,
         val showAutofill: Boolean = false,
         val showSyncSetting: Boolean = false,
-        val networkProtectionEntryState: NetPEntryState = Hidden,
         val isAutoconsentEnabled: Boolean = false,
         val isPrivacyProEnabled: Boolean = false,
     )
-
-    sealed class NetPEntryState {
-        object Hidden : NetPEntryState()
-        object Pending : NetPEntryState()
-        data class ShowState(
-            val icon: CheckItemStatus,
-            @StringRes val subtitle: Int,
-        ) : NetPEntryState()
-    }
 
     sealed class Command {
         object LaunchDefaultBrowser : Command()
@@ -111,7 +80,6 @@ class SettingsViewModel @Inject constructor(
         object LaunchAccessibilitySettings : Command()
         object LaunchAddHomeScreenWidget : Command()
         object LaunchAppTPTrackersScreen : Command()
-        data class LaunchNetPWaitlist(val screen: ActivityParams) : Command()
         object LaunchAppTPOnboarding : Command()
         object LaunchMacOs : Command()
         object LaunchWindows : Command()
@@ -145,35 +113,6 @@ class SettingsViewModel @Inject constructor(
         appTPPollJob.cancel()
     }
 
-    private suspend fun getNetworkProtectionEntryState(networkProtectionConnectionState: ConnectionState): NetPEntryState {
-        return when (val networkProtectionWaitlistState = networkProtectionWaitlist.getState()) {
-            is NetPWaitlistState.InBeta -> {
-                if (networkProtectionWaitlistState.termsAccepted || networkProtectionState.isOnboarded()) {
-                    val subtitle = when (networkProtectionConnectionState) {
-                        CONNECTED -> R.string.netpSettingsConnected
-                        CONNECTING -> R.string.netpSettingsConnecting
-                        else -> R.string.netpSettingsDisconnected
-                    }
-
-                    val netPItemStatus = if (networkProtectionConnectionState != DISCONNECTED) {
-                        CheckListItem.CheckItemStatus.ENABLED
-                    } else {
-                        CheckListItem.CheckItemStatus.WARNING
-                    }
-
-                    ShowState(
-                        icon = netPItemStatus,
-                        subtitle = subtitle,
-                    )
-                } else {
-                    Pending
-                }
-            }
-            NetPWaitlistState.NotUnlocked -> Hidden
-            NetPWaitlistState.PendingInviteCode, NetPWaitlistState.JoinedWaitlist -> Pending
-        }
-    }
-
     @VisibleForTesting
     internal fun start() {
         val defaultBrowserAlready = defaultWebBrowserCapability.isDefaultBrowser()
@@ -188,22 +127,10 @@ class SettingsViewModel @Inject constructor(
                     emailAddress = emailManager.getEmailAddress(),
                     showAutofill = autofillCapabilityChecker.canAccessCredentialManagementScreen(),
                     showSyncSetting = deviceSyncState.isFeatureEnabled(),
-                    networkProtectionEntryState = (if (networkProtectionState.isRunning()) CONNECTED else DISCONNECTED).run {
-                        if (isPrivacyProEnabled()) Hidden else getNetworkProtectionEntryState(this)
-                    },
                     isAutoconsentEnabled = autoconsent.isSettingEnabled(),
                     isPrivacyProEnabled = isPrivacyProEnabled() && subscriptions.isEligible(),
                 ),
             )
-            networkProtectionState.getConnectionStateFlow()
-                .onEach {
-                    viewState.emit(
-                        currentViewState().copy(
-                            networkProtectionEntryState = if (isPrivacyProEnabled()) Hidden else getNetworkProtectionEntryState(it),
-                        ),
-                    )
-                }.flowOn(dispatcherProvider.main())
-                .launchIn(viewModelScope)
         }
     }
 
@@ -221,7 +148,6 @@ class SettingsViewModel @Inject constructor(
                     appTrackingProtectionOnboardingShown = appTrackingProtection.isOnboarded(),
                     appTrackingProtectionEnabled = isDeviceShieldEnabled,
                     isPrivacyProEnabled = isPrivacyProEnabled && subscriptions.isEligible(),
-                    networkProtectionEntryState = if (isPrivacyProEnabled) Hidden else currentState.networkProtectionEntryState,
                 )
                 delay(1_000)
             }
@@ -310,16 +236,6 @@ class SettingsViewModel @Inject constructor(
                 command.send(Command.LaunchAppTPOnboarding)
             }
             pixel.fire(SETTINGS_APPTP_PRESSED)
-        }
-    }
-
-    fun onNetPSettingClicked() {
-        viewModelScope.launch {
-            val screen = networkProtectionWaitlist.getScreenForCurrentState()
-            screen?.let {
-                command.send(Command.LaunchNetPWaitlist(screen))
-                pixel.fire(SETTINGS_NETP_PRESSED)
-            } ?: Timber.w("Get screen for current NetP state is null")
         }
     }
 

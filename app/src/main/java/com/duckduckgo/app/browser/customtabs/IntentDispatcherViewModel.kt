@@ -22,6 +22,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.intentText
+import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
@@ -34,6 +35,7 @@ import timber.log.Timber
 class IntentDispatcherViewModel @Inject constructor(
     private val customTabDetector: CustomTabDetector,
     private val dispatcherProvider: DispatcherProvider,
+    private val emailProtectionLinkVerifier: EmailProtectionLinkVerifier,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -47,20 +49,32 @@ class IntentDispatcherViewModel @Inject constructor(
 
     fun onIntentReceived(intent: Intent?, defaultColor: Int) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            val hasSession = intent?.hasExtra(CustomTabsIntent.EXTRA_SESSION) == true
-            val intentText = intent?.intentText
-            val toolbarColor = intent?.getIntExtra(CustomTabsIntent.EXTRA_TOOLBAR_COLOR, defaultColor) ?: defaultColor
+            runCatching {
+                val hasSession = intent?.hasExtra(CustomTabsIntent.EXTRA_SESSION) == true
+                val intentText = intent?.intentText?.sanitize()
+                val toolbarColor = intent?.getIntExtra(CustomTabsIntent.EXTRA_TOOLBAR_COLOR, defaultColor) ?: defaultColor
+                val isEmailProtectionLink = emailProtectionLinkVerifier.shouldDelegateToInContextView(intentText, true)
+                val customTabRequested = hasSession && !isEmailProtectionLink
 
-            Timber.d("Intent $intent received. Has extra session=$hasSession. Intent text=$intentText. Toolbar color=$toolbarColor")
+                Timber.d("Intent $intent received. Has extra session=$hasSession. Intent text=$intentText. Toolbar color=$toolbarColor")
 
-            customTabDetector.setCustomTab(false)
-            _viewState.emit(
-                viewState.value.copy(
-                    customTabRequested = hasSession,
-                    intentText = intentText,
-                    toolbarColor = toolbarColor,
-                ),
-            )
+                customTabDetector.setCustomTab(false)
+                _viewState.emit(
+                    viewState.value.copy(
+                        customTabRequested = customTabRequested,
+                        intentText = intentText,
+                        toolbarColor = toolbarColor,
+                    ),
+                )
+            }.onFailure {
+                Timber.w("Error handling custom tab intent %s", it.message)
+            }
         }
+    }
+
+    private fun String.sanitize(): String {
+        // Some apps send URLs with spaces in the intent. This is happening mostly for authorization URLs.
+        // E.g https://mastodon.social/oauth/authorize?client_id=AcfPDZlcKUjwIatVtMt8B8cmdW-w1CSOR6_rYS_6Kxs&scope=read write push&redirect_uri=mastify://oauth&response_type=code
+        return this.replace(" ", "%20")
     }
 }

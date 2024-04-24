@@ -48,6 +48,7 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_A
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_ONBOARDING_FAQ_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_PRICE_MONTHLY_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_PRICE_YEARLY_CLICK
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_PRIVACY_PRO_REDIRECT
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_CHANGE_PLAN_OR_BILLING_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_REMOVE_FROM_DEVICE_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_SHOWN
@@ -59,7 +60,7 @@ interface SubscriptionPixelSender {
     fun reportOfferScreenShown()
     fun reportOfferSubscribeClick()
     fun reportPurchaseFailureOther()
-    fun reportPurchaseFailureStore()
+    fun reportPurchaseFailureStore(errorType: String)
     fun reportPurchaseFailureBackend()
     fun reportPurchaseFailureAccountCreation()
     fun reportPurchaseSuccess()
@@ -88,6 +89,7 @@ interface SubscriptionPixelSender {
     fun reportYearlyPriceClick()
     fun reportOnboardingFaqClick()
     fun reportAddEmailSuccess()
+    fun reportPrivacyProRedirect()
 }
 
 @ContributesBinding(AppScope::class)
@@ -107,8 +109,8 @@ class SubscriptionPixelSenderImpl @Inject constructor(
     override fun reportPurchaseFailureOther() =
         fire(PURCHASE_FAILURE_OTHER)
 
-    override fun reportPurchaseFailureStore() =
-        fire(PURCHASE_FAILURE_STORE)
+    override fun reportPurchaseFailureStore(errorType: String) =
+        fire(PURCHASE_FAILURE_STORE, mapOf("errorType" to errorType))
 
     override fun reportPurchaseFailureBackend() =
         fire(PURCHASE_FAILURE_BACKEND)
@@ -194,9 +196,12 @@ class SubscriptionPixelSenderImpl @Inject constructor(
     override fun reportAddEmailSuccess() =
         fire(SUBSCRIPTION_ADD_EMAIL_SUCCESS)
 
-    private fun fire(pixel: SubscriptionPixel) {
+    override fun reportPrivacyProRedirect() =
+        fire(SUBSCRIPTION_PRIVACY_PRO_REDIRECT)
+
+    private fun fire(pixel: SubscriptionPixel, params: Map<String, String> = emptyMap()) {
         pixel.getPixelNames().forEach { (pixelType, pixelName) ->
-            pixelSender.fire(pixelName = pixelName, type = pixelType)
+            pixelSender.fire(pixelName = pixelName, type = pixelType, parameters = params)
         }
     }
 }

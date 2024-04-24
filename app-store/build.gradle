@@ -29,6 +29,8 @@ dependencies {
     implementation AndroidX.room.runtime
 
     ksp AndroidX.room.compiler
+
+    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 android {
   namespace 'com.duckduckgo.app'

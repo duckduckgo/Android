@@ -25,4 +25,5 @@ class FakeCredentialsSyncStore : CredentialsSyncStore {
     override var clientModifiedSince: String = "0"
     override var isSyncPaused: Boolean = false
     override fun isSyncPausedFlow(): Flow<Boolean> = emptyFlow()
+    override var invalidEntitiesIds: List<String> = emptyList()
 }

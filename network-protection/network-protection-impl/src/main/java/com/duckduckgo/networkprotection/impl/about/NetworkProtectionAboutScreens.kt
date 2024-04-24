@@ -23,10 +23,4 @@ sealed class NetworkProtectionAboutScreens {
      * Use this model to launch the "Network Protection FAQs" screen
      */
     object NetPFaqsScreenNoParams : ActivityParams
-
-    /**
-     * Use this model to launch the "Network Protection" terms and conditions screen
-     */
-    @Deprecated("This is the old terms and conditions for VPN waitlist beta")
-    object NetPTermsScreenNoParams : ActivityParams
 }

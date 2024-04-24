@@ -17,6 +17,7 @@
 package com.duckduckgo.app.global.model
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
 import com.duckduckgo.app.global.model.PrivacyShield.UNPROTECTED
@@ -67,6 +68,8 @@ class SiteMonitorTest {
 
     private val mockContentBlocking: ContentBlocking = mock()
 
+    private val mockBypassedSSLCertificatesRepository: BypassedSSLCertificatesRepository = mock()
+
     @Test
     fun whenUrlIsHttpsThenHttpsStatusIsSecure() {
         val testee = SiteMonitor(
@@ -74,6 +77,7 @@ class SiteMonitorTest {
             title = null,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
+            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
@@ -87,6 +91,7 @@ class SiteMonitorTest {
             title = null,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
+            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
@@ -100,6 +105,7 @@ class SiteMonitorTest {
             title = null,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
+            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
@@ -114,6 +120,7 @@ class SiteMonitorTest {
             title = null,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
+            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
@@ -127,6 +134,7 @@ class SiteMonitorTest {
             title = null,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
+            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
@@ -140,6 +148,7 @@ class SiteMonitorTest {
             title = null,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
+            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
@@ -153,6 +162,7 @@ class SiteMonitorTest {
             title = null,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
+            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
@@ -199,6 +209,7 @@ class SiteMonitorTest {
             title = null,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
+            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
@@ -245,6 +256,7 @@ class SiteMonitorTest {
             title = null,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
+            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
@@ -291,6 +303,7 @@ class SiteMonitorTest {
             title = null,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
+            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
@@ -315,6 +328,7 @@ class SiteMonitorTest {
             title = null,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
+            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
@@ -339,6 +353,7 @@ class SiteMonitorTest {
             title = null,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
+            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
@@ -374,6 +389,7 @@ class SiteMonitorTest {
             title = null,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
+            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
@@ -387,6 +403,7 @@ class SiteMonitorTest {
             title = null,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
+            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
@@ -400,6 +417,7 @@ class SiteMonitorTest {
             title = null,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
+            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
@@ -414,6 +432,7 @@ class SiteMonitorTest {
             title = null,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
+            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
@@ -460,6 +479,7 @@ class SiteMonitorTest {
             title = null,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
+            bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             appCoroutineScope = coroutineRule.testScope,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
@@ -572,6 +592,14 @@ class SiteMonitorTest {
         assertEquals(PROTECTED, testee.privacyProtection())
     }
 
+    @Test
+    fun whenUserBypassedSslCertificateThenPrivacyShieldIsUnprotected() {
+        val testee = givenASiteMonitor(url = document)
+        whenever(mockBypassedSSLCertificatesRepository.contains(document)).thenReturn(false)
+
+        assertEquals(UNPROTECTED, testee.privacyProtection())
+    }
+
     fun givenASiteMonitor(
         url: String = document,
         title: String? = null,
@@ -582,6 +610,7 @@ class SiteMonitorTest {
         upgradedHttps = upgradedHttps,
         userAllowListRepository = mockAllowListRepository,
         contentBlocking = mockContentBlocking,
+        bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
         appCoroutineScope = coroutineRule.testScope,
         dispatcherProvider = coroutineRule.testDispatcherProvider,
     )

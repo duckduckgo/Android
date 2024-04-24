@@ -19,10 +19,11 @@
 package com.duckduckgo.app.tabs.model
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.MutableLiveData
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
-import app.cash.turbine.test
 import com.duckduckgo.app.blockingObserve
+import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.global.db.AppDatabase
@@ -216,9 +217,7 @@ class TabDataRepositoryTest {
 
         testee.addDefaultTab()
 
-        testee.flowTabs.test {
-            assertTrue(awaitItem().size == 1)
-        }
+        assertTrue(testee.liveTabs.blockingObserve()?.size == 1)
     }
 
     @Test
@@ -229,9 +228,7 @@ class TabDataRepositoryTest {
 
         testee.addDefaultTab()
 
-        testee.flowTabs.test {
-            assertTrue(awaitItem().size == 1)
-        }
+        assertTrue(testee.liveTabs.blockingObserve()?.size == 1)
     }
 
     @Test
@@ -408,6 +405,7 @@ class TabDataRepositoryTest {
         dao: TabsDao = mockDatabase(),
         entityLookup: EntityLookup = mock(),
         allowListRepository: UserAllowListRepository = mock(),
+        bypassedSSLCertificatesRepository: BypassedSSLCertificatesRepository = mock(),
         contentBlocking: ContentBlocking = mock(),
         webViewPreviewPersister: WebViewPreviewPersister = mock(),
         faviconManager: FaviconManager = mock(),
@@ -418,6 +416,7 @@ class TabDataRepositoryTest {
                 entityLookup,
                 contentBlocking,
                 allowListRepository,
+                bypassedSSLCertificatesRepository,
                 coroutinesTestRule.testScope,
                 coroutinesTestRule.testDispatcherProvider,
             ),
@@ -437,6 +436,8 @@ class TabDataRepositoryTest {
     private fun mockDatabase(): TabsDao {
         whenever(mockDao.flowDeletableTabs())
             .thenReturn(daoDeletableTabs.consumeAsFlow())
+        whenever(mockDao.liveTabs())
+            .thenReturn(MutableLiveData())
 
         return mockDao
     }

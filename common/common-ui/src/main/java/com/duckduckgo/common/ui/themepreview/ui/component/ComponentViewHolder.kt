@@ -183,6 +183,11 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 setLeadingIconClickListener { Snackbar.make(view, "Large Leading Icon clicked", Snackbar.LENGTH_SHORT).show() }
             }
 
+            view.findViewById<OneLineListItem>(R.id.oneLineListItemWithExtraLargeImage).apply {
+                setClickListener { Snackbar.make(view, component.name, Snackbar.LENGTH_SHORT).show() }
+                setLeadingIconClickListener { Snackbar.make(view, "Extra Large Leading Icon clicked", Snackbar.LENGTH_SHORT).show() }
+            }
+
             view.findViewById<OneLineListItem>(R.id.oneLineListItemWithTrailingIcon).apply {
                 setClickListener { Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show() }
                 setTrailingIconClickListener { Snackbar.make(view, "Overflow menu clicked", Snackbar.LENGTH_SHORT).show() }
@@ -245,6 +250,12 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             view.findViewById<TwoLineListItem>(R.id.twoLineListItemWithLargeImageAndTrailingIcon).apply {
                 setClickListener { Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show() }
                 setLeadingIconClickListener { Snackbar.make(view, "Large Leading Icon clicked", Snackbar.LENGTH_SHORT).show() }
+                setTrailingIconClickListener { Snackbar.make(view, "Overflow menu clicked", Snackbar.LENGTH_SHORT).show() }
+            }
+
+            view.findViewById<TwoLineListItem>(R.id.twoLineListItemWithExtraLargeImageAndTrailingIcon).apply {
+                setClickListener { Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show() }
+                setLeadingIconClickListener { Snackbar.make(view, "Extra Large Leading Icon clicked", Snackbar.LENGTH_SHORT).show() }
                 setTrailingIconClickListener { Snackbar.make(view, "Overflow menu clicked", Snackbar.LENGTH_SHORT).show() }
             }
 

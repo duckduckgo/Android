@@ -817,4 +817,15 @@
     <!-- Custom Tab -->
     <string name="openInDdgMenuItemTitle">Openen in DuckDuckGo</string>
     <string name="runningInDdgMenuItemTitle">Uitgevoerd in DuckDuckGo</string>
+
+    <!-- SSL Error -->
+    <string name="sslErrorTitle">Waarschuwing: Deze website is mogelijk onveilig</string>
+    <string name="sslErrorHeadline" instruction="Placeholder is domain with certificate issues">Het certificaat voor deze website is ongeldig. Mogelijk maak je verbinding met een server die zich voordoet als %1$s, waardoor je vertrouwelijke informatie in gevaar kan komen.</string>
+    <string name="sslErrorLeaveCTA">Deze website verlaten</string>
+    <string name="sslErrorAdvancedCTA">Geavanceerd</string>
+    <string name="sslErrorExpandedHeadline">DuckDuckGo waarschuwt je wanneer een website een ongeldig certificaat heeft.</string>
+    <string name="sslErrorExpandedCTA"><![CDATA[<u>Risico accepteren en site bezoeken<u/>]]></string>
+    <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">Het beveiligingscertificaat voor %1$s is verlopen. Mogelijk is de website verkeerd geconfigureerd, heeft een aanvaller je verbinding gecompromitteerd of staat de klok van je systeem niet goed.</string>
+    <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Het beveiligingscertificaat voor %1$s komt niet overeen met *.%2$s. Mogelijk is de website verkeerd geconfigureerd, heeft een aanvaller je verbinding gecompromitteerd of staat de klok van je systeem niet goed.</string>
+    <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Het besturingssysteem van je apparaat vertrouwt het beveiligingscertificaat voor %1$s niet. Mogelijk is de website verkeerd geconfigureerd, heeft een aanvaller je verbinding gecompromitteerd of staat de klok van je systeem niet goed.</string>
 </resources>

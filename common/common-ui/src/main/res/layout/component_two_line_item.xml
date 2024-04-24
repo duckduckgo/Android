@@ -91,6 +91,19 @@
         app:layout_constraintTop_toBottomOf="@id/twoLineListItemWithMediumImageAndTrailingIcon"/>
 
     <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+        android:id="@+id/twoLineListItemWithExtraLargeImageAndTrailingIcon"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:leadingIcon="@drawable/ic_dax_icon"
+        app:leadingIconSize="extra_large"
+        app:primaryText="Two Line Item"
+        app:secondaryText="With Extra Large Leading and Trailing Image"
+        app:trailingIcon="@drawable/ic_menu_vertical_24"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/twoLineListItemWithLargeImageAndTrailingIcon"/>
+
+    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
         android:id="@+id/twoLineListItemWithTrailingIcon"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -99,7 +112,7 @@
         app:trailingIcon="@drawable/ic_menu_vertical_24"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/twoLineListItemWithLargeImageAndTrailingIcon"/>
+        app:layout_constraintTop_toBottomOf="@id/twoLineListItemWithExtraLargeImageAndTrailingIcon"/>
 
     <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
         android:id="@+id/twoLineListItemWithBetaPill"

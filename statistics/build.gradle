@@ -79,6 +79,8 @@ dependencies {
 
     androidTestImplementation AndroidX.test.runner
     androidTestImplementation AndroidX.test.rules
+
+    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 
 android {
