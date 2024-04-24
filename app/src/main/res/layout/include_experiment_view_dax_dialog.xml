@@ -30,7 +30,6 @@
         android:background="@drawable/onboarding_experiment_background_bitmap"
         android:clipChildren="false">
 
-
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/logo"
             android:layout_width="56dp"
@@ -143,8 +142,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/keyline_2"
                         android:alpha="0"
+                        android:gravity="start|center_vertical"
                         android:text="@string/onboardingSitesDaxDialogOption1"
-                        android:textAlignment="textStart"
                         app:icon="@drawable/ic_globe_gray_16dp"
                         tools:alpha="1" />
 
@@ -154,8 +153,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="-4dp"
                         android:alpha="0"
+                        android:gravity="start|center_vertical"
                         android:text="@string/onboardingSitesDaxDialogOption2"
-                        android:textAlignment="textStart"
                         app:icon="@drawable/ic_globe_gray_16dp"
                         tools:alpha="1" />
 
@@ -165,8 +164,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="-4dp"
                         android:alpha="0"
+                        android:gravity="start|center_vertical"
                         android:text="@string/onboardingSitesDaxDialogOption3"
-                        android:textAlignment="textStart"
                         app:icon="@drawable/ic_globe_gray_16dp"
                         tools:alpha="1" />
 
@@ -176,8 +175,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="-4dp"
                         android:alpha="0"
+                        android:gravity="start|center_vertical"
                         android:text="@string/onboardingSitesDaxDialogOption4"
-                        android:textAlignment="textStart"
                         app:icon="@drawable/ic_wand_16"
                         tools:alpha="1" />
 

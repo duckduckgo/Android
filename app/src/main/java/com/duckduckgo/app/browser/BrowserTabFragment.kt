@@ -2133,6 +2133,7 @@ class BrowserTabFragment :
     private fun configurePrivacyShield() {
         omnibar.shieldIcon.setOnClickListener {
             browserActivity?.launchPrivacyDashboard()
+            viewModel.onPrivacyShieldSelected()
         }
     }
 
@@ -2206,7 +2207,7 @@ class BrowserTabFragment :
     @SuppressLint("SetJavaScriptEnabled")
     private fun configureWebView() {
         viewModel.configureBrowserBackground()
-        binding.browserContentLayout.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
+        binding.experimentDaxDialogContent.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
 
         webView = layoutInflater.inflate(
             R.layout.include_duckduckgo_browser_webview,
@@ -3810,7 +3811,12 @@ class BrowserTabFragment :
         private fun showExperimentDialogCta(configuration: ExperimentOnboardingDaxDialogCta) {
             hideHomeBackground()
             hideHomeCta()
-            configuration.showOnboardingCta(binding) { viewModel.onUserClickCtaOkButton() }
+            val onTypingAnimationFinished = if (configuration is ExperimentOnboardingDaxDialogCta.DaxTrackersBlockedCta) {
+                { viewModel.onExperimentDaxTypingAnimationFinished() }
+            } else {
+                {}
+            }
+            configuration.showOnboardingCta(binding, { viewModel.onUserClickCtaOkButton() }, onTypingAnimationFinished)
             if (configuration is ExperimentOnboardingDaxDialogCta.DaxSiteSuggestionsCta) {
                 configuration.setOnOptionClicked(
                     daxDialogExperimentOnboardingCta,

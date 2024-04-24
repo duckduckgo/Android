@@ -131,7 +131,7 @@ class BrowserWebViewClient @Inject constructor(
     ): Boolean {
         try {
             Timber.v("shouldOverride webViewUrl: ${webView.url} URL: $url")
-            webViewClientListener?.onWebUpdateRequested()
+            webViewClientListener?.onShouldOverride()
             if (isForMainFrame && dosDetector.isUrlGeneratingDos(url)) {
                 webView.loadUrl("about:blank")
                 webViewClientListener?.dosAttackDetected()

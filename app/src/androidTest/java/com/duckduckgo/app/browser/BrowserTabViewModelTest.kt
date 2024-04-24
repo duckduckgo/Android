@@ -23,8 +23,6 @@ import android.net.Uri
 import android.net.http.SslCertificate
 import android.net.http.SslError
 import android.os.Build
-import android.os.Handler
-import android.os.Looper
 import android.print.PrintAttributes
 import android.view.MenuItem
 import android.view.View
@@ -37,7 +35,6 @@ import android.webkit.WebChromeClient.FileChooserParams
 import android.webkit.WebView
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.core.net.toUri
-import androidx.core.os.postDelayed
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.room.Room
@@ -5235,10 +5232,19 @@ class BrowserTabViewModelTest {
         val cta = ExperimentOnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList())
         testee.ctaViewState.value = ctaViewState().copy(cta = cta)
 
-        testee.onCtaShown()
-        Handler(Looper.getMainLooper()).postDelayed(delayInMillis = 2000L) {
-            assertTrue(browserViewState().showPrivacyShield.isHighlighted())
-        }
+        testee.onExperimentDaxTypingAnimationFinished()
+
+        assertTrue(browserViewState().showPrivacyShield.isHighlighted())
+    }
+
+    @Test
+    fun givenOnboardingExperimentEnabledAndPrivacyShieldHighlightedWhenShieldIconSelectedThenStopPulse() = runTest {
+        whenever(mockExtendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()).thenReturn(true)
+        val cta = ExperimentOnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList())
+        testee.ctaViewState.value = ctaViewState().copy(cta = cta)
+
+        testee.onPrivacyShieldSelected()
+        assertTrue(!browserViewState().showPrivacyShield.isHighlighted())
     }
 
     @Test

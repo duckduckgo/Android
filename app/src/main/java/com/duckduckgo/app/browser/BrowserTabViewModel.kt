@@ -20,8 +20,6 @@ import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.net.Uri
 import android.net.http.SslCertificate
-import android.os.Handler
-import android.os.Looper
 import android.os.Message
 import android.print.PrintAttributes
 import android.provider.MediaStore
@@ -39,7 +37,6 @@ import android.webkit.WebView
 import androidx.annotation.AnyThread
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
-import androidx.core.os.postDelayed
 import androidx.lifecycle.*
 import androidx.lifecycle.Observer
 import com.duckduckgo.adclick.api.AdClickManager
@@ -2412,11 +2409,6 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             ctaViewModel.onCtaShown(cta)
         }
-        if (cta is ExperimentOnboardingDaxDialogCta.DaxTrackersBlockedCta) {
-            Handler(Looper.getMainLooper()).postDelayed(delayInMillis = 2000L) {
-                browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = true))
-            }
-        }
     }
 
     fun onNewTabFavouritesShown() {
@@ -3220,7 +3212,17 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    override fun onWebUpdateRequested() {
+    fun onPrivacyShieldSelected() {
+        if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled() && currentBrowserViewState().showPrivacyShield.isHighlighted()) {
+            browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
+        }
+    }
+
+    fun onExperimentDaxTypingAnimationFinished() {
+        browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = true))
+    }
+
+    override fun onShouldOverride() {
         val cta = currentCtaViewState().cta
         if (cta is ExperimentOnboardingDaxDialogCta) {
             onDismissExperimentDaxDialog(cta)

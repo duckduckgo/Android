@@ -241,6 +241,7 @@ interface ExperimentDaxCta {
     fun showOnboardingCta(
         binding: FragmentBrowserTabBinding,
         onPrimaryCtaClicked: () -> Unit,
+        onTypingAnimationFinished: () -> Unit,
     )
 
     fun hideOnboardingCta(
@@ -274,6 +275,7 @@ sealed class ExperimentOnboardingDaxDialogCta(
         daxText: String,
         buttonText: String?,
         binding: FragmentBrowserTabBinding,
+        onTypingAnimationFinished: () -> Unit = {},
     ) {
         val daxDialog = binding.includeOnboardingDaxDialogExperiment
 
@@ -290,6 +292,7 @@ sealed class ExperimentOnboardingDaxDialogCta(
         daxDialog.root.alpha = MAX_ALPHA
         daxDialog.dialogTextCta.startTypingAnimation(daxText, true) {
             ViewCompat.animate(daxDialog.primaryCta).alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
+            onTypingAnimationFinished.invoke()
         }
     }
 
@@ -310,6 +313,7 @@ sealed class ExperimentOnboardingDaxDialogCta(
         override fun showOnboardingCta(
             binding: FragmentBrowserTabBinding,
             onPrimaryCtaClicked: () -> Unit,
+            onTypingAnimationFinished: () -> Unit,
         ) {
             val context = binding.root.context
             setOnboardingDialogView(
@@ -339,12 +343,14 @@ sealed class ExperimentOnboardingDaxDialogCta(
         override fun showOnboardingCta(
             binding: FragmentBrowserTabBinding,
             onPrimaryCtaClicked: () -> Unit,
+            onTypingAnimationFinished: () -> Unit,
         ) {
             val context = binding.root.context
             setOnboardingDialogView(
                 daxText = getTrackersDescription(context, trackers),
                 buttonText = buttonText?.let { context.getString(it) },
                 binding = binding,
+                onTypingAnimationFinished = onTypingAnimationFinished,
             )
             binding.includeOnboardingDaxDialogExperiment.primaryCta.setOnClickListener { onPrimaryCtaClicked.invoke() }
         }
@@ -390,6 +396,7 @@ sealed class ExperimentOnboardingDaxDialogCta(
         override fun showOnboardingCta(
             binding: FragmentBrowserTabBinding,
             onPrimaryCtaClicked: () -> Unit,
+            onTypingAnimationFinished: () -> Unit,
         ) {
             val context = binding.root.context
             setOnboardingDialogView(
@@ -439,6 +446,7 @@ sealed class ExperimentOnboardingDaxDialogCta(
         override fun showOnboardingCta(
             binding: FragmentBrowserTabBinding,
             onPrimaryCtaClicked: () -> Unit,
+            onTypingAnimationFinished: () -> Unit,
         ) {
             val context = binding.root.context
             setOnboardingDialogView(
@@ -467,6 +475,7 @@ sealed class ExperimentOnboardingDaxDialogCta(
         override fun showOnboardingCta(
             binding: FragmentBrowserTabBinding,
             onPrimaryCtaClicked: () -> Unit,
+            onTypingAnimationFinished: () -> Unit,
         ) {
             val context = binding.root.context
             val daxDialog = binding.includeOnboardingDaxDialogExperiment
@@ -497,6 +506,7 @@ sealed class ExperimentOnboardingDaxDialogCta(
         override fun showOnboardingCta(
             binding: FragmentBrowserTabBinding,
             onPrimaryCtaClicked: () -> Unit,
+            onTypingAnimationFinished: () -> Unit,
         ) {
             val context = binding.root.context
             val daxDialog = binding.includeOnboardingDaxDialogExperiment

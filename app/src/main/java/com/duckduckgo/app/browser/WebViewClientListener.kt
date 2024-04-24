@@ -110,5 +110,5 @@ interface WebViewClientListener {
         handler: SslErrorHandler,
         errorResponse: SslErrorResponse,
     )
-    fun onWebUpdateRequested()
+    fun onShouldOverride()
 }
