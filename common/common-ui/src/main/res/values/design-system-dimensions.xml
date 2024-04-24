@@ -52,7 +52,8 @@
     <dimen name="listItemImageContainerSize">40dp</dimen>
     <dimen name="listItemImageSmallSize">16dp</dimen>
     <dimen name="listItemImageMediumSize">24dp</dimen>
-    <dimen name="listItemImageLargeSize">40dp</dimen>
+    <dimen name="listItemImageLargeSize">32dp</dimen>
+    <dimen name="listItemImageExtraLargeSize">40dp</dimen>
     <dimen name="listItemTrailingIconWidth">52dp</dimen>
     <dimen name="oneLineItemHeight">48dp</dimen>
     <dimen name="oneLineItemWithLargeImageHeight">56dp</dimen>
