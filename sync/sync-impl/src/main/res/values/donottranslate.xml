@@ -15,6 +15,9 @@
   -->
 
 <resources>
+    <string name="sync_require_device_passcode_dialog_title">Secure your device to use Sync &amp; Backup</string>
+    <string name="sync_require_device_passcode_dialog_body">A device lock pattern, PIN, or biometrics is required to use Sync &amp; Backup.</string>
+    <string name="sync_require_device_passcode_dialog_action">Go to Settings</string>
     <!-- Internal Setting -->
     <string name="sync_internal_activity_label">Sync Setup Internal</string>
     <string name="sync_internal_environment_header">Environment Settings</string>

@@ -52,6 +52,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasS
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroCreateAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroRecoverSyncData
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RequestSetupAuthentication
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowDeviceUnsupported
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowRecoveryCode
@@ -270,6 +271,7 @@ class SyncActivity : DuckDuckGoActivity() {
                 startActivity(DeviceUnsupportedActivity.intent(this))
                 finish()
             }
+            is RequestSetupAuthentication -> launchDeviceAuthEnrollment()
         }
     }
 
@@ -352,6 +354,22 @@ class SyncActivity : DuckDuckGoActivity() {
                     }
                 },
             ).show()
+    }
+
+    private fun launchDeviceAuthEnrollment() {
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.sync_require_device_passcode_dialog_title)
+            .setMessage(getString(R.string.sync_require_device_passcode_dialog_body))
+            .setPositiveButton(R.string.sync_require_device_passcode_dialog_action)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        deviceAuthenticator.launchDeviceAuthEnrollment(this@SyncActivity)
+                    }
+                },
+            )
+            .setCancellable(true)
+            .show()
     }
 
     private fun renderViewState(viewState: ViewState) {
