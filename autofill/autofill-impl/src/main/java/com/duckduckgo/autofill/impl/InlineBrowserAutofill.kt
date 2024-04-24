@@ -81,11 +81,13 @@ class InlineBrowserAutofill @Inject constructor(
     ) {
         Timber.d("Autofill: Configuring modern integration with %d message listeners", webMessageListeners.getPlugins().size)
 
-        webMessageListeners.getPlugins().forEach {
-            webView.addWebMessageListener(it, autofillCallback, tabId)
-        }
+        withContext(dispatchers.main()) {
+            webMessageListeners.getPlugins().forEach {
+                webView.addWebMessageListener(it, autofillCallback, tabId)
+            }
 
-        autofillJavascriptInjector.addDocumentStartJavascript(webView)
+            autofillJavascriptInjector.addDocumentStartJavascript(webView)
+        }
     }
 
     override fun cancelPendingAutofillRequestToChooseCredentials() {
