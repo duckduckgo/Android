@@ -57,10 +57,12 @@ class DuckDuckGoAppLinksHandler @Inject constructor() : AppLinksHandler {
 
         previousUrl?.let {
             if (isSameOrSubdomain(it, urlString)) {
-                if (isAUserQuery || !hasTriggeredForDomain || alwaysTriggerList.contains(urlString.extractDomain())) {
+                val shouldTrigger = alwaysTriggerList.contains(urlString.extractDomain())
+                if (isAUserQuery || !hasTriggeredForDomain || shouldTrigger) {
                     previousUrl = urlString
                     launchAppLink()
                     hasTriggeredForDomain = true
+                    if (shouldTrigger) return true
                 }
                 return false
             }
