@@ -99,6 +99,7 @@ import com.duckduckgo.app.browser.commands.Command
 import com.duckduckgo.app.browser.commands.Command.ShowBackNavigationHistory
 import com.duckduckgo.app.browser.commands.NavigationCommand
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
+import com.duckduckgo.app.browser.customtabs.CustomTabActivity
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.customtabs.CustomTabViewModel.Companion.CUSTOM_TAB_NAME_PREFIX
 import com.duckduckgo.app.browser.databinding.ContentSiteLocationPermissionDialogBinding
@@ -1297,6 +1298,8 @@ class BrowserTabFragment :
                 if (isActiveCustomTab()) {
                     webView?.hitTestResult?.extra?.let { data ->
                         webView?.loadUrl(Uri.parse(data).toString())
+                    } ?: run {
+                        (activity as CustomTabActivity).openMessageInNewFragmentInCustomTab(it.message, this, customTabToolbarColor)
                     }
                 } else {
                     browserActivity?.openMessageInNewTab(it.message, it.sourceTabId)

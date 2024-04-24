@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.customtabs
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Message
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -32,6 +33,7 @@ import com.duckduckgo.app.global.intentText
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import java.util.UUID
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
@@ -57,6 +59,20 @@ class CustomTabActivity : DuckDuckGoActivity() {
         }.launchIn(lifecycleScope)
 
         viewModel.onCustomTabCreated(url, toolbarColor)
+    }
+
+    fun openMessageInNewFragmentInCustomTab(
+        message: Message,
+        currentFragment: BrowserTabFragment,
+        toolbarColor: Int,
+    ) {
+        val tabId = "${CustomTabViewModel.CUSTOM_TAB_NAME_PREFIX}${UUID.randomUUID()}"
+        val newFragment = BrowserTabFragment.newInstanceForCustomTab(tabId, null, true, toolbarColor)
+        val transaction = supportFragmentManager.beginTransaction()
+        transaction.hide(currentFragment)
+        transaction.add(R.id.fragmentTabContainer, newFragment, tabId)
+        transaction.commit()
+        newFragment.messageFromPreviousTab = message
     }
 
     override fun onStart() {
