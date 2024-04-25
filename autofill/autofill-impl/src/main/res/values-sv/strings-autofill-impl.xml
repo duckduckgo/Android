@@ -160,4 +160,11 @@
     <string name="autofill_auth_text_for_delete_all">Autentisera för att bekräfta att du vill radera alla lösenord</string>
     <string name="autofill_title_text_for_delete_all">Radera alla lösenord</string>
 
+    <!-- Sync settings screen -->
+    <plurals name="syncCredentialInvalidItemsWarning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="one">Ditt lösenord för %1$s kan inte synkroniseras eftersom ett av dess fält överskrider teckengränsen.</item>
+        <item quantity="other">Dina lösenord för %1$s och %2$d andra webbplatser kan inte synkroniseras eftersom vissa av deras fält överskrider teckengränsen.</item>
+    </plurals>
+    <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Hantera lösenord</annotation></string>
+
 </resources>
