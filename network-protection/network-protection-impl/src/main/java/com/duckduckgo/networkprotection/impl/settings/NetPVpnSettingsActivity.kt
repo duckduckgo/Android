@@ -42,7 +42,7 @@ import kotlinx.coroutines.flow.onEach
     scope = ActivityScope::class,
     delayGeneration = true, // VpnSettingPlugin can be contributed from other modules
 )
-@ContributeToActivityStarter(NetPVpnSettingsScreenNoParams::class)
+@ContributeToActivityStarter(NetPVpnSettingsScreenNoParams::class, screenName = "vpn.settings")
 class NetPVpnSettingsActivity : DuckDuckGoActivity() {
 
     @Inject

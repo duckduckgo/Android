@@ -86,7 +86,7 @@ import nl.dionsegijn.konfetti.models.Shape
 import nl.dionsegijn.konfetti.models.Size
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(AppTrackerActivityWithEmptyParams::class)
+@ContributeToActivityStarter(AppTrackerActivityWithEmptyParams::class, screenName = "apptp.main")
 class DeviceShieldTrackerActivity :
     DuckDuckGoActivity(),
     DeviceShieldActivityFeedFragment.DeviceShieldActivityFeedListener {

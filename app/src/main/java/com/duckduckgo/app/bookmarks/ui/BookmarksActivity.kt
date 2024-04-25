@@ -74,7 +74,7 @@ import java.util.*
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(BookmarksScreenNoParams::class)
+@ContributeToActivityStarter(BookmarksScreenNoParams::class, screenName = "bookmarks")
 class BookmarksActivity : DuckDuckGoActivity() {
 
     @Inject
