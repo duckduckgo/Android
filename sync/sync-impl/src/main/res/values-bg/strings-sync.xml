@@ -159,6 +159,9 @@
     <!-- Sync Device Authentication -->
     <string name="sync_auth_text_for_access">Отключете устройството, за да влезете в Sync &amp; Backup.</string>
     <string name="sync_biometric_prompt_title">Функцията Sync &amp; Backup е заключена</string>
+    <string name="sync_require_device_passcode_dialog_title">Защитете устройството си, за да използвате Sync &amp; Backup</string>
+    <string name="sync_require_device_passcode_dialog_body">За да използване на Sync &amp; Backup е необходимо да зададете модел за заключване, ПИН код или биометрични данни.</string>
+    <string name="sync_require_device_passcode_dialog_action">Влезте в Настройки</string>
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Изтриване на данните от сървъра?</string>
