@@ -29,10 +29,8 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.registerExportedReceiver
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ReceiverScope
-import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.mobile.android.vpn.Vpn
-import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
-import com.squareup.anvil.annotations.ContributesBinding
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlin.properties.Delegates
@@ -41,34 +39,25 @@ import logcat.LogPriority
 import logcat.asLog
 import logcat.logcat
 
-interface VpnDisableOnCall {
-    fun enable()
-    fun disable()
-
-    suspend fun isEnabled(): Boolean
-}
-
 @InjectWith(ReceiverScope::class)
 @ContributesMultibinding(
     scope = AppScope::class,
     boundType = MainProcessLifecycleObserver::class,
-)
-@ContributesBinding(
-    scope = AppScope::class,
-    boundType = VpnDisableOnCall::class,
 )
 class VpnCallStateReceiver @Inject constructor(
     private val context: Context,
     private val vpn: Vpn,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val netPSettingsLocalConfig: NetPSettingsLocalConfig,
     @ProcessName private val processName: String,
-) : BroadcastReceiver(), MainProcessLifecycleObserver, VpnDisableOnCall {
+    private val vpnDisableOnCall: VpnDisableOnCall,
+    private val networkProtectionState: NetworkProtectionState,
+) : BroadcastReceiver(), MainProcessLifecycleObserver {
 
     private val telephonyManager by lazy {
         context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager?
     }
+
     private val _listener: PhoneStateListener =
         object : PhoneStateListener() {
             @Deprecated("Deprecated in Java")
@@ -78,10 +67,12 @@ class VpnCallStateReceiver @Inject constructor(
             ) {
                 appCoroutineScope.launch(dispatcherProvider.io()) {
                     logcat { "Call state: $state" }
-                    if (state == TelephonyManager.CALL_STATE_IDLE) {
-                        vpn.start()
-                    } else {
-                        vpn.stop()
+                    if (networkProtectionState.isEnabled()) {
+                        if (state == TelephonyManager.CALL_STATE_IDLE) {
+                            vpn.start()
+                        } else {
+                            vpn.stop()
+                        }
                     }
                 }
             }
@@ -94,24 +85,6 @@ class VpnCallStateReceiver @Inject constructor(
         new?.let {
             telephonyManager?.listen(new, PhoneStateListener.LISTEN_CALL_STATE)
         }
-    }
-
-    override fun enable() {
-        appCoroutineScope.launch(dispatcherProvider.io()) {
-            netPSettingsLocalConfig.vpnPauseDuringCalls().setEnabled(Toggle.State(enable = true))
-            context.sendBroadcast(Intent(ACTION_REGISTER_STATE_CALL_LISTENER))
-        }
-    }
-
-    override fun disable() {
-        appCoroutineScope.launch(dispatcherProvider.io()) {
-            context.sendBroadcast(Intent(ACTION_UNREGISTER_STATE_CALL_LISTENER))
-            netPSettingsLocalConfig.vpnPauseDuringCalls().setEnabled(Toggle.State(enable = false))
-        }
-    }
-
-    override suspend fun isEnabled(): Boolean = withContext(dispatcherProvider.io()) {
-        return@withContext netPSettingsLocalConfig.vpnPauseDuringCalls().isEnabled()
     }
 
     override fun onReceive(
@@ -145,7 +118,7 @@ class VpnCallStateReceiver @Inject constructor(
     override fun onCreate(owner: LifecycleOwner) {
         register()
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            if (isEnabled()) {
+            if (vpnDisableOnCall.isEnabled()) {
                 registerListener()
             } else {
                 logcat { "CALL_STATE listener feature is disabled" }
@@ -183,8 +156,8 @@ class VpnCallStateReceiver @Inject constructor(
     }
 
     companion object {
-        private const val ACTION_REGISTER_STATE_CALL_LISTENER = "com.duckduckgo.netp.feature.snooze.ACTION_REGISTER_STATE_CALL_LISTENER"
-        private const val ACTION_UNREGISTER_STATE_CALL_LISTENER = "com.duckduckgo.netp.feature.snooze.ACTION_UNREGISTER_STATE_CALL_LISTENER"
+        internal const val ACTION_REGISTER_STATE_CALL_LISTENER = "com.duckduckgo.netp.feature.snooze.ACTION_REGISTER_STATE_CALL_LISTENER"
+        internal const val ACTION_UNREGISTER_STATE_CALL_LISTENER = "com.duckduckgo.netp.feature.snooze.ACTION_UNREGISTER_STATE_CALL_LISTENER"
     }
 }
 

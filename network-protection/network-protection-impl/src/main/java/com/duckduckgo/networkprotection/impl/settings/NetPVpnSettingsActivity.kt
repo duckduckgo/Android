@@ -154,7 +154,6 @@ class NetPVpnSettingsActivity : DuckDuckGoActivity() {
         when (requestCode) {
             permission.READ_PHONE_STATE.hashCode().absoluteValue -> {
                 val granted = grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED
-                viewModel.onEnablePauseDuringWifiCalls()
                 binding.pauseWhileCalling.setIsChecked(granted)
                 if (!granted) {
                     logcat { "READ_PHONE_STATE permission denied" }
