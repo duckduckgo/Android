@@ -27,6 +27,8 @@ import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.listitem.CheckListItem.CheckItemStatus.DISABLED
+import com.duckduckgo.common.ui.view.listitem.CheckListItem.CheckItemStatus.WARNING
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
@@ -35,7 +37,9 @@ import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.GRACE_PERIOD
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
 import com.duckduckgo.subscriptions.impl.R
@@ -143,9 +147,25 @@ class ProSettingView @JvmOverloads constructor(
                 binding.subscriptionSettingContainer.gone()
                 binding.subscriptionRestoreContainer.show()
             }
+            EXPIRED, INACTIVE -> {
+                binding.subscriptionBuy.setPrimaryText(context.getString(R.string.subscriptionSettingExpired))
+                binding.subscriptionBuy.setSecondaryText(context.getString(R.string.subscriptionSettingExpiredSubtitle))
+                binding.subscriptionBuy.setItemStatus(WARNING)
+                binding.subscriptionGet.setText(R.string.subscriptionSettingExpiredViewPlans)
+                binding.subscribeSecondary.gone()
+                binding.subscriptionBuyContainer.show()
+                binding.subscriptionSettingContainer.show()
+                binding.subscriptionWaitingContainer.gone()
+                binding.subscriptionRestoreContainer.gone()
+            }
             else -> {
+                binding.subscriptionBuy.setPrimaryText(context.getString(R.string.subscriptionSettingSubscribe))
+                binding.subscriptionBuy.setSecondaryText(context.getString(R.string.subscriptionSettingSubscribeSubtitle))
+                binding.subscriptionBuy.setItemStatus(DISABLED)
+                binding.subscriptionGet.setText(R.string.subscriptionSettingGet)
                 val htmlText = context.getString(R.string.subscriptionSettingFeaturesList).html(context)
                 binding.subscribeSecondary.text = htmlText.noTrailingWhiteLines()
+                binding.subscribeSecondary.show()
                 binding.subscriptionBuyContainer.show()
                 binding.subscriptionSettingContainer.gone()
                 binding.subscriptionWaitingContainer.gone()
