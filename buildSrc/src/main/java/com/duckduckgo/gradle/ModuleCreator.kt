@@ -20,6 +20,7 @@ import com.duckduckgo.gradle.ModuleType.ApiPureKotlin
 import com.duckduckgo.gradle.ModuleType.Companion.INPUT_API_ANDROID
 import com.duckduckgo.gradle.ModuleType.Companion.INPUT_API_IMPL
 import com.duckduckgo.gradle.ModuleType.Companion.INPUT_API_KOTLIN
+import com.duckduckgo.gradle.ModuleType.Companion.INPUT_API_INTERNAL
 import com.duckduckgo.gradle.ModuleType.Companion.destinationDirectorySuffix
 import com.duckduckgo.gradle.ModuleType.Companion.exampleSubdirectorySuffix
 import com.duckduckgo.gradle.ModuleType.Companion.namespaceSuffix
@@ -135,7 +136,10 @@ abstract class ModuleCreator : DefaultTask() {
                 "\n\t./gradlew newModule -Pfeature=my-new-feature/${INPUT_API_ANDROID}" +
                 "\n" +
                 "\nTo create an impl module:" +
-                "\n\t./gradlew newModule -Pfeature=my-new-feature/${INPUT_API_IMPL}"
+                "\n\t./gradlew newModule -Pfeature=my-new-feature/${INPUT_API_IMPL}" +
+                "\n" +
+                "\nTo create an internal module:" +
+                "\n\t./gradlew newModule -Pfeature=my-new-feature/${INPUT_API_INTERNAL}"
     }
 }
 

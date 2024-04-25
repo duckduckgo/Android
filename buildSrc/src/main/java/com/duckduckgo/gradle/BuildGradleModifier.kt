@@ -21,6 +21,18 @@ import java.io.File
 
 class BuildGradleModifier(private val gradleFile: File) {
 
+    fun lineExists(placeholder: String): Boolean {
+        val lines = gradleFile.readText().lines()
+
+        for (line in lines) {
+            if (line.contains(placeholder)) {
+                return true
+            }
+        }
+
+        return false
+    }
+
     fun removeDependency(placeholder: String) {
         val lines = gradleFile.readText().lines()
         val updatedLines = mutableListOf<String>()
@@ -37,12 +49,15 @@ class BuildGradleModifier(private val gradleFile: File) {
 
     fun insertDependencies(
         featureName: String,
-        dependencies: List<String>
+        dependencies: List<String>,
+        isInternal: Boolean = false
     ) {
         if(dependencies.isEmpty()) return
 
+        val importStatement = if (isInternal) "internalImplementation" else "implementation"
+
         val searchString = "dependencies {"
-        val linesToAdd = dependencies.map { """implementation project(":${featureName}-${it}")""" }
+        val linesToAdd = dependencies.map { """$importStatement project(":${featureName}-${it}")""" }
 
         val lines = gradleFile.readText().lines()
         val updatedLines = mutableListOf<String>()
