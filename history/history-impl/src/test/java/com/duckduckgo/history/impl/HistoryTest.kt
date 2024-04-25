@@ -17,8 +17,7 @@
 package com.duckduckgo.history.impl
 
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
@@ -30,16 +29,15 @@ class HistoryTest {
 
     private val mockHistoryRepository: HistoryRepository = mock()
     private val mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
-    private val testScope = TestScope()
 
-    val testee = RealNavigationHistory(mockHistoryRepository, mockDuckDuckGoUrlDetector, testScope)
+    val testee = RealNavigationHistory(mockHistoryRepository, mockDuckDuckGoUrlDetector)
 
     @Test
     fun whenUrlIsSerpThenSaveToHistoryWithQueryAndSerpIsTrue() {
         whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoQueryUrl(any())).thenReturn(true)
         whenever(mockDuckDuckGoUrlDetector.extractQuery(any())).thenReturn("query")
 
-        testScope.launch {
+        runTest {
             testee.saveToHistory("url", "title")
 
             verify(mockHistoryRepository).saveToHistory(eq("url"), eq("title"), eq("query"), eq(true))
@@ -51,7 +49,7 @@ class HistoryTest {
         whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoQueryUrl(any())).thenReturn(true)
         whenever(mockDuckDuckGoUrlDetector.extractQuery(any())).thenReturn(null)
 
-        testScope.launch {
+        runTest {
             testee.saveToHistory("url", "title")
 
             verify(mockHistoryRepository).saveToHistory(eq("url"), eq("title"), eq(null), eq(false))
@@ -62,7 +60,7 @@ class HistoryTest {
     fun whenNotSerpUrlThenSaveToHistoryWithoutQueryAndSerpIsFalse() {
         whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoQueryUrl(any())).thenReturn(false)
 
-        testScope.launch {
+        runTest {
             testee.saveToHistory("url", "title")
 
             verify(mockHistoryRepository).saveToHistory(eq("url"), eq("title"), eq(null), eq(false))

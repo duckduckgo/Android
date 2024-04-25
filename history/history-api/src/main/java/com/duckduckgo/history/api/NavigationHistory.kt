@@ -26,7 +26,7 @@ interface NavigationHistory {
      * @param title The title of the history entry. Can be null.
      */
 
-    fun saveToHistory(url: String, title: String?)
+    suspend fun saveToHistory(url: String, title: String?)
 
     /**
      * Retrieves all [HistoryEntry].

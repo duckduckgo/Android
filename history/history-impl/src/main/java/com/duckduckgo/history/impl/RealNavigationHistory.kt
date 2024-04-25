@@ -17,32 +17,26 @@
 package com.duckduckgo.history.impl
 
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
-import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.history.api.HistoryEntry
 import com.duckduckgo.history.api.NavigationHistory
 import com.squareup.anvil.annotations.ContributesBinding
 import io.reactivex.Single
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 @ContributesBinding(AppScope::class)
 class RealNavigationHistory @Inject constructor(
     private val historyRepository: HistoryRepository,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : NavigationHistory {
-    override fun saveToHistory(
+    override suspend fun saveToHistory(
         url: String,
         title: String?,
     ) {
-        appCoroutineScope.launch {
-            val ddgUrl = duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)
-            val query = if (ddgUrl) duckDuckGoUrlDetector.extractQuery(url) else null
+        val ddgUrl = duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)
+        val query = if (ddgUrl) duckDuckGoUrlDetector.extractQuery(url) else null
 
-            historyRepository.saveToHistory(url, title, query, query != null)
-        }
+        historyRepository.saveToHistory(url, title, query, query != null)
     }
 
     override fun getHistorySingle(): Single<List<HistoryEntry>> {

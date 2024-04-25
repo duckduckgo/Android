@@ -28,10 +28,10 @@ import java.time.LocalDateTime
 interface HistoryDao {
     @Transaction
     @Query("SELECT * FROM history_entries")
-    fun getHistoryEntriesWithVisits(): List<HistoryEntryWithVisits>
+    suspend fun getHistoryEntriesWithVisits(): List<HistoryEntryWithVisits>
 
     @Transaction
-    fun updateOrInsertVisit(url: String, title: String, query: String?, isSerp: Boolean, date: LocalDateTime) {
+    suspend fun updateOrInsertVisit(url: String, title: String, query: String?, isSerp: Boolean, date: LocalDateTime) {
         val existingHistoryEntry = getHistoryEntryByUrl(url)
 
         if (existingHistoryEntry != null) {
@@ -47,11 +47,11 @@ interface HistoryDao {
     }
 
     @Query("SELECT * FROM history_entries WHERE url = :url LIMIT 1")
-    fun getHistoryEntryByUrl(url: String): HistoryEntryEntity?
+    suspend fun getHistoryEntryByUrl(url: String): HistoryEntryEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertHistoryEntry(historyEntry: HistoryEntryEntity): Long
+    suspend fun insertHistoryEntry(historyEntry: HistoryEntryEntity): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertVisit(visit: VisitEntity)
+    suspend fun insertVisit(visit: VisitEntity)
 }

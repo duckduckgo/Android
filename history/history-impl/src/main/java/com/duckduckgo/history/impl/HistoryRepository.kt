@@ -16,15 +16,19 @@
 
 package com.duckduckgo.history.impl
 
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.history.api.HistoryEntry
 import com.duckduckgo.history.impl.store.HistoryDao
 import io.reactivex.Single
 import java.time.LocalDateTime
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 interface HistoryRepository {
     fun getHistoryObservable(): Single<List<HistoryEntry>>
 
-    fun saveToHistory(
+    suspend fun saveToHistory(
         url: String,
         title: String?,
         query: String?,
@@ -34,32 +38,50 @@ interface HistoryRepository {
 
 class RealHistoryRepository(
     private val historyDao: HistoryDao,
+    private val dispatcherProvider: DispatcherProvider,
+    private val appCoroutineScope: CoroutineScope,
 ) : HistoryRepository {
 
     private var cachedHistoryEntries: List<HistoryEntry>? = null
 
     override fun getHistoryObservable(): Single<List<HistoryEntry>> {
-        return Single.just(cachedHistoryEntries ?: fetchAndCacheHistoryEntries())
+        return if (cachedHistoryEntries != null) {
+            Single.just(cachedHistoryEntries)
+        } else {
+            Single.create { emitter ->
+                appCoroutineScope.launch(dispatcherProvider.io()) {
+                    try {
+                        emitter.onSuccess(fetchAndCacheHistoryEntries())
+                    } catch (e: Exception) {
+                        emitter.onError(e)
+                    }
+                }
+            }
+        }
     }
 
-    override fun saveToHistory(
+    override suspend fun saveToHistory(
         url: String,
         title: String?,
         query: String?,
         isSerp: Boolean,
     ) {
-        historyDao.updateOrInsertVisit(
-            url,
-            title ?: "",
-            query,
-            isSerp,
-            LocalDateTime.now(),
-        )
-        fetchAndCacheHistoryEntries()
-    }
-    private fun fetchAndCacheHistoryEntries(): List<HistoryEntry> {
-        return historyDao.getHistoryEntriesWithVisits().mapNotNull { it.toHistoryEntry() }.also {
-            cachedHistoryEntries = it
+        withContext(dispatcherProvider.io()) {
+            historyDao.updateOrInsertVisit(
+                url,
+                title ?: "",
+                query,
+                isSerp,
+                LocalDateTime.now(),
+            )
+            fetchAndCacheHistoryEntries()
         }
+    }
+
+    private suspend fun fetchAndCacheHistoryEntries(): List<HistoryEntry> {
+        return historyDao
+            .getHistoryEntriesWithVisits()
+            .mapNotNull { it.toHistoryEntry() }
+            .also { cachedHistoryEntries = it }
     }
 }
