@@ -39,7 +39,7 @@ class RealUserAgent @Inject constructor(
     private val unprotectedTemporary: UnprotectedTemporary,
 ) : UserAgent {
 
-    private val legacySites = listOf("duckduckgo.com")
+    private val legacySites = listOf("duckduckgo.com", "ddg.gg", "duck.com", "duck.it")
 
     override fun useLegacyUserAgent(url: String): Boolean {
         return legacySites.any { UriString.sameOrSubdomain(url, it) }
