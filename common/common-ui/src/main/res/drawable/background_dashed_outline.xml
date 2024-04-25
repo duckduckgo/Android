@@ -1,5 +1,5 @@
-<!--
-  ~ Copyright (c) 2018 DuckDuckGo
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2023 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -13,20 +13,12 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item>
-        <shape>
-            <stroke
-                android:width="2dp"
-                android:color="?attr/daxColorAccentBlue" />
-            <corners android:radius="@dimen/smallShapeCornerRadius" />
-        </shape>
-    </item>
-    <item>
-        <shape>
-            <solid android:color="?attr/daxColorContainer" />
-            <corners android:radius="@dimen/smallShapeCornerRadius" />
-        </shape>
-    </item>
-</layer-list>
 
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <stroke
+        android:width="1dp"
+        android:dashWidth="4dp"
+        android:dashGap="4dp"
+        android:color="?attr/daxColorLines" />
+    <corners android:radius="@dimen/smallShapeCornerRadius" />
+</shape>

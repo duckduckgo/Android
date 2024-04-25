@@ -42,6 +42,7 @@ import android.text.Spanned
 import android.text.style.StyleSpan
 import android.view.*
 import android.view.View.*
+import android.view.ViewGroup.LayoutParams
 import android.view.inputmethod.EditorInfo
 import android.webkit.PermissionRequest
 import android.webkit.SslErrorHandler
@@ -56,6 +57,7 @@ import android.webkit.WebView.HitTestResult.*
 import android.widget.Button
 import android.widget.EditText
 import android.widget.FrameLayout
+import android.widget.PopupWindow
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
@@ -110,6 +112,7 @@ import com.duckduckgo.app.browser.databinding.HttpAuthenticationBinding
 import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarBinding
 import com.duckduckgo.app.browser.databinding.IncludeQuickAccessItemsBinding
 import com.duckduckgo.app.browser.databinding.PopupWindowBrowserMenuBinding
+import com.duckduckgo.app.browser.databinding.ViewNewTabFavoritesTooltipBinding
 import com.duckduckgo.app.browser.downloader.BlobConverterInjector
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.setting.FaviconPromptSheet
@@ -223,6 +226,7 @@ import com.duckduckgo.autofill.impl.jsbridge.AutofillMessagePoster
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
+import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.store.BrowserAppTheme
 import com.duckduckgo.common.ui.view.DaxDialog
 import com.duckduckgo.common.ui.view.DaxDialogListener
@@ -237,8 +241,11 @@ import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.hideKeyboard
 import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
+import com.duckduckgo.common.ui.view.shape.DaxBubbleEdgeTreatment
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.showKeyboard
+import com.duckduckgo.common.ui.view.text.DaxTextView
+import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -282,6 +289,7 @@ import com.duckduckgo.voice.api.VoiceSearchLauncher
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.shape.ShapeAppearanceModel
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import java.io.File
@@ -764,8 +772,6 @@ class BrowserTabFragment :
         }
     }
 
-    private val homeBackgroundLogo by lazy { HomeBackgroundLogo(newBrowserTab.ddgLogo) }
-
     private val ctaViewStateObserver = Observer<CtaViewState> {
         it?.let { renderer.renderCtaViewState(it) }
     }
@@ -1198,7 +1204,10 @@ class BrowserTabFragment :
         sslErrorView.gone()
     }
 
-    private fun showError(errorType: WebViewErrorResponse, url: String?) {
+    private fun showError(
+        errorType: WebViewErrorResponse,
+        url: String?,
+    ) {
         webViewContainer.gone()
         newBrowserTab.newTabLayout.gone()
         sslErrorView.gone()
@@ -1247,6 +1256,10 @@ class BrowserTabFragment :
             Timber.d("SSLError: no previous page to load, showing home")
             viewModel.recoverFromSSLWarningPage(false)
         }
+    }
+
+    fun hideFocusedView() {
+        showHome()
     }
 
     fun submitQuery(query: String) {
@@ -1524,7 +1537,10 @@ class BrowserTabFragment :
         }
     }
 
-    private fun showWebPageTitleInCustomTab(title: String, url: String?) {
+    private fun showWebPageTitleInCustomTab(
+        title: String,
+        url: String?,
+    ) {
         if (isActiveCustomTab()) {
             omnibar.customTabToolbarContainer.customTabTitle.text = title
 
@@ -2074,6 +2090,9 @@ class BrowserTabFragment :
         omnibarQuickAccessItemTouchHelper = createQuickAccessItemHolder(focusedView.quickAccessSuggestionsRecyclerView, omnibarQuickAccessAdapter)
         focusedView.quickAccessSuggestionsRecyclerView.adapter = omnibarQuickAccessAdapter
         focusedView.quickAccessSuggestionsRecyclerView.disableAnimation()
+        focusedView.sectionHeaderOverflowIcon.setOnClickListener {
+            showNewTabFavouritesPopup(it)
+        }
     }
 
     private fun configureHomeTabQuickAccessGrid() {
@@ -2085,6 +2104,38 @@ class BrowserTabFragment :
         quickAccessItemTouchHelper = createQuickAccessItemHolder(quickAccessItems.quickAccessRecyclerView, quickAccessAdapter)
         quickAccessItems.quickAccessRecyclerView.adapter = quickAccessAdapter
         quickAccessItems.quickAccessRecyclerView.disableAnimation()
+        quickAccessItems.sectionHeaderOverflowIcon.setOnClickListener {
+            showNewTabFavouritesPopup(it)
+        }
+    }
+
+    private fun showNewTabFavouritesPopup(anchor: View) {
+        val popupContent = ViewNewTabFavoritesTooltipBinding.inflate(LayoutInflater.from(context))
+        popupContent.cardView.cardElevation = PopupMenu.POPUP_DEFAULT_ELEVATION_DP.toPx()
+        val cornerRadius = resources.getDimension(com.duckduckgo.mobile.android.R.dimen.mediumShapeCornerRadius)
+        val cornerSize = resources.getDimension(com.duckduckgo.mobile.android.R.dimen.daxBubbleDialogEdge)
+        val distanceFromEdgeInDp = resources.getDimension(com.duckduckgo.mobile.android.R.dimen.daxBubbleDialogDistanceFromEdge)
+        val distanceFromEdge = popupContent.cardView.width - distanceFromEdgeInDp.toPx()
+        val edgeTreatment = DaxBubbleEdgeTreatment(cornerSize, distanceFromEdge)
+
+        popupContent.cardView.shapeAppearanceModel = ShapeAppearanceModel.builder()
+            .setAllCornerSizes(cornerRadius)
+            .setTopEdge(edgeTreatment)
+            .build()
+
+        popupContent.cardContent.text = HtmlCompat.fromHtml(getString(R.string.newTabPageFavoritesTooltip), FROM_HTML_MODE_LEGACY)
+
+        PopupWindow(
+            popupContent.root,
+            LayoutParams.WRAP_CONTENT,
+            LayoutParams.WRAP_CONTENT,
+            true,
+        ).apply {
+            setOnDismissListener {
+                omnibar.omniBarContainer.isPressed = true
+            }
+            showAsDropDown(anchor)
+        }
     }
 
     private fun createQuickAccessItemHolder(
@@ -2639,7 +2690,10 @@ class BrowserTabFragment :
         ).show()
     }
 
-    private fun launchSharePageChooser(url: String, title: String) {
+    private fun launchSharePageChooser(
+        url: String,
+        title: String,
+    ) {
         val intent = Intent(Intent.ACTION_SEND).also {
             it.type = "text/plain"
             it.putExtra(Intent.EXTRA_TEXT, url)
@@ -2653,7 +2707,10 @@ class BrowserTabFragment :
         }
     }
 
-    private fun launchSharePromoRMFPageChooser(url: String, shareTitle: String) {
+    private fun launchSharePromoRMFPageChooser(
+        url: String,
+        shareTitle: String,
+    ) {
         val share = Intent().apply {
             action = Intent.ACTION_SEND
             putExtra(Intent.EXTRA_TEXT, url)
@@ -2779,13 +2836,17 @@ class BrowserTabFragment :
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
 
-        newBrowserTab.ddgLogo.setImageResource(com.duckduckgo.mobile.android.R.drawable.logo_full)
         if (newBrowserTab.ctaContainer.isNotEmpty()) {
             renderer.renderHomeCta()
         }
         renderer.recreateDaxDialogCta()
+
         configureQuickAccessGridLayout(quickAccessItems.quickAccessRecyclerView)
         configureQuickAccessGridLayout(focusedView.quickAccessSuggestionsRecyclerView)
+
+        renderer.renderFocusedView()
+        renderer.showNewTabContent()
+
         decorator.recreatePopupMenu()
         privacyProtectionsPopup.onConfigurationChanged()
         viewModel.onConfigurationChanged()
@@ -2881,14 +2942,21 @@ class BrowserTabFragment :
         showDialogHidingPrevious(downloadConfirmationFragment, DOWNLOAD_CONFIRMATION_TAG)
     }
 
-    private fun launchFilePicker(filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: FileChooserRequestedParams) {
+    private fun launchFilePicker(
+        filePathCallback: ValueCallback<Array<Uri>>,
+        fileChooserParams: FileChooserRequestedParams,
+    ) {
         pendingUploadTask = filePathCallback
         val canChooseMultipleFiles = fileChooserParams.filePickingMode == FileChooserParams.MODE_OPEN_MULTIPLE
         val intent = fileChooserIntentBuilder.intent(fileChooserParams.acceptMimeTypes.toTypedArray(), canChooseMultipleFiles)
         startActivityForResult(intent, REQUEST_CODE_CHOOSE_FILE)
     }
 
-    private fun launchCameraCapture(filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: FileChooserRequestedParams, inputAction: String) {
+    private fun launchCameraCapture(
+        filePathCallback: ValueCallback<Array<Uri>>,
+        fileChooserParams: FileChooserRequestedParams,
+        inputAction: String,
+    ) {
         if (Intent(inputAction).resolveActivity(requireContext().packageManager) == null) {
             launchFilePicker(filePathCallback, fileChooserParams)
             return
@@ -3097,7 +3165,10 @@ class BrowserTabFragment :
         }
     }
 
-    fun resumeEmailProtectionInContextWebFlow(verificationUrl: String?, messageRequestId: String) {
+    fun resumeEmailProtectionInContextWebFlow(
+        verificationUrl: String?,
+        messageRequestId: String,
+    ) {
         if (verificationUrl == null) return
         context?.let {
             val params = EmailProtectionInContextSignUpHandleVerificationLink(url = verificationUrl, messageRequestId = messageRequestId)
@@ -3419,20 +3490,84 @@ class BrowserTabFragment :
         fun renderAutocomplete(viewState: AutoCompleteViewState) {
             renderIfChanged(viewState, lastSeenAutoCompleteViewState) {
                 lastSeenAutoCompleteViewState = viewState
+                renderFocusedView()
+            }
+        }
 
-                if (viewState.showSuggestions || viewState.showFavorites) {
-                    if (viewState.favorites.isNotEmpty() && viewState.showFavorites) {
-                        binding.autoCompleteSuggestionsList.gone()
-                        focusedView.rootFocusedView.show()
-                        omnibarQuickAccessAdapter.submitList(viewState.favorites)
+        fun renderFocusedView() {
+            val viewState = lastSeenAutoCompleteViewState
+            if (viewState != null) {
+                if (viewState.showSuggestions) {
+                    binding.autoCompleteSuggestionsList.show()
+                    focusedView.rootFocusedView.gone()
+                    autoCompleteSuggestionsAdapter.updateData(viewState.searchResults.query, viewState.searchResults.suggestions)
+                } else if (viewState.showFavorites) {
+                    binding.autoCompleteSuggestionsList.gone()
+                    focusedView.rootFocusedView.show()
+                    // consume clicks so the view is not hidden after losing focus
+                    focusedView.rootFocusedView.setOnClickListener { }
+                    focusedView.quickAccessRecyclerViewEmpty.setOnClickListener { }
+
+                    if (viewState.favorites.isEmpty()) {
+                        focusedView.quickAccessRecyclerViewEmpty.show()
+                        focusedView.sectionHeaderOverflowIcon.show()
+                        focusedView.quickAccessSuggestionsRecyclerView.gone()
+                        focusedView.newTabFavoritesToggle.gone()
                     } else {
-                        binding.autoCompleteSuggestionsList.show()
-                        focusedView.rootFocusedView.gone()
-                        autoCompleteSuggestionsAdapter.updateData(viewState.searchResults.query, viewState.searchResults.suggestions)
+                        focusedView.quickAccessRecyclerViewEmpty.gone()
+                        focusedView.sectionHeaderOverflowIcon.gone()
+                        focusedView.quickAccessSuggestionsRecyclerView.show()
+                        // portrait shows tops 8 favourites + Show More toggle
+                        // landscape / tablet shows tops 12 + Show More toggles
+
+                        val numOfColumns =
+                            gridViewColumnCalculator.calculateNumberOfColumns(QUICK_ACCESS_ITEM_MAX_SIZE_DP, QUICK_ACCESS_GRID_MAX_COLUMNS)
+                        val numOfCollapsedItems = numOfColumns * 2
+                        val showCollapsed = viewState.favorites.size > numOfCollapsedItems
+
+                        if (showCollapsed) {
+                            omnibarQuickAccessAdapter.submitList(viewState.favorites.take(numOfCollapsedItems))
+                            var expanded = false
+                            focusedView.newTabFavoritesToggle.show()
+                            focusedView.newTabFavoritesToggle.setOnClickListener {
+                                if (expanded) {
+                                    focusedView.newTabFavoritesToggle.text = getString(R.string.newTabFavoritesShowMore)
+                                    omnibarQuickAccessAdapter.submitList(viewState.favorites.take(numOfCollapsedItems))
+                                    focusedView.newTabFavoritesToggle.setCompoundDrawablesWithIntrinsicBounds(
+                                        0,
+                                        0,
+                                        com.duckduckgo.mobile.android.R.drawable.ic_chevron_small_down_16,
+                                        0,
+                                    )
+                                    expanded = false
+                                } else {
+                                    focusedView.newTabFavoritesToggle.text = getString(R.string.newTabFavoritesShowLess)
+                                    omnibarQuickAccessAdapter.submitList(viewState.favorites)
+                                    focusedView.newTabFavoritesToggle.setCompoundDrawablesWithIntrinsicBounds(
+                                        0,
+                                        0,
+                                        com.duckduckgo.mobile.android.R.drawable.ic_chevron_small_up_16,
+                                        0,
+                                    )
+                                    expanded = true
+                                }
+                            }
+                        } else {
+                            focusedView.newTabFavoritesToggle.gone()
+                            omnibarQuickAccessAdapter.submitList(viewState.favorites)
+                        }
                     }
                 } else {
                     binding.autoCompleteSuggestionsList.gone()
                     focusedView.rootFocusedView.gone()
+                }
+
+                focusedView.newTabShortcutBookmarks.setClickListener {
+                    browserActivity?.launchBookmarks()
+                }
+
+                focusedView.newTabShortcutChat.setClickListener {
+                    viewModel.onUserSubmittedQuery("https://duckduckgo.com/chat")
                 }
             }
         }
@@ -3686,12 +3821,12 @@ class BrowserTabFragment :
                 Timber.v("RMF: render $newMessage, $viewState")
                 when {
                     viewState.cta != null -> {
-                        showCta(viewState.cta, viewState.favorites)
+                        showCta(viewState.cta)
                     }
 
                     viewState.message != null -> {
                         showRemoteMessage(viewState.message, newMessage)
-                        showHomeBackground(viewState.favorites, hideLogo = true)
+                        showNewTabContent()
                         hideHomeCta()
                     }
 
@@ -3699,7 +3834,7 @@ class BrowserTabFragment :
                         hideHomeCta()
                         hideDaxCta()
                         newBrowserTab.messageCta.gone()
-                        showHomeBackground(viewState.favorites)
+                        showNewTabContent()
                     }
                 }
             }
@@ -3731,12 +3866,9 @@ class BrowserTabFragment :
             }
         }
 
-        private fun showCta(
-            configuration: Cta,
-            favorites: List<QuickAccessFavorite>,
-        ) {
+        private fun showCta(configuration: Cta) {
             when (configuration) {
-                is HomePanelCta -> showHomeCta(configuration, favorites)
+                is HomePanelCta -> showHomeCta(configuration)
                 is DaxBubbleCta -> showDaxCta(configuration)
                 is ExperimentDaxBubbleOptionsCta -> showDaxExperimentCta(configuration)
                 is BubbleCta -> showBubbleCta(configuration)
@@ -3845,44 +3977,88 @@ class BrowserTabFragment :
             newBrowserTab.newTabLayout.setOnClickListener(null)
         }
 
-        private fun showHomeCta(
-            configuration: HomePanelCta,
-            favorites: List<QuickAccessFavorite>,
-        ) {
+        private fun showHomeCta(configuration: HomePanelCta) {
             hideDaxCta()
             if (newBrowserTab.ctaContainer.isEmpty()) {
                 renderHomeCta()
             } else {
                 configuration.showCta(newBrowserTab.ctaContainer)
             }
-            showHomeBackground(favorites)
+            showNewTabContent()
             viewModel.onCtaShown()
         }
 
-        private fun showHomeBackground(
-            favorites: List<QuickAccessFavorite>,
-            hideLogo: Boolean = false,
-        ) {
-            if (favorites.isEmpty()) {
-                if (hideLogo) homeBackgroundLogo.hideLogo() else homeBackgroundLogo.showLogo()
-                quickAccessItems.quickAccessRecyclerView.gone()
-            } else {
-                homeBackgroundLogo.hideLogo()
-                quickAccessAdapter.submitList(favorites)
-                quickAccessItems.quickAccessRecyclerView.show()
-                with(quickAccessItems.newTabShortcutBookmarks) {
-                    setClickListener {
-                        browserActivity?.launchBookmarks()
+        fun showNewTabContent() {
+            val ctaViewState = lastSeenCtaViewState
+            if (ctaViewState != null) {
+                val favorites = ctaViewState.favorites
+                var expanded = false
+                Timber.d("New Tab: showHome favourites empty ${favorites.isEmpty()}")
+                if (favorites.isEmpty()) {
+                    newBrowserTab.newTabQuickAccessItemsLayout.show()
+                    newBrowserTab.newTabQuickAccessItemsLayout.findViewById<View>(R.id.quickAccessRecyclerView).gone()
+                    newBrowserTab.newTabQuickAccessItemsLayout.findViewById<View>(R.id.quickAccessRecyclerViewEmpty).show()
+                    newBrowserTab.newTabQuickAccessItemsLayout.findViewById<View>(R.id.newTabFavoritesToggle).gone()
+                    newBrowserTab.newTabQuickAccessItemsLayout.findViewById<View>(R.id.sectionHeaderOverflowIcon).show()
+                    newBrowserTab.newTabQuickAccessItemsLayout.findViewById<View>(R.id.sectionHeaderLayout).setOnClickListener {
+                        showNewTabFavouritesPopup(newBrowserTab.newTabQuickAccessItemsLayout.findViewById<View>(R.id.sectionHeaderOverflowIcon))
                     }
-                }
-                viewModel.onNewTabFavouritesShown()
-            }
+                } else {
+                    val numOfColumns = gridViewColumnCalculator.calculateNumberOfColumns(QUICK_ACCESS_ITEM_MAX_SIZE_DP, QUICK_ACCESS_GRID_MAX_COLUMNS)
+                    val numOfCollapsedItems = numOfColumns * 2
+                    val showCollapsed = favorites.size > numOfCollapsedItems
 
-            newBrowserTab.newTabQuickAccessItemsLayout.show()
+                    if (showCollapsed) {
+                        quickAccessAdapter.submitList(favorites.take(numOfCollapsedItems))
+                        val favoritesToggle = newBrowserTab.newTabQuickAccessItemsLayout.findViewById<DaxTextView>(R.id.newTabFavoritesToggle)
+                        favoritesToggle.show()
+                        favoritesToggle.setOnClickListener {
+                            if (expanded) {
+                                favoritesToggle.text = getString(R.string.newTabFavoritesShowMore)
+                                quickAccessAdapter.submitList(favorites.take(numOfCollapsedItems))
+                                favoritesToggle.setCompoundDrawablesWithIntrinsicBounds(
+                                    0,
+                                    0,
+                                    com.duckduckgo.mobile.android.R.drawable.ic_chevron_small_down_16,
+                                    0,
+                                )
+                                expanded = false
+                            } else {
+                                favoritesToggle.text = getString(R.string.newTabFavoritesShowLess)
+                                quickAccessAdapter.submitList(favorites)
+                                favoritesToggle.setCompoundDrawablesWithIntrinsicBounds(
+                                    0,
+                                    0,
+                                    com.duckduckgo.mobile.android.R.drawable.ic_chevron_small_up_16,
+                                    0,
+                                )
+                                expanded = true
+                            }
+                        }
+                    } else {
+                        newBrowserTab.newTabQuickAccessItemsLayout.findViewById<View>(R.id.newTabFavoritesToggle).gone()
+                        quickAccessAdapter.submitList(favorites)
+                    }
+
+                    newBrowserTab.newTabQuickAccessItemsLayout.findViewById<View>(R.id.sectionHeaderOverflowIcon).gone()
+                    newBrowserTab.newTabQuickAccessItemsLayout.findViewById<View>(R.id.quickAccessRecyclerViewEmpty).gone()
+                    newBrowserTab.newTabQuickAccessItemsLayout.findViewById<View>(R.id.quickAccessRecyclerView).show()
+                    viewModel.onNewTabFavouritesShown()
+                }
+
+                newBrowserTab.newTabQuickAccessItemsLayout.findViewById<View>(R.id.newTabShortcutBookmarks).setOnClickListener {
+                    browserActivity?.launchBookmarks()
+                }
+
+                newBrowserTab.newTabQuickAccessItemsLayout.findViewById<View>(R.id.newTabShortcutChat).setOnClickListener {
+                    viewModel.onUserSubmittedQuery("https://duckduckgo.com/chat")
+                }
+
+                newBrowserTab.newTabQuickAccessItemsLayout.show()
+            }
         }
 
         private fun hideHomeBackground() {
-            homeBackgroundLogo.hideLogo()
             newBrowserTab.newTabQuickAccessItemsLayout.gone()
         }
 
@@ -3958,7 +4134,10 @@ class BrowserTabFragment :
             (!viewState.isEditing || omnibarInput.isNullOrEmpty()) && omnibar.omnibarTextInput.isDifferent(omnibarInput)
     }
 
-    private fun launchPrint(url: String, defaultMediaSize: PrintAttributes.MediaSize) {
+    private fun launchPrint(
+        url: String,
+        defaultMediaSize: PrintAttributes.MediaSize,
+    ) {
         (activity?.getSystemService(Context.PRINT_SERVICE) as? PrintManager)?.let { printManager ->
             webView?.createPrintDocumentAdapter(url)?.let { printAdapter ->
                 printManager.print(
@@ -4014,7 +4193,10 @@ private class JsOrientationHandler {
      *
      * @return response data
      */
-    fun updateOrientation(data: JsCallbackData, browserTabFragment: BrowserTabFragment): JsCallbackData {
+    fun updateOrientation(
+        data: JsCallbackData,
+        browserTabFragment: BrowserTabFragment,
+    ): JsCallbackData {
         val activity = browserTabFragment.activity
         val response = if (activity == null) {
             NO_ACTIVITY_ERROR
@@ -4040,7 +4222,10 @@ private class JsOrientationHandler {
         )
     }
 
-    private enum class JsToNativeScreenOrientationMap(val jsValue: String, val nativeValue: Int) {
+    private enum class JsToNativeScreenOrientationMap(
+        val jsValue: String,
+        val nativeValue: Int,
+    ) {
         ANY("any", ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED),
         NATURAL("natural", ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED),
         LANDSCAPE("landscape", ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE),

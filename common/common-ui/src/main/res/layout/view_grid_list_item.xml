@@ -20,30 +20,27 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?selectableItemBackground"
-    android:clickable="true"
-    android:focusable="true"
     android:clipToPadding="false"
     android:orientation="vertical"
     android:paddingTop="@dimen/keyline_2"
-    android:paddingBottom="@dimen/keyline_4"
     android:paddingEnd="@dimen/keyline_4"
     android:paddingStart="@dimen/keyline_4">
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/quickAccessFaviconCard"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/gridItemImageSize"
+        android:layout_height="@dimen/gridItemImageSize"
         android:layout_gravity="center_horizontal"
-        android:paddingStart="@dimen/keyline_5"
-        android:paddingEnd="@dimen/keyline_5"
-        app:cardBackgroundColor="?attr/daxColorBackground"
+        app:cardBackgroundColor="?attr/daxColorSurface"
         app:cardCornerRadius="@dimen/smallShapeCornerRadius"
+        tools:visibility="visible"
         app:cardElevation="4dp">
 
         <ImageView
             android:id="@+id/quickAccessFavicon"
             android:layout_width="@dimen/gridItemImageSize"
             android:layout_height="@dimen/gridItemImageSize"
+            android:layout_gravity="center"
             android:importantForAccessibility="no" />
 
     </com.google.android.material.card.MaterialCardView>
@@ -55,18 +52,20 @@
         android:layout_gravity="center_horizontal"
         android:ellipsize="end"
         android:gravity="center"
-        android:layout_marginTop="@dimen/keyline_0"
+        android:layout_marginTop="@dimen/keyline_1"
+        android:includeFontPadding="false"
         android:maxLines="2"
         app:textType="primary"
         app:typography="caption"
+        tools:visibility="visible"
         tools:text="Super long favorite title" />
 
     <FrameLayout
         android:id="@+id/gridItemPlaceholder"
         android:layout_width="@dimen/gridItemImageSize"
         android:layout_height="@dimen/gridItemImageSize"
-        android:background="@drawable/omnibar_field_background"
+        android:background="@drawable/background_dashed_outline"
         android:visibility="gone"
-        tools:visibility="visible"/>
+        tools:visibility="gone"/>
 
 </LinearLayout>

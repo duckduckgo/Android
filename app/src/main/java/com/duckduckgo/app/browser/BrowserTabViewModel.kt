@@ -981,10 +981,18 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         if (!currentBrowserViewState().browserShowing) {
+            Timber.d("New Tab: onUserPressedBack browser not showing")
             return false
         }
 
+        if (currentAutoCompleteViewState().showSuggestions) {
+            Timber.d("New Tab: onUserPressedBack focused view showing")
+            autoCompleteViewState.value = currentAutoCompleteViewState().copy(showFavorites = false, showSuggestions = false)
+            return true
+        }
+
         if (navigation.canGoBack) {
+            Timber.d("New Tab: onUserPressedBack navigation can go back")
             command.value = NavigationCommand.NavigateBack(navigation.stepsToPreviousPage)
             return true
         } else if (hasSourceTab) {
@@ -993,6 +1001,7 @@ class BrowserTabViewModel @Inject constructor(
             }
             return true
         } else if (!skipHome) {
+            Timber.d("New Tab: onUserPressedBack navigate home")
             navigateHome()
             command.value = ShowKeyboard
             return true
@@ -1803,6 +1812,10 @@ class BrowserTabViewModel @Inject constructor(
         hasFocus: Boolean,
         hasQueryChanged: Boolean,
     ) {
+        // business logic
+        // if omnibar focused and query is not blank and suggestions enabled -> show autocomplete suggestions
+        //
+
         // determine if empty list to be shown, or existing search results
         val autoCompleteSearchResults = if (query.isBlank() || !hasFocus) {
             AutoCompleteResult(query, emptyList())
@@ -1812,14 +1825,24 @@ class BrowserTabViewModel @Inject constructor(
 
         val autoCompleteSuggestionsEnabled = appSettingsPreferencesStore.autoCompleteSuggestionsEnabled
         val showAutoCompleteSuggestions = hasFocus && query.isNotBlank() && hasQueryChanged && autoCompleteSuggestionsEnabled
+
         val showFavoritesAsSuggestions = if (!showAutoCompleteSuggestions) {
             val urlFocused = hasFocus && query.isNotBlank() && !hasQueryChanged && UriString.isWebUrl(query)
             val emptyQueryBrowsing = query.isBlank() && currentBrowserViewState().browserShowing
-            val favoritesAvailable = currentAutoCompleteViewState().favorites.isNotEmpty()
-            hasFocus && (urlFocused || emptyQueryBrowsing) && favoritesAvailable
+            // val favoritesAvailable = currentAutoCompleteViewState().favorites.isNotEmpty()
+            hasFocus && (urlFocused || emptyQueryBrowsing)
         } else {
             false
         }
+
+        // val showFavoritesAsSuggestions = if (!showAutoCompleteSuggestions) {
+        //     val urlFocused = hasFocus && query.isNotBlank() && !hasQueryChanged && UriString.isWebUrl(query)
+        //     val emptyQueryBrowsing = query.isBlank() && currentBrowserViewState().browserShowing
+        //     val favoritesAvailable = currentAutoCompleteViewState().favorites.isNotEmpty()
+        //     hasFocus && (urlFocused || emptyQueryBrowsing) && favoritesAvailable
+        // } else {
+        //     false
+        // }
 
         autoCompleteViewState.value = currentAutoCompleteViewState()
             .copy(
@@ -1828,7 +1851,7 @@ class BrowserTabViewModel @Inject constructor(
                 searchResults = autoCompleteSearchResults,
             )
 
-        if (hasFocus && autoCompleteSuggestionsEnabled) {
+        if (showAutoCompleteSuggestions) {
             autoCompletePublishSubject.accept(query.trim())
         }
     }

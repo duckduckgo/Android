@@ -41,20 +41,18 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginTop="@dimen/keyline_4">
+            android:layout_marginTop="@dimen/keyline_2"
+            android:layout_marginBottom="@dimen/keyline_4">
 
             <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/fragmentDeviceShieldContainer"
                 android:name="com.duckduckgo.mobile.android.vpn.ui.report.DeviceShieldFragment"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/keyline_2"
-                android:layout_marginEnd="@dimen/keyline_2"/>
+                android:layout_height="wrap_content" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/keyline_4">
+                android:layout_height="wrap_content">
 
                 <ImageView
                     android:id="@+id/ddgLogo"
@@ -81,7 +79,8 @@
                     app:layout_constraintTop_toTopOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <include layout="@layout/include_quick_access_items" />
+            <include
+                layout="@layout/include_quick_access_items" />
 
         </LinearLayout>
 

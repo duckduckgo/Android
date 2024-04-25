@@ -92,6 +92,10 @@ open class PopupMenu(
         private const val MARGIN = 16
         private const val ELEVATION = 6f
 
+        const val POPUP_DEFAULT_ELEVATION_DP = 8f
+        const val EDGE_TREATMENT_DISTANCE_FROM_EDGE = 200f
+        const val POPUP_HORIZONTAL_OFFSET_DP = -4
+
         fun inflate(
             layoutInflater: LayoutInflater,
             resourceId: Int,

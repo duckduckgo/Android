@@ -49,4 +49,11 @@ class GridViewColumnCalculator(val context: Context) {
         val remainingSpace = screenWidthDp - columnsWidth
         return if (remainingSpace <= 0) 0 else (remainingSpace / 2).toPx()
     }
+
+    companion object {
+        const val FAVOURITES_GRID_MAX_COLUMNS = 6
+        const val FAVOURITES_ITEM_MAX_SIZE_DP = 90
+        const val FAVOURITES_GRID_MAX_ITEMS_PORTRAIT = 8
+        const val FAVOURITES_GRID_MAX_ITEMS_LANDSCAPE = 12
+    }
 }

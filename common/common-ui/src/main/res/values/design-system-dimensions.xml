@@ -117,6 +117,7 @@
 
     <!-- GridItem -->
     <dimen name="gridItemImageSize">64dp</dimen>
+    <dimen name="gridItemIconSize">32dp</dimen>
 
     <!-- Legacy Dimensions -->
     <dimen name="omnibarCookieAnimationBannerHeight">38dp</dimen>

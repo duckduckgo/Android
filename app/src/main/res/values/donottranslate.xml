@@ -85,4 +85,8 @@
     <string name="newTabPageFavorites">Favorites</string>
     <string name="newTabPageShortcuts">Shortcuts</string>
     <string name="newTabPageShortcutBookmarks">Bookmarks</string>
+    <string name="newTabPageShortcutChat">Chat</string>
+    <string name="newTabPageFavoritesTooltip"><![CDATA[On any site, open the browser menu, select <b>Add Bookmark</b> and toggle to <b>Add to Favorites.</b>]]></string>
+    <string name="newTabFavoritesShowMore">Show More</string>
+    <string name="newTabFavoritesShowLess">Show Less</string>
 </resources>

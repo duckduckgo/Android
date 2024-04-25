@@ -24,17 +24,36 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginTop="@dimen/keyline_2">
+        android:orientation="vertical">
 
-        <com.duckduckgo.common.ui.view.text.DaxTextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:typography="h4"
+        <LinearLayout
+            android:id="@+id/sectionHeaderLayout"
             android:layout_marginStart="@dimen/keyline_5"
             android:layout_marginEnd="@dimen/keyline_5"
-            app:textType="primary"
-            android:text="@string/newTabPageFavorites" />
+            android:layout_marginTop="@dimen/keyline_2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/sectionHeaderText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:typography="h4"
+                android:layout_weight="1"
+                app:textType="primary"
+                android:text="@string/newTabPageFavorites" />
+
+            <com.duckduckgo.common.ui.view.button.IconButton
+                android:id="@+id/sectionHeaderOverflowIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?selectableItemBackgroundBorderless"
+                app:srcCompat="@drawable/ic_info_black_16"
+                tools:ignore="ContentDescription" />
+
+        </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/quickAccessRecyclerView"
@@ -44,11 +63,60 @@
             android:overScrollMode="never"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             tools:itemCount="8"
-            android:layout_marginStart="@dimen/keyline_2"
-            android:layout_marginEnd="@dimen/keyline_2"
             tools:listItem="@layout/view_quick_access_item"
             tools:showIn="@layout/activity_system_search"
             tools:spanCount="4" />
+
+        <LinearLayout
+            android:id="@+id/quickAccessRecyclerViewEmpty"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_2"
+            android:layout_marginEnd="@dimen/keyline_2"
+            android:clickable="false"
+            tools:visibility="gone"
+            android:orientation="horizontal">
+
+            <com.duckduckgo.common.ui.view.griditem.DaxNewTabGridItem
+                app:gridItemType="placeholder"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <com.duckduckgo.common.ui.view.griditem.DaxNewTabGridItem
+                app:gridItemType="placeholder"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <com.duckduckgo.common.ui.view.griditem.DaxNewTabGridItem
+                app:gridItemType="placeholder"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <com.duckduckgo.common.ui.view.griditem.DaxNewTabGridItem
+                app:gridItemType="placeholder"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/newTabFavoritesToggle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/keyline_1"
+            android:paddingBottom="@dimen/keyline_1"
+            android:includeFontPadding="false"
+            android:paddingStart="@dimen/keyline_2"
+            android:paddingEnd="@dimen/keyline_1"
+            android:layout_marginTop="@dimen/keyline_4"
+            android:gravity="center"
+            android:layout_gravity="center"
+            app:typography="caption"
+            app:textType="primary"
+            android:background="@drawable/chip_background"
+            android:text="@string/newTabFavoritesShowMore"
+            android:drawablePadding="@dimen/keyline_1"
+            android:drawableEnd="@drawable/ic_chevron_small_down_16" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:layout_width="match_parent"
@@ -56,18 +124,33 @@
             app:typography="h4"
             android:layout_marginStart="@dimen/keyline_5"
             android:layout_marginEnd="@dimen/keyline_5"
-            android:layout_marginTop="@dimen/keyline_4"
+            android:layout_marginTop="@dimen/keyline_5"
             app:textType="primary"
             android:text="@string/newTabPageShortcuts" />
 
-        <com.duckduckgo.common.ui.view.DaxNewTabGridItem
-            android:id="@+id/newTabShortcutBookmarks"
-            android:layout_marginStart="@dimen/keyline_2"
-            app:primaryText="@string/newTabPageShortcutBookmarks"
-            app:leadingIcon="@drawable/ic_folder_24"
-            app:placeholder="true"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <com.duckduckgo.common.ui.view.griditem.DaxNewTabGridItem
+                android:id="@+id/newTabShortcutBookmarks"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:gridItemType="shortcut"
+                app:primaryText="@string/newTabPageShortcutBookmarks"
+                app:leadingIcon="@drawable/ic_bookmarks_open_color_16"
+                android:layout_marginStart="@dimen/keyline_2" />
+
+            <com.duckduckgo.common.ui.view.griditem.DaxNewTabGridItem
+                android:id="@+id/newTabShortcutChat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:gridItemType="shortcut"
+                app:primaryText="@string/newTabPageShortcutChat"
+                app:leadingIcon="@drawable/ic_placeholder_color_16"
+                android:layout_marginStart="@dimen/keyline_2" />
+        </LinearLayout>
 
     </LinearLayout>
 </merge>

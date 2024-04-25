@@ -48,7 +48,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            style="@style/Widget.DuckDuckGo.MessageCta">
+            style="@style/Widget.DuckDuckGo.Card">
 
             <ImageView
                 android:id="@+id/deviceShieldCtaImage"
