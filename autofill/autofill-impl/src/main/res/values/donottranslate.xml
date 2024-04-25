@@ -22,6 +22,4 @@
     </plurals>
     <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Manage Passwords</annotation></string>
 
-    <string name="credentialManagementWebViewIncompatibleErrorMessage">Autofill for passwords is unavailable because your version of Android WebView is too old.</string>
-
 </resources>
