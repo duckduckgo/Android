@@ -160,4 +160,11 @@
     <string name="autofill_auth_text_for_delete_all">Удостоверете се, за да потвърдите, че искате да изтриете всички пароли</string>
     <string name="autofill_title_text_for_delete_all">Изтриване на всички пароли</string>
 
+    <!-- Sync settings screen -->
+    <plurals name="syncCredentialInvalidItemsWarning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="one">Вашата парола за %1$s не може да се синхронизира, защото някои от нейните полета надвишават ограничението за знаци.</item>
+        <item quantity="other">Вашите пароли за %1$s и %2$d други сайта не могат да се синхронизират, защото някои от техните полета надвишават ограничението за знаци.</item>
+    </plurals>
+    <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Управление на пароли</annotation></string>
+
 </resources>
