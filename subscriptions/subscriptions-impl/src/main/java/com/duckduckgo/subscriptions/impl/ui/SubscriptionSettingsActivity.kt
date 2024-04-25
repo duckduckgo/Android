@@ -49,7 +49,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(SubscriptionsSettingsScreenWithEmptyParams::class)
+@ContributeToActivityStarter(SubscriptionsSettingsScreenWithEmptyParams::class, screenName = "ppro.settings")
 class SubscriptionSettingsActivity : DuckDuckGoActivity() {
 
     @Inject

@@ -72,8 +72,8 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(NetworkProtectionManagementScreenNoParams::class)
-@ContributeToActivityStarter(NetworkProtectionManagementScreenAndEnable::class)
+@ContributeToActivityStarter(NetworkProtectionManagementScreenNoParams::class, screenName = "vpn.main")
+@ContributeToActivityStarter(NetworkProtectionManagementScreenAndEnable::class, screenName = "vpn.main")
 class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
 
     @Inject
