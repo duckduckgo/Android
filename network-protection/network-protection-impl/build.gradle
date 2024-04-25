@@ -43,6 +43,7 @@ dependencies {
     implementation project(':navigation-api')
     implementation project(':subscriptions-api')
     implementation project(':settings-api')
+    implementation project(':remote-messaging-api')
 
     implementation AndroidX.appCompat
     implementation AndroidX.constraintLayout
