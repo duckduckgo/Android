@@ -159,6 +159,9 @@
     <!-- Sync Device Authentication -->
     <string name="sync_auth_text_for_access">Otključaj uređaj za pristup opciji Sync &amp; Backup.</string>
     <string name="sync_biometric_prompt_title">Opcija Sync &amp; Backup je zaključana</string>
+    <string name="sync_require_device_passcode_dialog_title">Zaštiti svoj uređaj za korištenje značajke Sync &amp; Backup</string>
+    <string name="sync_require_device_passcode_dialog_body">Za korištenje Sync &amp; Backupa potreban je uzorak za zaključavanje uređaja, PIN ili biometrija.</string>
+    <string name="sync_require_device_passcode_dialog_action">Idi na Postavke</string>
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Izbrisati podatke poslužitelja?</string>
