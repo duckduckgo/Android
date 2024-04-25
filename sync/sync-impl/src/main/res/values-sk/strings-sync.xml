@@ -159,6 +159,9 @@
     <!-- Sync Device Authentication -->
     <string name="sync_auth_text_for_access">Ak chcete získať prístup k službe Sync &amp; Backup, odomknite zariadenie.</string>
     <string name="sync_biometric_prompt_title">Služba Sync &amp; Backup je uzamknutá</string>
+    <string name="sync_require_device_passcode_dialog_title">Aby ste mohli používať službu Sync &amp; Backup, zabezpečte svoje zariadenie.</string>
+    <string name="sync_require_device_passcode_dialog_body">Na používanie služby Sync &amp; Backup je potrebný odomykací vzor zariadenia, PIN alebo biometrická metóda.</string>
+    <string name="sync_require_device_passcode_dialog_action">Prejdite do Nastavení</string>
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Zmazať údaje servera?</string>
