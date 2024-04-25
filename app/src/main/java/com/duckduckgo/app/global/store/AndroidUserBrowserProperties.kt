@@ -28,7 +28,7 @@ import com.duckduckgo.common.ui.store.ThemingDataStore
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.savedsites.api.SavedSitesRepository
-import java.util.*
+import java.util.Date
 
 class AndroidUserBrowserProperties(
     private val themingDataStore: ThemingDataStore,

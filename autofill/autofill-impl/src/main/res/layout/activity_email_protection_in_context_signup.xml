@@ -28,13 +28,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         layout="@layout/include_default_toolbar" />
 
-    <WebView
-        android:id="@+id/web_view"
+    <FrameLayout
+        android:id="@+id/fragment_container"
         app:layout_constraintTop_toBottomOf="@id/includeToolbar"
+        app:layout_constraintBottom_toBottomOf="parent"
         android:layout_width="0dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
         android:layout_height="0dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -49,8 +49,10 @@
         <enum name="small" value="0" />
         <!-- Medium 24dp (default) -->
         <enum name="medium" value="1" />
-        <!-- Large 40dp -->
+        <!-- Large 32dp -->
         <enum name="large" value="2" />
+        <!-- Extra Large 40dp -->
+        <enum name="extra_large" value="3" />
     </attr>
     <attr name="textColorOverride" format="color"/>
     <attr name="showOverflowMenu" format="boolean"/>

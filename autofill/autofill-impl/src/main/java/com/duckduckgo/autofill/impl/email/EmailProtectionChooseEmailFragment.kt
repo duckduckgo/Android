@@ -22,9 +22,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.BundleCompat
 import androidx.fragment.app.setFragmentResult
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.autofill.api.AutofillWebMessageRequest
 import com.duckduckgo.autofill.api.EmailProtectionChooseEmailDialog
+import com.duckduckgo.autofill.api.EmailProtectionChooseEmailDialog.Companion.KEY_URL
 import com.duckduckgo.autofill.api.EmailProtectionChooseEmailDialog.UseEmailResultType
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.DialogEmailProtectionChooseEmailBinding
@@ -89,7 +92,7 @@ class EmailProtectionChooseEmailFragment : BottomSheetDialogFragment(), EmailPro
         Timber.v("User action: %s", resultType::class.java.simpleName)
 
         val result = Bundle().also {
-            it.putString(EmailProtectionChooseEmailDialog.KEY_URL, getOriginalUrl())
+            it.putParcelable(KEY_URL, getWebMessageRequest())
             it.putParcelable(EmailProtectionChooseEmailDialog.KEY_RESULT, resultType)
         }
 
@@ -109,19 +112,19 @@ class EmailProtectionChooseEmailFragment : BottomSheetDialogFragment(), EmailPro
     }
 
     private fun getPersonalAddress() = arguments?.getString(KEY_ADDRESS)!!
-    private fun getOriginalUrl() = arguments?.getString(EmailProtectionChooseEmailDialog.KEY_URL)!!
+    private fun getWebMessageRequest() = BundleCompat.getParcelable(requireArguments(), KEY_URL, AutofillWebMessageRequest::class.java)!!
     private fun getTabId() = arguments?.getString(KEY_TAB_ID)!!
 
     companion object {
         fun instance(
             personalDuckAddress: String,
-            url: String,
+            url: AutofillWebMessageRequest,
             tabId: String,
         ): EmailProtectionChooseEmailFragment {
             val fragment = EmailProtectionChooseEmailFragment()
             fragment.arguments = Bundle().also {
                 it.putString(KEY_ADDRESS, personalDuckAddress)
-                it.putString(EmailProtectionChooseEmailDialog.KEY_URL, url)
+                it.putParcelable(KEY_URL, url)
                 it.putString(KEY_TAB_ID, tabId)
             }
             return fragment

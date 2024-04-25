@@ -37,6 +37,7 @@ import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.survey.model.Survey
+import com.duckduckgo.autofill.api.AutofillWebMessageRequest
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -191,24 +192,19 @@ sealed class Command {
     object ChildTabClosed : Command()
 
     class CopyAliasToClipboard(val alias: String) : Command()
-    class InjectEmailAddress(
+    class ShowEmailProtectionChooseEmailPrompt(
         val duckAddress: String,
-        val originalUrl: String,
-        val autoSaveLogin: Boolean,
+        val autofillWebMessageRequest: AutofillWebMessageRequest,
     ) : Command()
 
-    class ShowEmailProtectionChooseEmailPrompt(val address: String) : Command()
-    object ShowEmailProtectionInContextSignUpPrompt : Command()
+    object PageChanged : Command()
     sealed class DaxCommand : Command() {
         object FinishPartialTrackerAnimation : DaxCommand()
         class HideDaxDialog(val cta: Cta) : DaxCommand()
     }
-
-    class CancelIncomingAutofillRequest(val url: String) : Command()
     object LaunchAutofillSettings : Command()
     class EditWithSelectedQuery(val query: String) : Command()
     class ShowBackNavigationHistory(val history: List<NavigationHistoryEntry>) : Command()
-    object EmailSignEvent : Command()
     class ShowSitePermissionsDialog(
         val permissionsToRequest: SitePermissions,
         val request: PermissionRequest,
@@ -233,4 +229,8 @@ sealed class Command {
     data class SetBrowserBackground(val backgroundRes: Int) : Command()
     data class ShowSSLError(val handler: SslErrorHandler, val error: SslErrorResponse) : Command()
     data object HideSSLError : Command()
+    class LaunchScreen(
+        val screen: String,
+        val payload: String,
+    ) : Command()
 }

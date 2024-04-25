@@ -46,9 +46,11 @@ class GlobalUncaughtExceptionHandler @Inject constructor(
         thread: Thread?,
         originalException: Throwable?,
     ) {
-        if (shouldRecordExceptionAndCrashApp(originalException)) {
-            recordExceptionAndAllowCrash(thread, originalException)
-            return
+        runCatching {
+            if (shouldRecordExceptionAndCrashApp(originalException)) {
+                recordExceptionAndAllowCrash(thread, originalException)
+                return
+            }
         }
     }
 

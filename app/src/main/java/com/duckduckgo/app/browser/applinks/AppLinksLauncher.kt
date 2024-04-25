@@ -17,9 +17,9 @@
 package com.duckduckgo.app.browser.applinks
 
 import android.content.ActivityNotFoundException
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.provider.Browser.EXTRA_APPLICATION_ID
 import android.widget.Toast
 import androidx.annotation.StringRes
 import com.duckduckgo.app.browser.BrowserTabViewModel
@@ -40,25 +40,25 @@ class DuckDuckGoAppLinksLauncher @Inject constructor() : AppLinksLauncher {
     override fun openAppLink(context: Context?, appLink: AppLink, viewModel: BrowserTabViewModel) {
         if (context == null) return
         appLink.appIntent?.let {
-            it.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            configureIntent(it, context)
             startActivityOrQuietlyFail(context, it)
-        } ?: run {
-            if (appLink.excludedComponents != null) {
-                val title = context.getString(R.string.appLinkIntentChooserTitle)
-                val chooserIntent = getChooserIntent(appLink.uriString, title, appLink.excludedComponents!!)
-                startActivityOrQuietlyFail(context, chooserIntent)
-            }
         }
         viewModel.clearPreviousUrl()
     }
 
-    private fun getChooserIntent(url: String?, title: String, excludedComponents: List<ComponentName>): Intent {
-        val urlIntent = Intent.parseUri(url, Intent.URI_ANDROID_APP_SCHEME).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        }
-        return Intent.createChooser(urlIntent, title).apply {
-            putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, excludedComponents.toTypedArray())
-        }
+    private fun configureIntent(
+        intent: Intent,
+        context: Context,
+    ) {
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+
+        intent.addCategory(Intent.CATEGORY_BROWSABLE)
+        intent.selector?.addCategory(Intent.CATEGORY_BROWSABLE)
+
+        intent.component = null
+        intent.selector?.component = null
+
+        intent.putExtra(EXTRA_APPLICATION_ID, context.packageName)
     }
 
     private fun startActivityOrQuietlyFail(context: Context, intent: Intent) {

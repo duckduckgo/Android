@@ -125,7 +125,7 @@
                 android:drawableEnd="@drawable/ic_arrow_circle_right_12"
                 android:drawablePadding="@dimen/keyline_2"
                 android:text="@string/login_screen_cant_scan"
-                android:textAlignment="center"
+                android:gravity="center"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

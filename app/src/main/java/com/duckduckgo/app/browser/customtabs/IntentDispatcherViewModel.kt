@@ -51,7 +51,7 @@ class IntentDispatcherViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             runCatching {
                 val hasSession = intent?.hasExtra(CustomTabsIntent.EXTRA_SESSION) == true
-                val intentText = intent?.intentText
+                val intentText = intent?.intentText?.sanitize()
                 val toolbarColor = intent?.getIntExtra(CustomTabsIntent.EXTRA_TOOLBAR_COLOR, defaultColor) ?: defaultColor
                 val isEmailProtectionLink = emailProtectionLinkVerifier.shouldDelegateToInContextView(intentText, true)
                 val customTabRequested = hasSession && !isEmailProtectionLink
@@ -70,5 +70,11 @@ class IntentDispatcherViewModel @Inject constructor(
                 Timber.w("Error handling custom tab intent %s", it.message)
             }
         }
+    }
+
+    private fun String.sanitize(): String {
+        // Some apps send URLs with spaces in the intent. This is happening mostly for authorization URLs.
+        // E.g https://mastodon.social/oauth/authorize?client_id=AcfPDZlcKUjwIatVtMt8B8cmdW-w1CSOR6_rYS_6Kxs&scope=read write push&redirect_uri=mastify://oauth&response_type=code
+        return this.replace(" ", "%20")
     }
 }

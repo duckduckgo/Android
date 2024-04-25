@@ -34,6 +34,7 @@ import com.android.billingclient.api.queryProductDetails
 import com.android.billingclient.api.queryPurchaseHistory
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.subscriptions.impl.billing.BillingError.BILLING_CRASH_ERROR
 import com.duckduckgo.subscriptions.impl.billing.BillingInitResult.Failure
 import com.duckduckgo.subscriptions.impl.billing.BillingInitResult.Success
 import com.squareup.anvil.annotations.ContributesBinding
@@ -44,6 +45,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.WARN
+import logcat.asLog
 import logcat.logcat
 
 @ContributesBinding(AppScope::class)
@@ -97,25 +99,30 @@ class RealBillingClientAdapter @Inject constructor(
     }
 
     override suspend fun getSubscriptions(productIds: List<String>): SubscriptionsResult {
-        val client = billingClient
-        if (client == null || !client.isReady) return SubscriptionsResult.Failure()
+        try {
+            val client = billingClient
+            if (client == null || !client.isReady) return SubscriptionsResult.Failure()
 
-        val queryParams = QueryProductDetailsParams.newBuilder()
-            .setProductList(
-                productIds.map { productId ->
-                    Product.newBuilder()
-                        .setProductId(productId)
-                        .setProductType(ProductType.SUBS)
-                        .build()
-                },
-            )
-            .build()
+            val queryParams = QueryProductDetailsParams.newBuilder()
+                .setProductList(
+                    productIds.map { productId ->
+                        Product.newBuilder()
+                            .setProductId(productId)
+                            .setProductType(ProductType.SUBS)
+                            .build()
+                    },
+                )
+                .build()
 
-        val (billingResult, productDetails) = client.queryProductDetails(queryParams)
+            val (billingResult, productDetails) = client.queryProductDetails(queryParams)
 
-        return when (billingResult.responseCode) {
-            BillingResponseCode.OK -> SubscriptionsResult.Success(productDetails.orEmpty())
-            else -> SubscriptionsResult.Failure(billingResult.responseCode.toBillingError(), billingResult.debugMessage)
+            return when (billingResult.responseCode) {
+                BillingResponseCode.OK -> SubscriptionsResult.Success(productDetails.orEmpty())
+                else -> SubscriptionsResult.Failure(billingResult.responseCode.toBillingError(), billingResult.debugMessage)
+            }
+        } catch (t: Throwable) {
+            logcat { "Error getting subscriptions: ${t.asLog()}" }
+            return SubscriptionsResult.Failure(billingError = BILLING_CRASH_ERROR)
         }
     }
 

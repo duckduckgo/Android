@@ -18,6 +18,7 @@ import com.duckduckgo.brokensite.api.BrokenSiteLastSentReport
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyConfig
@@ -70,6 +71,8 @@ class BrokenSiteSubmitterTest {
 
     private val mockBrokenSiteLastSentReport: BrokenSiteLastSentReport = mock()
 
+    private val networkProtectionState: NetworkProtectionState = mock()
+
     private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels = mock {
         runBlocking { whenever(mock.getPixelParams()).thenReturn(emptyMap()) }
     }
@@ -88,6 +91,7 @@ class BrokenSiteSubmitterTest {
         whenever(mockStatisticsDataStore.atb).thenReturn(Atb("v123-456"))
         whenever(mockVariantManager.getVariantKey()).thenReturn("g")
         whenever(mockPrivacyConfig.privacyConfigData()).thenReturn(PrivacyConfigData(version = "v", eTag = "e"))
+        runBlocking { whenever(networkProtectionState.isRunning()) }.thenReturn(false)
 
         testee = BrokenSiteSubmitter(
             mockStatisticsDataStore,
@@ -105,7 +109,38 @@ class BrokenSiteSubmitterTest {
             mockContentBlocking,
             mockBrokenSiteLastSentReport,
             privacyProtectionsPopupExperimentExternalPixels,
+            networkProtectionState,
         )
+    }
+
+    @Test
+    fun whenVpnDisabledReportFalse() = runTest {
+        whenever(networkProtectionState.isRunning()).thenReturn(false)
+        val brokenSite = getBrokenSite()
+
+        testee.submitBrokenSiteFeedback(brokenSite)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        val encodedParamsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), encodedParamsCaptor.capture(), eq(COUNT))
+        val params = paramsCaptor.firstValue
+
+        assertEquals("false", params["vpnOn"])
+    }
+
+    @Test
+    fun whenVpnEnabledReportTrue() = runTest {
+        whenever(networkProtectionState.isRunning()).thenReturn(true)
+        val brokenSite = getBrokenSite()
+
+        testee.submitBrokenSiteFeedback(brokenSite)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        val encodedParamsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), encodedParamsCaptor.capture(), eq(COUNT))
+        val params = paramsCaptor.firstValue
+
+        assertEquals("true", params["vpnOn"])
     }
 
     @Test
