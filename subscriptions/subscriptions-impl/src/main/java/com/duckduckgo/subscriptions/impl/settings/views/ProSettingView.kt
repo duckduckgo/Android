@@ -97,6 +97,27 @@ class ProSettingView @JvmOverloads constructor(
         viewModel.viewState
             .onEach { renderView(it) }
             .launchIn(coroutineScope!!)
+
+        binding.subscriptionSetting.setOnClickListener(null)
+        binding.subscriptionSetting.setOnTouchListener(null)
+        binding.subscriptionBuy.setOnClickListener(null)
+        binding.subscriptionBuy.setOnTouchListener(null)
+        binding.subscriptionGet.setOnClickListener(null)
+        binding.subscriptionGet.setOnTouchListener(null)
+        binding.subscriptionRestore.setOnTouchListener(null)
+        binding.subscriptionRestore.setOnClickListener(null)
+
+        binding.subscriptionSettingContainer.setOnClickListener {
+            viewModel.onSettings()
+        }
+
+        binding.subscriptionRestoreContainer.setOnClickListener {
+            viewModel.onRestore()
+        }
+
+        binding.subscriptionBuyContainer.setOnClickListener {
+            viewModel.onBuy()
+        }
     }
 
     override fun onDetachedFromWindow() {
@@ -109,33 +130,18 @@ class ProSettingView @JvmOverloads constructor(
 
     @SuppressLint("ClickableViewAccessibility")
     private fun renderView(viewState: ViewState) {
-        binding.subscriptionSetting.setOnClickListener(null)
-        binding.subscriptionSetting.setOnTouchListener(null)
-        binding.subscriptionBuy.setOnClickListener(null)
-        binding.subscriptionBuy.setOnTouchListener(null)
-        binding.subscriptionGet.setOnClickListener(null)
-        binding.subscriptionGet.setOnTouchListener(null)
-        binding.subscriptionRestore.setOnTouchListener(null)
-        binding.subscriptionRestore.setOnClickListener(null)
-
         when (viewState.status) {
             AUTO_RENEWABLE, NOT_AUTO_RENEWABLE, GRACE_PERIOD -> {
                 binding.subscriptionBuyContainer.gone()
                 binding.subscriptionRestoreContainer.gone()
                 binding.subscriptionWaitingContainer.gone()
                 binding.subscriptionSettingContainer.show()
-                binding.subscriptionSettingContainer.setOnClickListener {
-                    viewModel.onSettings()
-                }
             }
             WAITING -> {
                 binding.subscriptionBuyContainer.gone()
                 binding.subscriptionWaitingContainer.show()
                 binding.subscriptionSettingContainer.gone()
                 binding.subscriptionRestoreContainer.show()
-                binding.subscriptionRestoreContainer.setOnClickListener {
-                    viewModel.onRestore()
-                }
             }
             else -> {
                 val htmlText = context.getString(R.string.subscriptionSettingFeaturesList).html(context)
@@ -144,12 +150,6 @@ class ProSettingView @JvmOverloads constructor(
                 binding.subscriptionSettingContainer.gone()
                 binding.subscriptionWaitingContainer.gone()
                 binding.subscriptionRestoreContainer.show()
-                binding.subscriptionBuyContainer.setOnClickListener {
-                    viewModel.onBuy()
-                }
-                binding.subscriptionRestoreContainer.setOnClickListener {
-                    viewModel.onRestore()
-                }
             }
         }
     }
