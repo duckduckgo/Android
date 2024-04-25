@@ -16,28 +16,8 @@
 
 package com.duckduckgo.app.browser.customtabs
 
-import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
-import javax.inject.Inject
-
 interface CustomTabDetector {
     fun isCustomTab(): Boolean
 
     fun setCustomTab(value: Boolean)
-}
-
-@ContributesBinding(scope = AppScope::class)
-@SingleInstanceIn(AppScope::class)
-class RealCustomTabDetector @Inject constructor() : CustomTabDetector {
-
-    private var customTab: Boolean = false
-
-    override fun isCustomTab(): Boolean {
-        return customTab
-    }
-
-    override fun setCustomTab(value: Boolean) {
-        this.customTab = value
-    }
 }

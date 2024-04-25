@@ -28,7 +28,7 @@ import com.squareup.moshi.Types.newParameterizedType
 
 @Database(
     exportSchema = true,
-    version = 2,
+    version = 3,
     entities = [AnrEntity::class],
 )
 @TypeConverters(AnrTypeConverter::class)
@@ -38,14 +38,21 @@ abstract class AnrsDatabase : RoomDatabase() {
     companion object {
 
         private val MIGRATION_1_TO_2: Migration = object : Migration(1, 2) {
-            override fun migrate(database: SupportSQLiteDatabase) {
-                database.execSQL("ALTER TABLE `anr_entity` ADD COLUMN `webView` TEXT NOT NULL DEFAULT \"unknown\"")
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE `anr_entity` ADD COLUMN `webView` TEXT NOT NULL DEFAULT \"unknown\"")
+            }
+        }
+
+        private val MIGRATION_2_TO_3: Migration = object : Migration(1, 2) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE `anr_entity` ADD COLUMN `customTab` TEXT NOT NULL DEFAULT \"false\"")
             }
         }
 
         val ALL_MIGRATIONS: List<Migration>
             get() = listOf(
                 MIGRATION_1_TO_2,
+                MIGRATION_2_TO_3,
             )
     }
 }
