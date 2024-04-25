@@ -50,6 +50,18 @@ class GridViewColumnCalculator(val context: Context) {
         return if (remainingSpace <= 0) 0 else (remainingSpace / 2).toPx()
     }
 
+    fun calculateGridConfig(columnWidthDp: Int, maxColumns: Int): GridConfig {
+        val numColumns = calculateNumberOfColumns(columnWidthDp, maxColumns)
+        val displayMetrics = context.resources.displayMetrics
+        val width = displayMetrics.widthPixels
+        val remaining = displayMetrics.widthPixels - (numColumns * width)
+
+        val spacing = remaining / (2 * numColumns)
+        return GridConfig(numColumns, spacing)
+    }
+
+    data class GridConfig(val columns: Int, val spacing: Int)
+
     companion object {
         const val FAVOURITES_GRID_MAX_COLUMNS = 6
         const val FAVOURITES_ITEM_MAX_SIZE_DP = 90

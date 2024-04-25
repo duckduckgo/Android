@@ -42,8 +42,9 @@ import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAda
 import com.duckduckgo.app.browser.databinding.ActivitySystemSearchBinding
 import com.duckduckgo.app.browser.databinding.IncludeQuickAccessItemsBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.Companion.QUICK_ACCESS_ITEM_MAX_SIZE_DP
+import com.duckduckgo.app.browser.favorites.NewTabSectionsAdapter
+import com.duckduckgo.app.browser.favorites.NewTabSectionsItem
 import com.duckduckgo.app.browser.favorites.QuickAccessDragTouchItemListener
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
@@ -96,7 +97,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     private lateinit var quickAccessItemsBinding: IncludeQuickAccessItemsBinding
     private lateinit var autocompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
     private lateinit var deviceAppSuggestionsAdapter: DeviceAppSuggestionsAdapter
-    private lateinit var quickAccessAdapter: FavoritesQuickAccessAdapter
+    private lateinit var quickAccessAdapter: NewTabSectionsAdapter
     private lateinit var itemTouchHelper: ItemTouchHelper
 
     private val systemSearchOnboarding
@@ -231,10 +232,11 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         val numOfColumns = gridViewColumnCalculator.calculateNumberOfColumns(QUICK_ACCESS_ITEM_MAX_SIZE_DP, QUICK_ACCESS_GRID_MAX_COLUMNS)
         val layoutManager = GridLayoutManager(this, numOfColumns)
         quickAccessRecyclerView.layoutManager = layoutManager
-        quickAccessAdapter = FavoritesQuickAccessAdapter(
+        quickAccessAdapter = NewTabSectionsAdapter(
             this,
             faviconManager,
             { viewHolder -> itemTouchHelper.startDrag(viewHolder) },
+            { },
             { viewModel.onQuickAccessItemClicked(it) },
             { viewModel.onEditQuickAccessItemRequested(it) },
             { viewModel.onDeleteQuickAccessItemRequested(it) },
@@ -244,8 +246,9 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             QuickAccessDragTouchItemListener(
                 quickAccessAdapter,
                 object : QuickAccessDragTouchItemListener.DragDropListener {
-                    override fun onListChanged(listElements: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) {
-                        viewModel.onQuickAccessListChanged(listElements)
+                    override fun onListChanged(listElements: List<NewTabSectionsItem>) {
+                        val favouriteItems = listElements.filterIsInstance<NewTabSectionsItem.FavouriteItem>()
+                        viewModel.onQuickAccessListChanged(favouriteItems.map { it.favorite })
                     }
                 },
             ),
@@ -352,7 +355,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     }
 
     private fun renderQuickAccessItems(it: SystemSearchViewModel.Suggestions.QuickAccessItems) {
-        quickAccessAdapter.submitList(it.favorites)
+        quickAccessAdapter.submitList(it.favorites.map { NewTabSectionsItem.FavouriteItem(it) })
     }
 
     private fun processCommand(command: SystemSearchViewModel.Command) {

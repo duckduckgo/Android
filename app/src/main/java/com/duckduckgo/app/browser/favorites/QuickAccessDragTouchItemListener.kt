@@ -19,17 +19,16 @@ package com.duckduckgo.app.browser.favorites
 import android.graphics.Canvas
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
 
 class QuickAccessDragTouchItemListener(
-    private val favoritesQuickAccessAdapter: FavoritesQuickAccessAdapter,
+    private val adapter: NewTabSectionsAdapter,
     private val dragDropListener: DragDropListener,
 ) : ItemTouchHelper.SimpleCallback(
     ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.START or ItemTouchHelper.END,
     0,
 ) {
     interface DragDropListener {
-        fun onListChanged(listElements: List<QuickAccessFavorite>)
+        fun onListChanged(listElements: List<NewTabSectionsItem>)
     }
 
     override fun isLongPressDragEnabled(): Boolean {
@@ -41,11 +40,11 @@ class QuickAccessDragTouchItemListener(
         viewHolder: RecyclerView.ViewHolder,
         target: RecyclerView.ViewHolder,
     ): Boolean {
-        val items = favoritesQuickAccessAdapter.currentList.toMutableList()
+        val items = adapter.currentList.toMutableList()
         val quickAccessFavorite = items[viewHolder.bindingAdapterPosition]
         items.removeAt(viewHolder.bindingAdapterPosition)
         items.add(target.bindingAdapterPosition, quickAccessFavorite)
-        favoritesQuickAccessAdapter.submitList(items)
+        adapter.submitList(items)
         return true
     }
 
@@ -61,7 +60,7 @@ class QuickAccessDragTouchItemListener(
         viewHolder: RecyclerView.ViewHolder,
     ) {
         super.clearView(recyclerView, viewHolder)
-        dragDropListener.onListChanged(favoritesQuickAccessAdapter.currentList)
+        dragDropListener.onListChanged(adapter.currentList)
         (viewHolder as? DragDropViewHolderListener)?.onItemReleased()
     }
 

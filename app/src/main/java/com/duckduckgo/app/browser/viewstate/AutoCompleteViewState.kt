@@ -17,11 +17,13 @@
 package com.duckduckgo.app.browser.viewstate
 
 import com.duckduckgo.app.autocomplete.api.AutoComplete
-import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
+import com.duckduckgo.app.browser.favorites.NewTabSectionsAdapter
+import com.duckduckgo.app.browser.favorites.NewTabSectionsItem
 
 data class AutoCompleteViewState(
     val showSuggestions: Boolean = false,
     val showFavorites: Boolean = false,
     val searchResults: AutoComplete.AutoCompleteResult = AutoComplete.AutoCompleteResult("", emptyList()),
-    val favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite> = emptyList(),
+    val favorites: List<NewTabSectionsItem.FavouriteItem> = emptyList(),
+    val shortcuts: List<NewTabSectionsItem.ShortcutItem> = NewTabSectionsAdapter.SHORTCUTS,
 )

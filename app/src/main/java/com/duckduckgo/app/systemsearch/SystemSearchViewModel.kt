@@ -23,7 +23,6 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment
-import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.onboarding.store.AppStage
@@ -85,7 +84,7 @@ class SystemSearchViewModel @Inject constructor(
             val appResults: List<DeviceApp> = emptyList(),
         ) : Suggestions()
 
-        data class QuickAccessItems(val favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) : Suggestions()
+        data class QuickAccessItems(val favorites: List<Favorite>) : Suggestions()
     }
 
     sealed class Command {
@@ -131,7 +130,7 @@ class SystemSearchViewModel @Inject constructor(
             .onEach { filteredFavourites ->
                 withContext(dispatchers.main()) {
                     latestQuickAccessItems =
-                        Suggestions.QuickAccessItems(filteredFavourites.map { FavoritesQuickAccessAdapter.QuickAccessFavorite(it) })
+                        Suggestions.QuickAccessItems(filteredFavourites)
                     resultsViewState.postValue(latestQuickAccessItems)
                 }
             }
@@ -308,29 +307,29 @@ class SystemSearchViewModel @Inject constructor(
         super.onCleared()
     }
 
-    fun onQuickAccessListChanged(newList: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) {
+    fun onQuickAccessListChanged(newList: List<Favorite>) {
         viewModelScope.launch(dispatchers.io()) {
-            savedSitesRepository.updateWithPosition(newList.map { it.favorite })
+            savedSitesRepository.updateWithPosition(newList)
         }
     }
 
-    fun onQuickAccessItemClicked(it: FavoritesQuickAccessAdapter.QuickAccessFavorite) {
+    fun onQuickAccessItemClicked(favorite: Favorite) {
         pixel.fire(FAVORITE_SYSTEM_SEARCH_ITEM_PRESSED)
-        command.value = Command.LaunchBrowser(it.favorite.url)
+        command.value = Command.LaunchBrowser(favorite.url)
     }
 
-    fun onEditQuickAccessItemRequested(it: FavoritesQuickAccessAdapter.QuickAccessFavorite) {
-        command.value = Command.LaunchEditDialog(it.favorite)
+    fun onEditQuickAccessItemRequested(favorite: Favorite) {
+        command.value = Command.LaunchEditDialog(favorite)
     }
 
-    fun onDeleteQuickAccessItemRequested(it: FavoritesQuickAccessAdapter.QuickAccessFavorite) {
-        hideQuickAccessItem(it)
-        command.value = Command.DeleteFavoriteConfirmation(it.favorite)
+    fun onDeleteQuickAccessItemRequested(favorite: Favorite) {
+        hideQuickAccessItem(favorite)
+        command.value = Command.DeleteFavoriteConfirmation(favorite)
     }
 
-    fun onDeleteSavedSiteRequested(it: FavoritesQuickAccessAdapter.QuickAccessFavorite) {
-        hideQuickAccessItem(it)
-        command.value = Command.DeleteSavedSiteConfirmation(it.favorite)
+    fun onDeleteSavedSiteRequested(favorite: Favorite) {
+        hideQuickAccessItem(favorite)
+        command.value = Command.DeleteSavedSiteConfirmation(favorite)
     }
 
     companion object {
@@ -372,9 +371,9 @@ class SystemSearchViewModel @Inject constructor(
         }
     }
 
-    private fun hideQuickAccessItem(quickAccessFavourite: FavoritesQuickAccessAdapter.QuickAccessFavorite) {
+    private fun hideQuickAccessItem(favorite: Favorite) {
         viewModelScope.launch(dispatchers.io()) {
-            hiddenIds.emit(hiddenIds.value.copy(favorites = hiddenIds.value.favorites + quickAccessFavourite.favorite.id))
+            hiddenIds.emit(hiddenIds.value.copy(favorites = hiddenIds.value.favorites + favorite.id))
         }
     }
 

@@ -22,7 +22,11 @@ import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.app.ActivityOptions
 import android.app.PendingIntent
-import android.content.*
+import android.content.ActivityNotFoundException
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
@@ -31,7 +35,12 @@ import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
-import android.os.*
+import android.os.Build
+import android.os.Bundle
+import android.os.Environment
+import android.os.Handler
+import android.os.Looper
+import android.os.Message
 import android.print.PrintAttributes
 import android.print.PrintManager
 import android.provider.MediaStore
@@ -40,8 +49,16 @@ import android.text.Spannable
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.StyleSpan
-import android.view.*
-import android.view.View.*
+import android.view.ContextMenu
+import android.view.KeyEvent
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.View.GONE
+import android.view.View.OnFocusChangeListener
+import android.view.View.VISIBLE
+import android.view.View.inflate
+import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
 import android.view.inputmethod.EditorInfo
 import android.webkit.PermissionRequest
@@ -53,7 +70,9 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebView.FindListener
 import android.webkit.WebView.HitTestResult
-import android.webkit.WebView.HitTestResult.*
+import android.webkit.WebView.HitTestResult.IMAGE_TYPE
+import android.webkit.WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE
+import android.webkit.WebView.HitTestResult.UNKNOWN_TYPE
 import android.widget.Button
 import android.widget.EditText
 import android.widget.FrameLayout
@@ -70,13 +89,24 @@ import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.core.text.toSpannable
-import androidx.core.view.*
+import androidx.core.view.doOnLayout
+import androidx.core.view.isEmpty
+import androidx.core.view.isGone
+import androidx.core.view.isInvisible
+import androidx.core.view.isNotEmpty
+import androidx.core.view.isVisible
+import androidx.core.view.postDelayed
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commitNow
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.transaction
-import androidx.lifecycle.*
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.distinctUntilChanged
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -112,12 +142,15 @@ import com.duckduckgo.app.browser.databinding.HttpAuthenticationBinding
 import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarBinding
 import com.duckduckgo.app.browser.databinding.IncludeQuickAccessItemsBinding
 import com.duckduckgo.app.browser.databinding.PopupWindowBrowserMenuBinding
+import com.duckduckgo.app.browser.databinding.ViewNewTabFavoritesTooltipBinding
 import com.duckduckgo.app.browser.downloader.BlobConverterInjector
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.setting.FaviconPromptSheet
-import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.Companion.QUICK_ACCESS_ITEM_MAX_SIZE_DP
-import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
+import com.duckduckgo.app.browser.favorites.NewTabSectionsAdapter
+import com.duckduckgo.app.browser.favorites.NewTabSectionsItem
+import com.duckduckgo.app.browser.favorites.NewTabShortcut.BOOKMARKS
+import com.duckduckgo.app.browser.favorites.NewTabShortcut.CHAT
 import com.duckduckgo.app.browser.favorites.QuickAccessDragTouchItemListener
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.app.browser.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher
@@ -164,8 +197,16 @@ import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.app.browser.webshare.WebShareChooser
 import com.duckduckgo.app.browser.webview.WebContentDebugging
-import com.duckduckgo.app.cta.ui.*
-import com.duckduckgo.app.cta.ui.DaxDialogCta.*
+import com.duckduckgo.app.cta.ui.BubbleCta
+import com.duckduckgo.app.cta.ui.Cta
+import com.duckduckgo.app.cta.ui.CtaViewModel
+import com.duckduckgo.app.cta.ui.DaxBubbleCta
+import com.duckduckgo.app.cta.ui.DaxDialogCta
+import com.duckduckgo.app.cta.ui.DaxDialogCta.DaxTrackersBlockedCta
+import com.duckduckgo.app.cta.ui.DialogCta
+import com.duckduckgo.app.cta.ui.ExperimentDaxBubbleOptionsCta
+import com.duckduckgo.app.cta.ui.ExperimentOnboardingDaxDialogCta
+import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
@@ -296,10 +337,16 @@ import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Provider
 import kotlin.coroutines.CoroutineContext
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.Runnable
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import timber.log.Timber
 
@@ -510,10 +557,12 @@ class BrowserTabFragment :
 
     private lateinit var decorator: BrowserTabFragmentDecorator
 
-    private lateinit var quickAccessAdapter: FavoritesQuickAccessAdapter
-    private lateinit var quickAccessItemTouchHelper: ItemTouchHelper
+    private lateinit var newTabSectionFavouritesAdapter: NewTabSectionsAdapter
+    private lateinit var newTabShortcuts: NewTabSectionsAdapter
+    private lateinit var omnibarFavouritesAdapter: NewTabSectionsAdapter
+    private lateinit var omnibarShortcutsAdapter: NewTabSectionsAdapter
 
-    private lateinit var omnibarQuickAccessAdapter: FavoritesQuickAccessAdapter
+    private lateinit var quickAccessItemTouchHelper: ItemTouchHelper
     private lateinit var omnibarQuickAccessItemTouchHelper: ItemTouchHelper
 
     @Inject
@@ -2081,31 +2130,43 @@ class BrowserTabFragment :
     }
 
     private fun configureOmnibarQuickAccessGrid() {
-        configureQuickAccessGridLayout(focusedView.quickAccessSuggestionsRecyclerView)
-        omnibarQuickAccessAdapter = createQuickAccessAdapter(originPixel = AppPixelName.FAVORITE_OMNIBAR_ITEM_PRESSED) { viewHolder ->
-            focusedView.quickAccessSuggestionsRecyclerView.enableAnimation()
+        configureQuickAccessGridLayout(focusedView.focusedFavouritesRecyclerView)
+        omnibarFavouritesAdapter = createQuickAccessAdapter(originPixel = AppPixelName.FAVORITE_OMNIBAR_ITEM_PRESSED) { viewHolder ->
+            focusedView.focusedFavouritesRecyclerView.enableAnimation()
             omnibarQuickAccessItemTouchHelper.startDrag(viewHolder)
         }
-        omnibarQuickAccessItemTouchHelper = createQuickAccessItemHolder(focusedView.quickAccessSuggestionsRecyclerView, omnibarQuickAccessAdapter)
-        focusedView.quickAccessSuggestionsRecyclerView.adapter = omnibarQuickAccessAdapter
-        focusedView.quickAccessSuggestionsRecyclerView.disableAnimation()
-        focusedView.sectionHeaderOverflowIcon.setOnClickListener {
-            showNewTabFavouritesPopup(it)
+        omnibarQuickAccessItemTouchHelper = createQuickAccessItemHolder(focusedView.focusedFavouritesRecyclerView, omnibarFavouritesAdapter)
+        focusedView.focusedFavouritesRecyclerView.adapter = omnibarFavouritesAdapter
+        focusedView.focusedFavouritesRecyclerView.disableAnimation()
+
+        configureQuickAccessGridLayout(focusedView.focusedShortcutsRecyclerView)
+        omnibarShortcutsAdapter = createQuickAccessAdapter(originPixel = AppPixelName.FAVORITE_OMNIBAR_ITEM_PRESSED) { viewHolder ->
+            focusedView.focusedShortcutsRecyclerView.enableAnimation()
+            quickAccessItemTouchHelper.startDrag(viewHolder)
         }
+        focusedView.focusedShortcutsRecyclerView.adapter = omnibarShortcutsAdapter
     }
 
     private fun configureHomeTabQuickAccessGrid() {
         configureQuickAccessGridLayout(quickAccessItems.quickAccessRecyclerView)
-        quickAccessAdapter = createQuickAccessAdapter(originPixel = AppPixelName.FAVORITE_HOMETAB_ITEM_PRESSED) { viewHolder ->
+        newTabSectionFavouritesAdapter = createQuickAccessAdapter(originPixel = AppPixelName.FAVORITE_HOMETAB_ITEM_PRESSED) { viewHolder ->
             quickAccessItems.quickAccessRecyclerView.enableAnimation()
             quickAccessItemTouchHelper.startDrag(viewHolder)
         }
-        quickAccessItemTouchHelper = createQuickAccessItemHolder(quickAccessItems.quickAccessRecyclerView, quickAccessAdapter)
-        quickAccessItems.quickAccessRecyclerView.adapter = quickAccessAdapter
+        quickAccessItemTouchHelper = createQuickAccessItemHolder(quickAccessItems.quickAccessRecyclerView, newTabSectionFavouritesAdapter)
+        quickAccessItems.quickAccessRecyclerView.adapter = newTabSectionFavouritesAdapter
         quickAccessItems.quickAccessRecyclerView.disableAnimation()
+
         quickAccessItems.sectionHeaderOverflowIcon.setOnClickListener {
             showNewTabFavouritesPopup(it)
         }
+
+        configureQuickAccessGridLayout(quickAccessItems.quickAccessShortcutsRecyclerView)
+        newTabShortcuts = createQuickAccessAdapter(originPixel = AppPixelName.FAVORITE_HOMETAB_ITEM_PRESSED) { viewHolder ->
+            quickAccessItems.quickAccessRecyclerView.enableAnimation()
+            quickAccessItemTouchHelper.startDrag(viewHolder)
+        }
+        quickAccessItems.quickAccessShortcutsRecyclerView.adapter = newTabShortcuts
     }
 
     private fun showNewTabFavouritesPopup(anchor: View) {
@@ -2131,7 +2192,9 @@ class BrowserTabFragment :
             true,
         ).apply {
             setOnDismissListener {
-                omnibar.omniBarContainer.isPressed = true
+                omnibar.omnibarTextInput.hideKeyboard()
+                binding.focusDummy.requestFocus()
+                omnibar.omniBarContainer.isPressed = false
             }
             showAsDropDown(anchor)
         }
@@ -2139,14 +2202,15 @@ class BrowserTabFragment :
 
     private fun createQuickAccessItemHolder(
         recyclerView: RecyclerView,
-        apapter: FavoritesQuickAccessAdapter,
+        apapter: NewTabSectionsAdapter,
     ): ItemTouchHelper {
         return ItemTouchHelper(
             QuickAccessDragTouchItemListener(
                 apapter,
                 object : QuickAccessDragTouchItemListener.DragDropListener {
-                    override fun onListChanged(listElements: List<QuickAccessFavorite>) {
-                        viewModel.onQuickAccessListChanged(listElements)
+                    override fun onListChanged(listElements: List<NewTabSectionsItem>) {
+                        val favouriteItems = listElements.filterIsInstance<NewTabSectionsItem.FavouriteItem>()
+                        viewModel.onQuickAccessListChanged(favouriteItems.map { it.favorite })
                         recyclerView.disableAnimation()
                     }
                 },
@@ -2159,18 +2223,24 @@ class BrowserTabFragment :
     private fun createQuickAccessAdapter(
         originPixel: AppPixelName,
         onMoveListener: (RecyclerView.ViewHolder) -> Unit,
-    ): FavoritesQuickAccessAdapter {
-        return FavoritesQuickAccessAdapter(
+    ): NewTabSectionsAdapter {
+        return NewTabSectionsAdapter(
             this,
             faviconManager,
             onMoveListener,
             {
-                pixel.fire(originPixel)
-                viewModel.onUserSubmittedQuery(it.favorite.url)
+                when (it) {
+                    BOOKMARKS -> browserActivity?.launchBookmarks()
+                    CHAT -> viewModel.onUserSubmittedQuery("https://duckduckgo.com/chat")
+                }
             },
-            { viewModel.onEditSavedSiteRequested(it.favorite) },
-            { viewModel.onDeleteFavoriteRequested(it.favorite) },
-            { viewModel.onDeleteSavedSiteRequested(it.favorite) },
+            {
+                pixel.fire(originPixel)
+                viewModel.onUserSubmittedQuery(it.url)
+            },
+            { viewModel.onEditSavedSiteRequested(it) },
+            { viewModel.onDeleteFavoriteRequested(it) },
+            { viewModel.onDeleteSavedSiteRequested(it) },
         )
     }
 
@@ -2178,7 +2248,6 @@ class BrowserTabFragment :
         val numOfColumns = gridViewColumnCalculator.calculateNumberOfColumns(QUICK_ACCESS_ITEM_MAX_SIZE_DP, QUICK_ACCESS_GRID_MAX_COLUMNS)
         val layoutManager = GridLayoutManager(requireContext(), numOfColumns)
         recyclerView.layoutManager = layoutManager
-        val sidePadding = gridViewColumnCalculator.calculateSidePadding(QUICK_ACCESS_ITEM_MAX_SIZE_DP, numOfColumns)
     }
 
     private fun configurePrivacyShield() {
@@ -2841,7 +2910,9 @@ class BrowserTabFragment :
         renderer.recreateDaxDialogCta()
 
         configureQuickAccessGridLayout(quickAccessItems.quickAccessRecyclerView)
-        configureQuickAccessGridLayout(focusedView.quickAccessSuggestionsRecyclerView)
+        configureQuickAccessGridLayout(quickAccessItems.quickAccessShortcutsRecyclerView)
+        configureQuickAccessGridLayout(focusedView.focusedFavouritesRecyclerView)
+        configureQuickAccessGridLayout(focusedView.focusedShortcutsRecyclerView)
 
         renderer.renderFocusedView()
         renderer.showNewTabContent()
@@ -3496,6 +3567,10 @@ class BrowserTabFragment :
         fun renderFocusedView() {
             val viewState = lastSeenAutoCompleteViewState
             if (viewState != null) {
+                Timber.d(
+                    "New Tab: showSuggestions ${viewState.showSuggestions} showFavourites ${viewState.showFavorites} favourites size ${viewState.favorites.size}",
+                )
+
                 if (viewState.showSuggestions) {
                     binding.autoCompleteSuggestionsList.show()
                     focusedView.rootFocusedView.gone()
@@ -3505,68 +3580,88 @@ class BrowserTabFragment :
                     focusedView.rootFocusedView.show()
                     // consume clicks so the view is not hidden after losing focus
                     focusedView.rootFocusedView.setOnClickListener { }
-                    focusedView.quickAccessRecyclerViewEmpty.setOnClickListener { }
+                    omnibarShortcutsAdapter.submitList(NewTabSectionsAdapter.SHORTCUTS)
+
+                    val numOfColumns = gridViewColumnCalculator.calculateNumberOfColumns(
+                        QUICK_ACCESS_ITEM_MAX_SIZE_DP,
+                        QUICK_ACCESS_GRID_MAX_COLUMNS,
+                    )
 
                     if (viewState.favorites.isEmpty()) {
-                        focusedView.quickAccessRecyclerViewEmpty.show()
-                        focusedView.sectionHeaderOverflowIcon.show()
-                        focusedView.quickAccessSuggestionsRecyclerView.gone()
                         focusedView.newTabFavoritesToggle.gone()
-                    } else {
-                        focusedView.quickAccessRecyclerViewEmpty.gone()
-                        focusedView.sectionHeaderOverflowIcon.gone()
-                        focusedView.quickAccessSuggestionsRecyclerView.show()
-                        // portrait shows tops 8 favourites + Show More toggle
-                        // landscape / tablet shows tops 12 + Show More toggles
+                        focusedView.sectionHeaderOverflowIcon.show()
+                        focusedView.sectionHeaderLayout.setOnClickListener {
+                            showNewTabFavouritesPopup(it)
+                        }
 
-                        val numOfColumns =
-                            gridViewColumnCalculator.calculateNumberOfColumns(QUICK_ACCESS_ITEM_MAX_SIZE_DP, QUICK_ACCESS_GRID_MAX_COLUMNS)
+                        if (numOfColumns == QUICK_ACCESS_GRID_MAX_COLUMNS) {
+                            newTabSectionFavouritesAdapter.submitList(NewTabSectionsAdapter.LANDSCAPE_PLACEHOLDERS)
+                        } else {
+                            newTabSectionFavouritesAdapter.submitList(NewTabSectionsAdapter.PORTRAIT_PLACEHOLDERS)
+                        }
+                    } else {
+                        focusedView.sectionHeaderOverflowIcon.gone()
+                        focusedView.sectionHeaderLayout.setOnClickListener(null)
+
                         val numOfCollapsedItems = numOfColumns * 2
-                        val showCollapsed = viewState.favorites.size > numOfCollapsedItems
+                        val showToggle = viewState.favorites.size > numOfCollapsedItems
+                        val showCollapsed = !omnibarFavouritesAdapter.expanded
 
                         if (showCollapsed) {
-                            omnibarQuickAccessAdapter.submitList(viewState.favorites.take(numOfCollapsedItems))
-                            var expanded = false
+                            omnibarFavouritesAdapter.submitList(viewState.favorites.take(numOfCollapsedItems))
+                        } else {
+                            omnibarFavouritesAdapter.submitList(viewState.favorites)
+                        }
+
+                        if (showToggle) {
                             focusedView.newTabFavoritesToggle.show()
+                            if (showCollapsed) {
+                                focusedView.newTabFavoritesToggle.text = getString(R.string.newTabFavoritesShowMore)
+                                focusedView.newTabFavoritesToggle.setCompoundDrawablesWithIntrinsicBounds(
+                                    0,
+                                    0,
+                                    com.duckduckgo.mobile.android.R.drawable.ic_chevron_small_down_16,
+                                    0,
+                                )
+                            } else {
+                                focusedView.newTabFavoritesToggle.text = getString(R.string.newTabFavoritesShowLess)
+                                focusedView.newTabFavoritesToggle.setCompoundDrawablesWithIntrinsicBounds(
+                                    0,
+                                    0,
+                                    com.duckduckgo.mobile.android.R.drawable.ic_chevron_small_up_16,
+                                    0,
+                                )
+                            }
                             focusedView.newTabFavoritesToggle.setOnClickListener {
-                                if (expanded) {
+                                if (omnibarFavouritesAdapter.expanded) {
                                     focusedView.newTabFavoritesToggle.text = getString(R.string.newTabFavoritesShowMore)
-                                    omnibarQuickAccessAdapter.submitList(viewState.favorites.take(numOfCollapsedItems))
+                                    omnibarFavouritesAdapter.submitList(viewState.favorites.take(numOfCollapsedItems))
                                     focusedView.newTabFavoritesToggle.setCompoundDrawablesWithIntrinsicBounds(
                                         0,
                                         0,
                                         com.duckduckgo.mobile.android.R.drawable.ic_chevron_small_down_16,
                                         0,
                                     )
-                                    expanded = false
+                                    omnibarFavouritesAdapter.expanded = false
                                 } else {
                                     focusedView.newTabFavoritesToggle.text = getString(R.string.newTabFavoritesShowLess)
-                                    omnibarQuickAccessAdapter.submitList(viewState.favorites)
+                                    omnibarFavouritesAdapter.submitList(viewState.favorites)
                                     focusedView.newTabFavoritesToggle.setCompoundDrawablesWithIntrinsicBounds(
                                         0,
                                         0,
                                         com.duckduckgo.mobile.android.R.drawable.ic_chevron_small_up_16,
                                         0,
                                     )
-                                    expanded = true
+                                    omnibarFavouritesAdapter.expanded = true
                                 }
                             }
                         } else {
                             focusedView.newTabFavoritesToggle.gone()
-                            omnibarQuickAccessAdapter.submitList(viewState.favorites)
                         }
                     }
                 } else {
                     binding.autoCompleteSuggestionsList.gone()
                     focusedView.rootFocusedView.gone()
-                }
-
-                focusedView.newTabShortcutBookmarks.setClickListener {
-                    browserActivity?.launchBookmarks()
-                }
-
-                focusedView.newTabShortcutChat.setClickListener {
-                    viewModel.onUserSubmittedQuery("https://duckduckgo.com/chat")
                 }
             }
         }
@@ -3988,69 +4083,97 @@ class BrowserTabFragment :
         }
 
         fun showNewTabContent() {
+            newBrowserTab.newTabLayout.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+                if (omnibar.omniBarContainer.isPressed) {
+                    omnibar.omnibarTextInput.hideKeyboard()
+                    binding.focusDummy.requestFocus()
+                    omnibar.omniBarContainer.isPressed = false
+                }
+            }
+
             val ctaViewState = lastSeenCtaViewState
             if (ctaViewState != null) {
                 val favorites = ctaViewState.favorites
-                var expanded = false
                 Timber.d("New Tab: showHome favourites empty ${favorites.isEmpty()}")
+                newTabShortcuts.submitList(NewTabSectionsAdapter.SHORTCUTS)
+
+                val numOfColumns = gridViewColumnCalculator.calculateNumberOfColumns(QUICK_ACCESS_ITEM_MAX_SIZE_DP, QUICK_ACCESS_GRID_MAX_COLUMNS)
+
                 if (favorites.isEmpty()) {
                     newBrowserTab.newTabQuickAccessItemsLayout.show()
-                    newBrowserTab.newTabQuickAccessItemsLayout.findViewById<View>(R.id.quickAccessRecyclerView).gone()
-                    newBrowserTab.newTabQuickAccessItemsLayout.findViewById<View>(R.id.quickAccessRecyclerViewEmpty).show()
                     newBrowserTab.newTabQuickAccessItemsLayout.findViewById<View>(R.id.newTabFavoritesToggle).gone()
                     newBrowserTab.newTabQuickAccessItemsLayout.findViewById<View>(R.id.sectionHeaderOverflowIcon).show()
                     newBrowserTab.newTabQuickAccessItemsLayout.findViewById<View>(R.id.sectionHeaderLayout).setOnClickListener {
                         showNewTabFavouritesPopup(newBrowserTab.newTabQuickAccessItemsLayout.findViewById<View>(R.id.sectionHeaderOverflowIcon))
                     }
+                    if (numOfColumns == QUICK_ACCESS_GRID_MAX_COLUMNS) {
+                        newTabSectionFavouritesAdapter.submitList(NewTabSectionsAdapter.LANDSCAPE_PLACEHOLDERS)
+                    } else {
+                        newTabSectionFavouritesAdapter.submitList(NewTabSectionsAdapter.PORTRAIT_PLACEHOLDERS)
+                    }
                 } else {
-                    val numOfColumns = gridViewColumnCalculator.calculateNumberOfColumns(QUICK_ACCESS_ITEM_MAX_SIZE_DP, QUICK_ACCESS_GRID_MAX_COLUMNS)
+                    newBrowserTab.newTabQuickAccessItemsLayout.findViewById<View>(R.id.sectionHeaderLayout).setOnClickListener(null)
+                    newBrowserTab.newTabQuickAccessItemsLayout.findViewById<View>(R.id.sectionHeaderOverflowIcon).gone()
+
                     val numOfCollapsedItems = numOfColumns * 2
-                    val showCollapsed = favorites.size > numOfCollapsedItems
+                    Timber.d("New Tab: fav size ${favorites.size} numOfCollapsedItems $numOfCollapsedItems")
+                    val showToggle = favorites.size > numOfCollapsedItems
+                    val showCollapsed = !newTabSectionFavouritesAdapter.expanded
 
                     if (showCollapsed) {
-                        quickAccessAdapter.submitList(favorites.take(numOfCollapsedItems))
-                        val favoritesToggle = newBrowserTab.newTabQuickAccessItemsLayout.findViewById<DaxTextView>(R.id.newTabFavoritesToggle)
+                        newTabSectionFavouritesAdapter.submitList(favorites.take(numOfCollapsedItems))
+                    } else {
+                        newTabSectionFavouritesAdapter.submitList(favorites)
+                    }
+
+                    val favoritesToggle = newBrowserTab.newTabQuickAccessItemsLayout.findViewById<DaxTextView>(R.id.newTabFavoritesToggle)
+                    if (showToggle) {
                         favoritesToggle.show()
+                        if (showCollapsed) {
+                            favoritesToggle.text = getString(R.string.newTabFavoritesShowMore)
+                            favoritesToggle.setCompoundDrawablesWithIntrinsicBounds(
+                                0,
+                                0,
+                                com.duckduckgo.mobile.android.R.drawable.ic_chevron_small_down_16,
+                                0,
+                            )
+                        } else {
+                            favoritesToggle.text = getString(R.string.newTabFavoritesShowLess)
+                            favoritesToggle.setCompoundDrawablesWithIntrinsicBounds(
+                                0,
+                                0,
+                                com.duckduckgo.mobile.android.R.drawable.ic_chevron_small_up_16,
+                                0,
+                            )
+                        }
                         favoritesToggle.setOnClickListener {
-                            if (expanded) {
+                            if (newTabSectionFavouritesAdapter.expanded) {
                                 favoritesToggle.text = getString(R.string.newTabFavoritesShowMore)
-                                quickAccessAdapter.submitList(favorites.take(numOfCollapsedItems))
+                                newTabSectionFavouritesAdapter.submitList(favorites.take(numOfCollapsedItems))
                                 favoritesToggle.setCompoundDrawablesWithIntrinsicBounds(
                                     0,
                                     0,
                                     com.duckduckgo.mobile.android.R.drawable.ic_chevron_small_down_16,
                                     0,
                                 )
-                                expanded = false
+                                newTabSectionFavouritesAdapter.expanded = false
                             } else {
                                 favoritesToggle.text = getString(R.string.newTabFavoritesShowLess)
-                                quickAccessAdapter.submitList(favorites)
+                                newTabSectionFavouritesAdapter.submitList(favorites)
                                 favoritesToggle.setCompoundDrawablesWithIntrinsicBounds(
                                     0,
                                     0,
                                     com.duckduckgo.mobile.android.R.drawable.ic_chevron_small_up_16,
                                     0,
                                 )
-                                expanded = true
+                                newTabSectionFavouritesAdapter.expanded = true
                             }
                         }
                     } else {
-                        newBrowserTab.newTabQuickAccessItemsLayout.findViewById<View>(R.id.newTabFavoritesToggle).gone()
-                        quickAccessAdapter.submitList(favorites)
+                        favoritesToggle.gone()
                     }
 
-                    newBrowserTab.newTabQuickAccessItemsLayout.findViewById<View>(R.id.sectionHeaderOverflowIcon).gone()
-                    newBrowserTab.newTabQuickAccessItemsLayout.findViewById<View>(R.id.quickAccessRecyclerViewEmpty).gone()
-                    newBrowserTab.newTabQuickAccessItemsLayout.findViewById<View>(R.id.quickAccessRecyclerView).show()
                     viewModel.onNewTabFavouritesShown()
-                }
-
-                newBrowserTab.newTabQuickAccessItemsLayout.findViewById<View>(R.id.newTabShortcutBookmarks).setOnClickListener {
-                    browserActivity?.launchBookmarks()
-                }
-
-                newBrowserTab.newTabQuickAccessItemsLayout.findViewById<View>(R.id.newTabShortcutChat).setOnClickListener {
-                    viewModel.onUserSubmittedQuery("https://duckduckgo.com/chat")
                 }
 
                 newBrowserTab.newTabQuickAccessItemsLayout.show()

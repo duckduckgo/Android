@@ -16,11 +16,15 @@
 
 package com.duckduckgo.common.ui.view.griditem
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.ImageView.ScaleType.FIT_XY
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.griditem.DaxNewTabGridItem.GridItemType.Favicon
 import com.duckduckgo.common.ui.view.griditem.DaxNewTabGridItem.GridItemType.Placeholder
@@ -65,6 +69,16 @@ class DaxNewTabGridItem @JvmOverloads constructor(
         binding.quickAccessTitle.text = text
     }
 
+    /** Sets the primary text title */
+    fun setPrimaryText(@StringRes text: Int) {
+        binding.quickAccessTitle.text = context.getString(text)
+    }
+
+    /** Sets the leading icon image drawable */
+    fun setLeadingIconDrawable(@DrawableRes drawable: Int) {
+        binding.quickAccessFavicon.setImageResource(drawable)
+    }
+
     /** Sets the leading icon image drawable */
     fun setLeadingIconDrawable(drawable: Drawable) {
         binding.quickAccessFavicon.setImageDrawable(drawable)
@@ -73,6 +87,28 @@ class DaxNewTabGridItem @JvmOverloads constructor(
     /** Sets the item click listener */
     fun setClickListener(onClick: () -> Unit) {
         binding.root.setOnClickListener { onClick() }
+    }
+
+    /** Sets the item click listener */
+    fun setLongClickListener(onClick: OnLongClickListener) {
+        binding.root.setOnLongClickListener(onClick)
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    fun setTouchListener(onTouch: OnTouchListener) {
+        binding.root.setOnTouchListener(onTouch)
+    }
+
+    fun favicon(): ImageView {
+        return binding.quickAccessFavicon
+    }
+
+    fun hideTitle() {
+        binding.quickAccessTitle.alpha = 0f
+    }
+
+    fun showTitle() {
+        binding.quickAccessTitle.alpha = 1f
     }
 
     /** Sets the item type (see https://www.figma.com/file/6Yfag3rmVECFxs9PTYXdIt/New-Tab-page-exploration-(iOS%2FAndroid)?type=design&node-id=590-31843&mode=design&t=s7gAJlxNYHG02uJl-4 */
@@ -91,6 +127,7 @@ class DaxNewTabGridItem @JvmOverloads constructor(
         binding.quickAccessFavicon.gone()
         binding.quickAccessFaviconCard.gone()
         binding.gridItemPlaceholder.show()
+        binding.root.setBackgroundResource(R.drawable.background_rounded_transparent)
     }
 
     private fun setAsFavicon() {
@@ -98,6 +135,7 @@ class DaxNewTabGridItem @JvmOverloads constructor(
         binding.quickAccessFavicon.show()
         binding.quickAccessFaviconCard.show()
         binding.gridItemPlaceholder.gone()
+        binding.root.setBackgroundResource(R.drawable.selectable_rounded_ripple)
     }
 
     private fun setAsShortcut() {
@@ -106,6 +144,7 @@ class DaxNewTabGridItem @JvmOverloads constructor(
         binding.quickAccessFavicon.scaleType = FIT_XY
         binding.quickAccessFaviconCard.show()
         binding.gridItemPlaceholder.gone()
+        binding.root.setBackgroundResource(R.drawable.selectable_rounded_ripple)
     }
 
     private fun setImageSize(itemType: GridItemType) {

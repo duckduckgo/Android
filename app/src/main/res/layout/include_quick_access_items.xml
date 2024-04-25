@@ -61,43 +61,12 @@
             android:layout_height="wrap_content"
             android:clipToPadding="false"
             android:overScrollMode="never"
+            android:paddingHorizontal="@dimen/keyline_2"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             tools:itemCount="8"
             tools:listItem="@layout/view_quick_access_item"
             tools:showIn="@layout/activity_system_search"
             tools:spanCount="4" />
-
-        <LinearLayout
-            android:id="@+id/quickAccessRecyclerViewEmpty"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/keyline_2"
-            android:layout_marginEnd="@dimen/keyline_2"
-            android:clickable="false"
-            tools:visibility="gone"
-            android:orientation="horizontal">
-
-            <com.duckduckgo.common.ui.view.griditem.DaxNewTabGridItem
-                app:gridItemType="placeholder"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <com.duckduckgo.common.ui.view.griditem.DaxNewTabGridItem
-                app:gridItemType="placeholder"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <com.duckduckgo.common.ui.view.griditem.DaxNewTabGridItem
-                app:gridItemType="placeholder"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <com.duckduckgo.common.ui.view.griditem.DaxNewTabGridItem
-                app:gridItemType="placeholder"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-        </LinearLayout>
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/newTabFavoritesToggle"
@@ -113,7 +82,7 @@
             android:layout_gravity="center"
             app:typography="caption"
             app:textType="primary"
-            android:background="@drawable/chip_background"
+            android:background="@drawable/selectable_rounded_container_ripple"
             android:text="@string/newTabFavoritesShowMore"
             android:drawablePadding="@dimen/keyline_1"
             android:drawableEnd="@drawable/ic_chevron_small_down_16" />
@@ -124,33 +93,22 @@
             app:typography="h4"
             android:layout_marginStart="@dimen/keyline_5"
             android:layout_marginEnd="@dimen/keyline_5"
-            android:layout_marginTop="@dimen/keyline_5"
+            android:layout_marginTop="@dimen/keyline_4"
             app:textType="primary"
             android:text="@string/newTabPageShortcuts" />
 
-        <LinearLayout
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/quickAccessShortcutsRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <com.duckduckgo.common.ui.view.griditem.DaxNewTabGridItem
-                android:id="@+id/newTabShortcutBookmarks"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:gridItemType="shortcut"
-                app:primaryText="@string/newTabPageShortcutBookmarks"
-                app:leadingIcon="@drawable/ic_bookmarks_open_color_16"
-                android:layout_marginStart="@dimen/keyline_2" />
-
-            <com.duckduckgo.common.ui.view.griditem.DaxNewTabGridItem
-                android:id="@+id/newTabShortcutChat"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:gridItemType="shortcut"
-                app:primaryText="@string/newTabPageShortcutChat"
-                app:leadingIcon="@drawable/ic_placeholder_color_16"
-                android:layout_marginStart="@dimen/keyline_2" />
-        </LinearLayout>
+            android:clipToPadding="false"
+            android:overScrollMode="never"
+            android:paddingHorizontal="@dimen/keyline_2"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            tools:itemCount="8"
+            tools:listItem="@layout/view_quick_access_item"
+            tools:showIn="@layout/activity_system_search"
+            tools:spanCount="4" />
 
     </LinearLayout>
 </merge>

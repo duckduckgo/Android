@@ -200,7 +200,6 @@ class NetpGeoswitchingAdapter constructor(
         private const val COUNTRY_VIEW_TYPE = 3
     }
 }
-
 sealed class GeoswitchingListItem {
     data class HeaderItem(@StringRes val header: Int) : GeoswitchingListItem()
     data class RecommendedItem(
