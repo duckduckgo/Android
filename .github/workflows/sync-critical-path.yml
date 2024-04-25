@@ -60,7 +60,7 @@ jobs:
         if: always()
         run: find . -name "*.apk"  -exec mv '{}' apk/release.apk \;
 
-      - name: Run Sync flows
+      - name: Sync Flows
         uses: mobile-dev-inc/action-maestro-cloud@v1.8.1
         with:
           api-key: ${{ secrets.MOBILE_DEV_API_KEY }}
@@ -71,13 +71,6 @@ jobs:
           include-tags: syncCriticalPathTest
           env: |
             CODE=${{ steps.sync-recovery-code.outputs.recovery-code }}
-
-      - name: Maestro Output
-        run: |
-          echo "Console URL: ${{ steps.maestro.outputs.MAESTRO_CLOUD_CONSOLE_URL }}"
-          echo "Flow Results: ${{ steps.maestro.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}"
-          echo "Upload Status: ${{ steps.maestro.outputs.MAESTRO_CLOUD_UPLOAD_STATUS }}"
-          echo "App Binary ID:: ${{ steps.maestro.outputs.MAESTRO_CLOUD_APP_BINARY_ID }}"
 
       - name: Create Asana task when workflow failed
         if: ${{ failure() }}
