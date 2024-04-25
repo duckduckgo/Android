@@ -35,6 +35,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.app.cta.ui.Cta
+import com.duckduckgo.app.cta.ui.ExperimentOnboardingDaxDialogCta
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.autofill.api.AutofillWebMessageRequest
@@ -233,4 +234,5 @@ sealed class Command {
         val screen: String,
         val payload: String,
     ) : Command()
+    data class HideExperimentOnboardingDialog(val experimentCta: ExperimentOnboardingDaxDialogCta) : Command()
 }

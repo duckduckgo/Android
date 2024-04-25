@@ -27,7 +27,7 @@ data class BrowserViewState(
     val isFullScreen: Boolean = false,
     val isDesktopBrowsingMode: Boolean = false,
     val canChangeBrowsingMode: Boolean = false,
-    val showPrivacyShield: Boolean = false,
+    val showPrivacyShield: HighlightableButton = HighlightableButton.Visible(enabled = false),
     val showSearchIcon: Boolean = false,
     val showClearButton: Boolean = false,
     val showVoiceSearch: Boolean = false,

@@ -80,7 +80,10 @@ class ExperimentWelcomePage : OnboardingPageFragment(R.layout.content_onboarding
     private var typingAnimation: ViewPropertyAnimatorCompat? = null
     private var welcomeAnimationFinished = false
 
-    private val requestPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+    private val requestPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { permissionGranted ->
+        if (permissionGranted) {
+            viewModel.notificationRuntimePermissionGranted()
+        }
         if (view?.windowVisibility == View.VISIBLE) {
             scheduleWelcomeAnimation(ANIMATION_DELAY_AFTER_NOTIFICATIONS_PERMISSIONS_HANDLED)
         }
@@ -142,6 +145,7 @@ class ExperimentWelcomePage : OnboardingPageFragment(R.layout.content_onboarding
     @SuppressLint("InlinedApi")
     private fun requestNotificationsPermissions() {
         if (appBuildConfig.sdkInt >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            viewModel.notificationRuntimePermissionRequested()
             requestPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
         } else {
             scheduleWelcomeAnimation()
@@ -150,17 +154,19 @@ class ExperimentWelcomePage : OnboardingPageFragment(R.layout.content_onboarding
 
     private fun configureDaxCta(onboardingDialogType: PreOnboardingDialogType) {
         context?.let {
+            viewModel.onDialogShown(onboardingDialogType)
             when (onboardingDialogType) {
                 INITIAL -> {
                     ctaText = it.getString(R.string.preOnboardingDaxDialog1Title)
                     binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
                     binding.daxDialogCta.dialogTextCta.textInDialog = ctaText.html(it)
-                    binding.daxDialogCta.experimentDialogContentImage.alpha = MIN_ALPHA
                     binding.daxDialogCta.experimentDialogContentImage.gone()
-                    binding.daxDialogCta.experimentDialogContentText.gone()
-                    binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog1Button)
-                    binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(INITIAL) }
-                    ViewCompat.animate(binding.daxDialogCta.primaryCta).alpha(MAX_ALPHA).setDuration(ANIMATION_DURATION).startDelay = ANIMATION_DELAY
+
+                    scheduleTypingAnimation {
+                        binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog1Button)
+                        binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(INITIAL) }
+                        ViewCompat.animate(binding.daxDialogCta.primaryCta).alpha(MAX_ALPHA).duration = ANIMATION_DURATION
+                    }
                 }
 
                 COMPARISON_CHART -> {
@@ -171,14 +177,15 @@ class ExperimentWelcomePage : OnboardingPageFragment(R.layout.content_onboarding
                     binding.daxDialogCta.dialogTextCta.textInDialog = ctaText.html(it)
                     binding.daxDialogCta.experimentDialogContentImage.alpha = MIN_ALPHA
                     binding.daxDialogCta.experimentDialogContentImage.show()
+                    binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
                     binding.daxDialogCta.experimentDialogContentImage.setImageResource(R.drawable.comparison_chart)
-                    ViewCompat.animate(binding.daxDialogCta.experimentDialogContentImage)
-                        .alpha(MAX_ALPHA)
-                        .setDuration(ANIMATION_DURATION).startDelay = COMPARISON_CHART_DELAY
-                    binding.daxDialogCta.experimentDialogContentText.gone()
-                    binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog2Button)
-                    binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(COMPARISON_CHART) }
-                    scheduleTypingAnimation()
+
+                    scheduleTypingAnimation {
+                        binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog2Button)
+                        binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(COMPARISON_CHART) }
+                        ViewCompat.animate(binding.daxDialogCta.primaryCta).alpha(MAX_ALPHA).duration = ANIMATION_DURATION
+                        ViewCompat.animate(binding.daxDialogCta.experimentDialogContentImage).alpha(MAX_ALPHA).duration = ANIMATION_DURATION
+                    }
                 }
 
                 CELEBRATION -> {
@@ -190,19 +197,14 @@ class ExperimentWelcomePage : OnboardingPageFragment(R.layout.content_onboarding
                     binding.daxDialogCta.experimentDialogContentImage.alpha = MIN_ALPHA
                     binding.daxDialogCta.experimentDialogContentImage.show()
                     binding.daxDialogCta.experimentDialogContentImage.setImageResource(R.drawable.ic_success_128)
-                    ViewCompat.animate(binding.daxDialogCta.experimentDialogContentImage)
-                        .alpha(MAX_ALPHA)
-                        .setDuration(ANIMATION_DURATION).startDelay = SUCCESS_DELAY
-                    binding.daxDialogCta.experimentDialogContentText.text = it.getString(R.string.preOnboardingDaxDialog3Content)
-                    binding.daxDialogCta.experimentDialogContentText.show()
-                    ViewCompat.animate(binding.daxDialogCta.experimentDialogContentText)
-                        .alpha(MAX_ALPHA)
-                        .setDuration(ANIMATION_DURATION).startDelay = SUCCESS_DELAY
-                    binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog3Button)
-                    binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(CELEBRATION) }
-                    ViewCompat.animate(binding.daxDialogCta.primaryCta).alpha(MAX_ALPHA).setDuration(ANIMATION_DURATION).startDelay = SUCCESS_DELAY
-                    scheduleTypingAnimation()
                     launchKonfetti()
+
+                    scheduleTypingAnimation {
+                        ViewCompat.animate(binding.daxDialogCta.experimentDialogContentImage).alpha(MAX_ALPHA).duration = ANIMATION_DURATION
+                        binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog3Button)
+                        binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(CELEBRATION) }
+                        ViewCompat.animate(binding.daxDialogCta.primaryCta).alpha(MAX_ALPHA).duration = ANIMATION_DURATION
+                    }
                 }
             }
         }
@@ -231,24 +233,22 @@ class ExperimentWelcomePage : OnboardingPageFragment(R.layout.content_onboarding
             .setStartDelay(startDelay)
             .withEndAction {
                 configureDaxCta(INITIAL)
-                scheduleTypingAnimation()
             }
     }
 
-    private fun scheduleTypingAnimation() {
+    private fun scheduleTypingAnimation(afterAnimation: () -> Unit = {}) {
         typingAnimation = ViewCompat.animate(binding.daxDialogCta.daxCtaContainer)
             .alpha(MAX_ALPHA)
             .setDuration(ANIMATION_DURATION)
             .withEndAction {
                 welcomeAnimationFinished = true
-                binding.daxDialogCta.dialogTextCta.startTypingAnimation(ctaText)
+                binding.daxDialogCta.dialogTextCta.startTypingAnimation(ctaText, afterAnimation = afterAnimation)
             }
     }
 
     private fun finishTypingAnimation() {
         welcomeAnimation?.cancel()
         hikerAnimation?.cancel()
-        binding.daxDialogCta.dialogTextCta.finishAnimation()
     }
 
     private fun showDefaultBrowserDialog(intent: Intent) {
@@ -300,8 +300,6 @@ class ExperimentWelcomePage : OnboardingPageFragment(R.layout.content_onboarding
         private const val MAX_ALPHA = 1f
         private const val ANIMATION_DURATION = 400L
         private const val ANIMATION_DELAY = 1400L
-        private const val COMPARISON_CHART_DELAY = 1600L
-        private const val SUCCESS_DELAY = 800L
         private const val ANIMATION_DELAY_AFTER_NOTIFICATIONS_PERMISSIONS_HANDLED = 800L
 
         private const val DEFAULT_BROWSER_ROLE_MANAGER_DIALOG = 101

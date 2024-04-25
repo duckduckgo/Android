@@ -103,6 +103,8 @@ import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.app.browser.webview.SslWarningLayout.Action
 import com.duckduckgo.app.cta.ui.*
+import com.duckduckgo.app.cta.ui.ExperimentDaxBubbleOptionsCta.DaxDialogIntroOption
+import com.duckduckgo.app.cta.ui.ExperimentOnboardingDaxDialogCta
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
@@ -120,6 +122,7 @@ import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.onboarding.ui.page.experiment.ExtendedOnboardingExperimentVariantManager
+import com.duckduckgo.app.onboarding.ui.page.experiment.OnboardingExperimentPixel
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
@@ -130,6 +133,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FAVORITE_MENU_ITEM_STATE
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.UNIQUE
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.notification.SurveyNotificationScheduler
@@ -143,6 +147,7 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
+import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
 import com.duckduckgo.common.utils.AppUrl
@@ -159,6 +164,7 @@ import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.privacy.config.api.*
+import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupManager
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent
@@ -253,6 +259,7 @@ class BrowserTabViewModel @Inject constructor(
     private val subscriptions: Subscriptions,
     private val sslCertificatesFeature: SSLCertificatesFeature,
     private val bypassedSSLCertificatesRepository: BypassedSSLCertificatesRepository,
+    private val userBrowserProperties: UserBrowserProperties,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -710,6 +717,26 @@ class BrowserTabViewModel @Inject constructor(
             return
         }
 
+        if (currentCtaViewState().cta is ExperimentOnboardingDaxDialogCta) {
+            onDismissExperimentDaxDialog(currentCtaViewState().cta as ExperimentOnboardingDaxDialogCta)
+        }
+
+        when (currentCtaViewState().cta) {
+            is ExperimentDaxBubbleOptionsCta.ExperimentDaxIntroSearchOptionsCta -> {
+                if (!DaxDialogIntroOption.getSearchOptions().map { it.link }.contains(query)) {
+                    pixel.fire(OnboardingExperimentPixel.PixelName.ONBOARDING_SEARCH_CUSTOM)
+                }
+            }
+
+            is ExperimentDaxBubbleOptionsCta.ExperimentDaxIntroVisitSiteOptionsCta,
+            is ExperimentOnboardingDaxDialogCta.DaxSiteSuggestionsCta,
+            -> {
+                if (!DaxDialogIntroOption.getSitesOptions().map { it.link }.contains(query)) {
+                    pixel.fire(OnboardingExperimentPixel.PixelName.ONBOARDING_VISIT_SITE_CUSTOM)
+                }
+            }
+        }
+
         command.value = HideKeyboard
         val trimmedInput = query.trim()
 
@@ -1087,7 +1114,7 @@ class BrowserTabViewModel @Inject constructor(
             addFavorite = addFavorite,
             addToHomeEnabled = domain != null,
             canSharePage = domain != null,
-            showPrivacyShield = true,
+            showPrivacyShield = HighlightableButton.Visible(enabled = true),
             canReportSite = domain != null,
             canChangePrivacyProtection = domain != null,
             isPrivacyProtectionDisabled = false,
@@ -1319,7 +1346,7 @@ class BrowserTabViewModel @Inject constructor(
             addFavorite = HighlightableButton.Visible(enabled = false),
             addToHomeEnabled = false,
             canSharePage = false,
-            showPrivacyShield = false,
+            showPrivacyShield = HighlightableButton.Visible(enabled = false),
             canReportSite = false,
             showSearchIcon = true,
             showClearButton = true,
@@ -1684,7 +1711,7 @@ class BrowserTabViewModel @Inject constructor(
                 browserViewState.value =
                     currentBrowserViewState().copy(
                         browserShowing = false,
-                        showPrivacyShield = false,
+                        showPrivacyShield = HighlightableButton.Visible(enabled = false),
                         showDaxIcon = false,
                         showSearchIcon = false,
                         sslError = errorResponse.errorType,
@@ -1819,7 +1846,7 @@ class BrowserTabViewModel @Inject constructor(
 
         val currentBrowserViewState = currentBrowserViewState()
         browserViewState.value = currentBrowserViewState.copy(
-            showPrivacyShield = showPrivacyShield,
+            showPrivacyShield = HighlightableButton.Visible(enabled = showPrivacyShield),
             showSearchIcon = showSearchIcon,
             showTabsButton = showControls,
             fireButton = if (showControls) {
@@ -2433,6 +2460,7 @@ class BrowserTabViewModel @Inject constructor(
         command.value = when (cta) {
             is HomePanelCta.Survey -> LaunchSurvey(cta.survey)
             is HomePanelCta.AddWidgetAuto, is HomePanelCta.AddWidgetInstructions -> LaunchAddWidget
+            is ExperimentOnboardingDaxDialogCta -> onExperimentCtaOkButtonClicked(cta)
             else -> return
         }
     }
@@ -2859,7 +2887,12 @@ class BrowserTabViewModel @Inject constructor(
         url: String,
     ) {
         browserViewState.value =
-            currentBrowserViewState().copy(browserError = errorType, showPrivacyShield = false, showDaxIcon = false, showSearchIcon = false)
+            currentBrowserViewState().copy(
+                browserError = errorType,
+                showPrivacyShield = HighlightableButton.Visible(enabled = false),
+                showDaxIcon = false,
+                showSearchIcon = false,
+            )
         command.postValue(WebViewError(errorType, url))
     }
 
@@ -3060,14 +3093,6 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun configureBrowserBackground() {
-        val backgroundRes: Int =
-            if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) R.drawable.onboarding_experiment_background else 0
-        viewModelScope.launch {
-            command.value = SetBrowserBackground(backgroundRes)
-        }
-    }
-
     fun onSSLCertificateWarningAction(action: Action, url: String) {
         when (action) {
             is Action.Shown -> {
@@ -3109,12 +3134,110 @@ class BrowserTabViewModel @Inject constructor(
             )
             loadingViewState.value = currentLoadingViewState().copy(isLoading = false)
             browserViewState.value = currentBrowserViewState().copy(
-                showPrivacyShield = false,
+                showPrivacyShield = HighlightableButton.Visible(enabled = false),
                 showSearchIcon = true,
                 showDaxIcon = false,
                 browserShowing = showBrowser,
                 sslError = NONE,
             )
+        }
+    }
+
+    fun configureBrowserBackground() {
+        val backgroundRes: Int =
+            if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) R.drawable.onboarding_experiment_background_bitmap else 0
+        viewModelScope.launch {
+            command.value = SetBrowserBackground(backgroundRes)
+        }
+    }
+
+    private fun onExperimentCtaOkButtonClicked(experimentCta: ExperimentOnboardingDaxDialogCta): Command? {
+        viewModelScope.launch {
+            ctaViewModel.onUserDismissedCta(experimentCta)
+        }
+        return when (experimentCta) {
+            is ExperimentOnboardingDaxDialogCta.DaxSerpCta -> {
+                viewModelScope.launch {
+                    if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) {
+                        val cta = withContext(dispatchers.io()) { ctaViewModel.getExperimentSiteSuggestionsDialogCta() }
+                        ctaViewState.value = currentCtaViewState().copy(cta = cta)
+                        if (cta == null) {
+                            command.value = HideExperimentOnboardingDialog(experimentCta)
+                        }
+                    }
+                }
+                null
+            }
+
+            is ExperimentOnboardingDaxDialogCta.DaxTrackersBlockedCta,
+            is ExperimentOnboardingDaxDialogCta.DaxNoTrackersCta,
+            is ExperimentOnboardingDaxDialogCta.DaxMainNetworkCta,
+            -> {
+                if (currentBrowserViewState().showPrivacyShield.isHighlighted()) {
+                    browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
+                }
+                viewModelScope.launch {
+                    if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) {
+                        val cta = withContext(dispatchers.io()) { ctaViewModel.getExperimentFireDialogCta() }
+                        ctaViewState.value = currentCtaViewState().copy(cta = cta)
+                        if (cta == null) {
+                            command.value = HideExperimentOnboardingDialog(experimentCta)
+                        }
+                    }
+                }
+                null
+            }
+
+            else -> HideExperimentOnboardingDialog(experimentCta)
+        }
+    }
+
+    private fun onDismissExperimentDaxDialog(cta: ExperimentOnboardingDaxDialogCta) {
+        if (cta is ExperimentOnboardingDaxDialogCta.DaxTrackersBlockedCta) {
+            browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
+        }
+
+        onUserDismissedCta()
+        command.value = HideExperimentOnboardingDialog(cta)
+    }
+
+    fun onFireMenuSelected() {
+        if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) {
+            val cta = currentCtaViewState().cta
+            if (cta is ExperimentOnboardingDaxDialogCta.DaxFireButtonCta) {
+                onUserDismissedCta()
+                command.value = HideExperimentOnboardingDialog(cta)
+            }
+            if (currentBrowserViewState().fireButton.isHighlighted()) {
+                viewModelScope.launch {
+                    ctaViewModel.dismissPulseAnimation()
+                }
+            }
+        }
+    }
+
+    fun onPrivacyShieldSelected() {
+        if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled() && currentBrowserViewState().showPrivacyShield.isHighlighted()) {
+            browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
+            pixel.fire(
+                pixel = PrivacyDashboardPixels.PRIVACY_DASHBOARD_FIRST_TIME_OPENED,
+                parameters = mapOf(
+                    "daysSinceInstall" to userBrowserProperties.daysSinceInstalled().toString(),
+                    "from_onboarding" to "true",
+                ),
+                type = UNIQUE,
+            )
+        }
+    }
+
+    fun onExperimentDaxTypingAnimationFinished() {
+        browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = true))
+    }
+
+    override fun onShouldOverride() {
+        val cta = currentCtaViewState().cta
+        if (cta is ExperimentOnboardingDaxDialogCta) {
+            onDismissExperimentDaxDialog(cta)
         }
     }
 

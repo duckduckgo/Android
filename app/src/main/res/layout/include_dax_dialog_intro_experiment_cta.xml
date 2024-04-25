@@ -88,8 +88,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/keyline_2"
                 android:alpha="0"
+                android:gravity="start|center_vertical"
                 android:text="@string/onboardingSearchDaxDialogOption1"
-                android:gravity="start"
                 app:icon="@drawable/ic_find_search_16"
                 tools:alpha="1" />
 
@@ -99,8 +99,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="-4dp"
                 android:alpha="0"
+                android:gravity="start|center_vertical"
                 android:text="@string/onboardingSearchDaxDialogOption2"
-                android:gravity="start"
                 app:icon="@drawable/ic_find_search_16"
                 tools:alpha="1" />
 
@@ -110,8 +110,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="-4dp"
                 android:alpha="0"
+                android:gravity="start|center_vertical"
                 android:text="@string/onboardingSearchDaxDialogOption3"
-                android:gravity="start"
                 app:icon="@drawable/ic_find_search_16"
                 tools:alpha="1" />
 
@@ -121,8 +121,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="-4dp"
                 android:alpha="0"
+                android:gravity="start|center_vertical"
                 android:text="@string/onboardingSearchDaxDialogOption4"
-                android:gravity="start"
                 app:icon="@drawable/ic_wand_16"
                 tools:alpha="1" />
 
