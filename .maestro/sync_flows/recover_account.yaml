@@ -4,7 +4,7 @@
 appId: com.duckduckgo.mobile.android
 name: "Sync Critical Path test: Users can recover an account / Device can be added to an account"
 tags:
-  - syncCriticalPathTest
+  - syncCriticalPathTest1
 ---
 - launchApp:
     clearState: true
@@ -20,4 +20,4 @@ tags:
 - tapOn: "Navigate up"
 - tapOn: "Turn Off Sync & Backup…"
 - tapOn: "Turn Off"
-- runFlow: ../sync_flows/steps/action_recover_account.yaml
+- runFlow: ./steps/action_recover_account.yaml

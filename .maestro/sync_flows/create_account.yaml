@@ -2,7 +2,7 @@
 appId: com.duckduckgo.mobile.android
 name: "ReleaseTest: Users can create a sync account"
 tags:
-  - syncCriticalPathTest
+  - syncCriticalPathTest1
 ---
 - launchApp:
     clearState: true

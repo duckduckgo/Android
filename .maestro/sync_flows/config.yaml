@@ -1,0 +1,12 @@
+appStartup:
+  enabled: false
+appSize:
+  enabled: false
+disableRetries: true
+executionOrder:
+  continueOnFailure: false # default is true
+  flowsOrder:
+    - "Sync Critical Path test: Data can be synced p1"
+    - "Sync Critical Path test: Data can be synced p2"
+flows:
+ - "**"

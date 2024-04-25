@@ -2,7 +2,7 @@
 appId: com.duckduckgo.mobile.android
 name: "Sync Critical Path test: Users can remove all data"
 tags:
-  - syncCriticalPathTest
+  - syncCriticalPathTest1
 ---
 - launchApp:
     clearState: true
