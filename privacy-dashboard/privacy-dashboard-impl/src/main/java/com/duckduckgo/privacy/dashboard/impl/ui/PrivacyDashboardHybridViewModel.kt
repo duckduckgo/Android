@@ -201,7 +201,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
             pixel.fire(PRIVACY_DASHBOARD_OPENED, pixelParams, type = COUNT)
             pixel.fire(
                 pixel = PRIVACY_DASHBOARD_FIRST_TIME_OPENED,
-                parameters = mapOf("daysSinceInstall" to userBrowserProperties.daysSinceInstalled().toString()),
+                parameters = mapOf("daysSinceInstall" to userBrowserProperties.daysSinceInstalled().toString(), "from_onboarding" to "false"),
                 type = UNIQUE,
             )
         }

@@ -133,6 +133,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FAVORITE_MENU_ITEM_STATE
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.UNIQUE
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.notification.SurveyNotificationScheduler
@@ -146,6 +147,7 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
+import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
 import com.duckduckgo.common.utils.AppUrl
@@ -162,6 +164,7 @@ import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.privacy.config.api.*
+import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupManager
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent
@@ -256,6 +259,7 @@ class BrowserTabViewModel @Inject constructor(
     private val subscriptions: Subscriptions,
     private val sslCertificatesFeature: SSLCertificatesFeature,
     private val bypassedSSLCertificatesRepository: BypassedSSLCertificatesRepository,
+    private val userBrowserProperties: UserBrowserProperties,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -3215,6 +3219,14 @@ class BrowserTabViewModel @Inject constructor(
     fun onPrivacyShieldSelected() {
         if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled() && currentBrowserViewState().showPrivacyShield.isHighlighted()) {
             browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
+            pixel.fire(
+                pixel = PrivacyDashboardPixels.PRIVACY_DASHBOARD_FIRST_TIME_OPENED,
+                parameters = mapOf(
+                    "daysSinceInstall" to userBrowserProperties.daysSinceInstalled().toString(),
+                    "from_onboarding" to "true",
+                ),
+                type = UNIQUE,
+            )
         }
     }
 

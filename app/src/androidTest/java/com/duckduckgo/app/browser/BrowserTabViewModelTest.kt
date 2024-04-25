@@ -137,6 +137,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.UNIQUE
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.survey.api.SurveyRepository
 import com.duckduckgo.app.survey.model.Survey
@@ -155,6 +156,7 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
+import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -169,6 +171,7 @@ import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER_VALUE
 import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
+import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupManager
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent
@@ -457,6 +460,7 @@ class BrowserTabViewModelTest {
     private val mockSSLCertificatesFeature: SSLCertificatesFeature = mock()
     private val mockBypassedSSLCertificatesRepository: BypassedSSLCertificatesRepository = mock()
     private val mockExtendedOnboardingExperimentVariantManager: ExtendedOnboardingExperimentVariantManager = mock()
+    private val mockUserBrowserProperties: UserBrowserProperties = mock()
 
     @Before
     fun before() {
@@ -595,6 +599,7 @@ class BrowserTabViewModelTest {
             sslCertificatesFeature = mockSSLCertificatesFeature,
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             extendedOnboardingExperimentVariantManager = mockExtendedOnboardingExperimentVariantManager,
+            userBrowserProperties = mockUserBrowserProperties,
         )
 
         testee.loadData("abc", null, false, false)
@@ -5245,6 +5250,17 @@ class BrowserTabViewModelTest {
 
         testee.onPrivacyShieldSelected()
         assertTrue(!browserViewState().showPrivacyShield.isHighlighted())
+    }
+
+    @Test
+    fun givenOnboardingExperimentEnabledAndPrivacyShieldHighlightedWhenShieldIconSelectedThenSendPixel() = runTest {
+        whenever(mockUserBrowserProperties.daysSinceInstalled()).thenReturn(0)
+        whenever(mockExtendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()).thenReturn(true)
+        testee.browserViewState.value = browserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = true))
+        val testParams = mapOf("daysSinceInstall" to "0", "from_onboarding" to "true")
+
+        testee.onPrivacyShieldSelected()
+        verify(mockPixel).fire(pixel = PrivacyDashboardPixels.PRIVACY_DASHBOARD_FIRST_TIME_OPENED, parameters = testParams, type = UNIQUE)
     }
 
     @Test
