@@ -160,4 +160,11 @@
     <string name="autofill_auth_text_for_delete_all">Hitelesítéssel erősítsd meg, hogy minden jelszót törölni szeretnél</string>
     <string name="autofill_title_text_for_delete_all">Minden jelszó törlése</string>
 
+    <!-- Sync settings screen -->
+    <plurals name="syncCredentialInvalidItemsWarning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="one">A(z) %1$s webhely jelszava nem szinkronizálható, mert egyik mezője meghaladja a karakterkorlátot.</item>
+        <item quantity="other">A(z) %1$s és %2$d másik webhely jelszavai nem szinkronizálhatók, mert egyes mezőik meghaladják a karakterkorlátot.</item>
+    </plurals>
+    <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Jelszavak kezelése</annotation></string>
+
 </resources>
