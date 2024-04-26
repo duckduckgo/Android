@@ -160,4 +160,11 @@
     <string name="autofill_auth_text_for_delete_all">Godkjenn for å bekrefte at du vil slette alle passord</string>
     <string name="autofill_title_text_for_delete_all">Slett alle passord</string>
 
+    <!-- Sync settings screen -->
+    <plurals name="syncCredentialInvalidItemsWarning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="one">Passordet for %1$s kan ikke synkroniseres fordi ett av feltene overskrider tegngrensen.</item>
+        <item quantity="other">Passordene for %1$s og %2$d andre nettsteder kan ikke synkroniseres fordi noen av feltene overskrider tegngrensen.</item>
+    </plurals>
+    <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Administrer passord</annotation></string>
+
 </resources>
