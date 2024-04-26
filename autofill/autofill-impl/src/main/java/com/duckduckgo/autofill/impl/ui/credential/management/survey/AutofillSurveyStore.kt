@@ -29,6 +29,7 @@ import kotlinx.coroutines.withContext
 interface AutofillSurveyStore {
     suspend fun hasSurveyBeenTaken(id: String): Boolean
     suspend fun recordSurveyWasShown(id: String)
+    suspend fun resetPreviousSurveys()
 }
 
 @ContributesBinding(AppScope::class)
@@ -56,6 +57,14 @@ class AutofillSurveyStoreImpl @Inject constructor(
             newValue.add(id)
             prefs.edit {
                 putStringSet(SURVEY_IDS, newValue)
+            }
+        }
+    }
+
+    override suspend fun resetPreviousSurveys() {
+        withContext(dispatchers.io()) {
+            prefs.edit {
+                remove(SURVEY_IDS)
             }
         }
     }

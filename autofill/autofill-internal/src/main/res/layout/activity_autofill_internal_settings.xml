@@ -209,5 +209,24 @@
             app:primaryText="@string/autofillDevSettingsConfigDebugTitle"
             app:secondaryText="@string/autofillDevSettingsConfigDebugSubtitle" />
 
+        <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+            android:id="@+id/autofillSurveySectionTitle"
+            android:layout_width="match_parent"
+            android:layout_marginTop="20dp"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/autofillDevSettingsSurveySectionTitle" />
+
+        <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+            android:id="@+id/autofillSurveyResetButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/autofillDevSettingsSurveySectionResetPreviousSurveysTitle"
+            app:secondaryText="@string/autofillDevSettingsSurveySectionInstruction" />
+
+
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
