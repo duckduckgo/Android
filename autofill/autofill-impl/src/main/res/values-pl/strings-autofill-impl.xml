@@ -164,4 +164,13 @@
     <string name="autofill_auth_text_for_delete_all">Uwierzytelnij, aby potwierdzić, że chcesz usunąć wszystkie hasła</string>
     <string name="autofill_title_text_for_delete_all">Usuń wszystkie hasła</string>
 
+    <!-- Sync settings screen -->
+    <plurals name="syncCredentialInvalidItemsWarning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="one">Nie można zsynchronizować hasła do %1$s, ponieważ jedno z jego pól przekracza limit znaków.</item>
+        <item quantity="few">Nie można zsynchronizować haseł do %1$s i %2$d innych witryn, ponieważ niektóre ich pola przekraczają limit znaków.</item>
+        <item quantity="many">Nie można zsynchronizować haseł do %1$s i %2$d innych witryn, ponieważ niektóre ich pola przekraczają limit znaków.</item>
+        <item quantity="other">Nie można zsynchronizować haseł do %1$s i %2$d innej witryny, ponieważ niektóre ich pola przekraczają limit znaków.</item>
+    </plurals>
+    <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Zarządzaj hasłami</annotation></string>
+
 </resources>
