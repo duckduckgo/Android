@@ -27,14 +27,6 @@ import kotlinx.coroutines.withContext
 
 private val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.US)
 
-interface AppDaysUsedRepository {
-    suspend fun getNumberOfDaysAppUsed(): Long
-    suspend fun recordAppUsedToday()
-    suspend fun getNumberOfDaysAppUsedSinceDate(date: Date): Long
-    suspend fun getLastActiveDay(): String
-    suspend fun getPreviousActiveDay(): String?
-}
-
 class AppDaysUsedDatabaseRepository(private val appDaysUsedDao: AppDaysUsedDao) : AppDaysUsedRepository {
 
     private val singleThreadedDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
