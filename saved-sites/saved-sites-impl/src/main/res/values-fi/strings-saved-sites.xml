@@ -17,9 +17,14 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <!-- Setup screen -->
+    <!-- Sync settings screen -->
     <string name="sync_enable_option_favorites_title">Jaa suosikit</string>
     <string name="sync_enable_option_favorites_subtitle">Käytä samoja suosikkeja kaikilla laitteilla. Jätä pois, jos haluat pitää mobiili- ja työpöytäsuosikit erillään.</string>
     <string name="saved_site_limit_warning"><b>Synkronointi keskeytetty</b>\nKirjanmerkkien enimmäismäärä ylitetty. Poista jotain jatkaaksesi synkronointia.\n\n<annotation type="manage_bookmarks">Hallitse kirjanmerkkejä</annotation></string>
     <string name="saved_site_limit_warning_notif"><b>Kirjanmerkkien synkronointi on keskeytetty</b>\nOlet ylittänyt kirjanmerkkien synkronointirajan. Yritä poistaa joitakin kirjanmerkkejä. Kirjanmerkkejäsi ei varmuuskopioida ennen kuin tämä ongelma on ratkaistu.</string>
+    <plurals name="saved_site_invalid_items_warning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="one">Sivuston %1$s kirjanmerkkejä ei voi synkronoida, koska jotkin niiden kentät ylittävät merkkirajoituksen.</item>
+        <item quantity="other">Sivuston %1$s ja %2$d muun kirjanmerkkejä ei voi synkronoida, koska jotkin niiden kentät ylittävät merkkirajoituksen.</item>
+    </plurals>
+    <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Hallitse kirjanmerkkejä</annotation></string>
 </resources>
