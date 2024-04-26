@@ -42,7 +42,7 @@ data class VoiceSearchSupportedMatchingAttribute(
 }
 
 @ContributesMultibinding(AppScope::class)
-class SyncAttributeMatcherPlugin @Inject constructor(
+class VoiceSearchAttributeMatcherPlugin @Inject constructor(
     private val voiceSearchAvailability: VoiceSearchAvailability,
 ) : AttributeMatcherPlugin {
     override suspend fun evaluate(matchingAttribute: MatchingAttribute): Boolean? {
