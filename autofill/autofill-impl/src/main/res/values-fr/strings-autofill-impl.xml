@@ -160,4 +160,11 @@
     <string name="autofill_auth_text_for_delete_all">Authentifiez-vous pour confirmer que vous souhaitez supprimer tous les mots de passe</string>
     <string name="autofill_title_text_for_delete_all">Supprimer tous les mots de passe</string>
 
+    <!-- Sync settings screen -->
+    <plurals name="syncCredentialInvalidItemsWarning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="one">Votre mot de passe pour %1$s ne peut pas être synchronisé car l\'un de ses champs dépasse la limite de caractères.</item>
+        <item quantity="other">Vos mots de passe pour %1$s et %2$d autres sites ne peuvent pas être synchronisés car certains de leurs champs dépassent la limite de caractères.</item>
+    </plurals>
+    <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Gérer les mots de passe</annotation></string>
+
 </resources>
