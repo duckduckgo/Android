@@ -32,4 +32,5 @@ data class Anr(
     val stackTrace: List<String>,
     val timestamp: String,
     val webView: String,
+    val customTab: Boolean,
 )

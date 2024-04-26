@@ -38,6 +38,7 @@ internal data class AnrData(
     val stackTrace: ArrayList<String>,
     val timeStamp: String = FORMATTER_SECONDS.format(LocalDateTime.now()),
     val webView: String,
+    val customTab: Boolean,
 )
 
 internal fun AnrData.asAnrEntity(): AnrEntity {
@@ -50,10 +51,11 @@ internal fun AnrData.asAnrEntity(): AnrEntity {
         stackTrace = stackTrace,
         timestamp = timeStamp,
         webView = webView,
+        customTab = customTab,
     )
 }
 
-internal fun Throwable.asAnrData(webView: String): AnrData {
+internal fun Throwable.asAnrData(webView: String, customTab: Boolean): AnrData {
     return AnrData(
         name = this.toString().replace(": $message", "", true),
         message = message,
@@ -61,6 +63,7 @@ internal fun Throwable.asAnrData(webView: String): AnrData {
         file = stackTrace.getOrNull(0)?.fileName,
         lineNumber = stackTrace.getOrNull(0)?.lineNumber ?: Int.MIN_VALUE,
         webView = webView,
+        customTab = customTab,
     )
 }
 
@@ -68,6 +71,7 @@ internal fun CrashLogger.Crash.asCrashEntity(
     appVersion: String,
     processName: String,
     webView: String,
+    customTab: Boolean,
 ): ExceptionEntity {
     val timestamp = FORMATTER_SECONDS.format(LocalDateTime.now())
     val stacktrace = this.t.asLog().sanitizeStackTrace()
@@ -80,6 +84,7 @@ internal fun CrashLogger.Crash.asCrashEntity(
         version = appVersion,
         timestamp = timestamp,
         webView = webView,
+        customTab = customTab,
     )
 }
 

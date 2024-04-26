@@ -44,6 +44,7 @@ class AnrOfflinePixelSender @Inject constructor(
                     mapOf(
                         ANR_STACKTRACE to ss,
                         ANR_WEBVIEW_VERSION to it.webView,
+                        ANR_CUSTOM_TAB to it.customTab.toString(),
                     ),
                     mapOf(),
                     COUNT,
@@ -58,6 +59,7 @@ class AnrOfflinePixelSender @Inject constructor(
     companion object {
         const val ANR_STACKTRACE = "stackTrace"
         const val ANR_WEBVIEW_VERSION = "webView"
+        const val ANR_CUSTOM_TAB = "customTab"
     }
 }
 

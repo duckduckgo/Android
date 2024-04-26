@@ -55,6 +55,7 @@ class CrashOfflinePixelSender @Inject constructor(
                         EXCEPTION_APP_VERSION to exception.version,
                         EXCEPTION_TIMESTAMP to exception.timestamp,
                         EXCEPTION_WEBVIEW_VERSION to webViewVersionProvider.getFullVersion(),
+                        EXCEPTION_CUSTOM_TAB to exception.customTab.toString(),
                     )
 
                 if (isVerifiedPlayStoreInstall()) {
@@ -88,5 +89,6 @@ class CrashOfflinePixelSender @Inject constructor(
         private const val EXCEPTION_APP_VERSION = "v"
         private const val EXCEPTION_TIMESTAMP = "t"
         private const val EXCEPTION_WEBVIEW_VERSION = "webView"
+        private const val EXCEPTION_CUSTOM_TAB = "customTab"
     }
 }
