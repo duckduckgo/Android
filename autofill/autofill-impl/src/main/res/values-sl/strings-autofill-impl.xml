@@ -164,4 +164,13 @@
     <string name="autofill_auth_text_for_delete_all">Potrdite, da želite izbrisati vsa gesla</string>
     <string name="autofill_title_text_for_delete_all">Brisanje vseh gesel</string>
 
+    <!-- Sync settings screen -->
+    <plurals name="syncCredentialInvalidItemsWarning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="one">Vašega gesla za %1$s ni mogoče sinhronizirati, ker eno od polj presega omejitev števila znakov.</item>
+        <item quantity="two">Vaših gesel za %1$s in za %2$d drugi spletni mesti ni mogoče sinhronizirati, ker nekatera njihova polja presegajo omejitev števila znakov.</item>
+        <item quantity="few">Vaših gesel za %1$s in za %2$d druga spletna mesta ni mogoče sinhronizirati, ker nekatera njihova polja presegajo omejitev števila znakov.</item>
+        <item quantity="other">Vaših gesel za %1$s in za %2$d drugih spletnih mest ni mogoče sinhronizirati, ker nekatera njihova polja presegajo omejitev števila znakov.</item>
+    </plurals>
+    <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Upravljanje gesel</annotation></string>
+
 </resources>
