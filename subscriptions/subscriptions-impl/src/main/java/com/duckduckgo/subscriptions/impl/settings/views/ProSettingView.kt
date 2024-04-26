@@ -27,8 +27,8 @@ import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.listitem.CheckListItem.CheckItemStatus.ALERT
 import com.duckduckgo.common.ui.view.listitem.CheckListItem.CheckItemStatus.DISABLED
-import com.duckduckgo.common.ui.view.listitem.CheckListItem.CheckItemStatus.WARNING
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
@@ -150,7 +150,7 @@ class ProSettingView @JvmOverloads constructor(
             EXPIRED, INACTIVE -> {
                 binding.subscriptionBuy.setPrimaryText(context.getString(R.string.subscriptionSettingExpired))
                 binding.subscriptionBuy.setSecondaryText(context.getString(R.string.subscriptionSettingExpiredSubtitle))
-                binding.subscriptionBuy.setItemStatus(WARNING)
+                binding.subscriptionBuy.setItemStatus(ALERT)
                 binding.subscriptionGet.setText(R.string.subscriptionSettingExpiredViewPlans)
                 binding.subscribeSecondary.gone()
                 binding.subscriptionBuyContainer.show()
