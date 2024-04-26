@@ -19,32 +19,24 @@ package com.duckduckgo.user.agent.impl
 import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
-import com.duckduckgo.app.statistics.model.Atb
-import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.privacy.config.api.DefaultPolicy.CLOSEST
-import com.duckduckgo.privacy.config.api.DefaultPolicy.DDG
-import com.duckduckgo.privacy.config.api.DefaultPolicy.DDG_FIXED
-import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import com.duckduckgo.privacy.config.api.UserAgent
 import com.duckduckgo.user.agent.api.UserAgentInterceptor
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.duckduckgo.user.agent.impl.remoteconfig.ClientBrandHintFeature
+import com.duckduckgo.user.agent.store.UserAgentFeatureName
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import org.junit.After
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyString
-import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
@@ -59,25 +51,20 @@ class UserAgentProviderTest {
     private var deviceInfo: DeviceInfo = mock()
     private var userAgent: UserAgent = mock()
     private var toggle: FeatureToggle = mock()
-    private var statisticsDataStore: StatisticsDataStore = mock()
     private var toggles: Toggle = mock()
     private var clientBrandHintFeature: ClientBrandHintFeature = mock()
 
     @Before
     fun before() {
         whenever(deviceInfo.majorAppVersion).thenReturn("5")
-        whenever(toggle.isFeatureEnabled(PrivacyFeatureName.UserAgentFeatureName.value)).thenReturn(true)
+        whenever(toggle.isFeatureEnabled(UserAgentFeatureName.UserAgent.value)).thenReturn(true)
         whenever(clientBrandHintFeature.self()).thenReturn(toggles)
         whenever(clientBrandHintFeature.self().isEnabled()).thenReturn(false)
-        whenever(userAgent.isADefaultException("default.com")).thenReturn(true)
-        whenever(userAgent.isADefaultException("unprotected.com")).thenReturn(true)
-        whenever(userAgent.isADefaultException("subdomain.default.com")).thenReturn(true)
-        whenever(userAgent.isADefaultException("subdomain.unprotected.com")).thenReturn(true)
-        whenever(userAgent.isAVersionException("version.com")).thenReturn(true)
-        whenever(userAgent.isAVersionException("subdomain.version.com")).thenReturn(true)
-        whenever(userAgent.isAnApplicationException("application.com")).thenReturn(true)
-        whenever(userAgent.isAnApplicationException("subdomain.application.com")).thenReturn(true)
-        whenever(userAgent.defaultPolicy()).thenReturn(DDG)
+        whenever(userAgent.isException("default.com")).thenReturn(true)
+        whenever(userAgent.isException("unprotected.com")).thenReturn(true)
+        whenever(userAgent.isException("subdomain.default.com")).thenReturn(true)
+        whenever(userAgent.isException("subdomain.unprotected.com")).thenReturn(true)
+        whenever(userAgent.useLegacyUserAgent(anyString())).thenReturn(true)
 
         System.setProperty("os.arch", "aarch64")
     }
@@ -89,57 +76,43 @@ class UserAgentProviderTest {
     @Test
     fun whenUaRetrievedWithNoParamsThenDeviceStrippedAndApplicationComponentAddedBeforeSafari() {
         testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
-        val actual = testee.userAgent()
+        val actual = testee.userAgent(DOMAIN)
         assertTrue("$actual does not match expected regex", ValidationRegex.converted.matches(actual))
     }
 
     @Test
     fun whenMobileUaRetrievedThenDeviceStrippedAndApplicationComponentAddedBeforeSafari() {
         testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
-        val actual = testee.userAgent(isDesktop = false)
+        val actual = testee.userAgent(DOMAIN, isDesktop = false)
         assertTrue("$actual does not match expected regex", ValidationRegex.converted.matches(actual))
     }
 
     @Test
     fun whenDesktopUaRetrievedThenDeviceStrippedAndApplicationComponentAddedBeforeSafari() {
         testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
-        val actual = testee.userAgent(isDesktop = true)
+        val actual = testee.userAgent(DOMAIN, isDesktop = true)
         assertTrue("$actual does not match expected regex", ValidationRegex.desktop.matches(actual))
     }
 
     @Test
     fun whenMissingAppleWebKitComponentThenUaContainsMozillaAndApplicationAndSafariComponents() {
         testee = getUserAgentProvider(Agent.NO_WEBKIT, deviceInfo)
-        val actual = testee.userAgent(isDesktop = false)
+        val actual = testee.userAgent(DOMAIN, isDesktop = false)
         assertTrue("$actual does not match expected regex", ValidationRegex.missingWebKit.matches(actual))
     }
 
     @Test
     fun whenMissingSafariComponentThenUaContainsMozillaAndVersionAndApplicationComponents() {
         testee = getUserAgentProvider(Agent.NO_SAFARI, deviceInfo)
-        val actual = testee.userAgent(isDesktop = false)
+        val actual = testee.userAgent(DOMAIN, isDesktop = false)
         assertTrue("$actual does not match expected result", ValidationRegex.missingSafari.matches(actual))
     }
 
     @Test
     fun whenMissingVersionComponentThenUaContainsMozillaAndApplicationAndSafariComponents() {
         testee = getUserAgentProvider(Agent.NO_VERSION, deviceInfo)
-        val actual = testee.userAgent(isDesktop = false)
+        val actual = testee.userAgent(DOMAIN, isDesktop = false)
         assertTrue("$actual does not match expected result", ValidationRegex.noVersion.matches(actual))
-    }
-
-    @Test
-    fun whenDomainDoesNotSupportApplicationThenUaOmitsApplicationComponent() {
-        testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
-        val actual = testee.userAgent(NO_APPLICATION_DOMAIN)
-        assertTrue("$actual does not match expected regex", ValidationRegex.noApplication.matches(actual))
-    }
-
-    @Test
-    fun whenSubdomainDoesNotSupportApplicationThenUaOmitsApplicationComponent() {
-        testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
-        val actual = testee.userAgent(NO_APPLICATION_SUBDOMAIN)
-        assertTrue("$actual does not match expected regex", ValidationRegex.noApplication.matches(actual))
     }
 
     @Test
@@ -150,28 +123,14 @@ class UserAgentProviderTest {
     }
 
     @Test
-    fun whenDomainDoesNotSupportVersionThenUaOmitsVersionComponent() {
-        testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
-        val actual = testee.userAgent(NO_VERSION_DOMAIN)
-        assertTrue("$actual does not match expected regex", ValidationRegex.noVersion.matches(actual))
-    }
-
-    @Test
-    fun whenSubdomainDoesNotSupportVersionThenUaOmitsVersionComponent() {
-        testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
-        val actual = testee.userAgent(NO_VERSION_SUBDOMAIN)
-        assertTrue("$actual does not match expected regex", ValidationRegex.noVersion.matches(actual))
-    }
-
-    @Test
-    fun whenDomainHasDefaultExceptionThenUaIsDefault() {
+    fun whenDomainHasExceptionThenUaIsDefault() {
         testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
         val actual = testee.userAgent(DEFAULT_DOMAIN)
         assertTrue("$actual does not match expected regex", ValidationRegex.default.matches(actual))
     }
 
     @Test
-    fun whenSubdomainHasDefaultExceptionThenUaIsDefault() {
+    fun whenSubdomainHasExceptionThenUaIsDefault() {
         testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
         val actual = testee.userAgent(DEFAULT_SUBDOMAIN)
         assertTrue("$actual does not match expected regex", ValidationRegex.default.matches(actual))
@@ -193,7 +152,7 @@ class UserAgentProviderTest {
 
     @Test
     fun whenFeatureIsDisabledThenUaIsDefault() {
-        whenever(toggle.isFeatureEnabled(PrivacyFeatureName.UserAgentFeatureName.value)).thenReturn(false)
+        whenever(toggle.isFeatureEnabled(UserAgentFeatureName.UserAgent.value)).thenReturn(false)
         testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
         val actual = testee.userAgent(DOMAIN)
         assertTrue("$actual does not match expected regex", ValidationRegex.default.matches(actual))
@@ -242,211 +201,41 @@ class UserAgentProviderTest {
     }
 
     @Test
-    fun whenIsDdgDefaultSiteThenReturnDdgUserAgent() {
-        whenever(userAgent.isADdgDefaultSite(anyString())).thenReturn(true)
+    fun whenIsLegacySiteThenReturnLegacyUserAgent() {
         testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
         val actual = testee.userAgent(DOMAIN, false)
         assertTrue("$actual does not match expected regex", ValidationRegex.converted.matches(actual))
     }
 
     @Test
-    fun whenIsDdgDefaultSiteAndIsDesktopThenReturnDesktopDdgUserAgent() {
-        whenever(userAgent.isADdgDefaultSite(anyString())).thenReturn(true)
+    fun whenIsLegacySiteAndIsDesktopThenReturnDesktopLegacyUserAgent() {
         testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
         val actual = testee.userAgent(DOMAIN, true)
         assertTrue("$actual does not match expected regex", ValidationRegex.desktop.matches(actual))
     }
 
     @Test
-    fun whenIsDdgFixedUserAgentVersionThenReturnFixedUserAgent() {
-        whenever(statisticsDataStore.atb).thenReturn(Atb("v123-4"))
-        val versionCaptor = argumentCaptor<String>()
-        whenever(userAgent.isDdgFixedUserAgentVersion(versionCaptor.capture())).thenReturn(true)
-        whenever(userAgent.ddgFixedUserAgentEnabled()).thenReturn(true)
+    fun whenHasNoExceptionsThenReturnUserAgent() {
+        whenever(userAgent.useLegacyUserAgent(anyString())).thenReturn(false)
         testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
         val actual = testee.userAgent(DOMAIN, false)
-        assertEquals("123", versionCaptor.firstValue)
-        assertTrue("$actual does not match expected regex", ValidationRegex.ddgFixed.matches(actual))
+        assertTrue("$actual does not match expected regex", ValidationRegex.userAgent.matches(actual))
     }
 
     @Test
-    fun whenIsDdgFixedUserAgentVersionAndIsDesktopThenReturnDesktopFixedUserAgent() {
-        whenever(statisticsDataStore.atb).thenReturn(Atb("v123-4"))
-        val versionCaptor = argumentCaptor<String>()
-        whenever(userAgent.isDdgFixedUserAgentVersion(versionCaptor.capture())).thenReturn(true)
-        whenever(userAgent.ddgFixedUserAgentEnabled()).thenReturn(true)
+    fun whenIsDesktopThenReturnDesktopUserAgent() {
+        whenever(userAgent.useLegacyUserAgent(anyString())).thenReturn(false)
         testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
         val actual = testee.userAgent(DOMAIN, true)
-        assertEquals("123", versionCaptor.firstValue)
-        assertTrue("$actual does not match expected regex", ValidationRegex.ddgFixedDesktop.matches(actual))
+        assertTrue("$actual does not match expected regex", ValidationRegex.userAgentDesktop.matches(actual))
     }
 
     @Test
-    fun whenIsClosestUserAgentVersionThenReturnClosestUserAgent() {
-        whenever(statisticsDataStore.atb).thenReturn(Atb("v123-4"))
-        val versionCaptor = argumentCaptor<String>()
-        whenever(userAgent.isClosestUserAgentVersion(versionCaptor.capture())).thenReturn(true)
-        whenever(userAgent.closestUserAgentEnabled()).thenReturn(true)
-        testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
-        val actual = testee.userAgent(DOMAIN, false)
-        assertEquals("123", versionCaptor.firstValue)
-        assertTrue("$actual does not match expected regex", ValidationRegex.closest.matches(actual))
-    }
-
-    @Test
-    fun whenIsClosestUserAgentVersionAndIsDesktopThenReturnDesktopClosestUserAgent() {
-        whenever(statisticsDataStore.atb).thenReturn(Atb("v123-4"))
-        val versionCaptor = argumentCaptor<String>()
-        whenever(userAgent.isClosestUserAgentVersion(versionCaptor.capture())).thenReturn(true)
-        whenever(userAgent.closestUserAgentEnabled()).thenReturn(true)
+    fun whenIsDesktopAndIsAarch64ThenReturnX86_64DesktopUserAgent() {
+        whenever(userAgent.useLegacyUserAgent(anyString())).thenReturn(false)
         testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
         val actual = testee.userAgent(DOMAIN, true)
-        assertEquals("123", versionCaptor.firstValue)
-        assertTrue("$actual does not match expected regex", ValidationRegex.closestDesktop.matches(actual))
-    }
-
-    @Test
-    fun whenDefaultPolicyIsDdgFixedThenReturnDdgFixedUserAgent() {
-        whenever(userAgent.defaultPolicy()).thenReturn(DDG_FIXED)
-        whenever(userAgent.ddgFixedUserAgentEnabled()).thenReturn(true)
-        testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
-        val actual = testee.userAgent(DOMAIN, false)
-        assertTrue("$actual does not match expected regex", ValidationRegex.ddgFixed.matches(actual))
-    }
-
-    @Test
-    fun whenDefaultPolicyIsDdgFixedAndIsDesktopThenReturnDesktopDdgFixedUserAgent() {
-        whenever(userAgent.defaultPolicy()).thenReturn(DDG_FIXED)
-        whenever(userAgent.ddgFixedUserAgentEnabled()).thenReturn(true)
-        testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
-        val actual = testee.userAgent(DOMAIN, true)
-        assertTrue("$actual does not match expected regex", ValidationRegex.ddgFixedDesktop.matches(actual))
-    }
-
-    @Test
-    fun whenDefaultPolicyIsDdgFixedAndDdgFixedUserAgentDisabledThenReturnDdgUserAgent() {
-        whenever(userAgent.defaultPolicy()).thenReturn(DDG_FIXED)
-        whenever(userAgent.ddgFixedUserAgentEnabled()).thenReturn(false)
-        testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
-        val actual = testee.userAgent(DOMAIN, false)
-        assertTrue("$actual does not match expected regex", ValidationRegex.converted.matches(actual))
-    }
-
-    @Test
-    fun whenIsDdgFixedSiteThenReturnDdgFixedUserAgent() {
-        whenever(userAgent.isADdgFixedSite(anyString())).thenReturn(true)
-        whenever(userAgent.ddgFixedUserAgentEnabled()).thenReturn(true)
-        testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
-        val actual = testee.userAgent(DOMAIN, false)
-        assertTrue("$actual does not match expected regex", ValidationRegex.ddgFixed.matches(actual))
-    }
-
-    @Test
-    fun whenIsDdgFixedSiteAndIsDesktopThenReturnDesktopDdgFixedUserAgent() {
-        whenever(userAgent.isADdgFixedSite(anyString())).thenReturn(true)
-        whenever(userAgent.ddgFixedUserAgentEnabled()).thenReturn(true)
-        testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
-        val actual = testee.userAgent(DOMAIN, true)
-        assertTrue("$actual does not match expected regex", ValidationRegex.ddgFixedDesktop.matches(actual))
-    }
-
-    @Test
-    fun whenDefaultPolicyIsClosestThenReturnClosestUserAgent() {
-        whenever(userAgent.defaultPolicy()).thenReturn(CLOSEST)
-        whenever(userAgent.closestUserAgentEnabled()).thenReturn(true)
-        testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
-        val actual = testee.userAgent(DOMAIN, false)
-        assertTrue("$actual does not match expected regex", ValidationRegex.closest.matches(actual))
-    }
-
-    @Test
-    fun whenDefaultPolicyIsClosestAndIsDesktopThenReturnDesktopClosestUserAgent() {
-        whenever(userAgent.defaultPolicy()).thenReturn(CLOSEST)
-        whenever(userAgent.closestUserAgentEnabled()).thenReturn(true)
-        testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
-        val actual = testee.userAgent(DOMAIN, true)
-        assertTrue("$actual does not match expected regex", ValidationRegex.closestDesktop.matches(actual))
-    }
-
-    @Test
-    fun whenDefaultPolicyIsClosestAndClosestUserAgentDisabledThenReturnDdgUserAgent() {
-        whenever(userAgent.defaultPolicy()).thenReturn(CLOSEST)
-        whenever(userAgent.closestUserAgentEnabled()).thenReturn(false)
-        testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
-        val actual = testee.userAgent(DOMAIN, false)
-        assertTrue("$actual does not match expected regex", ValidationRegex.converted.matches(actual))
-    }
-
-    @Test
-    fun whenDomainDoesNotSupportApplicationThenDdgFixedUaOmitsApplicationComponent() {
-        whenever(userAgent.defaultPolicy()).thenReturn(DDG_FIXED)
-        whenever(userAgent.ddgFixedUserAgentEnabled()).thenReturn(true)
-        testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
-        val actual = testee.userAgent(NO_APPLICATION_DOMAIN, false)
-        assertTrue("$actual does not match expected regex", ValidationRegex.ddgFixedNoApplication.matches(actual))
-    }
-
-    @Test
-    fun whenDomainDoesNotSupportApplicationThenDdgFixedDesktopUaOmitsApplicationComponent() {
-        whenever(userAgent.defaultPolicy()).thenReturn(DDG_FIXED)
-        whenever(userAgent.ddgFixedUserAgentEnabled()).thenReturn(true)
-        testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
-        val actual = testee.userAgent(NO_APPLICATION_DOMAIN, true)
-        assertTrue("$actual does not match expected regex", ValidationRegex.ddgFixedDesktopNoApplication.matches(actual))
-    }
-
-    @Test
-    fun whenUserAgentIsForASiteThatShouldUseDesktopDdgFixedAgentThenReturnDesktopDdgFixedUserAgent() {
-        whenever(userAgent.defaultPolicy()).thenReturn(DDG_FIXED)
-        whenever(userAgent.ddgFixedUserAgentEnabled()).thenReturn(true)
-        testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
-        val actual = testee.userAgent(DESKTOP_ONLY_SITE)
-        assertTrue("$actual does not match expected regex", ValidationRegex.ddgFixedDesktop.matches(actual))
-    }
-
-    @Test
-    fun whenUserAgentIsForASiteThatShouldUseDesktopDdgFixedAgentButContainsAnExclusionThenDoNotReturnDdgFixedUserAgent() {
-        whenever(userAgent.defaultPolicy()).thenReturn(DDG_FIXED)
-        whenever(userAgent.ddgFixedUserAgentEnabled()).thenReturn(true)
-        testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
-        val actual = testee.userAgent(DESKTOP_ONLY_SITE_EXCEPTION)
-        assertTrue("$actual does not match expected regex", ValidationRegex.ddgFixed.matches(actual))
-    }
-
-    @Test
-    fun whenUserAgentIsForASiteThatShouldUseDesktopClosestAgentThenReturnDesktopClosestUserAgent() {
-        whenever(userAgent.defaultPolicy()).thenReturn(CLOSEST)
-        whenever(userAgent.closestUserAgentEnabled()).thenReturn(true)
-        testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
-        val actual = testee.userAgent(DESKTOP_ONLY_SITE)
-        assertTrue("$actual does not match expected regex", ValidationRegex.closestDesktop.matches(actual))
-    }
-
-    @Test
-    fun whenUserAgentIsForASiteThatShouldUseDesktopClosestAgentButContainsAnExclusionThenDoNotReturnClosestUserAgent() {
-        whenever(userAgent.defaultPolicy()).thenReturn(CLOSEST)
-        whenever(userAgent.closestUserAgentEnabled()).thenReturn(true)
-        testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
-        val actual = testee.userAgent(DESKTOP_ONLY_SITE_EXCEPTION)
-        assertTrue("$actual does not match expected regex", ValidationRegex.closest.matches(actual))
-    }
-
-    @Test
-    fun whenUserAgentIsDdgFixedAndIsDesktopAndIsAarch64ThenReturnX86_64DesktopDdgFixedUserAgent() {
-        whenever(userAgent.defaultPolicy()).thenReturn(DDG_FIXED)
-        whenever(userAgent.ddgFixedUserAgentEnabled()).thenReturn(true)
-        testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
-        val actual = testee.userAgent(DOMAIN, true)
-        assertTrue("$actual does not match expected regex", ValidationRegex.ddgFixedDesktopArch.matches(actual))
-    }
-
-    @Test
-    fun whenUserAgentIsClosestAndIsDesktopAndIsAarch64ThenReturnX86_64DesktopClosestUserAgent() {
-        whenever(userAgent.defaultPolicy()).thenReturn(CLOSEST)
-        whenever(userAgent.closestUserAgentEnabled()).thenReturn(true)
-        testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
-        val actual = testee.userAgent(DOMAIN, true)
-        assertTrue("$actual does not match expected regex", ValidationRegex.closestDesktopArch.matches(actual))
+        assertTrue("$actual does not match expected regex", ValidationRegex.userAgentDesktopArch.matches(actual))
     }
 
     private fun getUserAgentProvider(
@@ -461,7 +250,6 @@ class UserAgentProviderTest {
             userAgent,
             toggle,
             FakeUserAllowListRepo(),
-            statisticsDataStore,
         )
     }
 
@@ -483,10 +271,6 @@ class UserAgentProviderTest {
 
     companion object {
         const val DOMAIN = "http://example.com"
-        const val NO_APPLICATION_DOMAIN = "http://application.com"
-        const val NO_APPLICATION_SUBDOMAIN = "http://subdomain.application.com"
-        const val NO_VERSION_DOMAIN = "http://version.com"
-        const val NO_VERSION_SUBDOMAIN = "http://subdomain.version.com"
         const val DEFAULT_DOMAIN = "http://default.com"
         const val DEFAULT_SUBDOMAIN = "http://subdomain.default.com"
         const val UNPROTECTED_DOMAIN = "http://unprotected.com"
@@ -529,10 +313,6 @@ class UserAgentProviderTest {
             "Mozilla/5.0 \\(X11; Linux .*?\\) AppleWebKit/[.0-9]+ " +
                 "\\(KHTML, like Gecko\\) Version/[.0-9]+ Chrome/(\\d+)\\.0\\.0\\.0 DuckDuckGo/5 Safari/[.0-9]+",
         )
-        val noApplication = Regex(
-            "Mozilla/5.0 \\(Linux; Android .*?\\) AppleWebKit/[.0-9]+ " +
-                "\\(KHTML, like Gecko\\) Version/[.0-9]+ Chrome/(\\d+)\\.0\\.0\\.0 Mobile Safari/[.0-9]+",
-        )
         val noVersion = Regex(
             "Mozilla/5.0 \\(Linux; Android .*?\\) AppleWebKit/[.0-9]+ " +
                 "\\(KHTML, like Gecko\\) Chrome/(\\d+)\\.0\\.0\\.0 Mobile DuckDuckGo/5 Safari/[.0-9]+",
@@ -544,35 +324,15 @@ class UserAgentProviderTest {
             "Mozilla/5.0 \\(Linux; Android .*?\\) AppleWebKit/[.0-9]+ " +
                 "\\(KHTML, like Gecko\\) Version/[.0-9]+ Chrome/(\\d+)\\.0\\.0\\.0 Mobile DuckDuckGo/5",
         )
-        val ddgFixed = Regex(
-            "Mozilla/5.0 \\(Linux; Android 10; K\\) AppleWebKit/[.0-9]+ " +
-                "\\(KHTML, like Gecko\\) Chrome/(\\d+)\\.0\\.0\\.0 Mobile DuckDuckGo/5 Safari/[.0-9]+",
-        )
-        val ddgFixedNoApplication = Regex(
+        val userAgent = Regex(
             "Mozilla/5.0 \\(Linux; Android 10; K\\) AppleWebKit/[.0-9]+ " +
                 "\\(KHTML, like Gecko\\) Chrome/(\\d+)\\.0\\.0\\.0 Mobile Safari/[.0-9]+",
         )
-        val ddgFixedDesktop = Regex(
-            "Mozilla/5.0 \\(X11; Linux .*?\\) AppleWebKit/[.0-9]+ " +
-                "\\(KHTML, like Gecko\\) Chrome/(\\d+)\\.0\\.0\\.0 DuckDuckGo/5 Safari/[.0-9]+",
-        )
-        val ddgFixedDesktopArch = Regex(
-            "Mozilla/5.0 \\(X11; Linux x86_64\\) AppleWebKit/[.0-9]+ " +
-                "\\(KHTML, like Gecko\\) Chrome/(\\d+)\\.0\\.0\\.0 DuckDuckGo/5 Safari/[.0-9]+",
-        )
-        val ddgFixedDesktopNoApplication = Regex(
+        val userAgentDesktop = Regex(
             "Mozilla/5.0 \\(X11; Linux .*?\\) AppleWebKit/[.0-9]+ " +
                 "\\(KHTML, like Gecko\\) Chrome/(\\d+)\\.0\\.0\\.0 Safari/[.0-9]+",
         )
-        val closest = Regex(
-            "Mozilla/5.0 \\(Linux; Android 10; K\\) AppleWebKit/[.0-9]+ " +
-                "\\(KHTML, like Gecko\\) Chrome/(\\d+)\\.0\\.0\\.0 Mobile Safari/[.0-9]+",
-        )
-        val closestDesktop = Regex(
-            "Mozilla/5.0 \\(X11; Linux .*?\\) AppleWebKit/[.0-9]+ " +
-                "\\(KHTML, like Gecko\\) Chrome/(\\d+)\\.0\\.0\\.0 Safari/[.0-9]+",
-        )
-        val closestDesktopArch = Regex(
+        val userAgentDesktopArch = Regex(
             "Mozilla/5.0 \\(X11; Linux x86_64\\) AppleWebKit/[.0-9]+ " +
                 "\\(KHTML, like Gecko\\) Chrome/(\\d+)\\.0\\.0\\.0 Safari/[.0-9]+",
         )

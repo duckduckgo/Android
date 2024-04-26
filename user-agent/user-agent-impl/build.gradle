@@ -35,7 +35,9 @@ dependencies {
     implementation project(':app-build-config-api')
     implementation project(':user-agent-api')
     implementation project(':statistics')
+    implementation project(':user-agent-store')
 
+    implementation AndroidX.room.ktx
     implementation AndroidX.appCompat
     implementation Google.android.material
     implementation AndroidX.constraintLayout

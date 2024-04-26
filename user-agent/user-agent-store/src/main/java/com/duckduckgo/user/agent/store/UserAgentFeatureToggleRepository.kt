@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.fakes
+package com.duckduckgo.user.agent.store
 
-import com.duckduckgo.user.agent.impl.UserAgent
+interface UserAgentFeatureToggleRepository : UserAgentFeatureToggleStore
 
-class UserAgentFake : UserAgent {
-    override fun useLegacyUserAgent(url: String): Boolean = false
-    override fun isException(url: String): Boolean = false
-}
+class RealUserAgentFeatureToggleRepository(
+    userAgentFeatureToggleStore: UserAgentFeatureToggleStore,
+) : UserAgentFeatureToggleRepository, UserAgentFeatureToggleStore by userAgentFeatureToggleStore

@@ -27,9 +27,9 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.api.FakeChain
 import com.duckduckgo.common.utils.device.ContextDeviceInfo
 import com.duckduckgo.feature.toggles.api.FeatureToggle
-import com.duckduckgo.privacy.config.api.UserAgent
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.duckduckgo.user.agent.impl.RealUserAgentProvider
+import com.duckduckgo.user.agent.impl.UserAgent
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -60,7 +60,6 @@ class ApiRequestInterceptorTest {
             fakeUserAgent,
             fakeToggle,
             fakeUserAllowListRepository,
-            mock(),
         )
 
         testee = ApiRequestInterceptor(
@@ -88,7 +87,7 @@ class ApiRequestInterceptorTest {
         val response = testee.intercept(fakeChain)
         val header = response.request.header(Header.USER_AGENT)!!
         val regex =
-            "Mozilla/.* \\(Linux; Android.*\\) AppleWebKit/.* \\(KHTML, like Gecko\\) Version/.* Chrome/.* Mobile DuckDuckGo/.* Safari/.*".toRegex()
+            "Mozilla/.* \\(Linux; Android.*\\) AppleWebKit/.* \\(KHTML, like Gecko\\) Chrome/.* Mobile Safari/.*".toRegex()
         assertTrue(header.matches(regex))
     }
 }

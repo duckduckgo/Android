@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.impl.features.useragent
+package com.duckduckgo.user.agent.impl
 
 import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 
@@ -22,25 +22,4 @@ data class UserAgentFeature(
     val state: String,
     val minSupportedVersion: Int?,
     val exceptions: List<FeatureException>,
-    val settings: UserAgentSettings,
-)
-
-data class UserAgentSettings(
-    val defaultPolicy: String?,
-    val ddgDefaultSites: List<FeatureException>,
-    val ddgFixedSites: List<FeatureException>,
-    val closestUserAgent: ClosestUserAgent?,
-    val ddgFixedUserAgent: DdgFixedUserAgent?,
-    val omitApplicationSites: List<FeatureException>,
-    val omitVersionSites: List<FeatureException>,
-)
-
-data class ClosestUserAgent(
-    val versions: List<String>,
-    val state: String,
-)
-
-data class DdgFixedUserAgent(
-    val versions: List<String>,
-    val state: String,
 )

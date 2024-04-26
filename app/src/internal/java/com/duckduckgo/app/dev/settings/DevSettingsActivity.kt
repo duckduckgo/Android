@@ -148,11 +148,8 @@ class DevSettingsActivity : DuckDuckGoActivity() {
         val popup = PopupMenu(layoutInflater, layout.popup_window_user_agent_override)
         val view = popup.contentView
         popup.apply {
-            onMenuItemClicked(view.findViewById(R.id.noAppId)) { viewModel.onUserAgentSelected(UAOverride.NO_APP_ID) }
-            onMenuItemClicked(view.findViewById(R.id.noVersion)) { viewModel.onUserAgentSelected(UAOverride.NO_VERSION) }
-            onMenuItemClicked(view.findViewById(R.id.chrome)) { viewModel.onUserAgentSelected(UAOverride.CHROME) }
             onMenuItemClicked(view.findViewById(R.id.firefox)) { viewModel.onUserAgentSelected(UAOverride.FIREFOX) }
-            onMenuItemClicked(view.findViewById(R.id.duckDuckGo)) { viewModel.onUserAgentSelected(UAOverride.DDG) }
+            onMenuItemClicked(view.findViewById(R.id.defaultUA)) { viewModel.onUserAgentSelected(UAOverride.DEFAULT) }
             onMenuItemClicked(view.findViewById(R.id.webView)) { viewModel.onUserAgentSelected(UAOverride.WEBVIEW) }
         }
         popup.show(binding.root, binding.overrideUserAgentSelector)

@@ -14,11 +14,8 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.fakes
+package com.duckduckgo.user.agent.store
 
-import com.duckduckgo.user.agent.impl.UserAgent
-
-class UserAgentFake : UserAgent {
-    override fun useLegacyUserAgent(url: String): Boolean = false
-    override fun isException(url: String): Boolean = false
+enum class UserAgentFeatureName(val value: String) {
+    UserAgent("customUserAgent"),
 }
