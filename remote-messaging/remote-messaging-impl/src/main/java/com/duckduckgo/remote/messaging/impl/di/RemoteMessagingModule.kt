@@ -35,11 +35,13 @@ import com.duckduckgo.remote.messaging.impl.matchers.AndroidAppAttributeMatcher
 import com.duckduckgo.remote.messaging.impl.matchers.DeviceAttributeMatcher
 import com.duckduckgo.remote.messaging.impl.matchers.UserAttributeMatcher
 import com.duckduckgo.remote.messaging.impl.network.RemoteMessagingService
-import com.duckduckgo.remote.messaging.store.ALL_MIGRATIONS
 import com.duckduckgo.remote.messaging.store.LocalRemoteMessagingConfigRepository
 import com.duckduckgo.remote.messaging.store.RemoteMessagesDao
+import com.duckduckgo.remote.messaging.store.RemoteMessagingCohortStore
+import com.duckduckgo.remote.messaging.store.RemoteMessagingCohortStoreDB
 import com.duckduckgo.remote.messaging.store.RemoteMessagingConfigRepository
 import com.duckduckgo.remote.messaging.store.RemoteMessagingDatabase
+import com.duckduckgo.remote.messaging.store.RemoteMessagingDatabase.Companion.ALL_MIGRATIONS
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -117,8 +119,9 @@ object DataSourceModule {
     fun providesRemoteMessagingConfigMatcher(
         matchers: DaggerSet<AttributeMatcherPlugin>,
         remoteMessagingRepository: RemoteMessagingRepository,
+        remoteMessagingCohortStore: RemoteMessagingCohortStore,
     ): RemoteMessagingConfigMatcher {
-        return RemoteMessagingConfigMatcher(matchers, remoteMessagingRepository)
+        return RemoteMessagingConfigMatcher(matchers, remoteMessagingRepository, remoteMessagingCohortStore)
     }
 
     @Provides
@@ -159,5 +162,11 @@ object DataSourceModule {
             .fallbackToDestructiveMigration()
             .addMigrations(*ALL_MIGRATIONS)
             .build()
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun providesRemoteMessagingUserDataStore(database: RemoteMessagingDatabase): RemoteMessagingCohortStore {
+        return RemoteMessagingCohortStoreDB(database)
     }
 }

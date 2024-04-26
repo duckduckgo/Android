@@ -19,18 +19,36 @@ package com.duckduckgo.remote.messaging.store
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
     exportSchema = true,
-    version = 1,
+    version = 2,
     entities = [
         RemoteMessagingConfig::class,
         RemoteMessageEntity::class,
+        RemoteMessagingCohort::class,
     ],
 )
 abstract class RemoteMessagingDatabase : RoomDatabase() {
     abstract fun remoteMessagingConfigDao(): RemoteMessagingConfigDao
     abstract fun remoteMessagesDao(): RemoteMessagesDao
-}
+    abstract fun remoteMessagingCohortDao(): RemoteMessagingCohortDao
 
-val ALL_MIGRATIONS = emptyArray<Migration>()
+    companion object {
+        val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                with(database) {
+                    execSQL(
+                        "CREATE TABLE IF NOT EXISTS `remote_messaging_cohort` " +
+                            "(`id` INTEGER NOT NULL," +
+                            " `message` TEXT NOT NULL," +
+                            " `percentile` REAL NOT NULL," +
+                            " PRIMARY KEY(`id`))",
+                    )
+                }
+            }
+        }
+        val ALL_MIGRATIONS = arrayOf(MIGRATION_1_2)
+    }
+}

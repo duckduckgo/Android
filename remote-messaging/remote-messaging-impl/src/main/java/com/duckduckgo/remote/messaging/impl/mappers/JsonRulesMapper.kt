@@ -211,9 +211,20 @@ private val attributesMappers = mapOf(
 
 fun List<JsonMatchingRule>.mapToMatchingRules(
     matchingAttributeMappers: Set<JsonToMatchingAttributeMapper>,
-): Map<Int, List<MatchingAttribute>> = this.map {
-    Pair(it.id, it.attributes.map { attrs -> attrs.map(matchingAttributeMappers) })
-}.toMap()
+): List<Rule> = this.map {
+    Rule(
+        id = it.id,
+        targetPercentile = it.targetPercentile.map(),
+        attributes = it.attributes?.map { attrs -> attrs.map(matchingAttributeMappers) }.orEmpty(),
+    )
+}
+
+private fun JsonTargetPercentile?.map(): TargetPercentile? {
+    if (this == null) return null
+    return TargetPercentile(
+        before = this.before ?: 1f,
+    )
+}
 
 private fun Map.Entry<String, JsonMatchingAttribute>.map(matchingAttributeMappers: Set<JsonToMatchingAttributeMapper>): MatchingAttribute {
     return runCatching {

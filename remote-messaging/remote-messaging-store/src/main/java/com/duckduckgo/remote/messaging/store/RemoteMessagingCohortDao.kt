@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,18 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.remote.messaging.impl.models
+package com.duckduckgo.remote.messaging.store
 
-import com.duckduckgo.remote.messaging.api.MatchingAttribute
-import com.duckduckgo.remote.messaging.api.RemoteMessage
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
 
-data class RemoteConfig(
-    val messages: List<RemoteMessage>,
-    val rules: List<Rule>,
-)
+@Dao
+abstract class RemoteMessagingCohortDao {
+    @Query("select * from remote_messaging_cohort where message = :messageID")
+    abstract fun messageById(messageID: String): RemoteMessagingCohort?
 
-data class Rule(
-    val id: Int,
-    val targetPercentile: TargetPercentile?,
-    val attributes: List<MatchingAttribute>,
-)
-
-data class TargetPercentile(
-    val before: Float,
-)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract fun insert(entity: RemoteMessagingCohort)
+}
