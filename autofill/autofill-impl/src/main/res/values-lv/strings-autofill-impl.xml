@@ -162,4 +162,12 @@
     <string name="autofill_auth_text_for_delete_all">Autentificējies, lai apstiprinātu, ka vēlies dzēst visas paroles</string>
     <string name="autofill_title_text_for_delete_all">Dzēst visas paroles</string>
 
+    <!-- Sync settings screen -->
+    <plurals name="syncCredentialInvalidItemsWarning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="zero">Tavas paroles vietnei %1$s un vēl %2$d vietnēm nevar sinhronizēt, jo daži to lauki pārsniedz rakstzīmju ierobežojumu.</item>
+        <item quantity="one">Tavu paroli vietnei %1$s nevar sinhronizēt, jo kāds no tās laukiem pārsniedz rakstzīmju ierobežojumu.</item>
+        <item quantity="other">Tavas paroles vietnei %1$s un vēl %2$d vietnēm nevar sinhronizēt, jo daži to lauki pārsniedz rakstzīmju ierobežojumu.</item>
+    </plurals>
+    <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Pārvaldīt paroles</annotation></string>
+
 </resources>
