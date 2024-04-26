@@ -38,6 +38,16 @@
             app:panelBackground="@drawable/info_panel_alert_background"
             app:panelDrawable="@drawable/ic_info_panel_alert" />
 
+        <com.duckduckgo.common.ui.view.MessageCta
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:contentOrientation="start"
+            android:visibility="gone"
+            android:id="@+id/autofillSurveyMessage"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/webViewUnsupportedWarningPanel" />
+
         <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
             android:id="@+id/enabledToggle"
             android:layout_width="0dp"
@@ -48,7 +58,7 @@
             app:showSwitch="true"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/webViewUnsupportedWarningPanel"/>
+            app:layout_constraintTop_toBottomOf="@id/autofillSurveyMessage" />
 
         <com.duckduckgo.common.ui.view.divider.HorizontalDivider
             android:id="@+id/topDivider"

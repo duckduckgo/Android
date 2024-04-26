@@ -93,6 +93,8 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
         "m_autofill_device_capability_secure_storage_unavailable_and_device_auth_disabled",
     ),
     AUTOFILL_DEVICE_CAPABILITY_UNKNOWN_ERROR("m_autofill_device_capability_unknown"),
+
+    AUTOFILL_SURVEY_AVAILABLE_PROMPT_DISPLAYED("m_autofill_management_screen_visit_survey_available"),
 }
 
 @ContributesMultibinding(
