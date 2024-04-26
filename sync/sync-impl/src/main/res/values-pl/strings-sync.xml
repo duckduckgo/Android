@@ -159,6 +159,9 @@
     <!-- Sync Device Authentication -->
     <string name="sync_auth_text_for_access">Odblokuj urządzenie, aby uzyskać dostęp do synchronizacji i kopii zapasowej.</string>
     <string name="sync_biometric_prompt_title">Synchronizacja i kopia zapasowa zablokowane</string>
+    <string name="sync_require_device_passcode_dialog_title">Zabezpiecz urządzenie, aby korzystać z Sync &amp; Backup</string>
+    <string name="sync_require_device_passcode_dialog_body">Aby używać funkcji Sync &amp; Backup, należy korzystać z blokady urządzenia z wzorem, kodem PIN lub danymi biometrycznymi.</string>
+    <string name="sync_require_device_passcode_dialog_action">Przejdź do ustawień</string>
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Usunąć dane serwera?</string>
