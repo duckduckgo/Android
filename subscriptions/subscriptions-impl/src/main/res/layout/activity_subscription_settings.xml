@@ -62,17 +62,33 @@
                 app:typography="body1_bold"
                 tools:text="Monthly Subscription"/>
 
-            <com.duckduckgo.common.ui.view.text.DaxTextView
-                android:id="@+id/description"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
                 android:layout_marginTop="@dimen/keyline_3"
                 android:layout_marginBottom="@dimen/keyline_4"
-                android:text="Your subscription renews on April 20, 2027."
-                app:textType="secondary"
-                app:typography="body2"
-                tools:ignore="HardcodedText" />
+                android:orientation="horizontal"
+                android:gravity="center">
+
+                <ImageView
+                    android:id="@+id/descriptionExpiredIcon"
+                    android:visibility="gone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="1dp"
+                    android:layout_marginEnd="10dp"
+                    android:src="@drawable/ic_exclamation_yellow_16" />
+
+                <com.duckduckgo.common.ui.view.text.DaxTextView
+                    android:id="@+id/description"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Your subscription renews on April 20, 2027."
+                    app:textType="secondary"
+                    app:typography="body2"
+                    tools:ignore="HardcodedText" />
+
+            </LinearLayout>
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:layout_width="match_parent"
@@ -87,7 +103,16 @@
                 android:id="@+id/changePlan"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:primaryText="@string/changePlanTitle" />
+                android:visibility="gone"
+                app:primaryText="@string/changePlanTitle"
+                tools:visibility="visible" />
+
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                android:id="@+id/viewPlans"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:primaryText="@string/subscriptionSettingExpiredViewPlans" />
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:layout_width="match_parent"
