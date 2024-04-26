@@ -17,9 +17,14 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <!-- Setup screen -->
+    <!-- Sync settings screen -->
     <string name="sync_enable_option_favorites_title">Del favoritter</string>
     <string name="sync_enable_option_favorites_subtitle">Bruk de samme favorittene på alle enheter. La være av for å holde mobil- og skrivebordsfavoritter adskilt.</string>
     <string name="saved_site_limit_warning"><b>Synkronisering er satt på pause</b>\nGrensen for bokmerker er overskredet. Slett noen for å gjenoppta synkroniseringen.\n\n<annotation type="manage_bookmarks">Administrer bokmerker</annotation></string>
     <string name="saved_site_limit_warning_notif"><b>Synkronisering av bokmerker er satt på pause</b>\nDu har overskredet grensen for synkronisering av bokmerker. Prøv å slette noen bokmerker. Inntil dette er løst, blir ikke bokmerkene sikkerhetskopiert.</string>
+    <plurals name="saved_site_invalid_items_warning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="one">Bokmerket for %1$s kan ikke synkroniseres fordi ett av feltene overskrider tegngrensen.</item>
+        <item quantity="other">Bokmerkene for %1$s og %2$d andre steder kan ikke synkroniseres fordi noen av feltene overskrider tegngrensen.</item>
+    </plurals>
+    <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Administrer bokmerker</annotation></string>
 </resources>
