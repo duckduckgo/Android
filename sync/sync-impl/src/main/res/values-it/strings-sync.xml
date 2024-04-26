@@ -159,6 +159,9 @@
     <!-- Sync Device Authentication -->
     <string name="sync_auth_text_for_access">Sblocca il dispositivo per accedere a Sync &amp; Backup.</string>
     <string name="sync_biometric_prompt_title">Sync &amp; Backup bloccato</string>
+    <string name="sync_require_device_passcode_dialog_title">Proteggi il tuo dispositivo per utilizzare Sync &amp; Backup</string>
+    <string name="sync_require_device_passcode_dialog_body">Per utilizzare Sync &amp; Backup è necessario sbloccare il dispositivo utilizzando una sequenza di sblocco, un PIN o l\'autenticazione biometrica.</string>
+    <string name="sync_require_device_passcode_dialog_action">Vai a Impostazioni</string>
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Eliminare i dati del server?</string>
