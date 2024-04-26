@@ -122,12 +122,18 @@ class EnqueuedPixelWorkerTest {
         whenever(customTabDetector.isCustomTab()).thenReturn(true)
         whenever(unsentForgetAllPixelStore.pendingPixelCountClearData).thenReturn(1)
         whenever(webViewVersionProvider.getMajorVersion()).thenReturn("91")
-        whenever(defaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
+        whenever(defaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
 
         enqueuedPixelWorker.onCreate(lifecycleOwner)
         enqueuedPixelWorker.onStart(lifecycleOwner)
 
-        verify(pixel, never()).fire(AppPixelName.APP_LAUNCH)
+        verify(pixel).fire(
+            AppPixelName.APP_LAUNCH,
+            mapOf(
+                Pixel.PixelParameter.WEBVIEW_VERSION to "91",
+                Pixel.PixelParameter.DEFAULT_BROWSER to "true",
+            ),
+        )
     }
 
     @Test
