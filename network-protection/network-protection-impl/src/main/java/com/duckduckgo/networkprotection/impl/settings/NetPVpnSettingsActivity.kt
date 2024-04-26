@@ -27,6 +27,7 @@ import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.extensions.launchAlwaysOnSystemSettings
 import com.duckduckgo.common.utils.extensions.launchApplicationInfoSettings
@@ -38,7 +39,6 @@ import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpVpnSettingsBinding
 import com.duckduckgo.networkprotection.impl.settings.NetPVpnSettingsViewModel.RecommendedSettings
 import com.duckduckgo.networkprotection.impl.settings.NetPVpnSettingsViewModel.ViewState
-import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 import kotlin.math.absoluteValue
 import kotlinx.coroutines.flow.launchIn
@@ -118,16 +118,20 @@ class NetPVpnSettingsActivity : DuckDuckGoActivity() {
             } else if (isChecked) {
                 binding.pauseWhileCalling.setIsChecked(false)
                 if (shouldShowRequestPermissionRationale(permission.READ_PHONE_STATE)) {
-                    Snackbar.make(
-                        binding.root,
-                        getString(R.string.netpGrantPhonePermissionByline),
-                        Snackbar.LENGTH_LONG,
-                    ).setAction(
-                        getString(R.string.netpGrantPhonePermissionAction),
-                    ) {
-                        // User denied the permission 2+ times
-                        this@NetPVpnSettingsActivity.launchApplicationInfoSettings()
-                    }.show()
+                    TextAlertDialogBuilder(this)
+                        .setTitle(R.string.netpGrantPhonePermissionTitle)
+                        .setMessage(R.string.netpGrantPhonePermissionByline)
+                        .setPositiveButton(R.string.netpGrantPhonePermissionActionPositive)
+                        .setNegativeButton(R.string.netpGrantPhonePermissionActionNegative)
+                        .addEventListener(
+                            object : TextAlertDialogBuilder.EventListener() {
+                                override fun onPositiveButtonClicked() {
+                                    // User denied the permission 2+ times
+                                    this@NetPVpnSettingsActivity.launchApplicationInfoSettings()
+                                }
+                            },
+                        )
+                        .show()
                 } else {
                     requestPermissions(arrayOf(permission.READ_PHONE_STATE), permission.READ_PHONE_STATE.hashCode().absoluteValue)
                 }
