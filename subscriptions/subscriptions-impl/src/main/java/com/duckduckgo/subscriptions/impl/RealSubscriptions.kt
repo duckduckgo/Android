@@ -57,7 +57,6 @@ import kotlinx.coroutines.runBlocking
 @ContributesBinding(AppScope::class)
 class RealSubscriptions @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
-    private val privacyProFeature: PrivacyProFeature,
     private val globalActivityStarter: GlobalActivityStarter,
     private val pixel: SubscriptionPixelSender,
 ) : Subscriptions {
@@ -85,7 +84,7 @@ class RealSubscriptions @Inject constructor(
         }
     }
     override suspend fun isEnabled(): Boolean {
-        return privacyProFeature.isLaunched().isEnabled()
+        return true
     }
 
     override suspend fun isEligible(): Boolean {
@@ -140,9 +139,6 @@ class RealSubscriptions @Inject constructor(
 interface PrivacyProFeature {
     @Toggle.DefaultValue(false)
     fun self(): Toggle
-
-    @Toggle.DefaultValue(false)
-    fun isLaunched(): Toggle
 
     @Toggle.DefaultValue(false)
     fun allowPurchase(): Toggle
