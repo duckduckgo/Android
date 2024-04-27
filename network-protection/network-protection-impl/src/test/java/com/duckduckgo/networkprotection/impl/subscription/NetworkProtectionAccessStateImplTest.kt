@@ -24,10 +24,8 @@ import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager.VpnStatus.EXPIRED
 import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager.VpnStatus.INACTIVE
 import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager.VpnStatus.SIGNED_OUT
-import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -55,29 +53,15 @@ class NetworkProtectionAccessStateImplTest {
     @Mock
     private lateinit var networkProtectionRepository: NetworkProtectionRepository
 
-    @Mock
-    private lateinit var subscriptions: Subscriptions
-
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
-
-        runBlocking { whenever(subscriptions.isEnabled()) }.thenReturn(true)
 
         testee = NetworkProtectionAccessStateImpl(
             networkProtectionState,
             coroutineTestRule.testDispatcherProvider,
             netpSubscriptionManager,
-            subscriptions,
         )
-    }
-
-    @Test
-    fun whenSubscriptionsDisabledThenReturnNotUnlocked() = runTest {
-        whenever(subscriptions.isEnabled()).thenReturn(false)
-        testee.getState().also {
-            assertEquals(Locked, it)
-        }
     }
 
     @Test
@@ -137,14 +121,6 @@ class NetworkProtectionAccessStateImplTest {
         testee.getState().also {
             assertEquals(Locked, it)
             verify(networkProtectionState).stop()
-        }
-    }
-
-    @Test
-    fun whenSubscriptionsDisabledThenReturnFlowEmitsNotUnlocked() = runTest {
-        whenever(subscriptions.isEnabled()).thenReturn(false)
-        testee.getStateFlow().test {
-            assertEquals(Locked, expectMostRecentItem())
         }
     }
 

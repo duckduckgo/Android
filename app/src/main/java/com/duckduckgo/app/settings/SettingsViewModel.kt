@@ -128,7 +128,7 @@ class SettingsViewModel @Inject constructor(
                     showAutofill = autofillCapabilityChecker.canAccessCredentialManagementScreen(),
                     showSyncSetting = deviceSyncState.isFeatureEnabled(),
                     isAutoconsentEnabled = autoconsent.isSettingEnabled(),
-                    isPrivacyProEnabled = isPrivacyProEnabled() && subscriptions.isEligible(),
+                    isPrivacyProEnabled = subscriptions.isEligible(),
                 ),
             )
         }
@@ -142,12 +142,11 @@ class SettingsViewModel @Inject constructor(
         appTPPollJob += viewModelScope.launch(dispatcherProvider.io()) {
             while (isActive) {
                 val isDeviceShieldEnabled = appTrackingProtection.isRunning()
-                val isPrivacyProEnabled = isPrivacyProEnabled()
                 val currentState = currentViewState()
                 viewState.value = currentState.copy(
                     appTrackingProtectionOnboardingShown = appTrackingProtection.isOnboarded(),
                     appTrackingProtectionEnabled = isDeviceShieldEnabled,
-                    isPrivacyProEnabled = isPrivacyProEnabled && subscriptions.isEligible(),
+                    isPrivacyProEnabled = subscriptions.isEligible(),
                 )
                 delay(1_000)
             }
@@ -241,10 +240,6 @@ class SettingsViewModel @Inject constructor(
 
     private fun currentViewState(): ViewState {
         return viewState.value
-    }
-
-    private suspend fun isPrivacyProEnabled(): Boolean {
-        return subscriptions.isEnabled()
     }
 
     fun onSyncSettingClicked() {

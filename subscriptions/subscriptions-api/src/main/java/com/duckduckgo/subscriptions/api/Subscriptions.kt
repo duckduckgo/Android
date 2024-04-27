@@ -35,11 +35,6 @@ interface Subscriptions {
     fun getEntitlementStatus(): Flow<List<Product>>
 
     /**
-     * @return `true` if the Privacy Pro product is enabled and live, `false` otherwise
-     */
-    suspend fun isEnabled(): Boolean
-
-    /**
      * @return `true` if the Privacy Pro product is available for the user, `false` otherwise
      */
     suspend fun isEligible(): Boolean

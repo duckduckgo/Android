@@ -61,8 +61,6 @@ class RealSubscriptions @Inject constructor(
     private val pixel: SubscriptionPixelSender,
 ) : Subscriptions {
     override suspend fun getAccessToken(): String? {
-        if (!isEnabled()) return null
-
         return when (val result = subscriptionsManager.getAccessToken()) {
             is AccessToken.Success -> result.accessToken
             is AccessToken.Failure -> null
@@ -71,7 +69,7 @@ class RealSubscriptions @Inject constructor(
 
     override fun getEntitlementStatus(): Flow<List<Product>> {
         return subscriptionsManager.entitlements.map {
-            if (!isEnabled() || !checkIfActive()) emptyList() else it
+            if (!checkIfActive()) emptyList() else it
         }
     }
 
@@ -83,10 +81,6 @@ class RealSubscriptions @Inject constructor(
             false
         }
     }
-    override suspend fun isEnabled(): Boolean {
-        return true
-    }
-
     override suspend fun isEligible(): Boolean {
         val supportsEncryption = subscriptionsManager.canSupportEncryption()
         val isActive = subscriptionsManager.subscriptionStatus().isActiveOrWaiting()
@@ -123,7 +117,7 @@ class RealSubscriptions @Inject constructor(
         val path = uri.pathSegments.firstOrNull()
         return if (eTld == PRIVACY_PRO_ETLD && size == 1 && path == PRIVACY_PRO_PATH) {
             runBlocking {
-                isEligible() && isEnabled()
+                isEligible()
             }
         } else {
             false

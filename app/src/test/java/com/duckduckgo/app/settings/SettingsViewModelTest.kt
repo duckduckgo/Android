@@ -85,7 +85,6 @@ class SettingsViewModelTest {
             whenever(appTrackingProtection.isRunning()).thenReturn(false)
             whenever(appTrackingProtection.isEnabled()).thenReturn(false)
             whenever(appTrackingProtection.isOnboarded()).thenReturn(false)
-            whenever(subscriptions.isEnabled()).thenReturn(false)
         }
 
         testee = SettingsViewModel(
