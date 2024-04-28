@@ -98,6 +98,12 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         binding.syncFaviconsPromptCta.setOnClickListener {
             viewModel.resetFaviconsPrompt()
         }
+        binding.assertDataReceivedButton.setOnClickListener {
+            viewModel.assertDataReceived()
+        }
+        binding.addSampleDataButton.setOnClickListener {
+            viewModel.addSampleData()
+        }
     }
 
     private fun observeUiEvents() {
@@ -177,6 +183,12 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
                 connectedBinding.logoutButton.setOnClickListener {
                     viewModel.onDeviceLogoutClicked(device.deviceId)
                 }
+            }
+        }
+        viewState.e2eTests?.let {
+            binding.expectedDataReceivedResult.text = if (it.assertResult) "Assert Result: Success" else "Assert Result: Failed"
+            if (!it.assertResult) {
+                binding.errorsList.text = it.errors
             }
         }
     }

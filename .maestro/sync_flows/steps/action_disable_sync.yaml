@@ -8,7 +8,3 @@ appId: com.duckduckgo.mobile.android
     direction: UP
 - tapOn: "Turn Off Sync & Backup…"
 - tapOn: "Turn Off"
-- pressKey: Home
-- launchApp:
-    clearState: true
-    stopApp: true

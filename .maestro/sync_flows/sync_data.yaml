@@ -4,14 +4,43 @@ name: "Sync Critical Path test: Data can be synced"
 tags:
   - syncCriticalPathTest
 ---
+- launchApp:
+    clearState: true
+    stopApp: true
+- runFlow: ../shared/onboarding.yaml
+- runFlow: ../shared/open_sync_dev_settings_screen.yaml
+# Add sample data locally
+- scrollUntilVisible:
+   element:
+     text: "Add sample data"
+   direction: DOWN
+- tapOn: "Add sample data"
+# Login into account and validate signed in
+- back
+- tapOn: "Sync Dev Settings"
 - runFlow: ../sync_flows/steps/action_add_new_device.yaml
-- runFlow: ../sync_flows/steps/action_add_bookmarks_and_folders.yaml
-# Enable Unified Favourites
-- runFlow: ../sync_flows/steps/action_enable_unified_favourites.yaml
 # Disable account
+- back
+- tapOn: "Sync & Backup"
 - runFlow: ../sync_flows/steps/action_disable_sync.yaml
-# Recover account
+# Recover account and validate signed in
+- launchApp:
+    clearState: true
+    stopApp: true
+- runFlow: ../shared/onboarding.yaml
+- runFlow: ../shared/open_sync_dev_settings_screen.yaml
 - runFlow: ../sync_flows/steps/action_add_new_device.yaml
-# Verify newly created bookmarks and folders have been added
-# It also verifies that Unified Favourites is turned on
-- runFlow: ../sync_flows/steps/action_verify_bookmarks_and_folders.yaml
+# Assert remote and local data merged as expected
+- back
+- back
+- runFlow: ../shared/open_sync_dev_settings_screen.yaml
+- scrollUntilVisible:
+    element:
+      text: "Assert expected data"
+    direction: DOWN
+- tapOn: "Assert expected data"
+- scrollUntilVisible:
+    element:
+      id: "com.duckduckgo.mobile.android:id/expectedDataReceivedResult"
+    direction: DOWN
+- assertVisible: "Assert Result: Success"

@@ -274,5 +274,41 @@
             android:layout_height="wrap_content"
             android:text="Reset" />
 
+        <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="E2E tests" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/addSampleDataButton"
+            android:layout_width="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_height="wrap_content"
+            android:text="Add sample data" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/assertDataReceivedButton"
+            android:layout_width="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_height="wrap_content"
+            android:text="Assert expected data" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/expectedDataReceivedResult"
+            android:layout_margin="@dimen/keyline_4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:typography="body1" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/errorsList"
+            android:layout_margin="@dimen/keyline_4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:typography="body1" />
     </LinearLayout>
 </ScrollView>
