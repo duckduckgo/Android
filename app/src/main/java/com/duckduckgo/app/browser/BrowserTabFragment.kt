@@ -1300,11 +1300,7 @@ class BrowserTabFragment :
 
             is Command.OpenMessageInNewTab -> {
                 if (isActiveCustomTab()) {
-                    webView?.hitTestResult?.extra?.let { data ->
-                        webView?.loadUrl(Uri.parse(data).toString())
-                    } ?: run {
-                        (activity as CustomTabActivity).openMessageInNewFragmentInCustomTab(it.message, this, customTabToolbarColor)
-                    }
+                    (activity as CustomTabActivity).openMessageInNewFragmentInCustomTab(it.message, this, customTabToolbarColor)
                 } else {
                     browserActivity?.openMessageInNewTab(it.message, it.sourceTabId)
                 }
