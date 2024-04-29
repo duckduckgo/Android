@@ -40,16 +40,13 @@ class NetworkProtectionAccessStateImpl @Inject constructor(
 ) : NetworkProtectionAccessState {
 
     override suspend fun getState(): NetPAccessState = withContext(dispatcherProvider.io()) {
-        if (true) {
-            return@withContext if (!netpSubscriptionManager.getVpnStatus().isActive()) {
-                // if entitlement check succeeded and no entitlement, reset state and hide access.
-                handleRevokedVPNState()
-                Locked
-            } else {
-                UnLocked
-            }
+        return@withContext if (!netpSubscriptionManager.getVpnStatus().isActive()) {
+            // if entitlement check succeeded and no entitlement, reset state and hide access.
+            handleRevokedVPNState()
+            Locked
+        } else {
+            UnLocked
         }
-        return@withContext Locked
     }
 
     override suspend fun getStateFlow(): Flow<NetPAccessState> = withContext(dispatcherProvider.io()) {
