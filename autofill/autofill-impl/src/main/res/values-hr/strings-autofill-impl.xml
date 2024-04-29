@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="managementDisabledModeCta"><b>Odredi u Postavkama</b></string>
 
     <string name="saveLoginDialogButtonSave">Spremi lozinku</string>
@@ -146,13 +146,13 @@
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Izbriši sve lozinke</string>
 
-    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSynced">
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSynced" tools:ignore="ImpliedQuantity">
         <item quantity="one">Tvoja lozinka (ili više njih) bit će izbrisana s ovog uređaja.</item>
         <item quantity="few">Tvoje lozinke bit će izbrisane s ovog uređaja.</item>
         <item quantity="many">Tvoje lozinke bit će izbrisane s ovog uređaja.</item>
         <item quantity="other">Tvoje lozinke bit će izbrisane s ovog uređaja.</item>
     </plurals>
-    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSynced">
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSynced" tools:ignore="ImpliedQuantity">
         <item quantity="one">Tvoja lozinka (ili više njih) bit će izbrisana sa svih sinkroniziranih uređaja.</item>
         <item quantity="few">Tvoje lozinke bit će izbrisane sa svih sinkroniziranih uređaja.</item>
         <item quantity="many">Tvoje lozinke bit će izbrisane sa svih sinkroniziranih uređaja.</item>
@@ -165,7 +165,7 @@
         <item quantity="other">Sigurno želiš izbrisati %1$d lozinki?</item>
     </plurals>
 
-    <plurals name="credentialManagementDeleteAllSecondInstruction">
+    <plurals name="credentialManagementDeleteAllSecondInstruction" tools:ignore="ImpliedQuantity">
         <item quantity="one">Uvjeri se da i dalje imaš način pristupa svom računu/računima.</item>
         <item quantity="few">Uvjeri se da i dalje imaš način pristupa svojim računima.</item>
         <item quantity="many">Uvjeri se da i dalje imaš način pristupa svojim računima.</item>

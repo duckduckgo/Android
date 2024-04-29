@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="managementDisabledModeCta"><b>Nustatyti nustatymuose</b></string>
 
     <string name="saveLoginDialogButtonSave">Išsaugoti slaptažodį</string>
@@ -146,13 +146,13 @@
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Ištrinti visus slaptažodžius</string>
 
-    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSynced">
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSynced" tools:ignore="ImpliedQuantity">
         <item quantity="one">Jūsų slaptažodis bus ištrintas iš šio įrenginio.</item>
         <item quantity="few">Jūsų slaptažodžiai bus ištrinti iš šio įrenginio.</item>
         <item quantity="many">Jūsų slaptažodžiai bus ištrinti iš šio įrenginio.</item>
         <item quantity="other">Jūsų slaptažodžiai bus ištrinti iš šio įrenginio.</item>
     </plurals>
-    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSynced">
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSynced" tools:ignore="ImpliedQuantity">
         <item quantity="one">Jūsų slaptažodžiai bus ištrinti iš visų sinchronizuojamų įrenginių.</item>
         <item quantity="few">Jūsų slaptažodžiai bus ištrinti iš visų sinchronizuojamų įrenginių.</item>
         <item quantity="many">Jūsų slaptažodžiai bus ištrinti iš visų sinchronizuojamų įrenginių.</item>
@@ -165,7 +165,7 @@
         <item quantity="other">Ar tikrai norite ištrinti %1$d slaptažodžių?</item>
     </plurals>
 
-    <plurals name="credentialManagementDeleteAllSecondInstruction">
+    <plurals name="credentialManagementDeleteAllSecondInstruction" tools:ignore="ImpliedQuantity">
         <item quantity="one">Įsitikinkite, kad turite būdą pasiekti paskyrą.</item>
         <item quantity="few">Įsitikinkite, kad turite būdą, kaip pasiekti paskyras.</item>
         <item quantity="many">Įsitikinkite, kad vis dar turite būdą, kaip pasiekti paskyras.</item>
