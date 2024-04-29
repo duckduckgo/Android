@@ -164,4 +164,13 @@
     <string name="autofill_auth_text_for_delete_all">Patvirtinkite tapatybę, kad patvirtintumėte, jog norite ištrinti visus slaptažodžius</string>
     <string name="autofill_title_text_for_delete_all">Ištrinti visus slaptažodžius</string>
 
+    <!-- Sync settings screen -->
+    <plurals name="syncCredentialInvalidItemsWarning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="one">Jūsų %1$s slaptažodžio negalima sinchronizuoti, nes tekstas, viename iš laukų, viršija simbolių limitą.</item>
+        <item quantity="few">Jūsų %1$s ir %2$d kitų svetainių slaptažodžių negalima sinchronizuoti, nes tekstas kai kuriuose laukuose viršija simbolių limitą.</item>
+        <item quantity="many">Jūsų %1$s ir %2$d kitų svetainės slaptažodžių negalima sinchronizuoti, nes tekstas kai kuriuose laukuose viršija simbolių limitą.</item>
+        <item quantity="other">Jūsų %1$s ir %2$d kitų svetainių slaptažodžių negalima sinchronizuoti, nes tekstas kai kuriuose laukuose viršija simbolių limitą.</item>
+    </plurals>
+    <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Slaptažodžių valdymas</annotation></string>
+
 </resources>
