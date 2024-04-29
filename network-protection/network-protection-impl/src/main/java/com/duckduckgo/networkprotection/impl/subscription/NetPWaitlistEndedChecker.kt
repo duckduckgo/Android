@@ -25,7 +25,6 @@ import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
-import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -37,7 +36,6 @@ import logcat.logcat
 @ContributesMultibinding(VpnScope::class)
 @SingleInstanceIn(VpnScope::class)
 class NetPWaitlistEndedChecker @Inject constructor(
-    private val subscriptions: Subscriptions,
     private val netpSubscriptionManager: NetpSubscriptionManager,
     private val dispatcherProvider: DispatcherProvider,
     private val networkProtectionState: NetworkProtectionState,
@@ -51,7 +49,7 @@ class NetPWaitlistEndedChecker @Inject constructor(
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
         coroutineScope.launch(dispatcherProvider.io()) {
-            if (!preferences.isAlreadyChecked() && networkProtectionState.isEnabled() && subscriptions.isEnabled()) {
+            if (!preferences.isAlreadyChecked() && networkProtectionState.isEnabled()) {
                 preferences.checkDone()
                 var hasEntitlement = false
                 // I know, I don't like it either, but it seems we can't ensure a race otherwise

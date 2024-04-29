@@ -73,24 +73,24 @@ class SettingsViewModel @Inject constructor(
     )
 
     sealed class Command {
-        object LaunchDefaultBrowser : Command()
+        data object LaunchDefaultBrowser : Command()
         data class LaunchEmailProtection(val url: String) : Command()
-        object LaunchEmailProtectionNotSupported : Command()
-        object LaunchAutofillSettings : Command()
-        object LaunchAccessibilitySettings : Command()
-        object LaunchAddHomeScreenWidget : Command()
-        object LaunchAppTPTrackersScreen : Command()
-        object LaunchAppTPOnboarding : Command()
-        object LaunchMacOs : Command()
-        object LaunchWindows : Command()
-        object LaunchSyncSettings : Command()
-        object LaunchPrivateSearchWebPage : Command()
-        object LaunchWebTrackingProtectionScreen : Command()
-        object LaunchCookiePopupProtectionScreen : Command()
-        object LaunchFireButtonScreen : Command()
-        object LaunchPermissionsScreen : Command()
-        object LaunchAppearanceScreen : Command()
-        object LaunchAboutScreen : Command()
+        data object LaunchEmailProtectionNotSupported : Command()
+        data object LaunchAutofillSettings : Command()
+        data object LaunchAccessibilitySettings : Command()
+        data object LaunchAddHomeScreenWidget : Command()
+        data object LaunchAppTPTrackersScreen : Command()
+        data object LaunchAppTPOnboarding : Command()
+        data object LaunchMacOs : Command()
+        data object LaunchWindows : Command()
+        data object LaunchSyncSettings : Command()
+        data object LaunchPrivateSearchWebPage : Command()
+        data object LaunchWebTrackingProtectionScreen : Command()
+        data object LaunchCookiePopupProtectionScreen : Command()
+        data object LaunchFireButtonScreen : Command()
+        data object LaunchPermissionsScreen : Command()
+        data object LaunchAppearanceScreen : Command()
+        data object LaunchAboutScreen : Command()
     }
 
     private val viewState = MutableStateFlow(ViewState())
@@ -128,7 +128,7 @@ class SettingsViewModel @Inject constructor(
                     showAutofill = autofillCapabilityChecker.canAccessCredentialManagementScreen(),
                     showSyncSetting = deviceSyncState.isFeatureEnabled(),
                     isAutoconsentEnabled = autoconsent.isSettingEnabled(),
-                    isPrivacyProEnabled = isPrivacyProEnabled() && subscriptions.isEligible(),
+                    isPrivacyProEnabled = subscriptions.isEligible(),
                 ),
             )
         }
@@ -142,12 +142,11 @@ class SettingsViewModel @Inject constructor(
         appTPPollJob += viewModelScope.launch(dispatcherProvider.io()) {
             while (isActive) {
                 val isDeviceShieldEnabled = appTrackingProtection.isRunning()
-                val isPrivacyProEnabled = isPrivacyProEnabled()
                 val currentState = currentViewState()
                 viewState.value = currentState.copy(
                     appTrackingProtectionOnboardingShown = appTrackingProtection.isOnboarded(),
                     appTrackingProtectionEnabled = isDeviceShieldEnabled,
-                    isPrivacyProEnabled = isPrivacyProEnabled && subscriptions.isEligible(),
+                    isPrivacyProEnabled = subscriptions.isEligible(),
                 )
                 delay(1_000)
             }
@@ -241,10 +240,6 @@ class SettingsViewModel @Inject constructor(
 
     private fun currentViewState(): ViewState {
         return viewState.value
-    }
-
-    private suspend fun isPrivacyProEnabled(): Boolean {
-        return subscriptions.isEnabled()
     }
 
     fun onSyncSettingClicked() {

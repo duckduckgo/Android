@@ -49,7 +49,6 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetPAppExcl
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenAndEnable
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.networkprotection.impl.R
-import com.duckduckgo.networkprotection.impl.about.NetworkProtectionAboutScreens.NetPFaqsScreenNoParams
 import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpManagementBinding
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.None
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowAlwaysOnLockdownEnabled
@@ -65,7 +64,6 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.impl.management.alwayson.NetworkProtectionAlwaysOnDialogFragment
 import com.duckduckgo.networkprotection.impl.settings.NetPVpnSettingsScreenNoParams
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpGeoswitchingScreenNoParams
-import com.duckduckgo.subscriptions.api.Subscriptions
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -84,9 +82,6 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var appTheme: AppTheme
-
-    @Inject
-    lateinit var subscriptions: Subscriptions
 
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
@@ -152,14 +147,10 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
 
         binding.about.aboutFaq.setClickListener {
             lifecycleScope.launch(dispatcherProvider.io()) {
-                if (subscriptions.isEnabled()) {
-                    globalActivityStarter.start(
-                        this@NetworkProtectionManagementActivity,
-                        WebViewActivityWithParams(url = VPN_HELP_CENTER_URL, screenTitle = getString(R.string.netpFaqTitle)),
-                    )
-                } else {
-                    globalActivityStarter.start(this@NetworkProtectionManagementActivity, NetPFaqsScreenNoParams)
-                }
+                globalActivityStarter.start(
+                    this@NetworkProtectionManagementActivity,
+                    WebViewActivityWithParams(url = VPN_HELP_CENTER_URL, screenTitle = getString(R.string.netpFaqTitle)),
+                )
             }
         }
         configureHeaderAnimation()
