@@ -63,6 +63,15 @@
                 app:secondaryText="@string/netpVpnSettingExcludeLocalNetworksByline"
                 app:showSwitch="true" />
 
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/pauseWhileCalling"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/netpVpnSettingsPauseDuringCalls"
+                app:secondaryText="@string/netpVpnSettingsPauseDuringCallsByline"
+                app:showSwitch="true"
+                />
+
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />

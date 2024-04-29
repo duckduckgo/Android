@@ -122,4 +122,12 @@ enum class NetworkProtectionPixelNames(
     NETP_ENABLE_FROM_SETTINGS_TILE_DAILY("m_netp_ev_enable_from_settings_tile_d", enqueue = true),
     NETP_DISABLE_FROM_SETTINGS_TILE("m_netp_ev_disable_from_settings_tile_c", enqueue = true),
     NETP_DISABLE_FROM_SETTINGS_TILE_DAILY("m_netp_ev_disable_from_settings_tile_d", enqueue = true),
+    NETP_VPN_SCREEN_SHOWN("m_netp_imp_vpn_screen_c"),
+    NETP_VPN_SCREEN_SHOWN_DAILY("m_netp_imp_vpn_screen_d"),
+    NETP_VPN_SETTINGS_SHOWN("m_netp_imp_vpn_settings_screen_c"),
+    NETP_VPN_SETTINGS_SHOWN_DAILY("m_netp_imp_vpn_settings_screen_d"),
+    NETP_PAUSE_ON_CALL_ENABLED("m_netp_ev_enabled_pause_vpn_during_calls_c"),
+    NETP_PAUSE_ON_CALL_ENABLED_DAILY("m_netp_ev_enabled_pause_vpn_during_calls_d"),
+    NETP_PAUSE_ON_CALL_DISABLED("m_netp_ev_disabled_pause_vpn_during_calls_c"),
+    NETP_PAUSE_ON_CALL_DISABLED_DAILY("m_netp_ev_disabled_pause_vpn_during_calls_d"),
 }

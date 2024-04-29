@@ -52,6 +52,12 @@ interface NetPSettingsLocalConfig {
      */
     @Toggle.DefaultValue(true)
     fun vpnExcludeLocalNetworkRoutes(): Toggle
+
+    /**
+     * When `true` the VPN will automatically pause when a call is started and will automatically restart after.
+     */
+    @Toggle.DefaultValue(false)
+    fun vpnPauseDuringCalls(): Toggle
 }
 
 @ContributesBinding(AppScope::class)
