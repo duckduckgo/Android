@@ -21,7 +21,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistorySuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.history.api.HistoryEntry.VisitedPage
@@ -185,8 +185,8 @@ class AutoCompleteApiTest {
 
         assertEquals(
             listOf(
-                AutoCompleteBookmarkSuggestion(phrase = "example.com", "title", "https://example.com", isAllowedInTopHits = true, isFavorite = true),
                 AutoCompleteBookmarkSuggestion(phrase = "bar.com", "title", "https://bar.com", isAllowedInTopHits = true, isFavorite = false),
+                AutoCompleteBookmarkSuggestion(phrase = "example.com", "title", "https://example.com", isAllowedInTopHits = true, isFavorite = true),
                 AutoCompleteSearchSuggestion("foo", false),
                 AutoCompleteBookmarkSuggestion(phrase = "baz.com", "title", "https://baz.com", isAllowedInTopHits = false, isFavorite = false),
             ),
