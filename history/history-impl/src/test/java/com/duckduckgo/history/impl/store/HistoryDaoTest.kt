@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.store
+package com.duckduckgo.history.impl.store
 
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.history.store.HistoryDao
-import com.duckduckgo.app.history.store.HistoryDatabase
-import com.duckduckgo.app.history.store.HistoryEntryEntity
+import java.time.LocalDateTime
+import java.time.Month.JANUARY
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
@@ -49,30 +49,36 @@ class HistoryDaoTest {
     @Test
     fun testGetHistoryEntryByUrl() {
         val historyEntry = HistoryEntryEntity(url = "url", title = "title", query = "query", isSerp = false)
-        historyDao.insertHistoryEntry(historyEntry)
+        runTest {
+            historyDao.insertHistoryEntry(historyEntry)
 
-        val retrievedEntry = historyDao.getHistoryEntryByUrl("url")
-        Assert.assertNotNull(retrievedEntry)
-        Assert.assertEquals(historyEntry.url, retrievedEntry?.url)
+            val retrievedEntry = historyDao.getHistoryEntryByUrl("url")
+            Assert.assertNotNull(retrievedEntry)
+            Assert.assertEquals(historyEntry.url, retrievedEntry?.url)
+        }
     }
 
     @Test
     fun whenInsertSameUrlWithSameDateTwiceThenOnlyOneEntryAndOneVisitAreStored() {
-        historyDao.updateOrInsertVisit("url", "title", "query", false, 1L)
-        historyDao.updateOrInsertVisit("url", "title", "query", false, 1L)
+        runTest {
+            historyDao.updateOrInsertVisit("url", "title", "query", false, LocalDateTime.of(2000, JANUARY, 1, 0, 0))
+            historyDao.updateOrInsertVisit("url", "title", "query", false, LocalDateTime.of(2000, JANUARY, 1, 0, 0))
 
-        val historyEntriesWithVisits = historyDao.getHistoryEntriesWithVisits()
-        Assert.assertEquals(1, historyEntriesWithVisits.count())
-        Assert.assertEquals(1, historyEntriesWithVisits.first().visits.count())
+            val historyEntriesWithVisits = historyDao.getHistoryEntriesWithVisits()
+            Assert.assertEquals(1, historyEntriesWithVisits.count())
+            Assert.assertEquals(1, historyEntriesWithVisits.first().visits.count())
+        }
     }
 
     @Test
     fun whenInsertSameUrlWithDifferentDateTwiceThenOneEntryAndTwoVisitsAreStored() {
-        historyDao.updateOrInsertVisit("url", "title", "query", false, 1L)
-        historyDao.updateOrInsertVisit("url", "title", "query", false, 2L)
+        runTest {
+            historyDao.updateOrInsertVisit("url", "title", "query", false, LocalDateTime.of(2000, JANUARY, 1, 0, 0))
+            historyDao.updateOrInsertVisit("url", "title", "query", false, LocalDateTime.of(2000, JANUARY, 2, 0, 0))
 
-        val historyEntriesWithVisits = historyDao.getHistoryEntriesWithVisits()
-        Assert.assertEquals(1, historyEntriesWithVisits.count())
-        Assert.assertEquals(2, historyEntriesWithVisits.first().visits.count())
+            val historyEntriesWithVisits = historyDao.getHistoryEntriesWithVisits()
+            Assert.assertEquals(1, historyEntriesWithVisits.count())
+            Assert.assertEquals(2, historyEntriesWithVisits.first().visits.count())
+        }
     }
 }

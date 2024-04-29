@@ -14,42 +14,44 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.history.store
+package com.duckduckgo.history.impl.store
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
+import java.time.LocalDateTime
 
 @Dao
 interface HistoryDao {
     @Transaction
     @Query("SELECT * FROM history_entries")
-    fun getHistoryEntriesWithVisits(): List<HistoryEntryWithVisits>
+    suspend fun getHistoryEntriesWithVisits(): List<HistoryEntryWithVisits>
 
     @Transaction
-    fun updateOrInsertVisit(url: String, title: String, query: String?, isSerp: Boolean, date: Long) {
+    suspend fun updateOrInsertVisit(url: String, title: String, query: String?, isSerp: Boolean, date: LocalDateTime) {
         val existingHistoryEntry = getHistoryEntryByUrl(url)
 
         if (existingHistoryEntry != null) {
-            val newVisit = VisitEntity(date = date, historyEntryId = existingHistoryEntry.id)
+            val newVisit = VisitEntity(timestamp = DatabaseDateFormatter.timestamp(date), historyEntryId = existingHistoryEntry.id)
             insertVisit(newVisit)
         } else {
             val newHistoryEntry = HistoryEntryEntity(url = url, title = title, query = query, isSerp = isSerp)
             val historyEntryId = insertHistoryEntry(newHistoryEntry)
 
-            val newVisit = VisitEntity(date = date, historyEntryId = historyEntryId)
+            val newVisit = VisitEntity(timestamp = DatabaseDateFormatter.timestamp(date), historyEntryId = historyEntryId)
             insertVisit(newVisit)
         }
     }
 
     @Query("SELECT * FROM history_entries WHERE url = :url LIMIT 1")
-    fun getHistoryEntryByUrl(url: String): HistoryEntryEntity?
+    suspend fun getHistoryEntryByUrl(url: String): HistoryEntryEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertHistoryEntry(historyEntry: HistoryEntryEntity): Long
+    suspend fun insertHistoryEntry(historyEntry: HistoryEntryEntity): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertVisit(visit: VisitEntity)
+    suspend fun insertVisit(visit: VisitEntity)
 }

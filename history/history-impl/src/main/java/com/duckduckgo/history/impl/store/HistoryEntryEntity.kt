@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.history.store
+package com.duckduckgo.history.impl.store
 
 import androidx.room.Embedded
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.Relation
@@ -39,10 +40,21 @@ data class HistoryEntryEntity(
     }
 }
 
-@Entity(tableName = "visits_list", primaryKeys = ["date", "historyEntryId"])
+@Entity(
+    tableName = "visits_list",
+    primaryKeys = ["timestamp", "historyEntryId"],
+    foreignKeys = [
+        ForeignKey(
+            entity = HistoryEntryEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["historyEntryId"],
+            onDelete = ForeignKey.CASCADE,
+        ),
+    ],
+)
 data class VisitEntity(
     val historyEntryId: Long,
-    val date: Long,
+    val timestamp: String,
 )
 
 data class HistoryEntryWithVisits(
