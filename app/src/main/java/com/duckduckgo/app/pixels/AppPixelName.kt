@@ -179,7 +179,15 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     FEEDBACK_NEGATIVE_SUBMISSION("mfbs_%s_%s_%s"),
 
     AUTOCOMPLETE_BOOKMARK_SELECTION("m_aut_s_b"),
+    AUTOCOMPLETE_FAVORITE_SELECTION("m_autocomplete_favorite_selection"),
     AUTOCOMPLETE_SEARCH_SELECTION("m_aut_s_s"),
+    AUTOCOMPLETE_HISTORY_SELECTION("m_autocomplete_history_selection"),
+
+    AUTOCOMPLETE_HISTORY_TOGGLED_OFF("m_autocomplete_history_toggled_off"),
+    AUTOCOMPLETE_HISTORY_TOGGLED_ON("m_autocomplete_history_toggled_on"),
+
+    AUTOCOMPLETE_BANNER_SHOWN("m_autocomplete_banner_shown"),
+    AUTOCOMPLETE_BANNER_DISMISSED("m_autocomplete_banner_dismissed"),
 
     SERP_REQUERY("rq_%s"),
 

@@ -46,8 +46,8 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistorySearchSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistorySuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.DeleteBookmarkListener
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.EditSavedSiteListener
@@ -126,6 +126,7 @@ import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.OnboardingExperimentPixel
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_HISTORY_SELECTION
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
@@ -680,20 +681,33 @@ class BrowserTabViewModel @Inject constructor(
         val hasBookmarks = withContext(dispatchers.io()) {
             savedSitesRepository.hasBookmarks()
         }
-        val hasBookmarkResults = currentViewState.searchResults.suggestions.any { it is AutoCompleteBookmarkSuggestion }
+        val hasFavorites = withContext(dispatchers.io()) {
+            savedSitesRepository.hasFavorites()
+        }
+        val hasBookmarkResults = currentViewState.searchResults.suggestions.any { it is AutoCompleteBookmarkSuggestion && !it.isFavorite }
+        val hasFavoriteResults = currentViewState.searchResults.suggestions.any { it is AutoCompleteBookmarkSuggestion && it.isFavorite }
+        val hasHistoryResults =
+            currentViewState.searchResults.suggestions.any { it is AutoCompleteHistorySuggestion || it is AutoCompleteHistorySearchSuggestion }
         val params = mapOf(
             PixelParameter.SHOWED_BOOKMARKS to hasBookmarkResults.toString(),
+            PixelParameter.SHOWED_FAVORITES to hasFavoriteResults.toString(),
             PixelParameter.BOOKMARK_CAPABLE to hasBookmarks.toString(),
+            PixelParameter.FAVORITE_CAPABLE to hasFavorites.toString(),
+            PixelParameter.SHOWED_HISTORY to hasHistoryResults.toString(),
         )
         val pixelName = when (suggestion) {
-            is AutoCompleteBookmarkSuggestion -> AppPixelName.AUTOCOMPLETE_BOOKMARK_SELECTION
+            is AutoCompleteBookmarkSuggestion -> {
+                if (suggestion.isFavorite) {
+                    AppPixelName.AUTOCOMPLETE_FAVORITE_SELECTION
+                } else {
+                    AppPixelName.AUTOCOMPLETE_BOOKMARK_SELECTION
+                }
+            }
             is AutoCompleteSearchSuggestion -> AppPixelName.AUTOCOMPLETE_SEARCH_SELECTION
-            is AutoCompleteHistorySuggestion, is AutoCompleteHistorySearchSuggestion -> null
+            is AutoCompleteHistorySuggestion, is AutoCompleteHistorySearchSuggestion -> AUTOCOMPLETE_HISTORY_SELECTION
         }
 
-        pixelName?.let {
-            pixel.fire(pixelName, params)
-        }
+        pixel.fire(pixelName, params)
     }
 
     fun onUserLongPressedBack() {

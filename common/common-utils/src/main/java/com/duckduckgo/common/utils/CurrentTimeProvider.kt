@@ -22,10 +22,14 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 interface CurrentTimeProvider {
-    fun getTimeInMillis(): Long
+    fun elapsedRealtime(): Long
+
+    fun currentTimeMillis(): Long
 }
 
 @ContributesBinding(AppScope::class)
 class RealCurrentTimeProvider @Inject constructor() : CurrentTimeProvider {
-    override fun getTimeInMillis(): Long = SystemClock.elapsedRealtime()
+    override fun elapsedRealtime(): Long = SystemClock.elapsedRealtime()
+
+    override fun currentTimeMillis(): Long = System.currentTimeMillis()
 }
