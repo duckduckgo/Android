@@ -25,13 +25,14 @@ import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.history.api.NavigationHistory
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 interface PageLoadedHandler {
-    operator fun invoke(url: String, start: Long, end: Long)
+    fun onPageLoaded(url: String, title: String?, start: Long, end: Long)
 }
 
 @ContributesBinding(AppScope::class)
@@ -43,9 +44,10 @@ class RealPageLoadedHandler @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val autoconsent: Autoconsent,
     private val optimizeTrackerEvaluationRCWrapper: OptimizeTrackerEvaluationRCWrapper,
+    private val navigationHistory: NavigationHistory,
 ) : PageLoadedHandler {
 
-    override operator fun invoke(url: String, start: Long, end: Long) {
+    override fun onPageLoaded(url: String, title: String?, start: Long, end: Long) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             if (sites.any { UriString.sameOrSubdomain(url, it) }) {
                 pageLoadedPixelDao.add(
@@ -58,6 +60,7 @@ class RealPageLoadedHandler @Inject constructor(
                     ),
                 )
             }
+            navigationHistory.saveToHistory(url, title)
         }
     }
 }
