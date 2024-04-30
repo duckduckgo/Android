@@ -106,7 +106,8 @@ class AutoCompleteApi @Inject constructor(
                     getHistoryResults(query),
                 ) { bookmarksAndFavorites, historyItems ->
                     val searchHistory = historyItems.filter { it.suggestion is AutoCompleteHistorySearchSuggestion }
-                    val navigationHistory = historyItems.filterIsInstance<RankedSuggestion<AutoCompleteHistorySuggestion>>()
+                    val navigationHistory = historyItems
+                        .filter { it.suggestion is AutoCompleteHistorySuggestion } as List<RankedSuggestion<AutoCompleteHistorySuggestion>>
                     (removeDuplicates(navigationHistory, bookmarksAndFavorites) + searchHistory).sortedByDescending { it.score }.map { it.suggestion }
                 }
 
