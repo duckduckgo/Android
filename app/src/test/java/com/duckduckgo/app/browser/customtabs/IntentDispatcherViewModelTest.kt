@@ -119,6 +119,43 @@ class IntentDispatcherViewModelTest {
         }
     }
 
+    @Test
+    fun whenIntentReceivedWithNoSessionAndIntentTextContainingSpacesAndNotStartingWithHttpSchemaThenNoChangesAreMadeToTheIntent() = runTest {
+        val intentTextWithSpaces =
+            """
+                Voyager 1 is still bringing us surprises from the very edge of our solar system https://www.independent.co.uk/space/voyager-1-nasa-latest-solar-system-b2535462.html
+            """.trimIndent()
+        whenever(mockIntent.intentText).thenReturn(intentTextWithSpaces)
+        configureHasSession(false)
+        configureIsEmailProtectionLink(false)
+
+        testee.onIntentReceived(mockIntent, DEFAULT_COLOR)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertFalse(state.customTabRequested)
+            assertEquals(intentTextWithSpaces, state.intentText)
+        }
+    }
+
+    @Test
+    fun whenIntentReceivedWithSessionAndIntentTextContainingSpacesAndNotStartingWithHttpSchemaThenNoChangesAreMadeToTheIntent() = runTest {
+        val intentTextWithSpaces =
+            """
+                Voyager 1 is still bringing us surprises from the very edge of our solar system https://www.independent.co.uk/space/voyager-1-nasa-latest-solar-system-b2535462.html
+            """.trimIndent()
+        whenever(mockIntent.intentText).thenReturn(intentTextWithSpaces)
+        configureHasSession(true)
+
+        testee.onIntentReceived(mockIntent, DEFAULT_COLOR)
+
+        testee.viewState.test {
+            val state = awaitItem()
+            assertTrue(state.customTabRequested)
+            assertEquals(intentTextWithSpaces, state.intentText)
+        }
+    }
+
     private fun configureHasSession(returnValue: Boolean) {
         whenever(mockIntent.hasExtra(CustomTabsIntent.EXTRA_SESSION)).thenReturn(returnValue)
     }
