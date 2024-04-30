@@ -51,7 +51,7 @@ class IntentDispatcherViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             runCatching {
                 val hasSession = intent?.hasExtra(CustomTabsIntent.EXTRA_SESSION) == true
-                val intentText = intent?.intentText?.sanitize()
+                val intentText = intent?.intentText
                 val toolbarColor = intent?.getIntExtra(CustomTabsIntent.EXTRA_TOOLBAR_COLOR, defaultColor) ?: defaultColor
                 val isEmailProtectionLink = emailProtectionLinkVerifier.shouldDelegateToInContextView(intentText, true)
                 val customTabRequested = hasSession && !isEmailProtectionLink
@@ -62,7 +62,7 @@ class IntentDispatcherViewModel @Inject constructor(
                 _viewState.emit(
                     viewState.value.copy(
                         customTabRequested = customTabRequested,
-                        intentText = intentText,
+                        intentText = if (customTabRequested) intentText?.sanitize() else intentText,
                         toolbarColor = toolbarColor,
                     ),
                 )
@@ -73,8 +73,11 @@ class IntentDispatcherViewModel @Inject constructor(
     }
 
     private fun String.sanitize(): String {
-        // Some apps send URLs with spaces in the intent. This is happening mostly for authorization URLs.
-        // E.g https://mastodon.social/oauth/authorize?client_id=AcfPDZlcKUjwIatVtMt8B8cmdW-w1CSOR6_rYS_6Kxs&scope=read write push&redirect_uri=mastify://oauth&response_type=code
-        return this.replace(" ", "%20")
+        if (this.startsWith("http://") || this.startsWith("https://")) {
+            // Some apps send URLs with spaces in the intent. This is happening mostly for authorization URLs.
+            // E.g https://mastodon.social/oauth/authorize?client_id=AcfPDZlcKUjwIatVtMt8B8cmdW-w1CSOR6_rYS_6Kxs&scope=read write push&redirect_uri=mastify://oauth&response_type=code
+            return this.replace(" ", "%20")
+        }
+        return this
     }
 }
