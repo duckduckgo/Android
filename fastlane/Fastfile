@@ -14,10 +14,8 @@
 # update_fastlane
 
  # CONSTANTS
-    releaseNotesBodyHeader = "What's new in this release?"
-    releaseNotesSuffixHeader = "Have feedback?"
+    releaseNotesBodyHeader = "What's new:"
     releaseNotesFileBody = "../app/version/release-notes"
-    releaseNotesFileSuffix = "../app/version/release-notes-suffix"
     releaseNotesLocales= ["en-US", "en-GB", "en-CA"]
     releaseNotesMaxLength = 500
     errorMessageCancelled = "Release cancelled 😢"
@@ -32,9 +30,8 @@ platform :android do
   private_lane :release_notes_playstore do
 
     releaseNotesBody = File.read(releaseNotesFileBody)
-    releaseNotesSuffix = File.read(releaseNotesFileSuffix)
 
-    formatted = "#{releaseNotesBodyHeader}\n#{releaseNotesBody}\n\n#{releaseNotesSuffixHeader}\n#{releaseNotesSuffix}"
+    formatted = "#{releaseNotesBodyHeader}\n#{releaseNotesBody}"
 
     validateReleaseNotes(releaseNotes: formatted)
     UI.message("\n#{formatted}")
@@ -47,9 +44,8 @@ platform :android do
     private_lane :release_notes_github do
 
       releaseNotesBody = File.read(releaseNotesFileBody)
-      releaseNotesSuffix = File.read(releaseNotesFileSuffix)
 
-      formatted = "\#\# #{releaseNotesBodyHeader}\n#{releaseNotesBody}\n\n\#\# #{releaseNotesSuffixHeader}\n#{releaseNotesSuffix}"
+      formatted = "\#\# #{releaseNotesBodyHeader}\n#{releaseNotesBody}"
       UI.message("\n#{formatted}")
       formatted
 
