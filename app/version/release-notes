@@ -1,1 +1,7 @@
-Bug fixes and other improvements
+We improved how the browser handles app links.
+Permission dialogs now show up as expected in custom tabs.
+We also fixed other bugs, including an issue that caused some webpages to appear blank when loading.
+
+For Privacy Pro subscribers:
+The VPN can now turn off automatically when you're making a Wi-Fi call and seamlessly reconnect after. Turn on in VPN Settings.
+Visit https://duckduckgo.com/pro for more information. Privacy Pro is currently available to U.S. residents only.
