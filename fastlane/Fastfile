@@ -17,7 +17,6 @@
     releaseNotesBodyHeader = "What's new in this release?"
     releaseNotesSuffixHeader = "Have feedback?"
     releaseNotesFileBody = "../app/version/release-notes"
-    releaseNotesFileHiring = "../app/version/release-notes-hiring"
     releaseNotesFileSuffix = "../app/version/release-notes-suffix"
     releaseNotesLocales= ["en-US", "en-GB", "en-CA"]
     releaseNotesMaxLength = 500
@@ -34,9 +33,8 @@ platform :android do
 
     releaseNotesBody = File.read(releaseNotesFileBody)
     releaseNotesSuffix = File.read(releaseNotesFileSuffix)
-    releaseNotesHiring = File.read(releaseNotesFileHiring)
 
-    formatted = "#{releaseNotesBodyHeader}\n#{releaseNotesBody}#{releaseNotesHiring}\n\n#{releaseNotesSuffixHeader}\n#{releaseNotesSuffix}"
+    formatted = "#{releaseNotesBodyHeader}\n#{releaseNotesBody}\n\n#{releaseNotesSuffixHeader}\n#{releaseNotesSuffix}"
 
     validateReleaseNotes(releaseNotes: formatted)
     UI.message("\n#{formatted}")
@@ -50,9 +48,8 @@ platform :android do
 
       releaseNotesBody = File.read(releaseNotesFileBody)
       releaseNotesSuffix = File.read(releaseNotesFileSuffix)
-      releaseNotesHiring = File.read(releaseNotesFileHiring)
 
-      formatted = "\#\# #{releaseNotesBodyHeader}\n#{releaseNotesBody}#{releaseNotesHiring}\n\n\#\# #{releaseNotesSuffixHeader}\n#{releaseNotesSuffix}"
+      formatted = "\#\# #{releaseNotesBodyHeader}\n#{releaseNotesBody}\n\n\#\# #{releaseNotesSuffixHeader}\n#{releaseNotesSuffix}"
       UI.message("\n#{formatted}")
       formatted
 
