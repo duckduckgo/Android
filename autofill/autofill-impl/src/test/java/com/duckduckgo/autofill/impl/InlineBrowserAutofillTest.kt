@@ -8,7 +8,6 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.feature.toggles.api.toggle.AutofillTestFeature
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -94,14 +93,6 @@ class InlineBrowserAutofillTest {
         verify(webMessageAttacher).addListener(any(), eq(mockMessageListener))
     }
 
-    @Test
-    fun whenPluginsIsNotEmptyThenIsDeregisteredWithWebView() = runTest {
-        val mockMessageListener: AutofillWebMessageListener = mock()
-        webMessageListeners.add(mockMessageListener)
-        testee.removeJsInterface()
-        verify(webMessageAttacher).removeListener(any(), eq(mockMessageListener))
-    }
-
     private suspend fun verifyJavascriptNotAdded() {
         verify(autofillJavascriptInjector, never()).addDocumentStartJavascript(any())
     }
@@ -112,9 +103,5 @@ class InlineBrowserAutofillTest {
 
     private suspend fun InlineBrowserAutofill.addJsInterface() {
         addJsInterface(mockWebView, autofillCallback, "tab-id-123")
-    }
-
-    private fun InlineBrowserAutofill.removeJsInterface() {
-        removeJsInterface(mockWebView)
     }
 }

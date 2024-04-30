@@ -2804,7 +2804,6 @@ class BrowserTabFragment :
         popupMenu.dismiss()
         loginDetectionDialog?.dismiss()
         automaticFireproofDialog?.dismiss()
-        browserAutofill.removeJsInterface(webView)
         destroyWebView()
         super.onDestroy()
     }
