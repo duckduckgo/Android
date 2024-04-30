@@ -18,6 +18,8 @@
     package="com.duckduckgo.networkprotection.impl">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
     <application>
         <activity
             android:name=".management.NetworkProtectionManagementActivity"
@@ -26,11 +28,6 @@
         <activity
             android:name=".exclusion.ui.NetpAppExclusionListActivity"
             android:label="@string/netpExclusionListTitle"
-            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".about.NetpFaqActivity"
-            android:label="@string/netpFaqTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
             android:exported="false" />
         <activity

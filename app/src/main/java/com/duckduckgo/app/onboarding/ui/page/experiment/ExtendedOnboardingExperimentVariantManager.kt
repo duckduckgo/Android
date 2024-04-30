@@ -35,12 +35,12 @@ class ExtendedOnboardingExperimentVariantManagerImpl @Inject constructor(
     private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles,
 ) : ExtendedOnboardingExperimentVariantManager {
 
-    private val isExtendedOnboardingEnabled: Boolean = false
+    private val isExtendedOnboardingEnabled: Boolean = true
 
     override fun setExperimentVariants() {
         val variants = listOf(
-            VariantConfig("ms", 0.0, VariantFilters(locale = listOf("en_US", "en_GB", "en_CA", "en_IN", "en_AU"))),
-            VariantConfig("mt", 0.0, VariantFilters(locale = listOf("en_US", "en_GB", "en_CA", "en_IN", "en_AU"))),
+            VariantConfig("ms", 1.0, VariantFilters(locale = listOf("en_US", "en_GB", "en_CA", "en_IN", "en_AU"))),
+            VariantConfig("mt", 1.0, VariantFilters(locale = listOf("en_US", "en_GB", "en_CA", "en_IN", "en_AU"))),
         )
         variantManager.updateVariants(variants)
     }

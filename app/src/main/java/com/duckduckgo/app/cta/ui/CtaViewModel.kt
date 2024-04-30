@@ -194,8 +194,24 @@ class CtaViewModel @Inject constructor(
         if (!daxOnboardingActive()) return null
 
         return withContext(dispatchers.io()) {
-            if (hideTips() || daxDialogFireEducationShown()) return@withContext null
+            if (hideTips() || daxDialogFireEducationShown() || extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) {
+                return@withContext null
+            }
             return@withContext DaxFireDialogCta.TryClearDataCta(onboardingStore, appInstallStore)
+        }
+    }
+
+    suspend fun getExperimentFireDialogCta(): ExperimentOnboardingDaxDialogCta.DaxFireButtonCta? {
+        if (!daxOnboardingActive() || daxDialogFireEducationShown()) return null
+        return withContext(dispatchers.io()) {
+            return@withContext ExperimentOnboardingDaxDialogCta.DaxFireButtonCta(onboardingStore, appInstallStore)
+        }
+    }
+
+    suspend fun getExperimentSiteSuggestionsDialogCta(): ExperimentOnboardingDaxDialogCta.DaxSiteSuggestionsCta? {
+        if (!daxOnboardingActive() || !canShowDaxIntroVisitSiteCta()) return null
+        return withContext(dispatchers.io()) {
+            return@withContext ExperimentOnboardingDaxDialogCta.DaxSiteSuggestionsCta(onboardingStore, appInstallStore)
         }
     }
 
@@ -214,7 +230,11 @@ class CtaViewModel @Inject constructor(
             }
 
             canShowDaxCtaEndOfJourney() -> {
-                DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
+                if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) {
+                    ExperimentDaxBubbleOptionsCta.ExperimentDaxEndCta(onboardingStore, appInstallStore)
+                } else {
+                    DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
+                }
             }
 
             canShowWidgetCta() -> {
@@ -244,7 +264,7 @@ class CtaViewModel @Inject constructor(
 
     @WorkerThread
     private suspend fun canShowDaxIntroVisitSiteCta(): Boolean =
-        daxOnboardingActive() && daxDialogIntroShown() && !daxDialogIntroVisitSiteShown() && !hideTips() &&
+        daxOnboardingActive() && daxDialogIntroShown() && !hideTips() &&
             !(daxDialogNetworkShown() || daxDialogOtherShown() || daxDialogTrackersFoundShown())
 
     @WorkerThread
@@ -279,25 +299,45 @@ class CtaViewModel @Inject constructor(
 
             // Trackers blocked
             if (!daxDialogTrackersFoundShown() && !isSerpUrl(it.url) && it.orderedTrackerBlockedEntities().isNotEmpty()) {
-                return DaxDialogCta.DaxTrackersBlockedCta(onboardingStore, appInstallStore, it.orderedTrackerBlockedEntities(), host)
+                return if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) {
+                    ExperimentOnboardingDaxDialogCta.DaxTrackersBlockedCta(
+                        onboardingStore,
+                        appInstallStore,
+                        it.orderedTrackerBlockedEntities(),
+                    )
+                } else {
+                    DaxDialogCta.DaxTrackersBlockedCta(onboardingStore, appInstallStore, it.orderedTrackerBlockedEntities(), host)
+                }
             }
 
             // Is major network
             if (it.entity != null) {
                 it.entity?.let { entity ->
                     if (!daxDialogNetworkShown() && DaxDialogCta.mainTrackerNetworks.contains(entity.displayName)) {
-                        return DaxDialogCta.DaxMainNetworkCta(onboardingStore, appInstallStore, entity.displayName, host)
+                        return if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) {
+                            ExperimentOnboardingDaxDialogCta.DaxMainNetworkCta(onboardingStore, appInstallStore, entity.displayName, host)
+                        } else {
+                            DaxDialogCta.DaxMainNetworkCta(onboardingStore, appInstallStore, entity.displayName, host)
+                        }
                     }
                 }
             }
 
             // SERP
             if (isSerpUrl(it.url) && !daxDialogSerpShown()) {
-                return DaxDialogCta.DaxSerpCta(onboardingStore, appInstallStore)
+                return if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) {
+                    ExperimentOnboardingDaxDialogCta.DaxSerpCta(onboardingStore, appInstallStore)
+                } else {
+                    DaxDialogCta.DaxSerpCta(onboardingStore, appInstallStore)
+                }
             }
 
             if (!isSerpUrl(it.url) && !daxDialogOtherShown() && !daxDialogTrackersFoundShown() && !daxDialogNetworkShown()) {
-                return DaxDialogCta.DaxNoSerpCta(onboardingStore, appInstallStore)
+                return if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) {
+                    ExperimentOnboardingDaxDialogCta.DaxNoTrackersCta(onboardingStore, appInstallStore)
+                } else {
+                    DaxDialogCta.DaxNoSerpCta(onboardingStore, appInstallStore)
+                }
             }
             return null
         }

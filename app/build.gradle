@@ -72,15 +72,8 @@ android {
     ksp {
         arg("room.generateKotlin", "true")
     }
-
     signingConfigs {
         release
-        debug {
-            keyAlias 'android'
-            keyPassword 'pwpwpw'
-            storeFile file('debug-dummy.keystore')
-            storePassword 'pwpwpw'
-        }
     }
     buildTypes {
         debug {
@@ -232,6 +225,7 @@ dependencies {
     implementation project(':remote-messaging-api')
     implementation project(':remote-messaging-impl')
     implementation project(':remote-messaging-store')
+    internalImplementation project(":remote-messaging-internal")
 
     implementation project(':voice-search-api')
     implementation project(':voice-search-impl')
@@ -313,6 +307,7 @@ dependencies {
 
     implementation project(':user-agent-api')
     implementation project(':user-agent-impl')
+    implementation project(':user-agent-store')
 
     implementation project(':js-messaging-api')
     implementation project(':js-messaging-impl')

@@ -39,11 +39,8 @@
     <string name="devSettingsScreenPrivacyRemoteConfigUrlOverride">Override Privacy Remote Config URL</string>
     <string name="devSettingsScreenPrivacyRemoteConfigUrlOverrideSubtitle">Click here to customize the Privacy Remote Config URL</string>
     <string name="devSettingsScreenUserAgentSelectorTitle">UserAgent</string>
-    <string name="devSettingsScreenUserAgentNoAppId">Omit DuckDuckGo AppId</string>
-    <string name="devSettingsScreenUserAgentNoVersion">Omit Webview Version</string>
-    <string name="devSettingsScreenUserAgentChrome">Chrome (no appId and no Version)</string>
     <string name="devSettingsScreenUserAgentFirefox">Firefox</string>
-    <string name="devSettingsScreenUserAgentDuckDuckGo">DDG Default</string>
+    <string name="devSettingsScreenUserAgentDefault">Default</string>
     <string name="devSettingsScreenUserAgentWebView">UA WebView</string>
 
     <!-- Privacy Audit settings -->

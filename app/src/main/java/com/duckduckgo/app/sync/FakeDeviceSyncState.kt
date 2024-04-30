@@ -26,7 +26,7 @@ import javax.inject.*
  */
 @ContributesBinding(
     scope = AppScope::class,
-    priority = ContributesBinding.Priority.NORMAL,
+    rank = ContributesBinding.RANK_NORMAL,
 )
 class FakeDeviceSyncState @Inject constructor() : DeviceSyncState {
     override fun isFeatureEnabled(): Boolean = false

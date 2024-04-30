@@ -72,7 +72,7 @@ import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(SettingsScreenNoParams::class)
+@ContributeToActivityStarter(SettingsScreenNoParams::class, screenName = "settings")
 class SettingsActivity : DuckDuckGoActivity() {
 
     private val viewModel: SettingsViewModel by bindViewModel()

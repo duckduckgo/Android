@@ -45,7 +45,6 @@ class NetpSubscriptionChecker @Inject constructor(
     private val workManager: WorkManager,
     private val networkProtectionState: NetworkProtectionState,
     private val dispatcherProvider: DispatcherProvider,
-    private val subscriptions: Subscriptions,
 ) : VpnServiceCallbacks {
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
         coroutineScope.launch(dispatcherProvider.io()) {
@@ -68,7 +67,7 @@ class NetpSubscriptionChecker @Inject constructor(
     }
 
     private suspend fun runChecker() {
-        if (networkProtectionState.isEnabled() && subscriptions.isEnabled()) {
+        if (networkProtectionState.isEnabled()) {
             logcat { "Sub check: Scheduling checker" }
             PeriodicWorkRequestBuilder<NetpSubscriptionCheckWorker>(20, MINUTES)
                 .addTag(TAG_WORKER_NETP_SUBS_CHECK)
@@ -111,15 +110,11 @@ class NetpSubscriptionCheckWorker(
     override suspend fun doWork(): Result {
         logcat { "Sub check: checking entitlement" }
         if (networkProtectionState.isEnabled()) {
-            if (subscriptions.isEnabled()) {
-                if (netpSubscriptionManager.getVpnStatus().isActive()) {
-                    logcat { "Sub check: has entitlements" }
-                } else {
-                    logcat { "Sub check: disabling" }
-                    networkProtectionState.stop()
-                }
+            if (netpSubscriptionManager.getVpnStatus().isActive()) {
+                logcat { "Sub check: has entitlements" }
             } else {
-                logcat { "Sub check: Privacy Pro is not yet enabled" }
+                logcat { "Sub check: disabling" }
+                networkProtectionState.stop()
             }
         } else {
             logcat { "Sub check: cancelling scheduled checker" }

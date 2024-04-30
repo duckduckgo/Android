@@ -49,7 +49,6 @@
             android:layout_marginEnd="20dp"
             android:gravity="center"
             android:text="@string/defaultBrowserInstructions"
-            android:textAlignment="center"
             card_view:layout_constraintBottom_toBottomOf="@id/logo"
             card_view:layout_constraintEnd_toEndOf="parent"
             card_view:layout_constraintStart_toEndOf="@id/logo"

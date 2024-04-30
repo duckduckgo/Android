@@ -61,19 +61,6 @@ class InlineBrowserAutofill @Inject constructor(
         }
     }
 
-    @SuppressLint("RequiresFeature")
-    override fun removeJsInterface(webView: WebView?) {
-        if (webView == null) return
-
-        if (autofillCapabilityChecker.webViewSupportsAutofill()) {
-            kotlin.runCatching {
-                webMessageListeners.getPlugins().forEach {
-                    webMessageAttacher.removeListener(webView, it)
-                }
-            }
-        }
-    }
-
     private suspend fun configureModernIntegration(
         webView: WebView,
         autofillCallback: Callback,
@@ -81,11 +68,13 @@ class InlineBrowserAutofill @Inject constructor(
     ) {
         Timber.d("Autofill: Configuring modern integration with %d message listeners", webMessageListeners.getPlugins().size)
 
-        webMessageListeners.getPlugins().forEach {
-            webView.addWebMessageListener(it, autofillCallback, tabId)
-        }
+        withContext(dispatchers.main()) {
+            webMessageListeners.getPlugins().forEach {
+                webView.addWebMessageListener(it, autofillCallback, tabId)
+            }
 
-        autofillJavascriptInjector.addDocumentStartJavascript(webView)
+            autofillJavascriptInjector.addDocumentStartJavascript(webView)
+        }
     }
 
     override fun cancelPendingAutofillRequestToChooseCredentials() {
@@ -114,11 +103,6 @@ interface AutofillWebMessageAttacher {
         webView: WebView,
         listener: AutofillWebMessageListener,
     )
-
-    fun removeListener(
-        webView: WebView,
-        listener: AutofillWebMessageListener,
-    )
 }
 
 @SuppressLint("RequiresFeature")
@@ -130,12 +114,5 @@ class AutofillWebMessageAttacherImpl @Inject constructor() : AutofillWebMessageA
         listener: AutofillWebMessageListener,
     ) {
         WebViewCompat.addWebMessageListener(webView, listener.key, listener.origins, listener)
-    }
-
-    override fun removeListener(
-        webView: WebView,
-        listener: AutofillWebMessageListener,
-    ) {
-        WebViewCompat.removeWebMessageListener(webView, listener.key)
     }
 }

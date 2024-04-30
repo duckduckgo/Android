@@ -39,7 +39,6 @@
         android:roundIcon="${appIconRound}"
         android:dataExtractionRules="@xml/backup_rules_android_12_upwards"
         android:fullBackupContent="@xml/backup_rules_android_11_and_older"
-        android:supportsRtl="true"
         android:theme="@style/Theme.DuckDuckGo.Light"
         android:requestLegacyExternalStorage="true"
         tools:ignore="GoogleAppIndexingWarning,UnusedAttribute">

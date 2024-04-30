@@ -52,7 +52,7 @@
                     android:layout_marginTop="@dimen/keyline_5"
                     android:layout_marginStart="@dimen/keyline_5"
                     android:layout_marginEnd="@dimen/keyline_5"
-                    android:textAlignment="center"
+                    android:gravity="center"
                     app:typography="body1"
                     android:text="@string/changePlanDescription"
                     tools:ignore="HardcodedText"/>

@@ -158,24 +158,6 @@ data class EmailEnabled(
     }
 }
 
-data class AppTpOnboarded(
-    override val value: Boolean,
-    val fallback: Boolean? = null,
-) : MatchingAttribute, BooleanMatchingAttribute {
-    fun matches(matchingValue: Boolean): Boolean? {
-        return (this as BooleanMatchingAttribute).matches(matchingValue)
-    }
-}
-
-data class NetPOnboarded(
-    override val value: Boolean,
-    val fallback: Boolean? = null,
-) : MatchingAttribute, BooleanMatchingAttribute {
-    fun matches(matchingValue: Boolean): Boolean? {
-        return (this as BooleanMatchingAttribute).matches(matchingValue)
-    }
-}
-
 data class WidgetAdded(
     override val value: Boolean,
     val fallback: Boolean? = null,

@@ -57,7 +57,7 @@ jobs:
         run: find . -name "*.apk"  -exec mv '{}' apk/release.apk \;
 
       - name: Ad click detection flows
-        uses: mobile-dev-inc/action-maestro-cloud@v1.4.1
+        uses: mobile-dev-inc/action-maestro-cloud@v1.8.1
         with:
           api-key: ${{ secrets.MOBILE_DEV_API_KEY }}
           name: ${{ github.sha }}
@@ -67,7 +67,7 @@ jobs:
 
       - name: Privacy Tests
         if: always()
-        uses: mobile-dev-inc/action-maestro-cloud@v1.4.1
+        uses: mobile-dev-inc/action-maestro-cloud@v1.8.1
         with:
           api-key: ${{ secrets.MOBILE_DEV_API_KEY }}
           name: ${{ github.sha }}

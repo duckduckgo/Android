@@ -56,6 +56,8 @@
 
     <string name="credentialManagementSuggestionsLabel">Siūloma</string>
 
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">Automatinis slaptažodžių įrašymas nepasiekiamas, nes jūsų „Android WebView“ versija yra per sena.</string>
+
     <string name="autofillManagementSearchClearDescription">Išvalyti paieškos įvestį</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Rezultatų pagal paiešką „%1$s“ nerasta</string>
 

@@ -27,7 +27,7 @@ import javax.inject.Inject
 
 @ContributesBinding(
     scope = VpnScope::class,
-    priority = ContributesBinding.Priority.HIGHEST, // we replace the provider in AppTP using DI without having to touch production code
+    rank = ContributesBinding.RANK_HIGHEST, // we replace the provider in AppTP using DI without having to touch production code
 )
 class NetpVpnNetworkStackProviderImpl @Inject constructor(
     private val vpnNetworkStacks: PluginPoint<VpnNetworkStack>,

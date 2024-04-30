@@ -3,6 +3,7 @@ package com.duckduckgo.gradle
 import com.duckduckgo.gradle.ModuleType.ApiAndroid
 import com.duckduckgo.gradle.ModuleType.ApiPureKotlin
 import com.duckduckgo.gradle.ModuleType.Impl
+import com.duckduckgo.gradle.ModuleType.Internal
 import org.gradle.api.GradleException
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -74,6 +75,13 @@ class InputExtractorTest{
         val result = testee.extractFeatureNameAndTypes("feature/impl")
         assertEquals("feature", result.first)
         assertEquals(Impl, result.second)
+    }
+
+    @Test
+    fun whenInputSpeciesInternalTypeThenInternalTypeExtracted() {
+        val result = testee.extractFeatureNameAndTypes("feature/internal")
+        assertEquals("feature", result.first)
+        assertEquals(Internal, result.second)
     }
 
     @Test

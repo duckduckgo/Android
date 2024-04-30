@@ -90,12 +90,10 @@ class EnqueuedPixelWorker @Inject constructor(
         appCoroutineScope.launch {
             val popupExperimentParams = privacyProtectionsPopupExperimentExternalPixels.getPixelParams()
             val parameters = paramsMap + popupExperimentParams
-            if (!customTabDetector.isCustomTab()) {
-                pixel.get().fire(
-                    pixel = AppPixelName.APP_LAUNCH,
-                    parameters = parameters,
-                )
-            }
+            pixel.get().fire(
+                pixel = AppPixelName.APP_LAUNCH,
+                parameters = parameters,
+            )
 
             if (isVerifiedPlayStoreInstall() && !customTabDetector.isCustomTab()) {
                 pixel.get().fire(

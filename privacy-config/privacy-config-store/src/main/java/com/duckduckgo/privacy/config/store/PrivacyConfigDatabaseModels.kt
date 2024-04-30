@@ -108,45 +108,6 @@ fun ContentBlockingExceptionEntity.toFeatureException(): FeatureException {
     return FeatureException(domain = this.domain, reason = this.reason)
 }
 
-@Entity(tableName = "user_agent_exceptions")
-data class UserAgentExceptionEntity(
-    @PrimaryKey val domain: String,
-    val reason: String,
-    val omitApplication: Boolean,
-    val omitVersion: Boolean,
-)
-
-@Entity(tableName = "user_agent_sites")
-data class UserAgentSitesEntity(
-    @PrimaryKey val domain: String,
-    val reason: String,
-    val ddgDefaultSite: Boolean,
-    val ddgFixedSite: Boolean,
-)
-
-@Entity(tableName = "user_agent_versions")
-data class UserAgentVersionsEntity(
-    @PrimaryKey val version: String,
-    val closestUserAgent: Boolean,
-    val ddgFixedUserAgent: Boolean,
-)
-
-fun UserAgentSitesEntity.toFeatureException(): FeatureException {
-    return FeatureException(domain = this.domain, reason = this.reason)
-}
-
-@Entity(tableName = "user_agent_states")
-data class UserAgentStatesEntity(
-    @PrimaryKey val id: Int = 1,
-    val defaultPolicy: String,
-    val closestUserAgent: Boolean,
-    val ddgFixedUserAgent: Boolean,
-)
-
-fun UserAgentExceptionEntity.toFeatureException(): FeatureException {
-    return FeatureException(domain = this.domain, reason = this.reason)
-}
-
 @Entity(tableName = "privacy_config")
 data class PrivacyConfig(
     @PrimaryKey val id: Int = 1,

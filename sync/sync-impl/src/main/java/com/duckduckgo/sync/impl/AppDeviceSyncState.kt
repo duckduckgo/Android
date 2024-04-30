@@ -24,7 +24,7 @@ import javax.inject.*
 @ContributesBinding(
     scope = AppScope::class,
     boundType = DeviceSyncState::class,
-    priority = ContributesBinding.Priority.HIGHEST,
+    rank = ContributesBinding.RANK_HIGHEST,
 )
 class AppDeviceSyncState @Inject constructor(
     private val syncFeatureToggle: SyncFeatureToggle,

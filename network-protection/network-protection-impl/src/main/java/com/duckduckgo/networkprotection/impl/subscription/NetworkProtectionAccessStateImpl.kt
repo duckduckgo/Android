@@ -26,11 +26,9 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState.NetPAcc
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenAndEnable
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
-import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
@@ -39,35 +37,27 @@ class NetworkProtectionAccessStateImpl @Inject constructor(
     private val networkProtectionState: NetworkProtectionState,
     private val dispatcherProvider: DispatcherProvider,
     private val netpSubscriptionManager: NetpSubscriptionManager,
-    private val subscriptions: Subscriptions,
 ) : NetworkProtectionAccessState {
 
     override suspend fun getState(): NetPAccessState = withContext(dispatcherProvider.io()) {
-        if (isTreated()) {
-            return@withContext if (!netpSubscriptionManager.getVpnStatus().isActive()) {
+        return@withContext if (!netpSubscriptionManager.getVpnStatus().isActive()) {
+            // if entitlement check succeeded and no entitlement, reset state and hide access.
+            handleRevokedVPNState()
+            Locked
+        } else {
+            UnLocked
+        }
+    }
+
+    override suspend fun getStateFlow(): Flow<NetPAccessState> = withContext(dispatcherProvider.io()) {
+        netpSubscriptionManager.vpnStatus().map { status ->
+            if (!status.isActive()) {
                 // if entitlement check succeeded and no entitlement, reset state and hide access.
                 handleRevokedVPNState()
                 Locked
             } else {
                 UnLocked
             }
-        }
-        return@withContext Locked
-    }
-
-    override suspend fun getStateFlow(): Flow<NetPAccessState> = withContext(dispatcherProvider.io()) {
-        if (isTreated()) {
-            netpSubscriptionManager.vpnStatus().map { status ->
-                if (!status.isActive()) {
-                    // if entitlement check succeeded and no entitlement, reset state and hide access.
-                    handleRevokedVPNState()
-                    Locked
-                } else {
-                    UnLocked
-                }
-            }
-        } else {
-            flowOf(Locked)
         }
     }
 
@@ -90,6 +80,4 @@ class NetworkProtectionAccessStateImpl @Inject constructor(
             Locked -> null
         }
     }
-
-    private suspend fun isTreated(): Boolean = subscriptions.isEnabled()
 }

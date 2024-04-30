@@ -71,17 +71,24 @@ class ExperimentWelcomePageViewModel @Inject constructor(
 
             COMPARISON_CHART -> {
                 viewModelScope.launch {
-                    if (defaultRoleBrowserDialog.shouldShowDialog()) {
-                        val intent = defaultRoleBrowserDialog.createIntent(context)
-                        if (intent != null) {
-                            _commands.send(ShowDefaultBrowserDialog(intent))
+                    val isDDGDefaultBrowser =
+                        if (defaultRoleBrowserDialog.shouldShowDialog()) {
+                            val intent = defaultRoleBrowserDialog.createIntent(context)
+                            if (intent != null) {
+                                _commands.send(ShowDefaultBrowserDialog(intent))
+                            } else {
+                                pixel.fire(AppPixelName.DEFAULT_BROWSER_DIALOG_NOT_SHOWN)
+                                _commands.send(Finish)
+                            }
+                            false
                         } else {
-                            pixel.fire(AppPixelName.DEFAULT_BROWSER_DIALOG_NOT_SHOWN)
                             _commands.send(Finish)
+                            true
                         }
-                    } else {
-                        _commands.send(Finish)
-                    }
+                    pixel.fire(
+                        OnboardingExperimentPixel.PixelName.PREONBOARDING_CHOOSE_BROWSER_PRESSED,
+                        mapOf(OnboardingExperimentPixel.PixelParameter.DEFAULT_BROWSER to isDDGDefaultBrowser.toString()),
+                    )
                 }
             }
 
@@ -111,5 +118,25 @@ class ExperimentWelcomePageViewModel @Inject constructor(
         viewModelScope.launch {
             _commands.send(Finish)
         }
+    }
+
+    fun notificationRuntimePermissionRequested() {
+        pixel.fire(OnboardingExperimentPixel.PixelName.NOTIFICATION_RUNTIME_PERMISSION_SHOWN)
+    }
+
+    fun notificationRuntimePermissionGranted() {
+        pixel.fire(
+            AppPixelName.NOTIFICATIONS_ENABLED,
+            mapOf(OnboardingExperimentPixel.PixelParameter.FROM_ONBOARDING to true.toString()),
+        )
+    }
+
+    fun onDialogShown(onboardingDialogType: PreOnboardingDialogType) {
+        val pixelName = when (onboardingDialogType) {
+            INITIAL -> OnboardingExperimentPixel.PixelName.PREONBOARDING_INTRO_SHOWN
+            COMPARISON_CHART -> OnboardingExperimentPixel.PixelName.PREONBOARDING_COMPARISON_CHART_SHOWN
+            CELEBRATION -> OnboardingExperimentPixel.PixelName.PREONBOARDING_AFFIRMATION_SHOWN
+        }
+        pixel.fire(pixelName)
     }
 }

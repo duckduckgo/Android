@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,28 +16,9 @@
 
 package com.duckduckgo.app.fakes
 
-import com.duckduckgo.privacy.config.api.DefaultPolicy
-import com.duckduckgo.privacy.config.api.DefaultPolicy.DDG
-import com.duckduckgo.privacy.config.api.UserAgent
+import com.duckduckgo.user.agent.impl.UserAgent
 
 class UserAgentFake : UserAgent {
-    override fun isAnApplicationException(url: String): Boolean = false
-
-    override fun isAVersionException(url: String): Boolean = false
-
-    override fun isADefaultException(url: String): Boolean = false
-
-    override fun defaultPolicy(): DefaultPolicy = DDG
-
-    override fun isADdgDefaultSite(url: String): Boolean = false
-
-    override fun isADdgFixedSite(url: String): Boolean = false
-
-    override fun closestUserAgentEnabled(): Boolean = false
-
-    override fun ddgFixedUserAgentEnabled(): Boolean = false
-
-    override fun isClosestUserAgentVersion(version: String): Boolean = false
-
-    override fun isDdgFixedUserAgentVersion(version: String): Boolean = false
+    override fun useLegacyUserAgent(url: String): Boolean = false
+    override fun isException(url: String): Boolean = false
 }

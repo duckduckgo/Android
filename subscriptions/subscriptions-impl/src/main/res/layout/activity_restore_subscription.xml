@@ -52,7 +52,7 @@
                     android:layout_marginTop="@dimen/keyline_5"
                     android:layout_marginStart="@dimen/keyline_5"
                     android:layout_marginEnd="@dimen/keyline_5"
-                    android:textAlignment="center"
+                    android:gravity="center"
                     app:typography="h1"
                     android:text="@string/restoreSubscriptionTitle"
                     tools:ignore="HardcodedText"/>
@@ -62,7 +62,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="@dimen/keyline_5"
-                    android:textAlignment="center"
+                    android:gravity="center"
                     app:typography="body1"
                     app:textType="secondary"
                     android:text="@string/restoreSubscriptionDescription"

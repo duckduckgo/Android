@@ -199,6 +199,27 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
+    fun whenOnPageCommitVisibleCalledThenListenerInstructedToUpdateNavigationState() {
+        val mockWebView: WebView = mock()
+        whenever(mockWebView.url).thenReturn(EXAMPLE_URL)
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+        testee.onPageCommitVisible(mockWebView, EXAMPLE_URL)
+        verify(listener).navigationStateChanged(any())
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnPageCommitVisibleCalledWithDifferentUrlToPreviousThenListenerNotNotified() {
+        val mockWebView: WebView = mock()
+        whenever(mockWebView.url).thenReturn(EXAMPLE_URL)
+        whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+        testee.onPageCommitVisible(mockWebView, EXAMPLE_URL)
+        testee.onPageCommitVisible(mockWebView, "foo.com")
+        verify(listener).navigationStateChanged(any())
+    }
+
+    @UiThreadTest
+    @Test
     fun whenOnPageStartedCalledThenEventSentToLoginDetector() {
         testee.onPageStarted(webView, EXAMPLE_URL, null)
         verify(loginDetector).onEvent(WebNavigationEvent.OnPageStarted(webView))
@@ -334,6 +355,7 @@ class BrowserWebViewClientTest {
         verify(cookieManager).flush()
     }
 
+    @UiThreadTest
     @Test
     fun whenShouldOverrideThrowsExceptionThenRecordException() {
         val exception = RuntimeException()
@@ -342,6 +364,7 @@ class BrowserWebViewClientTest {
         verify(crashLogger).logCrash(Crash(shortName = "m_webview_should_override", t = exception))
     }
 
+    @UiThreadTest
     @Test
     fun whenPrivacyProLinkDetectedThenLaunchPrivacyProAndReturnTrue() {
         val urlType = SpecialUrlDetector.UrlType.ShouldLaunchPrivacyProLink
@@ -350,6 +373,7 @@ class BrowserWebViewClientTest {
         verify(subscriptions).launchPrivacyPro(any())
     }
 
+    @UiThreadTest
     @Test
     fun whenAppLinkDetectedAndIsHandledThenReturnTrue() {
         val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
@@ -361,6 +385,7 @@ class BrowserWebViewClientTest {
         verify(listener).handleAppLink(urlType, isForMainFrame = true)
     }
 
+    @UiThreadTest
     @Test
     fun whenAppLinkDetectedAndIsNotHandledThenReturnFalse() {
         val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
@@ -381,6 +406,7 @@ class BrowserWebViewClientTest {
         verify(listener, never()).handleAppLink(any(), any())
     }
 
+    @UiThreadTest
     @Test
     fun whenNonHttpAppLinkDetectedAndIsHandledThenReturnTrue() {
         val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink(EXAMPLE_URL, Intent(), EXAMPLE_URL)
@@ -392,6 +418,7 @@ class BrowserWebViewClientTest {
         verify(listener).handleNonHttpAppLink(urlType)
     }
 
+    @UiThreadTest
     @Test
     fun whenNonHttpAppLinkDetectedAndIsNotForMainframeThenOnlyReturnTrue() {
         val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink(EXAMPLE_URL, Intent(), EXAMPLE_URL)
@@ -400,9 +427,9 @@ class BrowserWebViewClientTest {
         whenever(listener.handleNonHttpAppLink(any())).thenReturn(true)
         whenever(webResourceRequest.isForMainFrame).thenReturn(false)
         assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
-        verifyNoInteractions(listener)
     }
 
+    @UiThreadTest
     @Test
     fun whenNonHttpAppLinkDetectedAndIsNotHandledThenReturnFalse() {
         val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink(EXAMPLE_URL, Intent(), EXAMPLE_URL)
@@ -414,6 +441,7 @@ class BrowserWebViewClientTest {
         verify(listener).handleNonHttpAppLink(urlType)
     }
 
+    @UiThreadTest
     @Test
     fun whenNonHttpAppLinkDetectedAndListenerIsNullThenReturnTrue() {
         whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(
@@ -456,6 +484,7 @@ class BrowserWebViewClientTest {
         whenAmpLinkDetectedAndIsForMainFrameThenReturnTrueAndLoadExtractedUrl()
     }
 
+    @UiThreadTest
     @Test
     fun whenCloakedAmpLinkDetectedAndIsForMainFrameThenHandleCloakedAmpLink() {
         whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any()))

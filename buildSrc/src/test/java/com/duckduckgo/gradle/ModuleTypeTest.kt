@@ -26,6 +26,7 @@ import com.duckduckgo.gradle.ModuleType.Companion.destinationDirectorySuffix
 import com.duckduckgo.gradle.ModuleType.Companion.exampleSubdirectorySuffix
 import com.duckduckgo.gradle.ModuleType.Companion.namespaceSuffix
 import com.duckduckgo.gradle.ModuleType.Impl
+import com.duckduckgo.gradle.ModuleType.Internal
 import org.gradle.internal.impldep.junit.framework.TestCase.assertEquals
 import org.gradle.internal.impldep.junit.framework.TestCase.assertTrue
 import org.junit.jupiter.api.Test
@@ -47,6 +48,11 @@ class ModuleTypeTest {
     @Test
     fun whenInputIsImplThenTypeIsImpl() {
         assertTrue(ModuleType.moduleTypeFromInput("impl") is Impl)
+    }
+
+    @Test
+    fun whenInputIsInternalThenTypeIsInternal() {
+        assertTrue(ModuleType.moduleTypeFromInput("internal") is Internal)
     }
 
     @Test
@@ -75,6 +81,11 @@ class ModuleTypeTest {
     }
 
     @Test
+    fun whenInternalThenNamespaceSuffixIsInternal() {
+        assertEquals("internal", Internal.namespaceSuffix())
+    }
+
+    @Test
     fun whenKotlinApiThenDestinationDirectorySuffixIsApi() {
         assertEquals("api", ApiPureKotlin.destinationDirectorySuffix())
     }
@@ -90,6 +101,11 @@ class ModuleTypeTest {
     }
 
     @Test
+    fun whenInternalThenDestinationDirectorySuffixIsInternal() {
+        assertEquals("internal", Internal.destinationDirectorySuffix())
+    }
+
+    @Test
     fun whenKotlinApiThenExampleDirectorySuffixIsApi() {
         assertEquals("api", ApiPureKotlin.exampleSubdirectorySuffix())
     }
@@ -102,5 +118,10 @@ class ModuleTypeTest {
     @Test
     fun whenImplThenExampleDirectorySuffixIsImpl() {
         assertEquals("impl", Impl.exampleSubdirectorySuffix())
+    }
+
+    @Test
+    fun whenInternalThenExampleDirectorySuffixIsInternal() {
+        assertEquals("internal", Internal.exampleSubdirectorySuffix())
     }
 }

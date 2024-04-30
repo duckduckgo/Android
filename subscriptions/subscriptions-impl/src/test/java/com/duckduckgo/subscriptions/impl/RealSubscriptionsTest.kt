@@ -19,9 +19,6 @@ package com.duckduckgo.subscriptions.impl
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.FakeToggleStore
-import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.Product.NetP
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
@@ -50,18 +47,16 @@ class RealSubscriptionsTest {
     private val globalActivityStarter: GlobalActivityStarter = mock()
     private val pixel: SubscriptionPixelSender = mock()
     private lateinit var subscriptions: RealSubscriptions
-    private val privacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java, FakeToggleStore())
 
     @Before
     fun before() = runTest {
         whenever(mockSubscriptionsManager.canSupportEncryption()).thenReturn(true)
-        subscriptions = RealSubscriptions(mockSubscriptionsManager, privacyProFeature, globalActivityStarter, pixel)
+        subscriptions = RealSubscriptions(mockSubscriptionsManager, globalActivityStarter, pixel)
     }
 
     @Test
     fun whenGetAccessTokenSucceedsThenReturnAccessToken() = runTest {
         whenever(mockSubscriptionsManager.getAccessToken()).thenReturn(AccessToken.Success("accessToken"))
-        privacyProFeature.isLaunched().setEnabled(State(enable = true))
         val result = subscriptions.getAccessToken()
         assertEquals("accessToken", result)
     }
@@ -75,7 +70,6 @@ class RealSubscriptionsTest {
     @Test
     fun whenGetEntitlementStatusHasEntitlementAndEnabledAndActiveThenReturnList() = runTest {
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
-        privacyProFeature.isLaunched().setEnabled(State(enable = true))
         whenever(mockSubscriptionsManager.entitlements).thenReturn(flowOf(listOf(NetP)))
 
         subscriptions.getEntitlementStatus().test {
@@ -87,7 +81,6 @@ class RealSubscriptionsTest {
     @Test
     fun whenGetEntitlementStatusHasEntitlementAndEnabledAndInactiveThenReturnEmptyList() = runTest {
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(INACTIVE)
-        privacyProFeature.isLaunched().setEnabled(State(enable = true))
         whenever(mockSubscriptionsManager.entitlements).thenReturn(flowOf(listOf(NetP)))
 
         subscriptions.getEntitlementStatus().test {
@@ -100,20 +93,7 @@ class RealSubscriptionsTest {
     @Test
     fun whenGetEntitlementStatusHasNoEntitlementAndEnabledAndActiveThenReturnEmptyList() = runTest {
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
-        privacyProFeature.isLaunched().setEnabled(State(enable = true))
         whenever(mockSubscriptionsManager.entitlements).thenReturn(flowOf(emptyList()))
-
-        subscriptions.getEntitlementStatus().test {
-            assertTrue(awaitItem().isEmpty())
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenGetEntitlementStatusHasEntitlementsAndNotEnabledAndActiveThenReturnEmptyList() = runTest {
-        whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
-        privacyProFeature.isLaunched().setEnabled(State(enable = false))
-        whenever(mockSubscriptionsManager.entitlements).thenReturn(flowOf(listOf(NetP)))
 
         subscriptions.getEntitlementStatus().test {
             assertTrue(awaitItem().isEmpty())
@@ -173,7 +153,6 @@ class RealSubscriptionsTest {
 
     @Test
     fun whenShouldLaunchPrivacyProForUrlThenReturnCorrectValue() = runTest {
-        privacyProFeature.isLaunched().setEnabled(State(enable = true))
         whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(
             SubscriptionOffer(monthlyPlanId = "test", yearlyFormattedPrice = "test", yearlyPlanId = "test", monthlyFormattedPrice = "test"),
         )
@@ -190,19 +169,17 @@ class RealSubscriptionsTest {
     }
 
     @Test
-    fun whenShouldLaunchPrivacyProForUrlAndNotEnableThenReturnFalse() = runTest {
-        privacyProFeature.isLaunched().setEnabled(State(enable = false))
+    fun whenShouldLaunchPrivacyProForUrlThenReturnTrue() = runTest {
         whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(
             SubscriptionOffer(monthlyPlanId = "test", yearlyFormattedPrice = "test", yearlyPlanId = "test", monthlyFormattedPrice = "test"),
         )
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(UNKNOWN)
 
-        assertFalse(subscriptions.shouldLaunchPrivacyProForUrl("https://duckduckgo.com/pro"))
+        assertTrue(subscriptions.shouldLaunchPrivacyProForUrl("https://duckduckgo.com/pro"))
     }
 
     @Test
     fun whenShouldLaunchPrivacyProForUrlAndNotEligibleThenReturnFalse() = runTest {
-        privacyProFeature.isLaunched().setEnabled(State(enable = true))
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(UNKNOWN)
 
         assertFalse(subscriptions.shouldLaunchPrivacyProForUrl("https://duckduckgo.com/pro"))

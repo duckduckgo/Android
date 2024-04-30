@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser
 
 import android.Manifest
+import android.animation.LayoutTransition
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.app.ActivityOptions
@@ -99,6 +100,7 @@ import com.duckduckgo.app.browser.commands.Command
 import com.duckduckgo.app.browser.commands.Command.ShowBackNavigationHistory
 import com.duckduckgo.app.browser.commands.NavigationCommand
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
+import com.duckduckgo.app.browser.customtabs.CustomTabActivity
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.customtabs.CustomTabViewModel.Companion.CUSTOM_TAB_NAME_PREFIX
 import com.duckduckgo.app.browser.databinding.ContentSiteLocationPermissionDialogBinding
@@ -548,6 +550,9 @@ class BrowserTabFragment :
 
     private val daxDialogIntroExperimentCta
         get() = binding.includeNewBrowserTab.includeDaxDialogIntroExperimentCta
+
+    private val daxDialogExperimentOnboardingCta
+        get() = binding.includeOnboardingDaxDialogExperiment
 
     private val smoothProgressAnimator by lazy { SmoothProgressAnimator(omnibar.pageLoadingIndicator) }
 
@@ -1295,9 +1300,7 @@ class BrowserTabFragment :
 
             is Command.OpenMessageInNewTab -> {
                 if (isActiveCustomTab()) {
-                    webView?.hitTestResult?.extra?.let { data ->
-                        webView?.loadUrl(Uri.parse(data).toString())
-                    }
+                    (activity as CustomTabActivity).openMessageInNewFragmentInCustomTab(it.message, this, customTabToolbarColor)
                 } else {
                     browserActivity?.openMessageInNewTab(it.message, it.sourceTabId)
                 }
@@ -1502,6 +1505,7 @@ class BrowserTabFragment :
             is Command.ShowSSLError -> showSSLWarning(it.handler, it.error)
             is Command.HideSSLError -> hideSSLWarning()
             is Command.LaunchScreen -> launchScreen(it.screen, it.payload)
+            is Command.HideExperimentOnboardingDialog -> hideOnboardingDaxDialog(it.experimentCta)
             else -> {
                 // NO OP
             }
@@ -1641,7 +1645,7 @@ class BrowserTabFragment :
     }
 
     private fun askSiteLocationPermission(locationPermission: LocationPermission) {
-        if (!isActiveTab) {
+        if (!isActiveCustomTab() && !isActiveTab) {
             Timber.v("Will not launch a dialog for an inactive tab")
             return
         }
@@ -1994,7 +1998,7 @@ class BrowserTabFragment :
     }
 
     private fun showAuthenticationDialog(request: BasicAuthenticationRequest) {
-        if (!isActiveTab) {
+        if (!isActiveCustomTab() && !isActiveTab) {
             Timber.v("Will not launch a dialog for an inactive tab")
             return
         }
@@ -2128,6 +2132,7 @@ class BrowserTabFragment :
     private fun configurePrivacyShield() {
         omnibar.shieldIcon.setOnClickListener {
             browserActivity?.launchPrivacyDashboard()
+            viewModel.onPrivacyShieldSelected()
         }
     }
 
@@ -2201,6 +2206,8 @@ class BrowserTabFragment :
     @SuppressLint("SetJavaScriptEnabled")
     private fun configureWebView() {
         viewModel.configureBrowserBackground()
+        binding.experimentDaxDialogContent.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
+
         webView = layoutInflater.inflate(
             R.layout.include_duckduckgo_browser_webview,
             binding.webViewContainer,
@@ -2297,6 +2304,10 @@ class BrowserTabFragment :
 
     private fun setBrowserBackground(backgroundRes: Int) {
         newBrowserTab.browserBackground.setBackgroundResource(backgroundRes)
+    }
+
+    private fun hideOnboardingDaxDialog(experimentCta: ExperimentOnboardingDaxDialogCta) {
+        experimentCta.hideOnboardingCta(binding)
     }
 
     private fun configureWebViewForAutofill(it: DuckDuckGoWebView) {
@@ -2793,7 +2804,6 @@ class BrowserTabFragment :
         popupMenu.dismiss()
         loginDetectionDialog?.dismiss()
         automaticFireproofDialog?.dismiss()
-        browserAutofill.removeJsInterface(webView)
         destroyWebView()
         super.onDestroy()
     }
@@ -3193,6 +3203,8 @@ class BrowserTabFragment :
                 omnibar.browserMenuImageView
             } else if (viewState.fireButton.isHighlighted()) {
                 omnibar.fireIconImageView
+            } else if (viewState.showPrivacyShield.isHighlighted()) {
+                omnibar.placeholder
             } else {
                 null
             }
@@ -3227,6 +3239,7 @@ class BrowserTabFragment :
                     AppPixelName.MENU_ACTION_FIRE_PRESSED.pixelName,
                     mapOf(FIRE_BUTTON_STATE to pulseAnimation.isActive.toString()),
                 )
+                viewModel.onFireMenuSelected()
             }
 
             tabsButton?.show()
@@ -3627,7 +3640,7 @@ class BrowserTabFragment :
         private fun renderToolbarMenus(viewState: BrowserViewState) {
             if (viewState.browserShowing) {
                 omnibar.daxIcon?.isVisible = viewState.showDaxIcon
-                omnibar.shieldIcon?.isInvisible = !viewState.showPrivacyShield || viewState.showDaxIcon
+                omnibar.shieldIcon?.isInvisible = !viewState.showPrivacyShield.isEnabled() || viewState.showDaxIcon
                 omnibar.clearTextButton?.isVisible = viewState.showClearButton
                 omnibar.searchIcon?.isVisible = viewState.showSearchIcon
             } else {
@@ -3723,6 +3736,7 @@ class BrowserTabFragment :
                 is ExperimentDaxBubbleOptionsCta -> showDaxExperimentCta(configuration)
                 is BubbleCta -> showBubbleCta(configuration)
                 is DialogCta -> showDaxDialogCta(configuration)
+                is ExperimentOnboardingDaxDialogCta -> showExperimentDialogCta(configuration)
             }
             newBrowserTab.messageCta.gone()
         }
@@ -3788,6 +3802,29 @@ class BrowserTabFragment :
             }
             newBrowserTab.newTabLayout.setOnClickListener { daxDialogIntroExperimentCta.dialogTextCta.finishAnimation() }
 
+            viewModel.onCtaShown()
+        }
+
+        @SuppressLint("ClickableViewAccessibility")
+        private fun showExperimentDialogCta(configuration: ExperimentOnboardingDaxDialogCta) {
+            hideHomeBackground()
+            hideHomeCta()
+            val onTypingAnimationFinished = if (configuration is ExperimentOnboardingDaxDialogCta.DaxTrackersBlockedCta) {
+                { viewModel.onExperimentDaxTypingAnimationFinished() }
+            } else {
+                {}
+            }
+            configuration.showOnboardingCta(binding, { viewModel.onUserClickCtaOkButton() }, onTypingAnimationFinished)
+            if (configuration is ExperimentOnboardingDaxDialogCta.DaxSiteSuggestionsCta) {
+                configuration.setOnOptionClicked(
+                    daxDialogExperimentOnboardingCta,
+                ) {
+                    userEnteredQuery(it.link)
+                    pixel.fire(it.pixel)
+                    viewModel.onUserClickCtaOkButton()
+                }
+            }
+            binding.webViewContainer.setOnClickListener { daxDialogIntroExperimentCta.dialogTextCta.finishAnimation() }
             viewModel.onCtaShown()
         }
 
@@ -3927,7 +3964,7 @@ class BrowserTabFragment :
         permissionsToRequest: SitePermissions,
         request: PermissionRequest,
     ) {
-        if (!isActiveTab) {
+        if (!isActiveCustomTab() && !isActiveTab) {
             Timber.v("Will not launch a dialog for an inactive tab")
             return
         }

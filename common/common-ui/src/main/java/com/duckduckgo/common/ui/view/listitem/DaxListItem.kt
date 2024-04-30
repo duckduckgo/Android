@@ -270,6 +270,7 @@ abstract class DaxListItem(
         Small,
         Medium,
         Large,
+        ExtraLarge,
         ;
 
         companion object {
@@ -279,6 +280,7 @@ abstract class DaxListItem(
                     0 -> Small
                     1 -> Medium
                     2 -> Large
+                    3 -> ExtraLarge
                     else -> Medium
                 }
             }
@@ -288,6 +290,7 @@ abstract class DaxListItem(
                     Small -> R.dimen.listItemImageSmallSize
                     Medium -> R.dimen.listItemImageMediumSize
                     Large -> R.dimen.listItemImageLargeSize
+                    ExtraLarge -> R.dimen.listItemImageExtraLargeSize
                 }
             }
         }

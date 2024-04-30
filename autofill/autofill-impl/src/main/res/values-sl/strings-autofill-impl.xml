@@ -56,6 +56,8 @@
 
     <string name="credentialManagementSuggestionsLabel">Predlagano</string>
 
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">Samodejno izpolnjevanje gesel ni na voljo, ker je vaša različica programa Android WebView prestara.</string>
+
     <string name="autofillManagementSearchClearDescription">Počisti vhod iskanja</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Ni rezultatov za »%1$s«</string>
 

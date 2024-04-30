@@ -27,6 +27,7 @@ import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
@@ -70,6 +71,7 @@ class PrivacyDashboardHybridViewModelTest {
 
     private val contentBlocking = mock<ContentBlocking>()
     private val unprotectedTemporary = mock<UnprotectedTemporary>()
+    private val mockUserBrowserProperties: UserBrowserProperties = mock()
 
     private val pixel = mock<Pixel>()
     private val privacyProtectionsToggleUsageListener: PrivacyProtectionsToggleUsageListener = mock()
@@ -89,6 +91,7 @@ class PrivacyDashboardHybridViewModelTest {
             autoconsentStatusViewStateMapper = CookiePromptManagementStatusViewStateMapper(),
             protectionsToggleUsageListener = privacyProtectionsToggleUsageListener,
             privacyProtectionsPopupExperimentExternalPixels = privacyProtectionsPopupExperimentExternalPixels,
+            userBrowserProperties = mockUserBrowserProperties,
         )
     }
 

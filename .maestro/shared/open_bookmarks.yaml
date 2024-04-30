@@ -3,3 +3,8 @@ appId: com.duckduckgo.mobile.android
 - tapOn:
       id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
 - tapOn: "Bookmarks"
+- runFlow:
+    when:
+          visible: "Download Missing Icons?"
+    commands:
+          - tapOn: "Not Now"

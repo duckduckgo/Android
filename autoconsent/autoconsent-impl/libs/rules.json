@@ -5549,7 +5549,7 @@
       ],
       "detectPopup": [
         {
-          "visible": "#tarteaucitronRoot #tarteaucitronAlertSmall,#tarteaucitronRoot #tarteaucitronAlertBig",
+          "visible": "#tarteaucitronRoot #tarteaucitronAlertBig",
           "check": "any"
         }
       ],
