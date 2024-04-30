@@ -38,11 +38,6 @@ interface BrowserAutofill {
     )
 
     /**
-     * Removes the JS interface as a clean-up. Recommended to call from onDestroy() of Fragment/Activity containing the WebView
-     */
-    fun removeJsInterface(webView: WebView?)
-
-    /**
      * Notifies that there has been a change in web page, and the autofill state should be re-evaluated
      */
     fun notifyPageChanged()

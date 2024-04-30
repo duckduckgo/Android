@@ -61,19 +61,6 @@ class InlineBrowserAutofill @Inject constructor(
         }
     }
 
-    @SuppressLint("RequiresFeature")
-    override fun removeJsInterface(webView: WebView?) {
-        if (webView == null) return
-
-        if (autofillCapabilityChecker.webViewSupportsAutofill()) {
-            kotlin.runCatching {
-                webMessageListeners.getPlugins().forEach {
-                    webMessageAttacher.removeListener(webView, it)
-                }
-            }
-        }
-    }
-
     private suspend fun configureModernIntegration(
         webView: WebView,
         autofillCallback: Callback,
@@ -116,11 +103,6 @@ interface AutofillWebMessageAttacher {
         webView: WebView,
         listener: AutofillWebMessageListener,
     )
-
-    fun removeListener(
-        webView: WebView,
-        listener: AutofillWebMessageListener,
-    )
 }
 
 @SuppressLint("RequiresFeature")
@@ -132,12 +114,5 @@ class AutofillWebMessageAttacherImpl @Inject constructor() : AutofillWebMessageA
         listener: AutofillWebMessageListener,
     ) {
         WebViewCompat.addWebMessageListener(webView, listener.key, listener.origins, listener)
-    }
-
-    override fun removeListener(
-        webView: WebView,
-        listener: AutofillWebMessageListener,
-    ) {
-        WebViewCompat.removeWebMessageListener(webView, listener.key)
     }
 }
