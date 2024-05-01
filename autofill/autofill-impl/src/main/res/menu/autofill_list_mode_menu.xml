@@ -22,23 +22,33 @@
         android:icon="@drawable/ic_find_search_24"
         android:title="@string/autofillManagementSearchLogins"
         android:visible="false"
+        android:orderInCategory="1"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/addLoginManually"
         android:icon="@drawable/ic_add_24"
         android:title="@string/autofillManagementAddLogin"
+        android:orderInCategory="2"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/resetNeverSavedSites"
         android:title="@string/credentialManagementClearNeverForThisSiteList"
         android:visible="false"
+        android:orderInCategory="3"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/importPasswords"
+        android:title="@string/autofillManagementImportPasswords"
+        android:orderInCategory="4"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/deleteAllPasswords"
         android:title="@string/credentialManagementDeleteAllPasswordsMenu"
+        android:orderInCategory="5"
         app:showAsAction="never" />
 
 </menu>
