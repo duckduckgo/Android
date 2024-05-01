@@ -282,7 +282,12 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
 
     private fun grantPermissions() {
         val permissions = permissionsHandledAutomatically.toTypedArray() + permissionsHandledByUser
-        sitePermissionRequest.grant(permissions)
+        try {
+            sitePermissionRequest.grant(permissions)
+        } catch (e: IllegalStateException) {
+            // IllegalStateException is thrown when grant() or deny() have been called already.
+            Timber.w("IllegalStateException when calling grant() site permissions")
+        }
     }
 
     private fun systemPermissionGranted() {
