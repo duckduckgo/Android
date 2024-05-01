@@ -49,8 +49,10 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementR
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.ContextMenuAction.Edit
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchDeleteAllPasswordsConfirmation
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchImportPasswords
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchResetNeverSaveListConfirmation
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.PromptUserToAuthenticateMassDeletion
+import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.ImportPasswordActivityParams
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.CredentialGrouper
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.InitialExtractor
 import com.duckduckgo.autofill.impl.ui.credential.management.suggestion.SuggestionListBuilder
@@ -67,6 +69,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.R as CommonR
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -104,6 +107,9 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
     @Inject
     lateinit var stringBuilder: AutofillManagementStringBuilder
 
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
+
     val viewModel by lazy {
         ViewModelProvider(requireActivity(), viewModelFactory)[AutofillSettingsViewModel::class.java]
     }
@@ -114,6 +120,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
     private var searchMenuItem: MenuItem? = null
     private var resetNeverSavedSitesMenuItem: MenuItem? = null
     private var deleteAllPasswordsMenuItem: MenuItem? = null
+    private var importPasswordsMenuItem: MenuItem? = null
 
     private val globalAutofillToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
         if (!lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) return@OnCheckedChangeListener
@@ -131,6 +138,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
         super.onViewCreated(view, savedInstanceState)
         configureToggle()
         configureRecyclerView()
+        configureImportPasswordsButton()
         observeViewModel()
         configureToolbar()
     }
@@ -138,6 +146,12 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
     override fun onStop() {
         super.onStop()
         hideSearchBar()
+    }
+
+    private fun configureImportPasswordsButton() {
+        binding.emptyStateLayout.importPasswordsButton.setOnClickListener {
+            viewModel.onImportPasswords()
+        }
     }
 
     private fun configureToolbar() {
@@ -151,6 +165,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
                     searchMenuItem = menu.findItem(R.id.searchLogins)
                     resetNeverSavedSitesMenuItem = menu.findItem(R.id.resetNeverSavedSites)
                     deleteAllPasswordsMenuItem = menu.findItem(R.id.deleteAllPasswords)
+                    importPasswordsMenuItem = menu.findItem(R.id.importPasswords)
 
                     initializeSearchBar()
                 }
@@ -160,6 +175,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
                     searchMenuItem?.isVisible = loginsSaved
                     deleteAllPasswordsMenuItem?.isVisible = loginsSaved
                     resetNeverSavedSitesMenuItem?.isVisible = viewModel.neverSavedSitesViewState.value.showOptionToReset
+                    importPasswordsMenuItem?.isVisible = loginsSaved
                 }
 
                 override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
@@ -176,6 +192,11 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
 
                         R.id.deleteAllPasswords -> {
                             viewModel.onDeleteAllPasswordsInitialSelection()
+                            true
+                        }
+
+                        R.id.importPasswords -> {
+                            viewModel.onImportPasswords()
                             true
                         }
 
@@ -268,6 +289,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
             LaunchResetNeverSaveListConfirmation -> launchResetNeverSavedSitesConfirmation()
             is LaunchDeleteAllPasswordsConfirmation -> launchDeleteAllLoginsConfirmationDialog(command.numberToDelete)
             is PromptUserToAuthenticateMassDeletion -> promptUserToAuthenticateMassDeletion(command.authConfiguration)
+            LaunchImportPasswords -> launchImportPasswordsScreen()
         }
         viewModel.commandProcessed(command)
     }
@@ -297,6 +319,12 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
         }
     }
 
+    private fun launchImportPasswordsScreen() {
+        context?.let {
+            globalActivityStarter.start(it, ImportPasswordActivityParams)
+        }
+    }
+
     private suspend fun credentialsListUpdated(
         credentials: List<LoginCredentials>,
         credentialSearchQuery: String,
@@ -318,6 +346,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
 
     private fun showEmptyCredentialsPlaceholders() {
         binding.emptyStateLayout.emptyStateContainer.show()
+
         binding.logins.gone()
     }
 
