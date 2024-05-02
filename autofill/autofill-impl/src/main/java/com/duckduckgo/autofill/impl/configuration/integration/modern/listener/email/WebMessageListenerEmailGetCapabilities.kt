@@ -31,6 +31,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.invoke
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @SingleInstanceIn(FragmentScope::class)
 @ContributesMultibinding(FragmentScope::class)
@@ -53,10 +54,14 @@ class WebMessageListenerEmailGetCapabilities @Inject constructor(
         isMainFrame: Boolean,
         reply: JavaScriptReplyProxy,
     ) {
-        if (!EmailProtectionUrl.isEmailProtectionUrl(webView.url)) return
+        kotlin.runCatching {
+            if (!EmailProtectionUrl.isEmailProtectionUrl(webView.url)) return
 
-        job += appCoroutineScope.launch(dispatchers.io()) {
-            reply.postMessage(generateResponse())
+            job += appCoroutineScope.launch(dispatchers.io()) {
+                reply.postMessage(generateResponse())
+            }
+        }.onFailure {
+            Timber.e(it, "Error while processing autofill web message for %s", key)
         }
     }
 

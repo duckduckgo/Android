@@ -73,18 +73,22 @@ class WebMessageListenerStoreFormData @Inject constructor(
         isMainFrame: Boolean,
         reply: JavaScriptReplyProxy,
     ) {
-        // important to call suppressor as soon as possible
-        systemAutofillServiceSuppressor.suppressAutofill(webView)
+        kotlin.runCatching {
+            // important to call suppressor as soon as possible
+            systemAutofillServiceSuppressor.suppressAutofill(webView)
 
-        val originalUrl: String? = webView.url
+            val originalUrl: String? = webView.url
 
-        appCoroutineScope.launch(dispatchers.io()) {
-            val requestOrigin = sourceOrigin.toString()
-            val requestId = storeReply(reply)
-            storeFormData(
-                message.data.toString(),
-                AutofillWebMessageRequest(requestOrigin = requestOrigin, originalPageUrl = originalUrl, requestId = requestId),
-            )
+            appCoroutineScope.launch(dispatchers.io()) {
+                val requestOrigin = sourceOrigin.toString()
+                val requestId = storeReply(reply)
+                storeFormData(
+                    message.data.toString(),
+                    AutofillWebMessageRequest(requestOrigin = requestOrigin, originalPageUrl = originalUrl, requestId = requestId),
+                )
+            }
+        }.onFailure {
+            Timber.e(it, "Error while processing autofill web message for %s", key)
         }
     }
 

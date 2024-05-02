@@ -30,6 +30,7 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @SuppressLint("RequiresFeature")
 @SingleInstanceIn(FragmentScope::class)
@@ -50,9 +51,13 @@ class WebMessageListenerGetAutofillConfig @Inject constructor(
         isMainFrame: Boolean,
         reply: JavaScriptReplyProxy,
     ) {
-        job += appCoroutineScope.launch(dispatchers.io()) {
-            val config = autofillRuntimeConfigProvider.getRuntimeConfiguration(sourceOrigin.toString())
-            reply.postMessage(config)
+        kotlin.runCatching {
+            job += appCoroutineScope.launch(dispatchers.io()) {
+                val config = autofillRuntimeConfigProvider.getRuntimeConfiguration(sourceOrigin.toString())
+                reply.postMessage(config)
+            }
+        }.onFailure {
+            Timber.e(it, "Error while processing autofill web message for %s", key)
         }
     }
 }
