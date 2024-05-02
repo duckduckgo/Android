@@ -28,7 +28,9 @@ fun NotificationManagerCompat.checkPermissionAndNotify(
     id: Int,
     notification: Notification,
 ) {
-    if (ActivityCompat.checkSelfPermission(context, POST_NOTIFICATIONS) == PERMISSION_GRANTED) {
-        notify(id, notification)
+    runCatching {
+        if (ActivityCompat.checkSelfPermission(context, POST_NOTIFICATIONS) == PERMISSION_GRANTED) {
+            notify(id, notification)
+        }
     }
 }
