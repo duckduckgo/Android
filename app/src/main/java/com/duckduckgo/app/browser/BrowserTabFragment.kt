@@ -78,8 +78,9 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.webkit.WebSettingsCompat
-import androidx.webkit.WebViewFeature
+import androidx.webkit.JavaScriptReplyProxy
+import androidx.webkit.WebMessageCompat
+import androidx.webkit.WebViewCompat
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.bookmarks.ui.BookmarksBottomSheetDialog
@@ -108,7 +109,6 @@ import com.duckduckgo.app.browser.databinding.HttpAuthenticationBinding
 import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarBinding
 import com.duckduckgo.app.browser.databinding.IncludeQuickAccessItemsBinding
 import com.duckduckgo.app.browser.databinding.PopupWindowBrowserMenuBinding
-import com.duckduckgo.app.browser.downloader.BlobConverterInjector
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.setting.FaviconPromptSheet
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
@@ -357,8 +357,8 @@ class BrowserTabFragment :
     @Inject
     lateinit var loginDetector: DOMLoginDetector
 
-    @Inject
-    lateinit var blobConverterInjector: BlobConverterInjector
+//    @Inject
+//    lateinit var blobConverterInjector: BlobConverterInjector
 
     val tabId get() = requireArguments()[TAB_ID_ARG] as String
     private val customTabToolbarColor get() = requireArguments().getInt(CUSTOM_TAB_TOOLBAR_COLOR_ARG)
@@ -2254,6 +2254,9 @@ class BrowserTabFragment :
         viewModel.onUserSubmittedQuery(query)
     }
 
+
+    private val replyProxyMap = mutableMapOf<String, JavaScriptReplyProxy>()
+
     @SuppressLint("SetJavaScriptEnabled")
     private fun configureWebView() {
         binding.daxDialogOnboardingCtaContent.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
@@ -2291,7 +2294,14 @@ class BrowserTabFragment :
             }
 
             it.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
-                viewModel.requestFileDownload(url, contentDisposition, mimeType, true)
+                Timber.d("TAG_ANA Downloading file from $url with contentDisposition $contentDisposition and mimeType $mimeType")
+
+                for ((key, value) in replyProxyMap) {
+                    if (url.contains(key)) {
+                        Timber.d("TAG_ANA Posting message to replyProxy: $value")
+                        value.postMessage(url)
+                    }
+                }
             }
 
             it.setOnTouchListener { _, _ ->
@@ -2310,12 +2320,78 @@ class BrowserTabFragment :
 
             it.setFindListener(this)
             loginDetector.addLoginDetection(it) { viewModel.loginDetected() }
-            blobConverterInjector.addJsInterface(it) { url, mimeType -> viewModel.requestFileDownload(url, null, mimeType, true) }
             emailInjector.addJsInterface(
                 it,
                 onSignedInEmailProtectionPromptShown = { viewModel.showEmailProtectionChooseEmailPrompt() },
                 onInContextEmailProtectionSignupPromptShown = { showNativeInContextEmailProtectionSignupPrompt() },
             )
+//            blobConverterInjector.addJsInterface(it) { url, mimeType -> viewModel.requestFileDownload(url, null, mimeType, true) }
+
+            val script = """
+            
+            myObject.postMessage('Hello from JavaScript')
+            console.log('TAG_ANA Posted message from JS: Hello from JavaScript'); 
+            
+            myObject.onmessage = function(event) {
+                console.log('TAG_ANA Event origin is: ' + event.origin); 
+                console.log('TAG_ANA Event data is: ' + event.data); 
+                console.log('TAG_ANA window.location is: ' + window.location);           
+
+                if (event.data.startsWith('blob:')) {
+                    console.log('TAG_ANA Event data is a blob: ' + event.data); 
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('GET', event.data, true);
+                    xhr.responseType = 'blob';
+                    
+                    xhr.onload = function(e) {
+                        if (this.status == 200) {
+                            var blob = this.response;
+                            var reader = new FileReader();
+                            
+                            reader.onloadend = function() {
+                                dataUrl = reader.result;
+                                console.log('TAG_ANA result is: ' + dataUrl); 
+                            }
+                            
+                            reader.onerror = function() {
+                                console.log('TAG_ANA Blob reader error'); 
+                            }
+                            
+                            reader.readAsDataURL(blob);
+                        } else {
+                            console.log('TAG_ANA Blob error'); 
+                        }
+                    };
+                
+                    xhr.onerror = function() {
+                        console.error('TAG_ANA An error occurred during the XMLHttpRequest. Status: ' + xhr.status + ', Error: ' + xhr.statusText);
+                    };
+                    
+                    xhr.send();
+                }
+            }
+                
+            """.trimIndent()
+            WebViewCompat.addDocumentStartJavaScript(it, script, setOf("*"))
+            WebViewCompat.addWebMessageListener(it, "myObject", setOf("*"), object : WebViewCompat.WebMessageListener {
+                override fun onPostMessage(
+                    view: WebView,
+                    message: WebMessageCompat,
+                    sourceOrigin: Uri,
+                    isMainFrame: Boolean,
+                    replyProxy: JavaScriptReplyProxy
+                ) {
+
+                    // Save replyProxy
+                    replyProxyMap[sourceOrigin.toString()] = replyProxy
+
+                    // Post message
+                    Timber.d("TAG_ANA onPostMessage. Got this message: ${message.data} -- sourceOrigin: $sourceOrigin -- isMainFrame: $isMainFrame -- replyProxy: $replyProxy")
+                    replyProxy.postMessage("Hello from Kotlin. Just received this message from JS: ${message.data!!}")
+                }
+
+            })
+
             configureWebViewForAutofill(it)
             printInjector.addJsInterface(it) { viewModel.printFromWebView() }
             autoconsent.addJsInterface(it, autoconsentCallback)
@@ -2930,7 +3006,8 @@ class BrowserTabFragment :
 
     private fun convertBlobToDataUri(blob: Command.ConvertBlobToDataUri) {
         webView?.let {
-            blobConverterInjector.convertBlobIntoDataUriAndDownload(it, blob.url, blob.mimeType)
+            Timber.d("TAG_ANA convertBlobToDataUri")
+//            blobConverterInjector.convertBlobIntoDataUriAndDownload(it, blob.url, blob.mimeType)
         }
     }
 

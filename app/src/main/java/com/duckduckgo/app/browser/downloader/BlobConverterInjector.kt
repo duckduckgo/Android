@@ -21,6 +21,7 @@ import android.webkit.WebView
 import androidx.annotation.UiThread
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.downloader.BlobConverterJavascriptInterface.Companion.JAVASCRIPT_INTERFACE_NAME
+import timber.log.Timber
 
 interface BlobConverterInjector {
     fun addJsInterface(
@@ -42,6 +43,7 @@ class BlobConverterInjectorJs : BlobConverterInjector {
         webView: WebView,
         onBlobTransformed: (url: String, mimeType: String) -> Unit,
     ) {
+        Timber.d("TAG_ANA addJsInterface")
         webView.addJavascriptInterface(BlobConverterJavascriptInterface(onBlobTransformed), JAVASCRIPT_INTERFACE_NAME)
     }
 
@@ -51,6 +53,7 @@ class BlobConverterInjectorJs : BlobConverterInjector {
         blobUrl: String,
         contentType: String?,
     ) {
+        Timber.d("TAG_ANA convertBlobIntoDataUriAndDownload")
         webView.evaluateJavascript("javascript:${javaScriptInjector.getFunctionsJS(webView.context, blobUrl, contentType)}", null)
     }
 
@@ -65,7 +68,9 @@ class BlobConverterInjectorJs : BlobConverterInjector {
             if (!this::functions.isInitialized) {
                 functions = context.resources.openRawResource(R.raw.blob_converter).bufferedReader().use { it.readText() }
             }
-            return functions.replace("%blobUrl%", blobUrl).replace("%contentType%", contentType.orEmpty())
+            val res = functions.replace("%blobUrl%", blobUrl).replace("%contentType%", contentType.orEmpty())
+            Timber.d("TAG_ANA getFunctionsJS -- $res")
+            return res
         }
     }
 }

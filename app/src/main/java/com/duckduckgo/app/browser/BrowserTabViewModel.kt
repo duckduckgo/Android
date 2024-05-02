@@ -2682,6 +2682,7 @@ class BrowserTabViewModel @Inject constructor(
         mimeType: String,
         requestUserConfirmation: Boolean,
     ) {
+        Timber.d("TAG_ANA requestFileDownload url=$url, contentDisposition=$contentDisposition, mimeType=$mimeType, requestUserConfirmation=$requestUserConfirmation")
         if (url.startsWith("blob:")) {
             command.value = ConvertBlobToDataUri(url, mimeType)
         } else {
@@ -2695,6 +2696,7 @@ class BrowserTabViewModel @Inject constructor(
         mimeType: String,
         requestUserConfirmation: Boolean,
     ) {
+        Timber.d("TAG_ANA sendRequestFileDownloadCommand url=$url, contentDisposition=$contentDisposition, mimeType=$mimeType, requestUserConfirmation=$requestUserConfirmation")
         command.postValue(RequestFileDownload(url, contentDisposition, mimeType, requestUserConfirmation))
     }
 
