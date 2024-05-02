@@ -33,6 +33,7 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @SingleInstanceIn(FragmentScope::class)
 @ContributesMultibinding(FragmentScope::class)
@@ -54,21 +55,25 @@ class WebMessageListenerEmailGetAlias @Inject constructor(
         isMainFrame: Boolean,
         reply: JavaScriptReplyProxy,
     ) {
-        val originalUrl: String? = webView.url
+        kotlin.runCatching {
+            val originalUrl: String? = webView.url
 
-        job += appCoroutineScope.launch(dispatchers.io()) {
-            val requestOrigin = sourceOrigin.toString()
-            if (!enabled(requestOrigin)) {
-                return@launch
+            job += appCoroutineScope.launch(dispatchers.io()) {
+                val requestOrigin = sourceOrigin.toString()
+                if (!enabled(requestOrigin)) {
+                    return@launch
+                }
+                val requestId = storeReply(reply)
+                callback.showNativeChooseEmailAddressPrompt(
+                    AutofillWebMessageRequest(
+                        requestOrigin = requestOrigin,
+                        originalPageUrl = originalUrl,
+                        requestId = requestId,
+                    ),
+                )
             }
-            val requestId = storeReply(reply)
-            callback.showNativeChooseEmailAddressPrompt(
-                AutofillWebMessageRequest(
-                    requestOrigin = requestOrigin,
-                    originalPageUrl = originalUrl,
-                    requestId = requestId,
-                ),
-            )
+        }.onFailure {
+            Timber.e(it, "Error while processing autofill web message for %s", key)
         }
     }
 

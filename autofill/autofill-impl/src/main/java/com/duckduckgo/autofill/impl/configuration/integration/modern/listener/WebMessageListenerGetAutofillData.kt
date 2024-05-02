@@ -71,19 +71,23 @@ class WebMessageListenerGetAutofillData @Inject constructor(
         isMainFrame: Boolean,
         reply: JavaScriptReplyProxy,
     ) {
-        val originalUrl: String? = webView.url
+        runCatching {
+            val originalUrl: String? = webView.url
 
-        job += appCoroutineScope.launch(dispatchers.io()) {
-            val requestId = storeReply(reply)
+            job += appCoroutineScope.launch(dispatchers.io()) {
+                val requestId = storeReply(reply)
 
-            getAutofillData(
-                message.data.toString(),
-                AutofillWebMessageRequest(
-                    requestOrigin = sourceOrigin.toString(),
-                    originalPageUrl = originalUrl,
-                    requestId = requestId,
-                ),
-            )
+                getAutofillData(
+                    message.data.toString(),
+                    AutofillWebMessageRequest(
+                        requestOrigin = sourceOrigin.toString(),
+                        originalPageUrl = originalUrl,
+                        requestId = requestId,
+                    ),
+                )
+            }
+        }.onFailure {
+            Timber.e(it, "Error while processing autofill web message for %s", key)
         }
     }
 
