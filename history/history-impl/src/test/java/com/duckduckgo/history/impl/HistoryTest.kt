@@ -17,13 +17,16 @@
 package com.duckduckgo.history.impl
 
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.history.api.HistoryRCWrapper
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import java.time.LocalDateTime
 import java.time.Month.JANUARY
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
+import org.junit.Before
 import org.junit.Test
+import org.mockito.Mockito.never
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -35,9 +38,15 @@ class HistoryTest {
     private val mockHistoryRepository: HistoryRepository = mock()
     private val mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
     private val mockCurrentTimeProvider: CurrentTimeProvider = mock()
+    private val mockHistoryRCWrapper: HistoryRCWrapper = mock()
     private val testScope = TestScope()
 
-    val testee = RealNavigationHistory(mockHistoryRepository, mockDuckDuckGoUrlDetector, mockCurrentTimeProvider)
+    val testee = RealNavigationHistory(mockHistoryRepository, mockDuckDuckGoUrlDetector, mockCurrentTimeProvider, mockHistoryRCWrapper)
+
+    @Before
+    fun setup() {
+        whenever(mockHistoryRCWrapper.shouldStoreHistory).thenReturn(true)
+    }
 
     @Test
     fun whenUrlIsSerpThenSaveToHistoryWithQueryAndSerpIsTrue() {
@@ -80,6 +89,17 @@ class HistoryTest {
         testScope.launch {
             testee.clearOldEntries()
             verify(mockHistoryRepository.clearEntriesOlderThan(eq(mockCurrentTimeProvider.localDateTimeNow().minusDays(30))))
+        }
+    }
+
+    @Test
+    fun whenShouldStoreHistoryIsFalseThenDoNotSaveToHistory() {
+        whenever(mockHistoryRCWrapper.shouldStoreHistory).thenReturn(false)
+
+        runTest {
+            testee.saveToHistory("url", "title")
+
+            verify(mockHistoryRepository, never()).saveToHistory(any(), any(), any(), any())
         }
     }
 }

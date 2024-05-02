@@ -20,6 +20,7 @@ import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.history.api.HistoryEntry
+import com.duckduckgo.history.api.HistoryRCWrapper
 import com.duckduckgo.history.api.NavigationHistory
 import com.squareup.anvil.annotations.ContributesBinding
 import io.reactivex.Single
@@ -35,11 +36,15 @@ class RealNavigationHistory @Inject constructor(
     private val historyRepository: HistoryRepository,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val currentTimeProvider: CurrentTimeProvider,
+    private val historyRCWrapperRCWrapper: HistoryRCWrapper,
 ) : InternalNavigationHistory {
     override suspend fun saveToHistory(
         url: String,
         title: String?,
     ) {
+        if (!historyRCWrapperRCWrapper.shouldStoreHistory) {
+            return
+        }
         val ddgUrl = duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)
         val query = if (ddgUrl) duckDuckGoUrlDetector.extractQuery(url) else null
 
@@ -47,7 +52,7 @@ class RealNavigationHistory @Inject constructor(
     }
 
     override fun getHistorySingle(): Single<List<HistoryEntry>> {
-        return historyRepository.getHistoryObservable()
+        return if (historyRCWrapperRCWrapper.shouldStoreHistory) historyRepository.getHistoryObservable() else Single.just(emptyList())
     }
 
     override suspend fun clearHistory() {
