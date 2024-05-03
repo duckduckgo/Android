@@ -75,7 +75,7 @@ platform :android do
   end
 
   desc "Annotate release"
-  lane :annotate_release do
+  private_lane :annotate_release do
     props = property_file_read(file: "app/version/version.properties")
     version = props["VERSION"]
 
