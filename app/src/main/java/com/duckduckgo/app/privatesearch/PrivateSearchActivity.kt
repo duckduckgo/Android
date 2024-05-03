@@ -18,6 +18,7 @@ package com.duckduckgo.app.privatesearch
 
 import android.os.Bundle
 import android.widget.CompoundButton
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -79,13 +80,18 @@ class PrivateSearchActivity : DuckDuckGoActivity() {
                         changeListener = autocompleteToggleListener,
                     )
                     if (it.storeHistoryEnabled) {
-                        binding.privateSearchAutocompleteRecentlyVisitedSitesToggle.isEnabled = true
+                        binding.privateSearchAutocompleteRecentlyVisitedSitesToggle.isVisible = true
+                        binding.privateSearchAutocompleteRecentlyVisitedSitesHint.isVisible = true
+                        binding.privateSearchAutoCompleteDivider.isVisible = true
                         binding.privateSearchAutocompleteRecentlyVisitedSitesToggle.quietlySetIsChecked(
                             newCheckedState = it.autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled,
                             changeListener = autocompleteRecentlyVisitedSitesToggleListener,
                         )
+                        binding.privateSearchAutocompleteRecentlyVisitedSitesToggle.isEnabled = it.autoCompleteSuggestionsEnabled
                     } else {
-                        binding.privateSearchAutocompleteRecentlyVisitedSitesToggle.isEnabled = false
+                        binding.privateSearchAutocompleteRecentlyVisitedSitesToggle.isVisible = false
+                        binding.privateSearchAutocompleteRecentlyVisitedSitesHint.isVisible = false
+                        binding.privateSearchAutoCompleteDivider.isVisible = false
                     }
                 }
             }.launchIn(lifecycleScope)

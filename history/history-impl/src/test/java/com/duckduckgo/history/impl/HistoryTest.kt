@@ -17,8 +17,8 @@
 package com.duckduckgo.history.impl
 
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
-import com.duckduckgo.history.api.HistoryRCWrapper
 import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.history.api.HistoryRCWrapper
 import java.time.LocalDateTime
 import java.time.Month.JANUARY
 import kotlinx.coroutines.launch

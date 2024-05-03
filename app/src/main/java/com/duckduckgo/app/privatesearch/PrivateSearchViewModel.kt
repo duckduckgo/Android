@@ -59,7 +59,7 @@ class PrivateSearchViewModel @Inject constructor(
             viewState.emit(
                 ViewState(
                     autoCompleteSuggestionsEnabled = settingsDataStore.autoCompleteSuggestionsEnabled,
-                    autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled = history.isHistoryUserEnabled(),
+                    autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled = settingsDataStore.autoCompleteSuggestionsEnabled && history.isHistoryUserEnabled(),
                     storeHistoryEnabled = history.isHistoryRCFlagEnabled(),
                 ),
             )
@@ -73,7 +73,14 @@ class PrivateSearchViewModel @Inject constructor(
     fun onAutocompleteSettingChanged(enabled: Boolean) {
         Timber.i("User changed autocomplete setting, is now enabled: $enabled")
         settingsDataStore.autoCompleteSuggestionsEnabled = enabled
-        viewModelScope.launch { viewState.emit(currentViewState().copy(autoCompleteSuggestionsEnabled = enabled)) }
+        viewModelScope.launch {
+            viewState.emit(
+                currentViewState().copy(
+                    autoCompleteSuggestionsEnabled = enabled,
+                    autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled = enabled && history.isHistoryUserEnabled(),
+                ),
+            )
+        }
     }
 
     fun onAutocompleteRecentlyVisitedSitesSettingChanged(enabled: Boolean) {
