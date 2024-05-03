@@ -2328,47 +2328,51 @@ class BrowserTabFragment :
 //            blobConverterInjector.addJsInterface(it) { url, mimeType -> viewModel.requestFileDownload(url, null, mimeType, true) }
 
             val script = """
+            window.__url_to_blob_collection = {};
+
+            const original_createObjectURL = URL.createObjectURL;
+
+            URL.createObjectURL = function () {
+                const blob = arguments[0];
+                const url = original_createObjectURL.call(this, ...arguments);
+                if (blob instanceof Blob) {
+                    __url_to_blob_collection[url] = blob;
+                }
+                return url;
+            }
             
+            function blobToBase64DataUrl(blob) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onloadend = function() {
+                        resolve(reader.result);
+                    }
+                    reader.onerror = function() {
+                        reject(new Error('Failed to read Blob object'));
+                    }
+                    reader.readAsDataURL(blob);
+                });
+            }
+
             myObject.postMessage('Hello from JavaScript')
             console.log('TAG_ANA Posted message from JS: Hello from JavaScript'); 
             
             myObject.onmessage = function(event) {
                 console.log('TAG_ANA Event origin is: ' + event.origin); 
-                console.log('TAG_ANA Event data is: ' + event.data); 
+                console.log('TAG_ANA Event data is: ' + event.data);
                 console.log('TAG_ANA window.location is: ' + window.location);           
 
                 if (event.data.startsWith('blob:')) {
-                    console.log('TAG_ANA Event data is a blob: ' + event.data); 
-                    var xhr = new XMLHttpRequest();
-                    xhr.open('GET', event.data, true);
-                    xhr.responseType = 'blob';
-                    
-                    xhr.onload = function(e) {
-                        if (this.status == 200) {
-                            var blob = this.response;
-                            var reader = new FileReader();
-                            
-                            reader.onloadend = function() {
-                                dataUrl = reader.result;
-                                console.log('TAG_ANA result is: ' + dataUrl); 
-                                myObject.postMessage(dataUrl);
-                            }
-                            
-                            reader.onerror = function() {
-                                console.log('TAG_ANA Blob reader error'); 
-                            }
-                            
-                            reader.readAsDataURL(blob);
-                        } else {
-                            console.log('TAG_ANA Blob error'); 
-                        }
-                    };
-                
-                    xhr.onerror = function() {
-                        console.error('TAG_ANA An error occurred during the XMLHttpRequest. Status: ' + xhr.status + ', Error: ' + xhr.statusText);
-                    };
-                    
-                    xhr.send();
+                    console.log('TAG_ANA Event data is a blob: ' + event.data);
+                    const blob = window.__url_to_blob_collection[event.data];
+                    if (blob) {
+                        console.log('TAG_ANA found blob data', blob);
+                        blobToBase64DataUrl(blob).then((dataUrl) => {
+                            myObject.postMessage(dataUrl);
+                        });
+                    } else {
+                        console.log('TAG_ANA no blob found')
+                    }
                 }
             }
                 
