@@ -266,10 +266,7 @@ internal class ToggleImpl constructor(
             return
         }
 
-        // local state is false (and remote state is enabled) try incremental rollout
-        if (!state.enable) {
-            state = calculateRolloutState(state)
-        }
+        state = evaluateRolloutThreshold(state)
 
         // remote state is null, means app update. Propagate the local state to remote state
         if (state.remoteEnableState == null) {
@@ -284,7 +281,7 @@ internal class ToggleImpl constructor(
         return store.get(key)
     }
 
-    private fun calculateRolloutState(
+    private fun evaluateRolloutThreshold(
         inputState: State,
     ): State {
         fun checkAndSetRolloutThreshold(state: State): State {

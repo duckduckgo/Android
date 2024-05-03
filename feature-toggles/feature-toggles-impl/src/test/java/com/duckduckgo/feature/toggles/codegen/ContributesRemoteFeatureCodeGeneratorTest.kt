@@ -607,6 +607,37 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
+    fun `test staged rollout for default-enabled feature flag`() {
+        val feature = generatedFeatureNewInstance()
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "state": "enabled",
+                    "features": {
+                        "defaultTrue": {
+                            "state": "enabled",
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 0.1
+                                    }                    
+                                ]
+                            }
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+        assertTrue(testFeature.self().isEnabled())
+        assertFalse(testFeature.defaultTrue().isEnabled())
+    }
+
+    @Test
     fun `the disable state of the feature always wins`() {
         val feature = generatedFeatureNewInstance()
 
@@ -996,8 +1027,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    // see https://app.asana.com/0/488551667048375/1206413338208929
-    fun `backwards compatibility test - feature was enabled remains enabled and rollout threshold not set`() {
+    fun `feature was enabled remains enabled and rollout threshold is set`() {
         whenever(appBuildConfig.versionCode).thenReturn(1)
         val feature = generatedFeatureNewInstance()
 
@@ -1034,8 +1064,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             ),
         )
         assertTrue(testFeature.self().isEnabled())
-        assertTrue(testFeature.fooFeature().isEnabled())
-        assertNull(testFeature.fooFeature().rolloutThreshold())
+        val rolloutThreshold = testFeature.fooFeature().rolloutThreshold()!!
+        assertEquals(rolloutThreshold < 50.0, testFeature.fooFeature().isEnabled())
     }
 
     @Test
@@ -1901,7 +1931,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             ),
         )
         assertTrue(testFeature.self().isEnabled())
-        assertTrue(testFeature.fooFeature().isEnabled())
+        assertFalse(testFeature.fooFeature().isEnabled())
 
         // Disable fooFeature, should disable the feature
         assertTrue(
