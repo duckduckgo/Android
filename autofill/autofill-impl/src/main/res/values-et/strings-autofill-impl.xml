@@ -162,4 +162,11 @@
     <string name="autofill_auth_text_for_delete_all">Autendi end, et kinnitada kõigi paroolide kustutamine</string>
     <string name="autofill_title_text_for_delete_all">Kustuta kõik paroolid</string>
 
+    <!-- Sync settings screen -->
+    <plurals name="syncCredentialInvalidItemsWarning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="one">Sinu parooli %1$s jaoks ei saa sünkroonida, sest üks selle väljadest ületab tähemärgipiirangu.</item>
+        <item quantity="other">Sinu paroolid %1$s ja %2$d muu saidi jaoks ei saa sünkroonida, kuna mõned nende väljad ületavad tähemärgipiirangu.</item>
+    </plurals>
+    <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Halda paroole</annotation></string>
+
 </resources>

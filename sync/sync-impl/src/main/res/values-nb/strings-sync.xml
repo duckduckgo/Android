@@ -159,6 +159,9 @@
     <!-- Sync Device Authentication -->
     <string name="sync_auth_text_for_access">Lås opp enheten for å få tilgang til Sync &amp; Backup.</string>
     <string name="sync_biometric_prompt_title">Sync &amp; Backup er låst</string>
+    <string name="sync_require_device_passcode_dialog_title">Sikre enheten din for å bruke Sync &amp; Backup</string>
+    <string name="sync_require_device_passcode_dialog_body">Det kreves et låsemønster, en PIN-kode eller biometri for å bruke Sync &amp; Backup.</string>
+    <string name="sync_require_device_passcode_dialog_action">Gå til Innstillinger</string>
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Vil du slette serverdata?</string>

@@ -166,4 +166,13 @@
     <string name="autofill_auth_text_for_delete_all">Overením potvrďte, že chcete odstrániť všetky heslá.</string>
     <string name="autofill_title_text_for_delete_all">Odstrániť všetky heslá</string>
 
+    <!-- Sync settings screen -->
+    <plurals name="syncCredentialInvalidItemsWarning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="one">Vaše heslo pre %1$s nemožno synchronizovať, pretože niektoré z polí prekračuje limit znakov.</item>
+        <item quantity="few">Vaše heslá pre %1$s a pre %2$d ďalších lokalít nemožno synchronizovať, pretože niektoré z polí prekračujú limit znakov.</item>
+        <item quantity="many">Vaše heslá pre %1$s a pre %2$d ďalších lokalít nemožno synchronizovať, pretože niektoré z polí prekračujú limit znakov.</item>
+        <item quantity="other">Vaše heslá pre %1$s a pre %2$d ďalších lokalít nemožno synchronizovať, pretože niektoré z polí prekračujú limit znakov.</item>
+    </plurals>
+    <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Spravovať heslá</annotation></string>
+
 </resources>

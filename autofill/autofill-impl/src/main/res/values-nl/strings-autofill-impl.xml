@@ -162,4 +162,11 @@
     <string name="autofill_auth_text_for_delete_all">Verifieer om te bevestigen dat je alle wachtwoorden wilt verwijderen</string>
     <string name="autofill_title_text_for_delete_all">Alle wachtwoorden verwijderen</string>
 
+    <!-- Sync settings screen -->
+    <plurals name="syncCredentialInvalidItemsWarning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="one">Je wachtwoord voor %1$s  kan niet worden gesynchroniseerd omdat sommige velden de tekenlimiet overschrijden.</item>
+        <item quantity="other">Je wachtwoorden voor %1$s en %2$d andere websites kunnen niet worden gesynchroniseerd omdat sommige velden de tekenlimiet overschrijden.</item>
+    </plurals>
+    <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Wachtwoorden beheren</annotation></string>
+
 </resources>

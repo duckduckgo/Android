@@ -162,4 +162,11 @@
     <string name="autofill_auth_text_for_delete_all">Tüm şifreleri silmek istediğinizi onaylamak için kimlik doğrulaması yapın</string>
     <string name="autofill_title_text_for_delete_all">Tüm Şifreleri Sil</string>
 
+    <!-- Sync settings screen -->
+    <plurals name="syncCredentialInvalidItemsWarning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="one">%1$s için şifreniz, alanlarından biri karakter sınırını aştığı için senkronize edilemiyor.</item>
+        <item quantity="other">%1$s ve %2$d diğer site için şifreleriniz, bazı alanları karakter sınırını aştığı için senkronize edilemiyor.</item>
+    </plurals>
+    <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Şifreleri Yönet</annotation></string>
+
 </resources>
