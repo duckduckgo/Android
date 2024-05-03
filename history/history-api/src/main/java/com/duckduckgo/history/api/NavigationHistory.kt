@@ -39,4 +39,19 @@ interface NavigationHistory {
      * Clears all history entries.
      */
     suspend fun clearHistory()
+
+    /**
+     * Returns whether the history is enabled by the user.
+     */
+    fun isHistoryUserEnabled(): Boolean
+
+    /**
+     * Sets whether the history is enabled by the user.
+     */
+    fun setHistoryUserEnabled(value: Boolean)
+
+    /**
+     * Returns whether the history RC flag is enabled.
+     */
+    fun isHistoryRCFlagEnabled(): Boolean
 }

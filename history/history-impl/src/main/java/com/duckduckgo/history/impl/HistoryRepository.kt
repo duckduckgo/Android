@@ -19,6 +19,7 @@ package com.duckduckgo.history.impl
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.history.api.HistoryEntry
 import com.duckduckgo.history.impl.store.HistoryDao
+import com.duckduckgo.history.impl.store.HistoryDataStore
 import io.reactivex.Single
 import java.time.LocalDateTime
 import kotlinx.coroutines.CoroutineScope
@@ -36,6 +37,9 @@ interface HistoryRepository {
     )
 
     suspend fun clearHistory()
+    fun isHistoryUserEnabled(default: Boolean): Boolean
+
+    fun setHistoryUserEnabled(value: Boolean)
 
     suspend fun clearEntriesOlderThan(dateTime: LocalDateTime)
 }
@@ -44,6 +48,7 @@ class RealHistoryRepository(
     private val historyDao: HistoryDao,
     private val dispatcherProvider: DispatcherProvider,
     private val appCoroutineScope: CoroutineScope,
+    private val historyDataStore: HistoryDataStore,
 ) : HistoryRepository {
 
     private var cachedHistoryEntries: List<HistoryEntry>? = null
@@ -88,6 +93,14 @@ class RealHistoryRepository(
             historyDao.deleteAll()
             fetchAndCacheHistoryEntries()
         }
+    }
+
+    override fun isHistoryUserEnabled(default: Boolean): Boolean {
+        return historyDataStore.isHistoryUserEnabled(default)
+    }
+
+    override fun setHistoryUserEnabled(value: Boolean) {
+        historyDataStore.setHistoryUserEnabled(value)
     }
 
     private suspend fun fetchAndCacheHistoryEntries(): List<HistoryEntry> {

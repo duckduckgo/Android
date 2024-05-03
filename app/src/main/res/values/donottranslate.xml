@@ -46,4 +46,8 @@
     <string name="audioCaptureSoundRecorderPermissionDeniedTitle">Allow DuckDuckGo to ask for sound recorder access on this device</string>
     <string name="audioCaptureSoundRecorderPermissionDeniedMessage">Sites can only use the sound recorder if you allow DuckDuckGo to ask for access.</string>
 
+    <!-- Private Search -->
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Recently Visited Sites</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">See private search suggestions, bookmarks, and recently visited sites as you type.</string>
+
 </resources>

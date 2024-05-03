@@ -49,6 +49,10 @@ class PrivateSearchActivity : DuckDuckGoActivity() {
         viewModel.onAutocompleteSettingChanged(isChecked)
     }
 
+    private val autocompleteRecentlyVisitedSitesToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
+        viewModel.onAutocompleteRecentlyVisitedSitesSettingChanged(isChecked)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -61,6 +65,7 @@ class PrivateSearchActivity : DuckDuckGoActivity() {
 
     private fun configureUiEventHandlers() {
         binding.privateSearchAutocompleteToggle.setOnCheckedChangeListener(autocompleteToggleListener)
+        binding.privateSearchAutocompleteRecentlyVisitedSitesToggle.setOnCheckedChangeListener(autocompleteRecentlyVisitedSitesToggleListener)
         binding.privateSearchMoreSearchSettings.setOnClickListener { viewModel.onPrivateSearchMoreSearchSettingsClicked() }
     }
 
@@ -73,6 +78,15 @@ class PrivateSearchActivity : DuckDuckGoActivity() {
                         newCheckedState = it.autoCompleteSuggestionsEnabled,
                         changeListener = autocompleteToggleListener,
                     )
+                    if (it.storeHistoryEnabled) {
+                        binding.privateSearchAutocompleteRecentlyVisitedSitesToggle.isEnabled = true
+                        binding.privateSearchAutocompleteRecentlyVisitedSitesToggle.quietlySetIsChecked(
+                            newCheckedState = it.autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled,
+                            changeListener = autocompleteRecentlyVisitedSitesToggleListener,
+                        )
+                    } else {
+                        binding.privateSearchAutocompleteRecentlyVisitedSitesToggle.isEnabled = false
+                    }
                 }
             }.launchIn(lifecycleScope)
 

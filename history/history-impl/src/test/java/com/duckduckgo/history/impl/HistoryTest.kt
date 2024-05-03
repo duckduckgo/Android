@@ -46,6 +46,7 @@ class HistoryTest {
     @Before
     fun setup() {
         whenever(mockHistoryRCWrapper.shouldStoreHistory).thenReturn(true)
+        whenever(mockHistoryRepository.isHistoryUserEnabled(any())).thenReturn(true)
     }
 
     @Test
@@ -95,6 +96,17 @@ class HistoryTest {
     @Test
     fun whenShouldStoreHistoryIsFalseThenDoNotSaveToHistory() {
         whenever(mockHistoryRCWrapper.shouldStoreHistory).thenReturn(false)
+
+        runTest {
+            testee.saveToHistory("url", "title")
+
+            verify(mockHistoryRepository, never()).saveToHistory(any(), any(), any(), any())
+        }
+    }
+
+    @Test
+    fun whenShouldStoreHistoryIsDisabledByUserThenDoNotSaveToHistory() {
+        whenever(mockHistoryRepository.isHistoryUserEnabled(any())).thenReturn(false)
 
         runTest {
             testee.saveToHistory("url", "title")

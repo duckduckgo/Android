@@ -23,6 +23,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.history.api.NavigationHistory
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -37,10 +38,13 @@ import timber.log.Timber
 class PrivateSearchViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val pixel: Pixel,
+    private val history: NavigationHistory,
 ) : ViewModel() {
 
     data class ViewState(
         val autoCompleteSuggestionsEnabled: Boolean = true,
+        val autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled: Boolean = true,
+        val storeHistoryEnabled: Boolean = false,
     )
 
     sealed class Command {
@@ -52,7 +56,13 @@ class PrivateSearchViewModel @Inject constructor(
 
     fun viewState(): Flow<ViewState> = viewState.onStart {
         viewModelScope.launch {
-            viewState.emit(ViewState(autoCompleteSuggestionsEnabled = settingsDataStore.autoCompleteSuggestionsEnabled))
+            viewState.emit(
+                ViewState(
+                    autoCompleteSuggestionsEnabled = settingsDataStore.autoCompleteSuggestionsEnabled,
+                    autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled = history.isHistoryUserEnabled(),
+                    storeHistoryEnabled = history.isHistoryRCFlagEnabled(),
+                ),
+            )
         }
     }
 
@@ -64,6 +74,12 @@ class PrivateSearchViewModel @Inject constructor(
         Timber.i("User changed autocomplete setting, is now enabled: $enabled")
         settingsDataStore.autoCompleteSuggestionsEnabled = enabled
         viewModelScope.launch { viewState.emit(currentViewState().copy(autoCompleteSuggestionsEnabled = enabled)) }
+    }
+
+    fun onAutocompleteRecentlyVisitedSitesSettingChanged(enabled: Boolean) {
+        Timber.i("User changed autocomplete recently visited sites setting, is now enabled: $enabled")
+        history.setHistoryUserEnabled(enabled)
+        viewModelScope.launch { viewState.emit(currentViewState().copy(autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled = enabled)) }
     }
 
     fun onPrivateSearchMoreSearchSettingsClicked() {

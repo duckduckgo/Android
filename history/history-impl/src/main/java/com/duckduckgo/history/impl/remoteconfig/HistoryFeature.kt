@@ -25,9 +25,9 @@ import com.duckduckgo.feature.toggles.api.Toggle
     featureName = "history",
 )
 interface HistoryFeature {
-    @Toggle.DefaultValue(true)
+    @Toggle.DefaultValue(false)
     fun self(): Toggle
 
-    @Toggle.DefaultValue(true)
+    @Toggle.DefaultValue(false)
     fun storeHistory(): Toggle
 }

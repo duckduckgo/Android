@@ -42,7 +42,7 @@ class RealNavigationHistory @Inject constructor(
         url: String,
         title: String?,
     ) {
-        if (!historyRCWrapperRCWrapper.shouldStoreHistory) {
+        if (!historyRCWrapperRCWrapper.shouldStoreHistory || !isHistoryUserEnabled()) {
             return
         }
         val ddgUrl = duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)
@@ -52,7 +52,7 @@ class RealNavigationHistory @Inject constructor(
     }
 
     override fun getHistorySingle(): Single<List<HistoryEntry>> {
-        return if (historyRCWrapperRCWrapper.shouldStoreHistory) historyRepository.getHistoryObservable() else Single.just(emptyList())
+        return if (isHistoryRCFlagEnabled() && isHistoryUserEnabled()) historyRepository.getHistoryObservable() else Single.just(emptyList())
     }
 
     override suspend fun clearHistory() {
@@ -61,5 +61,17 @@ class RealNavigationHistory @Inject constructor(
 
     override suspend fun clearOldEntries() {
         historyRepository.clearEntriesOlderThan(currentTimeProvider.localDateTimeNow().minusDays(30))
+    }
+
+    override fun isHistoryUserEnabled(): Boolean {
+        return historyRepository.isHistoryUserEnabled(historyRCWrapperRCWrapper.shouldStoreHistory)
+    }
+
+    override fun setHistoryUserEnabled(value: Boolean) {
+        historyRepository.setHistoryUserEnabled(value)
+    }
+
+    override fun isHistoryRCFlagEnabled(): Boolean {
+        return historyRCWrapperRCWrapper.shouldStoreHistory
     }
 }

@@ -36,7 +36,9 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.history.impl.store.ALL_MIGRATIONS
+import com.duckduckgo.history.impl.store.HistoryDataStore
 import com.duckduckgo.history.impl.store.HistoryDatabase
+import com.duckduckgo.history.impl.store.SharedPreferencesHistoryDataStore
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -53,8 +55,9 @@ class HistoryModule {
         historyDatabase: HistoryDatabase,
         dispatcherProvider: DispatcherProvider,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
+        historyDataStore: HistoryDataStore,
     ): HistoryRepository {
-        return RealHistoryRepository(historyDatabase.historyDao(), dispatcherProvider, appCoroutineScope)
+        return RealHistoryRepository(historyDatabase.historyDao(), dispatcherProvider, appCoroutineScope, historyDataStore)
     }
 
     @SingleInstanceIn(AppScope::class)
@@ -64,5 +67,11 @@ class HistoryModule {
             .fallbackToDestructiveMigration()
             .addMigrations(*ALL_MIGRATIONS)
             .build()
+    }
+
+    @SingleInstanceIn(AppScope::class)
+    @Provides
+    fun provideHistoryDataStore(context: Context): HistoryDataStore {
+        return SharedPreferencesHistoryDataStore(context)
     }
 }
