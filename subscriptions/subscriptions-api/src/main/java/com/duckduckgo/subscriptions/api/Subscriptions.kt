@@ -17,6 +17,7 @@
 package com.duckduckgo.subscriptions.api
 
 import android.content.Context
+import android.net.Uri
 import kotlinx.coroutines.flow.Flow
 
 interface Subscriptions {
@@ -52,7 +53,7 @@ interface Subscriptions {
     /**
      * Launches Privacy Pro with Settings as the parent activity
      */
-    fun launchPrivacyPro(context: Context)
+    fun launchPrivacyPro(context: Context, uri: Uri?)
 }
 
 enum class Product(val value: String) {

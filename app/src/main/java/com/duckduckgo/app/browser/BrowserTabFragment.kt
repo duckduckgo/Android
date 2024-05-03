@@ -1359,8 +1359,8 @@ class BrowserTabFragment :
             }
 
             is Command.LaunchPrivacyPro -> {
-                activity?.let {
-                    subscriptions.launchPrivacyPro(it)
+                activity?.let { context ->
+                    subscriptions.launchPrivacyPro(context, it.uri)
                 }
             }
 

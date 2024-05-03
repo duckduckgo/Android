@@ -3,6 +3,7 @@ package com.duckduckgo.subscriptions.impl.pixels
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DAILY
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.UNIQUE
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PURCHASE_SUCCESS_ORIGIN
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -15,21 +16,24 @@ class SubscriptionPixelTest(
 ) {
     @Test
     fun `pixel name has privacy pro namespace prefix`() {
-        pixel.getPixelNames().values.forEach { pixelName ->
-            assertTrue(pixelName.startsWith("m_privacy-pro_"))
+        SubscriptionPixel.entries.filterNot { it == PURCHASE_SUCCESS_ORIGIN }.forEach {
+            it.getPixelNames().values.forEach { pixelName ->
+                assertTrue(pixelName.startsWith("m_privacy-pro_"))
+            }
         }
     }
 
     @Test
     fun `pixel name has pixel type suffix`() {
-        pixel.getPixelNames().forEach { (pixelType, pixelName) ->
-            val expectedSuffix = when (pixelType) {
-                COUNT -> "_c"
-                DAILY -> "_d"
-                UNIQUE -> "_u"
+        SubscriptionPixel.entries.filterNot { it == PURCHASE_SUCCESS_ORIGIN }.forEach {
+            it.getPixelNames().forEach { (pixelType, pixelName) ->
+                val expectedSuffix = when (pixelType) {
+                    COUNT -> "_c"
+                    DAILY -> "_d"
+                    UNIQUE -> "_u"
+                }
+                assertTrue(pixelName.endsWith(expectedSuffix))
             }
-
-            assertTrue(pixelName.endsWith(expectedSuffix))
         }
     }
 

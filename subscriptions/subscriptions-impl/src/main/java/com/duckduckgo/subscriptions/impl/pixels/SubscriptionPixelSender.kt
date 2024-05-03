@@ -17,6 +17,8 @@
 package com.duckduckgo.subscriptions.impl.pixels
 
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.utils.extensions.toSanitizedLanguageTag
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.ACTIVATE_SUBSCRIPTION_ENTER_EMAIL_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.ACTIVATE_SUBSCRIPTION_RESTORE_PURCHASE_CLICK
@@ -36,6 +38,7 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PURCHASE_FAILU
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PURCHASE_FAILURE_OTHER
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PURCHASE_FAILURE_STORE
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PURCHASE_SUCCESS
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PURCHASE_SUCCESS_ORIGIN
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.RESTORE_AFTER_PURCHASE_ATTEMPT_SUCCESS
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.RESTORE_USING_EMAIL_SUCCESS
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.RESTORE_USING_STORE_FAILURE_OTHER
@@ -64,6 +67,7 @@ interface SubscriptionPixelSender {
     fun reportPurchaseFailureBackend()
     fun reportPurchaseFailureAccountCreation()
     fun reportPurchaseSuccess()
+    fun reportPurchaseSuccessOrigin(origin: String?)
     fun reportOfferRestorePurchaseClick()
     fun reportActivateSubscriptionEnterEmailClick()
     fun reportActivateSubscriptionRestorePurchaseClick()
@@ -95,6 +99,7 @@ interface SubscriptionPixelSender {
 @ContributesBinding(AppScope::class)
 class SubscriptionPixelSenderImpl @Inject constructor(
     private val pixelSender: Pixel,
+    private val appBuildConfig: AppBuildConfig,
 ) : SubscriptionPixelSender {
 
     override fun reportSubscriptionActive() =
@@ -120,6 +125,16 @@ class SubscriptionPixelSenderImpl @Inject constructor(
 
     override fun reportPurchaseSuccess() =
         fire(PURCHASE_SUCCESS)
+
+    override fun reportPurchaseSuccessOrigin(origin: String?) {
+        val map = mutableMapOf(
+            "locale" to appBuildConfig.deviceLocale.toSanitizedLanguageTag(),
+        )
+        origin?.let {
+            map.put("origin", origin)
+        }
+        fire(PURCHASE_SUCCESS_ORIGIN, map)
+    }
 
     override fun reportOfferRestorePurchaseClick() =
         fire(OFFER_RESTORE_PURCHASE_CLICK)
