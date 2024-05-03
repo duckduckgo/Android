@@ -17,7 +17,7 @@ tags:
     commands:
       - tapOn: "Don't allow"
 - tapOn: "Can't Scan? Share Text Code"
-- tapOn: "Navigate up"
+- pressKey: Back
 - tapOn: "Turn Off Sync & Backup…"
 - tapOn: "Turn Off"
 - runFlow: ../sync_flows/steps/action_recover_account.yaml

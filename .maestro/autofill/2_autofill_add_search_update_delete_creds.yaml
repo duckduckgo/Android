@@ -53,7 +53,7 @@ tags:
 
           - assertVisible: "Last updated.*"
 
-          - tapOn: "Navigate up"
+          - pressKey: Back
 
           - assertVisible:
                 text: "Save and autofill passwords"

@@ -15,12 +15,12 @@ name: "Sync Critical Path: Devices can be added to an existing account"
 - inputText: ${CODE}
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/sync_recovery_code_cta"
-- tapOn: "Navigate up"
+- pressKey: Back
 - scrollUntilVisible:
     element:
       text: "Sync & Backup"
     direction: UP
 - tapOn: "Sync & Backup"
 - assertVisible: "Synced Devices"
-- tapOn: "Navigate up"
-- tapOn: "Navigate up"
+- pressKey: Back
+- pressKey: Back

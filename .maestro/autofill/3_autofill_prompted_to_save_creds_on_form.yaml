@@ -29,7 +29,7 @@ tags:
     text: "Login"
 - assertVisible: "Save Password"
 - tapOn: "Save Password"
-- pressKey: back
+- pressKey: Back
 - tapOn: "Close Autofill Dialog"
 - tapOn:
     id: "password"

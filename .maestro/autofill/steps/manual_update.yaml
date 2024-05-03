@@ -22,4 +22,4 @@ name: "Autofill: Manually updating an existing credential"
     retryTapIfNoChange: false
 
 - assertVisible: "new note"
-- tapOn: "Navigate up"
+- pressKey: Back

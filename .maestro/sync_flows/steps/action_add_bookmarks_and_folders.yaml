@@ -63,7 +63,7 @@ appId: com.duckduckgo.mobile.android
 - tapOn: "Bookmarks"
 - tapOn: "${output.bookmarks.folders[0]}"
 - tapOn: "Confirm"
-- tapOn: "Navigate up"
+- pressKey: Back
 - runFlow:
     when:
       visible:
