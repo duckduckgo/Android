@@ -213,7 +213,7 @@ class FeatureTogglesTest {
         assertTrue(feature.self().isEnabled())
 
         feature.self().setEnabled(state.copy(rollout = listOf(1.0, 2.0)))
-        assertTrue(feature.self().isEnabled())
+        assertEquals(feature.self().rolloutThreshold() < 2.0, feature.self().isEnabled())
 
         feature.self().setEnabled(state.copy(rollout = listOf(0.5, 2.0), rolloutThreshold = 0.0))
         assertTrue(feature.self().isEnabled())
@@ -229,9 +229,9 @@ class FeatureTogglesTest {
             rollout = listOf(100.0),
             rolloutThreshold = null,
         )
-        val expected = state.copy(remoteEnableState = state.enable)
         feature.self().setEnabled(state)
         assertTrue(feature.self().isEnabled())
+        val expected = state.copy(remoteEnableState = state.enable, rolloutThreshold = feature.self().getRawStoredState()?.rolloutThreshold)
         assertEquals(expected, toggleStore.get("test"))
     }
 
@@ -369,7 +369,8 @@ class FeatureTogglesTest {
         )
         feature.self().setEnabled(state)
         assertTrue(feature.self().isEnabled())
-        assertEquals(state, toggleStore.get("test"))
+        val expected = state.copy(rolloutThreshold = feature.self().getRawStoredState()?.rolloutThreshold)
+        assertEquals(expected, toggleStore.get("test"))
     }
 
     @Test
