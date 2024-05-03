@@ -70,7 +70,24 @@ platform :android do
     )
 
     cleanup_fastlane_release_notes()
+    annotate_release()
 
+  end
+
+  desc "Annotate release"
+  lane :annotate_release do
+    props = property_file_read(file: "app/version/version.properties")
+    version = props["VERSION"]
+
+    http_status = sh("curl -s -o /dev/null -w '%{http_code}' https://improving.duckduckgo.com/t/m_new_release_android?appVersion=#{version}", log: false).to_i
+
+      if http_status >= 200 && http_status < 300
+        # Successful response
+        puts "Release annotation successful with status code #{http_status}"
+      else
+        # Unsuccessful response
+        puts "Release annotation failed with status code #{http_status}"
+      end
   end
 
   desc "Upload APK to ad-hoc internal app sharing"
