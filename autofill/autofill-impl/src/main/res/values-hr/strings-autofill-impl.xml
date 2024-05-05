@@ -166,4 +166,13 @@
     <string name="autofill_auth_text_for_delete_all">Izvrši autentifikaciju i time potvrdi da želiš izbrisati sve lozinke</string>
     <string name="autofill_title_text_for_delete_all">Izbriši sve lozinke</string>
 
+    <!-- Sync settings screen -->
+    <plurals name="syncCredentialInvalidItemsWarning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="one">Tvoje lozinke za %1$s ne mogu se sinkronizirati jer neka njihova polja premašuju ograničenje broja znakova.</item>
+        <item quantity="few">Tvoje lozinke za %1$s i %2$d drugih web-mjesta ne mogu se sinkronizirati jer neka njihova polja premašuju ograničenje broja znakova.</item>
+        <item quantity="many">Tvoje lozinke za %1$s i %2$d drugih web-mjesta ne mogu se sinkronizirati jer neka njihova polja premašuju ograničenje broja znakova.</item>
+        <item quantity="other">Tvoje lozinke za %1$s i %2$d drugih web-mjesta ne mogu se sinkronizirati jer neka njihova polja premašuju ograničenje broja znakova.</item>
+    </plurals>
+    <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Upravljanje lozinkama</annotation></string>
+
 </resources>

@@ -159,6 +159,9 @@
     <!-- Sync Device Authentication -->
     <string name="sync_auth_text_for_access">Odklenite napravo za dostop do sinhronizacije in varnostnega kopiranja.</string>
     <string name="sync_biometric_prompt_title">Sinhronizacija in varnostno kopiranje je zaklenjeno</string>
+    <string name="sync_require_device_passcode_dialog_title">Za uporabo funkcije Sync &amp; Backup (Sinhronizacija in varnostno kopiranje) zavarujte svojo napravo</string>
+    <string name="sync_require_device_passcode_dialog_body">Za uporabo funkcije Sync &amp; Backup (Sinhronizacija in varnostno kopiranje) je zahtevan vzorec za zaklepanje naprave, koda PIN ali biometrični podatki.</string>
+    <string name="sync_require_device_passcode_dialog_action">Odprite Nastavitve</string>
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Želite izbrisati podatke strežnika?</string>

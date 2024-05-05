@@ -17,9 +17,16 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <!-- Setup screen -->
+    <!-- Sync settings screen -->
     <string name="sync_enable_option_favorites_title">Bendrinti adresyną</string>
     <string name="sync_enable_option_favorites_subtitle">Naudokite tą patį adresyną visuose įrenginiuose. Palikite išjungtą, kad mobiliojo ir stacionaraus įrenginių adresynai būtų atskirti.</string>
     <string name="saved_site_limit_warning"><b>Sinchronizavimas pristabdytas</b>\nViršyta žymių riba. Ištrinkite kai kurias, kad tęstumėte sinchronizavimą.\n\n<annotation type="manage_bookmarks">Tvarkyti žymes</annotation></string>
     <string name="saved_site_limit_warning_notif"><b>Žymių sinchronizavimas pristabdytas</b>\nViršijote žymių sinchronizavimo ribą. Pabandykite ištrinti kai kurias žymes. Kol ši problema nebus išspręsta, nebus kuriamos atsarginės jūsų žymių kopijos.</string>
+    <plurals name="saved_site_invalid_items_warning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="one">Jūsų %1$s žymė negali būti sinchronizuojama, nes tekstas viename iš laukų viršija simbolių limitą.</item>
+        <item quantity="few">Jūsų %1$s ir %2$d kitų svetainių žymės negali būti sinchronizuojamos, nes tekstas kai kuriuose laukuose viršija simbolių limitą.</item>
+        <item quantity="many">Jūsų %1$s ir %2$d kitų svetainės žymės negali būti sinchronizuojamos, nes tekstas kai kuriuose laukuose viršija simbolių limitą.</item>
+        <item quantity="other">Jūsų %1$s ir %2$d kitų svetainių žymės negali būti sinchronizuojamos, nes tekstas kai kuriuose laukuose viršija simbolių limitą.</item>
+    </plurals>
+    <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Tvarkyti žymes</annotation></string>
 </resources>

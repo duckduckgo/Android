@@ -159,6 +159,9 @@
     <!-- Sync Device Authentication -->
     <string name="sync_auth_text_for_access">Sync &amp; Backup\'a erişmek için cihazın kilidini açın.</string>
     <string name="sync_biometric_prompt_title">Sync &amp; Backup Kilitli</string>
+    <string name="sync_require_device_passcode_dialog_title">Sync &amp; Backup\'ı kullanmak için cihazınızı güvenli hale getirin</string>
+    <string name="sync_require_device_passcode_dialog_body">Sync &amp; Backup\'ı kullanmak için cihaz kilit deseni, PIN veya biyometrik bilgi gerekir.</string>
+    <string name="sync_require_device_passcode_dialog_action">Ayarlar\'a gidin</string>
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Sunucu Verileri Silinsin mi?</string>

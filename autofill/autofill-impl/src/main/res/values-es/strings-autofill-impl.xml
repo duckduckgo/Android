@@ -162,4 +162,11 @@
     <string name="autofill_auth_text_for_delete_all">Autentícate para confirmar que deseas borrar todas las contraseñas</string>
     <string name="autofill_title_text_for_delete_all">Borrar todas las contraseñas</string>
 
+    <!-- Sync settings screen -->
+    <plurals name="syncCredentialInvalidItemsWarning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="one">La contraseñas de %1$s no se puede sincronizar porque algunos de sus campos superan el límite de caracteres.</item>
+        <item quantity="other">Las contraseñas de %1$s y %2$d otros sitios más no se pueden sincronizar porque algunos de sus campos superan el límite de caracteres.</item>
+    </plurals>
+    <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Gestionar contraseñas</annotation></string>
+
 </resources>

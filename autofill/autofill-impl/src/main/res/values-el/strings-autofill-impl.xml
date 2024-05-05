@@ -162,4 +162,11 @@
     <string name="autofill_auth_text_for_delete_all">Επαληθεύστε την ταυτότητά σας για να επιβεβαιώσετε ότι θέλετε να διαγράψετε όλους τους κωδικούς πρόσβασης</string>
     <string name="autofill_title_text_for_delete_all">Διαγραφή όλων των κωδικών πρόσβασης</string>
 
+    <!-- Sync settings screen -->
+    <plurals name="syncCredentialInvalidItemsWarning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="one">Ο κωδικός πρόσβασής σας για τον %1$s δεν μπορεί να συγχρονιστεί επειδή ορισμένα από τα πεδία του υπερβαίνουν το όριο χαρακτήρων.</item>
+        <item quantity="other">Οι κωδικοί πρόσβασής σας για τον %1$s και %2$d ακόμα ιστότοπους δεν μπορούν να συγχρονιστούν επειδή ορισμένα από τα πεδία τους υπερβαίνουν το όριο χαρακτήρων.</item>
+    </plurals>
+    <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Διαχείριση κωδικών πρόσβασης</annotation></string>
+
 </resources>

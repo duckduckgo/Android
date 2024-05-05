@@ -17,9 +17,14 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <!-- Setup screen -->
+    <!-- Sync settings screen -->
     <string name="sync_enable_option_favorites_title">Κοινοποιήστε τα Αγαπημένα</string>
     <string name="sync_enable_option_favorites_subtitle">Χρησιμοποιήστε τα ίδια αγαπημένα σε όλες τις συσκευές. Διακόψτε τη διαδικασία για να διατηρήσετε τα Αγαπημένα σας για κινητά και υπολογιστές ξεχωριστά.</string>
     <string name="saved_site_limit_warning"><b>Ο Συγχρονισμός τέθηκε σε παύση</b>\nΥπέρβαση του ορίου σελιδοδεικτών. Διαγραφή ορισμένων για συνέχιση του συγχρονισμού.\n\n<annotation type="manage_bookmarks">Διαχείριση σελιδοδεικτών</annotation></string>
     <string name="saved_site_limit_warning_notif"><b>Ο Συγχρονισμός σελιδοδεικτών τέθηκε σε παύση</b>\nΈχετε υπερβεί το όριο συγχρονισμού σελιδοδεικτών. Προσπαθήστε να διαγράψετε ορισμένους σελιδοδείκτες. Μέχρι να επιλυθεί το πρόβλημα αυτό, δεν θα δημιουργηθούν αντίγραφα ασφαλείας για τους σελιδοδείκτες σας.</string>
+    <plurals name="saved_site_invalid_items_warning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="one">Ο σελιδοδείκτης σας για τον %1$s δεν μπορεί να συγχρονιστεί επειδή ορισμένα από τα πεδία του υπερβαίνει το όριο χαρακτήρων.</item>
+        <item quantity="other">Οι σελιδοδείκτες σας για τον %1$s και %2$d ακόμα ιστότοπους δεν μπορούν να συγχρονιστούν επειδή ορισμένα από τα πεδία τους υπερβαίνουν το όριο χαρακτήρων.</item>
+    </plurals>
+    <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Διαχείριση σελιδοδεικτών</annotation></string>
 </resources>

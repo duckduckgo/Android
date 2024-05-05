@@ -164,4 +164,12 @@
     <string name="autofill_auth_text_for_delete_all">Autentifică-te pentru a confirma că dorești să ștergi toate parolele</string>
     <string name="autofill_title_text_for_delete_all">Șterge toate parolele</string>
 
+    <!-- Sync settings screen -->
+    <plurals name="syncCredentialInvalidItemsWarning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="one">Parola ta pentru %1$s nu se poate sincroniza, deoarece unul dintre câmpuri depășește limita de caractere.</item>
+        <item quantity="few">Parolele tale pentru %1$s și încă alte %2$d site-uri nu se pot sincroniza, deoarece unele dintre câmpuri depășesc limita de caractere.</item>
+        <item quantity="other">Parolele tale pentru %1$s și încă alte %2$d de site-uri nu se pot sincroniza deoarece unele dintre câmpurile lor depășesc limita de caractere.</item>
+    </plurals>
+    <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Gestionează parolele</annotation></string>
+
 </resources>

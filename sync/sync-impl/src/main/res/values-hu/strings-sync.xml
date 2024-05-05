@@ -159,6 +159,9 @@
     <!-- Sync Device Authentication -->
     <string name="sync_auth_text_for_access">Oldd fel az eszközt a Szinkronizálás és biztonsági mentés funkció eléréséhez.</string>
     <string name="sync_biometric_prompt_title">A Szinkronizálás és biztonsági mentés funkció zárolva</string>
+    <string name="sync_require_device_passcode_dialog_title">Eszköz lezárása a Sync &amp; Backup használatához</string>
+    <string name="sync_require_device_passcode_dialog_body">A Sync &amp; Backup funkció használatához az eszköz zárolási mintája, PIN-kód vagy biometrikus adatok szükségesek.</string>
+    <string name="sync_require_device_passcode_dialog_action">Lépj a Beállítások menübe</string>
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Szerveradatok törlése?</string>

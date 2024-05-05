@@ -162,4 +162,11 @@
     <string name="autofill_auth_text_for_delete_all">Autentica para confirmar que pretendes eliminar todas as palavras-passe</string>
     <string name="autofill_title_text_for_delete_all">Eliminar todas as palavras-passe</string>
 
+    <!-- Sync settings screen -->
+    <plurals name="syncCredentialInvalidItemsWarning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="one">Não é possível sincronizar a tua palavra-passe para %1$s porque um dos campos excede o limite de carateres.</item>
+        <item quantity="other">Não é possível sincronizar as tuas palavras-passe para %1$s e mais %2$d sites porque alguns dos campos excedem o limite de carateres.</item>
+    </plurals>
+    <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Gerir palavra-passes</annotation></string>
+
 </resources>

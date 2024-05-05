@@ -159,6 +159,9 @@
     <!-- Sync Device Authentication -->
     <string name="sync_auth_text_for_access">Sync &amp; Backup funktsiooni juurde pääsemiseks avage seade.</string>
     <string name="sync_biometric_prompt_title">Sync &amp; Backup on lukustatud</string>
+    <string name="sync_require_device_passcode_dialog_title">Funktsiooni Sync &amp; Backup kasutamiseks kindlusta oma seade</string>
+    <string name="sync_require_device_passcode_dialog_body">Seadme lukustusmuster, PIN-kood või biomeetria on vajalik funktsiooni Sync &amp; Backup kasutamiseks.</string>
+    <string name="sync_require_device_passcode_dialog_action">Ava Sätted</string>
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Kas kustutada serveri andmed?</string>

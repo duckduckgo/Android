@@ -159,6 +159,9 @@
     <!-- Sync Device Authentication -->
     <string name="sync_auth_text_for_access">Entsperre das Gerät, um auf Sync &amp; Backup zuzugreifen.</string>
     <string name="sync_biometric_prompt_title">Sync &amp; Backup gesperrt</string>
+    <string name="sync_require_device_passcode_dialog_title">Sichere dein Gerät, um Sync &amp; Backup zu nutzen</string>
+    <string name="sync_require_device_passcode_dialog_body">Für die Verwendung von Sync &amp; Backup sind ein Entsperrmuster, eine PIN oder biometrische Daten erforderlich.</string>
+    <string name="sync_require_device_passcode_dialog_action">Gehe zu Einstellungen</string>
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Serverdaten löschen?</string>

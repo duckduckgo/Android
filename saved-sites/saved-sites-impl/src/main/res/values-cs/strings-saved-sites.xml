@@ -17,9 +17,16 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <!-- Setup screen -->
+    <!-- Sync settings screen -->
     <string name="sync_enable_option_favorites_title">Sdílet oblíbené</string>
     <string name="sync_enable_option_favorites_subtitle">Používej na všech zařízeních stejné oblíbené položky. Nech volbu vypnutou, pokud chceš mít záložky na mobilu a na počítači oddělené.</string>
     <string name="saved_site_limit_warning"><b>Synchronizace je pozastavená</b>\nJe překročený limit počtu záložek. Jestli chceš synchronizaci obnovit, některé odstraň.<annotation type="manage_bookmarks">Spravovat záložky</annotation></string>
     <string name="saved_site_limit_warning_notif"><b>Synchronizace záložek je pozastavená</b>\nMáš překročený limit pro synchronizaci záložek. Zkus pár záložek smazat. Dokud problém nevyřešíš, záložky se nebudou zálohovat.</string>
+    <plurals name="saved_site_invalid_items_warning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="one">Tvoje záložka pro %1$s se nedá synchronizovat, protože jedno z jejich polí překračuje maximální počet znaků.</item>
+        <item quantity="few">Tvoje záložky pro %1$s a %2$d další weby se nedají synchronizovat, protože některá z jejich polí překračují maximální počet znaků.</item>
+        <item quantity="many">Tvoje záložky pro %1$s a %2$d dalšího webu se nedají synchronizovat, protože některá z jejich polí překračují maximální počet znaků.</item>
+        <item quantity="other">Tvoje záložky pro %1$s a %2$d dalších webů se nedají synchronizovat, protože některá z jejich polí překračují maximální počet znaků.</item>
+    </plurals>
+    <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Spravovat záložky</annotation></string>
 </resources>

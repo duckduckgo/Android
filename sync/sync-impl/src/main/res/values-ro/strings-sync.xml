@@ -159,6 +159,9 @@
     <!-- Sync Device Authentication -->
     <string name="sync_auth_text_for_access">Deblochează dispozitivul pentru a accesa Sync &amp; Backup.</string>
     <string name="sync_biometric_prompt_title">Sync &amp; Backup blocat</string>
+    <string name="sync_require_device_passcode_dialog_title">Securizează-ți dispozitivul pentru a utiliza Sync &amp; Backup</string>
+    <string name="sync_require_device_passcode_dialog_body">Este necesară secvența de blocare a dispozitivului, codul PIN sau identificarea biometrică pentru a utiliza Sync &amp; Backup.</string>
+    <string name="sync_require_device_passcode_dialog_action">Mergi la Setări</string>
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Ștergi datele serverului?</string>

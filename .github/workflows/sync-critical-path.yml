@@ -54,7 +54,7 @@ jobs:
       - name: Assemble internal release APK
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: assembleInternalRelease -Pforce-default-variant -x lint
+          arguments: assembleInternalRelease -Pforce-default-variant -Psync-disable-auth-requirement -x lint
 
       - name: Move APK to new folder
         if: always()

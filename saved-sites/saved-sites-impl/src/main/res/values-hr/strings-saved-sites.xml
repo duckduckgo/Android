@@ -17,9 +17,16 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <!-- Setup screen -->
+    <!-- Sync settings screen -->
     <string name="sync_enable_option_favorites_title">Dijeljenje favorita</string>
     <string name="sync_enable_option_favorites_subtitle">Koristi iste favorite na svim uređajima. Isključi za odvajanje favorita za mobilne uređaje i stolna računala.</string>
     <string name="saved_site_limit_warning"><b>Sinkronizacija pauzirana</b>\nOgraničenje oznaka je premašeno. Izbriši neke za nastavak sinkronizacije.\n\n<annotation type="manage_bookmarks">Upravljanje knjižnim oznakama</annotation></string>
     <string name="saved_site_limit_warning_notif"><b>Sinkronizacija knjižnih oznaka je pauzirana</b>\nPremašeno je ograničenje sinkronizacije knjižnih oznaka. Pokušaj izbrisati neke oznake. Dok se to ne riješi, tvoje se oznake neće sigurnosno kopirati.</string>
+    <plurals name="saved_site_invalid_items_warning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="one">Tvoje oznake za %1$s ne mogu se sinkronizirati jer neka njihova polja premašuju ograničenje broja znakova.</item>
+        <item quantity="few">Tvoje oznake za %1$s i %2$d drugih web-mjesta ne mogu se sinkronizirati jer neka njihova polja premašuju ograničenje broja znakova.</item>
+        <item quantity="many">Tvoje oznake za %1$s i %2$d drugih web-mjesta ne mogu se sinkronizirati jer neka njihova polja premašuju ograničenje broja znakova.</item>
+        <item quantity="other">Tvoje oznake za %1$s i %2$d drugih web-mjesta ne mogu se sinkronizirati jer neka njihova polja premašuju ograničenje broja znakova.</item>
+    </plurals>
+    <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Upravljanje knjižnim oznakama</annotation></string>
 </resources>

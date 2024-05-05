@@ -159,6 +159,9 @@
     <!-- Sync Device Authentication -->
     <string name="sync_auth_text_for_access">Ontgrendel het apparaat om toegang te krijgen tot \'Synchronisatie en back-up\'.</string>
     <string name="sync_biometric_prompt_title">\'Synchronisatie en back-up\' vergrendeld</string>
+    <string name="sync_require_device_passcode_dialog_title">Beveilig je apparaat om \'Synchronisatie en back-up\' te gebruiken</string>
+    <string name="sync_require_device_passcode_dialog_body">Er is een apparaatwachtwoord vereist om \'Synchronisatie  en back-up\' te kunnen gebruiken.</string>
+    <string name="sync_require_device_passcode_dialog_action">Ga naar Instellingen</string>
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Wil je de servergegevens verwijderen?</string>
