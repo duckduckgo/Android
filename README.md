@@ -1,6 +1,6 @@
 # DuckDuckGo Android
 
-Welcome to our android application. We are excited to engage the community in development, see [CONTRIBUTING.md](CONTRIBUTING.md).
+Welcome to our Android application. We are excited to engage the community in development, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## We are hiring!
 DuckDuckGo is growing fast and we continue to expand our fully distributed team. We embrace diverse perspectives, and seek out passionate, self-motivated people, committed to our shared vision of raising the standard of trust online. If you are a senior software engineer capable in either iOS or Android, visit our [careers](https://duckduckgo.com/hiring/#open) page to find out more about our openings!
@@ -27,4 +27,4 @@ Please refer to [contributing](CONTRIBUTING.md).
 Contact us at https://duckduckgo.com/feedback if you have feedback, questions or want to chat. You can also use the feedback form embedded within our Mobile App - to do so please navigate to Settings and select "Leave Feedback".
 
 ## License
-DuckDuckGo android is distributed under the Apache 2.0 [license](LICENSE).
+DuckDuckGo Android is distributed under the Apache 2.0 [license](LICENSE).
