@@ -40,4 +40,7 @@ interface SyncFeature {
 
     @Toggle.DefaultValue(true)
     fun level3AllowCreateAccount(): Toggle
+
+    @Toggle.DefaultValue(true)
+    fun gzipPatchRequests(): Toggle
 }
