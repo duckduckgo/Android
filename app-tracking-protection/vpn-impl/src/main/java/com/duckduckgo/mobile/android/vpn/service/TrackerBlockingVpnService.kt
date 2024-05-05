@@ -515,6 +515,11 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
                     }
                 }
 
+            logcat { "VPN log: adding search domains: ${tunnelConfig.searchDomains}" }
+            tunnelConfig.searchDomains?.let {
+                addSearchDomain(it)
+            }
+
             safelyAddDisallowedApps(tunnelConfig.appExclusionList.toList())
 
             // Apparently we always need to call prepare, even tho not clear in docs

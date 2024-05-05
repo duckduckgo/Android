@@ -25,7 +25,17 @@ class FakeVpnNetworkStack(override val name: String) : VpnNetworkStack {
     }
 
     override suspend fun onPrepareVpn(): Result<VpnNetworkStack.VpnTunnelConfig> {
-        return Result.success(VpnNetworkStack.VpnTunnelConfig(1500, emptyMap(), emptySet(), emptySet(), emptyMap(), emptySet()))
+        return Result.success(
+            VpnNetworkStack.VpnTunnelConfig(
+                mtu = 1500,
+                addresses = emptyMap(),
+                dns = emptySet(),
+                searchDomains = null,
+                customDns = emptySet(),
+                routes = emptyMap(),
+                appExclusionList = emptySet(),
+            ),
+        )
     }
 
     override fun onStartVpn(tunfd: ParcelFileDescriptor): Result<Unit> {
