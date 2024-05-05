@@ -15,5 +15,4 @@
   -->
 
 <resources>
-    <string name="credentialManagementWebViewIncompatibleErrorMessage">Autofill for passwords is unavailable because your version of Android WebView is too old.</string>
 </resources>
