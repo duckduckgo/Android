@@ -20,7 +20,6 @@ import com.duckduckgo.app.global.api.ApiInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.SyncService
-import com.duckduckgo.sync.impl.internal.SyncInternalEnvDataStore
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.io.IOException
 import javax.inject.Inject
@@ -39,7 +38,6 @@ import okio.buffer
     boundType = ApiInterceptorPlugin::class,
 )
 class SyngGzipInterceptor @Inject constructor(
-    private val envDataStore: SyncInternalEnvDataStore,
     private val syncFeature: SyncFeature,
 ) : ApiInterceptorPlugin, Interceptor {
 
