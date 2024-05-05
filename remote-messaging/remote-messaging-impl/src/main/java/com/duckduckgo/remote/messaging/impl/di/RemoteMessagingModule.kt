@@ -38,7 +38,7 @@ import com.duckduckgo.remote.messaging.impl.network.RemoteMessagingService
 import com.duckduckgo.remote.messaging.store.LocalRemoteMessagingConfigRepository
 import com.duckduckgo.remote.messaging.store.RemoteMessagesDao
 import com.duckduckgo.remote.messaging.store.RemoteMessagingCohortStore
-import com.duckduckgo.remote.messaging.store.RemoteMessagingCohortStoreDB
+import com.duckduckgo.remote.messaging.store.RemoteMessagingCohortStoreImpl
 import com.duckduckgo.remote.messaging.store.RemoteMessagingConfigRepository
 import com.duckduckgo.remote.messaging.store.RemoteMessagingDatabase
 import com.duckduckgo.remote.messaging.store.RemoteMessagingDatabase.Companion.ALL_MIGRATIONS
@@ -166,7 +166,7 @@ object DataSourceModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun providesRemoteMessagingUserDataStore(database: RemoteMessagingDatabase): RemoteMessagingCohortStore {
-        return RemoteMessagingCohortStoreDB(database)
+    fun providesRemoteMessagingUserDataStore(database: RemoteMessagingDatabase, dispatchers: DispatcherProvider): RemoteMessagingCohortStore {
+        return RemoteMessagingCohortStoreImpl(database, dispatchers)
     }
 }

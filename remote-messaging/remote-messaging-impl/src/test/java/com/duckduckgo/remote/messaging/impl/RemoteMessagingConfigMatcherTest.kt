@@ -19,6 +19,7 @@ package com.duckduckgo.remote.messaging.impl
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.remote.messaging.api.AttributeMatcherPlugin
 import com.duckduckgo.remote.messaging.api.MatchingAttribute
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
@@ -28,7 +29,7 @@ import com.duckduckgo.remote.messaging.impl.models.*
 import com.duckduckgo.remote.messaging.impl.models.RemoteConfig
 import com.duckduckgo.remote.messaging.store.RemoteMessagingCohort
 import com.duckduckgo.remote.messaging.store.RemoteMessagingCohortStore
-import com.duckduckgo.remote.messaging.store.RemoteMessagingCohortStoreDB
+import com.duckduckgo.remote.messaging.store.RemoteMessagingCohortStoreImpl
 import com.duckduckgo.remote.messaging.store.RemoteMessagingDatabase
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -42,6 +43,9 @@ import org.mockito.kotlin.whenever
 @RunWith(AndroidJUnit4::class)
 class RemoteMessagingConfigMatcherTest {
 
+    @get:org.junit.Rule
+    var coroutineRule = CoroutineTestRule()
+
     private val deviceAttributeMatcher: AttributeMatcherPlugin = mock()
     private val androidAppAttributeMatcher: AttributeMatcherPlugin = mock()
     private val userAttributeMatcher: AttributeMatcherPlugin = mock()
@@ -50,7 +54,7 @@ class RemoteMessagingConfigMatcherTest {
         .allowMainThreadQueries()
         .build()
     private val cohortDao = db.remoteMessagingCohortDao()
-    private val remoteMessagingCohortStore: RemoteMessagingCohortStore = RemoteMessagingCohortStoreDB(db)
+    private val remoteMessagingCohortStore: RemoteMessagingCohortStore = RemoteMessagingCohortStoreImpl(db, coroutineRule.testDispatcherProvider)
 
     private val testee = RemoteMessagingConfigMatcher(
         setOf(deviceAttributeMatcher, androidAppAttributeMatcher, userAttributeMatcher),
@@ -370,7 +374,7 @@ class RemoteMessagingConfigMatcherTest {
     @Test
     fun whenDeviceMatchesMessageRulesAndPartOfPercentileThenReturnMessage() = runBlocking {
         givenDeviceMatches(Api(max = 19))
-        cohortDao.insert(RemoteMessagingCohort(message = "message1", percentile = 0.1f))
+        cohortDao.insert(RemoteMessagingCohort(messageId = "message1", percentile = 0.1f))
 
         val message = testee.evaluate(
             RemoteConfig(
@@ -385,7 +389,7 @@ class RemoteMessagingConfigMatcherTest {
     @Test
     fun whenDeviceMatchesMessageRulesButOutOfPercentileThenReturnNull() = runBlocking {
         givenDeviceMatches(Api(max = 19))
-        cohortDao.insert(RemoteMessagingCohort(message = "message1", percentile = 0.5f))
+        cohortDao.insert(RemoteMessagingCohort(messageId = "message1", percentile = 0.5f))
 
         val message = testee.evaluate(
             RemoteConfig(
@@ -400,7 +404,7 @@ class RemoteMessagingConfigMatcherTest {
     @Test
     fun whenMatchingMessageShouldBeExcludedAndUserPartOfPercentileThenReturnNull() = runBlocking {
         givenDeviceMatches(Locale(value = listOf("en-US")))
-        cohortDao.insert(RemoteMessagingCohort(message = "message1", percentile = 0.1f))
+        cohortDao.insert(RemoteMessagingCohort(messageId = "message1", percentile = 0.1f))
 
         val message = testee.evaluate(
             RemoteConfig(
@@ -417,7 +421,7 @@ class RemoteMessagingConfigMatcherTest {
     @Test
     fun whenMatchingMessageShouldBeExcludedButOutOfPercentileThenReturnMessage() = runBlocking {
         givenDeviceMatches(Locale(value = listOf("en-US")))
-        cohortDao.insert(RemoteMessagingCohort(message = "message1", percentile = 0.5f))
+        cohortDao.insert(RemoteMessagingCohort(messageId = "message1", percentile = 0.5f))
 
         val message = testee.evaluate(
             RemoteConfig(

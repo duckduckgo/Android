@@ -36,19 +36,19 @@ abstract class RemoteMessagingDatabase : RoomDatabase() {
     abstract fun remoteMessagingCohortDao(): RemoteMessagingCohortDao
 
     companion object {
-        val MIGRATION_1_2 = object : Migration(1, 2) {
+        private val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 with(database) {
                     execSQL(
                         "CREATE TABLE IF NOT EXISTS `remote_messaging_cohort` " +
-                            "(`id` INTEGER NOT NULL," +
-                            " `message` TEXT NOT NULL," +
+                            "(`messageId` TEXT NOT NULL," +
                             " `percentile` REAL NOT NULL," +
-                            " PRIMARY KEY(`id`))",
+                            " PRIMARY KEY(`messageId`))",
                     )
                 }
             }
         }
-        val ALL_MIGRATIONS = arrayOf(MIGRATION_1_2)
+        val ALL_MIGRATIONS: Array<Migration>
+            get() = arrayOf(MIGRATION_1_2)
     }
 }

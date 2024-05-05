@@ -21,7 +21,6 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "remote_messaging_cohort")
 data class RemoteMessagingCohort(
-    @PrimaryKey val id: Int = 1,
-    val message: String,
+    @PrimaryKey val messageId: String,
     val percentile: Float,
 )

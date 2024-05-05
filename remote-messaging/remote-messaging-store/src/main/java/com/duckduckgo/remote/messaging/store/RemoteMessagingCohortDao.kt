@@ -22,10 +22,10 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 
 @Dao
-abstract class RemoteMessagingCohortDao {
-    @Query("select * from remote_messaging_cohort where message = :messageID")
-    abstract fun messageById(messageID: String): RemoteMessagingCohort?
+interface RemoteMessagingCohortDao {
+    @Query("select * from remote_messaging_cohort where messageId = :messageID limit 1")
+    suspend fun messageById(messageID: String): RemoteMessagingCohort?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insert(entity: RemoteMessagingCohort)
+    suspend fun insert(entity: RemoteMessagingCohort)
 }
