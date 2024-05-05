@@ -372,7 +372,7 @@ class SyncActivityViewModel @Inject constructor(
 
     private suspend fun requiresSetupAuthentication(action: suspend () -> Unit) {
         val hasValidDeviceAuthentication = deviceAuthenticator.hasValidDeviceAuthentication()
-        if (hasValidDeviceAuthentication.not()) {
+        if (hasValidDeviceAuthentication.not() && deviceAuthenticator.isAuthenticationRequired()) {
             command.send(RequestSetupAuthentication)
         } else {
             action()

@@ -26,6 +26,7 @@ import androidx.annotation.UiThread
 import androidx.fragment.app.FragmentActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.impl.BuildConfig
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthConfiguration
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthResult
@@ -49,6 +50,15 @@ interface DeviceAuthenticator {
         config: AuthConfiguration = AuthConfiguration(),
         onResult: (AuthResult) -> Unit,
     )
+
+    /**
+     * Returns true if the user has to authenticate to use sync. This is always true in production.
+     *
+     * When running some specific UI tests, this can be set to false with a build flag to allow us to have increased test coverage.
+     */
+    fun isAuthenticationRequired(): Boolean {
+        return BuildConfig.AUTH_REQUIRED
+    }
 
     /**
      * Launches the device authentication enrollment screen from system settings.

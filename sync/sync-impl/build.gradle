@@ -22,6 +22,10 @@ plugins {
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
+ext {
+    syncDisableAuthRequirementBuildFlag = "sync-disable-auth-requirement"
+}
+
 android {
     namespace 'com.duckduckgo.sync.impl'
 }
@@ -110,5 +114,16 @@ android {
     compileOptions {
         coreLibraryDesugaringEnabled = true
     }
+    defaultConfig {
+        if (project.hasProperty("$syncDisableAuthRequirementBuildFlag")) {
+            buildConfigField "boolean", "AUTH_REQUIRED", "false"
+        } else {
+            buildConfigField "boolean", "AUTH_REQUIRED", "true"
+        }
+    }
+}
+
+tasks.register('installForSyncTesting', Exec) {
+    commandLine "$rootDir/gradlew", ':app:installInternalDebug', "-P$syncDisableAuthRequirementBuildFlag"
 }
 

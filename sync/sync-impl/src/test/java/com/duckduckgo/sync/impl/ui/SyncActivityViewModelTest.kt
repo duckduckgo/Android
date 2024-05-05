@@ -97,7 +97,7 @@ class SyncActivityViewModelTest {
             syncPixels = syncPixels,
             deviceAuthenticator = deviceAuthenticator,
         )
-
+        whenever(deviceAuthenticator.isAuthenticationRequired()).thenReturn(true)
         whenever(syncStateMonitor.syncState()).thenReturn(emptyFlow())
         whenever(syncAccountRepository.isSyncSupported()).thenReturn(true)
     }
