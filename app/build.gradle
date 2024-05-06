@@ -486,7 +486,11 @@ tasks.register('releaseTestLocal', Exec) {
 
 tasks.register('releaseTestCloud', Exec) {
     commandLine 'maestro', 'cloud', '--include-tags', 'releaseTest', "build/outputs/apk/play/release/duckduckgo-${buildVersionName()}-play-release.apk", '../.maestro'
-    dependsOn 'assemblePlayRelease'
+    dependsOn 'assemblePlayReleaseTest'
+}
+
+tasks.register('assemblePlayReleaseTest', Exec) {
+    commandLine "$rootDir/gradlew", ':app:assemblePlayRelease', "-Pforce-default-variant"
 }
 
 task newModule(type: com.duckduckgo.gradle.ModuleCreator) {
