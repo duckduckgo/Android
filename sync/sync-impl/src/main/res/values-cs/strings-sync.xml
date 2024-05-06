@@ -159,6 +159,9 @@
     <!-- Sync Device Authentication -->
     <string name="sync_auth_text_for_access">Pro přístup k synchronizaci a zálohování zařízení odemkni.</string>
     <string name="sync_biometric_prompt_title">Funkce Sync &amp; Backup je nedostupná</string>
+    <string name="sync_require_device_passcode_dialog_title">Zabezpeč své zařízení, ať můžeš používat funkci Sync &amp; Backup</string>
+    <string name="sync_require_device_passcode_dialog_body">Pro použití funkce Sync &amp; Backup se vyžadují biometrické údaje, gesto nebo PIN k zařízení.</string>
+    <string name="sync_require_device_passcode_dialog_action">Přejdi do Nastavení</string>
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Smazat data ze serveru?</string>

@@ -159,6 +159,9 @@
     <!-- Sync Device Authentication -->
     <string name="sync_auth_text_for_access">Avaa laitteen lukitus käyttääksesi Sync &amp; Backupia.</string>
     <string name="sync_biometric_prompt_title">Sync &amp; Backup lukittu</string>
+    <string name="sync_require_device_passcode_dialog_title">Suojaa laitteesi käyttääksesi Sync &amp; Backup -ominaisuutta</string>
+    <string name="sync_require_device_passcode_dialog_body">Sync &amp; Backup -ominaisuuden käyttäminen edellyttää laitteen lukituskuviota, PIN-koodia tai biometrisiä tietoja.</string>
+    <string name="sync_require_device_passcode_dialog_action">Siirry kohtaan Asetukset</string>
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Poista palvelimen tiedot?</string>

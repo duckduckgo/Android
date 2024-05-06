@@ -16,6 +16,8 @@
 
 package com.duckduckgo.networkprotection.impl.configuration
 
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.Mode
@@ -56,6 +58,7 @@ class RealWgServerApi @Inject constructor(
     @UnprotectedVpnControllerService private val wgVpnControllerService: WgVpnControllerService,
     private val serverDebugProvider: WgServerDebugProvider,
     private val netNetpEgressServersProvider: NetpEgressServersProvider,
+    private val appBuildConfig: AppBuildConfig,
 ) : WgServerApi {
 
     override suspend fun registerPublicKey(
@@ -64,17 +67,21 @@ class RealWgServerApi @Inject constructor(
     ): WgServerData? {
         // This bit of code gets all possible egress servers which should be order by proximity, caches them for internal builds and then
         // returns the closest one or null if list is empty
-        val selectedServer = wgVpnControllerService.getServers().map { it.server }
-            .also { fetchedServers ->
-                logcat { "Fetched servers ${fetchedServers.map { it.name }}" }
-                serverDebugProvider.cacheServers(fetchedServers)
-            }
-            .map { it.name }
-            .firstOrNull { serverName ->
-                serverDebugProvider.getSelectedServerName()?.let { userSelectedServer ->
-                    serverName == userSelectedServer
-                } ?: false
-            }
+        val selectedServer = if (appBuildConfig.isInternalBuild()) {
+            wgVpnControllerService.getServers().map { it.server }
+                .also { fetchedServers ->
+                    logcat { "Fetched servers ${fetchedServers.map { it.name }}" }
+                    serverDebugProvider.cacheServers(fetchedServers)
+                }
+                .map { it.name }
+                .firstOrNull { serverName ->
+                    serverDebugProvider.getSelectedServerName()?.let { userSelectedServer ->
+                        serverName == userSelectedServer
+                    } ?: false
+                }
+        } else {
+            null
+        }
 
         val userPreferredLocation = netNetpEgressServersProvider.updateServerLocationsAndReturnPreferred()
         val registerKeyBody = if (mode is FailureRecovery) {

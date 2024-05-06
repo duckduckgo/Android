@@ -162,4 +162,11 @@
     <string name="autofill_auth_text_for_delete_all">Esegui l\'autenticazione per confermare l\'eliminazione di tutte le password</string>
     <string name="autofill_title_text_for_delete_all">Elimina tutte le password</string>
 
+    <!-- Sync settings screen -->
+    <plurals name="syncCredentialInvalidItemsWarning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="one">La password per %1$s non può essere sincronizzata perché uno dei suoi campi supera il limite di caratteri.</item>
+        <item quantity="other">Le password per %1$s e altri %2$d siti non possono essere sincronizzate perché alcuni dei loro campi superano il limite di caratteri.</item>
+    </plurals>
+    <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Gestisci password</annotation></string>
+
 </resources>

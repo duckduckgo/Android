@@ -159,6 +159,9 @@
     <!-- Sync Device Authentication -->
     <string name="sync_auth_text_for_access">Atrakinkite įrenginį, kad galėtumėte pasiekti funkciją „Sync &amp; Backup“.</string>
     <string name="sync_biometric_prompt_title">Funkcija „Sync &amp; Backup“ užrakinta</string>
+    <string name="sync_require_device_passcode_dialog_title">Apsaugokite savo įrenginį, kad galėtumėte naudoti „Sync &amp; Backup“</string>
+    <string name="sync_require_device_passcode_dialog_body">Norint naudoti „Sync &amp; Backup“, reikalingas užrakinimo piešinys, PIN kodas arba biometriniai duomenys.</string>
+    <string name="sync_require_device_passcode_dialog_action">Eikite į „Nustatymai“</string>
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Ištrinti serverio duomenis?</string>

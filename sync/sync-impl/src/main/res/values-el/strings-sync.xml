@@ -159,6 +159,9 @@
     <!-- Sync Device Authentication -->
     <string name="sync_auth_text_for_access">Ξεκλειδώστε τη συσκευή για πρόσβαση στο Sync &amp; Backup.</string>
     <string name="sync_biometric_prompt_title">Η λειτουργία Sync &amp; Backup κλειδώθηκε</string>
+    <string name="sync_require_device_passcode_dialog_title">Ασφαλίστε τη συσκευή σας για να χρησιμοποιείτε τη λειτουργία Sync &amp; Backup</string>
+    <string name="sync_require_device_passcode_dialog_body">Απαιτείται μοτίβο, PIN ή βιομετρικά στοιχεία κλειδώματος συσκευής για χρήση του Sync &amp; Backup.</string>
+    <string name="sync_require_device_passcode_dialog_action">Μεταβείτε στις Ρυθμίσεις</string>
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Διαγραφή δεδομένων διακομιστή;</string>

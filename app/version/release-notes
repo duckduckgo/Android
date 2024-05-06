@@ -1,7 +1,4 @@
-We improved how the browser handles app links.
-Permission dialogs now show up as expected in custom tabs.
-We also fixed other bugs, including an issue that caused some webpages to appear blank when loading.
-
-For Privacy Pro subscribers:
-The VPN can now turn off automatically when you're making a Wi-Fi call and seamlessly reconnect after. Turn on in VPN Settings.
-Visit https://duckduckgo.com/pro for more information. Privacy Pro is currently available to U.S. residents only.
+What's new:
+* Sync & Backup should now work more efficiently to ensure bookmarks and passwords are available on all of your DuckDuckGo browsers.
+* We fixed a bug that could cause the browser to crash when granting site permissions.
+* As usual, we also included other bug fixes and improvements.

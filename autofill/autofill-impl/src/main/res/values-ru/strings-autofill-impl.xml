@@ -166,4 +166,13 @@
     <string name="autofill_auth_text_for_delete_all">Чтобы подтвердить удаление, выполните авторизацию</string>
     <string name="autofill_title_text_for_delete_all">Удалить все пароли</string>
 
+    <!-- Sync settings screen -->
+    <plurals name="syncCredentialInvalidItemsWarning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="one">Синхронизировать ваш пароль от сайта %1$s не удалось, так как содержимое одного из полей превышает ограничение по числу символов.</item>
+        <item quantity="few">Синхронизировать ваш пароль от %1$s и еще %2$d сайтов не удалось, так как содержимое некоторых полей превышает ограничение по числу символов.</item>
+        <item quantity="many">Синхронизировать ваш пароль от %1$s и еще %2$d сайтов не удалось, так как содержимое некоторых полей превышает ограничение по числу символов.</item>
+        <item quantity="other">Синхронизировать ваш пароль от %1$s и других сайтов (%2$d) не удалось, так как содержимое некоторых полей превышает ограничение по числу символов.</item>
+    </plurals>
+    <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Управление паролями</annotation></string>
+
 </resources>

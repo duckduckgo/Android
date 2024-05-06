@@ -16,6 +16,8 @@
 
 package com.duckduckgo.networkprotection.impl.configuration
 
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.BuildFlavor.INTERNAL
 import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.WgServerData
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpEgressServersProvider
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpEgressServersProvider.PreferredLocation
@@ -39,6 +41,9 @@ class RealWgServerApiTest {
     @Mock
     private lateinit var netpEgressServersProvider: NetpEgressServersProvider
 
+    @Mock
+    private lateinit var appBuildConfig: AppBuildConfig
+
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
@@ -50,11 +55,13 @@ class RealWgServerApiTest {
             wgVpnControllerService,
             internalWgServerDebugProvider,
             netpEgressServersProvider,
+            appBuildConfig,
         )
         productionApi = RealWgServerApi(
             wgVpnControllerService,
             productionWgServerDebugProvider,
             netpEgressServersProvider,
+            appBuildConfig,
         )
     }
 
@@ -75,6 +82,7 @@ class RealWgServerApiTest {
 
     @Test
     fun whenRegisterInInternalAndServerSelectedThenReturnSelectedServer() = runTest {
+        whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
         internalWgServerDebugProvider.selectedServer = "egress.euw.2"
 
         assertEquals(
@@ -92,6 +100,7 @@ class RealWgServerApiTest {
 
     @Test
     fun whenRegisterInInternalAndServerSelectedWithNoServerCountryThenReturnSelectedServerWithNullLocation() = runTest {
+        whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
         internalWgServerDebugProvider.selectedServer = "egress.euw"
 
         assertEquals(
@@ -133,6 +142,7 @@ class RealWgServerApiTest {
 
     @Test
     fun whenInternalFlavorGetWgServerDataThenStoreReturnedServers() = runTest {
+        whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
         internalApi.registerPublicKey("testpublickey")
 
         assertEquals(8, internalWgServerDebugProvider.cachedServers.size)
@@ -190,6 +200,7 @@ class RealWgServerApiTest {
 
     @Test
     fun whenUserPreferredLocationSetAndInternalDebugServerSelectedThenRegisterPublicKeyShouldReturnDebugServer() = runTest {
+        whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
         internalWgServerDebugProvider.selectedServer = "egress.euw.2"
         whenever(netpEgressServersProvider.updateServerLocationsAndReturnPreferred()).thenReturn(
             PreferredLocation(countryCode = "us", cityName = "Des Moines"),

@@ -24,6 +24,7 @@ import com.duckduckgo.remote.messaging.fixtures.RemoteMessagingConfigOM.aRemoteM
 import com.duckduckgo.remote.messaging.fixtures.jsonMatchingAttributeMappers
 import com.duckduckgo.remote.messaging.fixtures.messageActionPlugins
 import com.duckduckgo.remote.messaging.impl.mappers.RemoteMessagingConfigJsonMapper
+import com.duckduckgo.remote.messaging.store.RemoteMessagingCohortStore
 import com.duckduckgo.remote.messaging.store.RemoteMessagingConfigRepository
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -50,7 +51,8 @@ class RealRemoteMessagingConfigProcessorTest {
     )
     private val remoteMessagingConfigRepository = mock<RemoteMessagingConfigRepository>()
     private val remoteMessagingRepository = mock<RemoteMessagingRepository>()
-    private val remoteMessagingConfigMatcher = RemoteMessagingConfigMatcher(setOf(mock(), mock(), mock()), mock())
+    private val remoteMessagingCohortStore = mock<RemoteMessagingCohortStore>()
+    private val remoteMessagingConfigMatcher = RemoteMessagingConfigMatcher(setOf(mock(), mock(), mock()), mock(), remoteMessagingCohortStore)
 
     private val testee = RealRemoteMessagingConfigProcessor(
         remoteMessagingConfigJsonMapper,

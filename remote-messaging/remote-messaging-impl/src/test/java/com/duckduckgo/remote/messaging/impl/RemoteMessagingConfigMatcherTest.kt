@@ -16,6 +16,10 @@
 
 package com.duckduckgo.remote.messaging.impl
 
+import androidx.room.Room
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.remote.messaging.api.AttributeMatcherPlugin
 import com.duckduckgo.remote.messaging.api.MatchingAttribute
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
@@ -23,29 +27,44 @@ import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aMediumMessage
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aSmallMessage
 import com.duckduckgo.remote.messaging.impl.models.*
 import com.duckduckgo.remote.messaging.impl.models.RemoteConfig
+import com.duckduckgo.remote.messaging.store.RemoteMessagingCohort
+import com.duckduckgo.remote.messaging.store.RemoteMessagingCohortStore
+import com.duckduckgo.remote.messaging.store.RemoteMessagingCohortStoreImpl
+import com.duckduckgo.remote.messaging.store.RemoteMessagingDatabase
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
+@RunWith(AndroidJUnit4::class)
 class RemoteMessagingConfigMatcherTest {
+
+    @get:org.junit.Rule
+    var coroutineRule = CoroutineTestRule()
 
     private val deviceAttributeMatcher: AttributeMatcherPlugin = mock()
     private val androidAppAttributeMatcher: AttributeMatcherPlugin = mock()
     private val userAttributeMatcher: AttributeMatcherPlugin = mock()
     private val remoteMessagingRepository: RemoteMessagingRepository = mock()
+    private val db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, RemoteMessagingDatabase::class.java)
+        .allowMainThreadQueries()
+        .build()
+    private val cohortDao = db.remoteMessagingCohortDao()
+    private val remoteMessagingCohortStore: RemoteMessagingCohortStore = RemoteMessagingCohortStoreImpl(db, coroutineRule.testDispatcherProvider)
 
     private val testee = RemoteMessagingConfigMatcher(
         setOf(deviceAttributeMatcher, androidAppAttributeMatcher, userAttributeMatcher),
         remoteMessagingRepository,
+        remoteMessagingCohortStore,
     )
 
     @Test
     fun whenEmptyConfigThenReturnNull() = runBlocking {
-        val emptyRemoteConfig = RemoteConfig(messages = emptyList(), rules = emptyMap())
+        val emptyRemoteConfig = RemoteConfig(messages = emptyList(), rules = emptyList())
 
         val message = testee.evaluate(emptyRemoteConfig)
 
@@ -54,7 +73,7 @@ class RemoteMessagingConfigMatcherTest {
 
     @Test
     fun whenNoMatchingRulesThenReturnFirstMessage() = runBlocking {
-        val noRulesRemoteConfig = RemoteConfig(messages = listOf(aSmallMessage()), rules = emptyMap())
+        val noRulesRemoteConfig = RemoteConfig(messages = listOf(aSmallMessage()), rules = emptyList())
 
         val message = testee.evaluate(noRulesRemoteConfig)
 
@@ -68,7 +87,7 @@ class RemoteMessagingConfigMatcherTest {
                 aSmallMessage(matchingRules = rules(1)),
                 aMediumMessage(),
             ),
-            rules = emptyMap(),
+            rules = emptyList(),
         )
 
         val message = testee.evaluate(noRulesRemoteConfig)
@@ -80,7 +99,7 @@ class RemoteMessagingConfigMatcherTest {
     fun whenNoMessagesThenReturnNull() = runBlocking {
         val noMessagesRemoteConfig = RemoteConfig(
             messages = emptyList(),
-            rules = mapOf(rule(1, Api(max = 19))),
+            rules = listOf(rule(id = 1, matchingAttributes = arrayOf(Api(max = 19)))),
         )
 
         val message = testee.evaluate(noMessagesRemoteConfig)
@@ -98,7 +117,7 @@ class RemoteMessagingConfigMatcherTest {
                     aSmallMessage(matchingRules = rules(1)),
                     aMediumMessage(matchingRules = rules(1)),
                 ),
-                rules = mapOf(rule(1, Api(max = 19))),
+                rules = listOf(rule(id = 1, matchingAttributes = arrayOf(Api(max = 19)))),
             ),
         )
 
@@ -115,10 +134,10 @@ class RemoteMessagingConfigMatcherTest {
                     aMediumMessage(matchingRules = emptyList(), exclusionRules = rules(2)),
                     aMediumMessage(matchingRules = emptyList(), exclusionRules = rules(3)),
                 ),
-                rules = mapOf(
-                    rule(1, Api(max = 19)),
-                    rule(2, Locale(value = listOf("en-US"))),
-                    rule(3, EmailEnabled(value = false)),
+                rules = listOf(
+                    rule(id = 1, matchingAttributes = arrayOf(Api(max = 19))),
+                    rule(id = 2, matchingAttributes = arrayOf(Locale(value = listOf("en-US")))),
+                    rule(id = 3, matchingAttributes = arrayOf(EmailEnabled(value = false))),
                 ),
             ),
         )
@@ -133,9 +152,9 @@ class RemoteMessagingConfigMatcherTest {
         val message = testee.evaluate(
             RemoteConfig(
                 messages = listOf(aMediumMessage(matchingRules = rules(1), exclusionRules = rules(2))),
-                rules = mapOf(
-                    rule(1, Api(max = 19)),
-                    rule(2, Locale(value = listOf("en-US"))),
+                rules = listOf(
+                    rule(id = 1, matchingAttributes = arrayOf(Api(max = 19))),
+                    rule(id = 2, matchingAttributes = arrayOf(Locale(value = listOf("en-US")))),
                 ),
             ),
         )
@@ -156,12 +175,12 @@ class RemoteMessagingConfigMatcherTest {
                     aMediumMessage(matchingRules = rules(1), exclusionRules = rules(2, 4)),
                     aMediumMessage(matchingRules = rules(1), exclusionRules = rules(5)),
                 ),
-                rules = mapOf(
-                    rule(1, Api(max = 19)),
-                    rule(2, EmailEnabled(value = true), Bookmarks(max = 10)),
-                    rule(3, EmailEnabled(value = true), Bookmarks(max = 10)),
-                    rule(4, Api(max = 19)),
-                    rule(5, EmailEnabled(value = true)),
+                rules = listOf(
+                    rule(id = 1, matchingAttributes = arrayOf(Api(max = 19))),
+                    rule(id = 2, matchingAttributes = arrayOf(EmailEnabled(value = true), Bookmarks(max = 10))),
+                    rule(id = 3, matchingAttributes = arrayOf(EmailEnabled(value = true), Bookmarks(max = 10))),
+                    rule(id = 4, matchingAttributes = arrayOf(Api(max = 19))),
+                    rule(id = 5, matchingAttributes = arrayOf(EmailEnabled(value = true))),
                 ),
             ),
         )
@@ -180,9 +199,9 @@ class RemoteMessagingConfigMatcherTest {
                     aMediumMessage(matchingRules = rules(1), exclusionRules = rules(2)),
                     aMediumMessage(matchingRules = rules(1), exclusionRules = emptyList()),
                 ),
-                rules = mapOf(
-                    rule(1, Api(max = 19)),
-                    rule(2, Locale(value = listOf("en-US"))),
+                rules = listOf(
+                    rule(id = 1, matchingAttributes = arrayOf(Api(max = 19))),
+                    rule(id = 2, matchingAttributes = arrayOf(Locale(value = listOf("en-US")))),
                 ),
             ),
         )
@@ -199,9 +218,9 @@ class RemoteMessagingConfigMatcherTest {
                 messages = listOf(
                     aMediumMessage(matchingRules = rules(1), exclusionRules = rules(2)),
                 ),
-                rules = mapOf(
-                    rule(1, Api(max = 19)),
-                    rule(2, EmailEnabled(value = false)),
+                rules = listOf(
+                    rule(id = 1, matchingAttributes = arrayOf(Api(max = 19))),
+                    rule(id = 2, matchingAttributes = arrayOf(EmailEnabled(value = false))),
                 ),
             ),
         )
@@ -216,7 +235,7 @@ class RemoteMessagingConfigMatcherTest {
         val message = testee.evaluate(
             RemoteConfig(
                 messages = listOf(aMediumMessage(matchingRules = rules(1))),
-                rules = mapOf(rule(1, Api(max = 19))),
+                rules = listOf(rule(id = 1, matchingAttributes = arrayOf(Api(max = 19)))),
             ),
         )
 
@@ -233,7 +252,7 @@ class RemoteMessagingConfigMatcherTest {
                     aMediumMessage(matchingRules = rules(1)),
                     aSmallMessage(matchingRules = rules(1)),
                 ),
-                rules = mapOf(rule(1, Api(max = 19))),
+                rules = listOf(rule(id = 1, matchingAttributes = arrayOf(Api(max = 19)))),
             ),
         )
 
@@ -250,9 +269,9 @@ class RemoteMessagingConfigMatcherTest {
                     aSmallMessage(matchingRules = rules(2)),
                     aMediumMessage(matchingRules = rules(1, 2)),
                 ),
-                rules = mapOf(
-                    rule(1, Api(max = 19)),
-                    rule(2, EmailEnabled(value = false)),
+                rules = listOf(
+                    rule(id = 1, matchingAttributes = arrayOf(Api(max = 19))),
+                    rule(id = 2, matchingAttributes = arrayOf(EmailEnabled(value = false))),
                 ),
             ),
         )
@@ -264,8 +283,8 @@ class RemoteMessagingConfigMatcherTest {
     fun whenUserDismissedMessagesAndDeviceMatchesMultipleMessagesThenReturnFistMatchNotDismissed() = runBlocking {
         givenDeviceMatches(Api(max = 19), EmailEnabled(value = true))
         givenUserDismissed("1")
-        val rules = mapOf(
-            rule(1, Api(max = 19)),
+        val rules = listOf(
+            rule(id = 1, matchingAttributes = arrayOf(Api(max = 19))),
         )
 
         val message = testee.evaluate(
@@ -288,9 +307,9 @@ class RemoteMessagingConfigMatcherTest {
         val message = testee.evaluate(
             RemoteConfig(
                 messages = listOf(aMediumMessage(matchingRules = rules(1, 2))),
-                rules = mapOf(
-                    rule(1, Locale(value = listOf("en-US"))),
-                    rule(2, Api(max = 15)),
+                rules = listOf(
+                    rule(id = 1, matchingAttributes = arrayOf(Locale(value = listOf("en-US")))),
+                    rule(id = 2, matchingAttributes = arrayOf(Api(max = 15))),
                 ),
             ),
         )
@@ -308,9 +327,9 @@ class RemoteMessagingConfigMatcherTest {
                     aMediumMessage(matchingRules = rules(1, 2)),
                     aSmallMessage(matchingRules = rules(1, 2)),
                 ),
-                rules = mapOf(
-                    rule(1, Api(max = 15)),
-                    rule(2, Api(max = 15)),
+                rules = listOf(
+                    rule(id = 1, matchingAttributes = arrayOf(Api(max = 15))),
+                    rule(id = 2, matchingAttributes = arrayOf(Api(max = 15))),
                 ),
             ),
         )
@@ -326,8 +345,8 @@ class RemoteMessagingConfigMatcherTest {
                     aSmallMessage(matchingRules = rules(1)),
                     aMediumMessage(matchingRules = rules(1)),
                 ),
-                rules = mapOf(
-                    rule(1, Unknown(fallback = false)),
+                rules = listOf(
+                    rule(id = 1, matchingAttributes = arrayOf(Unknown(fallback = false))),
                 ),
             ),
         )
@@ -343,13 +362,77 @@ class RemoteMessagingConfigMatcherTest {
                     aSmallMessage(matchingRules = rules(1)),
                     aMediumMessage(matchingRules = rules(1)),
                 ),
-                rules = mapOf(
-                    rule(1, Unknown(fallback = true)),
+                rules = listOf(
+                    rule(id = 1, matchingAttributes = arrayOf(Unknown(fallback = true))),
                 ),
             ),
         )
 
         assertEquals(aSmallMessage(matchingRules = rules(1)), message)
+    }
+
+    @Test
+    fun whenDeviceMatchesMessageRulesAndPartOfPercentileThenReturnMessage() = runBlocking {
+        givenDeviceMatches(Api(max = 19))
+        cohortDao.insert(RemoteMessagingCohort(messageId = "message1", percentile = 0.1f))
+
+        val message = testee.evaluate(
+            RemoteConfig(
+                messages = listOf(aMediumMessage(id = "message1", matchingRules = rules(1))),
+                rules = listOf(rule(id = 1, percentile = 0.6f, matchingAttributes = arrayOf(Api(max = 19)))),
+            ),
+        )
+
+        assertEquals(aMediumMessage(id = "message1", matchingRules = rules(1)), message)
+    }
+
+    @Test
+    fun whenDeviceMatchesMessageRulesButOutOfPercentileThenReturnNull() = runBlocking {
+        givenDeviceMatches(Api(max = 19))
+        cohortDao.insert(RemoteMessagingCohort(messageId = "message1", percentile = 0.5f))
+
+        val message = testee.evaluate(
+            RemoteConfig(
+                messages = listOf(aMediumMessage(id = "message1", matchingRules = rules(1))),
+                rules = listOf(rule(id = 1, percentile = 0.1f, matchingAttributes = arrayOf(Api(max = 19)))),
+            ),
+        )
+
+        assertNull(message)
+    }
+
+    @Test
+    fun whenMatchingMessageShouldBeExcludedAndUserPartOfPercentileThenReturnNull() = runBlocking {
+        givenDeviceMatches(Locale(value = listOf("en-US")))
+        cohortDao.insert(RemoteMessagingCohort(messageId = "message1", percentile = 0.1f))
+
+        val message = testee.evaluate(
+            RemoteConfig(
+                messages = listOf(aMediumMessage(id = "message1", exclusionRules = rules(2))),
+                rules = listOf(
+                    rule(id = 2, percentile = 0.5f, matchingAttributes = arrayOf(Locale(value = listOf("en-US")))),
+                ),
+            ),
+        )
+
+        assertNull(message)
+    }
+
+    @Test
+    fun whenMatchingMessageShouldBeExcludedButOutOfPercentileThenReturnMessage() = runBlocking {
+        givenDeviceMatches(Locale(value = listOf("en-US")))
+        cohortDao.insert(RemoteMessagingCohort(messageId = "message1", percentile = 0.5f))
+
+        val message = testee.evaluate(
+            RemoteConfig(
+                messages = listOf(aMediumMessage(id = "message1", exclusionRules = rules(2))),
+                rules = listOf(
+                    rule(id = 2, percentile = 0.1f, matchingAttributes = arrayOf(Locale(value = listOf("en-US")))),
+                ),
+            ),
+        )
+
+        assertEquals(aMediumMessage(id = "message1", exclusionRules = rules(2)), message)
     }
 
     private suspend fun givenDeviceMatches(
@@ -372,8 +455,9 @@ class RemoteMessagingConfigMatcherTest {
 
     private fun rule(
         id: Int,
+        percentile: Float = 1f,
         vararg matchingAttributes: MatchingAttribute,
-    ) = Pair(id, matchingAttributes.asList())
+    ) = Rule(id, TargetPercentile(before = percentile), matchingAttributes.asList())
 
     private fun rules(vararg ids: Int) = ids.asList()
 }

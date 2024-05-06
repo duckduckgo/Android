@@ -33,6 +33,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 @SingleInstanceIn(FragmentScope::class)
 @ContributesMultibinding(FragmentScope::class)
@@ -53,18 +54,22 @@ class WebMessageListenerShowInContextEmailProtectionSignupPrompt @Inject constru
         isMainFrame: Boolean,
         reply: JavaScriptReplyProxy,
     ) {
-        val originalUrl: String? = webView.url
+        kotlin.runCatching {
+            val originalUrl: String? = webView.url
 
-        job += appCoroutineScope.launch(dispatchers.io()) {
-            val requestOrigin = sourceOrigin.toString()
-            val requestId = storeReply(reply)
+            job += appCoroutineScope.launch(dispatchers.io()) {
+                val requestOrigin = sourceOrigin.toString()
+                val requestId = storeReply(reply)
 
-            val autofillWebMessageRequest = AutofillWebMessageRequest(
-                requestOrigin = requestOrigin,
-                originalPageUrl = originalUrl,
-                requestId = requestId,
-            )
-            showInContextEmailProtectionSignupPrompt(autofillWebMessageRequest)
+                val autofillWebMessageRequest = AutofillWebMessageRequest(
+                    requestOrigin = requestOrigin,
+                    originalPageUrl = originalUrl,
+                    requestId = requestId,
+                )
+                showInContextEmailProtectionSignupPrompt(autofillWebMessageRequest)
+            }
+        }.onFailure {
+            Timber.e(it, "Error while processing autofill web message for %s", key)
         }
     }
 

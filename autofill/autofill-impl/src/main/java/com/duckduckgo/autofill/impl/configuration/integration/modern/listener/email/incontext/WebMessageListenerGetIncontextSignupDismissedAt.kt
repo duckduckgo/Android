@@ -33,6 +33,7 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @SingleInstanceIn(FragmentScope::class)
 @ContributesMultibinding(FragmentScope::class)
@@ -55,8 +56,12 @@ class WebMessageListenerGetIncontextSignupDismissedAt @Inject constructor(
         isMainFrame: Boolean,
         reply: JavaScriptReplyProxy,
     ) {
-        job += appCoroutineScope.launch(dispatchers.io()) {
-            reply.postMessage(generateResponse())
+        kotlin.runCatching {
+            job += appCoroutineScope.launch(dispatchers.io()) {
+                reply.postMessage(generateResponse())
+            }
+        }.onFailure {
+            Timber.e(it, "Error while processing autofill web message for %s", key)
         }
     }
 

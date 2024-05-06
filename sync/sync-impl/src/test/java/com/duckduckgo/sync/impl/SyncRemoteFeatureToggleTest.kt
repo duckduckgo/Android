@@ -212,6 +212,7 @@ class TestSyncFeature(private val appBuildConfig: AppBuildConfig) : SyncFeature 
     var allowSetupFlows: Boolean = true
     var allowCreateAccount: Boolean = true
     var minSupportedVersion: Int = 0
+    var gzipPatchRequests: Boolean = true
     override fun self(): TestToggle = TestToggle(sync, minSupportedVersion, appBuildConfig.versionCode)
 
     override fun level0ShowSync(): TestToggle = TestToggle(showSync, minSupportedVersion, appBuildConfig.versionCode)
@@ -221,6 +222,7 @@ class TestSyncFeature(private val appBuildConfig: AppBuildConfig) : SyncFeature 
     override fun level2AllowSetupFlows(): TestToggle = TestToggle(allowSetupFlows, minSupportedVersion, appBuildConfig.versionCode)
 
     override fun level3AllowCreateAccount(): TestToggle = TestToggle(allowCreateAccount, minSupportedVersion, appBuildConfig.versionCode)
+    override fun gzipPatchRequests(): Toggle = TestToggle(gzipPatchRequests, minSupportedVersion, appBuildConfig.versionCode)
 }
 
 open class TestToggle(

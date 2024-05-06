@@ -25,6 +25,6 @@ import com.duckduckgo.feature.toggles.api.Toggle
     featureName = "credentialsLocalFieldValidation",
 )
 interface CredentialsSyncLocalValidationFeature {
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(true)
     fun self(): Toggle
 }

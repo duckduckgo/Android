@@ -159,6 +159,9 @@
     <!-- Sync Device Authentication -->
     <string name="sync_auth_text_for_access">Atbloķē ierīci, lai piekļūtu sinhronizēšanai un dublēšanai.</string>
     <string name="sync_biometric_prompt_title">Sinhronizēšana un dublēšana ir bloķēta</string>
+    <string name="sync_require_device_passcode_dialog_title">Aizsargā savu ierīci, lai izmantotu Sync &amp; Backup</string>
+    <string name="sync_require_device_passcode_dialog_body">Lai izmantotu Sync &amp; Backup, nepieciešama ierīces bloķēšanas figūra, PIN kods vai biometriskā aizsardzība.</string>
+    <string name="sync_require_device_passcode_dialog_action">Doties uz Iestatījumiem</string>
 
     <!-- Sync Settings -->
     <string name="sync_delete_server_data_dialog_title">Dzēst servera datus?</string>

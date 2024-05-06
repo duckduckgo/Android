@@ -30,7 +30,7 @@ class GridViewColumnCalculator(val context: Context) {
         val displayMetrics = context.resources.displayMetrics
         val screenWidthDp = displayMetrics.widthPixels.toDp()
         val numberOfColumns = screenWidthDp / columnWidthDp
-        return min(maxColumns, numberOfColumns)
+        return min(maxColumns, numberOfColumns).coerceAtLeast(1)
     }
 
     /**

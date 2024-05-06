@@ -23,6 +23,14 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 Upload APK to Play Store, in pre-production staging track
 
+### android annotate_release
+
+```sh
+[bundle exec] fastlane android annotate_release
+```
+
+Use to annotate the release in our monitor metrics
+
 ### android deploy_dogfood
 
 ```sh

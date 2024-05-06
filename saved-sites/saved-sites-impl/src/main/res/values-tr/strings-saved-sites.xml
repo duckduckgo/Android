@@ -17,9 +17,14 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <!-- Setup screen -->
+    <!-- Sync settings screen -->
     <string name="sync_enable_option_favorites_title">Favorileri Paylaş</string>
     <string name="sync_enable_option_favorites_subtitle">Tüm cihazlarda aynı favorileri kullanın. Mobil ve masaüstü favorilerini ayrı tutmak için kapalı bırakın.</string>
     <string name="saved_site_limit_warning"><b>Senkronizasyon Duraklatıldı</b>\nYer imi sınırı aşıldı. Senkronizasyona devam etmek için bazılarını silin.\n\n<annotation type="manage_bookmarks">Yer İmlerini Yönet</annotation></string>
     <string name="saved_site_limit_warning_notif"><b>Yer İmi Senkronizasyonu Duraklatıldı</b>\nYer imi senkronizasyon sınırını aştınız. Bazı yer işaretlerini silmeyi deneyin. Bu sorun çözülene kadar yer imleriniz yedeklenmeyecektir.</string>
+    <plurals name="saved_site_invalid_items_warning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="one">%1$s için yer işaretiniz, alanlarından biri karakter sınırını aştığı için senkronize edilemiyor.</item>
+        <item quantity="other">%1$s ve %2$d diğer site için yer işaretleriniz, bazı alanları karakter sınırını aştığı için senkronize edilemiyor.</item>
+    </plurals>
+    <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Yer İşaretlerini Yönet</annotation></string>
 </resources>

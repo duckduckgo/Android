@@ -17,9 +17,16 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <!-- Setup screen -->
+    <!-- Sync settings screen -->
     <string name="sync_enable_option_favorites_title">Udostępnij ulubione</string>
     <string name="sync_enable_option_favorites_subtitle">Korzystaj z tych samych ulubionych na wszystkich urządzeniach. Wyłącz, aby oddzielić ulubione na urządzenia mobilne i stacjonarne.</string>
     <string name="saved_site_limit_warning"><b>Synchronizacja wstrzymana</b>\nPrzekroczono limit zakładek. Usuń niektóre, aby wznowić synchronizację.\n\n<annotation type="manage_bookmarks">Zarządzaj zakładkami</annotation></string>
     <string name="saved_site_limit_warning_notif"><b>Synchronizacja zakładek wstrzymana</b>\nPrzekroczono limit synchronizacji zakładek. Spróbuj usunąć niektóre zakładki. Dopóki ten problem nie zostanie rozwiązany, nie będzie tworzona kopia zapasowa zakładek.</string>
+    <plurals name="saved_site_invalid_items_warning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="one">Nie można zsynchronizować zakładki dotyczącej %1$s, ponieważ jedno z jej pól przekracza limit znaków.</item>
+        <item quantity="few">Nie można zsynchronizować zakładek dotyczących %1$s i %2$d innych witryn, ponieważ niektóre ich pola przekraczają limit znaków.</item>
+        <item quantity="many">Nie można zsynchronizować zakładek dotyczących %1$s i %2$d innych witryn, ponieważ niektóre ich pola przekraczają limit znaków.</item>
+        <item quantity="other">Nie można zsynchronizować zakładek dotyczących %1$s i %2$d innej witryny, ponieważ niektóre ich pola przekraczają limit znaków.</item>
+    </plurals>
+    <string name="saved_site_invalid_items_warning_link"><annotation type="manage_bookmarks">Zarządzaj zakładkami</annotation></string>
 </resources>

@@ -60,13 +60,17 @@ class WebMessageListenerEmailStoreCredentials @Inject constructor(
         isMainFrame: Boolean,
         reply: JavaScriptReplyProxy,
     ) {
-        if (!EmailProtectionUrl.isEmailProtectionUrl(webView.url)) return
+        kotlin.runCatching {
+            if (!EmailProtectionUrl.isEmailProtectionUrl(webView.url)) return
 
-        appCoroutineScope.launch(dispatchers.io()) {
-            parseIncomingMessage(message.data.toString())?.let {
-                emailManager.storeCredentials(it.token, it.userName, it.cohort)
-                Timber.i("Saved email protection credentials for user %s", it.userName)
+            appCoroutineScope.launch(dispatchers.io()) {
+                parseIncomingMessage(message.data.toString())?.let {
+                    emailManager.storeCredentials(it.token, it.userName, it.cohort)
+                    Timber.i("Saved email protection credentials for user %s", it.userName)
+                }
             }
+        }.onFailure {
+            Timber.e(it, "Error while processing autofill web message for %s", key)
         }
     }
 
