@@ -57,7 +57,12 @@ data class JsonContentTranslations(
 
 data class JsonMatchingRule(
     val id: Int,
-    val attributes: Map<String, JsonMatchingAttribute>,
+    val targetPercentile: JsonTargetPercentile?,
+    val attributes: Map<String, JsonMatchingAttribute>?,
+)
+
+data class JsonTargetPercentile(
+    val before: Float?,
 )
 
 sealed class JsonMessageType(val jsonValue: String) {

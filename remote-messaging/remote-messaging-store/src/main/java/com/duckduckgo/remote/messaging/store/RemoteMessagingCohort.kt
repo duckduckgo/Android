@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.remote.messaging.impl.models
+package com.duckduckgo.remote.messaging.store
 
-import com.duckduckgo.remote.messaging.api.MatchingAttribute
-import com.duckduckgo.remote.messaging.api.RemoteMessage
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
-data class RemoteConfig(
-    val messages: List<RemoteMessage>,
-    val rules: List<Rule>,
-)
-
-data class Rule(
-    val id: Int,
-    val targetPercentile: TargetPercentile?,
-    val attributes: List<MatchingAttribute>,
-)
-
-data class TargetPercentile(
-    val before: Float,
+@Entity(tableName = "remote_messaging_cohort")
+data class RemoteMessagingCohort(
+    @PrimaryKey val messageId: String,
+    val percentile: Float,
 )
