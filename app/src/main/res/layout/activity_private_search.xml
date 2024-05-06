@@ -91,27 +91,33 @@
                 app:primaryText="@string/privateSearchAutocompleteToggle"
                 app:showSwitch="true" />
 
-            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-                android:id="@+id/privateSearchAutocompleteRecentlyVisitedSitesToggle"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:primaryText="@string/privateSearchAutocompleteRecentlyVisitedSitesToggle"
-                app:showSwitch="true" />
+                android:id="@+id/privateSearchAutocompleteRecentlyVisitedSites"
+                android:orientation="vertical">
 
-            <com.duckduckgo.common.ui.view.text.DaxTextView
-                android:id="@+id/privateSearchAutocompleteRecentlyVisitedSitesHint"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:textType="secondary"
-                app:typography="body2"
-                android:layout_marginHorizontal="@dimen/keyline_4"
-                android:text="@string/privateSearchAutocompleteRecentlyVisitedSitesHint"/>
+                <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                    android:id="@+id/privateSearchAutocompleteRecentlyVisitedSitesToggle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryText="@string/privateSearchAutocompleteRecentlyVisitedSitesToggle"
+                    app:showSwitch="true" />
 
-            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-                android:id="@+id/privateSearchAutoCompleteDivider"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/keyline_4"/>
+                <com.duckduckgo.common.ui.view.text.DaxTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:textType="secondary"
+                    app:typography="body2"
+                    android:layout_marginHorizontal="@dimen/keyline_4"
+                    android:text="@string/privateSearchAutocompleteRecentlyVisitedSitesHint"/>
+
+                <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/keyline_4"/>
+
+            </LinearLayout>
 
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/privateSearchMoreSearchSettings"

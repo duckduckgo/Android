@@ -31,7 +31,7 @@ constructor(
     private val context: Context,
 ) : HistoryDataStore {
     companion object {
-        const val FILENAME = "com.duckduckgo.app.history"
+        const val FILENAME = "com.duckduckgo.history"
         const val KEY_HISTORY_USER_ENABLED = "KEY_HISTORY_USER_ENABLED"
     }
 

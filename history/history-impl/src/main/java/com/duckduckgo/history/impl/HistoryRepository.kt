@@ -18,6 +18,7 @@ package com.duckduckgo.history.impl
 
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.history.api.HistoryEntry
+import com.duckduckgo.history.impl.remoteconfig.HistoryRCWrapper
 import com.duckduckgo.history.impl.store.HistoryDao
 import com.duckduckgo.history.impl.store.HistoryDataStore
 import io.reactivex.Single
@@ -49,6 +50,7 @@ class RealHistoryRepository(
     private val dispatcherProvider: DispatcherProvider,
     private val appCoroutineScope: CoroutineScope,
     private val historyDataStore: HistoryDataStore,
+    private val historyRCWrapper: HistoryRCWrapper,
 ) : HistoryRepository {
 
     private var cachedHistoryEntries: List<HistoryEntry>? = null

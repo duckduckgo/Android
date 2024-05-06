@@ -80,18 +80,14 @@ class PrivateSearchActivity : DuckDuckGoActivity() {
                         changeListener = autocompleteToggleListener,
                     )
                     if (it.storeHistoryEnabled) {
-                        binding.privateSearchAutocompleteRecentlyVisitedSitesToggle.isVisible = true
-                        binding.privateSearchAutocompleteRecentlyVisitedSitesHint.isVisible = true
-                        binding.privateSearchAutoCompleteDivider.isVisible = true
+                        binding.privateSearchAutocompleteRecentlyVisitedSites.isVisible = true
                         binding.privateSearchAutocompleteRecentlyVisitedSitesToggle.quietlySetIsChecked(
                             newCheckedState = it.autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled,
                             changeListener = autocompleteRecentlyVisitedSitesToggleListener,
                         )
                         binding.privateSearchAutocompleteRecentlyVisitedSitesToggle.isEnabled = it.autoCompleteSuggestionsEnabled
                     } else {
-                        binding.privateSearchAutocompleteRecentlyVisitedSitesToggle.isVisible = false
-                        binding.privateSearchAutocompleteRecentlyVisitedSitesHint.isVisible = false
-                        binding.privateSearchAutoCompleteDivider.isVisible = false
+                        binding.privateSearchAutocompleteRecentlyVisitedSites.isVisible = false
                     }
                 }
             }.launchIn(lifecycleScope)

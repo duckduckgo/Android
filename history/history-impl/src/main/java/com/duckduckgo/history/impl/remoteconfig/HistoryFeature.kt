@@ -16,18 +16,19 @@
 
 package com.duckduckgo.history.impl.remoteconfig
 
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.Toggle
+import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
 
-@ContributesRemoteFeature(
-    scope = AppScope::class,
-    featureName = "history",
-)
-interface HistoryFeature {
-    @Toggle.DefaultValue(false)
-    fun self(): Toggle
+interface HistoryRCWrapper {
+    val shouldStoreHistory: Boolean
+}
 
-    @Toggle.DefaultValue(false)
-    fun storeHistory(): Toggle
+@ContributesBinding(AppScope::class)
+class RealHistoryFeature @Inject constructor(
+    private val historyRemoteFeature: HistoryRemoteFeature,
+) : HistoryRCWrapper {
+    override val shouldStoreHistory by lazy {
+        historyRemoteFeature.self().isEnabled() && historyRemoteFeature.storeHistory().isEnabled()
+    }
 }

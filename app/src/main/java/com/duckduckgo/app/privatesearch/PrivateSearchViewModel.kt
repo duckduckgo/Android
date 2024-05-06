@@ -59,8 +59,9 @@ class PrivateSearchViewModel @Inject constructor(
             viewState.emit(
                 ViewState(
                     autoCompleteSuggestionsEnabled = settingsDataStore.autoCompleteSuggestionsEnabled,
-                    autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled = settingsDataStore.autoCompleteSuggestionsEnabled && history.isHistoryUserEnabled(),
-                    storeHistoryEnabled = history.isHistoryRCFlagEnabled(),
+                    autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled =
+                    settingsDataStore.autoCompleteSuggestionsEnabled && history.isHistoryUserEnabled(),
+                    storeHistoryEnabled = history.isHistoryFeatureAvailable(),
                 ),
             )
         }

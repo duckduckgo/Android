@@ -51,7 +51,7 @@ interface NavigationHistory {
     fun setHistoryUserEnabled(value: Boolean)
 
     /**
-     * Returns whether the history RC flag is enabled.
+     * Returns whether the history feature is available through RC.
      */
-    fun isHistoryRCFlagEnabled(): Boolean
+    fun isHistoryFeatureAvailable(): Boolean
 }

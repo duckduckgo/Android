@@ -20,8 +20,8 @@ import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.history.api.HistoryEntry
-import com.duckduckgo.history.api.HistoryRCWrapper
 import com.duckduckgo.history.api.NavigationHistory
+import com.duckduckgo.history.impl.remoteconfig.HistoryRCWrapper
 import com.squareup.anvil.annotations.ContributesBinding
 import io.reactivex.Single
 import javax.inject.Inject
@@ -36,13 +36,13 @@ class RealNavigationHistory @Inject constructor(
     private val historyRepository: HistoryRepository,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val currentTimeProvider: CurrentTimeProvider,
-    private val historyRCWrapperRCWrapper: HistoryRCWrapper,
+    private val historyRCWrapper: HistoryRCWrapper,
 ) : InternalNavigationHistory {
     override suspend fun saveToHistory(
         url: String,
         title: String?,
     ) {
-        if (!historyRCWrapperRCWrapper.shouldStoreHistory || !isHistoryUserEnabled()) {
+        if (!historyRCWrapper.shouldStoreHistory || !isHistoryUserEnabled()) {
             return
         }
         val ddgUrl = duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)
@@ -52,7 +52,7 @@ class RealNavigationHistory @Inject constructor(
     }
 
     override fun getHistorySingle(): Single<List<HistoryEntry>> {
-        return if (isHistoryRCFlagEnabled() && isHistoryUserEnabled()) historyRepository.getHistoryObservable() else Single.just(emptyList())
+        return if (isHistoryFeatureAvailable() && isHistoryUserEnabled()) historyRepository.getHistoryObservable() else Single.just(emptyList())
     }
 
     override suspend fun clearHistory() {
@@ -64,14 +64,14 @@ class RealNavigationHistory @Inject constructor(
     }
 
     override fun isHistoryUserEnabled(): Boolean {
-        return historyRepository.isHistoryUserEnabled(historyRCWrapperRCWrapper.shouldStoreHistory)
+        return historyRepository.isHistoryUserEnabled(historyRCWrapper.shouldStoreHistory)
     }
 
     override fun setHistoryUserEnabled(value: Boolean) {
         historyRepository.setHistoryUserEnabled(value)
     }
 
-    override fun isHistoryRCFlagEnabled(): Boolean {
-        return historyRCWrapperRCWrapper.shouldStoreHistory
+    override fun isHistoryFeatureAvailable(): Boolean {
+        return historyRCWrapper.shouldStoreHistory
     }
 }

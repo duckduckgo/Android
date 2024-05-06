@@ -35,6 +35,7 @@ import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.history.impl.remoteconfig.HistoryRCWrapper
 import com.duckduckgo.history.impl.store.ALL_MIGRATIONS
 import com.duckduckgo.history.impl.store.HistoryDataStore
 import com.duckduckgo.history.impl.store.HistoryDatabase
@@ -56,8 +57,9 @@ class HistoryModule {
         dispatcherProvider: DispatcherProvider,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         historyDataStore: HistoryDataStore,
+        historyRCWrapper: HistoryRCWrapper,
     ): HistoryRepository {
-        return RealHistoryRepository(historyDatabase.historyDao(), dispatcherProvider, appCoroutineScope, historyDataStore)
+        return RealHistoryRepository(historyDatabase.historyDao(), dispatcherProvider, appCoroutineScope, historyDataStore, historyRCWrapper)
     }
 
     @SingleInstanceIn(AppScope::class)
