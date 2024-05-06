@@ -109,7 +109,7 @@ class HistoryDaoTest {
     }
 
     @Test
-    fun whenDeleteOldItemsWithNoOldEnoughItemsThenTheyAreDeleted() {
+    fun whenDeleteOldItemsWithOldEnoughItemsThenTheyAreDeleted() {
         runTest {
             val insertDate = LocalDateTime.of(2000, JANUARY, 1, 0, 0)
             historyDao.updateOrInsertVisit("url", "title", "query", false, insertDate)

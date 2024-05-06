@@ -37,7 +37,7 @@ interface HistoryRepository {
 
     suspend fun clearHistory()
 
-    suspend fun clearEntriesOlderThan(minusDays: LocalDateTime)
+    suspend fun clearEntriesOlderThan(dateTime: LocalDateTime)
 }
 
 class RealHistoryRepository(
@@ -97,9 +97,9 @@ class RealHistoryRepository(
             .also { cachedHistoryEntries = it }
     }
 
-    override suspend fun clearEntriesOlderThan(minusDays: LocalDateTime) {
+    override suspend fun clearEntriesOlderThan(dateTime: LocalDateTime) {
         cachedHistoryEntries = null
-        historyDao.deleteEntriesOlderThan(minusDays)
+        historyDao.deleteEntriesOlderThan(dateTime)
         fetchAndCacheHistoryEntries()
     }
 }
