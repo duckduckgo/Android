@@ -481,15 +481,19 @@ tasks.register('androidTestsBuild') {
 
 tasks.register('releaseTestLocal', Exec) {
     commandLine 'maestro', 'test', '--include-tags', 'releaseTest', '../.maestro'
-    dependsOn 'installPlayRelease'
+    dependsOn 'installPlayReleaseDefaultVariant'
 }
 
 tasks.register('releaseTestCloud', Exec) {
     commandLine 'maestro', 'cloud', '--include-tags', 'releaseTest', "build/outputs/apk/play/release/duckduckgo-${buildVersionName()}-play-release.apk", '../.maestro'
-    dependsOn 'assemblePlayReleaseTest'
+    dependsOn 'assemblePlayReleaseDefaultVariant'
 }
 
-tasks.register('assemblePlayReleaseTest', Exec) {
+tasks.register('installPlayReleaseDefaultVariant', Exec) {
+    commandLine "$rootDir/gradlew", ':app:installPlayRelease', "-Pforce-default-variant"
+}
+
+tasks.register('assemblePlayReleaseDefaultVariant', Exec) {
     commandLine "$rootDir/gradlew", ':app:assemblePlayRelease', "-Pforce-default-variant"
 }
 
