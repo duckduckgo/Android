@@ -32,5 +32,6 @@ fun Action.asBrowserTabCommand(): Command? {
         is AppTpOnboarding -> LaunchAppTPOnboarding
         is Share -> SharePromoLinkRMF(this.value, this.title)
         is Navigation -> { LaunchScreen(this.value, this.additionalParameters?.get("payload").orEmpty()) }
+        is Survey -> SubmitUrl(this.value)
     }
 }

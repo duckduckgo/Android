@@ -112,4 +112,9 @@ sealed class Action(val actionType: String, open val value: String, open val add
         override val value: String,
         override val additionalParameters: Map<String, String>?,
     ) : Action(NAVIGATION.jsonValue, value, additionalParameters)
+
+    data class Survey(
+        override val value: String,
+        override val additionalParameters: Map<String, String>?,
+    ) : Action(JsonActionType.SURVEY.jsonValue, value, additionalParameters)
 }
