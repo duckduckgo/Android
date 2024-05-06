@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <string name="managementDisabledModeCta"><b>Nastavitev v nastavitvah</b></string>
 
     <string name="saveLoginDialogButtonSave">Shrani geslo</string>
@@ -146,13 +146,13 @@
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Brisanje vseh gesel</string>
 
-    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSynced" tools:ignore="ImpliedQuantity">
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSynced">
         <item quantity="one">Vaše geslo bo izbrisano iz te naprave.</item>
         <item quantity="two">Vaši gesli bosta izbrisani iz te naprave.</item>
         <item quantity="few">Vaša gesla bodo izbrisana iz te naprave.</item>
         <item quantity="other">Vaša gesla bodo izbrisana iz te naprave.</item>
     </plurals>
-    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSynced" tools:ignore="ImpliedQuantity">
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSynced">
         <item quantity="one">Vaše geslo bo izbrisano iz vseh sinhroniziranih naprav.</item>
         <item quantity="two">Vaši gesli bosta izbrisani iz vseh sinhroniziranih naprav.</item>
         <item quantity="few">Vaša gesla bodo izbrisana iz vseh sinhroniziranih naprav.</item>
@@ -165,7 +165,7 @@
         <item quantity="other">Ali ste prepričani, da želite izbrisati %1$d gesel?</item>
     </plurals>
 
-    <plurals name="credentialManagementDeleteAllSecondInstruction" tools:ignore="ImpliedQuantity">
+    <plurals name="credentialManagementDeleteAllSecondInstruction">
         <item quantity="one">Prepričajte se, da imate še vedno možnost dostopa do svojega računa.</item>
         <item quantity="two">Prepričajte se, da imate še vedno možnost dostopa do svojih računov.</item>
         <item quantity="few">Prepričajte se, da imate še vedno možnost dostopa do svojih računov.</item>
