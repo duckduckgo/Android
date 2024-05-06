@@ -23,6 +23,7 @@ import com.duckduckgo.app.browser.customtabs.CustomTabDetector
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.app.lifecycle.VpnProcessLifecycleObserver
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -51,7 +52,7 @@ class NativeCrashInit @Inject constructor(
     private val nativeCrashFeature: NativeCrashFeature,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
-) : MainProcessLifecycleObserver {
+) : MainProcessLifecycleObserver, VpnProcessLifecycleObserver {
 
     private val isCustomTab: Boolean by lazy { customTabDetector.isCustomTab() }
     private val processName: String by lazy { if (isMainProcess) "main" else "vpn" }
@@ -73,6 +74,16 @@ class NativeCrashInit @Inject constructor(
             }
         } else {
             logcat(ERROR) { "ndk-crash: onCreate wrongly called in a secondary process" }
+        }
+    }
+
+    override fun onVpnProcessCreated() {
+        if (!isMainProcess) {
+            coroutineScope.launch {
+                jniRegisterNativeSignalHandler()
+            }
+        } else {
+            logcat(ERROR) { "ndk-crash: onCreate wrongly called in the main process" }
         }
     }
 
