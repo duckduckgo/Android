@@ -2295,12 +2295,18 @@ class BrowserTabFragment :
 
             it.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
                 Timber.d("TAG_ANA Downloading file from $url with contentDisposition $contentDisposition and mimeType $mimeType")
+                Timber.d("TAG_ANA replyProxyMap is $replyProxyMap")
 
-                for ((key, value) in replyProxyMap) {
-                    if (url.contains(key)) {
-                        Timber.d("TAG_ANA Posting message to replyProxy: $value")
-                        value.postMessage(url)
+                if (url.startsWith("blob:")) {
+                    for ((key, value) in replyProxyMap) {
+                        Timber.d("TAG_ANA replyProxyMap key is $key and value is $value")
+                        if (url.contains(key)) {
+                            Timber.d("TAG_ANA Posting message to replyProxy: $value")
+                            value.postMessage(url)
+                        }
                     }
+                } else {
+                    viewModel.requestFileDownload(url, contentDisposition, mimeType, true)
                 }
             }
 
@@ -2395,10 +2401,6 @@ class BrowserTabFragment :
 
                     // Save replyProxy
                     replyProxyMap[sourceOrigin.toString()] = replyProxy
-
-                    // Post message
-                    Timber.d("TAG_ANA onPostMessage. Got this message: ${message.data} -- sourceOrigin: $sourceOrigin -- isMainFrame: $isMainFrame -- replyProxy: $replyProxy")
-                    replyProxy.postMessage("Hello from Kotlin. Just received this message from JS: ${message.data!!}")
                 }
 
             })
