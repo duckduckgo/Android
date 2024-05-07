@@ -64,7 +64,7 @@ platform :android do
     upload_to_play_store(
       apk: apkPath,
       track: 'production',
-      rollout:, 0.001 # ie. 0.1%
+      rollout: 0.001 # ie. 0.1%
       skip_upload_screenshots: true,
       skip_upload_images: true,
       validate_only: false
