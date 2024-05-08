@@ -117,9 +117,12 @@ class CustomTabActivity : DuckDuckGoActivity() {
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     val currentFragment = supportFragmentManager.findFragmentById(R.id.fragmentTabContainer) as? BrowserTabFragment
+                    if (currentFragment != null && currentFragment.onBackPressed(isCustomTab = true)) {
+                        return
+                    }
                     if (supportFragmentManager.backStackEntryCount > 0) {
                         supportFragmentManager.popBackStack()
-                    } else if (currentFragment?.onBackPressed(isCustomTab = true) == false) {
+                    } else {
                         isEnabled = false
                         finish()
                     }
