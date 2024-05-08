@@ -338,8 +338,10 @@ class NetpAppExclusionListViewModel @Inject constructor(
                 forceRestart = true
                 if (enabled) {
                     systemAppsExclusionRepository.includeCategory(category.category)
+                    networkProtectionPixels.reportExcludeSystemAppsDisabledForCategory(category.category.name)
                 } else {
                     systemAppsExclusionRepository.excludeCategory(category.category)
+                    networkProtectionPixels.reportExcludeSystemAppsEnabledForCategory(category.category.name)
                 }
             } else {
                 systemAppsExclusionRepository.markWarningShown()

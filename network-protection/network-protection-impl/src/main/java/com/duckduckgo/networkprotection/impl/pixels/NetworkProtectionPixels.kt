@@ -279,6 +279,9 @@ interface NetworkProtectionPixels {
     fun reportEnabledPauseDuringCalls()
 
     fun reportDisabledPauseDuringCalls()
+
+    fun reportExcludeSystemAppsEnabledForCategory(category: String)
+    fun reportExcludeSystemAppsDisabledForCategory(category: String)
 }
 
 @ContributesBinding(AppScope::class)
@@ -560,6 +563,16 @@ class RealNetworkProtectionPixel @Inject constructor(
     override fun reportDisabledPauseDuringCalls() {
         firePixel(NETP_PAUSE_ON_CALL_DISABLED)
         tryToFireDailyPixel(NETP_PAUSE_ON_CALL_ENABLED_DAILY)
+    }
+
+    override fun reportExcludeSystemAppsEnabledForCategory(category: String) {
+        firePixel(NETP_EXCLUDE_SYSTEM_APPS_ENABLED, mapOf("category" to category))
+        tryToFireDailyPixel(NETP_EXCLUDE_SYSTEM_APPS_ENABLED_DAILY, mapOf("category" to category))
+    }
+
+    override fun reportExcludeSystemAppsDisabledForCategory(category: String) {
+        firePixel(NETP_EXCLUDE_SYSTEM_APPS_DISABLED, mapOf("category" to category))
+        tryToFireDailyPixel(NETP_EXCLUDE_SYSTEM_APPS_DISABLED_DAILY, mapOf("category" to category))
     }
 
     private fun firePixel(
