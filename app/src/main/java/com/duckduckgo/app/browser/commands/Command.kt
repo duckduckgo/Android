@@ -174,10 +174,6 @@ sealed class Command {
     ) : Command()
 
     class ShowDomainHasPermissionMessage(val domain: String) : Command()
-    class ConvertBlobToDataUri(
-        val url: String,
-        val mimeType: String,
-    ) : Command()
 
     class RequestFileDownload(
         val url: String,

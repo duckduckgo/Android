@@ -81,6 +81,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.webkit.JavaScriptReplyProxy
 import androidx.webkit.WebMessageCompat
 import androidx.webkit.WebViewCompat
+import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.bookmarks.ui.BookmarksBottomSheetDialog
@@ -1492,7 +1493,6 @@ class BrowserTabFragment :
             is Command.AskToAutomateFireproofWebsite -> askToAutomateFireproofWebsite(requireContext(), it.fireproofWebsite)
             is Command.AskToDisableLoginDetection -> askToDisableLoginDetection(requireContext())
             is Command.ShowDomainHasPermissionMessage -> showDomainHasLocationPermission(it.domain)
-            is Command.ConvertBlobToDataUri -> convertBlobToDataUri(it)
             is Command.RequestFileDownload -> requestFileDownload(it.url, it.contentDisposition, it.mimeType, it.requestUserConfirmation)
             is Command.ChildTabClosed -> processUriForThirdPartyCookies()
             is Command.CopyAliasToClipboard -> copyAliasToClipboard(it.alias)
@@ -2254,9 +2254,6 @@ class BrowserTabFragment :
         viewModel.onUserSubmittedQuery(query)
     }
 
-
-    private val replyProxyMap = mutableMapOf<String, JavaScriptReplyProxy>()
-
     @SuppressLint("SetJavaScriptEnabled")
     private fun configureWebView() {
         binding.daxDialogOnboardingCtaContent.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
@@ -2295,19 +2292,7 @@ class BrowserTabFragment :
 
             it.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
                 Timber.d("TAG_ANA Downloading file from $url with contentDisposition $contentDisposition and mimeType $mimeType")
-                Timber.d("TAG_ANA replyProxyMap is $replyProxyMap")
-
-                if (url.startsWith("blob:")) {
-                    for ((key, value) in replyProxyMap) {
-                        Timber.d("TAG_ANA replyProxyMap key is $key and value is $value")
-                        if (url.contains(key)) {
-                            Timber.d("TAG_ANA Posting message to replyProxy: $value")
-                            value.postMessage(url)
-                        }
-                    }
-                } else {
-                    viewModel.requestFileDownload(url, contentDisposition, mimeType, true)
-                }
+                viewModel.requestFileDownload(url, contentDisposition, mimeType, true)
             }
 
             it.setOnTouchListener { _, _ ->
@@ -2331,9 +2316,59 @@ class BrowserTabFragment :
                 onSignedInEmailProtectionPromptShown = { viewModel.showEmailProtectionChooseEmailPrompt() },
                 onInContextEmailProtectionSignupPromptShown = { showNativeInContextEmailProtectionSignupPrompt() },
             )
-//            blobConverterInjector.addJsInterface(it) { url, mimeType -> viewModel.requestFileDownload(url, null, mimeType, true) }
+            configureWebViewForBlobDownload(it)
+            configureWebViewForAutofill(it)
+            printInjector.addJsInterface(it) { viewModel.printFromWebView() }
+            autoconsent.addJsInterface(it, autoconsentCallback)
+            contentScopeScripts.register(
+                it,
+                object : JsMessageCallback() {
+                    override fun process(
+                        featureName: String,
+                        method: String,
+                        id: String?,
+                        data: JSONObject?,
+                    ) {
+                        viewModel.processJsCallbackMessage(featureName, method, id, data)
+                    }
+                },
+            )
+        }
 
-            val script = """
+        WebView.setWebContentsDebuggingEnabled(webContentDebugging.isEnabled())
+    }
+
+    private fun screenLock(data: JsCallbackData) {
+        val returnData = jsOrientationHandler.updateOrientation(data, this)
+        contentScopeScripts.onResponse(returnData)
+    }
+
+    private fun screenUnlock() {
+        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+    }
+
+    private fun showFaviconsPrompt() {
+        val faviconPrompt = FaviconPromptSheet.Builder(requireContext())
+            .addEventListener(
+                object : FaviconPromptSheet.EventListener() {
+                    override fun onFaviconsFetchingPromptDismissed(fetchingEnabled: Boolean) {
+                        viewModel.onFaviconsFetchingEnabled(fetchingEnabled)
+                    }
+                },
+            )
+        faviconPrompt.show()
+    }
+
+    private fun setBrowserBackground(backgroundRes: Int) {
+        newBrowserTab.browserBackground.setBackgroundResource(backgroundRes)
+    }
+
+    private fun hideOnboardingDaxDialog(experimentCta: ExperimentOnboardingDaxDialogCta) {
+        experimentCta.hideOnboardingCta(binding)
+    }
+
+    private fun configureWebViewForBlobDownload(webView: DuckDuckGoWebView) {
+        val script = """
             window.__url_to_blob_collection = {};
 
             const original_createObjectURL = URL.createObjectURL;
@@ -2381,49 +2416,32 @@ class BrowserTabFragment :
                     }
                 }
             }
-                
-            """.trimIndent()
-            WebViewCompat.addDocumentStartJavaScript(it, script, setOf("*"))
-            WebViewCompat.addWebMessageListener(it, "myObject", setOf("*"), object : WebViewCompat.WebMessageListener {
-                override fun onPostMessage(
-                    view: WebView,
-                    message: WebMessageCompat,
-                    sourceOrigin: Uri,
-                    isMainFrame: Boolean,
-                    replyProxy: JavaScriptReplyProxy
-                ) {
+        """.trimIndent()
 
-                    if (message.data?.startsWith("data:") == true) {
-                        Timber.d("TAG_ANA Received a data URI ${message.data}")
-                        requestFileDownload(message.data!!, null, "", true)
-                        return
-                    }
-
-                    // Save replyProxy
-                    replyProxyMap[sourceOrigin.toString()] = replyProxy
-                }
-
-            })
-
-            configureWebViewForAutofill(it)
-            printInjector.addJsInterface(it) { viewModel.printFromWebView() }
-            autoconsent.addJsInterface(it, autoconsentCallback)
-            contentScopeScripts.register(
-                it,
-                object : JsMessageCallback() {
-                    override fun process(
-                        featureName: String,
-                        method: String,
-                        id: String?,
-                        data: JSONObject?,
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT) &&
+            WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {
+            WebViewCompat.addDocumentStartJavaScript(webView, script, setOf("*"))
+            WebViewCompat.addWebMessageListener(
+                webView, "myObject", setOf("*"), object : WebViewCompat.WebMessageListener {
+                    override fun onPostMessage(
+                        view: WebView,
+                        message: WebMessageCompat,
+                        sourceOrigin: Uri,
+                        isMainFrame: Boolean,
+                        replyProxy: JavaScriptReplyProxy
                     ) {
-                        viewModel.processJsCallbackMessage(featureName, method, id, data)
-                    }
-                },
-            )
-        }
 
-        WebView.setWebContentsDebuggingEnabled(webContentDebugging.isEnabled())
+                        if (message.data?.startsWith("data:") == true) {
+                            Timber.d("TAG_ANA Received a data URI ${message.data}")
+                            requestFileDownload(message.data!!, null, "", true)
+                            return
+                        }
+
+                        // Save replyProxy
+                        viewModel.saveReplyProxyForBlobDownload(sourceOrigin.toString(), replyProxy)
+                    }
+                })
+        }
     }
 
     private fun screenLock(data: JsCallbackData) {
@@ -3015,13 +3033,6 @@ class BrowserTabFragment :
         if (::webViewContainer.isInitialized) webViewContainer.removeAllViews()
         webView?.destroy()
         webView = null
-    }
-
-    private fun convertBlobToDataUri(blob: Command.ConvertBlobToDataUri) {
-        webView?.let {
-            Timber.d("TAG_ANA convertBlobToDataUri")
-//            blobConverterInjector.convertBlobIntoDataUriAndDownload(it, blob.url, blob.mimeType)
-        }
     }
 
     private fun requestFileDownload(
