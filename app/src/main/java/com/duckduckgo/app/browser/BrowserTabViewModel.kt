@@ -2710,12 +2710,22 @@ class BrowserTabViewModel @Inject constructor(
         if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {
             for ((key, value) in replyProxyMap) {
                 Timber.d("TAG_ANA replyProxyMap key is $key and value is $value")
-                if (url.contains(key)) {
+                if (sameOrigin(url.removePrefix("blob:"), key)) {
                     Timber.d("TAG_ANA Posting message to replyProxy: $value")
                     value.postMessage(url)
+                    return
                 }
             }
         }
+    }
+
+    private fun sameOrigin(firstUrl: String, secondUrl: String): Boolean {
+        return kotlin.runCatching {
+            val firstUri = Uri.parse(firstUrl)
+            val secondUri = Uri.parse(secondUrl)
+
+            firstUri.host == secondUri.host && firstUri.scheme == secondUri.scheme && firstUri.port == secondUri.port
+        }.getOrNull() ?: return false
     }
 
     fun showEmailProtectionChooseEmailPrompt() {

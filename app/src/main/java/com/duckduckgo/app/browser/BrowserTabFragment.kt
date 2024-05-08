@@ -2392,10 +2392,10 @@ class BrowserTabFragment :
                 });
             }
 
-            myObject.postMessage('Hello from JavaScript')
+            ddgBlobDownloadObj.postMessage('Hello from JavaScript')
             console.log('TAG_ANA Posted message from JS: Hello from JavaScript'); 
             
-            myObject.onmessage = function(event) {
+            ddgBlobDownloadObj.onmessage = function(event) {
                 console.log('TAG_ANA Event origin is: ' + event.origin); 
                 console.log('TAG_ANA Event data is: ' + event.data);
                 console.log('TAG_ANA window.location is: ' + window.location);           
@@ -2406,7 +2406,7 @@ class BrowserTabFragment :
                     if (blob) {
                         console.log('TAG_ANA found blob data', blob);
                         blobToBase64DataUrl(blob).then((dataUrl) => {
-                            myObject.postMessage(dataUrl);
+                            ddgBlobDownloadObj.postMessage(dataUrl);
                         });
                     } else {
                         console.log('TAG_ANA no blob found')
@@ -2415,11 +2415,13 @@ class BrowserTabFragment :
             }
         """.trimIndent()
 
-        if (WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT) &&
-            WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
             WebViewCompat.addDocumentStartJavaScript(webView, script, setOf("*"))
+        }
+
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {
             WebViewCompat.addWebMessageListener(
-                webView, "myObject", setOf("*"), object : WebViewCompat.WebMessageListener {
+                webView, "ddgBlobDownloadObj", setOf("*"), object : WebViewCompat.WebMessageListener {
                     override fun onPostMessage(
                         view: WebView,
                         message: WebMessageCompat,
