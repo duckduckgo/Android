@@ -74,6 +74,7 @@ class CustomTabActivity : DuckDuckGoActivity() {
         val transaction = supportFragmentManager.beginTransaction()
         transaction.hide(currentFragment)
         transaction.add(R.id.fragmentTabContainer, newFragment, tabId)
+        transaction.addToBackStack(tabId)
         transaction.commit()
         newFragment.messageFromPreviousTab = message
     }
@@ -116,7 +117,9 @@ class CustomTabActivity : DuckDuckGoActivity() {
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     val currentFragment = supportFragmentManager.findFragmentById(R.id.fragmentTabContainer) as? BrowserTabFragment
-                    if (currentFragment?.onBackPressed(isCustomTab = true) != true) {
+                    if (supportFragmentManager.backStackEntryCount > 0) {
+                        supportFragmentManager.popBackStack()
+                    } else if (currentFragment?.onBackPressed(isCustomTab = true) == false) {
                         isEnabled = false
                         finish()
                     }
