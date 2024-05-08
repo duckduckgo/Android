@@ -2686,7 +2686,6 @@ class BrowserTabViewModel @Inject constructor(
         mimeType: String,
         requestUserConfirmation: Boolean,
     ) {
-        Timber.d("TAG_ANA requestFileDownload url=$url, contentDisposition=$contentDisposition, mimeType=$mimeType, requestUserConfirmation=$requestUserConfirmation")
         if (url.startsWith("blob:")) {
             postMessageToConvertBlobToDataUri(url, mimeType)
         } else {
@@ -2700,18 +2699,19 @@ class BrowserTabViewModel @Inject constructor(
         mimeType: String,
         requestUserConfirmation: Boolean,
     ) {
-        Timber.d("TAG_ANA sendRequestFileDownloadCommand url=$url, contentDisposition=$contentDisposition, mimeType=$mimeType, requestUserConfirmation=$requestUserConfirmation")
         command.postValue(RequestFileDownload(url, contentDisposition, mimeType, requestUserConfirmation))
     }
 
+<<<<<<< HEAD
         private fun postMessageToConvertBlobToDataUri(url: String, mimeType: String) {
         Timber.d("TAG_ANA postMessageToConvertBlobToDataUri url=$url, mimeType=$mimeType")
 
+=======
+    private fun postMessageToConvertBlobToDataUri(url: String, mimeType: String) {
+>>>>>>> 9233946e3 (Removed logs.)
         if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {
             for ((key, value) in replyProxyMap) {
-                Timber.d("TAG_ANA replyProxyMap key is $key and value is $value")
                 if (sameOrigin(url.removePrefix("blob:"), key)) {
-                    Timber.d("TAG_ANA Posting message to replyProxy: $value")
                     value.postMessage(url)
                     return
                 }
@@ -3294,7 +3294,6 @@ class BrowserTabViewModel @Inject constructor(
 
     fun saveReplyProxyForBlobDownload(originUrl: String, replyProxy: JavaScriptReplyProxy) {
         replyProxyMap[originUrl] = replyProxy
-        Timber.d("TAG_ANA replyProxyMap is $replyProxyMap")
     }
 
     companion object {

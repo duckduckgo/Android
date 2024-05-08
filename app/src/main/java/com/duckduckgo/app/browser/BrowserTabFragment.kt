@@ -2288,7 +2288,6 @@ class BrowserTabFragment :
             }
 
             it.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
-                Timber.d("TAG_ANA Downloading file from $url with contentDisposition $contentDisposition and mimeType $mimeType")
                 viewModel.requestFileDownload(url, contentDisposition, mimeType, true)
             }
 
@@ -2392,24 +2391,15 @@ class BrowserTabFragment :
                 });
             }
 
-            ddgBlobDownloadObj.postMessage('Hello from JavaScript')
-            console.log('TAG_ANA Posted message from JS: Hello from JavaScript'); 
+            ddgBlobDownloadObj.postMessage('Ping')
             
             ddgBlobDownloadObj.onmessage = function(event) {
-                console.log('TAG_ANA Event origin is: ' + event.origin); 
-                console.log('TAG_ANA Event data is: ' + event.data);
-                console.log('TAG_ANA window.location is: ' + window.location);           
-
                 if (event.data.startsWith('blob:')) {
-                    console.log('TAG_ANA Event data is a blob: ' + event.data);
                     const blob = window.__url_to_blob_collection[event.data];
                     if (blob) {
-                        console.log('TAG_ANA found blob data', blob);
                         blobToBase64DataUrl(blob).then((dataUrl) => {
                             ddgBlobDownloadObj.postMessage(dataUrl);
                         });
-                    } else {
-                        console.log('TAG_ANA no blob found')
                     }
                 }
             }
@@ -2421,25 +2411,25 @@ class BrowserTabFragment :
 
         if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {
             WebViewCompat.addWebMessageListener(
-                webView, "ddgBlobDownloadObj", setOf("*"), object : WebViewCompat.WebMessageListener {
+                webView,
+                "ddgBlobDownloadObj",
+                setOf("*"),
+                object : WebViewCompat.WebMessageListener {
                     override fun onPostMessage(
                         view: WebView,
                         message: WebMessageCompat,
                         sourceOrigin: Uri,
                         isMainFrame: Boolean,
-                        replyProxy: JavaScriptReplyProxy
+                        replyProxy: JavaScriptReplyProxy,
                     ) {
-
                         if (message.data?.startsWith("data:") == true) {
-                            Timber.d("TAG_ANA Received a data URI ${message.data}")
                             requestFileDownload(message.data!!, null, "", true)
                             return
                         }
-
-                        // Save replyProxy
                         viewModel.saveReplyProxyForBlobDownload(sourceOrigin.toString(), replyProxy)
                     }
-                })
+                },
+            )
         }
     }
 
