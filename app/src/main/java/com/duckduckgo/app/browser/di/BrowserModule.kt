@@ -32,7 +32,6 @@ import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsRepository
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserObserver
-import com.duckduckgo.app.browser.downloader.*
 import com.duckduckgo.app.browser.favicon.FaviconPersister
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
@@ -257,11 +256,6 @@ class BrowserModule {
     @Provides
     fun domUrlExtractor(): DOMUrlExtractor {
         return JsUrlExtractor()
-    }
-
-    @Provides
-    fun blobConverterInjector(): BlobConverterInjector {
-        return BlobConverterInjectorJs()
     }
 
     @Provides

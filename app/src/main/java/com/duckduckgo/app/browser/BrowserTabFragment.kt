@@ -358,9 +358,6 @@ class BrowserTabFragment :
     @Inject
     lateinit var loginDetector: DOMLoginDetector
 
-//    @Inject
-//    lateinit var blobConverterInjector: BlobConverterInjector
-
     val tabId get() = requireArguments()[TAB_ID_ARG] as String
     private val customTabToolbarColor get() = requireArguments().getInt(CUSTOM_TAB_TOOLBAR_COLOR_ARG)
     private val tabDisplayedInCustomTabScreen get() = requireArguments().getBoolean(TAB_DISPLAYED_IN_CUSTOM_TAB_SCREEN_ARG)
