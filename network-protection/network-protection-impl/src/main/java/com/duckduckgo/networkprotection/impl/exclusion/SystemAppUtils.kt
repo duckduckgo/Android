@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.networkprotection.impl.exclusion.ui
+package com.duckduckgo.networkprotection.impl.exclusion
 
-import com.duckduckgo.networkprotection.impl.exclusion.systemapps.SystemAppsExclusionRepository.SystemAppCategory
+import android.content.pm.ApplicationInfo
 
-data class NetpExclusionListApp(
-    val packageName: String,
-    val name: String,
-    val isProtected: Boolean = false,
-)
-
-data class NetpExclusionListSystemAppCategory(
-    val category: SystemAppCategory,
-    val text: String,
-    val isEnabled: Boolean = false,
-)
+internal fun ApplicationInfo.isSystemApp(): Boolean {
+    return (flags and ApplicationInfo.FLAG_SYSTEM) != 0
+}

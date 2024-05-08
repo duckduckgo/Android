@@ -145,6 +145,12 @@
     <string name="netpExclusionListRestoreDefaultSnackbar">Protection restored to default settings</string>
     <string name="netpExclusionListRestoreDefaultsDisclaimer">Enabling protection sends the app\'s name to DuckDuckGo.</string>
 
+    <!-- System apps exclusion list -->
+    <string name="netpExclusionListSystemAppsHeader">Android System Apps</string>
+    <string name="netpExclusionListWarningTitle">Excluding Android system apps</string>
+    <string name="netpExclusionListWarningMessage">Note that excluding a group of system apps could cause unexpected data leaks. </string>
+    <string name="netpExclusionListWarningActionPositive">OK</string>
+
     <!-- About -->
     <string name="netpManagementAboutHeader">About</string>
     <string name="netpManagementAboutItemFaqs">Frequently Asked Questions</string>
