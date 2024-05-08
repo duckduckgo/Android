@@ -20,6 +20,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.impl.FakePasswordStoreEventPlugin
 import com.duckduckgo.autofill.store.CredentialsSyncMetadataEntity
 import com.duckduckgo.autofill.sync.CredentialsFixtures
 import com.duckduckgo.autofill.sync.CredentialsFixtures.toWebsiteLoginCredentials
@@ -60,6 +61,7 @@ internal class CredentialsSyncDataProviderTest {
         credentialsSyncMetadata,
         FakeCrypto(),
         FakeCredentialsSyncLocalValidationFeature(),
+        FakePasswordStoreEventPlugin(),
     )
     private val appBuildConfig = mock<AppBuildConfig>().apply {
         whenever(this.flavor).thenReturn(BuildFlavor.PLAY)

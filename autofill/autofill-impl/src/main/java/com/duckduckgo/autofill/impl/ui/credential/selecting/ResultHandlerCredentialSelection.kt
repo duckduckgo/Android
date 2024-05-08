@@ -30,9 +30,11 @@ import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
 import com.duckduckgo.autofill.api.CredentialAutofillPickerDialog
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
+import com.duckduckgo.autofill.impl.engagement.DataAutofilledListener
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -49,6 +51,7 @@ class ResultHandlerCredentialSelection @Inject constructor(
     private val deviceAuthenticator: DeviceAuthenticator,
     private val appBuildConfig: AppBuildConfig,
     private val autofillStore: InternalAutofillStore,
+    private val autofilledListeners: PluginPoint<DataAutofilledListener>,
 ) : AutofillFragmentResultsPlugin {
 
     override fun processResult(
@@ -99,6 +102,7 @@ class ResultHandlerCredentialSelection @Inject constructor(
                     DeviceAuthenticator.AuthResult.Success -> {
                         Timber.v("Autofill: user selected credential to use, and successfully authenticated")
                         pixel.fire(AutofillPixelNames.AUTOFILL_AUTHENTICATION_TO_AUTOFILL_AUTH_SUCCESSFUL)
+                        notifyAutofilledListeners()
                         autofillCallback.onShareCredentialsForAutofill(originalUrl, selectedCredentials)
                     }
 
@@ -115,6 +119,12 @@ class ResultHandlerCredentialSelection @Inject constructor(
                     }
                 }
             }
+        }
+    }
+
+    private fun notifyAutofilledListeners() {
+        autofilledListeners.getPlugins().forEach {
+            it.onAutofilledSavedPassword()
         }
     }
 

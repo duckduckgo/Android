@@ -36,6 +36,7 @@ import com.duckduckgo.autofill.store.LastUpdatedTimeProvider
 import com.duckduckgo.autofill.store.RealAutofillPrefsStore
 import com.duckduckgo.autofill.store.RealInternalTestUserStore
 import com.duckduckgo.autofill.store.RealLastUpdatedTimeProvider
+import com.duckduckgo.autofill.store.engagement.AutofillEngagementDatabase
 import com.duckduckgo.autofill.store.feature.AutofillDefaultStateDecider
 import com.duckduckgo.autofill.store.feature.AutofillFeatureRepository
 import com.duckduckgo.autofill.store.feature.RealAutofillDefaultStateDecider
@@ -135,6 +136,16 @@ class AutofillModule {
         database: AutofillDatabase,
     ): CredentialsSyncMetadataDao {
         return database.credentialsSyncDao()
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun providesAutofillEngagementDb(
+        context: Context,
+    ): AutofillEngagementDatabase {
+        return Room.databaseBuilder(context, AutofillEngagementDatabase::class.java, "autofill_engagement.db")
+            .addMigrations(*AutofillEngagementDatabase.ALL_MIGRATIONS)
+            .build()
     }
 }
 

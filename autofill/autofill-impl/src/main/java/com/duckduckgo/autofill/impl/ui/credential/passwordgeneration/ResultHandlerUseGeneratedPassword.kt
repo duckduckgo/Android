@@ -27,8 +27,10 @@ import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCrede
 import com.duckduckgo.autofill.api.UseGeneratedPasswordDialog
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
+import com.duckduckgo.autofill.impl.engagement.DataAutofilledListener
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -44,6 +46,7 @@ class ResultHandlerUseGeneratedPassword @Inject constructor(
     private val autoSavedLoginsMonitor: AutomaticSavedLoginsMonitor,
     private val existingCredentialMatchDetector: ExistingCredentialMatchDetector,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val autofilledListeners: PluginPoint<DataAutofilledListener>,
 ) : AutofillFragmentResultsPlugin {
 
     override fun processResult(
@@ -96,6 +99,10 @@ class ResultHandlerUseGeneratedPassword @Inject constructor(
         }
         withContext(dispatchers.main()) {
             callback.onAcceptGeneratedPassword(originalUrl)
+        }
+
+        autofilledListeners.getPlugins().forEach {
+            it.onUsedGeneratedPassword()
         }
     }
 

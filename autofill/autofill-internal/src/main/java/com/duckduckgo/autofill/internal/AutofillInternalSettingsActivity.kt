@@ -31,6 +31,7 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.impl.configuration.AutofillJavascriptEnvironmentConfiguration
 import com.duckduckgo.autofill.impl.email.incontext.store.EmailProtectionInContextDataStore
+import com.duckduckgo.autofill.impl.engagement.store.AutofillEngagementRepository
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
 import com.duckduckgo.autofill.impl.ui.credential.management.survey.AutofillSurveyStore
@@ -87,6 +88,9 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var autofillSurveyStore: AutofillSurveyStore
 
+    @Inject
+    lateinit var engagementRepository: AutofillEngagementRepository
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -137,6 +141,19 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
         configureNeverSavedSitesEventHandlers()
         configureAutofillJsConfigEventHandlers()
         configureSurveyEventHandlers()
+        configureEngagementEventHandlers()
+    }
+
+    private fun configureEngagementEventHandlers() {
+        binding.engagementClearEngagementHistoryButton.setOnClickListener {
+            lifecycleScope.launch(dispatchers.io()) {
+                engagementRepository.clearData(preserveToday = false)
+                withContext(dispatchers.main()) {
+                    val message = getString(R.string.autofillDevSettingsEngagementHistoryCleared)
+                    Toast.makeText(this@AutofillInternalSettingsActivity, message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
 
     private fun configureSurveyEventHandlers() {

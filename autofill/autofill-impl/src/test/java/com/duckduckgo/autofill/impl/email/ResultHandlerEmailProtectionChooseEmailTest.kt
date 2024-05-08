@@ -30,10 +30,12 @@ import com.duckduckgo.autofill.api.EmailProtectionChooseEmailDialog.UseEmailResu
 import com.duckduckgo.autofill.api.EmailProtectionChooseEmailDialog.UseEmailResultType.UsePersonalEmailAddress
 import com.duckduckgo.autofill.api.EmailProtectionChooseEmailDialog.UseEmailResultType.UsePrivateAliasAddress
 import com.duckduckgo.autofill.api.email.EmailManager
+import com.duckduckgo.autofill.impl.engagement.DataAutofilledListener
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_TOOLTIP_DISMISSED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_USE_ADDRESS
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_USE_ALIAS
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -59,6 +61,7 @@ class ResultHandlerEmailProtectionChooseEmailTest {
         dispatchers = coroutineTestRule.testDispatcherProvider,
         appCoroutineScope = coroutineTestRule.testScope,
         pixel = pixel,
+        autofilledListeners = FakePluginPoint(),
     )
 
     @Before
@@ -145,6 +148,12 @@ class ResultHandlerEmailProtectionChooseEmailTest {
         return Bundle().also {
             it.putString(EmailProtectionChooseEmailDialog.KEY_URL, url)
             it.putParcelable(EmailProtectionChooseEmailDialog.KEY_RESULT, result)
+        }
+    }
+
+    private class FakePluginPoint : PluginPoint<DataAutofilledListener> {
+        override fun getPlugins(): Collection<DataAutofilledListener> {
+            return emptyList()
         }
     }
 }

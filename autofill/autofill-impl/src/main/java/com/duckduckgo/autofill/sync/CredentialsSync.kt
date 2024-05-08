@@ -17,6 +17,7 @@
 package com.duckduckgo.autofill.sync
 
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.impl.PasswordStoreEventListener
 import com.duckduckgo.autofill.impl.securestorage.SecureStorage
 import com.duckduckgo.autofill.impl.securestorage.WebsiteLoginDetails
 import com.duckduckgo.autofill.impl.securestorage.WebsiteLoginDetailsWithCredentials
@@ -24,6 +25,7 @@ import com.duckduckgo.autofill.store.CredentialsSyncMetadataEntity
 import com.duckduckgo.autofill.sync.provider.CredentialsSyncLocalValidationFeature
 import com.duckduckgo.autofill.sync.provider.LoginCredentialEntry
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.SyncCrypto
 import dagger.SingleInstanceIn
@@ -40,6 +42,7 @@ class CredentialsSync @Inject constructor(
     private val credentialsSyncMetadata: CredentialsSyncMetadata,
     private val syncCrypto: SyncCrypto,
     private val credentialsSyncLocalValidationFeature: CredentialsSyncLocalValidationFeature,
+    private val passwordStoreEventPlugins: PluginPoint<PasswordStoreEventListener>,
 ) {
 
     suspend fun initMetadata() {
@@ -112,6 +115,7 @@ class CredentialsSync @Inject constructor(
             credentialsSyncMetadata.addOrUpdate(
                 CredentialsSyncMetadataEntity(syncId = remoteId, localId = autofillId, deleted_at = null, modified_at = null),
             )
+            passwordStoreEventPlugins.getPlugins().forEach { it.onCredentialAdded(autofillId) }
         }
     }
 

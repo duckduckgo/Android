@@ -32,6 +32,7 @@ import com.duckduckgo.autofill.store.LastUpdatedTimeProvider
 import com.duckduckgo.autofill.sync.SyncCredentialsListener
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -51,7 +52,10 @@ class SecureStoreBackedAutofillStore @Inject constructor(
     private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider(),
     private val autofillUrlMatcher: AutofillUrlMatcher,
     private val syncCredentialsListener: SyncCredentialsListener,
+    passwordStoreEventListenersPlugins: PluginPoint<PasswordStoreEventListener>,
 ) : InternalAutofillStore {
+
+    private val passwordStoreEventListeners = passwordStoreEventListenersPlugins.getPlugins()
 
     override val autofillAvailable: Boolean
         get() = secureStorage.canAccessSecureStorage()
@@ -130,6 +134,9 @@ class SecureStoreBackedAutofillStore @Inject constructor(
         return withContext(dispatcherProvider.io()) {
             secureStorage.addWebsiteLoginDetailsWithCredentials(webSiteLoginCredentials)?.toLoginCredentials().also {
                 syncCredentialsListener.onCredentialAdded(it?.id!!)
+                it.id?.let { newCredentialId ->
+                    passwordStoreEventListeners.forEach { listener -> listener.onCredentialAdded(newCredentialId) }
+                }
             }
         }
     }

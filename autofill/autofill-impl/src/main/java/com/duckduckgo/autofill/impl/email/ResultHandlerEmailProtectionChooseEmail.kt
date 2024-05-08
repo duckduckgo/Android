@@ -33,10 +33,12 @@ import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
 import com.duckduckgo.autofill.api.EmailProtectionChooseEmailDialog
 import com.duckduckgo.autofill.api.EmailProtectionChooseEmailDialog.UseEmailResultType.*
 import com.duckduckgo.autofill.api.email.EmailManager
+import com.duckduckgo.autofill.impl.engagement.DataAutofilledListener
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_TOOLTIP_DISMISSED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_USE_ADDRESS
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_USE_ALIAS
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -52,6 +54,7 @@ class ResultHandlerEmailProtectionChooseEmail @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val pixel: Pixel,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val autofilledListeners: PluginPoint<DataAutofilledListener>,
 ) : AutofillFragmentResultsPlugin {
 
     override fun processResult(
@@ -68,8 +71,14 @@ class ResultHandlerEmailProtectionChooseEmail @Inject constructor(
         val originalUrl = result.getString(EmailProtectionChooseEmailDialog.KEY_URL) ?: return
 
         when (userSelection) {
-            UsePersonalEmailAddress -> onSelectedToUsePersonalAddress(originalUrl, autofillCallback)
-            UsePrivateAliasAddress -> onSelectedToUsePrivateAlias(originalUrl, autofillCallback)
+            UsePersonalEmailAddress -> {
+                onSelectedToUsePersonalAddress(originalUrl, autofillCallback)
+                notifyAutofillListenersDuckAddressFilled()
+            }
+            UsePrivateAliasAddress -> {
+                onSelectedToUsePrivateAlias(originalUrl, autofillCallback)
+                notifyAutofillListenersDuckAddressFilled()
+            }
             DoNotUseEmailProtection -> onSelectedNotToUseEmailProtection()
         }
     }
@@ -132,5 +141,11 @@ class ResultHandlerEmailProtectionChooseEmail @Inject constructor(
 
     override fun resultKey(tabId: String): String {
         return EmailProtectionChooseEmailDialog.resultKey(tabId)
+    }
+
+    private fun notifyAutofillListenersDuckAddressFilled() {
+        autofilledListeners.getPlugins().forEach {
+            it.onAutofilledDuckAddress()
+        }
     }
 }

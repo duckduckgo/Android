@@ -18,6 +18,7 @@ package com.duckduckgo.autofill.sync
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.impl.FakePasswordStoreEventPlugin
 import com.duckduckgo.autofill.impl.securestorage.WebsiteLoginDetails
 import com.duckduckgo.autofill.impl.securestorage.WebsiteLoginDetailsWithCredentials
 import com.duckduckgo.autofill.store.CredentialsSyncMetadataEntity
@@ -50,6 +51,7 @@ internal class CredentialsSyncTest {
         credentialsSyncMetadata,
         FakeCrypto(),
         FakeCredentialsSyncLocalValidationFeature(),
+        FakePasswordStoreEventPlugin(),
     )
 
     @After fun after() = runBlocking {
