@@ -17,8 +17,6 @@
 package com.duckduckgo.autofill.impl.ui.credential.management
 
 import android.os.Bundle
-import android.system.Os.remove
-import android.text.TextUtils.replace
 import android.view.WindowManager
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
@@ -133,8 +131,8 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
 
     private fun setupInitialState() {
         when (val mode = extractViewMode()) {
-            is ViewMode.ListMode -> viewModel.onShowListMode()
-            is ViewMode.ListModeWithSuggestions -> viewModel.onShowListMode()
+            is ViewMode.ListMode -> viewModel.onInitialiseListMode()
+            is ViewMode.ListModeWithSuggestions -> viewModel.onInitialiseListMode()
             is ViewMode.CredentialMode -> viewModel.onViewCredentials(mode.loginCredentials)
         }
     }
@@ -252,7 +250,7 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
         if (credentialModeLaunchedDirectly()) {
             finish()
         } else {
-            viewModel.onShowListMode()
+            viewModel.onReturnToListModeFromCredentialMode()
         }
     }
 
@@ -339,7 +337,7 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
                 if (credentialModeLaunchedDirectly()) {
                     finish()
                 } else {
-                    viewModel.onShowListMode()
+                    viewModel.onReturnToListModeFromCredentialMode()
                 }
             }
 

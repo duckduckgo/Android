@@ -28,6 +28,7 @@ import com.duckduckgo.autofill.impl.InternalAutofillCapabilityChecker
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthConfiguration
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_ENABLED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_CONFIRMATION_PROMPT_CONFIRMED
@@ -72,6 +73,8 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsVie
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.PromptUserToAuthenticateMassDeletion
 import com.duckduckgo.autofill.impl.ui.credential.management.neversaved.NeverSavedSitesViewState
 import com.duckduckgo.autofill.impl.ui.credential.management.searching.CredentialListFilter
+import com.duckduckgo.autofill.impl.ui.credential.management.survey.AutofillSurvey
+import com.duckduckgo.autofill.impl.ui.credential.management.survey.AutofillSurvey.SurveyDetails
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.duckaddress.DuckAddressIdentifier
 import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository
 import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository.ActivationStatusResult
@@ -109,6 +112,7 @@ class AutofillSettingsViewModel @Inject constructor(
     private val syncEngine: SyncEngine,
     private val neverSavedSiteRepository: NeverSavedSiteRepository,
     private val capabilityChecker: InternalAutofillCapabilityChecker,
+    private val autofillSurvey: AutofillSurvey,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -146,7 +150,16 @@ class AutofillSettingsViewModel @Inject constructor(
         addCommand(ShowUserPasswordCopied())
     }
 
-    fun onShowListMode() {
+    fun onInitialiseListMode() {
+        onShowListMode()
+        showSurveyIfAvailable()
+    }
+
+    fun onReturnToListModeFromCredentialMode() {
+        onShowListMode()
+    }
+
+    private fun onShowListMode() {
         _viewState.value = _viewState.value.copy(credentialMode = ListMode)
         addCommand(ShowListMode)
     }
@@ -247,6 +260,31 @@ class AutofillSettingsViewModel @Inject constructor(
         }
     }
 
+    private fun showSurveyIfAvailable() {
+        viewModelScope.launch(dispatchers.io()) {
+            val survey = autofillSurvey.firstUnusedSurvey()
+            _viewState.value = _viewState.value.copy(survey = survey)
+
+            if (survey != null) {
+                pixel.fire(AutofillPixelNames.AUTOFILL_SURVEY_AVAILABLE_PROMPT_DISPLAYED)
+            }
+        }
+    }
+
+    fun onSurveyShown(surveyId: String) {
+        viewModelScope.launch(dispatchers.io()) {
+            _viewState.value = _viewState.value.copy(survey = null)
+            autofillSurvey.recordSurveyAsUsed(surveyId)
+        }
+    }
+
+    fun onSurveyPromptDismissed(surveyId: String) {
+        viewModelScope.launch(dispatchers.io()) {
+            _viewState.value = _viewState.value.copy(survey = null)
+            autofillSurvey.recordSurveyAsUsed(surveyId)
+        }
+    }
+
     suspend fun launchDeviceAuth() {
         if (!autofillStore.autofillAvailable) {
             Timber.d("Can't access secure storage so can't offer autofill functionality")
@@ -317,7 +355,7 @@ class AutofillSettingsViewModel @Inject constructor(
     }
 
     private fun addCommand(command: Command) {
-        Timber.v("Adding command %s", command)
+        Timber.v("Adding command %s", command::class.simpleName)
         commands.value.let { commands ->
             val updatedList = commands + command
             _commands.value = updatedList
@@ -647,6 +685,7 @@ class AutofillSettingsViewModel @Inject constructor(
         val credentialMode: CredentialMode? = null,
         val credentialSearchQuery: String = "",
         val webViewCompatible: Boolean = true,
+        val survey: SurveyDetails? = null,
     )
 
     /**
