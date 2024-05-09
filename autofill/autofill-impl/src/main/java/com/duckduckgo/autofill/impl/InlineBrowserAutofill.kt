@@ -29,6 +29,7 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.yield
 import timber.log.Timber
 
 @ContributesBinding(FragmentScope::class)
@@ -71,6 +72,7 @@ class InlineBrowserAutofill @Inject constructor(
         withContext(dispatchers.main()) {
             webMessageListeners.getPlugins().forEach {
                 webView.addWebMessageListener(it, autofillCallback, tabId)
+                yield()
             }
 
             autofillJavascriptInjector.addDocumentStartJavascript(webView)
