@@ -9,15 +9,6 @@
 
 ///////////////////////////////////////////////////////////////////////////
 
-static JavaVM *JVM = NULL;
-jclass clsCrash;
-jobject CLASS_JVM_CRASH = NULL;
-
-
-static jobject jniGlobalRef(JNIEnv *env, jobject cls);
-static jclass jniFindClass(JNIEnv *env, const char *name);
-static jmethodID jniGetMethodID(JNIEnv *env, jclass cls, const char *name, const char *signature);
-
 int loglevel = 0;
 char appVersion[256];
 char pname[256];
@@ -33,63 +24,6 @@ void __platform_log_print(int prio, const char *tag, const char *fmt, ...) {
     vsprintf(line, fmt, argptr);
     __android_log_print(prio, tag, "%s", line);
     va_end(argptr);
-}
-
-///////////////////////////////////////////////////////////////////////////
-// JNI utils
-///////////////////////////////////////////////////////////////////////////
-
-static jobject jniGlobalRef(JNIEnv *env, jobject cls) {
-    jobject gcls = env->NewGlobalRef(cls);
-    if (gcls == NULL)
-        log_print(ANDROID_LOG_ERROR, "Global ref failed (out of memory?)");
-    return gcls;
-}
-
-static jclass jniFindClass(JNIEnv *env, const char *name) {
-    jclass cls = env->FindClass(name);
-    if (cls == NULL)
-        log_print(ANDROID_LOG_ERROR, "Class %s not found", name);
-    return cls;
-}
-
-static jmethodID jniGetMethodID(JNIEnv *env, jclass cls, const char *name, const char *signature) {
-    jmethodID method = env->GetMethodID(cls, name, signature);
-    if (method == NULL) {
-        log_print(ANDROID_LOG_ERROR, "Method %s %s not found", name, signature);
-    }
-    return method;
-}
-
-///////////////////////////////////////////////////////////////////////////
-// JNI lifecycle
-///////////////////////////////////////////////////////////////////////////
-
-jint JNI_OnLoad(JavaVM *vm, void *reserved) {
-    JNIEnv *env;
-    if ((vm)->GetEnv((void **) &env, JNI_VERSION_1_6) != JNI_OK) {
-        log_print(ANDROID_LOG_INFO, "JNI load GetEnv failed");
-        return -1;
-    }
-
-    jint rs = env->GetJavaVM(&JVM);
-    if (rs != JNI_OK) {
-        log_print(ANDROID_LOG_ERROR, "Could not get JVM");
-        return -1;
-    }
-
-    return JNI_VERSION_1_6;
-}
-
-void JNI_OnUnload(JavaVM *vm, void *reserved) {
-    log_print(ANDROID_LOG_INFO, "JNI unload");
-
-    JNIEnv *env;
-    if (vm->GetEnv((void **) &env, JNI_VERSION_1_6) != JNI_OK)
-        log_print(ANDROID_LOG_INFO, "JNI load GetEnv failed");
-    else {
-        env->DeleteGlobalRef(clsCrash);
-    }
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -128,10 +62,6 @@ Java_com_duckduckgo_app_anr_ndk_NativeCrashInit_jni_1register_1sighandler(
 
     // get and set isCustomTabs
     isCustomTab = customtab_;
-
-    clsCrash = env->GetObjectClass(instance);
-    const char *emptyParamVoidSig = "()V";
-    CLASS_JVM_CRASH = env->NewGlobalRef(instance);
 
     send_crash_handle_init_pixel();
 
