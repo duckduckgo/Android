@@ -33,6 +33,7 @@ import com.duckduckgo.autofill.impl.configuration.AutofillJavascriptEnvironmentC
 import com.duckduckgo.autofill.impl.email.incontext.store.EmailProtectionInContextDataStore
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
+import com.duckduckgo.autofill.impl.ui.credential.management.survey.AutofillSurveyStore
 import com.duckduckgo.autofill.internal.databinding.ActivityAutofillInternalSettingsBinding
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -83,6 +84,9 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var autofillJavascriptEnvironmentConfiguration: AutofillJavascriptEnvironmentConfiguration
 
+    @Inject
+    lateinit var autofillSurveyStore: AutofillSurveyStore
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -132,6 +136,16 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
         configureLoginsUiEventHandlers()
         configureNeverSavedSitesEventHandlers()
         configureAutofillJsConfigEventHandlers()
+        configureSurveyEventHandlers()
+    }
+
+    private fun configureSurveyEventHandlers() {
+        binding.autofillSurveyResetButton.setOnClickListener {
+            lifecycleScope.launch(dispatchers.io()) {
+                autofillSurveyStore.resetPreviousSurveys()
+            }
+            Toast.makeText(this, getString(R.string.autofillDevSettingsSurveySectionResetted), Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun configureNeverSavedSitesEventHandlers() = with(binding) {
