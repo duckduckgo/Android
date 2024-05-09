@@ -290,6 +290,8 @@ class BrowserTabViewModel @Inject constructor(
     var siteLiveData: MutableLiveData<Site> = MutableLiveData()
     val privacyShieldViewState: MutableLiveData<PrivacyShieldViewState> = MutableLiveData()
 
+    // if navigating from home, want to know if a site was loaded previously to decide whether to reset WebView
+    private var returnedHomeAfterSiteLoaded = false
     var skipHome = false
     var hasCtaBeenShownForCurrentPage: AtomicBoolean = AtomicBoolean(false)
     val tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
@@ -774,6 +776,7 @@ class BrowserTabViewModel @Inject constructor(
                 }
 
                 if (shouldClearHistoryOnNewQuery()) {
+                    returnedHomeAfterSiteLoaded = false
                     command.value = ResetHistory
                 }
 
@@ -841,7 +844,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun shouldClearHistoryOnNewQuery(): Boolean {
-        val navigation = webNavigationState ?: return true
+        val navigation = webNavigationState ?: return returnedHomeAfterSiteLoaded
         return !currentBrowserViewState().browserShowing && navigation.hasNavigationHistory
     }
 
@@ -1004,6 +1007,7 @@ class BrowserTabViewModel @Inject constructor(
         site = null
         onSiteChanged()
         webNavigationState = null
+        returnedHomeAfterSiteLoaded = true
 
         val browserState = browserStateModifier.copyForHomeShowing(currentBrowserViewState()).copy(
             canGoForward = currentGlobalLayoutState() !is Invalidated,

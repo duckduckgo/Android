@@ -3809,8 +3809,17 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenSubmittedQueryAndNavigationStateIsNullThenResetHistoryCommandSent() {
+    fun whenSubmittedQueryAndNavigationStateIsNullAndNeverPreviouslyLoadedSiteThenResetHistoryCommandNotSent() {
         whenever(mockOmnibarConverter.convertQueryToUrl("nytimes.com", null)).thenReturn("nytimes.com")
+        testee.onUserSubmittedQuery("nytimes.com")
+        assertCommandNotIssued<Command.ResetHistory>()
+    }
+
+    @Test
+    fun whenSubmittedQueryAndNavigationStateIsNullAndPreviouslyLoadedSiteThenResetHistoryCommandSent() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("nytimes.com", null)).thenReturn("nytimes.com")
+        setupNavigation(isBrowsing = true)
+        testee.onUserPressedBack()
         testee.onUserSubmittedQuery("nytimes.com")
         assertCommandIssued<Command.ResetHistory>()
     }
