@@ -71,7 +71,7 @@ class RealSubscriptionsManagerTest {
     private val playBillingManager: PlayBillingManager = mock()
     private val context: Context = mock()
     private val pixelSender: SubscriptionPixelSender = mock()
-    private lateinit var subscriptionsManager: SubscriptionsManager
+    private lateinit var subscriptionsManager: RealSubscriptionsManager
 
     @Before
     fun before() = runTest {
@@ -589,7 +589,7 @@ class RealSubscriptionsManagerTest {
     }
 
     @Test
-    fun whenGetAuthTokenIfUserAuthenticatedWithSubscriptionAndTokenExpiredAndEntitlementsExistsThenReturnSuccess() = runTest {
+    fun whenGetValidatedAuthTokenIfUserAuthenticatedWithSubscriptionAndTokenExpiredAndEntitlementsExistsThenReturnSuccess() = runTest {
         authDataStore.externalId = "1234"
         givenUserIsAuthenticated()
         givenSubscriptionSucceedsWithEntitlements()
@@ -598,7 +598,7 @@ class RealSubscriptionsManagerTest {
         givenStoreLoginSucceeds()
         givenAccessTokenSucceeds()
 
-        val result = subscriptionsManager.getAuthToken()
+        val result = subscriptionsManager.getValidatedAuthToken()
 
         verify(authService).storeLogin(any())
         assertTrue(result is AuthToken.Success)
@@ -606,7 +606,7 @@ class RealSubscriptionsManagerTest {
     }
 
     @Test
-    fun whenGetAuthTokenIfUserAuthenticatedWithSubscriptionAndTokenExpiredAndEntitlementsExistsAndExternalIdDifferentThenReturnFailure() = runTest {
+    fun whenGetValidatedAuthTokenIfUserAuthenticatedWithSubscriptionAndTokenExpiredAndEntitlementsExistsAndExternalIdDifferentThenReturnFailure() = runTest {
         authDataStore.externalId = "test"
         givenUserIsAuthenticated()
         givenSubscriptionSucceedsWithEntitlements()
@@ -615,14 +615,14 @@ class RealSubscriptionsManagerTest {
         givenStoreLoginSucceeds()
         givenAccessTokenSucceeds()
 
-        val result = subscriptionsManager.getAuthToken()
+        val result = subscriptionsManager.getValidatedAuthToken()
 
         verify(authService).storeLogin(any())
         assertTrue(result is AuthToken.Failure)
     }
 
     @Test
-    fun whenGetAuthTokenIfUserAuthenticatedWithSubscriptionAndTokenExpiredAndEntitlementsDoNotExistThenReturnFailure() = runTest {
+    fun whenGetValidatedAuthTokenIfUserAuthenticatedWithSubscriptionAndTokenExpiredAndEntitlementsDoNotExistThenReturnFailure() = runTest {
         givenUserIsAuthenticated()
         givenValidateTokenSucceedsNoEntitlements()
         givenValidateTokenFailsAndThenSucceedsWithNoEntitlements("""{ "error": "expired_token" }""")
@@ -630,31 +630,31 @@ class RealSubscriptionsManagerTest {
         givenStoreLoginSucceeds()
         givenAccessTokenSucceeds()
 
-        val result = subscriptionsManager.getAuthToken()
+        val result = subscriptionsManager.getValidatedAuthToken()
 
         verify(authService).storeLogin(any())
         assertTrue(result is AuthToken.Failure)
     }
 
     @Test
-    fun whenGetAuthTokenIfUserAuthenticatedAndTokenExpiredAndNoPurchaseInTheStoreThenReturnFailure() = runTest {
+    fun whenGetValidatedAuthTokenIfUserAuthenticatedAndTokenExpiredAndNoPurchaseInTheStoreThenReturnFailure() = runTest {
         givenUserIsAuthenticated()
         givenValidateTokenFailsAndThenSucceeds("""{ "error": "expired_token" }""")
 
-        val result = subscriptionsManager.getAuthToken()
+        val result = subscriptionsManager.getValidatedAuthToken()
 
         verify(authService, never()).storeLogin(any())
         assertTrue(result is AuthToken.Failure)
     }
 
     @Test
-    fun whenGetAuthTokenIfUserAuthenticatedAndTokenExpiredAndPurchaseNotValidThenReturnFailure() = runTest {
+    fun whenGetValidatedAuthTokenIfUserAuthenticatedAndTokenExpiredAndPurchaseNotValidThenReturnFailure() = runTest {
         givenUserIsAuthenticated()
         givenValidateTokenFailsAndThenSucceeds("""{ "error": "expired_token" }""")
         givenStoreLoginFails()
         givenPurchaseStored()
 
-        val result = subscriptionsManager.getAuthToken()
+        val result = subscriptionsManager.getValidatedAuthToken()
 
         verify(authService).storeLogin(any())
         assertTrue(result is AuthToken.Failure)
