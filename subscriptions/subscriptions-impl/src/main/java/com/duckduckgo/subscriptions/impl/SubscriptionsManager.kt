@@ -44,6 +44,7 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.Account
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
 import com.duckduckgo.subscriptions.impl.repository.Subscription
+import com.duckduckgo.subscriptions.impl.repository.isExpired
 import com.duckduckgo.subscriptions.impl.repository.toProductList
 import com.duckduckgo.subscriptions.impl.services.AuthService
 import com.duckduckgo.subscriptions.impl.services.ConfirmationBody
@@ -452,17 +453,22 @@ class RealSubscriptionsManager @Inject constructor(
     ) {
         try {
             _currentPurchaseState.emit(CurrentPurchase.PreFlowInProgress)
-            val subscription: Subscription? =
-                if (isUserAuthenticated()) {
-                    fetchAndStoreAllData()
-                } else {
-                    val recovered = recoverSubscriptionFromStore()
-                    if (recovered is RecoverSubscriptionResult.Success) {
-                        recovered.subscription
-                    } else {
-                        null
+
+            // refresh any existing account / subscription data
+            fetchAndStoreAllData()
+
+            if (!isUserAuthenticated()) {
+                recoverSubscriptionFromStore()
+            } else {
+                authRepository.getSubscription()?.run {
+                    if (status.isExpired() && platform == "google") {
+                        // re-authenticate in case previous subscription was bought using different google account
+                        recoverSubscriptionFromStore()
                     }
                 }
+            }
+
+            val subscription = authRepository.getSubscription()
 
             if (subscription?.isActive() == true) {
                 pixelSender.reportSubscriptionActivated()
