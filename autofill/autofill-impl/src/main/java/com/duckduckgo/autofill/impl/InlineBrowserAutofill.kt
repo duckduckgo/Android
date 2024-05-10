@@ -16,105 +16,66 @@
 
 package com.duckduckgo.autofill.impl
 
-import android.annotation.SuppressLint
 import android.webkit.WebView
-import androidx.webkit.WebViewCompat
-import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.Callback
-import com.duckduckgo.autofill.impl.configuration.integration.modern.listener.AutofillWebMessageListener
-import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.autofill.api.EmailProtectionInContextSignupFlowListener
+import com.duckduckgo.autofill.api.EmailProtectionUserPromptListener
+import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-import kotlinx.coroutines.withContext
-import kotlinx.coroutines.yield
 import timber.log.Timber
 
 @ContributesBinding(FragmentScope::class)
 class InlineBrowserAutofill @Inject constructor(
-    private val autofillCapabilityChecker: InternalAutofillCapabilityChecker,
-    private val dispatchers: DispatcherProvider,
-    private val autofillJavascriptInjector: AutofillJavascriptInjector,
-    private val webMessageListeners: PluginPoint<AutofillWebMessageListener>,
-    private val autofillFeature: AutofillFeature,
-    private val webMessageAttacher: AutofillWebMessageAttacher,
+    private val autofillInterface: AutofillJavascriptInterface,
+    private val autoSavedLoginsMonitor: AutomaticSavedLoginsMonitor,
 ) : BrowserAutofill {
 
-    override suspend fun addJsInterface(
+    override fun addJsInterface(
         webView: WebView,
         autofillCallback: Callback,
+        emailProtectionInContextCallback: EmailProtectionUserPromptListener?,
+        emailProtectionInContextSignupFlowCallback: EmailProtectionInContextSignupFlowListener?,
         tabId: String,
     ) {
-        withContext(dispatchers.io()) {
-            if (!autofillCapabilityChecker.webViewSupportsAutofill()) {
-                Timber.e("Modern javascript integration is not supported on this WebView version; autofill will not work")
-                return@withContext
-            }
-
-            if (!autofillFeature.self().isEnabled()) {
-                Timber.w("Autofill feature is not enabled in remote config; autofill will not work")
-                return@withContext
-            }
-
-            configureModernIntegration(webView, autofillCallback, tabId)
-        }
+        Timber.v("Injecting BrowserAutofill interface")
+        // Adding the interface regardless if the feature is available or not
+        webView.addJavascriptInterface(autofillInterface, AutofillJavascriptInterface.INTERFACE_NAME)
+        autofillInterface.webView = webView
+        autofillInterface.callback = autofillCallback
+        autofillInterface.emailProtectionInContextCallback = emailProtectionInContextCallback
+        autofillInterface.autoSavedLoginsMonitor = autoSavedLoginsMonitor
+        autofillInterface.tabId = tabId
     }
 
-    private suspend fun configureModernIntegration(
-        webView: WebView,
-        autofillCallback: Callback,
-        tabId: String,
-    ) {
-        Timber.d("Autofill: Configuring modern integration with %d message listeners", webMessageListeners.getPlugins().size)
+    override fun removeJsInterface() {
+        autofillInterface.webView = null
+    }
 
-        withContext(dispatchers.main()) {
-            webMessageListeners.getPlugins().forEach {
-                webView.addWebMessageListener(it, autofillCallback, tabId)
-                yield()
-            }
-
-            autofillJavascriptInjector.addDocumentStartJavascript(webView)
+    override fun injectCredentials(credentials: LoginCredentials?) {
+        if (credentials == null) {
+            autofillInterface.injectNoCredentials()
+        } else {
+            autofillInterface.injectCredentials(credentials)
         }
     }
 
     override fun cancelPendingAutofillRequestToChooseCredentials() {
-        webMessageListeners.getPlugins().forEach {
-            it.cancelOutstandingRequests()
-        }
+        autofillInterface.cancelRetrievingStoredLogins()
     }
 
-    private fun WebView.addWebMessageListener(
-        messageListener: AutofillWebMessageListener,
-        autofillCallback: Callback,
-        tabId: String,
-    ) {
-        webMessageAttacher.addListener(this, messageListener)
-        messageListener.callback = autofillCallback
-        messageListener.tabId = tabId
+    override fun acceptGeneratedPassword() {
+        autofillInterface.acceptGeneratedPassword()
     }
 
-    override fun notifyPageChanged() {
-        webMessageListeners.getPlugins().forEach { it.cancelOutstandingRequests() }
+    override fun rejectGeneratedPassword() {
+        autofillInterface.rejectGeneratedPassword()
     }
-}
 
-interface AutofillWebMessageAttacher {
-    fun addListener(
-        webView: WebView,
-        listener: AutofillWebMessageListener,
-    )
-}
-
-@SuppressLint("RequiresFeature")
-@ContributesBinding(FragmentScope::class)
-class AutofillWebMessageAttacherImpl @Inject constructor() : AutofillWebMessageAttacher {
-
-    override fun addListener(
-        webView: WebView,
-        listener: AutofillWebMessageListener,
-    ) {
-        WebViewCompat.addWebMessageListener(webView, listener.key, listener.origins, listener)
+    override fun inContextEmailProtectionFlowFinished() {
+        autofillInterface.inContextEmailProtectionFlowFinished()
     }
 }

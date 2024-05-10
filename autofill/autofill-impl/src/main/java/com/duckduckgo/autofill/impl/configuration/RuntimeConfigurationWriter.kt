@@ -59,7 +59,7 @@ class RealRuntimeConfigurationWriter @Inject constructor(val moshi: Moshi) : Run
     */
     override fun generateContentScope(): String {
         return """
-            "contentScope" : {
+            contentScope = {
               "features": {
                 "autofill": {
                   "state": "enabled",
@@ -67,7 +67,7 @@ class RealRuntimeConfigurationWriter @Inject constructor(val moshi: Moshi) : Run
                 }
               },
               "unprotectedTemporary": []
-            }
+            };
         """.trimIndent()
     }
 
@@ -76,7 +76,7 @@ class RealRuntimeConfigurationWriter @Inject constructor(val moshi: Moshi) : Run
      */
     override fun generateUserUnprotectedDomains(): String {
         return """
-            "userUnprotectedDomains" : []
+            userUnprotectedDomains = [];
         """.trimIndent()
     }
 
@@ -88,7 +88,7 @@ class RealRuntimeConfigurationWriter @Inject constructor(val moshi: Moshi) : Run
         showInContextEmailProtectionSignup: Boolean,
     ): String {
         return """
-            "userPreferences" : {
+            userPreferences = {
               "debug": false,
               "platform": {
                 "name": "android"
@@ -109,7 +109,7 @@ class RealRuntimeConfigurationWriter @Inject constructor(val moshi: Moshi) : Run
                   }
                 }
               }
-            }
+            };
         """.trimIndent()
     }
 }

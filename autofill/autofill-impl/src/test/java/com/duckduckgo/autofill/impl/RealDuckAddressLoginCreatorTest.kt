@@ -16,7 +16,7 @@
 
 package com.duckduckgo.autofill.impl
 
-import com.duckduckgo.autofill.api.AutofillWebMessageRequest
+import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
@@ -34,7 +34,7 @@ class RealDuckAddressLoginCreatorTest {
 
     private val autofillStore: InternalAutofillStore = mock()
     private val automaticSavedLoginsMonitor: AutomaticSavedLoginsMonitor = mock()
-    private val autofillCapabilityChecker: InternalAutofillCapabilityChecker = mock()
+    private val autofillCapabilityChecker: AutofillCapabilityChecker = mock()
     private val neverSavedSiteRepository: NeverSavedSiteRepository = mock()
 
     private val testee = RealDuckAddressLoginCreator(
@@ -126,8 +126,6 @@ class RealDuckAddressLoginCreatorTest {
     companion object {
         private const val TAB_ID = "tab-id-123"
         private const val URL = "example.com"
-        private const val REQUEST_ID = "request-id-123"
-        private val AUTOFILL_URL_REQUEST = AutofillWebMessageRequest(URL, URL, REQUEST_ID)
         private const val DUCK_ADDRESS = "foo@duck.com"
     }
 }

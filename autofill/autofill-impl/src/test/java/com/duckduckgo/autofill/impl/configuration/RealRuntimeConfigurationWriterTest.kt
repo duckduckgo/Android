@@ -48,7 +48,7 @@ class RealRuntimeConfigurationWriterTest {
     @Test
     fun whenGenerateContentScopeTheReturnContentScopeString() {
         val expectedJson = """
-            "contentScope" : {
+            contentScope = {
               "features": {
                 "autofill": {
                   "state": "enabled",
@@ -56,7 +56,7 @@ class RealRuntimeConfigurationWriterTest {
                 }
               },
               "unprotectedTemporary": []
-            }
+            };
         """.trimIndent()
         assertEquals(
             expectedJson,
@@ -66,9 +66,7 @@ class RealRuntimeConfigurationWriterTest {
 
     @Test
     fun whenGenerateUserUnprotectedDomainsThenReturnUserUnprotectedDomainsString() {
-        val expectedJson = """
-            "userUnprotectedDomains" : []
-        """.trimIndent()
+        val expectedJson = "userUnprotectedDomains = [];"
         assertEquals(
             expectedJson,
             testee.generateUserUnprotectedDomains(),
@@ -78,7 +76,7 @@ class RealRuntimeConfigurationWriterTest {
     @Test
     fun whenGenerateUserPreferencesThenReturnUserPreferencesString() {
         val expectedJson = """
-            "userPreferences" : {
+            userPreferences = {
               "debug": false,
               "platform": {
                 "name": "android"
@@ -99,7 +97,7 @@ class RealRuntimeConfigurationWriterTest {
                   }
                 }
               }
-            }
+            };
         """.trimIndent()
         assertEquals(
             expectedJson,
