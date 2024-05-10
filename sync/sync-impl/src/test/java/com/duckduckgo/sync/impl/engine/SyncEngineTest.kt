@@ -29,6 +29,7 @@ import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.DATA_CHANGE
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import com.duckduckgo.sync.impl.API_CODE
+import com.duckduckgo.sync.impl.API_CODE.TOO_MANY_REQUESTS_1
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.engine.SyncOperation.DISCARD
@@ -582,7 +583,7 @@ internal class SyncEngineTest {
 
     private fun givenPatchError() {
         whenever(syncApiClient.patch(any())).thenReturn(
-            Result.Error(400, "patch failed"),
+            Result.Error(TOO_MANY_REQUESTS_1.code, "patch failed"),
         )
     }
 

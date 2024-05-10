@@ -26,13 +26,13 @@ import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreenNoParams
-import com.duckduckgo.autofill.impl.R
-import com.duckduckgo.autofill.impl.databinding.ViewCredentialsRateLimitWarningBinding
-import com.duckduckgo.autofill.sync.CredentialsRateLimitViewModel.Command
-import com.duckduckgo.autofill.sync.CredentialsRateLimitViewModel.Command.NavigateToCredentials
-import com.duckduckgo.autofill.sync.CredentialsRateLimitViewModel.ViewState
+import com.duckduckgo.autofill.impl.databinding.ViewCredentialsSyncPausedWarningBinding
+import com.duckduckgo.autofill.sync.CredentialsSyncPausedViewModel.Command
+import com.duckduckgo.autofill.sync.CredentialsSyncPausedViewModel.Command.NavigateToCredentials
+import com.duckduckgo.autofill.sync.CredentialsSyncPausedViewModel.ViewState
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import dagger.android.support.AndroidSupportInjection
@@ -45,7 +45,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ViewScope::class)
-class CredentialsRateLimitView @JvmOverloads constructor(
+class CredentialsSyncPausedView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
@@ -55,16 +55,16 @@ class CredentialsRateLimitView @JvmOverloads constructor(
     lateinit var globalActivityStarter: GlobalActivityStarter
 
     @Inject
-    lateinit var viewModelFactory: CredentialsRateLimitViewModel.Factory
+    lateinit var viewModelFactory: ViewViewModelFactory
 
     private var coroutineScope: CoroutineScope? = null
 
     private var job: ConflatedJob = ConflatedJob()
 
-    private val binding: ViewCredentialsRateLimitWarningBinding by viewBinding()
+    private val binding: ViewCredentialsSyncPausedWarningBinding by viewBinding()
 
-    private val viewModel: CredentialsRateLimitViewModel by lazy {
-        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[CredentialsRateLimitViewModel::class.java]
+    private val viewModel: CredentialsSyncPausedViewModel by lazy {
+        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[CredentialsSyncPausedViewModel::class.java]
     }
 
     override fun onAttachedToWindow() {
@@ -72,8 +72,6 @@ class CredentialsRateLimitView @JvmOverloads constructor(
         super.onAttachedToWindow()
 
         ViewTreeLifecycleOwner.get(this)?.lifecycle?.addObserver(viewModel)
-
-        configureViewListeners()
 
         @SuppressLint("NoHardcodedCoroutineDispatcher")
         coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
@@ -102,17 +100,18 @@ class CredentialsRateLimitView @JvmOverloads constructor(
     }
 
     private fun render(viewState: ViewState) {
-        this.isVisible = viewState.warningVisible
-    }
-
-    private fun configureViewListeners() {
-        binding.credentialsRateLimitWarning.setClickableLink(
-            WARNING_ACTION_ANNOTATION,
-            context.getText(R.string.credentials_limit_warning),
-            onClick = {
-                viewModel.onWarningActionClicked()
-            },
-        )
+        if (viewState.message != null) {
+            this.isVisible = true
+            binding.credentialsSyncPausedWarning.setClickableLink(
+                WARNING_ACTION_ANNOTATION,
+                context.getText(viewState.message),
+                onClick = {
+                    viewModel.onWarningActionClicked()
+                },
+            )
+        } else {
+            this.isVisible = false
+        }
     }
 
     private fun navigateToCredentials() {
