@@ -21,7 +21,6 @@ import androidx.fragment.app.Fragment
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.autofill.api.AutofillEventListener
-import com.duckduckgo.autofill.api.AutofillWebMessageRequest
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.NoMatch
 import com.duckduckgo.autofill.api.UseGeneratedPasswordDialog.Companion.KEY_ACCEPTED
@@ -30,8 +29,6 @@ import com.duckduckgo.autofill.api.UseGeneratedPasswordDialog.Companion.KEY_URL
 import com.duckduckgo.autofill.api.UseGeneratedPasswordDialog.Companion.KEY_USERNAME
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
-import com.duckduckgo.autofill.impl.jsbridge.AutofillMessagePoster
-import com.duckduckgo.autofill.impl.jsbridge.response.AutofillResponseWriter
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
@@ -52,17 +49,13 @@ class ResultHandlerUseGeneratedPasswordTest {
     private val autoSavedLoginsMonitor: AutomaticSavedLoginsMonitor = mock()
     private val existingCredentialMatchDetector: ExistingCredentialMatchDetector = mock()
     private val callback: AutofillEventListener = mock()
-    private val messagePoster: AutofillMessagePoster = mock()
-    private val responseWriter: AutofillResponseWriter = mock()
 
     private val testee = ResultHandlerUseGeneratedPassword(
         dispatchers = coroutineTestRule.testDispatcherProvider,
         autofillStore = autofillStore,
+        appCoroutineScope = coroutineTestRule.testScope,
         autoSavedLoginsMonitor = autoSavedLoginsMonitor,
         existingCredentialMatchDetector = existingCredentialMatchDetector,
-        messagePoster = messagePoster,
-        responseWriter = responseWriter,
-        appCoroutineScope = coroutineTestRule.testScope,
     )
 
     @Before
@@ -77,20 +70,18 @@ class ResultHandlerUseGeneratedPasswordTest {
     }
 
     @Test
-    fun whenUserRejectedToUsePasswordThenCorrectResponsePosted() = runTest {
+    fun whenUserRejectedToUsePasswordThenCorrectCallbackInvoked() {
         val bundle = bundle("example.com", acceptedGeneratedPassword = false)
         testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
-        verify(responseWriter).generateResponseForRejectingGeneratedPassword()
-        verify(messagePoster).postMessage(anyOrNull(), any())
+        verify(callback).onRejectGeneratedPassword("example.com")
     }
 
     @Test
-    fun whenUserAcceptedToUsePasswordNoAutoLoginInThenCorrectResponsePosted() = runTest {
+    fun whenUserAcceptedToUsePasswordNoAutoLoginInThenCorrectCallbackInvoked() = runTest {
         whenever(autoSavedLoginsMonitor.getAutoSavedLoginId(any())).thenReturn(null)
         val bundle = bundle("example.com", acceptedGeneratedPassword = true, password = "pw")
         testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
-        verify(responseWriter).generateResponseForAcceptingGeneratedPassword()
-        verify(messagePoster).postMessage(anyOrNull(), any())
+        verify(callback).onAcceptGeneratedPassword("example.com")
     }
 
     @Test
@@ -173,12 +164,10 @@ class ResultHandlerUseGeneratedPasswordTest {
     }
 
     @Test
-    fun whenUserAcceptedToUsePasswordButPasswordIsNullThen() = runTest {
+    fun whenUserAcceptedToUsePasswordButPasswordIsNullThenCorrectCallbackNotInvoked() = runTest {
         val bundle = bundle("example.com", acceptedGeneratedPassword = true, password = null)
         testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
-
-        verify(responseWriter, never()).generateResponseForAcceptingGeneratedPassword()
-        verify(messagePoster, never()).postMessage(any(), any())
+        verify(callback, never()).onAcceptGeneratedPassword("example.com")
     }
 
     @Test
@@ -195,9 +184,7 @@ class ResultHandlerUseGeneratedPasswordTest {
         password: String? = null,
     ): Bundle {
         return Bundle().also {
-            if (url != null) {
-                it.putParcelable(KEY_URL, AutofillWebMessageRequest(url, url, "abc-123"))
-            }
+            it.putString(KEY_URL, url)
             it.putBoolean(KEY_ACCEPTED, acceptedGeneratedPassword)
             it.putString(KEY_USERNAME, username)
             it.putString(KEY_PASSWORD, password)

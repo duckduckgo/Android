@@ -22,17 +22,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.os.BundleCompat
 import androidx.fragment.app.setFragmentResult
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.autofill.api.AutofillWebMessageRequest
 import com.duckduckgo.autofill.api.CredentialAutofillPickerDialog
-import com.duckduckgo.autofill.api.CredentialAutofillPickerDialog.Companion.KEY_CREDENTIALS
-import com.duckduckgo.autofill.api.CredentialAutofillPickerDialog.Companion.KEY_TAB_ID
-import com.duckduckgo.autofill.api.CredentialAutofillPickerDialog.Companion.KEY_TRIGGER_TYPE
-import com.duckduckgo.autofill.api.CredentialAutofillPickerDialog.Companion.KEY_URL_REQUEST
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType.AUTOPROMPT
@@ -109,7 +103,8 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
 
     private fun configureViews(binding: ContentAutofillSelectCredentialsTooltipBinding) {
         (dialog as BottomSheetDialog).behavior.state = BottomSheetBehavior.STATE_EXPANDED
-        configureRecyclerView(getUrlRequest(), binding)
+        val originalUrl = getOriginalUrl()
+        configureRecyclerView(originalUrl, binding)
         configureCloseButton(binding)
     }
 
@@ -118,10 +113,10 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
     }
 
     private fun configureRecyclerView(
-        autofillWebMessageRequest: AutofillWebMessageRequest,
+        originalUrl: String,
         binding: ContentAutofillSelectCredentialsTooltipBinding,
     ) {
-        binding.availableCredentialsRecycler.adapter = configureAdapter(getAvailableCredentials(autofillWebMessageRequest))
+        binding.availableCredentialsRecycler.adapter = configureAdapter(getAvailableCredentials(originalUrl))
     }
 
     private fun configureAdapter(credentials: List<ListItem>): CredentialsPickerRecyclerAdapter {
@@ -136,8 +131,8 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
 
             val result = Bundle().also {
                 it.putBoolean(CredentialAutofillPickerDialog.KEY_CANCELLED, false)
-                it.putParcelable(KEY_URL_REQUEST, getUrlRequest())
-                it.putParcelable(KEY_CREDENTIALS, selectedCredentials)
+                it.putString(CredentialAutofillPickerDialog.KEY_URL, getOriginalUrl())
+                it.putParcelable(CredentialAutofillPickerDialog.KEY_CREDENTIALS, selectedCredentials)
             }
             parentFragment?.setFragmentResult(CredentialAutofillPickerDialog.resultKey(getTabId()), result)
 
@@ -158,7 +153,7 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
 
         val result = Bundle().also {
             it.putBoolean(CredentialAutofillPickerDialog.KEY_CANCELLED, true)
-            it.putParcelable(KEY_URL_REQUEST, getUrlRequest())
+            it.putString(CredentialAutofillPickerDialog.KEY_URL, getOriginalUrl())
         }
 
         parentFragment?.setFragmentResult(CredentialAutofillPickerDialog.resultKey(getTabId()), result)
@@ -181,20 +176,20 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
         object Selected : DialogEvent
     }
 
-    private fun getAvailableCredentials(autofillWebMessageRequest: AutofillWebMessageRequest): List<ListItem> {
-        val unsortedCredentials = BundleCompat.getParcelableArrayList(requireArguments(), KEY_CREDENTIALS, LoginCredentials::class.java)!!
-        val grouped = autofillSelectCredentialsGrouper.group(autofillWebMessageRequest.requestOrigin, unsortedCredentials)
+    private fun getAvailableCredentials(originalUrl: String): List<ListItem> {
+        val unsortedCredentials = arguments?.getParcelableArrayList<LoginCredentials>(CredentialAutofillPickerDialog.KEY_CREDENTIALS)!!
+        val grouped = autofillSelectCredentialsGrouper.group(originalUrl, unsortedCredentials)
         return autofillSelectCredentialsListBuilder.buildFlatList(grouped)
     }
 
-    private fun getUrlRequest() = BundleCompat.getParcelable(requireArguments(), KEY_URL_REQUEST, AutofillWebMessageRequest::class.java)!!
-    private fun getTriggerType() = arguments?.getSerializable(KEY_TRIGGER_TYPE) as LoginTriggerType
-    private fun getTabId() = arguments?.getString(KEY_TAB_ID)!!
+    private fun getOriginalUrl() = arguments?.getString(CredentialAutofillPickerDialog.KEY_URL)!!
+    private fun getTriggerType() = arguments?.getSerializable(CredentialAutofillPickerDialog.KEY_TRIGGER_TYPE) as LoginTriggerType
+    private fun getTabId() = arguments?.getString(CredentialAutofillPickerDialog.KEY_TAB_ID)!!
 
     companion object {
 
         fun instance(
-            autofillWebMessageRequest: AutofillWebMessageRequest,
+            url: String,
             credentials: List<LoginCredentials>,
             triggerType: LoginTriggerType,
             tabId: String,
@@ -204,10 +199,10 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
             val fragment = AutofillSelectCredentialsDialogFragment()
             fragment.arguments =
                 Bundle().also {
-                    it.putParcelable(KEY_URL_REQUEST, autofillWebMessageRequest)
-                    it.putParcelableArrayList(KEY_CREDENTIALS, cr)
-                    it.putSerializable(KEY_TRIGGER_TYPE, triggerType)
-                    it.putString(KEY_TAB_ID, tabId)
+                    it.putString(CredentialAutofillPickerDialog.KEY_URL, url)
+                    it.putParcelableArrayList(CredentialAutofillPickerDialog.KEY_CREDENTIALS, cr)
+                    it.putSerializable(CredentialAutofillPickerDialog.KEY_TRIGGER_TYPE, triggerType)
+                    it.putString(CredentialAutofillPickerDialog.KEY_TAB_ID, tabId)
                 }
             return fragment
         }

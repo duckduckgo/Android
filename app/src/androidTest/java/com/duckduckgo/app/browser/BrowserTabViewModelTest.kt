@@ -151,7 +151,6 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
-import com.duckduckgo.autofill.api.AutofillWebMessageRequest
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
@@ -3697,13 +3696,49 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenEmailSignOutEventThenEmailSignEventCommandSent() = runTest {
+        emailStateFlow.emit(false)
+
+        assertCommandIssued<Command.EmailSignEvent>()
+    }
+
+    @Test
+    fun whenEmailIsSignedInThenEmailSignEventCommandSent() = runTest {
+        emailStateFlow.emit(true)
+
+        assertCommandIssued<Command.EmailSignEvent>()
+    }
+
+    @Test
+    fun whenConsumeAliasThenInjectAddressCommandSent() {
+        whenever(mockEmailManager.getAlias()).thenReturn("alias")
+
+        testee.usePrivateDuckAddress("", "alias")
+
+        assertCommandIssued<Command.InjectEmailAddress> {
+            assertEquals("alias", this.duckAddress)
+        }
+    }
+
+    @Test
+    fun whenUseAddressThenInjectAddressCommandSent() {
+        whenever(mockEmailManager.getEmailAddress()).thenReturn("address")
+
+        testee.usePersonalDuckAddress("", "address")
+
+        assertCommandIssued<Command.InjectEmailAddress> {
+            assertEquals("address", this.duckAddress)
+        }
+    }
+
+    @Test
     fun whenShowEmailTooltipIfAddressExistsThenShowEmailTooltipCommandSent() {
         whenever(mockEmailManager.getEmailAddress()).thenReturn("address")
 
-        testee.showEmailProtectionChooseEmailPrompt(urlRequest())
+        testee.showEmailProtectionChooseEmailPrompt()
 
         assertCommandIssued<Command.ShowEmailProtectionChooseEmailPrompt> {
-            assertEquals("address", this.duckAddress)
+            assertEquals("address", this.address)
         }
     }
 
@@ -3711,7 +3746,7 @@ class BrowserTabViewModelTest {
     fun whenShowEmailTooltipIfAddressDoesNotExistThenCommandNotSent() {
         whenever(mockEmailManager.getEmailAddress()).thenReturn(null)
 
-        testee.showEmailProtectionChooseEmailPrompt(urlRequest())
+        testee.showEmailProtectionChooseEmailPrompt()
 
         assertCommandNotIssued<Command.ShowEmailProtectionChooseEmailPrompt>()
     }
@@ -4373,6 +4408,16 @@ class BrowserTabViewModelTest {
         buildNavigationHistoryStack(stackSize = 20)
         testee.onUserLongPressedBack()
         assertShowHistoryCommandSent(expectedStackSize = 10)
+    }
+
+    @Test
+    fun whenReturnNoCredentialsWithPageThenEmitCancelIncomingAutofillRequestCommand() = runTest {
+        val url = "originalurl.com"
+        testee.returnNoCredentialsWithPage(url)
+
+        assertCommandIssued<Command.CancelIncomingAutofillRequest> {
+            assertEquals(url, this.url)
+        }
     }
 
     @Test
@@ -5478,8 +5523,6 @@ class BrowserTabViewModelTest {
         }
     }
 
-    private fun urlRequest() = AutofillWebMessageRequest("", "", "")
-
     private fun givenLoginDetected(domain: String) = LoginDetected(authLoginDomain = "", forwardedToDomain = domain)
 
     private fun givenCurrentSite(domain: String): Site {
@@ -5630,6 +5673,10 @@ class BrowserTabViewModelTest {
     private fun accessibilityViewState() = testee.accessibilityViewState.value!!
 
     class FakeCapabilityChecker(var enabled: Boolean) : AutofillCapabilityChecker {
-        override suspend fun canAccessCredentialManagementScreen(): Boolean = enabled
+        override suspend fun isAutofillEnabledByConfiguration(url: String) = enabled
+        override suspend fun canInjectCredentialsToWebView(url: String) = enabled
+        override suspend fun canSaveCredentialsFromWebView(url: String) = enabled
+        override suspend fun canGeneratePasswordFromWebView(url: String) = enabled
+        override suspend fun canAccessCredentialManagementScreen() = enabled
     }
 }
