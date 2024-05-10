@@ -22,9 +22,11 @@ import com.duckduckgo.common.utils.notification.checkPermissionAndNotify
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.engine.FeatureSyncError
 import com.duckduckgo.sync.api.engine.FeatureSyncError.COLLECTION_LIMIT_REACHED
+import com.duckduckgo.sync.api.engine.FeatureSyncError.INVALID_REQUEST
 import com.duckduckgo.sync.api.engine.SyncChangesResponse
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import timber.log.Timber
 
 interface CredentialsSyncFeatureListener {
     fun onSuccess(changes: SyncChangesResponse)
@@ -45,31 +47,42 @@ class AppCredentialsSyncFeatureListener @Inject constructor(
 
         if (credentialsSyncStore.isSyncPaused) {
             credentialsSyncStore.isSyncPaused = false
+            credentialsSyncStore.syncPausedReason = ""
             cancelNotification()
         }
     }
 
     override fun onError(syncError: FeatureSyncError) {
+        Timber.d("Sync-autofill: $syncError received, current state isPaused:${credentialsSyncStore.isSyncPaused}")
         when (syncError) {
-            COLLECTION_LIMIT_REACHED -> {
-                if (!credentialsSyncStore.isSyncPaused) {
-                    triggerNotification()
+            COLLECTION_LIMIT_REACHED,
+            INVALID_REQUEST,
+            -> {
+                if (!credentialsSyncStore.isSyncPaused || credentialsSyncStore.syncPausedReason != syncError.name) {
+                    Timber.i("Sync-autofill: should trigger notification for $syncError")
+                    triggerNotification(syncError)
                 }
                 credentialsSyncStore.isSyncPaused = true
+                credentialsSyncStore.syncPausedReason = syncError.name
             }
         }
     }
 
     override fun onSyncDisabled() {
         credentialsSyncStore.isSyncPaused = false
+        credentialsSyncStore.syncPausedReason = ""
         cancelNotification()
     }
 
-    private fun triggerNotification() {
+    private fun triggerNotification(syncError: FeatureSyncError) {
+        val notification = when (syncError) {
+            COLLECTION_LIMIT_REACHED -> notificationBuilder.buildRateLimitNotification(context)
+            INVALID_REQUEST -> notificationBuilder.buildInvalidRequestNotification(context)
+        }
         notificationManager.checkPermissionAndNotify(
             context,
             SYNC_PAUSED_CREDENTIALS_NOTIFICATION_ID,
-            notificationBuilder.buildRateLimitNotification(context),
+            notification,
         )
     }
 

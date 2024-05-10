@@ -22,9 +22,11 @@ import com.duckduckgo.common.utils.notification.checkPermissionAndNotify
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.engine.FeatureSyncError
 import com.duckduckgo.sync.api.engine.FeatureSyncError.COLLECTION_LIMIT_REACHED
+import com.duckduckgo.sync.api.engine.FeatureSyncError.INVALID_REQUEST
 import com.duckduckgo.sync.api.engine.SyncChangesResponse
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import timber.log.Timber
 
 interface SavedSitesSyncFeatureListener {
     fun onSuccess(changes: SyncChangesResponse)
@@ -45,31 +47,42 @@ class AppSavedSitesSyncFeatureListener @Inject constructor(
 
         if (savedSitesSyncStore.isSyncPaused) {
             savedSitesSyncStore.isSyncPaused = false
+            savedSitesSyncStore.syncPausedReason = ""
             cancelNotification()
         }
     }
 
     override fun onError(syncError: FeatureSyncError) {
+        Timber.d("Sync-Bookmarks: $syncError received, current state isPaused:${savedSitesSyncStore.isSyncPaused}")
         when (syncError) {
-            COLLECTION_LIMIT_REACHED -> {
-                if (!savedSitesSyncStore.isSyncPaused) {
-                    triggerNotification()
+            COLLECTION_LIMIT_REACHED,
+            INVALID_REQUEST,
+            -> {
+                if (!savedSitesSyncStore.isSyncPaused || savedSitesSyncStore.syncPausedReason != syncError.name) {
+                    Timber.i("Sync-Bookmarks: should trigger notification for $syncError")
+                    triggerNotification(syncError)
                 }
                 savedSitesSyncStore.isSyncPaused = true
+                savedSitesSyncStore.syncPausedReason = syncError.name
             }
         }
     }
 
     override fun onSyncDisabled() {
         savedSitesSyncStore.isSyncPaused = false
+        savedSitesSyncStore.syncPausedReason = ""
         cancelNotification()
     }
 
-    private fun triggerNotification() {
+    private fun triggerNotification(syncError: FeatureSyncError) {
+        val notification = when (syncError) {
+            COLLECTION_LIMIT_REACHED -> notificationBuilder.buildRateLimitNotification(context)
+            INVALID_REQUEST -> notificationBuilder.buildInvalidRequestNotification(context)
+        }
         notificationManager.checkPermissionAndNotify(
             context,
             SYNC_PAUSED_SAVED_SITES_NOTIFICATION_ID,
-            notificationBuilder.buildRateLimitNotification(context),
+            notification,
         )
     }
 

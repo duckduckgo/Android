@@ -20,6 +20,7 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.engine.*
 import com.duckduckgo.sync.api.engine.FeatureSyncError.COLLECTION_LIMIT_REACHED
+import com.duckduckgo.sync.api.engine.FeatureSyncError.INVALID_REQUEST
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_CREATION
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_LOGIN
@@ -274,6 +275,7 @@ class RealSyncEngine @Inject constructor(
         return when (code) {
             API_CODE.COUNT_LIMIT.code -> COLLECTION_LIMIT_REACHED
             API_CODE.CONTENT_TOO_LARGE.code -> COLLECTION_LIMIT_REACHED
+            API_CODE.VALIDATION_ERROR.code -> INVALID_REQUEST
             else -> null
         }
     }

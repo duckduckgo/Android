@@ -33,7 +33,7 @@ import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.saved.sites.impl.R
-import com.duckduckgo.saved.sites.impl.databinding.ViewSaveSiteRateLimitWarningBinding
+import com.duckduckgo.saved.sites.impl.databinding.ViewSaveSiteSyncInvalidItemsWarningBinding
 import com.duckduckgo.savedsites.impl.sync.SavedSiteInvalidItemsViewModel.Command
 import com.duckduckgo.savedsites.impl.sync.SavedSiteInvalidItemsViewModel.Command.NavigateToBookmarks
 import com.duckduckgo.savedsites.impl.sync.SavedSiteInvalidItemsViewModel.ViewState
@@ -63,7 +63,7 @@ class SavedSiteInvalidItemsView @JvmOverloads constructor(
 
     private var job: ConflatedJob = ConflatedJob()
 
-    private val binding: ViewSaveSiteRateLimitWarningBinding by viewBinding()
+    private val binding: ViewSaveSiteSyncInvalidItemsWarningBinding by viewBinding()
 
     private val viewModel: SavedSiteInvalidItemsViewModel by lazy {
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[SavedSiteInvalidItemsViewModel::class.java]
@@ -113,7 +113,7 @@ class SavedSiteInvalidItemsView @JvmOverloads constructor(
             ),
         ).append(context.getText(R.string.saved_site_invalid_items_warning_link))
 
-        binding.saveSiteRateLimitWarning.setClickableLink(
+        binding.savedSitesInvalidItemsWarning.setClickableLink(
             "manage_bookmarks",
             spannable,
             onClick = {

@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.savedsites.impl.sync
+package com.duckduckgo.autofill.sync
 
 import android.annotation.SuppressLint
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.Command
+import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.savedsites.impl.sync.DisplayModeViewModel.ViewState
+import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.sync.api.engine.FeatureSyncError
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -34,26 +35,32 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-@SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
-class SavedSiteRateLimitViewModel(
-    private val savedSitesSyncStore: SavedSitesSyncStore,
+@SuppressLint("NoLifecycleObserver") // does not subscribe to app lifecycle
+@ContributesViewModel(ViewScope::class)
+class CredentialsSyncPausedViewModel @Inject constructor(
+    private val credentialsSyncStore: CredentialsSyncStore,
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
-        val warningVisible: Boolean = false,
+        val message: Int? = null,
     )
 
     sealed class Command {
-        data object NavigateToBookmarks : Command()
+        data object NavigateToCredentials : Command()
     }
 
     private val command = Channel<Command>(1, DROP_OLDEST)
 
-    fun viewState(): Flow<ViewState> = savedSitesSyncStore.isSyncPausedFlow()
+    fun viewState(): Flow<ViewState> = credentialsSyncStore.isSyncPausedFlow()
         .map { syncPaused ->
+            val message = when (credentialsSyncStore.syncPausedReason) {
+                FeatureSyncError.COLLECTION_LIMIT_REACHED.name -> R.string.credentials_limit_warning
+                FeatureSyncError.INVALID_REQUEST.name -> R.string.credentials_invalid_request_warning
+                else -> null
+            }
             ViewState(
-                warningVisible = syncPaused,
+                message = message,
             )
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 
@@ -61,25 +68,7 @@ class SavedSiteRateLimitViewModel(
 
     fun onWarningActionClicked() {
         viewModelScope.launch {
-            command.send(Command.NavigateToBookmarks)
-        }
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    class Factory @Inject constructor(
-        private val savedSitesSyncStore: SavedSitesSyncStore,
-        private val dispatcherProvider: DispatcherProvider,
-    ) : ViewModelProvider.NewInstanceFactory() {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return with(modelClass) {
-                when {
-                    isAssignableFrom(SavedSiteRateLimitViewModel::class.java) -> SavedSiteRateLimitViewModel(
-                        savedSitesSyncStore,
-                        dispatcherProvider,
-                    )
-                    else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
-                }
-            } as T
+            command.send(Command.NavigateToCredentials)
         }
     }
 }
