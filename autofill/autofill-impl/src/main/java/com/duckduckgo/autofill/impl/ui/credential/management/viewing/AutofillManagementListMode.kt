@@ -227,12 +227,6 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
                         binding.logins.updateTopMargin(resources.getDimensionPixelSize(CommonR.dimen.keyline_4))
                     }
 
-                    if (state.webViewCompatible) {
-                        binding.webViewUnsupportedWarningPanel.gone()
-                    } else {
-                        binding.webViewUnsupportedWarningPanel.show()
-                    }
-
                     if (state.survey == null) {
                         hideSurvey()
                     } else {

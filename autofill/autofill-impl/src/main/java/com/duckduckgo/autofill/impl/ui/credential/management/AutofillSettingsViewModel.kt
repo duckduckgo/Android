@@ -24,7 +24,6 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
-import com.duckduckgo.autofill.impl.InternalAutofillCapabilityChecker
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthConfiguration
@@ -111,7 +110,6 @@ class AutofillSettingsViewModel @Inject constructor(
     private val duckAddressIdentifier: DuckAddressIdentifier,
     private val syncEngine: SyncEngine,
     private val neverSavedSiteRepository: NeverSavedSiteRepository,
-    private val capabilityChecker: InternalAutofillCapabilityChecker,
     private val autofillSurvey: AutofillSurvey,
 ) : ViewModel() {
 
@@ -400,11 +398,7 @@ class AutofillSettingsViewModel @Inject constructor(
     fun onViewCreated() {
         if (combineJob != null) return
         combineJob = viewModelScope.launch(dispatchers.io()) {
-            _viewState.value = _viewState.value.copy(
-                autofillEnabled = autofillStore.autofillEnabled,
-                webViewCompatible = capabilityChecker.webViewSupportsAutofill(),
-            )
-
+            _viewState.value = _viewState.value.copy(autofillEnabled = autofillStore.autofillEnabled)
             val allCredentials = autofillStore.getAllCredentials().distinctUntilChanged()
             val combined = allCredentials.combine(searchQueryFilter) { credentials, filter ->
                 credentialListFilter.filter(credentials, filter)
@@ -684,7 +678,6 @@ class AutofillSettingsViewModel @Inject constructor(
         val logins: List<LoginCredentials>? = null,
         val credentialMode: CredentialMode? = null,
         val credentialSearchQuery: String = "",
-        val webViewCompatible: Boolean = true,
         val survey: SurveyDetails? = null,
     )
 
