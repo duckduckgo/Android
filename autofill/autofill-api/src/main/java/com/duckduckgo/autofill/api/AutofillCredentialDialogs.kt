@@ -53,8 +53,8 @@ interface CredentialAutofillPickerDialog {
 
         const val TAG = "CredentialAutofillPickerDialog"
         const val KEY_CANCELLED = "cancelled"
+        const val KEY_URL = "url"
         const val KEY_CREDENTIALS = "credentials"
-        const val KEY_URL_REQUEST = "url"
         const val KEY_TRIGGER_TYPE = "triggerType"
         const val KEY_TAB_ID = "tabId"
     }
@@ -181,7 +181,6 @@ interface EmailProtectionInContextSignUpDialog {
 
         const val TAG = "EmailProtectionInContextSignUpDialog"
         const val KEY_RESULT = "result"
-        const val KEY_URL = "url"
     }
 }
 
@@ -194,7 +193,7 @@ interface CredentialAutofillDialogFactory {
      * Creates a dialog which prompts the user to choose which saved credential to autofill
      */
     fun autofillSelectCredentialsDialog(
-        autofillWebMessageRequest: AutofillWebMessageRequest,
+        url: String,
         credentials: List<LoginCredentials>,
         triggerType: LoginTriggerType,
         tabId: String,
@@ -204,7 +203,7 @@ interface CredentialAutofillDialogFactory {
      * Creates a dialog which prompts the user to choose whether to save credentials or not
      */
     fun autofillSavingCredentialsDialog(
-        autofillWebMessageRequest: AutofillWebMessageRequest,
+        url: String,
         credentials: LoginCredentials,
         tabId: String,
     ): DialogFragment
@@ -213,7 +212,7 @@ interface CredentialAutofillDialogFactory {
      * Creates a dialog which prompts the user to choose whether to update an existing credential's password
      */
     fun autofillSavingUpdatePasswordDialog(
-        autofillWebMessageRequest: AutofillWebMessageRequest,
+        url: String,
         credentials: LoginCredentials,
         tabId: String,
     ): DialogFragment
@@ -222,7 +221,7 @@ interface CredentialAutofillDialogFactory {
      * Creates a dialog which prompts the user to choose whether to update an existing credential's username
      */
     fun autofillSavingUpdateUsernameDialog(
-        autofillWebMessageRequest: AutofillWebMessageRequest,
+        url: String,
         credentials: LoginCredentials,
         tabId: String,
     ): DialogFragment
@@ -231,7 +230,7 @@ interface CredentialAutofillDialogFactory {
      * Creates a dialog which prompts the user to choose whether to use generated password or not
      */
     fun autofillGeneratePasswordDialog(
-        autofillWebMessageRequest: AutofillWebMessageRequest,
+        url: String,
         username: String?,
         generatedPassword: String,
         tabId: String,
@@ -241,7 +240,7 @@ interface CredentialAutofillDialogFactory {
      * Creates a dialog which prompts the user to choose whether to use their personal duck address or a private alias address
      */
     fun autofillEmailProtectionEmailChooserDialog(
-        autofillWebMessageRequest: AutofillWebMessageRequest,
+        url: String,
         personalDuckAddress: String,
         tabId: String,
     ): DialogFragment
@@ -249,7 +248,7 @@ interface CredentialAutofillDialogFactory {
     /**
      * Creates a dialog which prompts the user to sign up for Email Protection
      */
-    fun emailProtectionInContextSignUpDialog(tabId: String, autofillWebMessageRequest: AutofillWebMessageRequest): DialogFragment
+    fun emailProtectionInContextSignUpDialog(tabId: String): DialogFragment
 }
 
 private fun prefix(

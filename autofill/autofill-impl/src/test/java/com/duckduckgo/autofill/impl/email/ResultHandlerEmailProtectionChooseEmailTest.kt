@@ -23,15 +23,13 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.COHORT
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.LAST_USED_DAY
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.AutofillEventListener
-import com.duckduckgo.autofill.api.AutofillWebMessageRequest
 import com.duckduckgo.autofill.api.EmailProtectionChooseEmailDialog
 import com.duckduckgo.autofill.api.EmailProtectionChooseEmailDialog.UseEmailResultType.DoNotUseEmailProtection
 import com.duckduckgo.autofill.api.EmailProtectionChooseEmailDialog.UseEmailResultType.UsePersonalEmailAddress
 import com.duckduckgo.autofill.api.EmailProtectionChooseEmailDialog.UseEmailResultType.UsePrivateAliasAddress
-import com.duckduckgo.autofill.api.credential.saving.DuckAddressLoginCreator
 import com.duckduckgo.autofill.api.email.EmailManager
-import com.duckduckgo.autofill.impl.jsbridge.AutofillMessagePoster
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_TOOLTIP_DISMISSED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_USE_ADDRESS
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_USE_ALIAS
@@ -41,12 +39,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.any
-import org.mockito.kotlin.argWhere
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoInteractions
-import org.mockito.kotlin.whenever
+import org.mockito.kotlin.*
 
 @RunWith(AndroidJUnit4::class)
 class ResultHandlerEmailProtectionChooseEmailTest {
@@ -56,18 +49,16 @@ class ResultHandlerEmailProtectionChooseEmailTest {
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private val callback: AutofillEventListener = mock()
 
+    private val appBuildConfig: AppBuildConfig = mock()
     private val emailManager: EmailManager = mock()
     private val pixel: Pixel = mock()
-    private val messagePoster: AutofillMessagePoster = mock()
-    private val loginCreator: DuckAddressLoginCreator = mock()
 
     private val testee = ResultHandlerEmailProtectionChooseEmail(
+        appBuildConfig = appBuildConfig,
         emailManager = emailManager,
         dispatchers = coroutineTestRule.testDispatcherProvider,
         appCoroutineScope = coroutineTestRule.testScope,
         pixel = pixel,
-        messagePoster = messagePoster,
-        loginCreator = loginCreator,
     )
 
     @Before
@@ -79,17 +70,17 @@ class ResultHandlerEmailProtectionChooseEmailTest {
     }
 
     @Test
-    fun whenUserSelectedToUsePersonalAddressThenCorrectResponsePosted() = runTest {
+    fun whenUserSelectedToUsePersonalAddressThenCorrectCallbackInvoked() = runTest {
         val bundle = bundle(result = UsePersonalEmailAddress)
         testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
-        verify(messagePoster).postMessage(argWhere { it.contains(""""alias": "personal-example""") }, any())
+        verify(callback).onUseEmailProtectionPersonalAddress(any(), any())
     }
 
     @Test
-    fun whenUserSelectedToUsePrivateAliasAddressThenCorrectResponsePosted() = runTest {
+    fun whenUserSelectedToUsePrivateAliasAddressThenCorrectCallbackInvoked() = runTest {
         val bundle = bundle(result = UsePrivateAliasAddress)
         testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
-        verify(messagePoster).postMessage(argWhere { it.contains(""""alias": "private-example""") }, any())
+        verify(callback).onUseEmailProtectionPrivateAlias(any(), any())
     }
 
     @Test
@@ -152,9 +143,7 @@ class ResultHandlerEmailProtectionChooseEmailTest {
         result: EmailProtectionChooseEmailDialog.UseEmailResultType?,
     ): Bundle {
         return Bundle().also {
-            if (url != null) {
-                it.putParcelable(EmailProtectionChooseEmailDialog.KEY_URL, AutofillWebMessageRequest(url, url, ""))
-            }
+            it.putString(EmailProtectionChooseEmailDialog.KEY_URL, url)
             it.putParcelable(EmailProtectionChooseEmailDialog.KEY_RESULT, result)
         }
     }
