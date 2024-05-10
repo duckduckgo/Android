@@ -5,7 +5,7 @@ appId: com.duckduckgo.mobile.android
 - tapOn: "let's do it!"
 - runFlow:
     when:
-        visible: "set as default"
+      visible: "set as default"
     commands:
       - tapOn: "cancel"
       - assertVisible:
