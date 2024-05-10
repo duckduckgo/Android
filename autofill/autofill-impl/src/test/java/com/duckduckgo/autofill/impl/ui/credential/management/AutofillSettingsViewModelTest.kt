@@ -23,7 +23,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
-import com.duckduckgo.autofill.impl.InternalAutofillCapabilityChecker
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_ENABLED
@@ -92,7 +91,6 @@ class AutofillSettingsViewModelTest {
     private val webUrlIdentifier: WebUrlIdentifier = mock()
     private val duckAddressIdentifier: DuckAddressIdentifier = RealDuckAddressIdentifier()
     private val neverSavedSiteRepository: NeverSavedSiteRepository = mock()
-    private val capabilityChecker: InternalAutofillCapabilityChecker = mock()
     private val testee = AutofillSettingsViewModel(
         autofillStore = mockStore,
         clipboardInteractor = clipboardInteractor,
@@ -107,7 +105,6 @@ class AutofillSettingsViewModelTest {
         duckAddressIdentifier = duckAddressIdentifier,
         syncEngine = mock(),
         neverSavedSiteRepository = neverSavedSiteRepository,
-        capabilityChecker = capabilityChecker,
     )
 
     @Before
@@ -567,26 +564,6 @@ class AutofillSettingsViewModelTest {
             val commands = awaitItem()
             assertTrue(commands.contains(ShowDisabledMode))
             assertFalse(commands.contains(LaunchDeviceAuth))
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenInListModeAndWebViewCompatibleThenPassedInViewState() = runTest {
-        whenever(capabilityChecker.webViewSupportsAutofill()).thenReturn(true)
-        testee.onViewCreated()
-        testee.viewState.test {
-            assertTrue(awaitItem().webViewCompatible)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenInListModeAndWebViewIncompatibleThenPassedInViewState() = runTest {
-        whenever(capabilityChecker.webViewSupportsAutofill()).thenReturn(false)
-        testee.onViewCreated()
-        testee.viewState.test {
-            assertFalse(awaitItem().webViewCompatible)
             cancelAndIgnoreRemainingEvents()
         }
     }
