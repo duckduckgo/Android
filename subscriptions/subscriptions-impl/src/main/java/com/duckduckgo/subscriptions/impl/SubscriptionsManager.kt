@@ -206,6 +206,9 @@ class RealSubscriptionsManager @Inject constructor(
     override val entitlements = _entitlements.onSubscription { emitEntitlementsValues() }
 
     private var purchaseStateJob: Job? = null
+
+    private var removeExpiredSubscriptionOnCancelledPurchase: Boolean = false
+
     private suspend fun isUserAuthenticated(): Boolean = authRepository.isUserAuthenticated()
 
     private suspend fun emitEntitlementsValues() {
@@ -235,6 +238,12 @@ class RealSubscriptionsManager @Inject constructor(
                     is PurchaseState.Purchased -> checkPurchase(it.packageName, it.purchaseToken)
                     is PurchaseState.Canceled -> {
                         _currentPurchaseState.emit(CurrentPurchase.Canceled)
+                        if (removeExpiredSubscriptionOnCancelledPurchase) {
+                            if (subscriptionStatus().isExpired()) {
+                                signOut()
+                            }
+                            removeExpiredSubscriptionOnCancelledPurchase = false
+                        }
                     }
                     else -> {
                         // NOOP
@@ -463,7 +472,10 @@ class RealSubscriptionsManager @Inject constructor(
                 authRepository.getSubscription()?.run {
                     if (status.isExpired() && platform == "google") {
                         // re-authenticate in case previous subscription was bought using different google account
+                        val accountId = authRepository.getAccount()?.externalId
                         recoverSubscriptionFromStore()
+                        removeExpiredSubscriptionOnCancelledPurchase =
+                            accountId != null && accountId != authRepository.getAccount()?.externalId
                     }
                 }
             }
