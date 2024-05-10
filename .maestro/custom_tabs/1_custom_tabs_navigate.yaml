@@ -1,0 +1,75 @@
+appId: com.duckduckgo.mobile.android.debug
+name: "ReleaseTest: Navigate back"
+tags:
+  - releaseTest
+---
+- launchApp:
+    clearState: true
+    stopApp: true
+
+- assertVisible:
+    text: ".*Not to worry! Searching and browsing privately.*"
+- tapOn: "let's do it!"
+- tapOn: "duckduckgo"
+- tapOn: "set as default"
+- assertVisible:
+    text: ".*I'll also upgrade the security of your connection if possible.*"
+
+- tapOn:
+    id: "com.duckduckgo.mobile.android.debug:id/browserMenuImageView"
+- tapOn:
+    text: "settings"
+- scrollUntilVisible:
+    element:
+      text: "developer settings"
+    direction: DOWN
+- tapOn:
+    text: "developer settings"
+- scrollUntilVisible:
+    element:
+      text: "custom tabs"
+    direction: DOWN
+- tapOn:
+    text: "custom tabs"
+- tapOn:
+    text: "add your url here"
+- inputText: "https://www.search-company.site"
+- tapOn:
+    text: "load custom tab"
+- tapOn:
+    id: "com.duckduckgo.mobile.android.debug:id/browserMenuImageView"
+- assertVisible:
+    text: "running in duckduckgo"
+- back
+- tapOn:
+    text: "[Ad 1] SERP Ad (heuristic)"
+- back
+- tapOn:
+    text: "[Ad 1] SERP Ad (heuristic)"
+- tapOn:
+    id: "com.duckduckgo.mobile.android.debug:id/browserMenuImageView"
+- tapOn:
+    id: "com.duckduckgo.mobile.android.debug:id/backMenuItem"
+- assertVisible:
+    text: "Search engine"
+- tapOn:
+    id: "com.duckduckgo.mobile.android.debug:id/browserMenuImageView"
+- tapOn:
+    id: "com.duckduckgo.mobile.android.debug:id/forwardMenuItem"
+- assertVisible:
+    text: "Publisher site"
+- back
+- back
+- back
+- back
+- back
+- scrollUntilVisible:
+    element:
+      text: "default browser"
+    direction: UP
+- tapOn:
+    text: "default browser"
+- tapOn:
+    text: "browser app"
+- tapOn:
+    text: "chrome"
