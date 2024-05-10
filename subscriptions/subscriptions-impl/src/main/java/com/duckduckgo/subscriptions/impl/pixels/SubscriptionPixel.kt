@@ -25,6 +25,7 @@ import java.util.EnumSet
 enum class SubscriptionPixel(
     private val baseName: String,
     private val types: Set<PixelType>,
+    private val withSuffix: Boolean = true,
 ) {
     SUBSCRIPTION_ACTIVE(
         baseName = "m_privacy-pro_app_subscription_active",
@@ -57,6 +58,11 @@ enum class SubscriptionPixel(
     PURCHASE_SUCCESS(
         baseName = "m_privacy-pro_app_subscription-purchase_success",
         types = EnumSet.of(COUNT, DAILY),
+    ),
+    PURCHASE_SUCCESS_ORIGIN(
+        baseName = "m_subscribe",
+        type = COUNT,
+        withSuffix = false,
     ),
     OFFER_RESTORE_PURCHASE_CLICK(
         baseName = "m_privacy-pro_offer_restore-purchase_click",
@@ -167,10 +173,11 @@ enum class SubscriptionPixel(
     constructor(
         baseName: String,
         type: PixelType,
-    ) : this(baseName, EnumSet.of(type))
+        withSuffix: Boolean = true,
+    ) : this(baseName, EnumSet.of(type), withSuffix)
 
     fun getPixelNames(): Map<PixelType, String> =
-        types.associateWith { type -> "${baseName}_${type.pixelNameSuffix}" }
+        types.associateWith { type -> if (withSuffix) "${baseName}_${type.pixelNameSuffix}" else baseName }
 }
 
 private val PixelType.pixelNameSuffix: String

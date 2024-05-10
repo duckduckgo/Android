@@ -19,6 +19,7 @@ package com.duckduckgo.subscriptions.impl
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.net.Uri
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
 import androidx.core.net.toUri
@@ -92,7 +93,8 @@ class RealSubscriptions @Inject constructor(
         return subscriptionsManager.subscriptionStatus()
     }
 
-    override fun launchPrivacyPro(context: Context) {
+    override fun launchPrivacyPro(context: Context, uri: Uri?) {
+        val origin = uri?.getQueryParameter("origin")
         val settings = globalActivityStarter.startIntent(context, SettingsScreenNoParams) ?: return
         val privacyPro = globalActivityStarter.startIntent(
             context,
@@ -100,6 +102,7 @@ class RealSubscriptions @Inject constructor(
                 url = SubscriptionsConstants.BUY_URL,
                 screenTitle = context.getString(string.buySubscriptionTitle),
                 defaultToolbar = true,
+                origin = origin,
             ),
         ) ?: return
         val intents: Array<Intent> = listOf(settings, privacyPro).toTypedArray<Intent>()
@@ -110,6 +113,7 @@ class RealSubscriptions @Inject constructor(
         }
         pixel.reportPrivacyProRedirect()
     }
+
     override fun shouldLaunchPrivacyProForUrl(url: String): Boolean {
         val uri = url.toUri()
         val eTld = uri.host?.toTldPlusOne() ?: return false

@@ -3,6 +3,7 @@ package com.duckduckgo.subscriptions.impl.pixels
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.COUNT
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DAILY
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.UNIQUE
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PURCHASE_SUCCESS_ORIGIN
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -15,6 +16,7 @@ class SubscriptionPixelTest(
 ) {
     @Test
     fun `pixel name has privacy pro namespace prefix`() {
+        if (pixel == PURCHASE_SUCCESS_ORIGIN) return
         pixel.getPixelNames().values.forEach { pixelName ->
             assertTrue(pixelName.startsWith("m_privacy-pro_"))
         }
@@ -22,6 +24,7 @@ class SubscriptionPixelTest(
 
     @Test
     fun `pixel name has pixel type suffix`() {
+        if (pixel == PURCHASE_SUCCESS_ORIGIN) return
         pixel.getPixelNames().forEach { (pixelType, pixelName) ->
             val expectedSuffix = when (pixelType) {
                 COUNT -> "_c"
