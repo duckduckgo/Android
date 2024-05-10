@@ -20,7 +20,6 @@ import androidx.core.net.toUri
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.usage.app.AppDaysUsedRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.autofill.impl.configuration.integration.JavascriptCommunicationSupport
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.ui.credential.management.survey.AutofillSurvey.SurveyDetails
 import com.duckduckgo.autofill.impl.ui.credential.management.survey.AutofillSurveyImpl.Companion.SurveyParams.IN_APP
@@ -55,7 +54,6 @@ class AutofillSurveyImpl @Inject constructor(
     private val appDaysUsedRepository: AppDaysUsedRepository,
     private val dispatchers: DispatcherProvider,
     private val autofillSurveyStore: AutofillSurveyStore,
-    private val javascriptCommunicationSupport: JavascriptCommunicationSupport,
     private val internalAutofillStore: InternalAutofillStore,
 ) : AutofillSurvey {
 
@@ -66,7 +64,7 @@ class AutofillSurveyImpl @Inject constructor(
     }
 
     private fun canShowSurvey(): Boolean {
-        return deviceSetToEnglish() && javascriptCommunicationSupport.supportsModernIntegration()
+        return deviceSetToEnglish()
     }
 
     override suspend fun recordSurveyAsUsed(id: String) {
