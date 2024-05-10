@@ -1,4 +1,4 @@
-appId: com.duckduckgo.mobile.android.debug
+appId: com.duckduckgo.mobile.android
 name: "ReleaseTest: Navigate back"
 tags:
   - releaseTest
@@ -16,7 +16,7 @@ tags:
     text: ".*I'll also upgrade the security of your connection if possible.*"
 
 - tapOn:
-    id: "com.duckduckgo.mobile.android.debug:id/browserMenuImageView"
+    id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
 - tapOn:
     text: "settings"
 - scrollUntilVisible:
@@ -37,7 +37,7 @@ tags:
 - tapOn:
     text: "load custom tab"
 - tapOn:
-    id: "com.duckduckgo.mobile.android.debug:id/browserMenuImageView"
+    id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
 - assertVisible:
     text: "running in duckduckgo"
 - back
@@ -47,15 +47,15 @@ tags:
 - tapOn:
     text: "[Ad 1] SERP Ad (heuristic)"
 - tapOn:
-    id: "com.duckduckgo.mobile.android.debug:id/browserMenuImageView"
+    id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
 - tapOn:
-    id: "com.duckduckgo.mobile.android.debug:id/backMenuItem"
+    id: "com.duckduckgo.mobile.android:id/backMenuItem"
 - assertVisible:
     text: "Search engine"
 - tapOn:
-    id: "com.duckduckgo.mobile.android.debug:id/browserMenuImageView"
+    id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
 - tapOn:
-    id: "com.duckduckgo.mobile.android.debug:id/forwardMenuItem"
+    id: "com.duckduckgo.mobile.android:id/forwardMenuItem"
 - assertVisible:
     text: "Publisher site"
 - back
