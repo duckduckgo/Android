@@ -80,6 +80,14 @@
                 app:primaryText="@string/devSettingsClearSavedSites"
                 app:secondaryText="@string/devSettingsClearSavedSitesSubtitle" />
 
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/customTabs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/devSettingsScreenCustomTabs"
+                app:secondaryText="@string/devSettingsScreenCustomTabsSubtitle"
+                />
+
             <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                 android:id="@+id/privacyTitle"
                 android:layout_width="wrap_content"

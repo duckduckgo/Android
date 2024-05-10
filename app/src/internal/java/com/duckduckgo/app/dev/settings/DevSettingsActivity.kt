@@ -34,6 +34,7 @@ import com.duckduckgo.app.browser.R.layout
 import com.duckduckgo.app.browser.databinding.ActivityDevSettingsBinding
 import com.duckduckgo.app.browser.webview.WebContentDebuggingFeature
 import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command
+import com.duckduckgo.app.dev.settings.customtabs.CustomTabsInternalSettingsActivity
 import com.duckduckgo.app.dev.settings.db.UAOverride
 import com.duckduckgo.app.dev.settings.privacy.TrackerDataDevReceiver.Companion.DOWNLOAD_TDS_INTENT_ACTION
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -100,6 +101,7 @@ class DevSettingsActivity : DuckDuckGoActivity() {
         }
         binding.overrideUserAgentSelector.setOnClickListener { viewModel.onUserAgentSelectorClicked() }
         binding.overridePrivacyRemoteConfigUrl.setOnClickListener { viewModel.onRemotePrivacyUrlClicked() }
+        binding.customTabs.setOnClickListener { viewModel.customTabsClicked() }
     }
 
     private fun observeViewModel() {
@@ -128,6 +130,7 @@ class DevSettingsActivity : DuckDuckGoActivity() {
             is Command.OpenUASelector -> showUASelector()
             is Command.ShowSavedSitesClearedConfirmation -> showSavedSitesClearedConfirmation()
             is Command.ChangePrivacyConfigUrl -> showChangePrivacyUrl()
+            is Command.CustomTabs -> showCustomTabs()
             else -> TODO()
         }
     }
@@ -162,6 +165,11 @@ class DevSettingsActivity : DuckDuckGoActivity() {
     private fun showChangePrivacyUrl() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
         startActivity(PrivacyConfigInternalSettingsActivity.intent(this), options)
+    }
+
+    private fun showCustomTabs() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        startActivity(CustomTabsInternalSettingsActivity.intent(this), options)
     }
 
     companion object {
