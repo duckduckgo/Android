@@ -3,7 +3,6 @@ package com.duckduckgo.autofill.impl.ui.credential.management.survey
 import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.autofill.impl.configuration.integration.JavascriptCommunicationSupport
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.ui.credential.management.survey.AutofillSurvey.SurveyDetails
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -27,7 +26,6 @@ class AutofillSurveyImplTest {
 
     private val autofillSurveyStore: AutofillSurveyStore = mock()
     private val appBuildConfig: AppBuildConfig = mock()
-    private val javascriptCommunicationSupport: JavascriptCommunicationSupport = mock()
     private val autofillStore: InternalAutofillStore = mock()
     private val testee: AutofillSurveyImpl = AutofillSurveyImpl(
         statisticsStore = mock(),
@@ -36,14 +34,12 @@ class AutofillSurveyImplTest {
         appDaysUsedRepository = mock(),
         dispatchers = coroutineTestRule.testDispatcherProvider,
         autofillSurveyStore = autofillSurveyStore,
-        javascriptCommunicationSupport = javascriptCommunicationSupport,
         internalAutofillStore = autofillStore,
     )
 
     @Before
     fun setup() {
         whenever(appBuildConfig.deviceLocale).thenReturn(Locale("en"))
-        whenever(javascriptCommunicationSupport.supportsModernIntegration()).thenReturn(true)
 
         coroutineTestRule.testScope.runTest {
             configureCredentialCount(0)
@@ -55,13 +51,6 @@ class AutofillSurveyImplTest {
         whenever(autofillSurveyStore.hasSurveyBeenTaken("autofill-2024-04-26")).thenReturn(false)
         val survey = testee.firstUnusedSurvey()
         assertEquals("autofill-2024-04-26", survey!!.id)
-    }
-
-    @Test
-    fun whenSurveyHasNotBeenShownBeforeButWebViewNotCompatibleThenDoesNotReturnIt() = runTest {
-        whenever(autofillSurveyStore.hasSurveyBeenTaken("autofill-2024-04-26")).thenReturn(false)
-        whenever(javascriptCommunicationSupport.supportsModernIntegration()).thenReturn(false)
-        assertNull(testee.firstUnusedSurvey())
     }
 
     @Test
