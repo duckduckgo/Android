@@ -21,15 +21,13 @@ import androidx.fragment.app.Fragment
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.AutofillEventListener
-import com.duckduckgo.autofill.api.AutofillWebMessageRequest
 import com.duckduckgo.autofill.api.CredentialAutofillPickerDialog
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.NoMatch
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.deviceauth.FakeAuthenticator
-import com.duckduckgo.autofill.impl.jsbridge.AutofillMessagePoster
-import com.duckduckgo.autofill.impl.jsbridge.response.AutofillResponseWriter
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
@@ -48,11 +46,10 @@ class ResultHandlerCredentialSelectionTest {
     private val pixel: Pixel = mock()
     private val existingCredentialMatchDetector: ExistingCredentialMatchDetector = mock()
     private val callback: AutofillEventListener = mock()
+    private val appBuildConfig: AppBuildConfig = mock()
     private lateinit var deviceAuthenticator: FakeAuthenticator
     private lateinit var testee: ResultHandlerCredentialSelection
     private val autofillStore: InternalAutofillStore = mock()
-    private val messagePoster: AutofillMessagePoster = mock()
-    private val responseWriter: AutofillResponseWriter = mock()
 
     @Before
     fun setup() = runTest {
@@ -66,43 +63,35 @@ class ResultHandlerCredentialSelectionTest {
     }
 
     @Test
-    fun whenUserRejectedToUseCredentialThenCorrectResponsePosted() = runTest {
+    fun whenUserRejectedToUseCredentialThenCorrectCallbackInvoked() = runTest {
         configureSuccessfulAuth()
         val bundle = bundleForUserCancelling("example.com")
         testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
-
-        verify(responseWriter).generateEmptyResponseGetAutofillData()
-        verify(messagePoster).postMessage(anyOrNull(), any())
+        verify(callback).onNoCredentialsChosenForAutofill("example.com")
     }
 
     @Test
-    fun whenUserAcceptedToUseCredentialsAndSuccessfullyAuthenticatedThenCorrectResponsePosted() = runTest {
+    fun whenUserAcceptedToUseCredentialsAndSuccessfullyAuthenticatedThenCorrectCallbackInvoked() = runTest {
         configureSuccessfulAuth()
         val bundle = bundleForUserAcceptingToAutofill("example.com")
         testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
-
-        verify(responseWriter).generateResponseGetAutofillData(any())
-        verify(messagePoster).postMessage(anyOrNull(), any())
+        verify(callback).onShareCredentialsForAutofill("example.com", aLogin())
     }
 
     @Test
-    fun whenUserAcceptedToUseCredentialsAndCancelsAuthenticationThenCorrectResponsePosted() = runTest {
+    fun whenUserAcceptedToUseCredentialsAndCancelsAuthenticationThenCorrectCallbackInvoked() = runTest {
         configureCancelledAuth()
         val bundle = bundleForUserAcceptingToAutofill("example.com")
         testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
-
-        verify(responseWriter).generateEmptyResponseGetAutofillData()
-        verify(messagePoster).postMessage(anyOrNull(), any())
+        verify(callback).onNoCredentialsChosenForAutofill("example.com")
     }
 
     @Test
-    fun whenUserAcceptedToUseCredentialsAndAuthenticationFailsThenCorrectResponsePosted() = runTest {
+    fun whenUserAcceptedToUseCredentialsAndAuthenticationFailsThenCorrectCallbackInvoked() = runTest {
         configureFailedAuth()
         val bundle = bundleForUserAcceptingToAutofill("example.com")
         testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
-
-        verify(responseWriter).generateEmptyResponseGetAutofillData()
-        verify(messagePoster).postMessage(anyOrNull(), any())
+        verify(callback).onNoCredentialsChosenForAutofill("example.com")
     }
 
     @Test
@@ -110,7 +99,7 @@ class ResultHandlerCredentialSelectionTest {
         configureSuccessfulAuth()
         val bundle = bundleMissingCredentials("example.com")
         testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
-        verifyNoInteractions(messagePoster)
+        verifyNoInteractions(callback)
     }
 
     @Test
@@ -121,25 +110,25 @@ class ResultHandlerCredentialSelectionTest {
         verifyNoInteractions(callback)
     }
 
-    private fun bundleForUserCancelling(url: String): Bundle {
+    private fun bundleForUserCancelling(url: String?): Bundle {
         return Bundle().also {
-            it.putParcelable(CredentialAutofillPickerDialog.KEY_URL_REQUEST, url.asUrlRequest())
+            it.putString(CredentialAutofillPickerDialog.KEY_URL, url)
             it.putBoolean(CredentialAutofillPickerDialog.KEY_CANCELLED, true)
         }
     }
 
-    private fun bundleForUserAcceptingToAutofill(url: String): Bundle {
+    private fun bundleForUserAcceptingToAutofill(url: String?): Bundle {
         return Bundle().also {
-            it.putParcelable(CredentialAutofillPickerDialog.KEY_URL_REQUEST, url.asUrlRequest())
+            it.putString(CredentialAutofillPickerDialog.KEY_URL, url)
             it.putBoolean(CredentialAutofillPickerDialog.KEY_CANCELLED, false)
             it.putParcelable(CredentialAutofillPickerDialog.KEY_CREDENTIALS, aLogin())
         }
     }
 
     private fun bundleMissingUrl(): Bundle = Bundle()
-    private fun bundleMissingCredentials(url: String): Bundle {
+    private fun bundleMissingCredentials(url: String?): Bundle {
         return Bundle().also {
-            it.putParcelable(CredentialAutofillPickerDialog.KEY_URL_REQUEST, url.asUrlRequest())
+            it.putString(CredentialAutofillPickerDialog.KEY_URL, url)
         }
     }
 
@@ -168,13 +157,8 @@ class ResultHandlerCredentialSelectionTest {
             appCoroutineScope = coroutineTestRule.testScope,
             pixel = pixel,
             deviceAuthenticator = deviceAuthenticator,
+            appBuildConfig = appBuildConfig,
             autofillStore = autofillStore,
-            messagePoster = messagePoster,
-            autofillResponseWriter = responseWriter,
         )
-    }
-
-    private fun String.asUrlRequest(): AutofillWebMessageRequest {
-        return AutofillWebMessageRequest(this, this, "request-id-123")
     }
 }
