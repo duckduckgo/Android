@@ -1,5 +1,5 @@
 appId: com.duckduckgo.mobile.android
-name: "ReleaseTest: Navigate back"
+name: "ReleaseTest: Custom Tabs navigation"
 tags:
   - releaseTest
 ---
@@ -42,29 +42,22 @@ tags:
     text: "running in duckduckgo"
 - back
 - tapOn:
-    text: "[Ad 2] Shopping Tab Ad (heuristic)"
-- assertVisible:
-    text: "Publisher site"
+    text: "[Ad 1] SERP Ad (heuristic)"
 - back
 - tapOn:
-    text: "[Ad 2] Shopping Tab Ad (heuristic)"
-- tapOn:
-    text: "Red shoes"
-- assertVisible:
-    text: "Checkout"
+    text: "[Ad 1] SERP Ad (heuristic)"
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/backMenuItem"
 - assertVisible:
-    text: "Red shoes"
+    text: "Search engine"
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/forwardMenuItem"
 - assertVisible:
-    text: "Checkout"
-- back
+    text: "Publisher site"
 - back
 - back
 - back
