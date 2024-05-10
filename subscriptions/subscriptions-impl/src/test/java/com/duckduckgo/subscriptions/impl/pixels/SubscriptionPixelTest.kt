@@ -16,24 +16,23 @@ class SubscriptionPixelTest(
 ) {
     @Test
     fun `pixel name has privacy pro namespace prefix`() {
-        SubscriptionPixel.entries.filterNot { it == PURCHASE_SUCCESS_ORIGIN }.forEach {
-            it.getPixelNames().values.forEach { pixelName ->
-                assertTrue(pixelName.startsWith("m_privacy-pro_"))
-            }
+        if (pixel == PURCHASE_SUCCESS_ORIGIN) return
+        pixel.getPixelNames().values.forEach { pixelName ->
+            assertTrue(pixelName.startsWith("m_privacy-pro_"))
         }
     }
 
     @Test
     fun `pixel name has pixel type suffix`() {
-        SubscriptionPixel.entries.filterNot { it == PURCHASE_SUCCESS_ORIGIN }.forEach {
-            it.getPixelNames().forEach { (pixelType, pixelName) ->
-                val expectedSuffix = when (pixelType) {
-                    COUNT -> "_c"
-                    DAILY -> "_d"
-                    UNIQUE -> "_u"
-                }
-                assertTrue(pixelName.endsWith(expectedSuffix))
+        if (pixel == PURCHASE_SUCCESS_ORIGIN) return
+        pixel.getPixelNames().forEach { (pixelType, pixelName) ->
+            val expectedSuffix = when (pixelType) {
+                COUNT -> "_c"
+                DAILY -> "_d"
+                UNIQUE -> "_u"
             }
+
+            assertTrue(pixelName.endsWith(expectedSuffix))
         }
     }
 
