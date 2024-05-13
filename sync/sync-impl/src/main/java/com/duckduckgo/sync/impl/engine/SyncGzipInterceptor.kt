@@ -16,10 +16,14 @@
 
 package com.duckduckgo.sync.impl.engine
 
+import android.util.Base64
 import com.duckduckgo.app.global.api.ApiInterceptorPlugin
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.SyncService
+import com.duckduckgo.sync.impl.pixels.SyncPixelName
+import com.duckduckgo.sync.impl.pixels.SyncPixelParameters
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.io.IOException
 import javax.inject.Inject
@@ -37,8 +41,9 @@ import okio.buffer
     scope = AppScope::class,
     boundType = ApiInterceptorPlugin::class,
 )
-class SyngGzipInterceptor @Inject constructor(
+class SyncGzipInterceptor @Inject constructor(
     private val syncFeature: SyncFeature,
+    private val pixel: Pixel,
 ) : ApiInterceptorPlugin, Interceptor {
 
     override fun intercept(chain: Chain): Response {
@@ -51,13 +56,25 @@ class SyngGzipInterceptor @Inject constructor(
 
         // check if it's http operation is PATCH
         if (chain.request().method == "PATCH" && syncFeature.gzipPatchRequests().isEnabled()) {
-            val originalRequest = chain.request()
-            val body = originalRequest.body ?: return chain.proceed(originalRequest)
-            val compressedRequest = originalRequest.newBuilder()
-                .header("Content-Encoding", "gzip")
-                .method(originalRequest.method, forceContentLength(body.gzip()))
-                .build()
-            return chain.proceed(compressedRequest)
+            kotlin.runCatching {
+                val originalRequest = chain.request()
+                val body = originalRequest.body ?: return chain.proceed(originalRequest)
+                val compressedRequest = originalRequest.newBuilder()
+                    .header("Content-Encoding", "gzip")
+                    .method(originalRequest.method, forceContentLength(body.gzip()))
+                    .build()
+                return chain.proceed(compressedRequest)
+            }.onFailure {
+                val params = mapOf(
+                    SyncPixelParameters.ERROR to Base64.encodeToString(
+                        it.stackTraceToString().toByteArray(),
+                        Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE,
+                    ),
+                )
+                pixel.fire(SyncPixelName.SYNC_PATCH_COMPRESS_FAILED, params)
+                // if there is an exception, proceed with the original request
+                return chain.proceed(chain.request())
+            }
         }
 
         return chain.proceed(chain.request())

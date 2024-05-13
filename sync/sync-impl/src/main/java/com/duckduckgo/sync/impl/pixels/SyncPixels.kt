@@ -235,6 +235,7 @@ enum class SyncPixelName(override val pixelName: String) : Pixel.PixelName {
     SYNC_DELETE_ACCOUNT_FAILURE("m_delete_account_error"),
     SYNC_USER_SIGNED_IN_FAILURE("m_login_existing_account_error"),
     SYNC_CREATE_PDF_FAILURE("m_sync_create_recovery_pdf_error"),
+    SYNC_PATCH_COMPRESS_FAILED("m_sync_patch_compression_failed"),
 }
 
 object SyncPixelParameters {
@@ -252,4 +253,5 @@ object SyncPixelParameters {
     const val ORPHANS_PRESENT = "%s_orphans_present"
     const val ERROR_CODE = "code"
     const val ERROR_REASON = "reason"
+    const val ERROR = "error"
 }
