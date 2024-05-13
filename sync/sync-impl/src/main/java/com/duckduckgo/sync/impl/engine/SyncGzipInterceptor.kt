@@ -41,7 +41,7 @@ import okio.buffer
     scope = AppScope::class,
     boundType = ApiInterceptorPlugin::class,
 )
-class SyngGzipInterceptor @Inject constructor(
+class SyncGzipInterceptor @Inject constructor(
     private val syncFeature: SyncFeature,
     private val pixel: Pixel,
 ) : ApiInterceptorPlugin, Interceptor {
