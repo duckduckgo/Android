@@ -106,6 +106,11 @@ class NgVpnNetworkStack @Inject constructor(
                 "moto g play",
                 "moto g stylus 5G",
                 "moto g(60)",
+                "moto g(7) power",
+                "FIG-LX1",
+                "moto g 5G",
+                "moto g pure",
+                "moto g power",
             )
             val model = appBuildConfig.model
             if (targetModels.any { model.lowercase().contains(it.lowercase()) }) {
@@ -115,6 +120,7 @@ class NgVpnNetworkStack @Inject constructor(
 
             return emptySet()
         }
+
         return Result.success(
             VpnTunnelConfig(
                 mtu = vpnNetwork.get().mtu(),
@@ -123,12 +129,14 @@ class NgVpnNetworkStack @Inject constructor(
                     InetAddress.getByName("fd00:1:fd00:1:fd00:1:fd00:1") to 128, // Add IPv6 Unique Local Address
                 ),
                 dns = getDns(),
+                searchDomains = dnsProvider.getSearchDomains(),
                 customDns = emptySet(),
                 routes = emptyMap(),
                 appExclusionList = trackingProtectionAppsRepository.getExclusionAppsList().toSet(),
             ),
         )
     }
+
     override fun onStartVpn(tunfd: ParcelFileDescriptor): Result<Unit> {
         return startNative(tunfd.fd)
     }

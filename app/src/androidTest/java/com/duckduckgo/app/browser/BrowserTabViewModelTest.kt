@@ -722,7 +722,9 @@ class BrowserTabViewModelTest {
         whenever(mockOmnibarConverter.convertQueryToUrl("https://duckduckgo.com/pro", null)).thenReturn("https://duckduckgo.com/pro")
         whenever(subscriptions.shouldLaunchPrivacyProForUrl(any())).thenReturn(true)
         testee.onUserSubmittedQuery("https://duckduckgo.com/pro")
-        assertCommandIssued<LaunchPrivacyPro>()
+        assertCommandIssued<LaunchPrivacyPro> {
+            assertEquals("https://duckduckgo.com/pro", uri.toString())
+        }
     }
 
     @Test
@@ -733,7 +735,9 @@ class BrowserTabViewModelTest {
         whenever(subscriptions.shouldLaunchPrivacyProForUrl(any())).thenReturn(true)
 
         testee.onUserSubmittedQuery("https://duckduckgo.com/pro")
-        assertCommandIssued<LaunchPrivacyPro>()
+        assertCommandIssued<LaunchPrivacyPro> {
+            assertEquals("https://duckduckgo.com/pro", uri.toString())
+        }
         verify(mockAdClickManager).clearTabId(any())
         verify(mockTabRepository).deleteTabAndSelectSource(any())
     }
@@ -749,7 +753,9 @@ class BrowserTabViewModelTest {
 
         testee.navigationStateChanged(nav)
         testee.onUserSubmittedQuery("https://duckduckgo.com/pro")
-        assertCommandIssued<LaunchPrivacyPro>()
+        assertCommandIssued<LaunchPrivacyPro> {
+            assertEquals("https://duckduckgo.com/pro", uri.toString())
+        }
         verify(mockAdClickManager).clearTabId(any())
         verify(mockTabRepository).deleteTabAndSelectSource(any())
     }
@@ -765,7 +771,9 @@ class BrowserTabViewModelTest {
 
         testee.navigationStateChanged(nav)
         testee.onUserSubmittedQuery("https://duckduckgo.com/pro")
-        assertCommandIssued<LaunchPrivacyPro>()
+        assertCommandIssued<LaunchPrivacyPro> {
+            assertEquals("https://duckduckgo.com/pro", uri.toString())
+        }
         verify(mockAdClickManager, never()).clearTabId(any())
         verify(mockTabRepository, never()).deleteTabAndSelectSource(any())
     }

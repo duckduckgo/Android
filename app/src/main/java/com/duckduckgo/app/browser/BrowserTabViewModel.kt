@@ -754,7 +754,7 @@ class BrowserTabViewModel @Inject constructor(
                 if (webNavigationState == null || webNavigationState?.hasNavigationHistory == false) {
                     closeCurrentTab()
                 }
-                command.value = LaunchPrivacyPro
+                command.value = LaunchPrivacyPro(urlToNavigate.toUri())
                 return
             }
 
@@ -2144,7 +2144,7 @@ class BrowserTabViewModel @Inject constructor(
         return when (requiredAction) {
             is RequiredAction.OpenInNewTab -> {
                 if (subscriptions.shouldLaunchPrivacyProForUrl(requiredAction.url)) {
-                    command.value = LaunchPrivacyPro
+                    command.value = LaunchPrivacyPro(requiredAction.url.toUri())
                     return true
                 }
                 command.value = GenerateWebViewPreviewImage
@@ -2154,7 +2154,7 @@ class BrowserTabViewModel @Inject constructor(
 
             is RequiredAction.OpenInNewBackgroundTab -> {
                 if (subscriptions.shouldLaunchPrivacyProForUrl(requiredAction.url)) {
-                    command.value = LaunchPrivacyPro
+                    command.value = LaunchPrivacyPro(requiredAction.url.toUri())
                     return true
                 }
                 command.value = GenerateWebViewPreviewImage

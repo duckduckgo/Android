@@ -1,4 +1,3 @@
-What's new:
-* Sync & Backup should now work more efficiently to ensure bookmarks and passwords are available on all of your DuckDuckGo browsers.
-* We fixed a bug that could cause the browser to crash when granting site permissions.
-* As usual, we also included other bug fixes and improvements.
+We addressed an App Tracking Protection connection issue affecting some Android devices.
+We also fixed the issue that could have caused the browser to crash when switching or deleting tabs.
+Plus a handful of other bug fixes and improvements.

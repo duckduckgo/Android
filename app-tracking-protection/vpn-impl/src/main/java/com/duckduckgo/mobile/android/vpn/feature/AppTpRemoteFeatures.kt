@@ -25,6 +25,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultValue
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.mobile.android.vpn.feature.settings.ExceptionListsSettingStore
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
@@ -51,6 +52,9 @@ interface AppTpRemoteFeatures {
 
     @Toggle.DefaultValue(true)
     fun restartOnConnectivityLoss(): Toggle
+
+    @DefaultValue(true)
+    fun setSearchDomains(): Toggle // kill switch
 }
 
 @ContributesBinding(AppScope::class)

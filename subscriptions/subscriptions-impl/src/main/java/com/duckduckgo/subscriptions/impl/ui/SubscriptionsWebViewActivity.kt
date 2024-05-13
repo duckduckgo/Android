@@ -103,6 +103,7 @@ data class SubscriptionsWebViewActivityWithParams(
     val url: String,
     val screenTitle: String,
     val defaultToolbar: Boolean,
+    val origin: String? = null,
 ) : ActivityParams
 
 @InjectWith(
@@ -156,6 +157,8 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
 
     private var defaultToolbar: Boolean = true
 
+    private var origin: String? = null
+
     // Used to represent a file to download, but may first require permission
     private var pendingFileDownload: PendingFileDownload? = null
     private val downloadMessagesJob = ConflatedJob()
@@ -169,6 +172,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         val params = intent.getActivityParams(SubscriptionsWebViewActivityWithParams::class.java)
         url = params?.url ?: BUY_URL
         defaultToolbar = params?.defaultToolbar ?: true
+        origin = params?.origin
         setContentView(binding.root)
         setupInternalToolbar(toolbar)
 
@@ -217,7 +221,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             }
             it.webViewClient = SubscriptionsWebViewClient(specialUrlDetector, this)
             it.settings.apply {
-                userAgentString = userAgent.userAgent(url)
+                userAgentString = CUSTOM_UA
                 javaScriptEnabled = true
                 domStorageEnabled = true
                 loadWithOverviewMode = true
@@ -435,6 +439,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                 onPurchaseSuccess(null)
             }
             is PurchaseStateView.Success -> {
+                pixelSender.reportPurchaseSuccessOrigin(origin)
                 onPurchaseSuccess(purchaseState.subscriptionEventData)
             }
             is PurchaseStateView.Recovered -> {
@@ -566,5 +571,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     companion object {
         private const val DOWNLOAD_CONFIRMATION_TAG = "DOWNLOAD_CONFIRMATION_TAG"
         private const val PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 200
+        private const val CUSTOM_UA =
+            "Mozilla/5.0 (Linux; Android 12) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/124.0.0.0 Mobile DuckDuckGo/5 Safari/537.36"
     }
 }

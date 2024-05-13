@@ -44,6 +44,7 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.library.loader.LibraryLoader
 import com.duckduckgo.mobile.android.vpn.dao.VpnServiceStateStatsDao
+import com.duckduckgo.mobile.android.vpn.feature.AppTpRemoteFeatures
 import com.duckduckgo.mobile.android.vpn.integration.VpnNetworkStackProvider
 import com.duckduckgo.mobile.android.vpn.model.AlwaysOnState
 import com.duckduckgo.mobile.android.vpn.model.VpnServiceState
@@ -148,6 +149,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
     @Inject lateinit var crashLogger: CrashLogger
 
     @Inject lateinit var dnsChangeCallback: DnsChangeCallback
+
+    @Inject lateinit var appTpRemoteFeatures: AppTpRemoteFeatures
 
     private val serviceDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 
@@ -514,6 +517,13 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
                         }
                     }
                 }
+
+            logcat { "VPN log: adding search domains: ${tunnelConfig.searchDomains}" }
+            if (appTpRemoteFeatures.setSearchDomains().isEnabled()) {
+                tunnelConfig.searchDomains?.let {
+                    addSearchDomain(it)
+                }
+            }
 
             safelyAddDisallowedApps(tunnelConfig.appExclusionList.toList())
 

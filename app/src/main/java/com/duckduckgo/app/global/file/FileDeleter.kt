@@ -19,6 +19,7 @@ package com.duckduckgo.app.global.file
 import com.duckduckgo.common.utils.DispatcherProvider
 import java.io.File
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 interface FileDeleter {
 
@@ -53,9 +54,13 @@ class AndroidFileDeleter(private val dispatchers: DispatcherProvider) : FileDele
         excludedFiles: List<String>,
     ) {
         withContext(dispatchers.io()) {
-            val files = parentDirectory.listFiles() ?: return@withContext
-            val filesToDelete = files.filterNot { excludedFiles.contains(it.name) }
-            filesToDelete.forEach { it.deleteRecursively() }
+            runCatching {
+                val files = parentDirectory.listFiles() ?: return@withContext
+                val filesToDelete = files.filterNot { excludedFiles.contains(it.name) }
+                filesToDelete.forEach { it.deleteRecursively() }
+            }.onFailure {
+                Timber.e(it, "Failed to delete contents of directory: %s", parentDirectory.absolutePath)
+            }
         }
     }
 

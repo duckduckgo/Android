@@ -51,6 +51,8 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsVie
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchDeleteAllPasswordsConfirmation
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.PromptUserToAuthenticateMassDeletion
 import com.duckduckgo.autofill.impl.ui.credential.management.searching.CredentialListFilter
+import com.duckduckgo.autofill.impl.ui.credential.management.survey.AutofillSurvey
+import com.duckduckgo.autofill.impl.ui.credential.management.survey.AutofillSurvey.SurveyDetails
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.duckaddress.DuckAddressIdentifier
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.duckaddress.RealDuckAddressIdentifier
 import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository
@@ -91,6 +93,7 @@ class AutofillSettingsViewModelTest {
     private val webUrlIdentifier: WebUrlIdentifier = mock()
     private val duckAddressIdentifier: DuckAddressIdentifier = RealDuckAddressIdentifier()
     private val neverSavedSiteRepository: NeverSavedSiteRepository = mock()
+    private val autofillSurvey: AutofillSurvey = mock()
     private val testee = AutofillSettingsViewModel(
         autofillStore = mockStore,
         clipboardInteractor = clipboardInteractor,
@@ -105,6 +108,7 @@ class AutofillSettingsViewModelTest {
         duckAddressIdentifier = duckAddressIdentifier,
         syncEngine = mock(),
         neverSavedSiteRepository = neverSavedSiteRepository,
+        autofillSurvey = autofillSurvey,
     )
 
     @Before
@@ -424,7 +428,7 @@ class AutofillSettingsViewModelTest {
 
     @Test
     fun whenLockingAndUnlockingPreviousViewStateRestoredIfWasListMode() = runTest {
-        testee.onShowListMode()
+        testee.onInitialiseListMode()
         testee.lock()
         testee.unlock()
 
@@ -730,6 +734,54 @@ class AutofillSettingsViewModelTest {
             awaitItem().verifyHasCommandToShowDeleteAllConfirmation(100)
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenNoSurveysAvailableThenNoSurveyInViewState() = runTest {
+        testee.onViewStarted()
+        verifySurveyNotAvailable()
+    }
+
+    @Test
+    fun whenUnusedSurveyAvailableThenSurveyInViewState() = runTest {
+        whenever(autofillSurvey.firstUnusedSurvey()).thenReturn(SurveyDetails("surveyId-1", "example.com"))
+        testee.onInitialiseListMode()
+        "surveyId-1".verifySurveyAvailable()
+    }
+
+    @Test
+    fun whenSurveyShownThenNoSurveyInViewState() = runTest {
+        testee.onSurveyShown("surveyId-1")
+        verifySurveyNotAvailable()
+    }
+
+    @Test
+    fun whenSurveyShownThenSurveyMarkedAsUsed() = runTest {
+        testee.onSurveyShown("surveyId-1")
+        verify(autofillSurvey).recordSurveyAsUsed("surveyId-1")
+    }
+
+    @Test
+    fun whenSurveyPromptDismissedThenNoSurveyInViewState() = runTest {
+        testee.onSurveyPromptDismissed("surveyId-1")
+        verifySurveyNotAvailable()
+    }
+
+    @Test
+    fun whenSurveyPromptDismissedThenSurveyMarkedAsUsed() = runTest {
+        testee.onSurveyPromptDismissed("surveyId-1")
+        verify(autofillSurvey).recordSurveyAsUsed("surveyId-1")
+    }
+
+    private fun String.verifySurveyAvailable() {
+        val survey = testee.viewState.value.survey
+        assertNotNull(survey)
+        assertEquals(this, survey!!.id)
+    }
+
+    private fun verifySurveyNotAvailable() {
+        val survey = testee.viewState.value.survey
+        assertNull(survey)
     }
 
     private fun List<ListModeCommand>.verifyHasCommandToShowDeleteAllConfirmation(expectedNumberOfCredentialsToDelete: Int) {

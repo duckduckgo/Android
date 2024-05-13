@@ -16,8 +16,11 @@
 
 package com.duckduckgo.subscriptions.impl
 
+import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
+import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.Product.NetP
@@ -26,6 +29,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -33,7 +37,11 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -42,6 +50,8 @@ class RealSubscriptionsTest {
 
     @get:Rule
     val coroutineRule = CoroutineTestRule()
+
+    private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
     private val mockSubscriptionsManager: SubscriptionsManager = mock()
     private val globalActivityStarter: GlobalActivityStarter = mock()
@@ -183,5 +193,27 @@ class RealSubscriptionsTest {
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(UNKNOWN)
 
         assertFalse(subscriptions.shouldLaunchPrivacyProForUrl("https://duckduckgo.com/pro"))
+    }
+
+    @Test
+    fun whenLaunchPrivacyProWithOriginThenPassTheOriginToActivity() = runTest {
+        whenever(globalActivityStarter.startIntent(any(), any<SettingsScreenNoParams>())).thenReturn(mock())
+
+        val captor = argumentCaptor<SubscriptionsWebViewActivityWithParams>()
+        subscriptions.launchPrivacyPro(context, "https://duckduckgo.com/pro?origin=test".toUri())
+
+        verify(globalActivityStarter, times(2)).startIntent(eq(context), captor.capture())
+        assertEquals("test", captor.lastValue.origin)
+    }
+
+    @Test
+    fun whenLaunchPrivacyProWithNoOriginThenDoNotPassTheOriginToActivity() = runTest {
+        whenever(globalActivityStarter.startIntent(any(), any<SettingsScreenNoParams>())).thenReturn(mock())
+
+        val captor = argumentCaptor<SubscriptionsWebViewActivityWithParams>()
+        subscriptions.launchPrivacyPro(context, "https://duckduckgo.com/pro".toUri())
+
+        verify(globalActivityStarter, times(2)).startIntent(eq(context), captor.capture())
+        assertNull(captor.lastValue.origin)
     }
 }

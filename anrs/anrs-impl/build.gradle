@@ -23,6 +23,9 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
+    anvil project(':anvil-compiler')
+    implementation project(':anvil-annotations')
+
     implementation project(':app-build-config-api')
     implementation project(':anrs-api')
     implementation project(':anrs-store')
@@ -31,6 +34,8 @@ dependencies {
     implementation project(':browser-api')
     implementation project(':statistics')
     implementation project(':verified-installation-api')
+    implementation project(':library-loader-api')
+    implementation project(':feature-toggles-api')
 
     implementation AndroidX.core.ktx
     implementation KotlinX.coroutines.core
@@ -56,8 +61,16 @@ android {
     anvil {
         generateDaggerFactories = true // default is false
     }
-  namespace 'com.duckduckgo.app.anr'
+
+    ndkVersion '21.4.7075529'
+    namespace 'com.duckduckgo.app.anr'
     compileOptions {
         coreLibraryDesugaringEnabled = true
+    }
+
+    externalNativeBuild {
+        cmake {
+            path "CMakeLists.txt"
+        }
     }
 }

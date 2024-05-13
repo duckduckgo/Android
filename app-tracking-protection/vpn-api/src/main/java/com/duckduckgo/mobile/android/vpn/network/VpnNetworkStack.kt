@@ -68,6 +68,7 @@ interface VpnNetworkStack {
      * @param addresses the address you wish to set to the VPN service. They key contains the InetAddress of the address and
      * value should be the mask width.
      * @param dns the additional dns servers you wish to add to the VPN service
+     * @param searchDomains the DNS domains search path. Comma separated domains to search when resolving host names or null
      * @param routes the routes (if any) you wish to add to the VPN service.
      * The Map<String, Int> contains the String IP address and the Int mask.
      * If no routes are returned, the VPN will apply its own defaults.
@@ -77,6 +78,7 @@ interface VpnNetworkStack {
         val mtu: Int,
         val addresses: Map<InetAddress, Int>,
         val dns: Set<InetAddress>,
+        val searchDomains: String? = null,
         val customDns: Set<InetAddress>,
         val routes: Map<String, Int>,
         val appExclusionList: Set<String>,
