@@ -275,4 +275,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SSL_CERTIFICATE_WARNING_EXPIRED_SHOWN("m_certificate_warning_displayed_expired"),
     SSL_CERTIFICATE_WARNING_UNTRUSTED_SHOWN("m_certificate_warning_displayed_untrusted"),
     SSL_CERTIFICATE_WARNING_GENERIC_SHOWN("m_certificate_warning_displayed_generic"),
+
+    DMA_CHOICE_SCREEN_SEARCH_CHOICE_LEGACY_INSTALL("m_dma_search_choice_legacy_install"),
+    DMA_CHOICE_SCREEN_DEFAULT_BROWSER_LEGACY_INSTALL("m_dma_default_browser_legacy_install"),
 }
