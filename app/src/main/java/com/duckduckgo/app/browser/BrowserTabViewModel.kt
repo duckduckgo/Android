@@ -46,6 +46,7 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
@@ -272,6 +273,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private var buildingSiteFactoryJob: Job? = null
     private var hasUserSeenHistory = false
+    private var lastAutoCompleteState: AutoCompleteViewState? = null
 
     data class LocationPermission(
         val origin: String,
@@ -617,7 +619,8 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun onAutoCompleteResultReceived(result: AutoCompleteResult) {
         val currentViewState = currentAutoCompleteViewState()
-        autoCompleteViewState.value = currentViewState.copy(searchResults = AutoCompleteResult(result.query, result.suggestions))
+        lastAutoCompleteState = currentViewState.copy(searchResults = AutoCompleteResult(result.query, result.suggestions))
+        autoCompleteViewState.value = lastAutoCompleteState!!
     }
 
     @VisibleForTesting
@@ -3302,6 +3305,18 @@ class BrowserTabViewModel @Inject constructor(
             autoComplete.submitUserSeenHistoryIAM()
         }
         hasUserSeenHistory = false
+        lastAutoCompleteState?.searchResults?.suggestions?.let { suggestions ->
+            if (suggestions.any { it is AutoCompleteBookmarkSuggestion && it.isFavorite }) {
+                pixel.fire(AppPixelName.AUTOCOMPLETE_DISPLAYED_LOCAL_FAVORITE)
+            }
+            if (suggestions.any { it is AutoCompleteBookmarkSuggestion && !it.isFavorite }) {
+                pixel.fire(AppPixelName.AUTOCOMPLETE_DISPLAYED_LOCAL_BOOKMARK)
+            }
+            if (suggestions.any { it is AutoCompleteHistoryRelatedSuggestion }) {
+                pixel.fire(AppPixelName.AUTOCOMPLETE_DISPLAYED_LOCAL_HISTORY)
+            }
+        }
+        lastAutoCompleteState = null
     }
 
     companion object {

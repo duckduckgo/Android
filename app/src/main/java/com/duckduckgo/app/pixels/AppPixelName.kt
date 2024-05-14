@@ -189,6 +189,10 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     AUTOCOMPLETE_BANNER_SHOWN("m_autocomplete_banner_shown"),
     AUTOCOMPLETE_BANNER_DISMISSED("m_autocomplete_banner_dismissed"),
 
+    AUTOCOMPLETE_DISPLAYED_LOCAL_BOOKMARK("m_au_disp_lb"),
+    AUTOCOMPLETE_DISPLAYED_LOCAL_FAVORITE("m_au_disp_lf"),
+    AUTOCOMPLETE_DISPLAYED_LOCAL_HISTORY("m_au_disp_lh"),
+
     SERP_REQUERY("rq_%s"),
 
     CHANGE_APP_ICON_OPENED("m_ic"),
