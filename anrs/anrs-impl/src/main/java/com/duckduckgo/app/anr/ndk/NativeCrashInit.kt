@@ -20,15 +20,20 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.browser.customtabs.CustomTabDetector
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.library.loader.LibraryLoader
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
@@ -44,6 +49,8 @@ class NativeCrashInit @Inject constructor(
     private val customTabDetector: CustomTabDetector,
     private val appBuildConfig: AppBuildConfig,
     private val nativeCrashFeature: NativeCrashFeature,
+    private val dispatcherProvider: DispatcherProvider,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
 ) : MainProcessLifecycleObserver {
 
     private val isCustomTab: Boolean by lazy { customTabDetector.isCustomTab() }
@@ -61,15 +68,17 @@ class NativeCrashInit @Inject constructor(
 
     override fun onCreate(owner: LifecycleOwner) {
         if (isMainProcess) {
-            jniRegisterNativeSignalHandler()
+            coroutineScope.launch {
+                jniRegisterNativeSignalHandler()
+            }
         } else {
             logcat(ERROR) { "ndk-crash: onCreate wrongly called in a secondary process" }
         }
     }
 
-    private fun jniRegisterNativeSignalHandler() {
+    private suspend fun jniRegisterNativeSignalHandler() = withContext(dispatcherProvider.io()) {
         runCatching {
-            if (!nativeCrashFeature.nativeCrashHandling().isEnabled()) return
+            if (!nativeCrashFeature.nativeCrashHandling().isEnabled()) return@withContext
 
             val logLevel = if (appBuildConfig.isDebug || appBuildConfig.isInternalBuild()) {
                 Log.VERBOSE
