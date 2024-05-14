@@ -147,8 +147,8 @@
 
     <!-- System apps exclusion list -->
     <string name="netpExclusionListSystemAppsHeader">Android System Apps</string>
-    <string name="netpExclusionListWarningTitle">Excluding Android system apps</string>
-    <string name="netpExclusionListWarningMessage">Note that excluding a group of system apps could cause unexpected data leaks. </string>
+    <string name="netpExclusionListWarningTitle">About System App Exclusions</string>
+    <string name="netpExclusionListWarningMessage">Internet traffic, including background connections, used by this group of apps won\'t be protected by the VPN. Consider re-enabling when this doesn\'t fix the issue to prevent unexpected data leaks.</string>
     <string name="netpExclusionListWarningActionPositive">OK</string>
 
     <!-- About -->
