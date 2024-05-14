@@ -48,6 +48,7 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.DeleteBookmarkListener
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.EditSavedSiteListener
@@ -270,6 +271,7 @@ class BrowserTabViewModel @Inject constructor(
     NavigationHistoryListener {
 
     private var buildingSiteFactoryJob: Job? = null
+    private var hasUserSeenHistory = false
 
     data class LocationPermission(
         val origin: String,
@@ -337,7 +339,8 @@ class BrowserTabViewModel @Inject constructor(
     private val locationPermissionMessages: MutableMap<String, Boolean> = mutableMapOf()
     private val locationPermissionSession: MutableMap<String, LocationPermissionType> = mutableMapOf()
 
-    private val autoCompletePublishSubject = PublishRelay.create<String>()
+    @VisibleForTesting
+    val autoCompletePublishSubject = PublishRelay.create<String>()
     private val fireproofWebsiteState: LiveData<List<FireproofWebsiteEntity>> = fireproofWebsiteRepository.getFireproofWebsites()
 
     @ExperimentalCoroutinesApi
@@ -603,6 +606,9 @@ class BrowserTabViewModel @Inject constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 { result ->
+                    if (result.suggestions.contains(AutoCompleteInAppMessageSuggestion)) {
+                        hasUserSeenHistory = true
+                    }
                     onAutoCompleteResultReceived(result)
                 },
                 { t: Throwable? -> Timber.w(t, "Failed to get search results") },
@@ -705,6 +711,7 @@ class BrowserTabViewModel @Inject constructor(
             }
             is AutoCompleteSearchSuggestion -> AppPixelName.AUTOCOMPLETE_SEARCH_SELECTION
             is AutoCompleteHistorySuggestion, is AutoCompleteHistorySearchSuggestion -> AUTOCOMPLETE_HISTORY_SELECTION
+            else -> return
         }
 
         pixel.fire(pixelName, params)
@@ -3285,6 +3292,16 @@ class BrowserTabViewModel @Inject constructor(
         if (cta is ExperimentOnboardingDaxDialogCta) {
             onDismissExperimentDaxDialog(cta)
         }
+    }
+    fun onUserDismissedAutoCompleteInAppMessage() {
+        autoComplete.userDismissedHistoryInAutoCompleteIAM()
+    }
+
+    fun autoCompleteSuggestionsGone() {
+        if (hasUserSeenHistory) {
+            autoComplete.submitUserSeenHistoryIAM()
+        }
+        hasUserSeenHistory = false
     }
 
     companion object {

@@ -49,5 +49,7 @@
     <!-- Private Search -->
     <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Recently Visited Sites</string>
     <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">See private search suggestions, bookmarks, and recently visited sites as you type.</string>
+    <string name="improvedAutoCompleteIAMTitle">Improved Autocomplete</string>
+    <string name="improvedAutoCompleteIAMContent">To help speed up your searches, search suggestions now include recently visited sites. Use the Fire Button 🔥 anytime to delete.</string>
 
 </resources>
