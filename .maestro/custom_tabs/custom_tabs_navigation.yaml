@@ -40,10 +40,10 @@ tags:
     id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
 - assertVisible:
     text: "running in duckduckgo"
-- back
+- action: back
 - tapOn:
     text: "[Ad 1] SERP Ad (heuristic)"
-- back
+- action: back
 - tapOn:
     text: "[Ad 1] SERP Ad (heuristic)"
 - tapOn:
@@ -58,11 +58,11 @@ tags:
     id: "com.duckduckgo.mobile.android:id/forwardMenuItem"
 - assertVisible:
     text: "Publisher site"
-- back
-- back
-- back
-- back
-- back
+- action: back
+- action: back
+- action: back
+- action: back
+- action: back
 - scrollUntilVisible:
     element:
       text: "default browser"
