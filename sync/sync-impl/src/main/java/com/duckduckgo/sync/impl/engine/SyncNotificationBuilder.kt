@@ -32,6 +32,7 @@ import javax.inject.Inject
 
 interface SyncNotificationBuilder {
     fun buildSyncPausedNotification(context: Context, addNavigationIntent: Boolean = true): Notification
+    fun buildSyncSignedOutNotification(context: Context): Notification
 }
 
 @ContributesBinding(AppScope::class)
@@ -48,6 +49,19 @@ class AppCredentialsSyncNotificationBuilder @Inject constructor(
         if (addNavigationIntent) {
             notificationBuilder.setContentIntent(getPendingIntent(context))
         }
+        return notificationBuilder.build()
+    }
+
+    override fun buildSyncSignedOutNotification(
+        context: Context,
+    ): Notification {
+        val notificationBuilder = NotificationCompat.Builder(context, SYNC_NOTIFICATION_CHANNEL_ID)
+            .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
+            .setStyle(NotificationCompat.DecoratedCustomViewStyle())
+            .setCustomContentView(RemoteViews(context.packageName, R.layout.notification_sync_signed_out))
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setCategory(NotificationCompat.CATEGORY_STATUS)
+        notificationBuilder.setContentIntent(getPendingIntent(context))
         return notificationBuilder.build()
     }
 
