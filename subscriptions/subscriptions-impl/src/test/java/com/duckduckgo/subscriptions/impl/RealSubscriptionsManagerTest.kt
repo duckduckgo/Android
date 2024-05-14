@@ -606,20 +606,21 @@ class RealSubscriptionsManagerTest {
     }
 
     @Test
-    fun whenGetValidatedAuthTokenIfUserAuthenticatedWithSubscriptionAndTokenExpiredAndEntitlementsExistsAndExternalIdDifferentThenReturnFailure() = runTest {
-        authDataStore.externalId = "test"
-        givenUserIsAuthenticated()
-        givenSubscriptionSucceedsWithEntitlements()
-        givenValidateTokenFailsAndThenSucceeds("""{ "error": "expired_token" }""")
-        givenPurchaseStored()
-        givenStoreLoginSucceeds()
-        givenAccessTokenSucceeds()
+    fun whenGetValidatedAuthTokenIfUserAuthenticatedWithSubscriptionAndTokenExpiredAndEntitlementsExistsAndExternalIdDifferentThenReturnFailure() =
+        runTest {
+            authDataStore.externalId = "test"
+            givenUserIsAuthenticated()
+            givenSubscriptionSucceedsWithEntitlements()
+            givenValidateTokenFailsAndThenSucceeds("""{ "error": "expired_token" }""")
+            givenPurchaseStored()
+            givenStoreLoginSucceeds()
+            givenAccessTokenSucceeds()
 
-        val result = subscriptionsManager.getValidatedAuthToken()
+            val result = subscriptionsManager.getValidatedAuthToken()
 
-        verify(authService).storeLogin(any())
-        assertTrue(result is AuthToken.Failure)
-    }
+            verify(authService).storeLogin(any())
+            assertTrue(result is AuthToken.Failure)
+        }
 
     @Test
     fun whenGetValidatedAuthTokenIfUserAuthenticatedWithSubscriptionAndTokenExpiredAndEntitlementsDoNotExistThenReturnFailure() = runTest {
