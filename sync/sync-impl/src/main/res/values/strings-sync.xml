@@ -25,6 +25,7 @@
     <string name="sync_disabled_authenticated_user"><b>Sync &amp; Backup Paused</b>\nSorry, but Sync &amp; Backup is currently unavailable. Please try again later.</string>
     <string name="sync_disabled_authenticated_user_new_version"><b>Sync &amp; Backup Paused</b>\nSorry, but Sync &amp; Backup is no longer available in this app version. Please update DuckDuckGo to the latest version to continue.</string>
     <string name="sync_paused_notification"><b>Sync &amp; Backup Paused</b>\nSorry, but Sync &amp; Backup is currently unavailable. Please try again later.</string>
+    <string name="sync_signed_out_notification"><b>Sync is Paused</b>\nSync has been paused. If you want to continue syncing this device, reconnect using another device or your recovery code.</string>
 
     <!-- Settings screen -->
     <string name="sync_screen_title">Sync &amp; Backup</string>
