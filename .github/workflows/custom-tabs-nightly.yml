@@ -53,7 +53,7 @@ jobs:
         if: always()
         run: find . -name "*.apk"  -exec mv '{}' apk/release.apk \;
 
-      - name: Custom Tab Flows
+      - name: Custom Tabs Flows
         uses: mobile-dev-inc/action-maestro-cloud@v1.8.1
         with:
           api-key: ${{ secrets.MOBILE_DEV_API_KEY }}
@@ -61,7 +61,7 @@ jobs:
           app-file: apk/release.apk
           android-api-level: 30
           workspace: .maestro
-          include-tags: customTabTest
+          include-tags: customTabsTest
           env: |
             CODE=${{ steps.sync-recovery-code.outputs.recovery-code }}
 
@@ -73,6 +73,6 @@ jobs:
           asana-pat: ${{ secrets.GH_ASANA_SECRET }}
           asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          asana-task-name: GH Workflow Failure - Custom Tab Flows
+          asana-task-name: GH Workflow Failure - Custom Tabs Flows
           asana-task-description: The Custom Tabs nightly workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
           action: 'create-asana-task'

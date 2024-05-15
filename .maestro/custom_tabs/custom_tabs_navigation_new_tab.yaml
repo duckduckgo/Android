@@ -1,7 +1,7 @@
 appId: com.duckduckgo.mobile.android
 name: "ReleaseTest: Custom Tabs navigation in new tab"
 tags:
-  - releaseTest
+  - customTabsTest
 ---
 - launchApp:
     clearState: true
