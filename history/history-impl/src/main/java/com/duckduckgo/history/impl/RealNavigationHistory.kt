@@ -74,4 +74,8 @@ class RealNavigationHistory @Inject constructor(
     override fun isHistoryFeatureAvailable(): Boolean {
         return historyFeature.shouldStoreHistory
     }
+
+    override suspend fun hasHistory(): Boolean {
+        return historyRepository.hasHistory()
+    }
 }

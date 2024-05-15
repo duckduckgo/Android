@@ -166,6 +166,7 @@ import com.duckduckgo.downloads.api.DownloadCommand
 import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.privacy.config.api.*
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
@@ -264,6 +265,7 @@ class BrowserTabViewModel @Inject constructor(
     private val sslCertificatesFeature: SSLCertificatesFeature,
     private val bypassedSSLCertificatesRepository: BypassedSSLCertificatesRepository,
     private val userBrowserProperties: UserBrowserProperties,
+    private val history: NavigationHistory,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -693,6 +695,9 @@ class BrowserTabViewModel @Inject constructor(
         val hasFavorites = withContext(dispatchers.io()) {
             savedSitesRepository.hasFavorites()
         }
+        val hasHistory = withContext(dispatchers.io()) {
+            history.hasHistory()
+        }
         val hasBookmarkResults = currentViewState.searchResults.suggestions.any { it is AutoCompleteBookmarkSuggestion && !it.isFavorite }
         val hasFavoriteResults = currentViewState.searchResults.suggestions.any { it is AutoCompleteBookmarkSuggestion && it.isFavorite }
         val hasHistoryResults =
@@ -702,6 +707,7 @@ class BrowserTabViewModel @Inject constructor(
             PixelParameter.SHOWED_FAVORITES to hasFavoriteResults.toString(),
             PixelParameter.BOOKMARK_CAPABLE to hasBookmarks.toString(),
             PixelParameter.FAVORITE_CAPABLE to hasFavorites.toString(),
+            PixelParameter.HISTORY_CAPABLE to hasHistory.toString(),
             PixelParameter.SHOWED_HISTORY to hasHistoryResults.toString(),
         )
         val pixelName = when (suggestion) {

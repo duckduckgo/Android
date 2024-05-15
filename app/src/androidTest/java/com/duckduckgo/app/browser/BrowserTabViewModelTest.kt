@@ -623,6 +623,7 @@ class BrowserTabViewModelTest {
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             extendedOnboardingExperimentVariantManager = mockExtendedOnboardingExperimentVariantManager,
             userBrowserProperties = mockUserBrowserProperties,
+            history = mockNavigationHistory,
         )
 
         testee.loadData("abc", null, false, false)
@@ -2254,6 +2255,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenBookmarkSuggestionSubmittedThenAutoCompleteBookmarkSelectionPixelSent() = runTest {
         whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(true)
+        whenever(mockNavigationHistory.hasHistory()).thenReturn(false)
         val suggestion = AutoCompleteBookmarkSuggestion("example", "Example", "https://example.com")
         testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteResult("", listOf(suggestion)))
         testee.fireAutocompletePixel(suggestion)
@@ -2268,6 +2270,7 @@ class BrowserTabViewModelTest {
     fun whenBookmarkFavoriteSubmittedThenAutoCompleteFavoriteSelectionPixelSent() = runTest {
         whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(true)
         whenever(mockSavedSitesRepository.hasFavorites()).thenReturn(true)
+        whenever(mockNavigationHistory.hasHistory()).thenReturn(false)
         val suggestion = AutoCompleteBookmarkSuggestion("example", "Example", "https://example.com", isFavorite = true)
         testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteResult("", listOf(suggestion)))
         testee.fireAutocompletePixel(suggestion)
@@ -2284,6 +2287,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenHistorySubmittedThenAutoCompleteHistorySelectionPixelSent() = runTest {
         whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(true)
+        whenever(mockNavigationHistory.hasHistory()).thenReturn(true)
         val suggestion = AutoCompleteHistorySearchSuggestion("example")
         testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteResult("", listOf(suggestion)))
         testee.fireAutocompletePixel(suggestion)
@@ -2299,6 +2303,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenSearchSuggestionSubmittedWithBookmarksThenAutoCompleteSearchSelectionPixelSent() = runTest {
         whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(true)
+        whenever(mockNavigationHistory.hasHistory()).thenReturn(false)
         val suggestions = listOf(AutoCompleteSearchSuggestion("", false), AutoCompleteBookmarkSuggestion("", "", ""))
         testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteResult("", suggestions))
         testee.fireAutocompletePixel(AutoCompleteSearchSuggestion("example", false))
@@ -2313,6 +2318,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenSearchSuggestionSubmittedWithoutBookmarksThenAutoCompleteSearchSelectionPixelSent() = runTest {
         whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(false)
+        whenever(mockNavigationHistory.hasHistory()).thenReturn(false)
         testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteResult("", emptyList()))
         testee.fireAutocompletePixel(AutoCompleteSearchSuggestion("example", false))
 
