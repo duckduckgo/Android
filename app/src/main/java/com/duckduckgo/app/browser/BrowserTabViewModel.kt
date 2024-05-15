@@ -128,6 +128,8 @@ import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.onboarding.ui.page.experiment.ExtendedOnboardingExperimentVariantManager
 import com.duckduckgo.app.onboarding.ui.page.experiment.OnboardingExperimentPixel
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_DISMISSED
+import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_HISTORY_SELECTION
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
@@ -274,7 +276,7 @@ class BrowserTabViewModel @Inject constructor(
     NavigationHistoryListener {
 
     private var buildingSiteFactoryJob: Job? = null
-    private var hasUserSeenHistory = false
+    private var hasUserSeenHistoryIAM = false
     private var lastAutoCompleteState: AutoCompleteViewState? = null
 
     data class LocationPermission(
@@ -611,7 +613,7 @@ class BrowserTabViewModel @Inject constructor(
             .subscribe(
                 { result ->
                     if (result.suggestions.contains(AutoCompleteInAppMessageSuggestion)) {
-                        hasUserSeenHistory = true
+                        hasUserSeenHistoryIAM = true
                     }
                     onAutoCompleteResultReceived(result)
                 },
@@ -3304,13 +3306,15 @@ class BrowserTabViewModel @Inject constructor(
     }
     fun onUserDismissedAutoCompleteInAppMessage() {
         autoComplete.userDismissedHistoryInAutoCompleteIAM()
+        pixel.fire(AUTOCOMPLETE_BANNER_DISMISSED)
     }
 
     fun autoCompleteSuggestionsGone() {
-        if (hasUserSeenHistory) {
+        if (hasUserSeenHistoryIAM) {
             autoComplete.submitUserSeenHistoryIAM()
+            pixel.fire(AUTOCOMPLETE_BANNER_SHOWN)
         }
-        hasUserSeenHistory = false
+        hasUserSeenHistoryIAM = false
         lastAutoCompleteState?.searchResults?.suggestions?.let { suggestions ->
             if (suggestions.any { it is AutoCompleteBookmarkSuggestion && it.isFavorite }) {
                 pixel.fire(AppPixelName.AUTOCOMPLETE_DISPLAYED_LOCAL_FAVORITE)
