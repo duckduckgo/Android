@@ -24,6 +24,7 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.duckduckgo.anvil.annotations.ContributesWorker
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.notification.checkPermissionAndNotify
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.engine.SyncEngineLifecycle
@@ -38,6 +39,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 interface SyncUnavailableRepository {
@@ -167,8 +169,13 @@ class SchedulableErrorNotificationWorker(
     @Inject
     lateinit var syncPausedRepository: SyncUnavailableRepository
 
+    @Inject
+    lateinit var dispatcherProvider: DispatcherProvider
+
     override suspend fun doWork(): Result {
-        syncPausedRepository.triggerNotification()
+        withContext(dispatcherProvider.io()) {
+            syncPausedRepository.triggerNotification()
+        }
         return Result.success()
     }
 
