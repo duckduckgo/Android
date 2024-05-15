@@ -604,6 +604,7 @@ class RealDeviceShieldPixels @Inject constructor(
 
     override fun sendAppBreakageReport(metadata: Map<String, String>) {
         firePixel(DeviceShieldPixelNames.ATP_APP_BREAKAGE_REPORT, metadata)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_APP_BREAKAGE_REPORT_DAILY, metadata)
         tryToFireUniquePixel(DeviceShieldPixelNames.ATP_APP_BREAKAGE_REPORT_UNIQUE, payload = metadata)
     }
 
