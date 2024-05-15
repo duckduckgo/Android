@@ -21,7 +21,7 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.history.api.HistoryEntry
 import com.duckduckgo.history.api.NavigationHistory
-import com.duckduckgo.history.impl.remoteconfig.HistoryRCWrapper
+import com.duckduckgo.history.impl.remoteconfig.HistoryFeature
 import com.squareup.anvil.annotations.ContributesBinding
 import io.reactivex.Single
 import javax.inject.Inject
@@ -36,13 +36,13 @@ class RealNavigationHistory @Inject constructor(
     private val historyRepository: HistoryRepository,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val currentTimeProvider: CurrentTimeProvider,
-    private val historyRCWrapper: HistoryRCWrapper,
+    private val historyFeature: HistoryFeature,
 ) : InternalNavigationHistory {
     override suspend fun saveToHistory(
         url: String,
         title: String?,
     ) {
-        if (!historyRCWrapper.shouldStoreHistory || !isHistoryUserEnabled()) {
+        if (!historyFeature.shouldStoreHistory || !isHistoryUserEnabled()) {
             return
         }
         val ddgUrl = duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)
@@ -64,7 +64,7 @@ class RealNavigationHistory @Inject constructor(
     }
 
     override fun isHistoryUserEnabled(): Boolean {
-        return historyRepository.isHistoryUserEnabled(historyRCWrapper.shouldStoreHistory)
+        return historyRepository.isHistoryUserEnabled(historyFeature.shouldStoreHistory)
     }
 
     override fun setHistoryUserEnabled(value: Boolean) {
@@ -72,6 +72,6 @@ class RealNavigationHistory @Inject constructor(
     }
 
     override fun isHistoryFeatureAvailable(): Boolean {
-        return historyRCWrapper.shouldStoreHistory
+        return historyFeature.shouldStoreHistory
     }
 }

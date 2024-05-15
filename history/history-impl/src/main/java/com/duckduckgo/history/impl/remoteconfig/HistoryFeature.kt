@@ -20,14 +20,14 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
-interface HistoryRCWrapper {
+interface HistoryFeature {
     val shouldStoreHistory: Boolean
 }
 
 @ContributesBinding(AppScope::class)
 class RealHistoryFeature @Inject constructor(
     private val historyRemoteFeature: HistoryRemoteFeature,
-) : HistoryRCWrapper {
+) : HistoryFeature {
     override val shouldStoreHistory by lazy {
         historyRemoteFeature.self().isEnabled() && historyRemoteFeature.storeHistory().isEnabled()
     }

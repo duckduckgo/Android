@@ -18,7 +18,7 @@ package com.duckduckgo.history.impl
 
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.common.utils.CurrentTimeProvider
-import com.duckduckgo.history.impl.remoteconfig.HistoryRCWrapper
+import com.duckduckgo.history.impl.remoteconfig.HistoryFeature
 import java.time.LocalDateTime
 import java.time.Month.JANUARY
 import kotlinx.coroutines.launch
@@ -38,14 +38,14 @@ class HistoryTest {
     private val mockHistoryRepository: HistoryRepository = mock()
     private val mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
     private val mockCurrentTimeProvider: CurrentTimeProvider = mock()
-    private val mockHistoryRCWrapper: HistoryRCWrapper = mock()
+    private val mockHistoryFeature: HistoryFeature = mock()
     private val testScope = TestScope()
 
-    val testee = RealNavigationHistory(mockHistoryRepository, mockDuckDuckGoUrlDetector, mockCurrentTimeProvider, mockHistoryRCWrapper)
+    val testee = RealNavigationHistory(mockHistoryRepository, mockDuckDuckGoUrlDetector, mockCurrentTimeProvider, mockHistoryFeature)
 
     @Before
     fun setup() {
-        whenever(mockHistoryRCWrapper.shouldStoreHistory).thenReturn(true)
+        whenever(mockHistoryFeature.shouldStoreHistory).thenReturn(true)
         whenever(mockHistoryRepository.isHistoryUserEnabled(any())).thenReturn(true)
     }
 
@@ -95,7 +95,7 @@ class HistoryTest {
 
     @Test
     fun whenShouldStoreHistoryIsFalseThenDoNotSaveToHistory() {
-        whenever(mockHistoryRCWrapper.shouldStoreHistory).thenReturn(false)
+        whenever(mockHistoryFeature.shouldStoreHistory).thenReturn(false)
 
         runTest {
             testee.saveToHistory("url", "title")
