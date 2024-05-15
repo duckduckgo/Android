@@ -63,6 +63,7 @@ internal class SyncEngineTest {
     private val syncOperationErrorRecorder: SyncOperationErrorRecorder = mock()
     private val providerPlugins: PluginPoint<SyncableDataProvider> = mock()
     private val persisterPlugins: PluginPoint<SyncableDataPersister> = mock()
+    private val lifecyclePlugins: PluginPoint<SyncEngineLifecycle> = mock()
     private lateinit var syncEngine: RealSyncEngine
 
     @Before
@@ -76,6 +77,7 @@ internal class SyncEngineTest {
             syncOperationErrorRecorder,
             providerPlugins,
             persisterPlugins,
+            lifecyclePlugins,
         )
         whenever(syncStore.isSignedIn()).thenReturn(true)
         whenever(syncStore.syncingDataEnabled).thenReturn(true)

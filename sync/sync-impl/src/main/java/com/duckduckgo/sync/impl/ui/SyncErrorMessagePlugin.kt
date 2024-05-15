@@ -14,24 +14,18 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.sync.impl.engine
+package com.duckduckgo.sync.impl.ui
 
-import android.app.Notification
 import android.content.Context
+import android.view.View
+import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.sync.api.SyncMessagePlugin
+import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 
-class FakeNotificationBuilder() : SyncNotificationBuilder {
-    override fun buildSyncPausedNotification(
-        context: Context,
-        addNavigationIntent: Boolean,
-    ): Notification {
-        return Notification()
-    }
-
-    override fun buildSyncErrorNotification(context: Context): Notification {
-        return Notification()
-    }
-
-    override fun buildSyncSignedOutNotification(context: Context): Notification {
-        return Notification()
+@ContributesMultibinding(scope = ActivityScope::class)
+class SyncErrorMessagePlugin @Inject constructor() : SyncMessagePlugin {
+    override fun getView(context: Context): View {
+        return SyncErrorView(context)
     }
 }
