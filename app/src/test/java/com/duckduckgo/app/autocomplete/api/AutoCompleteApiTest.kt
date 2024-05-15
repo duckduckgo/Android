@@ -60,7 +60,7 @@ class AutoCompleteApiTest {
     fun before() {
         MockitoAnnotations.openMocks(this)
         whenever(mockNavigationHistory.getHistorySingle()).thenReturn(Single.just(listOf()))
-        testee = AutoCompleteApi(mockAutoCompleteService, mockSavedSitesRepository, mockNavigationHistory)
+        testee = AutoCompleteApi(mockAutoCompleteService, mockSavedSitesRepository, mockNavigationHistory, RealAutoCompleteScorer())
     }
 
     @Test
@@ -770,101 +770,6 @@ class AutoCompleteApiTest {
             ),
             value.suggestions,
         )
-    }
-
-    @Test
-    fun testWhenQueryIsJustWhitespaces_ThenTokensAreEmpty() {
-        val query = "  \t\n\t\t \t \t  \n\n\n "
-        val tokens = testee.tokensFrom(query)
-
-        assertEquals(0, tokens.size)
-    }
-
-    @Test
-    fun testWhenQueryContainsTabsOrNewlines_ThenResultIsTheSameAsIfThereAreSpaces() {
-        val spaceQuery = "testing query tokens"
-        val tabQuery = "testing\tquery\ttokens"
-        val newlineQuery = "testing\nquery\ntokens"
-        val spaceTokens = testee.tokensFrom(spaceQuery)
-        val tabTokens = testee.tokensFrom(tabQuery)
-        val newlineTokens = testee.tokensFrom(newlineQuery)
-
-        assertEquals(listOf("testing", "query", "tokens"), spaceTokens)
-        assertEquals(spaceTokens, tabTokens)
-        assertEquals(spaceTokens, newlineTokens)
-    }
-
-    @Test
-    fun testWhenURLMatchesWithQuery_ThenScoreIsIncreased() {
-        val query = "testcase.com/no"
-        val score = testee.score(
-            "Test case website",
-            "https://www.testcase.com/notroot".toUri(),
-            100,
-            query,
-        )
-
-        assertTrue(score > 0)
-    }
-
-    @Test
-    fun testWhenTitleMatchesFromTheBeginning_ThenScoreIsIncreased() {
-        val query = "test"
-        val score1 = testee.score(
-            "Test case website",
-            "https://www.website.com".toUri(),
-            100,
-            query,
-        )
-
-        val score2 = testee.score(
-            "Case test website 2",
-            "https://www.website2.com".toUri(),
-            100,
-            query,
-        )
-
-        assertTrue(score1 > score2)
-    }
-
-    @Test
-    fun testWhenDomainMatchesFromTheBeginning_ThenScoreIsIncreased() {
-        val query = "test"
-        val score1 = testee.score(
-            "Website",
-            "https://www.test.com".toUri(),
-            100,
-            query,
-        )
-
-        val score2 = testee.score(
-            "Website 2",
-            "https://www.websitetest.com".toUri(),
-            100,
-            query,
-        )
-
-        assertTrue(score1 > score2)
-    }
-
-    @Test
-    fun testWhenThereIsMoreVisitCount_ThenScoreIsIncreased() {
-        val query = "website"
-        val score1 = testee.score(
-            "Website",
-            "https://www.website.com".toUri(),
-            100,
-            query,
-        )
-
-        val score2 = testee.score(
-            "Website 2",
-            "https://www.website2.com".toUri(),
-            101,
-            query,
-        )
-
-        assertTrue(score1 < score2)
     }
 
     private fun favorite(
