@@ -49,6 +49,7 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.A
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
+import com.duckduckgo.app.autocomplete.api.AutoCompleteScorer
 import com.duckduckgo.app.autocomplete.api.AutoCompleteService
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
@@ -306,6 +307,9 @@ class BrowserTabViewModelTest {
     private lateinit var mockAutoCompleteService: AutoCompleteService
 
     @Mock
+    private lateinit var mockAutoCompleteScorer: AutoCompleteScorer
+
+    @Mock
     private lateinit var mockWidgetCapabilities: WidgetCapabilities
 
     @Mock
@@ -474,7 +478,7 @@ class BrowserTabViewModelTest {
         fireproofWebsiteDao = db.fireproofWebsiteDao()
         locationPermissionsDao = db.locationPermissionsDao()
 
-        mockAutoCompleteApi = AutoCompleteApi(mockAutoCompleteService, mockSavedSitesRepository, mockNavigationHistory)
+        mockAutoCompleteApi = AutoCompleteApi(mockAutoCompleteService, mockSavedSitesRepository, mockNavigationHistory, mockAutoCompleteScorer)
         val fireproofWebsiteRepositoryImpl = FireproofWebsiteRepositoryImpl(
             fireproofWebsiteDao,
             coroutineRule.testDispatcherProvider,
