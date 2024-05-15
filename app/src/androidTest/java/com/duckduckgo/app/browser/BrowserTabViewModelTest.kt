@@ -1549,6 +1549,21 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenIsCustomTabAndCannotGoBackThenReturnFalse() {
+        setupNavigation(isBrowsing = true, canGoBack = false)
+        assertFalse(testee.onUserPressedBack(isCustomTab = true))
+    }
+
+    @Test
+    fun whenIsCustomTabAndCannotGoBackThenNavigateBackAndReturnTrue() {
+        setupNavigation(isBrowsing = true, canGoBack = true)
+        assertTrue(testee.onUserPressedBack(isCustomTab = true))
+
+        val backCommand = captureCommands().lastValue as NavigationCommand.NavigateBack
+        assertNotNull(backCommand)
+    }
+
+    @Test
     fun whenHomeShowingByPressingBackOnInvalidatedBrowserThenForwardButtonInactive() {
         setupNavigation(isBrowsing = true)
         givenInvalidatedGlobalLayout()
