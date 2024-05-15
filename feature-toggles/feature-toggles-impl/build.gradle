@@ -43,7 +43,10 @@ dependencies {
     testImplementation project(':common-test')
     testImplementation project(':app-build-config-api')
     testImplementation project(':privacy-config-api')
+    testImplementation project(':data-store-api')
+    testImplementation project(':data-store-test')
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation "com.squareup.moshi:moshi-kotlin:_"
     testImplementation Testing.robolectric
     testImplementation AndroidX.test.ext.junit
     testImplementation Square.retrofit2.converter.moshi
