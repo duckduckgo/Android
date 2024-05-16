@@ -223,5 +223,7 @@ enum class DeviceShieldPixelNames(override val pixelName: String, val enqueue: B
     VPN_SNOOZE_ENDED_DAILY("m_vpn_ev_snooze_ended_d", enqueue = true),
 
     VPN_MOTO_G_FIX_DAILY("m_vpn_ev_moto_g_fix_d", enqueue = true),
+    VPN_START_ATTEMPT("m_vpn_ev_start_attempt_c", enqueue = true),
+    VPN_START_ATTEMPT_FAILURE("m_vpn_ev_start_attempt_failure_c", enqueue = true),
     ;
 }

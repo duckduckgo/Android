@@ -359,6 +359,8 @@ interface DeviceShieldPixels {
     fun reportVpnSnoozedEnded()
 
     fun reportMotoGFix()
+
+    fun reportVpnStartAttempt()
 }
 
 @ContributesBinding(AppScope::class)
@@ -514,6 +516,7 @@ class RealDeviceShieldPixels @Inject constructor(
     override fun startError() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_START_ERROR_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_START_ERROR)
+        firePixel(DeviceShieldPixelNames.VPN_START_ATTEMPT_FAILURE)
     }
 
     override fun automaticRestart() {
@@ -765,6 +768,10 @@ class RealDeviceShieldPixels @Inject constructor(
 
     override fun reportMotoGFix() {
         tryToFireDailyPixel(DeviceShieldPixelNames.VPN_MOTO_G_FIX_DAILY)
+    }
+
+    override fun reportVpnStartAttempt() {
+        firePixel(DeviceShieldPixelNames.VPN_START_ATTEMPT)
     }
 
     private fun suddenKill() {

@@ -252,6 +252,7 @@ class RealDeviceShieldPixelsTest {
 
         verify(pixel).fire(DeviceShieldPixelNames.ATP_START_ERROR_DAILY.pixelName)
         verify(pixel, times(2)).fire(DeviceShieldPixelNames.ATP_START_ERROR.pixelName)
+        verify(pixel, times(2)).enqueueFire(DeviceShieldPixelNames.VPN_START_ATTEMPT_FAILURE.pixelName)
         verifyNoMoreInteractions(pixel)
     }
 

@@ -295,6 +295,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             vpnNetworkStack.onCreateVpnWithErrorReporting()
             logcat { "VPN log: NEW network ${vpnNetworkStack.name}" }
         }
+        deviceShieldPixels.reportVpnStartAttempt()
         dnsChangeCallback.unregister()
 
         vpnServiceStateStatsDao.insert(createVpnState(state = ENABLING))
