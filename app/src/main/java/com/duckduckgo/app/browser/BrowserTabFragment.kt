@@ -2894,9 +2894,9 @@ class BrowserTabFragment :
         viewModel.onConfigurationChanged()
     }
 
-    fun onBackPressed(): Boolean {
+    fun onBackPressed(isCustomTab: Boolean = false): Boolean {
         if (!isAdded) return false
-        return viewModel.onUserPressedBack()
+        return viewModel.onUserPressedBack(isCustomTab)
     }
 
     private fun resetWebView() {

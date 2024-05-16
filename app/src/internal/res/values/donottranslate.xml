@@ -37,7 +37,9 @@
     <string name="devSettingsScreenUserAgentSection">User Agent</string>
     <string name="devSettingsScreenUserAgentOverride">Override UserAgent</string>
     <string name="devSettingsScreenPrivacyRemoteConfigUrlOverride">Override Privacy Remote Config URL</string>
+    <string name="devSettingsScreenCustomTabs">Custom Tabs</string>
     <string name="devSettingsScreenPrivacyRemoteConfigUrlOverrideSubtitle">Click here to customize the Privacy Remote Config URL</string>
+    <string name="devSettingsScreenCustomTabsSubtitle">Load a Custom Tab for a specified URL</string>
     <string name="devSettingsScreenUserAgentSelectorTitle">UserAgent</string>
     <string name="devSettingsScreenUserAgentFirefox">Firefox</string>
     <string name="devSettingsScreenUserAgentDefault">Default</string>
@@ -76,4 +78,11 @@
     <string name="surrogatesSubtitle">Main frame and iFrame should be green.</string>
     <string name="surrogatesDisabledTitle">Surrogates Disabled</string>
     <string name="surrogatesDisabledSubtitle">Main frame and iFrame should be red.</string>
+
+    <!-- Custom tabs -->
+    <string name="customTabsTitle">Custom Tabs</string>
+    <string name="customTabsLoad">Load Custom Tab</string>
+    <string name="customTabsUrlHint">Add your URL here</string>
+    <string name="customTabsInvalidUrl">Invalid URL</string>
+
 </resources>

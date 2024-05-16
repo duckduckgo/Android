@@ -965,7 +965,7 @@ class BrowserTabViewModel @Inject constructor(
      *
      * @return true if navigation handled, otherwise false
      */
-    fun onUserPressedBack(): Boolean {
+    fun onUserPressedBack(isCustomTab: Boolean = false): Boolean {
         navigationAwareLoginDetector.onEvent(NavigationEvent.UserAction.NavigateBack)
         val navigation = webNavigationState ?: return false
         val hasSourceTab = tabRepository.liveSelectedTab.value?.sourceTabId != null
@@ -987,19 +987,21 @@ class BrowserTabViewModel @Inject constructor(
         if (navigation.canGoBack) {
             command.value = NavigationCommand.NavigateBack(navigation.stepsToPreviousPage)
             return true
-        } else if (hasSourceTab) {
+        } else if (hasSourceTab && !isCustomTab) {
             viewModelScope.launch {
                 removeCurrentTabFromRepository()
             }
             return true
-        } else if (!skipHome) {
+        } else if (!skipHome && !isCustomTab) {
             navigateHome()
             command.value = ShowKeyboard
             return true
         }
 
-        Timber.d("User pressed back and tab is set to skip home; need to generate WebView preview now")
-        command.value = GenerateWebViewPreviewImage
+        if (!isCustomTab) {
+            Timber.d("User pressed back and tab is set to skip home; need to generate WebView preview now")
+            command.value = GenerateWebViewPreviewImage
+        }
         return false
     }
 

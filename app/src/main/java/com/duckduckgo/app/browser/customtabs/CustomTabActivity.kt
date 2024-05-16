@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Message
+import androidx.activity.OnBackPressedCallback
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -59,6 +60,8 @@ class CustomTabActivity : DuckDuckGoActivity() {
         }.launchIn(lifecycleScope)
 
         viewModel.onCustomTabCreated(url, toolbarColor)
+
+        configureOnBackPressedListener()
     }
 
     fun openMessageInNewFragmentInCustomTab(
@@ -71,6 +74,7 @@ class CustomTabActivity : DuckDuckGoActivity() {
         val transaction = supportFragmentManager.beginTransaction()
         transaction.hide(currentFragment)
         transaction.add(R.id.fragmentTabContainer, newFragment, tabId)
+        transaction.addToBackStack(tabId)
         transaction.commit()
         newFragment.messageFromPreviousTab = message
     }
@@ -105,5 +109,25 @@ class CustomTabActivity : DuckDuckGoActivity() {
                 putExtra(Intent.EXTRA_TEXT, text)
             }
         }
+    }
+
+    private fun configureOnBackPressedListener() {
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    val currentFragment = supportFragmentManager.findFragmentById(R.id.fragmentTabContainer) as? BrowserTabFragment
+                    if (currentFragment != null && currentFragment.onBackPressed(isCustomTab = true)) {
+                        return
+                    }
+                    if (supportFragmentManager.backStackEntryCount > 0) {
+                        supportFragmentManager.popBackStack()
+                    } else {
+                        isEnabled = false
+                        finish()
+                    }
+                }
+            },
+        )
     }
 }
