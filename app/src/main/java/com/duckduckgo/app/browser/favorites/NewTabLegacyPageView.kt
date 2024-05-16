@@ -79,6 +79,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
@@ -141,8 +142,17 @@ class NewTabLegacyPageView @JvmOverloads constructor(
         configureViews()
     }
 
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+
+        ViewTreeLifecycleOwner.get(this)?.lifecycle?.removeObserver(viewModel)
+        coroutineScope?.cancel()
+        coroutineScope = null
+    }
+
     private fun configureViews() {
         configureHomeTabQuickAccessGrid()
+        setOnClickListener(null)
     }
 
     private fun configureHomeTabQuickAccessGrid() {
