@@ -6,7 +6,8 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     tools:visibility="visible"
-    android:visibility="gone">
+    android:visibility="gone"
+    style="@style/Widget.DuckDuckGo.Card">
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/deviceShieldCtaHeader"
