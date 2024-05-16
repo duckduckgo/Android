@@ -24,12 +24,18 @@ import com.duckduckgo.mobile.android.vpn.exclusion.SystemAppOverridesProvider
 import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
 import com.duckduckgo.mobile.android.vpn.ui.OpenVpnBreakageCategoryWithBrokenApp
 import com.duckduckgo.networkprotection.impl.R.string
+import com.duckduckgo.networkprotection.impl.exclusion.systemapps.SystemAppsExclusionRepository
+import com.duckduckgo.networkprotection.impl.exclusion.systemapps.SystemAppsExclusionRepository.SystemAppCategory
 import com.duckduckgo.networkprotection.impl.exclusion.ui.AppsProtectionType.AppType
+import com.duckduckgo.networkprotection.impl.exclusion.ui.AppsProtectionType.DividerType
 import com.duckduckgo.networkprotection.impl.exclusion.ui.AppsProtectionType.FilterType
 import com.duckduckgo.networkprotection.impl.exclusion.ui.AppsProtectionType.HeaderType
+import com.duckduckgo.networkprotection.impl.exclusion.ui.AppsProtectionType.SystemAppCategoryType
+import com.duckduckgo.networkprotection.impl.exclusion.ui.AppsProtectionType.SystemAppHeaderType
 import com.duckduckgo.networkprotection.impl.exclusion.ui.Command.RestartVpn
 import com.duckduckgo.networkprotection.impl.exclusion.ui.Command.ShowDisableProtectionDialog
 import com.duckduckgo.networkprotection.impl.exclusion.ui.Command.ShowIssueReportingPage
+import com.duckduckgo.networkprotection.impl.exclusion.ui.Command.ShowSystemAppsExclusionWarning
 import com.duckduckgo.networkprotection.impl.exclusion.ui.HeaderContent.DEFAULT
 import com.duckduckgo.networkprotection.impl.exclusion.ui.NetpAppExclusionListActivity.Companion.AppsFilter
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
@@ -45,6 +51,7 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -64,6 +71,10 @@ class NetpAppExclusionListViewModelTest {
 
     @Mock
     private lateinit var networkProtectionPixels: NetworkProtectionPixels
+
+    @Mock
+    private lateinit var systemAppsExclusionRepository: SystemAppsExclusionRepository
+
     private val testbreakageCategories = listOf(AppBreakageCategory("test", "test description"))
     private val exclusionListFlow = MutableStateFlow(MANUAL_EXCLUSION_LIST)
     private lateinit var testee: NetpAppExclusionListViewModel
@@ -81,6 +92,7 @@ class NetpAppExclusionListViewModelTest {
             testbreakageCategories,
             systemAppOverridesProvider,
             networkProtectionPixels,
+            systemAppsExclusionRepository,
         )
 
         testee.initialize()
@@ -99,6 +111,7 @@ class NetpAppExclusionListViewModelTest {
 
     @Test
     fun whenFilterIsAllAndGetAppsThenReturnCorrectViewState() = runTest {
+        whenever(systemAppsExclusionRepository.getAvailableCategories()).thenReturn(emptySet())
         testee.getApps().test {
             assertEquals(
                 ViewState(
@@ -122,6 +135,7 @@ class NetpAppExclusionListViewModelTest {
 
     @Test
     fun whenFilterIsProtectedOnlyAndGetAppsThenReturnCorrectViewState() = runTest {
+        whenever(systemAppsExclusionRepository.getAvailableCategories()).thenReturn(emptySet())
         testee.applyAppsFilter(AppsFilter.PROTECTED_ONLY)
 
         testee.getApps().test {
@@ -143,6 +157,7 @@ class NetpAppExclusionListViewModelTest {
 
     @Test
     fun whenFilterIsUnprotectedOnlyAndGetAppsThenReturnCorrectViewState() = runTest {
+        whenever(systemAppsExclusionRepository.getAvailableCategories()).thenReturn(emptySet())
         testee.applyAppsFilter(AppsFilter.UNPROTECTED_ONLY)
 
         testee.getApps().test {
@@ -163,6 +178,7 @@ class NetpAppExclusionListViewModelTest {
 
     @Test
     fun whenGetAppsAndSystemAppIsInOverrideThenReturnCorrectViewState() = runTest {
+        whenever(systemAppsExclusionRepository.getAvailableCategories()).thenReturn(emptySet())
         whenever(systemAppOverridesProvider.getSystemAppOverridesList()).thenReturn(listOf("com.example.system"))
 
         testee.getApps().test {
@@ -170,6 +186,45 @@ class NetpAppExclusionListViewModelTest {
                 ViewState(
                     listOf(
                         HeaderType(headerContent = DEFAULT),
+                        FilterType(string.netpExclusionListFilterMenuAllLabel, 6),
+                        AppType(NetpExclusionListApp("com.example.app1", "App Name", true)),
+                        AppType(NetpExclusionListApp("com.example.app2", "App Name", false)),
+                        AppType(NetpExclusionListApp("com.example.app3", "App Name", false)),
+                        AppType(NetpExclusionListApp("com.example.game", "App Name", true)),
+                        AppType(NetpExclusionListApp("com.example.system", "App Name", true)),
+                        AppType(NetpExclusionListApp("com.duckduckgo.mobile", "App Name", true)),
+                    ),
+                ),
+                awaitItem(),
+            )
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSystemAppCategoriesAvailableThenReturnCorrectViewState() = runTest {
+        whenever(systemAppOverridesProvider.getSystemAppOverridesList()).thenReturn(listOf("com.example.system"))
+        whenever(systemAppsExclusionRepository.getAvailableCategories()).thenReturn(
+            setOf(
+                SystemAppCategory.Communication,
+            ),
+        )
+        whenever(systemAppsExclusionRepository.isCategoryExcluded(SystemAppCategory.Communication)).thenReturn(false)
+
+        testee.getApps().test {
+            assertEquals(
+                ViewState(
+                    listOf(
+                        HeaderType(headerContent = DEFAULT),
+                        SystemAppHeaderType,
+                        SystemAppCategoryType(
+                            NetpExclusionListSystemAppCategory(
+                                category = SystemAppCategory.Communication,
+                                text = SystemAppCategory.Communication.name,
+                                isEnabled = true,
+                            ),
+                        ),
+                        DividerType,
                         FilterType(string.netpExclusionListFilterMenuAllLabel, 6),
                         AppType(NetpExclusionListApp("com.example.app1", "App Name", true)),
                         AppType(NetpExclusionListApp("com.example.app2", "App Name", false)),
@@ -267,6 +322,7 @@ class NetpAppExclusionListViewModelTest {
 
         verify(netPExclusionListRepository).restoreDefaultProtectedList()
         verify(networkProtectionPixels).reportExclusionListRestoreDefaults()
+        verify(systemAppsExclusionRepository).restoreDefaults()
         testee.commands().test {
             assertEquals(RestartVpn, awaitItem())
             cancelAndConsumeRemainingEvents()
@@ -319,6 +375,71 @@ class NetpAppExclusionListViewModelTest {
         testee.commands().test {
             expectNoEvents()
         }
+    }
+
+    @Test
+    fun whenWarningNotYetShownOnSystemAppCategoryStateChangedThenShowWarning() = runTest {
+        whenever(systemAppsExclusionRepository.hasShownWarning()).thenReturn(false)
+
+        val category = NetpExclusionListSystemAppCategory(
+            category = SystemAppCategory.Communication,
+            text = SystemAppCategory.Communication.name,
+            isEnabled = true,
+        )
+        testee.onSystemAppCategoryStateChanged(
+            category,
+            false,
+        )
+
+        testee.commands().test {
+            assertEquals(ShowSystemAppsExclusionWarning(category), awaitItem())
+            cancelAndConsumeRemainingEvents()
+        }
+        verify(systemAppsExclusionRepository).markWarningShown()
+        verify(systemAppsExclusionRepository, never()).includeCategory(any())
+        verify(systemAppsExclusionRepository, never()).excludeCategory(any())
+    }
+
+    @Test
+    fun whenWarningShownAndCategorySetToDisabledOnSystemAppCategoryStateChangedThenExcludeCategory() = runTest {
+        whenever(systemAppsExclusionRepository.hasShownWarning()).thenReturn(true)
+
+        val category = NetpExclusionListSystemAppCategory(
+            category = SystemAppCategory.Communication,
+            text = SystemAppCategory.Communication.name,
+            isEnabled = true,
+        )
+        testee.onSystemAppCategoryStateChanged(
+            category,
+            false,
+        )
+
+        testee.commands().test {
+            expectNoEvents()
+        }
+        verify(systemAppsExclusionRepository, never()).includeCategory(any())
+        verify(systemAppsExclusionRepository).excludeCategory(any())
+    }
+
+    @Test
+    fun whenWarningShownAndCategorySetToEnabledOnSystemAppCategoryStateChangedThenIncludeCategory() = runTest {
+        whenever(systemAppsExclusionRepository.hasShownWarning()).thenReturn(true)
+
+        val category = NetpExclusionListSystemAppCategory(
+            category = SystemAppCategory.Communication,
+            text = SystemAppCategory.Communication.name,
+            isEnabled = false,
+        )
+        testee.onSystemAppCategoryStateChanged(
+            category,
+            true,
+        )
+
+        testee.commands().test {
+            expectNoEvents()
+        }
+        verify(systemAppsExclusionRepository).includeCategory(any())
+        verify(systemAppsExclusionRepository, never()).excludeCategory(any())
     }
 
     companion object {

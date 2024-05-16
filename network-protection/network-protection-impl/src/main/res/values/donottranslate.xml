@@ -145,6 +145,12 @@
     <string name="netpExclusionListRestoreDefaultSnackbar">Protection restored to default settings</string>
     <string name="netpExclusionListRestoreDefaultsDisclaimer">Enabling protection sends the app\'s name to DuckDuckGo.</string>
 
+    <!-- System apps exclusion list -->
+    <string name="netpExclusionListSystemAppsHeader">Android System Apps</string>
+    <string name="netpExclusionListWarningTitle">About System App Exclusions</string>
+    <string name="netpExclusionListWarningMessage">Internet traffic, including background connections, used by this group of apps won\'t be protected by the VPN. Consider re-enabling when this doesn\'t fix the issue to prevent unexpected data leaks.</string>
+    <string name="netpExclusionListWarningActionPositive">OK</string>
+
     <!-- About -->
     <string name="netpManagementAboutHeader">About</string>
     <string name="netpManagementAboutItemFaqs">Frequently Asked Questions</string>

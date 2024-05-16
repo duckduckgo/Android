@@ -31,9 +31,14 @@ import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
 import com.duckduckgo.mobile.android.vpn.ui.OpenVpnBreakageCategoryWithBrokenApp
 import com.duckduckgo.networkprotection.impl.R.string
 import com.duckduckgo.networkprotection.impl.di.NetpBreakageCategories
+import com.duckduckgo.networkprotection.impl.exclusion.isSystemApp
+import com.duckduckgo.networkprotection.impl.exclusion.systemapps.SystemAppsExclusionRepository
 import com.duckduckgo.networkprotection.impl.exclusion.ui.AppsProtectionType.AppType
+import com.duckduckgo.networkprotection.impl.exclusion.ui.AppsProtectionType.DividerType
 import com.duckduckgo.networkprotection.impl.exclusion.ui.AppsProtectionType.FilterType
 import com.duckduckgo.networkprotection.impl.exclusion.ui.AppsProtectionType.HeaderType
+import com.duckduckgo.networkprotection.impl.exclusion.ui.AppsProtectionType.SystemAppCategoryType
+import com.duckduckgo.networkprotection.impl.exclusion.ui.AppsProtectionType.SystemAppHeaderType
 import com.duckduckgo.networkprotection.impl.exclusion.ui.HeaderContent.DEFAULT
 import com.duckduckgo.networkprotection.impl.exclusion.ui.NetpAppExclusionListActivity.Companion.AppsFilter
 import com.duckduckgo.networkprotection.impl.exclusion.ui.NetpAppExclusionListActivity.Companion.AppsFilter.ALL
@@ -64,12 +69,14 @@ class NetpAppExclusionListViewModel @Inject constructor(
     @NetpBreakageCategories private val breakageCategories: List<AppBreakageCategory>,
     private val systemAppOverridesProvider: SystemAppOverridesProvider,
     private val networkProtectionPixels: NetworkProtectionPixels,
+    private val systemAppsExclusionRepository: SystemAppsExclusionRepository,
 ) : ViewModel(), DefaultLifecycleObserver {
     private val command = Channel<Command>(1, DROP_OLDEST)
     private val filterState = MutableStateFlow(ALL)
     private val refreshSnapshot = MutableStateFlow(System.currentTimeMillis())
     private val currentExclusionList = mutableListOf<NetPManuallyExcludedApp>()
     private val exclusionListSnapshot = mutableListOf<NetPManuallyExcludedApp>()
+    private var forceRestart: Boolean = false
 
     private var latestSnapshot = 0L
     private var installedApps: Sequence<ApplicationInfo> = emptySequence()
@@ -78,25 +85,61 @@ class NetpAppExclusionListViewModel @Inject constructor(
 
     internal fun getApps(): Flow<ViewState> {
         return getAppsForExclusionList().combine(filterState.asStateFlow()) { list, filter ->
+            val systemAppsCategories = systemAppsExclusionRepository.getAvailableCategories().map {
+                SystemAppCategoryType(
+                    NetpExclusionListSystemAppCategory(
+                        category = it,
+                        text = it.name,
+                        isEnabled = !systemAppsExclusionRepository.isCategoryExcluded(it),
+                    ),
+                )
+            }
 
             val panelType = HeaderType(headerContent = DEFAULT)
             val appList = when (filter) {
                 AppsFilter.PROTECTED_ONLY -> {
                     val protectedApps = list.filter { it.isProtected }.map { AppType(it) }
                     val filterType = FilterType(string.netpExclusionListFilterMenuProtectedLabel, protectedApps.size)
-                    mutableListOf(panelType, filterType).plus(protectedApps)
+                    buildList {
+                        add(panelType)
+                        if (systemAppsCategories.isNotEmpty()) {
+                            add(SystemAppHeaderType)
+                            addAll(systemAppsCategories)
+                            add(DividerType)
+                        }
+                        add(filterType)
+                        addAll(protectedApps)
+                    }
                 }
 
                 AppsFilter.UNPROTECTED_ONLY -> {
                     val unprotectedApps = list.filter { !it.isProtected }.map { AppType(it) }
                     val filterType = FilterType(string.netpExclusionListFilterMenuUnprotectedLabel, unprotectedApps.size)
-                    mutableListOf(panelType, filterType).plus(unprotectedApps)
+                    buildList {
+                        add(panelType)
+                        if (systemAppsCategories.isNotEmpty()) {
+                            add(SystemAppHeaderType)
+                            addAll(systemAppsCategories)
+                            add(DividerType)
+                        }
+                        add(filterType)
+                        addAll(unprotectedApps)
+                    }
                 }
 
                 else -> {
                     val allApps = list.map { AppType(it) }
                     val filterType = FilterType(string.netpExclusionListFilterMenuAllLabel, allApps.size)
-                    listOf(panelType, filterType).plus(allApps)
+                    buildList {
+                        add(panelType)
+                        if (systemAppsCategories.isNotEmpty()) {
+                            add(SystemAppHeaderType)
+                            addAll(systemAppsCategories)
+                            add(DividerType)
+                        }
+                        add(filterType)
+                        addAll(allApps)
+                    }
                 }
             }
 
@@ -127,10 +170,6 @@ class NetpAppExclusionListViewModel @Inject constructor(
             .filterNot { !systemAppOverridesProvider.getSystemAppOverridesList().contains(it.packageName) && it.isSystemApp() }
     }
 
-    private fun ApplicationInfo.isSystemApp(): Boolean {
-        return (flags and ApplicationInfo.FLAG_SYSTEM) != 0
-    }
-
     private fun isProtected(
         appInfo: ApplicationInfo,
         userExclusionList: List<NetPManuallyExcludedApp>,
@@ -158,7 +197,7 @@ class NetpAppExclusionListViewModel @Inject constructor(
 
     private fun onLeavingScreen() {
         viewModelScope.launch {
-            if (userMadeChanges()) {
+            if (userMadeChanges() || forceRestart) {
                 command.send(Command.RestartVpn)
             }
         }
@@ -283,8 +322,31 @@ class NetpAppExclusionListViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             networkProtectionPixels.reportExclusionListRestoreDefaults()
             netPExclusionListRepository.restoreDefaultProtectedList()
+            systemAppsExclusionRepository.restoreDefaults()
+            forceRestart = true
             refreshSnapshot.refresh()
             command.send(Command.RestartVpn)
+        }
+    }
+
+    fun onSystemAppCategoryStateChanged(
+        category: NetpExclusionListSystemAppCategory,
+        enabled: Boolean,
+    ) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            if (systemAppsExclusionRepository.hasShownWarning()) {
+                forceRestart = true
+                if (enabled) {
+                    systemAppsExclusionRepository.includeCategory(category.category)
+                    networkProtectionPixels.reportExcludeSystemAppsDisabledForCategory(category.category.name)
+                } else {
+                    systemAppsExclusionRepository.excludeCategory(category.category)
+                    networkProtectionPixels.reportExcludeSystemAppsEnabledForCategory(category.category.name)
+                }
+            } else {
+                systemAppsExclusionRepository.markWarningShown()
+                command.send(Command.ShowSystemAppsExclusionWarning(category))
+            }
         }
     }
 }
@@ -302,6 +364,7 @@ internal sealed class Command {
     object RestartVpn : Command()
     data class ShowIssueReportingPage(val params: OpenVpnBreakageCategoryWithBrokenApp) : Command()
     data class ShowDisableProtectionDialog(val forApp: NetpExclusionListApp) : Command()
+    data class ShowSystemAppsExclusionWarning(val category: NetpExclusionListSystemAppCategory) : Command()
 }
 
 sealed class AppsProtectionType {
@@ -312,6 +375,10 @@ sealed class AppsProtectionType {
     ) : AppsProtectionType()
 
     data class AppType(val appInfo: NetpExclusionListApp) : AppsProtectionType()
+    data object SystemAppHeaderType : AppsProtectionType()
+    data class SystemAppCategoryType(val category: NetpExclusionListSystemAppCategory) : AppsProtectionType()
+
+    data object DividerType : AppsProtectionType()
 }
 
 enum class HeaderContent {
