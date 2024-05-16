@@ -3,10 +3,6 @@ appId: com.duckduckgo.mobile.android
 - assertVisible:
     text: ".*Not to worry! Searching and browsing privately.*"
 - tapOn: "let's do it!"
-- runFlow:
-    when:
-      visible: "set as default"
-    commands:
-      - tapOn: "cancel"
-      - assertVisible:
-          text: ".*I'll also upgrade the security of your connection if possible.*"
+- tapOn: "cancel"
+- assertVisible:
+    text: ".*I'll also upgrade the security of your connection if possible.*"

@@ -1,5 +1,5 @@
 appId: com.duckduckgo.mobile.android
-name: "ReleaseTest: Custom Tabs navigation in new tab"
+name: "Custom Tabs navigation in new tab"
 tags:
   - customTabsTest
 ---
@@ -10,10 +10,14 @@ tags:
 - assertVisible:
     text: ".*Not to worry! Searching and browsing privately.*"
 - tapOn: "let's do it!"
-- tapOn: "duckduckgo"
-- tapOn: "set as default"
-- assertVisible:
-    text: ".*I'll also upgrade the security of your connection if possible.*"
+- runFlow:
+    when:
+      visible: "set as default"
+    commands:
+      - tapOn: "duckduckgo"
+      - tapOn: "set as default"
+      - assertVisible:
+          text: ".*I'll also upgrade the security of your connection if possible.*"
 
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
@@ -64,19 +68,3 @@ tags:
     id: "com.duckduckgo.mobile.android:id/forwardMenuItem"
 - assertVisible:
     text: "Checkout"
-- action: back
-- action: back
-- action: back
-- action: back
-- action: back
-- action: back
-- scrollUntilVisible:
-    element:
-      text: "default browser"
-    direction: UP
-- tapOn:
-    text: "default browser"
-- tapOn:
-    text: "browser app"
-- tapOn:
-    text: "chrome"
