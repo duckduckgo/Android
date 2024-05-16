@@ -212,19 +212,20 @@ class NewTabLegacyPageView @JvmOverloads constructor(
     }
 
     private fun render(viewState: ViewState) {
-        if (viewState.message != null) {
+        if (viewState.message == null && viewState.favourites.isEmpty()) {
+            homeBackgroundLogo.showLogo()
+        } else {
             homeBackgroundLogo.hideLogo()
+        }
+        if (viewState.message != null) {
             showRemoteMessage(viewState.message, viewState.newMessage)
         } else {
             binding.messageCta.gone()
         }
         if (viewState.favourites.isEmpty()) {
             binding.quickAccessRecyclerView.gone()
-            homeBackgroundLogo.showLogo()
-            binding.ddgLogo.show()
         } else {
             binding.quickAccessRecyclerView.show()
-            homeBackgroundLogo.hideLogo()
             quickAccessAdapter.submitList(viewState.favourites.map { QuickAccessFavorite(it) })
         }
     }
