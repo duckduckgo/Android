@@ -60,6 +60,7 @@ class DevSettingsViewModel @Inject constructor(
         object OpenUASelector : Command()
         object ShowSavedSitesClearedConfirmation : Command()
         object ChangePrivacyConfigUrl : Command()
+        object CustomTabs : Command()
     }
 
     private val viewState = MutableStateFlow(ViewState())
@@ -128,6 +129,10 @@ class DevSettingsViewModel @Inject constructor(
 
     fun onRemotePrivacyUrlClicked() {
         viewModelScope.launch { command.send(Command.ChangePrivacyConfigUrl) }
+    }
+
+    fun customTabsClicked() {
+        viewModelScope.launch { command.send(Command.CustomTabs) }
     }
 
     fun onUserAgentSelected(userAgent: UAOverride) {

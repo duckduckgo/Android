@@ -11,6 +11,10 @@
             android:name="com.duckduckgo.app.audit.AuditSettingsActivity"
             android:label="@string/auditSettingsTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+        <activity
+            android:name="com.duckduckgo.app.dev.settings.customtabs.CustomTabsInternalSettingsActivity"
+            android:label="@string/customTabsTitle"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
     </application>
 
 </manifest>
