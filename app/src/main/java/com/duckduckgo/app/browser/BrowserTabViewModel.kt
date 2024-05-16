@@ -230,7 +230,6 @@ class BrowserTabViewModel @Inject constructor(
     private val specialUrlDetector: SpecialUrlDetector,
     private val faviconManager: FaviconManager,
     private val addToHomeCapabilityDetector: AddToHomeCapabilityDetector,
-    private val remoteMessagingModel: Lazy<RemoteMessagingModel>,
     private val ctaViewModel: CtaViewModel,
     private val searchCountDao: SearchCountDao,
     private val pixel: Pixel,
@@ -455,7 +454,6 @@ class BrowserTabViewModel @Inject constructor(
             .onEach { filteredFavourites ->
                 withContext(dispatchers.main()) {
                     val favorites = filteredFavourites.map { FavoritesQuickAccessAdapter.QuickAccessFavorite(it) }
-                    ctaViewState.value = currentCtaViewState().copy(favorites = favorites)
                     autoCompleteViewState.value = currentAutoCompleteViewState().copy(favorites = favorites)
                     val favorite = filteredFavourites.firstOrNull { it.url == url }
                     browserViewState.value = currentBrowserViewState().copy(favorite = favorite)
@@ -477,22 +475,20 @@ class BrowserTabViewModel @Inject constructor(
             .launchIn(viewModelScope)
 
         viewModelScope.launch(dispatchers.io()) {
-            remoteMessagingModel.get().activeMessages
-                .combine(ctaChangedTicker.asStateFlow(), ::Pair)
-                .onEach { (activeMessage, ticker) ->
-                    Timber.v("RMF: $ticker-$activeMessage")
+            ctaChangedTicker.asStateFlow()
+                .onEach { ticker ->
+                    Timber.v("RMF: $ticker")
 
                     if (ticker.isEmpty()) return@onEach
                     if (currentBrowserViewState().browserShowing) return@onEach
 
                     val cta = currentCtaViewState().cta?.takeUnless { it ->
-                        activeMessage != null && it is HomePanelCta
+                        it is HomePanelCta
                     }
 
                     withContext(dispatchers.main()) {
                         ctaViewState.value = currentCtaViewState().copy(
                             cta = cta,
-                            message = if (cta == null) activeMessage else null,
                         )
                     }
                 }
@@ -2477,43 +2473,6 @@ class BrowserTabViewModel @Inject constructor(
     fun onUserClickCtaSecondaryButton(cta: Cta) {
         viewModelScope.launch {
             ctaViewModel.onUserDismissedCta(cta)
-        }
-    }
-
-    fun onMessageShown(message: RemoteMessage) {
-        viewModelScope.launch {
-            remoteMessagingModel.get().onMessageShown(message)
-        }
-    }
-
-    fun onMessageCloseButtonClicked(message: RemoteMessage) {
-        viewModelScope.launch {
-            remoteMessagingModel.get().onMessageDismissed(message)
-            refreshCta()
-        }
-    }
-
-    fun onMessagePrimaryButtonClicked(message: RemoteMessage) {
-        viewModelScope.launch {
-            val action = remoteMessagingModel.get().onPrimaryActionClicked(message) ?: return@launch
-            command.value = commandActionMapper.asBrowserTabCommand(action) ?: return@launch
-            refreshCta()
-        }
-    }
-
-    fun onMessageSecondaryButtonClicked(message: RemoteMessage) {
-        viewModelScope.launch {
-            val action = remoteMessagingModel.get().onSecondaryActionClicked(message) ?: return@launch
-            command.value = commandActionMapper.asBrowserTabCommand(action) ?: return@launch
-            refreshCta()
-        }
-    }
-
-    fun onMessageActionButtonClicked(message: RemoteMessage) {
-        viewModelScope.launch {
-            val action = remoteMessagingModel.get().onActionClicked(message) ?: return@launch
-            command.value = commandActionMapper.asBrowserTabCommand(action) ?: return@launch
-            refreshCta()
         }
     }
 

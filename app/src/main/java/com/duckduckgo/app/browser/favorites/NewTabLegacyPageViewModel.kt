@@ -25,7 +25,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.BrowserTabViewModel.HiddenBookmarksIds
 import com.duckduckgo.app.browser.favorites.NewTabLegacyPageViewModel.Command.DeleteFavoriteConfirmation
 import com.duckduckgo.app.browser.favorites.NewTabLegacyPageViewModel.Command.ShowEditSavedSiteDialog
-import com.duckduckgo.app.browser.remotemessage.RemoteMessagingViewModel
+import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
 import com.duckduckgo.app.browser.remotemessage.asNewTabCommand
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.app.playstore.PlayStoreUtils
@@ -39,6 +39,7 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
 import dagger.Lazy
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
@@ -50,16 +51,16 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ViewScope::class)
 class NewTabLegacyPageViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
-    private val remoteMessagingModel: Lazy<RemoteMessagingViewModel>,
+    private val remoteMessagingModel: Lazy<RemoteMessagingModel>,
     private val playStoreUtils: PlayStoreUtils,
     private val savedSitesRepository: SavedSitesRepository,
     private val syncEngine: SyncEngine,
@@ -104,8 +105,6 @@ class NewTabLegacyPageViewModel @Inject constructor(
 
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
-
-        Timber.d("New Tab: NewTabLegacyPageViewModel onStart")
 
         viewModelScope.launch(dispatchers.io()) {
             savedSitesRepository.getFavorites()
