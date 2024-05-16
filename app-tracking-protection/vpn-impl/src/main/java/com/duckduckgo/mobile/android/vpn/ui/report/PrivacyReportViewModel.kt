@@ -17,11 +17,12 @@
 package com.duckduckgo.mobile.android.vpn.ui.report
 
 import androidx.annotation.VisibleForTesting
+import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.formatters.time.model.dateOfLastHour
-import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.feature.removal.VpnFeatureRemover
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
@@ -34,14 +35,14 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
-@ContributesViewModel(FragmentScope::class)
+@ContributesViewModel(ViewScope::class)
 class PrivacyReportViewModel @Inject constructor(
     private val repository: AppTrackerBlockingStatsRepository,
     private val vpnStore: VpnStore,
     private val vpnFeatureRemover: VpnFeatureRemover,
     vpnStateMonitor: VpnStateMonitor,
     private val dispatchers: DispatcherProvider,
-) : ViewModel() {
+) : ViewModel(), DefaultLifecycleObserver {
 
     val viewStateFlow = vpnStateMonitor.getStateFlow(AppTpVpnFeature.APPTP_VPN).combine(getReport()) { vpnState, trackersBlocked ->
         PrivacyReportView.ViewState(vpnState, trackersBlocked, shouldShowCTA())
