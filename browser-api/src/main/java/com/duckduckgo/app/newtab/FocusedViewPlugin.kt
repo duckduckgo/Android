@@ -20,17 +20,17 @@ import android.content.Context
 import android.view.View
 
 /**
- * This class is used to provide one of the two different version of NewTabPage
+ * This class is used to provide one of the two different version of FocusedView
  * Legacy -> What existed before https://app.asana.com/0/1174433894299346/1207064372575037
  * New -> Implementation of https://app.asana.com/0/1174433894299346/1207064372575037
  */
-interface NewTabPagePlugin {
+interface FocusedViewPlugin {
 
     /** Name of the focused view version */
     val name: String
 
     /**
-     * This method returns a [View] that will be used as the NewTabPage content
+     * This method returns a [View] that will be used as the Focused View content
      * @return [View]
      */
     fun getView(context: Context): View
