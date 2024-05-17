@@ -18,7 +18,6 @@ package com.duckduckgo.subscriptions.impl
 
 import android.app.Activity
 import android.content.Context
-import androidx.annotation.VisibleForTesting
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -115,7 +114,7 @@ interface SubscriptionsManager {
     suspend fun exchangeAuthToken(authToken: String): String
 
     /**
-     * Returns the auth token
+     * Returns the auth token and if expired, tries to refresh irt
      */
     suspend fun getAuthToken(): AuthToken
 
@@ -262,7 +261,7 @@ class RealSubscriptionsManager @Inject constructor(
 
     override suspend fun deleteAccount(): Boolean {
         return try {
-            val token = getValidatedAuthToken()
+            val token = getAuthToken()
             if (token is AuthToken.Success) {
                 val state = authService.delete("Bearer ${token.authToken}")
                 (state.status == "deleted")
@@ -510,23 +509,13 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     override suspend fun getAuthToken(): AuthToken {
-        return if (isUserAuthenticated()) {
-            logcat { "Subs auth token is ${authRepository.getAuthToken()}" }
-            AuthToken.Success(authRepository.getAuthToken()!!)
-        } else {
-            AuthToken.Failure("")
-        }
-    }
-
-    @VisibleForTesting
-    suspend fun getValidatedAuthToken(): AuthToken {
         try {
-            return when (val token = getAuthToken()) {
-                is AuthToken.Success -> {
-                    validateToken(token.authToken)
-                    AuthToken.Success(token.authToken)
-                }
-                is AuthToken.Failure -> token
+            return if (isUserAuthenticated()) {
+                logcat { "Subs auth token is ${authRepository.getAuthToken()}" }
+                validateToken(authRepository.getAuthToken()!!)
+                AuthToken.Success(authRepository.getAuthToken()!!)
+            } else {
+                AuthToken.Failure("")
             }
         } catch (e: Exception) {
             return when (extractError(e)) {
