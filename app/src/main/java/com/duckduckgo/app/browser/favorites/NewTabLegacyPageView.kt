@@ -45,6 +45,7 @@ import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.Companio
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.browser.favorites.NewTabLegacyPageViewModel.Command
 import com.duckduckgo.app.browser.favorites.NewTabLegacyPageViewModel.Command.DeleteFavoriteConfirmation
+import com.duckduckgo.app.browser.favorites.NewTabLegacyPageViewModel.Command.DeleteSavedSiteConfirmation
 import com.duckduckgo.app.browser.favorites.NewTabLegacyPageViewModel.Command.DismissMessage
 import com.duckduckgo.app.browser.favorites.NewTabLegacyPageViewModel.Command.LaunchAppTPOnboarding
 import com.duckduckgo.app.browser.favorites.NewTabLegacyPageViewModel.Command.LaunchDefaultBrowser
@@ -70,6 +71,7 @@ import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ViewViewModelFactory
+import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -185,7 +187,7 @@ class NewTabLegacyPageView @JvmOverloads constructor(
             },
             { viewModel.onEditSavedSiteRequested(it.favorite) },
             { viewModel.onDeleteFavoriteRequested(it.favorite) },
-            { viewModel.onDeleteFavoriteRequested(it.favorite) },
+            { viewModel.onDeleteSavedSiteRequested(it.favorite) },
         )
     }
 
@@ -250,6 +252,12 @@ class NewTabLegacyPageView @JvmOverloads constructor(
                 context.getString(R.string.favoriteDeleteConfirmationMessage).toSpannable(),
             ) {
                 viewModel.onDeleteFavoriteSnackbarDismissed(command.savedSite)
+            }
+            is DeleteSavedSiteConfirmation -> confirmDeleteSavedSite(
+                command.savedSite,
+                context.getString(R.string.bookmarkDeleteConfirmationMessage, command.savedSite.title).html(context),
+            ) {
+                viewModel.onDeleteSavedSiteSnackbarDismissed(it)
             }
         }
     }

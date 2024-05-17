@@ -26,6 +26,7 @@ import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.DeleteBookmar
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.EditSavedSiteListener
 import com.duckduckgo.app.browser.BrowserTabViewModel.HiddenBookmarksIds
 import com.duckduckgo.app.browser.favorites.FocusedLegacyViewModel.Command.DeleteFavoriteConfirmation
+import com.duckduckgo.app.browser.favorites.FocusedLegacyViewModel.Command.DeleteSavedSiteConfirmation
 import com.duckduckgo.app.browser.favorites.FocusedLegacyViewModel.Command.ShowEditSavedSiteDialog
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -65,6 +66,7 @@ class FocusedLegacyViewModel @Inject constructor(
     sealed class Command {
         class ShowEditSavedSiteDialog(val savedSiteChangedViewState: SavedSiteChangedViewState) : Command()
         class DeleteFavoriteConfirmation(val savedSite: SavedSite) : Command()
+        class DeleteSavedSiteConfirmation(val savedSite: SavedSite) : Command()
     }
 
     val hiddenIds = MutableStateFlow(HiddenBookmarksIds())
@@ -210,6 +212,6 @@ class FocusedLegacyViewModel @Inject constructor(
     }
 
     fun onDeleteSavedSiteRequested(savedSite: SavedSite) {
-        hide(savedSite, DeleteFavoriteConfirmation(savedSite))
+        hide(savedSite, DeleteSavedSiteConfirmation(savedSite))
     }
 }
