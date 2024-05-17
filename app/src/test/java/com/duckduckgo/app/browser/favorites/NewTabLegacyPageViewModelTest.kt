@@ -12,7 +12,10 @@ import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
+import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.sync.api.engine.SyncEngine
+import java.util.UUID
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.flowOf
@@ -81,6 +84,22 @@ class NewTabLegacyPageViewModelTest {
                 assertFalse(it.newMessage)
             }
         }
+    }
+
+    @Test
+    fun whenFavoriteEditedThenRepositoryUpdated() = runTest {
+        val favorite = Favorite(UUID.randomUUID().toString(), "A title", "www.example.com", lastModified = "timestamp", 1)
+        testee.onFavouriteEdited(favorite)
+        verify(mockSavedSitesRepository).updateFavourite(favorite)
+    }
+
+    @Test
+    fun whenBookmarkEditedThenRepositoryIsUpdated() = runTest {
+        val folderId = "folder1"
+        val bookmark =
+            Bookmark(id = UUID.randomUUID().toString(), title = "A title", url = "www.example.com", parentId = folderId, lastModified = "timestamp")
+        testee.onBookmarkEdited(bookmark, folderId, false)
+        verify(mockSavedSitesRepository).updateBookmark(bookmark, folderId)
     }
 
     @Test
