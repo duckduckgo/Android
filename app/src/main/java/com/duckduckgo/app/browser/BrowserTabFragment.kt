@@ -2357,8 +2357,11 @@ class BrowserTabFragment :
     }
 
     // See https://app.asana.com/0/1200204095367872/1207300292572452/f (WebMessageListener debugging)
-    private fun addNoOpWebMessageListener(webView: WebView) {
-        if (webMessageListenerFeature.self().isEnabled() && WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {
+    private fun addNoOpWebMessageListener(webView: DuckDuckGoWebView) {
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER) &&
+            webMessageListenerFeature.self().isEnabled() &&
+            !webView.isDestroyed
+        ) {
             Timber.d("Adding no-op WebMessageListener")
             WebViewCompat.addWebMessageListener(
                 webView,
