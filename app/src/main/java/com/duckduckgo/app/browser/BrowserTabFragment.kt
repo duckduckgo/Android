@@ -117,7 +117,7 @@ import com.duckduckgo.app.browser.favicon.setting.FaviconPromptSheet
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.Companion.QUICK_ACCESS_ITEM_MAX_SIZE_DP
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
-import com.duckduckgo.app.browser.favorites.NewTabLegacyPageView
+import com.duckduckgo.app.browser.favorites.NewTabPageProvider
 import com.duckduckgo.app.browser.favorites.QuickAccessDragTouchItemListener
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.app.browser.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher
@@ -488,6 +488,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var webViewBlobDownloadFeature: WebViewBlobDownloadFeature
+
+    @Inject
+    lateinit var newTabPageProvider: NewTabPageProvider
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -3300,8 +3303,6 @@ class BrowserTabFragment :
         private const val COOKIES_ANIMATION_DELAY = 400L
 
         private const val BOOKMARKS_BOTTOM_SHEET_DURATION = 3500L
-
-        private const val WEB_MESSAGE_LISTENER_WEBVIEW_VERSION = "126.0.6478.40"
 
         fun newInstance(
             tabId: String,
