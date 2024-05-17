@@ -22,6 +22,8 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.DeleteBookmarkListener
+import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.EditSavedSiteListener
 import com.duckduckgo.app.browser.BrowserTabViewModel.HiddenBookmarksIds
 import com.duckduckgo.app.browser.favorites.NewTabLegacyPageViewModel.Command.DeleteFavoriteConfirmation
 import com.duckduckgo.app.browser.favorites.NewTabLegacyPageViewModel.Command.ShowEditSavedSiteDialog
@@ -64,7 +66,7 @@ class NewTabLegacyPageViewModel @Inject constructor(
     private val playStoreUtils: PlayStoreUtils,
     private val savedSitesRepository: SavedSitesRepository,
     private val syncEngine: SyncEngine,
-) : ViewModel(), DefaultLifecycleObserver {
+) : ViewModel(), DefaultLifecycleObserver, EditSavedSiteListener, DeleteBookmarkListener {
 
     data class ViewState(
         val message: RemoteMessage? = null,
@@ -271,5 +273,29 @@ class NewTabLegacyPageViewModel @Inject constructor(
         return withContext(dispatchers.io()) {
             savedSitesRepository.getFolder(bookmark.parentId)
         }
+    }
+
+    override fun onFavouriteEdited(favorite: Favorite) {
+        viewModelScope.launch(dispatchers.io()) {
+            savedSitesRepository.updateFavourite(favorite)
+        }
+    }
+
+    override fun onBookmarkEdited(
+        bookmark: Bookmark,
+        oldFolderId: String,
+        updateFavorite: Boolean,
+    ) {
+        viewModelScope.launch(dispatchers.io()) {
+            savedSitesRepository.updateBookmark(bookmark, oldFolderId, updateFavorite)
+        }
+    }
+
+    override fun onSavedSiteDeleted(savedSite: SavedSite) {
+        onDeleteSavedSiteRequested(savedSite)
+    }
+
+    fun onDeleteSavedSiteRequested(savedSite: SavedSite) {
+        hide(savedSite, DeleteFavoriteConfirmation(savedSite))
     }
 }

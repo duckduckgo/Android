@@ -3280,7 +3280,7 @@ class BrowserTabFragment :
         private const val SKIP_HOME_ARG = "SKIP_HOME_ARG"
         private const val DDG_DOMAIN = "duckduckgo.com"
 
-        private const val ADD_SAVED_SITE_FRAGMENT_TAG = "ADD_SAVED_SITE"
+        const val ADD_SAVED_SITE_FRAGMENT_TAG = "ADD_SAVED_SITE"
         private const val KEYBOARD_DELAY = 200L
 
         private const val REQUEST_CODE_CHOOSE_FILE = 100
