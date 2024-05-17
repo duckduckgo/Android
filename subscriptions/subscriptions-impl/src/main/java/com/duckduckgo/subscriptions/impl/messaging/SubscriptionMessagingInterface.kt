@@ -159,10 +159,10 @@ class SubscriptionMessagingInterface @Inject constructor(
 
             val authToken: String? = runBlocking(dispatcherProvider.io()) {
                 val pat = subscriptionsManager.getAuthToken()
-                if (pat is AuthToken.Success) {
-                    return@runBlocking pat.authToken
-                } else {
-                    return@runBlocking null
+                when (pat) {
+                    is AuthToken.Success -> pat.authToken
+                    is AuthToken.Failure.TokenExpired -> pat.authToken
+                    else -> null
                 }
             }
 

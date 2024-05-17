@@ -515,7 +515,7 @@ class RealSubscriptionsManager @Inject constructor(
                 validateToken(authRepository.getAuthToken()!!)
                 AuthToken.Success(authRepository.getAuthToken()!!)
             } else {
-                AuthToken.Failure("")
+                AuthToken.Failure.UnknownError
             }
         } catch (e: Exception) {
             return when (extractError(e)) {
@@ -525,11 +525,11 @@ class RealSubscriptionsManager @Inject constructor(
                     if (result is RecoverSubscriptionResult.Success) {
                         AuthToken.Success(authRepository.getAuthToken()!!)
                     } else {
-                        AuthToken.Failure("")
+                        AuthToken.Failure.TokenExpired(authRepository.getAuthToken()!!)
                     }
                 }
                 else -> {
-                    AuthToken.Failure("")
+                    AuthToken.Failure.UnknownError
                 }
             }
         }
@@ -586,7 +586,10 @@ sealed class AccessToken {
 
 sealed class AuthToken {
     data class Success(val authToken: String) : AuthToken()
-    data class Failure(val message: String) : AuthToken()
+    sealed class Failure : AuthToken() {
+        data class TokenExpired(val authToken: String) : Failure()
+        data object UnknownError : Failure()
+    }
 }
 
 fun String.toStatus(): SubscriptionStatus {

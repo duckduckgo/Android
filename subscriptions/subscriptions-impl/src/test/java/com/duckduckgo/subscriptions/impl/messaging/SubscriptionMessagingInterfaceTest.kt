@@ -207,6 +207,33 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
+    fun whenProcessAndGetSubscriptionsMessageIfTokenExpiredThenReturnResponse() = runTest {
+        givenInterfaceIsRegistered()
+        givenAuthTokenIsExpired()
+
+        val expected = JsRequestResponse.Success(
+            context = "subscriptionPages",
+            featureName = "useSubscription",
+            method = "getSubscription",
+            id = "myId",
+            result = JSONObject("""{ "token":"authToken"}"""),
+        )
+
+        val message = """
+            {"context":"subscriptionPages","featureName":"useSubscription","method":"getSubscription","id":"myId","params":{}}
+        """.trimIndent()
+
+        messagingInterface.process(message, "duckduckgo-android-messaging-secret")
+
+        val captor = argumentCaptor<JsRequestResponse>()
+        verify(jsMessageHelper).sendJsResponse(captor.capture(), eq(CALLBACK_NAME), eq(SECRET), eq(webView))
+        val jsMessage = captor.firstValue
+
+        assertTrue(jsMessage is JsRequestResponse.Success)
+        checkEquals(expected, jsMessage)
+    }
+
+    @Test
     fun whenProcessAndGetSubscriptionsIfFeatureNameDoesNotMatchDoNothing() = runTest {
         givenInterfaceIsRegistered()
         givenAuthTokenIsSuccess()
@@ -625,7 +652,11 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     private suspend fun givenAuthTokenIsFailure() {
-        whenever(subscriptionsManager.getAuthToken()).thenReturn(AuthToken.Failure(message = "something happened"))
+        whenever(subscriptionsManager.getAuthToken()).thenReturn(AuthToken.Failure.UnknownError)
+    }
+
+    private suspend fun givenAuthTokenIsExpired() {
+        whenever(subscriptionsManager.getAuthToken()).thenReturn(AuthToken.Failure.TokenExpired(authToken = "authToken"))
     }
 
     private suspend fun givenAccessTokenIsSuccess() {
