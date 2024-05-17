@@ -26,6 +26,7 @@ import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.DeleteBookmar
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.EditSavedSiteListener
 import com.duckduckgo.app.browser.BrowserTabViewModel.HiddenBookmarksIds
 import com.duckduckgo.app.browser.favorites.NewTabLegacyPageViewModel.Command.DeleteFavoriteConfirmation
+import com.duckduckgo.app.browser.favorites.NewTabLegacyPageViewModel.Command.DeleteSavedSiteConfirmation
 import com.duckduckgo.app.browser.favorites.NewTabLegacyPageViewModel.Command.ShowEditSavedSiteDialog
 import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
 import com.duckduckgo.app.browser.remotemessage.asNewTabCommand
@@ -41,7 +42,6 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
 import dagger.Lazy
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
@@ -53,7 +53,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -95,6 +94,7 @@ class NewTabLegacyPageViewModel @Inject constructor(
         ) : Command()
         class ShowEditSavedSiteDialog(val savedSiteChangedViewState: SavedSiteChangedViewState) : Command()
         class DeleteFavoriteConfirmation(val savedSite: SavedSite) : Command()
+        class DeleteSavedSiteConfirmation(val savedSite: SavedSite) : Command()
     }
 
     private var lastRemoteMessageSeen: RemoteMessage? = null
@@ -296,6 +296,6 @@ class NewTabLegacyPageViewModel @Inject constructor(
     }
 
     fun onDeleteSavedSiteRequested(savedSite: SavedSite) {
-        hide(savedSite, DeleteFavoriteConfirmation(savedSite))
+        hide(savedSite, DeleteSavedSiteConfirmation(savedSite))
     }
 }

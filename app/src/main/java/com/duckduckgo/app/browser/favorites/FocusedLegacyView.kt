@@ -40,6 +40,7 @@ import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.Companio
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.browser.favorites.FocusedLegacyViewModel.Command
 import com.duckduckgo.app.browser.favorites.FocusedLegacyViewModel.Command.DeleteFavoriteConfirmation
+import com.duckduckgo.app.browser.favorites.FocusedLegacyViewModel.Command.DeleteSavedSiteConfirmation
 import com.duckduckgo.app.browser.favorites.FocusedLegacyViewModel.Command.ShowEditSavedSiteDialog
 import com.duckduckgo.app.browser.favorites.FocusedLegacyViewModel.ViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
@@ -55,6 +56,7 @@ import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ViewViewModelFactory
+import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
@@ -160,7 +162,7 @@ class FocusedLegacyView @JvmOverloads constructor(
             },
             { viewModel.onEditSavedSiteRequested(it.favorite) },
             { viewModel.onDeleteFavoriteRequested(it.favorite) },
-            { viewModel.onDeleteFavoriteRequested(it.favorite) },
+            { viewModel.onDeleteSavedSiteRequested(it.favorite) },
         )
     }
 
@@ -212,6 +214,12 @@ class FocusedLegacyView @JvmOverloads constructor(
                 context.getString(R.string.favoriteDeleteConfirmationMessage).toSpannable(),
             ) {
                 viewModel.onDeleteFavoriteSnackbarDismissed(command.savedSite)
+            }
+            is DeleteSavedSiteConfirmation -> confirmDeleteSavedSite(
+                command.savedSite,
+                context.getString(R.string.bookmarkDeleteConfirmationMessage, command.savedSite.title).html(context),
+            ) {
+                viewModel.onDeleteSavedSiteSnackbarDismissed(command.savedSite)
             }
         }
     }
