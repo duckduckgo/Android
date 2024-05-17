@@ -39,6 +39,6 @@ class AppBrowserNav @Inject constructor() : BrowserNav {
         context: Context,
         url: String,
     ): Intent {
-        return BrowserActivity.intent(context, url)
+        return BrowserActivity.intent(context = context, queryExtra = url, openInCurrentTab = true)
     }
 }
