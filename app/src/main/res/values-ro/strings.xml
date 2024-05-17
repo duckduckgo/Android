@@ -833,4 +833,47 @@
     <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">Certificatul de securitate pentru %1$s a expirat. Este posibil ca site-ul web să fie configurat greșit, ca un atacator să-ți fi compromis conexiunea sau ca ceasul sistemului tău să fie incorect.</string>
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Certificatul de securitate pentru %1$s nu se potrivește cu *.%2$s. Este posibil ca site-ul web să fie configurat greșit, ca un atacator să-ți fi compromis conexiunea sau ca ceasul sistemului tău să fie incorect.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Sistemul de operare al dispozitivului tău nu are încredere în certificatul de securitate pentru %1$s. Este posibil ca site-ul web să fie configurat greșit, ca un atacator să-ți fi compromis conexiunea sau ca ceasul sistemului tău să fie incorect.</string>
+
+    <!-- Onboarding Experiment-->
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Salut!<br/><br/>Ești gata pentru un internet mai bun și mai privat?]]></string>
+    <string name="preOnboardingDaxDialog1Button">Hai să o facem!</string>
+    <string name="preOnboardingDaxDialog2Title">Măsurile de protecție a confidențialității au fost activate!</string>
+    <string name="preOnboardingDaxDialog2Button">Alege browserul</string>
+    <string name="preOnboardingComparisonChartItem1">Caută implicit în mod privat</string>
+    <string name="preOnboardingComparisonChartItem2">Blochează tehnologiile de urmărire terțe</string>
+    <string name="preOnboardingComparisonChartItem3">Blochează ferestrele pop-up privind modulele cookie</string>
+    <string name="preOnboardingComparisonChartItem4">Blochează reclamele înfiorătoare</string>
+    <string name="preOnboardingComparisonChartItem5">Șterge rapid datele de navigare</string>
+    <string name="preOnboardingDaxDialog3Title">Super! Bine ai venit de cealaltă parte!</string>
+    <string name="preOnboardingDaxDialog3Button">Începe navigarea</string>
+    <string name="onboardingSearchDaxDialogTitle">Încearcă o căutare!</string>
+    <string name="onboardingSearchDaxDialogDescription">Căutările tale DuckDuckGo sunt întotdeauna anonime.</string>
+    <string name="onboardingSearchDaxDialogOption1">cum se spune „rață” în spaniolă</string>
+    <string name="onboardingSearchDaxDialogOption2">distribuție mighty ducks</string>
+    <string name="onboardingSearchDaxDialogOption3">vremea locală</string>
+    <string name="onboardingSearchDaxDialogOption4">Surprinde-mă!</string>
+    <string name="onboardingSitesDaxDialogTitle">Încearcă să vizitezi un site!</string>
+    <string name="onboardingSitesDaxDialogDescription">Voi bloca instrumentele de urmărire ca să nu te mai spioneze.</string>
+    <string name="onboardingSitesDaxDialogOption1">espn.com</string>
+    <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
+    <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
+    <string name="onboardingSitesDaxDialogOption4">Surprinde-mă!</string>
+    <string name="onboardingSerpDaxDialogDescription">Acesta este DuckDuckGo Search. Privat. Rapid. Mai puține reclame.</string>
+    <string name="onboardingSerpDaxDialogButton">Am înțeles!</string>
+    <string name="onboardingSitesSuggestionsDaxDialogTitle">Apoi, încearcă să vizitezi un site!</string>
+    <plurals name="onboardingTrackersBlockedDialogDescription">
+        <item quantity="one"><![CDATA[ și <b>încă %1$d</b> încerca să te urmărească aici. L-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
+        <item quantity="few"><![CDATA[ și <b>încă %1$d</b> încercau să te urmărească aici. Le-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
+        <item quantity="other"><![CDATA[ și <b>încă %1$d</b> încercau să te urmărească aici. Le-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
+    </plurals>
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ încerca să te urmărească aici. L-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
+        <item quantity="few"><![CDATA[ încercau să te urmărească până aici. Le-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
+        <item quantity="other"><![CDATA[ încercau să te urmărească până aici. Le-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
+    </plurals>
+    <string name="onboardingTrackersBlockedDaxDialogButton">Am înțeles!</string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Șterge instantaneu activitatea de navigare cu <b>Fire Button</b>.<br/><br/>Încearcă! ☝️️]]></string>
+    <string name="onboardingEndDaxDialogTitle">"Ai ghicit!"</string>
+    <string name="onboardingEndDaxDialogDescription">Reține: de fiecare dată când navighezi cu mine, o reclamă terifiantă își pierde aripile. 👌</string>
+
 </resources>
