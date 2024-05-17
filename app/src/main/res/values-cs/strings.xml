@@ -838,4 +838,49 @@
     <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">Platnost bezpečnostního certifikátu pro %1$s vypršela. Je možné, že web je nesprávně nakonfigurovaný, že útočník prolomil tvoje připojení nebo že tvoje systémové hodiny jsou nesprávné.</string>
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Bezpečnostní certifikát pro %1$s neodpovídá *.%2$s. Je možné, že web je nesprávně nakonfigurovaný, že útočník prolomil tvoje připojení nebo že tvoje systémové hodiny jsou nesprávné.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Operační systém tvého zařízení nedůvěřuje bezpečnostnímu certifikátu %1$s. Je možné, že web je nesprávně nakonfigurovaný, že útočník prolomil tvoje připojení nebo že tvoje systémové hodiny jsou nesprávné.</string>
+
+    <!-- Onboarding Experiment-->
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Zdravíme tě.<br/><br/>Těšíš se na lepší internet s větší ochranou soukromí?]]></string>
+    <string name="preOnboardingDaxDialog1Button">Pojďme na to!</string>
+    <string name="preOnboardingDaxDialog2Title">Ochrana osobních údajů je aktivní!</string>
+    <string name="preOnboardingDaxDialog2Button">Vyber si prohlížeč</string>
+    <string name="preOnboardingComparisonChartItem1">Soukromé vyhledávání ve výchozím nastavení</string>
+    <string name="preOnboardingComparisonChartItem2">Blokuj trackery třetích stran</string>
+    <string name="preOnboardingComparisonChartItem3">Blokování vyskakovacích oken ohledně cookies</string>
+    <string name="preOnboardingComparisonChartItem4">Blokování reklam, které tě všude pronásledují</string>
+    <string name="preOnboardingComparisonChartItem5">Rychle vymaž údaje o procházení</string>
+    <string name="preOnboardingDaxDialog3Title">Bezva! Vítej v Kačerově.</string>
+    <string name="preOnboardingDaxDialog3Button">Spustit procházení</string>
+    <string name="onboardingSearchDaxDialogTitle">Vyzkoušejte vyhledávání!</string>
+    <string name="onboardingSearchDaxDialogDescription">Tvoje vyhledávání v DuckDuckGo je vždycky anonymní.</string>
+    <string name="onboardingSearchDaxDialogOption1">jak se řekne „kachna“ španělsky</string>
+    <string name="onboardingSearchDaxDialogOption2">herci z filmu Šampióni</string>
+    <string name="onboardingSearchDaxDialogOption3">aktuální počasí</string>
+    <string name="onboardingSearchDaxDialogOption4">Překvap mě!</string>
+    <string name="onboardingSitesDaxDialogTitle">Zkus přejít na nějaký web!</string>
+    <string name="onboardingSitesDaxDialogDescription">Zablokuju trackery, aby tě nemohly šmírovat.</string>
+    <string name="onboardingSitesDaxDialogOption1">espn.com</string>
+    <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
+    <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
+    <string name="onboardingSitesDaxDialogOption4">Překvap mě!</string>
+    <string name="onboardingSerpDaxDialogDescription">Tohle je vyhledávač DuckDuckGo Search. Soukromý. Rychlý. S méně reklamami.</string>
+    <string name="onboardingSerpDaxDialogButton">Mám to!</string>
+    <string name="onboardingSitesSuggestionsDaxDialogTitle">A teď zkus přejít na nějaký web!</string>
+    <plurals name="onboardingTrackersBlockedDialogDescription">
+        <item quantity="one"><![CDATA[ a <b>%1$d další tracker</b> se tě tady snaží sledovat. A tak jsem je zablokoval!<br/><br/>☝️ Další informace zobrazíš klepnutím na štít.️]]></item>
+        <item quantity="few"><![CDATA[ a <b>%1$d další trackery</b> se tě tady snaží sledovat. A tak jsem je zablokoval!<br/><br/>☝️ Další informace zobrazíš klepnutím na štít.️]]></item>
+        <item quantity="many"><![CDATA[ a <b>%1$d dalšího trackeru</b> se tě tady snaží sledovat. A tak jsem je zablokoval!<br/><br/>☝️ Další informace zobrazíš klepnutím na štít.️]]></item>
+        <item quantity="other"><![CDATA[ a <b>%1$d dalších trackerů</b> se tě tady snaží sledovat. A tak jsem je zablokoval!<br/><br/>☝️ Další informace zobrazíš klepnutím na štít.️]]></item>
+    </plurals>
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ se tě tady snaží sledovat. A tak jsem to zablokoval!<br/><br/>☝️ Klepnutím na štít si zobrazíš další informace.️]]></item>
+        <item quantity="few"><![CDATA[ se tě tady snaží sledovat. A tak jsem je zablokoval!<br/><br/>☝️ Klepnutím na štít si zobrazíš další informace.️]]></item>
+        <item quantity="many"><![CDATA[ se tě tady snaží sledovat. A tak jsem je zablokoval!<br/><br/>☝️ Klepnutím na štít si zobrazíš další informace.️]]></item>
+        <item quantity="other"><![CDATA[ se tě tady snaží sledovat. A tak jsem je zablokoval!<br/><br/>☝️ Klepnutím na štít si zobrazíš další informace.️]]></item>
+    </plurals>
+    <string name="onboardingTrackersBlockedDaxDialogButton">Mám to!</string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Vcukuletu můžeš smazat svou aktivitu při prohlížení pomocí funkce <b>Fire Button</b>.<br/><br/>Zkus ji! ☝️️]]></string>
+    <string name="onboardingEndDaxDialogTitle">"A je to!"</string>
+    <string name="onboardingEndDaxDialogDescription">Pamatuj: Když se mnou na webu surfuješ, příšerné reklamy zaženeš. 👌</string>
+
 </resources>
