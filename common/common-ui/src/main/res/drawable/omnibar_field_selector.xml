@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2019 DuckDuckGo
+  ~ Copyright (c) 2024 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -14,8 +14,11 @@
   ~ limitations under the License.
   -->
 
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
-    <size android:width="2dp" />
-    <solid android:color="?attr/daxColorAccentBlue" />
-</shape>
+<selector
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:state_pressed="true"
+        android:drawable="@drawable/omnibar_field_background_focused" />
+    <item
+        android:drawable="@drawable/omnibar_field_background" />
+</selector>
