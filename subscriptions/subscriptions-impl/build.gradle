@@ -49,7 +49,7 @@ dependencies {
     implementation project(path: ':downloads-api')
     implementation project(path: ':statistics')
     implementation project(':privacy-config-api') // remote feature flag
-    implementation project(':vpn-api') // remote feature flag
+    implementation project(':data-store-api')
     implementation project(':remote-messaging-api') // remote feature flag
 
     implementation AndroidX.appCompat

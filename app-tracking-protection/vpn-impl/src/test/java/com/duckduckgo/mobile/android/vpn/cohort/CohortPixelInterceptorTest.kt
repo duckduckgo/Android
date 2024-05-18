@@ -21,8 +21,8 @@ import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.api.FakeChain
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
-import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import java.time.LocalDate
 import org.junit.Assert
 import org.junit.Before
@@ -49,7 +49,7 @@ class CohortPixelInterceptorTest {
     private lateinit var cohortStore: CohortStore
     private lateinit var cohortCalculator: CohortCalculator
 
-    private val sharedPreferencesProvider = mock<VpnSharedPreferencesProvider>()
+    private val sharedPreferencesProvider = mock<SharedPreferencesProvider>()
 
     @Before
     fun setup() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.prefs
+package com.duckduckgo.data.store.impl
 
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
@@ -23,6 +23,7 @@ import androidx.core.content.edit
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import androidx.security.crypto.MasterKeys
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.frybits.harmony.getHarmonySharedPreferences
 import com.frybits.harmony.secure.getEncryptedHarmonySharedPreferences
@@ -34,9 +35,9 @@ import logcat.logcat
 private const val MIGRATED_TO_HARMONY = "migrated_to_harmony"
 
 @ContributesBinding(AppScope::class)
-class VpnSharedPreferencesProviderImpl @Inject constructor(
+class SharedPreferencesProviderImpl @Inject constructor(
     private val context: Context,
-) : VpnSharedPreferencesProvider {
+) : SharedPreferencesProvider {
     override fun getSharedPreferences(name: String, multiprocess: Boolean, migrate: Boolean): SharedPreferences {
         return if (multiprocess) {
             if (migrate) {

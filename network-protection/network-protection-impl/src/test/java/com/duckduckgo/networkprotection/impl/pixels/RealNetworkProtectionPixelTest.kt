@@ -18,7 +18,7 @@ package com.duckduckgo.networkprotection.impl.pixels
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
-import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.networkprotection.impl.cohort.NetpCohortStore
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_ENABLE_UNIQUE
 import java.time.LocalDate
@@ -37,7 +37,7 @@ class RealNetworkProtectionPixelTest {
     private lateinit var pixel: Pixel
 
     @Mock
-    private lateinit var vpnSharedPreferencesProvider: VpnSharedPreferencesProvider
+    private lateinit var sharedPreferencesProvider: SharedPreferencesProvider
 
     private lateinit var fakeNetpCohortStore: FakeNetpCohortStore
 
@@ -51,11 +51,11 @@ class RealNetworkProtectionPixelTest {
         }
         val prefs = InMemorySharedPreferences()
         whenever(
-            vpnSharedPreferencesProvider.getSharedPreferences(eq("com.duckduckgo.networkprotection.pixels.v1"), eq(true), eq(false)),
+            sharedPreferencesProvider.getSharedPreferences(eq("com.duckduckgo.networkprotection.pixels.v1"), eq(true), eq(false)),
         ).thenReturn(prefs)
         testee = RealNetworkProtectionPixel(
             pixel,
-            vpnSharedPreferencesProvider,
+            sharedPreferencesProvider,
             fakeNetpCohortStore,
             object : ETTimestamp() {
                 override fun formattedTimestamp(): String {

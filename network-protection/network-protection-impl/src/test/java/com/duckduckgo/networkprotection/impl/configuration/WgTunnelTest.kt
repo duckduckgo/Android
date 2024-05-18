@@ -2,7 +2,7 @@ package com.duckduckgo.networkprotection.impl.configuration
 
 import android.os.Build.VERSION
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.mobile.android.vpn.prefs.FakeVpnSharedPreferencesProvider
+import com.duckduckgo.data.store.api.FakeSharedPreferencesProvider
 import com.duckduckgo.networkprotection.impl.config.NetPDefaultConfigProvider
 import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.Mode.FailureRecovery
 import com.wireguard.config.Config
@@ -60,7 +60,7 @@ class WgTunnelTest {
             whenever(wgServerApi.registerPublicKey(eq(keys.publicKey.toBase64()), isNull()))
                 .thenReturn(serverData.copy(publicKey = keys.publicKey.toBase64()))
         }
-        wgTunnelStore = WgTunnelStore(FakeVpnSharedPreferencesProvider())
+        wgTunnelStore = WgTunnelStore(FakeSharedPreferencesProvider())
         wgTunnel = RealWgTunnel(wgServerApi, netPDefaultConfigProvider, wgTunnelStore)
     }
 

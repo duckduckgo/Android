@@ -18,8 +18,8 @@ package com.duckduckgo.networkprotection.impl.cohort
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.duckduckgo.networkprotection.impl.state.NetPFeatureRemover
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -40,7 +40,7 @@ interface NetpCohortStore {
     boundType = NetPFeatureRemover.NetPStoreRemovalPlugin::class,
 )
 class RealNetpCohortStore @Inject constructor(
-    private val sharedPreferencesProvider: VpnSharedPreferencesProvider,
+    private val sharedPreferencesProvider: SharedPreferencesProvider,
 ) : NetpCohortStore, NetPFeatureRemover.NetPStoreRemovalPlugin {
     private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 

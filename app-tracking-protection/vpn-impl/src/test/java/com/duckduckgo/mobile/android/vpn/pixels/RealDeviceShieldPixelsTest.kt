@@ -18,7 +18,7 @@ package com.duckduckgo.mobile.android.vpn.pixels
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
-import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import java.util.*
 import org.junit.Before
 import org.junit.Test
@@ -27,7 +27,7 @@ import org.mockito.kotlin.*
 class RealDeviceShieldPixelsTest {
 
     private val pixel = mock<Pixel>()
-    private val sharedPreferencesProvider = mock<VpnSharedPreferencesProvider>()
+    private val sharedPreferencesProvider = mock<SharedPreferencesProvider>()
 
     lateinit var deviceShieldPixels: DeviceShieldPixels
 

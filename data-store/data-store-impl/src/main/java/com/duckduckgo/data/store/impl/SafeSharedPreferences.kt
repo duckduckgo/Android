@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.prefs
+package com.duckduckgo.data.store.impl
 
 import android.content.SharedPreferences
 import android.content.SharedPreferences.Editor

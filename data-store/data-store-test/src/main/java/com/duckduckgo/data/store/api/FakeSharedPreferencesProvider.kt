@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.prefs
+package com.duckduckgo.data.store.api
 
 import android.content.SharedPreferences
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
 
-class FakeVpnSharedPreferencesProvider : VpnSharedPreferencesProvider {
+class FakeSharedPreferencesProvider : SharedPreferencesProvider {
     override fun getSharedPreferences(name: String, multiprocess: Boolean, migrate: Boolean): SharedPreferences {
         return InMemorySharedPreferences()
     }

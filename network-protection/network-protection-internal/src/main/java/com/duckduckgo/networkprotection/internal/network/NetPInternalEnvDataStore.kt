@@ -18,13 +18,13 @@ package com.duckduckgo.networkprotection.internal.network
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import javax.inject.Inject
 
-class NetPInternalEnvDataStore @Inject constructor(vpnSharedPreferencesProvider: VpnSharedPreferencesProvider) {
+class NetPInternalEnvDataStore @Inject constructor(sharedPreferencesProvider: SharedPreferencesProvider) {
 
     private val preferences: SharedPreferences by lazy {
-        vpnSharedPreferencesProvider.getSharedPreferences(FILENAME, multiprocess = true, migrate = false)
+        sharedPreferencesProvider.getSharedPreferences(FILENAME, multiprocess = true, migrate = false)
     }
 
     var customDns: String?

@@ -18,7 +18,7 @@ package com.duckduckgo.networkprotection.store
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 
 interface NetpDataStore {
     var authToken: String?
@@ -28,11 +28,11 @@ interface NetpDataStore {
 }
 
 class NetpDataStoreSharedPreferences constructor(
-    private val vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
+    private val sharedPreferencesProvider: SharedPreferencesProvider,
 ) : NetpDataStore {
 
     private val preferences: SharedPreferences by lazy {
-        vpnSharedPreferencesProvider.getSharedPreferences(
+        sharedPreferencesProvider.getSharedPreferences(
             FILENAME,
             multiprocess = true,
             migrate = false,
