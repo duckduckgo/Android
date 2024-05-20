@@ -130,4 +130,8 @@ enum class NetworkProtectionPixelNames(
     NETP_PAUSE_ON_CALL_ENABLED_DAILY("m_netp_ev_enabled_pause_vpn_during_calls_d"),
     NETP_PAUSE_ON_CALL_DISABLED("m_netp_ev_disabled_pause_vpn_during_calls_c"),
     NETP_PAUSE_ON_CALL_DISABLED_DAILY("m_netp_ev_disabled_pause_vpn_during_calls_d"),
+    NETP_EXCLUDE_SYSTEM_APPS_ENABLED("m_netp_ev_exclude_system_apps_enabled_c", enqueue = true),
+    NETP_EXCLUDE_SYSTEM_APPS_ENABLED_DAILY("m_netp_ev_exclude_system_apps_enabled_d", enqueue = true),
+    NETP_EXCLUDE_SYSTEM_APPS_DISABLED("m_netp_ev_exclude_system_apps_disabled_c", enqueue = true),
+    NETP_EXCLUDE_SYSTEM_APPS_DISABLED_DAILY("m_netp_ev_exclude_system_apps_disabled_d", enqueue = true),
 }

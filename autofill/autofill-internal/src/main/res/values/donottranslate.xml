@@ -21,6 +21,9 @@
     <string name="autofillDevSettingsSubtitle">Autofill and Email Protection dev options</string>
     <string name="autofillDevSettingsClearNeverAskAgainSettingButton">Clear \'never ask again\' setting</string>
     <string name="autofillDevSettingsEmailProtectionSignOutButton">Sign out</string>
+    <string name="autofillDevSettingsEngagementTitle">Engagement KPIs</string>
+    <string name="autofillDevSettingsEngagementClearHistory">Clear Engagement History</string>
+    <string name="autofillDevSettingsEngagementHistoryCleared">Cleared All Engagement History</string>
     <string name="autofillDevSettingsEmailProtectionTitle">Email Protection Settings</string>
     <string name="autofillDevSettingsEmailProtectionNeverAskAgainChoiceCleared">Never ask again choice cleared</string>
     <string name="autofillDevSettingsEmailProtectionSignedOut">Signed out</string>

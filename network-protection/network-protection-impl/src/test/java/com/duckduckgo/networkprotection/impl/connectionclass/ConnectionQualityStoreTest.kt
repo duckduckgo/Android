@@ -1,7 +1,7 @@
 package com.duckduckgo.networkprotection.impl.connectionclass
 
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.mobile.android.vpn.prefs.FakeVpnSharedPreferencesProvider
+import com.duckduckgo.data.store.api.FakeSharedPreferencesProvider
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -16,7 +16,7 @@ class ConnectionQualityStoreTest {
 
     @Before
     fun setup() {
-        connectionQualityStore = ConnectionQualityStore(FakeVpnSharedPreferencesProvider(), coroutineRule.testDispatcherProvider)
+        connectionQualityStore = ConnectionQualityStore(FakeSharedPreferencesProvider(), coroutineRule.testDispatcherProvider)
     }
 
     @Test

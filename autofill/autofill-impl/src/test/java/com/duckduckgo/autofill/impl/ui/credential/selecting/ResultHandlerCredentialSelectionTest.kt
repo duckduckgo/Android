@@ -28,8 +28,10 @@ import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector.ContainsCredentialsResult.NoMatch
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.deviceauth.FakeAuthenticator
+import com.duckduckgo.autofill.impl.engagement.DataAutofilledListener
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -159,6 +161,13 @@ class ResultHandlerCredentialSelectionTest {
             deviceAuthenticator = deviceAuthenticator,
             appBuildConfig = appBuildConfig,
             autofillStore = autofillStore,
+            autofilledListeners = FakePluginPoint(),
         )
+    }
+
+    private class FakePluginPoint : PluginPoint<DataAutofilledListener> {
+        override fun getPlugins(): Collection<DataAutofilledListener> {
+            return emptyList()
+        }
     }
 }

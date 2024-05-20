@@ -166,6 +166,8 @@ fladle {
 }
 
 dependencies {
+	implementation project(":data-store-impl")
+	implementation project(":data-store-api")
 	implementation project(":verified-installation-impl")
 	implementation project(":verified-installation-api")
 

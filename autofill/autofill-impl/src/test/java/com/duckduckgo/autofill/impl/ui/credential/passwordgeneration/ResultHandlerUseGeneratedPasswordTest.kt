@@ -29,8 +29,10 @@ import com.duckduckgo.autofill.api.UseGeneratedPasswordDialog.Companion.KEY_URL
 import com.duckduckgo.autofill.api.UseGeneratedPasswordDialog.Companion.KEY_USERNAME
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
+import com.duckduckgo.autofill.impl.engagement.DataAutofilledListener
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -56,6 +58,7 @@ class ResultHandlerUseGeneratedPasswordTest {
         appCoroutineScope = coroutineTestRule.testScope,
         autoSavedLoginsMonitor = autoSavedLoginsMonitor,
         existingCredentialMatchDetector = existingCredentialMatchDetector,
+        autofilledListeners = FakePluginPoint(),
     )
 
     @Before
@@ -193,5 +196,9 @@ class ResultHandlerUseGeneratedPasswordTest {
 
     private fun aLogin(id: Long = 0): LoginCredentials {
         return LoginCredentials(id = id, domain = "example.com", username = "user", password = "pw")
+    }
+
+    private class FakePluginPoint : PluginPoint<DataAutofilledListener> {
+        override fun getPlugins(): Collection<DataAutofilledListener> = emptyList()
     }
 }

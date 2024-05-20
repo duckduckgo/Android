@@ -28,6 +28,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.menu.PopupMenu
+import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -120,7 +121,11 @@ class NetpAppExclusionListActivity :
         }
     }
 
-    override fun onAppProtectionDisabled(appName: String, packageName: String, report: Boolean) {
+    override fun onAppProtectionDisabled(
+        appName: String,
+        packageName: String,
+        report: Boolean,
+    ) {
         viewModel.onAppProtectionDisabled(appName = appName, packageName = packageName, report = report)
     }
 
@@ -161,6 +166,14 @@ class NetpAppExclusionListActivity :
                 override fun onFilterClick(anchorView: View) {
                     showFilterPopupMenu(anchorView)
                 }
+
+                override fun onSystemAppCategoryStateChanged(
+                    category: NetpExclusionListSystemAppCategory,
+                    enabled: Boolean,
+                    position: Int,
+                ) {
+                    viewModel.onSystemAppCategoryStateChanged(category, enabled)
+                }
             },
         )
 
@@ -194,10 +207,27 @@ class NetpAppExclusionListActivity :
             is Command.ShowDisableProtectionDialog -> showDisableProtectionDialog(
                 command.forApp,
             )
+
             is Command.ShowIssueReportingPage -> globalActivityStarter.start(this, command.params)
+            is Command.ShowSystemAppsExclusionWarning -> showSystemAppsWarning(command.category)
             else -> { /* noop */
             }
         }
+    }
+
+    private fun showSystemAppsWarning(category: NetpExclusionListSystemAppCategory) {
+        TextAlertDialogBuilder(this@NetpAppExclusionListActivity)
+            .setTitle(R.string.netpExclusionListWarningTitle)
+            .setMessage(R.string.netpExclusionListWarningMessage)
+            .setPositiveButton(R.string.netpExclusionListWarningActionPositive)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onSystemAppCategoryStateChanged(category, false)
+                    }
+                },
+            )
+            .show()
     }
 
     private fun restartVpn() {

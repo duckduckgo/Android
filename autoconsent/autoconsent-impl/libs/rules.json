@@ -2391,7 +2391,10 @@
           "all": true
         },
         {
-          "waitForThenClick": "[data-project=\"mol-fe-cmp\"] button[class*=white]"
+          "waitForThenClick": [
+            "[data-project=\"mol-fe-cmp\"] [class*=footer]",
+            "xpath///button[contains(., 'Save & Exit')]"
+          ]
         }
       ]
     },
@@ -2605,6 +2608,35 @@
       "optOut": [
         {
           "waitForThenClick": "#ensRejectAll,#rejectAll,#ensRejectBanner"
+        }
+      ]
+    },
+    {
+      "name": "espace-personnel.agirc-arrco.fr",
+      "runContext": {
+        "urlPattern": "^https://espace-personnel\\.agirc-arrco\\.fr/"
+      },
+      "prehideSelectors": [
+        ".cdk-overlay-container"
+      ],
+      "detectCmp": [
+        {
+          "exists": ".cdk-overlay-container app-esaa-cookie-component"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": ".cdk-overlay-container app-esaa-cookie-component"
+        }
+      ],
+      "optIn": [
+        {
+          "waitForThenClick": ".btn-cookie-accepter"
+        }
+      ],
+      "optOut": [
+        {
+          "waitForThenClick": ".btn-cookie-refuser"
         }
       ]
     },
@@ -3344,7 +3376,7 @@
         "urlPattern": "^https://www\\.instagram\\.com/"
       },
       "prehideSelectors": [
-        ".x78zum5.xdt5ytf.xg6iff7.x1n2onr6"
+        ".x78zum5.xdt5ytf.xg6iff7.x1n2onr6:has(._a9--)"
       ],
       "detectCmp": [
         {
@@ -3444,18 +3476,18 @@
       ],
       "optIn": [
         {
-          "click": ".iubenda-cs-accept-btn"
+          "waitForThenClick": ".iubenda-cs-accept-btn"
         }
       ],
       "optOut": [
         {
-          "click": ".iubenda-cs-customize-btn"
+          "waitForThenClick": ".iubenda-cs-customize-btn"
         },
         {
           "eval": "EVAL_IUBENDA_0"
         },
         {
-          "click": "#iubFooterBtn"
+          "waitForThenClick": "#iubFooterBtn"
         }
       ],
       "test": [
@@ -5265,48 +5297,17 @@
       ],
       "detectPopup": [
         {
-          "visible": "sibbo-cmp-layout"
+          "visible": "#rejectAllMain"
         }
       ],
       "optIn": [
         {
-          "click": "sibbo-cmp-layout [data-accept-all]"
+          "click": "#acceptAllMain"
         }
       ],
       "optOut": [
         {
-          "click": ".sibbo-panel__aside__buttons a[data-nav=\"purposes\"]"
-        },
-        {
-          "click": ".sibbo-panel__main__header__actions a[data-focusable=\"reject-all\"]"
-        },
-        {
-          "if": {
-            "exists": "[data-view=purposes] .sibbo-panel__main__footer__actions [data-save-and-exit]"
-          },
-          "then": [],
-          "else": [
-            {
-              "waitFor": ".sibbo-panel__main__footer__actions a[data-focusable=\"next\"]:not(.sibbo-cmp-button--disabled)"
-            },
-            {
-              "click": ".sibbo-panel__main__footer__actions a[data-focusable=\"next\"]"
-            },
-            {
-              "click": ".sibbo-panel__main div[data-view=\"purposesLegInt\"] a[data-focusable=\"reject-all\"]"
-            }
-          ]
-        },
-        {
-          "waitFor": ".sibbo-panel__main__footer__actions [data-save-and-exit]:not(.sibbo-cmp-button--disabled)"
-        },
-        {
-          "click": ".sibbo-panel__main__footer__actions [data-save-and-exit]:not(.sibbo-cmp-button--disabled)"
-        }
-      ],
-      "test": [
-        {
-          "eval": "EVAL_SIBBO_0"
+          "click": "#rejectAllMain"
         }
       ]
     },
@@ -5788,9 +5789,8 @@
       "name": "termsfeed3",
       "vendorUrl": "https://termsfeed.com",
       "comment": "v3.x.x",
-      "cosmetic": true,
       "prehideSelectors": [
-        ".cc_dialog.cc_css_reboot"
+        ".cc_dialog.cc_css_reboot,.cc_overlay_lock"
       ],
       "detectCmp": [
         {
@@ -5809,7 +5809,25 @@
       ],
       "optOut": [
         {
-          "hide": ".cc_dialog.cc_css_reboot"
+          "if": {
+            "exists": ".cc_dialog.cc_css_reboot .cc_b_cp"
+          },
+          "then": [
+            {
+              "click": ".cc_dialog.cc_css_reboot .cc_b_cp"
+            },
+            {
+              "waitForVisible": ".cookie-consent-preferences-dialog .cc_cp_f_save button"
+            },
+            {
+              "waitForThenClick": ".cookie-consent-preferences-dialog .cc_cp_f_save button"
+            }
+          ],
+          "else": [
+            {
+              "hide": ".cc_dialog.cc_css_reboot,.cc_overlay_lock"
+            }
+          ]
         }
       ]
     },

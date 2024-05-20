@@ -54,7 +54,9 @@ fun Context.registerNotExportedReceiver(
     receiver: BroadcastReceiver,
     intentFilter: IntentFilter,
 ) {
-    ContextCompat.registerReceiver(this, receiver, intentFilter, ContextCompat.RECEIVER_NOT_EXPORTED)
+    kotlin.runCatching {
+        ContextCompat.registerReceiver(this, receiver, intentFilter, ContextCompat.RECEIVER_NOT_EXPORTED)
+    }
 }
 
 fun Context.registerExportedReceiver(

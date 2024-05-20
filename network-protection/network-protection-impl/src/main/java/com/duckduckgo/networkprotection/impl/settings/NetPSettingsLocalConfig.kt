@@ -58,6 +58,18 @@ interface NetPSettingsLocalConfig {
      */
     @Toggle.DefaultValue(false)
     fun vpnPauseDuringCalls(): Toggle
+
+    @Toggle.DefaultValue(false)
+    fun excludeSystemAppsCommunication(): Toggle
+
+    @Toggle.DefaultValue(false)
+    fun excludeSystemAppsNetworking(): Toggle
+
+    @Toggle.DefaultValue(false)
+    fun excludeSystemAppsMedia(): Toggle
+
+    @Toggle.DefaultValue(false)
+    fun excludeSystemAppsOthers(): Toggle
 }
 
 @ContributesBinding(AppScope::class)

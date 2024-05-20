@@ -19,8 +19,8 @@ package com.duckduckgo.networkprotection.impl.subscription
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.VpnScope
-import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
@@ -39,12 +39,12 @@ class NetPWaitlistEndedChecker @Inject constructor(
     private val netpSubscriptionManager: NetpSubscriptionManager,
     private val dispatcherProvider: DispatcherProvider,
     private val networkProtectionState: NetworkProtectionState,
-    private val vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
+    private val sharedPreferencesProvider: SharedPreferencesProvider,
     private val networkProtectionPixels: NetworkProtectionPixels,
 ) : VpnServiceCallbacks {
 
     private val preferences: SharedPreferences by lazy {
-        vpnSharedPreferencesProvider.getSharedPreferences("com.duckduckgo.networkprotection.subscription.vpnWaitlistChecker")
+        sharedPreferencesProvider.getSharedPreferences("com.duckduckgo.networkprotection.subscription.vpnWaitlistChecker")
     }
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {

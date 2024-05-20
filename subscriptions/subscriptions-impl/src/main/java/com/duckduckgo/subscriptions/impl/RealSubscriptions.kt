@@ -28,11 +28,11 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.toTldPlusOne
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
-import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
@@ -148,13 +148,13 @@ interface PrivacyProFeature {
 class PrivacyProFeatureStore @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
-    private val vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
+    private val sharedPreferencesProvider: SharedPreferencesProvider,
     moshi: Moshi,
 ) : Toggle.Store {
 
     private val preferences: SharedPreferences by lazy {
         // migrate old values to new multiprocess shared prefs
-        vpnSharedPreferencesProvider.getSharedPreferences(FILENAME, multiprocess = true, migrate = true)
+        sharedPreferencesProvider.getSharedPreferences(FILENAME, multiprocess = true, migrate = true)
     }
     private val stateAdapter: JsonAdapter<State> by lazy {
         moshi.newBuilder().add(KotlinJsonAdapterFactory()).build().adapter(State::class.java)

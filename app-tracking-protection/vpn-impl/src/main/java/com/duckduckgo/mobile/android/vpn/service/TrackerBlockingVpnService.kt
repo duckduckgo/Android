@@ -295,9 +295,14 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             vpnNetworkStack.onCreateVpnWithErrorReporting()
             logcat { "VPN log: NEW network ${vpnNetworkStack.name}" }
         }
+        deviceShieldPixels.reportVpnStartAttempt()
         dnsChangeCallback.unregister()
 
-        vpnServiceStateStatsDao.insert(createVpnState(state = ENABLING))
+        runCatching {
+            vpnServiceStateStatsDao.insert(createVpnState(state = ENABLING))
+        }.onFailure {
+            stopVpn(VpnStopReason.ERROR, false)
+        }
 
         logcat { "VPN log: Starting VPN" }
         val restarting = activeTun != null
@@ -381,7 +386,12 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         }
 
         // lastly set the VPN state to enabled
-        vpnServiceStateStatsDao.insert(createVpnState(state = ENABLED))
+        runCatching {
+            vpnServiceStateStatsDao.insert(createVpnState(state = ENABLED))
+        }.onFailure {
+            // onVpnStarted or onVpnReconfigured already called, ie. hasVpnAlreadyStarted = true
+            stopVpn(VpnStopReason.ERROR, true)
+        }
 
         // This is something temporary while we confirm whether we're able to fix the moto g issues with appTP
         // see https://app.asana.com/0/488551667048375/1203410036713941/f for more info
@@ -596,7 +606,9 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         }
 
         // Set the state to DISABLED here, then call the on stop/failure callbacks
-        vpnServiceStateStatsDao.insert(createVpnState(state = VpnServiceState.DISABLED, stopReason = reason))
+        runCatching {
+            vpnServiceStateStatsDao.insert(createVpnState(state = VpnServiceState.DISABLED, stopReason = reason))
+        }
 
         vpnStateServiceReference?.let {
             runCatching { unbindService(vpnStateServiceConnection).also { vpnStateServiceReference = null } }

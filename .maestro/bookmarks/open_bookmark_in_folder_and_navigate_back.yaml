@@ -157,6 +157,6 @@ tags:
     text: "Privacy Test Pages - Home"
 - assertVisible:
     text: "Privacy Test Pages"
-- tapOn: "back"
+- action: back
 - assertVisible:
     text: "Search engine"

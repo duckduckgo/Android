@@ -90,6 +90,23 @@
             android:layout_height="wrap_content" />
 
         <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+            android:id="@+id/engagementSectionTitle"
+            android:layout_width="match_parent"
+            android:layout_marginTop="20dp"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/autofillDevSettingsEngagementTitle" />
+
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/engagementClearEngagementHistoryButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/autofillDevSettingsEngagementClearHistory" />
+
+        <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
             android:id="@+id/emailProtectionInContextSectionTitle"
             android:layout_width="match_parent"
             android:layout_marginTop="20dp"

@@ -23,8 +23,8 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder.EventListener
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
@@ -59,11 +59,11 @@ class RealAccessRevokedDialog @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val globalActivityStarter: GlobalActivityStarter,
     private val networkProtectionPixels: NetworkProtectionPixels,
-    private val vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
+    private val sharedPreferencesProvider: SharedPreferencesProvider,
 ) : AccessRevokedDialog {
 
     private val preferences: SharedPreferences by lazy {
-        vpnSharedPreferencesProvider.getSharedPreferences(
+        sharedPreferencesProvider.getSharedPreferences(
             FILENAME,
             multiprocess = true,
             migrate = false,

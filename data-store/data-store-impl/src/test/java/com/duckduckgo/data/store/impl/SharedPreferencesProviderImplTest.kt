@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.prefs
+package com.duckduckgo.data.store.impl
 
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
@@ -22,6 +22,7 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import java.util.UUID
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
@@ -30,18 +31,18 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class VpnSharedPreferencesProviderImplTest {
+class SharedPreferencesProviderImplTest {
 
     private val context: Context = InstrumentationRegistry.getInstrumentation().context.applicationContext
     private lateinit var prefs: SharedPreferences
-    private lateinit var vpnPreferencesProvider: VpnSharedPreferencesProvider
+    private lateinit var vpnPreferencesProvider: SharedPreferencesProvider
     private lateinit var NAME: String
 
     @Before
     fun setup() {
         NAME = UUID.randomUUID().toString()
         prefs = context.getSharedPreferences(NAME, MODE_PRIVATE)
-        vpnPreferencesProvider = VpnSharedPreferencesProviderImpl(context)
+        vpnPreferencesProvider = SharedPreferencesProviderImpl(context)
     }
 
     @Test
@@ -80,7 +81,7 @@ class VpnSharedPreferencesProviderImplTest {
 
     @Test
     fun testSafeSharedPreferences() {
-        val prefs = SafeSharedPreferences(vpnPreferencesProvider.getSharedPreferences(NAME))
+        val prefs = com.duckduckgo.data.store.impl.SafeSharedPreferences(vpnPreferencesProvider.getSharedPreferences(NAME))
 
         prefs.edit(commit = true) { putBoolean("bool", true) }
         prefs.edit(commit = true) { putString("string", "true") }

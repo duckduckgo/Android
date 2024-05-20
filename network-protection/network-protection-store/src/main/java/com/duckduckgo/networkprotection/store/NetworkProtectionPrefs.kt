@@ -18,7 +18,7 @@ package com.duckduckgo.networkprotection.store
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 
 interface NetworkProtectionPrefs {
     fun putBoolean(
@@ -78,10 +78,10 @@ interface NetworkProtectionPrefs {
 }
 
 class RealNetworkProtectionPrefs constructor(
-    private val vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
+    private val sharedPreferencesProvider: SharedPreferencesProvider,
 ) : NetworkProtectionPrefs {
     private val prefs: SharedPreferences by lazy {
-        vpnSharedPreferencesProvider.getSharedPreferences(FILENAME, multiprocess = true, migrate = false)
+        sharedPreferencesProvider.getSharedPreferences(FILENAME, multiprocess = true, migrate = false)
     }
 
     override fun putString(

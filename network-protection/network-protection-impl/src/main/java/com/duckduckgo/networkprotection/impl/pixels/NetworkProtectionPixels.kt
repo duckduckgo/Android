@@ -19,8 +19,8 @@ package com.duckduckgo.networkprotection.impl.pixels
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.duckduckgo.networkprotection.impl.cohort.NetpCohortStore
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.*
 import com.squareup.anvil.annotations.ContributesBinding
@@ -279,19 +279,22 @@ interface NetworkProtectionPixels {
     fun reportEnabledPauseDuringCalls()
 
     fun reportDisabledPauseDuringCalls()
+
+    fun reportExcludeSystemAppsEnabledForCategory(category: String)
+    fun reportExcludeSystemAppsDisabledForCategory(category: String)
 }
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class RealNetworkProtectionPixel @Inject constructor(
     private val pixel: Pixel,
-    private val vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
+    private val sharedPreferencesProvider: SharedPreferencesProvider,
     private val cohortStore: NetpCohortStore,
     private val etTimestamp: ETTimestamp,
 ) : NetworkProtectionPixels {
 
     private val preferences: SharedPreferences by lazy {
-        vpnSharedPreferencesProvider.getSharedPreferences(
+        sharedPreferencesProvider.getSharedPreferences(
             NETP_PIXELS_PREF_FILE,
             multiprocess = true,
             migrate = false,
@@ -560,6 +563,16 @@ class RealNetworkProtectionPixel @Inject constructor(
     override fun reportDisabledPauseDuringCalls() {
         firePixel(NETP_PAUSE_ON_CALL_DISABLED)
         tryToFireDailyPixel(NETP_PAUSE_ON_CALL_ENABLED_DAILY)
+    }
+
+    override fun reportExcludeSystemAppsEnabledForCategory(category: String) {
+        firePixel(NETP_EXCLUDE_SYSTEM_APPS_ENABLED, mapOf("category" to category))
+        tryToFireDailyPixel(NETP_EXCLUDE_SYSTEM_APPS_ENABLED_DAILY, mapOf("category" to category))
+    }
+
+    override fun reportExcludeSystemAppsDisabledForCategory(category: String) {
+        firePixel(NETP_EXCLUDE_SYSTEM_APPS_DISABLED, mapOf("category" to category))
+        tryToFireDailyPixel(NETP_EXCLUDE_SYSTEM_APPS_DISABLED_DAILY, mapOf("category" to category))
     }
 
     private fun firePixel(

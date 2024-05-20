@@ -18,8 +18,8 @@ package com.duckduckgo.mobile.android.vpn.service.notification
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -29,10 +29,10 @@ interface VpnNotificationStore {
 
 @ContributesBinding(AppScope::class)
 class RealVpnNotificationStore @Inject constructor(
-    private val vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
+    private val sharedPreferencesProvider: SharedPreferencesProvider,
 ) : VpnNotificationStore {
     private val prefs: SharedPreferences by lazy {
-        vpnSharedPreferencesProvider.getSharedPreferences(FILENAME, multiprocess = true, migrate = false)
+        sharedPreferencesProvider.getSharedPreferences(FILENAME, multiprocess = true, migrate = false)
     }
 
     override var persistentNotifDimissedTimestamp: Long

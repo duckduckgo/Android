@@ -4,9 +4,9 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
-import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.test.runTest
@@ -30,7 +30,7 @@ class AppTpRemoteFeaturesStoreTest {
         appTpRemoteFeaturesStore = AppTpRemoteFeaturesStore(
             coroutineRule.testScope,
             coroutineRule.testDispatcherProvider,
-            object : VpnSharedPreferencesProvider {
+            object : SharedPreferencesProvider {
                 override fun getSharedPreferences(
                     name: String,
                     multiprocess: Boolean,
@@ -81,7 +81,7 @@ class AppTpRemoteFeaturesStoreTest {
         val store = AppTpRemoteFeaturesStore(
             coroutineRule.testScope,
             coroutineRule.testDispatcherProvider,
-            object : VpnSharedPreferencesProvider {
+            object : SharedPreferencesProvider {
                 override fun getSharedPreferences(
                     name: String,
                     multiprocess: Boolean,

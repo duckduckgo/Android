@@ -24,7 +24,8 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
     implementation project(':vpn-api')
-    implementation project(path: ':common-utils')
+    implementation project(':common-utils')
+    implementation project(':data-store-api')
 
     implementation AndroidX.core.ktx
 
