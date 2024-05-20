@@ -18,6 +18,7 @@ package com.duckduckgo.autofill.sync
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
+import com.duckduckgo.autofill.impl.FakePasswordStoreEventPlugin
 import com.duckduckgo.autofill.sync.CredentialsFixtures.invalidCredentials
 import com.duckduckgo.autofill.sync.CredentialsFixtures.spotifyCredentials
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -45,6 +46,7 @@ class CredentialsInvalidItemsViewModelTest {
         credentialsSyncMetadata,
         FakeCrypto(),
         FakeCredentialsSyncLocalValidationFeature(),
+        FakePasswordStoreEventPlugin(),
     )
 
     private val viewModel = CredentialsInvalidItemsViewModel(

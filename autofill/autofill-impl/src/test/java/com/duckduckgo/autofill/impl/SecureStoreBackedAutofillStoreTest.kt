@@ -501,6 +501,7 @@ class SecureStoreBackedAutofillStoreTest {
             autofillPrefsStore = autofillPrefsStore,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             autofillUrlMatcher = autofillUrlMatcher,
+            passwordStoreEventListenersPlugins = FakePasswordStoreEventPlugin(),
             syncCredentialsListener = SyncCredentialsListener(
                 CredentialsSyncMetadata(inMemoryAutofillDatabase().credentialsSyncDao()),
                 coroutineTestRule.testDispatcherProvider,

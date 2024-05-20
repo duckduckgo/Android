@@ -18,6 +18,7 @@ package com.duckduckgo.autofill.sync.persister
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.impl.FakePasswordStoreEventPlugin
 import com.duckduckgo.autofill.store.CredentialsSyncMetadataEntity
 import com.duckduckgo.autofill.sync.CredentialsFixtures.amazonCredentials
 import com.duckduckgo.autofill.sync.CredentialsFixtures.spotifyCredentials
@@ -63,6 +64,7 @@ internal class CredentialsLastModifiedWinsStrategyTest {
         credentialsSyncMetadata,
         FakeCrypto(),
         FakeCredentialsSyncLocalValidationFeature(),
+        FakePasswordStoreEventPlugin(),
     )
 
     @After fun after() = runBlocking {

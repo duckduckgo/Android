@@ -17,6 +17,10 @@
 package com.duckduckgo.autofill.impl.pixel
 
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENGAGEMENT_ACTIVE_USER
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENGAGEMENT_ENABLED_USER
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENGAGEMENT_ONBOARDED_USER
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENGAGEMENT_STACKED_LOGINS
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_TOOLTIP_DISMISSED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_USE_ADDRESS
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_USE_ALIAS
@@ -95,6 +99,11 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
     AUTOFILL_DEVICE_CAPABILITY_UNKNOWN_ERROR("m_autofill_device_capability_unknown"),
 
     AUTOFILL_SURVEY_AVAILABLE_PROMPT_DISPLAYED("m_autofill_management_screen_visit_survey_available"),
+
+    AUTOFILL_ENGAGEMENT_ACTIVE_USER("m_autofill_activeuser"),
+    AUTOFILL_ENGAGEMENT_ENABLED_USER("m_autofill_enableduser"),
+    AUTOFILL_ENGAGEMENT_ONBOARDED_USER("m_autofill_onboardeduser"),
+    AUTOFILL_ENGAGEMENT_STACKED_LOGINS("m_autofill_logins_stacked"),
 }
 
 @ContributesMultibinding(
@@ -107,6 +116,11 @@ object AutofillPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             EMAIL_USE_ALIAS.pixelName to PixelParameter.removeAll(),
             EMAIL_USE_ADDRESS.pixelName to PixelParameter.removeAll(),
             EMAIL_TOOLTIP_DISMISSED.pixelName to PixelParameter.removeAll(),
+
+            AUTOFILL_ENGAGEMENT_ACTIVE_USER.pixelName to PixelParameter.removeAtb(),
+            AUTOFILL_ENGAGEMENT_ENABLED_USER.pixelName to PixelParameter.removeAtb(),
+            AUTOFILL_ENGAGEMENT_ONBOARDED_USER.pixelName to PixelParameter.removeAtb(),
+            AUTOFILL_ENGAGEMENT_STACKED_LOGINS.pixelName to PixelParameter.removeAtb(),
         )
     }
 }
