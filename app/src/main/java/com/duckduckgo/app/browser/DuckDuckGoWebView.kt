@@ -49,6 +49,8 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
     private var nestedScrollHelper: NestedScrollingChildHelper = NestedScrollingChildHelper(this)
     private val helper = CoordinatorLayoutHelper()
 
+    var isDestroyed: Boolean = false
+
     constructor(context: Context) : this(context, null)
     constructor(
         context: Context,
@@ -60,6 +62,11 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         helper.onViewAttached(this)
+    }
+
+    override fun destroy() {
+        isDestroyed = true
+        super.destroy()
     }
 
     fun setBottomMatchingBehaviourEnabled(value: Boolean) {

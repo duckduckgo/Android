@@ -79,6 +79,8 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.webkit.WebViewCompat
+import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
@@ -161,6 +163,7 @@ import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.app.browser.webshare.WebShareChooser
+import com.duckduckgo.app.browser.webview.DummyWebMessageListenerFeature
 import com.duckduckgo.app.browser.webview.WebContentDebugging
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.cta.ui.DaxDialogCta.*
@@ -481,6 +484,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var subscriptions: Subscriptions
+
+    @Inject
+    lateinit var dummyWebMessageListenerFeature: DummyWebMessageListenerFeature
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -2344,9 +2350,33 @@ class BrowserTabFragment :
                     }
                 },
             )
+            addNoOpWebMessageListener(it)
         }
 
         WebView.setWebContentsDebuggingEnabled(webContentDebugging.isEnabled())
+    }
+
+    // See https://app.asana.com/0/1200204095367872/1207300292572452/f (WebMessageListener debugging)
+    private fun addNoOpWebMessageListener(webView: DuckDuckGoWebView) {
+        lifecycleScope.launch(dispatchers.main()) {
+            val isFeatureEnabled = withContext(dispatchers.io()) {
+                dummyWebMessageListenerFeature.self().isEnabled()
+            }
+
+            if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER) &&
+                isFeatureEnabled &&
+                !webView.isDestroyed
+            ) {
+                Timber.d("Adding no-op WebMessageListener")
+                WebViewCompat.addWebMessageListener(
+                    webView,
+                    "testObj",
+                    setOf("*"),
+                ) { _, _, _, _, _ ->
+                    // no-op
+                }
+            }
+        }
     }
 
     private fun screenLock(data: JsCallbackData) {
