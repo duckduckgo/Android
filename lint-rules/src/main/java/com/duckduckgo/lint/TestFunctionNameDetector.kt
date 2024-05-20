@@ -154,7 +154,10 @@ class TestFunctionNameDetector : Detector(), SourceCodeScanner {
             return null
         }
 
-        return LintFix.create().name("Use name suggested by language model").replace().all().with(proposedFunctionName).autoFix().build()
+        // Remove illegal characters
+        val sanitizedFunctionName = proposedFunctionName.replace('.', '·').replace(':', '·')
+
+        return LintFix.create().name("Use name suggested by language model").replace().all().with(sanitizedFunctionName).autoFix().build()
     }
 
     companion object {
