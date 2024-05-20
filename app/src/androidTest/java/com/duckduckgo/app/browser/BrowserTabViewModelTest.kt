@@ -2296,11 +2296,12 @@ class BrowserTabViewModelTest {
         testee.fireAutocompletePixel(suggestion)
 
         val argumentCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixel).fire(eq(AppPixelName.AUTOCOMPLETE_HISTORY_SELECTION), argumentCaptor.capture(), any(), any())
+        verify(mockPixel).fire(eq(AppPixelName.AUTOCOMPLETE_HISTORY_SEARCH_SELECTION), argumentCaptor.capture(), any(), any())
 
         assertEquals("false", argumentCaptor.firstValue[PixelParameter.SHOWED_BOOKMARKS])
         assertEquals("true", argumentCaptor.firstValue[PixelParameter.BOOKMARK_CAPABLE])
         assertEquals("true", argumentCaptor.firstValue[PixelParameter.SHOWED_HISTORY])
+        assertEquals("true", argumentCaptor.firstValue[PixelParameter.HISTORY_CAPABLE])
     }
 
     @Test
@@ -2312,7 +2313,7 @@ class BrowserTabViewModelTest {
         testee.fireAutocompletePixel(AutoCompleteSearchSuggestion("example", false))
 
         val argumentCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixel).fire(eq(AppPixelName.AUTOCOMPLETE_SEARCH_SELECTION), argumentCaptor.capture(), any(), any())
+        verify(mockPixel).fire(eq(AppPixelName.AUTOCOMPLETE_SEARCH_PHRASE_SELECTION), argumentCaptor.capture(), any(), any())
 
         assertEquals("true", argumentCaptor.firstValue[PixelParameter.SHOWED_BOOKMARKS])
         assertEquals("true", argumentCaptor.firstValue[PixelParameter.BOOKMARK_CAPABLE])
@@ -2326,7 +2327,7 @@ class BrowserTabViewModelTest {
         testee.fireAutocompletePixel(AutoCompleteSearchSuggestion("example", false))
 
         val argumentCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixel).fire(eq(AppPixelName.AUTOCOMPLETE_SEARCH_SELECTION), argumentCaptor.capture(), any(), any())
+        verify(mockPixel).fire(eq(AppPixelName.AUTOCOMPLETE_SEARCH_PHRASE_SELECTION), argumentCaptor.capture(), any(), any())
 
         assertEquals("false", argumentCaptor.firstValue[PixelParameter.SHOWED_BOOKMARKS])
         assertEquals("false", argumentCaptor.firstValue[PixelParameter.BOOKMARK_CAPABLE])
