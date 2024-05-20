@@ -64,6 +64,10 @@
     <string name="autofillDeleteLoginDialogCancel">Anulare</string>
     <string name="autofillDeleteLoginDialogDelete">Ștergere</string>
 
+    <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
+    <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in DuckDuckGo better.</string>
+    <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Numele de utilizator a fost copiat</string>
     <string name="autofillManagementPasswordCopied">Parolă copiată</string>
@@ -162,5 +166,33 @@
         <item quantity="other">Parolele tale pentru %1$s și încă alte %2$d de site-uri nu se pot sincroniza deoarece unele dintre câmpurile lor depășesc limita de caractere.</item>
     </plurals>
     <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Gestionează parolele</annotation></string>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Parola ta va fi ștearsă de pe acest dispozitiv.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural">
+        <item quantity="one">Parola ta va fi ștearsă de pe acest dispozitiv.</item>
+        <item quantity="few">Parolele tale vor fi șterse de pe acest dispozitiv.</item>
+        <item quantity="other">Parolele tale vor fi șterse de pe acest dispozitiv.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Parola ta va fi ștearsă de pe toate dispozitivele sincronizate.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural">
+        <item quantity="one">Parola ta va fi ștearsă de pe toate dispozitivele sincronizate.</item>
+        <item quantity="few">Parolele tale vor fi șterse de pe toate dispozitivele sincronizate.</item>
+        <item quantity="other">Parolele tale vor fi șterse de pe toate dispozitivele sincronizate.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Sigur dorești să ștergi această parolă?</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Sigur dorești să ștergi %1$d parolă?</item>
+        <item quantity="few">Sigur dorești să ștergi %1$d parole?</item>
+        <item quantity="other">Sigur dorești să ștergi această %1$d de parole?</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllSecondInstructionSingular">Asigură-te că ai în continuare posibilitatea de a-ți accesa contul.</string>
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural">
+        <item quantity="one">Asigură-te că ai în continuare posibilitatea de a-ți accesa contul.</item>
+        <item quantity="few">Asigură-te că ai în continuare posibilitatea de a-ți accesa conturile.</item>
+        <item quantity="other">Asigură-te că ai în continuare posibilitatea de a-ți accesa conturile.</item>
+    </plurals>
 
 </resources>

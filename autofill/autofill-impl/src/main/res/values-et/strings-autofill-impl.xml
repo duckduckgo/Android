@@ -64,6 +64,10 @@
     <string name="autofillDeleteLoginDialogCancel">Loobu</string>
     <string name="autofillDeleteLoginDialogDelete">Kustuta</string>
 
+    <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
+    <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in DuckDuckGo better.</string>
+    <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Kasutajanimi on kopeeritud</string>
     <string name="autofillManagementPasswordCopied">Parool on kopeeritud</string>
@@ -160,5 +164,29 @@
         <item quantity="other">Sinu paroolid %1$s ja %2$d muu saidi jaoks ei saa sünkroonida, kuna mõned nende väljad ületavad tähemärgipiirangu.</item>
     </plurals>
     <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Halda paroole</annotation></string>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Teie parool kustutatakse sellest seadmest.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural">
+        <item quantity="one">Sinu parool kustutatakse sellest seadmest.</item>
+        <item quantity="other">Sinu paroolid kustutatakse sellest seadmest.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Sinu parool kustutatakse kõigist sünkroonitud seadmetest.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural">
+        <item quantity="one">Sinu parool kustutatakse kõikidest sünkroonitud seadmetest.</item>
+        <item quantity="other">Sinu paroolid kustutatakse kõikidest sünkroonitud seadmetest.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Kas oled kindel, et soovid selle parooli kustutada?</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Kas soovid kindlasti %1$d parooli kustutada?</item>
+        <item quantity="other">Kas soovid kindlasti %1$d parooli kustutada?</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllSecondInstructionSingular">Veendu, et sulle jääks endiselt mõni viis oma kontole pääsemiseks.</string>
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural">
+        <item quantity="one">Veendu, et sulle jääks endiselt mõni viis oma kontole pääsemiseks.</item>
+        <item quantity="other">Veendu, et sulle jääks endiselt mõni viis oma kontodele pääsemiseks.</item>
+    </plurals>
 
 </resources>

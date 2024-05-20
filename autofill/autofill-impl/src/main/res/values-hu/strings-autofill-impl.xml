@@ -64,6 +64,10 @@
     <string name="autofillDeleteLoginDialogCancel">Mégsem</string>
     <string name="autofillDeleteLoginDialogDelete">Törlés</string>
 
+    <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
+    <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in DuckDuckGo better.</string>
+    <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Felhasználónév másolva</string>
     <string name="autofillManagementPasswordCopied">Jelszó másolva</string>
@@ -160,5 +164,29 @@
         <item quantity="other">A(z) %1$s és %2$d másik webhely jelszavai nem szinkronizálhatók, mert egyes mezőik meghaladják a karakterkorlátot.</item>
     </plurals>
     <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Jelszavak kezelése</annotation></string>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">A jelszó törölve lesz erről az eszközről.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural">
+        <item quantity="one">A jelszavad törölve lesz erről az eszközről.</item>
+        <item quantity="other">A jelszavaid törölve lesznek erről az eszközről.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">A jelszó az összes szinkronizált eszközről törölve lesz.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural">
+        <item quantity="one">A jelszavad törölve lesz minden szinkronizált eszközről.</item>
+        <item quantity="other">A jelszavaid törölve lesznek minden szinkronizált eszközről.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Biztosan törlöd ezt a jelszót?</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Biztosan törölni szeretnél %1$d jelszót?</item>
+        <item quantity="other">Biztosan törölni szeretnél %1$d jelszót?</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllSecondInstructionSingular">Győződj meg róla, hogy továbbra is hozzáférsz a fiókodhoz.</string>
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural">
+        <item quantity="one">Győződj meg róla, hogy továbbra is hozzáférsz a fiókodhoz.</item>
+        <item quantity="other">Győződj meg róla, hogy továbbra is hozzáférsz a fiókjaidhoz.</item>
+    </plurals>
 
 </resources>

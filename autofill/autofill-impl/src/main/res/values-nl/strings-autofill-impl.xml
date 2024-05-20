@@ -64,6 +64,10 @@
     <string name="autofillDeleteLoginDialogCancel">Annuleren</string>
     <string name="autofillDeleteLoginDialogDelete">Verwijderen</string>
 
+    <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
+    <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in DuckDuckGo better.</string>
+    <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Gebruikersnaam gekopieerd</string>
     <string name="autofillManagementPasswordCopied">Wachtwoord gekopieerd</string>
@@ -160,5 +164,29 @@
         <item quantity="other">Je wachtwoorden voor %1$s en %2$d andere websites kunnen niet worden gesynchroniseerd omdat sommige velden de tekenlimiet overschrijden.</item>
     </plurals>
     <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Wachtwoorden beheren</annotation></string>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Je wachtwoord wordt van dit apparaat verwijderd.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural">
+        <item quantity="one">Je wachtwoord wordt van dit apparaat verwijderd.</item>
+        <item quantity="other">Je wachtwoorden worden van dit apparaat verwijderd.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Je wachtwoord wordt verwijderd van alle gesynchroniseerde apparaten.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural">
+        <item quantity="one">Je wachtwoord wordt verwijderd van alle gesynchroniseerde apparaten.</item>
+        <item quantity="other">Je wachtwoorden worden verwijderd van alle gesynchroniseerde apparaten.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Weet je zeker dat je dit wachtwoord wilt verwijderen?</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Weet je zeker dat je %1$d wachtwoord wilt verwijderen?</item>
+        <item quantity="other">Weet je zeker dat je %1$d wachtwoorden wilt verwijderen?</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllSecondInstructionSingular">Zorg ervoor dat je nog steeds toegang hebt tot je account.</string>
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural">
+        <item quantity="one">Zorg ervoor dat je nog steeds toegang hebt tot je account.</item>
+        <item quantity="other">Zorg ervoor dat je nog steeds toegang hebt tot je accounts.</item>
+    </plurals>
 
 </resources>

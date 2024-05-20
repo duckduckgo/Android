@@ -64,6 +64,10 @@
     <string name="autofillDeleteLoginDialogCancel">Abbrechen</string>
     <string name="autofillDeleteLoginDialogDelete">Löschen</string>
 
+    <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
+    <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in DuckDuckGo better.</string>
+    <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Benutzername kopiert</string>
     <string name="autofillManagementPasswordCopied">Passwort kopiert</string>
@@ -160,5 +164,29 @@
         <item quantity="other">Deine Passwörter für %1$s und %2$d andere Websites können nicht synchronisiert werden, weil einige ihrer Felder das Zeichenlimit überschreiten.</item>
     </plurals>
     <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Passwörter verwalten</annotation></string>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Dein Passwort wird von diesem Gerät gelöscht.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural">
+        <item quantity="one">Dein Passwort wird von diesem Gerät gelöscht.</item>
+        <item quantity="other">Deine Passwörter werden von diesem Gerät gelöscht.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Dein Passwort wird von allen synchronisierten Geräten gelöscht.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural">
+        <item quantity="one">Dein Passwort wird von allen synchronisierten Geräten gelöscht.</item>
+        <item quantity="other">Deine Passwörter werden von allen synchronisierten Geräten gelöscht.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Möchtest du dieses Passwort wirklich löschen?</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Möchtest du dieses %1$d Passwort wirklich löschen?</item>
+        <item quantity="other">Möchtest du diese %1$d Passwörter wirklich löschen?</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllSecondInstructionSingular">Vergewissere dich, dass du weiterhin eine Möglichkeit hast, auf dein Konto zuzugreifen.</string>
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural">
+        <item quantity="one">Vergewissere dich, dass du weiterhin eine Möglichkeit hast, auf dein Konto zuzugreifen.</item>
+        <item quantity="other">Vergewissere dich, dass du weiterhin eine Möglichkeit hast, auf deine Konten zuzugreifen.</item>
+    </plurals>
 
 </resources>

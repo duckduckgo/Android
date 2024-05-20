@@ -64,6 +64,10 @@
     <string name="autofillDeleteLoginDialogCancel">Отмени</string>
     <string name="autofillDeleteLoginDialogDelete">Изтрий</string>
 
+    <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
+    <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in DuckDuckGo better.</string>
+    <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Потребителското име е копирано</string>
     <string name="autofillManagementPasswordCopied">Паролата е копирана</string>
@@ -160,5 +164,29 @@
         <item quantity="other">Вашите пароли за %1$s и %2$d други сайта не могат да се синхронизират, защото някои от техните полета надвишават ограничението за знаци.</item>
     </plurals>
     <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Управление на пароли</annotation></string>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Вашата парола ще бъде изтрита от това устройство.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural">
+        <item quantity="one">Вашата парола ще бъде изтрита от това устройство.</item>
+        <item quantity="other">Вашите пароли ще бъдат изтрити от това устройство.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Вашата парола ще бъде изтрита от всички синхронизирани устройства.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural">
+        <item quantity="one">Вашата парола ще бъде изтрита от всички синхронизирани устройства.</item>
+        <item quantity="other">Вашите пароли ще бъдат изтрити от всички синхронизирани устройства.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Сигурни ли сте, че искате да изтриете тази парола?</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Сигурни ли сте, че искате да изтриете %1$d парола?</item>
+        <item quantity="other">Сигурни ли сте, че искате да изтриете %1$d пароли?</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllSecondInstructionSingular">Уверете се, че все още имате друг начин за достъп до акаунта си.</string>
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural">
+        <item quantity="one">Уверете се, че все още имате друг начин за достъп до Вашия акаунт.</item>
+        <item quantity="other">Уверете се, че все още имате друг начин за достъп до Вашите акаунти.</item>
+    </plurals>
 
 </resources>

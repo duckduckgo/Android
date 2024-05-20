@@ -64,6 +64,10 @@
     <string name="autofillDeleteLoginDialogCancel">Zrušit</string>
     <string name="autofillDeleteLoginDialogDelete">Smazat</string>
 
+    <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
+    <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in DuckDuckGo better.</string>
+    <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Uživatelské jméno zkopírováno</string>
     <string name="autofillManagementPasswordCopied">Heslo zkopírováno</string>
@@ -164,5 +168,37 @@
         <item quantity="other">Tvoje hesla pro %1$s a %2$d dalších webů se nedají synchronizovat, protože některá z jejich polí překračují maximální počet znaků.</item>
     </plurals>
     <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Spravovat hesla</annotation></string>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Tvoje heslo se z tohohle zařízení smaže.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural">
+        <item quantity="one">Tvoje heslo se z tohohle zařízení smaže.</item>
+        <item quantity="few">Tvoje hesla se z tohohle zařízení smažou.</item>
+        <item quantity="many">Tvoje hesla se z tohohle zařízení smažou.</item>
+        <item quantity="other">Tvoje hesla se z tohohle zařízení smažou.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Tvoje heslo se smaže ze všech synchronizovaných zařízení.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural">
+        <item quantity="one">Tvoje heslo se smaže ze všech synchronizovaných zařízení.</item>
+        <item quantity="few">Tvoje hesla se smažou ze všech synchronizovaných zařízení.</item>
+        <item quantity="many">Tvoje hesla se smažou ze všech synchronizovaných zařízení.</item>
+        <item quantity="other">Tvoje hesla se smažou ze všech synchronizovaných zařízení.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Opravdu chceš smazat tohle heslo?</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Opravdu chceš smazat %1$d heslo?</item>
+        <item quantity="few">Opravdu chceš smazat %1$d hesla?</item>
+        <item quantity="many">Opravdu chceš smazat %1$d hesla?</item>
+        <item quantity="other">Opravdu chceš smazat %1$d hesel?</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllSecondInstructionSingular">Zkontroluj si předtím, že se i tak dostaneš ke svému účtu.</string>
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural">
+        <item quantity="one">Zkontroluj si předtím, že se k účtu i tak dostaneš.</item>
+        <item quantity="few">Zkontroluj si předtím, že se k účtům i tak dostaneš.</item>
+        <item quantity="many">Zkontroluj si předtím, že se k účtům i tak dostaneš.</item>
+        <item quantity="other">Zkontroluj si předtím, že se k účtům i tak dostaneš.</item>
+    </plurals>
 
 </resources>

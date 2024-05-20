@@ -64,6 +64,10 @@
     <string name="autofillDeleteLoginDialogCancel">Avbryt</string>
     <string name="autofillDeleteLoginDialogDelete">Ta bort</string>
 
+    <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
+    <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in DuckDuckGo better.</string>
+    <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Användarnamn kopierat</string>
     <string name="autofillManagementPasswordCopied">Lösenord kopierat</string>
@@ -160,5 +164,29 @@
         <item quantity="other">Dina lösenord för %1$s och %2$d andra webbplatser kan inte synkroniseras eftersom vissa av deras fält överskrider teckengränsen.</item>
     </plurals>
     <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Hantera lösenord</annotation></string>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Ditt lösenord kommer att raderas från denna enhet.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural">
+        <item quantity="one">Ditt lösenord kommer att raderas från denna enhet.</item>
+        <item quantity="other">Dina lösenord kommer att raderas från denna enhet.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Ditt lösenord kommer att raderas från alla synkroniserade enheter.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural">
+        <item quantity="one">Ditt lösenord kommer att raderas från alla synkroniserade enheter.</item>
+        <item quantity="other">Dina lösenord kommer att raderas från alla synkroniserade enheter.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Är du säker på att du vill radera detta lösenord?</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Är du säker på att du vill radera %1$d lösenord?</item>
+        <item quantity="other">Är du säker på att du vill radera %1$d lösenord?</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllSecondInstructionSingular">Se till att du har kvar ett sätt att komma åt ditt konto.</string>
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural">
+        <item quantity="one">Se till att du har kvar ett sätt att komma åt ditt konto.</item>
+        <item quantity="other">Se till att du har kvar ett sätt att komma åt dina konton.</item>
+    </plurals>
 
 </resources>
