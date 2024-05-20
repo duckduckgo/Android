@@ -208,7 +208,6 @@ class SubscriptionMessagingInterface @Inject constructor(
                     subscriptionsChecker.runChecker()
                     pixelSender.reportRestoreUsingEmailSuccess()
                     pixelSender.reportSubscriptionActivated()
-                    jsMessageCallback?.process(featureName, jsMessage.method, jsMessage.id, jsMessage.params)
                 }
             } catch (e: Exception) {
                 logcat { "Error parsing the token" }

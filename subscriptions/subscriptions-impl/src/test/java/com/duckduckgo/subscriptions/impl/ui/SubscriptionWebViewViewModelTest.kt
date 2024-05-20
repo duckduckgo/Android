@@ -284,24 +284,6 @@ class SubscriptionWebViewViewModelTest {
     }
 
     @Test
-    fun whenSetSubscriptionAndExpiredSubscriptionThenCommandNotSent() = runTest {
-        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(EXPIRED)
-        viewModel.commands().test {
-            viewModel.processJsCallbackMessage("test", "setSubscription", null, null)
-            assertTrue(awaitItem() is Command.SubscriptionRecoveredExpired)
-        }
-    }
-
-    @Test
-    fun whenSetSubscriptionAndActiveSubscriptionThenCommandNotSent() = runTest {
-        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
-        viewModel.commands().test {
-            viewModel.processJsCallbackMessage("test", "setSubscription", null, null)
-            ensureAllEventsConsumed()
-        }
-    }
-
-    @Test
     fun whenFeatureSelectedAndNoDataThenCommandNotSent() = runTest {
         whenever(subscriptionsManager.subscriptionStatus()).thenReturn(EXPIRED)
         viewModel.commands().test {

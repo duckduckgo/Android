@@ -84,7 +84,6 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.RestoreSubscription
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SendJsEvent
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SendResponseToJs
-import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SubscriptionRecoveredExpired
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SubscriptionSelected
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView
 import com.duckduckgo.user.agent.api.UserAgentProvider
@@ -403,7 +402,6 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             is GoToITR -> goToITR()
             is GoToPIR -> goToPIR()
             is GoToNetP -> goToNetP(command.activityParams)
-            is SubscriptionRecoveredExpired -> subscriptionNotFound()
         }
     }
 
@@ -494,22 +492,6 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
                         finish()
-                    }
-                },
-            )
-            .show()
-    }
-
-    private fun subscriptionNotFound() {
-        TextAlertDialogBuilder(this)
-            .setTitle(string.subscriptionNotFound)
-            .setMessage(string.subscriptionNotFoundEmailDescription)
-            .setDestructiveButtons(false)
-            .setPositiveButton(string.ok)
-            .addEventListener(
-                object : TextAlertDialogBuilder.EventListener() {
-                    override fun onPositiveButtonClicked() {
-                        backToSettings()
                     }
                 },
             )

@@ -42,7 +42,6 @@
     <string name="viewPlans">View Plans</string>
     <string name="subscriptionNotFound">Subscription Not Found</string>
     <string name="subscriptionNotFoundDescription">The subscription associated with this Google Play account is no longer active.</string>
-    <string name="subscriptionNotFoundEmailDescription">The subscription associated with this email is no longer active, or we could not find it.</string>
     <string name="purchaseRestored">Your purchases have been restored.</string>
     <string name="restoreSubscriptionTitle">Activate your subscription on this device</string>
     <string name="restoreSubscriptionDescription">Access your Privacy Pro subscription on this device via Google Play or an email address.</string>
