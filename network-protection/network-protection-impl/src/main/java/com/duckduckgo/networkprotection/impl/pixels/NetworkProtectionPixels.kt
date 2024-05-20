@@ -19,8 +19,8 @@ package com.duckduckgo.networkprotection.impl.pixels
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.duckduckgo.networkprotection.impl.cohort.NetpCohortStore
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.*
 import com.squareup.anvil.annotations.ContributesBinding
@@ -288,13 +288,13 @@ interface NetworkProtectionPixels {
 @SingleInstanceIn(AppScope::class)
 class RealNetworkProtectionPixel @Inject constructor(
     private val pixel: Pixel,
-    private val vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
+    private val sharedPreferencesProvider: SharedPreferencesProvider,
     private val cohortStore: NetpCohortStore,
     private val etTimestamp: ETTimestamp,
 ) : NetworkProtectionPixels {
 
     private val preferences: SharedPreferences by lazy {
-        vpnSharedPreferencesProvider.getSharedPreferences(
+        sharedPreferencesProvider.getSharedPreferences(
             NETP_PIXELS_PREF_FILE,
             multiprocess = true,
             migrate = false,

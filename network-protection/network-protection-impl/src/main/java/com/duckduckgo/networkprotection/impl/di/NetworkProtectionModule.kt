@@ -19,8 +19,8 @@ package com.duckduckgo.networkprotection.impl.di
 import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
@@ -44,8 +44,8 @@ object DataModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun provideNetworkProtectionRepository(
-        vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
-    ): NetworkProtectionPrefs = RealNetworkProtectionPrefs(vpnSharedPreferencesProvider)
+        sharedPreferencesProvider: SharedPreferencesProvider,
+    ): NetworkProtectionPrefs = RealNetworkProtectionPrefs(sharedPreferencesProvider)
 
     @SingleInstanceIn(AppScope::class)
     @Provides
@@ -109,6 +109,6 @@ object NetPBreakageCategoriesModule {
 object NetPDataStoreModule {
     @Provides
     fun provideNetPDataStore(
-        vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
-    ): NetpDataStore = NetpDataStoreSharedPreferences(vpnSharedPreferencesProvider)
+        sharedPreferencesProvider: SharedPreferencesProvider,
+    ): NetpDataStore = NetpDataStoreSharedPreferences(sharedPreferencesProvider)
 }

@@ -44,6 +44,7 @@ dependencies {
     implementation project(':subscriptions-api')
     implementation project(':settings-api')
     implementation project(':remote-messaging-api')
+    implementation project(':data-store-api')
 
     implementation AndroidX.appCompat
     implementation AndroidX.constraintLayout
@@ -63,6 +64,7 @@ dependencies {
 
     testImplementation project(':common-test')
     testImplementation project(':vpn-api-test')
+    testImplementation project(':data-store-test')
     testImplementation CashApp.turbine
     testImplementation Testing.junit4
     testImplementation AndroidX.archCore.testing

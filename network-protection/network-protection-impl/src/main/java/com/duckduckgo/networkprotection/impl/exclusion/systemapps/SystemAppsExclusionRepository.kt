@@ -21,10 +21,10 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import androidx.core.content.edit
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.mobile.android.vpn.exclusion.SystemAppOverridesProvider
-import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.duckduckgo.networkprotection.impl.exclusion.isSystemApp
 import com.duckduckgo.networkprotection.impl.exclusion.systemapps.SystemAppsExclusionRepository.SystemAppCategory
 import com.duckduckgo.networkprotection.impl.exclusion.systemapps.SystemAppsExclusionRepository.SystemAppCategory.Communication
@@ -62,13 +62,13 @@ interface SystemAppsExclusionRepository {
 @SingleInstanceIn(AppScope::class)
 class RealSystemAppsExclusionRepository @Inject constructor(
     private val netPSettingsLocalConfig: NetPSettingsLocalConfig,
-    private val vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
+    private val sharedPreferencesProvider: SharedPreferencesProvider,
     private val packageManager: PackageManager,
     private val systemAppOverridesProvider: SystemAppOverridesProvider,
     private val dispatcherProvider: DispatcherProvider,
 ) : SystemAppsExclusionRepository {
     private val preferences: SharedPreferences by lazy {
-        vpnSharedPreferencesProvider.getSharedPreferences(
+        sharedPreferencesProvider.getSharedPreferences(
             FILENAME,
             multiprocess = false,
             migrate = false,

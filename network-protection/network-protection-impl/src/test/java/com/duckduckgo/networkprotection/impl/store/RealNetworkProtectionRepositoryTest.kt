@@ -16,7 +16,7 @@
 
 package com.duckduckgo.networkprotection.impl.store
 
-import com.duckduckgo.mobile.android.vpn.prefs.FakeVpnSharedPreferencesProvider
+import com.duckduckgo.data.store.api.FakeSharedPreferencesProvider
 import com.duckduckgo.networkprotection.store.NetworkProtectionPrefs
 import com.duckduckgo.networkprotection.store.RealNetworkProtectionPrefs
 import com.wireguard.config.Config
@@ -53,7 +53,7 @@ class RealNetworkProtectionRepositoryTest {
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
-        networkProtectionPrefs = RealNetworkProtectionPrefs(FakeVpnSharedPreferencesProvider())
+        networkProtectionPrefs = RealNetworkProtectionPrefs(FakeSharedPreferencesProvider())
         testee = RealNetworkProtectionRepository(networkProtectionPrefs)
     }
 

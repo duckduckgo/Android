@@ -18,7 +18,6 @@ package com.duckduckgo.mobile.android.vpn.bugreport
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.net.*
 import android.os.SystemClock
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope

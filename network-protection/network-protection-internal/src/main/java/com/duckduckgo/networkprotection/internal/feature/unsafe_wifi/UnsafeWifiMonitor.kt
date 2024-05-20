@@ -33,8 +33,8 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.notification.checkPermissionAndNotify
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.notification.NetPDisabledNotificationBuilder
 import com.duckduckgo.networkprotection.impl.notification.NetPDisabledNotificationScheduler
@@ -55,7 +55,7 @@ class UnsafeWifiMonitor @Inject constructor(
     private val netPDisabledNotificationBuilder: NetPDisabledNotificationBuilder,
     private val notificationManager: NotificationManagerCompat,
     private val dispatcherProvider: DispatcherProvider,
-    private val sharedPreferencesProvider: VpnSharedPreferencesProvider,
+    private val sharedPreferencesProvider: SharedPreferencesProvider,
     private val appBuildConfig: AppBuildConfig,
 ) : MainProcessLifecycleObserver {
 

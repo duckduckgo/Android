@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.prefs
+package com.duckduckgo.data.store.api
 
 import android.content.SharedPreferences
 
-interface VpnSharedPreferencesProvider {
+interface SharedPreferencesProvider {
     /**
      * Returns an instance of Shared preferences
      * @param name Name of the shared preferences
      * @param multiprocess `true` if the shared preferences will be accessed from several processes else `false`
-     * @param migrate `true` if the shared preferences existed prior to use the [VpnSharedPreferencesProvider], else `false`
+     * @param migrate `true` if the shared preferences existed prior to use the [SharedPreferencesProvider], else `false`
      */
     fun getSharedPreferences(name: String, multiprocess: Boolean = false, migrate: Boolean = false): SharedPreferences
 

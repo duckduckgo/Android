@@ -16,9 +16,9 @@
 
 package com.duckduckgo.networkprotection.impl
 
+import com.duckduckgo.data.store.api.FakeSharedPreferencesProvider
 import com.duckduckgo.mobile.android.vpn.network.FakeDnsProvider
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack.VpnTunnelConfig
-import com.duckduckgo.mobile.android.vpn.prefs.FakeVpnSharedPreferencesProvider
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.RESTART
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.SELF_STOP
 import com.duckduckgo.networkprotection.impl.config.NetPDefaultConfigProvider
@@ -104,7 +104,7 @@ class WgVpnNetworkStackTest {
 
         privateDnsProvider = FakeDnsProvider()
         networkProtectionRepository = RealNetworkProtectionRepository(
-            RealNetworkProtectionPrefs(FakeVpnSharedPreferencesProvider()),
+            RealNetworkProtectionPrefs(FakeSharedPreferencesProvider()),
         )
 
         wgConfig = Config.parse(BufferedReader(StringReader(wgQuickConfig)))

@@ -18,9 +18,9 @@ package com.duckduckgo.networkprotection.impl.configuration
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.VpnScope
-import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.duckduckgo.networkprotection.impl.config.NetPDefaultConfigProvider
 import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.Mode.FailureRecovery
 import com.squareup.anvil.annotations.ContributesBinding
@@ -246,10 +246,10 @@ class RealWgTunnel @Inject constructor(
 private annotation class InternalApi
 
 class WgTunnelStore constructor(
-    private val vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
+    private val sharedPreferencesProvider: SharedPreferencesProvider,
 ) {
     private val prefs: SharedPreferences by lazy {
-        vpnSharedPreferencesProvider.getSharedPreferences(FILENAME, multiprocess = true, migrate = false)
+        sharedPreferencesProvider.getSharedPreferences(FILENAME, multiprocess = true, migrate = false)
     }
 
     var wireguardConfig: Config?
@@ -292,7 +292,7 @@ class WgTunnelStore constructor(
 object WgTunnelStoreModule {
     @Provides
     @InternalApi
-    fun provideWgTunnelStore(preferencesProvider: VpnSharedPreferencesProvider): WgTunnelStore {
+    fun provideWgTunnelStore(preferencesProvider: SharedPreferencesProvider): WgTunnelStore {
         return WgTunnelStore(preferencesProvider)
     }
 }
