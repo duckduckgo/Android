@@ -49,7 +49,7 @@ class VariantManagerImpl @Inject constructor(
 
     override fun updateVariants(variantConfig: List<VariantConfig>) {
         val activeVariants = variantConfig.toVariants()
-        Timber.d("Variants update $activeVariants")
+        Timber.d("Variants update $variantConfig")
         val currentVariantKey = experimentVariantRepository.getUserVariant()
 
         updateUserVariant(activeVariants, currentVariantKey)
