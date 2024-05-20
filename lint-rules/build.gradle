@@ -13,19 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 
 apply plugin: 'java-library'
 apply plugin: 'kotlin'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+def shade = configurations.maybeCreate("compileShaded")
+configurations.getByName("compileOnly").extendsFrom(shade)
 
 dependencies {
     compileOnly Kotlin.stdlib.jdk7
     compileOnly "com.android.tools.lint:lint-api:$lint_version"
     compileOnly "com.android.tools.lint:lint-checks:$lint_version"
 
+    compileShaded 'dev.langchain4j:langchain4j-ollama:0.30.0'
+
     testImplementation Testing.junit4
+
     testImplementation "com.android.tools.lint:lint-api:$lint_version"
     testImplementation "com.android.tools.lint:lint-tests:$lint_version"
+
+    // Dupe the dependency as compileShaded is effectively compileOnly
+    testImplementation 'dev.langchain4j:langchain4j-ollama:0.30.0'
 }
+
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
@@ -38,4 +50,17 @@ kotlin {
 
 tasks.register('jvm_checks') {
     dependsOn 'test'
+}
+
+def shadowJar = tasks.shadowJar
+shadowJar.configure {
+    archiveClassifier.set("")
+    configurations = [shade]
+    transformers.add(new ServiceFileTransformer())
+}
+
+
+artifacts {
+    runtimeOnly(shadowJar)
+    archives(shadowJar)
 }

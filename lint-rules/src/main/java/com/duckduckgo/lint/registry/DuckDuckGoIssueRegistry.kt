@@ -30,6 +30,7 @@ import com.duckduckgo.lint.NoRetrofitCreateMethodCallDetector.Companion.NO_RETRO
 import com.duckduckgo.lint.NoRobolectricTestRunnerDetector.Companion.NO_ROBOLECTRIC_TEST_RUNNER_ISSUE
 import com.duckduckgo.lint.NoSingletonDetector.Companion.NO_SINGLETON_ISSUE
 import com.duckduckgo.lint.NoSystemLoadLibraryDetector.Companion.NO_SYSTEM_LOAD_LIBRARY
+import com.duckduckgo.lint.TestFunctionNameDetector.Companion.TEST_FUNCTION_NAME
 import com.duckduckgo.lint.strings.MissingInstructionDetector.Companion.MISSING_INSTRUCTION
 import com.duckduckgo.lint.strings.PlaceholderDetector.Companion.PLACEHOLDER_MISSING_POSITION
 import com.duckduckgo.lint.ui.ColorAttributeInXmlDetector.Companion.INVALID_COLOR_ATTRIBUTE
@@ -74,8 +75,8 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             INVALID_SKELETON_VIEW_BACKGROUND,
             WRONG_STYLE_PARAMETER,
             WRONG_STYLE_NAME,
-            INVALID_COLOR_ATTRIBUTE
-
+            INVALID_COLOR_ATTRIBUTE,
+            TEST_FUNCTION_NAME,
         )
 
     override val api: Int

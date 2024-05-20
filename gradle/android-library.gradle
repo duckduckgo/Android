@@ -31,6 +31,7 @@ android {
     }
 
     lint {
+        checkOnly += "TestFunctionName"
         abortOnError true
         ignoreTestSources false
     }
