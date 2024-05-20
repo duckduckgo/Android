@@ -183,6 +183,9 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     AUTOCOMPLETE_SEARCH_SELECTION("m_aut_s_s"),
     AUTOCOMPLETE_HISTORY_SELECTION("m_autocomplete_history_selection"),
 
+    AUTOCOMPLETE_TOGGLED_OFF("m_autocomplete_toggled_off"),
+    AUTOCOMPLETE_TOGGLED_ON("m_autocomplete_toggled_on"),
+
     AUTOCOMPLETE_HISTORY_TOGGLED_OFF("m_autocomplete_history_toggled_off"),
     AUTOCOMPLETE_HISTORY_TOGGLED_ON("m_autocomplete_history_toggled_on"),
 
