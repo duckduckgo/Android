@@ -65,7 +65,7 @@ Java_com_duckduckgo_app_anr_ndk_NativeCrashInit_jni_1register_1sighandler(
 
     send_crash_handle_init_pixel();
 
-    log_print(ANDROID_LOG_ERROR, "Native crash handler successfully initialized.");
+    log_print(ANDROID_LOG_ERROR, "Native crash handler successfully initialized on %s.", pname);
 }
 
 extern "C" JNIEXPORT void JNICALL

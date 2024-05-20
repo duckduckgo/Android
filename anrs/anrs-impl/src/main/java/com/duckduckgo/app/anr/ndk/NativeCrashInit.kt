@@ -43,6 +43,10 @@ import logcat.logcat
     scope = AppScope::class,
     boundType = MainProcessLifecycleObserver::class,
 )
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = VpnProcessLifecycleObserver::class,
+)
 @SingleInstanceIn(AppScope::class)
 class NativeCrashInit @Inject constructor(
     context: Context,
@@ -89,7 +93,8 @@ class NativeCrashInit @Inject constructor(
 
     private suspend fun jniRegisterNativeSignalHandler() = withContext(dispatcherProvider.io()) {
         runCatching {
-            if (!nativeCrashFeature.nativeCrashHandling().isEnabled()) return@withContext
+            if (isMainProcess && !nativeCrashFeature.nativeCrashHandling().isEnabled()) return@withContext
+            if (!isMainProcess && !nativeCrashFeature.nativeCrashHandlingSecondaryProcess().isEnabled()) return@withContext
 
             val logLevel = if (appBuildConfig.isDebug || appBuildConfig.isInternalBuild()) {
                 Log.VERBOSE
