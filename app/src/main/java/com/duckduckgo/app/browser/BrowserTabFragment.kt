@@ -163,8 +163,8 @@ import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.app.browser.webshare.WebShareChooser
+import com.duckduckgo.app.browser.webview.DummyWebMessageListenerFeature
 import com.duckduckgo.app.browser.webview.WebContentDebugging
-import com.duckduckgo.app.browser.webview.WebMessageListenerFeature
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.cta.ui.DaxDialogCta.*
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -486,7 +486,7 @@ class BrowserTabFragment :
     lateinit var subscriptions: Subscriptions
 
     @Inject
-    lateinit var webMessageListenerFeature: WebMessageListenerFeature
+    lateinit var dummyWebMessageListenerFeature: DummyWebMessageListenerFeature
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -2358,17 +2358,19 @@ class BrowserTabFragment :
 
     // See https://app.asana.com/0/1200204095367872/1207300292572452/f (WebMessageListener debugging)
     private fun addNoOpWebMessageListener(webView: DuckDuckGoWebView) {
-        if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER) &&
-            webMessageListenerFeature.self().isEnabled() &&
-            !webView.isDestroyed
-        ) {
-            Timber.d("Adding no-op WebMessageListener")
-            WebViewCompat.addWebMessageListener(
-                webView,
-                "testObj",
-                setOf("*"),
-            ) { _, _, _, _, _ ->
-                // no-op
+        lifecycleScope.launch(dispatchers.io()) {
+            if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER) &&
+                dummyWebMessageListenerFeature.self().isEnabled() &&
+                !webView.isDestroyed
+            ) {
+                Timber.d("Adding no-op WebMessageListener")
+                WebViewCompat.addWebMessageListener(
+                    webView,
+                    "testObj",
+                    setOf("*"),
+                ) { _, _, _, _, _ ->
+                    // no-op
+                }
             }
         }
     }

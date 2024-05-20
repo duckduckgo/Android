@@ -22,10 +22,10 @@ import com.duckduckgo.feature.toggles.api.Toggle
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
-    featureName = "webMessageListener",
+    featureName = "dummyWebMessageListener",
 )
 
-interface WebMessageListenerFeature {
+interface DummyWebMessageListenerFeature {
 
     @Toggle.DefaultValue(false)
     fun self(): Toggle
