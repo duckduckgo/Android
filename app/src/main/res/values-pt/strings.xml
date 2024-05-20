@@ -828,4 +828,45 @@
     <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">O certificado de segurança de %1$s expirou. É possível que o site esteja mal configurado, que um invasor tenha comprometido a tua ligação ou que o teu relógio do sistema esteja incorreto.</string>
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">O certificado de segurança de %1$s não corresponde a *.%2$s. É possível que o site esteja mal configurado, que um invasor tenha comprometido a tua ligação ou que o teu relógio do sistema esteja incorreto.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">O sistema operativo do teu dispositivo não confia no certificado de segurança de %1$s. É possível que o site esteja mal configurado, que um invasor tenha comprometido a tua ligação ou que o teu relógio do sistema esteja incorreto.</string>
+
+    <!-- Onboarding Experiment-->
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Olá!<br/><br/>A postos para uma Internet melhor e mais privada?]]></string>
+    <string name="preOnboardingDaxDialog1Button">Vamos lá!</string>
+    <string name="preOnboardingDaxDialog2Title">Proteções de privacidade ativadas!</string>
+    <string name="preOnboardingDaxDialog2Button">Escolhe o teu navegador</string>
+    <string name="preOnboardingComparisonChartItem1">Pesquisa em privado por predefinição</string>
+    <string name="preOnboardingComparisonChartItem2">Bloqueia rastreadores de terceiros</string>
+    <string name="preOnboardingComparisonChartItem3">Bloquear pop-ups de cookies</string>
+    <string name="preOnboardingComparisonChartItem4">Bloquear anúncios assustadores</string>
+    <string name="preOnboardingComparisonChartItem5">Apaga rapidamente os dados de navegação</string>
+    <string name="preOnboardingDaxDialog3Title">Fantástico! Damos-te as boas-vindas ao Duck Side.</string>
+    <string name="preOnboardingDaxDialog3Button">Iniciar a navegação</string>
+    <string name="onboardingSearchDaxDialogTitle">Tente uma pesquisa!</string>
+    <string name="onboardingSearchDaxDialogDescription">As tuas pesquisas no DuckDuckGo são sempre anónimas.</string>
+    <string name="onboardingSearchDaxDialogOption1">como dizer \"pato\" em espanhol</string>
+    <string name="onboardingSearchDaxDialogOption2">elenco do filme A Hora dos Campeões</string>
+    <string name="onboardingSearchDaxDialogOption3">meteorologia local</string>
+    <string name="onboardingSearchDaxDialogOption4">Surpreende-me!</string>
+    <string name="onboardingSitesDaxDialogTitle">Experimenta visitar um site!</string>
+    <string name="onboardingSitesDaxDialogDescription">Bloquearei rastreadores para que não te espiem.</string>
+    <string name="onboardingSitesDaxDialogOption1">espn.com</string>
+    <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
+    <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
+    <string name="onboardingSitesDaxDialogOption4">Surpreende-me!</string>
+    <string name="onboardingSerpDaxDialogDescription">É a DuckDuckGo Search. Privado. Rápido. Menos anúncios.</string>
+    <string name="onboardingSerpDaxDialogButton">Entendi!</string>
+    <string name="onboardingSitesSuggestionsDaxDialogTitle">Em seguida, experimenta visitar um site!</string>
+    <plurals name="onboardingTrackersBlockedDialogDescription">
+        <item quantity="one"><![CDATA[ e <b>mais %1$d</b> estavam tentar rastrear-te aqui. Eu bloqueei-os!<br/><br/>☝️ Toca no escudo para obteres mais informações.️]]></item>
+        <item quantity="other"><![CDATA[ e <b>mais %1$d</b> estavam a tentar rastrear-te aqui. Eu bloqueei-os!<br/><br/>☝️ Toca no escudo para obteres mais informações.]]></item>
+    </plurals>
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ estavam a tentar rastrear-te aqui. Eu bloqueei-o!<br/><br/>☝️ Toca no escudo para obteres mais informações.️]]></item>
+        <item quantity="other"><![CDATA[ estavam a tentar rastrear-te aqui. Eu bloqueei-os!<br/><br/>☝️ Toca no escudo para obteres mais informações.️]]></item>
+    </plurals>
+    <string name="onboardingTrackersBlockedDaxDialogButton">Entendi!</string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Limpa instantaneamente a tua atividade de navegação com o <b>Fire Button</b>.<br/><br/>Experimenta! ☝️️]]></string>
+    <string name="onboardingEndDaxDialogTitle">"Tu consegues!"</string>
+    <string name="onboardingEndDaxDialogDescription">Lembra-te: sempre que navegas comigo, um anúncio assustador perde as suas asas. 👌</string>
+
 </resources>

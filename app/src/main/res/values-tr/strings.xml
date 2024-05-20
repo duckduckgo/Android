@@ -828,4 +828,45 @@
     <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">%1$s için güvenlik sertifikasının süresi doldu. Web sitesi yanlış yapılandırılmış, bir saldırgan bağlantınızı tehlikeye atmış veya sistem saatiniz yanlış ayarlanmış olabilir.</string>
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">%1$s için güvenlik sertifikası eşleşmiyor *.%2$s. Web sitesi yanlış yapılandırılmış, bir saldırgan bağlantınızı tehlikeye atmış veya sistem saatiniz yanlış ayarlanmış olabilir.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Cihazınızın işletim sistemi, %1$s güvenlik sertifikasına güvenmiyor. Web sitesi yanlış yapılandırılmış, bir saldırgan bağlantınızı tehlikeye atmış veya sistem saatiniz yanlış ayarlanmış olabilir.</string>
+
+    <!-- Onboarding Experiment-->
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Merhaba.<br/><br/>Daha iyi, daha özel bir internete hazır mısınız?]]></string>
+    <string name="preOnboardingDaxDialog1Button">Hadi başlayalım!</string>
+    <string name="preOnboardingDaxDialog2Title">Gizlilik korumaları etkinleştirildi!</string>
+    <string name="preOnboardingDaxDialog2Button">Tarayıcınızı Seçin</string>
+    <string name="preOnboardingComparisonChartItem1">Varsayılan olarak gizli arama yapın</string>
+    <string name="preOnboardingComparisonChartItem2">Üçüncü taraf izleyicileri engelleyin</string>
+    <string name="preOnboardingComparisonChartItem3">Çerez açılır pencerelerini engelle</string>
+    <string name="preOnboardingComparisonChartItem4">Tekinsiz reklamları engelleyin</string>
+    <string name="preOnboardingComparisonChartItem5">Tarama verilerini hızlıca silin</string>
+    <string name="preOnboardingDaxDialog3Title">Harika! Duck Side\'a hoş geldiniz.</string>
+    <string name="preOnboardingDaxDialog3Button">Gezinmeye Başla</string>
+    <string name="onboardingSearchDaxDialogTitle">Bir şeyler arayın!</string>
+    <string name="onboardingSearchDaxDialogDescription">DuckDuckGo aramalarınız her zaman anonimdir.</string>
+    <string name="onboardingSearchDaxDialogOption1">ispanyolca \"ördek\" nasıl denir</string>
+    <string name="onboardingSearchDaxDialogOption2">mighty ducks oyuncu kadrosu</string>
+    <string name="onboardingSearchDaxDialogOption3">yerel hava durumu</string>
+    <string name="onboardingSearchDaxDialogOption4">Şaşırt beni!</string>
+    <string name="onboardingSitesDaxDialogTitle">Bir siteyi ziyaret etmeyi deneyin!</string>
+    <string name="onboardingSitesDaxDialogDescription">Sizi gözetlemelerini önlemek için izleyicileri engelleyeceğim.</string>
+    <string name="onboardingSitesDaxDialogOption1">espn.com</string>
+    <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
+    <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
+    <string name="onboardingSitesDaxDialogOption4">Şaşırt beni!</string>
+    <string name="onboardingSerpDaxDialogDescription">DuckDuckGo Search bu işte. Özel. Hızlı. Daha az reklam.</string>
+    <string name="onboardingSerpDaxDialogButton">Anladım!</string>
+    <string name="onboardingSitesSuggestionsDaxDialogTitle">Sonra, bir siteyi ziyaret etmeyi deneyin!</string>
+    <plurals name="onboardingTrackersBlockedDialogDescription">
+        <item quantity="one"><![CDATA[ ve <b>%1$d site daha</b> sizi burada takip etmeye çalışıyordu. Onları engelledim!<br/><br/>☝️ Daha fazla bilgi için kalkana dokunun.️]]></item>
+        <item quantity="other"><![CDATA[ ve <b>%1$d site daha</b> sizi burada takip etmeye çalışıyordu. Onları engelledim!<br/><br/>☝️ Daha fazla bilgi için kalkana dokunun.️]]></item>
+    </plurals>
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ sizi burada takip etmeye çalışıyordu. Onları engelledim!<br/><br/>☝️ Daha fazla bilgi için kalkana dokunun.️]]></item>
+        <item quantity="other"><![CDATA[ sizi burada takip etmeye çalışıyordu. Onları engelledim!<br/><br/>☝️ Daha fazla bilgi için kalkana dokunun.️]]></item>
+    </plurals>
+    <string name="onboardingTrackersBlockedDaxDialogButton">Anladım!</string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[<b>Fire Button</b> ile göz atma etkinliğinizi anında temizleyin.<br/><br/>Hemen deneyin! ☝️️]]></string>
+    <string name="onboardingEndDaxDialogTitle">"İşte bu kadar!"</string>
+    <string name="onboardingEndDaxDialogDescription">Unutmayın: İnterneti benimle ne kadar çok gezerseniz rahatsız edici reklamları da o kadar az görürsünüz. 👌</string>
+
 </resources>

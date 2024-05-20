@@ -828,4 +828,45 @@
     <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">Het beveiligingscertificaat voor %1$s is verlopen. Mogelijk is de website verkeerd geconfigureerd, heeft een aanvaller je verbinding gecompromitteerd of staat de klok van je systeem niet goed.</string>
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Het beveiligingscertificaat voor %1$s komt niet overeen met *.%2$s. Mogelijk is de website verkeerd geconfigureerd, heeft een aanvaller je verbinding gecompromitteerd of staat de klok van je systeem niet goed.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Het besturingssysteem van je apparaat vertrouwt het beveiligingscertificaat voor %1$s niet. Mogelijk is de website verkeerd geconfigureerd, heeft een aanvaller je verbinding gecompromitteerd of staat de klok van je systeem niet goed.</string>
+
+    <!-- Onboarding Experiment-->
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Hoi.<br/><br/>Klaar voor een beter internet met meer privacy?]]></string>
+    <string name="preOnboardingDaxDialog1Button">Laten we het doen!</string>
+    <string name="preOnboardingDaxDialog2Title">Privacybescherming geactiveerd!</string>
+    <string name="preOnboardingDaxDialog2Button">Kies je browser</string>
+    <string name="preOnboardingComparisonChartItem1">Standaard privé zoeken</string>
+    <string name="preOnboardingComparisonChartItem2">Blokkeer trackers van derden</string>
+    <string name="preOnboardingComparisonChartItem3">Blokkeer cookiepop-ups</string>
+    <string name="preOnboardingComparisonChartItem4">Blokkeer enge advertenties</string>
+    <string name="preOnboardingComparisonChartItem5">Wis browsegegevens in een handomdraai</string>
+    <string name="preOnboardingDaxDialog3Title">Geweldig! Welkom aan de Duck-kant.</string>
+    <string name="preOnboardingDaxDialog3Button">Beginnen met browsen</string>
+    <string name="onboardingSearchDaxDialogTitle">Probeer een zoekopdracht!</string>
+    <string name="onboardingSearchDaxDialogDescription">Je DuckDuckGo-zoekopdrachten zijn altijd anoniem.</string>
+    <string name="onboardingSearchDaxDialogOption1">hoe zeg je \'eend\' in het Spaans?</string>
+    <string name="onboardingSearchDaxDialogOption2">cast van Mighty Ducks</string>
+    <string name="onboardingSearchDaxDialogOption3">lokaal weer</string>
+    <string name="onboardingSearchDaxDialogOption4">Verras me!</string>
+    <string name="onboardingSitesDaxDialogTitle">Bezoek eens een site!</string>
+    <string name="onboardingSitesDaxDialogDescription">Ik blokkeer trackers zodat ze je niet kunnen bespioneren.</string>
+    <string name="onboardingSitesDaxDialogOption1">espn.com</string>
+    <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
+    <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
+    <string name="onboardingSitesDaxDialogOption4">Verras me!</string>
+    <string name="onboardingSerpDaxDialogDescription">Dat is DuckDuckGo Search. Privé. Snel. Minder advertenties.</string>
+    <string name="onboardingSerpDaxDialogButton">Ik snap het!</string>
+    <string name="onboardingSitesSuggestionsDaxDialogTitle">Probeer nu een site te bezoeken!</string>
+    <plurals name="onboardingTrackersBlockedDialogDescription">
+        <item quantity="one"><![CDATA[ en nog <b>%1$d ander</b> probeerden je hier te volgen. Ik heb ze geblokkeerd!<br/><br/>☝️ Tik op het schild voor meer informatie.️]]></item>
+        <item quantity="other"><![CDATA[ en nog <b>%1$d anderen</b> probeerden je hier te volgen. Ik heb ze geblokkeerd!<br/><br/>☝️ Tik op het schild voor meer informatie.️]]></item>
+    </plurals>
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ probeerde je hier te volgen. Ik heb ze geblokkeerd!<br/><br/>☝️ Tik op het schild voor meer info.️]]></item>
+        <item quantity="other"><![CDATA[ probeerden je hier te volgen. Ik heb ze geblokkeerd!<br/><br/>☝️ Tik op het schild voor meer info.️]]></item>
+    </plurals>
+    <string name="onboardingTrackersBlockedDaxDialogButton">Ik snap het!</string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Wis je browse-activiteit direct met de <b>Fire Button</b>.<br/><br/>Probeer het maar! ☝️️]]></string>
+    <string name="onboardingEndDaxDialogTitle">"Je kunt het!"</string>
+    <string name="onboardingEndDaxDialogDescription">Denk eraan: elke keer als je met mij browset, verliest een enge advertentie zijn vleugels. 👌</string>
+
 </resources>

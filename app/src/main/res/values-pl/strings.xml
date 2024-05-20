@@ -838,4 +838,49 @@
     <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">Certyfikat zabezpieczeń dla %1$s wygasł. Możliwe, że witryna jest błędnie skonfigurowana, osoba atakująca naruszyła połączenie lub ustawienie zegara systemowego jest nieprawidłowe.</string>
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Certyfikat zabezpieczeń dla %1$s nie jest zgodny z *.%2$s. Możliwe, że witryna jest błędnie skonfigurowana, osoba atakująca naruszyła połączenie lub ustawienie zegara systemowego jest nieprawidłowe.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Certyfikat bezpieczeństwa %1$s nie jest zaufany przez system operacyjny urządzenia. Możliwe, że witryna jest błędnie skonfigurowana, osoba atakująca naruszyła połączenie lub ustawienie zegara systemowego jest nieprawidłowe.</string>
+
+    <!-- Onboarding Experiment-->
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Cześć!<br/><br/>Chcesz korzystać z lepszego, bardziej prywatnego Internetu?]]></string>
+    <string name="preOnboardingDaxDialog1Button">Zróbmy to!</string>
+    <string name="preOnboardingDaxDialog2Title">Aktywowano ochronę prywatności!</string>
+    <string name="preOnboardingDaxDialog2Button">Wybierz przeglądarkę</string>
+    <string name="preOnboardingComparisonChartItem1">Domyślnie szukaj prywatnie</string>
+    <string name="preOnboardingComparisonChartItem2">Blokuj mechanizmy śledzące innych firm</string>
+    <string name="preOnboardingComparisonChartItem3">Blokuj wyskakujące okienka z informacją o plikach cookie</string>
+    <string name="preOnboardingComparisonChartItem4">Blokuj wścibskie reklamy</string>
+    <string name="preOnboardingComparisonChartItem5">Szybko usuwaj dane przeglądania</string>
+    <string name="preOnboardingDaxDialog3Title">Fantastycznie! Witaj po Kaczej Stronie Mocy!</string>
+    <string name="preOnboardingDaxDialog3Button">Rozpocznij przeglądanie</string>
+    <string name="onboardingSearchDaxDialogTitle">Spróbuj coś wyszukać!</string>
+    <string name="onboardingSearchDaxDialogDescription">Wyszukiwania w DuckDuckGo zawsze są anonimowe.</string>
+    <string name="onboardingSearchDaxDialogOption1">jak się mówi „kaczka” po hiszpańsku</string>
+    <string name="onboardingSearchDaxDialogOption2">obsada potężnych kaczorów</string>
+    <string name="onboardingSearchDaxDialogOption3">pogoda lokalna</string>
+    <string name="onboardingSearchDaxDialogOption4">Zaskocz mnie!</string>
+    <string name="onboardingSitesDaxDialogTitle">Spróbuj odwiedzić witrynę!</string>
+    <string name="onboardingSitesDaxDialogDescription">Zablokuję mechanizmy śledzące, aby nie mogły Cię szpiegować.</string>
+    <string name="onboardingSitesDaxDialogOption1">espn.com</string>
+    <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
+    <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
+    <string name="onboardingSitesDaxDialogOption4">Zaskocz mnie!</string>
+    <string name="onboardingSerpDaxDialogDescription">To DuckDuckGo Search. Prywatna. Szybka. Z mniejszą liczbą reklam.</string>
+    <string name="onboardingSerpDaxDialogButton">Rozumiem!</string>
+    <string name="onboardingSitesSuggestionsDaxDialogTitle">Następnie spróbuj odwiedzić witrynę!</string>
+    <plurals name="onboardingTrackersBlockedDialogDescription">
+        <item quantity="one"><![CDATA[ i <b>jeszcze %1$d</b> mechanizm próbowały Cię tutaj śledzić. Zostały przeze mnie zablokowane!<br/><br/>☝️ Stuknij tarczę, aby uzyskać więcej informacji.️]]></item>
+        <item quantity="few"><![CDATA[ i <b>jeszcze %1$d</b> mechanizmy próbowały Cię tutaj śledzić. Zostały przeze mnie zablokowane!<br/><br/>☝️ Stuknij tarczę, aby uzyskać więcej informacji.️]]></item>
+        <item quantity="many"><![CDATA[ i <b>jeszcze %1$d</b> mechanizmów próbowało Cię tutaj śledzić. Zostały przeze mnie zablokowane!<br/><br/>☝️ Stuknij tarczę, aby uzyskać więcej informacji.️]]></item>
+        <item quantity="other"><![CDATA[ i <b>jeszcze %1$d mechanizmu</b> próbowało Cię tutaj śledzić. Zostały przeze mnie zablokowane!<br/><br/>☝️ Stuknij tarczę, aby uzyskać więcej informacji.️]]></item>
+    </plurals>
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ próbował Cię tutaj śledzić. Został przeze mnie zablokowany!<br/><br/>☝️ Dotknij tarczy, aby uzyskać więcej informacji.️]]></item>
+        <item quantity="few"><![CDATA[ próbowały Cię tutaj śledzić. Zostały przeze mnie zablokowane!<br/><br/>☝️ Dotknij tarczy, aby uzyskać więcej informacji.️]]></item>
+        <item quantity="many"><![CDATA[ próbowały Cię tutaj śledzić. Zostały przeze mnie zablokowane!<br/><br/>☝️ Dotknij tarczy, aby uzyskać więcej informacji.️]]></item>
+        <item quantity="other"><![CDATA[ próbował Cię tutaj śledzić. Został przeze mnie zablokowany!<br/><br/>☝️ Dotknij tarczy, aby uzyskać więcej informacji.️]]></item>
+    </plurals>
+    <string name="onboardingTrackersBlockedDaxDialogButton">Rozumiem!</string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Natychmiast wyczyść swoją aktywność związaną z przeglądaniem za pomocą przycisku <b>Fire Button</b>.<br/><br/>Wypróbuj go! ☝️️]]></string>
+    <string name="onboardingEndDaxDialogTitle">"Udało się!"</string>
+    <string name="onboardingEndDaxDialogDescription">Pamiętaj: za każdym razem, gdy przeglądasz ze mną Internet, jakaś wstrętna reklama przestaje działać. 👌</string>
+
 </resources>

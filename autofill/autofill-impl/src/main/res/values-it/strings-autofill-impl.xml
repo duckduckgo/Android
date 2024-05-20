@@ -64,6 +64,10 @@
     <string name="autofillDeleteLoginDialogCancel">Annulla</string>
     <string name="autofillDeleteLoginDialogDelete">Cancella</string>
 
+    <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
+    <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in DuckDuckGo better.</string>
+    <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Nome utente copiato</string>
     <string name="autofillManagementPasswordCopied">Password copiata</string>
