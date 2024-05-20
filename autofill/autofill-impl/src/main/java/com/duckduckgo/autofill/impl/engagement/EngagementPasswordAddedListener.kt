@@ -38,7 +38,15 @@ class EngagementPasswordAddedListener @Inject constructor(
     private val pixel: Pixel,
 ) : PasswordStoreEventListener {
 
+    // keep in-memory state to avoid sending the pixel multiple times if called repeatedly in a short time
+    private var credentialAdded = false
+
+    @Synchronized
     override fun onCredentialAdded(id: Long) {
+        if (credentialAdded) return
+
+        credentialAdded = true
+
         appCoroutineScope.launch(dispatchers.io()) {
             val daysInstalled = userBrowserProperties.daysSinceInstalled()
             Timber.v("onCredentialAdded. daysInstalled: $daysInstalled")
