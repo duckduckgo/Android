@@ -3245,8 +3245,6 @@ class BrowserTabFragment :
 
         private const val DEFAULT_CIRCLE_TARGET_TIMES_1_5 = 96
 
-        private const val QUICK_ACCESS_GRID_MAX_COLUMNS = 6
-
         private const val COOKIES_ANIMATION_DELAY = 400L
 
         private const val BOOKMARKS_BOTTOM_SHEET_DURATION = 3500L
