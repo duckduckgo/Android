@@ -57,9 +57,9 @@ class AnrOfflinePixelSender @Inject constructor(
     }
 
     companion object {
-        const val ANR_STACKTRACE = "stackTrace"
-        const val ANR_WEBVIEW_VERSION = "webView"
-        const val ANR_CUSTOM_TAB = "customTab"
+        private const val ANR_STACKTRACE = "stackTrace"
+        private const val ANR_WEBVIEW_VERSION = "webView"
+        private const val ANR_CUSTOM_TAB = "customTab"
     }
 }
 
