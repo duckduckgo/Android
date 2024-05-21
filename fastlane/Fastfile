@@ -52,7 +52,7 @@ platform :android do
     end
 
 
-  desc "Upload APK to Play Store, in pre-production staging track"
+  desc "Upload APK to Play Store, in production track with a very small rollout percentage"
   lane :deploy_playstore do
 
     update_fastlane_release_notes()
@@ -63,7 +63,8 @@ platform :android do
 
     upload_to_play_store(
       apk: apkPath,
-      track: 'Staging',
+      track: 'production',
+      rollout: '0.001', # ie. 0.1%
       skip_upload_screenshots: true,
       skip_upload_images: true,
       validate_only: false
