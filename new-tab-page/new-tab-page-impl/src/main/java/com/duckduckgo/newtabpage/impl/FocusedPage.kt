@@ -21,6 +21,7 @@ import android.view.View
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.newtabpage.api.FocusedViewPlugin
 import com.duckduckgo.newtabpage.api.FocusedViewVersion
+import com.duckduckgo.newtabpage.impl.view.FocusedView
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 

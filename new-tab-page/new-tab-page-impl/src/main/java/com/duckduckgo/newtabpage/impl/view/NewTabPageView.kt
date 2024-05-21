@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.newtabpage.impl
+package com.duckduckgo.newtabpage.impl.view
 
 import android.content.Context
 import android.util.AttributeSet

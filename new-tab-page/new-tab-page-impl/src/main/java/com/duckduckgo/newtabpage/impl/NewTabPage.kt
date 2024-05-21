@@ -21,6 +21,7 @@ import android.view.View
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.newtabpage.api.NewTabPagePlugin
 import com.duckduckgo.newtabpage.api.NewTabPageVersion
+import com.duckduckgo.newtabpage.impl.view.NewTabPageView
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 

@@ -1,5 +1,5 @@
-<!--
-  ~ Copyright (c) 2018 DuckDuckGo
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2024 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -14,7 +14,18 @@
   ~ limitations under the License.
   -->
 
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="?attr/daxColorContainer" />
-    <corners android:radius="@dimen/keyline_2" />
-</shape>
+<resources>
+
+    <!-- Grid Item-->
+    <attr name="gridItemType">
+        <enum name="favicon" value="0" />
+        <enum name="placeholder" value="1" />
+        <enum name="shortcut" value="2" />
+    </attr>
+    <declare-styleable name="DaxNewTabGridItem">
+        <attr name="primaryText"/>
+        <attr name="leadingIcon"/>
+        <attr name="gridItemType"/>
+    </declare-styleable>
+
+</resources>
