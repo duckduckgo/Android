@@ -16,13 +16,21 @@
 
 package com.duckduckgo.newtabpage.impl.view
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.LinearLayout
+import androidx.recyclerview.widget.ItemTouchHelper
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.newtabpage.impl.databinding.ViewNewTabPageBinding
+import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 
 @InjectWith(ViewScope::class)
 class NewTabPageView @JvmOverloads constructor(
@@ -33,4 +41,19 @@ class NewTabPageView @JvmOverloads constructor(
 
     @Inject
     lateinit var viewModelFactory: ViewViewModelFactory
+
+    private var coroutineScope: CoroutineScope? = null
+
+    private val binding: ViewNewTabPageBinding by viewBinding()
+
+    private lateinit var adapter: NewTabSectionsAdapter
+    private lateinit var touchHelper: ItemTouchHelper
+
+    override fun onAttachedToWindow() {
+        AndroidSupportInjection.inject(this)
+        super.onAttachedToWindow()
+
+        @SuppressLint("NoHardcodedCoroutineDispatcher")
+        coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+    }
 }
