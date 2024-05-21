@@ -70,6 +70,8 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(toolbar)
 
+        viewModel.init()
+
         viewModel.commands()
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach { processCommand(it) }

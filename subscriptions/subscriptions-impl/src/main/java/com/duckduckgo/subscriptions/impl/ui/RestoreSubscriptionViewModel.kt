@@ -21,6 +21,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.Companion.SUBSCRIPTION_NOT_FOUND_ERROR
 import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.RecoverSubscriptionResult
 import com.duckduckgo.subscriptions.impl.SubscriptionsChecker
@@ -39,6 +40,8 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
@@ -58,6 +61,14 @@ class RestoreSubscriptionViewModel @Inject constructor(
     data class ViewState(
         val email: String? = null,
     )
+
+    private lateinit var subscriptionStatus: SubscriptionStatus
+
+    fun init() {
+        subscriptionsManager.subscriptionStatus
+            .onEach { subscriptionStatus = it }
+            .launchIn(viewModelScope)
+    }
 
     fun restoreFromStore() {
         pixelSender.reportActivateSubscriptionRestorePurchaseClick()
@@ -99,7 +110,7 @@ class RestoreSubscriptionViewModel @Inject constructor(
     }
 
     fun onSubscriptionRestoredFromEmail() = viewModelScope.launch {
-        if (subscriptionsManager.subscriptionStatus().isExpired()) {
+        if (subscriptionStatus.isExpired()) {
             command.send(FinishAndGoToSubscriptionSettings)
         } else {
             command.send(FinishAndGoToOnboarding)

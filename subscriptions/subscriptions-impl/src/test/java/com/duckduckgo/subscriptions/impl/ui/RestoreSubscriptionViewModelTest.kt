@@ -17,6 +17,7 @@ import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.RestoreFromEmail
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.SubscriptionNotFound
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.Success
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -160,7 +161,9 @@ class RestoreSubscriptionViewModelTest {
 
     @Test
     fun whenOnSubscriptionRestoredFromEmailAndSubscriptionExpiredThenCommandIsSent() = runTest {
-        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(EXPIRED)
+        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowOf(EXPIRED))
+
+        viewModel.init()
 
         viewModel.commands().test {
             viewModel.onSubscriptionRestoredFromEmail()
@@ -171,7 +174,9 @@ class RestoreSubscriptionViewModelTest {
 
     @Test
     fun whenOnSubscriptionRestoredFromEmailAndSubscriptionActiveThenCommandIsSent() = runTest {
-        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
+        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowOf(AUTO_RENEWABLE))
+
+        viewModel.init()
 
         viewModel.commands().test {
             viewModel.onSubscriptionRestoredFromEmail()

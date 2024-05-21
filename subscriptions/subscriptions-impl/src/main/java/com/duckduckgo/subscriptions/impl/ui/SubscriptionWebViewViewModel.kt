@@ -26,6 +26,7 @@ import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState
+import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.CurrentPurchase
 import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
 import com.duckduckgo.subscriptions.impl.PrivacyProFeature
@@ -83,6 +84,8 @@ class SubscriptionWebViewViewModel @Inject constructor(
     private val _currentPurchaseViewState = MutableStateFlow(CurrentPurchaseViewState())
     val currentPurchaseViewState = _currentPurchaseViewState.asStateFlow()
 
+    private lateinit var subscriptionStatus: SubscriptionStatus
+
     fun start() {
         subscriptionsManager.currentPurchaseState.onEach {
             val state = when (it) {
@@ -115,6 +118,10 @@ class SubscriptionWebViewViewModel @Inject constructor(
             _currentPurchaseViewState.emit(currentPurchaseViewState.value.copy(purchaseState = state))
         }.flowOn(dispatcherProvider.io())
             .launchIn(viewModelScope)
+
+        subscriptionsManager.subscriptionStatus
+            .onEach { subscriptionStatus = it }
+            .launchIn(viewModelScope)
     }
 
     fun processJsCallbackMessage(featureName: String, method: String, id: String?, data: JSONObject?) {
@@ -134,7 +141,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
     }
 
     fun onSubscriptionRestored() = viewModelScope.launch {
-        if (subscriptionsManager.subscriptionStatus().isExpired()) {
+        if (subscriptionStatus.isExpired()) {
             command.send(BackToSettings)
         } else {
             command.send(Reload)
