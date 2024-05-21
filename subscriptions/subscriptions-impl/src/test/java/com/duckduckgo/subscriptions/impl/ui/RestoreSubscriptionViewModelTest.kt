@@ -12,6 +12,8 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.Entitlement
 import com.duckduckgo.subscriptions.impl.repository.Subscription
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.Error
+import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.FinishAndGoToOnboarding
+import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.FinishAndGoToSubscriptionSettings
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.RestoreFromEmail
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.SubscriptionNotFound
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.Success
@@ -154,6 +156,28 @@ class RestoreSubscriptionViewModelTest {
 
         viewModel.restoreFromStore()
         verify(pixelSender).reportRestoreUsingStoreFailureOther()
+    }
+
+    @Test
+    fun whenOnSubscriptionRestoredFromEmailAndSubscriptionExpiredThenCommandIsSent() = runTest {
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(EXPIRED)
+
+        viewModel.commands().test {
+            viewModel.onSubscriptionRestoredFromEmail()
+            val result = awaitItem()
+            assertTrue(result is FinishAndGoToSubscriptionSettings)
+        }
+    }
+
+    @Test
+    fun whenOnSubscriptionRestoredFromEmailAndSubscriptionActiveThenCommandIsSent() = runTest {
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
+
+        viewModel.commands().test {
+            viewModel.onSubscriptionRestoredFromEmail()
+            val result = awaitItem()
+            assertTrue(result is FinishAndGoToOnboarding)
+        }
     }
 
     private fun subscriptionNotActive(): Subscription {

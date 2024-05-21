@@ -20,6 +20,8 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.BackToSettings
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.Reload
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Companion
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView.Success
@@ -513,5 +515,27 @@ class SubscriptionWebViewViewModelTest {
             data = null,
         )
         verifyNoInteractions(pixelSender)
+    }
+
+    @Test
+    fun whenOnSubscriptionRestoredFromEmailAndSubscriptionExpiredThenCommandIsSent() = runTest {
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(EXPIRED)
+
+        viewModel.commands().test {
+            viewModel.onSubscriptionRestored()
+            val result = awaitItem()
+            assertTrue(result is BackToSettings)
+        }
+    }
+
+    @Test
+    fun whenOnSubscriptionRestoredFromEmailAndSubscriptionActiveThenCommandIsSent() = runTest {
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
+
+        viewModel.commands().test {
+            viewModel.onSubscriptionRestored()
+            val result = awaitItem()
+            assertTrue(result is Reload)
+        }
     }
 }

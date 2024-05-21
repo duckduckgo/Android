@@ -39,6 +39,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.isActive
+import com.duckduckgo.subscriptions.impl.repository.isExpired
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.*
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView.Failure
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView.InProgress
@@ -129,6 +130,14 @@ class SubscriptionWebViewViewModel @Inject constructor(
             else -> {
                 // NOOP
             }
+        }
+    }
+
+    fun onSubscriptionRestored() = viewModelScope.launch {
+        if (subscriptionsManager.subscriptionStatus().isExpired()) {
+            command.send(BackToSettings)
+        } else {
+            command.send(Reload)
         }
     }
 
@@ -297,6 +306,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
         data object GoToITR : Command()
         data object GoToPIR : Command()
         data class GoToNetP(val activityParams: ActivityParams) : Command()
+        data object Reload : Command()
     }
 
     companion object {

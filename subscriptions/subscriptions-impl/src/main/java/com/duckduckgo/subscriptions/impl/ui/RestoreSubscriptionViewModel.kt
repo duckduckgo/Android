@@ -26,7 +26,10 @@ import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.RecoverSubscri
 import com.duckduckgo.subscriptions.impl.SubscriptionsChecker
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
+import com.duckduckgo.subscriptions.impl.repository.isExpired
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.Error
+import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.FinishAndGoToOnboarding
+import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.FinishAndGoToSubscriptionSettings
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.RestoreFromEmail
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.SubscriptionNotFound
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.Success
@@ -95,10 +98,20 @@ class RestoreSubscriptionViewModel @Inject constructor(
         }
     }
 
+    fun onSubscriptionRestoredFromEmail() = viewModelScope.launch {
+        if (subscriptionsManager.subscriptionStatus().isExpired()) {
+            command.send(FinishAndGoToSubscriptionSettings)
+        } else {
+            command.send(FinishAndGoToOnboarding)
+        }
+    }
+
     sealed class Command {
         data object RestoreFromEmail : Command()
         data object Success : Command()
         data object SubscriptionNotFound : Command()
         data object Error : Command()
+        data object FinishAndGoToSubscriptionSettings : Command()
+        data object FinishAndGoToOnboarding : Command()
     }
 }
