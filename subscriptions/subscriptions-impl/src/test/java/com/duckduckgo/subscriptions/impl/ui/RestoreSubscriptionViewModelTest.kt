@@ -2,8 +2,10 @@ package com.duckduckgo.subscriptions.impl.ui
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.Companion.SUBSCRIPTION_NOT_FOUND_ERROR
 import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.RecoverSubscriptionResult
 import com.duckduckgo.subscriptions.impl.SubscriptionsChecker
@@ -18,6 +20,7 @@ import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.SubscriptionNotFound
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.Success
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -60,6 +63,8 @@ class RestoreSubscriptionViewModelTest {
         whenever(subscriptionsManager.recoverSubscriptionFromStore()).thenReturn(
             RecoverSubscriptionResult.Failure("error"),
         )
+        givenSubscriptionStatus(UNKNOWN)
+        viewModel.init()
 
         viewModel.commands().test {
             viewModel.restoreFromStore()
@@ -74,18 +79,9 @@ class RestoreSubscriptionViewModelTest {
             RecoverSubscriptionResult.Failure(SUBSCRIPTION_NOT_FOUND_ERROR),
         )
 
-        viewModel.commands().test {
-            viewModel.restoreFromStore()
-            val result = awaitItem()
-            assertTrue(result is SubscriptionNotFound)
-        }
-    }
+        givenSubscriptionStatus(UNKNOWN)
 
-    @Test
-    fun whenRestoreFromStoreIfNotActiveThenReturnNotFound() = runTest {
-        whenever(subscriptionsManager.recoverSubscriptionFromStore()).thenReturn(
-            RecoverSubscriptionResult.Success(subscriptionNotActive()),
-        )
+        viewModel.init()
 
         viewModel.commands().test {
             viewModel.restoreFromStore()
@@ -95,7 +91,7 @@ class RestoreSubscriptionViewModelTest {
     }
 
     @Test
-    fun whenRestoreFromStoreIfActiveThenReturnSuccess() = runTest {
+    fun whenRestoreFromStoreThenReturnSuccess() = runTest {
         whenever(subscriptionsManager.recoverSubscriptionFromStore()).thenReturn(
             RecoverSubscriptionResult.Success(subscriptionActive()),
         )
@@ -130,20 +126,12 @@ class RestoreSubscriptionViewModelTest {
     }
 
     @Test
-    fun whenRestoreFromStoreFailsBecauseThereAreNoEntitlementsThenPixelIsSent() = runTest {
-        whenever(subscriptionsManager.recoverSubscriptionFromStore()).thenReturn(
-            RecoverSubscriptionResult.Success(subscriptionNotActive()),
-        )
-
-        viewModel.restoreFromStore()
-        verify(pixelSender).reportRestoreUsingStoreFailureSubscriptionNotFound()
-    }
-
-    @Test
     fun whenRestoreFromStoreFailsBecauseThereIsNoSubscriptionThenPixelIsSent() = runTest {
         whenever(subscriptionsManager.recoverSubscriptionFromStore()).thenReturn(
             RecoverSubscriptionResult.Failure(SUBSCRIPTION_NOT_FOUND_ERROR),
         )
+        givenSubscriptionStatus(UNKNOWN)
+        viewModel.init()
 
         viewModel.restoreFromStore()
         verify(pixelSender).reportRestoreUsingStoreFailureSubscriptionNotFound()
@@ -154,6 +142,8 @@ class RestoreSubscriptionViewModelTest {
         whenever(subscriptionsManager.recoverSubscriptionFromStore()).thenReturn(
             RecoverSubscriptionResult.Failure("bad stuff happened"),
         )
+        givenSubscriptionStatus(UNKNOWN)
+        viewModel.init()
 
         viewModel.restoreFromStore()
         verify(pixelSender).reportRestoreUsingStoreFailureOther()
@@ -185,15 +175,20 @@ class RestoreSubscriptionViewModelTest {
         }
     }
 
-    private fun subscriptionNotActive(): Subscription {
-        return Subscription(
-            productId = "productId",
-            startedAt = 10000L,
-            expiresOrRenewsAt = 10000L,
-            status = EXPIRED,
-            platform = "google",
-            entitlements = emptyList(),
+    @Test
+    fun whenRestoreFromStoreFailsBecauseOfExpiredSubscriptionThenSignsUserOut() = runTest {
+        whenever(subscriptionsManager.recoverSubscriptionFromStore()).thenReturn(
+            RecoverSubscriptionResult.Failure(SUBSCRIPTION_NOT_FOUND_ERROR),
         )
+        givenSubscriptionStatus(EXPIRED)
+        viewModel.init()
+
+        viewModel.commands().test {
+            viewModel.restoreFromStore()
+            val result = awaitItem()
+            assertTrue(result is SubscriptionNotFound)
+            verify(subscriptionsManager).signOut()
+        }
     }
 
     private fun subscriptionActive(): Subscription {
@@ -205,5 +200,10 @@ class RestoreSubscriptionViewModelTest {
             platform = "google",
             entitlements = listOf(Entitlement("name", "product")),
         )
+    }
+
+    private fun givenSubscriptionStatus(subscriptionStatus: SubscriptionStatus) = runBlocking {
+        whenever(subscriptionsManager.subscriptionStatus()).thenReturn(subscriptionStatus)
+        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowOf(subscriptionStatus))
     }
 }

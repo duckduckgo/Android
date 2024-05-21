@@ -75,23 +75,22 @@ class RestoreSubscriptionViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             when (val subscription = subscriptionsManager.recoverSubscriptionFromStore()) {
                 is RecoverSubscriptionResult.Success -> {
-                    if (subscription.subscription.isActive()) {
-                        subscriptionsChecker.runChecker()
-                        pixelSender.reportRestoreUsingStoreSuccess()
-                        pixelSender.reportSubscriptionActivated()
-                        command.send(Success)
-                    } else {
-                        pixelSender.reportRestoreUsingStoreFailureSubscriptionNotFound()
-                        subscriptionsManager.signOut()
-                        command.send(SubscriptionNotFound)
-                    }
+                    subscriptionsChecker.runChecker()
+                    pixelSender.reportRestoreUsingStoreSuccess()
+                    pixelSender.reportSubscriptionActivated()
+                    command.send(Success)
                 }
+
                 is RecoverSubscriptionResult.Failure -> {
                     when (subscription.message) {
                         SUBSCRIPTION_NOT_FOUND_ERROR -> {
+                            if (subscriptionStatus.isExpired()) {
+                                subscriptionsManager.signOut()
+                            }
                             pixelSender.reportRestoreUsingStoreFailureSubscriptionNotFound()
                             command.send(SubscriptionNotFound)
                         }
+
                         else -> {
                             pixelSender.reportRestoreUsingStoreFailureOther()
                             command.send(Error)
