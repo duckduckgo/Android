@@ -19,10 +19,11 @@ package com.duckduckgo.app.browser.favorites
 import android.content.Context
 import android.view.View
 import com.duckduckgo.anvil.annotations.ContributesPluginPoint
-import com.duckduckgo.app.newtab.NewTabPagePlugin
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.newtabpage.api.NewTabPagePlugin
+import com.duckduckgo.newtabpage.api.NewTabPageVersion
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -55,23 +56,6 @@ class NewTabLegacyPage @Inject constructor() : NewTabPagePlugin {
     override fun getView(context: Context): View {
         return NewTabLegacyPageView(context)
     }
-}
-
-@ContributesMultibinding(
-    scope = ActivityScope::class,
-    boundType = NewTabPagePlugin::class,
-)
-class NewTabPage @Inject constructor() : NewTabPagePlugin {
-
-    override val name: String = NewTabPageVersion.NEW.name
-    override fun getView(context: Context): View {
-        return NewTabLegacyPageView(context)
-    }
-}
-
-internal enum class NewTabPageVersion {
-    LEGACY,
-    NEW,
 }
 
 @ContributesPluginPoint(

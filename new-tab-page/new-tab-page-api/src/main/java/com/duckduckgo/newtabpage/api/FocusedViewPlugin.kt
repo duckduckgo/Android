@@ -35,3 +35,8 @@ interface FocusedViewPlugin {
      */
     fun getView(context: Context): View
 }
+
+enum class FocusedViewVersion {
+    LEGACY,
+    NEW,
+}

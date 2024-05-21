@@ -14,24 +14,17 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.newtab
+package com.duckduckgo.newtabpage.impl
 
 import android.content.Context
-import android.view.View
+import android.util.AttributeSet
+import android.widget.LinearLayout
+import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.di.scopes.ViewScope
 
-/**
- * This class is used to provide one of the two different version of NewTabPage
- * Legacy -> What existed before https://app.asana.com/0/1174433894299346/1207064372575037
- * New -> Implementation of https://app.asana.com/0/1174433894299346/1207064372575037
- */
-interface NewTabPagePlugin {
-
-    /** Name of the focused view version */
-    val name: String
-
-    /**
-     * This method returns a [View] that will be used as the NewTabPage content
-     * @return [View]
-     */
-    fun getView(context: Context): View
-}
+@InjectWith(ViewScope::class)
+class FocusedView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyle: Int = 0,
+) : LinearLayout(context, attrs, defStyle)

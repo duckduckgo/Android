@@ -14,29 +14,24 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.newtabpage.api
+package com.duckduckgo.newtabpage.impl
 
 import android.content.Context
 import android.view.View
+import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.newtabpage.api.FocusedViewPlugin
+import com.duckduckgo.newtabpage.api.FocusedViewVersion
+import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 
-/**
- * This class is used to provide one of the two different version of NewTabPage
- * Legacy -> What existed before https://app.asana.com/0/1174433894299346/1207064372575037
- * New -> Implementation of https://app.asana.com/0/1174433894299346/1207064372575037
- */
-interface NewTabPagePlugin {
+@ContributesMultibinding(
+    scope = ActivityScope::class,
+    boundType = FocusedViewPlugin::class,
+)
+class FocusedPage @Inject constructor() : FocusedViewPlugin {
 
-    /** Name of the focused view version */
-    val name: String
-
-    /**
-     * This method returns a [View] that will be used as the NewTabPage content
-     * @return [View]
-     */
-    fun getView(context: Context): View
-}
-
-enum class NewTabPageVersion {
-    LEGACY,
-    NEW,
+    override val name: String = FocusedViewVersion.NEW.name
+    override fun getView(context: Context): View {
+        return FocusedView(context)
+    }
 }

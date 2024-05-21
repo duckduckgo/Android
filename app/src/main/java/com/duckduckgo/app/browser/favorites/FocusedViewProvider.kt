@@ -19,10 +19,11 @@ package com.duckduckgo.app.browser.favorites
 import android.content.Context
 import android.view.View
 import com.duckduckgo.anvil.annotations.ContributesPluginPoint
-import com.duckduckgo.app.newtab.FocusedViewPlugin
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.newtabpage.api.FocusedViewPlugin
+import com.duckduckgo.newtabpage.api.FocusedViewVersion
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -55,23 +56,6 @@ class FocusedLegacyPage @Inject constructor() : FocusedViewPlugin {
     override fun getView(context: Context): View {
         return FocusedLegacyView(context)
     }
-}
-
-@ContributesMultibinding(
-    scope = ActivityScope::class,
-    boundType = FocusedViewPlugin::class,
-)
-class FocusedPage @Inject constructor() : FocusedViewPlugin {
-
-    override val name: String = FocusedViewVersion.NEW.name
-    override fun getView(context: Context): View {
-        return FocusedLegacyView(context)
-    }
-}
-
-internal enum class FocusedViewVersion {
-    LEGACY,
-    NEW,
 }
 
 @ContributesPluginPoint(
