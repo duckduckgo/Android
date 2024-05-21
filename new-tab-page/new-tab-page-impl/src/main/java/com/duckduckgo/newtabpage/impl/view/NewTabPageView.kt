@@ -19,18 +19,22 @@ package com.duckduckgo.newtabpage.impl.view
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
+import android.view.ViewGroup.LayoutParams
 import android.widget.LinearLayout
-import androidx.recyclerview.widget.ItemTouchHelper
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ViewViewModelFactory
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.newtabpage.api.NewTabPageSectionPlugin
+import com.duckduckgo.newtabpage.api.NewTabPageSectionProvider
 import com.duckduckgo.newtabpage.impl.databinding.ViewNewTabPageBinding
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import logcat.logcat
 
 @InjectWith(ViewScope::class)
 class NewTabPageView @JvmOverloads constructor(
@@ -40,14 +44,11 @@ class NewTabPageView @JvmOverloads constructor(
 ) : LinearLayout(context, attrs, defStyle) {
 
     @Inject
-    lateinit var viewModelFactory: ViewViewModelFactory
+    lateinit var newTabSectionsProvider: NewTabPageSectionProvider
 
     private var coroutineScope: CoroutineScope? = null
 
     private val binding: ViewNewTabPageBinding by viewBinding()
-
-    private lateinit var adapter: NewTabSectionsAdapter
-    private lateinit var touchHelper: ItemTouchHelper
 
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
@@ -55,5 +56,20 @@ class NewTabPageView @JvmOverloads constructor(
 
         @SuppressLint("NoHardcodedCoroutineDispatcher")
         coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+
+        setupRemoteSections()
+    }
+
+    private fun setupRemoteSections() {
+        logcat { "New Tab: setupRemoteSections" }
+        newTabSectionsProvider.provideSections().forEach {
+            binding.newTabSectionsContent.addView(
+                it.getView(context),
+                android.view.ViewGroup.LayoutParams(
+                    android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                    android.view.ViewGroup.LayoutParams.WRAP_CONTENT,
+                ),
+            )
+        }
     }
 }

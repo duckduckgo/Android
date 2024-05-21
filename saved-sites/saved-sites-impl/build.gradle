@@ -35,6 +35,7 @@ dependencies {
     implementation project(path: ':sync-settings-api')
     implementation project(path: ':browser-api')
     implementation project(path: ':navigation-api')
+    implementation project(path: ':new-tab-page-api')
     api project(path: ':saved-sites-store')
 
     anvil project(path: ':anvil-compiler')
@@ -52,6 +53,12 @@ dependencies {
     implementation 'org.jsoup:jsoup:_'
     implementation Square.retrofit2.converter.moshi
     implementation "com.squareup.moshi:moshi-kotlin:_"
+    implementation "com.squareup.logcat:logcat:_"
+
+    // ViewModel and LiveData
+    implementation AndroidX.lifecycle.runtime.ktx
+    implementation AndroidX.lifecycle.viewModelKtx
+    implementation AndroidX.recyclerView
 
     // Room
     implementation AndroidX.room.runtime

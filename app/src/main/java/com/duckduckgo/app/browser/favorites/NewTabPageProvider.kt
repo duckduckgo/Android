@@ -24,6 +24,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.newtabpage.api.NewTabPagePlugin
 import com.duckduckgo.newtabpage.api.NewTabPageVersion
+import com.duckduckgo.newtabpage.impl.NewTabPage
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -33,20 +34,18 @@ interface NewTabPageProvider {
     fun provideNewTabPageVersion(): NewTabPagePlugin
 }
 
-@ContributesBinding(
-    scope = ActivityScope::class,
-)
+@ContributesBinding(scope = AppScope::class)
 class RealNewTabPageProvider @Inject constructor(
     private val newTabPageVersions: PluginPoint<NewTabPagePlugin>,
 ) : NewTabPageProvider {
     override fun provideNewTabPageVersion(): NewTabPagePlugin {
-        val newTabPage = newTabPageVersions.getPlugins().firstOrNull { it.name == NewTabPageVersion.LEGACY.name }
-        return newTabPage ?: NewTabLegacyPage()
+        val newTabPage = newTabPageVersions.getPlugins().firstOrNull { it.name == NewTabPageVersion.NEW.name }
+        return newTabPage ?: NewTabPage()
     }
 }
 
 @ContributesMultibinding(
-    scope = ActivityScope::class,
+    scope = AppScope::class,
     boundType = NewTabPagePlugin::class,
 )
 class NewTabLegacyPage @Inject constructor() : NewTabPagePlugin {

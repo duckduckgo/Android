@@ -17,96 +17,21 @@
   ~ limitations under the License.
   -->
 
-<merge xmlns:android="http://schemas.android.com/apk/res/android"
+
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/newTabLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:clipChildren="false">
 
     <LinearLayout
+        android:id="@+id/newTabSectionsContent"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <LinearLayout
-            android:id="@+id/sectionHeaderLayout"
-            android:layout_marginStart="@dimen/keyline_5"
-            android:layout_marginEnd="@dimen/keyline_5"
-            android:layout_marginTop="@dimen/keyline_2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <com.duckduckgo.common.ui.view.text.DaxTextView
-                android:id="@+id/sectionHeaderText"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                app:typography="h4"
-                android:layout_weight="1"
-                app:textType="primary"
-                android:text="@string/newTabPageFavorites" />
-
-            <com.duckduckgo.common.ui.view.button.IconButton
-                android:id="@+id/sectionHeaderOverflowIcon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="?selectableItemBackgroundBorderless"
-                app:srcCompat="@drawable/ic_info_black_16"
-                tools:ignore="ContentDescription" />
-
-        </LinearLayout>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/quickAccessRecyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clipToPadding="false"
-            android:overScrollMode="never"
-            android:paddingHorizontal="@dimen/keyline_2"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            tools:itemCount="8"
-            tools:listItem="@layout/view_quick_access_item"
-            tools:spanCount="4" />
-
-        <com.duckduckgo.common.ui.view.text.DaxTextView
-            android:id="@+id/newTabFavoritesToggle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="@dimen/keyline_1"
-            android:paddingBottom="@dimen/keyline_1"
-            android:includeFontPadding="false"
-            android:paddingStart="@dimen/keyline_2"
-            android:paddingEnd="@dimen/keyline_1"
-            android:layout_marginTop="@dimen/keyline_4"
-            android:gravity="center"
-            android:layout_gravity="center"
-            app:typography="caption"
-            app:textType="primary"
-            android:background="@drawable/selectable_rounded_container_ripple"
-            android:text="@string/newTabFavoritesShowMore"
-            android:drawablePadding="@dimen/keyline_1"
-            android:drawableEnd="@drawable/ic_chevron_small_down_16" />
-
-        <com.duckduckgo.common.ui.view.text.DaxTextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:typography="h4"
-            android:layout_marginStart="@dimen/keyline_5"
-            android:layout_marginEnd="@dimen/keyline_5"
-            android:layout_marginTop="@dimen/keyline_4"
-            app:textType="primary"
-            android:text="@string/newTabPageShortcuts" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/quickAccessShortcutsRecyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clipToPadding="false"
-            android:overScrollMode="never"
-            android:paddingHorizontal="@dimen/keyline_2"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            tools:itemCount="8"
-            tools:listItem="@layout/view_quick_access_item"
-            tools:spanCount="4" />
-
     </LinearLayout>
-</merge>
+</androidx.core.widget.NestedScrollView>

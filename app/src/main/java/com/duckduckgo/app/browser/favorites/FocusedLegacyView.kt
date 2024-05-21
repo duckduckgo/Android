@@ -44,13 +44,13 @@ import com.duckduckgo.app.browser.favorites.FocusedLegacyViewModel.Command.Delet
 import com.duckduckgo.app.browser.favorites.FocusedLegacyViewModel.Command.ShowEditSavedSiteDialog
 import com.duckduckgo.app.browser.favorites.FocusedLegacyViewModel.ViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
-import com.duckduckgo.app.global.view.disableAnimation
-import com.duckduckgo.app.global.view.enableAnimation
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.common.ui.DuckDuckGoFragment
+import com.duckduckgo.common.ui.recyclerviewext.disableAnimation
+import com.duckduckgo.common.ui.recyclerviewext.enableAnimation
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
 import com.duckduckgo.common.ui.view.show

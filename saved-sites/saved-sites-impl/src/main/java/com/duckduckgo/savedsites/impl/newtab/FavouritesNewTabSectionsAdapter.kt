@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.newtabpage.impl.view
+package com.duckduckgo.savedsites.impl.newtab
 
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
@@ -23,8 +23,6 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
@@ -33,66 +31,59 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.common.ui.menu.PopupMenu
-import com.duckduckgo.newtabpage.impl.R
-import com.duckduckgo.newtabpage.impl.databinding.RowNewTabGridItemBinding
-import com.duckduckgo.newtabpage.impl.view.DaxNewTabGridItem.GridItemType.Favicon
-import com.duckduckgo.newtabpage.impl.view.DaxNewTabGridItem.GridItemType.Placeholder
-import com.duckduckgo.newtabpage.impl.view.DaxNewTabGridItem.GridItemType.Shortcut
-import com.duckduckgo.newtabpage.impl.view.NewTabSectionsItem.FavouriteItem
-import com.duckduckgo.newtabpage.impl.view.NewTabSectionsItem.PlaceholderItem
-import com.duckduckgo.newtabpage.impl.view.NewTabSectionsItem.ShortcutItem
-import com.duckduckgo.newtabpage.impl.view.NewTabShortcut.BOOKMARKS
-import com.duckduckgo.newtabpage.impl.view.NewTabShortcut.CHAT
+import com.duckduckgo.common.ui.view.listitem.DaxGridItem.GridItemType.Favicon
+import com.duckduckgo.common.ui.view.listitem.DaxGridItem.GridItemType.Placeholder
+import com.duckduckgo.mobile.android.databinding.RowNewTabGridItemBinding
+import com.duckduckgo.saved.sites.impl.R
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionsAdapter.FavouriteViewHolder.ItemState.Drag
+import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionsAdapter.FavouriteViewHolder.ItemState.LongPress
+import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionsAdapter.FavouriteViewHolder.ItemState.Stale
+import com.duckduckgo.savedsites.impl.newtab.FavouriteNewTabSectionsItem.FavouriteItemFavourite
+import com.duckduckgo.savedsites.impl.newtab.FavouriteNewTabSectionsItem.PlaceholderItemFavourite
 import kotlin.math.absoluteValue
 import kotlinx.coroutines.launch
 import logcat.logcat
 
-class NewTabSectionsAdapter(
+class FavouritesNewTabSectionsAdapter(
     private val lifecycleOwner: LifecycleOwner,
     private val faviconManager: FaviconManager,
     private val onMoveListener: (ViewHolder) -> Unit,
-    private val onShortcutSelected: (NewTabShortcut) -> Unit,
     private val onFavoriteSelected: (Favorite) -> Unit,
     private val onEditFavoriteSelected: (Favorite) -> Unit,
     private val onRemoveFavoriteSelected: (Favorite) -> Unit,
     private val onDeleteFavoriteSelected: (Favorite) -> Unit,
-) : ListAdapter<NewTabSectionsItem, ViewHolder>(NewTabSectionsDiffCallback()) {
+) : ListAdapter<FavouriteNewTabSectionsItem, ViewHolder>(NewTabSectionsDiffCallback()) {
 
     var expanded: Boolean = false
 
     companion object {
         private const val PLACEHOLDER_VIEW_TYPE = 0
-        private const val SHORTCUT_VIEW_TYPE = 1
-        private const val FAVORITE_TYPE = 2
-
-        val SHORTCUTS = listOf(
-            ShortcutItem(BOOKMARKS),
-            ShortcutItem(CHAT),
-        )
+        private const val FAVORITE_TYPE = 1
+        const val QUICK_ACCESS_ITEM_MAX_SIZE_DP = 90
+        const val QUICK_ACCESS_GRID_MAX_COLUMNS = 6
 
         val PORTRAIT_PLACEHOLDERS = listOf(
-            PlaceholderItem,
-            PlaceholderItem,
-            PlaceholderItem,
-            PlaceholderItem,
+            PlaceholderItemFavourite,
+            PlaceholderItemFavourite,
+            PlaceholderItemFavourite,
+            PlaceholderItemFavourite,
         )
 
         val LANDSCAPE_PLACEHOLDERS = listOf(
-            PlaceholderItem,
-            PlaceholderItem,
-            PlaceholderItem,
-            PlaceholderItem,
-            PlaceholderItem,
-            PlaceholderItem,
+            PlaceholderItemFavourite,
+            PlaceholderItemFavourite,
+            PlaceholderItemFavourite,
+            PlaceholderItemFavourite,
+            PlaceholderItemFavourite,
+            PlaceholderItemFavourite,
         )
     }
 
     override fun getItemViewType(position: Int): Int {
         return when (getItem(position)) {
-            is PlaceholderItem -> PLACEHOLDER_VIEW_TYPE
-            is ShortcutItem -> SHORTCUT_VIEW_TYPE
-            is FavouriteItem -> FAVORITE_TYPE
+            is PlaceholderItemFavourite -> PLACEHOLDER_VIEW_TYPE
+            is FavouriteItemFavourite -> FAVORITE_TYPE
         }
     }
 
@@ -103,11 +94,6 @@ class NewTabSectionsAdapter(
         return when (viewType) {
             PLACEHOLDER_VIEW_TYPE -> PlaceholderViewHolder(
                 RowNewTabGridItemBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-            )
-
-            SHORTCUT_VIEW_TYPE -> ShortcutViewHolder(
-                RowNewTabGridItemBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-                onShortcutSelected,
             )
 
             FAVORITE_TYPE -> FavouriteViewHolder(
@@ -140,32 +126,13 @@ class NewTabSectionsAdapter(
     ) {
         when (holder) {
             is PlaceholderViewHolder -> holder.bind()
-            is ShortcutViewHolder -> holder.bind(getItem(position) as ShortcutItem)
-            is FavouriteViewHolder -> holder.bind(getItem(position) as FavouriteItem)
+            is FavouriteViewHolder -> holder.bind(getItem(position) as FavouriteItemFavourite)
         }
     }
 
     private class PlaceholderViewHolder(private val binding: RowNewTabGridItemBinding) : ViewHolder(binding.root) {
         fun bind() {
             binding.root.setItemType(Placeholder)
-        }
-    }
-
-    private class ShortcutViewHolder(
-        private val binding: RowNewTabGridItemBinding,
-        private val onShortcutSelected: (NewTabShortcut) -> Unit,
-    ) : ViewHolder(binding.root) {
-        fun bind(
-            item: ShortcutItem,
-        ) {
-            with(binding.root) {
-                setItemType(Shortcut)
-                setPrimaryText(item.shortcut.titleResource)
-                setLeadingIconDrawable(item.shortcut.iconResource)
-                setClickListener {
-                    onShortcutSelected(item.shortcut)
-                }
-            }
         }
     }
 
@@ -180,7 +147,7 @@ class NewTabSectionsAdapter(
         private val onDeleteFavoriteSelected: (Favorite) -> Unit,
     ) : ViewHolder(binding.root), DragDropViewHolderListener {
 
-        private var itemState: ItemState = ItemState.Stale
+        private var itemState: ItemState = Stale
         private var popupMenu: PopupMenu? = null
 
         sealed class ItemState {
@@ -205,7 +172,7 @@ class NewTabSectionsAdapter(
         }
 
         fun bind(
-            item: FavouriteItem,
+            item: FavouriteItemFavourite,
         ) {
             with(binding.root) {
                 setItemType(Favicon)
@@ -237,7 +204,7 @@ class NewTabSectionsAdapter(
         private fun configureClickListeners(favorite: Favorite) {
             binding.root.setLongClickListener {
                 logcat { "New Tab: onLongClick" }
-                itemState = ItemState.LongPress
+                itemState = LongPress
                 scaleUpFavicon()
                 showOverFlowMenu(binding.root, favorite)
                 false
@@ -265,7 +232,7 @@ class NewTabSectionsAdapter(
             binding.root.setTouchListener { _, event ->
                 when (event.actionMasked) {
                     MotionEvent.ACTION_MOVE -> {
-                        if (itemState != ItemState.LongPress) return@setTouchListener false
+                        if (itemState != LongPress) return@setTouchListener false
 
                         onMoveListener(this@FavouriteViewHolder)
                     }
@@ -281,14 +248,14 @@ class NewTabSectionsAdapter(
         override fun onDragStarted() {
             scaleUpFavicon()
             binding.root.hideTitle()
-            itemState = ItemState.Drag
+            itemState = Drag
         }
 
         override fun onItemMoved(
             dX: Float,
             dY: Float,
         ) {
-            if (itemState != ItemState.Drag) return
+            if (itemState != Drag) return
 
             if (dX.absoluteValue > 10 || dY.absoluteValue > 10) {
                 popupMenu?.dismiss()
@@ -298,36 +265,27 @@ class NewTabSectionsAdapter(
         override fun onItemReleased() {
             scaleDownFavicon()
             binding.root.showTitle()
-            itemState = ItemState.Stale
+            itemState = Stale
         }
     }
 }
 
-sealed class NewTabSectionsItem {
-    data object PlaceholderItem : NewTabSectionsItem()
-    data class ShortcutItem(val shortcut: NewTabShortcut) : NewTabSectionsItem()
-    data class FavouriteItem(val favorite: Favorite) : NewTabSectionsItem()
+sealed class FavouriteNewTabSectionsItem {
+    data object PlaceholderItemFavourite : FavouriteNewTabSectionsItem()
+    data class FavouriteItemFavourite(val favorite: Favorite) : FavouriteNewTabSectionsItem()
 }
 
-enum class NewTabShortcut(
-    @StringRes val titleResource: Int,
-    @DrawableRes val iconResource: Int,
-) {
-    BOOKMARKS(R.string.newTabPageShortcutBookmarks, R.drawable.ic_bookmarks_open_color_16),
-    CHAT(R.string.newTabPageShortcutChat, R.drawable.ic_placeholder_color_16),
-}
-
-private class NewTabSectionsDiffCallback : DiffUtil.ItemCallback<NewTabSectionsItem>() {
+private class NewTabSectionsDiffCallback : DiffUtil.ItemCallback<FavouriteNewTabSectionsItem>() {
     override fun areItemsTheSame(
-        oldItem: NewTabSectionsItem,
-        newItem: NewTabSectionsItem,
+        oldItem: FavouriteNewTabSectionsItem,
+        newItem: FavouriteNewTabSectionsItem,
     ): Boolean {
         return oldItem == newItem
     }
 
     override fun areContentsTheSame(
-        oldItem: NewTabSectionsItem,
-        newItem: NewTabSectionsItem,
+        oldItem: FavouriteNewTabSectionsItem,
+        newItem: FavouriteNewTabSectionsItem,
     ): Boolean {
         return oldItem == newItem
     }

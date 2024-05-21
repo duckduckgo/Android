@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.newtabpage.impl.view
+package com.duckduckgo.common.ui.recyclerviewext
 
 import android.content.Context
 import com.duckduckgo.common.ui.view.toDp
 import com.duckduckgo.common.ui.view.toPx
 import kotlin.math.min
 
-class NewTabGridColumnCalculator(val context: Context) {
+class GridColumnCalculator(val context: Context) {
 
     fun calculateNumberOfColumns(
         columnWidthDp: Int,

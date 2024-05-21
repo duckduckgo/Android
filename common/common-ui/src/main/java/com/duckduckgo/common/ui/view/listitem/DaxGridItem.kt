@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.newtabpage.impl.view
+package com.duckduckgo.common.ui.view.listitem
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -26,36 +26,36 @@ import android.widget.ImageView.ScaleType.FIT_XY
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.listitem.DaxGridItem.GridItemType.Favicon
+import com.duckduckgo.common.ui.view.listitem.DaxGridItem.GridItemType.Placeholder
+import com.duckduckgo.common.ui.view.listitem.DaxGridItem.GridItemType.Shortcut
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.newtabpage.impl.R
-import com.duckduckgo.newtabpage.impl.databinding.ViewNewTabGridItemBinding
-import com.duckduckgo.newtabpage.impl.view.DaxNewTabGridItem.GridItemType.Favicon
-import com.duckduckgo.newtabpage.impl.view.DaxNewTabGridItem.GridItemType.Placeholder
-import com.duckduckgo.newtabpage.impl.view.DaxNewTabGridItem.GridItemType.Shortcut
+import com.duckduckgo.mobile.android.R
+import com.duckduckgo.mobile.android.databinding.ViewGridItemBinding
 
-class DaxNewTabGridItem @JvmOverloads constructor(
+class DaxGridItem @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
-    private val binding: ViewNewTabGridItemBinding by viewBinding()
+    private val binding: ViewGridItemBinding by viewBinding()
 
     init {
         context.obtainStyledAttributes(
             attrs,
-            R.styleable.DaxNewTabGridItem,
+            R.styleable.DaxGridItem,
             0,
             0,
         ).apply {
-            setPrimaryText(getString(R.styleable.DaxNewTabGridItem_primaryText))
-            if (hasValue(R.styleable.DaxNewTabGridItem_leadingIcon)) {
-                setLeadingIconDrawable(getDrawable(R.styleable.DaxNewTabGridItem_leadingIcon)!!)
+            setPrimaryText(getString(R.styleable.DaxGridItem_primaryText))
+            if (hasValue(R.styleable.DaxGridItem_leadingIcon)) {
+                setLeadingIconDrawable(getDrawable(R.styleable.DaxGridItem_leadingIcon)!!)
             }
 
-            if (hasValue(R.styleable.DaxNewTabGridItem_gridItemType)) {
-                val itemType = GridItemType.from(getInt(R.styleable.DaxNewTabGridItem_gridItemType, 0))
+            if (hasValue(R.styleable.DaxGridItem_gridItemType)) {
+                val itemType = GridItemType.from(getInt(R.styleable.DaxGridItem_gridItemType, 0))
                 setItemType(itemType)
             } else {
                 setItemType(Favicon)
