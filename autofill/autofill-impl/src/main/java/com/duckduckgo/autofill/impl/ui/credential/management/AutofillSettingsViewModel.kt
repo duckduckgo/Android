@@ -73,7 +73,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsVie
 import com.duckduckgo.autofill.impl.ui.credential.management.neversaved.NeverSavedSitesViewState
 import com.duckduckgo.autofill.impl.ui.credential.management.searching.CredentialListFilter
 import com.duckduckgo.autofill.impl.ui.credential.management.survey.AutofillSurvey
-import com.duckduckgo.autofill.impl.ui.credential.management.survey.AutofillSurvey.SurveyDetails
+import com.duckduckgo.autofill.impl.ui.credential.management.survey.SurveyDetails
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.duckaddress.DuckAddressIdentifier
 import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository
 import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository.ActivationStatusResult

@@ -30,6 +30,7 @@ interface AutofillSurveyStore {
     suspend fun hasSurveyBeenTaken(id: String): Boolean
     suspend fun recordSurveyWasShown(id: String)
     suspend fun resetPreviousSurveys()
+    suspend fun availableSurveys(): List<SurveyDetails>
 }
 
 @ContributesBinding(AppScope::class)
@@ -67,6 +68,15 @@ class AutofillSurveyStoreImpl @Inject constructor(
                 remove(SURVEY_IDS)
             }
         }
+    }
+
+    override suspend fun availableSurveys(): List<SurveyDetails> {
+        return listOf(
+            SurveyDetails(
+                id = "autofill-2024-04-26",
+                url = "https://selfserve.decipherinc.com/survey/selfserve/32ab/240308",
+            ),
+        )
     }
 
     companion object {

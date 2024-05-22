@@ -21,7 +21,6 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.usage.app.AppDaysUsedRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
-import com.duckduckgo.autofill.impl.ui.credential.management.survey.AutofillSurvey.SurveyDetails
 import com.duckduckgo.autofill.impl.ui.credential.management.survey.AutofillSurveyImpl.Companion.SurveyParams.IN_APP
 import com.duckduckgo.autofill.impl.ui.credential.management.survey.AutofillSurveyImpl.Companion.SurveyParams.NUMBER_PASSWORD_BUCKET_LOTS
 import com.duckduckgo.autofill.impl.ui.credential.management.survey.AutofillSurveyImpl.Companion.SurveyParams.NUMBER_PASSWORD_BUCKET_MANY
@@ -39,11 +38,6 @@ import kotlinx.coroutines.withContext
 interface AutofillSurvey {
     suspend fun firstUnusedSurvey(): SurveyDetails?
     suspend fun recordSurveyAsUsed(id: String)
-
-    data class SurveyDetails(
-        val id: String,
-        val url: String,
-    )
 }
 
 @ContributesBinding(AppScope::class)
@@ -59,7 +53,7 @@ class AutofillSurveyImpl @Inject constructor(
 
     override suspend fun firstUnusedSurvey(): SurveyDetails? {
         if (!canShowSurvey()) return null
-        val survey = availableSurveys.firstOrNull { !surveyTakenPreviously(it.id) } ?: return null
+        val survey = autofillSurveyStore.availableSurveys().firstOrNull { !surveyTakenPreviously(it.id) } ?: return null
         return survey.copy(url = survey.url.addSurveyParameters())
     }
 
@@ -109,12 +103,6 @@ class AutofillSurveyImpl @Inject constructor(
     }
 
     companion object {
-        private val availableSurveys = listOf(
-            SurveyDetails(
-                id = "autofill-2024-04-26",
-                url = "https://selfserve.decipherinc.com/survey/selfserve/32ab/240308",
-            ),
-        )
 
         private object SurveyParams {
             const val ATB = "atb"
