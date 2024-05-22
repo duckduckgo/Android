@@ -20,8 +20,10 @@
     <!-- Sync settings screen -->
     <string name="sync_enable_option_favorites_title">Dela favoriter</string>
     <string name="sync_enable_option_favorites_subtitle">Använd samma favoriter på alla enheter. Låt bli att använda funktionen om du vill skilja på favoriter för mobil och dator.</string>
-    <string name="saved_site_limit_warning"><b>Synkronisering pausad</b>\nGränsen för antalet bokmärken har överskridits. Ta bort några för att återuppta synkronisering.\n\n<annotation type="manage_bookmarks">Hantera bokmärken</annotation></string>
-    <string name="saved_site_limit_warning_notif"><b>Synkronisering av bokmärken pausad</b>\nDu har överskridit gränsen för antalet lösenords om kan synkroniseras. Ta bort några bokmärken. Dina bokmärken kommer inte att säkerhetskopieras förrän detta har åtgärdats.</string>
+    <string name="saved_site_limit_warning"><b>Synkroniseringen har pausats</b>\nDu har nått det maximala antalet bokmärken. Ta bort några för att återuppta synkroniseringen.\n\n<annotation type="manage_bookmarks">Hantera bokmärken</annotation></string>
+    <string name="saved_site_limit_warning_notif"><b>Bokmärkessynkroniseringen har pausats</b>\nDu har nått det maximala antalet bokmärken. Ta bort några bokmärken för att återuppta synkroniseringen.</string>
+    <string name="saved_site_invalid_warning"><b>Synkroniseringen har pausats</b>\nVissa bokmärken är felaktigt formaterade eller för långa och har inte synkroniserats.\n\n<annotation type="manage_bookmarks">Hantera bokmärken</annotation></string>
+    <string name="saved_site_invalid_warning_notif"><b>Bokmärkessynkroniseringen har pausats</b>\nVissa bokmärken är felaktigt formaterade eller för långa och har inte synkroniserats.</string>
     <plurals name="saved_site_invalid_items_warning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
         <item quantity="one">Ditt bokmärke för %1$s kan inte synkroniseras eftersom ett av dess fält överskrider teckengränsen.</item>
         <item quantity="other">Dina bokmärken för %1$s och %2$d andra webbplatser kan inte synkroniseras eftersom vissa av deras fält överskrider teckengränsen.</item>
