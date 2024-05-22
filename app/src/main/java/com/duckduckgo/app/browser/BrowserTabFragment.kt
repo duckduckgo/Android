@@ -85,6 +85,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
@@ -2266,6 +2267,7 @@ class BrowserTabFragment :
             viewModel.fireAutocompletePixel(suggestion)
             withContext(dispatchers.main()) {
                 val origin = when (suggestion) {
+                    is AutoCompleteDefaultSuggestion -> FromAutocomplete(isNav = false)
                     is AutoCompleteBookmarkSuggestion -> FromAutocomplete(isNav = true)
                     is AutoCompleteSearchSuggestion -> FromAutocomplete(isNav = suggestion.isUrl)
                     is AutoCompleteHistorySuggestion -> FromAutocomplete(isNav = true)

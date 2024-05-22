@@ -20,6 +20,7 @@ import androidx.core.net.toUri
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
@@ -65,6 +66,10 @@ interface AutoComplete {
         data class AutoCompleteSearchSuggestion(
             override val phrase: String,
             val isUrl: Boolean,
+        ) : AutoCompleteSuggestion(phrase)
+
+        data class AutoCompleteDefaultSuggestion(
+            override val phrase: String,
         ) : AutoCompleteSuggestion(phrase)
 
         data class AutoCompleteBookmarkSuggestion(
@@ -152,7 +157,7 @@ class AutoCompleteApi @Inject constructor(
 
             AutoCompleteResult(
                 query = query,
-                suggestions = inAppMessage + suggestions,
+                suggestions = inAppMessage + suggestions.ifEmpty { listOf(AutoCompleteDefaultSuggestion(query)) },
             )
         }.onErrorResumeNext(Observable.empty())
     }
