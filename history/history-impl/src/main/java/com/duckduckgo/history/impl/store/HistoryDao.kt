@@ -30,11 +30,17 @@ interface HistoryDao {
     @Query("SELECT * FROM history_entries")
     suspend fun getHistoryEntriesWithVisits(): List<HistoryEntryWithVisits>
 
+    @Query("UPDATE history_entries SET title = :title WHERE id = :id")
+    suspend fun updateTitle(id: Long, title: String)
+
     @Transaction
     suspend fun updateOrInsertVisit(url: String, title: String, query: String?, isSerp: Boolean, date: LocalDateTime) {
         val existingHistoryEntry = getHistoryEntryByUrl(url)
 
         if (existingHistoryEntry != null) {
+            if (title.isNotBlank() && title != existingHistoryEntry.title) {
+                updateTitle(existingHistoryEntry.id, title)
+            }
             val newVisit = VisitEntity(timestamp = DatabaseDateFormatter.timestamp(date), historyEntryId = existingHistoryEntry.id)
             insertVisit(newVisit)
         } else {
