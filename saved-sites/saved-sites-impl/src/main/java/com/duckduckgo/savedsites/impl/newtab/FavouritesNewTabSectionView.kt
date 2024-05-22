@@ -69,13 +69,13 @@ import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.android.support.AndroidSupportInjection
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import logcat.logcat
-import javax.inject.Inject
 
 @InjectWith(ViewScope::class)
 class FavouritesNewTabSectionView @JvmOverloads constructor(
@@ -126,12 +126,11 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
 
     private fun configureViews() {
         configureHomeTabQuickAccessGrid()
-
     }
 
     private fun configureHomeTabQuickAccessGrid() {
         configureQuickAccessGridLayout(binding.quickAccessRecyclerView)
-        adapter = createQuickAccessAdapter{ viewHolder ->
+        adapter = createQuickAccessAdapter { viewHolder ->
             binding.quickAccessRecyclerView.enableAnimation()
             itemTouchHelper.startDrag(viewHolder)
         }
@@ -218,12 +217,11 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
     }
 
     private fun render(viewState: ViewState) {
-        logcat { "New Tab: showHome favourites empty ${viewState.favourites.isEmpty()}"}
+        logcat { "New Tab: showHome favourites empty ${viewState.favourites.isEmpty()}" }
         val gridColumnCalculator = GridColumnCalculator(context)
         val numOfColumns = gridColumnCalculator.calculateNumberOfColumns(QUICK_ACCESS_ITEM_MAX_SIZE_DP, QUICK_ACCESS_GRID_MAX_COLUMNS)
 
         if (viewState.favourites.isEmpty()) {
-            binding.newTabFavoritesToggle.gone()
             binding.newTabFavoritesToggle.gone()
             binding.sectionHeaderOverflowIcon.show()
             binding.sectionHeaderLayout.setOnClickListener {
@@ -239,7 +237,7 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
             binding.sectionHeaderOverflowIcon.gone()
 
             val numOfCollapsedItems = numOfColumns * 2
-            logcat { "New Tab: fav size ${viewState.favourites.size} numOfCollapsedItems $numOfCollapsedItems"}
+            logcat { "New Tab: fav size ${viewState.favourites.size} numOfCollapsedItems $numOfCollapsedItems" }
             val showToggle = viewState.favourites.size > numOfCollapsedItems
             val showCollapsed = !adapter.expanded
 
@@ -316,7 +314,6 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
             }
             is ShowEditSavedSiteDialog -> TODO()
         }
-
     }
 
     private fun confirmDeleteSavedSite(
@@ -344,7 +341,6 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
             )
             .show()
     }
-
 }
 
 @ContributesMultibinding(AppScope::class)

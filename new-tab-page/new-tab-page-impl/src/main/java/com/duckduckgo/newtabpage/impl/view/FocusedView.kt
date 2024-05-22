@@ -18,18 +18,11 @@ package com.duckduckgo.newtabpage.impl.view
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import android.widget.LinearLayout
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ViewScope
-import com.duckduckgo.newtabpage.api.NewTabPageSection
-import com.duckduckgo.newtabpage.api.NewTabPageSectionPlugin
-import com.duckduckgo.newtabpage.impl.databinding.ViewNewTabPageBinding
 import com.duckduckgo.newtabpage.impl.databinding.ViewPlaceholderBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
 
 @InjectWith(ViewScope::class)
 class FocusedView @JvmOverloads constructor(
@@ -39,5 +32,4 @@ class FocusedView @JvmOverloads constructor(
 ) : LinearLayout(context, attrs, defStyle) {
 
     private val binding: ViewPlaceholderBinding by viewBinding()
-
 }

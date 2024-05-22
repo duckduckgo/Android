@@ -19,7 +19,4 @@ package com.duckduckgo.newtabpage.api
 interface NewTabPageSectionProvider {
 
     fun provideSections(): List<NewTabPageSectionPlugin>
-
 }
-
-

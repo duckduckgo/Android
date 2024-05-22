@@ -23,10 +23,7 @@ import android.view.ViewGroup.LayoutParams
 import android.widget.LinearLayout
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.common.utils.ViewViewModelFactory
-import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ViewScope
-import com.duckduckgo.newtabpage.api.NewTabPageSectionPlugin
 import com.duckduckgo.newtabpage.api.NewTabPageSectionProvider
 import com.duckduckgo.newtabpage.impl.databinding.ViewNewTabPageBinding
 import dagger.android.support.AndroidSupportInjection

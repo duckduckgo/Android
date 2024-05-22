@@ -18,9 +18,7 @@ package com.duckduckgo.newtabpage.impl
 
 import android.content.Context
 import android.view.View
-import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.newtabpage.api.NewTabPagePlugin
 import com.duckduckgo.newtabpage.api.NewTabPageVersion
 import com.duckduckgo.newtabpage.impl.view.NewTabPageView

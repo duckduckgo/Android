@@ -19,12 +19,11 @@ package com.duckduckgo.newtabpage.impl
 import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.newtabpage.api.NewTabPageSectionPlugin
 import com.duckduckgo.newtabpage.api.NewTabPageSectionProvider
 import com.squareup.anvil.annotations.ContributesBinding
-import logcat.logcat
 import javax.inject.Inject
+import logcat.logcat
 
 @ContributesBinding(
     scope = AppScope::class,

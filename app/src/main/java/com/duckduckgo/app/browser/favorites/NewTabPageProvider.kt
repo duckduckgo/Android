@@ -20,7 +20,6 @@ import android.content.Context
 import android.view.View
 import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.common.utils.plugins.PluginPoint
-import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.newtabpage.api.NewTabPagePlugin
 import com.duckduckgo.newtabpage.api.NewTabPageVersion

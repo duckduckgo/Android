@@ -36,11 +36,11 @@ import com.duckduckgo.common.ui.view.listitem.DaxGridItem.GridItemType.Placehold
 import com.duckduckgo.mobile.android.databinding.RowNewTabGridItemBinding
 import com.duckduckgo.saved.sites.impl.R
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.impl.newtab.FavouriteNewTabSectionsItem.FavouriteItemFavourite
+import com.duckduckgo.savedsites.impl.newtab.FavouriteNewTabSectionsItem.PlaceholderItemFavourite
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionsAdapter.FavouriteViewHolder.ItemState.Drag
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionsAdapter.FavouriteViewHolder.ItemState.LongPress
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionsAdapter.FavouriteViewHolder.ItemState.Stale
-import com.duckduckgo.savedsites.impl.newtab.FavouriteNewTabSectionsItem.FavouriteItemFavourite
-import com.duckduckgo.savedsites.impl.newtab.FavouriteNewTabSectionsItem.PlaceholderItemFavourite
 import kotlin.math.absoluteValue
 import kotlinx.coroutines.launch
 import logcat.logcat
