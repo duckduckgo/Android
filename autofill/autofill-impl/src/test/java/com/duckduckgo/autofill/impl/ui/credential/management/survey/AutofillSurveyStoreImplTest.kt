@@ -48,6 +48,6 @@ class AutofillSurveyStoreImplTest {
 
     @Test
     fun whenAvailableSurveysCalledThenOneSurveyReturned() = runTest {
-        assertEquals(1, testee.availableSurveys().size)
+        assertEquals(0, testee.availableSurveys().size)
     }
 }

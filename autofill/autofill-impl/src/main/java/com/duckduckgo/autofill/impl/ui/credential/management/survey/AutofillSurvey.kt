@@ -52,9 +52,11 @@ class AutofillSurveyImpl @Inject constructor(
 ) : AutofillSurvey {
 
     override suspend fun firstUnusedSurvey(): SurveyDetails? {
-        if (!canShowSurvey()) return null
-        val survey = autofillSurveyStore.availableSurveys().firstOrNull { !surveyTakenPreviously(it.id) } ?: return null
-        return survey.copy(url = survey.url.addSurveyParameters())
+        return withContext(dispatchers.io()) {
+            if (!canShowSurvey()) return@withContext null
+            val survey = autofillSurveyStore.availableSurveys().firstOrNull { !surveyTakenPreviously(it.id) } ?: return@withContext null
+            return@withContext survey.copy(url = survey.url.addSurveyParameters())
+        }
     }
 
     private fun canShowSurvey(): Boolean {

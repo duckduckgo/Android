@@ -71,12 +71,7 @@ class AutofillSurveyStoreImpl @Inject constructor(
     }
 
     override suspend fun availableSurveys(): List<SurveyDetails> {
-        return listOf(
-            SurveyDetails(
-                id = "autofill-2024-04-26",
-                url = "https://selfserve.decipherinc.com/survey/selfserve/32ab/240308",
-            ),
-        )
+        return emptyList()
     }
 
     companion object {
