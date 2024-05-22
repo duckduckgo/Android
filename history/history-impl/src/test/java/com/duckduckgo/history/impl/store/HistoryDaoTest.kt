@@ -81,4 +81,17 @@ class HistoryDaoTest {
             Assert.assertEquals(2, historyEntriesWithVisits.first().visits.count())
         }
     }
+
+    @Test
+    fun whenInsertSameUrlWithDifferentDateAndDifferentTitleTwiceThenOneEntryAndTwoVisitsAreStored() {
+        runTest {
+            historyDao.updateOrInsertVisit("url", "title", "query", false, LocalDateTime.of(2000, JANUARY, 1, 0, 0))
+            historyDao.updateOrInsertVisit("url", "title2", "query", false, LocalDateTime.of(2000, JANUARY, 2, 0, 0))
+
+            val historyEntriesWithVisits = historyDao.getHistoryEntriesWithVisits()
+            Assert.assertEquals(1, historyEntriesWithVisits.count())
+            Assert.assertEquals(2, historyEntriesWithVisits.first().visits.count())
+            Assert.assertEquals("title2", historyEntriesWithVisits.first().historyEntry.title)
+        }
+    }
 }
