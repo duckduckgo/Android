@@ -16,7 +16,6 @@
 
 package com.duckduckgo.newtabpage.impl.view
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.view.ViewGroup.LayoutParams
@@ -28,9 +27,6 @@ import com.duckduckgo.newtabpage.api.NewTabPageSectionProvider
 import com.duckduckgo.newtabpage.impl.databinding.ViewNewTabPageBinding
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import logcat.logcat
 
 @InjectWith(ViewScope::class)
@@ -43,16 +39,11 @@ class NewTabPageView @JvmOverloads constructor(
     @Inject
     lateinit var newTabSectionsProvider: NewTabPageSectionProvider
 
-    private var coroutineScope: CoroutineScope? = null
-
     private val binding: ViewNewTabPageBinding by viewBinding()
 
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
-
-        @SuppressLint("NoHardcodedCoroutineDispatcher")
-        coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
         setupRemoteSections()
     }
