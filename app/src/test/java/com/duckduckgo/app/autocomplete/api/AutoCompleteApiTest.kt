@@ -106,7 +106,7 @@ class AutoCompleteApiTest {
     }
 
     @Test
-    fun whenAutoCompleteReturnsMultipleBookmarkAndFavoriteHitsOnlyShowFavoritesBeforeSearchSuggestions() {
+    fun whenAutoCompleteReturnsMultipleBookmarkAndFavoriteHitsThenBothShowBeforeSearchSuggestionsAndFavoritesShowFirst() {
         whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(
             Observable.just(
                 listOf(
@@ -135,10 +135,10 @@ class AutoCompleteApiTest {
 
         assertEquals(
             listOf(
-                AutoCompleteBookmarkSuggestion(phrase = "example.com", "title", "https://example.com", isAllowedInTopHits = true, isFavorite = true),
+                AutoCompleteBookmarkSuggestion(phrase = "example.com", "title", "https://example.com", isFavorite = true),
+                AutoCompleteBookmarkSuggestion(phrase = "bar.com", "title", "https://bar.com", isFavorite = false),
                 AutoCompleteSearchSuggestion("foo", false),
-                AutoCompleteBookmarkSuggestion(phrase = "bar.com", "title", "https://bar.com", isAllowedInTopHits = false, isFavorite = false),
-                AutoCompleteBookmarkSuggestion(phrase = "baz.com", "title", "https://baz.com", isAllowedInTopHits = false, isFavorite = false),
+                AutoCompleteBookmarkSuggestion(phrase = "baz.com", "title", "https://baz.com", isFavorite = false),
             ),
             value.suggestions,
         )
@@ -185,10 +185,10 @@ class AutoCompleteApiTest {
 
         assertEquals(
             listOf(
-                AutoCompleteBookmarkSuggestion(phrase = "bar.com", "title", "https://bar.com", isAllowedInTopHits = true, isFavorite = false),
-                AutoCompleteBookmarkSuggestion(phrase = "example.com", "title", "https://example.com", isAllowedInTopHits = true, isFavorite = true),
+                AutoCompleteBookmarkSuggestion(phrase = "bar.com", "title", "https://bar.com", isFavorite = false),
+                AutoCompleteBookmarkSuggestion(phrase = "example.com", "title", "https://example.com", isFavorite = true),
                 AutoCompleteSearchSuggestion("foo", false),
-                AutoCompleteBookmarkSuggestion(phrase = "baz.com", "title", "https://baz.com", isAllowedInTopHits = false, isFavorite = false),
+                AutoCompleteBookmarkSuggestion(phrase = "baz.com", "title", "https://baz.com", isFavorite = false),
             ),
             value.suggestions,
         )
@@ -234,8 +234,8 @@ class AutoCompleteApiTest {
                 AutoCompleteHistorySuggestion(phrase = "bar.com", "title", "https://bar.com", isAllowedInTopHits = true),
                 AutoCompleteHistorySuggestion(phrase = "foo.com", "title", "https://foo.com", isAllowedInTopHits = true),
                 AutoCompleteSearchSuggestion("foo", false),
-                AutoCompleteBookmarkSuggestion(phrase = "example.com", "title", "https://example.com", isAllowedInTopHits = true, isFavorite = true),
-                AutoCompleteBookmarkSuggestion(phrase = "baz.com", "title", "https://baz.com", isAllowedInTopHits = false, isFavorite = false),
+                AutoCompleteBookmarkSuggestion(phrase = "example.com", "title", "https://example.com", isFavorite = true),
+                AutoCompleteBookmarkSuggestion(phrase = "baz.com", "title", "https://baz.com", isFavorite = false),
             ),
             value.suggestions,
         )
@@ -278,11 +278,11 @@ class AutoCompleteApiTest {
 
         assertEquals(
             listOf(
-                AutoCompleteBookmarkSuggestion(phrase = "example.com", "title", "https://example.com", isAllowedInTopHits = true, isFavorite = true),
+                AutoCompleteBookmarkSuggestion(phrase = "example.com", "title", "https://example.com", isFavorite = true),
+                AutoCompleteBookmarkSuggestion(phrase = "baz.com", "title", "https://baz.com", isFavorite = false),
                 AutoCompleteSearchSuggestion("foo", false),
                 AutoCompleteHistorySuggestion(phrase = "bar.com/test", "title", "https://bar.com/test", isAllowedInTopHits = false),
                 AutoCompleteHistorySuggestion(phrase = "foo.com/test", "title", "https://foo.com/test", isAllowedInTopHits = false),
-                AutoCompleteBookmarkSuggestion(phrase = "baz.com", "title", "https://baz.com", isAllowedInTopHits = false, isFavorite = false),
             ),
             value.suggestions,
         )
@@ -317,17 +317,17 @@ class AutoCompleteApiTest {
 
         assertEquals(
             listOf(
-                AutoCompleteBookmarkSuggestion(phrase = "example.com", "title", "https://example.com", isAllowedInTopHits = true, isFavorite = true),
-                AutoCompleteBookmarkSuggestion(phrase = "foo.com", "title", "https://foo.com", isAllowedInTopHits = true, isFavorite = true),
+                AutoCompleteBookmarkSuggestion(phrase = "example.com", "title", "https://example.com", isFavorite = true),
+                AutoCompleteBookmarkSuggestion(phrase = "foo.com", "title", "https://foo.com", isFavorite = true),
                 AutoCompleteSearchSuggestion("foo", false),
-                AutoCompleteBookmarkSuggestion(phrase = "bar.com", "title", "https://bar.com", isAllowedInTopHits = true, isFavorite = true),
+                AutoCompleteBookmarkSuggestion(phrase = "bar.com", "title", "https://bar.com", isFavorite = true),
             ),
             value.suggestions,
         )
     }
 
     @Test
-    fun whenAutoCompleteReturnsMultipleSavedSitesHitsThenShowFavcritesFirst() {
+    fun whenAutoCompleteReturnsMultipleSavedSitesHitsThenShowFavoritesFirst() {
         whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(Observable.just(emptyList()))
         whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
             Single.just(
@@ -353,11 +353,11 @@ class AutoCompleteApiTest {
         val result = testee.autoComplete("title").test()
         val value = result.values()[0] as AutoCompleteResult
 
-        assertTrue((value.suggestions[0] as AutoCompleteBookmarkSuggestion).isAllowedInTopHits)
-        assertTrue((value.suggestions[1] as AutoCompleteBookmarkSuggestion).isAllowedInTopHits)
-        assertTrue((value.suggestions[2] as AutoCompleteBookmarkSuggestion).isAllowedInTopHits)
-        assertTrue((value.suggestions[3] as AutoCompleteBookmarkSuggestion).isAllowedInTopHits)
-        assertFalse((value.suggestions[4] as AutoCompleteBookmarkSuggestion).isAllowedInTopHits)
+        assertTrue((value.suggestions[0] as AutoCompleteBookmarkSuggestion).isFavorite)
+        assertTrue((value.suggestions[1] as AutoCompleteBookmarkSuggestion).isFavorite)
+        assertTrue((value.suggestions[2] as AutoCompleteBookmarkSuggestion).isFavorite)
+        assertTrue((value.suggestions[3] as AutoCompleteBookmarkSuggestion).isFavorite)
+        assertFalse((value.suggestions[4] as AutoCompleteBookmarkSuggestion).isFavorite)
     }
 
     @Test
@@ -402,14 +402,12 @@ class AutoCompleteApiTest {
                     phrase = "example.com",
                     "title example",
                     "https://example.com",
-                    isAllowedInTopHits = true,
                     isFavorite = true,
                 ),
                 AutoCompleteBookmarkSuggestion(
                     phrase = "foo.com/path/to/foo",
                     "title foo",
                     "https://foo.com/path/to/foo",
-                    isAllowedInTopHits = true,
                     isFavorite = true,
                 ),
                 AutoCompleteSearchSuggestion(phrase = "baz.com", true),
@@ -417,14 +415,12 @@ class AutoCompleteApiTest {
                     phrase = "foo.com",
                     title = "title foo",
                     url = "https://foo.com",
-                    isAllowedInTopHits = true,
                     isFavorite = true,
                 ),
                 AutoCompleteBookmarkSuggestion(
                     phrase = "bar.com",
                     title = "title bar",
                     url = "https://bar.com",
-                    isAllowedInTopHits = true,
                     isFavorite = true,
                 ),
             ),
@@ -465,14 +461,12 @@ class AutoCompleteApiTest {
                     phrase = "favexample.com",
                     title = "title",
                     url = "https://favexample.com",
-                    isAllowedInTopHits = true,
                     isFavorite = true,
                 ),
                 AutoCompleteBookmarkSuggestion(
                     phrase = "example.com",
                     title = "title",
                     url = "https://example.com",
-                    isAllowedInTopHits = false,
                     isFavorite = false,
                 ),
             ),
@@ -508,14 +502,14 @@ class AutoCompleteApiTest {
 
         assertEquals(
             listOf(
-                AutoCompleteSearchSuggestion(phrase = "example.com", false),
-                AutoCompleteSearchSuggestion(phrase = "baz.com", true),
                 AutoCompleteBookmarkSuggestion(
                     phrase = "foo.com?key=value",
                     "title foo",
                     "https://foo.com?key=value",
                 ),
                 AutoCompleteBookmarkSuggestion(phrase = "foo.com", "title foo", "https://foo.com"),
+                AutoCompleteSearchSuggestion(phrase = "example.com", false),
+                AutoCompleteSearchSuggestion(phrase = "baz.com", true),
                 AutoCompleteBookmarkSuggestion(phrase = "bar.com", "title bar", "https://bar.com"),
             ),
             value.suggestions,
