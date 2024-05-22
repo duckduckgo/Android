@@ -139,8 +139,10 @@
     <string name="managementDisabledModeSubtitle">Se requiere un patrón de bloqueo del dispositivo, un PIN o datos biométricos para proteger tus contraseñas.</string>
     <string name="credentialManagementEditTitle">Editar contraseña</string>
 
-    <string name="credentials_limit_warning"><b>Sincronización en pausa</b>\nSe ha superado el límite de inicios de sesión. Elimina algunos para reanudar la sincronización.\n\n<annotation type="manage_logins">Gestionar inicios de sesión</annotation></string>
-    <string name="credentials_limit_warning_notif"><b>La sincronización de contraseñas está en pausa</b>\nHas superado el límite de sincronización de contraseñas. Prueba a eliminar algunas contraseñas. No se realizará una copia de seguridad de las contraseñas hasta que se resuelva este problema.</string>
+    <string name="credentials_limit_warning"><b>Sincronización en pausa</b>\nHas alcanzado el número máximo de contraseñas. Elimina algunas para reanudar la sincronización.\n\n<annotation type="manage_logins">Gestionar contraseñas</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>La sincronización de contraseñas está en pausa</b>\nHas alcanzado el número máximo de contraseñas. Elimina algunas contraseñas para reanudar la sincronización.</string>
+    <string name="credentials_invalid_request_warning"><b>Sincronización en pausa</b>\nAlgunas contraseñas tienen un formato incorrecto o demasiado largo y no se han sincronizado.\n\n<annotation type="manage_logins">Gestionar contraseñas</annotation></string>
+    <string name="credentials_invalid_request_warning_notif"><b>La sincronización de contraseña está en pausa</b>\nAlgunas contraseñas tienen un formato incorrecto o son demasiado largas y no se han sincronizado.</string>
 
     <string name="saveLoginDialogNeverForThisSite">No preguntar nunca para esta página</string>
     <string name="credentialManagementInstructionNeverForThisSite">Si restableces los sitios excluidos, se te pedirá que guardes tu contraseña la próxima vez que accedas a cualquiera de estos sitios.</string>
