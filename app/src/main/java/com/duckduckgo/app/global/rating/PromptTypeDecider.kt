@@ -18,10 +18,10 @@ package com.duckduckgo.app.global.rating
 
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions.ShowEnjoymentPrompt
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions.ShowNothing
-import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
