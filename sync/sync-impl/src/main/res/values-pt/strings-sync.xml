@@ -25,6 +25,9 @@
     <string name="sync_disabled_authenticated_user"><b>Sincronização e cópia de segurança em pausa</b>\nLamentamos, mas a sincronização e a cópia de segurança não estão disponíveis de momento. Tenta novamente mais tarde.</string>
     <string name="sync_disabled_authenticated_user_new_version"><b>Sincronização &amp; Cópia de segurança em pausa</b>\nLamentamos, mas a sincronização e a cópia de segurança já não estão disponíveis nesta versão da aplicação. Atualiza o DuckDuckGo para a versão mais recente para continuar.</string>
     <string name="sync_paused_notification"><b>Sincronização e cópia de segurança em pausa</b>\nLamentamos, mas a sincronização e a cópia de segurança não estão disponíveis de momento. Tenta novamente mais tarde.</string>
+    <string name="sync_error_notification"><b>Erro de sincronização</b>\nO Sync &amp; Backup está temporariamente indisponível.</string>
+    <string name="sync_error_warning"><b>Erro de sincronização</b>\nO Sync &amp; Backup está temporariamente indisponível.</string>
+    <string name="sync_signed_out_notification"><b>A sincronização está em pausa</b>\nA sincronização foi colocada em pausa. Se quiseres continuar a sincronizar este dispositivo, inicia sessão novamente noutro dispositivo ou com o teu código de recuperação.</string>
 
     <!-- Settings screen -->
     <string name="sync_screen_title">Sincronização e cópia de segurança</string>
