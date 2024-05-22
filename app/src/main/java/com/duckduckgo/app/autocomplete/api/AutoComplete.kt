@@ -64,7 +64,6 @@ interface AutoComplete {
             override val phrase: String,
             val title: String,
             val url: String,
-            val isAllowedInTopHits: Boolean = false,
             val isFavorite: Boolean = false,
         ) : AutoCompleteSuggestion(phrase)
 
@@ -115,7 +114,7 @@ class AutoCompleteApi @Inject constructor(
                 when (it) {
                     is AutoCompleteHistorySearchSuggestion -> true
                     is AutoCompleteHistorySuggestion -> it.isAllowedInTopHits
-                    is AutoCompleteBookmarkSuggestion -> it.isAllowedInTopHits
+                    is AutoCompleteBookmarkSuggestion -> true
                     else -> false
                 }
             }.take(maximumNumberOfTopHits)
@@ -149,9 +148,6 @@ class AutoCompleteApi @Inject constructor(
             if (historySuggestion != null) {
                 bookmarkSuggestion.copy(
                     score = max(historySuggestion.score, bookmarkSuggestion.score),
-                    suggestion = bookmarkSuggestion.suggestion.copy(
-                        isAllowedInTopHits = historySuggestion.suggestion.isAllowedInTopHits,
-                    ),
                 )
             } else {
                 bookmarkSuggestion
@@ -233,13 +229,13 @@ class AutoCompleteApi @Inject constructor(
                     phrase = savedSite.url.toUri().toStringDropScheme(),
                     title = savedSite.title,
                     url = savedSite.url,
-                    isAllowedInTopHits = savedSite is Favorite,
                     isFavorite = savedSite is Favorite,
                 ),
             )
         }
             .map { scoreTitle(it, query) }
             .map { scoreTokens(it, query) }
+            .map { if (it.suggestion.isFavorite && it.score > 0) it.copy(score = it.score + 5) else it }
             .filter { it.score > 0 }
             .toList()
     }
