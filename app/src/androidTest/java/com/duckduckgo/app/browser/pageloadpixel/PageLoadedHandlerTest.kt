@@ -5,7 +5,6 @@ import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.device.DeviceInfo
-import com.duckduckgo.history.api.NavigationHistory
 import kotlinx.coroutines.test.TestScope
 import org.junit.Assert
 import org.junit.Before
@@ -29,7 +28,6 @@ class PageLoadedHandlerTest {
     private val webViewVersionProvider: WebViewVersionProvider = mock()
     private val pageLoadedPixelDao: PageLoadedPixelDao = mock()
     private val autoconsent: Autoconsent = mock()
-    private val navigationHistory: NavigationHistory = mock()
 
     private val testee = RealPageLoadedHandler(
         deviceInfo,
@@ -42,7 +40,6 @@ class PageLoadedHandlerTest {
             override val enabled: Boolean
                 get() = true
         },
-        navigationHistory,
     )
 
     @Before

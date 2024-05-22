@@ -68,6 +68,7 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
+import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.subscriptions.api.Subscriptions
 import java.math.BigInteger
@@ -131,6 +132,7 @@ class BrowserWebViewClientTest {
     private val pagePaintedHandler: PagePaintedHandler = mock()
     private val mediaPlayback: MediaPlayback = mock()
     private val subscriptions: Subscriptions = mock()
+    private val navigationHistory: NavigationHistory = mock()
 
     @UiThreadTest
     @Before
@@ -160,6 +162,7 @@ class BrowserWebViewClientTest {
             currentTimeProvider,
             pageLoadedHandler,
             pagePaintedHandler,
+            navigationHistory,
             mediaPlayback,
             subscriptions,
         )
@@ -792,6 +795,20 @@ class BrowserWebViewClientTest {
         testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
         testee.onPageFinished(mockWebView, EXAMPLE_URL)
         verify(pageLoadedHandler, never()).onPageLoaded(any(), any(), any(), any())
+    }
+
+    @Test
+    fun whenPageFinishesThenHistoryIsSubmitted() {
+        runTest {
+            val mockWebView = getImmediatelyInvokedMockWebView()
+            whenever(mockWebView.progress).thenReturn(100)
+            whenever(mockWebView.safeCopyBackForwardList()).thenReturn(TestBackForwardList())
+            whenever(mockWebView.settings).thenReturn(mock())
+            testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
+            whenever(currentTimeProvider.elapsedRealtime()).thenReturn(10)
+            testee.onPageFinished(mockWebView, EXAMPLE_URL)
+            verify(navigationHistory).saveToHistory(any(), eq(null))
+        }
     }
 
     @Test

@@ -68,6 +68,7 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
+import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.user.agent.api.ClientBrandHintProvider
@@ -102,6 +103,7 @@ class BrowserWebViewClient @Inject constructor(
     private val currentTimeProvider: CurrentTimeProvider,
     private val pageLoadedHandler: PageLoadedHandler,
     private val shouldSendPagePaintedPixel: PagePaintedHandler,
+    private val navigationHistory: NavigationHistory,
     private val mediaPlayback: MediaPlayback,
     private val subscriptions: Subscriptions,
 ) : WebViewClient() {
@@ -366,8 +368,12 @@ class BrowserWebViewClient @Inject constructor(
             url?.let {
                 if (url != ABOUT_BLANK) {
                     start?.let { safeStart ->
+                        // TODO (cbarreiro - 22/05/2024): Extract to plugins
                         pageLoadedHandler.onPageLoaded(it, navigationList.currentItem?.title, safeStart, currentTimeProvider.elapsedRealtime())
                         shouldSendPagePaintedPixel(webView = webView, url = it)
+                        appCoroutineScope.launch(dispatcherProvider.io()) {
+                            navigationHistory.saveToHistory(url, navigationList.currentItem?.title)
+                        }
                         start = null
                     }
                 }
