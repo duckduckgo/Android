@@ -25,6 +25,7 @@ import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.addtohome.AddToHomeSystemCapabilityDetector
+import com.duckduckgo.app.browser.applinks.ExternalAppIntentFlagsFeature
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.AppThirdPartyCookieManager
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
@@ -178,7 +179,8 @@ class BrowserModule {
         ampLinks: AmpLinks,
         trackingParameters: TrackingParameters,
         subscriptions: Subscriptions,
-    ): SpecialUrlDetector = SpecialUrlDetectorImpl(packageManager, ampLinks, trackingParameters, subscriptions)
+        externalAppIntentFlagsFeature: ExternalAppIntentFlagsFeature,
+    ): SpecialUrlDetector = SpecialUrlDetectorImpl(packageManager, ampLinks, trackingParameters, subscriptions, externalAppIntentFlagsFeature)
 
     @Provides
     fun webViewRequestInterceptor(
