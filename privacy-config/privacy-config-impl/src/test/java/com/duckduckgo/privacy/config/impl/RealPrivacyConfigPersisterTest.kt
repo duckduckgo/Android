@@ -156,6 +156,29 @@ class RealPrivacyConfigPersisterTest {
         }
 
     @Test
+    fun whenPersistPrivacyConfigAndMultiplePluginMatchesFeatureNameThenCallThemAll() =
+        runTest {
+            val differentPluginPoint = FakePrivacyFeaturePluginPoint(listOf(FakePrivacyFeaturePlugin(), FakePrivacyFeaturePlugin()))
+            // override
+            val testee =
+                RealPrivacyConfigPersister(
+                    differentPluginPoint,
+                    variantManagerPlugin,
+                    mockTogglesRepository,
+                    unprotectedTemporaryRepository,
+                    privacyRepository,
+                    db,
+                    mockPrivacyConfigUpdateListener,
+                    sharedPreferences,
+                )
+            testee.persistPrivacyConfig(getJsonPrivacyConfig())
+
+            for (plugin in differentPluginPoint.getPlugins()) {
+                assertEquals(1, (plugin as FakePrivacyFeaturePlugin).count)
+            }
+        }
+
+    @Test
     fun whenPersistPrivacyConfigAndVersionIsLowerThanPreviousOneStoredThenDoNothing() =
         runTest {
             privacyRepository.insert(PrivacyConfig(version = 3, readme = "readme", eTag = "eTag", timestamp = "2023-01-02"))
