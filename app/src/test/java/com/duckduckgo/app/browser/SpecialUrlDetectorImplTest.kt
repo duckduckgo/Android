@@ -29,7 +29,6 @@ import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.PHONE_MAX_LEN
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.SMS_MAX_LENGTH
 import com.duckduckgo.app.browser.applinks.ExternalAppIntentFlagsFeature
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.privacy.config.api.AmpLinkType
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.TrackingParameters
@@ -66,6 +65,9 @@ class SpecialUrlDetectorImplTest {
 
     @Mock
     lateinit var externalAppIntentFlagsFeature: ExternalAppIntentFlagsFeature
+
+    @Mock
+    lateinit var mockToggle: Toggle
 
     @Before
     fun setup() {
@@ -256,17 +258,8 @@ class SpecialUrlDetectorImplTest {
 
     @Test
     fun whenUrlIsCustomUriSchemeThenNonHttpAppLinkTypeDetectedWithAdditionalIntentFlags() {
-        whenever(externalAppIntentFlagsFeature.self()).thenReturn(
-            object : Toggle {
-                override fun isEnabled(): Boolean = true
-                override fun setEnabled(state: State) {
-                    TODO("Not yet implemented")
-                }
-                override fun getRawStoredState(): State? {
-                    TODO("Not yet implemented")
-                }
-            },
-        )
+        whenever(mockToggle.isEnabled()).thenReturn(true)
+        whenever(externalAppIntentFlagsFeature.self()).thenReturn(mockToggle)
         val type = testee.determineType("myapp:foo bar") as NonHttpAppLink
         assertEquals("myapp:foo bar", type.uriString)
         assertEquals(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP, type.intent.flags)
@@ -275,17 +268,8 @@ class SpecialUrlDetectorImplTest {
 
     @Test
     fun whenUrlIsCustomUriSchemeThenNonHttpAppLinkTypeDetectedWithoutAdditionalIntentFlags() {
-        whenever(externalAppIntentFlagsFeature.self()).thenReturn(
-            object : Toggle {
-                override fun isEnabled(): Boolean = false
-                override fun setEnabled(state: State) {
-                    TODO("Not yet implemented")
-                }
-                override fun getRawStoredState(): State? {
-                    TODO("Not yet implemented")
-                }
-            },
-        )
+        whenever(mockToggle.isEnabled()).thenReturn(false)
+        whenever(externalAppIntentFlagsFeature.self()).thenReturn(mockToggle)
         val type = testee.determineType("myapp:foo bar") as NonHttpAppLink
         assertEquals("myapp:foo bar", type.uriString)
         assertEquals(0, type.intent.flags)
