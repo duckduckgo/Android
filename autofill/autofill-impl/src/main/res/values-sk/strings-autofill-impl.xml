@@ -139,8 +139,10 @@
     <string name="managementDisabledModeSubtitle">Na ochranu vašich prihlasovacích údajov sa vyžaduje vzor uzamknutia zariadenia, kód PIN alebo biometrické údaje.</string>
     <string name="credentialManagementEditTitle">Upraviť heslo</string>
 
-    <string name="credentials_limit_warning"><b>Synchronizácia bola pozastavená</b>\nBol dosiahnutý limit pre počet prihlásení. Ak chcete obnoviť synchronizáciu, odstráňte niektoré záložky.\n\n<annotation type="manage_logins">Správa prihlásení</annotation></string>
-    <string name="credentials_limit_warning_notif"><b>Synchronizácia hesiel bola pozastavená</b>\nPrekročili ste limit synchronizácie hesiel. Skúste niektoré heslá odstrániť. Kým to nevyriešite, vaše heslá sa nebudú zálohovať.</string>
+    <string name="credentials_limit_warning"><b>Synchronizácia bola pozastavená</b>\nDosiahli ste maximálny počet hesiel. Ak chcete obnoviť synchronizáciu, odstráňte niektoré.\n\n<annotation type="manage_logins">Správa hesiel</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Synchronizácia hesiel bola pozastavená</b>\nDosiahli ste maximálny počet hesiel. Ak chcete obnoviť synchronizáciu, odstráňte niektoré heslá.</string>
+    <string name="credentials_invalid_request_warning"><b></b>\nNiektoré heslá sú nesprávne naformátované alebo sú príliš dlhé, a neboli synchronizované.\n\n<annotation type="manage_logins">Spravovať heslá</annotation></string>
+    <string name="credentials_invalid_request_warning_notif">Heslá<b>sa nesynchronizujú\nNiektoré heslá sú nesprávne naformátované alebo sú príliš dlhé, a neboli synchronizované.</b></string>
 
     <string name="saveLoginDialogNeverForThisSite">Nikdy sa nepýtať na túto stránku</string>
     <string name="credentialManagementInstructionNeverForThisSite">Ak obnovíte vylúčené lokality, pri ďalšom prihlásení na niektorú z týchto lokalít dostanete výzvu na uloženie svojho hesla.</string>
