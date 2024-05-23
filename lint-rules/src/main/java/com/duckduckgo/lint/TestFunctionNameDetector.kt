@@ -151,11 +151,17 @@ class TestFunctionNameDetector : Detector(), SourceCodeScanner {
         }
 
         if (!usedNames.add(proposedFunctionName)) {
+            // We've already used this test name and we'd get a conflicting overloads error.
             return null
         }
 
         // Remove illegal characters
         val sanitizedFunctionName = proposedFunctionName.replace('.', '·').replace(':', '·')
+
+        if (sanitizedFunctionName.length > 120) {
+            // It's too long and would break MAX_LINE_LENGTH. Leave this test to be migrated manually.
+            return null
+        }
 
         return LintFix.create().name("Use name suggested by language model").replace().all().with(sanitizedFunctionName).autoFix().build()
     }
@@ -187,9 +193,9 @@ class TestFunctionNameDetector : Detector(), SourceCodeScanner {
 
         private val prompt: SystemMessage = SystemMessage.from(
             """
-            There is a Kotlin project with unit tests. The unit test functions currently have various non-standard names.
-            
-            We are performing a migration from non-standard names to a new standard.
+            You are a coding completion assistant working on an automated refactoring task for a Kotlin project.
+             
+            The unit test functions currently have various non-standard names. We are performing a migration from non-standard names to a new standard.
             
             The new standard for the names is:
             
@@ -208,11 +214,11 @@ class TestFunctionNameDetector : Detector(), SourceCodeScanner {
             * They must have a minimum of two parts separated by a spaced hyphen " - "
             * The "state" (second part) is optional - it can be omitted to allow for tests with only two parts
             * The parts must start with lowercase if possible
+            * The test name should not be too long. Try and keep the name under 120 characters. You can usually do this by abbreviating
+            the "expected outcome" part so that it summarizes the expected outcome.
             
             I am going to give you a Kotlin function to consider. You must propose a new name for the function that meets the convention. 
             Your answer MUST only contain the new proposed function name.
-            
-            Please omit any filler in your answers like "Certainly!"
              
             Here is a sample input and output to help you.             
       
