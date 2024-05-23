@@ -25,7 +25,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
     featureName = "externalAppIntentFlags",
 )
 
-// A safeguard for this fix: https://app.asana.com/0/414730916066338/1207374732742336/f
+// A safeguard for this fix: https://app.asana.com/0/0/1207374732742336/1207383486029585/f
 interface ExternalAppIntentFlagsFeature {
 
     @Toggle.DefaultValue(false)
