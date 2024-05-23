@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.onboarding.ui.page.experiment
+package com.duckduckgo.app.onboarding.ui.page.extendedonboarding
 
 import android.content.Context
 import android.content.res.ColorStateList

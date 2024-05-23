@@ -25,7 +25,6 @@ import com.duckduckgo.app.browser.databinding.ActivityOnboardingBinding
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.R
 
 @InjectWith(ActivityScope::class)
 class OnboardingActivity : DuckDuckGoActivity() {
@@ -39,13 +38,8 @@ class OnboardingActivity : DuckDuckGoActivity() {
     private val viewPager
         get() = binding.viewPager
 
-    private var forceLightTheme: Boolean = true
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        forceLightTheme = intent.getBooleanExtra(EXTRA_FORCE_LIGHT_THEME, true)
-        val onboardingTheme = if (forceLightTheme) R.style.Theme_DuckDuckGo_Light else R.style.Theme_DuckDuckGo
-        setTheme(onboardingTheme)
         setContentView(binding.root)
         configurePager()
     }
@@ -59,7 +53,7 @@ class OnboardingActivity : DuckDuckGoActivity() {
         }
     }
 
-    fun onOnboardingDone() {
+    private fun onOnboardingDone() {
         viewModel.onOnboardingDone()
         startActivity(BrowserActivity.intent(this@OnboardingActivity))
         finish()
@@ -85,12 +79,8 @@ class OnboardingActivity : DuckDuckGoActivity() {
 
     companion object {
 
-        private const val EXTRA_FORCE_LIGHT_THEME = "FORCE_LIGHT_THEME"
-
-        fun intent(context: Context, forceLightTheme: Boolean): Intent {
-            return Intent(context, OnboardingActivity::class.java).apply {
-                putExtra(EXTRA_FORCE_LIGHT_THEME, forceLightTheme)
-            }
+        fun intent(context: Context): Intent {
+            return Intent(context, OnboardingActivity::class.java)
         }
     }
 }

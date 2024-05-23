@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.onboarding.ui.page.experiment
+package com.duckduckgo.app.onboarding.ui.page
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -24,14 +24,20 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
-import com.duckduckgo.app.onboarding.ui.page.experiment.ExperimentWelcomePage.Companion.PreOnboardingDialogType
-import com.duckduckgo.app.onboarding.ui.page.experiment.ExperimentWelcomePage.Companion.PreOnboardingDialogType.CELEBRATION
-import com.duckduckgo.app.onboarding.ui.page.experiment.ExperimentWelcomePage.Companion.PreOnboardingDialogType.COMPARISON_CHART
-import com.duckduckgo.app.onboarding.ui.page.experiment.ExperimentWelcomePage.Companion.PreOnboardingDialogType.INITIAL
-import com.duckduckgo.app.onboarding.ui.page.experiment.ExperimentWelcomePageViewModel.Command.Finish
-import com.duckduckgo.app.onboarding.ui.page.experiment.ExperimentWelcomePageViewModel.Command.ShowComparisonChart
-import com.duckduckgo.app.onboarding.ui.page.experiment.ExperimentWelcomePageViewModel.Command.ShowDefaultBrowserDialog
-import com.duckduckgo.app.onboarding.ui.page.experiment.ExperimentWelcomePageViewModel.Command.ShowSuccessDialog
+import com.duckduckgo.app.onboarding.ui.page.ExperimentWelcomePage.Companion.PreOnboardingDialogType
+import com.duckduckgo.app.onboarding.ui.page.ExperimentWelcomePage.Companion.PreOnboardingDialogType.CELEBRATION
+import com.duckduckgo.app.onboarding.ui.page.ExperimentWelcomePage.Companion.PreOnboardingDialogType.COMPARISON_CHART
+import com.duckduckgo.app.onboarding.ui.page.ExperimentWelcomePage.Companion.PreOnboardingDialogType.INITIAL
+import com.duckduckgo.app.onboarding.ui.page.ExperimentWelcomePageViewModel.Command.Finish
+import com.duckduckgo.app.onboarding.ui.page.ExperimentWelcomePageViewModel.Command.ShowComparisonChart
+import com.duckduckgo.app.onboarding.ui.page.ExperimentWelcomePageViewModel.Command.ShowDefaultBrowserDialog
+import com.duckduckgo.app.onboarding.ui.page.ExperimentWelcomePageViewModel.Command.ShowSuccessDialog
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.OnboardingExperimentPixel.PixelName.NOTIFICATION_RUNTIME_PERMISSION_SHOWN
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.OnboardingExperimentPixel.PixelName.PREONBOARDING_AFFIRMATION_SHOWN
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.OnboardingExperimentPixel.PixelName.PREONBOARDING_CHOOSE_BROWSER_PRESSED
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.OnboardingExperimentPixel.PixelName.PREONBOARDING_COMPARISON_CHART_SHOWN
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.OnboardingExperimentPixel.PixelName.PREONBOARDING_INTRO_SHOWN
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.OnboardingExperimentPixel.PixelParameter
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.UNIQUE
@@ -87,8 +93,8 @@ class ExperimentWelcomePageViewModel @Inject constructor(
                             true
                         }
                     pixel.fire(
-                        OnboardingExperimentPixel.PixelName.PREONBOARDING_CHOOSE_BROWSER_PRESSED,
-                        mapOf(OnboardingExperimentPixel.PixelParameter.DEFAULT_BROWSER to isDDGDefaultBrowser.toString()),
+                        PREONBOARDING_CHOOSE_BROWSER_PRESSED,
+                        mapOf(PixelParameter.DEFAULT_BROWSER to isDDGDefaultBrowser.toString()),
                     )
                 }
             }
@@ -122,13 +128,13 @@ class ExperimentWelcomePageViewModel @Inject constructor(
     }
 
     fun notificationRuntimePermissionRequested() {
-        pixel.fire(OnboardingExperimentPixel.PixelName.NOTIFICATION_RUNTIME_PERMISSION_SHOWN)
+        pixel.fire(NOTIFICATION_RUNTIME_PERMISSION_SHOWN)
     }
 
     fun notificationRuntimePermissionGranted() {
         pixel.fire(
             AppPixelName.NOTIFICATIONS_ENABLED,
-            mapOf(OnboardingExperimentPixel.PixelParameter.FROM_ONBOARDING to true.toString()),
+            mapOf(PixelParameter.FROM_ONBOARDING to true.toString()),
         )
     }
 

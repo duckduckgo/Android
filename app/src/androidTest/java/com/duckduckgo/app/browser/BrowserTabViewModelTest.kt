@@ -126,8 +126,8 @@ import com.duckduckgo.app.location.data.LocationPermissionsRepositoryImpl
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
-import com.duckduckgo.app.onboarding.ui.page.experiment.ExtendedOnboardingExperimentVariantManager
-import com.duckduckgo.app.onboarding.ui.page.experiment.OnboardingExperimentPixel
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingExperimentVariantManager
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.OnboardingExperimentPixel
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao

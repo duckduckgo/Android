@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.onboarding.ui.page.experiment
+package com.duckduckgo.app.onboarding.ui.page
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -39,14 +39,13 @@ import androidx.transition.TransitionManager
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomeExperimentBinding
-import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
-import com.duckduckgo.app.onboarding.ui.page.experiment.ExperimentWelcomePage.Companion.PreOnboardingDialogType.CELEBRATION
-import com.duckduckgo.app.onboarding.ui.page.experiment.ExperimentWelcomePage.Companion.PreOnboardingDialogType.COMPARISON_CHART
-import com.duckduckgo.app.onboarding.ui.page.experiment.ExperimentWelcomePage.Companion.PreOnboardingDialogType.INITIAL
-import com.duckduckgo.app.onboarding.ui.page.experiment.ExperimentWelcomePageViewModel.Command.Finish
-import com.duckduckgo.app.onboarding.ui.page.experiment.ExperimentWelcomePageViewModel.Command.ShowComparisonChart
-import com.duckduckgo.app.onboarding.ui.page.experiment.ExperimentWelcomePageViewModel.Command.ShowDefaultBrowserDialog
-import com.duckduckgo.app.onboarding.ui.page.experiment.ExperimentWelcomePageViewModel.Command.ShowSuccessDialog
+import com.duckduckgo.app.onboarding.ui.page.ExperimentWelcomePage.Companion.PreOnboardingDialogType.CELEBRATION
+import com.duckduckgo.app.onboarding.ui.page.ExperimentWelcomePage.Companion.PreOnboardingDialogType.COMPARISON_CHART
+import com.duckduckgo.app.onboarding.ui.page.ExperimentWelcomePage.Companion.PreOnboardingDialogType.INITIAL
+import com.duckduckgo.app.onboarding.ui.page.ExperimentWelcomePageViewModel.Command.Finish
+import com.duckduckgo.app.onboarding.ui.page.ExperimentWelcomePageViewModel.Command.ShowComparisonChart
+import com.duckduckgo.app.onboarding.ui.page.ExperimentWelcomePageViewModel.Command.ShowDefaultBrowserDialog
+import com.duckduckgo.app.onboarding.ui.page.ExperimentWelcomePageViewModel.Command.ShowSuccessDialog
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show

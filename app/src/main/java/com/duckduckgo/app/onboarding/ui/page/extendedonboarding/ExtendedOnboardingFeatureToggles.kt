@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.onboarding.ui.page.experiment
+package com.duckduckgo.app.onboarding.ui.page.extendedonboarding
 
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope

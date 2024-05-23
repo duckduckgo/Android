@@ -40,7 +40,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_dax_icon" />
 
-        <com.duckduckgo.app.onboarding.ui.page.experiment.ExperimentDaxBubbleCardView
+        <com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExperimentDaxBubbleCardView
             android:id="@+id/cardView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -182,6 +182,6 @@
 
                 </LinearLayout>
             </FrameLayout>
-        </com.duckduckgo.app.onboarding.ui.page.experiment.ExperimentDaxBubbleCardView>
+        </com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExperimentDaxBubbleCardView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

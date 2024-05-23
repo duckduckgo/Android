@@ -14,42 +14,20 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.onboarding.ui.page.experiment
+package com.duckduckgo.app.onboarding.ui.page.extendedonboarding
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.experiments.api.VariantConfig
-import com.duckduckgo.experiments.api.VariantFilters
-import com.duckduckgo.experiments.api.VariantManager
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 interface ExtendedOnboardingExperimentVariantManager {
-    fun setExperimentVariants()
-    fun isComparisonChartEnabled(): Boolean
     fun isAestheticUpdatesEnabled(): Boolean
 }
 
 @ContributesBinding(AppScope::class)
 class ExtendedOnboardingExperimentVariantManagerImpl @Inject constructor(
-    private val variantManager: VariantManager,
     private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles,
 ) : ExtendedOnboardingExperimentVariantManager {
-
-    private val isExtendedOnboardingEnabled: Boolean = true
-
-    override fun setExperimentVariants() {
-        val variants = listOf(
-            VariantConfig("ms", 1.0, VariantFilters(locale = listOf("en_US", "en_GB", "en_CA", "en_IN", "en_AU"))),
-            VariantConfig("mt", 1.0, VariantFilters(locale = listOf("en_US", "en_GB", "en_CA", "en_IN", "en_AU"))),
-        )
-        variantManager.updateVariants(variants)
-    }
-
-    override fun isComparisonChartEnabled(): Boolean {
-        val isRemoteFeatureEnabled = extendedOnboardingFeatureToggles.comparisonChart().isEnabled()
-        val isLocalFeatureEnabled = isExtendedOnboardingEnabled && variantManager.getVariantKey() == "mt"
-        return isRemoteFeatureEnabled || isLocalFeatureEnabled
-    }
 
     override fun isAestheticUpdatesEnabled(): Boolean {
         return extendedOnboardingFeatureToggles.aestheticUpdates().isEnabled()

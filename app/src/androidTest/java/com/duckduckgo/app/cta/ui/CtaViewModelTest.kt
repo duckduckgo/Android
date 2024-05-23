@@ -32,7 +32,7 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
-import com.duckduckgo.app.onboarding.ui.page.experiment.ExtendedOnboardingExperimentVariantManager
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingExperimentVariantManager
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.privacy.model.HttpsStatus
