@@ -20,8 +20,8 @@ import android.net.Uri
 import android.webkit.URLUtil
 import com.duckduckgo.app.browser.RequestRewriter
 import com.duckduckgo.app.browser.UriString
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.utils.AppUrl
-import com.duckduckgo.common.utils.AppUrl.Url
 import com.duckduckgo.common.utils.UrlScheme.Companion.https
 import com.duckduckgo.common.utils.withScheme
 import com.duckduckgo.di.scopes.AppScope
@@ -29,8 +29,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
-class QueryUrlConverter @Inject constructor(private val requestRewriter: RequestRewriter) : OmnibarEntryConverter {
-
+class QueryUrlConverter @Inject constructor(private val requestRewriter: RequestRewriter, private val settingsDataStore: SettingsDataStore) : OmnibarEntryConverter {
     override fun convertQueryToUrl(
         searchQuery: String,
         vertical: String?,
@@ -52,7 +51,7 @@ class QueryUrlConverter @Inject constructor(private val requestRewriter: Request
         val uriBuilder = Uri.Builder()
             .scheme(https)
             .appendQueryParameter(AppUrl.ParamKey.QUERY, searchQuery)
-            .authority(Url.HOST)
+            .authority(settingsDataStore.searchEngine.host)
 
         if (vertical != null && majorVerticals.contains(vertical)) {
             uriBuilder.appendQueryParameter(AppUrl.ParamKey.VERTICAL_REWRITE, vertical)

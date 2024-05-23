@@ -1347,7 +1347,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenTriggeringAutocompleteThenAutoCompleteSuggestionsShown() {
-        whenever(mockAutoCompleteService.autoComplete("foo")).thenReturn(Observable.just(emptyList()))
+        whenever(mockAutoCompleteService.autoCompleteWithDDG("foo")).thenReturn(Observable.just(emptyList()))
         doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
         testee.triggerAutocomplete("foo", true, hasQueryChanged = true)
         assertTrue(autoCompleteViewState().showSuggestions)

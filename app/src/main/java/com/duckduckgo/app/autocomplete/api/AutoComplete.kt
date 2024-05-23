@@ -21,6 +21,9 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.app.browser.UriString
+import com.duckduckgo.app.searchengines.DuckDuckGoSearchEngine
+import com.duckduckgo.app.searchengines.SearxSearchEngine
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.toStringDropScheme
 import com.duckduckgo.di.scopes.AppScope
@@ -59,6 +62,7 @@ interface AutoComplete {
 class AutoCompleteApi @Inject constructor(
     private val autoCompleteService: AutoCompleteService,
     private val repository: SavedSitesRepository,
+    private val settingsDataStore: SettingsDataStore,
 ) : AutoComplete {
 
     override fun autoComplete(query: String): Observable<AutoCompleteResult> {
@@ -84,7 +88,7 @@ class AutoCompleteApi @Inject constructor(
     }
 
     private fun getAutoCompleteSearchResults(query: String) =
-        autoCompleteService.autoComplete(query)
+        autoCompleteSearch(query)
             .flatMapIterable { it }
             .map {
                 AutoCompleteSearchSuggestion(phrase = it.phrase, isUrl = (it.isNav ?: UriString.isWebUrl(it.phrase)))
@@ -92,6 +96,23 @@ class AutoCompleteApi @Inject constructor(
             .toList()
             .onErrorReturn { emptyList() }
             .toObservable()
+
+    private fun autoCompleteSearch(query: String): Observable<List<AutoCompleteServiceRawResult>> {
+        return when (val searchEngine = settingsDataStore.searchEngine) {
+            is DuckDuckGoSearchEngine -> {
+                autoCompleteService.autoCompleteWithDDG(query)
+            }
+            is SearxSearchEngine -> {
+                autoCompleteService.autoCompleteWithSearx(searchEngine.autocomplete, query).flatMap { result ->
+                    Observable.fromIterable(result.suggestions)
+                }.map { suggestion ->
+                    AutoCompleteServiceRawResult(suggestion, null)
+                }.toList()
+                    .onErrorReturn { emptyList() }
+                    .toObservable()
+            }
+        }
+    }
 
     private fun getAutoCompleteBookmarkResults(query: String) =
         repository.getBookmarksObservable()

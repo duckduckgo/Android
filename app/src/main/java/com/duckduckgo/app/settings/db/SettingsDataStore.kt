@@ -23,6 +23,9 @@ import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.ASK_EVERY_TIME
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.NEVER
 import com.duckduckgo.app.icon.api.AppIcon
+import com.duckduckgo.app.searchengines.DuckDuckGoSearchEngine
+import com.duckduckgo.app.searchengines.SearchEngine
+import com.duckduckgo.app.searchengines.SearxSearchEngine
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireAnimation
@@ -70,6 +73,8 @@ interface SettingsDataStore {
     fun isCurrentlySelected(fireAnimation: FireAnimation): Boolean
     fun hasBackgroundTimestampRecorded(): Boolean
     fun clearAppBackgroundTimestamp()
+
+    var searchEngine: SearchEngine
 }
 
 @ContributesBinding(AppScope::class)
@@ -173,6 +178,15 @@ class SettingsSharedPreferences @Inject constructor(
         get() = preferences.getBoolean(SHOW_AUTOMATIC_FIREPROOF_DIALOG, true)
         set(enabled) = preferences.edit { putBoolean(SHOW_AUTOMATIC_FIREPROOF_DIALOG, enabled) }
 
+    override var searchEngine: SearchEngine
+        get() = preferences.getString(SEARX_INSTANCE, null)?.let { SearxSearchEngine(it) } ?: DuckDuckGoSearchEngine
+        set(value) {
+            when (value) {
+                is DuckDuckGoSearchEngine -> preferences.edit { remove(SEARX_INSTANCE) }
+                is SearxSearchEngine -> preferences.edit { putString(SEARX_INSTANCE, value.home)}
+            }
+        }
+
     override fun hasBackgroundTimestampRecorded(): Boolean = preferences.contains(KEY_APP_BACKGROUNDED_TIMESTAMP)
     override fun clearAppBackgroundTimestamp() = preferences.edit { remove(KEY_APP_BACKGROUNDED_TIMESTAMP) }
 
@@ -240,6 +254,7 @@ class SettingsSharedPreferences @Inject constructor(
         const val SHOW_APP_LINKS_PROMPT = "SHOW_APP_LINKS_PROMPT"
         const val SHOW_AUTOMATIC_FIREPROOF_DIALOG = "SHOW_AUTOMATIC_FIREPROOF_DIALOG"
         const val KEY_NOTIFY_ME_IN_DOWNLOADS_DISMISSED = "KEY_NOTIFY_ME_IN_DOWNLOADS_DISMISSED"
+        const val SEARX_INSTANCE = "SEARX_INSTANCE"
     }
 
     private class FireAnimationPrefsMapper {
