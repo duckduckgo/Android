@@ -214,8 +214,6 @@ class TestFunctionNameDetector : Detector(), SourceCodeScanner {
             * They must have a minimum of two parts separated by a spaced hyphen " - "
             * The "state" (second part) is optional - it can be omitted to allow for tests with only two parts
             * The parts must start with lowercase if possible
-            * Long test names are good, but not ones that exceed 120 characters. Make names that do not exceed 120 characters. You can usually do this by abbreviating
-            the "expected outcome" part so that it summarizes the expected outcome.
             
             I am going to give you a Kotlin function to consider. You must propose a new name for the function that meets the convention. 
             Your answer MUST only contain the new proposed function name.
