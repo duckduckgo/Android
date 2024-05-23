@@ -166,7 +166,6 @@ import com.duckduckgo.app.browser.webshare.WebShareChooser
 import com.duckduckgo.app.browser.webview.DummyWebMessageListenerFeature
 import com.duckduckgo.app.browser.webview.WebContentDebugging
 import com.duckduckgo.app.cta.ui.*
-import com.duckduckgo.app.cta.ui.DaxDialogCta.*
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
@@ -230,7 +229,6 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.store.BrowserAppTheme
 import com.duckduckgo.common.ui.view.DaxDialog
-import com.duckduckgo.common.ui.view.DaxDialogListener
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText.ShowSuggestionsListener
 import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
@@ -1493,8 +1491,6 @@ class BrowserTabFragment :
             is Command.GenerateWebViewPreviewImage -> generateWebViewPreviewImage()
             is Command.LaunchTabSwitcher -> launchTabSwitcher()
             is Command.ShowErrorWithAction -> showErrorSnackbar(it)
-            is Command.DaxCommand.FinishPartialTrackerAnimation -> finishPartialTrackerAnimation()
-            is Command.DaxCommand.HideDaxDialog -> showHideTipsDialog(it.cta)
             is Command.HideWebContent -> webView?.hide()
             is Command.ShowWebContent -> webView?.show()
             is Command.CheckSystemLocationPermission -> checkSystemLocationPermission(it.domain, it.deniedForever)
@@ -1545,7 +1541,6 @@ class BrowserTabFragment :
             is Command.ScreenLock -> screenLock(it.data)
             is Command.ScreenUnlock -> screenUnlock()
             is Command.ShowFaviconsPrompt -> showFaviconsPrompt()
-            is Command.SetBrowserBackground -> setBrowserBackground(it.backgroundRes)
             is Command.ShowWebPageTitle -> showWebPageTitleInCustomTab(it.title, it.url)
             is Command.ShowSSLError -> showSSLWarning(it.handler, it.error)
             is Command.HideSSLError -> hideSSLWarning()
@@ -2274,7 +2269,6 @@ class BrowserTabFragment :
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun configureWebView() {
-        viewModel.configureBrowserBackground()
         binding.experimentDaxDialogContent.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
 
         webView = layoutInflater.inflate(
@@ -2400,11 +2394,7 @@ class BrowserTabFragment :
         faviconPrompt.show()
     }
 
-    private fun setBrowserBackground(backgroundRes: Int) {
-        newBrowserTab.browserBackground.setBackgroundResource(backgroundRes)
-    }
-
-    private fun hideOnboardingDaxDialog(experimentCta: ExperimentOnboardingDaxDialogCta) {
+    private fun hideOnboardingDaxDialog(experimentCta: OnboardingDaxDialogCta) {
         experimentCta.hideOnboardingCta(binding)
     }
 
@@ -2916,7 +2906,6 @@ class BrowserTabFragment :
         if (newBrowserTab.ctaContainer.isNotEmpty()) {
             renderer.renderHomeCta()
         }
-        renderer.recreateDaxDialogCta()
         configureQuickAccessGridLayout(quickAccessItems.quickAccessRecyclerView)
         configureQuickAccessGridLayout(binding.quickAccessSuggestionsRecyclerView)
         decorator.recreatePopupMenu()
@@ -3130,16 +3119,6 @@ class BrowserTabFragment :
         }
     }
 
-    private fun finishPartialTrackerAnimation() {
-        animatorHelper.finishPartialTrackerAnimation()
-    }
-
-    private fun showHideTipsDialog(cta: Cta) {
-        context?.let {
-            launchHideTipsDialog(it, cta)
-        }
-    }
-
     private fun showBackNavigationHistory(history: ShowBackNavigationHistory) {
         activity?.let { context ->
             NavigationHistorySheet(
@@ -3174,27 +3153,6 @@ class BrowserTabFragment :
         if (this::viewModelFactory.isInitialized) {
             viewModel.onUserLongPressedBack()
         }
-    }
-
-    private fun launchHideTipsDialog(
-        context: Context,
-        cta: Cta,
-    ) {
-        TextAlertDialogBuilder(context)
-            .setTitle(R.string.hideTipsTitle)
-            .setMessage(getString(R.string.hideTipsText))
-            .setPositiveButton(R.string.hideTipsButton)
-            .setNegativeButton(android.R.string.no)
-            .addEventListener(
-                object : TextAlertDialogBuilder.EventListener() {
-                    override fun onPositiveButtonClicked() {
-                        launch {
-                            ctaViewModel.hideTipsForever(cta)
-                        }
-                    }
-                },
-            )
-            .show()
     }
 
     fun omnibarViews(): List<View> = listOf(omnibar.clearTextButton, omnibar.omnibarTextInput, omnibar.searchIcon)
@@ -3661,7 +3619,6 @@ class BrowserTabFragment :
                     activity?.let { activity ->
                         animatorHelper.startTrackersAnimation(
                             context = activity,
-                            shouldRunPartialAnimation = lastSeenCtaViewState?.cta is DaxTrackersBlockedCta,
                             shieldAnimationView = omnibar.shieldIcon,
                             trackersAnimationView = omnibar.trackersAnimation,
                             omnibarViews = omnibarViews(),
@@ -3877,51 +3834,28 @@ class BrowserTabFragment :
                 is DaxBubbleCta -> showDaxCta(configuration)
                 is ExperimentDaxBubbleOptionsCta -> showDaxExperimentCta(configuration)
                 is BubbleCta -> showBubbleCta(configuration)
-                is DialogCta -> showDaxDialogCta(configuration)
-                is ExperimentOnboardingDaxDialogCta -> showExperimentDialogCta(configuration)
+                is OnboardingDaxDialogCta -> showExperimentDialogCta(configuration)
             }
             newBrowserTab.messageCta.gone()
         }
 
-        fun recreateDaxDialogCta() {
-            val configuration = lastSeenCtaViewState?.cta
-            if (configuration is DaxDialogCta) {
-                activity?.let { activity ->
-                    configuration.createCta(activity, daxListener).apply {
-                        showDialogHidingPrevious(this, DAX_DIALOG_DIALOG_TAG)
-                    }
-                }
-            }
-        }
-
-        private fun showDaxDialogCta(configuration: DialogCta) {
-            hideHomeCta()
-            hideDaxCta()
-            activity?.let { activity ->
-                configuration.createCta(activity, daxListener).apply {
-                    showDialogIfNotExist(this, DAX_DIALOG_DIALOG_TAG)
-                }
-                viewModel.onCtaShown()
-            }
-        }
-
-        private val daxListener = object : DaxDialogListener {
-            override fun onDaxDialogDismiss() {
-                viewModel.onDaxDialogDismissed()
-            }
-
-            override fun onDaxDialogHideClick() {
-                viewModel.onUserHideDaxDialog()
-            }
-
-            override fun onDaxDialogPrimaryCtaClick() {
-                viewModel.onUserClickCtaOkButton()
-            }
-
-            override fun onDaxDialogSecondaryCtaClick() {
-                viewModel.onUserClickCtaSecondaryButton()
-            }
-        }
+        // private val daxListener = object : DaxDialogListener {
+        //     override fun onDaxDialogDismiss() {
+        //         viewModel.onDaxDialogDismissed()
+        //     }
+        //
+        //     override fun onDaxDialogHideClick() {
+        //         viewModel.onUserHideDaxDialog()
+        //     }
+        //
+        //     override fun onDaxDialogPrimaryCtaClick() {
+        //         viewModel.onUserClickCtaOkButton()
+        //     }
+        //
+        //     override fun onDaxDialogSecondaryCtaClick() {
+        //         viewModel.onUserClickCtaSecondaryButton()
+        //     }
+        // }
 
         private fun showDaxCta(configuration: DaxBubbleCta) {
             hideHomeBackground()
@@ -3948,16 +3882,16 @@ class BrowserTabFragment :
         }
 
         @SuppressLint("ClickableViewAccessibility")
-        private fun showExperimentDialogCta(configuration: ExperimentOnboardingDaxDialogCta) {
+        private fun showExperimentDialogCta(configuration: OnboardingDaxDialogCta) {
             hideHomeBackground()
             hideHomeCta()
-            val onTypingAnimationFinished = if (configuration is ExperimentOnboardingDaxDialogCta.DaxTrackersBlockedCta) {
+            val onTypingAnimationFinished = if (configuration is OnboardingDaxDialogCta.DaxTrackersBlockedCta) {
                 { viewModel.onExperimentDaxTypingAnimationFinished() }
             } else {
                 {}
             }
             configuration.showOnboardingCta(binding, { viewModel.onUserClickCtaOkButton() }, onTypingAnimationFinished)
-            if (configuration is ExperimentOnboardingDaxDialogCta.DaxSiteSuggestionsCta) {
+            if (configuration is OnboardingDaxDialogCta.DaxSiteSuggestionsCta) {
                 configuration.setOnOptionClicked(
                     daxDialogExperimentOnboardingCta,
                 ) {

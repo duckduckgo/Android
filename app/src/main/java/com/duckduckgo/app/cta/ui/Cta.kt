@@ -26,10 +26,15 @@ import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
-import androidx.fragment.app.DialogFragment
+import androidx.core.view.ViewCompat
+import androidx.transition.AutoTransition
+import androidx.transition.TransitionManager
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
+import com.duckduckgo.app.browser.databinding.IncludeExperimentViewDaxDialogBinding
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.ui.DaxCta.Companion.MAX_DAYS_ALLOWED
+import com.duckduckgo.app.cta.ui.ExperimentDaxBubbleOptionsCta.DaxDialogIntroOption
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.onboarding.store.OnboardingStore
@@ -37,18 +42,13 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_FIRE_DIALOG_CTA
 import com.duckduckgo.app.trackerdetection.model.Entity
-import com.duckduckgo.common.ui.view.DaxDialogListener
 import com.duckduckgo.common.ui.view.TypeAnimationTextView
-import com.duckduckgo.common.ui.view.TypewriterDaxDialog
+import com.duckduckgo.common.ui.view.button.DaxButton
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.extensions.html
-
-interface DialogCta {
-    fun createCta(context: Context, daxDialogListener: DaxDialogListener): DialogFragment
-}
 
 interface ViewCta {
     fun showCta(view: View)
@@ -75,23 +75,29 @@ interface Cta {
     fun pixelOkParameters(): Map<String, String>
 }
 
-sealed class DaxDialogCta(
+interface OnboardingDaxCta {
+    fun showOnboardingCta(
+        binding: FragmentBrowserTabBinding,
+        onPrimaryCtaClicked: () -> Unit,
+        onTypingAnimationFinished: () -> Unit,
+    )
+
+    fun hideOnboardingCta(
+        binding: FragmentBrowserTabBinding,
+    )
+}
+
+sealed class OnboardingDaxDialogCta(
     override val ctaId: CtaId,
+    @StringRes open val description: Int?,
+    @StringRes open val buttonText: Int?,
     override val shownPixel: Pixel.PixelName?,
     override val okPixel: Pixel.PixelName?,
     override val cancelPixel: Pixel.PixelName?,
     override var ctaPixelParam: String,
     override val onboardingStore: OnboardingStore,
     override val appInstallStore: AppInstallStore,
-) : Cta, DialogCta, DaxCta {
-
-    // This is not an empty CTA. We pass empty values because they actual implementation of DaxDialogCta will take care of them
-    override fun createCta(context: Context, daxDialogListener: DaxDialogListener): DialogFragment =
-        TypewriterDaxDialog.newInstance(
-            daxText = "",
-            primaryButtonText = "",
-            hideButtonText = "",
-        )
+) : Cta, DaxCta, OnboardingDaxCta {
 
     override fun pixelCancelParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
 
@@ -99,11 +105,42 @@ sealed class DaxDialogCta(
 
     override fun pixelShownParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to addCtaToHistory(ctaPixelParam))
 
+    override fun hideOnboardingCta(binding: FragmentBrowserTabBinding) {
+        binding.includeOnboardingDaxDialogExperiment.root.gone()
+    }
+
+    internal fun setOnboardingDialogView(
+        daxText: String,
+        buttonText: String?,
+        binding: FragmentBrowserTabBinding,
+        onTypingAnimationFinished: () -> Unit = {},
+    ) {
+        val daxDialog = binding.includeOnboardingDaxDialogExperiment
+
+        daxDialog.root.show()
+        daxDialog.dialogTextCta.text = ""
+        daxDialog.hiddenTextCta.text = daxText.html(binding.root.context)
+        buttonText?.let {
+            daxDialog.primaryCta.show()
+            daxDialog.primaryCta.alpha = MIN_ALPHA
+            daxDialog.primaryCta.text = buttonText
+        } ?: daxDialog.primaryCta.gone()
+        binding.includeOnboardingDaxDialogExperiment.onboardingDialogSuggestionsContent.gone()
+        binding.includeOnboardingDaxDialogExperiment.onboardingDialogContent.show()
+        daxDialog.root.alpha = MAX_ALPHA
+        daxDialog.dialogTextCta.startTypingAnimation(daxText, true) {
+            ViewCompat.animate(daxDialog.primaryCta).alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
+            onTypingAnimationFinished.invoke()
+        }
+    }
+
     class DaxSerpCta(
         override val onboardingStore: OnboardingStore,
         override val appInstallStore: AppInstallStore,
-    ) : DaxDialogCta(
+    ) : OnboardingDaxDialogCta(
         CtaId.DAX_DIALOG_SERP,
+        R.string.onboardingSerpDaxDialogDescription,
+        R.string.onboardingSerpDaxDialogButton,
         AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
@@ -111,14 +148,18 @@ sealed class DaxDialogCta(
         onboardingStore,
         appInstallStore,
     ) {
-        override fun createCta(context: Context, daxDialogListener: DaxDialogListener): DialogFragment {
-            val dialog = TypewriterDaxDialog.newInstance(
-                daxText = context.getString(R.string.daxSerpCtaText),
-                primaryButtonText = context.getString(R.string.daxDialogPhew),
-                hideButtonText = context.getString(R.string.daxDialogHideButton),
+        override fun showOnboardingCta(
+            binding: FragmentBrowserTabBinding,
+            onPrimaryCtaClicked: () -> Unit,
+            onTypingAnimationFinished: () -> Unit,
+        ) {
+            val context = binding.root.context
+            setOnboardingDialogView(
+                daxText = description?.let { context.getString(it) }.orEmpty(),
+                buttonText = buttonText?.let { context.getString(it) },
+                binding = binding,
             )
-            dialog.setDaxDialogListener(daxDialogListener)
-            return dialog
+            binding.includeOnboardingDaxDialogExperiment.primaryCta.setOnClickListener { onPrimaryCtaClicked.invoke() }
         }
     }
 
@@ -126,9 +167,10 @@ sealed class DaxDialogCta(
         override val onboardingStore: OnboardingStore,
         override val appInstallStore: AppInstallStore,
         val trackers: List<Entity>,
-        val host: String,
-    ) : DaxDialogCta(
+    ) : OnboardingDaxDialogCta(
         CtaId.DAX_DIALOG_TRACKERS_FOUND,
+        null,
+        R.string.onboardingTrackersBlockedDaxDialogButton,
         AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
@@ -136,21 +178,27 @@ sealed class DaxDialogCta(
         onboardingStore,
         appInstallStore,
     ) {
-
-        override fun createCta(context: Context, daxDialogListener: DaxDialogListener): DialogFragment {
-            val dialog = TypewriterDaxDialog.newInstance(
-                daxText = getDaxText(context),
-                primaryButtonText = context.getString(R.string.daxDialogHighFive),
-                toolbarDimmed = false,
-                hideButtonText = context.getString(R.string.daxDialogHideButton),
+        override fun showOnboardingCta(
+            binding: FragmentBrowserTabBinding,
+            onPrimaryCtaClicked: () -> Unit,
+            onTypingAnimationFinished: () -> Unit,
+        ) {
+            val context = binding.root.context
+            setOnboardingDialogView(
+                daxText = getTrackersDescription(context, trackers),
+                buttonText = buttonText?.let { context.getString(it) },
+                binding = binding,
+                onTypingAnimationFinished = onTypingAnimationFinished,
             )
-            dialog.setDaxDialogListener(daxDialogListener)
-            return dialog
+            binding.includeOnboardingDaxDialogExperiment.primaryCta.setOnClickListener { onPrimaryCtaClicked.invoke() }
         }
 
         @VisibleForTesting
-        fun getDaxText(context: Context): String {
-            val trackers = trackers
+        fun getTrackersDescription(
+            context: Context,
+            trackersEntities: List<Entity>,
+        ): String {
+            val trackers = trackersEntities
                 .map { it.displayName }
                 .distinct()
 
@@ -159,9 +207,9 @@ sealed class DaxDialogCta(
             val size = trackers.size - trackersFiltered.size
             val quantityString =
                 if (size == 0) {
-                    context.resources.getQuantityString(R.plurals.daxTrackersBlockedCtaZeroText, trackersFiltered.size)
+                    context.resources.getQuantityString(R.plurals.onboardingTrackersBlockedZeroDialogDescription, trackersFiltered.size)
                 } else {
-                    context.resources.getQuantityString(R.plurals.daxTrackersBlockedCtaText, size, size)
+                    context.resources.getQuantityString(R.plurals.onboardingTrackersBlockedDialogDescription, size, size)
                 }
             return "<b>$trackersText</b>$quantityString"
         }
@@ -172,8 +220,10 @@ sealed class DaxDialogCta(
         override val appInstallStore: AppInstallStore,
         val network: String,
         private val siteHost: String,
-    ) : DaxDialogCta(
+    ) : OnboardingDaxDialogCta(
         CtaId.DAX_DIALOG_NETWORK,
+        null,
+        R.string.daxDialogGotIt,
         AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
@@ -182,18 +232,22 @@ sealed class DaxDialogCta(
         appInstallStore,
     ) {
 
-        override fun createCta(context: Context, daxDialogListener: DaxDialogListener): DialogFragment {
-            val dialog = TypewriterDaxDialog.newInstance(
-                daxText = getDaxText(context),
-                primaryButtonText = context.getString(R.string.daxDialogGotIt),
-                hideButtonText = context.getString(R.string.daxDialogHideButton),
+        override fun showOnboardingCta(
+            binding: FragmentBrowserTabBinding,
+            onPrimaryCtaClicked: () -> Unit,
+            onTypingAnimationFinished: () -> Unit,
+        ) {
+            val context = binding.root.context
+            setOnboardingDialogView(
+                daxText = getTrackersDescription(context),
+                buttonText = buttonText?.let { context.getString(it) },
+                binding = binding,
             )
-            dialog.setDaxDialogListener(daxDialogListener)
-            return dialog
+            binding.includeOnboardingDaxDialogExperiment.primaryCta.setOnClickListener { onPrimaryCtaClicked.invoke() }
         }
 
         @VisibleForTesting
-        fun getDaxText(context: Context): String {
+        fun getTrackersDescription(context: Context): String {
             return if (isFromSameNetworkDomain()) {
                 context.resources.getString(
                     R.string.daxMainNetworkCtaText,
@@ -214,11 +268,13 @@ sealed class DaxDialogCta(
         private fun isFromSameNetworkDomain(): Boolean = mainTrackerDomains.any { siteHost.contains(it) }
     }
 
-    class DaxNoSerpCta(
+    class DaxNoTrackersCta(
         override val onboardingStore: OnboardingStore,
         override val appInstallStore: AppInstallStore,
-    ) : DaxDialogCta(
+    ) : OnboardingDaxDialogCta(
         CtaId.DAX_DIALOG_OTHER,
+        R.string.daxNonSerpCtaText,
+        R.string.daxDialogGotIt,
         AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
@@ -226,22 +282,118 @@ sealed class DaxDialogCta(
         onboardingStore,
         appInstallStore,
     ) {
-        override fun createCta(context: Context, daxDialogListener: DaxDialogListener): DialogFragment {
-            val dialog = TypewriterDaxDialog.newInstance(
-                daxText = context.getString(R.string.daxNonSerpCtaText),
-                primaryButtonText = context.getString(R.string.daxDialogGotIt),
-                hideButtonText = context.getString(R.string.daxDialogHideButton),
+        override fun showOnboardingCta(
+            binding: FragmentBrowserTabBinding,
+            onPrimaryCtaClicked: () -> Unit,
+            onTypingAnimationFinished: () -> Unit,
+        ) {
+            val context = binding.root.context
+            setOnboardingDialogView(
+                daxText = description?.let { context.getString(it) }.orEmpty(),
+                buttonText = buttonText?.let { context.getString(it) },
+                binding = binding,
             )
-            dialog.setDaxDialogListener(daxDialogListener)
-            return dialog
+            binding.includeOnboardingDaxDialogExperiment.primaryCta.setOnClickListener { onPrimaryCtaClicked.invoke() }
+        }
+    }
+
+    class DaxFireButtonCta(
+        override val onboardingStore: OnboardingStore,
+        override val appInstallStore: AppInstallStore,
+    ) : OnboardingDaxDialogCta(
+        CtaId.DAX_FIRE_BUTTON,
+        R.string.onboardingFireButtonDaxDialogDescription,
+        null,
+        AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
+        AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
+        null,
+        DAX_FIRE_DIALOG_CTA,
+        onboardingStore,
+        appInstallStore,
+    ) {
+        override fun showOnboardingCta(
+            binding: FragmentBrowserTabBinding,
+            onPrimaryCtaClicked: () -> Unit,
+            onTypingAnimationFinished: () -> Unit,
+        ) {
+            val context = binding.root.context
+            val daxDialog = binding.includeOnboardingDaxDialogExperiment
+            val daxText = description?.let { context.getString(it) }.orEmpty()
+
+            daxDialog.primaryCta.gone()
+            daxDialog.dialogTextCta.text = ""
+            daxDialog.hiddenTextCta.text = daxText.html(binding.root.context)
+            TransitionManager.beginDelayedTransition(binding.includeOnboardingDaxDialogExperiment.cardView, AutoTransition())
+            daxDialog.dialogTextCta.startTypingAnimation(daxText, true)
+        }
+    }
+
+    class DaxSiteSuggestionsCta(
+        override val onboardingStore: OnboardingStore,
+        override val appInstallStore: AppInstallStore,
+    ) : OnboardingDaxDialogCta(
+        CtaId.DAX_INTRO_VISIT_SITE,
+        R.string.onboardingSitesDaxDialogDescription,
+        null,
+        AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
+        AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
+        null,
+        Pixel.PixelValues.DAX_INITIAL_VISIT_SITE_CTA,
+        onboardingStore,
+        appInstallStore,
+    ) {
+        override fun showOnboardingCta(
+            binding: FragmentBrowserTabBinding,
+            onPrimaryCtaClicked: () -> Unit,
+            onTypingAnimationFinished: () -> Unit,
+        ) {
+            val context = binding.root.context
+            val daxDialog = binding.includeOnboardingDaxDialogExperiment
+            val daxText = description?.let { context.getString(it) }.orEmpty()
+
+            binding.includeOnboardingDaxDialogExperiment.onboardingDialogContent.gone()
+            binding.includeOnboardingDaxDialogExperiment.onboardingDialogSuggestionsContent.show()
+            daxDialog.suggestionsDialogTextCta.text = ""
+            daxDialog.suggestionsHiddenTextCta.text = daxText.html(context)
+            TransitionManager.beginDelayedTransition(binding.includeOnboardingDaxDialogExperiment.cardView, AutoTransition())
+            daxDialog.suggestionsDialogTextCta.startTypingAnimation(daxText, true) {
+                val optionsViews = listOf<DaxButton>(
+                    daxDialog.daxDialogOption1,
+                    daxDialog.daxDialogOption2,
+                    daxDialog.daxDialogOption3,
+                    daxDialog.daxDialogOption4,
+                )
+
+                optionsViews.forEachIndexed { index, buttonView ->
+                    val options = DaxDialogIntroOption.getSitesOptions()
+                    options[index].setOptionView(buttonView)
+                    ViewCompat.animate(buttonView).alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
+                }
+            }
+        }
+
+        fun setOnOptionClicked(
+            daxDialog: IncludeExperimentViewDaxDialogBinding,
+            onOptionClicked: (DaxDialogIntroOption) -> Unit,
+        ) {
+            val options = DaxDialogIntroOption.getSitesOptions()
+            daxDialog.daxDialogOption1.setOnClickListener { onOptionClicked.invoke(options[0]) }
+            daxDialog.daxDialogOption2.setOnClickListener { onOptionClicked.invoke(options[1]) }
+            daxDialog.daxDialogOption3.setOnClickListener { onOptionClicked.invoke(options[2]) }
+            daxDialog.daxDialogOption4.setOnClickListener { onOptionClicked.invoke(options[3]) }
         }
     }
 
     companion object {
-        private const val MAX_TRACKERS_SHOWS = 2
+
         const val SERP = "duckduckgo"
-        private val mainTrackerDomains = listOf("facebook", "google")
         val mainTrackerNetworks = listOf("Facebook", "Google")
+
+        private const val MAX_TRACKERS_SHOWS = 2
+        private val mainTrackerDomains = listOf("facebook", "google")
+        private const val DAX_DIALOG_APPEARANCE_ANIMATION = 400L
+        private const val MAX_ALPHA = 1.0f
+        private const val MIN_ALPHA = 0.0f
     }
 }
 

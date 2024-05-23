@@ -30,6 +30,6 @@ class ExtendedOnboardingExperimentVariantManagerImpl @Inject constructor(
 ) : ExtendedOnboardingExperimentVariantManager {
 
     override fun isAestheticUpdatesEnabled(): Boolean {
-        return extendedOnboardingFeatureToggles.aestheticUpdates().isEnabled()
+        return true // extendedOnboardingFeatureToggles.aestheticUpdates().isEnabled()
     }
 }

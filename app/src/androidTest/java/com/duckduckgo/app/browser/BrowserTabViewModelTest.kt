@@ -104,10 +104,9 @@ import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
-import com.duckduckgo.app.cta.ui.DaxDialogCta
 import com.duckduckgo.app.cta.ui.ExperimentDaxBubbleOptionsCta
-import com.duckduckgo.app.cta.ui.ExperimentOnboardingDaxDialogCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
+import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryImpl
@@ -2429,32 +2428,6 @@ class BrowserTabViewModelTest {
         setCta(cta)
         testee.onUserDismissedCta()
         verify(mockPixel).fire(cta.cancelPixel!!, cta.pixelCancelParameters())
-    }
-
-    @Test
-    fun whenUserClickedHideDaxDialogThenHideDaxDialogCommandSent() {
-        val cta = DaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore)
-        setCta(cta)
-        testee.onUserHideDaxDialog()
-        val command = captureCommands().lastValue
-        assertTrue(command is Command.DaxCommand.HideDaxDialog)
-    }
-
-    @Test
-    fun whenUserDismissDaxTrackersBlockedDialogThenFinishTrackerAnimationCommandSent() {
-        val cta = DaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList(), "")
-        setCta(cta)
-        testee.onDaxDialogDismissed()
-        val command = captureCommands().lastValue
-        assertTrue(command is Command.DaxCommand.FinishPartialTrackerAnimation)
-    }
-
-    @Test
-    fun whenUserDismissDifferentThanDaxTrackersBlockedDialogThenFinishTrackerAnimationCommandNotSent() {
-        val cta = DaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore)
-        setCta(cta)
-        testee.onDaxDialogDismissed()
-        assertCommandNotIssued<Command.DaxCommand.FinishPartialTrackerAnimation>()
     }
 
     @Test
@@ -5287,31 +5260,9 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnboardingExperimentEnabledThenSetBrowserBackgroundWithNewDrawable() = runTest {
-        whenever(mockExtendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()).thenReturn(true)
-
-        testee.configureBrowserBackground()
-
-        assertCommandIssued<Command.SetBrowserBackground> {
-            assertEquals(R.drawable.onboarding_experiment_background_bitmap, this.backgroundRes)
-        }
-    }
-
-    @Test
-    fun whenOnboardingExperimentDisabledThenSetBrowserBackgroundWithNoDrawable() = runTest {
-        whenever(mockExtendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()).thenReturn(false)
-
-        testee.configureBrowserBackground()
-
-        assertCommandIssued<Command.SetBrowserBackground> {
-            assertEquals(0, this.backgroundRes)
-        }
-    }
-
-    @Test
     fun givenOnboardingExperimentEnabledWhenTrackersBlockedCtaShownThenPrivacyShieldIsHighlighted() = runTest {
         whenever(mockExtendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()).thenReturn(true)
-        val cta = ExperimentOnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList())
+        val cta = OnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList())
         testee.ctaViewState.value = ctaViewState().copy(cta = cta)
 
         testee.onExperimentDaxTypingAnimationFinished()
@@ -5322,7 +5273,7 @@ class BrowserTabViewModelTest {
     @Test
     fun givenOnboardingExperimentEnabledAndPrivacyShieldHighlightedWhenShieldIconSelectedThenStopPulse() = runTest {
         whenever(mockExtendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()).thenReturn(true)
-        val cta = ExperimentOnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList())
+        val cta = OnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList())
         testee.ctaViewState.value = ctaViewState().copy(cta = cta)
 
         testee.onPrivacyShieldSelected()
@@ -5342,10 +5293,10 @@ class BrowserTabViewModelTest {
 
     @Test
     fun givenOnboardingExperimentEnabledWhenUserDismissDaxTrackersBlockedDialogThenFinishPrivacyShieldPulse() {
-        val cta = ExperimentOnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList())
+        val cta = OnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList())
         setCta(cta)
 
-        testee.onDaxDialogDismissed()
+        testee.onUserDismissedCta()
         assertFalse(browserViewState().showPrivacyShield.isHighlighted())
     }
 
@@ -5353,7 +5304,7 @@ class BrowserTabViewModelTest {
     fun givenOnboardingExperimentCtaShownWhenUserSubmittedQueryThenDismissCta() {
         whenever(mockExtendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()).thenReturn(true)
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
-        val cta = ExperimentOnboardingDaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore)
+        val cta = OnboardingDaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore)
         testee.ctaViewState.value = CtaViewState(cta = cta)
 
         testee.onUserSubmittedQuery("foo")

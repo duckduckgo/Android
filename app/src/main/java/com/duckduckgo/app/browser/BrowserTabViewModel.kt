@@ -104,7 +104,7 @@ import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.app.browser.webview.SslWarningLayout.Action
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.cta.ui.ExperimentDaxBubbleOptionsCta.DaxDialogIntroOption
-import com.duckduckgo.app.cta.ui.ExperimentOnboardingDaxDialogCta
+import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
@@ -719,8 +719,8 @@ class BrowserTabViewModel @Inject constructor(
             return
         }
 
-        if (currentCtaViewState().cta is ExperimentOnboardingDaxDialogCta) {
-            onDismissExperimentDaxDialog(currentCtaViewState().cta as ExperimentOnboardingDaxDialogCta)
+        if (currentCtaViewState().cta is OnboardingDaxDialogCta) {
+            onDismissExperimentDaxDialog(currentCtaViewState().cta as OnboardingDaxDialogCta)
         }
 
         when (currentCtaViewState().cta) {
@@ -731,7 +731,7 @@ class BrowserTabViewModel @Inject constructor(
             }
 
             is ExperimentDaxBubbleOptionsCta.ExperimentDaxIntroVisitSiteOptionsCta,
-            is ExperimentOnboardingDaxDialogCta.DaxSiteSuggestionsCta,
+            is OnboardingDaxDialogCta.DaxSiteSuggestionsCta,
             -> {
                 if (!DaxDialogIntroOption.getSitesOptions().map { it.link }.contains(query)) {
                     pixel.fire(OnboardingExperimentPixel.PixelName.ONBOARDING_VISIT_SITE_CUSTOM)
@@ -2448,8 +2448,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun showOrHideKeyboard(cta: Cta?) {
-        command.value =
-            if (cta is DialogCta || cta is HomePanelCta) HideKeyboard else ShowKeyboard
+        command.value = if (cta is HomePanelCta) HideKeyboard else ShowKeyboard
     }
 
     fun registerDaxBubbleCtaDismissed() {
@@ -2466,7 +2465,7 @@ class BrowserTabViewModel @Inject constructor(
         command.value = when (cta) {
             is HomePanelCta.Survey -> LaunchSurvey(cta.survey)
             is HomePanelCta.AddWidgetAuto, is HomePanelCta.AddWidgetInstructions -> LaunchAddWidget
-            is ExperimentOnboardingDaxDialogCta -> onExperimentCtaOkButtonClicked(cta)
+            is OnboardingDaxDialogCta -> onExperimentCtaOkButtonClicked(cta)
             else -> return
         }
     }
@@ -2518,19 +2517,6 @@ class BrowserTabViewModel @Inject constructor(
             command.value = action.asBrowserTabCommand() ?: return@launch
             refreshCta()
         }
-    }
-
-    fun onUserHideDaxDialog() {
-        val cta = currentCtaViewState().cta ?: return
-        command.value = DaxCommand.HideDaxDialog(cta)
-    }
-
-    fun onDaxDialogDismissed() {
-        val cta = currentCtaViewState().cta ?: return
-        if (cta is DaxDialogCta.DaxTrackersBlockedCta) {
-            command.value = DaxCommand.FinishPartialTrackerAnimation
-        }
-        onUserDismissedCta()
     }
 
     fun onUserDismissedCta() {
@@ -3170,20 +3156,12 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun configureBrowserBackground() {
-        val backgroundRes: Int =
-            if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) R.drawable.onboarding_experiment_background_bitmap else 0
-        viewModelScope.launch {
-            command.value = SetBrowserBackground(backgroundRes)
-        }
-    }
-
-    private fun onExperimentCtaOkButtonClicked(experimentCta: ExperimentOnboardingDaxDialogCta): Command? {
+    private fun onExperimentCtaOkButtonClicked(experimentCta: OnboardingDaxDialogCta): Command? {
         viewModelScope.launch {
             ctaViewModel.onUserDismissedCta(experimentCta)
         }
         return when (experimentCta) {
-            is ExperimentOnboardingDaxDialogCta.DaxSerpCta -> {
+            is OnboardingDaxDialogCta.DaxSerpCta -> {
                 viewModelScope.launch {
                     if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) {
                         val cta = withContext(dispatchers.io()) { ctaViewModel.getExperimentSiteSuggestionsDialogCta() }
@@ -3196,9 +3174,9 @@ class BrowserTabViewModel @Inject constructor(
                 null
             }
 
-            is ExperimentOnboardingDaxDialogCta.DaxTrackersBlockedCta,
-            is ExperimentOnboardingDaxDialogCta.DaxNoTrackersCta,
-            is ExperimentOnboardingDaxDialogCta.DaxMainNetworkCta,
+            is OnboardingDaxDialogCta.DaxTrackersBlockedCta,
+            is OnboardingDaxDialogCta.DaxNoTrackersCta,
+            is OnboardingDaxDialogCta.DaxMainNetworkCta,
             -> {
                 if (currentBrowserViewState().showPrivacyShield.isHighlighted()) {
                     browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
@@ -3219,8 +3197,8 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    private fun onDismissExperimentDaxDialog(cta: ExperimentOnboardingDaxDialogCta) {
-        if (cta is ExperimentOnboardingDaxDialogCta.DaxTrackersBlockedCta) {
+    private fun onDismissExperimentDaxDialog(cta: OnboardingDaxDialogCta) {
+        if (cta is OnboardingDaxDialogCta.DaxTrackersBlockedCta) {
             browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
         }
 
@@ -3231,7 +3209,7 @@ class BrowserTabViewModel @Inject constructor(
     fun onFireMenuSelected() {
         if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) {
             val cta = currentCtaViewState().cta
-            if (cta is ExperimentOnboardingDaxDialogCta.DaxFireButtonCta) {
+            if (cta is OnboardingDaxDialogCta.DaxFireButtonCta) {
                 onUserDismissedCta()
                 command.value = HideExperimentOnboardingDialog(cta)
             }
@@ -3263,7 +3241,7 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun onShouldOverride() {
         val cta = currentCtaViewState().cta
-        if (cta is ExperimentOnboardingDaxDialogCta) {
+        if (cta is OnboardingDaxDialogCta) {
             onDismissExperimentDaxDialog(cta)
         }
     }
