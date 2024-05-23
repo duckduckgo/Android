@@ -14,16 +14,34 @@
   ~ limitations under the License.
   -->
 
-<androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/quickAccessRecyclerView"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:clipToPadding="false"
-    android:overScrollMode="never"
-    android:paddingHorizontal="@dimen/keyline_2"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:itemCount="8"
-    tools:listItem="@layout/view_quick_access_item"
-    tools:spanCount="4" />
+    android:orientation="vertical">
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/sectionHeaderText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_5"
+        android:layout_marginTop="@dimen/keyline_2"
+        android:layout_marginEnd="@dimen/keyline_5"
+        android:text="@string/newTabPageShortcuts"
+        app:textType="primary"
+        app:typography="h4" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/quickAccessRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        android:overScrollMode="never"
+        android:paddingHorizontal="@dimen/keyline_2"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:itemCount="8"
+        tools:listItem="@layout/view_quick_access_item"
+        tools:spanCount="4" />
+
+</LinearLayout>
