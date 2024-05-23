@@ -25,6 +25,9 @@
     <string name="sync_disabled_authenticated_user"><b>Synchronisation et sauvegarde est suspendu</b>\nDésolé, mais Synchronisation et sauvegarde n’est pas disponible pour le moment. Veuillez réessayer plus tard.</string>
     <string name="sync_disabled_authenticated_user_new_version"><b>Synchronisation et sauvegarde est suspendu</b>\nDésolé, mais Synchronisation et sauvegarde n’est plus disponible dans cette version de l\'application. Veuillez mettre à jour DuckDuckGo avec la dernière version pour continuer.</string>
     <string name="sync_paused_notification"><b>Synchronisation et sauvegarde est suspendu</b>\nDésolé, mais Synchronisation et sauvegarde n’est pas disponible pour le moment. Veuillez réessayer plus tard.</string>
+    <string name="sync_error_notification"><b>Erreur de synchronisation</b>\nSync &amp; Backup est temporairement indisponible.</string>
+    <string name="sync_error_warning"><b>Erreur de synchronisation</b>\nSync &amp; Backup est temporairement indisponible.</string>
+    <string name="sync_signed_out_notification"><b>La synchronisation est suspendue</b>\nLa synchronisation a été suspendue. Si vous souhaitez continuer à synchroniser cet appareil, reconnectez-vous à l’aide d’un autre appareil ou de votre code de récupération.</string>
 
     <!-- Settings screen -->
     <string name="sync_screen_title">Synchronisation et sauvegarde</string>
