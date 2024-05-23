@@ -133,6 +133,7 @@ class ShortcutsNewTabSectionView @JvmOverloads constructor(
 
 @ContributesMultibinding(AppScope::class)
 class FavouritesNewTabSectionPlugin @Inject constructor() : NewTabPageSectionPlugin {
+
     override val name = NewTabPageSection.SHORTCUTS.name
 
     override fun getView(context: Context): View {

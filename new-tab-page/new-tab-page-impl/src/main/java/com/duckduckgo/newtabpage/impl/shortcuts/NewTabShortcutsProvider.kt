@@ -21,8 +21,6 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.newtabpage.api.NewTabPageShortcutPlugin
 import com.duckduckgo.newtabpage.api.NewTabShortcut
-import com.duckduckgo.newtabpage.api.NewTabShortcut.Bookmarks
-import com.duckduckgo.newtabpage.api.NewTabShortcut.Chat
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -49,15 +47,8 @@ class RealNewTabPageShortcutProvider @Inject constructor(
 private interface NewTabPageShortcutPluginPointTrigger
 
 @ContributesMultibinding(AppScope::class)
-class BookmarksNewTabShortcutPlugin @Inject constructor() : NewTabPageShortcutPlugin {
-    override fun getShortcut(): NewTabShortcut {
-        return Bookmarks
-    }
-}
-
-@ContributesMultibinding(AppScope::class)
 class AIChatNewTabShortcutPlugin @Inject constructor() : NewTabPageShortcutPlugin {
     override fun getShortcut(): NewTabShortcut {
-        return Chat
+        return NewTabShortcut.Chat
     }
 }
