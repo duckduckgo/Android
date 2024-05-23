@@ -20,8 +20,10 @@
     <!-- Sync settings screen -->
     <string name="sync_enable_option_favorites_title">Favorileri Paylaş</string>
     <string name="sync_enable_option_favorites_subtitle">Tüm cihazlarda aynı favorileri kullanın. Mobil ve masaüstü favorilerini ayrı tutmak için kapalı bırakın.</string>
-    <string name="saved_site_limit_warning"><b>Senkronizasyon Duraklatıldı</b>\nYer imi sınırı aşıldı. Senkronizasyona devam etmek için bazılarını silin.\n\n<annotation type="manage_bookmarks">Yer İmlerini Yönet</annotation></string>
-    <string name="saved_site_limit_warning_notif"><b>Yer İmi Senkronizasyonu Duraklatıldı</b>\nYer imi senkronizasyon sınırını aştınız. Bazı yer işaretlerini silmeyi deneyin. Bu sorun çözülene kadar yer imleriniz yedeklenmeyecektir.</string>
+    <string name="saved_site_limit_warning"><b>Senkronizasyon Duraklatıldı</b>\nMaksimum yer işareti sayısına ulaştınız. Senkronizasyona devam etmek için lütfen bazılarını silin.\n\n<annotation type="manage_bookmarks">Yer İşaretlerini Yönet</annotation></string>
+    <string name="saved_site_limit_warning_notif"><b>Yer İşareti Senkronizasyonu Duraklatıldı</b>\nMaksimum yer işareti sayısına ulaştınız. Senkronizasyona devam etmek için lütfen bazı yer işaretlerini silin.</string>
+    <string name="saved_site_invalid_warning"><b>Senkronizasyonu Duraklatıldı</b>\nBazı yer işaretleri yanlış veya çok uzun biçimlendirilmiş ve senkronize edilmedi.\n\n<annotation type="manage_bookmarks">Yer İşaretlerini Yönet</annotation></string>
+    <string name="saved_site_invalid_warning_notif"><b></b>\nBazı yer işaretleri yanlış biçimlendirilmiş veya çok uzun olduğu için senkronize edilmedi.</string>
     <plurals name="saved_site_invalid_items_warning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
         <item quantity="one">%1$s için yer işaretiniz, alanlarından biri karakter sınırını aştığı için senkronize edilemiyor.</item>
         <item quantity="other">%1$s ve %2$d diğer site için yer işaretleriniz, bazı alanları karakter sınırını aştığı için senkronize edilemiyor.</item>
