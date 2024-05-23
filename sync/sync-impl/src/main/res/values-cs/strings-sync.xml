@@ -25,6 +25,9 @@
     <string name="sync_disabled_authenticated_user"><b>Funkce synchronizace a zálohování je pozastavená</b>\nOmlouváme se, ale funkce synchronizace a zálohování teď není dostupná. Zkus to znovu později.</string>
     <string name="sync_disabled_authenticated_user_new_version"><b>Funkce synchronizace a zálohování je pozastavená</b>\nOmlouváme se, ale funkce synchronizace a zálohování není v téhle verzi aplikace dostupná. Pro pokračování aktualizuj DuckDuckGo na nejnovější verzi.</string>
     <string name="sync_paused_notification"><b>Funkce synchronizace a zálohování je pozastavená</b>\nOmlouváme se, ale funkce synchronizace a zálohování teď není dostupná. Zkus to znovu později.</string>
+    <string name="sync_error_notification"><b>Chyba synchronizace</b>\nFunkce Sync &amp; Backup je dočasně nedostupná.</string>
+    <string name="sync_error_warning"><b>Chyba synchronizace</b>\nFunkce Sync &amp; Backup je dočasně nedostupná.</string>
+    <string name="sync_signed_out_notification"><b>Synchronizace je pozastavená</b>\nSynchronizaci jsme pozastavili. Pokud chceš tohle zařízení dál synchronizovat, znovu se připoj pomocí jiného zařízení nebo kódu pro obnovení.</string>
 
     <!-- Settings screen -->
     <string name="sync_screen_title">Synchronizace a zálohování</string>
