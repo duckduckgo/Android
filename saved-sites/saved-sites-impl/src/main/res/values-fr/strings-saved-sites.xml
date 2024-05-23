@@ -20,8 +20,10 @@
     <!-- Sync settings screen -->
     <string name="sync_enable_option_favorites_title">Partager les favoris</string>
     <string name="sync_enable_option_favorites_subtitle">Utilisez les mêmes favoris sur tous les appareils. Laissez désactivé pour séparer les favoris sur mobile et ceux sur ordinateur de bureau.</string>
-    <string name="saved_site_limit_warning"><b>Synchronisation suspendue</b>\nLimite de favoris dépassée. Supprimez-en quelques-uns pour reprendre la synchronisation.\n\n<annotation type="manage_bookmarks">Gérer les favoris</annotation></string>
-    <string name="saved_site_limit_warning_notif"><b>La synchronisation des favoris est suspendue</b>\nVous avez dépassé la limite de synchronisation des favoris. Veuillez en supprimer quelques-uns pour pouvoir sauvegarder vos favoris.</string>
+    <string name="saved_site_limit_warning"><b>Synchronisation suspendue</b>\nVous avez atteint le nombre maximal de favoris. Veuillez en supprimer quelques-uns pour reprendre la synchronisation.\n\n<annotation type="manage_bookmarks">Gérer les favoris</annotation></string>
+    <string name="saved_site_limit_warning_notif"><b>La synchronisation des favoris est suspendue</b>\nVous avez atteint le nombre maximal de favoris. Veuillez en supprimer quelques-uns pour reprendre la synchronisation.</string>
+    <string name="saved_site_invalid_warning"><b>Synchronisation suspendue</b>\nCertains favoris sont mal formatés ou trop longs et n\'ont pas été synchronisés.\n\n<annotation type="manage_bookmarks">Gérer les favoris</annotation></string>
+    <string name="saved_site_invalid_warning_notif"><b>La synchronisation des favoris est suspendue</b>\nCertains favoris sont mal formatés ou trop longs et n\'ont pas été synchronisés.\n\n</string>
     <plurals name="saved_site_invalid_items_warning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
         <item quantity="one">Votre favori pour %1$s ne peut pas être synchronisé car l\'un de ses champs dépasse la limite de caractères.</item>
         <item quantity="other">Vos favoris pour %1$s et %2$d autres sites ne peuvent pas être synchronisés car certains de leurs champs dépassent la limite de caractères.</item>
