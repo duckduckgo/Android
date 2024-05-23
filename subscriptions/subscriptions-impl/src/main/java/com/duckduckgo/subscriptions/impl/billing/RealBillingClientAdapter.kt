@@ -97,6 +97,7 @@ class RealBillingClientAdapter @Inject constructor(
                 )
             } catch (e: SecurityException) {
                 logcat(priority = WARN) { "Exception when starting a connection to billing, ignoring" }
+                continuation.resume(Failure(BILLING_CRASH_ERROR))
             }
         }
     }
