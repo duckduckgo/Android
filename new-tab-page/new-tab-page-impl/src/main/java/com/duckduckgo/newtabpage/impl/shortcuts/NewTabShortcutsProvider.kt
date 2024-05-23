@@ -21,7 +21,8 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.newtabpage.api.NewTabPageShortcutPlugin
 import com.duckduckgo.newtabpage.api.NewTabShortcut
-import com.duckduckgo.newtabpage.impl.R
+import com.duckduckgo.newtabpage.api.NewTabShortcut.Bookmarks
+import com.duckduckgo.newtabpage.api.NewTabShortcut.Chat
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -50,13 +51,13 @@ private interface NewTabPageShortcutPluginPointTrigger
 @ContributesMultibinding(AppScope::class)
 class BookmarksNewTabShortcutPlugin @Inject constructor() : NewTabPageShortcutPlugin {
     override fun getShortcut(): NewTabShortcut {
-        return NewTabShortcut(R.string.newTabPageShortcutBookmarks, R.drawable.ic_bookmarks_open_color_16)
+        return Bookmarks
     }
 }
 
 @ContributesMultibinding(AppScope::class)
 class AIChatNewTabShortcutPlugin @Inject constructor() : NewTabPageShortcutPlugin {
     override fun getShortcut(): NewTabShortcut {
-        return NewTabShortcut(R.string.newTabPageShortcutBookmarks, R.drawable.ic_placeholder_color_16)
+        return Chat
     }
 }

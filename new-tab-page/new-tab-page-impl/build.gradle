@@ -28,8 +28,9 @@ dependencies {
     implementation project(':browser-api')
     implementation project(':common-utils')
     implementation project(':saved-sites-api')
-
+    implementation project(':navigation-api')
     implementation project(':common-ui')
+
     implementation AndroidX.appCompat
     implementation Google.android.material
     implementation AndroidX.constraintLayout
