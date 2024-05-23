@@ -158,7 +158,7 @@ class TestFunctionNameDetector : Detector(), SourceCodeScanner {
         // Remove illegal characters
         val sanitizedFunctionName = proposedFunctionName.replace('.', '·').replace(':', '·').replace("/", "")
 
-        if (sanitizedFunctionName.length > 120) {
+        if (sanitizedFunctionName.length > 140) {
             // It's too long and would break MAX_LINE_LENGTH. Leave this test to be migrated manually.
             return null
         }
