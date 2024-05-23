@@ -84,6 +84,11 @@
                     android:adjustViewBounds="true"
                     android:visibility="gone" />
 
+                <include
+                    android:id="@+id/comparison_chart"
+                    android:visibility="gone"
+                    layout="@layout/pre_onboarding_comparison_chart" />
+
                 <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                     android:id="@+id/primaryCta"
                     android:layout_width="match_parent"

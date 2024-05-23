@@ -175,21 +175,21 @@ class ExperimentWelcomePage : OnboardingPageFragment(R.layout.content_onboarding
                     ctaText = it.getString(R.string.preOnboardingDaxDialog2Title)
                     binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
                     binding.daxDialogCta.dialogTextCta.textInDialog = ctaText.html(it)
-                    binding.daxDialogCta.experimentDialogContentImage.alpha = MIN_ALPHA
-                    binding.daxDialogCta.experimentDialogContentImage.show()
                     binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
-                    binding.daxDialogCta.experimentDialogContentImage.setImageResource(R.drawable.comparison_chart)
+                    binding.daxDialogCta.comparisonChart.root.show()
+                    binding.daxDialogCta.comparisonChart.root.alpha = MIN_ALPHA
 
                     scheduleTypingAnimation {
                         binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog2Button)
                         binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(COMPARISON_CHART) }
                         ViewCompat.animate(binding.daxDialogCta.primaryCta).alpha(MAX_ALPHA).duration = ANIMATION_DURATION
-                        ViewCompat.animate(binding.daxDialogCta.experimentDialogContentImage).alpha(MAX_ALPHA).duration = ANIMATION_DURATION
+                        ViewCompat.animate(binding.daxDialogCta.comparisonChart.root).alpha(MAX_ALPHA).duration = ANIMATION_DURATION
                     }
                 }
 
                 CELEBRATION -> {
                     binding.daxDialogCta.dialogTextCta.text = ""
+                    binding.daxDialogCta.comparisonChart.root.gone()
                     binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
                     ctaText = it.getString(R.string.preOnboardingDaxDialog3Title)
                     binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
