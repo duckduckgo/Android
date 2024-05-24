@@ -16,28 +16,28 @@
 
 package com.duckduckgo.newtabpage.impl
 
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
-import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
+import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.newtabpage.api.NewTabPageSectionPlugin
 import com.duckduckgo.newtabpage.api.NewTabPageSectionProvider
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-import logcat.logcat
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 @ContributesBinding(
     scope = AppScope::class,
 )
 class RealNewTabPageSectionProvider @Inject constructor(
-    private val newTabPageSections: PluginPoint<NewTabPageSectionPlugin>,
+    private val newTabPageSections: ActivePluginPoint<@JvmSuppressWildcards NewTabPageSectionPlugin>,
 ) : NewTabPageSectionProvider {
-    override fun provideSections(): List<NewTabPageSectionPlugin> {
-        logcat { "New Tab: ${newTabPageSections.getPlugins()}" }
-        return newTabPageSections.getPlugins().map { it }
+    override fun provideSections(): Flow<List<NewTabPageSectionPlugin>> = flow {
+        emit(newTabPageSections.getPlugins().map { it })
     }
 }
 
-@ContributesPluginPoint(
+@ContributesActivePluginPoint(
     scope = AppScope::class,
     boundType = NewTabPageSectionPlugin::class,
 )

@@ -18,12 +18,13 @@ package com.duckduckgo.newtabpage.impl.shortcuts
 
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
-import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.newtabpage.api.NewTabPageShortcutPlugin
 import com.duckduckgo.newtabpage.api.NewTabShortcut
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import kotlinx.coroutines.runBlocking
 
 interface NewTabShortcutsProvider {
     fun provideShortcuts(): List<NewTabPageShortcutPlugin>
@@ -33,10 +34,12 @@ interface NewTabShortcutsProvider {
     scope = AppScope::class,
 )
 class RealNewTabPageShortcutProvider @Inject constructor(
-    private val newTabPageSections: PluginPoint<NewTabPageShortcutPlugin>,
+    private val newTabPageSections: ActivePluginPoint<@JvmSuppressWildcards NewTabPageShortcutPlugin>,
 ) : NewTabShortcutsProvider {
     override fun provideShortcuts(): List<NewTabPageShortcutPlugin> {
-        return newTabPageSections.getPlugins().map { it }
+        return runBlocking {
+            newTabPageSections.getPlugins().map { it }
+        }
     }
 }
 

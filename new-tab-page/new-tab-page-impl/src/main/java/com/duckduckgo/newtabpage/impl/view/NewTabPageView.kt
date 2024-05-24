@@ -16,6 +16,7 @@
 
 package com.duckduckgo.newtabpage.impl.view
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.view.ViewGroup.LayoutParams
@@ -27,6 +28,11 @@ import com.duckduckgo.newtabpage.api.NewTabPageSectionProvider
 import com.duckduckgo.newtabpage.impl.databinding.ViewNewTabPageBinding
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import logcat.logcat
 
 @InjectWith(ViewScope::class)
@@ -39,25 +45,33 @@ class NewTabPageView @JvmOverloads constructor(
     @Inject
     lateinit var newTabSectionsProvider: NewTabPageSectionProvider
 
+    private var coroutineScope: CoroutineScope? = null
+
     private val binding: ViewNewTabPageBinding by viewBinding()
 
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
 
+        @SuppressLint("NoHardcodedCoroutineDispatcher")
+        coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+
         setupRemoteSections()
     }
 
     private fun setupRemoteSections() {
-        logcat { "New Tab: setupRemoteSections" }
-        newTabSectionsProvider.provideSections().forEach {
-            binding.newTabSectionsContent.addView(
-                it.getView(context),
-                android.view.ViewGroup.LayoutParams(
-                    android.view.ViewGroup.LayoutParams.MATCH_PARENT,
-                    android.view.ViewGroup.LayoutParams.WRAP_CONTENT,
-                ),
-            )
-        }
+        newTabSectionsProvider.provideSections()
+            .onEach { views ->
+                logcat { "New Tab: setupRemoteSections $views" }
+                views.forEach {
+                    binding.newTabSectionsContent.addView(
+                        it.getView(context),
+                        android.view.ViewGroup.LayoutParams(
+                            android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                            android.view.ViewGroup.LayoutParams.WRAP_CONTENT,
+                        ),
+                    )
+                }
+            }.launchIn(coroutineScope!!)
     }
 }

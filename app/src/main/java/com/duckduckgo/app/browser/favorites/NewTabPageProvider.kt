@@ -20,13 +20,14 @@ import android.content.Context
 import android.view.View
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
-import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.newtabpage.api.NewTabPagePlugin
 import com.duckduckgo.newtabpage.api.NewTabPageVersion
 import com.duckduckgo.newtabpage.impl.NewTabPage
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import kotlinx.coroutines.runBlocking
 
 interface NewTabPageProvider {
 
@@ -35,11 +36,13 @@ interface NewTabPageProvider {
 
 @ContributesBinding(scope = AppScope::class)
 class RealNewTabPageProvider @Inject constructor(
-    private val newTabPageVersions: PluginPoint<NewTabPagePlugin>,
+    private val newTabPageVersions: ActivePluginPoint<@JvmSuppressWildcards NewTabPagePlugin>,
 ) : NewTabPageProvider {
     override fun provideNewTabPageVersion(): NewTabPagePlugin {
-        val newTabPage = newTabPageVersions.getPlugins().firstOrNull { it.name == NewTabPageVersion.NEW.name }
-        return newTabPage ?: NewTabPage()
+        return runBlocking {
+            val newTabPage = newTabPageVersions.getPlugins().firstOrNull()
+            newTabPage ?: NewTabPage()
+        }
     }
 }
 
