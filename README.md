@@ -1,30 +1,27 @@
-# DuckDuckGo Android
+# SearxDuckGo
 
-Welcome to our android application. We are excited to engage the community in development, see [CONTRIBUTING.md](CONTRIBUTING.md).
+DuckDuckGo is a superb privacy-focused browser. However, it restricts you from changing the search engine and insists on exclusive use of DuckDuckGo. The goal of this fork is to introduce the ability to **change** the **search engine**. At present you can select your search engine preference between DuckDuckGo and Searx.
 
-## We are hiring!
-DuckDuckGo is growing fast and we continue to expand our fully distributed team. We embrace diverse perspectives, and seek out passionate, self-motivated people, committed to our shared vision of raising the standard of trust online. If you are a senior software engineer capable in either iOS or Android, visit our [careers](https://duckduckgo.com/hiring/#open) page to find out more about our openings!
+## Why Searx?
 
-## Building the Project
-We use git submodules and so when you are checking out the app, you'll need to ensure the submodules are initialized properly. You can use the `--recursive` flag when cloning the project to do this.
+Searx is my preferred search engine. Searx is a free internet metasearch engine which aggregates results from more than 70 search services. Users are neither tracked nor profiled. Additionally, searx can be used over Tor for online anonymity.
 
-    git clone --recursive https://github.com/duckduckgo/android.git
+You can also host your own Searx instance and set it as a search engine in your browser.
 
-Alternatively, if you already have the project checked out, you can initialize the submodules manually.
+To learn more about Searx, you can visit the official site - https://searx.github.io/searx/
 
-    git submodule update --init
-    
-## Terminology
+### Interesting tips
 
-We have taken steps to update our terminology and remove words with problematic racial connotations, most notably the change to `main` branches, `allow lists`, and `blocklists`. Closed issues or PRs may contain deprecated terminology that should not be used going forward.
+To use Google search, simply prefix your queries with `!go`. For Wikipedia, use `!wp`. To search for images, type “!images”. You can even search in DuckDuckGo by using `!ddg`. Searx is cool, definitely check it out!
 
-## Contribute
+## Will other search engines be supported?
 
-Please refer to [contributing](CONTRIBUTING.md).
+I have already supported the search engine that I use myself, thus I do not intend to add more search engines personally. However, thanks to my modifications, adding another search engine is not difficult. 
 
-## Discuss
+If you want to add your preferred search engine to help other people, feel free to create a Pull Request (PR).
 
-Contact us at https://duckduckgo.com/feedback if you have feedback, questions or want to chat. You can also use the feedback form embedded within our Mobile App - to do so please navigate to Settings and select "Leave Feedback".
+## How can I help?
 
-## License
-DuckDuckGo android is distributed under the Apache 2.0 [license](LICENSE).
+- You can add your favorite search engine in a PR
+- You can translate the string constants that I added to other languages
+- You can give this fork a star or share it, to help other people find it more easily. 
