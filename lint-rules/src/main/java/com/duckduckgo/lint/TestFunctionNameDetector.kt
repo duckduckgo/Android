@@ -34,12 +34,11 @@ import dev.langchain4j.data.message.UserMessage
 import dev.langchain4j.model.chat.ChatLanguageModel
 import dev.langchain4j.model.ollama.OllamaChatModel
 import org.jetbrains.kotlin.psi.KtNamedDeclaration
-import org.jetbrains.kotlin.toKtPsiSourceElement
 import org.jetbrains.uast.UClass
 import org.jetbrains.uast.UElement
 import org.jetbrains.uast.getParentOfType
 import org.jetbrains.uast.kotlin.KotlinUMethod
-import org.jetbrains.uast.skipParentOfType
+import java.lang.StringBuilder
 import java.util.EnumSet
 import kotlin.LazyThreadSafetyMode.SYNCHRONIZED
 import kotlin.io.path.Path
@@ -68,9 +67,10 @@ class TestFunctionNameDetector : Detector(), SourceCodeScanner {
         annotationInfo: AnnotationInfo,
         usageInfo: AnnotationUsageInfo,
     ) {
+        // Skip UI tests - these have a different convention from unit tests.
         if (context.isAndroidTest()) return
 
-        // Skip parameterized tests
+        // Skip parameterized tests.
         val containerClass = element.getParentOfType<UClass>() ?: return
         val annotation = containerClass.getAnnotation("org.junit.runner.RunWith")
         if (annotation != null) {
@@ -132,7 +132,7 @@ class TestFunctionNameDetector : Detector(), SourceCodeScanner {
         context: JavaContext
     ): LintFix? {
         if (Scope.ALL_JAVA_FILES !in context.scope) {
-            // We're in the IDE so don't try and use the LLM to generate a LintFix.
+            // We're not running in batch mode, so don't try and use the LLM to generate a fix.
             return null
         }
 
@@ -140,31 +140,58 @@ class TestFunctionNameDetector : Detector(), SourceCodeScanner {
         context.log(null, "Response from LM: ")
         context.log(null, response)
 
-        val firstBackTick = response.indexOfFirst { it == '`' }
-        val secondBackTick = response.indexOfLast { it == '`' }
-        if (firstBackTick == -1 || secondBackTick == -1) return null
-
-        val proposedFunctionName = response.substring(firstBackTick..secondBackTick)
-
-        if (proposedFunctionName.isEmpty()) {
-            return null
-        }
-
-        if (!usedNames.add(proposedFunctionName)) {
-            // We've already used this test name and we'd get a conflicting overloads error.
-            return null
-        }
-
-        // Remove illegal characters
-        val sanitizedFunctionName = proposedFunctionName.replace('.', '·').replace(':', '·').replace("/", "")
-
-        if (sanitizedFunctionName.length > 140) {
-            // It's too long and would break MAX_LINE_LENGTH. Leave this test to be migrated manually.
-            return null
-        }
+        val extractedFunctionName = response.substringBetween('`') ?: return null
+        val sanitizedFunctionName = extractedFunctionName.sanitizedFunctionName() ?: return null
 
         return LintFix.create().name("Use name suggested by language model").replace().all().with(sanitizedFunctionName).autoFix().build()
     }
+
+    /**
+     * Returns the substring between (inclusive) the first instance of [c] and the last instance of [c]
+     * or `null` if such substring does not exist.
+     */
+    private fun String.substringBetween(c: Char): String? {
+        var firstIndex: Int? = null
+        var lastIndex: Int? = null
+        for (i in indices) {
+            if (this[i] == c) {
+                if (firstIndex == null) {
+                    firstIndex = i
+                } else {
+                    lastIndex = i
+                }
+            }
+        }
+        if (firstIndex == null || lastIndex == null) return null
+        return substring(firstIndex..lastIndex)
+    }
+
+    /**
+     * Takes a proposed function name and
+     */
+    private fun String.sanitizedFunctionName(): String? {
+        if (this.isEmpty()) return null
+        if (this.length > 140) {
+            // It's too long and would break MAX_LINE_LENGTH. Leave this test to be migrated manually.
+            return null
+        }
+        val sb = StringBuilder()
+        for (c in this) {
+            if (c in illegalChars) {
+                sb.append('·')
+            } else {
+                sb.append(c)
+            }
+        }
+        return sb.toString()
+    }
+
+    /**
+     * Illegal characters for a Kotlin function name
+     *
+     * See: https://kotlinlang.org/spec/syntax-and-grammar.html#grammar-rule-Identifier
+     */
+    private val illegalChars = hashSetOf('.', ';', '[', ']', '/', '<', '>', ':', '\\')
 
     companion object {
 
