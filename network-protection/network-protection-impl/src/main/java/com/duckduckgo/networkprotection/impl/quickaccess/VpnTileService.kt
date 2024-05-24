@@ -76,7 +76,7 @@ class VpnTileService : TileService() {
         AndroidInjection.inject(this, VpnTileServiceBindingKey::class.java)
     }
 
-    @SuppressLint("NewApi") // IDE doesn't get we use appBuildConfig
+    @SuppressLint("NewApi", "StartActivityAndCollapseDeprecated") // IDE doesn't get we use appBuildConfig
     override fun onClick() {
         serviceScope.launch(dispatcherProvider.io()) {
             if (networkProtectionState.isRunning()) {
