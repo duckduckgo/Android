@@ -320,7 +320,7 @@ class ContributesActivePluginPointCodeGenerator : CodeGenerator {
                     pluginPriority?.let {
                         addAnnotation(
                             AnnotationSpec.builder(PriorityKey::class)
-                                .addMember("%L", it)
+                                .addMember("%L", it.toString())
                                 .build(),
                         )
                     }

@@ -62,7 +62,7 @@ class FooActivePlugin @Inject constructor() : MyPlugin {
 @ContributesActivePlugin(
     scope = AppScope::class,
     boundType = MyPlugin::class,
-    priority = 100,
+    priority = 1000,
 )
 class BarActivePlugin @Inject constructor() : MyPlugin {
     override fun doSomething() {
