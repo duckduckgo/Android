@@ -55,7 +55,7 @@ class ContributesActivePluginPointCodeGeneratorTest {
 
         val priorityAnnotation = clazz.java.getAnnotation(PriorityKey::class.java)!!
         assertNotNull(priorityAnnotation)
-        assertEquals(100, priorityAnnotation.priority)
+        assertEquals(1000, priorityAnnotation.priority)
     }
 
     @Test
