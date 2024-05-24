@@ -618,7 +618,8 @@ class RealSubscriptionsManagerTest {
         val result = subscriptionsManager.getAuthToken()
 
         verify(authService).storeLogin(any())
-        assertTrue(result is AuthToken.Failure)
+        assertTrue(result is AuthToken.Failure.TokenExpired)
+        assertEquals("authToken", (result as AuthToken.Failure.TokenExpired).authToken)
     }
 
     @Test
@@ -633,7 +634,8 @@ class RealSubscriptionsManagerTest {
         val result = subscriptionsManager.getAuthToken()
 
         verify(authService).storeLogin(any())
-        assertTrue(result is AuthToken.Failure)
+        assertTrue(result is AuthToken.Failure.TokenExpired)
+        assertEquals("authToken", (result as AuthToken.Failure.TokenExpired).authToken)
     }
 
     @Test
@@ -644,7 +646,8 @@ class RealSubscriptionsManagerTest {
         val result = subscriptionsManager.getAuthToken()
 
         verify(authService, never()).storeLogin(any())
-        assertTrue(result is AuthToken.Failure)
+        assertTrue(result is AuthToken.Failure.TokenExpired)
+        assertEquals("authToken", (result as AuthToken.Failure.TokenExpired).authToken)
     }
 
     @Test
@@ -657,7 +660,8 @@ class RealSubscriptionsManagerTest {
         val result = subscriptionsManager.getAuthToken()
 
         verify(authService).storeLogin(any())
-        assertTrue(result is AuthToken.Failure)
+        assertTrue(result is AuthToken.Failure.TokenExpired)
+        assertEquals("authToken", (result as AuthToken.Failure.TokenExpired).authToken)
     }
 
     @Test

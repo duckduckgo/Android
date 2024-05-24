@@ -26,6 +26,7 @@ import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState
+import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.CurrentPurchase
 import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
 import com.duckduckgo.subscriptions.impl.PrivacyProFeature
@@ -39,7 +40,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.isActive
-import com.duckduckgo.subscriptions.impl.repository.isActiveOrWaiting
+import com.duckduckgo.subscriptions.impl.repository.isExpired
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.*
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView.Failure
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView.InProgress
@@ -83,6 +84,8 @@ class SubscriptionWebViewViewModel @Inject constructor(
     private val _currentPurchaseViewState = MutableStateFlow(CurrentPurchaseViewState())
     val currentPurchaseViewState = _currentPurchaseViewState.asStateFlow()
 
+    private lateinit var subscriptionStatus: SubscriptionStatus
+
     fun start() {
         subscriptionsManager.currentPurchaseState.onEach {
             val state = when (it) {
@@ -115,6 +118,10 @@ class SubscriptionWebViewViewModel @Inject constructor(
             _currentPurchaseViewState.emit(currentPurchaseViewState.value.copy(purchaseState = state))
         }.flowOn(dispatcherProvider.io())
             .launchIn(viewModelScope)
+
+        subscriptionsManager.subscriptionStatus
+            .onEach { subscriptionStatus = it }
+            .launchIn(viewModelScope)
     }
 
     fun processJsCallbackMessage(featureName: String, method: String, id: String?, data: JSONObject?) {
@@ -124,7 +131,6 @@ class SubscriptionWebViewViewModel @Inject constructor(
             "getSubscriptionOptions" -> id?.let { getSubscriptionOptions(featureName, method, it) }
             "subscriptionSelected" -> subscriptionSelected(data)
             "activateSubscription" -> activateSubscription()
-            "setSubscription" -> setSubscription()
             "featureSelected" -> data?.let { featureSelected(data) }
             "subscriptionsWelcomeFaqClicked" -> subscriptionsWelcomeFaqClicked()
             "subscriptionsWelcomeAddEmailClicked" -> subscriptionsWelcomeAddEmailClicked()
@@ -134,11 +140,11 @@ class SubscriptionWebViewViewModel @Inject constructor(
         }
     }
 
-    private fun setSubscription() {
-        viewModelScope.launch {
-            if (!subscriptionsManager.subscriptionStatus().isActiveOrWaiting()) {
-                command.send(SubscriptionRecoveredExpired)
-            }
+    fun onSubscriptionRestored() = viewModelScope.launch {
+        if (subscriptionStatus.isExpired()) {
+            command.send(BackToSettings)
+        } else {
+            command.send(Reload)
         }
     }
 
@@ -299,7 +305,6 @@ class SubscriptionWebViewViewModel @Inject constructor(
 
     sealed class Command {
         data object BackToSettings : Command()
-        data object SubscriptionRecoveredExpired : Command()
         data object BackToSettingsActivateSuccess : Command()
         data class SendJsEvent(val event: SubscriptionEventData) : Command()
         data class SendResponseToJs(val data: JsCallbackData) : Command()
@@ -308,6 +313,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
         data object GoToITR : Command()
         data object GoToPIR : Command()
         data class GoToNetP(val activityParams: ActivityParams) : Command()
+        data object Reload : Command()
     }
 
     companion object {
