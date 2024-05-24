@@ -34,6 +34,7 @@ import com.duckduckgo.app.onboarding.ui.page.experiment.ExperimentWelcomePageVie
 import com.duckduckgo.app.onboarding.ui.page.experiment.ExperimentWelcomePageViewModel.Command.ShowSuccessDialog
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.UNIQUE
 import com.duckduckgo.di.scopes.FragmentScope
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -132,11 +133,19 @@ class ExperimentWelcomePageViewModel @Inject constructor(
     }
 
     fun onDialogShown(onboardingDialogType: PreOnboardingDialogType) {
-        val pixelName = when (onboardingDialogType) {
-            INITIAL -> OnboardingExperimentPixel.PixelName.PREONBOARDING_INTRO_SHOWN
-            COMPARISON_CHART -> OnboardingExperimentPixel.PixelName.PREONBOARDING_COMPARISON_CHART_SHOWN
-            CELEBRATION -> OnboardingExperimentPixel.PixelName.PREONBOARDING_AFFIRMATION_SHOWN
+        when (onboardingDialogType) {
+            INITIAL -> {
+                pixel.fire(OnboardingExperimentPixel.PixelName.PREONBOARDING_INTRO_SHOWN)
+                pixel.fire(OnboardingExperimentPixel.PixelName.PREONBOARDING_INTRO_SHOWN_UNIQUE, type = UNIQUE)
+            }
+            COMPARISON_CHART -> {
+                pixel.fire(OnboardingExperimentPixel.PixelName.PREONBOARDING_COMPARISON_CHART_SHOWN)
+                pixel.fire(OnboardingExperimentPixel.PixelName.PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE, type = UNIQUE)
+            }
+            CELEBRATION -> {
+                pixel.fire(OnboardingExperimentPixel.PixelName.PREONBOARDING_AFFIRMATION_SHOWN)
+                pixel.fire(OnboardingExperimentPixel.PixelName.PREONBOARDING_AFFIRMATION_SHOWN_UNIQUE, type = UNIQUE)
+            }
         }
-        pixel.fire(pixelName)
     }
 }
