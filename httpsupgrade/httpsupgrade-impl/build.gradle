@@ -55,6 +55,8 @@ dependencies {
     // WorkManager
     implementation AndroidX.work.runtimeKtx
     testImplementation AndroidX.work.testing
+
+    coreLibraryDesugaring Android.tools.desugarJdkLibs
 }
 
 android {
@@ -72,6 +74,9 @@ android {
         unitTests {
             includeAndroidResources = true
         }
+    }
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
     }
 }
 
