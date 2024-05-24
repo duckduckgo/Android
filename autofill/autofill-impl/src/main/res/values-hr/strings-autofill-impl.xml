@@ -139,8 +139,10 @@
     <string name="managementDisabledModeSubtitle">Uzorak za zaključavanje uređaja, PIN ili biometrija potrebni su za zaštitu tvojih lozinki.</string>
     <string name="credentialManagementEditTitle">Uredi lozinku</string>
 
-    <string name="credentials_limit_warning"><b>Sinkronizacija pauzirana</b>\nOgraničenje prijava premašeno. Izbriši neke za nastavak sinkronizacije.\n\n<annotation type="manage_logins">upravljanje prijavama</annotation></string>
-    <string name="credentials_limit_warning_notif"><b>Sinkronizacija lozinki je pauzirana</b>\nPremašeno je ograničenje sinkronizacije lozinki. Pokušaj izbrisati neke lozinke. Dok se to ne riješi, tvoje se lozinke neće sigurnosno kopirati.</string>
+    <string name="credentials_limit_warning"><b>Sinkronizacija je pauzirana</b>\nDosegnut je maksimalni broj lozinki. Izbriši neke za nastavak sinkronizacije.\n\n<annotation type="manage_logins">Upravljanje lozinkama</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Sinkronizacija lozinki je pauzirana</b>\nDosegnut je maksimalni broj lozinki. Izbriši neke lozinke za nastavak sinkronizacije.</string>
+    <string name="credentials_invalid_request_warning"><b>Sinkronizacija je pauzirana</b>\nNeke su lozinke formatirane pogrešno, ili su preduge i nisu sinkronizirane.\n\n<annotation type="manage_logins">Upravljanje lozinkama</annotation></string>
+    <string name="credentials_invalid_request_warning_notif"><b>Sinkronizacija lozinki je pauzirana</b>\nNeke su lozinke formatirane pogrešno, ili su preduge i nisu sinkronizirane.\n\n</string>
 
     <string name="saveLoginDialogNeverForThisSite">Nikada ne traži za ovu web lokaciju</string>
     <string name="credentialManagementInstructionNeverForThisSite">Ako resetiraš isključene web lokacije, od tebe će se zatražiti da spremiš svoju lozinku sljedeći put kad se prijaviš na bilo koju od ovih lokacija.</string>
