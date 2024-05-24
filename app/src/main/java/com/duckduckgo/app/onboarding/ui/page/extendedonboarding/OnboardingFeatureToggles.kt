@@ -25,13 +25,10 @@ import com.duckduckgo.feature.toggles.api.Toggle.Experiment
     scope = AppScope::class,
     featureName = "extendedOnboarding",
 )
-interface ExtendedOnboardingFeatureToggles {
-    @Toggle.DefaultValue(false)
-    fun self(): Toggle
+interface OnboardingFeatureToggles {
 
     @Toggle.DefaultValue(false)
-    @Experiment
-    fun comparisonChart(): Toggle
+    fun self(): Toggle
 
     @Toggle.DefaultValue(false)
     @Experiment
