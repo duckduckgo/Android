@@ -33,15 +33,42 @@ constructor(
 ) : MaterialCardView(context, attrs, defStyleAttr) {
 
     init {
+        val attr = context.theme.obtainStyledAttributes(attrs, R.styleable.DaxBubbleCardView, defStyleAttr, 0)
+        val edgePosition = EdgePosition.from(attr.getInt(R.styleable.DaxBubbleCardView_edgePosition, 0))
+
         val cornderRadius = resources.getDimension(R.dimen.mediumShapeCornerRadius)
         val cornerSize = resources.getDimension(R.dimen.daxBubbleDialogEdge)
         val distanceFromEdge = resources.getDimension(R.dimen.daxBubbleDialogDistanceFromEdge)
-        val edgeTreatment = DaxBubbleEdgeTreatment(cornerSize, distanceFromEdge)
+        val edgeTreatment = DaxBubbleEdgeTreatment(cornerSize, distanceFromEdge, edgePosition)
 
         setCardBackgroundColor(ColorStateList.valueOf(context.getColorFromAttr(R.attr.daxColorSurface)))
-        shapeAppearanceModel = ShapeAppearanceModel.builder()
-            .setAllCornerSizes(cornderRadius)
-            .setTopEdge(edgeTreatment)
-            .build()
+
+        shapeAppearanceModel = when (edgePosition) {
+            EdgePosition.TOP -> ShapeAppearanceModel.builder()
+                .setAllCornerSizes(cornderRadius)
+                .setTopEdge(edgeTreatment)
+                .build()
+
+            EdgePosition.LEFT -> ShapeAppearanceModel.builder()
+                .setAllCornerSizes(cornderRadius)
+                .setLeftEdge(edgeTreatment)
+                .build()
+        }
+    }
+
+    enum class EdgePosition {
+        TOP,
+        LEFT,
+        ;
+
+        companion object {
+            fun from(value: Int): EdgePosition {
+                // same order as attrs-dax-dialog.xml
+                return when (value) {
+                    1 -> LEFT
+                    else -> TOP
+                }
+            }
+        }
     }
 }

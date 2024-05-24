@@ -22,8 +22,8 @@ import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlue
 import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint.DefaultBrowserBlueprint
 import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint.ExperimentWelcomeBluePrint
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
-import com.duckduckgo.app.onboarding.ui.page.ExperimentWelcomePage
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
+import com.duckduckgo.app.onboarding.ui.page.WelcomePage
 
 interface OnboardingPageManager {
     fun pageCount(): Int
@@ -69,7 +69,7 @@ class OnboardingPageManagerWithTrackerBlocking(
         return onboardingPageBuilder.buildDefaultBrowserPage()
     }
 
-    private fun buildExperimentWelcomePage(): ExperimentWelcomePage {
+    private fun buildExperimentWelcomePage(): WelcomePage {
         return onboardingPageBuilder.buildExperimentWelcomePage()
     }
 }

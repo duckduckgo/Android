@@ -32,7 +32,7 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.OnboardingFeatureToggles
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.privacy.model.HttpsStatus
@@ -115,7 +115,7 @@ class CtaViewModelTest {
     private lateinit var mockSurveyRepository: SurveyRepository
 
     @Mock
-    private lateinit var mockOnboardingFeatureToggles: OnboardingFeatureToggles
+    private lateinit var mockExtendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles
 
     private val requiredDaxOnboardingCtas: List<CtaId> = listOf(
         CtaId.DAX_INTRO,
@@ -141,7 +141,7 @@ class CtaViewModelTest {
         whenever(mockUserAllowListRepository.isDomainInUserAllowList(any())).thenReturn(false)
         whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(db.dismissedCtaDao().dismissedCtas())
         whenever(mockTabRepository.flowTabs).thenReturn(db.tabsDao().flowTabs())
-        whenever(mockOnboardingFeatureToggles.aestheticUpdates().isEnabled()).thenReturn(true)
+        whenever(mockExtendedOnboardingFeatureToggles.aestheticUpdates().isEnabled()).thenReturn(true)
 
         testee = CtaViewModel(
             appInstallStore = mockAppInstallStore,
@@ -156,7 +156,7 @@ class CtaViewModelTest {
             dispatchers = coroutineRule.testDispatcherProvider,
             duckDuckGoUrlDetector = DuckDuckGoUrlDetectorImpl(),
             surveyRepository = mockSurveyRepository,
-            onboardingFeatureToggles = mockOnboardingFeatureToggles,
+            extendedOnboardingFeatureToggles = mockExtendedOnboardingFeatureToggles,
         )
     }
 
@@ -649,7 +649,7 @@ class CtaViewModelTest {
         givenDaxOnboardingActive()
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(false)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_DIALOG_SERP)).thenReturn(true)
-        whenever(mockOnboardingFeatureToggles.aestheticUpdates().isEnabled()).thenReturn(true)
+        whenever(mockExtendedOnboardingFeatureToggles.aestheticUpdates().isEnabled()).thenReturn(true)
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
         assertTrue(value is DaxBubbleCta.DaxIntroSearchOptionsCta)
@@ -671,7 +671,7 @@ class CtaViewModelTest {
         givenDaxOnboardingActive()
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_DIALOG_TRACKERS_FOUND)).thenReturn(false)
-        whenever(mockOnboardingFeatureToggles.aestheticUpdates().isEnabled()).thenReturn(true)
+        whenever(mockExtendedOnboardingFeatureToggles.aestheticUpdates().isEnabled()).thenReturn(true)
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
         assertTrue(value is DaxBubbleCta.DaxIntroVisitSiteOptionsCta)
@@ -682,7 +682,7 @@ class CtaViewModelTest {
         givenDaxOnboardingActive()
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_DIALOG_TRACKERS_FOUND)).thenReturn(true)
-        whenever(mockOnboardingFeatureToggles.aestheticUpdates().isEnabled()).thenReturn(true)
+        whenever(mockExtendedOnboardingFeatureToggles.aestheticUpdates().isEnabled()).thenReturn(true)
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
         assertFalse(value is DaxBubbleCta.DaxIntroVisitSiteOptionsCta)

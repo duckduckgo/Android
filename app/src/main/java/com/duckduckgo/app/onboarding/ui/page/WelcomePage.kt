@@ -39,13 +39,13 @@ import androidx.transition.TransitionManager
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomeExperimentBinding
-import com.duckduckgo.app.onboarding.ui.page.ExperimentWelcomePage.Companion.PreOnboardingDialogType.CELEBRATION
-import com.duckduckgo.app.onboarding.ui.page.ExperimentWelcomePage.Companion.PreOnboardingDialogType.COMPARISON_CHART
-import com.duckduckgo.app.onboarding.ui.page.ExperimentWelcomePage.Companion.PreOnboardingDialogType.INITIAL
-import com.duckduckgo.app.onboarding.ui.page.ExperimentWelcomePageViewModel.Command.Finish
-import com.duckduckgo.app.onboarding.ui.page.ExperimentWelcomePageViewModel.Command.ShowComparisonChart
-import com.duckduckgo.app.onboarding.ui.page.ExperimentWelcomePageViewModel.Command.ShowDefaultBrowserDialog
-import com.duckduckgo.app.onboarding.ui.page.ExperimentWelcomePageViewModel.Command.ShowSuccessDialog
+import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType.CELEBRATION
+import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType.COMPARISON_CHART
+import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType.INITIAL
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Finish
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowComparisonChart
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowDefaultBrowserDialog
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSuccessDialog
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -60,7 +60,7 @@ import nl.dionsegijn.konfetti.models.Shape
 import nl.dionsegijn.konfetti.models.Size
 
 @InjectWith(FragmentScope::class)
-class ExperimentWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_experiment) {
+class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_experiment) {
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
@@ -70,7 +70,7 @@ class ExperimentWelcomePage : OnboardingPageFragment(R.layout.content_onboarding
 
     private val binding: ContentOnboardingWelcomeExperimentBinding by viewBinding()
     private val viewModel by lazy {
-        ViewModelProvider(this, viewModelFactory)[ExperimentWelcomePageViewModel::class.java]
+        ViewModelProvider(this, viewModelFactory)[WelcomePageViewModel::class.java]
     }
 
     private var ctaText: String = ""

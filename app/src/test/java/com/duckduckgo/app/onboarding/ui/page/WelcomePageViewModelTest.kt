@@ -21,11 +21,11 @@ import android.content.Intent
 import app.cash.turbine.test
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
-import com.duckduckgo.app.onboarding.ui.page.ExperimentWelcomePage.Companion.PreOnboardingDialogType
-import com.duckduckgo.app.onboarding.ui.page.ExperimentWelcomePageViewModel.Command.Finish
-import com.duckduckgo.app.onboarding.ui.page.ExperimentWelcomePageViewModel.Command.ShowComparisonChart
-import com.duckduckgo.app.onboarding.ui.page.ExperimentWelcomePageViewModel.Command.ShowDefaultBrowserDialog
-import com.duckduckgo.app.onboarding.ui.page.ExperimentWelcomePageViewModel.Command.ShowSuccessDialog
+import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Finish
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowComparisonChart
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowDefaultBrowserDialog
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSuccessDialog
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.OnboardingExperimentPixel
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -38,7 +38,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-class ExperimentWelcomePageViewModelTest {
+class WelcomePageViewModelTest {
 
     @get:Rule
     @Suppress("unused")
@@ -49,8 +49,8 @@ class ExperimentWelcomePageViewModelTest {
     private val mockPixel: Pixel = mock()
     private val mockAppInstallStore: AppInstallStore = mock()
 
-    private val testee: ExperimentWelcomePageViewModel by lazy {
-        ExperimentWelcomePageViewModel(
+    private val testee: WelcomePageViewModel by lazy {
+        WelcomePageViewModel(
             mockDefaultRoleBrowserDialog,
             mockContext,
             mockPixel,

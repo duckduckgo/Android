@@ -30,7 +30,7 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.onboarding.store.*
-import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.OnboardingFeatureToggles
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -63,7 +63,7 @@ class CtaViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val surveyRepository: SurveyRepository,
-    private val onboardingFeatureToggles: OnboardingFeatureToggles,
+    private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles,
 ) {
     val surveyLiveData: LiveData<Survey> = surveyRepository.getScheduledLiveSurvey()
 
@@ -198,7 +198,7 @@ class CtaViewModel @Inject constructor(
     }
 
     private suspend fun getHomeCta(): Cta? {
-        val onboardingEnabled = onboardingFeatureToggles.aestheticUpdates().isEnabled()
+        val onboardingEnabled = extendedOnboardingFeatureToggles.aestheticUpdates().isEnabled()
         return when {
             canShowDaxIntroCta() && onboardingEnabled -> {
                 DaxBubbleCta.DaxIntroSearchOptionsCta(onboardingStore, appInstallStore)
@@ -272,7 +272,7 @@ class CtaViewModel @Inject constructor(
 
             if (!canShowDaxDialogCta()) return null
 
-            if (onboardingFeatureToggles.aestheticUpdates().isEnabled()) {
+            if (extendedOnboardingFeatureToggles.aestheticUpdates().isEnabled()) {
                 // Trackers blocked
                 if (!daxDialogTrackersFoundShown() && !isSerpUrl(it.url) && it.orderedTrackerBlockedEntities().isNotEmpty()) {
                     return OnboardingDaxDialogCta.DaxTrackersBlockedCta(

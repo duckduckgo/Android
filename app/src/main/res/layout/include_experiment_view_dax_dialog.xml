@@ -40,12 +40,13 @@
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_dax_icon" />
 
-        <com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExperimentDaxBubbleCardView
+        <com.duckduckgo.common.ui.view.shape.DaxBubbleCardView
             android:id="@+id/cardView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/keyline_4"
             android:layout_marginStart="@dimen/keyline_4"
+            app:edgePosition="left"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/logo"
@@ -182,6 +183,7 @@
 
                 </LinearLayout>
             </FrameLayout>
-        </com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExperimentDaxBubbleCardView>
+        </com.duckduckgo.common.ui.view.shape.DaxBubbleCardView>
+        >
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>
