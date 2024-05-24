@@ -140,11 +140,11 @@ class AutoCompleteApi @Inject constructor(
         historySuggestions: List<RankedSuggestion<AutoCompleteHistorySuggestion>>,
         bookmarkSuggestions: List<RankedSuggestion<AutoCompleteBookmarkSuggestion>>,
     ): List<RankedSuggestion<*>> {
-        val bookmarkMap = bookmarkSuggestions.associateBy { it.suggestion.phrase }
+        val bookmarkMap = bookmarkSuggestions.associateBy { it.suggestion.phrase.lowercase() }
 
-        val uniqueHistorySuggestions = historySuggestions.filter { !bookmarkMap.containsKey(it.suggestion.phrase) }
+        val uniqueHistorySuggestions = historySuggestions.filter { !bookmarkMap.containsKey(it.suggestion.phrase.lowercase()) }
         val updatedBookmarkSuggestions = bookmarkSuggestions.map { bookmarkSuggestion ->
-            val historySuggestion = historySuggestions.find { it.suggestion.phrase == bookmarkSuggestion.suggestion.phrase }
+            val historySuggestion = historySuggestions.find { it.suggestion.phrase.equals(bookmarkSuggestion.suggestion.phrase, ignoreCase = true) }
             if (historySuggestion != null) {
                 bookmarkSuggestion.copy(
                     score = max(historySuggestion.score, bookmarkSuggestion.score),

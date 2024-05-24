@@ -766,6 +766,92 @@ class AutoCompleteApiTest {
         )
     }
 
+    @Test
+    fun whenAutoCompleteQueryIsCapitalizedButResultsAreNotThenIgnoreCapitalization() {
+        whenever(mockAutoCompleteService.autoComplete("Title")).thenReturn(
+            Observable.just(
+                listOf(
+                    AutoCompleteServiceRawResult("foo", isNav = false),
+                ),
+            ),
+        )
+        whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(
+            Single.just(
+                listOf(),
+            ),
+        )
+        whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
+            Single.just(
+                listOf(),
+            ),
+        )
+        whenever(mockNavigationHistory.getHistorySingle()).thenReturn(
+            Single.just(
+                listOf(
+                    VisitedPage(title = "Title", url = "https://example.com".toUri(), visits = listOf(LocalDateTime.now(), LocalDateTime.now())),
+                    VisitedPage(title = "Title", url = "https://foo.com".toUri(), visits = listOf(LocalDateTime.now(), LocalDateTime.now())),
+                    VisitedPage(title = "Title", url = "https://bar.com".toUri(), visits = listOf(LocalDateTime.now(), LocalDateTime.now())),
+                ),
+            ),
+        )
+
+        val result = testee.autoComplete("Title").test()
+        val value = result.values()[0] as AutoCompleteResult
+
+        assertEquals(
+            listOf(
+                AutoCompleteHistorySuggestion(phrase = "example.com", "Title", "https://example.com", isAllowedInTopHits = true),
+                AutoCompleteHistorySuggestion(phrase = "foo.com", "Title", "https://foo.com", isAllowedInTopHits = true),
+                AutoCompleteSearchSuggestion("foo", false),
+                AutoCompleteHistorySuggestion(phrase = "bar.com", "Title", "https://bar.com", isAllowedInTopHits = true),
+            ),
+            value.suggestions,
+        )
+    }
+
+    @Test
+    fun whenAutoCompleteQueryIsNotCapitalizedButResultsAreThenIgnoreCapitalization() {
+        whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(
+            Observable.just(
+                listOf(
+                    AutoCompleteServiceRawResult("foo", isNav = false),
+                ),
+            ),
+        )
+        whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(
+            Single.just(
+                listOf(),
+            ),
+        )
+        whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
+            Single.just(
+                listOf(),
+            ),
+        )
+        whenever(mockNavigationHistory.getHistorySingle()).thenReturn(
+            Single.just(
+                listOf(
+                    VisitedPage(title = "Title", url = "https://example.com".toUri(), visits = listOf(LocalDateTime.now(), LocalDateTime.now())),
+                    VisitedPage(title = "Title", url = "https://foo.com".toUri(), visits = listOf(LocalDateTime.now(), LocalDateTime.now())),
+                    VisitedPage(title = "Title", url = "https://bar.com".toUri(), visits = listOf(LocalDateTime.now(), LocalDateTime.now())),
+                ),
+            ),
+        )
+
+        val result = testee.autoComplete("title").test()
+        val value = result.values()[0] as AutoCompleteResult
+
+        assertEquals(
+            listOf(
+                AutoCompleteHistorySuggestion(phrase = "example.com", "Title", "https://example.com", isAllowedInTopHits = true),
+                AutoCompleteHistorySuggestion(phrase = "foo.com", "Title", "https://foo.com", isAllowedInTopHits = true),
+                AutoCompleteSearchSuggestion("foo", false),
+                AutoCompleteHistorySuggestion(phrase = "bar.com", "Title", "https://bar.com", isAllowedInTopHits = true),
+            ),
+            value.suggestions,
+        )
+    }
+
     private fun favorite(
         id: String = UUID.randomUUID().toString(),
         title: String = "title",
