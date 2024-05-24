@@ -848,10 +848,14 @@
     <string name="preOnboardingDaxDialog3Button">Începe navigarea</string>
     <string name="onboardingSearchDaxDialogTitle">Încearcă o căutare!</string>
     <string name="onboardingSearchDaxDialogDescription">Căutările tale DuckDuckGo sunt întotdeauna anonime.</string>
-    <string name="onboardingSearchDaxDialogOption1">cum se spune „rață” în spaniolă</string>
-    <string name="onboardingSearchDaxDialogOption2">distribuție mighty ducks</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">cum se spune „rață” în engleză</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">cum se spune „rață” în spaniolă</string>
+    <string name="onboardingSearchQueryOption1">cum se spune rață în engleză</string>
+    <string name="onboardingSearchQueryOption1English">cum se spune rață în spaniolă</string>
+    <string name="onboardingSearchDaxDialogOption2">distribuția din avatar</string>
     <string name="onboardingSearchDaxDialogOption3">vremea locală</string>
     <string name="onboardingSearchDaxDialogOption4">Surprinde-mă!</string>
+    <string name="onboardingSearchQueryOption4">rețete pentru cină</string>
     <string name="onboardingSitesDaxDialogTitle">Încearcă să vizitezi un site!</string>
     <string name="onboardingSitesDaxDialogDescription">Voi bloca instrumentele de urmărire ca să nu te mai spioneze.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
@@ -875,5 +879,6 @@
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Șterge instantaneu activitatea de navigare cu <b>Fire Button</b>.<br/><br/>Încearcă! ☝️️]]></string>
     <string name="onboardingEndDaxDialogTitle">"Ai ghicit!"</string>
     <string name="onboardingEndDaxDialogDescription">Reține: de fiecare dată când navighezi cu mine, o reclamă terifiantă își pierde aripile. 👌</string>
+    <string name="onboardingEndDaxDialogButton">Gata!</string>
 
 </resources>
