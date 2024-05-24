@@ -42,7 +42,6 @@
     <string name="viewPlans">View Plans</string>
     <string name="subscriptionNotFound">Subscription Not Found</string>
     <string name="subscriptionNotFoundDescription">The subscription associated with this Google Play account is no longer active.</string>
-    <string name="subscriptionNotFoundEmailDescription">The subscription associated with this email is no longer active, or we could not find it.</string>
     <string name="purchaseRestored">Your purchases have been restored.</string>
     <string name="restoreSubscriptionTitle">Activate your subscription on this device</string>
     <string name="restoreSubscriptionDescription">Access your Privacy Pro subscription on this device via Google Play or an email address.</string>
@@ -58,6 +57,7 @@
     <string name="removeFromDevice">Remove from this device?</string>
     <string name="removeFromDeviceDescription">You will no longer be able to access your Privacy Pro subscription on this device. This will not cancel your subscription, and it will remain active on your other devices.</string>
     <string name="subscriptionsData" instruction="First placeholder is renews or expires, second is a date in format MMMM dd, yyyy">Your subscription %1$s on %2$s.</string>
+    <string name="subscriptionsExpiredData" instruction="The placeholder is a date in format MMMM dd, yyyy">Your subscription expired on %1$s.</string>
     <string name="monthlySubscription">Monthly Subscription</string>
     <string name="yearlySubscription">Yearly Subscription</string>
     <string name="renews">renews</string>
@@ -72,6 +72,10 @@
     <string name="subscriptionSettingRestore">I Have a Subscription</string>
     <string name="subscriptionSettingWaiting">Your Subscription is Being Activated</string>
     <string name="subscriptionSettingWaitingSubtitle">This is taking longer than usual, please check back later.</string>
+    <string name="subscriptionSettingExpired">Your Privacy Pro subscription expired</string>
+    <string name="subscriptionSettingExpiredSubtitle">Subscribe again to continue using Privacy\u00A0Pro</string>
+    <string name="subscriptionSettingExpiredViewPlans">View Plans</string>
+
 
     <!--Purchase Subscriptions-->
     <string name="purchaseCompletedTitle">You\'re all set.</string>

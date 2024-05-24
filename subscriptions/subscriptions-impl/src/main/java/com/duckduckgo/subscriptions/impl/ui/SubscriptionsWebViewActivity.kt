@@ -81,10 +81,10 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.GoToITR
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.GoToNetP
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.GoToPIR
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.Reload
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.RestoreSubscription
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SendJsEvent
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SendResponseToJs
-import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SubscriptionRecoveredExpired
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SubscriptionSelected
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView
 import com.duckduckgo.user.agent.api.UserAgentProvider
@@ -403,7 +403,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             is GoToITR -> goToITR()
             is GoToPIR -> goToPIR()
             is GoToNetP -> goToNetP(command.activityParams)
-            is SubscriptionRecoveredExpired -> subscriptionNotFound()
+            Reload -> binding.webview.reload()
         }
     }
 
@@ -500,22 +500,6 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             .show()
     }
 
-    private fun subscriptionNotFound() {
-        TextAlertDialogBuilder(this)
-            .setTitle(string.subscriptionNotFound)
-            .setMessage(string.subscriptionNotFoundEmailDescription)
-            .setDestructiveButtons(false)
-            .setPositiveButton(string.ok)
-            .addEventListener(
-                object : TextAlertDialogBuilder.EventListener() {
-                    override fun onPositiveButtonClicked() {
-                        finish()
-                    }
-                },
-            )
-            .show()
-    }
-
     private fun selectSubscription(id: String) {
         viewModel.purchaseSubscription(this, id)
     }
@@ -533,7 +517,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
 
     private val startForResultRestore = registerForActivityResult(StartActivityForResult()) { result: ActivityResult ->
         if (result.resultCode == RESULT_OK) {
-            binding.webview.reload()
+            viewModel.onSubscriptionRestored()
         }
     }
 

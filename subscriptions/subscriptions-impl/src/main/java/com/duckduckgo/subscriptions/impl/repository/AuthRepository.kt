@@ -21,7 +21,9 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.GRACE_PERIOD
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
@@ -203,6 +205,9 @@ fun SubscriptionStatus.isActive(): Boolean {
         else -> false
     }
 }
+
+fun SubscriptionStatus.isExpired(): Boolean =
+    this == EXPIRED || this == INACTIVE
 
 fun SubscriptionStatus.isActiveOrWaiting(): Boolean {
     return this.isActive() || this == WAITING
