@@ -3831,42 +3831,14 @@ class BrowserTabFragment :
         ) {
             when (configuration) {
                 is HomePanelCta -> showHomeCta(configuration, favorites)
-                is DaxBubbleCta -> showDaxCta(configuration)
-                is ExperimentDaxBubbleOptionsCta -> showDaxExperimentCta(configuration)
+                is DaxBubbleCta -> showDaxExperimentCta(configuration)
                 is BubbleCta -> showBubbleCta(configuration)
                 is OnboardingDaxDialogCta -> showExperimentDialogCta(configuration)
             }
             newBrowserTab.messageCta.gone()
         }
 
-        // private val daxListener = object : DaxDialogListener {
-        //     override fun onDaxDialogDismiss() {
-        //         viewModel.onDaxDialogDismissed()
-        //     }
-        //
-        //     override fun onDaxDialogHideClick() {
-        //         viewModel.onUserHideDaxDialog()
-        //     }
-        //
-        //     override fun onDaxDialogPrimaryCtaClick() {
-        //         viewModel.onUserClickCtaOkButton()
-        //     }
-        //
-        //     override fun onDaxDialogSecondaryCtaClick() {
-        //         viewModel.onUserClickCtaSecondaryButton()
-        //     }
-        // }
-
-        private fun showDaxCta(configuration: DaxBubbleCta) {
-            hideHomeBackground()
-            hideHomeCta()
-            configuration.showCta(daxDialogCta.daxCtaContainer)
-            newBrowserTab.newTabLayout.setOnClickListener { daxDialogCta.dialogTextCta.finishAnimation() }
-
-            viewModel.onCtaShown()
-        }
-
-        private fun showDaxExperimentCta(configuration: ExperimentDaxBubbleOptionsCta) {
+        private fun showDaxExperimentCta(configuration: DaxBubbleCta) {
             hideHomeBackground()
             hideHomeCta()
             configuration.apply {

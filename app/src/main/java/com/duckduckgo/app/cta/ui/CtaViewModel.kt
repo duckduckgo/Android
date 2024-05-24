@@ -122,7 +122,7 @@ class CtaViewModel @Inject constructor(
 
     suspend fun registerDaxBubbleCtaDismissed(cta: Cta) {
         withContext(dispatchers.io()) {
-            if (cta is DaxBubbleCta || cta is ExperimentDaxBubbleOptionsCta) {
+            if (cta is DaxBubbleCta) {
                 dismissedCtaDao.insert(DismissedCta(cta.ctaId))
                 completeStageIfDaxOnboardingCompleted()
             }
@@ -183,14 +183,14 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    suspend fun getExperimentFireDialogCta(): OnboardingDaxDialogCta.DaxFireButtonCta? {
+    suspend fun getFireDialogCta(): OnboardingDaxDialogCta.DaxFireButtonCta? {
         if (!daxOnboardingActive() || daxDialogFireEducationShown()) return null
         return withContext(dispatchers.io()) {
             return@withContext OnboardingDaxDialogCta.DaxFireButtonCta(onboardingStore, appInstallStore)
         }
     }
 
-    suspend fun getExperimentSiteSuggestionsDialogCta(): OnboardingDaxDialogCta.DaxSiteSuggestionsCta? {
+    suspend fun getSiteSuggestionsDialogCta(): OnboardingDaxDialogCta.DaxSiteSuggestionsCta? {
         if (!daxOnboardingActive() || !canShowDaxIntroVisitSiteCta()) return null
         return withContext(dispatchers.io()) {
             return@withContext OnboardingDaxDialogCta.DaxSiteSuggestionsCta(onboardingStore, appInstallStore)
@@ -201,15 +201,15 @@ class CtaViewModel @Inject constructor(
         val onboardingEnabled = extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()
         return when {
             canShowDaxIntroCta() && onboardingEnabled -> {
-                ExperimentDaxBubbleOptionsCta.ExperimentDaxIntroSearchOptionsCta(onboardingStore, appInstallStore)
+                DaxBubbleCta.DaxIntroSearchOptionsCta(onboardingStore, appInstallStore)
             }
 
             canShowDaxIntroVisitSiteCta() && onboardingEnabled -> {
-                ExperimentDaxBubbleOptionsCta.ExperimentDaxIntroVisitSiteOptionsCta(onboardingStore, appInstallStore)
+                DaxBubbleCta.DaxIntroVisitSiteOptionsCta(onboardingStore, appInstallStore)
             }
 
             canShowDaxCtaEndOfJourney() && onboardingEnabled -> {
-                ExperimentDaxBubbleOptionsCta.ExperimentDaxEndCta(onboardingStore, appInstallStore)
+                DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
             }
 
             canShowWidgetCta() -> {

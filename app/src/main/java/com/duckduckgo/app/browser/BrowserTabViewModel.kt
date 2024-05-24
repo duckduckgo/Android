@@ -103,7 +103,7 @@ import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.app.browser.webview.SslWarningLayout.Action
 import com.duckduckgo.app.cta.ui.*
-import com.duckduckgo.app.cta.ui.ExperimentDaxBubbleOptionsCta.DaxDialogIntroOption
+import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
@@ -724,13 +724,13 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         when (currentCtaViewState().cta) {
-            is ExperimentDaxBubbleOptionsCta.ExperimentDaxIntroSearchOptionsCta -> {
+            is DaxBubbleCta.DaxIntroSearchOptionsCta -> {
                 if (!DaxDialogIntroOption.getSearchOptions().map { it.link }.contains(query)) {
                     pixel.fire(OnboardingExperimentPixel.PixelName.ONBOARDING_SEARCH_CUSTOM)
                 }
             }
 
-            is ExperimentDaxBubbleOptionsCta.ExperimentDaxIntroVisitSiteOptionsCta,
+            is DaxBubbleCta.DaxIntroVisitSiteOptionsCta,
             is OnboardingDaxDialogCta.DaxSiteSuggestionsCta,
             -> {
                 if (!DaxDialogIntroOption.getSitesOptions().map { it.link }.contains(query)) {
@@ -3164,7 +3164,7 @@ class BrowserTabViewModel @Inject constructor(
             is OnboardingDaxDialogCta.DaxSerpCta -> {
                 viewModelScope.launch {
                     if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) {
-                        val cta = withContext(dispatchers.io()) { ctaViewModel.getExperimentSiteSuggestionsDialogCta() }
+                        val cta = withContext(dispatchers.io()) { ctaViewModel.getSiteSuggestionsDialogCta() }
                         ctaViewState.value = currentCtaViewState().copy(cta = cta)
                         if (cta == null) {
                             command.value = HideExperimentOnboardingDialog(experimentCta)
@@ -3183,7 +3183,7 @@ class BrowserTabViewModel @Inject constructor(
                 }
                 viewModelScope.launch {
                     if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) {
-                        val cta = withContext(dispatchers.io()) { ctaViewModel.getExperimentFireDialogCta() }
+                        val cta = withContext(dispatchers.io()) { ctaViewModel.getFireDialogCta() }
                         ctaViewState.value = currentCtaViewState().copy(cta = cta)
                         if (cta == null) {
                             command.value = HideExperimentOnboardingDialog(experimentCta)
