@@ -75,6 +75,7 @@ interface SettingsDataStore {
     fun clearAppBackgroundTimestamp()
 
     var searchEngine: SearchEngine
+    var searxInstance: String
 }
 
 @ContributesBinding(AppScope::class)
@@ -179,13 +180,22 @@ class SettingsSharedPreferences @Inject constructor(
         set(enabled) = preferences.edit { putBoolean(SHOW_AUTOMATIC_FIREPROOF_DIALOG, enabled) }
 
     override var searchEngine: SearchEngine
-        get() = preferences.getString(SEARX_INSTANCE, null)?.let { SearxSearchEngine(it) } ?: DuckDuckGoSearchEngine
-        set(value) {
-            when (value) {
-                is DuckDuckGoSearchEngine -> preferences.edit { remove(SEARX_INSTANCE) }
-                is SearxSearchEngine -> preferences.edit { putString(SEARX_INSTANCE, value.home)}
+        get() {
+            return when (preferences.getString(SEARCH_ENGINE, null)) {
+                SearchEngineMapper.SEARX_VALUE -> SearxSearchEngine(searxInstance)
+                else -> DuckDuckGoSearchEngine
             }
         }
+        set(value) {
+            when (value) {
+                is DuckDuckGoSearchEngine -> preferences.edit { putString(SEARCH_ENGINE, SearchEngineMapper.DUCK_DUCK_GO_VALUE) }
+                is SearxSearchEngine -> preferences.edit { putString(SEARCH_ENGINE, SearchEngineMapper.SEARX_VALUE) }
+            }
+        }
+
+    override var searxInstance: String
+        get() = preferences.getString(SEARX_INSTANCE, null) ?: "https://baresearch.org/"
+        set(value) = preferences.edit { putString(SEARX_INSTANCE, value) }
 
     override fun hasBackgroundTimestampRecorded(): Boolean = preferences.contains(KEY_APP_BACKGROUNDED_TIMESTAMP)
     override fun clearAppBackgroundTimestamp() = preferences.edit { remove(KEY_APP_BACKGROUNDED_TIMESTAMP) }
@@ -254,6 +264,7 @@ class SettingsSharedPreferences @Inject constructor(
         const val SHOW_APP_LINKS_PROMPT = "SHOW_APP_LINKS_PROMPT"
         const val SHOW_AUTOMATIC_FIREPROOF_DIALOG = "SHOW_AUTOMATIC_FIREPROOF_DIALOG"
         const val KEY_NOTIFY_ME_IN_DOWNLOADS_DISMISSED = "KEY_NOTIFY_ME_IN_DOWNLOADS_DISMISSED"
+        const val SEARCH_ENGINE = "SEARCH_ENGINE"
         const val SEARX_INSTANCE = "SEARX_INSTANCE"
     }
 
@@ -281,6 +292,13 @@ class SettingsSharedPreferences @Inject constructor(
             HERO_ABSTRACT_PREFS_VALUE -> FireAnimation.HeroAbstract
             NONE_PREFS_VALUE -> FireAnimation.None
             else -> defValue
+        }
+    }
+
+    private class SearchEngineMapper {
+        companion object {
+            public const val DUCK_DUCK_GO_VALUE = "DUCK_DUCK_GO"
+            public const val SEARX_VALUE = "SEARX"
         }
     }
 
