@@ -195,7 +195,7 @@ class SettingsSharedPreferences @Inject constructor(
         }
 
     override var searxInstance: String
-        get() = preferences.getString(SEARX_INSTANCE, null) ?: "https://baresearch.org/"
+        get() = preferences.getString(SEARX_INSTANCE, null) ?: "https://searx.hu/"
         set(value) = preferences.edit { putString(SEARX_INSTANCE, value) }
 
     override fun hasBackgroundTimestampRecorded(): Boolean = preferences.contains(KEY_APP_BACKGROUNDED_TIMESTAMP)
