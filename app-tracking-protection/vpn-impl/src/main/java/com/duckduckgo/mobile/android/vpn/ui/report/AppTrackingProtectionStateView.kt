@@ -19,14 +19,17 @@ package com.duckduckgo.mobile.android.vpn.ui.report
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
+import android.view.View
 import android.widget.FrameLayout
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.*
+import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ViewViewModelFactory
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.databinding.FragmentDeviceShieldCtaBinding
@@ -35,6 +38,8 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.E
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.REVOKED
 import com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportViewModel.PrivacyReportView.ViewState
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
+import com.duckduckgo.newtabpage.api.NewTabPageSection
+import com.duckduckgo.newtabpage.api.NewTabPageSectionPlugin
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -176,5 +181,17 @@ class AppTrackingProtectionStateView @JvmOverloads constructor(
 
         binding.deviceShieldCtaHeader.text = HtmlCompat.fromHtml(textToStyle, HtmlCompat.FROM_HTML_MODE_LEGACY)
         binding.deviceShieldCtaImage.setImageResource(R.drawable.ic_apptp_default)
+    }
+}
+
+@ContributesActivePlugin(
+    AppScope::class,
+    boundType = NewTabPageSectionPlugin::class,
+)
+class AppTrackingProtectionNewTabPageSectionPlugin @Inject constructor() : NewTabPageSectionPlugin {
+    override val name = NewTabPageSection.APP_TRACKING_PROTECTION.name
+
+    override fun getView(context: Context): View {
+        return AppTrackingProtectionStateView(context)
     }
 }
