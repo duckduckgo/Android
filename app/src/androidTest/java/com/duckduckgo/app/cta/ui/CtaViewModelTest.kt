@@ -630,30 +630,11 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenFirstTimeUserClicksOnFireButtonThenFireDialogCtaReturned() = runTest {
-        givenDaxOnboardingActive()
-
-        val fireDialogCta = testee.getFireDialogCta()
-
-        assertTrue(fireDialogCta is DaxFireDialogCta.TryClearDataCta)
-    }
-
-    @Test
-    fun whenFirstTimeUserClicksOnFireButtonButUserHidAllTipsThenFireDialogCtaIsNull() = runTest {
-        givenDaxOnboardingActive()
-        whenever(mockSettingsDataStore.hideTips).thenReturn(true)
-
-        val fireDialogCta = testee.getFireDialogCta()
-
-        assertNull(fireDialogCta)
-    }
-
-    @Test
     fun whenFireCtaDismissedThenFireDialogCtaIsNull() = runTest {
         givenDaxOnboardingActive()
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_FIRE_BUTTON)).thenReturn(true)
 
-        val fireDialogCta = testee.getFireDialogCta()
+        val fireDialogCta = testee.getExperimentFireDialogCta()
 
         assertNull(fireDialogCta)
     }

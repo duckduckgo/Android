@@ -497,47 +497,6 @@ sealed class BubbleCta(
     }
 }
 
-sealed class DaxFireDialogCta(
-    override val ctaId: CtaId,
-    @StringRes open val description: Int,
-    override val shownPixel: Pixel.PixelName?,
-    override val okPixel: Pixel.PixelName?,
-    override val cancelPixel: Pixel.PixelName?,
-    override var ctaPixelParam: String,
-    override val onboardingStore: OnboardingStore,
-    override val appInstallStore: AppInstallStore,
-) : Cta, ViewCta, DaxCta {
-
-    override fun showCta(view: View) {
-        val daxText = view.context.getString(description)
-        view.show()
-        view.alpha = 1f
-        view.findViewById<TextView>(R.id.hiddenTextCta).text = daxText.html(view.context)
-        view.findViewById<View>(R.id.primaryCta).gone()
-        view.findViewById<TypeAnimationTextView>(R.id.dialogTextCta).startTypingAnimation(daxText, true)
-    }
-
-    override fun pixelCancelParameters(): Map<String, String> = emptyMap()
-
-    override fun pixelOkParameters(): Map<String, String> = emptyMap()
-
-    override fun pixelShownParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to addCtaToHistory(ctaPixelParam))
-
-    class TryClearDataCta(
-        override val onboardingStore: OnboardingStore,
-        override val appInstallStore: AppInstallStore,
-    ) : DaxFireDialogCta(
-        ctaId = CtaId.DAX_FIRE_BUTTON,
-        description = R.string.daxClearDataCtaText,
-        shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
-        okPixel = null,
-        cancelPixel = null,
-        ctaPixelParam = DAX_FIRE_DIALOG_CTA,
-        onboardingStore = onboardingStore,
-        appInstallStore = appInstallStore,
-    )
-}
-
 sealed class HomePanelCta(
     override val ctaId: CtaId,
     @DrawableRes open val image: Int,

@@ -183,17 +183,6 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    suspend fun getFireDialogCta(): DaxFireDialogCta? {
-        if (!daxOnboardingActive()) return null
-
-        return withContext(dispatchers.io()) {
-            if (hideTips() || daxDialogFireEducationShown() || extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) {
-                return@withContext null
-            }
-            return@withContext DaxFireDialogCta.TryClearDataCta(onboardingStore, appInstallStore)
-        }
-    }
-
     suspend fun getExperimentFireDialogCta(): OnboardingDaxDialogCta.DaxFireButtonCta? {
         if (!daxOnboardingActive() || daxDialogFireEducationShown()) return null
         return withContext(dispatchers.io()) {
