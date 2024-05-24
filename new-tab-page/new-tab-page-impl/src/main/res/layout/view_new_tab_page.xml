@@ -18,20 +18,10 @@
   -->
 
 
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/newTabLayout"
+    android:id="@+id/newTabSectionsContent"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
-    android:clipChildren="false">
-
-    <LinearLayout
-        android:id="@+id/newTabSectionsContent"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-    </LinearLayout>
-</androidx.core.widget.NestedScrollView>
+    android:orientation="vertical"/>
