@@ -28,6 +28,6 @@ import com.duckduckgo.feature.toggles.api.Toggle
 // A safeguard for this fix: https://app.asana.com/0/0/1207374732742336/1207383486029585/f
 interface ExternalAppIntentFlagsFeature {
 
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(true)
     fun self(): Toggle
 }
