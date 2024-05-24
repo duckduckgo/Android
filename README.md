@@ -1,14 +1,13 @@
 # SearxDuckGo
-
 DuckDuckGo is a superb privacy-focused browser. However, it restricts you from changing the search engine and insists on exclusive use of DuckDuckGo. The goal of this fork is to introduce the ability to **change** the **search engine**. At present you can select your search engine preference between DuckDuckGo and Searx.
 
 ## Why Searx?
 
-Searx is my preferred search engine. Searx is a free internet metasearch engine which aggregates results from more than 70 search services. Users are neither tracked nor profiled. Additionally, searx can be used over Tor for online anonymity.
+Searx is my preferred search engine. Searx is a free internet metasearch engine which aggregates results from more than 70 search services. It's also privacy focused. Additionally, searx can be used over Tor for online anonymity.
 
 You can also host your own Searx instance and set it as a search engine in your browser.
 
-To learn more about Searx, you can visit the official site - https://searx.github.io/searx/
+To learn more about Searx, you can visit the [official site](https://docs.searxng.org/index.html).
 
 ### Interesting tips
 
