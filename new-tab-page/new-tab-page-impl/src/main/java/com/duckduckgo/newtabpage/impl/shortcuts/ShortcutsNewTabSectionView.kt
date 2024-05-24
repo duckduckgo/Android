@@ -26,6 +26,7 @@ import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
@@ -44,7 +45,6 @@ import com.duckduckgo.newtabpage.impl.shortcuts.NewTabSectionsItem.ShortcutItem
 import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsAdapter.Companion.QUICK_ACCESS_GRID_MAX_COLUMNS
 import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsAdapter.Companion.QUICK_ACCESS_ITEM_MAX_SIZE_DP
 import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsViewModel.ViewState
-import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -131,8 +131,11 @@ class ShortcutsNewTabSectionView @JvmOverloads constructor(
     }
 }
 
-@ContributesMultibinding(AppScope::class)
-class FavouritesNewTabSectionPlugin @Inject constructor() : NewTabPageSectionPlugin {
+@ContributesActivePlugin(
+    AppScope::class,
+    boundType = NewTabPageSectionPlugin::class,
+)
+class ShortcutsNewTabSectionPlugin @Inject constructor() : NewTabPageSectionPlugin {
 
     override val name = NewTabPageSection.SHORTCUTS.name
 

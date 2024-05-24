@@ -18,14 +18,14 @@ package com.duckduckgo.newtabpage.impl
 
 import android.content.Context
 import android.view.View
+import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.newtabpage.api.NewTabPagePlugin
 import com.duckduckgo.newtabpage.api.NewTabPageVersion
 import com.duckduckgo.newtabpage.impl.view.NewTabPageView
-import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesActivePlugin(
     scope = AppScope::class,
     boundType = NewTabPagePlugin::class,
 )

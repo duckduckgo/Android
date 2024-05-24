@@ -18,14 +18,14 @@ package com.duckduckgo.app.browser.favorites
 
 import android.content.Context
 import android.view.View
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import com.duckduckgo.anvil.annotations.ContributesActivePlugin
+import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.newtabpage.api.NewTabPagePlugin
 import com.duckduckgo.newtabpage.api.NewTabPageVersion
 import com.duckduckgo.newtabpage.impl.NewTabPage
 import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 interface NewTabPageProvider {
@@ -43,7 +43,7 @@ class RealNewTabPageProvider @Inject constructor(
     }
 }
 
-@ContributesMultibinding(
+@ContributesActivePlugin(
     scope = AppScope::class,
     boundType = NewTabPagePlugin::class,
 )
@@ -56,7 +56,7 @@ class NewTabLegacyPage @Inject constructor() : NewTabPagePlugin {
     }
 }
 
-@ContributesPluginPoint(
+@ContributesActivePluginPoint(
     scope = AppScope::class,
     boundType = NewTabPagePlugin::class,
 )

@@ -18,14 +18,14 @@ package com.duckduckgo.app.browser.favorites
 
 import android.content.Context
 import android.view.View
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import com.duckduckgo.anvil.annotations.ContributesActivePlugin
+import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.newtabpage.api.FocusedViewPlugin
 import com.duckduckgo.newtabpage.api.FocusedViewVersion
 import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 interface FocusedViewProvider {
@@ -45,7 +45,7 @@ class RealFocusedViewProvider @Inject constructor(
     }
 }
 
-@ContributesMultibinding(
+@ContributesActivePlugin(
     scope = ActivityScope::class,
     boundType = FocusedViewPlugin::class,
 )
@@ -58,7 +58,7 @@ class FocusedLegacyPage @Inject constructor() : FocusedViewPlugin {
     }
 }
 
-@ContributesPluginPoint(
+@ContributesActivePluginPoint(
     scope = AppScope::class,
     boundType = FocusedViewPlugin::class,
 )

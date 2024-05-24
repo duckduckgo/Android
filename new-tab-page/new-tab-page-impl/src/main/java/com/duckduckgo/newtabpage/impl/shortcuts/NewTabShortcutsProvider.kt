@@ -16,13 +16,13 @@
 
 package com.duckduckgo.newtabpage.impl.shortcuts
 
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import com.duckduckgo.anvil.annotations.ContributesActivePlugin
+import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.newtabpage.api.NewTabPageShortcutPlugin
 import com.duckduckgo.newtabpage.api.NewTabShortcut
 import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 interface NewTabShortcutsProvider {
@@ -40,13 +40,16 @@ class RealNewTabPageShortcutProvider @Inject constructor(
     }
 }
 
-@ContributesPluginPoint(
+@ContributesActivePluginPoint(
     scope = AppScope::class,
     boundType = NewTabPageShortcutPlugin::class,
 )
 private interface NewTabPageShortcutPluginPointTrigger
 
-@ContributesMultibinding(AppScope::class)
+@ContributesActivePlugin(
+    AppScope::class,
+    boundType = NewTabPageShortcutPlugin::class,
+)
 class AIChatNewTabShortcutPlugin @Inject constructor() : NewTabPageShortcutPlugin {
     override fun getShortcut(): NewTabShortcut {
         return NewTabShortcut.Chat

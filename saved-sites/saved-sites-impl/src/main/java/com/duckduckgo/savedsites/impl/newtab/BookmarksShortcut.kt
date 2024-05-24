@@ -19,6 +19,7 @@ package com.duckduckgo.savedsites.impl.newtab
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.LinearLayout
+import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -29,7 +30,6 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.newtabpage.api.NewTabPageShortcutPlugin
 import com.duckduckgo.newtabpage.api.NewTabShortcut
 import com.duckduckgo.newtabpage.api.NewTabShortcut.Bookmarks
-import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
@@ -55,7 +55,10 @@ class BookmarksShortcutView @JvmOverloads constructor(
     }
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesActivePlugin(
+    AppScope::class,
+    boundType = NewTabPageShortcutPlugin::class,
+)
 class BookmarksNewTabShortcutPlugin @Inject constructor() : NewTabPageShortcutPlugin {
     override fun getShortcut(): NewTabShortcut {
         return Bookmarks

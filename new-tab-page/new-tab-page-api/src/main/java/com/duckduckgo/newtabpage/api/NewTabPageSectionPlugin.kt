@@ -18,12 +18,13 @@ package com.duckduckgo.newtabpage.api
 
 import android.content.Context
 import android.view.View
+import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 
 /**
  * This class is used to provide each of the Sections that build the New Tab Page
  * Implementation of https://app.asana.com/0/1174433894299346/12070643725750
  */
-interface NewTabPageSectionPlugin {
+interface NewTabPageSectionPlugin : ActivePluginPoint.ActivePlugin {
 
     /** Name of the focused view version */
     val name: String

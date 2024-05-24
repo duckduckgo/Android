@@ -35,5 +35,7 @@ dependencies {
     api Square.retrofit2.converter.moshi
     api "com.squareup.moshi:moshi-kotlin:_"
     api project(':privacy-config-api') // needed for ContributesRemoteFeature
+    api project(':feature-toggles-api') // needed for Active Plugins
+    api project(':app-build-config-api') // needed for Active Plugins
 }
 

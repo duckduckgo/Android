@@ -18,13 +18,14 @@ package com.duckduckgo.newtabpage.api
 
 import android.content.Context
 import android.view.View
+import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 
 /**
  * This class is used to provide one of the two different version of FocusedView
  * Legacy -> What existed before https://app.asana.com/0/1174433894299346/1207064372575037
  * New -> Implementation of https://app.asana.com/0/1174433894299346/1207064372575037
  */
-interface FocusedViewPlugin {
+interface FocusedViewPlugin : ActivePluginPoint.ActivePlugin {
 
     /** Name of the focused view version */
     val name: String

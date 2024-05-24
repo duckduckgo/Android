@@ -33,6 +33,7 @@ import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.tabs.BrowserNav
@@ -67,7 +68,6 @@ import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionsAdapter.Com
 import com.google.android.material.shape.ShapeAppearanceModel
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
-import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -306,12 +306,14 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
             ) {
                 viewModel.onDeleteFavoriteSnackbarDismissed(it)
             }
+
             is DeleteSavedSiteConfirmation -> confirmDeleteSavedSite(
                 command.savedSite,
                 context.getString(R.string.bookmarkDeleteConfirmationMessage, command.savedSite.title).html(context),
             ) {
                 viewModel.onDeleteSavedSiteSnackbarDismissed(it)
             }
+
             is ShowEditSavedSiteDialog -> TODO()
         }
     }
@@ -343,7 +345,10 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
     }
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesActivePlugin(
+    AppScope::class,
+    boundType = NewTabPageSectionPlugin::class,
+)
 class FavouritesNewTabSectionPlugin @Inject constructor() : NewTabPageSectionPlugin {
     override val name = NewTabPageSection.FAVOURITES.name
 

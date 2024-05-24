@@ -30,6 +30,7 @@ import androidx.core.os.bundleOf
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
+import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.common.ui.view.gone
@@ -56,7 +57,6 @@ import com.duckduckgo.remote.messaging.impl.newtab.RemoteMessageViewModel.Comman
 import com.duckduckgo.remote.messaging.impl.newtab.RemoteMessageViewModel.Command.SharePromoLinkRMF
 import com.duckduckgo.remote.messaging.impl.newtab.RemoteMessageViewModel.Command.SubmitUrl
 import com.duckduckgo.remote.messaging.impl.newtab.RemoteMessageViewModel.ViewState
-import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -210,8 +210,11 @@ class RemoteMessageView @JvmOverloads constructor(
     }
 }
 
-@ContributesMultibinding(AppScope::class)
-class FavouritesNewTabSectionPlugin @Inject constructor() : NewTabPageSectionPlugin {
+@ContributesActivePlugin(
+    AppScope::class,
+    boundType = NewTabPageSectionPlugin::class,
+)
+class RemoteMessageNewTabSectionPlugin @Inject constructor() : NewTabPageSectionPlugin {
     override val name = NewTabPageSection.REMOTE_MESSAGING_FRAMEWORK.name
 
     override fun getView(context: Context): View {
