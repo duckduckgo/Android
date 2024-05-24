@@ -153,11 +153,11 @@
 
     <!-- About -->
     <string name="netpManagementAboutHeader">About</string>
-    <string name="netpManagementAboutItemFaqs">Frequently Asked Questions</string>
+    <string name="netpManagementAboutItemFaqs">FAQs and Support</string>
     <string name="netpManagementAboutItemShareFeedback">Share VPN Feedback</string>
 
     <!-- FAQS -->
-    <string name="netpFaqTitle">Frequently Asked Questions</string>
+    <string name="netpFaqTitle">FAQs and Support</string>
     <string name="netpFaqQuestionOne">How does DuckDuckGo VPN work?</string>
     <string name="netpFaqAnswerOne">The VPN uses the open source WireGuard protocol to configure a virtual private network (VPN) on your device. When enabled, all of your device traffic is first encrypted and then routed through the nearest VPN server to protect your browsing activity from Internet service providers and hide your location from apps and sites you visit.</string>
     <string name="netpFaqQuestionTwo">Is only my web browsing protected?</string>
