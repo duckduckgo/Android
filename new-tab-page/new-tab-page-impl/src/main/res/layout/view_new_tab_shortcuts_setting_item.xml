@@ -20,8 +20,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:primaryText="@string/newTabPageFavorites"
-    app:leadingIcon="@drawable/ic_favorite_24"
+    app:primaryText="@string/newTabPageShortcuts"
+    app:leadingIcon="@drawable/ic_shortcut_16"
     app:showSwitch="true"
     app:leadingIconSize="medium"
     app:leadingIconBackground="circular"/>
