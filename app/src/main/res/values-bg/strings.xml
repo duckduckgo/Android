@@ -843,10 +843,14 @@
     <string name="preOnboardingDaxDialog3Button">Стартиране на сърфирането</string>
     <string name="onboardingSearchDaxDialogTitle">Опитайте търсене!</string>
     <string name="onboardingSearchDaxDialogDescription">Търсенето в DuckDuckGo винаги е анонимно.</string>
-    <string name="onboardingSearchDaxDialogOption1">как се казва „патица“ на испански</string>
-    <string name="onboardingSearchDaxDialogOption2">прогнозата на мощните патици</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">как се казва „патица“ на английски</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">как се казва „патица“ на испански</string>
+    <string name="onboardingSearchQueryOption1">как се нарича патицата на английски</string>
+    <string name="onboardingSearchQueryOption1English">как се казва „патица“ на испански</string>
+    <string name="onboardingSearchDaxDialogOption2">актьори в аватар</string>
     <string name="onboardingSearchDaxDialogOption3">местното време</string>
     <string name="onboardingSearchDaxDialogOption4">Изненадайте ме!</string>
+    <string name="onboardingSearchQueryOption4">рецепти за вечеря</string>
     <string name="onboardingSitesDaxDialogTitle">Опитайте да посетите сайт!</string>
     <string name="onboardingSitesDaxDialogDescription">Ще блокирам тракерите, за да не ви шпионират.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
@@ -868,5 +872,6 @@
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Незабавно изчистване на дейностите при сърфиране с <b>Fire Button</b>.<br/><br/>Изпробвайте го! ☝️️]]></string>
     <string name="onboardingEndDaxDialogTitle">"Справихте се!"</string>
     <string name="onboardingEndDaxDialogDescription">Запомнете: всеки път, когато сърфирате с мен, аз ще подрязвам крилцата на досадните реклами. 👌</string>
+    <string name="onboardingEndDaxDialogButton">Готово!</string>
 
 </resources>
