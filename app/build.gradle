@@ -65,6 +65,7 @@ android {
         coreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+        incremental = false
     }
     kotlin {
         jvmToolchain(17)

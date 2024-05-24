@@ -91,6 +91,7 @@ class SettingsViewModel @Inject constructor(
         data object LaunchPermissionsScreen : Command()
         data object LaunchAppearanceScreen : Command()
         data object LaunchAboutScreen : Command()
+        data object LaunchSearchEngineScreen : Command()
     }
 
     private val viewState = MutableStateFlow(ViewState())
@@ -250,6 +251,10 @@ class SettingsViewModel @Inject constructor(
     fun onFireButtonSettingClicked() {
         viewModelScope.launch { command.send(Command.LaunchFireButtonScreen) }
         pixel.fire(SETTINGS_FIRE_BUTTON_PRESSED)
+    }
+
+    fun onSearchEngineSettingClicked() {
+        viewModelScope.launch { command.send(Command.LaunchSearchEngineScreen) }
     }
 
     fun onPermissionsSettingClicked() {

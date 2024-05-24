@@ -427,6 +427,11 @@
             android:label="@string/fireButtonActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <activity
+            android:name="com.duckduckgo.app.searchengine.SearchEngineActivity"
+            android:exported="false"
+            android:label="@string/searchEngineActivityTitle"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+        <activity
             android:name="com.duckduckgo.app.permissions.PermissionsActivity"
             android:exported="false"
             android:label="@string/permissionsActivityTitle"

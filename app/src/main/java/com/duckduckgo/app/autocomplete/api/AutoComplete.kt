@@ -21,8 +21,8 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.app.browser.UriString
-import com.duckduckgo.app.searchengines.DuckDuckGoSearchEngine
-import com.duckduckgo.app.searchengines.SearxSearchEngine
+import com.duckduckgo.app.searchengine.DuckDuckGoSearchEngine
+import com.duckduckgo.app.searchengine.SearxSearchEngine
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.toStringDropScheme

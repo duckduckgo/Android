@@ -23,9 +23,9 @@ import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.ASK_EVERY_TIME
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.NEVER
 import com.duckduckgo.app.icon.api.AppIcon
-import com.duckduckgo.app.searchengines.DuckDuckGoSearchEngine
-import com.duckduckgo.app.searchengines.SearchEngine
-import com.duckduckgo.app.searchengines.SearxSearchEngine
+import com.duckduckgo.app.searchengine.DuckDuckGoSearchEngine
+import com.duckduckgo.app.searchengine.SearchEngine
+import com.duckduckgo.app.searchengine.SearxSearchEngine
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireAnimation
@@ -71,6 +71,7 @@ interface SettingsDataStore {
     fun isCurrentlySelected(clearWhatOption: ClearWhatOption): Boolean
     fun isCurrentlySelected(clearWhenOption: ClearWhenOption): Boolean
     fun isCurrentlySelected(fireAnimation: FireAnimation): Boolean
+    fun isCurrentlySelected(searchEngine: SearchEngine): Boolean
     fun hasBackgroundTimestampRecorded(): Boolean
     fun clearAppBackgroundTimestamp()
 
@@ -212,6 +213,10 @@ class SettingsSharedPreferences @Inject constructor(
 
     override fun isCurrentlySelected(fireAnimation: FireAnimation): Boolean {
         return selectedFireAnimationSavedValue() == fireAnimation
+    }
+
+    override fun isCurrentlySelected(searchEngine: SearchEngine): Boolean {
+        return this.searchEngine == searchEngine
     }
 
     override var notifyMeInDownloadsDismissed: Boolean

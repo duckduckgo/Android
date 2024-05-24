@@ -56,6 +56,12 @@
         app:primaryText="@string/settingsFireButton" />
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        android:id="@+id/searchEngineSetting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/settingsSearchEngine" />
+
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/permissionsSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

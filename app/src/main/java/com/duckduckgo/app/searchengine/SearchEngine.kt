@@ -14,26 +14,49 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.searchengines
+package com.duckduckgo.app.searchengine
 
+import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.settings.clear.FireAnimation
+import com.duckduckgo.app.settings.clear.FireAnimation.HeroAbstract
+import com.duckduckgo.app.settings.clear.FireAnimation.HeroFire
+import com.duckduckgo.app.settings.clear.FireAnimation.HeroWater
+import com.duckduckgo.app.settings.clear.FireAnimation.None
 import com.duckduckgo.common.utils.AppUrl
+import java.io.Serializable
 import java.net.MalformedURLException
 import java.net.URL
 import kotlin.jvm.Throws
 
-sealed class SearchEngine {
+sealed class SearchEngine(
+    val nameResId: Int,
+) : Serializable {
     abstract val host: String
     abstract val home: String
     abstract val autocomplete: String
+
+    fun getOptionIndex(): Int {
+        return when (this) {
+            DuckDuckGoSearchEngine -> 1
+            is SearxSearchEngine -> 2
+        }
+    }
+
+    fun Int.getSearchEngineForIndex(searxInstance: String): SearchEngine {
+        return when (this) {
+            2 -> SearxSearchEngine(searxInstance)
+            else -> DuckDuckGoSearchEngine
+        }
+    }
 }
 
-data object DuckDuckGoSearchEngine : SearchEngine() {
+data object DuckDuckGoSearchEngine : SearchEngine(R.string.settingsSearchEngineDuckduckgo) {
     override val host: String = AppUrl.Url.HOST
     override val home: String = AppUrl.Url.HOME
     override val autocomplete: String = AppUrl.Url.API + "/ac/"
 }
 
-class SearxSearchEngine @Throws(MalformedURLException::class) constructor(override val home: String) : SearchEngine() {
+class SearxSearchEngine @Throws(MalformedURLException::class) constructor(override val home: String) : SearchEngine(R.string.settingsSearchEngineSearx) {
     override val host: String = URL(home).host
     override val autocomplete: String = if (home.endsWith("/")) "${home}autocompleter" else "$home/autocompleter"
 }

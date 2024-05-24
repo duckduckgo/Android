@@ -40,6 +40,7 @@ import com.duckduckgo.app.permissions.PermissionsScreenNoParams
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.PRIVACY_PRO_IS_ENABLED_AND_ELIGIBLE
 import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
+import com.duckduckgo.app.searchengine.SearchEngineScreenNoParams
 import com.duckduckgo.app.settings.SettingsViewModel.Command
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.DAILY
@@ -146,6 +147,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             autofillLoginsSetting.setClickListener { viewModel.onAutofillSettingsClick() }
             syncSetting.setClickListener { viewModel.onSyncSettingClicked() }
             fireButtonSetting.setClickListener { viewModel.onFireButtonSettingClicked() }
+            searchEngineSetting.setClickListener { viewModel.onSearchEngineSettingClicked() }
             permissionsSetting.setClickListener { viewModel.onPermissionsSettingClicked() }
             appearanceSetting.setClickListener { viewModel.onAppearanceSettingClicked() }
             accessibilitySetting.setClickListener { viewModel.onAccessibilitySettingClicked() }
@@ -269,6 +271,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             is Command.LaunchPermissionsScreen -> launchPermissionsScreen()
             is Command.LaunchAppearanceScreen -> launchAppearanceScreen()
             is Command.LaunchAboutScreen -> launchAboutScreen()
+            is Command.LaunchSearchEngineScreen -> launchSearchEngineScreen()
             null -> TODO()
         }
     }
@@ -383,6 +386,11 @@ class SettingsActivity : DuckDuckGoActivity() {
     private fun launchFireButtonScreen() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
         globalActivityStarter.start(this, FireButtonScreenNoParams, options)
+    }
+
+    private fun launchSearchEngineScreen() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        globalActivityStarter.start(this, SearchEngineScreenNoParams, options)
     }
 
     private fun launchPermissionsScreen() {
