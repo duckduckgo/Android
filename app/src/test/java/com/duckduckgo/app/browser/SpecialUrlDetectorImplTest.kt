@@ -27,11 +27,14 @@ import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.*
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.EMAIL_MAX_LENGTH
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.PHONE_MAX_LENGTH
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.SMS_MAX_LENGTH
+import com.duckduckgo.app.browser.applinks.ExternalAppIntentFlagsFeature
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.privacy.config.api.AmpLinkType
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.subscriptions.api.Subscriptions
 import java.net.URISyntaxException
+import junit.framework.TestCase.assertNull
 import junit.framework.TestCase.assertTrue
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -60,6 +63,12 @@ class SpecialUrlDetectorImplTest {
     @Mock
     lateinit var subscriptions: Subscriptions
 
+    @Mock
+    lateinit var externalAppIntentFlagsFeature: ExternalAppIntentFlagsFeature
+
+    @Mock
+    lateinit var mockToggle: Toggle
+
     @Before
     fun setup() {
         MockitoAnnotations.openMocks(this)
@@ -68,6 +77,7 @@ class SpecialUrlDetectorImplTest {
             ampLinks = mockAmpLinks,
             trackingParameters = mockTrackingParameters,
             subscriptions = subscriptions,
+            externalAppIntentFlagsFeature = externalAppIntentFlagsFeature,
         )
         whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(emptyList())
     }
@@ -247,9 +257,23 @@ class SpecialUrlDetectorImplTest {
     }
 
     @Test
-    fun whenUrlIsCustomUriSchemeThenNonHttpAppLinkTypeDetected() {
+    fun whenUrlIsCustomUriSchemeThenNonHttpAppLinkTypeDetectedWithAdditionalIntentFlags() {
+        whenever(mockToggle.isEnabled()).thenReturn(true)
+        whenever(externalAppIntentFlagsFeature.self()).thenReturn(mockToggle)
         val type = testee.determineType("myapp:foo bar") as NonHttpAppLink
         assertEquals("myapp:foo bar", type.uriString)
+        assertEquals(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP, type.intent.flags)
+        assertEquals(Intent.CATEGORY_BROWSABLE, type.intent.categories.first())
+    }
+
+    @Test
+    fun whenUrlIsCustomUriSchemeThenNonHttpAppLinkTypeDetectedWithoutAdditionalIntentFlags() {
+        whenever(mockToggle.isEnabled()).thenReturn(false)
+        whenever(externalAppIntentFlagsFeature.self()).thenReturn(mockToggle)
+        val type = testee.determineType("myapp:foo bar") as NonHttpAppLink
+        assertEquals("myapp:foo bar", type.uriString)
+        assertEquals(0, type.intent.flags)
+        assertNull(type.intent.categories)
     }
 
     @Test
