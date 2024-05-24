@@ -38,6 +38,7 @@ import org.jetbrains.uast.UClass
 import org.jetbrains.uast.UElement
 import org.jetbrains.uast.getParentOfType
 import org.jetbrains.uast.kotlin.KotlinUMethod
+import java.io.IOException
 import java.lang.StringBuilder
 import java.util.EnumSet
 import kotlin.LazyThreadSafetyMode.SYNCHRONIZED
@@ -119,7 +120,7 @@ class TestFunctionNameDetector : Detector(), SourceCodeScanner {
         }
     }
 
-    enum class Error(val message: String) {
+    private enum class Error(val message: String) {
         BACKTICKS("Test name should be in backticks."),
         PARTS("Test name should have two or three parts separated by a spaced hyphen in the form `functionUnderTest - state - expected outcome`"),
         CAPITALIZATION("Test name parts should not be capitalized")
@@ -192,6 +193,34 @@ class TestFunctionNameDetector : Detector(), SourceCodeScanner {
      * See: https://kotlinlang.org/spec/syntax-and-grammar.html#grammar-rule-Identifier
      */
     private val illegalChars = hashSetOf('.', ';', '[', ']', '/', '<', '>', ':', '\\')
+
+    private fun <T> retryWithExponentialBackoff(
+        initialDelayMillis: Long = 1000L,
+        maxDelayMillis: Long = 16000L,
+        factor: Double = 2.0,
+        maxAttempts: Int = 5,
+        action: () -> T
+    ): T {
+        var currentDelay = initialDelayMillis
+        var attempt = 0
+
+        while (attempt < maxAttempts) {
+            try {
+                return action()
+            } catch (e: Exception) {
+                attempt++
+                if (attempt >= maxAttempts) {
+                    throw e // Rethrow the exception if maximum attempts are reached.
+                }
+
+                // Just sleep since we're running in batch mode.
+                Thread.sleep(currentDelay)
+
+                currentDelay = (currentDelay * factor).toLong().coerceAtMost(maxDelayMillis)
+            }
+        }
+        throw IOException("Failed after $maxAttempts attempts")
+    }
 
     companion object {
 
