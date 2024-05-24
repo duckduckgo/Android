@@ -54,12 +54,13 @@ class RealAutoCompleteScorer @Inject constructor() : AutoCompleteScorer {
             score += 300
             // Prioritize root URLs most
             if (url.isRoot()) score += 2000
-        } else if (lowercasedTitle.startsWith(query)) {
+        } else if (lowercasedTitle.startsWith(query, ignoreCase = true)) {
             score += 200
             if (url.isRoot()) score += 2000
-        } else if (queryCount > 2 && domain.contains(query)) {
+        } else if (queryCount > 2 && domain.contains(query, ignoreCase = true)) {
             score += 150
-        } else if (queryCount > 2 && lowercasedTitle.contains(" $query")) { // Exact match from the beginning of the word within string.
+            // Exact match from the beginning of the word within string.
+        } else if (queryCount > 2 && lowercasedTitle.contains(" $query", ignoreCase = true)) {
             score += 100
         } else {
             // Tokenized matches
@@ -67,7 +68,11 @@ class RealAutoCompleteScorer @Inject constructor() : AutoCompleteScorer {
                 var matchesAllTokens = true
                 for (token in tokens) {
                     // Match only from the beginning of the word to avoid unintuitive matches.
-                    if (!lowercasedTitle.startsWith(token) && !lowercasedTitle.contains(" $token") && !nakedUrl.startsWith(token)) {
+                    if (
+                        !lowercasedTitle.startsWith(token, ignoreCase = true) &&
+                        !lowercasedTitle.contains(" $token", ignoreCase = true) &&
+                        !nakedUrl.startsWith(token, ignoreCase = true)
+                    ) {
                         matchesAllTokens = false
                         break
                     }
@@ -80,9 +85,9 @@ class RealAutoCompleteScorer @Inject constructor() : AutoCompleteScorer {
                     // Boost score if first token matches:
                     val firstToken = tokens.firstOrNull()
                     if (firstToken != null) { // nakedUrlString - high score boost
-                        if (nakedUrl.startsWith(firstToken)) {
+                        if (nakedUrl.startsWith(firstToken, ignoreCase = true)) {
                             score += 70
-                        } else if (lowercasedTitle.startsWith(firstToken)) { // beginning of the title - moderate score boost
+                        } else if (lowercasedTitle.startsWith(firstToken, ignoreCase = true)) { // beginning of the title - moderate score boost
                             score += 50
                         }
                     }
