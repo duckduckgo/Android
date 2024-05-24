@@ -26,5 +26,6 @@ import retrofit2.http.GET
 @ContributesServiceApi(AppScope::class)
 interface PrivacyConfigService {
     @GET(PRIVACY_REMOTE_CONFIG_URL)
+    // @GET("https://jsonblob.com/api/jsonBlob/1243573265112096768")
     suspend fun privacyConfig(): Response<JsonPrivacyConfig>
 }

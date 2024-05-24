@@ -28,9 +28,11 @@ import com.duckduckgo.newtabpage.impl.shortcuts.NewTabSectionsItem.ShortcutItem
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import logcat.logcat
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ViewScope::class)
@@ -49,12 +51,15 @@ class ShortcutsViewModel @Inject constructor(
         super.onStart(owner)
 
         viewModelScope.launch(dispatchers.io()) {
-            val shortcuts = newTabShortcutsProvider.provideShortcuts().map { ShortcutItem(it.getShortcut()) }
-            withContext(dispatchers.main()) {
-                _viewState.update {
-                    viewState.value.copy(
-                        shortcuts = shortcuts,
-                    )
+            newTabShortcutsProvider.provideShortcuts().onEach { views ->
+                logcat { "New Tab: Shortcuts $views " }
+                val shortcuts = views.map { ShortcutItem(it.getShortcut()) }
+                withContext(dispatchers.main()) {
+                    _viewState.update {
+                        viewState.value.copy(
+                            shortcuts = shortcuts,
+                        )
+                    }
                 }
             }
         }

@@ -20,28 +20,30 @@ import android.content.Context
 import android.view.View
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
-import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.newtabpage.api.FocusedViewPlugin
 import com.duckduckgo.newtabpage.api.FocusedViewVersion
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 interface FocusedViewProvider {
 
-    fun provideFocusedViewVersion(): FocusedViewPlugin
+    fun provideFocusedViewVersion(): Flow<FocusedViewPlugin>
 }
 
 @ContributesBinding(
     scope = ActivityScope::class,
 )
 class RealFocusedViewProvider @Inject constructor(
-    private val focusedViewVersions: PluginPoint<FocusedViewPlugin>,
+    private val focusedViewVersions: ActivePluginPoint<@JvmSuppressWildcards FocusedViewPlugin>,
 ) : FocusedViewProvider {
-    override fun provideFocusedViewVersion(): FocusedViewPlugin {
-        val focusedView = focusedViewVersions.getPlugins().firstOrNull { it.name == FocusedViewVersion.LEGACY.name }
-        return focusedView ?: FocusedLegacyPage()
+    override fun provideFocusedViewVersion(): Flow<FocusedViewPlugin> = flow {
+        val focusedView = focusedViewVersions.getPlugins().firstOrNull() ?: FocusedLegacyPage()
+        emit(focusedView)
     }
 }
 

@@ -62,7 +62,7 @@ class NewTabPageView @JvmOverloads constructor(
     private fun setupRemoteSections() {
         newTabSectionsProvider.provideSections()
             .onEach { views ->
-                logcat { "New Tab: setupRemoteSections $views" }
+                logcat { "New Tab: Sections $views" }
                 views.forEach {
                     binding.newTabSectionsContent.addView(
                         it.getView(context),

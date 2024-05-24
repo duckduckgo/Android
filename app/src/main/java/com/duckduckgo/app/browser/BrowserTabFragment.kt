@@ -2105,13 +2105,16 @@ class BrowserTabFragment :
     }
 
     private fun configureFocusedView() {
-        binding.focusedViewContainerLayout.addView(
-            focusedViewProvider.provideFocusedViewVersion().getView(requireContext()),
-            LayoutParams(
-                LayoutParams.MATCH_PARENT,
-                LayoutParams.MATCH_PARENT,
-            ),
-        )
+        focusedViewProvider.provideFocusedViewVersion().onEach { focusedView ->
+            Timber.d("New Tab: Focused View $focusedView")
+            binding.focusedViewContainerLayout.addView(
+                focusedView.getView(requireContext()),
+                LayoutParams(
+                    LayoutParams.MATCH_PARENT,
+                    LayoutParams.MATCH_PARENT,
+                ),
+            )
+        }
     }
 
     private fun configureNewTab() {
@@ -2123,13 +2126,16 @@ class BrowserTabFragment :
             }
         }
 
-        newBrowserTab.newTabContainerLayout.addView(
-            NewTabLegacyPageView(requireContext()),
-            LayoutParams(
-                LayoutParams.MATCH_PARENT,
-                LayoutParams.MATCH_PARENT,
-            ),
-        )
+        newTabPageProvider.provideNewTabPageVersion().onEach { newTabPage ->
+            Timber.d("New Tab: Page $newTabPage")
+            newBrowserTab.newTabContainerLayout.addView(
+                newTabPage.getView(requireContext()),
+                LayoutParams(
+                    LayoutParams.MATCH_PARENT,
+                    LayoutParams.MATCH_PARENT,
+                ),
+            )
+        }
     }
 
     private fun configurePrivacyShield() {
@@ -2160,9 +2166,11 @@ class BrowserTabFragment :
                 viewModel.triggerAutocomplete(omnibar.omnibarTextInput.text.toString(), hasFocus, false)
                 if (hasFocus) {
                     cancelPendingAutofillRequestsToChooseCredentials()
+                    omnibar.omniBarContainer.isPressed = true
                 } else {
                     omnibar.omnibarTextInput.hideKeyboard()
                     binding.focusDummy.requestFocus()
+                    omnibar.omniBarContainer.isPressed = false
                 }
             }
 
@@ -3714,11 +3722,6 @@ class BrowserTabFragment :
                 }
             }
             newBrowserTab.newTabLayout.setOnClickListener { daxDialogIntroBubbleCta.dialogTextCta.finishAnimation() }
-            if (appTheme.isLightModeEnabled()) {
-                newBrowserTab.browserBackground.setBackgroundResource(R.drawable.onboarding_experiment_background_bitmap_light)
-            } else {
-                newBrowserTab.browserBackground.setBackgroundResource(R.drawable.onboarding_experiment_background_bitmap_dark)
-            }
 
             viewModel.onCtaShown()
         }

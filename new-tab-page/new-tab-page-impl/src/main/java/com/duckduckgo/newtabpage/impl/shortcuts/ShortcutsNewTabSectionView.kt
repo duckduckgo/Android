@@ -41,7 +41,6 @@ import com.duckduckgo.newtabpage.api.NewTabPageSectionPlugin
 import com.duckduckgo.newtabpage.api.NewTabShortcut.Bookmarks
 import com.duckduckgo.newtabpage.api.NewTabShortcut.Chat
 import com.duckduckgo.newtabpage.impl.databinding.ViewNewTabShortcutsSectionBinding
-import com.duckduckgo.newtabpage.impl.shortcuts.NewTabSectionsItem.ShortcutItem
 import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsAdapter.Companion.QUICK_ACCESS_GRID_MAX_COLUMNS
 import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsAdapter.Companion.QUICK_ACCESS_ITEM_MAX_SIZE_DP
 import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsViewModel.ViewState
@@ -91,12 +90,11 @@ class ShortcutsNewTabSectionView @JvmOverloads constructor(
         @SuppressLint("NoHardcodedCoroutineDispatcher")
         coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
+        configureGrid()
+
         viewModel.viewState
             .onEach { render(it) }
             .launchIn(coroutineScope!!)
-
-        configureGrid()
-        setupRemoteShortcuts()
     }
 
     private fun render(viewState: ViewState) {
@@ -119,11 +117,6 @@ class ShortcutsNewTabSectionView @JvmOverloads constructor(
         val numOfColumns = gridColumnCalculator.calculateNumberOfColumns(QUICK_ACCESS_ITEM_MAX_SIZE_DP, QUICK_ACCESS_GRID_MAX_COLUMNS)
         val layoutManager = GridLayoutManager(context, numOfColumns)
         recyclerView.layoutManager = layoutManager
-    }
-
-    private fun setupRemoteShortcuts() {
-        val shortcuts = newTabShortcutsProvider.provideShortcuts().map { ShortcutItem(it.getShortcut()) }
-        adapter.submitList(shortcuts)
     }
 
     companion object {

@@ -24,10 +24,11 @@ import com.duckduckgo.newtabpage.api.NewTabPageShortcutPlugin
 import com.duckduckgo.newtabpage.api.NewTabShortcut
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 interface NewTabShortcutsProvider {
-    fun provideShortcuts(): List<NewTabPageShortcutPlugin>
+    fun provideShortcuts(): Flow<List<NewTabPageShortcutPlugin>>
 }
 
 @ContributesBinding(
@@ -36,10 +37,8 @@ interface NewTabShortcutsProvider {
 class RealNewTabPageShortcutProvider @Inject constructor(
     private val newTabPageSections: ActivePluginPoint<@JvmSuppressWildcards NewTabPageShortcutPlugin>,
 ) : NewTabShortcutsProvider {
-    override fun provideShortcuts(): List<NewTabPageShortcutPlugin> {
-        return runBlocking {
-            newTabPageSections.getPlugins().map { it }
-        }
+    override fun provideShortcuts(): Flow<List<NewTabPageShortcutPlugin>> = flow {
+        emit(newTabPageSections.getPlugins().map { it })
     }
 }
 
