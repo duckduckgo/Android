@@ -45,6 +45,13 @@
                 app:primaryTextTruncated="false"
                 tools:secondaryText="test test test" />
 
+            <com.duckduckgo.common.ui.view.text.DaxTextInput
+                android:id="@+id/searxInstanceSetting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/settingsSearxInstanceInputHint"
+                app:type="single_line"
+                />
         </LinearLayout>
     </ScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

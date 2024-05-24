@@ -195,7 +195,7 @@ class SettingsSharedPreferences @Inject constructor(
         }
 
     override var searxInstance: String
-        get() = preferences.getString(SEARX_INSTANCE, null) ?: "https://searx.hu/"
+        get() = preferences.getString(SEARX_INSTANCE, null) ?: DEFAULT_SEARX_INSTANCE
         set(value) = preferences.edit { putString(SEARX_INSTANCE, value) }
 
     override fun hasBackgroundTimestampRecorded(): Boolean = preferences.contains(KEY_APP_BACKGROUNDED_TIMESTAMP)
@@ -249,6 +249,8 @@ class SettingsSharedPreferences @Inject constructor(
     }
 
     companion object {
+        const val DEFAULT_SEARX_INSTANCE = "https://searx.hu/"
+
         const val FILENAME = "com.duckduckgo.app.settings_activity.settings"
         const val KEY_BACKGROUND_JOB_ID = "BACKGROUND_JOB_ID"
         const val KEY_AUTOCOMPLETE_ENABLED = "AUTOCOMPLETE_ENABLED"

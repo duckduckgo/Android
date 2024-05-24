@@ -19,9 +19,8 @@ package com.duckduckgo.app.searchengine
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.settings.clear.ClearWhatOption
-import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.settings.db.SettingsSharedPreferences
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -41,12 +40,7 @@ class SearchEngineViewModel @Inject constructor(
 
     data class ViewState(
         val selectedSearchEngine: SearchEngine = DuckDuckGoSearchEngine,
-    )
-
-    data class AutomaticallyClearData(
-        val clearWhatOption: ClearWhatOption,
-        val clearWhenOption: ClearWhenOption,
-        val clearWhenOptionEnabled: Boolean = true,
+        val selectedSearxInstance: String = SettingsSharedPreferences.DEFAULT_SEARX_INSTANCE,
     )
 
     sealed class Command {
@@ -61,6 +55,7 @@ class SearchEngineViewModel @Inject constructor(
             viewState.emit(
                 ViewState(
                     selectedSearchEngine = settingsDataStore.searchEngine,
+                    selectedSearxInstance = settingsDataStore.searxInstance,
                 ),
             )
         }
@@ -85,8 +80,15 @@ class SearchEngineViewModel @Inject constructor(
         }
     }
 
-    private fun isAutomaticallyClearingDataWhenSettingEnabled(clearWhatOption: ClearWhatOption?): Boolean {
-        return clearWhatOption != null && clearWhatOption != ClearWhatOption.CLEAR_NONE
+    fun onSearxInstanceUpdated(searxInstance: String) {
+        if (settingsDataStore.searxInstance == searxInstance) {
+            Timber.v("User selected same thing they already have set: $searxInstance; no need to do anything else")
+            return
+        }
+        settingsDataStore.searxInstance = searxInstance
+        viewModelScope.launch {
+            viewState.emit(currentViewState().copy(selectedSearxInstance = searxInstance))
+        }
     }
 
     private fun currentViewState(): ViewState {

@@ -178,6 +178,11 @@
 
     <!-- Search Engine -->
     <string name="searchEngineActivityTitle">Search engine</string>
+    <string name="settingsSearchEngine">Search Engine</string>
+    <string name="settingsSearchEngineDuckduckgo">DuckDuckGo</string>
+    <string name="settingsSearchEngineSearx">Searx</string>
+    <string name="settingsSelectSearchEngineDialogSave">Save</string>
+    <string name="settingsSearxInstanceInputHint">Searx instance</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Permissions</string>
@@ -202,11 +207,6 @@
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">App exit, inactive for 15 minutes</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">App exit, inactive for 30 minutes</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">App exit, inactive for 1 hour</string>
-
-    <string name="settingsSearchEngine">Search Engine</string>
-    <string name="settingsSearchEngineDuckduckgo">DuckDuckGo</string>
-    <string name="settingsSearchEngineSearx">Searx</string>
-    <string name="settingsSelectSearchEngineDialogSave">Save</string>
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">About DuckDuckGo</string>

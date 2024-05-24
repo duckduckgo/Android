@@ -17,6 +17,7 @@
 package com.duckduckgo.app.searchengine
 
 import android.os.Bundle
+import android.view.inputmethod.EditorInfo
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -30,6 +31,9 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
+import com.duckduckgo.common.ui.view.hide
+import com.duckduckgo.common.ui.view.hideKeyboard
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.flow.launchIn
@@ -55,12 +59,20 @@ class SearchEngineActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
 
-        configureUiEventHandlers()
+         configureUiEventHandlers()
         observeViewModel()
     }
 
     private fun configureUiEventHandlers() {
         binding.searchEngineSetting.setClickListener { viewModel.userRequestedToChangeSearchEngine() }
+        binding.searxInstanceSetting.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                viewModel.onSearxInstanceUpdated(binding.searxInstanceSetting.text)
+                binding.searxInstanceSetting.hideKeyboard()
+                return@setOnEditorActionListener true
+            }
+            return@setOnEditorActionListener false
+        }
     }
 
     private fun observeViewModel() {
@@ -69,6 +81,7 @@ class SearchEngineActivity : DuckDuckGoActivity() {
             .onEach { viewState ->
                 viewState.let {
                     updateSelectedSearchEngine(it.selectedSearchEngine)
+                    updateSelectedSearxInstance(it.selectedSearchEngine, it.selectedSearxInstance)
                 }
             }.launchIn(lifecycleScope)
 
@@ -81,6 +94,15 @@ class SearchEngineActivity : DuckDuckGoActivity() {
     private fun updateSelectedSearchEngine(searchEngine: SearchEngine) {
         val subtitle = getString(searchEngine.nameResId)
         binding.searchEngineSetting.setSecondaryText(subtitle)
+    }
+
+    private fun updateSelectedSearxInstance(searchEngine: SearchEngine, searxInstance: String) {
+        if (searchEngine is SearxSearchEngine) {
+            binding.searxInstanceSetting.show()
+        } else {
+            binding.searxInstanceSetting.hide()
+        }
+        binding.searxInstanceSetting.text = searxInstance
     }
 
     private fun processCommand(it: Command) {
