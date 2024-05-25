@@ -223,7 +223,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
         skipHome: Boolean,
     ): BrowserTabFragment {
         Timber.i("Opening new tab, url: $url, tabId: $tabId")
-        val fragment = BrowserTabFragment.newInstance(tabId, url, skipHome)
+        val startPageUrl = settingsDataStore.startPage
+        val urlToOpen = if (url.isNullOrEmpty() && settingsDataStore.customStartPage && !startPageUrl.isNullOrEmpty()) {
+            startPageUrl
+        } else {
+            url
+        }
+        val fragment = BrowserTabFragment.newInstance(tabId, urlToOpen, skipHome)
         addOrReplaceNewTab(fragment, tabId)
         currentTab = fragment
         return fragment
