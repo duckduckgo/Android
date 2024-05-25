@@ -75,6 +75,11 @@ class SearchEngineActivity : DuckDuckGoActivity() {
             }
             return@setOnEditorActionListener false
         }
+        binding.startPageSetting.addFocusChangedListener { _, hasFocus ->
+            if (!hasFocus) {
+                viewModel.onStartPageUrlUpdated(binding.startPageSetting.text)
+            }
+        }
 
         binding.searchEngineSetting.setClickListener { viewModel.userRequestedToChangeSearchEngine() }
         binding.searxInstanceSetting.setOnEditorActionListener { _, actionId, _ ->
