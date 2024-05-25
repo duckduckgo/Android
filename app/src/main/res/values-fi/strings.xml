@@ -843,10 +843,14 @@
     <string name="preOnboardingDaxDialog3Button">Aloita selailu</string>
     <string name="onboardingSearchDaxDialogTitle">Kokeile hakua!</string>
     <string name="onboardingSearchDaxDialogDescription">DuckDuckGo-hakusi ovat aina nimettömiä.</string>
-    <string name="onboardingSearchDaxDialogOption1">kuinka sanotaan \"duck\" espanjaksi</string>
-    <string name="onboardingSearchDaxDialogOption2">mighty ducks cast</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">miten sanotaan \"ankka\" englanniksi</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">kuinka sanotaan \"duck\" espanjaksi</string>
+    <string name="onboardingSearchQueryOption1">miten sanotaan ankka englanniksi</string>
+    <string name="onboardingSearchQueryOption1English">miten sanotaan ankka espanjaksi</string>
+    <string name="onboardingSearchDaxDialogOption2">avatarmuotti</string>
     <string name="onboardingSearchDaxDialogOption3">paikallissää</string>
     <string name="onboardingSearchDaxDialogOption4">Yllätä minut!</string>
+    <string name="onboardingSearchQueryOption4">illallisreseptejä</string>
     <string name="onboardingSitesDaxDialogTitle">Siirry sivustolle!</string>
     <string name="onboardingSitesDaxDialogDescription">Estän jäljittäjät, jotta ne eivät voi vakoilla sinua.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
@@ -868,5 +872,6 @@
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Tyhjennä selaustoimintasi välittömästi <b>Fire Button</b> -painikkeella.<br/><br/>Kokeile nyt! ☝️️]]></string>
     <string name="onboardingEndDaxDialogTitle">"Hyvin menee!"</string>
     <string name="onboardingEndDaxDialogDescription">Muista, että joka kerta kun käytät minua selaamiseen, rasittavat mainokset katoavat. 👌</string>
+    <string name="onboardingEndDaxDialogButton">Valmista!</string>
 
 </resources>
