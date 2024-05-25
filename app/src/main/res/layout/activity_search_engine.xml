@@ -37,19 +37,58 @@
             android:orientation="vertical"
             android:paddingBottom="@dimen/keyline_5">
 
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/settingsStartPageSectionTitle"/>
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/useStartPageToggle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/settingsStartPageSwitcherPrimaryText"
+                app:secondaryText="@string/settingsStartPageSwitcherSecondaryText"
+                app:showSwitch="true" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextInput
+                android:id="@+id/startPageSetting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/settingsStartPageUrlInputHint"
+                android:layout_marginHorizontal="@dimen/keyline_4"
+                app:type="single_line"
+                />
+
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_4"
+                app:primaryText="@string/settingsSearchEngineSectionTitle"
+                />
+
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/searchEngineSetting"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:primaryText="@string/settingsSearchEngine"
                 app:primaryTextTruncated="false"
-                tools:secondaryText="test test test" />
+                />
+
+            <!--            TODO some info about searx instances-->
+            <!--            <com.duckduckgo.common.ui.view.text.DaxTextView-->
+            <!--                android:layout_width="match_parent"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_margin="@dimen/keyline_4"-->
+            <!--                android:text="@string/globalPrivacyControlDescription"-->
+            <!--                app:textType="primary"-->
+            <!--                />-->
 
             <com.duckduckgo.common.ui.view.text.DaxTextInput
                 android:id="@+id/searxInstanceSetting"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/settingsSearxInstanceInputHint"
+                android:layout_marginHorizontal="@dimen/keyline_4"
                 app:type="single_line"
                 />
         </LinearLayout>

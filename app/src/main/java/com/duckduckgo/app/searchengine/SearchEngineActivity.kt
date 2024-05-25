@@ -64,6 +64,18 @@ class SearchEngineActivity : DuckDuckGoActivity() {
     }
 
     private fun configureUiEventHandlers() {
+        binding.useStartPageToggle.quietlySetIsChecked(viewModel.useCustomStartPage) { _, enabled ->
+            viewModel.onUseStartPageUpdated(enabled)
+        }
+        binding.startPageSetting.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_NEXT) {
+                viewModel.onStartPageUrlUpdated(binding.startPageSetting.text)
+                binding.startPageSetting.hideKeyboard()
+                return@setOnEditorActionListener true
+            }
+            return@setOnEditorActionListener false
+        }
+
         binding.searchEngineSetting.setClickListener { viewModel.userRequestedToChangeSearchEngine() }
         binding.searxInstanceSetting.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -80,6 +92,9 @@ class SearchEngineActivity : DuckDuckGoActivity() {
             .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
             .onEach { viewState ->
                 viewState.let {
+                    updateUseStartPage(it.useCustomStartPage)
+                    updateSelectedStartPage(it.useCustomStartPage, it.selectedStartPageUrl)
+
                     updateSelectedSearchEngine(it.selectedSearchEngine)
                     updateSelectedSearxInstance(it.selectedSearchEngine, it.selectedSearxInstance)
                 }
@@ -89,6 +104,15 @@ class SearchEngineActivity : DuckDuckGoActivity() {
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
+    }
+
+    // updateUseStartPage(it.useCustomStartPage)
+    // updateSelectedStartPage(it.useCustomStartPage, it.selectedStartPageUrl)
+    private fun updateUseStartPage(useCustomStartPage: Boolean) {}
+
+    private fun updateSelectedStartPage(useCustomStartPage: Boolean, startPageUrl: String) {
+        binding.startPageSetting.isEditable = useCustomStartPage
+        binding.startPageSetting.text = startPageUrl
     }
 
     private fun updateSelectedSearchEngine(searchEngine: SearchEngine) {

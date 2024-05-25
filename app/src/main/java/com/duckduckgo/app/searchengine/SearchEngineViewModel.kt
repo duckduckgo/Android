@@ -36,9 +36,13 @@ import javax.inject.Inject
 class SearchEngineViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
 ) : ViewModel() {
+    internal val useCustomStartPage get() = settingsDataStore.customStartPage
     internal val searxInstance get() = settingsDataStore.searxInstance
 
     data class ViewState(
+        val useCustomStartPage: Boolean = false,
+        val selectedStartPageUrl: String = "",
+
         val selectedSearchEngine: SearchEngine = DuckDuckGoSearchEngine,
         val selectedSearxInstance: String = SettingsSharedPreferences.DEFAULT_SEARX_INSTANCE,
     )
@@ -54,6 +58,9 @@ class SearchEngineViewModel @Inject constructor(
         viewModelScope.launch {
             viewState.emit(
                 ViewState(
+                    useCustomStartPage = settingsDataStore.customStartPage,
+                    selectedStartPageUrl = settingsDataStore.startPage ?: "",
+
                     selectedSearchEngine = settingsDataStore.searchEngine,
                     selectedSearxInstance = settingsDataStore.searxInstance,
                 ),
@@ -67,6 +74,28 @@ class SearchEngineViewModel @Inject constructor(
 
     fun userRequestedToChangeSearchEngine() {
         viewModelScope.launch { command.send(Command.LaunchSearchEngineSettings(viewState.value.selectedSearchEngine)) }
+    }
+
+    fun onUseStartPageUpdated(value: Boolean) {
+        if (settingsDataStore.customStartPage == value) {
+            Timber.v("User selected same thing they already have set: $value; no need to do anything else")
+            return
+        }
+        settingsDataStore.customStartPage = value
+        viewModelScope.launch {
+            viewState.emit(currentViewState().copy(useCustomStartPage = value))
+        }
+    }
+
+    fun onStartPageUrlUpdated(value: String) {
+        if (settingsDataStore.startPage == value) {
+            Timber.v("User selected same thing they already have set: $value; no need to do anything else")
+            return
+        }
+        settingsDataStore.startPage = value
+        viewModelScope.launch {
+            viewState.emit(currentViewState().copy(selectedStartPageUrl = value))
+        }
     }
 
     fun onSearchEngineSelected(selectedSearchEngine: SearchEngine) {

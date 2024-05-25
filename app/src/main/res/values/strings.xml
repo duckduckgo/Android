@@ -177,12 +177,19 @@
     <string name="fireButtonActivityTitle">Fire Button</string>
 
     <!-- Search Engine -->
-    <string name="searchEngineActivityTitle">Search engine</string>
+    <string name="startPageAndSearchEngineActivityTitle">Start Page &amp; Search Engine</string>
+    <string name="startPageAndSearchEngine">Start Page &amp; Search Engine</string>
+    <string name="settingsSearchEngineSectionTitle">Search Engine</string>
     <string name="settingsSearchEngine">Search Engine</string>
     <string name="settingsSearchEngineDuckduckgo">DuckDuckGo</string>
     <string name="settingsSearchEngineSearx">Searx</string>
     <string name="settingsSelectSearchEngineDialogSave">Save</string>
     <string name="settingsSearxInstanceInputHint">Searx instance</string>
+
+    <string name="settingsStartPageSectionTitle">Start Page</string>
+    <string name="settingsStartPageSwitcherPrimaryText">Use custom start page</string>
+    <string name="settingsStartPageSwitcherSecondaryText">This page will be open by default whenever you create a new tab or do not have tabs at all</string>
+    <string name="settingsStartPageUrlInputHint">Start page url</string>
 
     <!-- Permissions -->
     <string name="permissionsActivityTitle">Permissions</string>
