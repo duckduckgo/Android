@@ -28,6 +28,7 @@ import kotlin.LazyThreadSafetyMode.SYNCHRONIZED
  * Defaults to Ollama with llama3
  *
  * ./gradlew lintFix --continue -Dcom.duckduckgo.lint.model=openai -Dcom.duckduckgo.lint.openai.key=MY_API_KEY
+ * ./gradlew lintFix --continue -Dcom.duckduckgo.lint.model=gemini -Dcom.duckduckgo.lint.gemini.project=MY_PROJECT -Dcom.duckduckgo.lint.gemini.location=us-central1 -Dcom.duckduckgo.lint.gemini.model=gemini-1.5-pro-001
  *
  */
 object ChatModels {
