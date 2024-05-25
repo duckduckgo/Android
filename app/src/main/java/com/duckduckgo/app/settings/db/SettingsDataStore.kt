@@ -75,6 +75,7 @@ interface SettingsDataStore {
     fun hasBackgroundTimestampRecorded(): Boolean
     fun clearAppBackgroundTimestamp()
 
+    var startPage: String?
     var searchEngine: SearchEngine
     var searxInstance: String
 }
@@ -194,6 +195,10 @@ class SettingsSharedPreferences @Inject constructor(
             }
         }
 
+    override var startPage: String?
+        get() = preferences.getString(START_PAGE, null)
+        set(value) = preferences.edit { putString(START_PAGE, value) }
+
     override var searxInstance: String
         get() = preferences.getString(SEARX_INSTANCE, null) ?: DEFAULT_SEARX_INSTANCE
         set(value) = preferences.edit { putString(SEARX_INSTANCE, value) }
@@ -271,6 +276,7 @@ class SettingsSharedPreferences @Inject constructor(
         const val SHOW_APP_LINKS_PROMPT = "SHOW_APP_LINKS_PROMPT"
         const val SHOW_AUTOMATIC_FIREPROOF_DIALOG = "SHOW_AUTOMATIC_FIREPROOF_DIALOG"
         const val KEY_NOTIFY_ME_IN_DOWNLOADS_DISMISSED = "KEY_NOTIFY_ME_IN_DOWNLOADS_DISMISSED"
+        const val START_PAGE = "START_PAGE"
         const val SEARCH_ENGINE = "SEARCH_ENGINE"
         const val SEARX_INSTANCE = "SEARX_INSTANCE"
     }
@@ -304,8 +310,8 @@ class SettingsSharedPreferences @Inject constructor(
 
     private class SearchEngineMapper {
         companion object {
-            public const val DUCK_DUCK_GO_VALUE = "DUCK_DUCK_GO"
-            public const val SEARX_VALUE = "SEARX"
+            const val DUCK_DUCK_GO_VALUE = "DUCK_DUCK_GO"
+            const val SEARX_VALUE = "SEARX"
         }
     }
 
