@@ -22,6 +22,14 @@ import dev.langchain4j.model.openai.OpenAiChatModel
 import dev.langchain4j.model.vertexai.VertexAiGeminiChatModel
 import kotlin.LazyThreadSafetyMode.SYNCHRONIZED
 
+/**
+ * Switch chat models from the command line
+ *
+ * Defaults to Ollama with llama3
+ *
+ * ./gradlew lintFix --continue -Dcom.duckduckgo.lint.model=openai -Dcom.duckduckgo.lint.openai.key=MY_API_KEY
+ *
+ */
 object ChatModels {
 
     val chatModel: ChatLanguageModel by lazy(SYNCHRONIZED) {
