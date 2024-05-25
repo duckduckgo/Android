@@ -43,6 +43,7 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.Account
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
 import com.duckduckgo.subscriptions.impl.repository.Subscription
+import com.duckduckgo.subscriptions.impl.repository.isExpired
 import com.duckduckgo.subscriptions.impl.repository.toProductList
 import com.duckduckgo.subscriptions.impl.services.AuthService
 import com.duckduckgo.subscriptions.impl.services.ConfirmationBody
@@ -204,6 +205,9 @@ class RealSubscriptionsManager @Inject constructor(
     override val entitlements = _entitlements.onSubscription { emitEntitlementsValues() }
 
     private var purchaseStateJob: Job? = null
+
+    private var removeExpiredSubscriptionOnCancelledPurchase: Boolean = false
+
     private suspend fun isUserAuthenticated(): Boolean = authRepository.isUserAuthenticated()
 
     private suspend fun emitEntitlementsValues() {
@@ -233,6 +237,12 @@ class RealSubscriptionsManager @Inject constructor(
                     is PurchaseState.Purchased -> checkPurchase(it.packageName, it.purchaseToken)
                     is PurchaseState.Canceled -> {
                         _currentPurchaseState.emit(CurrentPurchase.Canceled)
+                        if (removeExpiredSubscriptionOnCancelledPurchase) {
+                            if (subscriptionStatus().isExpired()) {
+                                signOut()
+                            }
+                            removeExpiredSubscriptionOnCancelledPurchase = false
+                        }
                     }
                     else -> {
                         // NOOP
@@ -451,17 +461,25 @@ class RealSubscriptionsManager @Inject constructor(
     ) {
         try {
             _currentPurchaseState.emit(CurrentPurchase.PreFlowInProgress)
-            val subscription: Subscription? =
-                if (isUserAuthenticated()) {
-                    fetchAndStoreAllData()
-                } else {
-                    val recovered = recoverSubscriptionFromStore()
-                    if (recovered is RecoverSubscriptionResult.Success) {
-                        recovered.subscription
-                    } else {
-                        null
+
+            // refresh any existing account / subscription data
+            fetchAndStoreAllData()
+
+            if (!isUserAuthenticated()) {
+                recoverSubscriptionFromStore()
+            } else {
+                authRepository.getSubscription()?.run {
+                    if (status.isExpired() && platform == "google") {
+                        // re-authenticate in case previous subscription was bought using different google account
+                        val accountId = authRepository.getAccount()?.externalId
+                        recoverSubscriptionFromStore()
+                        removeExpiredSubscriptionOnCancelledPurchase =
+                            accountId != null && accountId != authRepository.getAccount()?.externalId
                     }
                 }
+            }
+
+            val subscription = authRepository.getSubscription()
 
             if (subscription?.isActive() == true) {
                 pixelSender.reportSubscriptionActivated()
@@ -497,7 +515,7 @@ class RealSubscriptionsManager @Inject constructor(
                 validateToken(authRepository.getAuthToken()!!)
                 AuthToken.Success(authRepository.getAuthToken()!!)
             } else {
-                AuthToken.Failure("")
+                AuthToken.Failure.UnknownError
             }
         } catch (e: Exception) {
             return when (extractError(e)) {
@@ -507,11 +525,11 @@ class RealSubscriptionsManager @Inject constructor(
                     if (result is RecoverSubscriptionResult.Success) {
                         AuthToken.Success(authRepository.getAuthToken()!!)
                     } else {
-                        AuthToken.Failure("")
+                        AuthToken.Failure.TokenExpired(authRepository.getAuthToken()!!)
                     }
                 }
                 else -> {
-                    AuthToken.Failure("")
+                    AuthToken.Failure.UnknownError
                 }
             }
         }
@@ -568,7 +586,10 @@ sealed class AccessToken {
 
 sealed class AuthToken {
     data class Success(val authToken: String) : AuthToken()
-    data class Failure(val message: String) : AuthToken()
+    sealed class Failure : AuthToken() {
+        data class TokenExpired(val authToken: String) : Failure()
+        data object UnknownError : Failure()
+    }
 }
 
 fun String.toStatus(): SubscriptionStatus {

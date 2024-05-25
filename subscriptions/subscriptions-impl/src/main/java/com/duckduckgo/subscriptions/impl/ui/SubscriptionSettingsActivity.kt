@@ -20,6 +20,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -31,7 +32,10 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
 import com.duckduckgo.subscriptions.impl.R.string
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.FAQS_URL
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionSettingsBinding
@@ -110,6 +114,10 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             goToFaqs()
         }
 
+        binding.viewPlans.setClickListener {
+            goToPurchasePage()
+        }
+
         if (savedInstanceState == null) {
             pixelSender.reportSubscriptionSettingsShown()
         }
@@ -121,35 +129,50 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun renderView(viewState: ViewState) {
-        binding.subscriptionDuration.setText(
-            if (viewState.duration is Monthly) string.monthlySubscription else string.yearlySubscription,
-        )
+        if (viewState.status in listOf(INACTIVE, EXPIRED)) {
+            binding.subscriptionDuration.isVisible = false
+            binding.descriptionExpiredIcon.isVisible = true
+            binding.viewPlans.isVisible = true
+            binding.changePlan.isVisible = false
+            binding.description.text = getString(string.subscriptionsExpiredData, viewState.date)
+        } else {
+            binding.subscriptionDuration.isVisible = true
+            binding.descriptionExpiredIcon.isVisible = false
+            binding.viewPlans.isVisible = false
+            binding.changePlan.isVisible = true
 
-        val status = when (viewState.status) {
-            AUTO_RENEWABLE -> getString(string.renews)
-            else -> getString(string.expires)
-        }
-        binding.description.text = getString(string.subscriptionsData, status, viewState.date)
+            binding.subscriptionDuration.setText(
+                if (viewState.duration is Monthly) string.monthlySubscription else string.yearlySubscription,
+            )
 
-        when (viewState.platform?.lowercase()) {
-            "apple", "ios" ->
-                binding.changePlan.setClickListener {
-                    pixelSender.reportSubscriptionSettingsChangePlanOrBillingClick()
-                    globalActivityStarter.start(this, ChangePlanScreenWithEmptyParams)
-                }
-            "stripe" -> {
-                binding.changePlan.setClickListener {
-                    pixelSender.reportSubscriptionSettingsChangePlanOrBillingClick()
-                    viewModel.goToStripe()
-                }
+            val status = when (viewState.status) {
+                AUTO_RENEWABLE -> getString(string.renews)
+                else -> getString(string.expires)
             }
-            else -> {
-                binding.changePlan.setClickListener {
-                    pixelSender.reportSubscriptionSettingsChangePlanOrBillingClick()
-                    val url = String.format(URL, BASIC_SUBSCRIPTION, applicationContext.packageName)
-                    val intent = Intent(Intent.ACTION_VIEW)
-                    intent.setData(Uri.parse(url))
-                    startActivity(intent)
+            binding.description.text = getString(string.subscriptionsData, status, viewState.date)
+
+            when (viewState.platform?.lowercase()) {
+                "apple", "ios" ->
+                    binding.changePlan.setClickListener {
+                        pixelSender.reportSubscriptionSettingsChangePlanOrBillingClick()
+                        globalActivityStarter.start(this, ChangePlanScreenWithEmptyParams)
+                    }
+
+                "stripe" -> {
+                    binding.changePlan.setClickListener {
+                        pixelSender.reportSubscriptionSettingsChangePlanOrBillingClick()
+                        viewModel.goToStripe()
+                    }
+                }
+
+                else -> {
+                    binding.changePlan.setClickListener {
+                        pixelSender.reportSubscriptionSettingsChangePlanOrBillingClick()
+                        val url = String.format(URL, BASIC_SUBSCRIPTION, applicationContext.packageName)
+                        val intent = Intent(Intent.ACTION_VIEW)
+                        intent.setData(Uri.parse(url))
+                        startActivity(intent)
+                    }
                 }
             }
         }
@@ -181,6 +204,17 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
                 url = FAQS_URL,
                 screenTitle = "",
                 defaultToolbar = false,
+            ),
+        )
+    }
+
+    private fun goToPurchasePage() {
+        globalActivityStarter.start(
+            context = this,
+            params = SubscriptionsWebViewActivityWithParams(
+                url = SubscriptionsConstants.BUY_URL,
+                screenTitle = "",
+                defaultToolbar = true,
             ),
         )
     }
