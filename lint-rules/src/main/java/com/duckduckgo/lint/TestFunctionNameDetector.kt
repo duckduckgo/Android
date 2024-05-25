@@ -29,10 +29,9 @@ import com.android.tools.lint.detector.api.LintFix
 import com.android.tools.lint.detector.api.Scope
 import com.android.tools.lint.detector.api.Severity.WARNING
 import com.android.tools.lint.detector.api.SourceCodeScanner
+import com.duckduckgo.lint.chatmodel.ChatModels
 import dev.langchain4j.data.message.SystemMessage
 import dev.langchain4j.data.message.UserMessage
-import dev.langchain4j.model.chat.ChatLanguageModel
-import dev.langchain4j.model.ollama.OllamaChatModel
 import org.jetbrains.kotlin.psi.KtNamedDeclaration
 import org.jetbrains.uast.UClass
 import org.jetbrains.uast.UElement
@@ -41,7 +40,6 @@ import org.jetbrains.uast.kotlin.KotlinUMethod
 import java.io.IOException
 import java.lang.StringBuilder
 import java.util.EnumSet
-import kotlin.LazyThreadSafetyMode.SYNCHRONIZED
 import kotlin.io.path.Path
 
 @Suppress("UnstableApiUsage")
@@ -137,7 +135,10 @@ class TestFunctionNameDetector : Detector(), SourceCodeScanner {
             return null
         }
 
-        val response = model.generate(prompt, UserMessage.from(method.sourcePsi!!.text)).content().text()
+        val response = context.retryWithExponentialBackoff {
+            ChatModels.chatModel.generate(prompt, UserMessage.from(method.sourcePsi!!.text)).content().text()
+        }
+
         context.log(null, "Response from LM: ")
         context.log(null, response)
 
@@ -194,7 +195,7 @@ class TestFunctionNameDetector : Detector(), SourceCodeScanner {
      */
     private val illegalChars = hashSetOf('.', ';', '[', ']', '/', '<', '>', ':', '\\')
 
-    private fun <T> retryWithExponentialBackoff(
+    private fun <T> JavaContext.retryWithExponentialBackoff(
         initialDelayMillis: Long = 1000L,
         maxDelayMillis: Long = 16000L,
         factor: Double = 2.0,
@@ -208,6 +209,7 @@ class TestFunctionNameDetector : Detector(), SourceCodeScanner {
             try {
                 return action()
             } catch (e: Exception) {
+                log(e, null)
                 attempt++
                 if (attempt >= maxAttempts) {
                     throw e // Rethrow the exception if maximum attempts are reached.
@@ -219,7 +221,9 @@ class TestFunctionNameDetector : Detector(), SourceCodeScanner {
                 currentDelay = (currentDelay * factor).toLong().coerceAtMost(maxDelayMillis)
             }
         }
-        throw IOException("Failed after $maxAttempts attempts")
+        val exception = IOException("Failed after $maxAttempts attempts")
+        log(exception, null)
+        throw exception
     }
 
     companion object {
@@ -237,15 +241,6 @@ class TestFunctionNameDetector : Detector(), SourceCodeScanner {
                 EnumSet.of(Scope.TEST_SOURCES),
             ),
         )
-
-        private val model: ChatLanguageModel by lazy(SYNCHRONIZED) {
-            OllamaChatModel.builder().modelName("llama3").temperature(0.0).seed(0)
-                /**
-                 * Ollama binds 127.0.0.1 port 11434 by default. Change the bind address with the OLLAMA_HOST environment variable
-                 * See https://github.com/ollama/ollama/blob/main/docs/faq.md
-                 */
-                .baseUrl("http://127.0.0.1:11434").build()
-        }
 
         private val prompt: SystemMessage = SystemMessage.from(
             """
