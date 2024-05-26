@@ -853,10 +853,14 @@
     <string name="preOnboardingDaxDialog3Button">Начать просмотр</string>
     <string name="onboardingSearchDaxDialogTitle">Попробуйте поискать!</string>
     <string name="onboardingSearchDaxDialogDescription">Ваши поисковые запросы в DuckDuckGo всегда анонимны.</string>
-    <string name="onboardingSearchDaxDialogOption1">Как сказать «утка» по-испански?</string>
-    <string name="onboardingSearchDaxDialogOption2">Кто играет главные роли в фильме «Могучие утята»?</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">Как сказать «утка» по-английски?</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">Как сказать «утка» по-испански?</string>
+    <string name="onboardingSearchQueryOption1">как сказать «утка» на английском?</string>
+    <string name="onboardingSearchQueryOption1English">как сказать «утка» по-испански</string>
+    <string name="onboardingSearchDaxDialogOption2">актерский состав аватара</string>
     <string name="onboardingSearchDaxDialogOption3">Местная погода</string>
     <string name="onboardingSearchDaxDialogOption4">Удиви меня!</string>
+    <string name="onboardingSearchQueryOption4">рецепты на ужин</string>
     <string name="onboardingSitesDaxDialogTitle">Попробуйте посетить сайт!</string>
     <string name="onboardingSitesDaxDialogDescription">Мы заблокируем трекеры и пресечем слежку.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
@@ -882,5 +886,6 @@
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Кнопка <b>Fire Button</b> моментально стирает из браузера данные о посещении сайтов.<br/><br/>Давайте попробуем! ☝️️]]></string>
     <string name="onboardingEndDaxDialogTitle">"Проще некуда!"</string>
     <string name="onboardingEndDaxDialogDescription">Бродить по сайтам с нами — значит подрезать крылья назойливой рекламе. 👌</string>
+    <string name="onboardingEndDaxDialogButton">Всё готово!</string>
 
 </resources>
