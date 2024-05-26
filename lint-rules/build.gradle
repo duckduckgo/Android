@@ -58,6 +58,7 @@ def shadowJar = tasks.shadowJar
 shadowJar.configure {
     archiveClassifier.set("")
     configurations = [shade]
+    minimize()
     transformers.add(new ServiceFileTransformer())
 }
 
