@@ -19,10 +19,21 @@ To run the refactors yourself you can do:
 
 ```bash
 # Defaults to using Ollama with llama3
-gradle lintFix --continue
+./gradlew lintFix --continue
+
+# Configuring Ollama
+./gradlew lintFix --continue -Dcom.duckduckgo.lint.model=ollama -Dcom.duckduckgo.lint.ollama.baseurl=BASE_URL -Dcom.duckduckgo.lint.ollama.modelname=llama3
 
 # Use Open AI
-gradle lintFix --continue -Dcom.duckduckgo.lint.model=openai -Dcom.duckduckgo.lint.openai.key=MY_API_KEY -Dcom.duckduckgo.lint.openai.model=gpt-4o
+./gradlew lintFix --continue -Dcom.duckduckgo.lint.model=openai -Dcom.duckduckgo.lint.openai.key=MY_API_KEY -Dcom.duckduckgo.lint.openai.model=gpt-4o
+```
+
+This performs the entire refactor over a large set of modules.
+
+If you want to just try one module then do
+
+```bash
+./gradle :autofill-impl:lintFix
 ```
 
 To add your own models and integrations, look at `com/duckduckgo/lint/chatmodel/ChatModels.kt` in the repo and refer to the langchain4j
