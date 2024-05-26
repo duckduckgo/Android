@@ -33,7 +33,7 @@ This performs the entire refactor over a large set of modules.
 If you want to just try one module then do
 
 ```bash
-./gradle :autofill-impl:lintFix
+./gradlew :autofill-impl:lintFix
 ```
 
 To add your own models and integrations, look at `com/duckduckgo/lint/chatmodel/ChatModels.kt` in the repo and refer to the langchain4j
