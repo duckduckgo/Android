@@ -853,10 +853,14 @@
     <string name="preOnboardingDaxDialog3Button">Započni pretraživanje</string>
     <string name="onboardingSearchDaxDialogTitle">Isprobajte pretragu!</string>
     <string name="onboardingSearchDaxDialogDescription">Tvoja su DuckDuckGo pretraživanja uvijek anonimna.</string>
-    <string name="onboardingSearchDaxDialogOption1">kako se kaže \"patka\" na španjolskom</string>
-    <string name="onboardingSearchDaxDialogOption2">moćne patke</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">kako se kaže \"patka\" na engleskom</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">kako se kaže \"patka\" na španjolskom</string>
+    <string name="onboardingSearchQueryOption1">kako se kaže patka na engleskom</string>
+    <string name="onboardingSearchQueryOption1English">kako se kaže \"patka\" na španjolskom</string>
+    <string name="onboardingSearchDaxDialogOption2">uloge u filmu Avatar</string>
     <string name="onboardingSearchDaxDialogOption3">lokalno vrijeme</string>
     <string name="onboardingSearchDaxDialogOption4">Iznenadi me!</string>
+    <string name="onboardingSearchQueryOption4">recepti za večeru</string>
     <string name="onboardingSitesDaxDialogTitle">Pokušaj posjetiti web-mjesto!</string>
     <string name="onboardingSitesDaxDialogDescription">Blokirat ću tragače kako te ne bi mogli špijunirati.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
@@ -882,5 +886,6 @@
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Odmah izbriši svoju aktivnost pregledavanja pomoću <b>Fire Buttona</b>.<br/><br/>Probaj! ☝️️]]></string>
     <string name="onboardingEndDaxDialogTitle">"Možeš ti to!"</string>
     <string name="onboardingEndDaxDialogDescription">Zapamti: svaki put kada me koristiš za pregledavanje, grozne reklame odlaze u zaborav. 👌</string>
+    <string name="onboardingEndDaxDialogButton">Gotovo!</string>
 
 </resources>
