@@ -39,5 +39,10 @@ If you want to just try one module then do
 To add your own models and integrations, look at `com/duckduckgo/lint/chatmodel/ChatModels.kt` in the repo and refer to the langchain4j
 documentation [here](https://docs.langchain4j.dev/integrations/language-models/)
 
+After you've generated the diff, you can run `./gradlew compileDebugUnitTestKotlin` to check. 
+
+Formatting is run via `./gradlew formatKotlin`
+
+
 ## License
 DuckDuckGo android is distributed under the Apache 2.0 [license](LICENSE).
