@@ -19,7 +19,6 @@ package com.duckduckgo.lint.chatmodel
 import dev.langchain4j.model.chat.ChatLanguageModel
 import dev.langchain4j.model.ollama.OllamaChatModel
 import dev.langchain4j.model.openai.OpenAiChatModel
-import dev.langchain4j.model.vertexai.VertexAiGeminiChatModel
 import kotlin.LazyThreadSafetyMode.SYNCHRONIZED
 
 /**
@@ -28,7 +27,6 @@ import kotlin.LazyThreadSafetyMode.SYNCHRONIZED
  * Defaults to Ollama with llama3
  *
  * ./gradlew lintFix --continue -Dcom.duckduckgo.lint.model=openai -Dcom.duckduckgo.lint.openai.key=MY_API_KEY
- * ./gradlew lintFix --continue -Dcom.duckduckgo.lint.model=gemini -Dcom.duckduckgo.lint.gemini.project=MY_PROJECT -Dcom.duckduckgo.lint.gemini.location=us-central1 -Dcom.duckduckgo.lint.gemini.model=gemini-1.5-pro-001
  *
  */
 object ChatModels {
@@ -37,17 +35,19 @@ object ChatModels {
         val model = System.getProperty("com.duckduckgo.lint.model")
         when (model) {
             "openai" -> getOpenAiModel()
-            "gemini" -> getGeminiModel()
             else -> getOllamaModel()
         }
     }
 
-    private fun getOllamaModel() = OllamaChatModel.builder().modelName("llama3").temperature(0.0).seed(0)
-        /**
-         * Ollama binds 127.0.0.1 port 11434 by default. Change the bind address with the OLLAMA_HOST environment variable
-         * See https://github.com/ollama/ollama/blob/main/docs/faq.md
-         */
-        .baseUrl("http://127.0.0.1:11434").build()
+    private fun getOllamaModel() =
+        OllamaChatModel.builder().modelName(System.getProperty("com.duckduckgo.lint.ollama.modelname", "llama3")).temperature(0.0).seed(0)
+            /**
+             * Ollama binds 127.0.0.1 port 11434 by default.
+             *
+             * Within Ollama, you can change the bind address with the OLLAMA_HOST environment variable
+             * See https://github.com/ollama/ollama/blob/main/docs/faq.md
+             */
+            .baseUrl(System.getProperty("com.duckduckgo.lint.ollama.baseurl", "http://127.0.0.1:11434")).build()
 
     private fun getOpenAiModel() =
         OpenAiChatModel.builder()
@@ -56,11 +56,4 @@ object ChatModels {
             .temperature(0.0)
             .seed(0)
             .build()
-
-    private fun getGeminiModel() = VertexAiGeminiChatModel.builder()
-        .temperature(0.0f)
-        .project(System.getProperty("com.duckduckgo.lint.gemini.project"))
-        .location(System.getProperty("com.duckduckgo.lint.gemini.location"))
-        .modelName(System.getProperty("com.duckduckgo.lint.gemini.model"))
-        .build()
 }

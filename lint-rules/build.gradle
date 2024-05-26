@@ -29,7 +29,6 @@ dependencies {
 
     compileShaded 'dev.langchain4j:langchain4j-ollama:0.30.0'
     compileShaded 'dev.langchain4j:langchain4j-open-ai:0.30.0'
-    compileShaded 'dev.langchain4j:langchain4j-vertex-ai-gemini:0.30.0'
 
     testImplementation Testing.junit4
 
@@ -39,7 +38,6 @@ dependencies {
     // Dupe the dependency as compileShaded is effectively compileOnly
     testImplementation 'dev.langchain4j:langchain4j-ollama:0.30.0'
     testImplementation 'dev.langchain4j:langchain4j-open-ai:0.30.0'
-    testImplementation 'dev.langchain4j:langchain4j-vertex-ai-gemini:0.30.0'
 }
 
 
