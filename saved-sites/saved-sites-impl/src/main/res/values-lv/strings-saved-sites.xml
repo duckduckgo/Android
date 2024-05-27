@@ -20,8 +20,10 @@
     <!-- Sync settings screen -->
     <string name="sync_enable_option_favorites_title">Kopīgot izlasi</string>
     <string name="sync_enable_option_favorites_subtitle">Izmanto vienu izlasi visās ierīcēs. Atstāj izslēgtu, lai nodalītu mobilās un galddatora izlases.</string>
-    <string name="saved_site_limit_warning"><b>Sinhronizācija pārtraukta</b>\nPārsniegts grāmatzīmju ierobežojums. Izdzēs dažas, lai atsāktu sinhronizāciju.\n\n<annotation type="manage_bookmarks">Pārvaldīt grāmatzīmes</annotation></string>
-    <string name="saved_site_limit_warning_notif"><b>Grāmatzīmju sinhronizācija ir pārtraukta</b>\nPārsniegts grāmatzīmju sinhronizācijas ierobežojums. Mēģini izdzēst dažas grāmatzīmes. Kamēr šī problēma nebūs atrisināta, grāmatzīmes netiks dublētas.</string>
+    <string name="saved_site_limit_warning"><b>Sinhronizācija pārtraukta</b>\nTu esi sasniedzis maksimālo grāmatzīmju skaitu. Lūdzu, izdzēs dažas, lai atsāktu sinhronizāciju.\n\n<annotation type="manage_bookmarks">Pārvaldīt grāmatzīmes</annotation></string>
+    <string name="saved_site_limit_warning_notif"><b>Grāmatzīmju sinhronizācija ir pārtraukta</b>\nTu esi sasniedzis maksimālo grāmatzīmju skaitu. Lūdzu, izdzēs dažas grāmatzīmes, lai atsāktu sinhronizāciju.</string>
+    <string name="saved_site_invalid_warning"><b>Sinhronizācija pārtraukta</b>\nDažas grāmatzīmes ir formatētas nepareizi vai ir pārāk garas un netika sinhronizētas.\n\n<annotation type="manage_bookmarks">Pārvaldīt grāmatzīmes</annotation></string>
+    <string name="saved_site_invalid_warning_notif"><b>Grāmatzīmju sinhronizācija ir pārtraukta</b>\nDažas grāmatzīmes ir formatētas nepareizi vai ir pārāk garas un netika sinhronizētas.</string>
     <plurals name="saved_site_invalid_items_warning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
         <item quantity="zero">Tavas grāmatzīmes vietnei %1$s un vēl %2$d vietnēm nevar sinhronizēt, jo daži to lauki pārsniedz rakstzīmju ierobežojumu.</item>
         <item quantity="one">Tavu grāmatzīmi vietnei %1$s nevar sinhronizēt, jo kāds no tās laukiem pārsniedz rakstzīmju ierobežojumu.</item>

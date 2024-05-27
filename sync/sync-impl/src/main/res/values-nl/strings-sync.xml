@@ -25,6 +25,9 @@
     <string name="sync_disabled_authenticated_user"><b>\'Synchronisatie en back-up\' is onderbroken</b>\n\'Synchronisatie en back-up\' is momenteel niet beschikbaar. Probeer het later opnieuw.</string>
     <string name="sync_disabled_authenticated_user_new_version"><b>\'Synchronisatie en back-up\' is onderbroken</b>\n\'Synchronisatie en back-up\' is helaas niet langer beschikbaar in deze app-versie. Werk DuckDuckGo bij naar de nieuwste versie om door te gaan.</string>
     <string name="sync_paused_notification"><b>\'Synchronisatie en back-up\' is onderbroken</b>\n\'Synchronisatie en back-up\' is momenteel niet beschikbaar. Probeer het later opnieuw.</string>
+    <string name="sync_error_notification"><b>Synchronisatiefout</b>\n\'Synchronisatie en back-up\' is tijdelijk niet beschikbaar.</string>
+    <string name="sync_error_warning"><b>Synchronisatiefout</b>\n\'Sync &amp; Backup\' is tijdelijk niet beschikbaar.</string>
+    <string name="sync_signed_out_notification"><b>Synchronisatie is onderbroken</b>\nSynchronisatie is onderbroken. Als je dit apparaat wilt blijven synchroniseren, maak dan opnieuw verbinding met een ander apparaat of met je herstelcode.</string>
 
     <!-- Settings screen -->
     <string name="sync_screen_title">Synchronisatie en back-up</string>

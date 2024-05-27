@@ -20,8 +20,10 @@
     <!-- Sync settings screen -->
     <string name="sync_enable_option_favorites_title">Споделяне на любими</string>
     <string name="sync_enable_option_favorites_subtitle">Използвайте едни и същи любими елементи на всички устройства. Оставете изключено, ако имате различни предпочитания за мобилни устройства и настолни компютри.</string>
-    <string name="saved_site_limit_warning"><b>Синхронизирането е спряно</b>\nПревишихте лимита за отметки. Изтрийте някои от тях, за да възобновите синхронизирането.\n\n<annotation type="manage_bookmarks">Управление на отметките</annotation></string>
-    <string name="saved_site_limit_warning_notif"><b>Синхронизирането на отметките е спряно</b>\nПревишихте ограничението за синхронизиране на отметки. Опитайте да изтриете някои от отметките. Докато този проблем не бъде разрешен, отметките няма да бъдат архивирани.</string>
+    <string name="saved_site_limit_warning"><b>Синхронизирането е на пауза</b>\nДостигнахте максималния брой отметки. Изтрийте някои от тях, за да възобновите синхронизирането.\n\n<annotation type="manage_bookmarks">Управление на отметките</annotation></string>
+    <string name="saved_site_limit_warning_notif"><b>Синхронизирането на отметки е на пауза</b>\nДостигнахте максималния брой отметки. Изтрийте някои отметки, за да възобновите синхронизирането.</string>
+    <string name="saved_site_invalid_warning"><b>Синхронизирането е на пауза</b>\nНякои отметки са форматирани неправилно или са твърде дълги и не бяха синхронизирани.\n\n<annotation type="manage_bookmarks">Управление на отметките</annotation></string>
+    <string name="saved_site_invalid_warning_notif"><b>Синхронизирането на отметки е на пауза</b>\nНякои отметки са форматирани неправилно или са твърде дълги и не бяха синхронизирани.\n\n</string>
     <plurals name="saved_site_invalid_items_warning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
         <item quantity="one">Вашата отметка за %1$s не може да се синхронизира, защото някои от нейните полета надвишават ограничението за знаци.</item>
         <item quantity="other">Вашите отметки за %1$s и %2$d други сайта не могат да се синхронизират, защото някои от техните полета надвишават ограничението за знаци.</item>

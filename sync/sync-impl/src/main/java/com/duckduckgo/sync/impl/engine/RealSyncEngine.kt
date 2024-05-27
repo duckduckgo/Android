@@ -64,6 +64,7 @@ class RealSyncEngine @Inject constructor(
     private val syncOperationErrorRecorder: SyncOperationErrorRecorder,
     private val providerPlugins: PluginPoint<SyncableDataProvider>,
     private val persisterPlugins: PluginPoint<SyncableDataPersister>,
+    private val lifecyclePlugins: PluginPoint<SyncEngineLifecycle>,
 ) : SyncEngine {
 
     override fun triggerSync(trigger: SyncTrigger) {
@@ -262,11 +263,17 @@ class RealSyncEngine @Inject constructor(
         persisterPlugins.getPlugins().map {
             it.onSyncEnabled()
         }
+        lifecyclePlugins.getPlugins().forEach {
+            it.onSyncEnabled()
+        }
     }
 
     override fun onSyncDisabled() {
         syncStateRepository.clearAll()
         persisterPlugins.getPlugins().map {
+            it.onSyncDisabled()
+        }
+        lifecyclePlugins.getPlugins().forEach {
             it.onSyncDisabled()
         }
     }

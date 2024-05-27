@@ -139,8 +139,10 @@
     <string name="managementDisabledModeSubtitle">За защита на паролите е необходимо да зададете модел за заключване, ПИН код или биометрични данни.</string>
     <string name="credentialManagementEditTitle">Редактиране на парола</string>
 
-    <string name="credentials_limit_warning"><b>Синхронизирането е спряно</b>\nПревишихте лимита за данни за вход. Изтрийте някои от тях, за да възобновите синхронизирането.<annotation type="manage_logins">Управление на данните за вход</annotation></string>
-    <string name="credentials_limit_warning_notif"><b>Синхронизирането на пароли е спряно</b>\nПревишихте ограничението за синхронизиране на пароли. Опитайте да изтриете някои от паролите. Докато този проблем не бъде разрешен, паролите няма да бъдат архивирани.</string>
+    <string name="credentials_limit_warning"><b>Синхронизирането е на пауза</b>\nДостигнахте максималния брой пароли. Изтрийте някои от тях, за да възобновите синхронизирането.\n\n<annotation type="manage_logins">Управление на пароли</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Синхронизирането на пароли е на пауза</b>\nДостигнахте максималния брой пароли. Изтрийте някои пароли, за да възобновите синхронизирането.</string>
+    <string name="credentials_invalid_request_warning"><b>Синхронизирането е на пауза</b>\nНякои пароли са форматирани неправилно или са твърде дълги и не бяха синхронизирани.\n\n<annotation type="manage_logins">Управление на пароли</annotation></string>
+    <string name="credentials_invalid_request_warning_notif"><b></b>\nСинхронизирането на пароли е на пауза\nНякои пароли са форматирани неправилно или са твърде дълги и не бяха синхронизирани.</string>
 
     <string name="saveLoginDialogNeverForThisSite">Никога не питай за този сайт</string>
     <string name="credentialManagementInstructionNeverForThisSite">Ако нулирате изключените сайтове, при следващото влизане в някой от тези сайтове ще бъдете подканени да запазите паролата за вход.</string>

@@ -139,8 +139,10 @@
     <string name="managementDisabledModeSubtitle">Det kreves et låsemønster, en PIN-kode eller biometri for å beskytte passordene dine.</string>
     <string name="credentialManagementEditTitle">Rediger passordet</string>
 
-    <string name="credentials_limit_warning"><b>Synkronisering er satt på pause</b>\nGrensen for pålogginger er overskredet. Slett noen for å gjenoppta synkroniseringen.\n\n<annotation type="manage_logins">Administrer pålogginger</annotation></string>
-    <string name="credentials_limit_warning_notif"><b>Synkronisering av passord er satt på pause</b>\nDu har overskredet grensen for passordsynkronisering. Prøv å slette noen passord. Inntil dette er løst, blir ikke passordene sikkerhetskopiert.</string>
+    <string name="credentials_limit_warning"><b>Synkronisering satt på pause</b>\nDu har nådd maksimalt antall passord. Slett noen for å gjenoppta synkronisering.\n\n<annotation type="manage_logins">Administrer passord</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Synkronisering av passord er satt på pause</b>\nDu har nådd maksimalt antall passord. Slett noen passord for å gjenoppta synkronisering.</string>
+    <string name="credentials_invalid_request_warning"><b>Synkronisering satt på pause</b>\nNoen passord er formatert feil eller for lange og ble ikke synkronisert.\n\n<annotation type="manage_logins">Administrer passord</annotation></string>
+    <string name="credentials_invalid_request_warning_notif"><b>Synkronisering av passord er satt på pause</b>\nNoen passord er formatert feil eller for lange og ble ikke synkronisert.</string>
 
     <string name="saveLoginDialogNeverForThisSite">Aldri spør for dette nettstedet</string>
     <string name="credentialManagementInstructionNeverForThisSite">Hvis du tilbakestiller ekskluderte nettsteder, blir du bedt om å lagre passordet ditt neste gang du logger på disse nettstedene.</string>

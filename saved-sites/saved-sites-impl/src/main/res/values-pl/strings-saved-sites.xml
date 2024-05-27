@@ -20,8 +20,10 @@
     <!-- Sync settings screen -->
     <string name="sync_enable_option_favorites_title">Udostępnij ulubione</string>
     <string name="sync_enable_option_favorites_subtitle">Korzystaj z tych samych ulubionych na wszystkich urządzeniach. Wyłącz, aby oddzielić ulubione na urządzenia mobilne i stacjonarne.</string>
-    <string name="saved_site_limit_warning"><b>Synchronizacja wstrzymana</b>\nPrzekroczono limit zakładek. Usuń niektóre, aby wznowić synchronizację.\n\n<annotation type="manage_bookmarks">Zarządzaj zakładkami</annotation></string>
-    <string name="saved_site_limit_warning_notif"><b>Synchronizacja zakładek wstrzymana</b>\nPrzekroczono limit synchronizacji zakładek. Spróbuj usunąć niektóre zakładki. Dopóki ten problem nie zostanie rozwiązany, nie będzie tworzona kopia zapasowa zakładek.</string>
+    <string name="saved_site_limit_warning"><b>Synchronizacja wstrzymana</b>\nOsiągnięto maksymalną liczbę zakładek. Usuń część z nich, aby wznowić synchronizację.\n\n<annotation type="manage_bookmarks">Zarządzaj zakładkami</annotation></string>
+    <string name="saved_site_limit_warning_notif"><b>Synchronizacja zakładek wstrzymana</b>\nOsiągnięto maksymalną liczbę zakładek. Usuń część zakładek, aby wznowić synchronizację.</string>
+    <string name="saved_site_invalid_warning"><b>Synchronizacja wstrzymana</b>\nNiektóre zakładki mają niepoprawny format lub są zbyt długie i nie zostały zsynchronizowane.\n\n<annotation type="manage_bookmarks">Zarządzaj zakładkami</annotation></string>
+    <string name="saved_site_invalid_warning_notif"><b>Synchronizacja zakładek jest wstrzymana</b>\nNiektóre zakładki mają niepoprawny format lub są zbyt długie i nie zostały zsynchronizowane.</string>
     <plurals name="saved_site_invalid_items_warning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
         <item quantity="one">Nie można zsynchronizować zakładki dotyczącej %1$s, ponieważ jedno z jej pól przekracza limit znaków.</item>
         <item quantity="few">Nie można zsynchronizować zakładek dotyczących %1$s i %2$d innych witryn, ponieważ niektóre ich pola przekraczają limit znaków.</item>
