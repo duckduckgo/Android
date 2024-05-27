@@ -28,7 +28,7 @@ import javax.inject.Inject
     boundType = NewTabPageShortcutPlugin::class,
 )
 class BookmarksNewTabShortcutPlugin @Inject constructor(
-    private val globalActivityStarter: GlobalActivityStarter
+    private val globalActivityStarter: GlobalActivityStarter,
 ) : NewTabPageShortcutPlugin {
     override fun getShortcut(): NewTabShortcut {
         return Bookmarks

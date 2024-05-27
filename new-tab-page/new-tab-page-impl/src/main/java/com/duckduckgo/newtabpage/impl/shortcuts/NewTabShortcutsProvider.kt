@@ -55,7 +55,7 @@ private interface NewTabPageShortcutPluginPointTrigger
     boundType = NewTabPageShortcutPlugin::class,
 )
 class AIChatNewTabShortcutPlugin @Inject constructor(
-    private val browserNav: BrowserNav
+    private val browserNav: BrowserNav,
 ) : NewTabPageShortcutPlugin {
     override fun getShortcut(): NewTabShortcut {
         return NewTabShortcut.Chat
@@ -68,5 +68,4 @@ class AIChatNewTabShortcutPlugin @Inject constructor(
     companion object {
         private const val AI_CHAT_URL = "https://duckduckgo.com/chat"
     }
-
 }
