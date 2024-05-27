@@ -838,4 +838,49 @@
     <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">Varnostno potrdilo za %1$s je poteklo. Morda je spletno mesto napačno konfigurirano, napadalec je morda ogrozil vašo povezavo ali pa je vaša sistemska ura napačna.</string>
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Varnostno potrdilo za %1$s se ne ujema z *.%2$s. Morda je spletno mesto napačno konfigurirano, napadalec je morda ogrozil vašo povezavo ali pa je vaša sistemska ura napačna.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Operacijski sistem naprave ne zaupa varnostnemu potrdilu za %1$s. Morda je spletno mesto napačno konfigurirano, napadalec je morda ogrozil vašo povezavo ali pa je vaša sistemska ura napačna.</string>
+
+    <!-- Onboarding Experiment-->
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Pozdravljeni.<br/><br/>Ste pripravljeni na boljši, bolj zasebni internet?]]></string>
+    <string name="preOnboardingDaxDialog1Button">Pa se lotimo!</string>
+    <string name="preOnboardingDaxDialog2Title">Zaščite zasebnosti so aktivirane!</string>
+    <string name="preOnboardingDaxDialog2Button">Izberite brskalnik</string>
+    <string name="preOnboardingComparisonChartItem1">Privzeto išče zasebno</string>
+    <string name="preOnboardingComparisonChartItem2">Blokirajte sledilnike tretjih oseb</string>
+    <string name="preOnboardingComparisonChartItem3">Blokirajte pojavna okna za piškotke</string>
+    <string name="preOnboardingComparisonChartItem4">Blokirajte srhljive oglase</string>
+    <string name="preOnboardingComparisonChartItem5">Hitro izbrišite podatke brskanja</string>
+    <string name="preOnboardingDaxDialog3Title">Odlično! Veseli nas, da ste se nam pridružili.</string>
+    <string name="preOnboardingDaxDialog3Button">Začni brskanje</string>
+    <string name="onboardingSearchDaxDialogTitle">Preizkusi z iskanjem!</string>
+    <string name="onboardingSearchDaxDialogDescription">Vaša iskanja v DuckDuckGo so vedno anonimna.</string>
+    <string name="onboardingSearchDaxDialogOption1">kako se reče »raca« v španščini</string>
+    <string name="onboardingSearchDaxDialogOption2">zasedba mogočnih racmanov</string>
+    <string name="onboardingSearchDaxDialogOption3">lokalno vreme</string>
+    <string name="onboardingSearchDaxDialogOption4">Preseneti me!</string>
+    <string name="onboardingSitesDaxDialogTitle">Poskusite obiskati spletno stran!</string>
+    <string name="onboardingSitesDaxDialogDescription">Blokiral bom sledilnike, da ne bodo vohunili za vami.</string>
+    <string name="onboardingSitesDaxDialogOption1">espn.com</string>
+    <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
+    <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
+    <string name="onboardingSitesDaxDialogOption4">Preseneti me!</string>
+    <string name="onboardingSerpDaxDialogDescription">To je iskanje DuckDuckGo Search. Zasebno. Hitro. Z manj oglasi.</string>
+    <string name="onboardingSerpDaxDialogButton">Razumem!</string>
+    <string name="onboardingSitesSuggestionsDaxDialogTitle">Nato obiščite spletno mesto!</string>
+    <plurals name="onboardingTrackersBlockedDialogDescription">
+        <item quantity="one"><![CDATA[ in <b>še %1$d</b> sta vam poskušala tukaj slediti. Blokiral sem ju!<br/><br/>☝️ Za več informacij se dotaknite ščita.]]></item>
+        <item quantity="two"><![CDATA[ in <b>še %1$d</b> so vam poskušali tukaj slediti. Blokiral sem jih!<br/><br/>☝️ Za več informacij se dotaknite ščita.]]></item>
+        <item quantity="few"><![CDATA[ in <b>še %1$d</b> so vam poskušali tukaj slediti. Blokiral sem jih!<br/><br/>☝️ Za več informacij se dotaknite ščita.]]></item>
+        <item quantity="other"><![CDATA[ in <b>še %1$d </b> vam je poskušalo tukaj slediti. Blokiral sem jih!<br/><br/>☝️ Za več informacij se dotaknite ščita.]]></item>
+    </plurals>
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ vam je poskušal tukaj slediti. Blokiral sem ga!<br/><br/>☝️ Za več informacij tapnite ščit.️]]></item>
+        <item quantity="two"><![CDATA[ sta vam poskušala tukaj slediti. Blokiral sem ju!<br/><br/>☝️ Za več informacij tapnite ščit.️]]></item>
+        <item quantity="few"><![CDATA[ so vam poskušali tukaj slediti. Blokiral sem jih!<br/><br/>☝️ Za več informacij tapnite ščit.️]]></item>
+        <item quantity="other"><![CDATA[ vam je poskušalo tukaj slediti. Blokiral sem jih!<br/><br/>☝️ Za več informacij tapnite ščit.️]]></item>
+    </plurals>
+    <string name="onboardingTrackersBlockedDaxDialogButton">Razumem!</string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Takoj počistite svojo dejavnost brskanja z gumbom <b>Fire Button</b>.<br/><br/>Poskusite! ☝️️]]></string>
+    <string name="onboardingEndDaxDialogTitle">"Uspelo vam bo!"</string>
+    <string name="onboardingEndDaxDialogDescription">Ne pozabite: Vedno kadar brskate z mano, shrljivemu oglasu pristrižete peruti. 👌</string>
+
 </resources>

@@ -36,6 +36,7 @@ dependencies {
     implementation project(':verified-installation-api')
     implementation project(':library-loader-api')
     implementation project(':feature-toggles-api')
+    implementation project(':data-store-api')
 
     implementation AndroidX.core.ktx
     implementation KotlinX.coroutines.core
@@ -48,6 +49,7 @@ dependencies {
     implementation AndroidX.room.rxJava2
 
     testImplementation project(':common-test')
+    implementation project(':data-store-test')
     testImplementation Testing.junit4
     testImplementation AndroidX.archCore.testing
     testImplementation AndroidX.test.ext.junit

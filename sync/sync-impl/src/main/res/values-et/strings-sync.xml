@@ -25,6 +25,9 @@
     <string name="sync_disabled_authenticated_user"><b>Sünkroonimine ja varundamine peatatud</b>\nKahjuks pole sünkroonimine ja varundamine praegu saadaval. Proovi hiljem uuesti.</string>
     <string name="sync_disabled_authenticated_user_new_version"><b>Sünkroonimine ja varundamine peatatud</b>\nVabandust, kuid sünkroonimine ja varundamine pole selles rakenduse versioonis enam saadaval. Jätkamiseks värskenda DuckDuckGo uusimale versioonile.</string>
     <string name="sync_paused_notification"><b>Sünkroonimine ja varundus on peatatud</b>\nVabandust, sünkroonimine ja varundus pole praegu saadaval. Proovi hiljem uuesti.</string>
+    <string name="sync_error_notification"><b>Sünkroonimisviga</b>\nSync &amp; Backup pole ajutiselt saadaval.</string>
+    <string name="sync_error_warning"><b>Sünkroonimisviga</b>\nSync &amp; Backup pole ajutiselt saadaval.</string>
+    <string name="sync_signed_out_notification"><b>Sünkroonimine on peatatud</b>\nSünkroonimine on peatatud. Kui soovid selle seadme sünkroonimist jätkata, loo uuesti ühendus, kasutades mõnda teist seadet või taastamiskoodi.</string>
 
     <!-- Settings screen -->
     <string name="sync_screen_title">Sünkroonimine ja varundamine</string>

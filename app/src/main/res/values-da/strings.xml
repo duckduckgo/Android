@@ -828,4 +828,45 @@
     <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">Sikkerhedscertifikatet for %1$s er udløbet. Det er muligt, at webstedet er forkert konfigureret, at en angriber har kompromitteret din forbindelse, eller at dit systemur er forkert.</string>
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Sikkerhedscertifikatet for %1$s matcher ikke *.%2$s. Det er muligt, at webstedet er forkert konfigureret, eller at en angriber har kompromitteret din forbindelse, eller at dit systemur er forkert.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Enhedens operativsystem har ikke tillid til sikkerhedscertifikatet for %1$s. Det er muligt, at webstedet er forkert konfigureret, eller at en angriber har kompromitteret din forbindelse, eller at dit systemur er forkert.</string>
+
+    <!-- Onboarding Experiment-->
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Hej<br/><br/>Er du klar til et bedre og mere privat internet?]]></string>
+    <string name="preOnboardingDaxDialog1Button">Lad os gøre det!</string>
+    <string name="preOnboardingDaxDialog2Title">Beskyttelse af privatlivet er aktiveret!</string>
+    <string name="preOnboardingDaxDialog2Button">Vælg din browser</string>
+    <string name="preOnboardingComparisonChartItem1">Søg fortroligt som standard</string>
+    <string name="preOnboardingComparisonChartItem2">Bloker tredjeparts-trackere</string>
+    <string name="preOnboardingComparisonChartItem3">Bloker pop op-vinduer om cookies</string>
+    <string name="preOnboardingComparisonChartItem4">Bloker uhyggelige annoncer</string>
+    <string name="preOnboardingComparisonChartItem5">Ryd hurtigt browserdata</string>
+    <string name="preOnboardingDaxDialog3Title">Fantastisk! Velkommen til den \"anden\" side.</string>
+    <string name="preOnboardingDaxDialog3Button">Start søgning</string>
+    <string name="onboardingSearchDaxDialogTitle">Prøv at søge!</string>
+    <string name="onboardingSearchDaxDialogDescription">Dine DuckDuckGo-søgninger er altid anonyme.</string>
+    <string name="onboardingSearchDaxDialogOption1">hvordan siger man \"and\" på spansk</string>
+    <string name="onboardingSearchDaxDialogOption2">mighty ducks film</string>
+    <string name="onboardingSearchDaxDialogOption3">lokalt vejr</string>
+    <string name="onboardingSearchDaxDialogOption4">Overrask mig!</string>
+    <string name="onboardingSitesDaxDialogTitle">Prøv at besøge en hjemmeside!</string>
+    <string name="onboardingSitesDaxDialogDescription">Jeg blokerer trackere, så de ikke kan udspionere dig.</string>
+    <string name="onboardingSitesDaxDialogOption1">espn.com</string>
+    <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
+    <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
+    <string name="onboardingSitesDaxDialogOption4">Overrask mig!</string>
+    <string name="onboardingSerpDaxDialogDescription">Det er DuckDuckGo Search. Privat. Hurtig. Færre annoncer.</string>
+    <string name="onboardingSerpDaxDialogButton">Forstået</string>
+    <string name="onboardingSitesSuggestionsDaxDialogTitle">Prøv nu at besøge en hjemmeside!</string>
+    <plurals name="onboardingTrackersBlockedDialogDescription">
+        <item quantity="one"><![CDATA[ og <b>%1$d anden</b> forsøgte at spore dig her. Jeg blokerede dem!<br/><br/>☝️ Tryk på skjoldet for at få flere oplysninger.️]]></item>
+        <item quantity="other"><![CDATA[ og <b>%1$d andre</b> forsøgte at spore dig her. Jeg blokerede dem!<br/><br/>☝️ Tryk på skjoldet for at få flere oplysninger.️]]></item>
+    </plurals>
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ prøvede at spore dig her. Jeg blokerede dem!<br/><br/>☝️ Tryk på skjoldet for at få flere oplysninger.️]]></item>
+        <item quantity="other"><![CDATA[ prøvede at spore dig her. Jeg blokerede dem!<br/><br/>☝️ Tryk på skjoldet for at få flere oplysninger.️]]></item>
+    </plurals>
+    <string name="onboardingTrackersBlockedDaxDialogButton">Forstået</string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Ryd øjeblikkeligt din browseraktivitet med <b>Fire Button</b>.<br/><br/>Prøv det! ☝️️]]></string>
+    <string name="onboardingEndDaxDialogTitle">"Du har forstået det!"</string>
+    <string name="onboardingEndDaxDialogDescription">Husk: hver gang du browser med mig, mister en uhyggelig annonce sine vinger. 👌</string>
+
 </resources>

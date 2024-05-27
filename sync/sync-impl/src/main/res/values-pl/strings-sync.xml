@@ -25,6 +25,9 @@
     <string name="sync_disabled_authenticated_user"><b>Synchronizacja i kopia zapasowa wstrzymana</b>\nNiestety synchronizacja i kopia zapasowa jest obecnie niedostępna. Spróbuj ponownie później.</string>
     <string name="sync_disabled_authenticated_user_new_version"><b>Synchronizacja i kopia zapasowa wstrzymana</b>\nNiestety synchronizacja i kopia zapasowa nie jest już dostępna w tej wersji aplikacji. Aby kontynuować, zaktualizuj DuckDuckGo do najnowszej wersji.</string>
     <string name="sync_paused_notification"><b>Synchronizacja i kopia zapasowa wstrzymana</b>\nNiestety synchronizacja i kopia zapasowa jest obecnie niedostępna. Spróbuj ponownie później.</string>
+    <string name="sync_error_notification"><b>Błąd synchronizacji</b>\nFunkcja Sync &amp; Backup jest tymczasowo niedostępna.</string>
+    <string name="sync_error_warning"><b>Błąd synchronizacji</b>\nFunkcja Sync &amp; Backup jest tymczasowo niedostępna.</string>
+    <string name="sync_signed_out_notification"><b>Synchronizacja jest wstrzymana</b>\nSynchronizacja została wstrzymana. Jeśli chcesz kontynuować synchronizowanie tego urządzenia, ponownie nawiąż połączenie za pomocą innego urządzenia lub użyj kodu odzyskiwania.</string>
 
     <!-- Settings screen -->
     <string name="sync_screen_title">Synchronizacja i kopia zapasowa</string>

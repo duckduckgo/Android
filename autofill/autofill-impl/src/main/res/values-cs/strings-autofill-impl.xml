@@ -64,6 +64,10 @@
     <string name="autofillDeleteLoginDialogCancel">Zrušit</string>
     <string name="autofillDeleteLoginDialogDelete">Smazat</string>
 
+    <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
+    <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in DuckDuckGo better.</string>
+    <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Uživatelské jméno zkopírováno</string>
     <string name="autofillManagementPasswordCopied">Heslo zkopírováno</string>
@@ -135,8 +139,10 @@
     <string name="managementDisabledModeSubtitle">Na ochranu hesel se vyžaduje gesto zámku obrazovky, PIN nebo biometrické ověření.</string>
     <string name="credentialManagementEditTitle">Upravit heslo</string>
 
-    <string name="credentials_limit_warning"><b>Synchronizace je pozastavená</b>\nJe překročený limit počtu přihlášení. Jestli chceš synchronizaci obnovit, některá odstraň.\n\n<annotation type="manage_logins">Spravovat přihlašovací údaje</annotation></string>
-    <string name="credentials_limit_warning_notif"><b>Synchronizace hesel je pozastavená</b>\nDošlo k překročení limitu pro synchronizaci hesel. Zkus pár hesel smazat. Dokud tenhle problém nevyřešíš, hesla se nebudou zálohovat.</string>
+    <string name="credentials_limit_warning"><b>Synchronizace je pozastavená</b>\nUž máš maximální počet hesel. Jestli chceš synchronizaci obnovit, některá smaž.\n\n<annotation type="manage_logins">Spravovat hesla</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Synchronizace hesel je pozastavená</b>\nUž máš maximální počet hesel. Jestli chceš synchronizaci obnovit, některá hesla smaž.</string>
+    <string name="credentials_invalid_request_warning"><b>Synchronizace je pozastavená</b>\nNěkterá hesla jsou nesprávně naformátovaná nebo moc dlouhá, takže jsme je nemohli synchronizovat.\n\n<annotation type="manage_logins">Spravovat hesla</annotation></string>
+    <string name="credentials_invalid_request_warning_notif"><b>Synchronizace hesel je pozastavená</b>\nNěkterá hesla jsou nesprávně naformátovaná nebo moc dlouhá, takže jsme je nemohli synchronizovat.</string>
 
     <string name="saveLoginDialogNeverForThisSite">Na téhle stránce už se neptat</string>
     <string name="credentialManagementInstructionNeverForThisSite">Pokud vyloučené weby resetuješ, při příštím přihlašování na některý z nich se ti zobrazí výzva k uložení hesla.</string>

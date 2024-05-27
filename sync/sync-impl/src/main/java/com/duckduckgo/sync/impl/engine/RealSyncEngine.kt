@@ -20,6 +20,7 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.engine.*
 import com.duckduckgo.sync.api.engine.FeatureSyncError.COLLECTION_LIMIT_REACHED
+import com.duckduckgo.sync.api.engine.FeatureSyncError.INVALID_REQUEST
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_CREATION
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_LOGIN
@@ -63,6 +64,7 @@ class RealSyncEngine @Inject constructor(
     private val syncOperationErrorRecorder: SyncOperationErrorRecorder,
     private val providerPlugins: PluginPoint<SyncableDataProvider>,
     private val persisterPlugins: PluginPoint<SyncableDataPersister>,
+    private val lifecyclePlugins: PluginPoint<SyncEngineLifecycle>,
 ) : SyncEngine {
 
     override fun triggerSync(trigger: SyncTrigger) {
@@ -261,11 +263,17 @@ class RealSyncEngine @Inject constructor(
         persisterPlugins.getPlugins().map {
             it.onSyncEnabled()
         }
+        lifecyclePlugins.getPlugins().forEach {
+            it.onSyncEnabled()
+        }
     }
 
     override fun onSyncDisabled() {
         syncStateRepository.clearAll()
         persisterPlugins.getPlugins().map {
+            it.onSyncDisabled()
+        }
+        lifecyclePlugins.getPlugins().forEach {
             it.onSyncDisabled()
         }
     }
@@ -274,6 +282,7 @@ class RealSyncEngine @Inject constructor(
         return when (code) {
             API_CODE.COUNT_LIMIT.code -> COLLECTION_LIMIT_REACHED
             API_CODE.CONTENT_TOO_LARGE.code -> COLLECTION_LIMIT_REACHED
+            API_CODE.VALIDATION_ERROR.code -> INVALID_REQUEST
             else -> null
         }
     }

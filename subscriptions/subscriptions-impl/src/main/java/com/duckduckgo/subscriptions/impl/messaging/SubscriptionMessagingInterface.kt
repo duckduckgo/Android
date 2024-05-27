@@ -32,6 +32,7 @@ import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.JsRequestResponse
 import com.duckduckgo.js.messaging.api.SubscriptionEvent
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
+import com.duckduckgo.subscriptions.impl.AccessToken
 import com.duckduckgo.subscriptions.impl.AuthToken
 import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
 import com.duckduckgo.subscriptions.impl.SubscriptionsChecker
@@ -67,6 +68,7 @@ class SubscriptionMessagingInterface @Inject constructor(
         GetSubscriptionMessage(subscriptionsManager, dispatcherProvider),
         SetSubscriptionMessage(subscriptionsManager, appCoroutineScope, dispatcherProvider, pixelSender, subscriptionsChecker),
         InformationalEventsMessage(appCoroutineScope, pixelSender),
+        GetAccessTokenMessage(subscriptionsManager),
     )
 
     @JavascriptInterface
@@ -78,6 +80,7 @@ class SubscriptionMessagingInterface @Inject constructor(
                 webView.url?.toUri()?.host
             }
             jsMessage?.let {
+                logcat { jsMessage.toString() }
                 if (this.secret == secret && context == jsMessage.context && isUrlAllowed(url)) {
                     handlers.firstOrNull {
                         it.methods.contains(jsMessage.method) && it.featureName == jsMessage.featureName
@@ -156,10 +159,10 @@ class SubscriptionMessagingInterface @Inject constructor(
 
             val authToken: String? = runBlocking(dispatcherProvider.io()) {
                 val pat = subscriptionsManager.getAuthToken()
-                if (pat is AuthToken.Success && subscriptionsManager.getSubscription()?.isActive() == true) {
-                    return@runBlocking pat.authToken
-                } else {
-                    return@runBlocking null
+                when (pat) {
+                    is AuthToken.Success -> pat.authToken
+                    is AuthToken.Failure.TokenExpired -> pat.authToken
+                    else -> null
                 }
             }
 
@@ -205,7 +208,6 @@ class SubscriptionMessagingInterface @Inject constructor(
                     subscriptionsChecker.runChecker()
                     pixelSender.reportRestoreUsingEmailSuccess()
                     pixelSender.reportSubscriptionActivated()
-                    jsMessageCallback?.process(featureName, jsMessage.method, jsMessage.id, jsMessage.params)
                 }
             } catch (e: Exception) {
                 logcat { "Error parsing the token" }
@@ -252,5 +254,41 @@ class SubscriptionMessagingInterface @Inject constructor(
             "subscriptionsWelcomeAddEmailClicked",
             "subscriptionsWelcomeFaqClicked",
         )
+    }
+
+    private inner class GetAccessTokenMessage(
+        private val subscriptionsManager: SubscriptionsManager,
+    ) : JsMessageHandler {
+
+        override fun process(
+            jsMessage: JsMessage,
+            secret: String,
+            jsMessageCallback: JsMessageCallback?,
+        ) {
+            val jsMessageId = jsMessage.id ?: return
+
+            val pat: AccessToken = runBlocking {
+                subscriptionsManager.getAccessToken()
+            }
+
+            val resultJson = when (pat) {
+                is AccessToken.Success -> """{"token":"${pat.accessToken}"}"""
+                is AccessToken.Failure -> """{ }"""
+            }
+
+            val response = JsRequestResponse.Success(
+                context = jsMessage.context,
+                featureName = featureName,
+                method = jsMessage.method,
+                id = jsMessageId,
+                result = JSONObject(resultJson),
+            )
+
+            jsMessageHelper.sendJsResponse(response, callbackName, secret, webView)
+        }
+
+        override val allowedDomains: List<String> = emptyList()
+        override val featureName: String = "useSubscription"
+        override val methods: List<String> = listOf("getAccessToken")
     }
 }

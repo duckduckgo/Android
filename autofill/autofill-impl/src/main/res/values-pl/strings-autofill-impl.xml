@@ -64,6 +64,10 @@
     <string name="autofillDeleteLoginDialogCancel">Anuluj</string>
     <string name="autofillDeleteLoginDialogDelete">Usuń</string>
 
+    <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
+    <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in DuckDuckGo better.</string>
+    <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Skopiowano nazwę użytkownika</string>
     <string name="autofillManagementPasswordCopied">Skopiowano hasło</string>
@@ -135,8 +139,10 @@
     <string name="managementDisabledModeSubtitle">Aby chronić hasła, korzystaj z blokady urządzenia za pomocą wzoru, kodu PIN lub danych biometrycznych.</string>
     <string name="credentialManagementEditTitle">Edytuj hasło</string>
 
-    <string name="credentials_limit_warning"><b>Synchronizacja wstrzymana</b>\nPrzekroczono limit logowań. Usuń niektóre, aby wznowić synchronizację.\n\n<annotation type="manage_logins">Zarządzaj loginami</annotation></string>
-    <string name="credentials_limit_warning_notif"><b>Synchronizacja haseł wstrzymana</b>\nPrzekroczono limit synchronizacji haseł. Spróbuj usunąć niektóre hasła. Dopóki ten problem nie zostanie rozwiązany, nie będzie tworzona kopia zapasowa haseł.</string>
+    <string name="credentials_limit_warning"><b>Synchronizacja wstrzymana</b>\nOsiągnięto maksymalną liczbę haseł. Usuń część z nich, aby wznowić synchronizację.\n\n<annotation type="manage_logins">Zarządzaj hasłami</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Synchronizacja haseł wstrzymana</b>\nOsiągnięto maksymalną liczbę haseł. Usuń część haseł, aby wznowić synchronizację.</string>
+    <string name="credentials_invalid_request_warning"><b>Synchronizacja wstrzymana</b>\nNiektóre hasła mają niepoprawny format lub są za długie i nie zostały zsynchronizowane.\n\n<annotation type="manage_logins">Zarządzaj hasłami</annotation></string>
+    <string name="credentials_invalid_request_warning_notif"><b>Synchronizacja haseł wstrzymana</b>\nNiektóre hasła mają niepoprawny format lub są za długie i nie zostały zsynchronizowane.</string>
 
     <string name="saveLoginDialogNeverForThisSite">Nigdy nie pytaj o tę witrynę</string>
     <string name="credentialManagementInstructionNeverForThisSite">Jeśli zresetujesz wykluczone witryny, przy następnym logowaniu do dowolnej z nich pojawi się monit o zapisanie hasła.</string>

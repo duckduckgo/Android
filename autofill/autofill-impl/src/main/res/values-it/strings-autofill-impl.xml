@@ -64,6 +64,10 @@
     <string name="autofillDeleteLoginDialogCancel">Annulla</string>
     <string name="autofillDeleteLoginDialogDelete">Cancella</string>
 
+    <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
+    <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in DuckDuckGo better.</string>
+    <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Nome utente copiato</string>
     <string name="autofillManagementPasswordCopied">Password copiata</string>
@@ -135,8 +139,10 @@
     <string name="managementDisabledModeSubtitle">Per proteggere le password sono necessari una sequenza di blocco del dispositivo, un PIN o dati biometrici.</string>
     <string name="credentialManagementEditTitle">Modifica password</string>
 
-    <string name="credentials_limit_warning"><b>Sincronizzazione interrotta</b>\nLimite di accessi superato. Eliminane alcuni per riprendere la sincronizzazione.\n\n<annotation type="manage_logins">Gestisci gli accessi</annotation></string>
-    <string name="credentials_limit_warning_notif"><b>La sincronizzazione con password è sospesa</b>\nHai superato il limite di sincronizzazione con password. Prova a eliminare qualche password. Fino a quando il problema non verrà risolto, non sarà eseguito il backup delle password.</string>
+    <string name="credentials_limit_warning"><b>Sincronizzazione in pausa</b>\nHai raggiunto il numero massimo di password. Eliminane alcune per riprendere la sincronizzazione.<annotation type="manage_logins">Gestisci password</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Sincronizzazione password in pausa</b>\nHai raggiunto il numero massimo di password. Eliminane alcune per riprendere la sincronizzazione.</string>
+    <string name="credentials_invalid_request_warning"><b>Sincronizzazione in pausa</b>\nAlcune password sono formattate in modo errato o sono troppo lunghe e non sono state sincronizzate.\n\n<annotation type="manage_logins">Gestisci password</annotation></string>
+    <string name="credentials_invalid_request_warning_notif"><b>Sincronizzazione password in pausa</b>\nAlcune password sono formattate in modo errato o sono troppo lunghe e non sono state sincronizzate.</string>
 
     <string name="saveLoginDialogNeverForThisSite">Non chiedere mai per questo sito</string>
     <string name="credentialManagementInstructionNeverForThisSite">Se ripristini i siti esclusi, ti verrà richiesto di salvare la password la prossima volta che accederai a uno di questi siti.</string>

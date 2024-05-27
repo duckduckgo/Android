@@ -25,6 +25,9 @@
     <string name="sync_disabled_authenticated_user"><b>A szinkronizálás és a biztonságai másolatkészítés szünetel</b>\nA szinkronizálás és biztonsági másolatkészítés jelenleg sajnos nem érhető el. Próbálkozz újra később.</string>
     <string name="sync_disabled_authenticated_user_new_version"><b>A szinkronizálás és a biztonsági másolatkészítés szünetel</b>\nA szinkronizálás és biztonsági másolatkészítés az alkalmazás ezen verziójában sajnos már nem érhető el. A folytatáshoz frissíts a DuckDuckGo a legújabb verziójára.</string>
     <string name="sync_paused_notification"><b>A szinkronizálás és a biztonságai másolatkészítés szünetel</b>\nA szinkronizálás és biztonsági másolatkészítés jelenleg sajnos nem érhető el. Próbálkozz újra később.</string>
+    <string name="sync_error_notification"><b>Szinkronizálási hiba</b>\nA szinkronizálás és biztonsági mentés átmenetileg nem érhető el.</string>
+    <string name="sync_error_warning"><b>Szinkronizálási hiba</b>\nA Sync &amp; Backup funkció átmenetileg nem érhető el.</string>
+    <string name="sync_signed_out_notification"><b>Szinkronizálás szüneteltetve</b>\nA szinkronizálás szüneteltetve lett. Ha folytatni szeretnéd az eszköz szinkronizálását, csatlakozz újra egy másik eszközzel vagy a helyreállítási kóddal.</string>
 
     <!-- Settings screen -->
     <string name="sync_screen_title">Szinkronizálás és biztonsági mentés</string>

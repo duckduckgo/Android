@@ -64,6 +64,10 @@
     <string name="autofillDeleteLoginDialogCancel">Avbryt</string>
     <string name="autofillDeleteLoginDialogDelete">Ta bort</string>
 
+    <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
+    <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in DuckDuckGo better.</string>
+    <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Användarnamn kopierat</string>
     <string name="autofillManagementPasswordCopied">Lösenord kopierat</string>
@@ -135,8 +139,10 @@
     <string name="managementDisabledModeSubtitle">För att skydda dina lösenord krävs ett enhetslåsmönster, en PIN-kod eller biometri.</string>
     <string name="credentialManagementEditTitle">Redigera lösenord</string>
 
-    <string name="credentials_limit_warning"><b>Synkronisering pausad</b>\nGränsen för antalet inloggningar har överskridits. Ta bort några för att återuppta synkronisering.\n\n<annotation type="manage_logins">Hantera inloggningar</annotation></string>
-    <string name="credentials_limit_warning_notif"><b>Synkronisering av lösenord pausad</b>\nDu har överskridit gränsen för antalet lösenords som kan synkroniseras. Ta bort några lösenord. Dina lösenord kommer inte att säkerhetskopieras förrän detta har åtgärdats.</string>
+    <string name="credentials_limit_warning"><b>Synkroniseringen har pausats</b>\nDu har nått det maximala antalet lösenord. Ta bort några för att återuppta synkroniseringen.\n\n<annotation type="manage_logins">Hantera lösenord</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Lösenordssynkroniseringen har pausats</b>\nDu har nått det maximala antalet lösenord. Ta bort några lösenord för att återuppta synkroniseringen.</string>
+    <string name="credentials_invalid_request_warning"><b>Synkroniseringen har pausats</b>\nVissa lösenord är felaktigt formaterade eller för långa och har inte synkroniserats.\n\n<annotation type="manage_logins">Hantera lösenord</annotation></string>
+    <string name="credentials_invalid_request_warning_notif"><b>Lösenordssynkroniseringen har pausats</b>\nVissa lösenord är felaktigt formaterade eller för långa och har inte synkroniserats.</string>
 
     <string name="saveLoginDialogNeverForThisSite">Fråga aldrig för den här webbplatsen</string>
     <string name="credentialManagementInstructionNeverForThisSite">Om du återställer exkluderade webbplatser kommer du att uppmanas att spara ditt lösenord nästa gång du loggar in på någon av dessa webbplatser.</string>

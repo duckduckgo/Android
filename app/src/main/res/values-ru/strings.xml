@@ -838,4 +838,49 @@
     <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">Срок действия сертификата безопасности сайта %1$s истек. Возможно, неверно задана конфигурация сайта, соединение перехвачено злоумышленником либо неправильно настроены системные часы.</string>
     <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Сертификат безопасности сайта %1$s не подходит для домена *.%2$s. Возможно, неверно задана конфигурация сайта, соединение перехвачено злоумышленником либо неправильно настроены системные часы.</string>
     <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Операционная система вашего устройства не доверяет сертификату безопасности сайта %1$s. Возможно, неверно задана конфигурация сайта, соединение перехвачено злоумышленником либо неправильно настроены системные часы.</string>
+
+    <!-- Onboarding Experiment-->
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Привет!<br/><br/>Качественный интернет с защитой данных заказывали?]]></string>
+    <string name="preOnboardingDaxDialog1Button">Поехали!</string>
+    <string name="preOnboardingDaxDialog2Title">Защита конфиденциальности уже включена!</string>
+    <string name="preOnboardingDaxDialog2Button">Выбрать браузер</string>
+    <string name="preOnboardingComparisonChartItem1">Конфиденциальный поиск по умолчанию</string>
+    <string name="preOnboardingComparisonChartItem2">Блокировка сторонних трекеров</string>
+    <string name="preOnboardingComparisonChartItem3">Блокировка всплывающих окон куки</string>
+    <string name="preOnboardingComparisonChartItem4">Защита от надоедливой рекламы</string>
+    <string name="preOnboardingComparisonChartItem5">Быстрая очистка данных из браузера</string>
+    <string name="preOnboardingDaxDialog3Title">Супер! Добро пожаловать в утиную команду!</string>
+    <string name="preOnboardingDaxDialog3Button">Начать просмотр</string>
+    <string name="onboardingSearchDaxDialogTitle">Попробуйте поискать!</string>
+    <string name="onboardingSearchDaxDialogDescription">Ваши поисковые запросы в DuckDuckGo всегда анонимны.</string>
+    <string name="onboardingSearchDaxDialogOption1">Как сказать «утка» по-испански?</string>
+    <string name="onboardingSearchDaxDialogOption2">Кто играет главные роли в фильме «Могучие утята»?</string>
+    <string name="onboardingSearchDaxDialogOption3">Местная погода</string>
+    <string name="onboardingSearchDaxDialogOption4">Удиви меня!</string>
+    <string name="onboardingSitesDaxDialogTitle">Попробуйте посетить сайт!</string>
+    <string name="onboardingSitesDaxDialogDescription">Мы заблокируем трекеры и пресечем слежку.</string>
+    <string name="onboardingSitesDaxDialogOption1">espn.com</string>
+    <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
+    <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
+    <string name="onboardingSitesDaxDialogOption4">Удиви меня!</string>
+    <string name="onboardingSerpDaxDialogDescription">Это — DuckDuckGo Search. Надежно. Быстро. Меньше рекламы.</string>
+    <string name="onboardingSerpDaxDialogButton">Понятно</string>
+    <string name="onboardingSitesSuggestionsDaxDialogTitle">А теперь попробуйте посетить сайт!</string>
+    <plurals name="onboardingTrackersBlockedDialogDescription">
+        <item quantity="one"><![CDATA[ и еще <b>%1$d сервис</b> пытались вести за вами слежку, но мы их заблокировали.<br/><br/>☝️ Нажмите на щит, чтобы узнать подробности.]]></item>
+        <item quantity="few"><![CDATA[ и еще <b>%1$d сервиса</b> пытались вести за вами слежку, но мы их заблокировали.<br/><br/>☝️ Нажмите на щит, чтобы узнать подробности.]]></item>
+        <item quantity="many"><![CDATA[ и еще <b>%1$d сервисов</b> пытались вести за вами слежку, но мы их заблокировали.<br/><br/>☝️ Нажмите на щит, чтобы узнать подробности.]]></item>
+        <item quantity="other"><![CDATA[ и <b>другие сервисы (еще %1$d)</b> пытались вести за вами слежку, но мы их заблокировали.<br/><br/>☝️ Нажмите на щит, чтобы узнать подробности.]]></item>
+    </plurals>
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ пытался вести за вами слежку, но мы его заблокировали.<br/><br/>☝️ Нажмите на щит, чтобы узнать подробности.]]></item>
+        <item quantity="few"><![CDATA[ пытались вести за вами слежку, но мы их заблокировали.<br/><br/>☝️ Нажмите на щит, чтобы узнать подробности.]]></item>
+        <item quantity="many"><![CDATA[ пытались вести за вами слежку, но мы их заблокировали.<br/><br/>☝️ Нажмите на щит, чтобы узнать подробности.]]></item>
+        <item quantity="other"><![CDATA[ пытались вести за вами слежку, но мы их заблокировали.<br/><br/>☝️ Нажмите на щит, чтобы узнать подробности.]]></item>
+    </plurals>
+    <string name="onboardingTrackersBlockedDaxDialogButton">Понятно!</string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Кнопка <b>Fire Button</b> моментально стирает из браузера данные о посещении сайтов.<br/><br/>Давайте попробуем! ☝️️]]></string>
+    <string name="onboardingEndDaxDialogTitle">"Проще некуда!"</string>
+    <string name="onboardingEndDaxDialogDescription">Бродить по сайтам с нами — значит подрезать крылья назойливой рекламе. 👌</string>
+
 </resources>

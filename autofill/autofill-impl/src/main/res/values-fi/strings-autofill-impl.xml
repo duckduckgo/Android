@@ -64,6 +64,10 @@
     <string name="autofillDeleteLoginDialogCancel">Peruuta</string>
     <string name="autofillDeleteLoginDialogDelete">Poista</string>
 
+    <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
+    <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in DuckDuckGo better.</string>
+    <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Käyttäjätunnus kopioitu</string>
     <string name="autofillManagementPasswordCopied">Salasana kopioitu</string>
@@ -135,8 +139,10 @@
     <string name="managementDisabledModeSubtitle">Salasanojen suojaamiseen tarvitaan laitteen lukituskuvio, PIN-koodi tai biometriset tiedot.</string>
     <string name="credentialManagementEditTitle">Muokkaa salasanaa</string>
 
-    <string name="credentials_limit_warning"><b>Synkronointi keskeytetty</b>\nKirjautumisten enimmäismäärä ylitetty. Poista jotain jatkaaksesi synkronointia.\n\n<annotation type="manage_logins">Hallitse kirjautumisia</annotation></string>
-    <string name="credentials_limit_warning_notif"><b>Salasanojen synkronointi on keskeytetty</b>\nOlet ylittänyt salasanojen synkronointirajan. Yritä poistaa joitakin salasanoja. Salasanojasi ei varmuuskopioida ennen kuin tämä ongelma on ratkaistu.</string>
+    <string name="credentials_limit_warning"><b>Synkronointi keskeytetty</b>\nSalasanakiintiösi on täynnä. Poista joitain salasanoja jatkaaksesi synkronointia.\n\n<annotation type="manage_logins">Hallitse salasanoja</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Salasanojen synkronointi on keskeytetty</b>\nSalasanakiintiösi on täynnä. Poista joitakin salasanoja jatkaaksesi synkronointia.</string>
+    <string name="credentials_invalid_request_warning"><b>Synkronointi keskeytetty</b>\nJotkin salasanat on muotoiltu väärin tai ovat liian pitkiä, eikä niitä synkronoitu.\n\n<annotation type="manage_logins">Hallitse salasanoja</annotation></string>
+    <string name="credentials_invalid_request_warning_notif"><b>Salasanojen synkronointi keskeytetty</b>\nSalasanojen synkronointi on keskeytetty.\n\nJotkin salasanat on muotoiltu väärin tai ovat liian pitkiä, eikä niitä synkronoitu.</string>
 
     <string name="saveLoginDialogNeverForThisSite">Älä kysy enää tällä sivustolla</string>
     <string name="credentialManagementInstructionNeverForThisSite">Jos nollaat poissuljetut sivustot, sinua pyydetään tallentamaan salasanasi, kun seuraavan kerran kirjaudut sisään jollekin näistä sivustoista.</string>

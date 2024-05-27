@@ -20,8 +20,10 @@
     <!-- Sync settings screen -->
     <string name="sync_enable_option_favorites_title">Partilhar favoritos</string>
     <string name="sync_enable_option_favorites_subtitle">Usa os mesmos favoritos em todos os teus dispositivos. Deixa desativado para manter separados os favoritos em dispositivos móveis e computadores.</string>
-    <string name="saved_site_limit_warning"><b>Sincronização em pausa</b>\nLimite de favoritos excedido. Elimina alguns para retomar a sincronização.\n\n<annotation type="manage_bookmarks">Gerir marcadores</annotation></string>
-    <string name="saved_site_limit_warning_notif"><b>A sincronização de marcadores está em pausa</b>\nExcedeste o limite de sincronização de marcadores. Experimenta eliminar alguns marcadores. Não é possível fazer uma cópia de segurança dos marcadores até este problema estar resolvido.</string>
+    <string name="saved_site_limit_warning"><b>Sincronização em pausa</b>\nAtingiste o número máximo de marcadores. Elimina alguns para retomar a sincronização.\n\n<annotation type="manage_bookmarks">Gerir marcadores</annotation></string>
+    <string name="saved_site_limit_warning_notif"><b>A sincronização de marcadores está em pausa</b>\nAtingiste o número máximo de marcadores. Elimina alguns marcadores para retomar a sincronização.</string>
+    <string name="saved_site_invalid_warning"><b>Sincronização em pausa</b>\nAlguns marcadores estão formatados incorretamente ou são demasiado longos e não foram sincronizados.\n\n<annotation type="manage_bookmarks">Gerir marcadores</annotation></string>
+    <string name="saved_site_invalid_warning_notif"><b>A sincronização de marcadores está em pausa</b>\nAlguns marcadores estão formatados incorretamente ou são demasiado longos e não foram sincronizados.</string>
     <plurals name="saved_site_invalid_items_warning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
         <item quantity="one">Não é possível sincronizar o teu marcador para %1$s porque um dos campos excede o limite de carateres.</item>
         <item quantity="other">Não é possível sincronizar os teus marcadores para %1$s e mais %2$d sites porque alguns dos campos excedem o limite de carateres.</item>

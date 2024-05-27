@@ -24,6 +24,7 @@ import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.net.Uri
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType
+import com.duckduckgo.app.browser.applinks.ExternalAppIntentFlagsFeature
 import com.duckduckgo.privacy.config.api.AmpLinkType
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.TrackingParameters
@@ -36,6 +37,7 @@ class SpecialUrlDetectorImpl(
     private val ampLinks: AmpLinks,
     private val trackingParameters: TrackingParameters,
     private val subscriptions: Subscriptions,
+    private val externalAppIntentFlagsFeature: ExternalAppIntentFlagsFeature,
 ) : SpecialUrlDetector {
 
     override fun determineType(initiatingUrl: String?, uri: Uri): UrlType {
@@ -154,6 +156,12 @@ class SpecialUrlDetectorImpl(
     private fun buildIntent(uriString: String): UrlType {
         return try {
             val intent = Intent.parseUri(uriString, URI_ANDROID_APP_SCHEME)
+
+            if (externalAppIntentFlagsFeature.self().isEnabled()) {
+                intent.addCategory(Intent.CATEGORY_BROWSABLE)
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            }
+
             val fallbackUrl = intent.getStringExtra(EXTRA_FALLBACK_URL)
             val fallbackIntent = buildFallbackIntent(fallbackUrl)
             UrlType.NonHttpAppLink(uriString = uriString, intent = intent, fallbackUrl = fallbackUrl, fallbackIntent = fallbackIntent)

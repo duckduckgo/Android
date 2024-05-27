@@ -20,8 +20,10 @@
     <!-- Sync settings screen -->
     <string name="sync_enable_option_favorites_title">Синхронизировать избранное</string>
     <string name="sync_enable_option_favorites_subtitle">Поддерживать одно и то же избранное на всех устройствах. Не выбирайте этот вариант, если хотите использовать разное избранное в мобильной и настольной версиях браузера.</string>
-    <string name="saved_site_limit_warning"><b>Синхронизация приостановлена</b>\nПревышен лимит по количеству закладок. Удалите некоторые из них, чтобы возобновить синхронизацию.\n\n<annotation type="manage_bookmarks">Управление закладками</annotation></string>
-    <string name="saved_site_limit_warning_notif"><b>Синхронизация закладок приостановлена</b>\nВы превысили лимит синхронизации закладок. Попробуйте удалить некоторые из них. Пока вы не устраните эту проблему, резервная копия закладок создаваться не будет.</string>
+    <string name="saved_site_limit_warning"><b>Синхронизация на паузе</b>\nДостигнуто максимальное число закладок. Чтобы возобновить синхронизацию, удалите некоторые из них.\n\n<annotation type="manage_bookmarks">Управление закладками</annotation></string>
+    <string name="saved_site_limit_warning_notif"><b>Синхронизация закладок на паузе</b>\nДостигнуто максимальное число закладок. Чтобы возобновить синхронизацию, удалите некоторые из них.</string>
+    <string name="saved_site_invalid_warning"><b>Синхронизация на паузе</b>\nНекоторые закладки не синхронизируются из-за неверного формата или превышения ограничений по длине.\n\n<annotation type="manage_bookmarks">Управление закладками</annotation></string>
+    <string name="saved_site_invalid_warning_notif"><b>Синхронизация закладок на паузе</b>\nНекоторые закладки не синхронизируются из-за неверного формата или превышения ограничений по длине.</string>
     <plurals name="saved_site_invalid_items_warning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
         <item quantity="one">Синхронизировать вашу закладку на сайт %1$s не удалось, так как содержимое одного из полей превышает ограничение по числу символов.</item>
         <item quantity="few">Синхронизировать ваши закладки на %1$s и еще %2$d сайта не удалось, так как содержимое некоторых полей превышает ограничение по числу символов.</item>

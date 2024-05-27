@@ -23,26 +23,6 @@
     android:layout_height="wrap_content">
 
     <com.duckduckgo.subscriptions.impl.settings.views.SubscriptionSettingLayout
-        android:id="@+id/subscriptionSettingContainer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?attr/selectableItemBackground"
-        android:visibility="gone"
-        tools:visibility="visible">
-
-        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-            android:id="@+id/subscriptionSetting"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clickable="false"
-            android:paddingStart="56dp"
-            app:primaryText="@string/subscriptionSetting"
-            tools:ignore="RtlSymmetry" />
-
-    </com.duckduckgo.subscriptions.impl.settings.views.SubscriptionSettingLayout>
-
-
-    <com.duckduckgo.subscriptions.impl.settings.views.SubscriptionSettingLayout
         android:id="@+id/subscriptionBuyContainer"
         android:background="?attr/selectableItemBackground"
         android:orientation="vertical"
@@ -76,6 +56,25 @@
             app:textType="primary"
             app:typography="h4"
             android:text="@string/subscriptionSettingGet" />
+
+    </com.duckduckgo.subscriptions.impl.settings.views.SubscriptionSettingLayout>
+
+    <com.duckduckgo.subscriptions.impl.settings.views.SubscriptionSettingLayout
+        android:id="@+id/subscriptionSettingContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/subscriptionSetting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            android:paddingStart="56dp"
+            app:primaryText="@string/subscriptionSetting"
+            tools:ignore="RtlSymmetry" />
 
     </com.duckduckgo.subscriptions.impl.settings.views.SubscriptionSettingLayout>
 

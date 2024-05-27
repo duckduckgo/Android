@@ -4,7 +4,6 @@ import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
-import com.duckduckgo.autofill.impl.ui.credential.management.survey.AutofillSurvey.SurveyDetails
 import com.duckduckgo.common.test.CoroutineTestRule
 import java.util.*
 import kotlinx.coroutines.flow.flowOf
@@ -42,8 +41,19 @@ class AutofillSurveyImplTest {
         whenever(appBuildConfig.deviceLocale).thenReturn(Locale("en"))
 
         coroutineTestRule.testScope.runTest {
+            whenever(autofillSurveyStore.availableSurveys()).thenReturn(
+                listOf(
+                    SurveyDetails("autofill-2024-04-26", "https://example.com/survey"),
+                ),
+            )
             configureCredentialCount(0)
         }
+    }
+
+    @Test
+    fun whenNoSurveyAvailableThenFirstUnusedSurveyReturnsNull() = runTest {
+        whenever(autofillSurveyStore.availableSurveys()).thenReturn(emptyList())
+        assertNull(testee.firstUnusedSurvey())
     }
 
     @Test
