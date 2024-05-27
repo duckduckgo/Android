@@ -16,6 +16,7 @@
 
 package com.duckduckgo.newtabpage.api
 
+import android.content.Context
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.duckduckgo.common.utils.plugins.ActivePlugin
@@ -31,6 +32,8 @@ interface NewTabPageShortcutPlugin : ActivePlugin {
      * @return [NewTabShortcut]
      */
     fun getShortcut(): NewTabShortcut
+
+    fun onClick(context: Context, shortcut: NewTabShortcut)
 }
 
 // TODO: Clean up  this so it's an interface that exposes type, name and drawable

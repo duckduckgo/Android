@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.savedsites.impl.newtab
+package com.duckduckgo.newtabpage.impl.shortcuts
 
 import android.content.Context
 import android.util.AttributeSet
@@ -28,17 +28,17 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.databinding.RowOneLineListItemBinding
 import com.duckduckgo.newtabpage.api.NewTabPageSection
 import com.duckduckgo.newtabpage.api.NewTabPageSectionSettingsPlugin
-import com.duckduckgo.saved.sites.impl.databinding.ViewFavouritesSettingsItemBinding
+import com.duckduckgo.newtabpage.impl.databinding.ViewShortcutsSettingsItemBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
-class FavouritesNewTabSettingView @JvmOverloads constructor(
+class ShortcutsNewTabSettingView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
 ) : LinearLayout(context, attrs, defStyle) {
 
-    private val binding: ViewFavouritesSettingsItemBinding by viewBinding()
+    private val binding: ViewShortcutsSettingsItemBinding by viewBinding()
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
@@ -46,10 +46,10 @@ class FavouritesNewTabSettingView @JvmOverloads constructor(
 }
 
 @ContributesMultibinding(scope = ActivityScope::class)
-class FavouritesNewTabSectionSettingsPlugin @Inject constructor() : NewTabPageSectionSettingsPlugin {
-    override val name = NewTabPageSection.FAVOURITES.name
+class ShortcutsNewTabSettingViewPlugin @Inject constructor() : NewTabPageSectionSettingsPlugin {
+    override val name = NewTabPageSection.SHORTCUTS.name
 
     override fun getView(context: Context): View {
-        return FavouritesNewTabSettingView(context)
+        return ShortcutsNewTabSettingView(context)
     }
 }

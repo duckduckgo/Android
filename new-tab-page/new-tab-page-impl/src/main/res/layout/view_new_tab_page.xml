@@ -24,4 +24,23 @@
     android:id="@+id/newTabSectionsContent"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"/>
+    android:orientation="vertical">
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/newTabEdit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/keyline_4"
+        android:background="@drawable/selectable_rounded_container_ripple"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:paddingStart="@dimen/keyline_3"
+        android:paddingTop="@dimen/keyline_2"
+        android:paddingEnd="@dimen/keyline_3"
+        android:paddingBottom="@dimen/keyline_2"
+        android:text="@string/newTabPageEdit"
+        app:textType="primary"
+        app:typography="caption" />
+
+</LinearLayout>

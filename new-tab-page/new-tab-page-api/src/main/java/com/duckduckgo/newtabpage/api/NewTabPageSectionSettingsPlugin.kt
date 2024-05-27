@@ -23,6 +23,7 @@ import android.view.View
  * This class is used to provide each of the Sections that build the New Tab Page
  * Implementation of https://app.asana.com/0/1174433894299346/12070643725750
  */
+
 interface NewTabPageSectionSettingsPlugin {
 
     /** Name of the focused view version */

@@ -22,8 +22,10 @@ import android.util.AttributeSet
 import android.view.ViewGroup.LayoutParams
 import android.widget.LinearLayout
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.browser.api.ui.BrowserScreens.NewTabSettingsScreenNoParams
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.newtabpage.api.NewTabPageSectionProvider
 import com.duckduckgo.newtabpage.impl.databinding.ViewNewTabPageBinding
 import dagger.android.support.AndroidSupportInjection
@@ -45,6 +47,9 @@ class NewTabPageView @JvmOverloads constructor(
     @Inject
     lateinit var newTabSectionsProvider: NewTabPageSectionProvider
 
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
+
     private var coroutineScope: CoroutineScope? = null
 
     private val binding: ViewNewTabPageBinding by viewBinding()
@@ -57,6 +62,10 @@ class NewTabPageView @JvmOverloads constructor(
         coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
         setupRemoteSections()
+
+        binding.newTabEdit.setOnClickListener {
+            globalActivityStarter.start(context, NewTabSettingsScreenNoParams)
+        }
     }
 
     private fun setupRemoteSections() {
