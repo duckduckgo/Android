@@ -30,7 +30,7 @@ import kotlinx.coroutines.flow.flow
     scope = AppScope::class,
 )
 class RealNewTabPageSectionProvider @Inject constructor(
-    private val newTabPageSections: ActivePluginPoint<@JvmSuppressWildcards NewTabPageSectionPlugin>,
+    private val newTabPageSections: ActivePluginPoint<NewTabPageSectionPlugin>,
 ) : NewTabPageSectionProvider {
     override fun provideSections(): Flow<List<NewTabPageSectionPlugin>> = flow {
         emit(newTabPageSections.getPlugins().map { it })

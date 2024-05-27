@@ -41,6 +41,7 @@ import com.duckduckgo.newtabpage.api.NewTabPageSectionPlugin
 import com.duckduckgo.newtabpage.api.NewTabShortcut.Bookmarks
 import com.duckduckgo.newtabpage.api.NewTabShortcut.Chat
 import com.duckduckgo.newtabpage.impl.databinding.ViewNewTabShortcutsSectionBinding
+import com.duckduckgo.newtabpage.impl.shortcuts.NewTabSectionsItem.ShortcutItem
 import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsAdapter.Companion.QUICK_ACCESS_GRID_MAX_COLUMNS
 import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsAdapter.Companion.QUICK_ACCESS_ITEM_MAX_SIZE_DP
 import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsViewModel.ViewState
@@ -51,6 +52,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import logcat.logcat
 
 @InjectWith(ViewScope::class)
 class ShortcutsNewTabSectionView @JvmOverloads constructor(
@@ -92,9 +94,16 @@ class ShortcutsNewTabSectionView @JvmOverloads constructor(
 
         configureGrid()
 
-        viewModel.viewState
-            .onEach { render(it) }
-            .launchIn(coroutineScope!!)
+        newTabShortcutsProvider.provideShortcuts()
+            .onEach { shortcutPlugins ->
+                logcat { "New Tab: Shortcuts $shortcutPlugins" }
+                val shortcuts = shortcutPlugins.map { ShortcutItem(it.getShortcut()) }
+                adapter.submitList(shortcuts)
+            }.launchIn(coroutineScope!!)
+
+        // viewModel.viewState
+        //     .onEach { render(it) }
+        //     .launchIn(coroutineScope!!)˚
     }
 
     private fun render(viewState: ViewState) {

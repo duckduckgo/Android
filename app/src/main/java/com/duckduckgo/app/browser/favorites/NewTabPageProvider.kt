@@ -36,7 +36,7 @@ interface NewTabPageProvider {
 
 @ContributesBinding(scope = AppScope::class)
 class RealNewTabPageProvider @Inject constructor(
-    private val newTabPageVersions: ActivePluginPoint<@JvmSuppressWildcards NewTabPagePlugin>,
+    private val newTabPageVersions: ActivePluginPoint<NewTabPagePlugin>,
 ) : NewTabPageProvider {
     override fun provideNewTabPageVersion(): Flow<NewTabPagePlugin> = flow {
         val newTabPage = newTabPageVersions.getPlugins().firstOrNull() ?: NewTabLegacyPage()

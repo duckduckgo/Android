@@ -39,7 +39,7 @@ interface FocusedViewProvider {
     scope = ActivityScope::class,
 )
 class RealFocusedViewProvider @Inject constructor(
-    private val focusedViewVersions: ActivePluginPoint<@JvmSuppressWildcards FocusedViewPlugin>,
+    private val focusedViewVersions: ActivePluginPoint<FocusedViewPlugin>,
 ) : FocusedViewProvider {
     override fun provideFocusedViewVersion(): Flow<FocusedViewPlugin> = flow {
         val focusedView = focusedViewVersions.getPlugins().firstOrNull() ?: FocusedLegacyPage()
@@ -59,6 +59,19 @@ class FocusedLegacyPage @Inject constructor() : FocusedViewPlugin {
         return FocusedLegacyView(context)
     }
 }
+
+@ContributesActivePlugin(
+    scope = ActivityScope::class,
+    boundType = FocusedViewPlugin::class,
+)
+class FocusedPage @Inject constructor() : FocusedViewPlugin {
+
+    override val name: String = FocusedViewVersion.NEW.name
+    override fun getView(context: Context): View {
+        return FocusedView(context)
+    }
+}
+
 
 @ContributesActivePluginPoint(
     scope = AppScope::class,

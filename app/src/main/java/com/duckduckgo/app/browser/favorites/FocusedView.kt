@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.newtabpage.impl.view
+package com.duckduckgo.app.browser.favorites
 
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.LinearLayout
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.browser.databinding.ViewFocusedViewBinding
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ViewScope
-import com.duckduckgo.newtabpage.impl.databinding.ViewPlaceholderBinding
 
 @InjectWith(ViewScope::class)
 class FocusedView @JvmOverloads constructor(
@@ -31,5 +31,5 @@ class FocusedView @JvmOverloads constructor(
     defStyle: Int = 0,
 ) : LinearLayout(context, attrs, defStyle) {
 
-    private val binding: ViewPlaceholderBinding by viewBinding()
+    private val binding: ViewFocusedViewBinding by viewBinding()
 }

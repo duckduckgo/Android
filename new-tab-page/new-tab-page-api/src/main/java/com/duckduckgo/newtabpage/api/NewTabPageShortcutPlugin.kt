@@ -18,13 +18,13 @@ package com.duckduckgo.newtabpage.api
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import com.duckduckgo.common.utils.plugins.ActivePluginPoint
+import com.duckduckgo.common.utils.plugins.ActivePlugin
 
 /**
  * This class is used to provide each of the Shortcuts that build the Shortcut section in New Tab Page
  * Implementation of https://app.asana.com/0/1174433894299346/12070643725750
  */
-interface NewTabPageShortcutPlugin : ActivePluginPoint.ActivePlugin {
+interface NewTabPageShortcutPlugin : ActivePlugin {
 
     /**
      * This method returns a [NewTabShortcut] that will be used as the Shortcuts content

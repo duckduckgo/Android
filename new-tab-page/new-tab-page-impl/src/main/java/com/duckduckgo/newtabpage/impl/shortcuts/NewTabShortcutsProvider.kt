@@ -35,7 +35,7 @@ interface NewTabShortcutsProvider {
     scope = AppScope::class,
 )
 class RealNewTabPageShortcutProvider @Inject constructor(
-    private val newTabPageSections: ActivePluginPoint<@JvmSuppressWildcards NewTabPageShortcutPlugin>,
+    private val newTabPageSections: ActivePluginPoint<NewTabPageShortcutPlugin>,
 ) : NewTabShortcutsProvider {
     override fun provideShortcuts(): Flow<List<NewTabPageShortcutPlugin>> = flow {
         emit(newTabPageSections.getPlugins().map { it })
