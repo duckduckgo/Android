@@ -22,7 +22,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.os.Bundle
 import android.view.MenuItem
-import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
