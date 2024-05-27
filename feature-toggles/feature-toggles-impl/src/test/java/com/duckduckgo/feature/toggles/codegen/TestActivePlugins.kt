@@ -18,18 +18,18 @@ package com.duckduckgo.feature.toggles.codegen
 
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
-import com.duckduckgo.common.utils.plugins.ActivePluginPoint
+import com.duckduckgo.common.utils.plugins.ActivePlugin
 import com.duckduckgo.di.scopes.AppScope
 import javax.inject.Inject
 
 @ContributesActivePluginPoint(
     scope = AppScope::class,
 )
-interface MyPlugin : ActivePluginPoint.ActivePlugin {
+interface MyPlugin : ActivePlugin {
     fun doSomething()
 }
 
-interface TriggeredMyPlugin : ActivePluginPoint.ActivePlugin {
+interface TriggeredMyPlugin : ActivePlugin {
     fun doSomething()
 }
 

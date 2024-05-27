@@ -21,12 +21,12 @@ import kotlin.reflect.KClass
 /**
  * Anvil annotation to generate plugin points that are guarded by a remote feature flag.
  *
- * Active plugins need to extend from [ActivePluginPoint.ActivePlugin]
+ * Active plugins need to extend from [ActivePlugin]
  *
  * Usage:
  * ```kotlin
  * @ContributesActivePluginPoint(SomeDaggerScope::class)
- * interface MyPlugin : ActivePluginPoint.ActivePlugin {
+ * interface MyPlugin : ActivePlugin {
  *
  * }
  * ```
@@ -49,7 +49,7 @@ annotation class ContributesActivePluginPoint(
      * )
      * interface MyPluginPoint : MyPlugin
      *
-     * interface MyPlugin : ActivePluginPoint.ActivePlugin {...}
+     * interface MyPlugin : ActivePlugin {...}
      * ```
      */
     val boundType: KClass<*> = Unit::class,
