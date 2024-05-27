@@ -72,7 +72,6 @@ class FocusedPage @Inject constructor() : FocusedViewPlugin {
     }
 }
 
-
 @ContributesActivePluginPoint(
     scope = AppScope::class,
     boundType = FocusedViewPlugin::class,
