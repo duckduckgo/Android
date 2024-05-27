@@ -25,6 +25,9 @@
     <string name="sync_disabled_authenticated_user"><b>Sinhronizacija in varnostno kopiranje sta začasno zaustavljena</b>\nSinhronizacija in varnostno kopiranje žal trenutno nista na voljo. Poskusite znova pozneje.</string>
     <string name="sync_disabled_authenticated_user_new_version"><b>Sinhronizacija in varnostno kopiranje sta začasno zaustavljena</b>\nSinhronizacija in varnostno kopiranje žal nista več na voljo v tej različici aplikacije. Če želite nadaljevati, DuckDuckGo posodobite na najnovejšo različico.</string>
     <string name="sync_paused_notification"><b>Sinhronizacija in varnostno kopiranje sta začasno zaustavljena</b>\nSinhronizacija in varnostno kopiranje žal trenutno nista na voljo. Poskusite znova pozneje.</string>
+    <string name="sync_error_notification"><b>Napaka pri sinhronizaciji</b>\nSinhronizacija in varnostno kopiranje začasno nista na voljo.</string>
+    <string name="sync_error_warning"><b>Napaka pri sinhronizaciji</b>\nSinhronizacija in varnostno kopiranje začasno nista na voljo.</string>
+    <string name="sync_signed_out_notification"><b>Sinhronizacija je začasno zaustavljena</b>\nSinhronizacija je bila začasno zaustavljena. Če želite še naprej sinhronizirati to napravo, znova vzpostavite povezavo z uporabo druge naprave ali obnovitvene kode.</string>
 
     <!-- Settings screen -->
     <string name="sync_screen_title">Sinhronizacija in varnostno kopiranje</string>

@@ -139,8 +139,10 @@
     <string name="managementDisabledModeSubtitle">Je hebt een vergrendelingspatroon, pincode of biometrische gegevens nodig om je aanmeldgegevens te beschermen.</string>
     <string name="credentialManagementEditTitle">Wachtwoord bewerken</string>
 
-    <string name="credentials_limit_warning"><b>Synchronisatie onderbroken</b>\nDe limiet voor het aantal aanmeldingsgegevens is overschreden. Verwijder er een paar om de synchronisatie te hervatten.\n\n<annotation type="manage_logins">Aanmeldingsgegevens beheren</annotation></string>
-    <string name="credentials_limit_warning_notif"><b>De synchronisatie van wachtwoorden is onderbroken</b>\nJe hebt de synchronisatielimiet voor wachtwoorden overschreden. Probeer enkele wachtwoorden te verwijderen. Er wordt geen back-up van je wachtwoorden gemaakt totdat dit probleem is opgelost.</string>
+    <string name="credentials_limit_warning"><b>Synchronisatie onderbroken</b>\nJe hebt het maximale aantal wachtwoorden bereikt. Verwijder er een paar om de synchronisatie te hervatten.\n\n<annotation type="manage_logins">Wachtwoorden beheren</annotation></string>
+    <string name="credentials_limit_warning_notif"><b></b>\nJe hebt het maximale aantal wachtwoorden bereikt. Verwijder enkele wachtwoorden om de synchronisatie te hervatten.</string>
+    <string name="credentials_invalid_request_warning"><b>Synchronisatie onderbroken</b>\nSommige wachtwoorden hebben de verkeerde indeling of zijn te lang en werden niet gesynchroniseerd.\n\n<annotation type="manage_logins">Wachtwoorden beheren</annotation></string>
+    <string name="credentials_invalid_request_warning_notif"><b>Synchronisatie onderbroken</b>\nSommige wachtwoorden hebben de verkeerde indeling of zijn te lang en werden niet gesynchroniseerd.</string>
 
     <string name="saveLoginDialogNeverForThisSite">Nooit vragen voor deze site</string>
     <string name="credentialManagementInstructionNeverForThisSite">Als je uitgesloten sites opnieuw instelt, zie je de volgende keer dat je bij een van deze sites inlogt een melding om je wachtwoord op te slaan.</string>

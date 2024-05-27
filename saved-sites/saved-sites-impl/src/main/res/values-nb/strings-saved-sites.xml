@@ -20,8 +20,10 @@
     <!-- Sync settings screen -->
     <string name="sync_enable_option_favorites_title">Del favoritter</string>
     <string name="sync_enable_option_favorites_subtitle">Bruk de samme favorittene på alle enheter. La være av for å holde mobil- og skrivebordsfavoritter adskilt.</string>
-    <string name="saved_site_limit_warning"><b>Synkronisering er satt på pause</b>\nGrensen for bokmerker er overskredet. Slett noen for å gjenoppta synkroniseringen.\n\n<annotation type="manage_bookmarks">Administrer bokmerker</annotation></string>
-    <string name="saved_site_limit_warning_notif"><b>Synkronisering av bokmerker er satt på pause</b>\nDu har overskredet grensen for synkronisering av bokmerker. Prøv å slette noen bokmerker. Inntil dette er løst, blir ikke bokmerkene sikkerhetskopiert.</string>
+    <string name="saved_site_limit_warning"><b>Synkronisering satt på pause</b>\nDu har nådd maksimalt antall bokmerker. Slett noen for å gjenoppta synkronisering.\n\n<annotation type="manage_bookmarks">Administrer bokmerker</annotation></string>
+    <string name="saved_site_limit_warning_notif"><b>Synkronisering av bokmerker er satt på pause</b>\nDu har nådd maksimalt antall bokmerker. Slett noen bokmerker for å gjenoppta synkronisering.</string>
+    <string name="saved_site_invalid_warning"><b>Synkronisering satt på pause</b>\nNoen bokmerker er formatert feil eller for lange og ble ikke synkronisert.\n\n<annotation type="manage_bookmarks">Administrer bokmerker</annotation></string>
+    <string name="saved_site_invalid_warning_notif"><b>Synkronisering av bokmerker er satt på pause</b>\nNoen bokmerker er formatert feil eller for lange og ble ikke synkronisert.</string>
     <plurals name="saved_site_invalid_items_warning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
         <item quantity="one">Bokmerket for %1$s kan ikke synkroniseres fordi ett av feltene overskrider tegngrensen.</item>
         <item quantity="other">Bokmerkene for %1$s og %2$d andre steder kan ikke synkroniseres fordi noen av feltene overskrider tegngrensen.</item>

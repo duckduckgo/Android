@@ -20,8 +20,10 @@
     <!-- Sync settings screen -->
     <string name="sync_enable_option_favorites_title">Kedvencek megosztása</string>
     <string name="sync_enable_option_favorites_subtitle">Használd ugyanazokat a kedvenceket minden eszközön. Hagyd kikapcsolva a mobil és asztali kedvencek különválasztásához.</string>
-    <string name="saved_site_limit_warning"><b>A szinkronizálás szünetel</b>\nTúllépted a könyvjelzők maximális számát. A szinkronizálás folytatásához törölj néhányat.\n\n<annotation type="manage_bookmarks">Könyvjelzők kezelése</annotation></string>
-    <string name="saved_site_limit_warning_notif"><b>A könyvjelzők szinkronizálása szünetel</b>\nTúllépted a szinkronizálandó könyvjelzők maximális számát. Próbálj törölni néhány könyvjelzőt. Amíg ezt nem sikerül megoldani, a könyvjelzőkről nem készül biztonsági másolat.</string>
+    <string name="saved_site_limit_warning"><b>Szinkronizálás szüneteltetve</b>\nElérted a könyvjelzők maximális számát. A szinkronizálás folytatásához törölj néhányat.\n\n<annotation type="manage_bookmarks">Könyvjelzők kezelése</annotation></string>
+    <string name="saved_site_limit_warning_notif"><b>Könyvjelző-szinkronizálás szüneteltetve</b>\nElérted a könyvjelzők maximális számát. A szinkronizálás folytatásához törölj néhány könyvjelzőt.</string>
+    <string name="saved_site_invalid_warning"><b>Szinkronizálás szüneteltetve</b>\nEgyes könyvjelzők helytelen formátumúak vagy túl hosszúak, és nem lettek szinkronizálva.\n\n<annotation type="manage_bookmarks">Könyvjelzők kezelése</annotation></string>
+    <string name="saved_site_invalid_warning_notif"><b>Könyvjelző-szinkronizálás szüneteltetve</b>\nEgyes könyvjelzők helytelen formátumúak vagy túl hosszúak, és nem lettek szinkronizálva.</string>
     <plurals name="saved_site_invalid_items_warning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
         <item quantity="one">A(z) %1$s webhely könyvjelzője nem szinkronizálható, mert egyik mezője meghaladja a karakterkorlátot.</item>
         <item quantity="other">A(z) %1$s és %2$d másik webhely könyvjelzői nem szinkronizálhatók, mert egyes mezőik meghaladják a karakterkorlátot.</item>
