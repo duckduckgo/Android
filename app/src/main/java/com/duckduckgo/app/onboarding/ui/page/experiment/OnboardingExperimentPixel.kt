@@ -23,9 +23,12 @@ class OnboardingExperimentPixel {
     enum class PixelName(override val pixelName: String) : Pixel.PixelName {
         NOTIFICATION_RUNTIME_PERMISSION_SHOWN("m_notification_runtime_permission_shown"),
         PREONBOARDING_INTRO_SHOWN("m_preonboarding_intro_shown"),
+        PREONBOARDING_INTRO_SHOWN_UNIQUE("m_preonboarding_intro_shown_unique"),
         PREONBOARDING_COMPARISON_CHART_SHOWN("m_preonboarding_comparison_chart_shown"),
+        PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE("m_preonboarding_comparison_chart_shown_unique"),
         PREONBOARDING_CHOOSE_BROWSER_PRESSED("m_preonboarding_choose_browser_pressed"),
         PREONBOARDING_AFFIRMATION_SHOWN("m_preonboarding_affirmation_shown"),
+        PREONBOARDING_AFFIRMATION_SHOWN_UNIQUE("m_preonboarding_affirmation_shown_unique"),
         ONBOARDING_SEARCH_SAY_DUCK("m_onboarding_search_say_duck"),
         ONBOARDING_SEARCH_MIGHTY_DUCK("m_onboarding_search_mighty_duck"),
         ONBOARDING_SEARCH_WEATHER("m_onboarding_search_weather"),
