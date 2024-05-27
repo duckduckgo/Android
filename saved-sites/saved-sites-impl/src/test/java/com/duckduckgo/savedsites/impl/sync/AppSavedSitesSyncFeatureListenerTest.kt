@@ -24,7 +24,8 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
-import com.duckduckgo.sync.api.engine.FeatureSyncError
+import com.duckduckgo.sync.api.engine.FeatureSyncError.COLLECTION_LIMIT_REACHED
+import com.duckduckgo.sync.api.engine.FeatureSyncError.INVALID_REQUEST
 import com.duckduckgo.sync.api.engine.SyncChangesResponse
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import org.junit.Assert.*
@@ -67,6 +68,7 @@ class AppSavedSitesSyncFeatureListenerTest {
         testee.onSuccess(validChanges)
 
         assertFalse(savedSitesSyncStore.isSyncPaused)
+        assertTrue(savedSitesSyncStore.syncPausedReason.isEmpty())
     }
 
     @Test
@@ -83,18 +85,30 @@ class AppSavedSitesSyncFeatureListenerTest {
     fun whenSyncPausedAndOnErrorThenSyncPaused() {
         savedSitesSyncStore.isSyncPaused = true
 
-        testee.onError(FeatureSyncError.COLLECTION_LIMIT_REACHED)
+        testee.onError(COLLECTION_LIMIT_REACHED)
 
         assertTrue(savedSitesSyncStore.isSyncPaused)
+        assertEquals(COLLECTION_LIMIT_REACHED.name, savedSitesSyncStore.syncPausedReason)
+    }
+
+    @Test
+    fun whenSyncPausedAndNewErrorThenSyncPausedAndReasonUpdated() {
+        savedSitesSyncStore.isSyncPaused = true
+
+        testee.onError(INVALID_REQUEST)
+
+        assertTrue(savedSitesSyncStore.isSyncPaused)
+        assertEquals(INVALID_REQUEST.name, savedSitesSyncStore.syncPausedReason)
     }
 
     @Test
     fun whenSyncActiveAndOnErrorThenSyncPaused() {
         savedSitesSyncStore.isSyncPaused = false
 
-        testee.onError(FeatureSyncError.COLLECTION_LIMIT_REACHED)
+        testee.onError(COLLECTION_LIMIT_REACHED)
 
         assertTrue(savedSitesSyncStore.isSyncPaused)
+        assertEquals(COLLECTION_LIMIT_REACHED.name, savedSitesSyncStore.syncPausedReason)
     }
 
     @Test

@@ -20,8 +20,10 @@
     <!-- Sync settings screen -->
     <string name="sync_enable_option_favorites_title">Condividi preferiti</string>
     <string name="sync_enable_option_favorites_subtitle">Usa gli stessi preferiti su tutti i dispositivi. Lascialo disattivato per tenere separati i preferiti per dispositivi mobili e desktop.</string>
-    <string name="saved_site_limit_warning"><b>Sincronizzazione interrotta</b>\nLimite di segnalibri superato. Eliminane alcuni per riprendere la sincronizzazione.\n\n<annotation type="manage_bookmarks">Gestisci segnalibri</annotation></string>
-    <string name="saved_site_limit_warning_notif"><b>Sincronizzazione segnalibri sospesa</b>\nÈ stato superato il limite di sincronizzazione dei segnalibri. Prova a eliminarne qualcuno. Fino a quando il problema non sarà risolto, non sarà eseguito il backup dei segnalibri.</string>
+    <string name="saved_site_limit_warning"><b>Sincronizzazione in pausa</b>\nHai raggiunto il numero massimo di segnalibri. Eliminane alcuni per riprendere la sincronizzazione.<annotation type="manage_bookmarks">Gestisci segnalibri</annotation></string>
+    <string name="saved_site_limit_warning_notif"><b>Sincronizzazione segnalibri in pausa</b>\nHai raggiunto il numero massimo di segnalibri. Eliminane alcuni per riprendere la sincronizzazione.</string>
+    <string name="saved_site_invalid_warning"><b>Sincronizzazione in pausa</b>\nAlcuni segnalibri sono formattati in modo errato o sono troppo lunghi e non sono stati sincronizzati.\n\n<annotation type="manage_bookmarks">Gestisci segnalibri</annotation></string>
+    <string name="saved_site_invalid_warning_notif"><b>Sincronizzazione dei segnalibri in pausa</b>\nAlcuni segnalibri sono formattati in modo errato o sono troppo lunghi e non sono stati sincronizzati.\n\n</string>
     <plurals name="saved_site_invalid_items_warning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
         <item quantity="one">Il tuo segnalibro per %1$s non può essere sincronizzato perché uno dei suoi campi supera il limite di caratteri.</item>
         <item quantity="other">I tuoi segnalibri per %1$s e altri %2$d siti non possono essere sincronizzati perché alcuni dei loro campi superano il limite di caratteri.</item>

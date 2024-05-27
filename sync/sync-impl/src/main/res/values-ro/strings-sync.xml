@@ -25,6 +25,9 @@
     <string name="sync_disabled_authenticated_user"><b>Sincronizare și backup întreruptă temporar</b>\nNe pare rău, dar Sincronizare și backup este momentan indisponibilă. Încearcă din nou mai târziu.</string>
     <string name="sync_disabled_authenticated_user_new_version"><b>Sincronizare și backup întreruptă temporar</b>\nNe pare rău, dar Sincronizare și backup nu mai este disponibilă în această versiune a aplicației. Actualizează DuckDuckGo la cea mai recentă versiune pentru a continua.</string>
     <string name="sync_paused_notification"><b>Sincronizare și backup întrerupt temporar</b>\nNe pare rău, dar Sincronizare și backup este momentan indisponibil. Încearcă din nou mai târziu.</string>
+    <string name="sync_error_notification"><b>Eroare de sincronizare</b>\nSync &amp; Backup sunt temporar indisponibile.</string>
+    <string name="sync_error_warning"><b>Eroare de sincronizare</b>\nSync &amp; Backup este indisponibil temporar.</string>
+    <string name="sync_signed_out_notification"><b>Sincronizarea este întreruptă</b>\nSincronizarea a fost întreruptă. Dacă dorești să continui sincronizarea acestui dispozitiv, reconectează-te folosind un alt dispozitiv sau codul de recuperare.</string>
 
     <!-- Settings screen -->
     <string name="sync_screen_title">Sincronizare și copiere de rezervă</string>

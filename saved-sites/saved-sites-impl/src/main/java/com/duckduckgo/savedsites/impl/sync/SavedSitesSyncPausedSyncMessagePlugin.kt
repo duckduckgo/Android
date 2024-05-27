@@ -14,15 +14,18 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.sync
+package com.duckduckgo.savedsites.impl.sync
 
 import android.content.Context
 import android.view.View
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.api.SyncMessagePlugin
+import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
-class CredentialsRateLimitSyncMessagePlugin @Inject constructor() : SyncMessagePlugin {
+@ContributesMultibinding(scope = ActivityScope::class)
+class SavedSitesSyncPausedSyncMessagePlugin @Inject constructor() : SyncMessagePlugin {
     override fun getView(context: Context): View {
-        return CredentialsRateLimitView(context)
+        return SavedSiteSyncPausedView(context)
     }
 }

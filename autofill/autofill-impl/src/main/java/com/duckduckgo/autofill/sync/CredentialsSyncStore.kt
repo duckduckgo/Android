@@ -36,6 +36,7 @@ interface CredentialsSyncStore {
     var startTimeStamp: String
     var clientModifiedSince: String
     var isSyncPaused: Boolean
+    var syncPausedReason: String
     fun isSyncPausedFlow(): Flow<Boolean>
     var invalidEntitiesIds: List<String>
 }
@@ -77,6 +78,12 @@ class RealCredentialsSyncStore @Inject constructor(
                 putStringSet(KEY_CLIENT_INVALID_IDS, value.toSet())
             }
         }
+    override var syncPausedReason: String
+        get() = preferences.getString(KEY_CLIENT_SYNC_PAUSED_REASON, "") ?: ""
+        set(value) {
+            preferences.edit(true) { putString(KEY_CLIENT_SYNC_PAUSED_REASON, value) }
+            emitNewValue()
+        }
 
     override fun isSyncPausedFlow(): Flow<Boolean> = syncPausedSharedFlow
 
@@ -96,5 +103,6 @@ class RealCredentialsSyncStore @Inject constructor(
         private const val KEY_END_TIMESTAMP = "KEY_END_TIMESTAMP"
         private const val KEY_CLIENT_LIMIT_EXCEEDED = "KEY_CLIENT_LIMIT_EXCEEDED"
         private const val KEY_CLIENT_INVALID_IDS = "KEY_CLIENT_INVALID_IDS"
+        private const val KEY_CLIENT_SYNC_PAUSED_REASON = "KEY_CLIENT_SYNC_PAUSED_REASON"
     }
 }

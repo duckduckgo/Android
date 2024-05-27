@@ -20,8 +20,10 @@
     <!-- Sync settings screen -->
     <string name="sync_enable_option_favorites_title">Delite priljubljene</string>
     <string name="sync_enable_option_favorites_subtitle">Uporabite iste priljubljene v vseh napravah. Če želite ločiti priljubljene strani za mobilne naprave in namizne računalnike, pustite izklopljeno.</string>
-    <string name="saved_site_limit_warning"><b>Sinhronizacija je začasno zaustavljena</b>\nOmejitev zaznamkov je presežena. Izbrišite jih nekaj, če želite nadaljevati sinhronizacijo.\n\n<annotation type="manage_bookmarks">Upravljanje zaznamkov</annotation></string>
-    <string name="saved_site_limit_warning_notif"><b>Sinhronizacija zaznamkov je začasno zaustavljena</b>\nPresegli ste omejitev za sinhronizacijo zaznamkov. Poskusite izbrisati nekaj zaznamkov. Dokler ta težava ne bo odpravljena, zaznamki ne bodo varnostno kopirani.</string>
+    <string name="saved_site_limit_warning"><b>Sinhronizacija je začasno zaustavljena</b>\nDosegli ste največje število zaznamkov. Izbrišite jih nekaj, če želite nadaljevati sinhronizacijo.\n\n<annotation type="manage_bookmarks">Upravljanje zaznamkov</annotation></string>
+    <string name="saved_site_limit_warning_notif"><b>Sinhronizacija zaznamkov je začasno zaustavljena</b>\nDosegli ste največje število zaznamkov. Izbrišite nekaj zaznamkov, da nadaljujete sinhronizacijo.</string>
+    <string name="saved_site_invalid_warning"><b>Sinhronizacija je začasno zaustavljena</b>\nNekateri zaznamki so napačno oblikovani ali predolgi in niso bili sinhronizirani.\n\n<annotation type="manage_bookmarks">Upravljanje zaznamkov</annotation></string>
+    <string name="saved_site_invalid_warning_notif"><b>Sinhronizacija zaznamkov je začasno zaustavljena</b>\nNekateri zaznamki so napačno oblikovani ali predolgi in niso bili sinhronizirani.</string>
     <plurals name="saved_site_invalid_items_warning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
         <item quantity="one">Vašega zaznamka za %1$s ni mogoče sinhronizirati, ker eno od polj presega omejitev števila znakov.</item>
         <item quantity="two">Vaših zaznamkov za %1$s in za %2$d drugi spletni mesti ni mogoče sinhronizirati, ker nekatera njihova polja presegajo omejitev števila znakov.</item>

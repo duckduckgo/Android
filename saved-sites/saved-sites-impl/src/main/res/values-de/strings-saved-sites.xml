@@ -20,8 +20,10 @@
     <!-- Sync settings screen -->
     <string name="sync_enable_option_favorites_title">Favoriten teilen</string>
     <string name="sync_enable_option_favorites_subtitle">Verwende auf allen Geräten dieselben Favoriten. Lass diese Option deaktiviert, um deine Favoriten auf deinem Handy und deinem Desktop getrennt zu halten.</string>
-    <string name="saved_site_limit_warning"><b>Synchronisierung angehalten</b>\nLesezeichenlimit überschritten. Lösche Anmeldedaten, um die Synchronisierung fortzusetzen.\n\n<annotation type="manage_bookmarks">Lesezeichen verwalten</annotation></string>
-    <string name="saved_site_limit_warning_notif"><b>Die Lesezeichen-Synchronisierung wurde pausiert</b>\nDu hast das Limit für die Synchronisierung von Lesezeichen überschritten. Versuche, einige Lesezeichen zu löschen. Bis dieses Problem behoben ist, werden deine Lesezeichen nicht gesichert.</string>
+    <string name="saved_site_limit_warning"><b>Synchronisierung angehalten</b>\nDu hast die maximale Anzahl von Lesezeichen erreicht. Lösche einige, um die Synchronisierung fortzusetzen.\n\n<annotation type="manage_bookmarks">Lesezeichen verwalten</annotation></string>
+    <string name="saved_site_limit_warning_notif"><b>Die Lesezeichen-Synchronisierung wurde angehalten</b>\nDu hast die maximale Anzahl von Lesezeichen erreicht. Bitte lösche einige Lesezeichen, um die Synchronisierung fortzusetzen.</string>
+    <string name="saved_site_invalid_warning"><b>Synchronisierung angehalten</b>\nEinige Lesezeichen sind falsch formatiert oder zu lang und wurden nicht synchronisiert.\n\n<annotation type="manage_bookmarks">Lesezeichen verwalten</annotation></string>
+    <string name="saved_site_invalid_warning_notif"><b>Die Lesezeichen-Synchronisierung wurde angehalten</b>\nEinige Lesezeichen sind falsch formatiert oder zu lang und wurden nicht synchronisiert.\n\n</string>
     <plurals name="saved_site_invalid_items_warning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
         <item quantity="one">Dein Lesezeichen für %1$s kann nicht synchronisiert werden, weil eines seiner Felder das Zeichenlimit überschreitet.</item>
         <item quantity="other">Deine Lesezeichen für %1$s und %2$d andere Websites können nicht synchronisiert werden, weil einige ihrer Felder das Zeichenlimit überschreiten.</item>

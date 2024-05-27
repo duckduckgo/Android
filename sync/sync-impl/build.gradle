@@ -81,6 +81,7 @@ dependencies {
     testImplementation Testing.junit4
     testImplementation AndroidX.core
     testImplementation AndroidX.test.ext.junit
+    testImplementation AndroidX.test.rules
     testImplementation "androidx.test:runner:_"
     testImplementation Testing.robolectric
     testImplementation CashApp.turbine

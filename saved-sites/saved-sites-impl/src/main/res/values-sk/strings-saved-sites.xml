@@ -20,8 +20,10 @@
     <!-- Sync settings screen -->
     <string name="sync_enable_option_favorites_title">Zdieľať obľúbené položky</string>
     <string name="sync_enable_option_favorites_subtitle">Používajte rovnaké obľúbené položky na všetkých zariadeniach. Toto vynechajte, ak chcete aby obľúbené položky z mobilných zariadení a počítačov zostali oddelené.</string>
-    <string name="saved_site_limit_warning"><b>Synchronizácia bola pozastavená</b>\nBol dosiahnutý limit pre počet záložiek. Ak chcete obnoviť synchronizáciu, odstráňte niektoré záložky.\n\n<annotation type="manage_bookmarks">Správa záložiek</annotation></string>
-    <string name="saved_site_limit_warning_notif"><b>Synchronizácia záložiek bola pozastavená</b>\nBol dosiahnutý limit pre počet záložiek. Skúste niektoré záložky odstrániť. Kým to nevyriešite, vaše záložky sa nebudú zálohovať.</string>
+    <string name="saved_site_limit_warning"><b>Synchronizácia bola pozastavená</b>\nDosiahli ste maximálny počet záložiek. Ak chcete obnoviť synchronizáciu, odstráňte niektoré záložky.\n\n<annotation type="manage_bookmarks">Správa záložiek</annotation></string>
+    <string name="saved_site_limit_warning_notif"><b>Synchronizácia záložiek bola pozastavená</b>\nDosiahli ste maximálny počet záložiek. Ak chcete obnoviť synchronizáciu, odstráňte niektoré záložky.</string>
+    <string name="saved_site_invalid_warning"><b></b>\nNiektoré záložky sú nesprávne naformátované alebo sú príliš dlhé, a neboli synchronizované.\n\n<annotation type="manage_bookmarks">Správa záložiek</annotation></string>
+    <string name="saved_site_invalid_warning_notif"><b></b>\nNiektoré záložky sú nesprávne naformátované alebo sú príliš dlhé, a neboli synchronizované.</string>
     <plurals name="saved_site_invalid_items_warning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
         <item quantity="one">Vaše záložky pre %1$s nemožno synchronizovať, pretože niektoré z polí prekračujú limit znakov.</item>
         <item quantity="few">Vaše záložky pre %1$s a pre %2$d ďalších lokalít nemožno synchronizovať, pretože niektoré z polí prekračujú limit znakov.</item>

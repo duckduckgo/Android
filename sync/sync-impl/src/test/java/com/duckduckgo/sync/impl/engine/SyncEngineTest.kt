@@ -29,6 +29,7 @@ import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.DATA_CHANGE
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import com.duckduckgo.sync.impl.API_CODE
+import com.duckduckgo.sync.impl.API_CODE.TOO_MANY_REQUESTS_1
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.engine.SyncOperation.DISCARD
@@ -62,6 +63,7 @@ internal class SyncEngineTest {
     private val syncOperationErrorRecorder: SyncOperationErrorRecorder = mock()
     private val providerPlugins: PluginPoint<SyncableDataProvider> = mock()
     private val persisterPlugins: PluginPoint<SyncableDataPersister> = mock()
+    private val lifecyclePlugins: PluginPoint<SyncEngineLifecycle> = mock()
     private lateinit var syncEngine: RealSyncEngine
 
     @Before
@@ -75,6 +77,7 @@ internal class SyncEngineTest {
             syncOperationErrorRecorder,
             providerPlugins,
             persisterPlugins,
+            lifecyclePlugins,
         )
         whenever(syncStore.isSignedIn()).thenReturn(true)
         whenever(syncStore.syncingDataEnabled).thenReturn(true)
@@ -582,7 +585,7 @@ internal class SyncEngineTest {
 
     private fun givenPatchError() {
         whenever(syncApiClient.patch(any())).thenReturn(
-            Result.Error(400, "patch failed"),
+            Result.Error(TOO_MANY_REQUESTS_1.code, "patch failed"),
         )
     }
 

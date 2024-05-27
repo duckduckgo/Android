@@ -20,8 +20,10 @@
     <!-- Sync settings screen -->
     <string name="sync_enable_option_favorites_title">Favorieten delen</string>
     <string name="sync_enable_option_favorites_subtitle">Gebruik dezelfde favorieten op alle apparaten. Schakel deze optie uit als je je favoriete bladwijzers niet wilt synchroniseren tussen je mobiele apparaat en pc.</string>
-    <string name="saved_site_limit_warning"><b>Synchronisatie onderbroken</b>\nDe limiet voor het aantal bladwijzers is overschreden. Verwijder er een paar om de synchronisatie te hervatten.\n\n<annotation type="manage_bookmarks">Bladwijzers beheren</annotation></string>
-    <string name="saved_site_limit_warning_notif"><b>De synchronisatie van bladwijzers is onderbroken</b>\nJe hebt de synchronisatielimiet voor bladwijzers overschreden. Probeer enkele bladwijzers te verwijderen. Er wordt geen back-up van je bladwijzers gemaakt totdat dit probleem is opgelost.</string>
+    <string name="saved_site_limit_warning"><b>Synchronisatie gepauzeerd</b>\nJe hebt het maximum aantal bladwijzers bereikt. Verwijder er een paar om de synchronisatie te hervatten.\n\n<annotation type="manage_bookmarks">Bladwijzers beheren</annotation></string>
+    <string name="saved_site_limit_warning_notif"><b>Synchronisatie bladwijzers gepauzeerd</b>\nJe hebt het maximum aantal bladwijzers bereikt. Verwijder enkele bladwijzers om de synchronisatie te hervatten.</string>
+    <string name="saved_site_invalid_warning"><b>Synchronisatie gepauzeerd</b>\nSommige bladwijzers hebben de verkeerde indeling of zijn te lang en werden niet gesynchroniseerd.\n\n<annotation type="manage_bookmarks">Bladwijzers beheren</annotation></string>
+    <string name="saved_site_invalid_warning_notif"><b>Synchronisatie bladwijzers gepauzeerd</b>\nSommige bladwijzers hebben de verkeerde indeling of zijn te lang en werden niet gesynchroniseerd.</string>
     <plurals name="saved_site_invalid_items_warning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
         <item quantity="one">Je bladwijzer voor %1$s kan niet worden gesynchroniseerd omdat sommige velden de tekenlimiet overschrijden.</item>
         <item quantity="other">Je bladwijzers voor %1$s en %2$d andere websites kunnen niet worden gesynchroniseerd omdat sommige velden de tekenlimiet overschrijden.</item>

@@ -25,6 +25,9 @@
     <string name="sync_disabled_authenticated_user"><b>Senkronizasyon ve Yedekleme Duraklatıldı</b>\nÜzgünüz, Senkronizasyon ve Yedekleme şu anda kullanılamıyor. Lütfen daha sonra tekrar deneyin.</string>
     <string name="sync_disabled_authenticated_user_new_version"><b>Senkronizasyon ve Yedekleme Duraklatıldı</b>\nÜzgünüz, ancak Senkronizasyon ve Yedekleme artık bu uygulama sürümünde kullanılamıyor. Devam etmek için lütfen DuckDuckGo\'yu en son sürüme güncelleyin.</string>
     <string name="sync_paused_notification"><b>Senkronizasyon ve Yedekleme Duraklatıldı</b>\nÜzgünüz, Senkronizasyon ve Yedekleme şu anda kullanılamıyor. Lütfen daha sonra tekrar deneyin.</string>
+    <string name="sync_error_notification"><b>Senkronizasyon Hatası</b>\nSync &amp; Backup geçici olarak kullanılamıyor.</string>
+    <string name="sync_error_warning"><b>Senkronizasyon Hatası</b>\nSync &amp; Backup geçici olarak kullanılamıyor.</string>
+    <string name="sync_signed_out_notification"><b>Senkronizasyonu Duraklatıldı</b>\nSenkronizasyon duraklatıldı. Bu cihazın senkronizasyonuna devam etmek istiyorsanız, başka bir cihaz veya kurtarma kodunuzu kullanarak yeniden bağlanın.</string>
 
     <!-- Settings screen -->
     <string name="sync_screen_title">Senkronizasyon ve Yedekleme</string>

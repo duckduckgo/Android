@@ -25,6 +25,9 @@
     <string name="sync_disabled_authenticated_user"><b>Sinchronizavimas ir atsarginės kopijos kūrimas pristabdyti</b>\nAtsiprašome, bet sinchronizavimas ir atsarginės kopijos kūrimas šiuo metu nepasiekiami. Pabandykite dar kartą vėliau.</string>
     <string name="sync_disabled_authenticated_user_new_version"><b>Sinchronizavimas ir atsarginės kopijos kūrimas pristabdyti</b>\nAtsiprašome, bet sinchronizavimas ir atsarginės kopijos kūrimas šioje programos versijoje nebepasiekiami. Norėdami tęsti, atnaujinkite „DuckDuckGo“ į naujausią versiją.</string>
     <string name="sync_paused_notification"><b>Sinchronizavimas ir atsarginės kopijos kūrimas pristabdyti</b>\nAtsiprašome, bet sinchronizavimas ir atsarginės kopijos kūrimas šiuo metu nepasiekiami. Pabandykite dar kartą vėliau.</string>
+    <string name="sync_error_notification"><b>Sinchronizavimo klaida</b>\n„Sync &amp; Backup“ laikinai nepasiekiamas.</string>
+    <string name="sync_error_warning"><b>Sinchronizavimo klaida</b>\n„Sync &amp; Backup“ laikinai nepasiekiamas.</string>
+    <string name="sync_signed_out_notification"><b>Sinchronizavimas pristabdymas</b>\nSinchronizavimas buvo pristabdytas. Jei norite toliau sinchronizuoti šį įrenginį, iš naujo prisijunkite naudodami kitą įrenginį arba atkūrimo kodą.</string>
 
     <!-- Settings screen -->
     <string name="sync_screen_title">Sinchronizuoti ir kurti atsarginę kopiją</string>

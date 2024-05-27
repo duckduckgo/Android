@@ -25,6 +25,9 @@
     <string name="sync_disabled_authenticated_user"><b>Synchronisieren und sichern angehalten</b>\nLeider ist Synchronisieren und sichern derzeit nicht verfügbar. Bitte versuche es zu einem späteren Zeitpunkt erneut.</string>
     <string name="sync_disabled_authenticated_user_new_version"><b>Synchronisieren und Sichern pausiert</b>\nLeider ist Synchronisieren und Sichern in dieser App-Version nicht mehr verfügbar. Bitte aktualisiere DuckDuckGo auf die neueste Version, um fortzufahren.</string>
     <string name="sync_paused_notification"><b>Synchronisieren und Sichern pausiert</b>\nLeider ist Synchronisieren und Sichern derzeit nicht verfügbar. Bitte versuche es zu einem späteren Zeitpunkt erneut.</string>
+    <string name="sync_error_notification"><b>Synchronisierungsfehler</b>\nSync &amp; Backup ist vorübergehend nicht verfügbar.</string>
+    <string name="sync_error_warning"><b>Synchronisierungsfehler</b>\nSync &amp; Backup ist vorübergehend nicht verfügbar.</string>
+    <string name="sync_signed_out_notification"><b>Synchronisierung wurde angehalten</b>\nDie Synchronisierung wurde angehalten. Wenn du die Synchronisierung dieses Geräts fortsetzen möchtest, stelle die Verbindung mit einem anderen Gerät oder deinem Wiederherstellungscode wieder her.</string>
 
     <!-- Settings screen -->
     <string name="sync_screen_title">Synchronisieren und sichern</string>
