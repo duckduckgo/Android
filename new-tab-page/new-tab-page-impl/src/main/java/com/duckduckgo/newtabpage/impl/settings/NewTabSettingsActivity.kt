@@ -28,12 +28,12 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.newtabpage.api.NewTabPageSectionSettingsPlugin
 import com.duckduckgo.newtabpage.impl.databinding.ActivityNewTabSettingsBinding
-import logcat.logcat
 import javax.inject.Inject
+import logcat.logcat
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(NewTabSettingsScreenNoParams::class, screenName = "newtabsettings")
-class NewTabSettingsActivity: DuckDuckGoActivity() {
+class NewTabSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var newTabSectionsSettingsPlugins: PluginPoint<NewTabPageSectionSettingsPlugin>
@@ -49,14 +49,13 @@ class NewTabSettingsActivity: DuckDuckGoActivity() {
         addSections()
     }
 
-    private fun addSections(){
+    private fun addSections() {
         newTabSectionsSettingsPlugins.getPlugins().forEach { feature ->
             logcat { "New Tab: Settings - Add Section $feature" }
             val sectionView = feature.getView(this)
             binding.newTabSettingSectionsLayout.addDragView(sectionView, sectionView)
         }
     }
-
 }
 
 @ContributesPluginPoint(
@@ -64,4 +63,3 @@ class NewTabSettingsActivity: DuckDuckGoActivity() {
     boundType = NewTabPageSectionSettingsPlugin::class,
 )
 private interface NewTabPageSectionSettingsPluginPointTrigger
-
