@@ -38,6 +38,7 @@ import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.newtabpage.api.NewTabPageSection
 import com.duckduckgo.newtabpage.api.NewTabPageSectionPlugin
+import com.duckduckgo.newtabpage.api.NewTabPageSectionSettingsPlugin
 import com.duckduckgo.newtabpage.api.NewTabShortcut.Bookmarks
 import com.duckduckgo.newtabpage.api.NewTabShortcut.Chat
 import com.duckduckgo.newtabpage.impl.databinding.ViewNewTabShortcutsSectionBinding

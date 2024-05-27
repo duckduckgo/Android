@@ -16,8 +16,10 @@
 
 package com.duckduckgo.newtabpage.impl.shortcuts
 
+import android.content.Context
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
+import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.newtabpage.api.NewTabPageShortcutPlugin
@@ -52,8 +54,19 @@ private interface NewTabPageShortcutPluginPointTrigger
     AppScope::class,
     boundType = NewTabPageShortcutPlugin::class,
 )
-class AIChatNewTabShortcutPlugin @Inject constructor() : NewTabPageShortcutPlugin {
+class AIChatNewTabShortcutPlugin @Inject constructor(
+    private val browserNav: BrowserNav
+) : NewTabPageShortcutPlugin {
     override fun getShortcut(): NewTabShortcut {
         return NewTabShortcut.Chat
     }
+
+    override fun onClick(context: Context, shortcut: NewTabShortcut) {
+        context.startActivity(browserNav.openInCurrentTab(context, AI_CHAT_URL))
+    }
+
+    companion object {
+        private const val AI_CHAT_URL = "https://duckduckgo.com/chat"
+    }
+
 }

@@ -21,6 +21,7 @@ import android.view.View
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.newtabpage.api.NewTabPagePlugin
 import com.duckduckgo.newtabpage.api.NewTabPageVersion
@@ -34,7 +35,7 @@ interface NewTabPageProvider {
     fun provideNewTabPageVersion(): Flow<NewTabPagePlugin>
 }
 
-@ContributesBinding(scope = AppScope::class)
+@ContributesBinding(scope = ActivityScope::class)
 class RealNewTabPageProvider @Inject constructor(
     private val newTabPageVersions: ActivePluginPoint<NewTabPagePlugin>,
 ) : NewTabPageProvider {
