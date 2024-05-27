@@ -139,8 +139,10 @@
     <string name="managementDisabledModeSubtitle">Lai aizsargātu tavus pieteikšanās datus, ir nepieciešama ierīces bloķēšanas figūra, PIN kods vai biometriskā aizsardzība.</string>
     <string name="credentialManagementEditTitle">Paroles rediģēšana</string>
 
-    <string name="credentials_limit_warning"><b>Sinhronizācija pārtraukta</b>\nPārsniegts pieteikšanās datu ierobežojums. Izdzēsiet dažus, lai atsāktu sinhronizāciju.\n\n<annotation type="manage_logins">Pārvaldīt pieteikšanās datus</annotation></string>
-    <string name="credentials_limit_warning_notif"><b>Paroļu sinhronizācija ir pārtraukta</b>\nIr pārsniegts paroļu sinhronizācijas ierobežojums. Mēģini izdzēst dažas paroles. Kamēr šī problēma nebūs atrisināta, paroles netiks dublētas.</string>
+    <string name="credentials_limit_warning"><b>Sinhronizācija pārtraukta</b>\nTu esi sasniedzis maksimālo paroļu skaitu. Lūdzu, izdzēs dažas, lai atsāktu sinhronizāciju.\n\n<annotation type="manage_logins">Pārvaldīt paroles</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Paroļu sinhronizācija ir pārtraukta</b>\nTu esi sasniedzis maksimālo paroļu skaitu. Lūdzu, izdzēs dažas paroles, lai atsāktu sinhronizāciju.</string>
+    <string name="credentials_invalid_request_warning"><b>Sinhronizācija pārtraukta</b>\nDažas paroles ir formatētas nepareizi vai ir pārāk garas un netika sinhronizētas.\n\n<annotation type="manage_logins">Pārvaldīt paroles</annotation></string>
+    <string name="credentials_invalid_request_warning_notif"><b>Paroļu sinhronizācija ir pārtraukta</b>\nDažas paroles ir formatētas nepareizi vai ir pārāk garas un netika sinhronizētas.</string>
 
     <string name="saveLoginDialogNeverForThisSite">Nekad nejautāt par šo vietni</string>
     <string name="credentialManagementInstructionNeverForThisSite">Ja atiestatīsi izslēgtās vietnes, tev tiks piedāvāts saglabāt savus pieteikšanās datus, kad nākamreiz tajās pierakstīsies.</string>

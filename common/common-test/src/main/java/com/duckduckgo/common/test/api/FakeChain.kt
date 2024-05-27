@@ -19,7 +19,7 @@ package com.duckduckgo.common.test.api
 import java.util.concurrent.TimeUnit
 import okhttp3.*
 
-class FakeChain(
+open class FakeChain(
     private val url: String,
     private val expectedResponseCode: Int? = null,
 ) : Interceptor.Chain {

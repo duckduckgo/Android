@@ -45,6 +45,8 @@ import com.duckduckgo.sync.store.SyncDatabase
 import com.duckduckgo.sync.store.SyncSharedPrefsProvider
 import com.duckduckgo.sync.store.SyncSharedPrefsStore
 import com.duckduckgo.sync.store.SyncStore
+import com.duckduckgo.sync.store.SyncUnavailableSharedPrefsStore
+import com.duckduckgo.sync.store.SyncUnavailableStore
 import com.journeyapps.barcodescanner.BarcodeEncoder
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -143,5 +145,13 @@ object SyncStoreModule {
         syncAccountRepository: SyncAccountRepository,
     ): FaviconsFetchingPrompt {
         return SyncFaviconsFetchingPrompt(faviconFetchingStore, syncAccountRepository)
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun provideSyncPausedStore(
+        sharedPrefsProvider: SharedPrefsProvider,
+    ): SyncUnavailableStore {
+        return SyncUnavailableSharedPrefsStore(sharedPrefsProvider)
     }
 }

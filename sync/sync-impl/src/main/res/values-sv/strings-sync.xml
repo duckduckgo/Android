@@ -25,6 +25,9 @@
     <string name="sync_disabled_authenticated_user"><b>Synkronisering och säkerhetskopiering har pausats</b>\nSynkronisering och säkerhetskopiering är dessvärre inte tillgängliga just nu. Försök igen senare.</string>
     <string name="sync_disabled_authenticated_user_new_version"><b>Synkronisering och säkerhetskopiering pausad</b>\nTyvärr är synkronisering och säkerhetskopiering inte längre tillgänglig i denna appversion. Uppdatera DuckDuckGo till den senaste versionen för att fortsätta.</string>
     <string name="sync_paused_notification"><b>Synkronisering och säkerhetskopiering pausad</b>\nTyvärr är synkronisering och säkerhetskopiering inte tillgänglig för närvarande. Försök igen senare.</string>
+    <string name="sync_error_notification"><b>Synkroniseringsfel</b>\nSync &amp; Backup är inte tillgängligt för tillfället.</string>
+    <string name="sync_error_warning"><b>Synkroniseringsfel</b>\nSync &amp; Backup är inte tillgängligt för tillfället.</string>
+    <string name="sync_signed_out_notification"><b>Synkroniseringen har pausats</b>\nSynkroniseringen har pausats. Om du vill fortsätta att synkronisera den här enheten ansluter du igen från en annan enhet eller med din återställningskod.</string>
 
     <!-- Settings screen -->
     <string name="sync_screen_title">Synkronisering och säkerhetskopiering</string>

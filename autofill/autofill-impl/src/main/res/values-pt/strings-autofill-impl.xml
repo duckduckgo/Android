@@ -139,8 +139,10 @@
     <string name="managementDisabledModeSubtitle">É necessário um padrão de bloqueio de dispositivo, PIN ou biometria para proteger as tuas palavras-passe.</string>
     <string name="credentialManagementEditTitle">Editar palavra-passe</string>
 
-    <string name="credentials_limit_warning"><b>Sincronização em pausa</b>\nLimite de inícios de sessão excedido. Elimina alguns para retomar a sincronização.\n\n<annotation type="manage_logins">Gerir inícios de sessão</annotation></string>
-    <string name="credentials_limit_warning_notif"><b>A sincronização de palavras-passe está em pausa</b>\nExcedeste o limite de sincronização de palavras-passe. Experimenta eliminar algumas palavras-passe. Não é possível fazer uma cópia de segurança das palavras-passe até este problema estar resolvido.</string>
+    <string name="credentials_limit_warning"><b>Sincronização em pausa</b>\nAtingiste o número máximo de palavras-passe. Elimina algumas para retomar a sincronização.\n\n<annotation type="manage_logins">Gerir palavra-passes</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>A sincronização de palavras-passe está em pausa</b>\nAtingiste o número máximo de palavras-passe. Elimina algumas palavras-passe para retomar a sincronização.</string>
+    <string name="credentials_invalid_request_warning"><b>Sincronização em pausa</b>\nAlgumas palavras-passe estão formatadas incorretamente ou são demasiado longas e não foram sincronizadas.\n\n<annotation type="manage_logins">Gerir palavra-passes</annotation></string>
+    <string name="credentials_invalid_request_warning_notif"><b>A sincronização de palavras-passe está em pausa</b>\nAlgumas palavras-passe estão formatadas incorretamente ou são demasiado longas e não foram sincronizadas.</string>
 
     <string name="saveLoginDialogNeverForThisSite">Nunca pedir para este site</string>
     <string name="credentialManagementInstructionNeverForThisSite">Se repuseres os sites excluídos, ser-te-á pedido que guardes a tua palavra-passe da próxima vez que iniciares sessão num destes sites.</string>

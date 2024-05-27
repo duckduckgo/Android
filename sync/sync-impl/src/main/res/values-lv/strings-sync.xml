@@ -25,6 +25,9 @@
     <string name="sync_disabled_authenticated_user"><b>Sinhronizācija un dublēšana pātraukta</b>\nDiemžēl sinhronizācija un dublēšana pašlaik nav pieejama. Lūdzu, mēģini vēlreiz vēlāk.</string>
     <string name="sync_disabled_authenticated_user_new_version"><b>Sinhronizācija un dublēšana pātraukta</b>\nDiemžēl sinhronizācija un dublēšana šajā lietotnes versijā vairs nav pieejama. Lai turpinātu, lūdzu, atjaunini DuckDuckGo uz jaunāko versiju.</string>
     <string name="sync_paused_notification"><b>Sinhronizācija un dublēšana pātraukta</b>\nDiemžēl sinhronizācija un dublēšana pašlaik nav pieejama. Lūdzu, mēģini vēlreiz vēlāk.</string>
+    <string name="sync_error_notification"><b>Sinhronizācijas kļūda</b>\nSync &amp; Backup uz laiku nav pieejams.</string>
+    <string name="sync_error_warning"><b>Sinhronizācijas kļūda</b>\nSync &amp; Backup uz laiku nav pieejams.</string>
+    <string name="sync_signed_out_notification"><b></b>\nSinhronizācija ir pārtraukta. Ja vēlies turpināt sinhronizēt šo ierīci, izveido savienojumu no jauna, izmantojot citu ierīci vai savu atgūšanas kodu.</string>
 
     <!-- Settings screen -->
     <string name="sync_screen_title">Sinhronizācija un dublēšana</string>
