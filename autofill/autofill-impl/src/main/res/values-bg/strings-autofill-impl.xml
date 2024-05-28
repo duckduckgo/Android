@@ -126,7 +126,6 @@
     <string name="saveLoginDialogSubtitle">Паролите се съхраняват сигурно на Вашето устройство.</string>
     <string name="autofillManagementAddLogin">Добавяне на парола</string>
     <string name="credentialManagementEditLoginTitleHint">Заглавие</string>
-    <string name="autofillDeleteLoginDialogTitle">Сигурни ли сте, че искате да изтриете тази парола?</string>
     <string name="autofillManagementDeletedConfirmation">Паролата е изтрита</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Последна актуализация %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">Искате ли да продължите да запазвате пароли?</string>
@@ -152,13 +151,6 @@
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Отмени</string>
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Изтриване на всички пароли</string>
-    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
-        <item quantity="one">Сигурни ли сте, че искате да изтриете %1$d парола?</item>
-        <item quantity="other">Сигурни ли сте, че искате да изтриете %1$d пароли?</item>
-    </plurals>
-
-    <string name="credentialManagementDeletePasswordConfirmationMessage">Вашата парола ще бъде изтрита от всички синхронизирани устройства. Уверете се, че все още имате друг начин за достъп до акаунта си.</string>
-    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Вашите пароли ще бъдат изтрити от всички синхронизирани устройства. Уверете се, че все още имате друг начин за достъп до Вашите акаунти.</string>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
         <item quantity="one">%1$d изтрита парола</item>
