@@ -41,6 +41,6 @@
         android:paddingBottom="@dimen/keyline_2"
         android:text="@string/newTabPageEdit"
         app:textType="primary"
-        app:typography="caption" />
+        app:typography="button" />
 
 </LinearLayout>

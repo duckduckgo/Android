@@ -16,8 +16,11 @@
 
 package com.duckduckgo.savedsites.impl.newtab
 
+import android.content.Context
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
+import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.newtabpage.api.NewTabPageShortcutPlugin
 import com.duckduckgo.newtabpage.api.NewTabShortcut
 import com.duckduckgo.newtabpage.api.NewTabShortcut.Bookmarks
@@ -26,6 +29,7 @@ import javax.inject.Inject
 @ContributesActivePlugin(
     AppScope::class,
     boundType = NewTabPageShortcutPlugin::class,
+    priority = 1,
 )
 class BookmarksNewTabShortcutPlugin @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,

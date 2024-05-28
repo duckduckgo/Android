@@ -53,6 +53,7 @@ private interface NewTabPageShortcutPluginPointTrigger
 @ContributesActivePlugin(
     AppScope::class,
     boundType = NewTabPageShortcutPlugin::class,
+    priority = 2,
 )
 class AIChatNewTabShortcutPlugin @Inject constructor(
     private val browserNav: BrowserNav,
