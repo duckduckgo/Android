@@ -96,7 +96,7 @@ class BrowserAutoCompleteSuggestionsAdapter(
 
     override fun getItemCount(): Int {
         if (suggestions.isEmpty() && phrase.isNotBlank()) {
-            return 1 // No suggestions message
+            return 1 // Empty ViewHolder
         }
         return suggestions.size
     }

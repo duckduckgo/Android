@@ -32,7 +32,6 @@ import com.duckduckgo.app.browser.databinding.ItemAutocompleteBookmarkSuggestion
 import com.duckduckgo.app.browser.databinding.ItemAutocompleteDefaultBinding
 import com.duckduckgo.app.browser.databinding.ItemAutocompleteHistorySuggestionBinding
 import com.duckduckgo.app.browser.databinding.ItemAutocompleteInAppMessageBinding
-import com.duckduckgo.app.browser.databinding.ItemAutocompleteNoSuggestionsBinding
 import com.duckduckgo.app.browser.databinding.ItemAutocompleteSearchSuggestionBinding
 import com.duckduckgo.common.ui.view.MessageCta.Message
 
@@ -136,8 +135,12 @@ class BookmarkSuggestionViewHolderFactory : SuggestionViewHolderFactory {
 class EmptySuggestionViewHolderFactory : SuggestionViewHolderFactory {
 
     override fun onCreateViewHolder(parent: ViewGroup): AutoCompleteViewHolder {
-        val inflater = LayoutInflater.from(parent.context)
-        return AutoCompleteViewHolder.EmptySuggestionViewHolder(ItemAutocompleteNoSuggestionsBinding.inflate(inflater, parent, false))
+        val view = View(parent.context)
+        view.layoutParams = RecyclerView.LayoutParams(
+            RecyclerView.LayoutParams.MATCH_PARENT,
+            RecyclerView.LayoutParams.WRAP_CONTENT,
+        )
+        return AutoCompleteViewHolder.EmptySuggestionViewHolder(view)
     }
 
     override fun onBindViewHolder(
@@ -250,7 +253,7 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
         }
     }
 
-    class EmptySuggestionViewHolder(binding: ItemAutocompleteNoSuggestionsBinding) : AutoCompleteViewHolder(binding.root)
+    class EmptySuggestionViewHolder(view: View) : AutoCompleteViewHolder(view)
 
     class DefaultSuggestionViewHolder(val binding: ItemAutocompleteDefaultBinding) : AutoCompleteViewHolder(binding.root) {
         fun bind(
