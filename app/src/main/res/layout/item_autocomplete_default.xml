@@ -48,9 +48,22 @@
         android:includeFontPadding="false"
         android:maxLines="1"
         app:layout_constraintBottom_toBottomOf="@id/phraseOrUrlIndicator"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/editQueryImage"
         app:layout_constraintStart_toEndOf="@id/phraseOrUrlIndicator"
         app:layout_constraintTop_toTopOf="@id/phraseOrUrlIndicator"
         tools:text="phrase or URL suggestion"/>
+
+    <ImageView
+        android:id="@+id/editQueryImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        android:contentDescription="@string/editQueryBeforeSubmitting"
+        android:padding="3dp"
+        android:src="@drawable/ic_autocomplete_24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:visibility="invisible"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
