@@ -136,7 +136,9 @@ class ShortcutsNewTabSectionView @JvmOverloads constructor(
 @ContributesActivePlugin(
     AppScope::class,
     boundType = NewTabPageSectionPlugin::class,
+    priority = 4,
 )
+
 class ShortcutsNewTabSectionPlugin @Inject constructor() : NewTabPageSectionPlugin {
 
     override val name = NewTabPageSection.SHORTCUTS.name

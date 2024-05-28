@@ -213,6 +213,7 @@ class RemoteMessageView @JvmOverloads constructor(
 @ContributesActivePlugin(
     AppScope::class,
     boundType = NewTabPageSectionPlugin::class,
+    priority = 1,
 )
 class RemoteMessageNewTabSectionPlugin @Inject constructor() : NewTabPageSectionPlugin {
     override val name = NewTabPageSection.REMOTE_MESSAGING_FRAMEWORK.name
