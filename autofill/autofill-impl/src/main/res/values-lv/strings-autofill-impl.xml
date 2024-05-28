@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="managementDisabledModeCta"><b>Iestati sadaļā Iestatījumi</b></string>
 
     <string name="saveLoginDialogButtonSave">Saglabāt paroli</string>
@@ -168,14 +168,14 @@
     <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Pārvaldīt paroles</annotation></string>
 
     <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Tavas paroles tiks dzēstas no šīs ierīces.</string>
-    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural">
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural" tools:ignore="ImpliedQuantity">
         <item quantity="zero">Tavas paroles tiks dzēstas no šīs ierīces.</item>
         <item quantity="one">Tava parole tiks dzēsta no šīs ierīces.</item>
         <item quantity="other">Tavas paroles tiks dzēstas no šīs ierīces.</item>
     </plurals>
 
     <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Parole tiks dzēsta no visām sinhronizētajām ierīcēm.</string>
-    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural">
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
         <item quantity="zero">Tavas paroles tiks dzēstas no visām sinhronizētajām ierīcēm.</item>
         <item quantity="one">Tava parole tiks dzēsta no visām sinhronizētajām ierīcēm.</item>
         <item quantity="other">Tavas paroles tiks dzēstas no visām sinhronizētajām ierīcēm.</item>
@@ -189,7 +189,7 @@
     </plurals>
 
     <string name="credentialManagementDeleteAllSecondInstructionSingular">Pārliecinies, vai joprojām varēsi piekļūt savam kontam.</string>
-    <plurals name="credentialManagementDeleteAllSecondInstructionPlural">
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
         <item quantity="zero">Pārliecinies, vai joprojām varēsi piekļūt savam kontam.</item>
         <item quantity="one">Pārliecinies, vai joprojām varēsi piekļūt savam kontam.</item>
         <item quantity="other">Pārliecinies, vai joprojām varēsi piekļūt savam kontam.</item>
