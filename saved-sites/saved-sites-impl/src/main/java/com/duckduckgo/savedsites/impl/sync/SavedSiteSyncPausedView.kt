@@ -28,13 +28,13 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.saved.sites.impl.R
-import com.duckduckgo.saved.sites.impl.databinding.ViewSaveSiteRateLimitWarningBinding
-import com.duckduckgo.savedsites.impl.sync.SavedSiteRateLimitViewModel.Command
-import com.duckduckgo.savedsites.impl.sync.SavedSiteRateLimitViewModel.Command.NavigateToBookmarks
-import com.duckduckgo.savedsites.impl.sync.SavedSiteRateLimitViewModel.ViewState
+import com.duckduckgo.saved.sites.impl.databinding.ViewSaveSiteSyncPausedWarningBinding
+import com.duckduckgo.savedsites.impl.sync.SavedSiteSyncPausedViewModel.Command
+import com.duckduckgo.savedsites.impl.sync.SavedSiteSyncPausedViewModel.Command.NavigateToBookmarks
+import com.duckduckgo.savedsites.impl.sync.SavedSiteSyncPausedViewModel.ViewState
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -45,7 +45,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ViewScope::class)
-class SavedSiteRateLimitView @JvmOverloads constructor(
+class SavedSiteSyncPausedView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
@@ -55,16 +55,16 @@ class SavedSiteRateLimitView @JvmOverloads constructor(
     lateinit var globalActivityStarter: GlobalActivityStarter
 
     @Inject
-    lateinit var viewModelFactory: SavedSiteRateLimitViewModel.Factory
+    lateinit var viewModelFactory: ViewViewModelFactory
 
     private var coroutineScope: CoroutineScope? = null
 
     private var job: ConflatedJob = ConflatedJob()
 
-    private val binding: ViewSaveSiteRateLimitWarningBinding by viewBinding()
+    private val binding: ViewSaveSiteSyncPausedWarningBinding by viewBinding()
 
-    private val viewModel: SavedSiteRateLimitViewModel by lazy {
-        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[SavedSiteRateLimitViewModel::class.java]
+    private val viewModel: SavedSiteSyncPausedViewModel by lazy {
+        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[SavedSiteSyncPausedViewModel::class.java]
     }
 
     override fun onAttachedToWindow() {
@@ -72,8 +72,6 @@ class SavedSiteRateLimitView @JvmOverloads constructor(
         super.onAttachedToWindow()
 
         ViewTreeLifecycleOwner.get(this)?.lifecycle?.addObserver(viewModel)
-
-        configureViewListeners()
 
         @SuppressLint("NoHardcodedCoroutineDispatcher")
         coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
@@ -102,20 +100,25 @@ class SavedSiteRateLimitView @JvmOverloads constructor(
     }
 
     private fun render(viewState: ViewState) {
-        this.isVisible = viewState.warningVisible
-    }
-
-    private fun configureViewListeners() {
-        binding.saveSiteRateLimitWarning.setClickableLink(
-            "manage_bookmarks",
-            context.getText(R.string.saved_site_limit_warning),
-            onClick = {
-                viewModel.onWarningActionClicked()
-            },
-        )
+        if (viewState.message != null) {
+            this.isVisible = true
+            binding.saveSiteRateLimitWarning.setClickableLink(
+                WARNING_ACTION_ANNOTATION,
+                context.getText(viewState.message),
+                onClick = {
+                    viewModel.onWarningActionClicked()
+                },
+            )
+        } else {
+            this.isVisible = false
+        }
     }
 
     private fun navigateToBookmarks() {
         globalActivityStarter.start(this.context, BookmarksScreenNoParams)
+    }
+
+    companion object {
+        const val WARNING_ACTION_ANNOTATION = "manage_bookmarks"
     }
 }

@@ -572,7 +572,7 @@ class ContributesActivePluginPointCodeGenerator : CodeGenerator {
     companion object {
         private val pluginPointFqName = FqName("com.duckduckgo.common.utils.plugins.PluginPoint")
         private val dispatcherProviderFqName = FqName("com.duckduckgo.common.utils.DispatcherProvider")
-        private val activePluginPointFqName = FqName("com.duckduckgo.common.utils.plugins.ActivePluginPoint")
+        private val activePluginPointFqName = FqName("com.duckduckgo.common.utils.plugins.InternalActivePluginPoint")
         private val coroutineScopeFqName = FqName("kotlinx.coroutines.CoroutineScope")
         private val sharedPreferencesProviderFqName = FqName("com.duckduckgo.data.store.api.SharedPreferencesProvider")
         private val moshiFqName = FqName("com.squareup.moshi.Moshi")

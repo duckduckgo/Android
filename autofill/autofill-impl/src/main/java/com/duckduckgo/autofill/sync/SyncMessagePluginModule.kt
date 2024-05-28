@@ -31,5 +31,5 @@ import dagger.multibindings.IntoSet
 @ContributesTo(ActivityScope::class)
 abstract class SyncMessagePluginModule {
     @Binds @IntoSet
-    abstract fun providesCredentialsRateLimitSyncMessagePlugin(messagePlugin: CredentialsRateLimitSyncMessagePlugin): SyncMessagePlugin
+    abstract fun providesCredentialsSyncPausedSyncMessagePlugin(messagePlugin: CredentialsSyncPausedSyncMessagePlugin): SyncMessagePlugin
 }

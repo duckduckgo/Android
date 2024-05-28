@@ -20,8 +20,10 @@
     <!-- Sync settings screen -->
     <string name="sync_enable_option_favorites_title">Share Favorites</string>
     <string name="sync_enable_option_favorites_subtitle">Use the same favorites on all devices. Leave off to keep mobile and desktop favorites separate.</string>
-    <string name="saved_site_limit_warning"><b>Sync Paused</b>\nBookmark limit exceeded. Delete some to resume syncing.\n\n<annotation type="manage_bookmarks">Manage Bookmarks</annotation></string>
-    <string name="saved_site_limit_warning_notif"><b>Bookmarks Sync is Paused</b>\nYou have exceeded the bookmarks sync limit. Try deleting some bookmarks. Until this is resolved your bookmarks will not be backed up.</string>
+    <string name="saved_site_limit_warning"><b>Sync Paused</b>\nYou\'ve reached the maximum number of bookmarks. Please delete some to resume sync.\n\n<annotation type="manage_bookmarks">Manage Bookmarks</annotation></string>
+    <string name="saved_site_limit_warning_notif"><b>Bookmark Sync is Paused</b>\nYou\'ve reached the maximum number of bookmarks. Please delete some bookmarks to resume sync.</string>
+    <string name="saved_site_invalid_warning"><b>Sync Paused</b>\nSome bookmarks are formatted incorrectly or too long and were not synced.\n\n<annotation type="manage_bookmarks">Manage Bookmarks</annotation></string>
+    <string name="saved_site_invalid_warning_notif"><b>Bookmark Sync is Paused</b>\nSome bookmarks are formatted incorrectly or too long and were not synced.</string>
     <plurals name="saved_site_invalid_items_warning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
         <item quantity="one">Your bookmark for %1$s can’t sync because one of its fields exceeds the character limit.\n\n</item>
         <item quantity="other">Your bookmarks for %1$s and %2$d other sites can’t sync because some of their fields exceed the character limit.\n\n</item>

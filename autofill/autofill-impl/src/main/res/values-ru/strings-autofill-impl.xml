@@ -139,8 +139,10 @@
     <string name="managementDisabledModeSubtitle">Для защиты паролей требуются биометрические данные, графический ключ или ПИН-код.</string>
     <string name="credentialManagementEditTitle">Редактирование пароля</string>
 
-    <string name="credentials_limit_warning"><b>Синхронизация приостановлена</b>\nПревышен лимит по количеству логинов. Удалите некоторые из них, чтобы возобновить синхронизацию.\n\n<annotation type="manage_logins">Управление логинами</annotation></string>
-    <string name="credentials_limit_warning_notif"><b>Синхронизация паролей приостановлена</b>\nВы превысили лимит синхронизации паролей. Удалите несколько из них. Пока вы не устраните эту проблему, резервная копия закладок создаваться не будет.</string>
+    <string name="credentials_limit_warning"><b>Синхронизация приостановлена</b>\nДостигнуто максимальное количество паролей. Чтобы возобновить синхронизацию, удалите некоторые из них.\n\n<annotation type="manage_logins">Управление паролями</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Синхронизация паролей на паузе</b>\nДостигнуто максимальное число паролей. Чтобы возобновить синхронизацию, удалите некоторые из них.</string>
+    <string name="credentials_invalid_request_warning"><b>Синхронизация на паузе</b>\nНекоторые пароли не синхронизируются из-за неверного формата или превышения ограничений по длине.\n\n<annotation type="manage_logins">Управление паролями</annotation></string>
+    <string name="credentials_invalid_request_warning_notif"><b>Синхронизация паролей на паузе</b>\nНекоторые пароли не синхронизируются из-за неверного формата или превышения ограничений по длине.</string>
 
     <string name="saveLoginDialogNeverForThisSite">Больше не спрашивать на этом сайте</string>
     <string name="credentialManagementInstructionNeverForThisSite">Если вы очистите список исключений, при следующем входе на любой из этих сайтов система предложит вам сохранить пароль.</string>

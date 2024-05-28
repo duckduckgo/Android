@@ -139,8 +139,10 @@
     <string name="managementDisabledModeSubtitle">A device lock pattern, PIN, or biometrics is required to protect your passwords.</string>
     <string name="credentialManagementEditTitle">Edit Password</string>
 
-    <string name="credentials_limit_warning"><b>Sync Paused</b>\nLogins limit exceeded. Delete some to resume syncing.\n\n<annotation type="manage_logins">Manage Logins</annotation></string>
-    <string name="credentials_limit_warning_notif"><b>Passwords Sync is Paused</b>\nYou have exceeded the passwords sync limit. Try deleting some passwords. Until this is resolved your passwords will not be backed up.</string>
+    <string name="credentials_limit_warning"><b>Sync Paused</b>\nYou\'ve reached the maximum number of passwords. Please delete some to resume sync.\n\n<annotation type="manage_logins">Manage Passwords</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Passwords Sync is Paused</b>\nYou\'ve reached the maximum number of passwords. Please delete some passwords to resume sync.</string>
+    <string name="credentials_invalid_request_warning"><b>Sync Paused</b>\nSome passwords are formatted incorrectly or too long and were not synced.\n\n<annotation type="manage_logins">Manage Passwords</annotation></string>
+    <string name="credentials_invalid_request_warning_notif"><b>Password Sync is Paused</b>\nSome passwords are formatted incorrectly or too long and were not synced.</string>
 
     <string name="saveLoginDialogNeverForThisSite">Never Ask for This Site</string>
     <string name="credentialManagementInstructionNeverForThisSite">If you reset excluded sites, you will be prompted to save your password next time you sign in to any of these sites.</string>

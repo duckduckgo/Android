@@ -31,7 +31,7 @@ import kotlin.reflect.KClass
  *
  * }
  *
- * interface MyPlugin : ActivePluginPoint.ActivePlugin {...}
+ * interface MyPlugin : ActivePlugin {...}
  * ```
  */
 @Target(AnnotationTarget.CLASS)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,24 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.savedsites.impl.sync
+package com.duckduckgo.sync.impl.engine
 
+import android.app.Notification
 import android.content.Context
-import android.view.View
-import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.sync.api.SyncMessagePlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
 
-@ContributesMultibinding(scope = ActivityScope::class)
-class SavedSitesRateLimitSyncMessagePlugin @Inject constructor() : SyncMessagePlugin {
-    override fun getView(context: Context): View {
-        return SavedSiteRateLimitView(context)
+class FakeNotificationBuilder() : SyncNotificationBuilder {
+    override fun buildSyncPausedNotification(
+        context: Context,
+        addNavigationIntent: Boolean,
+    ): Notification {
+        return Notification()
+    }
+
+    override fun buildSyncErrorNotification(context: Context): Notification {
+        return Notification()
+    }
+
+    override fun buildSyncSignedOutNotification(context: Context): Notification {
+        return Notification()
     }
 }
