@@ -83,13 +83,6 @@ import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.app.bookmarks.ui.BookmarksBottomSheetDialog
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment
 import com.duckduckgo.app.brokensite.BrokenSiteActivity
@@ -139,7 +132,6 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
-import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromAutocomplete
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
 import com.duckduckgo.app.browser.omnibar.animations.TrackersAnimatorListener
@@ -2126,7 +2118,7 @@ class BrowserTabFragment :
         binding.autoCompleteSuggestionsList.layoutManager = LinearLayoutManager(context)
         autoCompleteSuggestionsAdapter = BrowserAutoCompleteSuggestionsAdapter(
             immediateSearchClickListener = {
-                userSelectedAutocomplete(it)
+                viewModel.userSelectedAutocomplete(it)
             },
             editableSearchClickListener = {
                 viewModel.onUserSelectedToEditQuery(it.phrase)
@@ -2259,24 +2251,6 @@ class BrowserTabFragment :
         )
 
         omnibar.clearTextButton.setOnClickListener { omnibar.omnibarTextInput.setText("") }
-    }
-
-    private fun userSelectedAutocomplete(suggestion: AutoCompleteSuggestion) {
-        // send pixel before submitting the query and changing the autocomplete state to empty; otherwise will send the wrong params
-        appCoroutineScope.launch(dispatchers.io()) {
-            viewModel.fireAutocompletePixel(suggestion)
-            withContext(dispatchers.main()) {
-                val origin = when (suggestion) {
-                    is AutoCompleteDefaultSuggestion -> FromAutocomplete(isNav = false)
-                    is AutoCompleteBookmarkSuggestion -> FromAutocomplete(isNav = true)
-                    is AutoCompleteSearchSuggestion -> FromAutocomplete(isNav = suggestion.isUrl)
-                    is AutoCompleteHistorySuggestion -> FromAutocomplete(isNav = true)
-                    is AutoCompleteHistorySearchSuggestion -> FromAutocomplete(isNav = false)
-                    is AutoCompleteInAppMessageSuggestion -> return@withContext
-                }
-                viewModel.onUserSubmittedQuery(suggestion.phrase, origin)
-            }
-        }
     }
 
     private fun userEnteredQuery(query: String) {
