@@ -17,6 +17,9 @@
 package com.duckduckgo.newtabpage.impl.settings
 
 import android.os.Bundle
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -28,7 +31,10 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.newtabpage.api.NewTabPageSectionSettingsPlugin
 import com.duckduckgo.newtabpage.impl.databinding.ActivityNewTabSettingsBinding
+import com.duckduckgo.newtabpage.impl.settings.NewTabSettingsViewModel.ViewState
 import javax.inject.Inject
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import logcat.logcat
 
 @InjectWith(ActivityScope::class)
@@ -38,6 +44,7 @@ class NewTabSettingsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var newTabSectionsSettingsPlugins: PluginPoint<NewTabPageSectionSettingsPlugin>
 
+    private val viewModel: NewTabSettingsViewModel by bindViewModel()
     private val binding: ActivityNewTabSettingsBinding by viewBinding()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,7 +53,17 @@ class NewTabSettingsActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
 
-        addSections()
+        viewModel.viewState()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
+            .onEach { render(it) }
+            .launchIn(lifecycleScope)
+    }
+
+    private fun render(viewState: ViewState) {
+        viewState.sections.forEach { section ->
+            val sectionView = section.plugin.getView(this)
+            binding.newTabSettingSectionsLayout.addDragView(sectionView, sectionView)
+        }
     }
 
     private fun addSections() {
