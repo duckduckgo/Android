@@ -20,6 +20,7 @@ import androidx.core.net.toUri
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
@@ -67,6 +68,10 @@ interface AutoComplete {
             val isUrl: Boolean,
         ) : AutoCompleteSuggestion(phrase)
 
+        data class AutoCompleteDefaultSuggestion(
+            override val phrase: String,
+        ) : AutoCompleteSuggestion(phrase)
+
         data class AutoCompleteBookmarkSuggestion(
             override val phrase: String,
             val title: String,
@@ -84,6 +89,7 @@ interface AutoComplete {
 
             data class AutoCompleteHistorySearchSuggestion(
                 override val phrase: String,
+                val isAllowedInTopHits: Boolean,
             ) : AutoCompleteHistoryRelatedSuggestion(phrase)
 
             data object AutoCompleteInAppMessageSuggestion : AutoCompleteHistoryRelatedSuggestion("")
@@ -123,7 +129,7 @@ class AutoCompleteApi @Inject constructor(
         return savedSitesObservable.zipWith(getAutoCompleteSearchResults(query)) { bookmarksAndHistory, searchResults ->
             val topHits = (searchResults + bookmarksAndHistory).filter {
                 when (it) {
-                    is AutoCompleteHistorySearchSuggestion -> true
+                    is AutoCompleteHistorySearchSuggestion -> it.isAllowedInTopHits
                     is AutoCompleteHistorySuggestion -> it.isAllowedInTopHits
                     is AutoCompleteBookmarkSuggestion -> true
                     else -> false
@@ -152,7 +158,7 @@ class AutoCompleteApi @Inject constructor(
 
             AutoCompleteResult(
                 query = query,
-                suggestions = inAppMessage + suggestions,
+                suggestions = inAppMessage + suggestions.ifEmpty { listOf(AutoCompleteDefaultSuggestion(query)) },
             )
         }.onErrorResumeNext(Observable.empty())
     }
@@ -299,6 +305,7 @@ class AutoCompleteApi @Inject constructor(
                     is VisitedSERP -> {
                         AutoCompleteHistorySearchSuggestion(
                             phrase = entry.query,
+                            isAllowedInTopHits = isAllowedInTopHits(entry),
                         )
                     }
                 }.let { suggestion ->
