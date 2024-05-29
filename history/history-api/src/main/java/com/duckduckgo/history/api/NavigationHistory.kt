@@ -54,4 +54,10 @@ interface NavigationHistory {
      * Returns whether the history feature is available through RC.
      */
     fun isHistoryFeatureAvailable(): Boolean
+
+    /**
+     * Returns if the user has any [HistoryEntry]
+     * @return [Boolean] true if has [HistoryEntry], false if there are no [HistoryEntry]
+     */
+    suspend fun hasHistory(): Boolean
 }

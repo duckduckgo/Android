@@ -22,6 +22,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -111,6 +112,7 @@ class SystemSearchViewModel @Inject constructor(
     private var results = SystemSearchResult(AutoCompleteResult("", emptyList()), emptyList())
     private var resultsDisposable: Disposable? = null
     private var latestQuickAccessItems: Suggestions.QuickAccessItems = Suggestions.QuickAccessItems(emptyList())
+    private var hasUserSeenHistory = false
 
     val hiddenIds = MutableStateFlow(HiddenBookmarksIds())
 
@@ -182,6 +184,9 @@ class SystemSearchViewModel @Inject constructor(
             autoComplete.autoComplete(query),
             Observable.just(deviceAppLookup.query(query)),
         ) { autocompleteResult: AutoCompleteResult, appsResult: List<DeviceApp> ->
+            if (autocompleteResult.suggestions.contains(AutoCompleteInAppMessageSuggestion)) {
+                hasUserSeenHistory = true
+            }
             SystemSearchResult(autocompleteResult, appsResult)
         }
     }
@@ -390,5 +395,16 @@ class SystemSearchViewModel @Inject constructor(
 
     fun voiceSearchDisabled() {
         command.value = UpdateVoiceSearch
+    }
+
+    fun onUserDismissedAutoCompleteInAppMessage() {
+        autoComplete.userDismissedHistoryInAutoCompleteIAM()
+    }
+
+    fun autoCompleteSuggestionsGone() {
+        if (hasUserSeenHistory) {
+            autoComplete.submitUserSeenHistoryIAM()
+        }
+        hasUserSeenHistory = false
     }
 }

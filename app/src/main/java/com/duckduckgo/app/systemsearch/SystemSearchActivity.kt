@@ -214,6 +214,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             editableSearchClickListener = {
                 viewModel.onUserSelectedToEditQuery(it.phrase)
             },
+            autoCompleteInAppMessageDismissedListener = { viewModel.onUserDismissedAutoCompleteInAppMessage() },
         )
         binding.autocompleteSuggestions.adapter = autocompleteSuggestionsAdapter
     }
@@ -348,6 +349,9 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     private fun renderResultsViewState(viewState: SystemSearchViewModel.Suggestions.SystemSearchResultsViewState) {
         binding.deviceLabel.isVisible = viewState.appResults.isNotEmpty()
         autocompleteSuggestionsAdapter.updateData(viewState.autocompleteResults.query, viewState.autocompleteResults.suggestions)
+        if (viewState.autocompleteResults.suggestions.isEmpty()) {
+            viewModel.autoCompleteSuggestionsGone()
+        }
         deviceAppSuggestionsAdapter.updateData(viewState.appResults)
     }
 

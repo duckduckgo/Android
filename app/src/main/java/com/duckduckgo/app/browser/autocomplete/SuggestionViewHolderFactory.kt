@@ -22,14 +22,18 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.autocomplete.AutoCompleteViewHolder.InAppMessageViewHolder
 import com.duckduckgo.app.browser.databinding.ItemAutocompleteBookmarkSuggestionBinding
+import com.duckduckgo.app.browser.databinding.ItemAutocompleteDefaultBinding
 import com.duckduckgo.app.browser.databinding.ItemAutocompleteHistorySuggestionBinding
-import com.duckduckgo.app.browser.databinding.ItemAutocompleteNoSuggestionsBinding
+import com.duckduckgo.app.browser.databinding.ItemAutocompleteInAppMessageBinding
 import com.duckduckgo.app.browser.databinding.ItemAutocompleteSearchSuggestionBinding
+import com.duckduckgo.common.ui.view.MessageCta.Message
 
 interface SuggestionViewHolderFactory {
 
@@ -40,6 +44,7 @@ interface SuggestionViewHolderFactory {
         suggestion: AutoCompleteSuggestion,
         immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+        deleteClickListener: (AutoCompleteSuggestion) -> Unit = {},
     )
 }
 
@@ -56,6 +61,7 @@ class SearchSuggestionViewHolderFactory : SuggestionViewHolderFactory {
         suggestion: AutoCompleteSuggestion,
         immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+        deleteClickListener: (AutoCompleteSuggestion) -> Unit,
     ) {
         val searchSuggestionViewHolder = holder as AutoCompleteViewHolder.SearchSuggestionViewHolder
         searchSuggestionViewHolder.bind(suggestion as AutoCompleteSearchSuggestion, immediateSearchClickListener, editableSearchClickListener)
@@ -75,6 +81,7 @@ class HistorySuggestionViewHolderFactory : SuggestionViewHolderFactory {
         suggestion: AutoCompleteSuggestion,
         immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+        deleteClickListener: (AutoCompleteSuggestion) -> Unit,
     ) {
         val searchSuggestionViewHolder = holder as AutoCompleteViewHolder.HistorySuggestionViewHolder
         searchSuggestionViewHolder.bind(suggestion as AutoCompleteHistorySuggestion, immediateSearchClickListener, editableSearchClickListener)
@@ -94,6 +101,7 @@ class HistorySearchSuggestionViewHolderFactory : SuggestionViewHolderFactory {
         suggestion: AutoCompleteSuggestion,
         immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+        deleteClickListener: (AutoCompleteSuggestion) -> Unit,
     ) {
         val historySearchSuggestionViewHolder = holder as AutoCompleteViewHolder.HistorySearchSuggestionViewHolder
         historySearchSuggestionViewHolder.bind(
@@ -117,6 +125,7 @@ class BookmarkSuggestionViewHolderFactory : SuggestionViewHolderFactory {
         suggestion: AutoCompleteSuggestion,
         immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+        deleteClickListener: (AutoCompleteSuggestion) -> Unit,
     ) {
         val bookmarkSuggestionViewHolder = holder as AutoCompleteViewHolder.BookmarkSuggestionViewHolder
         bookmarkSuggestionViewHolder.bind(suggestion as AutoCompleteBookmarkSuggestion, immediateSearchClickListener, editableSearchClickListener)
@@ -126,8 +135,12 @@ class BookmarkSuggestionViewHolderFactory : SuggestionViewHolderFactory {
 class EmptySuggestionViewHolderFactory : SuggestionViewHolderFactory {
 
     override fun onCreateViewHolder(parent: ViewGroup): AutoCompleteViewHolder {
-        val inflater = LayoutInflater.from(parent.context)
-        return AutoCompleteViewHolder.EmptySuggestionViewHolder(ItemAutocompleteNoSuggestionsBinding.inflate(inflater, parent, false))
+        val view = View(parent.context)
+        view.layoutParams = RecyclerView.LayoutParams(
+            RecyclerView.LayoutParams.MATCH_PARENT,
+            RecyclerView.LayoutParams.WRAP_CONTENT,
+        )
+        return AutoCompleteViewHolder.EmptySuggestionViewHolder(view)
     }
 
     override fun onBindViewHolder(
@@ -135,8 +148,46 @@ class EmptySuggestionViewHolderFactory : SuggestionViewHolderFactory {
         suggestion: AutoCompleteSuggestion,
         immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+        deleteClickListener: (AutoCompleteSuggestion) -> Unit,
     ) {
         // do nothing
+    }
+}
+
+class DefaultSuggestionViewHolderFactory : SuggestionViewHolderFactory {
+
+    override fun onCreateViewHolder(parent: ViewGroup): AutoCompleteViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
+        return AutoCompleteViewHolder.DefaultSuggestionViewHolder(ItemAutocompleteDefaultBinding.inflate(inflater, parent, false))
+    }
+
+    override fun onBindViewHolder(
+        holder: AutoCompleteViewHolder,
+        suggestion: AutoCompleteSuggestion,
+        immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+        editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+        deleteClickListener: (AutoCompleteSuggestion) -> Unit,
+    ) {
+        val viewholder = holder as AutoCompleteViewHolder.DefaultSuggestionViewHolder
+        viewholder.bind(suggestion as AutoCompleteDefaultSuggestion, immediateSearchClickListener)
+    }
+}
+
+class InAppMessageViewHolderFactory : SuggestionViewHolderFactory {
+    override fun onCreateViewHolder(parent: ViewGroup): AutoCompleteViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
+        return AutoCompleteViewHolder.InAppMessageViewHolder(ItemAutocompleteInAppMessageBinding.inflate(inflater, parent, false))
+    }
+
+    override fun onBindViewHolder(
+        holder: AutoCompleteViewHolder,
+        suggestion: AutoCompleteSuggestion,
+        immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+        editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+        deleteClickListener: (AutoCompleteSuggestion) -> Unit,
+    ) {
+        val viewHolder = holder as InAppMessageViewHolder
+        viewHolder.bind(suggestion, deleteClickListener)
     }
 }
 
@@ -180,7 +231,7 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
             editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         ) = with(binding) {
             title.text = item.title
-            url.text = item.url
+            url.text = item.phrase
 
             bookmarkIndicator.setImageResource(if (item.isFavorite) R.drawable.ic_bookmark_favorite_20 else R.drawable.ic_bookmark_20)
             goToBookmarkImage.setOnClickListener { editableSearchClickListener(item) }
@@ -202,5 +253,31 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
         }
     }
 
-    class EmptySuggestionViewHolder(binding: ItemAutocompleteNoSuggestionsBinding) : AutoCompleteViewHolder(binding.root)
+    class EmptySuggestionViewHolder(view: View) : AutoCompleteViewHolder(view)
+
+    class DefaultSuggestionViewHolder(val binding: ItemAutocompleteDefaultBinding) : AutoCompleteViewHolder(binding.root) {
+        fun bind(
+            item: AutoCompleteDefaultSuggestion,
+            immediateSearchListener: (AutoCompleteSuggestion) -> Unit,
+        ) {
+            binding.phrase.text = item.phrase
+            binding.root.setOnClickListener { immediateSearchListener(item) }
+        }
+    }
+
+    class InAppMessageViewHolder(val binding: ItemAutocompleteInAppMessageBinding) : AutoCompleteViewHolder(binding.root) {
+        fun bind(
+            item: AutoCompleteSuggestion,
+            deleteClickListener: (AutoCompleteSuggestion) -> Unit,
+        ) {
+            binding.messageCta.setMessage(
+                Message(
+                    title = binding.root.context.getString(R.string.improvedAutoCompleteIAMTitle),
+                    subtitle = binding.root.context.getString(R.string.improvedAutoCompleteIAMContent),
+                    topIllustration = com.duckduckgo.mobile.android.R.drawable.ic_announce,
+                ),
+            )
+            binding.messageCta.onCloseButtonClicked { deleteClickListener(item) }
+        }
+    }
 }
