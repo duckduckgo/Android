@@ -32,9 +32,9 @@ class DefaultDomainNameNormalizer @Inject constructor(
 ) : DomainNameNormalizer {
     override suspend fun normalizeDomains(unnormalized: List<LoginCredentials>): List<LoginCredentials> {
         return unnormalized.map {
-            val currentDomain = it.domain ?: return@map null
+            val currentDomain = it.domain ?: return@map it
             val normalizedDomain = urlMatcher.cleanRawUrl(currentDomain)
             it.copy(domain = normalizedDomain)
-        }.filterNotNull()
+        }
     }
 }

@@ -21,16 +21,34 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
-interface ImportedPasswordValidator {
+interface ImportedCredentialValidator {
     fun isValid(loginCredentials: LoginCredentials): Boolean
 }
 
 @ContributesBinding(AppScope::class)
-class DefaultImportedPasswordValidator @Inject constructor() : ImportedPasswordValidator {
+class DefaultImportedCredentialValidator @Inject constructor() : ImportedCredentialValidator {
 
     override fun isValid(loginCredentials: LoginCredentials): Boolean {
-        return with(loginCredentials) {
-            domain.isNullOrBlank().not() && password.isNullOrBlank().not()
+        with(loginCredentials) {
+            if (domain?.startsWith(APP_PASSWORD_PREFIX) == true) return false
+
+            if (allFieldsEmpty()) {
+                return false
+            }
+
+            return true
         }
+    }
+
+    private fun LoginCredentials.allFieldsEmpty(): Boolean {
+        return domain.isNullOrBlank() &&
+            username.isNullOrBlank() &&
+            password.isNullOrBlank() &&
+            domainTitle.isNullOrBlank() &&
+            notes.isNullOrBlank()
+    }
+
+    companion object {
+        private const val APP_PASSWORD_PREFIX = "android://"
     }
 }

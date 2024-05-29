@@ -35,10 +35,19 @@ class GooglePasswordBlobDecoderImpl @Inject constructor(
 
     override suspend fun decode(data: String): String {
         return withContext(dispatchers.io()) {
-            val base64Data = data.split(",")[1]
-            val decodedBytes = Base64.decode(base64Data, DEFAULT)
-            val decoded = String(decodedBytes, Charsets.UTF_8)
-            return@withContext decoded
+            kotlin.runCatching {
+                val base64Data = removeDataTypePrefix(data)
+                val decodedBytes = Base64.decode(base64Data, DEFAULT)
+                String(decodedBytes, Charsets.UTF_8)
+            }.getOrElse { rootCause ->
+                throw IllegalArgumentException("Unrecognized format", rootCause)
+            }
         }
     }
+
+    /**
+     * String will start with data type.
+     * e.g., data:text/csv;charset=utf-8;;base64,
+     */
+    private fun removeDataTypePrefix(data: String) = data.split(",")[1]
 }

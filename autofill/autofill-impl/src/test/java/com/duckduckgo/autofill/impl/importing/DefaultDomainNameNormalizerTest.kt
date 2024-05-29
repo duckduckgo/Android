@@ -27,41 +27,38 @@ class DefaultDomainNameNormalizerTest {
         val input = listOf(creds(domain = "example.com"))
         val output = testee.normalizeDomains(input)
         assertEquals(1, output.size)
-        assertEquals(creds(), output.first())
+        assertEquals(input.first(), output.first())
     }
 
     @Test
-    fun whenInputDomainNotAlreadyNormalizedThenIncludedInOutput() = runTest {
+    fun whenInputDomainNotAlreadyNormalizedThenNormalizedAndIncludedInOutput() = runTest {
         val input = listOf(creds(domain = "https://example.com/foo/bar"))
         val output = testee.normalizeDomains(input)
         assertEquals(1, output.size)
-        assertEquals(creds(), output.first())
+        assertEquals(input.first().copy(domain = "example.com"), output.first())
     }
 
     @Test
-    fun whenInputDomainIsNullThenNotIncludedInOutput() = runTest {
+    fun whenInputDomainIsNullThenNormalizedToNullDomain() = runTest {
         val input = listOf(creds(domain = null))
         val output = testee.normalizeDomains(input)
-        assertTrue(output.isEmpty())
+        assertEquals(1, output.size)
+        assertEquals(null, output.first().domain)
     }
 
     @Test
-    fun whenManyInputsWithOneNullDomainThenOnlyMissingDomainIsNotIncludedInOutput() = runTest {
-        val input = listOf(
-            creds(),
-            creds(domain = null),
-            creds(),
-        )
+    fun whenDomainCannotBeNormalizedThenIsIncludedUnmodified() = runTest {
+        val input = listOf(creds(domain = "unnormalizable"))
         val output = testee.normalizeDomains(input)
-        assertEquals(2, output.size)
+        assertEquals("unnormalizable", output.first().domain)
     }
 
     private fun creds(
-        domain: String? = "example.com",
-        username: String? = "username",
-        password: String? = "password",
-        notes: String? = "notes",
-        domainTitle: String? = "example title",
+        domain: String? = null,
+        username: String? = null,
+        password: String? = null,
+        notes: String? = null,
+        domainTitle: String? = null,
     ): LoginCredentials {
         return LoginCredentials(
             domainTitle = domainTitle,

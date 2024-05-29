@@ -17,6 +17,9 @@
 package com.duckduckgo.autofill.impl.importing
 
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.impl.importing.CsvCredentialParser.ParseResult
+import com.duckduckgo.autofill.impl.importing.CsvCredentialParser.ParseResult.Error
+import com.duckduckgo.autofill.impl.importing.CsvCredentialParser.ParseResult.Success
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -26,28 +29,31 @@ import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
-interface CsvPasswordParser {
-    suspend fun parseCsv(csv: String): List<LoginCredentials>
+interface CsvCredentialParser {
+    suspend fun parseCsv(csv: String): ParseResult
+
+    sealed interface ParseResult {
+        data class Success(val credentials: List<LoginCredentials>) : ParseResult
+        data object Error : ParseResult
+    }
 }
 
 @ContributesBinding(AppScope::class)
-class GooglePasswordManagerCsvPasswordParser @Inject constructor(
+class GooglePasswordManagerCsvCredentialParser @Inject constructor(
     private val dispatchers: DispatcherProvider,
-) : CsvPasswordParser {
+) : CsvCredentialParser {
 
-//    private val csvFormat by lazy {
-//        CSVFormat.Builder.create(CSVFormat.DEFAULT).build()
-//    }
-
-    override suspend fun parseCsv(csv: String): List<LoginCredentials> {
+    override suspend fun parseCsv(csv: String): ParseResult {
         return kotlin.runCatching {
-            convertToPasswordList(csv).also {
-                Timber.i("Parsed CSV. Found %d passwords", it.size)
+            val credentials = convertToCredentials(csv).also {
+                Timber.i("Parsed CSV. Found %d credentials", it.size)
             }
+            Success(credentials)
         }.onFailure {
-            Timber.e("Failed to parse CSV: %s", it.message)
+            Timber.e(it, "Failed to parse CSV")
+            Error
         }.getOrElse {
-            emptyList()
+            Error
         }
     }
 
@@ -55,7 +61,7 @@ class GooglePasswordManagerCsvPasswordParser @Inject constructor(
      * Format of the Google Password Manager CSV is:
      * name | url | username | password | note
      */
-    private suspend fun convertToPasswordList(csv: String): List<LoginCredentials> {
+    private suspend fun convertToCredentials(csv: String): List<LoginCredentials> {
         return withContext(dispatchers.io()) {
             val lines = mutableListOf<CsvRow>()
             val iter = CsvReader.builder().build(csv).spliterator()
@@ -65,13 +71,12 @@ class GooglePasswordManagerCsvPasswordParser @Inject constructor(
             lines.firstOrNull().verifyExpectedFormat()
 
             // drop the header row
-            val passwordsLines = lines.drop(1)
+            val credentialLines = lines.drop(1)
 
-            Timber.v("About to parse %d passwords", passwordsLines.size)
-            return@withContext passwordsLines
+            return@withContext credentialLines
                 .mapNotNull {
-                    if (it.fields.size != EXPECTED_HEADERS.size) {
-                        Timber.w("CSV line does not match expected format. Expected ${EXPECTED_HEADERS.size} parts, found ${it.fields.size}")
+                    if (it.fields.size != EXPECTED_HEADERS_ORDERED.size) {
+                        Timber.w("Line is unexpected format. Expected ${EXPECTED_HEADERS_ORDERED.size} parts, found ${it.fields.size}")
                         return@mapNotNull null
                     }
 
@@ -113,21 +118,23 @@ class GooglePasswordManagerCsvPasswordParser @Inject constructor(
 
         val headers = this.fields
 
-        if (headers.size != EXPECTED_HEADERS.size) {
+        if (headers.size != EXPECTED_HEADERS_ORDERED.size) {
             throw IllegalArgumentException(
-                "CSV header size does not match expected amount. Expected: ${EXPECTED_HEADERS.size}, found: ${headers.size}",
+                "CSV header size does not match expected amount. Expected: ${EXPECTED_HEADERS_ORDERED.size}, found: ${headers.size}",
             )
         }
 
         headers.forEachIndexed { index, value ->
-            if (value != EXPECTED_HEADERS[index]) {
-                throw IllegalArgumentException("CSV header does not match expected format. Expected: ${EXPECTED_HEADERS[index]}, found: $value")
+            if (value != EXPECTED_HEADERS_ORDERED[index]) {
+                throw IllegalArgumentException(
+                    "CSV header does not match expected format. Expected: ${EXPECTED_HEADERS_ORDERED[index]}, found: $value",
+                )
             }
         }
     }
 
     companion object {
-        val EXPECTED_HEADERS = listOf(
+        val EXPECTED_HEADERS_ORDERED = listOf(
             "name",
             "url",
             "username",
