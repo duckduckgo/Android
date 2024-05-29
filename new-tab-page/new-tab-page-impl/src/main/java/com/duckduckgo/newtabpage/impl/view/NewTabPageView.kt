@@ -19,15 +19,18 @@ package com.duckduckgo.newtabpage.impl.view
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
-import android.view.ViewGroup.LayoutParams
 import android.widget.LinearLayout
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewTreeLifecycleOwner
+import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.browser.api.ui.BrowserScreens.NewTabSettingsScreenNoParams
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.newtabpage.api.NewTabPageSectionProvider
 import com.duckduckgo.newtabpage.impl.databinding.ViewNewTabPageBinding
+import com.duckduckgo.newtabpage.impl.view.NewTabPageViewModel.ViewState
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -35,7 +38,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import logcat.logcat
 
 @InjectWith(ViewScope::class)
 class NewTabPageView @JvmOverloads constructor(
@@ -45,7 +47,7 @@ class NewTabPageView @JvmOverloads constructor(
 ) : LinearLayout(context, attrs, defStyle) {
 
     @Inject
-    lateinit var newTabSectionsProvider: NewTabPageSectionProvider
+    lateinit var viewModelFactory: ViewViewModelFactory
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
@@ -54,33 +56,42 @@ class NewTabPageView @JvmOverloads constructor(
 
     private val binding: ViewNewTabPageBinding by viewBinding()
 
+    private val viewModel: NewTabPageViewModel by lazy {
+        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[NewTabPageViewModel::class.java]
+    }
+
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
 
+        ViewTreeLifecycleOwner.get(this)?.lifecycle?.addObserver(viewModel)
+
         @SuppressLint("NoHardcodedCoroutineDispatcher")
         coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
-        setupRemoteSections()
+        viewModel.viewState
+            .onEach { render(it) }
+            .launchIn(coroutineScope!!)
 
         binding.newTabEdit.setOnClickListener {
             globalActivityStarter.start(context, NewTabSettingsScreenNoParams)
         }
     }
 
-    private fun setupRemoteSections() {
-        newTabSectionsProvider.provideSections()
-            .onEach { views ->
-                logcat { "New Tab: Sections $views" }
-                views.forEach {
-                    binding.newTabSectionsContent.addView(
-                        it.getView(context),
-                        android.view.ViewGroup.LayoutParams(
-                            android.view.ViewGroup.LayoutParams.MATCH_PARENT,
-                            android.view.ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ),
-                    )
-                }
-            }.launchIn(coroutineScope!!)
+    private fun render(viewState: ViewState) {
+        // remove all views but the RMF
+        val childCount = binding.newTabSectionsContent.childCount
+        if (childCount > 0) {
+            binding.newTabSectionsContent.removeViews(1, childCount - 1)
+        }
+        viewState.sections.onEach {
+            binding.newTabSectionsContent.addView(
+                it.getView(context),
+                android.view.ViewGroup.LayoutParams(
+                    android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                    android.view.ViewGroup.LayoutParams.WRAP_CONTENT,
+                ),
+            )
+        }
     }
 }
