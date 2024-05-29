@@ -21,6 +21,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
@@ -103,7 +104,7 @@ class AutoCompleteApiTest {
     }
 
     @Test
-    fun whenAutoCompleteDoesNotMatchAnySavedSiteReturnEmptySavedSiteList() {
+    fun whenAutoCompleteDoesNotMatchAnySavedSiteReturnDefault() {
         whenever(mockAutoCompleteService.autoComplete("wrong")).thenReturn(Observable.just(emptyList()))
 
         whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
@@ -121,7 +122,7 @@ class AutoCompleteApiTest {
         val result = testee.autoComplete("wrong").test()
         val value = result.values()[0] as AutoCompleteResult
 
-        assertTrue(value.suggestions.isEmpty())
+        assertEquals(value.suggestions.first(), AutoCompleteDefaultSuggestion("wrong"))
     }
 
     @Test
@@ -738,7 +739,7 @@ class AutoCompleteApiTest {
     }
 
     @Test
-    fun whenMultipleTokenQueryAndNoTokenMatchThenReturnEmpty() {
+    fun whenMultipleTokenQueryAndNoTokenMatchThenReturnDefault() {
         val query = "example title foo"
         whenever(mockAutoCompleteService.autoComplete(query)).thenReturn(Observable.just(listOf()))
         whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
@@ -756,7 +757,7 @@ class AutoCompleteApiTest {
         val result = testee.autoComplete(query).test()
         val value = result.values()[0] as AutoCompleteResult
 
-        assertEquals(listOf<AutoCompleteSuggestion>(), value.suggestions)
+        assertEquals(listOf<AutoCompleteSuggestion>(AutoCompleteDefaultSuggestion("example title foo")), value.suggestions)
     }
 
     @Test

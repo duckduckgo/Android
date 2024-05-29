@@ -38,11 +38,14 @@ interface HistoryRepository {
     )
 
     suspend fun clearHistory()
+
     fun isHistoryUserEnabled(default: Boolean): Boolean
 
     fun setHistoryUserEnabled(value: Boolean)
 
     suspend fun clearEntriesOlderThan(dateTime: LocalDateTime)
+
+    suspend fun hasHistory(): Boolean
 }
 
 class RealHistoryRepository(
@@ -116,5 +119,13 @@ class RealHistoryRepository(
         cachedHistoryEntries = null
         historyDao.deleteEntriesOlderThan(dateTime)
         fetchAndCacheHistoryEntries()
+    }
+
+    override suspend fun hasHistory(): Boolean {
+        return withContext(dispatcherProvider.io()) {
+            (cachedHistoryEntries ?: fetchAndCacheHistoryEntries()).let {
+                it.isNotEmpty()
+            }
+        }
     }
 }

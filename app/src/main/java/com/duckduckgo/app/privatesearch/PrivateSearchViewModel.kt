@@ -20,6 +20,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_HISTORY_TOGGLED_OFF
+import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_HISTORY_TOGGLED_ON
+import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_TOGGLED_OFF
+import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_TOGGLED_ON
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
@@ -80,6 +84,11 @@ class PrivateSearchViewModel @Inject constructor(
         if (!enabled) {
             history.setHistoryUserEnabled(false)
         }
+        if (enabled) {
+            pixel.fire(AUTOCOMPLETE_TOGGLED_ON)
+        } else {
+            pixel.fire(AUTOCOMPLETE_TOGGLED_OFF)
+        }
         viewModelScope.launch {
             viewState.emit(
                 currentViewState().copy(
@@ -93,6 +102,11 @@ class PrivateSearchViewModel @Inject constructor(
     fun onAutocompleteRecentlyVisitedSitesSettingChanged(enabled: Boolean) {
         Timber.i("User changed autocomplete recently visited sites setting, is now enabled: $enabled")
         history.setHistoryUserEnabled(enabled)
+        if (enabled) {
+            pixel.fire(AUTOCOMPLETE_HISTORY_TOGGLED_ON)
+        } else {
+            pixel.fire(AUTOCOMPLETE_HISTORY_TOGGLED_OFF)
+        }
         viewModelScope.launch { viewState.emit(currentViewState().copy(autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled = enabled)) }
     }
 
