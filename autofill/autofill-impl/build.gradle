@@ -18,6 +18,7 @@ plugins {
     id 'com.android.library'
     id 'kotlin-android'
     id 'com.squareup.anvil'
+    id 'kotlin-parcelize'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
@@ -58,6 +59,8 @@ dependencies {
     implementation "androidx.webkit:webkit:_"
 
     implementation "androidx.datastore:datastore-preferences:_"
+
+    implementation "de.siegmar:fastcsv:_"
 
     implementation Square.retrofit2.converter.moshi
     implementation "com.squareup.moshi:moshi-kotlin:_"
