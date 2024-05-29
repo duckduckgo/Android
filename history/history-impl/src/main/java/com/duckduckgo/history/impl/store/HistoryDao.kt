@@ -17,6 +17,7 @@
 package com.duckduckgo.history.impl.store
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -63,4 +64,25 @@ interface HistoryDao {
 
     @Query("DELETE FROM history_entries")
     suspend fun deleteAll()
+
+    @Delete
+    suspend fun delete(entryEntity: HistoryEntryEntity)
+
+    @Delete
+    suspend fun delete(entities: List<HistoryEntryEntity>)
+
+    @Query("DELETE FROM visits_list WHERE timestamp < :timestamp")
+    suspend fun deleteOldVisitsByTimestamp(timestamp: String)
+
+    @Query("DELETE FROM history_entries WHERE id NOT IN (SELECT DISTINCT historyEntryId FROM visits_list)")
+    suspend fun deleteEntriesWithNoVisits()
+
+    @Transaction
+    suspend fun deleteEntriesOlderThan(dateTime: LocalDateTime) {
+        val timestamp = DatabaseDateFormatter.timestamp(dateTime)
+
+        deleteOldVisitsByTimestamp(timestamp)
+
+        deleteEntriesWithNoVisits()
+    }
 }

@@ -20,9 +20,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_HISTORY_TOGGLED_OFF
+import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_HISTORY_TOGGLED_ON
+import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_TOGGLED_OFF
+import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_TOGGLED_ON
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.history.api.NavigationHistory
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -37,10 +42,13 @@ import timber.log.Timber
 class PrivateSearchViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val pixel: Pixel,
+    private val history: NavigationHistory,
 ) : ViewModel() {
 
     data class ViewState(
         val autoCompleteSuggestionsEnabled: Boolean = true,
+        val autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled: Boolean = true,
+        val storeHistoryEnabled: Boolean = false,
     )
 
     sealed class Command {
@@ -52,7 +60,17 @@ class PrivateSearchViewModel @Inject constructor(
 
     fun viewState(): Flow<ViewState> = viewState.onStart {
         viewModelScope.launch {
-            viewState.emit(ViewState(autoCompleteSuggestionsEnabled = settingsDataStore.autoCompleteSuggestionsEnabled))
+            val autoCompleteEnabled = settingsDataStore.autoCompleteSuggestionsEnabled
+            if (!autoCompleteEnabled) {
+                history.setHistoryUserEnabled(false)
+            }
+            viewState.emit(
+                ViewState(
+                    autoCompleteSuggestionsEnabled = settingsDataStore.autoCompleteSuggestionsEnabled,
+                    autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled = history.isHistoryUserEnabled(),
+                    storeHistoryEnabled = history.isHistoryFeatureAvailable(),
+                ),
+            )
         }
     }
 
@@ -63,7 +81,33 @@ class PrivateSearchViewModel @Inject constructor(
     fun onAutocompleteSettingChanged(enabled: Boolean) {
         Timber.i("User changed autocomplete setting, is now enabled: $enabled")
         settingsDataStore.autoCompleteSuggestionsEnabled = enabled
-        viewModelScope.launch { viewState.emit(currentViewState().copy(autoCompleteSuggestionsEnabled = enabled)) }
+        if (!enabled) {
+            history.setHistoryUserEnabled(false)
+        }
+        if (enabled) {
+            pixel.fire(AUTOCOMPLETE_TOGGLED_ON)
+        } else {
+            pixel.fire(AUTOCOMPLETE_TOGGLED_OFF)
+        }
+        viewModelScope.launch {
+            viewState.emit(
+                currentViewState().copy(
+                    autoCompleteSuggestionsEnabled = enabled,
+                    autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled = history.isHistoryUserEnabled(),
+                ),
+            )
+        }
+    }
+
+    fun onAutocompleteRecentlyVisitedSitesSettingChanged(enabled: Boolean) {
+        Timber.i("User changed autocomplete recently visited sites setting, is now enabled: $enabled")
+        history.setHistoryUserEnabled(enabled)
+        if (enabled) {
+            pixel.fire(AUTOCOMPLETE_HISTORY_TOGGLED_ON)
+        } else {
+            pixel.fire(AUTOCOMPLETE_HISTORY_TOGGLED_OFF)
+        }
+        viewModelScope.launch { viewState.emit(currentViewState().copy(autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled = enabled)) }
     }
 
     fun onPrivateSearchMoreSearchSettingsClicked() {
