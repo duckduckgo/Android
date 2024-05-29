@@ -47,10 +47,10 @@
         android:gravity="center_vertical|start"
         android:includeFontPadding="false"
         android:maxLines="1"
-        app:layout_constraintBottom_toBottomOf="@id/phraseOrUrlIndicator"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/editQueryImage"
         app:layout_constraintStart_toEndOf="@id/phraseOrUrlIndicator"
-        app:layout_constraintTop_toTopOf="@id/phraseOrUrlIndicator"
+        app:layout_constraintTop_toTopOf="parent"
         tools:text="phrase or URL suggestion"/>
 
     <ImageView
