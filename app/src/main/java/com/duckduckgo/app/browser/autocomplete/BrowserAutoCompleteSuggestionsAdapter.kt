@@ -21,19 +21,30 @@ import androidx.annotation.UiThread
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
 import com.duckduckgo.app.browser.autocomplete.AutoCompleteViewHolder.EmptySuggestionViewHolder
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.BOOKMARK_TYPE
+import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.DEFAULT_TYPE
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.EMPTY_TYPE
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.HISTORY_SEARCH_TYPE
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.HISTORY_TYPE
+import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.IN_APP_MESSAGE_TYPE
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.SUGGESTION_TYPE
 
 class BrowserAutoCompleteSuggestionsAdapter(
     private val immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
     private val editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+    private val autoCompleteInAppMessageDismissedListener: () -> Unit,
 ) : RecyclerView.Adapter<AutoCompleteViewHolder>() {
+
+    private val deleteClickListener: (AutoCompleteSuggestion) -> Unit = {
+        suggestions = suggestions.filter { suggestion -> suggestion != it }
+        notifyItemRemoved((suggestions.indexOf(it)))
+        autoCompleteInAppMessageDismissedListener()
+    }
 
     private val viewHolderFactoryMap: Map<Int, SuggestionViewHolderFactory> = mapOf(
         EMPTY_TYPE to EmptySuggestionViewHolderFactory(),
@@ -41,6 +52,8 @@ class BrowserAutoCompleteSuggestionsAdapter(
         BOOKMARK_TYPE to BookmarkSuggestionViewHolderFactory(),
         HISTORY_TYPE to HistorySuggestionViewHolderFactory(),
         HISTORY_SEARCH_TYPE to HistorySearchSuggestionViewHolderFactory(),
+        IN_APP_MESSAGE_TYPE to InAppMessageViewHolderFactory(),
+        DEFAULT_TYPE to DefaultSuggestionViewHolderFactory(),
     )
 
     private var phrase = ""
@@ -58,6 +71,8 @@ class BrowserAutoCompleteSuggestionsAdapter(
             suggestions[position] is AutoCompleteBookmarkSuggestion -> BOOKMARK_TYPE
             suggestions[position] is AutoCompleteHistorySuggestion -> HISTORY_TYPE
             suggestions[position] is AutoCompleteHistorySearchSuggestion -> HISTORY_SEARCH_TYPE
+            suggestions[position] is AutoCompleteInAppMessageSuggestion -> IN_APP_MESSAGE_TYPE
+            suggestions[position] is AutoCompleteDefaultSuggestion -> DEFAULT_TYPE
             else -> SUGGESTION_TYPE
         }
     }
@@ -74,13 +89,14 @@ class BrowserAutoCompleteSuggestionsAdapter(
                 suggestions[position],
                 immediateSearchClickListener,
                 editableSearchClickListener,
+                deleteClickListener,
             )
         }
     }
 
     override fun getItemCount(): Int {
         if (suggestions.isEmpty() && phrase.isNotBlank()) {
-            return 1 // No suggestions message
+            return 1 // Empty ViewHolder
         }
         return suggestions.size
     }
@@ -102,5 +118,7 @@ class BrowserAutoCompleteSuggestionsAdapter(
         const val BOOKMARK_TYPE = 3
         const val HISTORY_TYPE = 4
         const val HISTORY_SEARCH_TYPE = 5
+        const val IN_APP_MESSAGE_TYPE = 6
+        const val DEFAULT_TYPE = 7
     }
 }

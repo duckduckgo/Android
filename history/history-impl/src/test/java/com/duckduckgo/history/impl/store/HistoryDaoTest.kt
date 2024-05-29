@@ -48,8 +48,8 @@ class HistoryDaoTest {
 
     @Test
     fun testGetHistoryEntryByUrl() {
-        val historyEntry = HistoryEntryEntity(url = "url", title = "title", query = "query", isSerp = false)
         runTest {
+            val historyEntry = HistoryEntryEntity(url = "url", title = "title", query = "query", isSerp = false)
             historyDao.insertHistoryEntry(historyEntry)
 
             val retrievedEntry = historyDao.getHistoryEntryByUrl("url")
@@ -92,6 +92,44 @@ class HistoryDaoTest {
             Assert.assertEquals(1, historyEntriesWithVisits.count())
             Assert.assertEquals(2, historyEntriesWithVisits.first().visits.count())
             Assert.assertEquals("title2", historyEntriesWithVisits.first().historyEntry.title)
+        }
+    }
+
+    @Test
+    fun whenDeleteOldItemsWithNoOldEnoughItemsThenNothingIsDeleted() {
+        runTest {
+            val insertDate = LocalDateTime.of(2000, JANUARY, 1, 0, 0)
+            historyDao.updateOrInsertVisit("url", "title", "query", false, insertDate)
+            historyDao.updateOrInsertVisit("url2", "title2", "query2", false, insertDate)
+            historyDao.deleteEntriesOlderThan(insertDate.minusMinutes(1))
+            val historyEntriesWithVisits = historyDao.getHistoryEntriesWithVisits()
+            Assert.assertEquals(2, historyEntriesWithVisits.count())
+            Assert.assertEquals(1, historyEntriesWithVisits.first().visits.count())
+        }
+    }
+
+    @Test
+    fun whenDeleteOldItemsWithOldEnoughItemsThenTheyAreDeleted() {
+        runTest {
+            val insertDate = LocalDateTime.of(2000, JANUARY, 1, 0, 0)
+            historyDao.updateOrInsertVisit("url", "title", "query", false, insertDate)
+            historyDao.updateOrInsertVisit("url2", "title2", "query2", false, insertDate)
+            historyDao.deleteEntriesOlderThan(insertDate.plusMinutes(1))
+            val historyEntriesWithVisits = historyDao.getHistoryEntriesWithVisits()
+            Assert.assertEquals(0, historyEntriesWithVisits.count())
+        }
+    }
+
+    @Test
+    fun whenDeleteOldItemsWithVisitsBothBeforeAndAfterDeletionTimestampThenDeleteOnlyOldVisitsButNotEntries() {
+        runTest {
+            val insertDate = LocalDateTime.of(2000, JANUARY, 1, 0, 0)
+            historyDao.updateOrInsertVisit("url", "title", "query", false, insertDate)
+            historyDao.updateOrInsertVisit("url2", "title2", "query2", false, insertDate.plusMinutes(5))
+            historyDao.deleteEntriesOlderThan(insertDate.plusMinutes(1))
+            val historyEntriesWithVisits = historyDao.getHistoryEntriesWithVisits()
+            Assert.assertEquals(1, historyEntriesWithVisits.count())
+            Assert.assertEquals(1, historyEntriesWithVisits.first().visits.count())
         }
     }
 }

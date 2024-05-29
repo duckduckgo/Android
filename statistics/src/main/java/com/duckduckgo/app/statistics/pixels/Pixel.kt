@@ -43,6 +43,7 @@ interface Pixel {
         const val URL = "url"
         const val BOOKMARK_CAPABLE = "bc"
         const val FAVORITE_CAPABLE = "fc"
+        const val HISTORY_CAPABLE = "hc"
         const val SHOWED_BOOKMARKS = "sb"
         const val SHOWED_FAVORITES = "sf"
         const val SHOWED_HISTORY = "sh"

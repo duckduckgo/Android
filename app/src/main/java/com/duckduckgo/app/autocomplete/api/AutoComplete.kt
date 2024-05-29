@@ -20,11 +20,17 @@ import androidx.core.net.toUri
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
+import com.duckduckgo.app.autocomplete.impl.AutoCompleteRepository
 import com.duckduckgo.app.browser.UriString
+import com.duckduckgo.app.onboarding.store.AppStage
+import com.duckduckgo.app.onboarding.store.UserStageStore
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.toStringDropScheme
 import com.duckduckgo.di.scopes.AppScope
@@ -41,6 +47,7 @@ import io.reactivex.Observable
 import java.io.InterruptedIOException
 import javax.inject.Inject
 import kotlin.math.max
+import kotlinx.coroutines.runBlocking
 
 const val maximumNumberOfSuggestions = 12
 const val maximumNumberOfTopHits = 2
@@ -48,6 +55,8 @@ const val minimumNumberInSuggestionGroup = 5
 
 interface AutoComplete {
     fun autoComplete(query: String): Observable<AutoCompleteResult>
+    fun userDismissedHistoryInAutoCompleteIAM()
+    fun submitUserSeenHistoryIAM()
 
     data class AutoCompleteResult(
         val query: String,
@@ -58,6 +67,10 @@ interface AutoComplete {
         data class AutoCompleteSearchSuggestion(
             override val phrase: String,
             val isUrl: Boolean,
+        ) : AutoCompleteSuggestion(phrase)
+
+        data class AutoCompleteDefaultSuggestion(
+            override val phrase: String,
         ) : AutoCompleteSuggestion(phrase)
 
         data class AutoCompleteBookmarkSuggestion(
@@ -77,7 +90,10 @@ interface AutoComplete {
 
             data class AutoCompleteHistorySearchSuggestion(
                 override val phrase: String,
+                val isAllowedInTopHits: Boolean,
             ) : AutoCompleteHistoryRelatedSuggestion(phrase)
+
+            data object AutoCompleteInAppMessageSuggestion : AutoCompleteHistoryRelatedSuggestion("")
         }
     }
 }
@@ -85,9 +101,12 @@ interface AutoComplete {
 @ContributesBinding(AppScope::class)
 class AutoCompleteApi @Inject constructor(
     private val autoCompleteService: AutoCompleteService,
-    private val repository: SavedSitesRepository,
+    private val savedSitesRepository: SavedSitesRepository,
     private val navigationHistory: NavigationHistory,
     private val autoCompleteScorer: AutoCompleteScorer,
+    private val autoCompleteRepository: AutoCompleteRepository,
+    private val userStageStore: UserStageStore,
+    private val dispatcherProvider: DispatcherProvider,
 ) : AutoComplete {
 
     override fun autoComplete(query: String): Observable<AutoCompleteResult> {
@@ -112,7 +131,7 @@ class AutoCompleteApi @Inject constructor(
         return savedSitesObservable.zipWith(getAutoCompleteSearchResults(query)) { bookmarksAndHistory, searchResults ->
             val topHits = (searchResults + bookmarksAndHistory).filter {
                 when (it) {
-                    is AutoCompleteHistorySearchSuggestion -> true
+                    is AutoCompleteHistorySearchSuggestion -> it.isAllowedInTopHits
                     is AutoCompleteHistorySuggestion -> it.isAllowedInTopHits
                     is AutoCompleteBookmarkSuggestion -> true
                     else -> false
@@ -129,9 +148,19 @@ class AutoCompleteApi @Inject constructor(
                 .filter { searchSuggestion -> filteredBookmarks.none { it.phrase == searchSuggestion.phrase } }
                 .take(maxSearchResults)
 
+            val inAppMessage = mutableListOf<AutoCompleteSuggestion>()
+
+            val suggestions = (topHits + filteredSearchResults + filteredBookmarks).distinctBy { it.phrase }
+
+            runBlocking(dispatcherProvider.io()) {
+                if (shouldShowHistoryInAutoCompleteIAM(suggestions)) {
+                    inAppMessage.add(0, AutoCompleteInAppMessageSuggestion)
+                }
+            }
+
             AutoCompleteResult(
                 query = query,
-                suggestions = (topHits + filteredSearchResults + filteredBookmarks).distinctBy { it.phrase },
+                suggestions = inAppMessage + suggestions.ifEmpty { listOf(AutoCompleteDefaultSuggestion(query)) },
             )
         }.onErrorResumeNext(Observable.empty())
     }
@@ -157,6 +186,29 @@ class AutoCompleteApi @Inject constructor(
         return uniqueHistorySuggestions + updatedBookmarkSuggestions
     }
 
+    override fun userDismissedHistoryInAutoCompleteIAM() {
+        autoCompleteRepository.dismissHistoryInAutoCompleteIAM()
+    }
+
+    private suspend fun shouldShowHistoryInAutoCompleteIAM(suggestions: List<AutoCompleteSuggestion>): Boolean {
+        return isExistingUser() && !autoCompleteRepository.wasHistoryInAutoCompleteIAMDismissed() &&
+            autoCompleteRepository.countHistoryInAutoCompleteIAMShown() < 3 &&
+            suggestions.any { it is AutoCompleteHistorySuggestion || it is AutoCompleteHistorySearchSuggestion }
+    }
+
+    private suspend fun isExistingUser(): Boolean {
+        if (userStageStore.getUserAppStage() == AppStage.NEW || userStageStore.getUserAppStage() == AppStage.DAX_ONBOARDING) {
+            // do not show anymore
+            autoCompleteRepository.dismissHistoryInAutoCompleteIAM()
+            return false
+        }
+        return true
+    }
+
+    override fun submitUserSeenHistoryIAM() {
+        autoCompleteRepository.submitUserSeenHistoryIAM()
+    }
+
     private fun isAllowedInTopHits(entry: HistoryEntry): Boolean {
         return entry.visits.size > 3 || entry.url.isRoot()
     }
@@ -174,7 +226,7 @@ class AutoCompleteApi @Inject constructor(
             .toObservable()
 
     private fun getAutoCompleteBookmarkResults(query: String): Observable<MutableList<RankedSuggestion<AutoCompleteBookmarkSuggestion>>> =
-        repository.getBookmarksObservable()
+        savedSitesRepository.getBookmarksObservable()
             .map { rankBookmarks(query, it) }
             .flattenAsObservable { it }
             .distinctUntilChanged()
@@ -183,7 +235,7 @@ class AutoCompleteApi @Inject constructor(
             .toObservable()
 
     private fun getAutoCompleteFavoritesResults(query: String): Observable<MutableList<RankedSuggestion<AutoCompleteBookmarkSuggestion>>> =
-        repository.getFavoritesObservable()
+        savedSitesRepository.getFavoritesObservable()
             .map { rankFavorites(query, it) }
             .flattenAsObservable { it }
             .distinctUntilChanged()
@@ -255,6 +307,7 @@ class AutoCompleteApi @Inject constructor(
                     is VisitedSERP -> {
                         AutoCompleteHistorySearchSuggestion(
                             phrase = entry.query,
+                            isAllowedInTopHits = isAllowedInTopHits(entry),
                         )
                     }
                 }.let { suggestion ->

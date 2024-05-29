@@ -34,4 +34,30 @@ interface NavigationHistory {
      */
     @Deprecated("RxJava is deprecated, except for Auto-Complete")
     fun getHistorySingle(): Single<List<HistoryEntry>>
+
+    /**
+     * Clears all history entries.
+     */
+    suspend fun clearHistory()
+
+    /**
+     * Returns whether the history is enabled by the user.
+     */
+    fun isHistoryUserEnabled(): Boolean
+
+    /**
+     * Sets whether the history is enabled by the user.
+     */
+    fun setHistoryUserEnabled(value: Boolean)
+
+    /**
+     * Returns whether the history feature is available through RC.
+     */
+    fun isHistoryFeatureAvailable(): Boolean
+
+    /**
+     * Returns if the user has any [HistoryEntry]
+     * @return [Boolean] true if has [HistoryEntry], false if there are no [HistoryEntry]
+     */
+    suspend fun hasHistory(): Boolean
 }
