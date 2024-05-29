@@ -14,50 +14,48 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.newtabpage.impl.settings
+package com.duckduckgo.newtabpage.impl.view
 
 import android.annotation.SuppressLint
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.newtabpage.api.NewTabPageSectionSettingsPlugin
+import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.newtabpage.api.NewTabPageSectionPlugin
+import com.duckduckgo.newtabpage.api.NewTabPageSectionProvider
 import javax.inject.Inject
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import logcat.logcat
 
-@SuppressLint("NoLifecycleObserver")
-@ContributesViewModel(ActivityScope::class)
-class NewTabSettingsViewModel @Inject constructor(
-    private val newTabPageSectionSettingsProvider: NewTabPageSectionSettingsProvider,
+@SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
+@ContributesViewModel(ViewScope::class)
+class NewTabPageViewModel @Inject constructor(
+    private val newTabSectionsProvider: NewTabPageSectionProvider,
     private val dispatcherProvider: DispatcherProvider,
-) : ViewModel() {
+) : ViewModel(), DefaultLifecycleObserver {
 
-    private val activePlugins: MutableList<NewTabPageSectionSettingsPlugin> = mutableListOf()
+    data class ViewState(val sections: List<NewTabPageSectionPlugin> = emptyList())
 
     private val _viewState = MutableStateFlow(ViewState())
-    fun viewState(): Flow<ViewState> =
-        _viewState.onStart {
-            configureViews()
-        }.flowOn(dispatcherProvider.io())
+    val viewState = _viewState.asStateFlow()
 
-    data class ViewState(val sections: List<NewTabPageSectionSettingsPlugin> = emptyList())
+    override fun onResume(owner: LifecycleOwner) {
+        configureViews()
+    }
 
     private fun configureViews() {
         viewModelScope.launch(dispatcherProvider.io()) {
-            newTabPageSectionSettingsProvider.provideSections().collect { sections ->
-                if (sections != activePlugins) {
-                    activePlugins.clear()
-                    activePlugins.addAll(sections)
-                    withContext(dispatcherProvider.main()) {
-                        _viewState.update { ViewState(sections) }
-                    }
+            newTabSectionsProvider.provideSections().collect { sections ->
+                logcat { "New Tab: Sections $sections" }
+                withContext(dispatcherProvider.main()) {
+                    _viewState.update { ViewState(sections) }
                 }
             }
         }

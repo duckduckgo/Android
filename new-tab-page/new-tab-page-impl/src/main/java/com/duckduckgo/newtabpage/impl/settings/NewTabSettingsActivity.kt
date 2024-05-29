@@ -48,7 +48,7 @@ class NewTabSettingsActivity : DuckDuckGoActivity() {
         setupToolbar(binding.includeToolbar.toolbar)
 
         viewModel.viewState()
-            .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
+            .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
             .onEach { render(it) }
             .launchIn(lifecycleScope)
     }
