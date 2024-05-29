@@ -24,6 +24,7 @@ import android.widget.FrameLayout
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.*
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
+import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -31,6 +32,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.databinding.FragmentDeviceShieldCtaBinding
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
@@ -189,10 +191,28 @@ class AppTrackingProtectionStateView @JvmOverloads constructor(
     boundType = NewTabPageSectionPlugin::class,
     priority = 2,
 )
-class AppTrackingProtectionNewTabPageSectionPlugin @Inject constructor() : NewTabPageSectionPlugin {
+class AppTrackingProtectionNewTabPageSectionPlugin @Inject constructor(
+    private val setting: NewTabAppTrackingProtectionSectionSetting,
+) : NewTabPageSectionPlugin {
     override val name = NewTabPageSection.APP_TRACKING_PROTECTION.name
 
     override fun getView(context: Context): View {
         return AppTrackingProtectionStateView(context)
     }
+
+    override suspend fun isUserEnabled(): Boolean {
+        return setting.self().isEnabled()
+    }
+}
+
+/**
+ * Local feature/settings - they will never be in remote config
+ */
+@ContributesRemoteFeature(
+    scope = AppScope::class,
+    featureName = "newTabAppTPSectionSetting",
+)
+interface NewTabAppTrackingProtectionSectionSetting {
+    @Toggle.DefaultValue(true)
+    fun self(): Toggle
 }

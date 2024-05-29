@@ -26,16 +26,13 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.browser.api.ui.BrowserScreens.NewTabSettingsScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.newtabpage.api.NewTabPageSectionSettingsPlugin
 import com.duckduckgo.newtabpage.impl.databinding.ActivityNewTabSettingsBinding
 import com.duckduckgo.newtabpage.impl.settings.NewTabSettingsViewModel.ViewState
-import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import logcat.logcat
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(NewTabSettingsScreenNoParams::class, screenName = "newtabsettings")
@@ -61,7 +58,6 @@ class NewTabSettingsActivity : DuckDuckGoActivity() {
             val sectionView = section.getView(this)
             binding.newTabSettingSectionsLayout.addDragView(sectionView, sectionView)
             binding.newTabSettingSectionsLayout.setOnViewSwapListener { firstView, firstPosition, secondView, secondPosition ->
-
             }
         }
     }

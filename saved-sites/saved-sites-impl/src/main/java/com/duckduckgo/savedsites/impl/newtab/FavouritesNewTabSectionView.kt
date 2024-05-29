@@ -350,10 +350,16 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
     boundType = NewTabPageSectionPlugin::class,
     priority = 3,
 )
-class FavouritesNewTabSectionPlugin @Inject constructor() : NewTabPageSectionPlugin {
+class FavouritesNewTabSectionPlugin @Inject constructor(
+    private val setting: NewTabFavouritesSectionSetting,
+) : NewTabPageSectionPlugin {
     override val name = NewTabPageSection.FAVOURITES.name
 
     override fun getView(context: Context): View {
         return FavouritesNewTabSectionView(context)
+    }
+
+    override suspend fun isUserEnabled(): Boolean {
+        return setting.self().isEnabled()
     }
 }

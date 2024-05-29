@@ -35,7 +35,11 @@ interface NewTabPageSectionPlugin : ActivePlugin {
      */
     fun getView(context: Context): View?
 
-    // suspend fun isUserEnabled(): Boolean
+    /**
+     * This method returns a [Boolean] that shows if the plugin is enabled manually by the user
+     * @return [View]
+     */
+    suspend fun isUserEnabled(): Boolean
 }
 
 enum class NewTabPageSection {

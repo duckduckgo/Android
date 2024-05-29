@@ -139,11 +139,17 @@ class ShortcutsNewTabSectionView @JvmOverloads constructor(
     priority = 4,
 )
 
-class ShortcutsNewTabSectionPlugin @Inject constructor() : NewTabPageSectionPlugin {
+class ShortcutsNewTabSectionPlugin @Inject constructor(
+    private val setting: NewTabShortcutsSectionSetting,
+) : NewTabPageSectionPlugin {
 
     override val name = NewTabPageSection.SHORTCUTS.name
 
     override fun getView(context: Context): View {
         return ShortcutsNewTabSectionView(context)
+    }
+
+    override suspend fun isUserEnabled(): Boolean {
+        return setting.self().isEnabled()
     }
 }

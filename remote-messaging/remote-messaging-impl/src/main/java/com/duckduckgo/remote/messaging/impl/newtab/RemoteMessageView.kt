@@ -221,4 +221,9 @@ class RemoteMessageNewTabSectionPlugin @Inject constructor() : NewTabPageSection
     override fun getView(context: Context): View {
         return RemoteMessageView(context)
     }
+
+    // this plugin is always enabled
+    override suspend fun isUserEnabled(): Boolean {
+        return true
+    }
 }

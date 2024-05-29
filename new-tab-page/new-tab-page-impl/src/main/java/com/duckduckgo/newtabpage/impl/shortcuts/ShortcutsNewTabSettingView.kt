@@ -38,12 +38,12 @@ import com.duckduckgo.newtabpage.impl.databinding.ViewShortcutsSettingsItemBindi
 import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsNewTabSettingsViewModel.ViewState
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.android.support.AndroidSupportInjection
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import javax.inject.Inject
 
 @InjectWith(ViewScope::class)
 class ShortcutsNewTabSettingView @JvmOverloads constructor(
@@ -82,7 +82,6 @@ class ShortcutsNewTabSettingView @JvmOverloads constructor(
             viewModel.onSettingEnabled(enabled)
         }
     }
-
 }
 
 @ContributesMultibinding(scope = ActivityScope::class)
@@ -102,7 +101,6 @@ class ShortcutsNewTabSettingViewPlugin @Inject constructor() : NewTabPageSection
     featureName = "newTabShortcutsSectionSetting",
 )
 interface NewTabShortcutsSectionSetting {
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(true)
     fun self(): Toggle
 }
-

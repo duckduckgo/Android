@@ -39,6 +39,7 @@ class RealNewTabPageSectionSettingsProvider @Inject constructor(
     // we only show settings for sections that are enabled via remote config
     override fun provideSections(): Flow<List<NewTabPageSectionSettingsPlugin>> = flow {
         val plugins = mutableListOf<NewTabPageSectionSettingsPlugin>()
+
         val settingsPlugins = newTabSectionsSettingsPlugins.getPlugins()
         newTabSectionsPlugins.getPlugins().onEach { section ->
             val setting = settingsPlugins.find { it.name == section.name }
@@ -50,4 +51,3 @@ class RealNewTabPageSectionSettingsProvider @Inject constructor(
         emit(plugins)
     }
 }
-
