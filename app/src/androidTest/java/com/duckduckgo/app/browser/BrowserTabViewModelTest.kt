@@ -495,6 +495,7 @@ class BrowserTabViewModelTest {
             mockAutoCompleteScorer,
             mockAutoCompleteRepository,
             mockUserStageStore,
+            coroutineRule.testDispatcherProvider,
         )
         val fireproofWebsiteRepositoryImpl = FireproofWebsiteRepositoryImpl(
             fireproofWebsiteDao,
@@ -2291,7 +2292,7 @@ class BrowserTabViewModelTest {
     fun whenHistorySubmittedThenAutoCompleteHistorySelectionPixelSent() = runTest {
         whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(true)
         whenever(mockNavigationHistory.hasHistory()).thenReturn(true)
-        val suggestion = AutoCompleteHistorySearchSuggestion("example")
+        val suggestion = AutoCompleteHistorySearchSuggestion("example", true)
         testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteResult("", listOf(suggestion)))
         testee.fireAutocompletePixel(suggestion)
 
