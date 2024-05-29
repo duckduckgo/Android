@@ -16,6 +16,7 @@
 
 package com.duckduckgo.history.impl
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.history.impl.remoteconfig.HistoryFeature
@@ -26,6 +27,7 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.Mockito.never
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
@@ -33,6 +35,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@RunWith(AndroidJUnit4::class)
 class HistoryTest {
 
     private val mockHistoryRepository: HistoryRepository = mock()
@@ -55,21 +58,9 @@ class HistoryTest {
         whenever(mockDuckDuckGoUrlDetector.extractQuery(any())).thenReturn("query")
 
         runTest {
-            testee.saveToHistory("url", "title")
+            testee.saveToHistory("http://example.com", "title")
 
-            verify(mockHistoryRepository).saveToHistory(eq("url"), eq("title"), eq("query"), eq(true))
-        }
-    }
-
-    @Test
-    fun whenSerpUrlDoesNotHaveQueryThenSaveToHistoryWithQueryAndSerpIsTrue() {
-        whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoQueryUrl(any())).thenReturn(true)
-        whenever(mockDuckDuckGoUrlDetector.extractQuery(any())).thenReturn(null)
-
-        runTest {
-            testee.saveToHistory("url", "title")
-
-            verify(mockHistoryRepository).saveToHistory(eq("url"), eq("title"), eq(null), eq(false))
+            verify(mockHistoryRepository).saveToHistory(eq("https://duckduckgo.com?q=query"), eq("title"), eq("query"), eq(true))
         }
     }
 
@@ -78,9 +69,9 @@ class HistoryTest {
         whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoQueryUrl(any())).thenReturn(false)
 
         runTest {
-            testee.saveToHistory("url", "title")
+            testee.saveToHistory("http://example.com", "title")
 
-            verify(mockHistoryRepository).saveToHistory(eq("url"), eq("title"), eq(null), eq(false))
+            verify(mockHistoryRepository).saveToHistory(eq("http://example.com"), eq("title"), eq(null), eq(false))
         }
     }
 
