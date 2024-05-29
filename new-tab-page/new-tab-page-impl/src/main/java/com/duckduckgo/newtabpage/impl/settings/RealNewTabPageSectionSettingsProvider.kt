@@ -16,47 +16,38 @@
 
 package com.duckduckgo.newtabpage.impl.settings
 
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.newtabpage.api.NewTabPageSectionPlugin
 import com.duckduckgo.newtabpage.api.NewTabPageSectionSettingsPlugin
-import com.duckduckgo.newtabpage.impl.settings.db.NewTabUserSection
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 interface NewTabPageSectionSettingsProvider {
-    fun provideSections(): Flow<List<NewTabPageSectionSettings>>
+    fun provideSections(): Flow<List<NewTabPageSectionSettingsPlugin>>
 }
 
 @ContributesBinding(scope = AppScope::class)
 class RealNewTabPageSectionSettingsProvider @Inject constructor(
     private val newTabSectionsSettingsPlugins: PluginPoint<NewTabPageSectionSettingsPlugin>,
     private val newTabSectionsPlugins: ActivePluginPoint<NewTabPageSectionPlugin>,
-    private val userSectionsRepository: NewTabUserSectionsRepository,
-    private val dispatcherProvider: DispatcherProvider,
 ) : NewTabPageSectionSettingsProvider {
 
     // we only show settings for sections that are enabled via remote config
-    override fun provideSections(): Flow<List<NewTabPageSectionSettings>> = flow {
-        val plugins = mutableListOf<NewTabPageSectionSettings>()
+    override fun provideSections(): Flow<List<NewTabPageSectionSettingsPlugin>> = flow {
+        val plugins = mutableListOf<NewTabPageSectionSettingsPlugin>()
         val settingsPlugins = newTabSectionsSettingsPlugins.getPlugins()
         newTabSectionsPlugins.getPlugins().onEach { section ->
             val setting = settingsPlugins.find { it.name == section.name }
             // if there isn't a view that implements the settings plugin, we won't show it
             if (setting != null) {
-                val userSection = userSectionsRepository.getUserSection(section.name)
-                plugins.add(NewTabPageSectionSettings(setting, userSection))
+                plugins.add(setting)
             }
         }
         emit(plugins)
     }
 }
 
-data class NewTabPageSectionSettings(
-    val plugin: NewTabPageSectionSettingsPlugin,
-    val userSection: NewTabUserSection,
-)

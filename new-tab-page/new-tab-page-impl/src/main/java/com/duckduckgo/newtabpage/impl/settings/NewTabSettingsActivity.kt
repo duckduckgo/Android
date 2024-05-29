@@ -41,9 +41,6 @@ import logcat.logcat
 @ContributeToActivityStarter(NewTabSettingsScreenNoParams::class, screenName = "newtabsettings")
 class NewTabSettingsActivity : DuckDuckGoActivity() {
 
-    @Inject
-    lateinit var newTabSectionsSettingsPlugins: PluginPoint<NewTabPageSectionSettingsPlugin>
-
     private val viewModel: NewTabSettingsViewModel by bindViewModel()
     private val binding: ActivityNewTabSettingsBinding by viewBinding()
 
@@ -61,16 +58,11 @@ class NewTabSettingsActivity : DuckDuckGoActivity() {
 
     private fun render(viewState: ViewState) {
         viewState.sections.forEach { section ->
-            val sectionView = section.plugin.getView(this)
+            val sectionView = section.getView(this)
             binding.newTabSettingSectionsLayout.addDragView(sectionView, sectionView)
-        }
-    }
+            binding.newTabSettingSectionsLayout.setOnViewSwapListener { firstView, firstPosition, secondView, secondPosition ->
 
-    private fun addSections() {
-        newTabSectionsSettingsPlugins.getPlugins().forEach { feature ->
-            logcat { "New Tab: Settings - Add Section $feature" }
-            val sectionView = feature.getView(this)
-            binding.newTabSettingSectionsLayout.addDragView(sectionView, sectionView)
+            }
         }
     }
 }
