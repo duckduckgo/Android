@@ -89,6 +89,7 @@ interface AutoComplete {
 
             data class AutoCompleteHistorySearchSuggestion(
                 override val phrase: String,
+                val isAllowedInTopHits: Boolean,
             ) : AutoCompleteHistoryRelatedSuggestion(phrase)
 
             data object AutoCompleteInAppMessageSuggestion : AutoCompleteHistoryRelatedSuggestion("")
@@ -128,7 +129,7 @@ class AutoCompleteApi @Inject constructor(
         return savedSitesObservable.zipWith(getAutoCompleteSearchResults(query)) { bookmarksAndHistory, searchResults ->
             val topHits = (searchResults + bookmarksAndHistory).filter {
                 when (it) {
-                    is AutoCompleteHistorySearchSuggestion -> true
+                    is AutoCompleteHistorySearchSuggestion -> it.isAllowedInTopHits
                     is AutoCompleteHistorySuggestion -> it.isAllowedInTopHits
                     is AutoCompleteBookmarkSuggestion -> true
                     else -> false
@@ -304,6 +305,7 @@ class AutoCompleteApi @Inject constructor(
                     is VisitedSERP -> {
                         AutoCompleteHistorySearchSuggestion(
                             phrase = entry.query,
+                            isAllowedInTopHits = isAllowedInTopHits(entry),
                         )
                     }
                 }.let { suggestion ->

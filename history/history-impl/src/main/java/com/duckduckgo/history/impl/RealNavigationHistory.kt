@@ -16,8 +16,12 @@
 
 package com.duckduckgo.history.impl
 
+import android.net.Uri
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.common.utils.AppUrl
+import com.duckduckgo.common.utils.AppUrl.Url
 import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.common.utils.UrlScheme
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.history.api.HistoryEntry
 import com.duckduckgo.history.api.NavigationHistory
@@ -47,8 +51,16 @@ class RealNavigationHistory @Inject constructor(
         }
         val ddgUrl = duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)
         val query = if (ddgUrl) duckDuckGoUrlDetector.extractQuery(url) else null
+        val sanitizedUrl = if (ddgUrl) {
+            Uri.Builder()
+                .scheme(UrlScheme.https)
+                .appendQueryParameter(AppUrl.ParamKey.QUERY, query)
+                .authority(Url.HOST).toString()
+        } else {
+            url
+        }
 
-        historyRepository.saveToHistory(url, title, query, query != null)
+        historyRepository.saveToHistory(sanitizedUrl, title, query, query != null)
     }
 
     override fun getHistorySingle(): Single<List<HistoryEntry>> {
