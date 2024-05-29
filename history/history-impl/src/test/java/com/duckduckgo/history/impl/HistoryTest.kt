@@ -16,28 +16,41 @@
 
 package com.duckduckgo.history.impl
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.history.impl.remoteconfig.HistoryFeature
 import java.time.LocalDateTime
 import java.time.Month.JANUARY
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
+import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.mockito.Mockito.never
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@RunWith(AndroidJUnit4::class)
 class HistoryTest {
 
     private val mockHistoryRepository: HistoryRepository = mock()
     private val mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
     private val mockCurrentTimeProvider: CurrentTimeProvider = mock()
+    private val mockHistoryFeature: HistoryFeature = mock()
     private val testScope = TestScope()
 
-    val testee = RealNavigationHistory(mockHistoryRepository, mockDuckDuckGoUrlDetector, mockCurrentTimeProvider)
+    val testee = RealNavigationHistory(mockHistoryRepository, mockDuckDuckGoUrlDetector, mockCurrentTimeProvider, mockHistoryFeature)
+
+    @Before
+    fun setup() {
+        whenever(mockHistoryFeature.shouldStoreHistory).thenReturn(true)
+        whenever(mockHistoryRepository.isHistoryUserEnabled(any())).thenReturn(true)
+    }
 
     @Test
     fun whenUrlIsSerpThenSaveToHistoryWithQueryAndSerpIsTrue() {
@@ -45,21 +58,9 @@ class HistoryTest {
         whenever(mockDuckDuckGoUrlDetector.extractQuery(any())).thenReturn("query")
 
         runTest {
-            testee.saveToHistory("url", "title")
+            testee.saveToHistory("http://example.com", "title")
 
-            verify(mockHistoryRepository).saveToHistory(eq("url"), eq("title"), eq("query"), eq(true))
-        }
-    }
-
-    @Test
-    fun whenSerpUrlDoesNotHaveQueryThenSaveToHistoryWithQueryAndSerpIsTrue() {
-        whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoQueryUrl(any())).thenReturn(true)
-        whenever(mockDuckDuckGoUrlDetector.extractQuery(any())).thenReturn(null)
-
-        runTest {
-            testee.saveToHistory("url", "title")
-
-            verify(mockHistoryRepository).saveToHistory(eq("url"), eq("title"), eq(null), eq(false))
+            verify(mockHistoryRepository).saveToHistory(eq("https://duckduckgo.com?q=query"), eq("title"), eq("query"), eq(true))
         }
     }
 
@@ -68,9 +69,9 @@ class HistoryTest {
         whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoQueryUrl(any())).thenReturn(false)
 
         runTest {
-            testee.saveToHistory("url", "title")
+            testee.saveToHistory("http://example.com", "title")
 
-            verify(mockHistoryRepository).saveToHistory(eq("url"), eq("title"), eq(null), eq(false))
+            verify(mockHistoryRepository).saveToHistory(eq("http://example.com"), eq("title"), eq(null), eq(false))
         }
     }
 
@@ -80,6 +81,28 @@ class HistoryTest {
         testScope.launch {
             testee.clearOldEntries()
             verify(mockHistoryRepository.clearEntriesOlderThan(eq(mockCurrentTimeProvider.localDateTimeNow().minusDays(30))))
+        }
+    }
+
+    @Test
+    fun whenShouldStoreHistoryIsFalseThenDoNotSaveToHistory() {
+        whenever(mockHistoryFeature.shouldStoreHistory).thenReturn(false)
+
+        runTest {
+            testee.saveToHistory("url", "title")
+
+            verify(mockHistoryRepository, never()).saveToHistory(any(), any(), any(), any())
+        }
+    }
+
+    @Test
+    fun whenShouldStoreHistoryIsDisabledByUserThenDoNotSaveToHistory() {
+        whenever(mockHistoryRepository.isHistoryUserEnabled(any())).thenReturn(false)
+
+        runTest {
+            testee.saveToHistory("url", "title")
+
+            verify(mockHistoryRepository, never()).saveToHistory(any(), any(), any(), any())
         }
     }
 }
