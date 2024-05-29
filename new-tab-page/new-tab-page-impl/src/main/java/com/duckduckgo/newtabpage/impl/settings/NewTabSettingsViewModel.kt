@@ -22,6 +22,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.newtabpage.api.NewTabPageSectionSettingsPlugin
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -44,7 +45,7 @@ class NewTabSettingsViewModel @Inject constructor(
             configureViews()
         }.flowOn(dispatcherProvider.io())
 
-    data class ViewState(val sections: List<NewTabPageSectionSettings> = emptyList())
+    data class ViewState(val sections: List<NewTabPageSectionSettingsPlugin> = emptyList())
 
     private fun configureViews() {
         viewModelScope.launch(dispatcherProvider.io()) {

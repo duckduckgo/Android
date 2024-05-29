@@ -34,6 +34,8 @@ interface NewTabPageSectionPlugin : ActivePlugin {
      * @return [View]
      */
     fun getView(context: Context): View?
+
+    // suspend fun isUserEnabled(): Boolean
 }
 
 enum class NewTabPageSection {

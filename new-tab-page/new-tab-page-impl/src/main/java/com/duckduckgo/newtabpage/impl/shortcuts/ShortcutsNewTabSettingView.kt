@@ -16,29 +16,73 @@
 
 package com.duckduckgo.newtabpage.impl.shortcuts
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewTreeLifecycleOwner
+import androidx.lifecycle.findViewTreeViewModelStoreOwner
+import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.newtabpage.api.NewTabPageSection
 import com.duckduckgo.newtabpage.api.NewTabPageSectionSettingsPlugin
 import com.duckduckgo.newtabpage.impl.databinding.ViewShortcutsSettingsItemBinding
+import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsNewTabSettingsViewModel.ViewState
 import com.squareup.anvil.annotations.ContributesMultibinding
+import dagger.android.support.AndroidSupportInjection
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
+@InjectWith(ViewScope::class)
 class ShortcutsNewTabSettingView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
 ) : LinearLayout(context, attrs, defStyle) {
 
+    @Inject
+    lateinit var viewModelFactory: ViewViewModelFactory
+
     private val binding: ViewShortcutsSettingsItemBinding by viewBinding()
 
-    override fun onAttachedToWindow() {
-        super.onAttachedToWindow()
+    private var coroutineScope: CoroutineScope? = null
+
+    private val viewModel: ShortcutsNewTabSettingsViewModel by lazy {
+        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[ShortcutsNewTabSettingsViewModel::class.java]
     }
+
+    override fun onAttachedToWindow() {
+        AndroidSupportInjection.inject(this)
+        super.onAttachedToWindow()
+
+        ViewTreeLifecycleOwner.get(this)?.lifecycle?.addObserver(viewModel)
+
+        @SuppressLint("NoHardcodedCoroutineDispatcher")
+        coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+
+        viewModel.viewState
+            .onEach { render(it) }
+            .launchIn(coroutineScope!!)
+    }
+
+    private fun render(viewState: ViewState) {
+        binding.root.quietlySetIsChecked(viewState.enabled) { _, enabled ->
+            viewModel.onSettingEnabled(enabled)
+        }
+    }
+
 }
 
 @ContributesMultibinding(scope = ActivityScope::class)
@@ -49,3 +93,16 @@ class ShortcutsNewTabSettingViewPlugin @Inject constructor() : NewTabPageSection
         return ShortcutsNewTabSettingView(context)
     }
 }
+
+/**
+ * Local feature/settings - they will never be in remote config
+ */
+@ContributesRemoteFeature(
+    scope = AppScope::class,
+    featureName = "newTabShortcutsSectionSetting",
+)
+interface NewTabShortcutsSectionSetting {
+    @Toggle.DefaultValue(false)
+    fun self(): Toggle
+}
+
