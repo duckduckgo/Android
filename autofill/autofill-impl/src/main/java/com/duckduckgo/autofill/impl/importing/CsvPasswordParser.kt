@@ -17,6 +17,9 @@
 package com.duckduckgo.autofill.impl.importing
 
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.impl.importing.CsvPasswordParser.ParseResult
+import com.duckduckgo.autofill.impl.importing.CsvPasswordParser.ParseResult.Error
+import com.duckduckgo.autofill.impl.importing.CsvPasswordParser.ParseResult.Success
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -27,7 +30,12 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 interface CsvPasswordParser {
-    suspend fun parseCsv(csv: String): List<LoginCredentials>
+    suspend fun parseCsv(csv: String): ParseResult
+
+    sealed interface ParseResult {
+        data class Success(val passwords: List<LoginCredentials>) : ParseResult
+        data object Error : ParseResult
+    }
 }
 
 @ContributesBinding(AppScope::class)
@@ -35,19 +43,17 @@ class GooglePasswordManagerCsvPasswordParser @Inject constructor(
     private val dispatchers: DispatcherProvider,
 ) : CsvPasswordParser {
 
-//    private val csvFormat by lazy {
-//        CSVFormat.Builder.create(CSVFormat.DEFAULT).build()
-//    }
-
-    override suspend fun parseCsv(csv: String): List<LoginCredentials> {
+    override suspend fun parseCsv(csv: String): ParseResult {
         return kotlin.runCatching {
-            convertToPasswordList(csv).also {
+            val passwords = convertToPasswordList(csv).also {
                 Timber.i("Parsed CSV. Found %d passwords", it.size)
             }
+            Success(passwords)
         }.onFailure {
             Timber.e("Failed to parse CSV: %s", it.message)
+            Error
         }.getOrElse {
-            emptyList()
+            Error
         }
     }
 
