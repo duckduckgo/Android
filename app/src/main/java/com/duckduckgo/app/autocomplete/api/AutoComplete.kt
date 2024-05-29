@@ -30,6 +30,7 @@ import com.duckduckgo.app.autocomplete.impl.AutoCompleteRepository
 import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.toStringDropScheme
 import com.duckduckgo.di.scopes.AppScope
@@ -105,6 +106,7 @@ class AutoCompleteApi @Inject constructor(
     private val autoCompleteScorer: AutoCompleteScorer,
     private val autoCompleteRepository: AutoCompleteRepository,
     private val userStageStore: UserStageStore,
+    private val dispatcherProvider: DispatcherProvider,
 ) : AutoComplete {
 
     override fun autoComplete(query: String): Observable<AutoCompleteResult> {
@@ -150,7 +152,7 @@ class AutoCompleteApi @Inject constructor(
 
             val suggestions = (topHits + filteredSearchResults + filteredBookmarks).distinctBy { it.phrase }
 
-            runBlocking {
+            runBlocking(dispatcherProvider.io()) {
                 if (shouldShowHistoryInAutoCompleteIAM(suggestions)) {
                     inAppMessage.add(0, AutoCompleteInAppMessageSuggestion)
                 }

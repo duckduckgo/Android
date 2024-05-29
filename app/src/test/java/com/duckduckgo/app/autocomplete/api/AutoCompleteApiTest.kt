@@ -28,6 +28,7 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.A
 import com.duckduckgo.app.autocomplete.impl.AutoCompleteRepository
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.history.api.HistoryEntry.VisitedPage
 import com.duckduckgo.history.api.NavigationHistory
@@ -42,6 +43,7 @@ import java.util.UUID
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.*
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
@@ -67,6 +69,9 @@ class AutoCompleteApiTest {
     @Mock
     private lateinit var mockUserStageStore: UserStageStore
 
+    @get:Rule
+    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
+
     private lateinit var testee: AutoCompleteApi
 
     @Before
@@ -80,6 +85,7 @@ class AutoCompleteApiTest {
             RealAutoCompleteScorer(),
             mockAutoCompleteRepository,
             mockUserStageStore,
+            coroutineTestRule.testDispatcherProvider,
         )
     }
 
