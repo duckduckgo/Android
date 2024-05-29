@@ -22,6 +22,7 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
@@ -31,6 +32,7 @@ import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.history.api.HistoryEntry.VisitedPage
+import com.duckduckgo.history.api.HistoryEntry.VisitedSERP
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
@@ -263,6 +265,77 @@ class AutoCompleteApiTest {
                 AutoCompleteSearchSuggestion("foo", false),
                 AutoCompleteBookmarkSuggestion(phrase = "example.com", "title", "https://example.com", isFavorite = true),
                 AutoCompleteBookmarkSuggestion(phrase = "baz.com", "title", "https://baz.com", isFavorite = false),
+            ),
+            value.suggestions,
+        )
+    }
+
+    @Test
+    fun whenAutoCompleteReturnsDuplicateHistorySerpWithMoreThan3CombinedVisitsTheyShowBeforeSuggestions() {
+        whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(
+            Observable.just(
+                listOf(
+                    AutoCompleteServiceRawResult("foo", isNav = false),
+                ),
+            ),
+        )
+        whenever(mockNavigationHistory.getHistorySingle()).thenReturn(
+            Single.just(
+                listOf(
+                    VisitedSERP("https://duckduckgo.com?q=query".toUri(), "title", "query", visits = listOf(LocalDateTime.now(), LocalDateTime.now())),
+                    VisitedSERP(
+                        "https://duckduckgo.com?q=query&atb=1".toUri(),
+                        "title",
+                        "query",
+                        visits = listOf(LocalDateTime.now(), LocalDateTime.now()),
+                    ),
+                ),
+            ),
+        )
+        whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(Single.just(listOf()))
+        whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(Single.just(listOf()))
+
+        val result = testee.autoComplete("title").test()
+        val value = result.values()[0] as AutoCompleteResult
+
+        assertEquals(
+            listOf(
+                AutoCompleteInAppMessageSuggestion,
+                AutoCompleteHistorySearchSuggestion(phrase = "query", true),
+                AutoCompleteSearchSuggestion("foo", false),
+            ),
+            value.suggestions,
+        )
+    }
+
+    @Test
+    fun whenAutoCompleteReturnsDuplicateHistorySerpWithLessThan3CombinedVisitsTheyDoNotShowBeforeSuggestions() {
+        whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(
+            Observable.just(
+                listOf(
+                    AutoCompleteServiceRawResult("foo", isNav = false),
+                ),
+            ),
+        )
+        whenever(mockNavigationHistory.getHistorySingle()).thenReturn(
+            Single.just(
+                listOf(
+                    VisitedSERP("https://duckduckgo.com?q=query".toUri(), "title", "query", visits = listOf(LocalDateTime.now())),
+                    VisitedSERP("https://duckduckgo.com?q=query&atb=1".toUri(), "title", "query", visits = listOf(LocalDateTime.now())),
+                ),
+            ),
+        )
+        whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(Single.just(listOf()))
+        whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(Single.just(listOf()))
+
+        val result = testee.autoComplete("title").test()
+        val value = result.values()[0] as AutoCompleteResult
+
+        assertEquals(
+            listOf(
+                AutoCompleteInAppMessageSuggestion,
+                AutoCompleteSearchSuggestion("foo", false),
+                AutoCompleteHistorySearchSuggestion(phrase = "query", false),
             ),
             value.suggestions,
         )

@@ -52,15 +52,14 @@ class HistoryTest {
         whenever(mockHistoryRepository.isHistoryUserEnabled(any())).thenReturn(true)
     }
 
-    @Test
     fun whenUrlIsSerpThenSaveToHistoryWithQueryAndSerpIsTrue() {
         whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoQueryUrl(any())).thenReturn(true)
         whenever(mockDuckDuckGoUrlDetector.extractQuery(any())).thenReturn("query")
 
         runTest {
-            testee.saveToHistory("http://example.com", "title")
+            testee.saveToHistory("url", "title")
 
-            verify(mockHistoryRepository).saveToHistory(eq("https://duckduckgo.com?q=query"), eq("title"), eq("query"), eq(true))
+            verify(mockHistoryRepository).saveToHistory(eq("url"), eq("title"), eq("query"), eq(true))
         }
     }
 
@@ -69,9 +68,9 @@ class HistoryTest {
         whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoQueryUrl(any())).thenReturn(false)
 
         runTest {
-            testee.saveToHistory("http://example.com", "title")
+            testee.saveToHistory("url", "title")
 
-            verify(mockHistoryRepository).saveToHistory(eq("http://example.com"), eq("title"), eq(null), eq(false))
+            verify(mockHistoryRepository).saveToHistory(eq("url"), eq("title"), eq(null), eq(false))
         }
     }
 

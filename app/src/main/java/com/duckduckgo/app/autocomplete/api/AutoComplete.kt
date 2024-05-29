@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.autocomplete.api
 
+import android.net.Uri
 import androidx.core.net.toUri
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
@@ -30,7 +31,10 @@ import com.duckduckgo.app.autocomplete.impl.AutoCompleteRepository
 import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
+import com.duckduckgo.common.utils.AppUrl
+import com.duckduckgo.common.utils.AppUrl.Url
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.UrlScheme
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.toStringDropScheme
 import com.duckduckgo.di.scopes.AppScope
@@ -293,7 +297,22 @@ class AutoCompleteApi @Inject constructor(
     }
 
     private fun Sequence<HistoryEntry>.sortHistoryByRank(query: String): List<RankedSuggestion<AutoCompleteHistoryRelatedSuggestion>> {
-        return this
+        return this.let { entries ->
+            entries.filterIsInstance<VisitedSERP>()
+                .groupBy { it.query }
+                .mapNotNull { (query, suggestions) ->
+                    val sanitizedUrl =
+                        Uri.Builder()
+                            .scheme(UrlScheme.https)
+                            .appendQueryParameter(AppUrl.ParamKey.QUERY, query)
+                            .authority(Url.HOST)
+                            .build()
+
+                    suggestions.firstOrNull()?.let { suggestion ->
+                        VisitedSERP(sanitizedUrl, suggestion.title, query, suggestions.flatMap { it.visits })
+                    }
+                } + entries.filterIsInstance<VisitedPage>()
+        }
             .map { entry ->
                 when (entry) {
                     is VisitedPage -> {
