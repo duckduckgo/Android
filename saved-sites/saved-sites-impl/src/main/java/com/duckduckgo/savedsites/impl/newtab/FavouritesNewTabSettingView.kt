@@ -38,12 +38,12 @@ import com.duckduckgo.saved.sites.impl.databinding.ViewFavouritesSettingsItemBin
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSettingsViewModel.ViewState
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.android.support.AndroidSupportInjection
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import javax.inject.Inject
 
 @InjectWith(ViewScope::class)
 class FavouritesNewTabSettingView @JvmOverloads constructor(
@@ -75,7 +75,6 @@ class FavouritesNewTabSettingView @JvmOverloads constructor(
         viewModel.viewState
             .onEach { render(it) }
             .launchIn(coroutineScope!!)
-
     }
 
     private fun render(viewState: ViewState) {
@@ -102,6 +101,6 @@ class FavouritesNewTabSectionSettingsPlugin @Inject constructor() : NewTabPageSe
     featureName = "newTabFavouritesSectionSetting",
 )
 interface NewTabFavouritesSectionSetting {
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(true)
     fun self(): Toggle
 }
