@@ -33,6 +33,9 @@ dependencies {
 
     implementation project(path: ':common-utils')
     implementation project(path: ':browser-api')
+    implementation project(path: ':feature-toggles-api')
+    implementation project(path: ':privacy-config-api')
+    implementation project(path: ':app-build-config-api')
 
     implementation KotlinX.coroutines.android
     implementation AndroidX.core.ktx
@@ -44,6 +47,13 @@ dependencies {
     implementation AndroidX.room.rxJava2
     implementation AndroidX.room.ktx
 
+    implementation Square.moshi
+
+    implementation AndroidX.work.runtimeKtx
+
+    implementation JakeWharton.timber
+
+    testImplementation AndroidX.work.testing
     testImplementation AndroidX.test.ext.junit
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,27 +14,21 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.common.utils
+package com.duckduckgo.history.impl.remoteconfig
 
-import android.os.SystemClock
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import java.time.LocalDateTime
 import javax.inject.Inject
 
-interface CurrentTimeProvider {
-    fun elapsedRealtime(): Long
-
-    fun currentTimeMillis(): Long
-
-    fun localDateTimeNow(): LocalDateTime
+interface HistoryFeature {
+    val shouldStoreHistory: Boolean
 }
 
 @ContributesBinding(AppScope::class)
-class RealCurrentTimeProvider @Inject constructor() : CurrentTimeProvider {
-    override fun elapsedRealtime(): Long = SystemClock.elapsedRealtime()
-
-    override fun currentTimeMillis(): Long = System.currentTimeMillis()
-
-    override fun localDateTimeNow(): LocalDateTime = LocalDateTime.now()
+class RealHistoryFeature @Inject constructor(
+    private val historyRemoteFeature: HistoryRemoteFeature,
+) : HistoryFeature {
+    override val shouldStoreHistory by lazy {
+        historyRemoteFeature.self().isEnabled() && historyRemoteFeature.storeHistory().isEnabled()
+    }
 }

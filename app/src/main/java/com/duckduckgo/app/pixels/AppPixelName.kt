@@ -178,16 +178,28 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     FEEDBACK_POSITIVE_SUBMISSION("mfbs_%s_submit"),
     FEEDBACK_NEGATIVE_SUBMISSION("mfbs_%s_%s_%s"),
 
-    AUTOCOMPLETE_BOOKMARK_SELECTION("m_aut_s_b"),
-    AUTOCOMPLETE_FAVORITE_SELECTION("m_autocomplete_favorite_selection"),
-    AUTOCOMPLETE_SEARCH_SELECTION("m_aut_s_s"),
-    AUTOCOMPLETE_HISTORY_SELECTION("m_autocomplete_history_selection"),
+    AUTOCOMPLETE_BOOKMARK_SELECTION("m_autocomplete_click_bookmark"),
+    AUTOCOMPLETE_FAVORITE_SELECTION("m_autocomplete_click_favorite"),
+    AUTOCOMPLETE_SEARCH_PHRASE_SELECTION("m_autocomplete_click_phrase"),
+    AUTOCOMPLETE_SEARCH_WEBSITE_SELECTION("m_autocomplete_click_website"),
+
+    AUTOCOMPLETE_HISTORY_SEARCH_SELECTION("m_autocomplete_click_history_search"),
+    AUTOCOMPLETE_HISTORY_SITE_SELECTION("m_autocomplete_click_history_site"),
+
+    AUTOCOMPLETE_TOGGLED_OFF("m_autocomplete_recent_sites_toggled_off"),
+    AUTOCOMPLETE_TOGGLED_ON("m_autocomplete_recent_sites_toggled_on"),
 
     AUTOCOMPLETE_HISTORY_TOGGLED_OFF("m_autocomplete_history_toggled_off"),
     AUTOCOMPLETE_HISTORY_TOGGLED_ON("m_autocomplete_history_toggled_on"),
 
-    AUTOCOMPLETE_BANNER_SHOWN("m_autocomplete_banner_shown"),
-    AUTOCOMPLETE_BANNER_DISMISSED("m_autocomplete_banner_dismissed"),
+    AUTOCOMPLETE_BANNER_SHOWN("m_autocomplete_recent_sites_intro_message_displayed"),
+    AUTOCOMPLETE_BANNER_DISMISSED("m_autocomplete_recent_sites_intro_message_dismissed"),
+
+    AUTOCOMPLETE_DISPLAYED_LOCAL_BOOKMARK("m_autocomplete_displayed_bookmark"),
+    AUTOCOMPLETE_DISPLAYED_LOCAL_FAVORITE("m_autocomplete_displayed_favorite"),
+    AUTOCOMPLETE_DISPLAYED_LOCAL_WEBSITE("m_autocomplete_displayed_website"),
+    AUTOCOMPLETE_DISPLAYED_LOCAL_HISTORY("m_autocomplete_displayed_history_site"),
+    AUTOCOMPLETE_DISPLAYED_LOCAL_HISTORY_SEARCH("m_autocomplete_displayed_history_search"),
 
     SERP_REQUERY("rq_%s"),
 

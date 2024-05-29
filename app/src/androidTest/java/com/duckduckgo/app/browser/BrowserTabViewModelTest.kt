@@ -44,6 +44,7 @@ import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.ValueCaptorObserver
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsSharedPreferences
+import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
@@ -51,6 +52,7 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.A
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteScorer
 import com.duckduckgo.app.autocomplete.api.AutoCompleteService
+import com.duckduckgo.app.autocomplete.impl.AutoCompleteRepository
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
@@ -124,11 +126,13 @@ import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsDao
 import com.duckduckgo.app.location.data.LocationPermissionsRepositoryImpl
 import com.duckduckgo.app.onboarding.store.AppStage
+import com.duckduckgo.app.onboarding.store.AppStage.ESTABLISHED
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.OnboardingExperimentPixel
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_SHOWN
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
@@ -166,6 +170,7 @@ import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.history.api.HistoryEntry.VisitedPage
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.privacy.config.api.*
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc
@@ -195,10 +200,12 @@ import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import dagger.Lazy
 import io.reactivex.Observable
+import io.reactivex.Single
 import java.io.File
 import java.math.BigInteger
 import java.security.cert.X509Certificate
 import java.security.interfaces.RSAPublicKey
+import java.time.LocalDateTime
 import java.util.Locale
 import java.util.UUID
 import java.util.concurrent.CopyOnWriteArrayList
@@ -391,7 +398,7 @@ class BrowserTabViewModelTest {
 
     private val lazyFaviconManager = Lazy { mockFaviconManager }
 
-    private lateinit var mockAutoCompleteApi: AutoCompleteApi
+    private lateinit var mockAutoCompleteApi: AutoComplete
 
     private lateinit var ctaViewModel: CtaViewModel
 
@@ -468,6 +475,7 @@ class BrowserTabViewModelTest {
     private val mockBypassedSSLCertificatesRepository: BypassedSSLCertificatesRepository = mock()
     private val mockExtendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles = mock()
     private val mockUserBrowserProperties: UserBrowserProperties = mock()
+    private val mockAutoCompleteRepository: AutoCompleteRepository = mock()
 
     @Before
     fun before() {
@@ -478,7 +486,15 @@ class BrowserTabViewModelTest {
         fireproofWebsiteDao = db.fireproofWebsiteDao()
         locationPermissionsDao = db.locationPermissionsDao()
 
-        mockAutoCompleteApi = AutoCompleteApi(mockAutoCompleteService, mockSavedSitesRepository, mockNavigationHistory, mockAutoCompleteScorer)
+        mockAutoCompleteApi = AutoCompleteApi(
+            mockAutoCompleteService,
+            mockSavedSitesRepository,
+            mockNavigationHistory,
+            mockAutoCompleteScorer,
+            mockAutoCompleteRepository,
+            mockUserStageStore,
+            coroutineRule.testDispatcherProvider,
+        )
         val fireproofWebsiteRepositoryImpl = FireproofWebsiteRepositoryImpl(
             fireproofWebsiteDao,
             coroutineRule.testDispatcherProvider,
@@ -607,6 +623,7 @@ class BrowserTabViewModelTest {
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
             extendedOnboardingFeatureToggles = mockExtendedOnboardingFeatureToggles,
             userBrowserProperties = mockUserBrowserProperties,
+            history = mockNavigationHistory,
         )
 
         testee.loadData("abc", null, false, false)
@@ -1412,6 +1429,50 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun wheneverAutoCompleteIsGoneAndHistoryIAMHasBeenShownThenNotifyUserSeenIAM() {
+        whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(Observable.just(emptyList()))
+        whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
+            Single.just(listOf(Bookmark("abc", "title", "https://example.com", lastModified = null))),
+        )
+        whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(
+            Single.just(listOf(Favorite("abc", "title", "https://example.com", position = 1, lastModified = null))),
+        )
+        whenever(mockNavigationHistory.getHistorySingle()).thenReturn(
+            Single.just(listOf(VisitedPage("https://foo.com".toUri(), "title", listOf(LocalDateTime.now())))),
+        )
+        doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
+
+        whenever(mockAutoCompleteRepository.wasHistoryInAutoCompleteIAMDismissed()).thenReturn(false)
+        whenever(mockAutoCompleteRepository.countHistoryInAutoCompleteIAMShown()).thenReturn(0)
+        whenever(mockAutoCompleteScorer.score("title", "https://foo.com".toUri(), 1, "title")).thenReturn(1)
+
+        runTest {
+            whenever(mockUserStageStore.getUserAppStage()).thenReturn(ESTABLISHED)
+        }
+        testee.autoCompletePublishSubject.accept("title")
+        testee.autoCompleteSuggestionsGone()
+        verify(mockAutoCompleteRepository).submitUserSeenHistoryIAM()
+        verify(mockPixel).fire(AUTOCOMPLETE_BANNER_SHOWN)
+    }
+
+    @Test
+    fun wheneverAutoCompleteIsGoneAndHistoryIAMHasNotBeenShownThenDoNotNotifyUserSeenIAM() {
+        whenever(mockAutoCompleteService.autoComplete("query")).thenReturn(Observable.just(emptyList()))
+        whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
+            Single.just(listOf(Bookmark("abc", "title", "https://example.com", lastModified = null))),
+        )
+        whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(
+            Single.just(listOf(Favorite("abc", "title", "https://example.com", position = 1, lastModified = null))),
+        )
+        whenever(mockNavigationHistory.getHistorySingle()).thenReturn(Single.just(listOf()))
+        doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
+        testee.autoCompletePublishSubject.accept("query")
+        testee.autoCompleteSuggestionsGone()
+        verify(mockAutoCompleteRepository, never()).submitUserSeenHistoryIAM()
+        verify(mockPixel, never()).fire(AUTOCOMPLETE_BANNER_SHOWN)
+    }
+
+    @Test
     fun whenEnteringEmptyQueryThenHideKeyboardCommandNotIssued() {
         testee.onUserSubmittedQuery("")
         verify(mockCommandObserver, never()).onChanged(any(Command.HideKeyboard.javaClass))
@@ -2196,6 +2257,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenBookmarkSuggestionSubmittedThenAutoCompleteBookmarkSelectionPixelSent() = runTest {
         whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(true)
+        whenever(mockNavigationHistory.hasHistory()).thenReturn(false)
         val suggestion = AutoCompleteBookmarkSuggestion("example", "Example", "https://example.com")
         testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteResult("", listOf(suggestion)))
         testee.fireAutocompletePixel(suggestion)
@@ -2210,6 +2272,7 @@ class BrowserTabViewModelTest {
     fun whenBookmarkFavoriteSubmittedThenAutoCompleteFavoriteSelectionPixelSent() = runTest {
         whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(true)
         whenever(mockSavedSitesRepository.hasFavorites()).thenReturn(true)
+        whenever(mockNavigationHistory.hasHistory()).thenReturn(false)
         val suggestion = AutoCompleteBookmarkSuggestion("example", "Example", "https://example.com", isFavorite = true)
         testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteResult("", listOf(suggestion)))
         testee.fireAutocompletePixel(suggestion)
@@ -2226,27 +2289,30 @@ class BrowserTabViewModelTest {
     @Test
     fun whenHistorySubmittedThenAutoCompleteHistorySelectionPixelSent() = runTest {
         whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(true)
-        val suggestion = AutoCompleteHistorySearchSuggestion("example")
+        whenever(mockNavigationHistory.hasHistory()).thenReturn(true)
+        val suggestion = AutoCompleteHistorySearchSuggestion("example", true)
         testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteResult("", listOf(suggestion)))
         testee.fireAutocompletePixel(suggestion)
 
         val argumentCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixel).fire(eq(AppPixelName.AUTOCOMPLETE_HISTORY_SELECTION), argumentCaptor.capture(), any(), any())
+        verify(mockPixel).fire(eq(AppPixelName.AUTOCOMPLETE_HISTORY_SEARCH_SELECTION), argumentCaptor.capture(), any(), any())
 
         assertEquals("false", argumentCaptor.firstValue[PixelParameter.SHOWED_BOOKMARKS])
         assertEquals("true", argumentCaptor.firstValue[PixelParameter.BOOKMARK_CAPABLE])
         assertEquals("true", argumentCaptor.firstValue[PixelParameter.SHOWED_HISTORY])
+        assertEquals("true", argumentCaptor.firstValue[PixelParameter.HISTORY_CAPABLE])
     }
 
     @Test
     fun whenSearchSuggestionSubmittedWithBookmarksThenAutoCompleteSearchSelectionPixelSent() = runTest {
         whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(true)
+        whenever(mockNavigationHistory.hasHistory()).thenReturn(false)
         val suggestions = listOf(AutoCompleteSearchSuggestion("", false), AutoCompleteBookmarkSuggestion("", "", ""))
         testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteResult("", suggestions))
         testee.fireAutocompletePixel(AutoCompleteSearchSuggestion("example", false))
 
         val argumentCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixel).fire(eq(AppPixelName.AUTOCOMPLETE_SEARCH_SELECTION), argumentCaptor.capture(), any(), any())
+        verify(mockPixel).fire(eq(AppPixelName.AUTOCOMPLETE_SEARCH_PHRASE_SELECTION), argumentCaptor.capture(), any(), any())
 
         assertEquals("true", argumentCaptor.firstValue[PixelParameter.SHOWED_BOOKMARKS])
         assertEquals("true", argumentCaptor.firstValue[PixelParameter.BOOKMARK_CAPABLE])
@@ -2255,11 +2321,12 @@ class BrowserTabViewModelTest {
     @Test
     fun whenSearchSuggestionSubmittedWithoutBookmarksThenAutoCompleteSearchSelectionPixelSent() = runTest {
         whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(false)
+        whenever(mockNavigationHistory.hasHistory()).thenReturn(false)
         testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteResult("", emptyList()))
         testee.fireAutocompletePixel(AutoCompleteSearchSuggestion("example", false))
 
         val argumentCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixel).fire(eq(AppPixelName.AUTOCOMPLETE_SEARCH_SELECTION), argumentCaptor.capture(), any(), any())
+        verify(mockPixel).fire(eq(AppPixelName.AUTOCOMPLETE_SEARCH_PHRASE_SELECTION), argumentCaptor.capture(), any(), any())
 
         assertEquals("false", argumentCaptor.firstValue[PixelParameter.SHOWED_BOOKMARKS])
         assertEquals("false", argumentCaptor.firstValue[PixelParameter.BOOKMARK_CAPABLE])
