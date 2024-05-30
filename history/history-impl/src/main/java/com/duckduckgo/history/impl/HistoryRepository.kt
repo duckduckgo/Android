@@ -18,7 +18,6 @@ package com.duckduckgo.history.impl
 
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.history.api.HistoryEntry
-import com.duckduckgo.history.impl.remoteconfig.HistoryFeature
 import com.duckduckgo.history.impl.store.HistoryDao
 import com.duckduckgo.history.impl.store.HistoryDataStore
 import io.reactivex.Single
@@ -39,9 +38,9 @@ interface HistoryRepository {
 
     suspend fun clearHistory()
 
-    fun isHistoryUserEnabled(default: Boolean): Boolean
+    suspend fun isHistoryUserEnabled(default: Boolean): Boolean
 
-    fun setHistoryUserEnabled(value: Boolean)
+    suspend fun setHistoryUserEnabled(value: Boolean)
 
     suspend fun clearEntriesOlderThan(dateTime: LocalDateTime)
 
@@ -53,7 +52,6 @@ class RealHistoryRepository(
     private val dispatcherProvider: DispatcherProvider,
     private val appCoroutineScope: CoroutineScope,
     private val historyDataStore: HistoryDataStore,
-    private val historyFeature: HistoryFeature,
 ) : HistoryRepository {
 
     private var cachedHistoryEntries: List<HistoryEntry>? = null
@@ -100,12 +98,16 @@ class RealHistoryRepository(
         }
     }
 
-    override fun isHistoryUserEnabled(default: Boolean): Boolean {
-        return historyDataStore.isHistoryUserEnabled(default)
+    override suspend fun isHistoryUserEnabled(default: Boolean): Boolean {
+        return withContext(dispatcherProvider.io()) {
+            historyDataStore.isHistoryUserEnabled(default)
+        }
     }
 
-    override fun setHistoryUserEnabled(value: Boolean) {
-        historyDataStore.setHistoryUserEnabled(value)
+    override suspend fun setHistoryUserEnabled(value: Boolean) {
+        withContext(dispatcherProvider.io()) {
+            historyDataStore.setHistoryUserEnabled(value)
+        }
     }
 
     private suspend fun fetchAndCacheHistoryEntries(): List<HistoryEntry> {

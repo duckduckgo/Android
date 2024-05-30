@@ -43,12 +43,12 @@ interface NavigationHistory {
     /**
      * Returns whether the history is enabled by the user.
      */
-    fun isHistoryUserEnabled(): Boolean
+    suspend fun isHistoryUserEnabled(): Boolean
 
     /**
      * Sets whether the history is enabled by the user.
      */
-    fun setHistoryUserEnabled(value: Boolean)
+    suspend fun setHistoryUserEnabled(value: Boolean)
 
     /**
      * Returns whether the history feature is available through RC.
