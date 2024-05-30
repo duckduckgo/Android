@@ -47,6 +47,10 @@ class NewTabSettingsActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
 
+        binding.newTabSettingSectionsLayout.setOnViewSwapListener { firstView, firstPosition, secondView, secondPosition ->
+            viewModel.onSectionsSwapped(firstView.tag.toString(), firstPosition, secondView.tag.toString(), secondPosition)
+        }
+
         viewModel.viewState()
             .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
             .onEach { render(it) }
@@ -56,9 +60,8 @@ class NewTabSettingsActivity : DuckDuckGoActivity() {
     private fun render(viewState: ViewState) {
         viewState.sections.forEach { section ->
             val sectionView = section.getView(this)
+            sectionView?.tag = section.name
             binding.newTabSettingSectionsLayout.addDragView(sectionView, sectionView)
-            binding.newTabSettingSectionsLayout.setOnViewSwapListener { firstView, firstPosition, secondView, secondPosition ->
-            }
         }
     }
 }
