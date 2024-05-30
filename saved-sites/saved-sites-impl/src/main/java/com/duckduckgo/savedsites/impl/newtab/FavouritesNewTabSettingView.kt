@@ -91,6 +91,10 @@ class FavouritesNewTabSectionSettingsPlugin @Inject constructor() : NewTabPageSe
     override fun getView(context: Context): View {
         return FavouritesNewTabSettingView(context)
     }
+
+    override suspend fun isActive(): Boolean {
+        return true
+    }
 }
 
 /**

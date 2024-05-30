@@ -34,4 +34,11 @@ interface NewTabPageSectionSettingsPlugin {
      * @return [View]
      */
     fun getView(context: Context): View?
+
+    /**
+     * This method returns a [Boolean] that represents if the plugin should be visible in New Tab Settings
+     * Specially built for AppTP Setting. We don't want to show the Setting unless AppTP has ever been enabled
+     * @return [View]
+     */
+    suspend fun isActive(): Boolean
 }
