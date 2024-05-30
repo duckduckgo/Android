@@ -87,9 +87,16 @@
                 android:id="@+id/privateSearchAutocompleteToggle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/keyline_4"
                 app:primaryText="@string/privateSearchAutocompleteToggle"
                 app:showSwitch="true" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:textType="secondary"
+                app:typography="body2"
+                android:layout_marginHorizontal="@dimen/keyline_4"
+                android:text="@string/privateSearchAutocompleteHint"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
