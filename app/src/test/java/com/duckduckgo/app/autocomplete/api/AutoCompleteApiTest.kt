@@ -282,7 +282,12 @@ class AutoCompleteApiTest {
         whenever(mockNavigationHistory.getHistorySingle()).thenReturn(
             Single.just(
                 listOf(
-                    VisitedSERP("https://duckduckgo.com?q=query".toUri(), "title", "query", visits = listOf(LocalDateTime.now(), LocalDateTime.now())),
+                    VisitedSERP(
+                        "https://duckduckgo.com?q=query".toUri(),
+                        "title",
+                        "query",
+                        visits = listOf(LocalDateTime.now(), LocalDateTime.now()),
+                    ),
                     VisitedSERP(
                         "https://duckduckgo.com?q=query&atb=1".toUri(),
                         "title",

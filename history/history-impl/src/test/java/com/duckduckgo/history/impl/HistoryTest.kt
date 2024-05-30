@@ -18,6 +18,7 @@ package com.duckduckgo.history.impl
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.history.impl.remoteconfig.HistoryFeature
 import java.time.LocalDateTime
@@ -26,6 +27,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.never
@@ -38,18 +40,30 @@ import org.mockito.kotlin.whenever
 @RunWith(AndroidJUnit4::class)
 class HistoryTest {
 
+    @get:Rule
+    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
+
     private val mockHistoryRepository: HistoryRepository = mock()
     private val mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
     private val mockCurrentTimeProvider: CurrentTimeProvider = mock()
     private val mockHistoryFeature: HistoryFeature = mock()
     private val testScope = TestScope()
+    private val dispatcherProvider = coroutineTestRule.testDispatcherProvider
 
-    val testee = RealNavigationHistory(mockHistoryRepository, mockDuckDuckGoUrlDetector, mockCurrentTimeProvider, mockHistoryFeature)
+    val testee = RealNavigationHistory(
+        mockHistoryRepository,
+        mockDuckDuckGoUrlDetector,
+        mockCurrentTimeProvider,
+        mockHistoryFeature,
+        dispatcherProvider,
+    )
 
     @Before
     fun setup() {
-        whenever(mockHistoryFeature.shouldStoreHistory).thenReturn(true)
-        whenever(mockHistoryRepository.isHistoryUserEnabled(any())).thenReturn(true)
+        runTest {
+            whenever(mockHistoryFeature.shouldStoreHistory).thenReturn(true)
+            whenever(mockHistoryRepository.isHistoryUserEnabled(any())).thenReturn(true)
+        }
     }
 
     fun whenUrlIsSerpThenSaveToHistoryWithQueryAndSerpIsTrue() {
@@ -96,9 +110,9 @@ class HistoryTest {
 
     @Test
     fun whenShouldStoreHistoryIsDisabledByUserThenDoNotSaveToHistory() {
-        whenever(mockHistoryRepository.isHistoryUserEnabled(any())).thenReturn(false)
-
         runTest {
+            whenever(mockHistoryRepository.isHistoryUserEnabled(any())).thenReturn(false)
+
             testee.saveToHistory("url", "title")
 
             verify(mockHistoryRepository, never()).saveToHistory(any(), any(), any(), any())
