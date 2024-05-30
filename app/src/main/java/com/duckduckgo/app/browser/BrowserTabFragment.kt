@@ -561,11 +561,11 @@ class BrowserTabFragment :
     private val daxDialogCta
         get() = binding.includeNewBrowserTab.includeDaxDialogCta
 
-    private val daxDialogIntroExperimentCta
-        get() = binding.includeNewBrowserTab.includeDaxDialogIntroExperimentCta
+    private val daxDialogIntroBubbleCta
+        get() = binding.includeNewBrowserTab.includeDaxDialogIntroBubbleCta
 
-    private val daxDialogExperimentOnboardingCta
-        get() = binding.includeOnboardingDaxDialogExperiment
+    private val daxDialogOnboardingCta
+        get() = binding.includeOnboardingDaxDialog
 
     private val smoothProgressAnimator by lazy { SmoothProgressAnimator(omnibar.pageLoadingIndicator) }
 
@@ -1545,7 +1545,7 @@ class BrowserTabFragment :
             is Command.ShowSSLError -> showSSLWarning(it.handler, it.error)
             is Command.HideSSLError -> hideSSLWarning()
             is Command.LaunchScreen -> launchScreen(it.screen, it.payload)
-            is Command.HideExperimentOnboardingDialog -> hideOnboardingDaxDialog(it.experimentCta)
+            is Command.HideOnboardingDaxDialog -> hideOnboardingDaxDialog(it.onboardingCta)
             else -> {
                 // NO OP
             }
@@ -2269,7 +2269,7 @@ class BrowserTabFragment :
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun configureWebView() {
-        binding.experimentDaxDialogContent.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
+        binding.daxDialogOnboardingCtaContent.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
 
         webView = layoutInflater.inflate(
             R.layout.include_duckduckgo_browser_webview,
@@ -3831,48 +3831,48 @@ class BrowserTabFragment :
         ) {
             when (configuration) {
                 is HomePanelCta -> showHomeCta(configuration, favorites)
-                is DaxBubbleCta -> showDaxExperimentCta(configuration)
+                is DaxBubbleCta -> showDaxOnboardingBubbleCta(configuration)
                 is BubbleCta -> showBubbleCta(configuration)
-                is OnboardingDaxDialogCta -> showExperimentDialogCta(configuration)
+                is OnboardingDaxDialogCta -> showOnboardingDialogCta(configuration)
             }
             newBrowserTab.messageCta.gone()
         }
 
-        private fun showDaxExperimentCta(configuration: DaxBubbleCta) {
+        private fun showDaxOnboardingBubbleCta(configuration: DaxBubbleCta) {
             hideHomeBackground()
             hideHomeCta()
             configuration.apply {
-                showCta(daxDialogIntroExperimentCta.daxCtaContainer)
+                showCta(daxDialogIntroBubbleCta.daxCtaContainer)
                 setOnOptionClicked {
                     userEnteredQuery(it.link)
                     pixel.fire(it.pixel)
                 }
             }
-            newBrowserTab.newTabLayout.setOnClickListener { daxDialogIntroExperimentCta.dialogTextCta.finishAnimation() }
+            newBrowserTab.newTabLayout.setOnClickListener { daxDialogIntroBubbleCta.dialogTextCta.finishAnimation() }
 
             viewModel.onCtaShown()
         }
 
         @SuppressLint("ClickableViewAccessibility")
-        private fun showExperimentDialogCta(configuration: OnboardingDaxDialogCta) {
+        private fun showOnboardingDialogCta(configuration: OnboardingDaxDialogCta) {
             hideHomeBackground()
             hideHomeCta()
             val onTypingAnimationFinished = if (configuration is OnboardingDaxDialogCta.DaxTrackersBlockedCta) {
-                { viewModel.onExperimentDaxTypingAnimationFinished() }
+                { viewModel.onOnboardingDaxTypingAnimationFinished() }
             } else {
                 {}
             }
             configuration.showOnboardingCta(binding, { viewModel.onUserClickCtaOkButton() }, onTypingAnimationFinished)
             if (configuration is OnboardingDaxDialogCta.DaxSiteSuggestionsCta) {
                 configuration.setOnOptionClicked(
-                    daxDialogExperimentOnboardingCta,
+                    daxDialogOnboardingCta,
                 ) {
                     userEnteredQuery(it.link)
                     pixel.fire(it.pixel)
                     viewModel.onUserClickCtaOkButton()
                 }
             }
-            binding.webViewContainer.setOnClickListener { daxDialogIntroExperimentCta.dialogTextCta.finishAnimation() }
+            binding.webViewContainer.setOnClickListener { daxDialogIntroBubbleCta.dialogTextCta.finishAnimation() }
             viewModel.onCtaShown()
         }
 

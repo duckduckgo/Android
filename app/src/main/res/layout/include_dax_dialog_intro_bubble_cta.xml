@@ -51,7 +51,7 @@
             android:orientation="vertical">
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
-                android:id="@+id/experimentDialogTitle"
+                android:id="@+id/daxBubbleDialogTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:typography="h2"

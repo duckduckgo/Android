@@ -83,8 +83,8 @@
         </LinearLayout>
 
         <include
-            android:id="@+id/includeDaxDialogIntroExperimentCta"
-            layout="@layout/include_dax_dialog_intro_experiment_cta"
+            android:id="@+id/includeDaxDialogIntroBubbleCta"
+            layout="@layout/include_dax_dialog_intro_bubble_cta"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_2"

@@ -38,7 +38,7 @@ import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomeExperimentBinding
+import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomePageBinding
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType.CELEBRATION
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType.COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboardingDialogType.INITIAL
@@ -60,7 +60,7 @@ import nl.dionsegijn.konfetti.models.Shape
 import nl.dionsegijn.konfetti.models.Size
 
 @InjectWith(FragmentScope::class)
-class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_experiment) {
+class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_page) {
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
@@ -68,7 +68,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_e
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
 
-    private val binding: ContentOnboardingWelcomeExperimentBinding by viewBinding()
+    private val binding: ContentOnboardingWelcomePageBinding by viewBinding()
     private val viewModel by lazy {
         ViewModelProvider(this, viewModelFactory)[WelcomePageViewModel::class.java]
     }
@@ -93,7 +93,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_e
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        val binding = ContentOnboardingWelcomeExperimentBinding.inflate(inflater, container, false)
+        val binding = ContentOnboardingWelcomePageBinding.inflate(inflater, container, false)
         viewModel.commands.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach {
             when (it) {
                 is ShowComparisonChart -> configureDaxCta(COMPARISON_CHART)
@@ -159,7 +159,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_e
                     ctaText = it.getString(R.string.preOnboardingDaxDialog1Title)
                     binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
                     binding.daxDialogCta.dialogTextCta.textInDialog = ctaText.html(it)
-                    binding.daxDialogCta.experimentDialogContentImage.gone()
+                    binding.daxDialogCta.daxDialogContentImage.gone()
 
                     scheduleTypingAnimation {
                         binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog1Button)
@@ -193,13 +193,13 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_e
                     ctaText = it.getString(R.string.preOnboardingDaxDialog3Title)
                     binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
                     binding.daxDialogCta.dialogTextCta.textInDialog = ctaText.html(it)
-                    binding.daxDialogCta.experimentDialogContentImage.alpha = MIN_ALPHA
-                    binding.daxDialogCta.experimentDialogContentImage.show()
-                    binding.daxDialogCta.experimentDialogContentImage.setImageResource(R.drawable.ic_success_128)
+                    binding.daxDialogCta.daxDialogContentImage.alpha = MIN_ALPHA
+                    binding.daxDialogCta.daxDialogContentImage.show()
+                    binding.daxDialogCta.daxDialogContentImage.setImageResource(R.drawable.ic_success_128)
                     launchKonfetti()
 
                     scheduleTypingAnimation {
-                        ViewCompat.animate(binding.daxDialogCta.experimentDialogContentImage).alpha(MAX_ALPHA).duration = ANIMATION_DURATION
+                        ViewCompat.animate(binding.daxDialogCta.daxDialogContentImage).alpha(MAX_ALPHA).duration = ANIMATION_DURATION
                         binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog3Button)
                         binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(CELEBRATION) }
                         ViewCompat.animate(binding.daxDialogCta.primaryCta).alpha(MAX_ALPHA).duration = ANIMATION_DURATION

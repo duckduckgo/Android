@@ -231,5 +231,5 @@ sealed class Command {
         val screen: String,
         val payload: String,
     ) : Command()
-    data class HideExperimentOnboardingDialog(val experimentCta: OnboardingDaxDialogCta) : Command()
+    data class HideOnboardingDaxDialog(val onboardingCta: OnboardingDaxDialogCta) : Command()
 }

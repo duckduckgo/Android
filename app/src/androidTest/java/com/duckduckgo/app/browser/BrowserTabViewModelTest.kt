@@ -66,7 +66,7 @@ import com.duckduckgo.app.browser.camera.CameraHardwareChecker
 import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
 import com.duckduckgo.app.browser.certificates.remoteconfig.SSLCertificatesFeature
 import com.duckduckgo.app.browser.commands.Command
-import com.duckduckgo.app.browser.commands.Command.HideExperimentOnboardingDialog
+import com.duckduckgo.app.browser.commands.Command.HideOnboardingDaxDialog
 import com.duckduckgo.app.browser.commands.Command.LaunchPrivacyPro
 import com.duckduckgo.app.browser.commands.Command.LoadExtractedUrl
 import com.duckduckgo.app.browser.commands.Command.ShowBackNavigationHistory
@@ -5263,7 +5263,7 @@ class BrowserTabViewModelTest {
         val cta = OnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList())
         testee.ctaViewState.value = ctaViewState().copy(cta = cta)
 
-        testee.onExperimentDaxTypingAnimationFinished()
+        testee.onOnboardingDaxTypingAnimationFinished()
 
         assertTrue(browserViewState().showPrivacyShield.isHighlighted())
     }
@@ -5304,8 +5304,8 @@ class BrowserTabViewModelTest {
 
         testee.onUserSubmittedQuery("foo")
 
-        assertCommandIssued<HideExperimentOnboardingDialog> {
-            assertEquals(cta, this.experimentCta)
+        assertCommandIssued<HideOnboardingDaxDialog> {
+            assertEquals(cta, this.onboardingCta)
         }
     }
 
