@@ -38,6 +38,7 @@ class BrowserAutoCompleteSuggestionsAdapter(
     private val immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
     private val editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
     private val autoCompleteInAppMessageDismissedListener: () -> Unit,
+    private val autoCompleteOpenSettingsClickListener: () -> Unit,
 ) : RecyclerView.Adapter<AutoCompleteViewHolder>() {
 
     private val deleteClickListener: (AutoCompleteSuggestion) -> Unit = {
@@ -90,6 +91,7 @@ class BrowserAutoCompleteSuggestionsAdapter(
                 immediateSearchClickListener,
                 editableSearchClickListener,
                 deleteClickListener,
+                autoCompleteOpenSettingsClickListener,
             )
         }
     }
