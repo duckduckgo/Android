@@ -33,7 +33,9 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.mobile.android.vpn.databinding.ViewApptpSettingsItemBinding
+import com.duckduckgo.mobile.android.vpn.feature.removal.VpnFeatureRemover
 import com.duckduckgo.mobile.android.vpn.ui.newtab.AppTrackingProtectionNewTabSettingsViewModel.ViewState
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import com.duckduckgo.newtabpage.api.NewTabPageSection
 import com.duckduckgo.newtabpage.api.NewTabPageSectionSettingsPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -85,11 +87,21 @@ class AppTrackingProtectionNewTabSettingView @JvmOverloads constructor(
 }
 
 @ContributesMultibinding(scope = ActivityScope::class)
-class AppTrackingProtectionNewTabSettingViewPlugin @Inject constructor() : NewTabPageSectionSettingsPlugin {
+class AppTrackingProtectionNewTabSettingViewPlugin @Inject constructor(
+    private val vpnStore: VpnStore,
+    private val vpnFeatureRemover: VpnFeatureRemover,
+) : NewTabPageSectionSettingsPlugin {
     override val name = NewTabPageSection.APP_TRACKING_PROTECTION.name
 
     override fun getView(context: Context): View {
         return AppTrackingProtectionNewTabSettingView(context)
+    }
+
+    override suspend fun isActive(): Boolean {
+        if (vpnFeatureRemover.isFeatureRemoved()) {
+            return false
+        }
+        return vpnStore.didShowOnboarding()
     }
 }
 

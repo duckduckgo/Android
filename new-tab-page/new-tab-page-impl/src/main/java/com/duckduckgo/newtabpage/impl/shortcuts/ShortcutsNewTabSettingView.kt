@@ -91,6 +91,10 @@ class ShortcutsNewTabSettingViewPlugin @Inject constructor() : NewTabPageSection
     override fun getView(context: Context): View {
         return ShortcutsNewTabSettingView(context)
     }
+
+    override suspend fun isActive(): Boolean {
+        return true
+    }
 }
 
 /**

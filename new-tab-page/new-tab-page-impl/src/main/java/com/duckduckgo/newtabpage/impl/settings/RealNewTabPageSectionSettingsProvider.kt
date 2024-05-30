@@ -40,7 +40,7 @@ class RealNewTabPageSectionSettingsProvider @Inject constructor(
 
     // we only show settings for sections that are enabled via remote config
     override fun provideSections(): Flow<List<NewTabPageSectionSettingsPlugin>> = flow {
-        val sectionSettingsPlugins = newTabSectionsSettingsPlugins.getPlugins()
+        val sectionSettingsPlugins = newTabSectionsSettingsPlugins.getPlugins().filter { it.isActive() }
         // store can be empty the first time we check it, so we make sure the content is initialised
         if (sectionSettingsPlugins.isNotEmpty()) {
             if (newTabSettingsStore.settings.isEmpty()) {
