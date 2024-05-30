@@ -31,11 +31,13 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import logcat.logcat
 
 @SuppressLint("NoLifecycleObserver")
 @ContributesViewModel(ActivityScope::class)
 class NewTabSettingsViewModel @Inject constructor(
     private val newTabPageSectionSettingsProvider: NewTabPageSectionSettingsProvider,
+    private val newTabSettingsStore: NewTabSettingsStore,
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
@@ -62,4 +64,26 @@ class NewTabSettingsViewModel @Inject constructor(
             }
         }
     }
+
+    fun onSectionsSwapped(
+        firstTag: String,
+        newSecondPosition: Int,
+        secondTag: String,
+        newFirstPosition: Int,
+    ) {
+        logcat { "New Tab: $firstTag to $newFirstPosition $secondTag to $newSecondPosition" }
+        viewModelScope.launch(dispatcherProvider.io()) {
+            val settings = newTabSettingsStore.settings.toMutableList()
+            logcat { "New Tab: Sections $settings" }
+            settings.swap(newFirstPosition, newSecondPosition)
+            newTabSettingsStore.settings = settings
+            logcat { "New Tab: Sections updated to $settings" }
+        }
+    }
+}
+
+fun <T> MutableList<T>.swap(idx1: Int, idx2: Int): MutableList<T> = apply {
+    val t = this[idx1]
+    this[idx1] = this[idx2]
+    this[idx2] = t
 }
