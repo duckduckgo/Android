@@ -68,7 +68,7 @@
 
     <!-- Grid Item -->
     <dimen name="gridItemSize">80dp</dimen>
-    <dimen name="gridItemImageSize">64dp</dimen>
+    <dimen name="gridItemImageSize">56dp</dimen>
     <dimen name="gridItemIconSize">32dp</dimen>
 
     <!-- PopupMenu -->
