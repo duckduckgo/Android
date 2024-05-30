@@ -843,10 +843,14 @@
     <string name="preOnboardingDaxDialog3Button">Gezinmeye Başla</string>
     <string name="onboardingSearchDaxDialogTitle">Bir şeyler arayın!</string>
     <string name="onboardingSearchDaxDialogDescription">DuckDuckGo aramalarınız her zaman anonimdir.</string>
-    <string name="onboardingSearchDaxDialogOption1">ispanyolca \"ördek\" nasıl denir</string>
-    <string name="onboardingSearchDaxDialogOption2">mighty ducks oyuncu kadrosu</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">ingilizcede \"ördek\" nasıl denir</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">ispanyolca \"ördek\" nasıl denir</string>
+    <string name="onboardingSearchQueryOption1">ingilizcede ördek nasıl denir</string>
+    <string name="onboardingSearchQueryOption1English">ispanyolcada ördek nasıl denir</string>
+    <string name="onboardingSearchDaxDialogOption2">avatar oyuncu kadrosu</string>
     <string name="onboardingSearchDaxDialogOption3">yerel hava durumu</string>
     <string name="onboardingSearchDaxDialogOption4">Şaşırt beni!</string>
+    <string name="onboardingSearchQueryOption4">akşam yemeği tarifleri</string>
     <string name="onboardingSitesDaxDialogTitle">Bir siteyi ziyaret etmeyi deneyin!</string>
     <string name="onboardingSitesDaxDialogDescription">Sizi gözetlemelerini önlemek için izleyicileri engelleyeceğim.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
@@ -868,5 +872,6 @@
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[<b>Fire Button</b> ile göz atma etkinliğinizi anında temizleyin.<br/><br/>Hemen deneyin! ☝️️]]></string>
     <string name="onboardingEndDaxDialogTitle">"İşte bu kadar!"</string>
     <string name="onboardingEndDaxDialogDescription">Unutmayın: İnterneti benimle ne kadar çok gezerseniz rahatsız edici reklamları da o kadar az görürsünüz. 👌</string>
+    <string name="onboardingEndDaxDialogButton">Hepsi tamam!</string>
 
 </resources>

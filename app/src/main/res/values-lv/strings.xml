@@ -848,10 +848,14 @@
     <string name="preOnboardingDaxDialog3Button">Sākt pārlūkošanu</string>
     <string name="onboardingSearchDaxDialogTitle">Izmēģini meklēt!</string>
     <string name="onboardingSearchDaxDialogDescription">Tavi DuckDuckGo meklējumi vienmēr ir anonīmi.</string>
-    <string name="onboardingSearchDaxDialogOption1">kā spāniski pateikt “pīle”</string>
-    <string name="onboardingSearchDaxDialogOption2">mighty ducks aktieri</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">kā angliski pateikt “pīle”</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">kā spāniski pateikt “pīle”</string>
+    <string name="onboardingSearchQueryOption1">kā angliski pateikt “pīle”</string>
+    <string name="onboardingSearchQueryOption1English">kā spāniski pateikt “pīle”</string>
+    <string name="onboardingSearchDaxDialogOption2">avatara aktieru sastāvs</string>
     <string name="onboardingSearchDaxDialogOption3">vietējie laikapstākļi</string>
     <string name="onboardingSearchDaxDialogOption4">Pārsteidz mani!</string>
+    <string name="onboardingSearchQueryOption4">vakariņu receptes</string>
     <string name="onboardingSitesDaxDialogTitle">Pamēģini apmeklēt kādu vietni!</string>
     <string name="onboardingSitesDaxDialogDescription">Es nobloķēšu izsekotājus, lai tie nevarētu tevi izspiegot.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
@@ -875,5 +879,6 @@
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Nekavējoties notīri savu pārlūkošanas vēsturi, izmantojot <b>Fire Button</b>.<br/><br/>Izmēģini! ☝️️]]></string>
     <string name="onboardingEndDaxDialogTitle">"Izdevās!"</string>
     <string name="onboardingEndDaxDialogDescription">Atceries: katru reizi, kad pārlūkosi kopā ar mani, uzmācīgās reklāmas zaudēs savu spēku! 👌</string>
+    <string name="onboardingEndDaxDialogButton">Viss pabeigts!</string>
 
 </resources>

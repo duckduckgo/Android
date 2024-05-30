@@ -843,10 +843,14 @@
     <string name="preOnboardingDaxDialog3Button">Commencer la navigation</string>
     <string name="onboardingSearchDaxDialogTitle">Essayez une recherche !</string>
     <string name="onboardingSearchDaxDialogDescription">Vos recherches sur DuckDuckGo sont toujours anonymes.</string>
-    <string name="onboardingSearchDaxDialogOption1">comment dire « duck » en espagnol</string>
-    <string name="onboardingSearchDaxDialogOption2">casting de mighty ducks</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">comment dire « canard » en anglais</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">comment dire « duck » en espagnol</string>
+    <string name="onboardingSearchQueryOption1">comment dire canard en anglais</string>
+    <string name="onboardingSearchQueryOption1English">comment dire « canard » en espagnol</string>
+    <string name="onboardingSearchDaxDialogOption2">casting d\'avatar</string>
     <string name="onboardingSearchDaxDialogOption3">météo locale</string>
     <string name="onboardingSearchDaxDialogOption4">Surprenez-moi !</string>
+    <string name="onboardingSearchQueryOption4">recettes pour le dîner</string>
     <string name="onboardingSitesDaxDialogTitle">Essayez de visiter un site !</string>
     <string name="onboardingSitesDaxDialogDescription">Je bloquerai les traqueurs afin qu\'ils ne puissent pas vous espionner.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
@@ -868,5 +872,6 @@
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Effacez instantanément votre activité de navigation avec le <b>Fire Button</b>.<br/><br/>Essayez par vous-même ! ☝️️]]></string>
     <string name="onboardingEndDaxDialogTitle">"Bien joué !"</string>
     <string name="onboardingEndDaxDialogDescription">Pensez-y : chaque fois que vous naviguez avec moi, une publicité douteuse disparaît. 👌</string>
+    <string name="onboardingEndDaxDialogButton">C\'est fait !</string>
 
 </resources>

@@ -843,10 +843,14 @@
     <string name="preOnboardingDaxDialog3Button">Börja bläddra</string>
     <string name="onboardingSearchDaxDialogTitle">Pröva att söka!</string>
     <string name="onboardingSearchDaxDialogDescription">Dina DuckDuckGo-sökningar är alltid anonyma.</string>
-    <string name="onboardingSearchDaxDialogOption1">vad heter ”anka” på spanska</string>
-    <string name="onboardingSearchDaxDialogOption2">medverkande i mighty ducks</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">hur säger man ”anka” på engelska</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">vad heter ”anka” på spanska</string>
+    <string name="onboardingSearchQueryOption1">hur säger man anka på engelska</string>
+    <string name="onboardingSearchQueryOption1English">hur säger man anka på spanska</string>
+    <string name="onboardingSearchDaxDialogOption2">rollbesättningen för avatar</string>
     <string name="onboardingSearchDaxDialogOption3">lokalt väder</string>
     <string name="onboardingSearchDaxDialogOption4">Överraska mig!</string>
+    <string name="onboardingSearchQueryOption4">middagsrecept</string>
     <string name="onboardingSitesDaxDialogTitle">Prova att besöka en webbplats!</string>
     <string name="onboardingSitesDaxDialogDescription">Jag blockerar spårare så att de inte kan spionera på dig.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
@@ -868,5 +872,6 @@
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Rensa omedelbart din surfaktivitet med <b>Fire Button</b>.<br/><br/>Prova! ☝️️]]></string>
     <string name="onboardingEndDaxDialogTitle">"Du klarar det här!"</string>
     <string name="onboardingEndDaxDialogDescription">Kom ihåg: varje gång du surfar med mig förlorar en läskig annons sina vingar. 👌</string>
+    <string name="onboardingEndDaxDialogButton">Allt klart!</string>
 
 </resources>
