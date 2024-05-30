@@ -18,6 +18,7 @@ package com.duckduckgo.history.impl
 
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.history.api.HistoryEntry
 import com.duckduckgo.history.api.NavigationHistory
@@ -25,6 +26,7 @@ import com.duckduckgo.history.impl.remoteconfig.HistoryFeature
 import com.squareup.anvil.annotations.ContributesBinding
 import io.reactivex.Single
 import javax.inject.Inject
+import kotlinx.coroutines.runBlocking
 
 interface InternalNavigationHistory : NavigationHistory {
     suspend fun clearOldEntries()
@@ -37,6 +39,7 @@ class RealNavigationHistory @Inject constructor(
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val currentTimeProvider: CurrentTimeProvider,
     private val historyFeature: HistoryFeature,
+    private val dispatcherProvider: DispatcherProvider,
 ) : InternalNavigationHistory {
     override suspend fun saveToHistory(
         url: String,
@@ -52,7 +55,8 @@ class RealNavigationHistory @Inject constructor(
     }
 
     override fun getHistorySingle(): Single<List<HistoryEntry>> {
-        return if (isHistoryFeatureAvailable() && isHistoryUserEnabled()) historyRepository.getHistoryObservable() else Single.just(emptyList())
+        val isHistoryUserEnabled = runBlocking(dispatcherProvider.io()) { isHistoryUserEnabled() }
+        return if (isHistoryFeatureAvailable() && isHistoryUserEnabled) historyRepository.getHistoryObservable() else Single.just(emptyList())
     }
 
     override suspend fun clearHistory() {
@@ -63,11 +67,11 @@ class RealNavigationHistory @Inject constructor(
         historyRepository.clearEntriesOlderThan(currentTimeProvider.localDateTimeNow().minusDays(30))
     }
 
-    override fun isHistoryUserEnabled(): Boolean {
+    override suspend fun isHistoryUserEnabled(): Boolean {
         return historyRepository.isHistoryUserEnabled(historyFeature.shouldStoreHistory)
     }
 
-    override fun setHistoryUserEnabled(value: Boolean) {
+    override suspend fun setHistoryUserEnabled(value: Boolean) {
         historyRepository.setHistoryUserEnabled(value)
     }
 

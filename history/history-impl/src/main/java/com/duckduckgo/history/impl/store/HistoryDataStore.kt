@@ -21,9 +21,9 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 
 interface HistoryDataStore {
-    fun isHistoryUserEnabled(default: Boolean): Boolean
+    suspend fun isHistoryUserEnabled(default: Boolean): Boolean
 
-    fun setHistoryUserEnabled(value: Boolean)
+    suspend fun setHistoryUserEnabled(value: Boolean)
 }
 
 class SharedPreferencesHistoryDataStore
@@ -39,11 +39,11 @@ constructor(
         context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
     }
 
-    override fun isHistoryUserEnabled(default: Boolean): Boolean {
+    override suspend fun isHistoryUserEnabled(default: Boolean): Boolean {
         return preferences.getBoolean(KEY_HISTORY_USER_ENABLED, default)
     }
 
-    override fun setHistoryUserEnabled(value: Boolean) {
+    override suspend fun setHistoryUserEnabled(value: Boolean) {
         updateValue(KEY_HISTORY_USER_ENABLED, value)
     }
 
