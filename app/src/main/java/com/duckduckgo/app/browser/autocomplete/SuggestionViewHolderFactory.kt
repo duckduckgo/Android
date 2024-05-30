@@ -45,6 +45,7 @@ interface SuggestionViewHolderFactory {
         immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         deleteClickListener: (AutoCompleteSuggestion) -> Unit = {},
+        openSettingsClickListener: () -> Unit = {},
     )
 }
 
@@ -62,6 +63,7 @@ class SearchSuggestionViewHolderFactory : SuggestionViewHolderFactory {
         immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         deleteClickListener: (AutoCompleteSuggestion) -> Unit,
+        openSettingsClickListener: () -> Unit,
     ) {
         val searchSuggestionViewHolder = holder as AutoCompleteViewHolder.SearchSuggestionViewHolder
         searchSuggestionViewHolder.bind(suggestion as AutoCompleteSearchSuggestion, immediateSearchClickListener, editableSearchClickListener)
@@ -82,6 +84,7 @@ class HistorySuggestionViewHolderFactory : SuggestionViewHolderFactory {
         immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         deleteClickListener: (AutoCompleteSuggestion) -> Unit,
+        openSettingsClickListener: () -> Unit,
     ) {
         val searchSuggestionViewHolder = holder as AutoCompleteViewHolder.HistorySuggestionViewHolder
         searchSuggestionViewHolder.bind(suggestion as AutoCompleteHistorySuggestion, immediateSearchClickListener, editableSearchClickListener)
@@ -102,6 +105,7 @@ class HistorySearchSuggestionViewHolderFactory : SuggestionViewHolderFactory {
         immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         deleteClickListener: (AutoCompleteSuggestion) -> Unit,
+        openSettingsClickListener: () -> Unit,
     ) {
         val historySearchSuggestionViewHolder = holder as AutoCompleteViewHolder.HistorySearchSuggestionViewHolder
         historySearchSuggestionViewHolder.bind(
@@ -126,6 +130,7 @@ class BookmarkSuggestionViewHolderFactory : SuggestionViewHolderFactory {
         immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         deleteClickListener: (AutoCompleteSuggestion) -> Unit,
+        openSettingsClickListener: () -> Unit,
     ) {
         val bookmarkSuggestionViewHolder = holder as AutoCompleteViewHolder.BookmarkSuggestionViewHolder
         bookmarkSuggestionViewHolder.bind(suggestion as AutoCompleteBookmarkSuggestion, immediateSearchClickListener, editableSearchClickListener)
@@ -149,6 +154,7 @@ class EmptySuggestionViewHolderFactory : SuggestionViewHolderFactory {
         immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         deleteClickListener: (AutoCompleteSuggestion) -> Unit,
+        openSettingsClickListener: () -> Unit,
     ) {
         // do nothing
     }
@@ -167,6 +173,7 @@ class DefaultSuggestionViewHolderFactory : SuggestionViewHolderFactory {
         immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         deleteClickListener: (AutoCompleteSuggestion) -> Unit,
+        openSettingsClickListener: () -> Unit,
     ) {
         val viewholder = holder as AutoCompleteViewHolder.DefaultSuggestionViewHolder
         viewholder.bind(suggestion as AutoCompleteDefaultSuggestion, immediateSearchClickListener)
@@ -185,9 +192,10 @@ class InAppMessageViewHolderFactory : SuggestionViewHolderFactory {
         immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         deleteClickListener: (AutoCompleteSuggestion) -> Unit,
+        openSettingsClickListener: () -> Unit,
     ) {
         val viewHolder = holder as InAppMessageViewHolder
-        viewHolder.bind(suggestion, deleteClickListener)
+        viewHolder.bind(suggestion, deleteClickListener, openSettingsClickListener)
     }
 }
 
@@ -269,15 +277,18 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
         fun bind(
             item: AutoCompleteSuggestion,
             deleteClickListener: (AutoCompleteSuggestion) -> Unit,
+            openSettingsClickListener: () -> Unit,
         ) {
             binding.messageCta.setMessage(
                 Message(
                     title = binding.root.context.getString(R.string.improvedAutoCompleteIAMTitle),
                     subtitle = binding.root.context.getString(R.string.improvedAutoCompleteIAMContent),
                     topIllustration = com.duckduckgo.mobile.android.R.drawable.ic_announce,
+                    action = binding.root.context.getString(R.string.openAutoCompleteSettings),
                 ),
             )
             binding.messageCta.onCloseButtonClicked { deleteClickListener(item) }
+            binding.messageCta.onPrimaryActionClicked { openSettingsClickListener() }
         }
     }
 }
