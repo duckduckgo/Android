@@ -853,10 +853,14 @@
     <string name="preOnboardingDaxDialog3Button">Pradėti naršyti</string>
     <string name="onboardingSearchDaxDialogTitle">Išmėgink paiešką!</string>
     <string name="onboardingSearchDaxDialogDescription">Jūsų „DuckDuckGo“ paieškos visada yra anoniminės.</string>
-    <string name="onboardingSearchDaxDialogOption1">kaip pasakyti „antis“ ispanų kalba</string>
-    <string name="onboardingSearchDaxDialogOption2">mighty ducks aktoriai</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">kaip pasakyti „antis“ anglų kalba</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">kaip pasakyti „antis“ ispanų kalba</string>
+    <string name="onboardingSearchQueryOption1">kaip pasakyti antis anglų kalba</string>
+    <string name="onboardingSearchQueryOption1English">kaip pasakyti antis ispanų kalba</string>
+    <string name="onboardingSearchDaxDialogOption2">įsikūnijimo aktoriai</string>
     <string name="onboardingSearchDaxDialogOption3">vietinis oras</string>
     <string name="onboardingSearchDaxDialogOption4">Nustebink mane!</string>
+    <string name="onboardingSearchQueryOption4">vakarienės receptai</string>
     <string name="onboardingSitesDaxDialogTitle">Pabandyk apsilankyti svetainėje!</string>
     <string name="onboardingSitesDaxDialogDescription">Užblokuosiu stebėjimo priemones, kad jos negalėtų tavęs šnipinėti.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
@@ -882,5 +886,6 @@
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Akimirksniu išvalykite naršymo veiklą naudodami <b>Fire Button</b>.<br/><br/>Išbandykite! ☝️️]]></string>
     <string name="onboardingEndDaxDialogTitle">"Atlikote!"</string>
     <string name="onboardingEndDaxDialogDescription">Įsidėmėkite: kiekvieną kartą, kai naršai su manimi, bauginantis skelbimas praranda galią. 👌</string>
+    <string name="onboardingEndDaxDialogButton">Viskas!</string>
 
 </resources>
