@@ -51,6 +51,8 @@ class RealNewTabPageSectionSettingsProvider @Inject constructor(
                 newTabSettingsStore.settings = userSections
             }
         }
+
+        // we need to take the user settings order into account
         newTabSectionsPlugins.getPlugins().onEach { section ->
             val setting = settingsPlugins.find { it.name == section.name }
             // if there isn't a view that implements the settings plugin, we won't show it
