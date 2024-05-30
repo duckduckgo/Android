@@ -16,10 +16,14 @@
 
 package com.duckduckgo.autofill.internal
 
+import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.lifecycleScope
@@ -32,6 +36,8 @@ import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.impl.configuration.AutofillJavascriptEnvironmentConfiguration
 import com.duckduckgo.autofill.impl.email.incontext.store.EmailProtectionInContextDataStore
 import com.duckduckgo.autofill.impl.engagement.store.AutofillEngagementRepository
+import com.duckduckgo.autofill.impl.importing.CsvPasswordImporter
+import com.duckduckgo.autofill.impl.importing.CsvPasswordParser
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
 import com.duckduckgo.autofill.impl.ui.credential.management.survey.AutofillSurveyStore
@@ -44,6 +50,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.google.android.material.snackbar.Snackbar
 import java.text.SimpleDateFormat
 import javax.inject.Inject
 import kotlinx.coroutines.flow.first
@@ -71,6 +78,9 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var autofillStore: InternalAutofillStore
 
+    @Inject
+    lateinit var csvPasswordParser: CsvPasswordParser
+
     private val dateFormatter = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.MEDIUM)
 
     @Inject
@@ -90,6 +100,24 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var engagementRepository: AutofillEngagementRepository
+
+    @Inject
+    lateinit var csvPasswordImporter: CsvPasswordImporter
+
+    private val importCsvLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val data: Intent? = result.data
+            val fileUrl = data?.data
+
+            logcat { "cdr onActivityResult for CSV file request. resultCode=${result.resultCode}. uri=$fileUrl" }
+            if (fileUrl != null) {
+                lifecycleScope.launch {
+                    val insertedIds = csvPasswordImporter.importCsv(fileUrl)
+                    Toast.makeText(this@AutofillInternalSettingsActivity, "Imported ${insertedIds.size} passwords", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -142,6 +170,33 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
         configureAutofillJsConfigEventHandlers()
         configureSurveyEventHandlers()
         configureEngagementEventHandlers()
+        configureImportPasswordsEventHandlers()
+    }
+
+    @SuppressLint("QueryPermissionsNeeded")
+    private fun configureImportPasswordsEventHandlers() {
+        binding.importPasswordsLaunchGooglePasswordWebpage.setClickListener {
+        }
+
+        binding.importPasswordsLaunchGooglePasswordChrome.setClickListener {
+            val googlePasswordsUrl = "https://passwords.google.com/options?ep=1"
+
+            Intent(Intent.ACTION_VIEW, "googlechrome://navigate?url=$googlePasswordsUrl".toUri()).also {
+                it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                if (it.resolveActivity(packageManager) != null) {
+                    startActivity(it)
+                } else {
+                    Snackbar.make(binding.root, "Chrome not installed", Snackbar.LENGTH_LONG).show()
+                }
+            }
+        }
+        binding.importPasswordsImportCsv.setClickListener {
+            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                addCategory(Intent.CATEGORY_OPENABLE)
+                type = "*/*"
+            }
+            importCsvLauncher.launch(intent)
+        }
     }
 
     private fun configureEngagementEventHandlers() {
