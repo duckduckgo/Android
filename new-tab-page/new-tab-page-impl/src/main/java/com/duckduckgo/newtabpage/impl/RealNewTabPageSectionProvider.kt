@@ -19,8 +19,10 @@ package com.duckduckgo.newtabpage.impl
 import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.newtabpage.api.NewTabPageSection
 import com.duckduckgo.newtabpage.api.NewTabPageSectionPlugin
 import com.duckduckgo.newtabpage.api.NewTabPageSectionProvider
+import com.duckduckgo.newtabpage.impl.settings.NewTabSettingsStore
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
@@ -31,9 +33,24 @@ import kotlinx.coroutines.flow.flow
 )
 class RealNewTabPageSectionProvider @Inject constructor(
     private val newTabPageSections: ActivePluginPoint<NewTabPageSectionPlugin>,
+    private val newTabSettingsStore: NewTabSettingsStore,
 ) : NewTabPageSectionProvider {
     override fun provideSections(): Flow<List<NewTabPageSectionPlugin>> = flow {
-        emit(newTabPageSections.getPlugins().filter { it.isUserEnabled() }.map { it })
+        val sections = mutableListOf<NewTabPageSectionPlugin>()
+        val enabledPlugins = newTabPageSections.getPlugins().filter { it.isUserEnabled() }.map { it }
+
+        val rmfSection = enabledPlugins.find { it.name == NewTabPageSection.REMOTE_MESSAGING_FRAMEWORK.name }
+        if (rmfSection != null) {
+            sections.add(rmfSection)
+        }
+        newTabSettingsStore.settings.forEach { userSetting ->
+            val sectionPlugin = enabledPlugins.find { it.name == userSetting }
+            if (sectionPlugin != null) {
+                sections.add(sectionPlugin)
+            }
+        }
+
+        emit(sections)
     }
 }
 

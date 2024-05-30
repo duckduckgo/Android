@@ -40,24 +40,27 @@ class RealNewTabPageSectionSettingsProvider @Inject constructor(
 
     // we only show settings for sections that are enabled via remote config
     override fun provideSections(): Flow<List<NewTabPageSectionSettingsPlugin>> = flow {
-        val plugins = mutableListOf<NewTabPageSectionSettingsPlugin>()
-
-        val settingsPlugins = newTabSectionsSettingsPlugins.getPlugins()
+        val sectionSettingsPlugins = newTabSectionsSettingsPlugins.getPlugins()
         // store can be empty the first time we check it, so we make sure the content is initialised
-        if (settingsPlugins.isNotEmpty()) {
+        if (sectionSettingsPlugins.isNotEmpty()) {
             if (newTabSettingsStore.settings.isEmpty()) {
-                val userSections = settingsPlugins.map { it.name }
+                val userSections = sectionSettingsPlugins.map { it.name }
                 logcat { "New Tab: User Sections initialised to $userSections" }
                 newTabSettingsStore.settings = userSections
             }
         }
 
-        // we need to take the user settings order into account
-        newTabSectionsPlugins.getPlugins().onEach { section ->
-            val setting = settingsPlugins.find { it.name == section.name }
-            // if there isn't a view that implements the settings plugin, we won't show it
-            if (setting != null) {
-                plugins.add(setting)
+        val plugins = mutableListOf<NewTabPageSectionSettingsPlugin>()
+        val sections = newTabSectionsPlugins.getPlugins()
+        val userSections = newTabSettingsStore.settings
+        userSections.forEach { section ->
+            val sectionPlugin = sections.find { it.name == section }
+            if (sectionPlugin != null) {
+                // if there is a view that implements the settings plugin, we show it
+                val sectionSettingsPlugin = sectionSettingsPlugins.find { it.name == section }
+                if (sectionSettingsPlugin != null) {
+                    plugins.add(sectionSettingsPlugin)
+                }
             }
         }
         emit(plugins)
