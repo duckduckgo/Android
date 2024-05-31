@@ -104,7 +104,13 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
 
     fun onQuickAccessListChanged(newList: List<Favorite>) {
         viewModelScope.launch(dispatchers.io()) {
-            savedSitesRepository.updateWithPosition(newList.map { it })
+            val favourites = savedSitesRepository.getFavoritesSync()
+            if (favourites.size == newList.size) {
+                savedSitesRepository.updateWithPosition(newList.map { it })
+            } else {
+                val updatedList = newList.plus(favourites.takeLast(favourites.size - newList.size))
+                savedSitesRepository.updateWithPosition(updatedList.map { it })
+            }
         }
     }
 
