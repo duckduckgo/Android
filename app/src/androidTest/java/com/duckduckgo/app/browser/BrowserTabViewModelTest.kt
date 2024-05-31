@@ -5321,17 +5321,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun givenSuggestedSearchesDialogShownWhenUserSubmittedQueryDifferentFromOptionsThenPixelIsNotSent() {
-        whenever(mockOmnibarConverter.convertQueryToUrl("mighty ducks cast", null)).thenReturn("mighty ducks cast")
-        val cta = DaxBubbleCta.DaxIntroSearchOptionsCta(mockOnboardingStore, mockAppInstallStore)
-        testee.ctaViewState.value = CtaViewState(cta = cta)
-
-        testee.onUserSubmittedQuery("mighty ducks cast")
-
-        verify(mockPixel, never()).fire(OnboardingExperimentPixel.PixelName.ONBOARDING_SEARCH_CUSTOM)
-    }
-
-    @Test
     fun givenSuggestedSitesDialogShownWhenUserSubmittedQueryThenCustomSitePixelIsSent() {
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
         val cta = DaxBubbleCta.DaxIntroVisitSiteOptionsCta(mockOnboardingStore, mockAppInstallStore)

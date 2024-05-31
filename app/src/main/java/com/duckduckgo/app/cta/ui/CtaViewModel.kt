@@ -374,6 +374,10 @@ class CtaViewModel @Inject constructor(
     @Deprecated("New users won't have this option available since extended onboarding")
     private fun hideTips() = settingsDataStore.hideTips
 
+    fun isSuggestedSearchOption(query: String): Boolean = onboardingStore.getSearchOptions().map { it.link }.contains(query)
+
+    fun isSuggestedSiteOption(query: String): Boolean = onboardingStore.getSitesOptions().map { it.link }.contains(query)
+
     companion object {
         private const val MAX_TABS_OPEN_FIRE_EDUCATION = 2
     }
