@@ -168,6 +168,7 @@ fladle {
 dependencies {
 	implementation project(":history-impl")
 	implementation project(":history-api")
+    internalImplementation project(":history-internal")
 	implementation project(":data-store-impl")
 	implementation project(":data-store-api")
 	implementation project(":verified-installation-impl")
