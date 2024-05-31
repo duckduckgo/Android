@@ -25,7 +25,6 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import logcat.logcat
 
 interface NewTabPageSectionSettingsProvider {
     fun provideSections(): Flow<List<NewTabPageSectionSettingsPlugin>>
@@ -37,19 +36,9 @@ class RealNewTabPageSectionSettingsProvider @Inject constructor(
     private val newTabSectionsPlugins: ActivePluginPoint<NewTabPageSectionPlugin>,
     private val newTabSettingsStore: NewTabSettingsStore,
 ) : NewTabPageSectionSettingsProvider {
-
     // we only show settings for sections that are enabled via remote config
     override fun provideSections(): Flow<List<NewTabPageSectionSettingsPlugin>> = flow {
         val sectionSettingsPlugins = newTabSectionsSettingsPlugins.getPlugins().filter { it.isActive() }
-        // store can be empty the first time we check it, so we make sure the content is initialised
-        if (sectionSettingsPlugins.isNotEmpty()) {
-            if (newTabSettingsStore.settings.isEmpty()) {
-                val userSections = sectionSettingsPlugins.map { it.name }
-                logcat { "New Tab: User Sections initialised to $userSections" }
-                newTabSettingsStore.settings = userSections
-            }
-        }
-
         val plugins = mutableListOf<NewTabPageSectionSettingsPlugin>()
         val sections = newTabSectionsPlugins.getPlugins()
         val userSections = newTabSettingsStore.settings

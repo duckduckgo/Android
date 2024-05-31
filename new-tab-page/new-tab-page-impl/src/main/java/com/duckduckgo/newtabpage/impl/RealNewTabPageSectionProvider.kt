@@ -19,7 +19,6 @@ package com.duckduckgo.newtabpage.impl
 import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.newtabpage.api.NewTabPageSection
 import com.duckduckgo.newtabpage.api.NewTabPageSectionPlugin
 import com.duckduckgo.newtabpage.api.NewTabPageSectionProvider
 import com.duckduckgo.newtabpage.impl.settings.NewTabSettingsStore
@@ -27,6 +26,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import logcat.logcat
 
 @ContributesBinding(
     scope = AppScope::class,
@@ -36,13 +36,19 @@ class RealNewTabPageSectionProvider @Inject constructor(
     private val newTabSettingsStore: NewTabSettingsStore,
 ) : NewTabPageSectionProvider {
     override fun provideSections(): Flow<List<NewTabPageSectionPlugin>> = flow {
+        // store can be empty the first time we check it, so we make sure the content is initialised
+        val sectionSettingsPlugins = newTabPageSections.getPlugins()
+        if (sectionSettingsPlugins.isNotEmpty()) {
+            if (newTabSettingsStore.settings.isEmpty()) {
+                val userSections = sectionSettingsPlugins.map { it.name }
+                logcat { "New Tab: User Sections initialised to $userSections" }
+                newTabSettingsStore.settings = userSections
+            }
+        }
+
         val sections = mutableListOf<NewTabPageSectionPlugin>()
         val enabledPlugins = newTabPageSections.getPlugins().filter { it.isUserEnabled() }.map { it }
 
-        val rmfSection = enabledPlugins.find { it.name == NewTabPageSection.REMOTE_MESSAGING_FRAMEWORK.name }
-        if (rmfSection != null) {
-            sections.add(rmfSection)
-        }
         newTabSettingsStore.settings.forEach { userSetting ->
             val sectionPlugin = enabledPlugins.find { it.name == userSetting }
             if (sectionPlugin != null) {
