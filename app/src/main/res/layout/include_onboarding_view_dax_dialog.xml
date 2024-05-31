@@ -63,6 +63,14 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
+                    <com.duckduckgo.common.ui.view.text.DaxTextView
+                        android:id="@+id/onboardingDialogTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/onboardingEndDaxDialogTitle"
+                        android:layout_marginBottom="@dimen/keyline_1"
+                        app:typography="h2" />
+
                     <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">

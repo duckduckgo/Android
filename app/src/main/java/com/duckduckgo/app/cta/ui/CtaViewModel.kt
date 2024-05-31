@@ -300,6 +300,11 @@ class CtaViewModel @Inject constructor(
                 if (!isSerpUrl(it.url) && !daxDialogOtherShown() && !daxDialogTrackersFoundShown() && !daxDialogNetworkShown()) {
                     return OnboardingDaxDialogCta.DaxNoTrackersCta(onboardingStore, appInstallStore)
                 }
+
+                // End
+                if (canShowDaxCtaEndOfJourney() && daxDialogFireEducationShown()) {
+                    return OnboardingDaxDialogCta.DaxEndCta(onboardingStore, appInstallStore)
+                }
             }
             return null
         }
