@@ -105,14 +105,12 @@ class RealAutoCompleteScorer @Inject constructor() : AutoCompleteScorer {
     }
 
     private fun Uri.naked(): String {
-        if (host == null) {
-            return toString().removePrefix("//")
-        }
+        val host = host?.takeUnless { it.isEmpty() } ?: return toString().removePrefix("//")
 
         val builder = buildUpon()
 
         builder.scheme(null)
-        builder.authority(host!!.removePrefix("www."))
+        builder.authority(host.removePrefix("www."))
 
         if (path?.lastOrNull() == '/') {
             builder.path(path!!.dropLast(1))
