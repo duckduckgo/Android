@@ -12,7 +12,7 @@ class RealAutoCompleteScorerTest {
     private val testee = RealAutoCompleteScorer()
 
     @Test
-    fun testWhenURLMatchesWithQuery_ThenScoreIsIncreased() {
+    fun whenURLMatchesWithQueryThenScoreIsIncreased() {
         val query = "testcase.com/no"
         val score = testee.score(
             "Test case website",
@@ -25,7 +25,7 @@ class RealAutoCompleteScorerTest {
     }
 
     @Test
-    fun testWhenTitleMatchesFromTheBeginning_ThenScoreIsIncreased() {
+    fun whenTitleMatchesFromTheBeginningThenScoreIsIncreased() {
         val query = "test"
         val score1 = testee.score(
             "Test case website",
@@ -45,7 +45,7 @@ class RealAutoCompleteScorerTest {
     }
 
     @Test
-    fun testWhenDomainMatchesFromTheBeginning_ThenScoreIsIncreased() {
+    fun whenDomainMatchesFromTheBeginningThenScoreIsIncreased() {
         val query = "test"
         val score1 = testee.score(
             "Website",
@@ -65,7 +65,7 @@ class RealAutoCompleteScorerTest {
     }
 
     @Test
-    fun testWhenThereIsMoreVisitCount_ThenScoreIsIncreased() {
+    fun whenThereIsMoreVisitCountThenScoreIsIncreased() {
         val query = "website"
         val score1 = testee.score(
             "Website",

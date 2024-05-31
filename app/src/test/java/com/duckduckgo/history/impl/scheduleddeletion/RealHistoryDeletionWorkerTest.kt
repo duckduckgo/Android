@@ -7,8 +7,8 @@ import androidx.work.testing.TestListenableWorkerBuilder
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.history.impl.InternalNavigationHistory
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
@@ -36,16 +36,14 @@ class RealHistoryDeletionWorkerTest {
     }
 
     @Test
-    fun whenDoWorkThenCallCleanOldEntriesAndReturnSuccess() {
-        appCoroutineScope.launch {
-            val worker =
-                TestListenableWorkerBuilder<RealHistoryDeletionWorker>(context = context).build()
-            worker.historyDeletionWorker = historyDeletionWorker
+    fun whenDoWorkThenCallCleanOldEntriesAndReturnSuccess() = runTest {
+        val worker =
+            TestListenableWorkerBuilder<RealHistoryDeletionWorker>(context = context).build()
+        worker.historyDeletionWorker = historyDeletionWorker
 
-            val result = worker.doWork()
+        val result = worker.doWork()
 
-            verify(mockHistory, never()).clearOldEntries()
-            Assert.assertEquals(result, Result.success())
-        }
+        verify(mockHistory, never()).clearOldEntries()
+        Assert.assertEquals(result, Result.success())
     }
 }

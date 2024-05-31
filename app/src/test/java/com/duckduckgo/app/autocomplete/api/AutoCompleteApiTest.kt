@@ -42,7 +42,7 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import java.time.LocalDateTime
 import java.util.UUID
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -975,7 +975,7 @@ class AutoCompleteApiTest {
         )
         whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(Single.just(emptyList()))
         whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(Single.just(emptyList()))
-        runBlocking {
+        runTest {
             whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
         }
 
@@ -1007,7 +1007,7 @@ class AutoCompleteApiTest {
         )
         whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(Single.just(emptyList()))
         whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(Single.just(emptyList()))
-        runBlocking {
+        runTest {
             whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         }
 

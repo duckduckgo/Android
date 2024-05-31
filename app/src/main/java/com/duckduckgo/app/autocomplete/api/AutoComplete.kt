@@ -361,7 +361,7 @@ class AutoCompleteApi @Inject constructor(
             tokens.forEach { token ->
                 if (!suggestion.title.startsWith(token, ignoreCase = true) &&
                     !suggestion.title.contains(" $token", ignoreCase = true) &&
-                    domain?.startsWith(token, ignoreCase = true) == false
+                    (domain == null || !domain.startsWith(token, ignoreCase = true))
                 ) {
                     return rankedBookmark
                 }

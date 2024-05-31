@@ -23,8 +23,6 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.history.impl.remoteconfig.HistoryFeature
 import java.time.LocalDateTime
 import java.time.Month.JANUARY
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -47,7 +45,6 @@ class HistoryTest {
     private val mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
     private val mockCurrentTimeProvider: CurrentTimeProvider = mock()
     private val mockHistoryFeature: HistoryFeature = mock()
-    private val testScope = TestScope()
     private val dispatcherProvider = coroutineTestRule.testDispatcherProvider
 
     val testee = RealNavigationHistory(
@@ -91,9 +88,9 @@ class HistoryTest {
     @Test
     fun whenClearOldEntriesThenDeleteOldEntriesIsCalledWith30Days() {
         whenever(mockCurrentTimeProvider.localDateTimeNow()).thenReturn(LocalDateTime.of(2000, JANUARY, 1, 0, 0))
-        testScope.launch {
+        runTest {
             testee.clearOldEntries()
-            verify(mockHistoryRepository.clearEntriesOlderThan(eq(mockCurrentTimeProvider.localDateTimeNow().minusDays(30))))
+            verify(mockHistoryRepository).clearEntriesOlderThan(eq(mockCurrentTimeProvider.localDateTimeNow().minusDays(30)))
         }
     }
 
