@@ -403,7 +403,7 @@ sealed class OnboardingDaxDialogCta(
         AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
-        Pixel.PixelValues.DAX_END_CTA,
+        Pixel.PixelValues.DAX_ONBOARDING_END_CTA,
         onboardingStore,
         appInstallStore,
     ) {

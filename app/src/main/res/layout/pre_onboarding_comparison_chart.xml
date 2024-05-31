@@ -79,7 +79,7 @@
         app:layout_constraintEnd_toStartOf="@id/chromeLogo"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/chromeLogo"
-        app:typography="body2" />
+        app:typography="body1" />
 
     <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:layout_width="0dp"
@@ -118,7 +118,7 @@
         app:layout_constraintEnd_toStartOf="@id/chromeLogo"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/feature1"
-        app:typography="body2" />
+        app:typography="body1" />
 
     <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:layout_width="0dp"
@@ -157,7 +157,7 @@
         app:layout_constraintEnd_toStartOf="@id/chromeLogo"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/feature2"
-        app:typography="body2" />
+        app:typography="body1" />
 
     <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:layout_width="0dp"
@@ -196,7 +196,7 @@
         app:layout_constraintEnd_toStartOf="@id/chromeLogo"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/feature3"
-        app:typography="body2" />
+        app:typography="body1" />
 
     <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:layout_width="0dp"
@@ -235,6 +235,6 @@
         app:layout_constraintEnd_toStartOf="@id/chromeLogo"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/feature4"
-        app:typography="body2" />
+        app:typography="body1" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
