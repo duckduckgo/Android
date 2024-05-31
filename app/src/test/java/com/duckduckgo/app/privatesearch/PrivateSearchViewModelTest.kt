@@ -25,14 +25,17 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.history.api.NavigationHistory
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -67,6 +70,12 @@ internal class PrivateSearchViewModelTest {
         )
     }
 
+    @After
+    fun after() {
+        // Clean up the state after each test if necessary
+        reset(mockAppSettingsDataStore, mockPixel, mockHistory)
+    }
+
     @Test
     fun whenAutocompleteSwitchedOnThenDataStoreIsUpdated() {
         testee.onAutocompleteSettingChanged(true)
@@ -94,42 +103,51 @@ internal class PrivateSearchViewModelTest {
 
     @Test
     fun whenAutocompleteSwitchedOffAndHistoryUserEnabledThenRecentlyVisitedSitesIsOn() {
-        whenever(mockHistory.isHistoryUserEnabled()).thenReturn(true)
+        runBlocking {
+            whenever(mockHistory.isHistoryUserEnabled()).thenReturn(true)
 
-        testee.onAutocompleteSettingChanged(true)
+            testee.onAutocompleteSettingChanged(true)
 
-        TestScope().launch {
-            testee.viewState().test {
-                assertEquals(true, awaitItem().autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled)
+            TestScope().launch {
+                testee.viewState().test {
+                    assertEquals(true, awaitItem().autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled)
+                }
             }
         }
     }
 
     @Test
     fun whenAutocompleteSwitchedOffAndHistoryUserEnabledThenRecentlyVisitedSitesIsOff() {
-        whenever(mockHistory.isHistoryUserEnabled()).thenReturn(true)
+        runBlocking {
+            whenever(mockHistory.isHistoryUserEnabled()).thenReturn(true)
 
-        testee.onAutocompleteSettingChanged(false)
+            testee.onAutocompleteSettingChanged(false)
 
-        TestScope().launch {
-            testee.viewState().test {
-                assertEquals(false, awaitItem().autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled)
+            TestScope().launch {
+                testee.viewState().test {
+                    assertEquals(false, awaitItem().autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled)
+                }
             }
         }
     }
 
     @Test
     fun whenAutocompleteRecentlyVisitedSitesSwitchedOnThenHistoryUpdated() {
-        testee.onAutocompleteRecentlyVisitedSitesSettingChanged(true)
+        runBlocking {
+            testee.onAutocompleteRecentlyVisitedSitesSettingChanged(true)
 
-        verify(mockHistory).setHistoryUserEnabled(true)
+            verify(mockHistory).setHistoryUserEnabled(true)
+        }
     }
 
     @Test
     fun whenAutocompleteRecentlyVisitedSitesSwitchedOffThenHistoryUpdated() {
-        testee.onAutocompleteRecentlyVisitedSitesSettingChanged(false)
+        runBlocking {
+            whenever(mockHistory.isHistoryUserEnabled()).thenReturn(false)
+            testee.onAutocompleteRecentlyVisitedSitesSettingChanged(false)
 
-        verify(mockHistory).setHistoryUserEnabled(false)
+            verify(mockHistory).setHistoryUserEnabled(false)
+        }
     }
 
     @Test
