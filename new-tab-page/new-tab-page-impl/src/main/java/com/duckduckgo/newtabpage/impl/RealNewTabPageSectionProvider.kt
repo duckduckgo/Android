@@ -18,9 +18,12 @@ package com.duckduckgo.newtabpage.impl
 
 import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.newtabpage.api.NewTabPageSection
 import com.duckduckgo.newtabpage.api.NewTabPageSectionPlugin
 import com.duckduckgo.newtabpage.api.NewTabPageSectionProvider
+import com.duckduckgo.newtabpage.api.NewTabPageSectionSettingsPlugin
 import com.duckduckgo.newtabpage.impl.settings.NewTabSettingsStore
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -33,21 +36,40 @@ import logcat.logcat
 )
 class RealNewTabPageSectionProvider @Inject constructor(
     private val newTabPageSections: ActivePluginPoint<NewTabPageSectionPlugin>,
+    private val newTabSectionsSettingsPlugins: PluginPoint<NewTabPageSectionSettingsPlugin>,
     private val newTabSettingsStore: NewTabSettingsStore,
 ) : NewTabPageSectionProvider {
     override fun provideSections(): Flow<List<NewTabPageSectionPlugin>> = flow {
         // store can be empty the first time we check it, so we make sure the content is initialised
-        val sectionSettingsPlugins = newTabPageSections.getPlugins()
+        val sectionSettingsPlugins = newTabSectionsSettingsPlugins.getPlugins().filter { it.isActive() }
         if (sectionSettingsPlugins.isNotEmpty()) {
             if (newTabSettingsStore.settings.isEmpty()) {
                 val userSections = sectionSettingsPlugins.map { it.name }
                 logcat { "New Tab: User Sections initialised to $userSections" }
                 newTabSettingsStore.settings = userSections
+            } else {
+                // some new settings might have appeared, so we want to make sure they are stored
+                val sectionsToAdd = mutableListOf<String>()
+                val sectionsSetting = sectionSettingsPlugins.map { it.name }
+                val userSections = newTabSettingsStore.settings
+                sectionsSetting.forEach { section ->
+                    if (userSections.find { it == section } == null) {
+                        // new setting not in user settings, we add it
+                        sectionsToAdd.add(section)
+                    }
+                }
+
+                newTabSettingsStore.settings = sectionsToAdd.plus(userSections)
             }
         }
 
         val sections = mutableListOf<NewTabPageSectionPlugin>()
         val enabledPlugins = newTabPageSections.getPlugins().filter { it.isUserEnabled() }.map { it }
+
+        val rmfSection = enabledPlugins.find { it.name == NewTabPageSection.REMOTE_MESSAGING_FRAMEWORK.name }
+        if (rmfSection != null) {
+            sections.add(rmfSection)
+        }
 
         newTabSettingsStore.settings.forEach { userSetting ->
             val sectionPlugin = enabledPlugins.find { it.name == userSetting }
