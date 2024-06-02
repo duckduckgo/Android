@@ -71,7 +71,7 @@ class OnboardingStoreImpl @Inject constructor(private val context: Context) : On
             DaxDialogIntroOption(
                 optionText = context.getString(R.string.onboardingSearchDaxDialogOption4),
                 iconRes = drawable.ic_wand_16,
-                link = if (country == "US") "chocolate chip cookie recipes" else context.getString(R.string.onboardingSearchDaxDialogOption4),
+                link = if (country == "US") "chocolate chip cookie recipes" else context.getString(R.string.onboardingSearchQueryOption4),
                 pixel = ONBOARDING_SEARCH_SURPRISE_ME,
             ),
         )
