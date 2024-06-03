@@ -82,7 +82,7 @@ class RemoteMessageViewModel @Inject constructor(
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
 
-        viewModelScope.launch(dispatchers.io()) {
+        viewModelScope.launch {
             remoteMessagingModel.getActiveMessages()
                 .flowOn(dispatchers.io())
                 .onEach { message ->
