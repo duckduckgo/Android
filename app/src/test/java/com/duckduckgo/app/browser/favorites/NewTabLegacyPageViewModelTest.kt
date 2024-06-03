@@ -175,4 +175,5 @@ class NewTabLegacyPageViewModelTest {
             }
         }
     }
+
 }
