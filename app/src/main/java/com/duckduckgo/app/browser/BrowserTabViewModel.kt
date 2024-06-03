@@ -627,8 +627,10 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun onAutoCompleteResultReceived(result: AutoCompleteResult) {
         val currentViewState = currentAutoCompleteViewState()
-        lastAutoCompleteState = currentViewState.copy(searchResults = AutoCompleteResult(result.query, result.suggestions))
-        autoCompleteViewState.value = lastAutoCompleteState!!
+        currentViewState.copy(searchResults = AutoCompleteResult(result.query, result.suggestions)).also {
+            lastAutoCompleteState = it
+            autoCompleteViewState.value = it
+        }
     }
 
     @VisibleForTesting
@@ -3305,34 +3307,38 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
     fun onUserDismissedAutoCompleteInAppMessage() {
-        autoComplete.userDismissedHistoryInAutoCompleteIAM()
-        pixel.fire(AUTOCOMPLETE_BANNER_DISMISSED)
+        viewModelScope.launch(dispatchers.io()) {
+            autoComplete.userDismissedHistoryInAutoCompleteIAM()
+            pixel.fire(AUTOCOMPLETE_BANNER_DISMISSED)
+        }
     }
 
     fun autoCompleteSuggestionsGone() {
-        if (hasUserSeenHistoryIAM) {
-            autoComplete.submitUserSeenHistoryIAM()
-            pixel.fire(AUTOCOMPLETE_BANNER_SHOWN)
+        viewModelScope.launch(dispatchers.io()) {
+            if (hasUserSeenHistoryIAM) {
+                autoComplete.submitUserSeenHistoryIAM()
+                pixel.fire(AUTOCOMPLETE_BANNER_SHOWN)
+            }
+            hasUserSeenHistoryIAM = false
+            lastAutoCompleteState?.searchResults?.suggestions?.let { suggestions ->
+                if (suggestions.any { it is AutoCompleteBookmarkSuggestion && it.isFavorite }) {
+                    pixel.fire(AppPixelName.AUTOCOMPLETE_DISPLAYED_LOCAL_FAVORITE)
+                }
+                if (suggestions.any { it is AutoCompleteBookmarkSuggestion && !it.isFavorite }) {
+                    pixel.fire(AppPixelName.AUTOCOMPLETE_DISPLAYED_LOCAL_BOOKMARK)
+                }
+                if (suggestions.any { it is AutoCompleteHistorySuggestion }) {
+                    pixel.fire(AppPixelName.AUTOCOMPLETE_DISPLAYED_LOCAL_HISTORY)
+                }
+                if (suggestions.any { it is AutoCompleteHistorySearchSuggestion }) {
+                    pixel.fire(AppPixelName.AUTOCOMPLETE_DISPLAYED_LOCAL_HISTORY_SEARCH)
+                }
+                if (suggestions.any { it is AutoCompleteSearchSuggestion && it.isUrl }) {
+                    pixel.fire(AppPixelName.AUTOCOMPLETE_DISPLAYED_LOCAL_WEBSITE)
+                }
+            }
+            lastAutoCompleteState = null
         }
-        hasUserSeenHistoryIAM = false
-        lastAutoCompleteState?.searchResults?.suggestions?.let { suggestions ->
-            if (suggestions.any { it is AutoCompleteBookmarkSuggestion && it.isFavorite }) {
-                pixel.fire(AppPixelName.AUTOCOMPLETE_DISPLAYED_LOCAL_FAVORITE)
-            }
-            if (suggestions.any { it is AutoCompleteBookmarkSuggestion && !it.isFavorite }) {
-                pixel.fire(AppPixelName.AUTOCOMPLETE_DISPLAYED_LOCAL_BOOKMARK)
-            }
-            if (suggestions.any { it is AutoCompleteHistorySuggestion }) {
-                pixel.fire(AppPixelName.AUTOCOMPLETE_DISPLAYED_LOCAL_HISTORY)
-            }
-            if (suggestions.any { it is AutoCompleteHistorySearchSuggestion }) {
-                pixel.fire(AppPixelName.AUTOCOMPLETE_DISPLAYED_LOCAL_HISTORY_SEARCH)
-            }
-            if (suggestions.any { it is AutoCompleteSearchSuggestion && it.isUrl }) {
-                pixel.fire(AppPixelName.AUTOCOMPLETE_DISPLAYED_LOCAL_WEBSITE)
-            }
-        }
-        lastAutoCompleteState = null
     }
 
     companion object {

@@ -24,11 +24,13 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 interface AutoCompleteDataStore {
-    fun setHistoryInAutoCompleteIAMDismissed()
+    suspend fun setHistoryInAutoCompleteIAMDismissed()
 
-    fun wasHistoryInAutoCompleteIAMDismissed(): Boolean
+    suspend fun wasHistoryInAutoCompleteIAMDismissed(): Boolean
 
-    var countHistoryInAutoCompleteIAMShown: Int
+    suspend fun incrementCountHistoryInAutoCompleteIAMShown()
+
+    suspend fun countHistoryInAutoCompleteIAMShown(): Int
 }
 
 @ContributesBinding(AppScope::class)
@@ -42,17 +44,19 @@ class SharedPreferencesAutoCompleteDataStore @Inject constructor(
     }
 
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
-    override var countHistoryInAutoCompleteIAMShown: Int
-        get() = preferences.getInt(KEY_HISTORY_AUTOCOMPLETE_SHOW_COUNT, 0)
-        set(value) {
-            updateValue(KEY_HISTORY_AUTOCOMPLETE_SHOW_COUNT, value)
-        }
 
-    override fun setHistoryInAutoCompleteIAMDismissed() {
+    override suspend fun countHistoryInAutoCompleteIAMShown(): Int {
+        return preferences.getInt(KEY_HISTORY_AUTOCOMPLETE_SHOW_COUNT, 0)
+    }
+
+    override suspend fun incrementCountHistoryInAutoCompleteIAMShown() {
+        updateValue(KEY_HISTORY_AUTOCOMPLETE_SHOW_COUNT, countHistoryInAutoCompleteIAMShown() + 1)
+    }
+    override suspend fun setHistoryInAutoCompleteIAMDismissed() {
         updateValue(KEY_HISTORY_AUTOCOMPLETE_DISMISSED, true)
     }
 
-    override fun wasHistoryInAutoCompleteIAMDismissed(): Boolean {
+    override suspend fun wasHistoryInAutoCompleteIAMDismissed(): Boolean {
         return preferences.getBoolean(KEY_HISTORY_AUTOCOMPLETE_DISMISSED, false)
     }
 

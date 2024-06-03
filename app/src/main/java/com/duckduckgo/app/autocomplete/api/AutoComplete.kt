@@ -59,8 +59,8 @@ const val minimumNumberInSuggestionGroup = 5
 
 interface AutoComplete {
     fun autoComplete(query: String): Observable<AutoCompleteResult>
-    fun userDismissedHistoryInAutoCompleteIAM()
-    fun submitUserSeenHistoryIAM()
+    suspend fun userDismissedHistoryInAutoCompleteIAM()
+    suspend fun submitUserSeenHistoryIAM()
 
     data class AutoCompleteResult(
         val query: String,
@@ -190,7 +190,7 @@ class AutoCompleteApi @Inject constructor(
         return uniqueHistorySuggestions + updatedBookmarkSuggestions
     }
 
-    override fun userDismissedHistoryInAutoCompleteIAM() {
+    override suspend fun userDismissedHistoryInAutoCompleteIAM() {
         autoCompleteRepository.dismissHistoryInAutoCompleteIAM()
     }
 
@@ -209,7 +209,7 @@ class AutoCompleteApi @Inject constructor(
         return true
     }
 
-    override fun submitUserSeenHistoryIAM() {
+    override suspend fun submitUserSeenHistoryIAM() {
         autoCompleteRepository.submitUserSeenHistoryIAM()
     }
 

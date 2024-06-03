@@ -1430,46 +1430,48 @@ class BrowserTabViewModelTest {
 
     @Test
     fun wheneverAutoCompleteIsGoneAndHistoryIAMHasBeenShownThenNotifyUserSeenIAM() {
-        whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(Observable.just(emptyList()))
-        whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
-            Single.just(listOf(Bookmark("abc", "title", "https://example.com", lastModified = null))),
-        )
-        whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(
-            Single.just(listOf(Favorite("abc", "title", "https://example.com", position = 1, lastModified = null))),
-        )
-        whenever(mockNavigationHistory.getHistorySingle()).thenReturn(
-            Single.just(listOf(VisitedPage("https://foo.com".toUri(), "title", listOf(LocalDateTime.now())))),
-        )
-        doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
-
-        whenever(mockAutoCompleteRepository.wasHistoryInAutoCompleteIAMDismissed()).thenReturn(false)
-        whenever(mockAutoCompleteRepository.countHistoryInAutoCompleteIAMShown()).thenReturn(0)
-        whenever(mockAutoCompleteScorer.score("title", "https://foo.com".toUri(), 1, "title")).thenReturn(1)
-
         runTest {
+            whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(Observable.just(emptyList()))
+            whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
+                Single.just(listOf(Bookmark("abc", "title", "https://example.com", lastModified = null))),
+            )
+            whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(
+                Single.just(listOf(Favorite("abc", "title", "https://example.com", position = 1, lastModified = null))),
+            )
+            whenever(mockNavigationHistory.getHistorySingle()).thenReturn(
+                Single.just(listOf(VisitedPage("https://foo.com".toUri(), "title", listOf(LocalDateTime.now())))),
+            )
+            doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
+
+            whenever(mockAutoCompleteRepository.wasHistoryInAutoCompleteIAMDismissed()).thenReturn(false)
+            whenever(mockAutoCompleteRepository.countHistoryInAutoCompleteIAMShown()).thenReturn(0)
+            whenever(mockAutoCompleteScorer.score("title", "https://foo.com".toUri(), 1, "title")).thenReturn(1)
             whenever(mockUserStageStore.getUserAppStage()).thenReturn(ESTABLISHED)
+
+            testee.autoCompletePublishSubject.accept("title")
+            testee.autoCompleteSuggestionsGone()
+            verify(mockAutoCompleteRepository).submitUserSeenHistoryIAM()
+            verify(mockPixel).fire(AUTOCOMPLETE_BANNER_SHOWN)
         }
-        testee.autoCompletePublishSubject.accept("title")
-        testee.autoCompleteSuggestionsGone()
-        verify(mockAutoCompleteRepository).submitUserSeenHistoryIAM()
-        verify(mockPixel).fire(AUTOCOMPLETE_BANNER_SHOWN)
     }
 
     @Test
     fun wheneverAutoCompleteIsGoneAndHistoryIAMHasNotBeenShownThenDoNotNotifyUserSeenIAM() {
-        whenever(mockAutoCompleteService.autoComplete("query")).thenReturn(Observable.just(emptyList()))
-        whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
-            Single.just(listOf(Bookmark("abc", "title", "https://example.com", lastModified = null))),
-        )
-        whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(
-            Single.just(listOf(Favorite("abc", "title", "https://example.com", position = 1, lastModified = null))),
-        )
-        whenever(mockNavigationHistory.getHistorySingle()).thenReturn(Single.just(listOf()))
-        doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
-        testee.autoCompletePublishSubject.accept("query")
-        testee.autoCompleteSuggestionsGone()
-        verify(mockAutoCompleteRepository, never()).submitUserSeenHistoryIAM()
-        verify(mockPixel, never()).fire(AUTOCOMPLETE_BANNER_SHOWN)
+        runTest {
+            whenever(mockAutoCompleteService.autoComplete("query")).thenReturn(Observable.just(emptyList()))
+            whenever(mockSavedSitesRepository.getBookmarksObservable()).thenReturn(
+                Single.just(listOf(Bookmark("abc", "title", "https://example.com", lastModified = null))),
+            )
+            whenever(mockSavedSitesRepository.getFavoritesObservable()).thenReturn(
+                Single.just(listOf(Favorite("abc", "title", "https://example.com", position = 1, lastModified = null))),
+            )
+            whenever(mockNavigationHistory.getHistorySingle()).thenReturn(Single.just(listOf()))
+            doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
+            testee.autoCompletePublishSubject.accept("query")
+            testee.autoCompleteSuggestionsGone()
+            verify(mockAutoCompleteRepository, never()).submitUserSeenHistoryIAM()
+            verify(mockPixel, never()).fire(AUTOCOMPLETE_BANNER_SHOWN)
+        }
     }
 
     @Test

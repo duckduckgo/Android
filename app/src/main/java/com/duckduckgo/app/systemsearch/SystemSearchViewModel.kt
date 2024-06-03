@@ -398,13 +398,17 @@ class SystemSearchViewModel @Inject constructor(
     }
 
     fun onUserDismissedAutoCompleteInAppMessage() {
-        autoComplete.userDismissedHistoryInAutoCompleteIAM()
+        viewModelScope.launch(dispatchers.io()) {
+            autoComplete.userDismissedHistoryInAutoCompleteIAM()
+        }
     }
 
     fun autoCompleteSuggestionsGone() {
-        if (hasUserSeenHistory) {
-            autoComplete.submitUserSeenHistoryIAM()
+        viewModelScope.launch(dispatchers.io()) {
+            if (hasUserSeenHistory) {
+                autoComplete.submitUserSeenHistoryIAM()
+            }
+            hasUserSeenHistory = false
         }
-        hasUserSeenHistory = false
     }
 }

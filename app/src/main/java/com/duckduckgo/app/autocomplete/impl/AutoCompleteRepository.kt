@@ -16,36 +16,47 @@
 
 package com.duckduckgo.app.autocomplete.impl
 
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import kotlinx.coroutines.withContext
 
 interface AutoCompleteRepository {
 
-    fun countHistoryInAutoCompleteIAMShown(): Int
-    fun dismissHistoryInAutoCompleteIAM()
-    fun wasHistoryInAutoCompleteIAMDismissed(): Boolean
-    fun submitUserSeenHistoryIAM()
+    suspend fun countHistoryInAutoCompleteIAMShown(): Int
+    suspend fun dismissHistoryInAutoCompleteIAM()
+    suspend fun wasHistoryInAutoCompleteIAMDismissed(): Boolean
+    suspend fun submitUserSeenHistoryIAM()
 }
 
 @ContributesBinding(AppScope::class)
 class RealAutoCompleteRepository @Inject constructor(
     private val dataStore: AutoCompleteDataStore,
+    private val dispatcherProvider: DispatcherProvider,
 ) : AutoCompleteRepository {
 
-    override fun countHistoryInAutoCompleteIAMShown(): Int {
-        return dataStore.countHistoryInAutoCompleteIAMShown
+    override suspend fun countHistoryInAutoCompleteIAMShown(): Int {
+        return withContext(dispatcherProvider.io()) {
+            dataStore.countHistoryInAutoCompleteIAMShown()
+        }
     }
 
-    override fun dismissHistoryInAutoCompleteIAM() {
-        dataStore.setHistoryInAutoCompleteIAMDismissed()
+    override suspend fun dismissHistoryInAutoCompleteIAM() {
+        withContext(dispatcherProvider.io()) {
+            dataStore.setHistoryInAutoCompleteIAMDismissed()
+        }
     }
 
-    override fun wasHistoryInAutoCompleteIAMDismissed(): Boolean {
-        return dataStore.wasHistoryInAutoCompleteIAMDismissed()
+    override suspend fun wasHistoryInAutoCompleteIAMDismissed(): Boolean {
+        return withContext(dispatcherProvider.io()) {
+            dataStore.wasHistoryInAutoCompleteIAMDismissed()
+        }
     }
 
-    override fun submitUserSeenHistoryIAM() {
-        dataStore.countHistoryInAutoCompleteIAMShown += 1
+    override suspend fun submitUserSeenHistoryIAM() {
+        withContext(dispatcherProvider.io()) {
+            dataStore.incrementCountHistoryInAutoCompleteIAMShown()
+        }
     }
 }
