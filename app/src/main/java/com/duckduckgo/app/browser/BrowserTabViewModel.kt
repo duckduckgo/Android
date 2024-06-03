@@ -103,7 +103,6 @@ import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.app.browser.webview.SslWarningLayout.Action
 import com.duckduckgo.app.cta.ui.*
-import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
@@ -725,7 +724,7 @@ class BrowserTabViewModel @Inject constructor(
 
         when (currentCtaViewState().cta) {
             is DaxBubbleCta.DaxIntroSearchOptionsCta -> {
-                if (!DaxDialogIntroOption.getSearchOptions().map { it.link }.contains(query)) {
+                if (!ctaViewModel.isSuggestedSearchOption(query)) {
                     pixel.fire(OnboardingExperimentPixel.PixelName.ONBOARDING_SEARCH_CUSTOM)
                 }
             }
@@ -733,7 +732,7 @@ class BrowserTabViewModel @Inject constructor(
             is DaxBubbleCta.DaxIntroVisitSiteOptionsCta,
             is OnboardingDaxDialogCta.DaxSiteSuggestionsCta,
             -> {
-                if (!DaxDialogIntroOption.getSitesOptions().map { it.link }.contains(query)) {
+                if (!ctaViewModel.isSuggestedSiteOption(query)) {
                     pixel.fire(OnboardingExperimentPixel.PixelName.ONBOARDING_VISIT_SITE_CUSTOM)
                 }
             }

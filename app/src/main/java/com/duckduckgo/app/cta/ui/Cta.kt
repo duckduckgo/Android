@@ -368,7 +368,7 @@ sealed class OnboardingDaxDialogCta(
                 )
 
                 optionsViews.forEachIndexed { index, buttonView ->
-                    val options = DaxDialogIntroOption.getSitesOptions()
+                    val options = onboardingStore.getSitesOptions()
                     options[index].setOptionView(buttonView)
                     ViewCompat.animate(buttonView).alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
                 }
@@ -379,7 +379,7 @@ sealed class OnboardingDaxDialogCta(
             daxDialog: IncludeOnboardingViewDaxDialogBinding,
             onOptionClicked: (DaxDialogIntroOption) -> Unit,
         ) {
-            val options = DaxDialogIntroOption.getSitesOptions()
+            val options = onboardingStore.getSitesOptions()
             daxDialog.daxDialogOption1.setOnClickListener { onOptionClicked.invoke(options[0]) }
             daxDialog.daxDialogOption2.setOnClickListener { onOptionClicked.invoke(options[1]) }
             daxDialog.daxDialogOption3.setOnClickListener { onOptionClicked.invoke(options[2]) }
@@ -477,7 +477,7 @@ sealed class DaxBubbleCta(
         CtaId.DAX_INTRO,
         R.string.onboardingSearchDaxDialogTitle,
         R.string.onboardingSearchDaxDialogDescription,
-        DaxDialogIntroOption.getSearchOptions(),
+        onboardingStore.getSearchOptions(),
         AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
@@ -493,7 +493,7 @@ sealed class DaxBubbleCta(
         CtaId.DAX_INTRO_VISIT_SITE,
         R.string.onboardingSitesDaxDialogTitle,
         R.string.onboardingSitesDaxDialogDescription,
-        DaxDialogIntroOption.getSitesOptions(),
+        onboardingStore.getSitesOptions(),
         AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
@@ -519,74 +519,16 @@ sealed class DaxBubbleCta(
     )
 
     data class DaxDialogIntroOption(
-        @StringRes val textRes: Int,
+        val optionText: String,
         @DrawableRes val iconRes: Int,
         val link: String,
         val pixel: PixelName,
     ) {
         fun setOptionView(buttonView: DaxButton) {
             buttonView.apply {
-                text = this.context.getString(textRes)
+                text = optionText
                 icon = ContextCompat.getDrawable(this.context, iconRes)
             }
-        }
-
-        companion object {
-            fun getSearchOptions(): List<DaxDialogIntroOption> =
-                listOf(
-                    DaxDialogIntroOption(
-                        R.string.onboardingSearchDaxDialogOption1,
-                        com.duckduckgo.mobile.android.R.drawable.ic_find_search_16,
-                        "how to say duck in spanish",
-                        PixelName.ONBOARDING_SEARCH_SAY_DUCK,
-                    ),
-                    DaxDialogIntroOption(
-                        R.string.onboardingSearchDaxDialogOption2,
-                        com.duckduckgo.mobile.android.R.drawable.ic_find_search_16,
-                        "mighty ducks cast",
-                        PixelName.ONBOARDING_SEARCH_MIGHTY_DUCK,
-                    ),
-                    DaxDialogIntroOption(
-                        R.string.onboardingSearchDaxDialogOption3,
-                        com.duckduckgo.mobile.android.R.drawable.ic_find_search_16,
-                        "local weather",
-                        PixelName.ONBOARDING_SEARCH_WEATHER,
-                    ),
-                    DaxDialogIntroOption(
-                        R.string.onboardingSearchDaxDialogOption4,
-                        com.duckduckgo.mobile.android.R.drawable.ic_wand_16,
-                        "chocolate chip cookie recipes",
-                        PixelName.ONBOARDING_SEARCH_SURPRISE_ME,
-                    ),
-                )
-
-            fun getSitesOptions(): List<DaxDialogIntroOption> =
-                listOf(
-                    DaxDialogIntroOption(
-                        R.string.onboardingSitesDaxDialogOption1,
-                        com.duckduckgo.mobile.android.R.drawable.ic_globe_gray_16dp,
-                        "espn.com",
-                        PixelName.ONBOARDING_VISIT_SITE_ESPN,
-                    ),
-                    DaxDialogIntroOption(
-                        R.string.onboardingSitesDaxDialogOption2,
-                        com.duckduckgo.mobile.android.R.drawable.ic_globe_gray_16dp,
-                        "yahoo.com",
-                        PixelName.ONBOARDING_VISIT_SITE_YAHOO,
-                    ),
-                    DaxDialogIntroOption(
-                        R.string.onboardingSitesDaxDialogOption3,
-                        com.duckduckgo.mobile.android.R.drawable.ic_globe_gray_16dp,
-                        "ebay.com",
-                        PixelName.ONBOARDING_VISIT_SITE_EBAY,
-                    ),
-                    DaxDialogIntroOption(
-                        R.string.onboardingSitesDaxDialogOption4,
-                        com.duckduckgo.mobile.android.R.drawable.ic_wand_16,
-                        "britannica.com/animal/duck",
-                        PixelName.ONBOARDING_VISIT_SITE_SURPRISE_ME,
-                    ),
-                )
         }
     }
 }
