@@ -283,7 +283,6 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
                 Message(
                     title = binding.root.context.getString(R.string.improvedAutoCompleteIAMTitle),
                     subtitle = binding.root.context.getString(R.string.improvedAutoCompleteIAMContent),
-                    topIllustration = com.duckduckgo.mobile.android.R.drawable.ic_announce,
                     action = binding.root.context.getString(R.string.openAutoCompleteSettings),
                 ),
             )
