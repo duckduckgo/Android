@@ -1,6 +1,6 @@
 appId: com.duckduckgo.mobile.android
 tags:
-    - adClickTest
+  - adClickTest
 ---
 - launchApp:
     clearState: true
@@ -12,11 +12,11 @@ tags:
 - assertVisible:
     text: ".*Got It.*"
 - tapOn:
-    text: "HIDE"
-- assertVisible:
-    text: "HIDE TIPS FOREVER"
+    text: "Got It"
 - tapOn:
-    text: "HIDE TIPS FOREVER"
+    id: "com.duckduckgo.mobile.android:id/fireIconMenu"
+- tapOn:
+    text: "Cancel"
 - assertVisible:
     id: "ad-id-13"
 - tapOn:

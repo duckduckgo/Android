@@ -9,12 +9,6 @@ tags:
 - pressKey: Enter
 - assertVisible:
     text: ".*Got It.*"
-- tapOn:
-    text: "HIDE"
-- assertVisible:
-    text: "HIDE TIPS FOREVER"
-- tapOn:
-    text: "HIDE TIPS FOREVER"
 - assertVisible:
     id: "ad-id-5"
 - longPressOn:

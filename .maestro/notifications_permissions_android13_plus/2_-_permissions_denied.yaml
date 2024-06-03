@@ -10,12 +10,9 @@ appId: com.duckduckgo.mobile.android
 - assertVisible:
     text: ".*Welcome to DuckDuckGo!.*"
     optional: true
-- assertVisible:
-    text: ".*Not to worry! Searching and browsing privately.*"
-- tapOn: "let's do it!"
-- tapOn: "cancel"
-- assertVisible:
-      text: ".*I'll also upgrade the security of your connection if possible.*"
+
+- runFlow: ../shared/onboarding.yaml
+
 - tapOn:
       id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
 - tapOn:

@@ -7,17 +7,7 @@ tags:
     clearState: true
     stopApp: true
 
-- assertVisible:
-    text: ".*Not to worry! Searching and browsing privately.*"
-- tapOn: "let's do it!"
-- runFlow:
-    when:
-      visible: "set as default"
-    commands:
-      - tapOn: "duckduckgo"
-      - tapOn: "set as default"
-      - assertVisible:
-          text: ".*I'll also upgrade the security of your connection if possible.*"
+- runFlow: ../shared/onboarding.yaml
 
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
