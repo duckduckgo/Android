@@ -157,7 +157,7 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
             .setTopEdge(edgeTreatment)
             .build()
 
-        popupContent.cardContent.text = HtmlCompat.fromHtml(context.getString(R.string.newTabPageFavoritesTooltip), FROM_HTML_MODE_LEGACY)
+        popupContent.cardContent.text = HtmlCompat.fromHtml(context.getString(R.string.newTabPageFavoritesTooltip), HtmlCompat.FROM_HTML_MODE_LEGACY)
 
         PopupWindow(
             popupContent.root,
