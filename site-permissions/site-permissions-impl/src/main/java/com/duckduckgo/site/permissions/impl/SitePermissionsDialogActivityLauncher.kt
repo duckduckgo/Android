@@ -336,7 +336,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         val snackbarView = snackbar.view
         if (activity.resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
             val layoutParams = snackbarView.layoutParams as ViewGroup.MarginLayoutParams
-            layoutParams.setMargins(layoutParams.leftMargin, layoutParams.topMargin, layoutParams.rightMargin, 40.toPx())
+            layoutParams.setMargins(layoutParams.leftMargin, layoutParams.topMargin, layoutParams.rightMargin, 32.toPx())
             snackbarView.layoutParams = layoutParams
         }
         snackbar.apply {
