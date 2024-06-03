@@ -16,15 +16,16 @@
 
 package com.duckduckgo.newtabpage.impl.shortcuts
 
+import android.content.Context
 import androidx.lifecycle.LifecycleOwner
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.newtabpage.api.NewTabPageShortcutPlugin
 import com.duckduckgo.newtabpage.api.NewTabShortcut
-import com.duckduckgo.newtabpage.api.NewTabShortcut.Chat
-import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -34,49 +35,61 @@ import org.mockito.kotlin.whenever
 class ShortcutsViewModelTest {
 
     @get:Rule
-    var coroutinesTestRule = CoroutineTestRule()
-
-    private var shortcutsProvider: NewTabShortcutsProvider = mock()
-    private val mockOwner: LifecycleOwner = mock()
+    var coroutineRule = CoroutineTestRule()
 
     private lateinit var testee: ShortcutsViewModel
 
+    private var mockLifecycleOwner: LifecycleOwner = mock()
+    private val newTabShortcutsProvider: NewTabShortcutsProvider = mock()
+    private val shortcutPlugins = FakePluginPoint()
+
     @Before
-    fun setUp() {
-        testee = ShortcutsViewModel(coroutinesTestRule.testDispatcherProvider, shortcutsProvider)
-    }
-
-    @Test
-    fun whenViewModelStartsThenInitialViewStateProvided() = runTest {
-        testee.viewState.test {
-            testee.onStart(mockOwner)
-            expectMostRecentItem().also {
-                assertEquals(it.shortcuts.size, 0)
-            }
-        }
-    }
-
-    @Test
-    fun whenViewModelStartsThenShortcutsProvider() = runTest {
-        testee.viewState.test {
-            whenever(shortcutsProvider.provideShortcuts()).thenReturn(flowOf(someShortcuts()))
-            testee.onStart(mockOwner)
-            expectMostRecentItem().also {
-                assertEquals(it.shortcuts.size, 0)
-            }
-        }
-    }
-
-    private fun someShortcuts(): List<NewTabPageShortcutPlugin> {
-        return listOf(
-            FakeShortcutPlugin(Chat),
-            FakeShortcutPlugin(NewTabShortcut.Bookmarks),
+    fun setup() {
+        testee = ShortcutsViewModel(
+            coroutineRule.testDispatcherProvider,
+            newTabShortcutsProvider,
         )
     }
 
-    class FakeShortcutPlugin(val fakeShortcut: NewTabShortcut) : NewTabPageShortcutPlugin {
+    @Test
+    fun whenViewModelStartsAndNoShortcutsThenViewStateShortcutsAreEmpty() = runTest {
+        whenever(newTabShortcutsProvider.provideShortcuts()).thenReturn(flowOf(emptyList()))
+        testee.onStart(mockLifecycleOwner)
+        testee.viewState.test {
+            expectMostRecentItem().also {
+                assertTrue(it.shortcuts.isEmpty())
+            }
+        }
+    }
+
+    @Test
+    fun whenViewModelStartsAndSomeShortcutsThenViewStateShortcutsAreNotEmpty() = runTest {
+        whenever(newTabShortcutsProvider.provideShortcuts()).thenReturn(flowOf(shortcutPlugins.getPlugins()))
+        testee.onStart(mockLifecycleOwner)
+        testee.viewState.test {
+            expectMostRecentItem().also {
+                assertTrue(it.shortcuts.isNotEmpty())
+            }
+        }
+    }
+
+    private class FakePluginPoint : PluginPoint<NewTabPageShortcutPlugin> {
+        val plugin = FakeShortcutPlugin()
+        override fun getPlugins(): List<NewTabPageShortcutPlugin> {
+            return listOf(plugin)
+        }
+    }
+
+    private class FakeShortcutPlugin : NewTabPageShortcutPlugin {
         override fun getShortcut(): NewTabShortcut {
-            return fakeShortcut
+            return NewTabShortcut.Bookmarks
+        }
+
+        override fun onClick(
+            context: Context,
+            shortcut: NewTabShortcut,
+        ) {
+            // no - op
         }
     }
 }
