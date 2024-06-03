@@ -3927,6 +3927,8 @@ class BrowserTabFragment :
         private fun hideDaxCta() {
             daxDialogCta.dialogTextCta.cancelAnimation()
             daxDialogCta.daxCtaContainer.hide()
+            daxDialogOnboardingCta.dialogTextCta.cancelAnimation()
+            daxDialogOnboardingCta.daxCtaContainer.gone()
         }
 
         private fun hideHomeCta() {
