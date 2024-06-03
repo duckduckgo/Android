@@ -2,6 +2,7 @@ package com.duckduckgo.app.browser.favorites
 
 import androidx.lifecycle.LifecycleOwner
 import app.cash.turbine.test
+import com.duckduckgo.app.browser.BrowserTabViewModel.HiddenBookmarksIds
 import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.playstore.PlayStoreUtils
@@ -17,6 +18,7 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.sync.api.engine.SyncEngine
 import java.util.UUID
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -63,6 +65,8 @@ class NewTabLegacyPageViewModelTest {
             savedSitesRepository = mockSavedSitesRepository,
             syncEngine = mockSyncEngine,
         )
+
+        whenever(testee.hiddenIds).thenReturn(MutableStateFlow(HiddenBookmarksIds()))
     }
 
     @After
