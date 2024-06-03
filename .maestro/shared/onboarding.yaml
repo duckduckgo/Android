@@ -1,8 +1,11 @@
 appId: com.duckduckgo.mobile.android
 ---
 - assertVisible:
-    text: ".*Not to worry! Searching and browsing privately.*"
+    text: ".*Ready for a better, more private internet?.*"
 - tapOn: "let's do it!"
+- assertVisible:
+    text: ".*Privacy protections activated.*"
+- tapOn: "choose your browser"
 - tapOn: "cancel"
 - assertVisible:
-    text: ".*I'll also upgrade the security of your connection if possible.*"
+    text: ".*Try a search!.*"

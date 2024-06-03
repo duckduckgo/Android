@@ -1,6 +1,6 @@
 appId: com.duckduckgo.mobile.android
 tags:
-    - adClickTest
+  - adClickTest
 ---
 - launchApp:
     clearState: true
@@ -11,12 +11,6 @@ tags:
 - pressKey: Enter
 - assertVisible:
     text: ".*Got It.*"
-- tapOn:
-    text: "HIDE"
-- assertVisible:
-    text: "HIDE TIPS FOREVER"
-- tapOn:
-    text: "HIDE TIPS FOREVER"
 - assertVisible:
     id: "ad-id-6"
 - tapOn:
