@@ -25,6 +25,8 @@ import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.browser.api.ui.BrowserScreens.NewTabSettingsScreenNoParams
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
@@ -64,6 +66,8 @@ class NewTabPageView @JvmOverloads constructor(
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
 
+        binding.newTabContentShimmer.startShimmer()
+
         ViewTreeLifecycleOwner.get(this)?.lifecycle?.addObserver(viewModel)
 
         @SuppressLint("NoHardcodedCoroutineDispatcher")
@@ -93,5 +97,8 @@ class NewTabPageView @JvmOverloads constructor(
                 ),
             )
         }
+
+        binding.newTabContentShimmer.gone()
+        binding.newTabSectionsContent.show()
     }
 }
