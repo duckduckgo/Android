@@ -87,7 +87,7 @@ class DeviceShieldTileService : TileService() {
         }
     }
 
-    @SuppressLint("NewApi") // IDE doesn't get we use appBuildConfig
+    @SuppressLint("NewApi", "StartActivityAndCollapseDeprecated") // IDE doesn't get we use appBuildConfig
     private fun launchActivity() {
         val intent = Intent(this, VpnPermissionRequesterActivity::class.java).apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) }
         if (appBuildConfig.sdkInt >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {

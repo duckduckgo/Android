@@ -22,6 +22,7 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
 import android.provider.Settings
+import android.view.ViewGroup
 import android.webkit.PermissionRequest
 import androidx.activity.result.ActivityResultCaller
 import androidx.annotation.StringRes
@@ -43,7 +44,6 @@ import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEnti
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.BaseTransientBottomBar.BaseCallback
 import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.snackbar.Snackbar.SnackbarLayout
 import com.squareup.anvil.annotations.ContributesBinding
 import java.lang.IllegalStateException
 import javax.inject.Inject
@@ -333,9 +333,11 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
             }
 
         val snackbar = Snackbar.make(activity.window.decorView.rootView, message, Snackbar.LENGTH_LONG)
-        val layout = snackbar.view as SnackbarLayout
+        val snackbarView = snackbar.view
         if (activity.resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            layout.setPadding(0, 0, 0, 40.toPx())
+            val layoutParams = snackbarView.layoutParams as ViewGroup.MarginLayoutParams
+            layoutParams.setMargins(layoutParams.leftMargin, layoutParams.topMargin, layoutParams.rightMargin, 32.toPx())
+            snackbarView.layoutParams = layoutParams
         }
         snackbar.apply {
             setAction(R.string.sitePermissionsDeniedSnackBarAction) { onPermissionAllowed() }
