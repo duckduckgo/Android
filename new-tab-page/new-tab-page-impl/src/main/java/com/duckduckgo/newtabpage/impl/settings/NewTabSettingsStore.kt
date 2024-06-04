@@ -28,7 +28,8 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 
 interface NewTabSettingsStore {
-    var settings: List<String>
+    var sectionSettings: List<String>
+    var shortcutSettings: List<String>
 }
 
 @ContributesBinding(AppScope::class)
@@ -39,9 +40,13 @@ class AppNewTabSettingsStore @Inject constructor(private val context: Context) :
     private val stringListType = Types.newParameterizedType(List::class.java, String::class.java)
     private val stringListAdapter: JsonAdapter<List<String>> = Moshi.Builder().build().adapter(stringListType)
 
-    override var settings: List<String>
-        get() = toStringList(preferences.getString(KEY_NEW_TAB_SETTINGS_ORDER, null))
-        set(value) = preferences.edit(true) { putString(KEY_NEW_TAB_SETTINGS_ORDER, fromStringList(value)) }
+    override var sectionSettings: List<String>
+        get() = toStringList(preferences.getString(KEY_NEW_TAB_SECTION_SETTINGS_ORDER, null))
+        set(value) = preferences.edit(true) { putString(KEY_NEW_TAB_SECTION_SETTINGS_ORDER, fromStringList(value)) }
+
+    override var shortcutSettings: List<String>
+        get() = toStringList(preferences.getString(KEY_NEW_TAB_SHORTCUT_SETTINGS_ORDER, null))
+        set(value) = preferences.edit(true) { putString(KEY_NEW_TAB_SHORTCUT_SETTINGS_ORDER, fromStringList(value)) }
 
     private fun toStringList(value: String?): List<String> {
         if (value != null) {
@@ -57,6 +62,7 @@ class AppNewTabSettingsStore @Inject constructor(private val context: Context) :
 
     companion object {
         const val FILENAME = "com.duckduckgo.newtabpage.settings"
-        private const val KEY_NEW_TAB_SETTINGS_ORDER = "KEY_NEW_TAB_SETTINGS_ORDER"
+        private const val KEY_NEW_TAB_SECTION_SETTINGS_ORDER = "KEY_NEW_TAB_SECTION_SETTINGS_ORDER"
+        private const val KEY_NEW_TAB_SHORTCUT_SETTINGS_ORDER = "KEY_NEW_TAB_SHORTCUT_SETTINGS_ORDER"
     }
 }

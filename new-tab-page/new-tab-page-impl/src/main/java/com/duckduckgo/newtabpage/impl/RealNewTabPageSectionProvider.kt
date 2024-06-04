@@ -43,35 +43,39 @@ class RealNewTabPageSectionProvider @Inject constructor(
         // store can be empty the first time we check it, so we make sure the content is initialised
         val sectionSettingsPlugins = newTabSectionsSettingsPlugins.getPlugins().filter { it.isActive() }
         if (sectionSettingsPlugins.isNotEmpty()) {
-            if (newTabSettingsStore.settings.isEmpty()) {
+            if (newTabSettingsStore.sectionSettings.isEmpty()) {
                 val userSections = sectionSettingsPlugins.map { it.name }
                 logcat { "New Tab: User Sections initialised to $userSections" }
-                newTabSettingsStore.settings = userSections
+                newTabSettingsStore.sectionSettings = userSections
             } else {
                 // some new settings might have appeared, so we want to make sure they are stored
                 val sectionsToAdd = mutableListOf<String>()
                 val sectionsSetting = sectionSettingsPlugins.map { it.name }
-                val userSections = newTabSettingsStore.settings
+                val userSections = newTabSettingsStore.sectionSettings
                 sectionsSetting.forEach { section ->
                     if (userSections.find { it == section } == null) {
-                        // new setting not in user settings, we add it
+                        logcat { "New Tab: New Section found $section" }
                         sectionsToAdd.add(section)
                     }
                 }
 
-                newTabSettingsStore.settings = sectionsToAdd.plus(userSections)
+                if (sectionsToAdd.isNotEmpty()) {
+                    val updatedShortcuts = sectionsToAdd.plus(userSections)
+                    logcat { "New Tab: User Sections updated to $updatedShortcuts" }
+                    newTabSettingsStore.sectionSettings = updatedShortcuts
+                }
             }
         }
 
         val sections = mutableListOf<NewTabPageSectionPlugin>()
-        val enabledPlugins = newTabPageSections.getPlugins().filter { it.isUserEnabled() }.map { it }
+        val enabledPlugins = newTabPageSections.getPlugins().filter { it.isUserEnabled() }
 
         val rmfSection = enabledPlugins.find { it.name == NewTabPageSection.REMOTE_MESSAGING_FRAMEWORK.name }
         if (rmfSection != null) {
             sections.add(rmfSection)
         }
 
-        newTabSettingsStore.settings.forEach { userSetting ->
+        newTabSettingsStore.sectionSettings.forEach { userSetting ->
             val sectionPlugin = enabledPlugins.find { it.name == userSetting }
             if (sectionPlugin != null) {
                 sections.add(sectionPlugin)

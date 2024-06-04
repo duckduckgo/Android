@@ -41,7 +41,7 @@ class RealNewTabPageSectionSettingsProvider @Inject constructor(
         val plugins = mutableListOf<NewTabPageSectionSettingsPlugin>()
         val sectionSettingsPlugins = newTabSectionsSettingsPlugins.getPlugins().filter { it.isActive() }
         val sections = newTabSectionsPlugins.getPlugins()
-        val userSections = newTabSettingsStore.settings
+        val userSections = newTabSettingsStore.sectionSettings
 
         userSections.forEach { section ->
             val sectionPlugin = sections.find { it.name == section }

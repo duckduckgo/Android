@@ -24,10 +24,12 @@ import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.newtabpage.api.NewTabPageShortcutPlugin
 import com.duckduckgo.newtabpage.api.NewTabShortcut
+import com.duckduckgo.newtabpage.impl.settings.NewTabSettingsStore
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import logcat.logcat
 
 interface NewTabShortcutsProvider {
     fun provideShortcuts(): Flow<List<NewTabPageShortcutPlugin>>
@@ -37,10 +39,47 @@ interface NewTabShortcutsProvider {
     scope = AppScope::class,
 )
 class RealNewTabPageShortcutProvider @Inject constructor(
-    private val newTabPageSections: ActivePluginPoint<NewTabPageShortcutPlugin>,
+    private val shortcutPlugins: ActivePluginPoint<NewTabPageShortcutPlugin>,
+    private val newTabSettingsStore: NewTabSettingsStore,
 ) : NewTabShortcutsProvider {
     override fun provideShortcuts(): Flow<List<NewTabPageShortcutPlugin>> = flow {
-        emit(newTabPageSections.getPlugins().map { it })
+        // store can be empty the first time we check it, so we make sure the content is initialised
+        val plugins = shortcutPlugins.getPlugins()
+        if (plugins.isNotEmpty()) {
+            if (newTabSettingsStore.shortcutSettings.isEmpty()) {
+                val userShortcuts = plugins.map { it.getShortcut().name }
+                logcat { "New Tab: User Shortcuts initialised to $userShortcuts" }
+                newTabSettingsStore.shortcutSettings = userShortcuts
+            } else {
+                // some new shortcuts might have appeared, so we want to make sure they are stored
+                val sectionsToAdd = mutableListOf<String>()
+                val sectionsSetting = plugins.map { it.getShortcut().name }
+                val userShortcuts = newTabSettingsStore.shortcutSettings
+                sectionsSetting.forEach { section ->
+                    if (userShortcuts.find { it == section } == null) {
+                        logcat { "New Tab: New Shortcuts found $section" }
+                        sectionsToAdd.add(section)
+                    }
+                }
+
+                if (sectionsToAdd.isNotEmpty()) {
+                    val updatedShortcuts = sectionsToAdd.plus(userShortcuts)
+                    logcat { "New Tab: User Shortcuts updated to $updatedShortcuts" }
+                    newTabSettingsStore.shortcutSettings = sectionsToAdd.plus(updatedShortcuts)
+                }
+            }
+        }
+
+        val shortcuts = mutableListOf<NewTabPageShortcutPlugin>()
+
+        newTabSettingsStore.shortcutSettings.forEach { userSetting ->
+            val shortcutPlugin = plugins.find { it.getShortcut().name == userSetting }
+            if (shortcutPlugin != null) {
+                shortcuts.add(shortcutPlugin)
+            }
+        }
+
+        emit(shortcuts)
     }
 }
 
