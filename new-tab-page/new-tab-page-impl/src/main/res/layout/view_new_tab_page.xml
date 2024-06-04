@@ -91,6 +91,19 @@
         android:orientation="vertical"
         android:visibility="gone" />
 
+    <ImageView
+        android:id="@+id/ddgLogo"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/homeTabDdgLogoTopMargin"
+        android:contentDescription="@string/top_app_bar_label_title"
+        android:maxWidth="180dp"
+        android:maxHeight="180dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="@dimen/keyline_4"
+        app:srcCompat="@drawable/logo_full" />
+
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/newTabEdit"
         android:layout_width="wrap_content"

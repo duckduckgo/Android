@@ -45,6 +45,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParam
 import com.duckduckgo.newtabpage.api.NewTabPageSection
 import com.duckduckgo.newtabpage.api.NewTabPageSectionPlugin
 import com.duckduckgo.remote.messaging.api.RemoteMessage
+import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import com.duckduckgo.remote.messaging.impl.R
 import com.duckduckgo.remote.messaging.impl.databinding.ViewRemoteMessageBinding
 import com.duckduckgo.remote.messaging.impl.mappers.asMessage
@@ -62,8 +63,10 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 
 @InjectWith(ViewScope::class)
@@ -215,7 +218,9 @@ class RemoteMessageView @JvmOverloads constructor(
     boundType = NewTabPageSectionPlugin::class,
     priority = 1,
 )
-class RemoteMessageNewTabSectionPlugin @Inject constructor() : NewTabPageSectionPlugin {
+class RemoteMessageNewTabSectionPlugin @Inject constructor(
+    private val remoteMessageModel: RemoteMessageModel,
+) : NewTabPageSectionPlugin {
     override val name = NewTabPageSection.REMOTE_MESSAGING_FRAMEWORK.name
 
     override fun getView(context: Context): View {
@@ -224,6 +229,14 @@ class RemoteMessageNewTabSectionPlugin @Inject constructor() : NewTabPageSection
 
     // this plugin is always enabled
     override suspend fun isUserEnabled(): Boolean {
-        return true
+        var hasMessage = false
+        runBlocking {
+            remoteMessageModel.getActiveMessages().collectLatest { message ->
+                Timber.d("New Tab: RMF isUserEnabled $message")
+                hasMessage = message != null
+            }
+        }
+
+        return hasMessage
     }
 }
