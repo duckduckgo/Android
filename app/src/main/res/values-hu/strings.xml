@@ -843,10 +843,14 @@
     <string name="preOnboardingDaxDialog3Button">Böngészés indítása</string>
     <string name="onboardingSearchDaxDialogTitle">Keress rá!</string>
     <string name="onboardingSearchDaxDialogDescription">A DuckDuckGo-kereséseid mindig névtelenek.</string>
-    <string name="onboardingSearchDaxDialogOption1">hogyan mondják spanyolul, hogy „kacsa”</string>
-    <string name="onboardingSearchDaxDialogOption2">kerge kacsák szereposztása</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">hogyan mondják angolul, hogy „kacsa”</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">hogyan mondják spanyolul, hogy „kacsa”</string>
+    <string name="onboardingSearchQueryOption1">hogyan mondják angolul, hogy kacsa</string>
+    <string name="onboardingSearchQueryOption1English">hogyan mondják spanyolul, hogy kacsa</string>
+    <string name="onboardingSearchDaxDialogOption2">avatar szereposztása</string>
     <string name="onboardingSearchDaxDialogOption3">helyi időjárás</string>
     <string name="onboardingSearchDaxDialogOption4">Lepj meg!</string>
+    <string name="onboardingSearchQueryOption4">vacsorareceptek</string>
     <string name="onboardingSitesDaxDialogTitle">Próbálj meg ellátogatni egy webhelyre!</string>
     <string name="onboardingSitesDaxDialogDescription">Én blokkolom a nyomkövetőket, hogy ne tudjanak kémkedni utánad.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
@@ -868,5 +872,6 @@
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Töröld azonnal böngészési tevékenységedet a <b>Fire Button</b> használatával.<br/><br/>Próbáld ki! ☝️️]]></string>
     <string name="onboardingEndDaxDialogTitle">"Megvan, ez az!"</string>
     <string name="onboardingEndDaxDialogDescription">Ne feledd: minden alkalommal, amikor velem böngészel, egy undok hirdetés elveszíti az erejét. 👌</string>
+    <string name="onboardingEndDaxDialogButton">Minden kész!</string>
 
 </resources>

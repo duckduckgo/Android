@@ -853,10 +853,14 @@
     <string name="preOnboardingDaxDialog3Button">Začnite prehliadať</string>
     <string name="onboardingSearchDaxDialogTitle">Skúste vyhľadávanie!</string>
     <string name="onboardingSearchDaxDialogDescription">Vyhľadávania v službe DuckDuckGo sú vždy anonymné.</string>
-    <string name="onboardingSearchDaxDialogOption1">ako sa povie „kačica“ po španielsky</string>
-    <string name="onboardingSearchDaxDialogOption2">mocné kačice obsadenie</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">ako sa povie „kačica“ po anglicky</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">ako sa povie „kačica“ po španielsky</string>
+    <string name="onboardingSearchQueryOption1">ako sa povie „kačica“ po anglicky</string>
+    <string name="onboardingSearchQueryOption1English">ako sa povie „kačica“ po španielsky</string>
+    <string name="onboardingSearchDaxDialogOption2">obsadenie avatara</string>
     <string name="onboardingSearchDaxDialogOption3">Miestne počasie</string>
     <string name="onboardingSearchDaxDialogOption4">Prekvapte ma!</string>
+    <string name="onboardingSearchQueryOption4">Recepty na večeru</string>
     <string name="onboardingSitesDaxDialogTitle">Skúste navštíviť stránku!</string>
     <string name="onboardingSitesDaxDialogDescription">Zablokujem sledovacie zariadenia, ktoré by vás mohli špehovať.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
@@ -882,5 +886,6 @@
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Okamžite vymažte svoju aktivitu pri prehliadaní pomocou <b>Fire Button</b>.<br/><br/>Skúste to! ☝️️]]></string>
     <string name="onboardingEndDaxDialogTitle">"Hotovo!"</string>
     <string name="onboardingEndDaxDialogDescription">Pamätajte: zakaždým, keď prehliadate v našej aplikácii, tak čudným reklamám pristrihávate krídla. 👌</string>
+    <string name="onboardingEndDaxDialogButton">Všetko je hotové!</string>
 
 </resources>

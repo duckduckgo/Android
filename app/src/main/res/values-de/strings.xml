@@ -843,10 +843,14 @@
     <string name="preOnboardingDaxDialog3Button">Mit dem Browsen beginnen</string>
     <string name="onboardingSearchDaxDialogTitle">Suche ausprobieren!</string>
     <string name="onboardingSearchDaxDialogDescription">Deine DuckDuckGo-Suchanfragen sind immer anonym.</string>
-    <string name="onboardingSearchDaxDialogOption1">wie sagt man „Ente“ auf Spanisch</string>
-    <string name="onboardingSearchDaxDialogOption2">Besetzung von Mighty Ducks</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">wie sagt man „Ente“ auf Englisch</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">wie sagt man „Ente“ auf Spanisch</string>
+    <string name="onboardingSearchQueryOption1">wie sagt man Ente auf Englisch</string>
+    <string name="onboardingSearchQueryOption1English">wie sagt man „Ente“ auf Spanisch</string>
+    <string name="onboardingSearchDaxDialogOption2">Besetzung von Avatar</string>
     <string name="onboardingSearchDaxDialogOption3">Lokales Wetter</string>
     <string name="onboardingSearchDaxDialogOption4">Überrasche mich!</string>
+    <string name="onboardingSearchQueryOption4">Dinner-Rezepte</string>
     <string name="onboardingSitesDaxDialogTitle">Versuche, eine Website zu besuchen!</string>
     <string name="onboardingSitesDaxDialogDescription">Ich blockiere Tracker, damit sie dich nicht ausspionieren können.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
@@ -868,5 +872,6 @@
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Lösche deine Browseraktivitäten sofort mit dem <b>Fire Button</b>.<br/><br/>Versuch es doch mal! ☝️️]]></string>
     <string name="onboardingEndDaxDialogTitle">"Du schaffst das!"</string>
     <string name="onboardingEndDaxDialogDescription">Hinweis: Jedes Mal, wenn du mit mir browst, verliert eine gruselige Anzeige ihren Schrecken. 👌</string>
+    <string name="onboardingEndDaxDialogButton">Alles erledigt!</string>
 
 </resources>

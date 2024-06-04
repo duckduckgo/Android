@@ -66,7 +66,7 @@ import com.duckduckgo.app.browser.camera.CameraHardwareChecker
 import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
 import com.duckduckgo.app.browser.certificates.remoteconfig.SSLCertificatesFeature
 import com.duckduckgo.app.browser.commands.Command
-import com.duckduckgo.app.browser.commands.Command.HideExperimentOnboardingDialog
+import com.duckduckgo.app.browser.commands.Command.HideOnboardingDaxDialog
 import com.duckduckgo.app.browser.commands.Command.LaunchPrivacyPro
 import com.duckduckgo.app.browser.commands.Command.LoadExtractedUrl
 import com.duckduckgo.app.browser.commands.Command.ShowBackNavigationHistory
@@ -104,10 +104,8 @@ import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
-import com.duckduckgo.app.cta.ui.DaxDialogCta
-import com.duckduckgo.app.cta.ui.ExperimentDaxBubbleOptionsCta
-import com.duckduckgo.app.cta.ui.ExperimentOnboardingDaxDialogCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
+import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryImpl
@@ -126,8 +124,8 @@ import com.duckduckgo.app.location.data.LocationPermissionsRepositoryImpl
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
-import com.duckduckgo.app.onboarding.ui.page.experiment.ExtendedOnboardingExperimentVariantManager
-import com.duckduckgo.app.onboarding.ui.page.experiment.OnboardingExperimentPixel
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.OnboardingExperimentPixel
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
@@ -443,7 +441,7 @@ class BrowserTabViewModelTest {
 
     private val androidBrowserConfig: AndroidBrowserConfigFeature = mock()
 
-    private val mockToggle: Toggle = mock()
+    private val mockEnabledToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
 
     private val mockPrivacyProtectionsPopupManager: PrivacyProtectionsPopupManager = mock()
 
@@ -458,7 +456,7 @@ class BrowserTabViewModelTest {
     private val mockFaviconFetchingPrompt: FaviconsFetchingPrompt = mock()
     private val mockSSLCertificatesFeature: SSLCertificatesFeature = mock()
     private val mockBypassedSSLCertificatesRepository: BypassedSSLCertificatesRepository = mock()
-    private val mockExtendedOnboardingExperimentVariantManager: ExtendedOnboardingExperimentVariantManager = mock()
+    private val mockExtendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles = mock()
     private val mockUserBrowserProperties: UserBrowserProperties = mock()
 
     @Before
@@ -485,9 +483,9 @@ class BrowserTabViewModelTest {
         whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(bookmarksListFlow.consumeAsFlow())
         whenever(mockRemoteMessagingRepository.messageFlow()).thenReturn(remoteMessageFlow.consumeAsFlow())
         whenever(mockSettingsDataStore.automaticFireproofSetting).thenReturn(AutomaticFireproofSetting.ASK_EVERY_TIME)
-        whenever(androidBrowserConfig.screenLock()).thenReturn(mockToggle)
-        whenever(mockSSLCertificatesFeature.allowBypass()).thenReturn(mockToggle)
-        whenever(mockExtendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()).thenReturn(false)
+        whenever(androidBrowserConfig.screenLock()).thenReturn(mockEnabledToggle)
+        whenever(mockSSLCertificatesFeature.allowBypass()).thenReturn(mockEnabledToggle)
+        whenever(mockExtendedOnboardingFeatureToggles.aestheticUpdates()).thenReturn(mockEnabledToggle)
         whenever(subscriptions.shouldLaunchPrivacyProForUrl(any())).thenReturn(false)
 
         remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
@@ -505,7 +503,7 @@ class BrowserTabViewModelTest {
             dispatchers = coroutineRule.testDispatcherProvider,
             duckDuckGoUrlDetector = DuckDuckGoUrlDetectorImpl(),
             surveyRepository = mockSurveyRepository,
-            extendedOnboardingExperimentVariantManager = mockExtendedOnboardingExperimentVariantManager,
+            extendedOnboardingFeatureToggles = mockExtendedOnboardingFeatureToggles,
         )
 
         val siteFactory = SiteFactoryImpl(
@@ -597,7 +595,7 @@ class BrowserTabViewModelTest {
             subscriptions = subscriptions,
             sslCertificatesFeature = mockSSLCertificatesFeature,
             bypassedSSLCertificatesRepository = mockBypassedSSLCertificatesRepository,
-            extendedOnboardingExperimentVariantManager = mockExtendedOnboardingExperimentVariantManager,
+            extendedOnboardingFeatureToggles = mockExtendedOnboardingFeatureToggles,
             userBrowserProperties = mockUserBrowserProperties,
         )
 
@@ -2345,7 +2343,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenRegisterDaxBubbleCtaDismissedThenRegisterInDatabase() = runTest {
-        val cta = DaxBubbleCta.DaxIntroCta(mockOnboardingStore, mockAppInstallStore)
+        val cta = DaxBubbleCta.DaxIntroSearchOptionsCta(mockOnboardingStore, mockAppInstallStore)
         testee.ctaViewState.value = CtaViewState(cta = cta)
 
         testee.registerDaxBubbleCtaDismissed()
@@ -2354,7 +2352,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenRegisterDaxBubbleCtaDismissedThenCtaChangedToNull() = runTest {
-        val cta = DaxBubbleCta.DaxIntroCta(mockOnboardingStore, mockAppInstallStore)
+        val cta = DaxBubbleCta.DaxIntroSearchOptionsCta(mockOnboardingStore, mockAppInstallStore)
         testee.ctaViewState.value = CtaViewState(cta = cta)
 
         testee.registerDaxBubbleCtaDismissed()
@@ -2371,7 +2369,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserClickedCtaButtonThenFirePixel() {
-        val cta = DaxBubbleCta.DaxIntroCta(mockOnboardingStore, mockAppInstallStore)
+        val cta = DaxBubbleCta.DaxIntroSearchOptionsCta(mockOnboardingStore, mockAppInstallStore)
         setCta(cta)
         testee.onUserClickCtaOkButton()
         verify(mockPixel).fire(cta.okPixel!!, cta.pixelOkParameters())
@@ -2429,32 +2427,6 @@ class BrowserTabViewModelTest {
         setCta(cta)
         testee.onUserDismissedCta()
         verify(mockPixel).fire(cta.cancelPixel!!, cta.pixelCancelParameters())
-    }
-
-    @Test
-    fun whenUserClickedHideDaxDialogThenHideDaxDialogCommandSent() {
-        val cta = DaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore)
-        setCta(cta)
-        testee.onUserHideDaxDialog()
-        val command = captureCommands().lastValue
-        assertTrue(command is Command.DaxCommand.HideDaxDialog)
-    }
-
-    @Test
-    fun whenUserDismissDaxTrackersBlockedDialogThenFinishTrackerAnimationCommandSent() {
-        val cta = DaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList(), "")
-        setCta(cta)
-        testee.onDaxDialogDismissed()
-        val command = captureCommands().lastValue
-        assertTrue(command is Command.DaxCommand.FinishPartialTrackerAnimation)
-    }
-
-    @Test
-    fun whenUserDismissDifferentThanDaxTrackersBlockedDialogThenFinishTrackerAnimationCommandNotSent() {
-        val cta = DaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore)
-        setCta(cta)
-        testee.onDaxDialogDismissed()
-        assertCommandNotIssued<Command.DaxCommand.FinishPartialTrackerAnimation>()
     }
 
     @Test
@@ -4881,14 +4853,14 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenProcessJsCallbackMessageScreenLockNotEnabledDoNotSendCommand() = runTest {
-        whenever(mockToggle.isEnabled()).thenReturn(false)
+        whenever(mockEnabledToggle.isEnabled()).thenReturn(false)
         testee.processJsCallbackMessage("myFeature", "screenLock", "myId", JSONObject("""{ "my":"object"}"""))
         assertCommandNotIssued<Command.ScreenLock>()
     }
 
     @Test
     fun whenProcessJsCallbackMessageScreenLockEnabledSendCommand() = runTest {
-        whenever(mockToggle.isEnabled()).thenReturn(true)
+        whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
         testee.processJsCallbackMessage("myFeature", "screenLock", "myId", JSONObject("""{ "my":"object"}"""))
         assertCommandIssued<Command.ScreenLock> {
             assertEquals("object", this.data.params.getString("my"))
@@ -4900,14 +4872,14 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenProcessJsCallbackMessageScreenUnlockNotEnabledDoNotSendCommand() = runTest {
-        whenever(mockToggle.isEnabled()).thenReturn(false)
+        whenever(mockEnabledToggle.isEnabled()).thenReturn(false)
         testee.processJsCallbackMessage("myFeature", "screenUnlock", "myId", JSONObject("""{ "my":"object"}"""))
         assertCommandNotIssued<Command.ScreenUnlock>()
     }
 
     @Test
     fun whenProcessJsCallbackMessageScreenUnlockEnabledSendCommand() = runTest {
-        whenever(mockToggle.isEnabled()).thenReturn(true)
+        whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
         testee.processJsCallbackMessage("myFeature", "screenUnlock", "myId", JSONObject("""{ "my":"object"}"""))
         assertCommandIssued<Command.ScreenUnlock>()
     }
@@ -5075,7 +5047,7 @@ class BrowserTabViewModelTest {
     @Test
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     fun whenAllowBypassSSLCertificatesFeatureDisabledThenSSLCertificateErrorsAreIgnored() {
-        whenever(mockToggle.isEnabled()).thenReturn(false)
+        whenever(mockEnabledToggle.isEnabled()).thenReturn(false)
 
         val url = "http://example.com"
         givenCurrentSite(url)
@@ -5090,7 +5062,7 @@ class BrowserTabViewModelTest {
     @Test
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     fun whenSslCertificateIssueReceivedForLoadingSiteThenShowSslWarningCommandSentAndViewStatesUpdated() {
-        whenever(mockToggle.isEnabled()).thenReturn(true)
+        whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
 
         val url = "http://example.com"
         givenCurrentSite(url)
@@ -5111,7 +5083,7 @@ class BrowserTabViewModelTest {
     @Test
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     fun whenSslCertificateIssueReceivedForAnotherSiteThenShowSslWarningCommandNotSentAndViewStatesNotUpdated() {
-        whenever(mockToggle.isEnabled()).thenReturn(true)
+        whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
         val url = "http://example.com"
         givenCurrentSite(url)
 
@@ -5127,7 +5099,7 @@ class BrowserTabViewModelTest {
     @Test
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     fun whenInFreshStartAndSslCertificateIssueReceivedThenShowSslWarningCommandSentAndViewStatesUpdated() = runTest {
-        whenever(mockToggle.isEnabled()).thenReturn(true)
+        whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
         val url = "http://example.com"
         val site: Site = mock()
         whenever(site.url).thenReturn(url)
@@ -5196,7 +5168,7 @@ class BrowserTabViewModelTest {
     @Test
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     fun whenSslCertificateActionProceedThenPixelsFiredAndViewStatesUpdated() {
-        whenever(mockToggle.isEnabled()).thenReturn(true)
+        whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
         val url = "http://example.com"
         val certificate = aRSASslCertificate()
         val sslErrorResponse = SslErrorResponse(SslError(SslError.SSL_EXPIRED, certificate, url), EXPIRED, url)
@@ -5215,7 +5187,7 @@ class BrowserTabViewModelTest {
     @Test
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     fun whenWebViewRefreshedThenSSLErrorStateIsNone() {
-        whenever(mockToggle.isEnabled()).thenReturn(true)
+        whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
         val url = "http://example.com"
         val certificate = aRSASslCertificate()
         val sslErrorResponse = SslErrorResponse(SslError(SslError.SSL_EXPIRED, certificate, url), EXPIRED, url)
@@ -5230,7 +5202,7 @@ class BrowserTabViewModelTest {
     @Test
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     fun whenResetSSLErrorThenBrowserErrorStateIsLoading() {
-        whenever(mockToggle.isEnabled()).thenReturn(true)
+        whenever(mockEnabledToggle.isEnabled()).thenReturn(true)
         val url = "http://example.com"
         val certificate = aRSASslCertificate()
         val sslErrorResponse = SslErrorResponse(SslError(SslError.SSL_EXPIRED, certificate, url), EXPIRED, url)
@@ -5287,42 +5259,18 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnboardingExperimentEnabledThenSetBrowserBackgroundWithNewDrawable() = runTest {
-        whenever(mockExtendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()).thenReturn(true)
-
-        testee.configureBrowserBackground()
-
-        assertCommandIssued<Command.SetBrowserBackground> {
-            assertEquals(R.drawable.onboarding_experiment_background_bitmap, this.backgroundRes)
-        }
-    }
-
-    @Test
-    fun whenOnboardingExperimentDisabledThenSetBrowserBackgroundWithNoDrawable() = runTest {
-        whenever(mockExtendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()).thenReturn(false)
-
-        testee.configureBrowserBackground()
-
-        assertCommandIssued<Command.SetBrowserBackground> {
-            assertEquals(0, this.backgroundRes)
-        }
-    }
-
-    @Test
-    fun givenOnboardingExperimentEnabledWhenTrackersBlockedCtaShownThenPrivacyShieldIsHighlighted() = runTest {
-        whenever(mockExtendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()).thenReturn(true)
-        val cta = ExperimentOnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList())
+    fun whenTrackersBlockedCtaShownThenPrivacyShieldIsHighlighted() = runTest {
+        val cta = OnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList())
         testee.ctaViewState.value = ctaViewState().copy(cta = cta)
 
-        testee.onExperimentDaxTypingAnimationFinished()
+        testee.onOnboardingDaxTypingAnimationFinished()
 
         assertTrue(browserViewState().showPrivacyShield.isHighlighted())
     }
 
     @Test
-    fun givenOnboardingExperimentEnabledAndPrivacyShieldHighlightedWhenShieldIconSelectedThenStopPulse() = runTest {
-        whenever(mockExtendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()).thenReturn(true)
-        val cta = ExperimentOnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList())
+    fun givenPrivacyShieldHighlightedWhenShieldIconSelectedThenStopPulse() = runTest {
+        val cta = OnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList())
         testee.ctaViewState.value = ctaViewState().copy(cta = cta)
 
         testee.onPrivacyShieldSelected()
@@ -5330,9 +5278,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun givenOnboardingExperimentEnabledAndPrivacyShieldHighlightedWhenShieldIconSelectedThenSendPixel() = runTest {
+    fun givenPrivacyShieldHighlightedWhenShieldIconSelectedThenSendPixel() = runTest {
         whenever(mockUserBrowserProperties.daysSinceInstalled()).thenReturn(0)
-        whenever(mockExtendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()).thenReturn(true)
         testee.browserViewState.value = browserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = true))
         val testParams = mapOf("daysSinceInstall" to "0", "from_onboarding" to "true")
 
@@ -5341,33 +5288,31 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun givenOnboardingExperimentEnabledWhenUserDismissDaxTrackersBlockedDialogThenFinishPrivacyShieldPulse() {
-        val cta = ExperimentOnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList())
+    fun whenUserDismissDaxTrackersBlockedDialogThenFinishPrivacyShieldPulse() {
+        val cta = OnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList())
         setCta(cta)
 
-        testee.onDaxDialogDismissed()
+        testee.onUserDismissedCta()
         assertFalse(browserViewState().showPrivacyShield.isHighlighted())
     }
 
     @Test
-    fun givenOnboardingExperimentCtaShownWhenUserSubmittedQueryThenDismissCta() {
-        whenever(mockExtendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()).thenReturn(true)
+    fun givenOnboardingCtaShownWhenUserSubmittedQueryThenDismissCta() {
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
-        val cta = ExperimentOnboardingDaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore)
+        val cta = OnboardingDaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore)
         testee.ctaViewState.value = CtaViewState(cta = cta)
 
         testee.onUserSubmittedQuery("foo")
 
-        assertCommandIssued<HideExperimentOnboardingDialog> {
-            assertEquals(cta, this.experimentCta)
+        assertCommandIssued<HideOnboardingDaxDialog> {
+            assertEquals(cta, this.onboardingCta)
         }
     }
 
     @Test
     fun givenSuggestedSearchesDialogShownWhenUserSubmittedQueryThenCustomSearchPixelIsSent() {
-        whenever(mockExtendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()).thenReturn(true)
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
-        val cta = ExperimentDaxBubbleOptionsCta.ExperimentDaxIntroSearchOptionsCta(mockOnboardingStore, mockAppInstallStore)
+        val cta = DaxBubbleCta.DaxIntroSearchOptionsCta(mockOnboardingStore, mockAppInstallStore)
         testee.ctaViewState.value = CtaViewState(cta = cta)
 
         testee.onUserSubmittedQuery("foo")
@@ -5376,21 +5321,9 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun givenSuggestedSearchesDialogShownWhenUserSubmittedQueryDifferentFromOptionsThenPixelIsNotSent() {
-        whenever(mockOmnibarConverter.convertQueryToUrl("mighty ducks cast", null)).thenReturn("mighty ducks cast")
-        val cta = ExperimentDaxBubbleOptionsCta.ExperimentDaxIntroSearchOptionsCta(mockOnboardingStore, mockAppInstallStore)
-        testee.ctaViewState.value = CtaViewState(cta = cta)
-
-        testee.onUserSubmittedQuery("mighty ducks cast")
-
-        verify(mockPixel, never()).fire(OnboardingExperimentPixel.PixelName.ONBOARDING_SEARCH_CUSTOM)
-    }
-
-    @Test
     fun givenSuggestedSitesDialogShownWhenUserSubmittedQueryThenCustomSitePixelIsSent() {
-        whenever(mockExtendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()).thenReturn(true)
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
-        val cta = ExperimentDaxBubbleOptionsCta.ExperimentDaxIntroVisitSiteOptionsCta(mockOnboardingStore, mockAppInstallStore)
+        val cta = DaxBubbleCta.DaxIntroVisitSiteOptionsCta(mockOnboardingStore, mockAppInstallStore)
         testee.ctaViewState.value = CtaViewState(cta = cta)
 
         testee.onUserSubmittedQuery("foo")

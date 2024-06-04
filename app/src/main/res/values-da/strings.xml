@@ -843,10 +843,14 @@
     <string name="preOnboardingDaxDialog3Button">Start søgning</string>
     <string name="onboardingSearchDaxDialogTitle">Prøv at søge!</string>
     <string name="onboardingSearchDaxDialogDescription">Dine DuckDuckGo-søgninger er altid anonyme.</string>
-    <string name="onboardingSearchDaxDialogOption1">hvordan siger man \"and\" på spansk</string>
-    <string name="onboardingSearchDaxDialogOption2">mighty ducks film</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">hvordan siger man \"and\" på engelsk</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">hvordan siger man \"and\" på spansk</string>
+    <string name="onboardingSearchQueryOption1">hvordan siger man and på engelsk</string>
+    <string name="onboardingSearchQueryOption1English">hvordan siger man \"and\" på spansk</string>
+    <string name="onboardingSearchDaxDialogOption2">skuespillere i avatar</string>
     <string name="onboardingSearchDaxDialogOption3">lokalt vejr</string>
     <string name="onboardingSearchDaxDialogOption4">Overrask mig!</string>
+    <string name="onboardingSearchQueryOption4">middagsopskrifter</string>
     <string name="onboardingSitesDaxDialogTitle">Prøv at besøge en hjemmeside!</string>
     <string name="onboardingSitesDaxDialogDescription">Jeg blokerer trackere, så de ikke kan udspionere dig.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
@@ -868,5 +872,6 @@
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Ryd øjeblikkeligt din browseraktivitet med <b>Fire Button</b>.<br/><br/>Prøv det! ☝️️]]></string>
     <string name="onboardingEndDaxDialogTitle">"Du har forstået det!"</string>
     <string name="onboardingEndDaxDialogDescription">Husk: hver gang du browser med mig, mister en uhyggelig annonce sine vinger. 👌</string>
+    <string name="onboardingEndDaxDialogButton">Helt færdig!</string>
 
 </resources>

@@ -126,7 +126,6 @@
     <string name="saveLoginDialogSubtitle">Heslá sú zabezpečeným spôsobom uložené vo vašom zariadení.</string>
     <string name="autofillManagementAddLogin">Pridať heslo</string>
     <string name="credentialManagementEditLoginTitleHint">Názov</string>
-    <string name="autofillDeleteLoginDialogTitle">Naozaj chcete odstrániť toto heslo?</string>
     <string name="autofillManagementDeletedConfirmation">Heslo bolo odstránené</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Naposledy aktualizované %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">Chcete pokračovať v ukladaní hesiel?</string>
@@ -152,15 +151,6 @@
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Zrušiť</string>
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Odstránenie všetkých hesiel</string>
-    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
-        <item quantity="one">Naozaj chcete odstrániť %1$d heslo?</item>
-        <item quantity="few">Naozaj chcete odstrániť %1$d heslá?</item>
-        <item quantity="many">Naozaj chcete odstrániť %1$d hesla?</item>
-        <item quantity="other">Naozaj chcete odstrániť %1$d hesiel?</item>
-    </plurals>
-
-    <string name="credentialManagementDeletePasswordConfirmationMessage">Vaše heslo sa odstráni zo všetkých synchronizovaných zariadení. Zabezpečte si prístup k svojmu účtu.</string>
-    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Vaše heslá sa odstránia zo všetkých synchronizovaných zariadení. Zabezpečte si prístup k svojim účtom.</string>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
         <item quantity="one">Bolo odstránené %1$d heslo</item>

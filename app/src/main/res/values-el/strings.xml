@@ -843,10 +843,14 @@
     <string name="preOnboardingDaxDialog3Button">Έναρξη περιήγησης</string>
     <string name="onboardingSearchDaxDialogTitle">Δοκίμασε μια αναζήτηση!</string>
     <string name="onboardingSearchDaxDialogDescription">Οι αναζητήσεις σας στο DuckDuckGo είναι πάντα ανώνυμες.</string>
-    <string name="onboardingSearchDaxDialogOption1">πώς μπορείτε να πείτε «duck» στα ισπανικά</string>
-    <string name="onboardingSearchDaxDialogOption2">Mighty Ducks Cast</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">πώς να πείτε «πάπια» στα αγγλικά</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">πώς μπορείτε να πείτε «duck» στα ισπανικά</string>
+    <string name="onboardingSearchQueryOption1">πώς να πείτε πάπια στα αγγλικά</string>
+    <string name="onboardingSearchQueryOption1English">πώς μπορείτε να πείτε πάπια στα ισπανικά</string>
+    <string name="onboardingSearchDaxDialogOption2">οι ηθοποιοί του avatar</string>
     <string name="onboardingSearchDaxDialogOption3">τοπικός καιρός</string>
     <string name="onboardingSearchDaxDialogOption4">Κάνε μου έκπληξη!</string>
+    <string name="onboardingSearchQueryOption4">συνταγές για δείπνο</string>
     <string name="onboardingSitesDaxDialogTitle">Δοκιμάστε να επισκεφτείτε έναν ιστότοπο!</string>
     <string name="onboardingSitesDaxDialogDescription">Θα εμποδίσω τις εφαρμογές παρακολούθησης ώστε να μην μπορούν να σας κατασκοπεύουν.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
@@ -868,5 +872,6 @@
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Διαγράψτε άμεσα τη δραστηριότητα περιήγησής σας με το <b>Fire Button</b>.<br/><br/>Δοκιμάστε το! ☝️️]]></string>
     <string name="onboardingEndDaxDialogTitle">"Το έχετε!"</string>
     <string name="onboardingEndDaxDialogDescription">Να θυμάστε: κάθε φορά που περιηγείστε μαζί μου, μια ανατριχιαστική διαφήμιση χάνει τη δύναμή της! 👌</string>
+    <string name="onboardingEndDaxDialogButton">Όλα έτοιμα!</string>
 
 </resources>

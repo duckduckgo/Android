@@ -27,19 +27,11 @@
         android:visibility="gone"
         app:lottie_loop="false" />
 
-    <LinearLayout
+    <FrameLayout
         android:id="@+id/fireDialogRootView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:orientation="vertical">
-
-        <ViewStub
-            android:id="@+id/fireCtaViewStub"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            android:layout="@layout/include_dax_dialog_cta" />
+        android:layout_gravity="bottom">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -65,5 +57,5 @@
                 app:primaryText="@string/fireCancel" />
 
         </LinearLayout>
-    </LinearLayout>
+    </FrameLayout>
 </FrameLayout>

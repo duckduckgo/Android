@@ -25,14 +25,8 @@ import android.provider.Settings
 import android.provider.Settings.Global.ANIMATOR_DURATION_SCALE
 import android.view.LayoutInflater
 import androidx.core.content.ContextCompat
-import androidx.core.view.doOnDetach
-import androidx.core.view.isVisible
-import androidx.lifecycle.lifecycleScope
 import com.airbnb.lottie.RenderMode
-import com.duckduckgo.app.browser.databinding.IncludeDaxDialogCtaBinding
 import com.duckduckgo.app.browser.databinding.SheetFireClearDataBinding
-import com.duckduckgo.app.cta.ui.CtaViewModel
-import com.duckduckgo.app.cta.ui.DaxFireDialogCta
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.view.FireDialog.FireDialogClearAllEvent.AnimationFinished
@@ -58,7 +52,6 @@ private const val ANIMATION_SPEED_INCREMENT = 0.15f
 @SuppressLint("NoBottomSheetDialog")
 class FireDialog(
     context: Context,
-    private val ctaViewModel: CtaViewModel,
     private val clearPersonalDataAction: ClearDataAction,
     private val pixel: Pixel,
     private val settingsDataStore: SettingsDataStore,
@@ -68,11 +61,8 @@ class FireDialog(
 ) : BottomSheetDialog(context, com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_FireDialog) {
 
     private lateinit var binding: SheetFireClearDataBinding
-    private lateinit var fireCtaBinding: IncludeDaxDialogCtaBinding
 
     var clearStarted: (() -> Unit) = {}
-    val ctaVisible: Boolean
-        get() = if (this::fireCtaBinding.isInitialized) fireCtaBinding.daxCtaContainer.isVisible else false
 
     private val accelerateAnimatorUpdateListener = object : ValueAnimator.AnimatorUpdateListener {
         override fun onAnimationUpdate(animation: ValueAnimator) {
@@ -88,20 +78,12 @@ class FireDialog(
     init {
         val inflater = LayoutInflater.from(context)
         binding = SheetFireClearDataBinding.inflate(inflater)
-        binding.fireCtaViewStub.setOnInflateListener { _, inflated ->
-            fireCtaBinding = IncludeDaxDialogCtaBinding.bind(inflated)
-        }
         setContentView(binding.root)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        lifecycleScope.launch {
-            ctaViewModel.getFireDialogCta()?.let {
-                configureFireDialogCta(it)
-            }
-        }
         binding.clearAllOption.setOnClickListener {
             onClearOptionClicked()
         }
@@ -126,22 +108,8 @@ class FireDialog(
         binding.fireAnimationView.enableMergePathsForKitKatAndAbove(true)
     }
 
-    private fun configureFireDialogCta(cta: DaxFireDialogCta) {
-        binding.fireCtaViewStub.inflate()
-        cta.showCta(fireCtaBinding.daxCtaContainer)
-        ctaViewModel.onCtaShown(cta)
-        onClearDataOptionsDismissed = {
-            appCoroutineScope.launch(dispatcherProvider.io()) {
-                ctaViewModel.onUserDismissedCta(cta)
-            }
-        }
-        fireCtaBinding.daxCtaContainer.doOnDetach {
-            onClearDataOptionsDismissed()
-        }
-    }
-
     private fun onClearOptionClicked() {
-        pixel.enqueueFire(if (ctaVisible) FIRE_DIALOG_PROMOTED_CLEAR_PRESSED else FIRE_DIALOG_CLEAR_PRESSED)
+        pixel.enqueueFire(FIRE_DIALOG_CLEAR_PRESSED)
         pixel.enqueueFire(
             pixel = FIRE_DIALOG_ANIMATION,
             parameters = mapOf(FIRE_ANIMATION to settingsDataStore.selectedFireAnimation.getPixelValue()),

@@ -18,7 +18,6 @@ package com.duckduckgo.app.onboarding.ui
 
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
-import com.duckduckgo.app.onboarding.ui.page.experiment.ExtendedOnboardingExperimentVariantManager
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -34,7 +33,6 @@ class OnboardingPageManagerPageCountTest(private val testCase: TestCase) {
     private val onboardingPageBuilder: OnboardingPageBuilder = mock()
     private val mockDefaultBrowserDetector: DefaultBrowserDetector = mock()
     private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog = mock()
-    private val mockExtendedOnboardingExperimentVariantManager: ExtendedOnboardingExperimentVariantManager = mock()
 
     @Before
     fun setup() {
@@ -42,7 +40,6 @@ class OnboardingPageManagerPageCountTest(private val testCase: TestCase) {
             defaultRoleBrowserDialog,
             onboardingPageBuilder,
             mockDefaultBrowserDetector,
-            mockExtendedOnboardingExperimentVariantManager,
         )
     }
 

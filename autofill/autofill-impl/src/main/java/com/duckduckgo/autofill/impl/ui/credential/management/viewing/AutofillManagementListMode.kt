@@ -69,6 +69,7 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.R as CommonR
 import javax.inject.Inject
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @InjectWith(FragmentScope::class)
 class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill_management_list_mode) {
@@ -99,6 +100,9 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
 
     @Inject
     lateinit var deviceAuthenticator: DeviceAuthenticator
+
+    @Inject
+    lateinit var stringBuilder: AutofillManagementStringBuilder
 
     val viewModel by lazy {
         ViewModelProvider(requireActivity(), viewModelFactory)[AutofillSettingsViewModel::class.java]
@@ -350,61 +354,54 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
 
     private fun launchDeleteLoginConfirmationDialog(loginCredentials: LoginCredentials) {
         this.context?.let {
-            TextAlertDialogBuilder(it)
-                .setTitle(R.string.autofillDeleteLoginDialogTitle)
-                .setMessage(R.string.credentialManagementDeletePasswordConfirmationMessage)
-                .setDestructiveButtons(true)
-                .setPositiveButton(R.string.autofillDeleteLoginDialogDelete)
-                .setNegativeButton(R.string.autofillDeleteLoginDialogCancel)
-                .addEventListener(
-                    object : TextAlertDialogBuilder.EventListener() {
-                        override fun onPositiveButtonClicked() {
-                            viewModel.onDeleteCredentials(loginCredentials)
-                        }
-                    },
-                )
-                .show()
+            lifecycleScope.launch(dispatchers.io()) {
+                val dialogTitle = stringBuilder.stringForDeletePasswordDialogConfirmationTitle(numberToDelete = 1)
+                val dialogMessage = stringBuilder.stringForDeletePasswordDialogConfirmationMessage(numberToDelete = 1)
+
+                withContext(dispatchers.main()) {
+                    TextAlertDialogBuilder(it)
+                        .setTitle(dialogTitle)
+                        .setMessage(dialogMessage)
+                        .setDestructiveButtons(true)
+                        .setPositiveButton(R.string.autofillDeleteLoginDialogDelete)
+                        .setNegativeButton(R.string.autofillDeleteLoginDialogCancel)
+                        .addEventListener(
+                            object : TextAlertDialogBuilder.EventListener() {
+                                override fun onPositiveButtonClicked() {
+                                    viewModel.onDeleteCredentials(loginCredentials)
+                                }
+                            },
+                        )
+                        .show()
+                }
+            }
         }
     }
 
     private fun launchDeleteAllLoginsConfirmationDialog(numberToDelete: Int) {
-        val displayStrings = getDisplayStringsForDeletingAllLogins(numberToDelete)
-
         this.context?.let {
-            TextAlertDialogBuilder(it)
-                .setTitle(displayStrings.first)
-                .setMessage(displayStrings.second)
-                .setDestructiveButtons(true)
-                .setPositiveButton(R.string.autofillDeleteLoginDialogDelete)
-                .setNegativeButton(R.string.autofillDeleteLoginDialogCancel)
-                .setCancellable(true)
-                .addEventListener(
-                    object : TextAlertDialogBuilder.EventListener() {
-                        override fun onPositiveButtonClicked() {
-                            viewModel.onDeleteAllPasswordsConfirmed()
-                        }
-                    },
-                )
-                .show()
-        }
-    }
+            lifecycleScope.launch(dispatchers.io()) {
+                val dialogTitle = stringBuilder.stringForDeletePasswordDialogConfirmationTitle(numberToDelete)
+                val dialogMessage = stringBuilder.stringForDeletePasswordDialogConfirmationMessage(numberToDelete)
 
-    /**
-     * Returns a pair of strings for the title and message of the delete all logins confirmation dialog.
-     *
-     * The strings will change depending on if there is only one login to delete or multiple.
-     */
-    private fun getDisplayStringsForDeletingAllLogins(numberToDelete: Int): Pair<String, String> {
-        return if (numberToDelete == 1) {
-            Pair(
-                getString(R.string.autofillDeleteLoginDialogTitle),
-                getString(R.string.credentialManagementDeletePasswordConfirmationMessage),
-            )
-        } else {
-            Pair(
-                resources.getQuantityString(R.plurals.credentialManagementDeleteAllPasswordsConfirmationTitle, numberToDelete, numberToDelete),
-                getString(R.string.credentialManagementDeleteAllPasswordsConfirmationMessage),
-            )
+                withContext(dispatchers.main()) {
+                    TextAlertDialogBuilder(it)
+                        .setTitle(dialogTitle)
+                        .setMessage(dialogMessage)
+                        .setDestructiveButtons(true)
+                        .setPositiveButton(R.string.autofillDeleteLoginDialogDelete)
+                        .setNegativeButton(R.string.autofillDeleteLoginDialogCancel)
+                        .setCancellable(true)
+                        .addEventListener(
+                            object : TextAlertDialogBuilder.EventListener() {
+                                override fun onPositiveButtonClicked() {
+                                    viewModel.onDeleteAllPasswordsConfirmed()
+                                }
+                            },
+                        )
+                        .show()
+                }
+            }
         }
     }
 

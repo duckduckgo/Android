@@ -843,10 +843,14 @@
     <string name="preOnboardingDaxDialog3Button">Beginnen met browsen</string>
     <string name="onboardingSearchDaxDialogTitle">Probeer een zoekopdracht!</string>
     <string name="onboardingSearchDaxDialogDescription">Je DuckDuckGo-zoekopdrachten zijn altijd anoniem.</string>
-    <string name="onboardingSearchDaxDialogOption1">hoe zeg je \'eend\' in het Spaans?</string>
-    <string name="onboardingSearchDaxDialogOption2">cast van Mighty Ducks</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">hoe zeg je \'eend\' in het Engels?</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">hoe zeg je \'eend\' in het Spaans?</string>
+    <string name="onboardingSearchQueryOption1">hoe zeg je \'eend\' in het Engels?</string>
+    <string name="onboardingSearchQueryOption1English">hoe zeg je \'eend\' in het Spaans?</string>
+    <string name="onboardingSearchDaxDialogOption2">cast van avatar</string>
     <string name="onboardingSearchDaxDialogOption3">lokaal weer</string>
     <string name="onboardingSearchDaxDialogOption4">Verras me!</string>
+    <string name="onboardingSearchQueryOption4">recepten voor het avondeten</string>
     <string name="onboardingSitesDaxDialogTitle">Bezoek eens een site!</string>
     <string name="onboardingSitesDaxDialogDescription">Ik blokkeer trackers zodat ze je niet kunnen bespioneren.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
@@ -868,5 +872,6 @@
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Wis je browse-activiteit direct met de <b>Fire Button</b>.<br/><br/>Probeer het maar! ☝️️]]></string>
     <string name="onboardingEndDaxDialogTitle">"Je kunt het!"</string>
     <string name="onboardingEndDaxDialogDescription">Denk eraan: elke keer als je met mij browset, verliest een enge advertentie zijn vleugels. 👌</string>
+    <string name="onboardingEndDaxDialogButton">Helemaal klaar!</string>
 
 </resources>

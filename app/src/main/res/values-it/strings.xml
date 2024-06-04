@@ -843,10 +843,14 @@
     <string name="preOnboardingDaxDialog3Button">Inizia a navigare</string>
     <string name="onboardingSearchDaxDialogTitle">Prova una ricerca!</string>
     <string name="onboardingSearchDaxDialogDescription">Le tue ricerche su DuckDuckGo sono sempre anonime.</string>
-    <string name="onboardingSearchDaxDialogOption1">come si dice \"anatra\" in spagnolo</string>
-    <string name="onboardingSearchDaxDialogOption2">cast delle papere potenti</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">come si dice \"anatra\" in inglese</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">come si dice \"anatra\" in spagnolo</string>
+    <string name="onboardingSearchQueryOption1">come si dice anatra in inglese</string>
+    <string name="onboardingSearchQueryOption1English">come si dice anatra in spagnolo</string>
+    <string name="onboardingSearchDaxDialogOption2">cast di avatar</string>
     <string name="onboardingSearchDaxDialogOption3">meteo locale</string>
     <string name="onboardingSearchDaxDialogOption4">Sorprendimi!</string>
+    <string name="onboardingSearchQueryOption4">ricette per la cena</string>
     <string name="onboardingSitesDaxDialogTitle">Prova a visitare un sito!</string>
     <string name="onboardingSitesDaxDialogDescription">Bloccherò i sistemi di tracciamento in modo che non possano spiarti.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
@@ -868,5 +872,6 @@
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Cancella istantaneamente la tua attività di navigazione con il <b>Fire Button</b>.<br/><br/>Provalo! ☝️️]]></string>
     <string name="onboardingEndDaxDialogTitle">"Ben fatto!"</string>
     <string name="onboardingEndDaxDialogDescription">Ricorda: quando navighi con me gli annunci inquietanti non possono seguirti. 👌</string>
+    <string name="onboardingEndDaxDialogButton">Fatto!</string>
 
 </resources>
