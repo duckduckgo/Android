@@ -848,9 +848,11 @@
     <string name="onboardingSearchQueryOption1">как се нарича патицата на английски</string>
     <string name="onboardingSearchQueryOption1English">как се казва „патица“ на испански</string>
     <string name="onboardingSearchDaxDialogOption2">актьори в аватар</string>
+    <string name="onboardingSearchDaxDialogOption2US">прогнозата на мощните патици</string>
     <string name="onboardingSearchDaxDialogOption3">местното време</string>
     <string name="onboardingSearchDaxDialogOption4">Изненадайте ме!</string>
     <string name="onboardingSearchQueryOption4">рецепти за вечеря</string>
+    <string name="onboardingSearchQueryOption4US">рецепти за бисквити с парченца шоколад</string>
     <string name="onboardingSitesDaxDialogTitle">Опитайте да посетите сайт!</string>
     <string name="onboardingSitesDaxDialogDescription">Ще блокирам тракерите, за да не ви шпионират.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
