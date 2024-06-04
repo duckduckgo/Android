@@ -39,7 +39,7 @@ import timber.log.Timber
 class CustomTabsInternalSettingsActivity : DuckDuckGoActivity() {
 
     private val binding: ActivityCustomTabsInternalSettingsBinding by viewBinding()
-    private lateinit var defaultBrowserActivityResultLauncher: ActivityResultLauncher<Intent>
+    private lateinit var defaultAppActivityResultLauncher: ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,7 +51,7 @@ class CustomTabsInternalSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun registerActivityResultLauncher() {
-        defaultBrowserActivityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        defaultAppActivityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             updateDefaultBrowserLabel()
         }
     }
@@ -71,7 +71,7 @@ class CustomTabsInternalSettingsActivity : DuckDuckGoActivity() {
         }
 
         binding.defaultBrowser.setOnClickListener {
-            launchDefaultAppActivityForResult(defaultBrowserActivityResultLauncher)
+            launchDefaultAppActivityForResult(defaultAppActivityResultLauncher)
         }
     }
 
