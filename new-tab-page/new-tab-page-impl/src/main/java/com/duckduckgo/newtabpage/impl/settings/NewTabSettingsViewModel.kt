@@ -73,10 +73,10 @@ class NewTabSettingsViewModel @Inject constructor(
     ) {
         logcat { "New Tab: $firstTag to $newFirstPosition $secondTag to $newSecondPosition" }
         viewModelScope.launch(dispatcherProvider.io()) {
-            val settings = newTabSettingsStore.settings.toMutableList()
+            val settings = newTabSettingsStore.sectionSettings.toMutableList()
             logcat { "New Tab: Sections $settings" }
             settings.swap(newFirstPosition, newSecondPosition)
-            newTabSettingsStore.settings = settings
+            newTabSettingsStore.sectionSettings = settings
             logcat { "New Tab: Sections updated to $settings" }
         }
     }

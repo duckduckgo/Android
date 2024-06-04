@@ -41,7 +41,7 @@ class NewTabPageSectionProviderTest {
 
     @Before
     fun setup() {
-        whenever(newTabSettingsStore.settings).thenReturn(
+        whenever(newTabSettingsStore.sectionSettings).thenReturn(
             listOf(
                 NewTabPageSection.APP_TRACKING_PROTECTION.name,
                 NewTabPageSection.FAVOURITES.name,
@@ -85,7 +85,7 @@ class NewTabPageSectionProviderTest {
 
     @Test
     fun whenUserDisabledFavoritesThenPluginsReturnedInOrder() = runTest {
-        whenever(newTabSettingsStore.settings).thenReturn(
+        whenever(newTabSettingsStore.sectionSettings).thenReturn(
             listOf(
                 NewTabPageSection.APP_TRACKING_PROTECTION.name,
                 NewTabPageSection.SHORTCUTS.name,
@@ -109,7 +109,7 @@ class NewTabPageSectionProviderTest {
 
     @Test
     fun whenRemoteDisabledFavoritesThenPluginsReturnedInOrder() = runTest {
-        whenever(newTabSettingsStore.settings).thenReturn(
+        whenever(newTabSettingsStore.sectionSettings).thenReturn(
             listOf(
                 NewTabPageSection.APP_TRACKING_PROTECTION.name,
                 NewTabPageSection.FAVOURITES.name,
@@ -134,7 +134,7 @@ class NewTabPageSectionProviderTest {
 
     @Test
     fun whenDisabledFavoritesSettingThenPluginsReturnedInOrder() = runTest {
-        whenever(newTabSettingsStore.settings).thenReturn(
+        whenever(newTabSettingsStore.sectionSettings).thenReturn(
             listOf(
                 NewTabPageSection.APP_TRACKING_PROTECTION.name,
                 NewTabPageSection.SHORTCUTS.name,

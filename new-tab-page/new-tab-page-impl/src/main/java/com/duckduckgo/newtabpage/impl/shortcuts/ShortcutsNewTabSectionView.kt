@@ -25,12 +25,15 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
 import com.duckduckgo.common.ui.recyclerviewext.GridColumnCalculator
+import com.duckduckgo.common.ui.recyclerviewext.disableAnimation
+import com.duckduckgo.common.ui.recyclerviewext.enableAnimation
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.AppScope
@@ -65,17 +68,18 @@ class ShortcutsNewTabSectionView @JvmOverloads constructor(
     lateinit var viewModelFactory: ViewViewModelFactory
 
     @Inject
-    lateinit var newTabShortcutsProvider: NewTabShortcutsProvider
-
-    @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
     @Inject
     lateinit var browserNav: BrowserNav
 
+    @Inject
+    lateinit var newTabShortcutsProvider: NewTabShortcutsProvider
+
     private val binding: ViewNewTabShortcutsSectionBinding by viewBinding()
 
     private lateinit var adapter: ShortcutsAdapter
+    private lateinit var itemTouchHelper: ItemTouchHelper
 
     private var coroutineScope: CoroutineScope? = null
 
@@ -102,19 +106,29 @@ class ShortcutsNewTabSectionView @JvmOverloads constructor(
             }.launchIn(coroutineScope!!)
     }
 
-    private fun render(viewState: ViewState) {
-        adapter.submitList(viewState.shortcuts)
-    }
-
     private fun configureGrid() {
         configureQuickAccessGridLayout(binding.quickAccessRecyclerView)
-        adapter = ShortcutsAdapter { shortcut ->
-            when (shortcut) {
+        adapter = createQuickAccessAdapter { viewHolder ->
+            binding.quickAccessRecyclerView.enableAnimation()
+            itemTouchHelper.startDrag(viewHolder)
+        }
+
+        itemTouchHelper = createQuickAccessItemHolder(binding.quickAccessRecyclerView, adapter)
+        binding.quickAccessRecyclerView.adapter = adapter
+        binding.quickAccessRecyclerView.disableAnimation()
+    }
+
+    private fun createQuickAccessAdapter(
+        onMoveListener: (RecyclerView.ViewHolder) -> Unit,
+    ): ShortcutsAdapter {
+        return ShortcutsAdapter(
+            onMoveListener,
+        ) {
+            when (it) {
                 Bookmarks -> globalActivityStarter.start(this.context, BookmarksScreenNoParams)
                 Chat -> context.startActivity(browserNav.openInCurrentTab(context, AI_CHAT_URL))
             }
         }
-        binding.quickAccessRecyclerView.adapter = adapter
     }
 
     private fun configureQuickAccessGridLayout(recyclerView: RecyclerView) {
@@ -122,6 +136,26 @@ class ShortcutsNewTabSectionView @JvmOverloads constructor(
         val numOfColumns = gridColumnCalculator.calculateNumberOfColumns(SHORTCUT_ITEM_MAX_SIZE_DP, SHORTCUT_GRID_MAX_COLUMNS)
         val layoutManager = GridLayoutManager(context, numOfColumns)
         recyclerView.layoutManager = layoutManager
+    }
+
+    private fun createQuickAccessItemHolder(
+        recyclerView: RecyclerView,
+        adapter: ShortcutsAdapter,
+    ): ItemTouchHelper {
+        return ItemTouchHelper(
+            QuickAccessDragTouchItemListener(
+                adapter,
+                object : QuickAccessDragTouchItemListener.DragDropListener {
+                    override fun onListChanged(listElements: List<NewTabSectionsItem>) {
+                        val shortcuts = listElements.filterIsInstance<ShortcutItem>().map { it.shortcut.name }
+                        viewModel.onQuickAccessListChanged(shortcuts)
+                        recyclerView.disableAnimation()
+                    }
+                },
+            ),
+        ).also {
+            it.attachToRecyclerView(recyclerView)
+        }
     }
 
     companion object {

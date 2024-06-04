@@ -41,4 +41,11 @@ interface NewTabPageSectionSettingsPlugin {
      * @return [View]
      */
     suspend fun isActive(): Boolean
+
+    // Every time you want to add a setting add the priority (order) to the list below and use it in the plugin
+    companion object {
+        const val APP_TRACKING_PROTECTION = 100
+        const val FAVOURITES = 200
+        const val SHORTCUTS = 300
+    }
 }

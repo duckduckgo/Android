@@ -26,6 +26,7 @@ import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ActivityScope
@@ -85,6 +86,7 @@ class ShortcutsNewTabSettingView @JvmOverloads constructor(
 }
 
 @ContributesMultibinding(scope = ActivityScope::class)
+@PriorityKey(NewTabPageSectionSettingsPlugin.SHORTCUTS)
 class ShortcutsNewTabSettingViewPlugin @Inject constructor() : NewTabPageSectionSettingsPlugin {
     override val name = NewTabPageSection.SHORTCUTS.name
 

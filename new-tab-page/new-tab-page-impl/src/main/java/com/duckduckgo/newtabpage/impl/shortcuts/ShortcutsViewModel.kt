@@ -24,6 +24,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.newtabpage.impl.settings.NewTabSettingsStore
 import com.duckduckgo.newtabpage.impl.shortcuts.NewTabSectionsItem.ShortcutItem
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,6 +39,7 @@ import logcat.logcat
 @ContributesViewModel(ViewScope::class)
 class ShortcutsViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
+    private val newTabSettingsStore: NewTabSettingsStore,
     private val newTabShortcutsProvider: NewTabShortcutsProvider,
 
 ) : ViewModel(), DefaultLifecycleObserver {
@@ -63,5 +65,12 @@ class ShortcutsViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun onQuickAccessListChanged(newShortcuts: List<String>) {
+        val shortcuts = newTabSettingsStore.shortcutSettings.toMutableList()
+        logcat { "New Tab: Shortcuts $shortcuts" }
+        newTabSettingsStore.shortcutSettings = newShortcuts
+        logcat { "New Tab: Shortcuts updated to $newShortcuts" }
     }
 }
