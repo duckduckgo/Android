@@ -848,9 +848,11 @@
     <string name="onboardingSearchQueryOption1">como dizer pato em inglês</string>
     <string name="onboardingSearchQueryOption1English">como dizer pato em espanhol</string>
     <string name="onboardingSearchDaxDialogOption2">elenco de avatar</string>
+    <string name="onboardingSearchDaxDialogOption2US">elenco do filme A Hora dos Campeões</string>
     <string name="onboardingSearchDaxDialogOption3">meteorologia local</string>
     <string name="onboardingSearchDaxDialogOption4">Surpreende-me!</string>
     <string name="onboardingSearchQueryOption4">receitas de jantar</string>
+    <string name="onboardingSearchQueryOption4US">receitas de biscoitos de chocolate</string>
     <string name="onboardingSitesDaxDialogTitle">Experimenta visitar um site!</string>
     <string name="onboardingSitesDaxDialogDescription">Bloquearei rastreadores para que não te espiem.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
