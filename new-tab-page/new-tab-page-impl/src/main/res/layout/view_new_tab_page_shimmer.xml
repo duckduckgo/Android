@@ -21,14 +21,13 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/newTabContent"
+    android:id="@+id/newTabContentShimmer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-
     <com.facebook.shimmer.ShimmerFrameLayout
-        android:id="@+id/newTabContentShimmer"
+        android:id="@+id/manageRecentAppsSkeleton"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -83,29 +82,5 @@
         </LinearLayout>
 
     </com.facebook.shimmer.ShimmerFrameLayout>
-
-    <LinearLayout
-        android:id="@+id/newTabSectionsContent"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:visibility="gone" />
-
-    <com.duckduckgo.common.ui.view.text.DaxTextView
-        android:id="@+id/newTabEdit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="@dimen/keyline_4"
-        android:background="@drawable/selectable_rounded_container_ripple"
-        android:gravity="center"
-        android:includeFontPadding="false"
-        android:paddingStart="@dimen/keyline_3"
-        android:paddingTop="@dimen/keyline_2"
-        android:paddingEnd="@dimen/keyline_3"
-        android:paddingBottom="@dimen/keyline_2"
-        android:text="@string/newTabPageEdit"
-        app:textType="primary"
-        app:typography="button" />
 
 </LinearLayout>

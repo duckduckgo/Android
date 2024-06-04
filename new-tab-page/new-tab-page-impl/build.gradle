@@ -37,6 +37,9 @@ dependencies {
     implementation AndroidX.constraintLayout
     implementation AndroidX.recyclerView
 
+    // Shimmer
+    implementation "com.facebook.shimmer:shimmer:_"
+
     // ViewModel and LiveData
     implementation AndroidX.lifecycle.runtime.ktx
     implementation AndroidX.lifecycle.viewModelKtx
