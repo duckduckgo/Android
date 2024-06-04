@@ -858,9 +858,11 @@
     <string name="onboardingSearchQueryOption1">как сказать «утка» на английском?</string>
     <string name="onboardingSearchQueryOption1English">как сказать «утка» по-испански</string>
     <string name="onboardingSearchDaxDialogOption2">актерский состав аватара</string>
+    <string name="onboardingSearchDaxDialogOption2US">Кто играет главные роли в фильме «Могучие утята»?</string>
     <string name="onboardingSearchDaxDialogOption3">Местная погода</string>
     <string name="onboardingSearchDaxDialogOption4">Удиви меня!</string>
     <string name="onboardingSearchQueryOption4">рецепты на ужин</string>
+    <string name="onboardingSearchQueryOption4US">рецепты печенья с шоколадной крошкой</string>
     <string name="onboardingSitesDaxDialogTitle">Попробуйте посетить сайт!</string>
     <string name="onboardingSitesDaxDialogDescription">Мы заблокируем трекеры и пресечем слежку.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
@@ -882,7 +884,7 @@
         <item quantity="many"><![CDATA[ пытались вести за вами слежку, но мы их заблокировали.<br/><br/>☝️ Нажмите на щит, чтобы узнать подробности.]]></item>
         <item quantity="other"><![CDATA[ пытались вести за вами слежку, но мы их заблокировали.<br/><br/>☝️ Нажмите на щит, чтобы узнать подробности.]]></item>
     </plurals>
-    <string name="onboardingTrackersBlockedDaxDialogButton">Понятно!</string>
+    <string name="onboardingTrackersBlockedDaxDialogButton">Понятно</string>
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Кнопка <b>Fire Button</b> моментально стирает из браузера данные о посещении сайтов.<br/><br/>Давайте попробуем! ☝️️]]></string>
     <string name="onboardingEndDaxDialogTitle">"Проще некуда!"</string>
     <string name="onboardingEndDaxDialogDescription">Бродить по сайтам с нами — значит подрезать крылья назойливой рекламе. 👌</string>
