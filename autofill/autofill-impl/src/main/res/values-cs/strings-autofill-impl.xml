@@ -126,7 +126,6 @@
     <string name="saveLoginDialogSubtitle">Hesla se bezpečně ukládají do tvého zařízení.</string>
     <string name="autofillManagementAddLogin">Přidat heslo</string>
     <string name="credentialManagementEditLoginTitleHint">Název</string>
-    <string name="autofillDeleteLoginDialogTitle">Opravdu chceš smazat tohle heslo?</string>
     <string name="autofillManagementDeletedConfirmation">Heslo smazáno</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Poslední aktualizace %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">Chceš dál ukládat hesla?</string>
@@ -152,15 +151,6 @@
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Zrušit</string>
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Smazat všechna hesla</string>
-    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
-        <item quantity="one">Opravdu chceš smazat %1$d heslo?</item>
-        <item quantity="few">Opravdu chceš smazat %1$d hesla?</item>
-        <item quantity="many">Opravdu chceš smazat %1$d hesla?</item>
-        <item quantity="other">Opravdu chceš smazat %1$d hesel?</item>
-    </plurals>
-
-    <string name="credentialManagementDeletePasswordConfirmationMessage">Tvoje heslo se smaže ze všech synchronizovaných zařízení. Zkontroluj si předtím, že se i tak dostaneš ke svému účtu.</string>
-    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Tvoje hesla se smažou ze všech synchronizovaných zařízení. Zkontroluj si předtím, že se k účtům i tak dostaneš.</string>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
         <item quantity="one">%1$d smazané heslo</item>

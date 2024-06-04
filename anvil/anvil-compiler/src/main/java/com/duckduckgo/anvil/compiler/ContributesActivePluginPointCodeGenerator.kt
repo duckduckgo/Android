@@ -49,6 +49,7 @@ import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asClassName
 import dagger.Binds
 import java.io.File
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.name.FqName
@@ -122,6 +123,16 @@ class ContributesActivePluginPointCodeGenerator : CodeGenerator {
         val scope = vmClass.annotations.firstOrNull { it.fqName == ContributesActivePluginPoint::class.fqName }?.scopeOrNull(0)!!
         val pluginClassType = vmClass.pluginClassName(ContributesActivePluginPoint::class.fqName) ?: vmClass.asClassName()
         val featureName = "pluginPoint${pluginClassType.simpleName}"
+
+        // Check if there's another plugin point class that has the same class simplename
+        // we can't allow that because the backing remote feature would be the same
+        val existingFeature = featureBackedClassNames.putIfAbsent(featureName, vmClass.fqName)
+        if (existingFeature != null) {
+            throw AnvilCompilationException(
+                "${vmClass.fqName} plugin point naming is duplicated, previous found in $existingFeature",
+                element = vmClass.clazz.identifyingElement,
+            )
+        }
 
         val content = FileSpec.buildFile(generatedPackage, pluginPointClassFileName) {
             // This is the normal plugin point
@@ -303,6 +314,16 @@ class ContributesActivePluginPointCodeGenerator : CodeGenerator {
         val pluginRemoteFeatureClassName = "${vmClass.shortName}_ActivePlugin_RemoteFeature"
         val pluginRemoteFeatureStoreClassName = "${vmClass.shortName}_ActivePlugin_RemoteFeature_MultiProcessStore"
         val pluginPriority = vmClass.annotations.firstOrNull { it.fqName == ContributesActivePlugin::class.fqName }?.priorityOrNull()
+
+        // Check if there's another plugin class, in the same plugin point, that has the same class simplename
+        // we can't allow that because the backing remote feature would be the same
+        val existingFeature = featureBackedClassNames.putIfAbsent("${featureName}_$parentFeatureName", vmClass.fqName)
+        if (existingFeature != null) {
+            throw AnvilCompilationException(
+                "${vmClass.fqName} plugin name is duplicated, previous found in $existingFeature",
+                element = vmClass.clazz.identifyingElement,
+            )
+        }
 
         val content = FileSpec.buildFile(generatedPackage, pluginClassName) {
             // First create the class that will contribute the active plugin.
@@ -570,6 +591,8 @@ class ContributesActivePluginPointCodeGenerator : CodeGenerator {
     }
 
     companion object {
+        internal val featureBackedClassNames = ConcurrentHashMap<String, FqName>()
+
         private val pluginPointFqName = FqName("com.duckduckgo.common.utils.plugins.PluginPoint")
         private val dispatcherProviderFqName = FqName("com.duckduckgo.common.utils.DispatcherProvider")
         private val activePluginPointFqName = FqName("com.duckduckgo.common.utils.plugins.InternalActivePluginPoint")

@@ -84,7 +84,7 @@ class WrongPluginPointCollectorDetector : Detector(), SourceCodeScanner {
         }
 
         private fun PsiClass.isActivePlugin(): Boolean {
-            return this.isSubtypeOf("com.duckduckgo.common.utils.plugins.ActivePluginPoint.ActivePlugin")
+            return this.isSubtypeOf("com.duckduckgo.common.utils.plugins.ActivePlugin")
         }
         private fun handleField(node: UField) {
             node.type.let { psiType ->
@@ -95,7 +95,7 @@ class WrongPluginPointCollectorDetector : Detector(), SourceCodeScanner {
                         for (typeArgument in typeArguments) {
                             val typeArgumentClass = (typeArgument as? PsiClassType)?.resolve()
                             if (typeArgumentClass?.isSubtypeOf(
-                                    "com.duckduckgo.common.utils.plugins.ActivePluginPoint.ActivePlugin"
+                                    "com.duckduckgo.common.utils.plugins.ActivePlugin"
                                 ) == true) {
                                 context.reportError(node, WRONG_PLUGIN_POINT_ISSUE)
                             }

@@ -126,7 +126,6 @@
     <string name="saveLoginDialogSubtitle">As palavras-passe são armazenadas com segurança no teu dispositivo.</string>
     <string name="autofillManagementAddLogin">Adicionar palavra-passe</string>
     <string name="credentialManagementEditLoginTitleHint">Título</string>
-    <string name="autofillDeleteLoginDialogTitle">Tens a certeza de que pretendes eliminar esta palavra-passe?</string>
     <string name="autofillManagementDeletedConfirmation">Palavra-passe eliminada</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Última atualização a %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">Pretendes continuar a guardar palavras-passe?</string>
@@ -152,13 +151,6 @@
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Cancelar</string>
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Eliminar todas as palavras-passe</string>
-    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
-        <item quantity="one">Tens a certeza de que pretendes eliminar %1$d palavra-passe?</item>
-        <item quantity="other">Tens a certeza de que pretendes eliminar %1$d palavras-passe?</item>
-    </plurals>
-
-    <string name="credentialManagementDeletePasswordConfirmationMessage">A tua palavra-passe será eliminada de todos os dispositivos sincronizados. Confirma que ainda tens uma forma de aceder à conta.</string>
-    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">As tuas palavras-passe serão eliminadas de todos os dispositivos sincronizados. Confirma que ainda tens uma forma de aceder às contas.</string>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
         <item quantity="one">%1$d palavra-passe eliminada</item>

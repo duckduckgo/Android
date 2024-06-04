@@ -857,10 +857,14 @@
     <string name="preOnboardingDaxDialog3Button">Start Browsing</string>
     <string name="onboardingSearchDaxDialogTitle">Try a search!</string>
     <string name="onboardingSearchDaxDialogDescription">Your DuckDuckGo searches are always anonymous.</string>
-    <string name="onboardingSearchDaxDialogOption1">how to say “duck” in spanish</string>
-    <string name="onboardingSearchDaxDialogOption2">mighty ducks cast</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate 'duck' too.">how to say “duck” in english</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate 'duck' too. Don't add question mark">how to say “duck” in spanish</string>
+    <string name="onboardingSearchQueryOption1">how to say duck in english</string>
+    <string name="onboardingSearchQueryOption1English">how to say duck in spanish</string>
+    <string name="onboardingSearchDaxDialogOption2">cast of avatar</string>
     <string name="onboardingSearchDaxDialogOption3">local weather</string>
     <string name="onboardingSearchDaxDialogOption4">Surprise me!</string>
+    <string name="onboardingSearchQueryOption4">dinner recipes</string>
     <string name="onboardingSitesDaxDialogTitle">Try visiting a site!</string>
     <string name="onboardingSitesDaxDialogDescription">I\'ll block trackers so they can\'t spy on you.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
@@ -882,5 +886,6 @@
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Instantly clear your browsing activity with the <b>Fire Button</b>.<br/><br/>Give it a try! ☝️️]]></string>
     <string name="onboardingEndDaxDialogTitle">You\'ve got this!"</string>
     <string name="onboardingEndDaxDialogDescription">Remember: every time you browse with me a creepy ad loses its wings. 👌</string>
+    <string name="onboardingEndDaxDialogButton">All done!</string>
 
 </resources>

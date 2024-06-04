@@ -843,10 +843,14 @@
     <string name="preOnboardingDaxDialog3Button">Empezar a navegar</string>
     <string name="onboardingSearchDaxDialogTitle">Prueba una búsqueda!</string>
     <string name="onboardingSearchDaxDialogDescription">Tus búsquedas en DuckDuckGo son siempre anónimas.</string>
-    <string name="onboardingSearchDaxDialogOption1">cómo se dice «pato» en inglés</string>
-    <string name="onboardingSearchDaxDialogOption2">reparto de Mighty Ducks</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">cómo se dice «pato» en inglés</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">cómo se dice «pato» en inglés</string>
+    <string name="onboardingSearchQueryOption1">cómo se dice «pato» en inglés</string>
+    <string name="onboardingSearchQueryOption1English">cómo se dice «duck» en español</string>
+    <string name="onboardingSearchDaxDialogOption2">reparto de Avatar</string>
     <string name="onboardingSearchDaxDialogOption3">el tiempo local</string>
     <string name="onboardingSearchDaxDialogOption4">¡Sorpréndeme!</string>
+    <string name="onboardingSearchQueryOption4">recetas para la cena</string>
     <string name="onboardingSitesDaxDialogTitle">¡Intenta visitar un sitio!</string>
     <string name="onboardingSitesDaxDialogDescription">Bloquearé los rastreadores para que no puedan espiarte.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
@@ -868,5 +872,6 @@
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Borra al instante tu actividad de navegación con el <b>Fire Button</b>.<br/><br/>¡Pruébalo! ☝️️]]></string>
     <string name="onboardingEndDaxDialogTitle">"¡Lo estás haciendo muy bien!"</string>
     <string name="onboardingEndDaxDialogDescription">Recuerda: cada vez que navegas conmigo corto las alas a un anuncio horrible. 👌</string>
+    <string name="onboardingEndDaxDialogButton">¡Todo listo!</string>
 
 </resources>

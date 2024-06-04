@@ -66,7 +66,7 @@ tags:
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/primaryCta"
 - tapOn: "LAYOUTS"
-- tapOn: "Primary"
+- assertVisible: "Expandable Layout"
 - tapOn: "INTERACTIVE"
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/switch_one"

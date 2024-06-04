@@ -103,8 +103,7 @@ import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.app.browser.webview.SslWarningLayout.Action
 import com.duckduckgo.app.cta.ui.*
-import com.duckduckgo.app.cta.ui.ExperimentDaxBubbleOptionsCta.DaxDialogIntroOption
-import com.duckduckgo.app.cta.ui.ExperimentOnboardingDaxDialogCta
+import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
@@ -121,8 +120,8 @@ import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
-import com.duckduckgo.app.onboarding.ui.page.experiment.ExtendedOnboardingExperimentVariantManager
-import com.duckduckgo.app.onboarding.ui.page.experiment.OnboardingExperimentPixel
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.OnboardingExperimentPixel
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
@@ -254,7 +253,7 @@ class BrowserTabViewModel @Inject constructor(
     private val privacyProtectionsToggleUsageListener: PrivacyProtectionsToggleUsageListener,
     private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels,
     private val faviconsFetchingPrompt: FaviconsFetchingPrompt,
-    private val extendedOnboardingExperimentVariantManager: ExtendedOnboardingExperimentVariantManager,
+    private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles,
     private val subscriptions: Subscriptions,
     private val sslCertificatesFeature: SSLCertificatesFeature,
     private val bypassedSSLCertificatesRepository: BypassedSSLCertificatesRepository,
@@ -719,21 +718,21 @@ class BrowserTabViewModel @Inject constructor(
             return
         }
 
-        if (currentCtaViewState().cta is ExperimentOnboardingDaxDialogCta) {
-            onDismissExperimentDaxDialog(currentCtaViewState().cta as ExperimentOnboardingDaxDialogCta)
+        if (currentCtaViewState().cta is OnboardingDaxDialogCta) {
+            onDismissOnboardingDaxDialog(currentCtaViewState().cta as OnboardingDaxDialogCta)
         }
 
         when (currentCtaViewState().cta) {
-            is ExperimentDaxBubbleOptionsCta.ExperimentDaxIntroSearchOptionsCta -> {
-                if (!DaxDialogIntroOption.getSearchOptions().map { it.link }.contains(query)) {
+            is DaxBubbleCta.DaxIntroSearchOptionsCta -> {
+                if (!ctaViewModel.isSuggestedSearchOption(query)) {
                     pixel.fire(OnboardingExperimentPixel.PixelName.ONBOARDING_SEARCH_CUSTOM)
                 }
             }
 
-            is ExperimentDaxBubbleOptionsCta.ExperimentDaxIntroVisitSiteOptionsCta,
-            is ExperimentOnboardingDaxDialogCta.DaxSiteSuggestionsCta,
+            is DaxBubbleCta.DaxIntroVisitSiteOptionsCta,
+            is OnboardingDaxDialogCta.DaxSiteSuggestionsCta,
             -> {
-                if (!DaxDialogIntroOption.getSitesOptions().map { it.link }.contains(query)) {
+                if (!ctaViewModel.isSuggestedSiteOption(query)) {
                     pixel.fire(OnboardingExperimentPixel.PixelName.ONBOARDING_VISIT_SITE_CUSTOM)
                 }
             }
@@ -2448,8 +2447,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun showOrHideKeyboard(cta: Cta?) {
-        command.value =
-            if (cta is DialogCta || cta is HomePanelCta) HideKeyboard else ShowKeyboard
+        command.value = if (cta is HomePanelCta) HideKeyboard else ShowKeyboard
     }
 
     fun registerDaxBubbleCtaDismissed() {
@@ -2466,7 +2464,7 @@ class BrowserTabViewModel @Inject constructor(
         command.value = when (cta) {
             is HomePanelCta.Survey -> LaunchSurvey(cta.survey)
             is HomePanelCta.AddWidgetAuto, is HomePanelCta.AddWidgetInstructions -> LaunchAddWidget
-            is ExperimentOnboardingDaxDialogCta -> onExperimentCtaOkButtonClicked(cta)
+            is OnboardingDaxDialogCta -> onOnboardingCtaOkButtonClicked(cta)
             else -> return
         }
     }
@@ -2518,19 +2516,6 @@ class BrowserTabViewModel @Inject constructor(
             command.value = action.asBrowserTabCommand() ?: return@launch
             refreshCta()
         }
-    }
-
-    fun onUserHideDaxDialog() {
-        val cta = currentCtaViewState().cta ?: return
-        command.value = DaxCommand.HideDaxDialog(cta)
-    }
-
-    fun onDaxDialogDismissed() {
-        val cta = currentCtaViewState().cta ?: return
-        if (cta is DaxDialogCta.DaxTrackersBlockedCta) {
-            command.value = DaxCommand.FinishPartialTrackerAnimation
-        }
-        onUserDismissedCta()
     }
 
     fun onUserDismissedCta() {
@@ -3170,70 +3155,62 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun configureBrowserBackground() {
-        val backgroundRes: Int =
-            if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) R.drawable.onboarding_experiment_background_bitmap else 0
+    private fun onOnboardingCtaOkButtonClicked(onboardingCta: OnboardingDaxDialogCta): Command? {
         viewModelScope.launch {
-            command.value = SetBrowserBackground(backgroundRes)
+            ctaViewModel.onUserDismissedCta(onboardingCta)
         }
-    }
-
-    private fun onExperimentCtaOkButtonClicked(experimentCta: ExperimentOnboardingDaxDialogCta): Command? {
-        viewModelScope.launch {
-            ctaViewModel.onUserDismissedCta(experimentCta)
-        }
-        return when (experimentCta) {
-            is ExperimentOnboardingDaxDialogCta.DaxSerpCta -> {
+        return when (onboardingCta) {
+            is OnboardingDaxDialogCta.DaxSerpCta -> {
                 viewModelScope.launch {
-                    if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) {
-                        val cta = withContext(dispatchers.io()) { ctaViewModel.getExperimentSiteSuggestionsDialogCta() }
+                    if (extendedOnboardingFeatureToggles.aestheticUpdates().isEnabled()) {
+                        val cta = withContext(dispatchers.io()) { ctaViewModel.getSiteSuggestionsDialogCta() }
                         ctaViewState.value = currentCtaViewState().copy(cta = cta)
                         if (cta == null) {
-                            command.value = HideExperimentOnboardingDialog(experimentCta)
+                            command.value = HideOnboardingDaxDialog(onboardingCta)
                         }
                     }
                 }
                 null
             }
 
-            is ExperimentOnboardingDaxDialogCta.DaxTrackersBlockedCta,
-            is ExperimentOnboardingDaxDialogCta.DaxNoTrackersCta,
-            is ExperimentOnboardingDaxDialogCta.DaxMainNetworkCta,
+            is OnboardingDaxDialogCta.DaxTrackersBlockedCta,
+            is OnboardingDaxDialogCta.DaxNoTrackersCta,
+            is OnboardingDaxDialogCta.DaxMainNetworkCta,
             -> {
                 if (currentBrowserViewState().showPrivacyShield.isHighlighted()) {
                     browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
                 }
                 viewModelScope.launch {
-                    if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) {
-                        val cta = withContext(dispatchers.io()) { ctaViewModel.getExperimentFireDialogCta() }
+                    if (extendedOnboardingFeatureToggles.aestheticUpdates().isEnabled()) {
+                        val cta = withContext(dispatchers.io()) { ctaViewModel.getFireDialogCta() }
                         ctaViewState.value = currentCtaViewState().copy(cta = cta)
                         if (cta == null) {
-                            command.value = HideExperimentOnboardingDialog(experimentCta)
+                            command.value = HideOnboardingDaxDialog(onboardingCta)
                         }
                     }
                 }
                 null
             }
 
-            else -> HideExperimentOnboardingDialog(experimentCta)
+            else -> HideOnboardingDaxDialog(onboardingCta)
         }
     }
 
-    private fun onDismissExperimentDaxDialog(cta: ExperimentOnboardingDaxDialogCta) {
-        if (cta is ExperimentOnboardingDaxDialogCta.DaxTrackersBlockedCta) {
+    private fun onDismissOnboardingDaxDialog(cta: OnboardingDaxDialogCta) {
+        if (cta is OnboardingDaxDialogCta.DaxTrackersBlockedCta) {
             browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
         }
 
         onUserDismissedCta()
-        command.value = HideExperimentOnboardingDialog(cta)
+        command.value = HideOnboardingDaxDialog(cta)
     }
 
     fun onFireMenuSelected() {
-        if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled()) {
+        if (extendedOnboardingFeatureToggles.aestheticUpdates().isEnabled()) {
             val cta = currentCtaViewState().cta
-            if (cta is ExperimentOnboardingDaxDialogCta.DaxFireButtonCta) {
+            if (cta is OnboardingDaxDialogCta.DaxFireButtonCta) {
                 onUserDismissedCta()
-                command.value = HideExperimentOnboardingDialog(cta)
+                command.value = HideOnboardingDaxDialog(cta)
             }
             if (currentBrowserViewState().fireButton.isHighlighted()) {
                 viewModelScope.launch {
@@ -3244,7 +3221,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onPrivacyShieldSelected() {
-        if (extendedOnboardingExperimentVariantManager.isAestheticUpdatesEnabled() && currentBrowserViewState().showPrivacyShield.isHighlighted()) {
+        if (extendedOnboardingFeatureToggles.aestheticUpdates().isEnabled() && currentBrowserViewState().showPrivacyShield.isHighlighted()) {
             browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
             pixel.fire(
                 pixel = PrivacyDashboardPixels.PRIVACY_DASHBOARD_FIRST_TIME_OPENED,
@@ -3257,14 +3234,14 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun onExperimentDaxTypingAnimationFinished() {
+    fun onOnboardingDaxTypingAnimationFinished() {
         browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = true))
     }
 
     override fun onShouldOverride() {
         val cta = currentCtaViewState().cta
-        if (cta is ExperimentOnboardingDaxDialogCta) {
-            onDismissExperimentDaxDialog(cta)
+        if (cta is OnboardingDaxDialogCta) {
+            onDismissOnboardingDaxDialog(cta)
         }
     }
 

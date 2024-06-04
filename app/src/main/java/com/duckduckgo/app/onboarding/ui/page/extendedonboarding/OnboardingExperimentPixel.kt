@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.onboarding.ui.page.experiment
+package com.duckduckgo.app.onboarding.ui.page.extendedonboarding
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 

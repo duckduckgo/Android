@@ -843,10 +843,14 @@
     <string name="preOnboardingDaxDialog3Button">Begynn å surfe</string>
     <string name="onboardingSearchDaxDialogTitle">Prøv et søk!</string>
     <string name="onboardingSearchDaxDialogDescription">DuckDuckGo-søkene dine er alltid anonyme.</string>
-    <string name="onboardingSearchDaxDialogOption1">hvordan si «duck» på spansk</string>
-    <string name="onboardingSearchDaxDialogOption2">mighty ducks rolleinnehavere</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">hva heter «and» på engelsk</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">hvordan si «duck» på spansk</string>
+    <string name="onboardingSearchQueryOption1">hva heter and på engelsk</string>
+    <string name="onboardingSearchQueryOption1English">hva heter and på spansk</string>
+    <string name="onboardingSearchDaxDialogOption2">rollebesetningen i avatar</string>
     <string name="onboardingSearchDaxDialogOption3">lokalt vær</string>
     <string name="onboardingSearchDaxDialogOption4">Overrask meg!</string>
+    <string name="onboardingSearchQueryOption4">middagsoppskrifter</string>
     <string name="onboardingSitesDaxDialogTitle">Prøv å besøke et nettsted!</string>
     <string name="onboardingSitesDaxDialogDescription">Jeg blokkerer sporingsforsøk slik at de ikke kan spionere på deg.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
@@ -868,5 +872,6 @@
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Fjern nettleseraktiviteten din umiddelbart med <b>Fire Button</b>.<br/><br/>Prøv det! ☝️️]]></string>
     <string name="onboardingEndDaxDialogTitle">"Dette går bra!"</string>
     <string name="onboardingEndDaxDialogDescription">Husk: Hver gang du surfer med meg, klippes vingene på en uhyggelig annonse. 👌</string>
+    <string name="onboardingEndDaxDialogButton">Ferdig!</string>
 
 </resources>

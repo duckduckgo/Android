@@ -843,10 +843,14 @@
     <string name="preOnboardingDaxDialog3Button">Alusta sirvimist</string>
     <string name="onboardingSearchDaxDialogTitle">Proovige otsingut!</string>
     <string name="onboardingSearchDaxDialogDescription">Sinu DuckDuckGo otsingud on alati anonüümsed.</string>
-    <string name="onboardingSearchDaxDialogOption1">kuidas öelda „part“ hispaania keeles</string>
-    <string name="onboardingSearchDaxDialogOption2">Mighty Ducks näitlejad</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">kuidas öelda „part“ inglise keeles</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">kuidas öelda „part“ hispaania keeles</string>
+    <string name="onboardingSearchQueryOption1">kuidas öelda part inglise keeles</string>
+    <string name="onboardingSearchQueryOption1English">kuidas öelda part hispaania keeles</string>
+    <string name="onboardingSearchDaxDialogOption2">Avatari näitlejad</string>
     <string name="onboardingSearchDaxDialogOption3">kohalik ilm</string>
     <string name="onboardingSearchDaxDialogOption4">Üllata mind!</string>
+    <string name="onboardingSearchQueryOption4">õhtusöögi retseptid</string>
     <string name="onboardingSitesDaxDialogTitle">Proovi külastada saiti!</string>
     <string name="onboardingSitesDaxDialogDescription">Ma blokeerin jälgijaid, et nad ei saaks sind luurata.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
@@ -868,5 +872,6 @@
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Tühjenda oma sirvimistegevus hetkega <b>Fire Button</b> abil.<br/><br/>Proovi! ☝️️]]></string>
     <string name="onboardingEndDaxDialogTitle">"Sa saad hakkama!"</string>
     <string name="onboardingEndDaxDialogDescription">Pea meeles: iga kord kui minuga sirvid, kaotab jube reklaam oma tiivad. 👌</string>
+    <string name="onboardingEndDaxDialogButton">Kõik valmis!</string>
 
 </resources>

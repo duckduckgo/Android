@@ -15,7 +15,7 @@ tags:
 - extendedWaitUntil:
     notVisible: "Not DDG."  # Spoofed content not visible
     timeout: 10000
-- tapOn: "Phew!"
+- tapOn: "Got it!"
 - copyTextFrom:
     id: "omnibarTextInput"
 - assertTrue: ${maestro.copiedText == "about:blank" || maestro.copiedText == "https://duckduckgo.com/"}
