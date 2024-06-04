@@ -848,9 +848,11 @@
     <string name="onboardingSearchQueryOption1">hvordan siger man and på engelsk</string>
     <string name="onboardingSearchQueryOption1English">hvordan siger man \"and\" på spansk</string>
     <string name="onboardingSearchDaxDialogOption2">skuespillere i avatar</string>
+    <string name="onboardingSearchDaxDialogOption2US">mighty ducks film</string>
     <string name="onboardingSearchDaxDialogOption3">lokalt vejr</string>
     <string name="onboardingSearchDaxDialogOption4">Overrask mig!</string>
     <string name="onboardingSearchQueryOption4">middagsopskrifter</string>
+    <string name="onboardingSearchQueryOption4US">opskrift på chocolate chip cookie</string>
     <string name="onboardingSitesDaxDialogTitle">Prøv at besøge en hjemmeside!</string>
     <string name="onboardingSitesDaxDialogDescription">Jeg blokerer trackere, så de ikke kan udspionere dig.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
