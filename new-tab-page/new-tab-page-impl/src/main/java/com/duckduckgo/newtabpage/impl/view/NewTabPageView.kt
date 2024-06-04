@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.LinearLayout
+import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
@@ -66,8 +67,6 @@ class NewTabPageView @JvmOverloads constructor(
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
 
-        binding.newTabContentShimmer.startShimmer()
-
         ViewTreeLifecycleOwner.get(this)?.lifecycle?.addObserver(viewModel)
 
         @SuppressLint("NoHardcodedCoroutineDispatcher")
@@ -83,22 +82,34 @@ class NewTabPageView @JvmOverloads constructor(
     }
 
     private fun render(viewState: ViewState) {
-        // remove all views but the RMF
-        val childCount = binding.newTabSectionsContent.childCount
-        if (childCount > 0) {
-            binding.newTabSectionsContent.removeViews(1, childCount - 1)
-        }
-        viewState.sections.onEach {
-            binding.newTabSectionsContent.addView(
-                it.getView(context),
-                android.view.ViewGroup.LayoutParams(
-                    android.view.ViewGroup.LayoutParams.MATCH_PARENT,
-                    android.view.ViewGroup.LayoutParams.WRAP_CONTENT,
-                ),
-            )
-        }
+        if (viewState.loading) {
+            binding.newTabContentShimmer.startShimmer()
+        } else {
+            if (viewState.sections.isEmpty()) {
+                binding.newTabSectionsContent.gone()
+                binding.ddgLogo.show()
+            } else {
+                // remove all views but the RMF
+                val childCount = binding.newTabSectionsContent.childCount
+                if (childCount > 0) {
+                    binding.newTabSectionsContent.removeViews(1, childCount - 1)
+                }
+                viewState.sections.onEach {
+                    binding.newTabSectionsContent.addView(
+                        it.getView(context),
+                        android.view.ViewGroup.LayoutParams(
+                            android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                            android.view.ViewGroup.LayoutParams.WRAP_CONTENT,
+                        ),
+                    )
+                }
+            }
 
-        binding.newTabContentShimmer.gone()
-        binding.newTabSectionsContent.show()
+            if (binding.newTabContentShimmer.isVisible) {
+                binding.newTabContentShimmer.stopShimmer()
+                binding.newTabContentShimmer.gone()
+                binding.newTabSectionsContent.show()
+            }
+        }
     }
 }

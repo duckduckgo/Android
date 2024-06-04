@@ -41,7 +41,7 @@ class NewTabPageViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel(), DefaultLifecycleObserver {
 
-    data class ViewState(val sections: List<NewTabPageSectionPlugin> = emptyList())
+    data class ViewState(val sections: List<NewTabPageSectionPlugin> = emptyList(), val loading: Boolean = true)
 
     private val _viewState = MutableStateFlow(ViewState())
     val viewState = _viewState.asStateFlow()
@@ -55,7 +55,7 @@ class NewTabPageViewModel @Inject constructor(
             newTabSectionsProvider.provideSections().collect { sections ->
                 logcat { "New Tab: Sections $sections" }
                 withContext(dispatcherProvider.main()) {
-                    _viewState.update { ViewState(sections) }
+                    _viewState.update { ViewState(sections, false) }
                 }
             }
         }
