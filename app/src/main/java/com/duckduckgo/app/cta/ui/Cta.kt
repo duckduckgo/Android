@@ -79,6 +79,8 @@ interface Cta {
 }
 
 interface OnboardingDaxCta {
+    val markAsReadOnShow: Boolean
+
     fun showOnboardingCta(
         binding: FragmentBrowserTabBinding,
         onPrimaryCtaClicked: () -> Unit,
@@ -157,6 +159,8 @@ sealed class OnboardingDaxDialogCta(
         onboardingStore,
         appInstallStore,
     ) {
+        override val markAsReadOnShow: Boolean = false
+
         override fun showOnboardingCta(
             binding: FragmentBrowserTabBinding,
             onPrimaryCtaClicked: () -> Unit,
@@ -187,6 +191,8 @@ sealed class OnboardingDaxDialogCta(
         onboardingStore,
         appInstallStore,
     ) {
+        override val markAsReadOnShow: Boolean = false
+
         override fun showOnboardingCta(
             binding: FragmentBrowserTabBinding,
             onPrimaryCtaClicked: () -> Unit,
@@ -240,6 +246,7 @@ sealed class OnboardingDaxDialogCta(
         onboardingStore,
         appInstallStore,
     ) {
+        override val markAsReadOnShow: Boolean = false
 
         override fun showOnboardingCta(
             binding: FragmentBrowserTabBinding,
@@ -291,6 +298,8 @@ sealed class OnboardingDaxDialogCta(
         onboardingStore,
         appInstallStore,
     ) {
+        override val markAsReadOnShow: Boolean = false
+
         override fun showOnboardingCta(
             binding: FragmentBrowserTabBinding,
             onPrimaryCtaClicked: () -> Unit,
@@ -320,6 +329,8 @@ sealed class OnboardingDaxDialogCta(
         onboardingStore,
         appInstallStore,
     ) {
+        override val markAsReadOnShow: Boolean = false
+
         override fun showOnboardingCta(
             binding: FragmentBrowserTabBinding,
             onPrimaryCtaClicked: () -> Unit,
@@ -351,6 +362,8 @@ sealed class OnboardingDaxDialogCta(
         onboardingStore,
         appInstallStore,
     ) {
+        override val markAsReadOnShow: Boolean = false
+
         override fun showOnboardingCta(
             binding: FragmentBrowserTabBinding,
             onPrimaryCtaClicked: () -> Unit,
@@ -407,6 +420,8 @@ sealed class OnboardingDaxDialogCta(
         onboardingStore,
         appInstallStore,
     ) {
+        override val markAsReadOnShow: Boolean = true
+
         override fun showOnboardingCta(
             binding: FragmentBrowserTabBinding,
             onPrimaryCtaClicked: () -> Unit,

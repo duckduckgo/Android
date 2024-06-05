@@ -710,6 +710,20 @@ class CtaViewModelTest {
         assertFalse(value is DaxBubbleCta.DaxIntroVisitSiteOptionsCta)
     }
 
+    @Test
+    fun whenCtaShownIfCtaIsNotMarkedAsReadOnShowAThenCtaNotInsertedInDatabase() {
+        testee.onCtaShown(OnboardingDaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore))
+
+        verify(mockDismissedCtaDao, never()).insert(DismissedCta(CtaId.DAX_DIALOG_SERP))
+    }
+
+    @Test
+    fun whenCtaShownIfCtaIsMarkedAsReadOnShowAThenCtaInsertedInDatabase() {
+        testee.onCtaShown(OnboardingDaxDialogCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore))
+
+        verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_END))
+    }
+
     private suspend fun givenDaxOnboardingActive() {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
     }

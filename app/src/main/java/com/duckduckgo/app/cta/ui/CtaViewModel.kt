@@ -118,6 +118,9 @@ class CtaViewModel @Inject constructor(
                 pixel.fire(it, cta.pixelShownParameters())
             }
         }
+        if (cta is OnboardingDaxDialogCta && cta.markAsReadOnShow) {
+            dismissedCtaDao.insert(DismissedCta(cta.ctaId))
+        }
     }
 
     suspend fun registerDaxBubbleCtaDismissed(cta: Cta) {
