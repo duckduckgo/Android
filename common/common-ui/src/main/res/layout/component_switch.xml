@@ -33,40 +33,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
-    <com.duckduckgo.common.ui.view.SwitchView
-        android:id="@+id/switch_one"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_4"
-        android:layout_marginEnd="@dimen/keyline_2"
-        android:checked="false"
-        app:layout_constraintEnd_toStartOf="@+id/switch_two"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/label"/>
-
-    <com.duckduckgo.common.ui.view.SwitchView
-        android:id="@+id/switch_two"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/keyline_2"
-        android:checked="true"
-        app:layout_constraintBottom_toBottomOf="@+id/switch_one"
-        app:layout_constraintStart_toEndOf="@+id/switch_one"
-        app:layout_constraintTop_toTopOf="@+id/switch_one"/>
-
-    <com.duckduckgo.common.ui.view.SwitchView
-        android:id="@+id/switch_three"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/keyline_2"
-        android:checked="false"
-        android:enabled="false"
-        app:layout_constraintBottom_toBottomOf="@+id/switch_two"
-        app:layout_constraintStart_toEndOf="@+id/switch_two"
-        app:layout_constraintTop_toTopOf="@+id/switch_two"/>
-
     <com.duckduckgo.common.ui.view.DaxSwitch
         android:id="@+id/dax_switch_one"
         android:layout_width="wrap_content"
@@ -74,11 +40,10 @@
         android:layout_marginTop="@dimen/keyline_4"
         android:layout_marginEnd="@dimen/keyline_2"
         android:checked="false"
-        app:layout_constraintEnd_toStartOf="@+id/switch_two"
+        app:layout_constraintTop_toBottomOf="@+id/label"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/switch_one"/>
+        app:layout_constraintStart_toStartOf="parent" />
 
     <com.duckduckgo.common.ui.view.DaxSwitch
         android:id="@+id/dax_switch_two"
@@ -100,5 +65,16 @@
         app:layout_constraintBottom_toBottomOf="@+id/dax_switch_two"
         app:layout_constraintStart_toEndOf="@+id/dax_switch_two"
         app:layout_constraintTop_toTopOf="@+id/dax_switch_two"/>
+
+    <com.duckduckgo.common.ui.view.DaxSwitch
+        android:id="@+id/dax_switch_four"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_2"
+        android:checked="true"
+        android:enabled="false"
+        app:layout_constraintBottom_toBottomOf="@+id/dax_switch_three"
+        app:layout_constraintStart_toEndOf="@+id/dax_switch_three"
+        app:layout_constraintTop_toTopOf="@+id/dax_switch_three"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

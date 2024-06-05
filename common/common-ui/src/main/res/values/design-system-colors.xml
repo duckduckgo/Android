@@ -82,8 +82,12 @@
 
     <attr name="daxColorSwitchTrackOn" format="color"/>
     <attr name="daxColorSwitchTrackOff" format="color"/>
+    <attr name="daxColorSwitchTrackDisabledOn" format="color"/>
+    <attr name="daxColorSwitchTrackDisabledOff" format="color"/>
     <attr name="daxColorSwitchThumbOn" format="color"/>
     <attr name="daxColorSwitchThumbOff" format="color"/>
+    <attr name="daxColorSwitchThumbDisabledOn" format="color"/>
+    <attr name="daxColorSwitchThumbDisabledOff" format="color"/>
 
     <attr name="daxColorSwitchOff" format="color"/>
     <attr name="daxColorSwitchOn" format="color"/>

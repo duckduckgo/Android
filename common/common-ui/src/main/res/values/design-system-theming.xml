@@ -181,9 +181,13 @@
 
         <!-- Switch -->
         <item name="daxColorSwitchTrackOn">?attr/daxColorAccentBlue</item>
-        <item name="daxColorSwitchTrackOff">@color/gray36</item>
-        <item name="daxColorSwitchThumbOn">?attr/daxColorAccentBlue</item>
-        <item name="daxColorSwitchThumbOff">@color/gray36</item>
+        <item name="daxColorSwitchTrackOff">@color/gray60_50</item>
+        <item name="daxColorSwitchTrackDisabledOn">@color/gray30</item>
+        <item name="daxColorSwitchTrackDisabledOff">@color/gray30</item>
+        <item name="daxColorSwitchThumbOn">?attr/daxColorWhite</item>
+        <item name="daxColorSwitchThumbOff">?attr/daxColorWhite</item>
+        <item name="daxColorSwitchThumbDisabledOn">@color/white48</item>
+        <item name="daxColorSwitchThumbDisabledOff">@color/white48</item>
 
         <!-- SwitchV3 (Material3) -->
         <item name="daxColorSwitchThumb">?attr/daxColorWhite</item>
@@ -259,9 +263,13 @@
 
         <!-- Switch -->
         <item name="daxColorSwitchTrackOn">?attr/daxColorAccentBlue</item>
-        <item name="daxColorSwitchTrackOff">@color/gray60</item>
-        <item name="daxColorSwitchThumbOn">?attr/daxColorAccentBlue</item>
-        <item name="daxColorSwitchThumbOff">@color/white</item>
+        <item name="daxColorSwitchTrackOff">@color/gray60_50</item>
+        <item name="daxColorSwitchTrackDisabledOn">@color/gray36</item>
+        <item name="daxColorSwitchTrackDisabledOff">@color/gray36</item>
+        <item name="daxColorSwitchThumbOn">?attr/daxColorWhite</item>
+        <item name="daxColorSwitchThumbOff">?attr/daxColorWhite</item>
+        <item name="daxColorSwitchThumbDisabledOn">?attr/daxColorWhite</item>
+        <item name="daxColorSwitchThumbDisabledOff">?attr/daxColorWhite</item>
 
         <!-- SwitchV3 (Material3) -->
         <item name="daxColorSwitchThumb">?attr/daxColorWhite</item>
