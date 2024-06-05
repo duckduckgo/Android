@@ -848,9 +848,11 @@
     <string name="onboardingSearchQueryOption1">ingilizcede ördek nasıl denir</string>
     <string name="onboardingSearchQueryOption1English">ispanyolcada ördek nasıl denir</string>
     <string name="onboardingSearchDaxDialogOption2">avatar oyuncu kadrosu</string>
+    <string name="onboardingSearchDaxDialogOption2US">mighty ducks oyuncu kadrosu</string>
     <string name="onboardingSearchDaxDialogOption3">yerel hava durumu</string>
     <string name="onboardingSearchDaxDialogOption4">Şaşırt beni!</string>
     <string name="onboardingSearchQueryOption4">akşam yemeği tarifleri</string>
+    <string name="onboardingSearchQueryOption4US">çikolata parçacıklı kurabiye tarifleri</string>
     <string name="onboardingSitesDaxDialogTitle">Bir siteyi ziyaret etmeyi deneyin!</string>
     <string name="onboardingSitesDaxDialogDescription">Sizi gözetlemelerini önlemek için izleyicileri engelleyeceğim.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
