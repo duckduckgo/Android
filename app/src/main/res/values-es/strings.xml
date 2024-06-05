@@ -472,7 +472,7 @@
         <item quantity="one"><![CDATA[ y <b>%1$d más</b> intentaban rastrearte aquí. <br/><br/>¡Los he bloqueado!<br/><br/> ☝️Puedes consultar la barra de navegación para ver quién está tratando de rastrearte cuando visitas un nuevo sitio.️]]></item>
         <item quantity="other"><![CDATA[ y <b>%1$d más</b> intentaban rastrearte aquí. <br/><br/>¡Los he bloqueado!<br/><br/> ☝️Puedes consultar la barra de navegación para ver quién está tratando de rastrearte cuando visitas un nuevo sitio.️]]></item>
     </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
+    <plurals name="daxTrackersBlockedCtaZeroText">
         <item quantity="one"><![CDATA[ intentaba rastrearte aquí. <br/><br/>¡Lo he bloqueado!<br/><br/> ☝️Puedes consultar la barra de navegación para ver quién está tratando de rastrearte cuando visitas un nuevo sitio.️]]></item>
         <item quantity="other"><![CDATA[ intentaban rastrearte aquí. <br/><br/>¡Los he bloqueado!<br/><br/> ☝️Puedes consultar la barra de navegación para ver quién está tratando de rastrearte cuando visitas un nuevo sitio.️]]></item>
     </plurals>
@@ -864,7 +864,7 @@
         <item quantity="one"><![CDATA[ y <b>%1$d persona más</b> intentaba rastrearte hasta aquí. ¡Los he bloqueado!<br/><br/>☝️ Pulsa en el escudo para obtener más información.️]]></item>
         <item quantity="other"><![CDATA[ y <b>%1$d personas más</b> intentaban rastrearte hasta aquí. ¡Los he bloqueado!<br/><br/>☝️ Pulsa en el escudo para obtener más información.️]]></item>
     </plurals>
-    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription">
         <item quantity="one"><![CDATA[ intentaba rastrearte hasta aquí. ¡Los he bloqueado!<br/><br/>☝️ Pulsa en el escudo para obtener más información.️]]></item>
         <item quantity="other"><![CDATA[ intentaban rastrearte hasta aquí. ¡Los he bloqueado!<br/><br/>☝️ Pulsa en el escudo para obtener más información.️]]></item>
     </plurals>

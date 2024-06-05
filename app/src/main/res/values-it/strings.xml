@@ -472,7 +472,7 @@
         <item quantity="one"><![CDATA[ e <b>%1$d altro</b> stava tentando di tracciare la tua attività qui. <br/><br/>L\'ho bloccato!<br/><br/> ☝️Controlla la barra degli indirizzi per vedere chi sta cercando di tracciare la tua attività quando visiti un nuovo sito.️]]></item>
         <item quantity="other"><![CDATA[ e <b>altri %1$d</b> stavano tentando di tracciare la tua attività qui. <br/><br/>Li ho bloccati!<br/><br/> ☝️Controlla la barra degli indirizzi per vedere chi sta cercando di tracciare la tua attività quando visiti un nuovo sito.️]]></item>
     </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
+    <plurals name="daxTrackersBlockedCtaZeroText">
         <item quantity="one"><![CDATA[ stava tentando di tracciare la tua attività qui. <br/><br/>L\'ho bloccato!<br/><br/> ☝️Controlla la barra degli indirizzi per vedere chi sta cercando di tracciare la tua attività quando visiti un nuovo sito.️]]></item>
         <item quantity="other"><![CDATA[ stavano tentando di tracciare la tua attività qui. <br/><br/>Li ho bloccati!<br/><br/> ☝️Controlla la barra degli indirizzi per vedere chi sta cercando di tracciare la tua attività quando visiti un nuovo sito.️]]></item>
     </plurals>
@@ -864,7 +864,7 @@
         <item quantity="one"><![CDATA[ e <b>%1$d altro</b> stavano tentando di tracciare la tua attività qui. Li ho bloccati!<br/><br/>☝️ Tocca lo scudo per maggiori informazioni.️]]></item>
         <item quantity="other"><![CDATA[ e <b>altri %1$d</b> stavano tentando di tracciare la tua attività qui. Li ho bloccati!<br/><br/>☝️ Tocca lo scudo per maggiori informazioni.️]]></item>
     </plurals>
-    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription">
         <item quantity="one"><![CDATA[ stava tentando di tracciare la tua attività qui. L\'ho bloccato!<br/><br/>☝️ Tocca lo scudo per maggiori informazioni.️]]></item>
         <item quantity="other"><![CDATA[ stavano tentando di tracciare la tua attività qui. Li ho bloccati!<br/><br/>☝️ Tocca lo scudo per maggiori informazioni.]]></item>
     </plurals>

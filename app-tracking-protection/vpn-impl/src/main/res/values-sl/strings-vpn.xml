@@ -219,13 +219,13 @@
     <string name="atp_ActivityPastWeekBlocked">Blokirana stran</string>
     <string name="atp_ActivityPastWeekAcross">Na spletni strani</string>
 
-    <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_ActivityPastWeekTrackerCount">
         <item quantity="one">Poskus sledenja</item>
         <item quantity="two">Poskusa sledenja</item>
         <item quantity="few">Poskusi sledenja</item>
         <item quantity="other">Poskusi sledenja</item>
     </plurals>
-    <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_ActivityPastWeekAppCount">
         <item quantity="one">Aplikacija</item>
         <item quantity="two">Aplikaciji</item>
         <item quantity="few">Aplikacije</item>

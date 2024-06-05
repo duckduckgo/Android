@@ -211,11 +211,11 @@
     <string name="atp_ActivityPastWeekBlocked">Blokkolt</string>
     <string name="atp_ActivityPastWeekAcross">Itt:</string>
 
-    <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_ActivityPastWeekTrackerCount">
         <item quantity="one">Követési kísérlet</item>
         <item quantity="other">Követési kísérletek</item>
     </plurals>
-    <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_ActivityPastWeekAppCount">
         <item quantity="one">Alkalmazás</item>
         <item quantity="other">Alkalmazások</item>
     </plurals>

@@ -219,13 +219,13 @@
     <string name="atp_ActivityPastWeekBlocked">Zablokované</string>
     <string name="atp_ActivityPastWeekAcross">Ve více</string>
 
-    <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_ActivityPastWeekTrackerCount">
         <item quantity="one">Pokus o sledování</item>
         <item quantity="few">Pokusy o sledování</item>
         <item quantity="many">Pokusu o sledování</item>
         <item quantity="other">Pokusů o sledování</item>
     </plurals>
-    <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_ActivityPastWeekAppCount">
         <item quantity="one">Aplikace</item>
         <item quantity="few">Aplikace</item>
         <item quantity="many">Aplikace</item>

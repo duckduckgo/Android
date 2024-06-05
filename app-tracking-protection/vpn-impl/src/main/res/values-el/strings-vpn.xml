@@ -211,11 +211,11 @@
     <string name="atp_ActivityPastWeekBlocked">Αποκλείστηκαν</string>
     <string name="atp_ActivityPastWeekAcross">Σε συνολικά</string>
 
-    <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_ActivityPastWeekTrackerCount">
         <item quantity="one">Προσπάθεια παρακολούθησης</item>
         <item quantity="other">Προσπάθειες παρακολούθησης</item>
     </plurals>
-    <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_ActivityPastWeekAppCount">
         <item quantity="one">Εφαρμογή</item>
         <item quantity="other">Εφαρμογές</item>
     </plurals>

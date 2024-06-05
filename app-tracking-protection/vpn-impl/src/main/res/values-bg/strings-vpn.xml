@@ -211,11 +211,11 @@
     <string name="atp_ActivityPastWeekBlocked">Блокиран/и</string>
     <string name="atp_ActivityPastWeekAcross">В</string>
 
-    <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_ActivityPastWeekTrackerCount">
         <item quantity="one">Опит за проследяване</item>
         <item quantity="other">Опита за проследяване</item>
     </plurals>
-    <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_ActivityPastWeekAppCount">
         <item quantity="one">Приложение</item>
         <item quantity="other">Приложения</item>
     </plurals>

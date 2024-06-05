@@ -472,7 +472,7 @@
         <item quantity="one"><![CDATA[ ja <b>%1$d teine</b> üritasid sind siin jälitada. <br/><br/>Blokeerisin tema!<br/><br/> ☝️Võid vaadata aadressiriba, et näha, kes üritab sind jälgida, kui külastad uut saiti.️]]></item>
         <item quantity="other"><![CDATA[ ja <b>%1$d teised</b> üritasid sind siin jälitada. <br/><br/>Blokeerisin nad!<br/><br/> ☝️Võid vaadata aadressiriba, et näha, kes üritab sind jälgida, kui külastad uut saiti.️]]></item>
     </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
+    <plurals name="daxTrackersBlockedCtaZeroText">
         <item quantity="one"><![CDATA[ üritas sind siin jälitada. <br/><br/>Blokeerisin tema!<br/><br/> ☝️Võid vaadata URL-i riba, et näha, kes üritab sind jälgida, kui külastad uut saiti.️]]></item>
         <item quantity="other"><![CDATA[ üritas sind siin jälitada. <br/><br/>Blokeerisin nad!<br/><br/> ☝️Võid vaadata URL-i riba, et näha, kes üritab sind jälgida, kui külastad uut saiti.️]]></item>
     </plurals>
@@ -864,7 +864,7 @@
         <item quantity="one"><![CDATA[ ja <b>veel %1$d teine</b> üritas sind siin jälgida. Ma blokeerisin need!<br/><br/>☝️ Lisateabe saamiseks vajuta kilbile.]]></item>
         <item quantity="other"><![CDATA[ ja <b>veel %1$d teist</b> üritasid sind siin jälgida. Ma blokeerisin need!<br/><br/>☝️ Lisateabe saamiseks vajuta kilbile.]]></item>
     </plurals>
-    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription">
         <item quantity="one"><![CDATA[ üritas sind siin jälgida. Ma blokeerisin selle!<br/><br/>☝️ Lisateabe saamiseks vajuta kilbile. ️]]></item>
         <item quantity="other"><![CDATA[ üritasid sind siin jälgida. Ma blokeerisin need!<br/><br/>☝️ Lisateabe saamiseks vajuta kilbile.]]></item>
     </plurals>

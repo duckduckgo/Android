@@ -211,11 +211,11 @@
     <string name="atp_ActivityPastWeekBlocked">Bloqueado</string>
     <string name="atp_ActivityPastWeekAcross">En</string>
 
-    <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_ActivityPastWeekTrackerCount">
         <item quantity="one">Intento de rastreo</item>
         <item quantity="other">Intentos de rastreo</item>
     </plurals>
-    <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_ActivityPastWeekAppCount">
         <item quantity="one">Aplicación</item>
         <item quantity="other">Aplicaciones</item>
     </plurals>

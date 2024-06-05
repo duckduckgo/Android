@@ -211,11 +211,11 @@
     <string name="atp_ActivityPastWeekBlocked">Engellendi</string>
     <string name="atp_ActivityPastWeekAcross">Uygulama Sayısı:</string>
 
-    <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_ActivityPastWeekTrackerCount">
         <item quantity="one">İzleme Girişimi</item>
         <item quantity="other">İzleme Girişimi</item>
     </plurals>
-    <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_ActivityPastWeekAppCount">
         <item quantity="one">Uygulama</item>
         <item quantity="other">Uygulama</item>
     </plurals>

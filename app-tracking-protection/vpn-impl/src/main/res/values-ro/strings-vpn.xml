@@ -215,12 +215,12 @@
     <string name="atp_ActivityPastWeekBlocked">Blocat</string>
     <string name="atp_ActivityPastWeekAcross">Din</string>
 
-    <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_ActivityPastWeekTrackerCount">
         <item quantity="one">Încercare de urmărire</item>
         <item quantity="few">Încercări de urmărire</item>
         <item quantity="other">Încercări de urmărire</item>
     </plurals>
-    <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
+    <plurals name="atp_ActivityPastWeekAppCount">
         <item quantity="one">Aplicație</item>
         <item quantity="few">Aplicații</item>
         <item quantity="other">Aplicații</item>
