@@ -219,13 +219,13 @@
     <string name="atp_ActivityPastWeekBlocked">Zablokowano</string>
     <string name="atp_ActivityPastWeekAcross">W</string>
 
-    <plurals name="atp_ActivityPastWeekTrackerCount">
+    <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
         <item quantity="one">Próba śledzenia</item>
         <item quantity="few">Próby śledzenia</item>
         <item quantity="many">Prób śledzenia</item>
         <item quantity="other">Próby śledzenia</item>
     </plurals>
-    <plurals name="atp_ActivityPastWeekAppCount">
+    <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
         <item quantity="one">Aplikacja</item>
         <item quantity="few">Aplikacje</item>
         <item quantity="many">Aplikacji</item>
