@@ -829,7 +829,7 @@
         <item quantity="one"><![CDATA[ en nog <b>%1$d ander</b> probeerden je hier te volgen. Ik heb ze geblokkeerd!<br/><br/>☝️ Tik op het schild voor meer informatie.️]]></item>
         <item quantity="other"><![CDATA[ en nog <b>%1$d anderen</b> probeerden je hier te volgen. Ik heb ze geblokkeerd!<br/><br/>☝️ Tik op het schild voor meer informatie.️]]></item>
     </plurals>
-    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription">
         <item quantity="one"><![CDATA[ probeerde je hier te volgen. Ik heb ze geblokkeerd!<br/><br/>☝️ Tik op het schild voor meer info.️]]></item>
         <item quantity="other"><![CDATA[ probeerden je hier te volgen. Ik heb ze geblokkeerd!<br/><br/>☝️ Tik op het schild voor meer info.️]]></item>
     </plurals>

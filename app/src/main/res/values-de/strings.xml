@@ -829,7 +829,7 @@
         <item quantity="one"><![CDATA[ und <b>%1$d weiteres Tracker-Netzwerk</b> hat versucht, dich hier zu tracken. Ich habe es blockiert!<br/><br/>☝️ Tippe auf das Schild, um weitere Informationen zu erhalten.]]></item>
         <item quantity="other"><![CDATA[ und <b>%1$d weitere Tracker-Netzwerke</b> haben versucht, dich hier zu tracken. Ich habe sie blockiert!<br/><br/>☝️ Tippe auf das Schild, um weitere Informationen zu erhalten.]]></item>
     </plurals>
-    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription">
         <item quantity="one"><![CDATA[ haben versucht, dich hier zu tracken. Ich habe sie blockiert!<br/><br/>☝️ Tippe auf das Schild, um weitere Informationen zu erhalten.]]></item>
         <item quantity="other"><![CDATA[ haben versucht, dich hier zu tracken. Ich habe sie blockiert!<br/><br/>☝️ Tippe auf das Schild, um weitere Informationen zu erhalten.]]></item>
     </plurals>

@@ -829,7 +829,7 @@
         <item quantity="one"><![CDATA[ ve <b>%1$d site daha</b> sizi burada takip etmeye çalışıyordu. Onları engelledim!<br/><br/>☝️ Daha fazla bilgi için kalkana dokunun.️]]></item>
         <item quantity="other"><![CDATA[ ve <b>%1$d site daha</b> sizi burada takip etmeye çalışıyordu. Onları engelledim!<br/><br/>☝️ Daha fazla bilgi için kalkana dokunun.️]]></item>
     </plurals>
-    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription">
         <item quantity="one"><![CDATA[ sizi burada takip etmeye çalışıyordu. Onları engelledim!<br/><br/>☝️ Daha fazla bilgi için kalkana dokunun.️]]></item>
         <item quantity="other"><![CDATA[ sizi burada takip etmeye çalışıyordu. Onları engelledim!<br/><br/>☝️ Daha fazla bilgi için kalkana dokunun.️]]></item>
     </plurals>

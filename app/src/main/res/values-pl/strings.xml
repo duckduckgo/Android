@@ -837,7 +837,7 @@
         <item quantity="many"><![CDATA[ i <b>jeszcze %1$d</b> mechanizmów próbowało Cię tutaj śledzić. Zostały przeze mnie zablokowane!<br/><br/>☝️ Stuknij tarczę, aby uzyskać więcej informacji.️]]></item>
         <item quantity="other"><![CDATA[ i <b>jeszcze %1$d mechanizmu</b> próbowało Cię tutaj śledzić. Zostały przeze mnie zablokowane!<br/><br/>☝️ Stuknij tarczę, aby uzyskać więcej informacji.️]]></item>
     </plurals>
-    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription">
         <item quantity="one"><![CDATA[ próbował Cię tutaj śledzić. Został przeze mnie zablokowany!<br/><br/>☝️ Dotknij tarczy, aby uzyskać więcej informacji.️]]></item>
         <item quantity="few"><![CDATA[ próbowały Cię tutaj śledzić. Zostały przeze mnie zablokowane!<br/><br/>☝️ Dotknij tarczy, aby uzyskać więcej informacji.️]]></item>
         <item quantity="many"><![CDATA[ próbowały Cię tutaj śledzić. Zostały przeze mnie zablokowane!<br/><br/>☝️ Dotknij tarczy, aby uzyskać więcej informacji.️]]></item>

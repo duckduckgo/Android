@@ -829,7 +829,7 @@
         <item quantity="one"><![CDATA[ ja <b>veel %1$d teine</b> üritas sind siin jälgida. Ma blokeerisin need!<br/><br/>☝️ Lisateabe saamiseks vajuta kilbile.]]></item>
         <item quantity="other"><![CDATA[ ja <b>veel %1$d teist</b> üritasid sind siin jälgida. Ma blokeerisin need!<br/><br/>☝️ Lisateabe saamiseks vajuta kilbile.]]></item>
     </plurals>
-    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription">
         <item quantity="one"><![CDATA[ üritas sind siin jälgida. Ma blokeerisin selle!<br/><br/>☝️ Lisateabe saamiseks vajuta kilbile. ️]]></item>
         <item quantity="other"><![CDATA[ üritasid sind siin jälgida. Ma blokeerisin need!<br/><br/>☝️ Lisateabe saamiseks vajuta kilbile.]]></item>
     </plurals>

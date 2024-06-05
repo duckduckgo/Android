@@ -829,7 +829,7 @@
         <item quantity="one"><![CDATA[ ja <b>%1$d muu</b> yritti seurata sinua täällä. Estin ne!<br/><br/>☝️ Napauta kilpeä saadaksesi lisätietoja.️]]></item>
         <item quantity="other"><![CDATA[ ja <b>%1$d muuta</b> yrittivät seurata sinua täällä. Estin ne!<br/><br/>☝️ Napauta kilpiä saadaksesi lisätietoja.️]]></item>
     </plurals>
-    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription">
         <item quantity="one"><![CDATA[ yritti seurata sinua täällä. Estin sen!<br/><br/>☝️ Napauta kilpeä saadaksesi lisätietoja.️]]></item>
         <item quantity="other"><![CDATA[ yrittivät seurata sinua täällä. Estin ne!<br/><br/>☝️ Napauta kilpeä saadaksesi lisätietoja.️]]></item>
     </plurals>

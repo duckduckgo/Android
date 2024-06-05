@@ -837,7 +837,7 @@
         <item quantity="many"><![CDATA[ a <b>%1$d dalšího trackeru</b> se tě tady snaží sledovat. A tak jsem je zablokoval!<br/><br/>☝️ Další informace zobrazíš klepnutím na štít.️]]></item>
         <item quantity="other"><![CDATA[ a <b>%1$d dalších trackerů</b> se tě tady snaží sledovat. A tak jsem je zablokoval!<br/><br/>☝️ Další informace zobrazíš klepnutím na štít.️]]></item>
     </plurals>
-    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription">
         <item quantity="one"><![CDATA[ se tě tady snaží sledovat. A tak jsem to zablokoval!<br/><br/>☝️ Klepnutím na štít si zobrazíš další informace.️]]></item>
         <item quantity="few"><![CDATA[ se tě tady snaží sledovat. A tak jsem je zablokoval!<br/><br/>☝️ Klepnutím na štít si zobrazíš další informace.️]]></item>
         <item quantity="many"><![CDATA[ se tě tady snaží sledovat. A tak jsem je zablokoval!<br/><br/>☝️ Klepnutím na štít si zobrazíš další informace.️]]></item>

@@ -829,7 +829,7 @@
         <item quantity="one"><![CDATA[ и <b>%1$d друг</b> се опитваха да ви проследят тук. Блокирах ги!<br/><br/>☝️ Докоснете щита за повече информация.️]]></item>
         <item quantity="other"><![CDATA[ и <b>%1$d други</b> се опитваха да ви проследят тук. Блокирах ги!<br/><br/>☝️ Докоснете щита за повече информация.️]]></item>
     </plurals>
-    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription">
         <item quantity="one"><![CDATA[ се опита да ви проследи тук. Блокирах го!<br/><br/>☝️ Докоснете щита за повече информация.️]]></item>
         <item quantity="other"><![CDATA[ се опитваха да ви проследят тук. Блокирах ги!<br/><br/>☝️ Докоснете щита за повече информация.️]]></item>
     </plurals>

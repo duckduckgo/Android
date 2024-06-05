@@ -828,7 +828,7 @@
         <item quantity="one" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 1 other..."><![CDATA[&#160;and <b>%1$d other</b> were trying to track you here. I blocked them!<br/><br/>☝️ Tap the shield for more info.️]]></item>
         <item quantity="other" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 3 others..."><![CDATA[&#160;and <b>%1$d others</b> were trying to track you here. I blocked them!<br/><br/>☝️ Tap the shield for more info.️]]></item>
     </plurals>
-    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription">
         <item quantity="one" instruction="This sentence is preceded by the name of a company, i.e. Facebook was trying to track..."><![CDATA[&#160;was trying to track you here. I blocked them!<br/><br/>☝️ Tap the shield for more info.️]]></item>
         <item quantity="other" instruction="This sentence is preceded by the name of several companies, i.e. Facebook and Google were trying to track..."><![CDATA[&#160;were trying to track you here. I blocked them!<br/><br/>☝️ Tap the shield for more info.️]]></item>
     </plurals>

@@ -829,7 +829,7 @@
         <item quantity="one"><![CDATA[ és <b>további %1$d</b> próbált téged követni itt. Blokkoltam őket!<br/><br/>☝️ További információkért koppints a pajzsra.️]]></item>
         <item quantity="other"><![CDATA[ és <b>további %1$d</b> próbált téged követni itt. Blokkoltam őket!<br/><br/>☝️ További információkért koppints a pajzsra.️]]></item>
     </plurals>
-    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription">
         <item quantity="one"><![CDATA[ próbált téged követni itt. Blokkoltam őket!<br/><br/>☝️ További információkért koppints a pajzsra.️]]></item>
         <item quantity="other"><![CDATA[ próbált téged követni itt. Blokkoltam őket!<br/><br/>☝️ További információkért koppints a pajzsra.️]]></item>
     </plurals>

@@ -829,7 +829,7 @@
         <item quantity="one"><![CDATA[ και <b>%1$d ακόμα</b> προσπαθούσαν να σας παρακολουθήσουν εδώ. Τους μπλόκαρα!<br/><br/>☝️ Πατήστε την ασπίδα για περισσότερες πληροφορίες.️]]></item>
         <item quantity="other"><![CDATA[ και <b>%1$d ακόμα</b> προσπαθούσαν να σας παρακολουθήσουν εδώ. Τους μπλόκαρα!<br/><br/>☝️ Πατήστε την ασπίδα για περισσότερες πληροφορίες.️]]></item>
     </plurals>
-    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription">
         <item quantity="one"><![CDATA[ προσπαθούσε να σας παρακολουθήσει εδώ. Τους μπλόκαρα!<br/><br/>☝️ Πατήστε την ασπίδα για περισσότερες πληροφορίες.️]]></item>
         <item quantity="other"><![CDATA[ προσπαθούσαν να σας παρακολουθήσουν εδώ. Τους μπλόκαρα!<br/><br/>☝️ Πατήστε την ασπίδα για περισσότερες πληροφορίες.️]]></item>
     </plurals>

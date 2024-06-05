@@ -829,7 +829,7 @@
         <item quantity="one"><![CDATA[ og <b>%1$d andre</b> prøvde å spore deg her. Jeg blokkerte dem!<br/><br/>☝️ Trykk på skjoldet for mer informasjon.️]]></item>
         <item quantity="other"><![CDATA[ og <b>%1$d andre</b> prøvde å spore deg her. Jeg blokkerte dem!<br/><br/>☝️ Trykk på skjoldet for mer informasjon.️]]></item>
     </plurals>
-    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription">
         <item quantity="one"><![CDATA[ prøvde å spore deg her. Jeg blokkerte dem!<br/><br/>☝️ Trykk på skjoldet for mer info.️]]></item>
         <item quantity="other"><![CDATA[ prøvde å spore deg her. Jeg blokkerte dem!<br/><br/>☝️ Trykk på skjoldet for mer info.️]]></item>
     </plurals>

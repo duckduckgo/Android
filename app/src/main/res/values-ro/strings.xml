@@ -833,7 +833,7 @@
         <item quantity="few"><![CDATA[ și <b>încă %1$d</b> încercau să te urmărească aici. Le-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
         <item quantity="other"><![CDATA[ și <b>încă %1$d</b> încercau să te urmărească aici. Le-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
     </plurals>
-    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription">
         <item quantity="one"><![CDATA[ încerca să te urmărească aici. L-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
         <item quantity="few"><![CDATA[ încercau să te urmărească până aici. Le-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
         <item quantity="other"><![CDATA[ încercau să te urmărească până aici. Le-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
