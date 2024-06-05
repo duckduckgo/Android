@@ -848,9 +848,11 @@
     <string name="onboardingSearchQueryOption1">kuidas öelda part inglise keeles</string>
     <string name="onboardingSearchQueryOption1English">kuidas öelda part hispaania keeles</string>
     <string name="onboardingSearchDaxDialogOption2">Avatari näitlejad</string>
+    <string name="onboardingSearchDaxDialogOption2US">Mighty Ducks näitlejad</string>
     <string name="onboardingSearchDaxDialogOption3">kohalik ilm</string>
     <string name="onboardingSearchDaxDialogOption4">Üllata mind!</string>
     <string name="onboardingSearchQueryOption4">õhtusöögi retseptid</string>
+    <string name="onboardingSearchQueryOption4US">šokolaadiküpsiste retseptid</string>
     <string name="onboardingSitesDaxDialogTitle">Proovi külastada saiti!</string>
     <string name="onboardingSitesDaxDialogDescription">Ma blokeerin jälgijaid, et nad ei saaks sind luurata.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
