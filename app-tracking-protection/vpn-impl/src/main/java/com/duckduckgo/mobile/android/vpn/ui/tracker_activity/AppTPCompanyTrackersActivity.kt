@@ -32,8 +32,8 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.*
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
-import com.duckduckgo.common.ui.view.InfoPanel
 import com.duckduckgo.common.ui.view.DaxSwitch
+import com.duckduckgo.common.ui.view.InfoPanel
 import com.duckduckgo.common.ui.view.addClickableLink
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.quietlySetIsChecked

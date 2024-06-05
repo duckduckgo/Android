@@ -35,9 +35,9 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.DaxDialogListener
+import com.duckduckgo.common.ui.view.DaxSwitch
 import com.duckduckgo.common.ui.view.InfoPanel.Companion.APPTP_SETTINGS_ANNOTATION
 import com.duckduckgo.common.ui.view.InfoPanel.Companion.REPORT_ISSUES_ANNOTATION
-import com.duckduckgo.common.ui.view.DaxSwitch
 import com.duckduckgo.common.ui.view.TypewriterDaxDialog
 import com.duckduckgo.common.ui.view.dialog.StackedAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
