@@ -165,17 +165,6 @@
     <issue
         id="MissingQuantity"
         message="For locale &quot;fr&quot; (French) the following quantities should also be defined: `many`"
-        errorLine1="    &lt;plurals name=&quot;daxTrackersBlockedCtaText&quot;>"
-        errorLine2="    ^">
-        <location
-            file="src/main/res/values-fr/strings.xml"
-            line="417"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="MissingQuantity"
-        message="For locale &quot;fr&quot; (French) the following quantities should also be defined: `many`"
         errorLine1="    &lt;plurals name=&quot;daxTrackersBlockedCtaZeroText&quot;>"
         errorLine2="    ^">
         <location
@@ -1974,17 +1963,6 @@
         <location
             file="src/main/res/values/strings.xml"
             line="298"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="UnusedQuantity"
-        message="For language &quot;hr&quot; (Croatian) the following quantities are not relevant: `many`"
-        errorLine1="    &lt;plurals name=&quot;daxTrackersBlockedCtaText&quot;>"
-        errorLine2="    ^">
-        <location
-            file="src/main/res/values-hr/strings.xml"
-            line="417"
             column="5"/>
     </issue>
 
