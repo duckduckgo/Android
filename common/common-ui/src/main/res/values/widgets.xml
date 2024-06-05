@@ -381,18 +381,13 @@
     <style name="ThemeOverlay.DuckDuckGo.Switch" >
         <item name="trackTint">@color/switch_track_tint</item>
         <item name="thumbTint">@color/switch_thumb_tint</item>
+        <item name="android:thumb">@drawable/switch_thumb</item>
     </style>
 
     <style name="Widget.DuckDuckGo.v3.Switch" parent="Widget.Material3.CompoundButton.MaterialSwitch">
-        <item name="materialThemeOverlay">@style/ThemeOverlay.DuckDuckGo.v3.Switch</item>
-    </style>
-
-    <style name="ThemeOverlay.DuckDuckGo.v3.Switch" parent="">
-        <item name="colorPrimary">?daxColorSwitchOn</item>
-        <item name="colorSurfaceVariant">?daxColorSwitchOff</item>
-        <item name="colorOutline">?daxColorSwitchThumb</item>
-        <item name="colorOnPrimary">?daxColorSwitchThumb</item>
-        <item name="colorOnPrimaryContainer">?daxColorSwitchThumb</item>
+        <item name="trackTint">@color/switch_track_tint</item>
+        <item name="thumbTint">@color/switch_thumb_tint</item>
+        <item name="android:thumb">@drawable/switch_thumb</item>
     </style>
 
     <!-- Slider -->
