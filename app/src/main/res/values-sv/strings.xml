@@ -848,9 +848,11 @@
     <string name="onboardingSearchQueryOption1">hur säger man anka på engelska</string>
     <string name="onboardingSearchQueryOption1English">hur säger man anka på spanska</string>
     <string name="onboardingSearchDaxDialogOption2">rollbesättningen för avatar</string>
+    <string name="onboardingSearchDaxDialogOption2US">medverkande i mighty ducks</string>
     <string name="onboardingSearchDaxDialogOption3">lokalt väder</string>
     <string name="onboardingSearchDaxDialogOption4">Överraska mig!</string>
     <string name="onboardingSearchQueryOption4">middagsrecept</string>
+    <string name="onboardingSearchQueryOption4US">recept på chokladkakor</string>
     <string name="onboardingSitesDaxDialogTitle">Prova att besöka en webbplats!</string>
     <string name="onboardingSitesDaxDialogDescription">Jag blockerar spårare så att de inte kan spionera på dig.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
