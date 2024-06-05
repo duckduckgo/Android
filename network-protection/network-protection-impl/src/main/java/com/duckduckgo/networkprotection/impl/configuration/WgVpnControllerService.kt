@@ -42,6 +42,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.POST
+import retrofit2.http.Path
 
 @Module
 @ContributesTo(scope = VpnScope::class)
@@ -116,6 +117,11 @@ interface WgVpnControllerService {
     @GET("$NETP_ENVIRONMENT_URL/servers")
     suspend fun getServers(): List<RegisteredServerInfo>
 
+    @GET("$NETP_ENVIRONMENT_URL/servers/{serverName}/status")
+    suspend fun getServerStatus(
+        @Path("serverName") serverName: String,
+    ): ServerStatus
+
     @Headers("Content-Type: application/json")
     @POST("$NETP_ENVIRONMENT_URL/register")
     suspend fun registerKey(
@@ -141,6 +147,10 @@ data class NetPRedeemCodeError(val message: String) {
         const val INVALID = "invalid code"
     }
 }
+
+data class ServerStatus(
+    val shouldMigrate: Boolean,
+)
 
 data class RegisteredServerInfo(
     val registeredAt: String,
