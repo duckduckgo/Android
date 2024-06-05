@@ -465,7 +465,6 @@
     <string name="onboardingWelcomeTitle">"Välkommen till DuckDuckGo!"</string>
     <string name="onboardingDaxText"><![CDATA[Internet kan vara lite läskigt.<br/><br/>Oroa dig inte! Att söka och surfa privat är lättare än du tror.]]></string>
     <string name="onboardingLetsDoItButton">Vi kör!</string>
-    <string name="daxSerpCtaText">Dina DuckDuckGo-sökningar är anonyma. Alltid. 🙌</string>
     <string name="daxNonSerpCtaText"><![CDATA[Medan du pekar och bläddrar kommer jag att blockera irriterande spårare. <br/><br/>Fortsätt – surfa vidare!]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Bra att veta! Jag kan inte hindra %1$s från att se din aktivitet på %2$s&lt;br/&gt;&lt;br/&gt;Men om du surfar med hjälp av mig kan jag se till att %3$s får veta mindre om dig genom att blockera deras spårare på många andra webbplatser.</string>
     <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Bra att veta! Eftersom %1$s äger %2$s kan jag inte hindra dem från att se din aktivitet här.&lt;br/&gt;&lt;br/&gt;Men om du surfar med hjälp av mig kan jag se till att %3$s får veta mindre om dig genom att blockera deras spårare på många andra webbplatser.</string>

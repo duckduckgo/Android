@@ -465,7 +465,6 @@
     <string name="onboardingWelcomeTitle">"Üdvözlünk a DuckDuckGo-ban!"</string>
     <string name="onboardingDaxText"><![CDATA[Az internet néha hátborzongató.<br/><br/>Ne aggódj! A magánjellegű keresés és böngészés könnyebb, mint gondolnád.]]></string>
     <string name="onboardingLetsDoItButton">Rajta, csináljuk!</string>
-    <string name="daxSerpCtaText">A DuckDuckGo keresései névtelenek. Mindig. 🙌</string>
     <string name="daxNonSerpCtaText"><![CDATA[Ahogy megérinted és görgeted, én blokkolni fogom a bosszantó nyomkövetőket. <br/><br/>Menj tovább - folytasd a böngészést!]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Figyelem! Nem tudom megakadályozni, hogy %1$s láthassa a tevékenységedet itt: %2$s &lt;br/&gt;&lt;br/&gt;Ha azonban velem böngészel, a sok más weboldalon is használt nyomkövetőjük blokkolásával korlátozni tudom azt, amit %3$s megtudhat rólad.</string>
     <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Figyelem! Mivel %1$s tulajdonában van a(z) %2$s, nem tudom megakadályozni, hogy lássák az itteni tevékenységedet.&lt;br/&gt;&lt;br/&gt;Ha azonban velem böngészel, a sok más weboldalon is használt nyomkövetőjük blokkolásával korlátozni tudom azt, amit %3$s tud rólad.</string>

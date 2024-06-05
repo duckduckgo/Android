@@ -465,7 +465,6 @@
     <string name="onboardingWelcomeTitle">"Tere tulemast DuckDuckGo kasutajaks!"</string>
     <string name="onboardingDaxText"><![CDATA[Internet võib olla üsna jube.<br/><br/>Ärge muretsege! Privaatselt otsimine ja sirvimine on lihtsam kui arvate.]]></string>
     <string name="onboardingLetsDoItButton">Teeme ära!</string>
-    <string name="daxSerpCtaText">Sinu DuckDuckGo\' otsingud on anonüümsed. Alati. 🙌</string>
     <string name="daxNonSerpCtaText"><![CDATA[Kui puudutate ja kerite, siis mina blokeerin tüütud jälgijad. <br/><br/>Edasi — jätkake sirvimist!]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Ettevaatust! Ma ei saa takistada %1$s nägemast sinu tegevust %2$s&lt;br/&gt;&lt;br/&gt;Kuid sirvi koos minuga ja ma saan vähendada seda, mida %3$s sinust üldiselt teab, blokeerides tema jälitajad paljudel teistel lehtedel.</string>
     <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Tähelepanu! Kuna %1$s on %2$s omanik, ei saa ma takistada teda jälgimast sinu tegevust siin.&lt;br/&gt;&lt;br/&gt;Kuid sirvi koos minuga ja ma saan vähendada seda, mida %3$s sinust üldiselt teab, blokeerides tema jälgijad paljudel teistel lehtedel.</string>
