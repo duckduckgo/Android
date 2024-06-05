@@ -54,7 +54,7 @@
         <item name="tabStyle">@style/Widget.DuckDuckGo.TabLayout</item>
         <item name="radioButtonStyle">@style/Widget.DuckDuckGo.RadioButton</item>
         <item name="sliderStyle">@style/Widget.DuckDuckGo.Slider</item>
-        <item name="switchStyle">@style/Widget.DuckDuckGo.Switch</item>
+        <item name="switchStyle">@style/Widget.DuckDuckGo.v3.Switch</item>
         <item name="snackbarStyle">@style/Widget.DuckDuckGo.Snackbar</item>
         <item name="snackbarButtonStyle">@style/Widget.DuckDuckGo.SnackbarButton</item>
         <item name="snackbarTextViewStyle">@style/Widget.DuckDuckGo.SnackbarText</item>
@@ -189,11 +189,6 @@
         <item name="daxColorSwitchThumbDisabledOn">@color/white48</item>
         <item name="daxColorSwitchThumbDisabledOff">@color/white48</item>
 
-        <!-- SwitchV3 (Material3) -->
-        <item name="daxColorSwitchThumb">?attr/daxColorWhite</item>
-        <item name="daxColorSwitchOn">?attr/daxColorAccentBlue</item>
-        <item name="daxColorSwitchOff">@color/gray36</item>
-
         <!-- Slider -->
         <item name="daxColorSliderTrackInactive">@color/gray40_50</item>
         <item name="daxColorSliderActive">?attr/daxColorAccentBlue</item>
@@ -270,11 +265,6 @@
         <item name="daxColorSwitchThumbOff">?attr/daxColorWhite</item>
         <item name="daxColorSwitchThumbDisabledOn">?attr/daxColorWhite</item>
         <item name="daxColorSwitchThumbDisabledOff">?attr/daxColorWhite</item>
-
-        <!-- SwitchV3 (Material3) -->
-        <item name="daxColorSwitchThumb">?attr/daxColorWhite</item>
-        <item name="daxColorSwitchOn">?attr/daxColorAccentBlue</item>
-        <item name="daxColorSwitchOff">@color/gray36</item>
 
         <!-- Slider -->
         <item name="daxColorSliderTrackInactive">@color/gray60_50</item>

@@ -89,10 +89,6 @@
     <attr name="daxColorSwitchThumbDisabledOn" format="color"/>
     <attr name="daxColorSwitchThumbDisabledOff" format="color"/>
 
-    <attr name="daxColorSwitchOff" format="color"/>
-    <attr name="daxColorSwitchOn" format="color"/>
-    <attr name="daxColorSwitchThumb" format="color"/>
-
     <attr name="daxColorSliderTrackInactive" format="color"/>
     <attr name="daxColorSliderActive" format="color"/>
 
