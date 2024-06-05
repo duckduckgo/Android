@@ -858,9 +858,11 @@
     <string name="onboardingSearchQueryOption1">jak se řekne anglicky kachna</string>
     <string name="onboardingSearchQueryOption1English">jak se řekne španělsky „kachna“</string>
     <string name="onboardingSearchDaxDialogOption2">obsazení avatara</string>
+    <string name="onboardingSearchDaxDialogOption2US">herci z filmu Šampióni</string>
     <string name="onboardingSearchDaxDialogOption3">aktuální počasí</string>
     <string name="onboardingSearchDaxDialogOption4">Překvap mě!</string>
     <string name="onboardingSearchQueryOption4">recepty na večeři</string>
+    <string name="onboardingSearchQueryOption4US">recepty na čokoládové sušenky</string>
     <string name="onboardingSitesDaxDialogTitle">Zkus přejít na nějaký web!</string>
     <string name="onboardingSitesDaxDialogDescription">Zablokuju trackery, aby tě nemohly šmírovat.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
