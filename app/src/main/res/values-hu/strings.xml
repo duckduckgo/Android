@@ -848,9 +848,11 @@
     <string name="onboardingSearchQueryOption1">hogyan mondják angolul, hogy kacsa</string>
     <string name="onboardingSearchQueryOption1English">hogyan mondják spanyolul, hogy kacsa</string>
     <string name="onboardingSearchDaxDialogOption2">avatar szereposztása</string>
+    <string name="onboardingSearchDaxDialogOption2US">kerge kacsák szereposztása</string>
     <string name="onboardingSearchDaxDialogOption3">helyi időjárás</string>
     <string name="onboardingSearchDaxDialogOption4">Lepj meg!</string>
     <string name="onboardingSearchQueryOption4">vacsorareceptek</string>
+    <string name="onboardingSearchQueryOption4US">csokisütireceptek</string>
     <string name="onboardingSitesDaxDialogTitle">Próbálj meg ellátogatni egy webhelyre!</string>
     <string name="onboardingSitesDaxDialogDescription">Én blokkolom a nyomkövetőket, hogy ne tudjanak kémkedni utánad.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
@@ -868,7 +870,7 @@
         <item quantity="one"><![CDATA[ próbált téged követni itt. Blokkoltam őket!<br/><br/>☝️ További információkért koppints a pajzsra.️]]></item>
         <item quantity="other"><![CDATA[ próbált téged követni itt. Blokkoltam őket!<br/><br/>☝️ További információkért koppints a pajzsra.️]]></item>
     </plurals>
-    <string name="onboardingTrackersBlockedDaxDialogButton">Rendben!</string>
+    <string name="onboardingTrackersBlockedDaxDialogButton">Megvan!</string>
     <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Töröld azonnal böngészési tevékenységedet a <b>Fire Button</b> használatával.<br/><br/>Próbáld ki! ☝️️]]></string>
     <string name="onboardingEndDaxDialogTitle">"Megvan, ez az!"</string>
     <string name="onboardingEndDaxDialogDescription">Ne feledd: minden alkalommal, amikor velem böngészel, egy undok hirdetés elveszíti az erejét. 👌</string>
