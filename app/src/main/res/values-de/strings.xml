@@ -848,9 +848,11 @@
     <string name="onboardingSearchQueryOption1">wie sagt man Ente auf Englisch</string>
     <string name="onboardingSearchQueryOption1English">wie sagt man „Ente“ auf Spanisch</string>
     <string name="onboardingSearchDaxDialogOption2">Besetzung von Avatar</string>
+    <string name="onboardingSearchDaxDialogOption2US">Besetzung von Mighty Ducks</string>
     <string name="onboardingSearchDaxDialogOption3">Lokales Wetter</string>
     <string name="onboardingSearchDaxDialogOption4">Überrasche mich!</string>
     <string name="onboardingSearchQueryOption4">Dinner-Rezepte</string>
+    <string name="onboardingSearchQueryOption4US">Rezepte für Schokoladenkekse</string>
     <string name="onboardingSitesDaxDialogTitle">Versuche, eine Website zu besuchen!</string>
     <string name="onboardingSitesDaxDialogDescription">Ich blockiere Tracker, damit sie dich nicht ausspionieren können.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
