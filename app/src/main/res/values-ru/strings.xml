@@ -472,23 +472,6 @@
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Внимание! Мы не можем скрыть от %1$s вашу активность на %2$s.&lt;br/&gt;&lt;br/&gt;Используйте наш браузер, и мы сократим объем собираемой о вас информации, заблокировав трекеры %3$s на других сайтах.</string>
     <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Внимание! Так как %2$s принадлежит сети %1$s, мы не можем скрыть вашу активность на этом ресурсе.&lt;br/&gt;&lt;br/&gt;Используйте наш браузер, и мы сократим объем собираемой о вас информации, заблокировав трекеры %3$s на других сайтах.</string>
 
-    <!-- Onboarding DDG Feature Options -->
-    <string name="onboardingFeatureOptionsTitle">Что заинтересовало вас в DuckDuckGo?</string>
-    <string name="onboardingFeatureOptionsContinue">Продолжить</string>
-    <string name="onboardingFeatureOptionsSkip">Пропустить этот шаг</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionPrivateSearch">Конфиденциальный поиск</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionTrackerBlocking">Блокировка трекеров</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionSmallerDigitalFootprint">Меньший цифровой след</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFasterPageLoads">Ускоренная загрузка страниц</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFewerAds">Меньше рекламы</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionOneClickDataClearing">Очистка данных одним кликом</string>
-
     <!-- Download Confirmation -->
     <string name="downloadConfirmationSaveFileTitle" instruction="Placeholder is the name of a file">Сохранить %1$s</string>
     <string name="downloadConfirmationKeepBothFilesText">Оставить оба</string>
