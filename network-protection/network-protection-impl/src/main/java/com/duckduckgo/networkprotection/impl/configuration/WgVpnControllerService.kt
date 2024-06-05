@@ -110,10 +110,6 @@ object WgVpnControllerServiceModule {
 @ContributesServiceApi(AppScope::class)
 @ProtectedVpnControllerService
 interface WgVpnControllerService {
-    @Headers("Content-Type: application/json")
-    @POST("$NETP_ENVIRONMENT_URL/redeem")
-    suspend fun redeemCode(@Body code: NetPRedeemCodeRequest): NetPRedeemCodeResponse
-
     @GET("$NETP_ENVIRONMENT_URL/servers")
     suspend fun getServers(): List<RegisteredServerInfo>
 
@@ -133,20 +129,6 @@ interface WgVpnControllerService {
 }
 
 const val NETP_ENVIRONMENT_URL = "https://controller.netp.duckduckgo.com"
-
-data class NetPRedeemCodeRequest(
-    val code: String,
-)
-
-data class NetPRedeemCodeResponse(
-    val token: String,
-)
-
-data class NetPRedeemCodeError(val message: String) {
-    companion object {
-        const val INVALID = "invalid code"
-    }
-}
 
 data class ServerStatus(
     val shouldMigrate: Boolean,
