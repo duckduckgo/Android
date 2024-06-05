@@ -108,6 +108,7 @@ class NewTabPageView @JvmOverloads constructor(
             if (binding.newTabContentShimmer.isVisible) {
                 binding.newTabContentShimmer.stopShimmer()
                 binding.newTabContentShimmer.gone()
+                binding.ddgLogo.gone()
                 binding.newTabSectionsContent.show()
             }
         }
