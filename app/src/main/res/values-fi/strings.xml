@@ -465,7 +465,6 @@
     <string name="onboardingWelcomeTitle">"Tervetuloa DuckDuckGo-sovellukseen!"</string>
     <string name="onboardingDaxText"><![CDATA[Internet voi olla pelottava.<br/><br/>Ei hätää! Yksityinen haku ja selaaminen on helpompaa kuin luulet.]]></string>
     <string name="onboardingLetsDoItButton">Aloitetaan!</string>
-    <string name="daxEndCtaText"><![CDATA[Hyvin menee!<br/><br/>Muista, että joka kerta, kun käytät minua selaamiseen, rasittavat mainokset katoavat. 👍]]></string>
     <string name="daxSerpCtaText">DuckDuckGo-hakusi ovat aina nimettömiä. 🙌</string>
     <string name="daxNonSerpCtaText"><![CDATA[Kun napautat ja selaat, estän ikävät seurantaohjelmat. <br/><br/>Siirry eteenpäin – jatka selaamista!]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Huomio! %1$s näkee mitä teet sivustolla %2$s enkä voi estää sitä. &lt;br/&gt;&lt;br/&gt;Mutta jos käytät minua selaamiseen, voin vähentää, mitä %3$s saa tietää sinusta, estämällä heidän seurantansa monilla muilla sivustoilla.</string>

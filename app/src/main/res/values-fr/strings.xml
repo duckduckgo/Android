@@ -465,7 +465,6 @@
     <string name="onboardingWelcomeTitle">"Bienvenue sur DuckDuckGo !"</string>
     <string name="onboardingDaxText"><![CDATA[Internet peut être intrusif.\n\nMais ne vous inquiétez pas ! Rechercher et naviguer de manière confidentielle est plus facile que vous ne le pensez.]]></string>
     <string name="onboardingLetsDoItButton">Allons-y !</string>
-    <string name="daxEndCtaText"><![CDATA[Bien joué !<br/><br/>Souvenez-vous : chaque fois que vous naviguez avec moi, des publicités intrusives disparaissent. 👍]]></string>
     <string name="daxSerpCtaText">Vos recherches sur DuckDuckGo sont anonymes. Toujours. 🙌</string>
     <string name="daxNonSerpCtaText"><![CDATA[Lors de votre navigation, je bloque les traqueurs indésirables.<br/><br/>Continuez à naviguer en toute tranquillité !]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Attention ! Je ne peux pas empêcher %1$s de voir votre activité sur %2$s.&lt;br/&gt;&lt;br/&gt;Si vous naviguez avec moi, je peux réduire les données récoltées par %3$s en bloquant ses traqueurs sur de nombreux autres sites.</string>
