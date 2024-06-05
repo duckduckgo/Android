@@ -848,9 +848,11 @@
     <string name="onboardingSearchQueryOption1">hva heter and på engelsk</string>
     <string name="onboardingSearchQueryOption1English">hva heter and på spansk</string>
     <string name="onboardingSearchDaxDialogOption2">rollebesetningen i avatar</string>
+    <string name="onboardingSearchDaxDialogOption2US">mighty ducks rolleinnehavere</string>
     <string name="onboardingSearchDaxDialogOption3">lokalt vær</string>
     <string name="onboardingSearchDaxDialogOption4">Overrask meg!</string>
     <string name="onboardingSearchQueryOption4">middagsoppskrifter</string>
+    <string name="onboardingSearchQueryOption4US">oppskrifter på sjokoladekjeks</string>
     <string name="onboardingSitesDaxDialogTitle">Prøv å besøke et nettsted!</string>
     <string name="onboardingSitesDaxDialogDescription">Jeg blokkerer sporingsforsøk slik at de ikke kan spionere på deg.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
