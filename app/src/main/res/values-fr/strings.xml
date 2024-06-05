@@ -848,9 +848,11 @@
     <string name="onboardingSearchQueryOption1">comment dire canard en anglais</string>
     <string name="onboardingSearchQueryOption1English">comment dire « canard » en espagnol</string>
     <string name="onboardingSearchDaxDialogOption2">casting d\'avatar</string>
+    <string name="onboardingSearchDaxDialogOption2US">casting de mighty ducks</string>
     <string name="onboardingSearchDaxDialogOption3">météo locale</string>
     <string name="onboardingSearchDaxDialogOption4">Surprenez-moi !</string>
     <string name="onboardingSearchQueryOption4">recettes pour le dîner</string>
+    <string name="onboardingSearchQueryOption4US">recettes de cookies aux pépites de chocolat</string>
     <string name="onboardingSitesDaxDialogTitle">Essayez de visiter un site !</string>
     <string name="onboardingSitesDaxDialogDescription">Je bloquerai les traqueurs afin qu\'ils ne puissent pas vous espionner.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
