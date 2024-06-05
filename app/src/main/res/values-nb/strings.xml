@@ -447,6 +447,7 @@
     <string name="systemSearchOnboardingButtonOk">Den er grei</string>
 
     <!-- Dax Dialog -->
+    <string name="daxDialogHighFive">High Five!</string>
     <string name="daxDialogGotIt">Den er grei</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->

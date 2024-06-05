@@ -447,6 +447,7 @@
     <string name="systemSearchOnboardingButtonOk">Понятно</string>
 
     <!-- Dax Dialog -->
+    <string name="daxDialogHighFive">Дай пять!</string>
     <string name="daxDialogGotIt">Понятно</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->

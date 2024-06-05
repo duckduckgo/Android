@@ -447,6 +447,7 @@
     <string name="systemSearchOnboardingButtonOk">Forstået</string>
 
     <!-- Dax Dialog -->
+    <string name="daxDialogHighFive">Giv mig fem!</string>
     <string name="daxDialogGotIt">Forstået</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->

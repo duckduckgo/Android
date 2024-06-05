@@ -447,6 +447,7 @@
     <string name="systemSearchOnboardingButtonOk">Mám to</string>
 
     <!-- Dax Dialog -->
+    <string name="daxDialogHighFive">Plácnutí!</string>
     <string name="daxDialogGotIt">Mám to</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->

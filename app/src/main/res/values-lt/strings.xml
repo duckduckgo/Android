@@ -447,6 +447,7 @@
     <string name="systemSearchOnboardingButtonOk">Supratau</string>
 
     <!-- Dax Dialog -->
+    <string name="daxDialogHighFive">Duok penkis!</string>
     <string name="daxDialogGotIt">Supratau</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->

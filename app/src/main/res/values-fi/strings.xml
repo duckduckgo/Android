@@ -447,6 +447,7 @@
     <string name="systemSearchOnboardingButtonOk">Selvä</string>
 
     <!-- Dax Dialog -->
+    <string name="daxDialogHighFive">Ylävitonen!</string>
     <string name="daxDialogGotIt">Selvä</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->

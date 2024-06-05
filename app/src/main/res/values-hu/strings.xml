@@ -447,6 +447,7 @@
     <string name="systemSearchOnboardingButtonOk">Értem</string>
 
     <!-- Dax Dialog -->
+    <string name="daxDialogHighFive">Pacsi!</string>
     <string name="daxDialogGotIt">Megvan</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
