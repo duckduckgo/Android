@@ -68,6 +68,7 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
+import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.user.agent.api.ClientBrandHintProvider
@@ -100,8 +101,9 @@ class BrowserWebViewClient @Inject constructor(
     private val crashLogger: CrashLogger,
     private val jsPlugins: PluginPoint<JsInjectorPlugin>,
     private val currentTimeProvider: CurrentTimeProvider,
-    private val shouldSendPageLoadedPixel: PageLoadedHandler,
+    private val pageLoadedHandler: PageLoadedHandler,
     private val shouldSendPagePaintedPixel: PagePaintedHandler,
+    private val navigationHistory: NavigationHistory,
     private val mediaPlayback: MediaPlayback,
     private val subscriptions: Subscriptions,
 ) : WebViewClient() {
@@ -309,7 +311,7 @@ class BrowserWebViewClient @Inject constructor(
         url?.let {
             // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
             if (it != "about:blank" && start == null) {
-                start = currentTimeProvider.getTimeInMillis()
+                start = currentTimeProvider.elapsedRealtime()
             }
             handleMediaPlayback(webView, it)
             autoconsent.injectAutoconsent(webView, url)
@@ -346,6 +348,7 @@ class BrowserWebViewClient @Inject constructor(
         url: String?,
     ) {
         Timber.v("onPageFinished webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}")
+        // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
         if (webView.progress == 100) {
             jsPlugins.getPlugins().forEach {
                 it.onPageFinished(webView, url, webViewClientListener?.getSite())
@@ -363,12 +366,14 @@ class BrowserWebViewClient @Inject constructor(
             printInjector.injectPrint(webView)
 
             url?.let {
-                start?.let { safeStart ->
-                    val progress = webView.progress
-                    // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
-                    if (url != ABOUT_BLANK) {
-                        shouldSendPageLoadedPixel(it, safeStart, currentTimeProvider.getTimeInMillis())
+                if (url != ABOUT_BLANK) {
+                    start?.let { safeStart ->
+                        // TODO (cbarreiro - 22/05/2024): Extract to plugins
+                        pageLoadedHandler.onPageLoaded(it, navigationList.currentItem?.title, safeStart, currentTimeProvider.elapsedRealtime())
                         shouldSendPagePaintedPixel(webView = webView, url = it)
+                        appCoroutineScope.launch(dispatcherProvider.io()) {
+                            navigationHistory.saveToHistory(url, navigationList.currentItem?.title)
+                        }
                         start = null
                     }
                 }
