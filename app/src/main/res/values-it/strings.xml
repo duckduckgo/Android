@@ -848,9 +848,11 @@
     <string name="onboardingSearchQueryOption1">come si dice anatra in inglese</string>
     <string name="onboardingSearchQueryOption1English">come si dice anatra in spagnolo</string>
     <string name="onboardingSearchDaxDialogOption2">cast di avatar</string>
+    <string name="onboardingSearchDaxDialogOption2US">cast delle papere potenti</string>
     <string name="onboardingSearchDaxDialogOption3">meteo locale</string>
     <string name="onboardingSearchDaxDialogOption4">Sorprendimi!</string>
     <string name="onboardingSearchQueryOption4">ricette per la cena</string>
+    <string name="onboardingSearchQueryOption4US">ricette di biscotti con gocce di cioccolato</string>
     <string name="onboardingSitesDaxDialogTitle">Prova a visitare un sito!</string>
     <string name="onboardingSitesDaxDialogDescription">Bloccherò i sistemi di tracciamento in modo che non possano spiarti.</string>
     <string name="onboardingSitesDaxDialogOption1">espn.com</string>
