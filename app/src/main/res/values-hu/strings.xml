@@ -465,7 +465,6 @@
     <string name="onboardingWelcomeTitle">"Üdvözlünk a DuckDuckGo-ban!"</string>
     <string name="onboardingDaxText"><![CDATA[Az internet néha hátborzongató.<br/><br/>Ne aggódj! A magánjellegű keresés és böngészés könnyebb, mint gondolnád.]]></string>
     <string name="onboardingLetsDoItButton">Rajta, csináljuk!</string>
-    <string name="daxIntroCtaText"><![CDATA[A következő lépésben látogasd meg az egyik kedvenc webhelyed! <br/><br/>Én blokkolom a nyomkövetőket, hogy ne tudjanak kémkedni. Ha lehet, a kapcsolat biztonságát is javítom. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[Megvan, ez az!<br/><br/>Ne feledd: minden alkalommal, amikor velem végzed a böngészést, egy hátborzongató hirdetés elveszíti az erejét. 👍]]></string>
     <string name="daxSerpCtaText">A DuckDuckGo keresései névtelenek. Mindig. 🙌</string>
     <string name="daxNonSerpCtaText"><![CDATA[Ahogy megérinted és görgeted, én blokkolni fogom a bosszantó nyomkövetőket. <br/><br/>Menj tovább - folytasd a böngészést!]]></string>

@@ -465,7 +465,6 @@
     <string name="onboardingWelcomeTitle">"Dobro došao/la u DuckDuckGo!"</string>
     <string name="onboardingDaxText"><![CDATA[Internet može biti pomalo neugodan.<br/><br/> Ne brini! Privatno pretraživanje i pregledavanje lakše je nego što misliš.]]></string>
     <string name="onboardingLetsDoItButton">Učinimo to!</string>
-    <string name="daxIntroCtaText"><![CDATA[Zatim pokušaj posjetiti jedno od svojih omiljenih web-mjesta! <br/><br/>Blokirat ću tragače kako te ne bi mogli špijunirati. Nadogradit ću i sigurnost tvoje veze ako je moguće. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[Shvatio/la si!<br/><br/> Zapamti: svaki put kada pregledavaš sa mnom, neugodna reklama gubi krila. 👍]]></string>
     <string name="daxSerpCtaText">Tvoje su DuckDuckGo pretrage anonimne. Uvijek. 🙌</string>
     <string name="daxNonSerpCtaText"><![CDATA[Dok dodiruješ i pomičeš se na zaslonu, blokirat ću neugodne tragače.\n\nSamo naprijed - nastavi pretraživati!]]></string>

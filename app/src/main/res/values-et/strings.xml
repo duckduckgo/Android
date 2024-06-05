@@ -465,7 +465,6 @@
     <string name="onboardingWelcomeTitle">"Tere tulemast DuckDuckGo kasutajaks!"</string>
     <string name="onboardingDaxText"><![CDATA[Internet võib olla üsna jube.<br/><br/>Ärge muretsege! Privaatselt otsimine ja sirvimine on lihtsam kui arvate.]]></string>
     <string name="onboardingLetsDoItButton">Teeme ära!</string>
-    <string name="daxIntroCtaText"><![CDATA[Järgmisena proovige külastada ühte oma lemmiksaitidest! <br/><br/>Mina aga blokeerin jälgijaid, et nad ei saaks teid luurata. Täiustan võimalusel ka teie ühenduse turvalisust. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[Käpas! <br/><br/>Pea meeles: iga kord, kui minuga sirvid, kaotab jube reklaam tiivad. 👍]]></string>
     <string name="daxSerpCtaText">Sinu DuckDuckGo\' otsingud on anonüümsed. Alati. 🙌</string>
     <string name="daxNonSerpCtaText"><![CDATA[Kui puudutate ja kerite, siis mina blokeerin tüütud jälgijad. <br/><br/>Edasi — jätkake sirvimist!]]></string>
