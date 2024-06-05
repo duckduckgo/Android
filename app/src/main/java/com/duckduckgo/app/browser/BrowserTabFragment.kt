@@ -181,6 +181,7 @@ import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
 import com.duckduckgo.app.survey.model.Survey
@@ -484,6 +485,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var dummyWebMessageListenerFeature: DummyWebMessageListenerFeature
+
+    @Inject
+    lateinit var settingsDataStore: SettingsDataStore
 
     @Inject
     lateinit var webViewVersionProvider: WebViewVersionProvider
@@ -2295,6 +2299,7 @@ class BrowserTabFragment :
                 if (accessibilitySettingsDataStore.overrideSystemFontSize) {
                     textZoom = accessibilitySettingsDataStore.fontSize.toInt()
                 }
+                isAlgorithmicDarkeningAllowed = settingsDataStore.experimentalWebsiteDarkMode
             }
 
             it.setDownloadListener { url, _, contentDisposition, mimeType, _ ->

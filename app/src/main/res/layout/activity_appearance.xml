@@ -77,6 +77,17 @@
                     tools:srcCompat="@mipmap/ic_launcher_red_round" />
 
             </LinearLayout>
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/experimentalNightMode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_4"
+                app:primaryText="@string/appearanceNightModeTitle"
+                app:primaryTextTruncated="false"
+                app:showSwitch="true"
+                app:secondaryText="@string/appearanceNightModeSecondary" />
+
         </LinearLayout>
     </ScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

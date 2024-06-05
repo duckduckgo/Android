@@ -17,6 +17,7 @@
 package com.duckduckgo.app.appearance
 
 import android.os.Bundle
+import android.widget.CompoundButton
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -31,6 +32,7 @@ import com.duckduckgo.common.ui.sendThemeChangedBroadcast
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
@@ -41,6 +43,11 @@ class AppearanceActivity : DuckDuckGoActivity() {
 
     private val viewModel: AppearanceViewModel by bindViewModel()
     private val binding: ActivityAppearanceBinding by viewBinding()
+
+    private val forceDarkModeToggleListener = CompoundButton.OnCheckedChangeListener { view, isChecked ->
+        viewModel.onForceDarkModeSettingChanged(isChecked)
+        Snackbar.make(view, getString(R.string.appearanceNightModeWarning), Snackbar.LENGTH_SHORT).show()
+    }
 
     private val changeIconFlow = registerForActivityResult(ChangeIconContract()) { resultOk ->
         if (resultOk) {
@@ -61,6 +68,7 @@ class AppearanceActivity : DuckDuckGoActivity() {
     private fun configureUiEventHandlers() {
         binding.selectedThemeSetting.setClickListener { viewModel.userRequestedToChangeTheme() }
         binding.changeAppIconSetting.setOnClickListener { viewModel.userRequestedToChangeIcon() }
+        binding.experimentalNightMode.setOnCheckedChangeListener(forceDarkModeToggleListener)
     }
 
     private fun observeViewModel() {
@@ -70,6 +78,7 @@ class AppearanceActivity : DuckDuckGoActivity() {
                 viewState.let {
                     updateSelectedTheme(it.theme)
                     binding.changeAppIcon.setImageResource(it.appIcon.icon)
+                    binding.experimentalNightMode.quietlySetIsChecked(viewState.forceDarkModeEnabled, forceDarkModeToggleListener)
                 }
             }.launchIn(lifecycleScope)
 
