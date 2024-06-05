@@ -447,14 +447,7 @@
     <string name="systemSearchOnboardingButtonOk">Supratau</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Slėpti</string>
-    <string name="daxDialogPhew">Oi!</string>
-    <string name="daxDialogNext">Kitas</string>
-    <string name="daxDialogHighFive">Duok penkis!</string>
     <string name="daxDialogGotIt">Supratau</string>
-    <string name="hideTipsTitle">Slėpti likusius patarimus?</string>
-    <string name="hideTipsText">Jų tik keletas, stengėmės, kad jie būtų informatyvūs.</string>
-    <string name="hideTipsButton">Slėpti patarimus visam laikui</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Dabar blokuojate sekimo įrenginius internete 🎉<br/><br/>Taip pat galiu blokuoti kitose programėlėse pasislėpusius sekimo įrenginius, net kai nenaudojate telefono.]]></string>

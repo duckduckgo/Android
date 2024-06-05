@@ -447,14 +447,7 @@
     <string name="systemSearchOnboardingButtonOk">Verstanden</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Ausblenden</string>
-    <string name="daxDialogPhew">Puh!</string>
-    <string name="daxDialogNext">Weiter</string>
-    <string name="daxDialogHighFive">Schlag ein!</string>
     <string name="daxDialogGotIt">Verstanden</string>
-    <string name="hideTipsTitle">Verbleibende Tipps ausblenden?</string>
-    <string name="hideTipsText">Es gibt nur wenige und wir haben versucht, sie informativ zu gestalten.</string>
-    <string name="hideTipsButton">Tipps für immer ausblenden</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Du blockierst jetzt Tracker im gesamten Web 🎉<br/><br/>Ich kann auch Tracker blockieren, die sich in deinen anderen Apps verstecken, selbst wenn du dein Handy gerade nicht benutzt.]]></string>

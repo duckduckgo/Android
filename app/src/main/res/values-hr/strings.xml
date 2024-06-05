@@ -447,14 +447,7 @@
     <string name="systemSearchOnboardingButtonOk">Shvatio/la sam</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Sakrij</string>
-    <string name="daxDialogPhew">Uf!</string>
-    <string name="daxDialogNext">Dalje</string>
-    <string name="daxDialogHighFive">Daj pet!</string>
     <string name="daxDialogGotIt">Shvatio/la sam</string>
-    <string name="hideTipsTitle">Sakriti preostale savjete?</string>
-    <string name="hideTipsText">Ima ih samo nekoliko, a pokušali smo ih učiniti što informativnijima.</string>
-    <string name="hideTipsButton">Sakrij savjete zauvijek</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Sad blokiraš alate za praćenje na čitavoj mreži🎉<br/><br/>Također mogu blokirati alate za praćenje koji se skrivaju u tvojim drugim aplikacijama, čak i kad ne koristiš telefon.]]></string>

@@ -447,14 +447,7 @@
     <string name="systemSearchOnboardingButtonOk">Selvä</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Piilota</string>
-    <string name="daxDialogPhew">Huh huh!</string>
-    <string name="daxDialogNext">Seuraava</string>
-    <string name="daxDialogHighFive">Ylävitonen!</string>
     <string name="daxDialogGotIt">Selvä</string>
-    <string name="hideTipsTitle">Piilotetaanko jäljellä olevat vinkit?</string>
-    <string name="hideTipsText">Niitä on vain pari, ja yritimme tehdä niistä informatiivisia.</string>
-    <string name="hideTipsButton">Piilota vinkit ikuisesti</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Nyt estät seurantaohjelmia kaikkialla verkossa 🎉<br/><br/>Voin estää myös seurantaohjelmat, jotka piileskelevät muissa sovelluksissa, vaikka et käyttäisi puhelintasi.]]></string>

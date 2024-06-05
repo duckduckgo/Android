@@ -447,14 +447,7 @@
     <string name="systemSearchOnboardingButtonOk">Το έπιασα</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Αποκρυψη</string>
-    <string name="daxDialogPhew">Φιου!</string>
-    <string name="daxDialogNext">Επόμενο</string>
-    <string name="daxDialogHighFive">Κόλλα πέντε!</string>
     <string name="daxDialogGotIt">Το έπιασα</string>
-    <string name="hideTipsTitle">Απόκρυψη συμβουλών που απομένουν;</string>
-    <string name="hideTipsText">Υπάρχουν λίγες μόνο και προσπαθήσαμε να τις καταστήσουμε ενημερωτικές.</string>
-    <string name="hideTipsButton">Απόκρυψη συμβουλών για πάντα</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Πλέον αποκλείετε εφαρμογές παρακολούθησης στο σύνολο του διαδικτύου 🎉<br/><br/>Μπορώ επίσης να αποκλείσω εφαρμογές παρακολούθησης που κρύβονται σε άλλες εφαρμογές σας, ακόμη και όταν δεν χρησιμοποιείτε το τηλέφωνό σας.]]></string>

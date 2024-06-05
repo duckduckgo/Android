@@ -447,14 +447,7 @@
     <string name="systemSearchOnboardingButtonOk">J\'ai compris</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Masquer</string>
-    <string name="daxDialogPhew">Ouf !</string>
-    <string name="daxDialogNext">Suivant</string>
-    <string name="daxDialogHighFive">Bien joué !</string>
     <string name="daxDialogGotIt">J\'ai compris</string>
-    <string name="hideTipsTitle">Masquer les conseils restants ?</string>
-    <string name="hideTipsText">Il n\'y en a que quelques-uns et nous avons essayé de les rendre aussi utiles que possible.</string>
-    <string name="hideTipsButton">Masquer les conseils définitivement</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Vous bloquez désormais les traqueurs sur le Web 🎉<br/><br/>Je peux également bloquer les traqueurs qui se cachent dans vos autres applications, même lorsque vous n\'utilisez pas votre téléphone.]]></string>

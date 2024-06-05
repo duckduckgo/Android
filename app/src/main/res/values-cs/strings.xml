@@ -447,14 +447,7 @@
     <string name="systemSearchOnboardingButtonOk">Mám to</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Skrýt</string>
-    <string name="daxDialogPhew">Pche!</string>
-    <string name="daxDialogNext">Další</string>
-    <string name="daxDialogHighFive">Plácnutí!</string>
     <string name="daxDialogGotIt">Mám to</string>
-    <string name="hideTipsTitle">Skrýt zbývající tipy?</string>
-    <string name="hideTipsText">Je jich jen pár a snažili jsme se udělat je informativní.</string>
-    <string name="hideTipsButton">Navždy skrýt tipy</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Teď máš zablokované trackery na webu 🎉<br/><br/>Můžu taky blokovat trackery aktivní v aplikacích, i když telefon zrovna nepoužíváš.]]></string>

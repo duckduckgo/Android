@@ -447,14 +447,7 @@
     <string name="systemSearchOnboardingButtonOk">Понятно</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Скрыть</string>
-    <string name="daxDialogPhew">Уф!</string>
-    <string name="daxDialogNext">Далее</string>
-    <string name="daxDialogHighFive">Дай пять!</string>
     <string name="daxDialogGotIt">Понятно</string>
-    <string name="hideTipsTitle">Скрыть другие подсказки?</string>
-    <string name="hideTipsText">Их немного, и мы постарались сделать их информативными.</string>
-    <string name="hideTipsButton">Скрыть подсказки насовсем</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Теперь вы блокируете трекеры в Интернете 🎉<br/><br/>Можно также блокировать трекеры в других приложениях, даже когда вы не пользуетесь телефоном.]]></string>

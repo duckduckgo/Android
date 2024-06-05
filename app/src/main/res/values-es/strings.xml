@@ -447,14 +447,7 @@
     <string name="systemSearchOnboardingButtonOk">Entendido</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Ocultar</string>
-    <string name="daxDialogPhew">¡Uf!</string>
-    <string name="daxDialogNext">Siguiente</string>
-    <string name="daxDialogHighFive">¡Choca esos cinco!</string>
     <string name="daxDialogGotIt">Entendido</string>
-    <string name="hideTipsTitle">¿Ocultar los consejos restantes?</string>
-    <string name="hideTipsText">Solo hay unos cuantos, e intentamos que sean informativos.</string>
-    <string name="hideTipsButton">Ocultar consejos para siempre</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Ahora estás bloqueando rastreadores en toda la web 🎉<br/><br/>También puedo bloquear rastreadores que se ocultan en tus otras aplicaciones, incluso cuando no estás usando el teléfono.]]></string>

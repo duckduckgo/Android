@@ -447,14 +447,7 @@
     <string name="systemSearchOnboardingButtonOk">Rozumiem</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Ukryj</string>
-    <string name="daxDialogPhew">Uff!</string>
-    <string name="daxDialogNext">Dalej</string>
-    <string name="daxDialogHighFive">Piątka!</string>
     <string name="daxDialogGotIt">Rozumiem</string>
-    <string name="hideTipsTitle">Ukryć pozostałe wskazówki?</string>
-    <string name="hideTipsText">Jest ich tylko kilka i staraliśmy się, aby były pouczające.</string>
-    <string name="hideTipsButton">Ukryj wskazówki na zawsze</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Teraz blokujesz mechanizmy śledzące w Internecie 🎉<br/><br/>Mogę też blokować skrypty śledzące ukryte w innych aplikacjach, nawet gdy nie używasz telefonu.]]></string>

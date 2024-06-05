@@ -447,14 +447,7 @@
     <string name="systemSearchOnboardingButtonOk">Den er grei</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Skjul</string>
-    <string name="daxDialogPhew">Puh!</string>
-    <string name="daxDialogNext">Neste</string>
-    <string name="daxDialogHighFive">High Five!</string>
     <string name="daxDialogGotIt">Den er grei</string>
-    <string name="hideTipsTitle">Skjul gjenværende tips?</string>
-    <string name="hideTipsText">Det er bare noen få, og vi prøvde å gjøre dem informative.</string>
-    <string name="hideTipsButton">Skjul tips for alltid</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Du blokkerer nå sporere på nettet 🎉<br/><br/>Jeg kan også blokkere sporere som er skjult i andre apper, selv når du ikke bruker telefonen.]]></string>

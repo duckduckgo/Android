@@ -447,14 +447,7 @@
     <string name="systemSearchOnboardingButtonOk">Sapratu</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Paslēpt</string>
-    <string name="daxDialogPhew">Pē!</string>
-    <string name="daxDialogNext">Nākamais</string>
-    <string name="daxDialogHighFive">Dod pieci!</string>
     <string name="daxDialogGotIt">Sapratu</string>
-    <string name="hideTipsTitle">Vai paslēpt pārējos padomus?</string>
-    <string name="hideTipsText">Tie ir tikai daži, un mēs centāmies tos padarīt informatīvus.</string>
-    <string name="hideTipsButton">Paslēpt padomus uz visiem laikiem</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Tagad tu bloķē izsekotājus visā tīmeklī 🎉<br/><br/>Es varu bloķēt arī citās lietotnēs paslēptus izsekotājus – pat laikā, kad tu tālruni neizmanto.]]></string>

@@ -447,14 +447,7 @@
     <string name="systemSearchOnboardingButtonOk">Anladım</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Gizle</string>
-    <string name="daxDialogPhew">Uf!</string>
-    <string name="daxDialogNext">Sonraki</string>
-    <string name="daxDialogHighFive">Çak Bir Beşlik!</string>
     <string name="daxDialogGotIt">Anladım</string>
-    <string name="hideTipsTitle">Kalan ipuçları gizlensin mi?</string>
-    <string name="hideTipsText">Sadece birkaç tane var ve onları da bilgilendirici hâle getirmeye çalıştık.</string>
-    <string name="hideTipsButton">İpuçlarını Sonsuza Kadar Gizle</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Artık web genelinde izleyicileri engelliyorsunuz 🎉<br/><br/>Telefonunuzu kullanmadığınız zamanlarda bile diğer uygulamalarınızda gizlenen izleyicileri de engelleyebilirim.]]></string>

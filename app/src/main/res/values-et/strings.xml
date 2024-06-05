@@ -447,14 +447,7 @@
     <string name="systemSearchOnboardingButtonOk">Sain aru</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Peida</string>
-    <string name="daxDialogPhew">Huh!</string>
-    <string name="daxDialogNext">Järgmine</string>
-    <string name="daxDialogHighFive">Viska viis!</string>
     <string name="daxDialogGotIt">Sain aru</string>
-    <string name="hideTipsTitle">Kas peita allesjäänud näpunäited?</string>
-    <string name="hideTipsText">Neid on üsna vähe ja püüdsime muuta need informatiivseks.</string>
-    <string name="hideTipsButton">Peida näpunäited igaveseks</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Nüüd blokeerite jälgurid kogu veebis 🎉<br/><br/>Ma saan blokeerida ka teie teistes rakendustes peidus olevad jälgurid, isegi kui te oma telefoni ei kasuta.]]></string>

@@ -447,14 +447,7 @@
     <string name="systemSearchOnboardingButtonOk">Értem</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Elrejtés</string>
-    <string name="daxDialogPhew">Hűűű!</string>
-    <string name="daxDialogNext">Következő</string>
-    <string name="daxDialogHighFive">Pacsi!</string>
     <string name="daxDialogGotIt">Megvan</string>
-    <string name="hideTipsTitle">Elrejted a többi tippet?</string>
-    <string name="hideTipsText">Csak néhány van, és megpróbáltuk őket informatívvá tenni.</string>
-    <string name="hideTipsButton">Tippek elrejtése örökre</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Mostantól a teljes weben blokkolod a nyomkövetőket 🎉<br/><br/>A többi alkalmazásba rejtett nyomkövetőket is blokkolhatom, még akkor is, amikor nem használod a telefont.]]></string>

@@ -447,14 +447,7 @@
     <string name="systemSearchOnboardingButtonOk">Ik snap het</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Verbergen</string>
-    <string name="daxDialogPhew">Opluchting!</string>
-    <string name="daxDialogNext">Volgende</string>
-    <string name="daxDialogHighFive">High Five!</string>
     <string name="daxDialogGotIt">Ik snap het</string>
-    <string name="hideTipsTitle">Resterende tips verbergen?</string>
-    <string name="hideTipsText">Het zijn er maar een paar en we hebben geprobeerd ze informatief te maken.</string>
-    <string name="hideTipsButton">Tips voor altijd verbergen</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Je blokkeert verborgen trackers op het web 🎉<br/><br/>Ik kan ook trackers blokkeren die in andere apps verborgen zitten, zelfs als je je telefoon niet gebruikt.]]></string>

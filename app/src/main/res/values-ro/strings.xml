@@ -447,14 +447,7 @@
     <string name="systemSearchOnboardingButtonOk">Am înțeles</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Ascunde</string>
-    <string name="daxDialogPhew">Pfiu!</string>
-    <string name="daxDialogNext">Următorul</string>
-    <string name="daxDialogHighFive">Bate palma!</string>
     <string name="daxDialogGotIt">Am înțeles</string>
-    <string name="hideTipsTitle">Ascunzi sfaturile rămase?</string>
-    <string name="hideTipsText">Sunt doar câteva, iar noi am încercat să le facem informative.</string>
-    <string name="hideTipsButton">Ascunde sfaturile definitiv</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Acum blochezi tehnologii de urmărire de pe internet 🎉<br/><br/>De asemenea, pot să blochez și tehnologiile de urmărire care se ascund în alte aplicații ale tale, chiar și atunci când nu îți folosești telefonul.]]></string>

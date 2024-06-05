@@ -447,14 +447,7 @@
     <string name="systemSearchOnboardingButtonOk">Ho capito</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Nascondi</string>
-    <string name="daxDialogPhew">Accidenti!</string>
-    <string name="daxDialogNext">Successivo</string>
-    <string name="daxDialogHighFive">Batti cinque!</string>
     <string name="daxDialogGotIt">Fatto</string>
-    <string name="hideTipsTitle">Nascondere i suggerimenti rimanenti?</string>
-    <string name="hideTipsText">Ce ne sono solo alcuni e abbiamo cercato di renderli informativi.</string>
-    <string name="hideTipsButton">Nascondi suggerimenti per sempre</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Ora stai bloccando i sistemi di tracciamento sul web 🎉<br/><br/>Posso anche bloccare i sistemi di tracciamento nascosti nelle altre tue app, anche quando non usi il telefono.]]></string>

@@ -447,14 +447,7 @@
     <string name="systemSearchOnboardingButtonOk">Jag fattar</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Dölj</string>
-    <string name="daxDialogPhew">Puh!</string>
-    <string name="daxDialogNext">Nästa</string>
-    <string name="daxDialogHighFive">High Five!</string>
     <string name="daxDialogGotIt">Jag fattar</string>
-    <string name="hideTipsTitle">Dölj återstående tips?</string>
-    <string name="hideTipsText">Det finns bara några få, och vi försökte göra dem informativa.</string>
-    <string name="hideTipsButton">Dölj tipsen för alltid</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Du blockerar nu spårare på hela webben 🎉<br/><br/>Jag kan också blockera spårare som döljer sig i andra appar, även när du inte använder telefonen.]]></string>

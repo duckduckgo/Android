@@ -447,14 +447,7 @@
     <string name="systemSearchOnboardingButtonOk">Razumem</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Skrij se</string>
-    <string name="daxDialogPhew">Fuj!</string>
-    <string name="daxDialogNext">Naslednji</string>
-    <string name="daxDialogHighFive">Petka!</string>
     <string name="daxDialogGotIt">Razumem</string>
-    <string name="hideTipsTitle">Skrij preostale nasvete?</string>
-    <string name="hideTipsText">Le nekaj jih je in poskušali smo jih narediti informativne.</string>
-    <string name="hideTipsButton">Skrij nasvete za vedno</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Zdaj blokirate sledilnike v spletu 🎉<br/><br/>Blokiram lahko tudi sledilnike, ki se skrivajo v vaših drugih aplikacijah tudi, kadar telefona ne uporabljate.]]></string>
