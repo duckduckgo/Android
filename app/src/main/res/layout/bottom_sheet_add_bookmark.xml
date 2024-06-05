@@ -47,7 +47,7 @@
             app:leadingIconBackground="circular"
             app:primaryText="Primary Item" />
 
-        <com.duckduckgo.common.ui.view.SwitchView
+        <com.duckduckgo.common.ui.view.DaxSwitch
             android:id="@+id/bookmarksBottomSheetSwitch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

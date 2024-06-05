@@ -58,7 +58,7 @@
         app:typography="caption"
         tools:text="App issues may occur if enabled" />
 
-    <com.duckduckgo.common.ui.view.SwitchView
+    <com.duckduckgo.common.ui.view.DaxSwitch
         android:id="@+id/deviceShieldAppEntryShieldEnabled"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

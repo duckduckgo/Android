@@ -28,7 +28,7 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
-import com.duckduckgo.common.ui.view.SwitchView
+import com.duckduckgo.common.ui.view.DaxSwitch
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.quietlySetIsChecked
 import com.duckduckgo.common.ui.view.recursiveEnable
@@ -49,7 +49,7 @@ abstract class BookmarkListItem(
     internal abstract val leadingIconContainer: View
     internal abstract val trailingIcon: ImageView
     internal abstract val trailingIconContainer: View
-    internal abstract val trailingSwitch: SwitchView
+    internal abstract val trailingSwitch: DaxSwitch
     internal abstract val favoriteStar: ImageView?
     internal abstract val itemContainer: View
     internal abstract val verticalPadding: Int
