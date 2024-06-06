@@ -100,7 +100,8 @@ class NewTabPageView @JvmOverloads constructor(
                     viewModel.refreshViews()
                 }
             }
-        },)
+        },
+        )
     }
 
     private fun render(viewState: ViewState) {
@@ -127,6 +128,10 @@ class NewTabPageView @JvmOverloads constructor(
                         ),
                     )
                 }
+
+                binding.ddgLogo.gone()
+                binding.newTabContentShimmer.gone()
+                binding.newTabSectionsContent.show()
             }
 
             if (binding.newTabContentShimmer.isVisible) {
@@ -135,6 +140,8 @@ class NewTabPageView @JvmOverloads constructor(
                 binding.ddgLogo.gone()
                 binding.newTabSectionsContent.show()
             }
+
+            logcat { "New Tab: child count ${binding.newTabContentShimmer.childCount}" }
         }
     }
 }
