@@ -162,6 +162,12 @@
     <string name="privateSearchMoreSearchSettingsPrimaryText">Dodatne postavke pretraživanja</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Prilagodi jezik pretraživanja, regiju i još mnogo toga</string>
     <string name="privateSearchMoreSearchSettingsTitle">Dodatne postavke pretraživanja</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Uključi nedavno posjećena web-mjesta</string>
+    <string name="privateSearchAutocompleteHint">Pregledaj prijedloge privatnog pretraživanja dok tipkaš, uključujući knjižne oznake</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Također uključi nedavno posjećena web-mjesta u prijedloge privatnog pretraživanja. Nedavna web-mjesta pohranjena su samo na tvom uređaju i mogu se izbrisati korištenjem Fire Buttona</string>
+    <string name="improvedAutoCompleteIAMTitle">Ista privatnost.\nBolji prijedlozi za pretraživanje!</string>
+    <string name="improvedAutoCompleteIAMContent">Prijedlozi sada uključuju nedavno posjećena web-mjesta. Ona se pohranjuju na tvom uređaju, a ne na poslužiteljima DuckDuckGoa. Isključi u postavkama ili izbriši u bilo kojem trenutku pomoću Fire Buttona 🔥.</string>
+    <string name="openAutoCompleteSettings">Otvori postavke</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Zaštita od praćenja na webu</string>
@@ -838,7 +844,7 @@
         <item quantity="many"><![CDATA[ I <b>još %1$d drugih</b> pokušavalo te ovdje pratiti. Blokirani su!<br/><br/>☝️ Dodirni štit za više informacija.️]]></item>
         <item quantity="other"><![CDATA[ I <b>još %1$d drugih</b> pokušavalo te ovdje pratiti. Blokirani su!<br/><br/>☝️ Dodirni štit za više informacija.️]]></item>
     </plurals>
-    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription">
         <item quantity="one"><![CDATA[ pokušavali su te ovdje pratiti. Blokirani su!<br/><br/>☝️ Dodirni štit za više informacija.️]]></item>
         <item quantity="few"><![CDATA[ pokušavali su te ovdje pratiti. Blokirani su!<br/><br/>☝️ Dodirni štit za više informacija.️]]></item>
         <item quantity="many"><![CDATA[ pokušavali su te ovdje pratiti. Blokirani su!<br/><br/>☝️ Dodirni štit za više informacija.️]]></item>
