@@ -40,6 +40,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import java.net.URI
 
 @ContributesViewModel(ActivityScope::class)
 class PrivacyConfigInternalViewModel @Inject constructor(
@@ -98,7 +99,8 @@ class PrivacyConfigInternalViewModel @Inject constructor(
     fun canUrlBeChanged(): Boolean {
         val storedUrl = store.remotePrivacyConfigUrl
         val isCustomSettingEnabled = store.useCustomPrivacyConfigUrl
-        val canBeChanged = isCustomSettingEnabled && !storedUrl.isNullOrEmpty() && URLUtil.isValidUrl(storedUrl)
+        val validHost = runCatching { URI(storedUrl).host.isNotEmpty() }.getOrDefault(false)
+        val canBeChanged = isCustomSettingEnabled && !storedUrl.isNullOrEmpty() && URLUtil.isValidUrl(storedUrl) && validHost
         store.canUrlBeChanged = canBeChanged
         return canBeChanged
     }
