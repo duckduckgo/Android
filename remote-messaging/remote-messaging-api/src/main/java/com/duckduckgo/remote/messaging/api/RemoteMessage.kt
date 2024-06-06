@@ -81,6 +81,7 @@ sealed class Content(val messageType: MessageType) {
         CRITICAL_UPDATE("CriticalUpdate"),
         APP_UPDATE("AppUpdate"),
         MAC_AND_WINDOWS("NewForMacAndWindows"),
+        PRIVACY_SHIELD("PrivacyShield"),
         ;
 
         companion object {
