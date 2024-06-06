@@ -467,6 +467,29 @@ class CtaViewModelTest {
     }
 
     @Test
+    fun whenRefreshOnboardingCtaAndCanShowDaxCtaEndOfJourneyButNotFireDialogShownThenOnboardingEndCtaDontShow() = runTest {
+        givenDaxOnboardingActive()
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_DIALOG_TRACKERS_FOUND)).thenReturn(true)
+
+        val site = site(url = "http://www.cnn.com", trackerCount = 1)
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
+        assertFalse(value is OnboardingDaxDialogCta.DaxEndCta)
+    }
+
+    @Test
+    fun whenRefreshOnboardingCtaAndCanShowDaxCtaEndThenOnboardingEndCtaShown() = runTest {
+        givenDaxOnboardingActive()
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_DIALOG_TRACKERS_FOUND)).thenReturn(true)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_FIRE_BUTTON)).thenReturn(true)
+
+        val site = site(url = "http://www.cnn.com", trackerCount = 1)
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
+        assertTrue(value is OnboardingDaxDialogCta.DaxEndCta)
+    }
+
+    @Test
     fun whenRefreshCtaOnHomeTabAndIntroCtaWasNotPreviouslyShownThenIntroCtaShown() = runTest {
         givenDaxOnboardingActive()
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(false)
@@ -685,6 +708,20 @@ class CtaViewModelTest {
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
         assertFalse(value is DaxBubbleCta.DaxIntroVisitSiteOptionsCta)
+    }
+
+    @Test
+    fun whenCtaShownIfCtaIsNotMarkedAsReadOnShowThenCtaNotInsertedInDatabase() {
+        testee.onCtaShown(OnboardingDaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore))
+
+        verify(mockDismissedCtaDao, never()).insert(DismissedCta(CtaId.DAX_DIALOG_SERP))
+    }
+
+    @Test
+    fun whenCtaShownIfCtaIsMarkedAsReadOnShowThenCtaInsertedInDatabase() {
+        testee.onCtaShown(OnboardingDaxDialogCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore))
+
+        verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_END))
     }
 
     private suspend fun givenDaxOnboardingActive() {

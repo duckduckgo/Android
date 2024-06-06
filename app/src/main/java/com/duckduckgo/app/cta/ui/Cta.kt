@@ -79,6 +79,9 @@ interface Cta {
 }
 
 interface OnboardingDaxCta {
+    val markAsReadOnShow: Boolean
+        get() = false
+
     fun showOnboardingCta(
         binding: FragmentBrowserTabBinding,
         onPrimaryCtaClicked: () -> Unit,
@@ -113,6 +116,7 @@ sealed class OnboardingDaxDialogCta(
     }
 
     internal fun setOnboardingDialogView(
+        daxTitle: String? = null,
         daxText: String,
         buttonText: String?,
         binding: FragmentBrowserTabBinding,
@@ -123,6 +127,10 @@ sealed class OnboardingDaxDialogCta(
         daxDialog.root.show()
         daxDialog.dialogTextCta.text = ""
         daxDialog.hiddenTextCta.text = daxText.html(binding.root.context)
+        daxTitle?.let {
+            daxDialog.onboardingDialogTitle.show()
+            daxDialog.onboardingDialogTitle.text = daxTitle
+        } ?: daxDialog.onboardingDialogTitle.gone()
         buttonText?.let {
             daxDialog.primaryCta.show()
             daxDialog.primaryCta.alpha = MIN_ALPHA
@@ -234,7 +242,6 @@ sealed class OnboardingDaxDialogCta(
         onboardingStore,
         appInstallStore,
     ) {
-
         override fun showOnboardingCta(
             binding: FragmentBrowserTabBinding,
             onPrimaryCtaClicked: () -> Unit,
@@ -384,6 +391,38 @@ sealed class OnboardingDaxDialogCta(
             daxDialog.daxDialogOption2.setOnClickListener { onOptionClicked.invoke(options[1]) }
             daxDialog.daxDialogOption3.setOnClickListener { onOptionClicked.invoke(options[2]) }
             daxDialog.daxDialogOption4.setOnClickListener { onOptionClicked.invoke(options[3]) }
+        }
+    }
+
+    class DaxEndCta(
+        override val onboardingStore: OnboardingStore,
+        override val appInstallStore: AppInstallStore,
+    ) : OnboardingDaxDialogCta(
+        CtaId.DAX_END,
+        R.string.onboardingEndDaxDialogDescription,
+        R.string.daxDialogHighFive,
+        AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
+        AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
+        null,
+        Pixel.PixelValues.DAX_ONBOARDING_END_CTA,
+        onboardingStore,
+        appInstallStore,
+    ) {
+        override val markAsReadOnShow: Boolean = true
+
+        override fun showOnboardingCta(
+            binding: FragmentBrowserTabBinding,
+            onPrimaryCtaClicked: () -> Unit,
+            onTypingAnimationFinished: () -> Unit,
+        ) {
+            val context = binding.root.context
+            setOnboardingDialogView(
+                daxTitle = context.getString(R.string.onboardingEndDaxDialogTitle),
+                daxText = description?.let { context.getString(it) }.orEmpty(),
+                buttonText = buttonText?.let { context.getString(it) },
+                binding = binding,
+            )
+            binding.includeOnboardingDaxDialog.primaryCta.setOnClickListener { onPrimaryCtaClicked.invoke() }
         }
     }
 
@@ -567,7 +606,10 @@ sealed class BubbleCta(
             super.showCta(view)
             val accessibilityDelegate: View.AccessibilityDelegate =
                 object : View.AccessibilityDelegate() {
-                    override fun onInitializeAccessibilityNodeInfo(host: View, info: AccessibilityNodeInfo) {
+                    override fun onInitializeAccessibilityNodeInfo(
+                        host: View,
+                        info: AccessibilityNodeInfo,
+                    ) {
                         super.onInitializeAccessibilityNodeInfo(host, info)
                         info.text = host.context?.getString(R.string.daxFavoritesOnboardingCtaContentDescription)
                     }
