@@ -221,6 +221,7 @@ import com.duckduckgo.autofill.api.credential.saving.DuckAddressLoginCreator
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.api.emailprotection.EmailInjector
+import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
@@ -482,6 +483,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var dummyWebMessageListenerFeature: DummyWebMessageListenerFeature
+
+    @Inject
+    lateinit var webViewVersionProvider: WebViewVersionProvider
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -2348,6 +2352,7 @@ class BrowserTabFragment :
             }
 
             if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER) &&
+                webViewVersionProvider.getMajorVersion() == "126" &&
                 isFeatureEnabled &&
                 !webView.isDestroyed
             ) {
