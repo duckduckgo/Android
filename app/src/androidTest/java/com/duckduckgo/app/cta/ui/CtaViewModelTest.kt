@@ -711,7 +711,7 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenCtaShownIfCtaIsNotMarkedAsReadOnShowAThenCtaNotInsertedInDatabase() {
+    fun whenCtaShownIfCtaIsNotMarkedAsReadOnShowThenCtaNotInsertedInDatabase() {
         testee.onCtaShown(OnboardingDaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore))
 
         verify(mockDismissedCtaDao, never()).insert(DismissedCta(CtaId.DAX_DIALOG_SERP))
