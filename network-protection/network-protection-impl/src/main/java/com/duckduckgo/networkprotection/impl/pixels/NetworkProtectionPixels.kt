@@ -282,6 +282,10 @@ interface NetworkProtectionPixels {
 
     fun reportExcludeSystemAppsEnabledForCategory(category: String)
     fun reportExcludeSystemAppsDisabledForCategory(category: String)
+
+    fun reportServerMigrationAttempt()
+    fun reportServerMigrationAttemptSuccess()
+    fun reportServerMigrationAttemptFailed()
 }
 
 @ContributesBinding(AppScope::class)
@@ -573,6 +577,21 @@ class RealNetworkProtectionPixel @Inject constructor(
     override fun reportExcludeSystemAppsDisabledForCategory(category: String) {
         firePixel(NETP_EXCLUDE_SYSTEM_APPS_DISABLED, mapOf("category" to category))
         tryToFireDailyPixel(NETP_EXCLUDE_SYSTEM_APPS_DISABLED_DAILY, mapOf("category" to category))
+    }
+
+    override fun reportServerMigrationAttempt() {
+        firePixel(NETP_SERVER_MIGRATION_ATTEMPT)
+        tryToFireDailyPixel(NETP_SERVER_MIGRATION_ATTEMPT_DAILY)
+    }
+
+    override fun reportServerMigrationAttemptSuccess() {
+        firePixel(NETP_SERVER_MIGRATION_ATTEMPT_SUCCESS)
+        tryToFireDailyPixel(NETP_SERVER_MIGRATION_ATTEMPT_SUCCESS_DAILY)
+    }
+
+    override fun reportServerMigrationAttemptFailed() {
+        firePixel(NETP_SERVER_MIGRATION_ATTEMPT_FAILED)
+        tryToFireDailyPixel(NETP_SERVER_MIGRATION_ATTEMPT_FAILED_DAILY)
     }
 
     private fun firePixel(

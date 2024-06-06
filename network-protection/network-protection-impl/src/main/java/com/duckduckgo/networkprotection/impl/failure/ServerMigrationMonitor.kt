@@ -27,6 +27,7 @@ import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.configuration.WgVpnControllerService
 import com.duckduckgo.networkprotection.impl.configuration.asServerDetails
 import com.duckduckgo.networkprotection.impl.di.ProtectedVpnControllerService
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.wireguard.crypto.KeyPair
 import javax.inject.Inject
@@ -39,12 +40,13 @@ import kotlinx.coroutines.withContext
 import logcat.logcat
 
 @ContributesMultibinding(VpnScope::class)
-class ServerDrainingMonitor @Inject constructor(
+class ServerMigrationMonitor @Inject constructor(
     @ProtectedVpnControllerService private val wgVpnControllerService: WgVpnControllerService,
     private val wgTunnelConfig: WgTunnelConfig,
     private val networkProtectionState: NetworkProtectionState,
     private val dispatcherProvider: DispatcherProvider,
     private val wgTunnel: WgTunnel,
+    private val networkProtectionPixels: NetworkProtectionPixels,
 ) : VpnServiceCallbacks {
     private val job = ConflatedJob()
 
@@ -70,6 +72,7 @@ class ServerDrainingMonitor @Inject constructor(
     private suspend fun startMonitor() = withContext(dispatcherProvider.io()) {
         if (networkProtectionState.isEnabled()) {
             val serverName = wgTunnelConfig.getWgConfig()?.asServerDetails()?.serverName
+            logcat { "Server drain monitor: monitor started for $serverName" }
             while (isActive && networkProtectionState.isEnabled()) {
                 delay(5.minutes.inWholeMilliseconds)
 
@@ -78,7 +81,7 @@ class ServerDrainingMonitor @Inject constructor(
                         logcat { "Server drain monitor: getServerStatus for $serverName" }
                         wgVpnControllerService.getServerStatus(serverName).also {
                             if (it.shouldMigrate) {
-                                // TODO: emit pixel
+                                networkProtectionPixels.reportServerMigrationAttempt()
                                 logcat { "Server drain monitor: attempting to migrate server" }
                                 attemptServerMigration()
                             }
@@ -95,15 +98,14 @@ class ServerDrainingMonitor @Inject constructor(
 
     private suspend fun attemptServerMigration() {
         kotlin.runCatching {
-            // TODO: emit pixel
             val config = wgTunnel.createAndSetWgConfig(KeyPair())
             networkProtectionState.restart()
             config.getOrNull()
         }.onFailure {
-            // TODO: emit pixel
+            networkProtectionPixels.reportServerMigrationAttemptFailed()
             logcat { "Server drain monitor: server migration failed" }
         }.onSuccess {
-            // TODO: emit pixel
+            networkProtectionPixels.reportServerMigrationAttemptSuccess()
             logcat { "Server drain monitor: server migration succeeded to ${it?.asServerDetails()?.serverName}}" }
         }
     }
