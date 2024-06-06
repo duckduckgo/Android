@@ -79,6 +79,7 @@ class AppearanceActivity : DuckDuckGoActivity() {
                     updateSelectedTheme(it.theme)
                     binding.changeAppIcon.setImageResource(it.appIcon.icon)
                     binding.experimentalNightMode.quietlySetIsChecked(viewState.forceDarkModeEnabled, forceDarkModeToggleListener)
+                    binding.experimentalNightMode.isEnabled = viewState.canForceDarkMode
                 }
             }.launchIn(lifecycleScope)
 

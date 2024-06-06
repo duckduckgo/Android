@@ -47,6 +47,7 @@ class AppearanceViewModel @Inject constructor(
         val theme: DuckDuckGoTheme = DuckDuckGoTheme.LIGHT,
         val appIcon: AppIcon = AppIcon.DEFAULT,
         val forceDarkModeEnabled: Boolean = false,
+        val canForceDarkMode: Boolean = false,
     )
 
     sealed class Command {
@@ -65,6 +66,7 @@ class AppearanceViewModel @Inject constructor(
                     theme = themingDataStore.theme,
                     appIcon = settingsDataStore.appIcon,
                     forceDarkModeEnabled = settingsDataStore.experimentalWebsiteDarkMode,
+                    canForceDarkMode = themingDataStore.theme != DuckDuckGoTheme.LIGHT,
                 ),
             )
         }
