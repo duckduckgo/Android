@@ -97,6 +97,28 @@
             <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
+                app:primaryText="@string/activateOnOtherDevices" />
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/manageEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:primaryText="@string/addEmailPrimaryText"
+                tools:secondaryText="@string/addEmailSecondaryText"/>
+
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                android:id="@+id/learnMore"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/learnMore" />
+
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
                 app:primaryText="Subscription" />
 
             <com.duckduckgo.common.ui.view.listitem.OneLineListItem
@@ -122,12 +144,6 @@
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent"
                     app:primaryText="Manage Devices" />
-
-            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-                    android:id="@+id/addDevice"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:primaryText="Add to Another Device" />
 
             <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                     android:id="@+id/removeDevice"

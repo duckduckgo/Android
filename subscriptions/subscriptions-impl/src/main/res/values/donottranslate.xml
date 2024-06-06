@@ -62,6 +62,12 @@
     <string name="yearlySubscription">Yearly Subscription</string>
     <string name="renews">renews</string>
     <string name="expires">expires</string>
+    <string name="activateOnOtherDevices">Activate on Other Devices</string>
+    <string name="addEmailPrimaryText">Add Email</string>
+    <string name="addEmailSecondaryText">Add an email address to access your subscription in DuckDuckGo on other devices. We’ll only use this address to verify your subscription.</string>
+    <string name="editEmailPrimaryText">Edit Email</string>
+    <string name="editEmailSecondaryText">Use this email to activate your subscription from browser settings in the DuckDuckGo app on your other devices.</string>
+    <string name="learnMore">Learn More</string>
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Subscription Settings</string>

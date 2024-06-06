@@ -28,6 +28,8 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.FinishSignOut
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToAddEmailScreen
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToEditEmailScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPortal
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Yearly
@@ -62,6 +64,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
         val duration: SubscriptionDuration? = null,
         val status: SubscriptionStatus? = null,
         val platform: String? = null,
+        val email: String? = null,
     )
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -75,13 +78,28 @@ class SubscriptionSettingsViewModel @Inject constructor(
     }
 
     private suspend fun emitChanges() {
-        subscriptionsManager.getSubscription()?.let {
-            val formatter = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
-            val date = formatter.format(Date(it.expiresOrRenewsAt))
-            val type = if (it.productId == MONTHLY_PLAN) Monthly else Yearly
-            _viewState.emit(
-                viewState.value.copy(date = date, duration = type, status = it.status, platform = it.platform),
-            )
+        val account = subscriptionsManager.getAccount() ?: return
+        val subscription = subscriptionsManager.getSubscription() ?: return
+
+        val formatter = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
+        val date = formatter.format(Date(subscription.expiresOrRenewsAt))
+        val type = if (subscription.productId == MONTHLY_PLAN) Monthly else Yearly
+
+        _viewState.emit(
+            viewState.value.copy(
+                date = date,
+                duration = type,
+                status = subscription.status,
+                platform = subscription.platform,
+                email = account.email?.takeUnless { it.isBlank() },
+            ),
+        )
+    }
+
+    fun onEmailButtonClicked() {
+        pixelSender.reportAddDeviceEnterEmailClick()
+        viewModelScope.launch {
+            command.send(if (viewState.value.email == null) GoToAddEmailScreen else GoToEditEmailScreen)
         }
     }
 
@@ -108,6 +126,8 @@ class SubscriptionSettingsViewModel @Inject constructor(
 
     sealed class Command {
         data object FinishSignOut : Command()
+        data object GoToEditEmailScreen : Command()
+        data object GoToAddEmailScreen : Command()
         data class GoToPortal(val url: String) : Command()
     }
 }

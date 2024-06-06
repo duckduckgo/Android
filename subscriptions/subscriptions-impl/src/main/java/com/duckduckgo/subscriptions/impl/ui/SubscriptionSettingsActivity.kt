@@ -40,11 +40,12 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTI
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.FAQS_URL
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionSettingsBinding
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
-import com.duckduckgo.subscriptions.impl.ui.AddDeviceActivity.Companion.AddDeviceScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.ui.ChangePlanActivity.Companion.ChangePlanScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsActivity.Companion.SubscriptionsSettingsScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.FinishSignOut
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToAddEmailScreen
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToEditEmailScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPortal
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.ViewState
@@ -84,11 +85,6 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             renderView(it)
         }.launchIn(lifecycleScope)
 
-        binding.addDevice.setClickListener {
-            pixelSender.reportSettingsAddDeviceClick()
-            globalActivityStarter.start(this, AddDeviceScreenWithEmptyParams)
-        }
-
         binding.removeDevice.setClickListener {
             TextAlertDialogBuilder(this)
                 .setTitle(string.removeFromDevice)
@@ -110,8 +106,16 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
                 .show()
         }
 
+        binding.manageEmail.setOnClickListener {
+            viewModel.onEmailButtonClicked()
+        }
+
         binding.faq.setClickListener {
             goToFaqs()
+        }
+
+        binding.learnMore.setOnClickListener {
+            goToLearnMore()
         }
 
         binding.viewPlans.setClickListener {
@@ -176,6 +180,14 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
                 }
             }
         }
+
+        if (viewState.email == null) {
+            binding.manageEmail.setPrimaryText(resources.getString(string.addEmailPrimaryText))
+            binding.manageEmail.setSecondaryText(resources.getString(string.addEmailSecondaryText))
+        } else {
+            binding.manageEmail.setPrimaryText(resources.getString(string.editEmailPrimaryText))
+            binding.manageEmail.setSecondaryText(viewState.email + "\n\n" + resources.getString(string.editEmailSecondaryText))
+        }
     }
 
     private fun processCommand(command: Command) {
@@ -184,6 +196,10 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
                 Toast.makeText(this, string.subscriptionRemoved, Toast.LENGTH_SHORT).show()
                 finish()
             }
+
+            GoToAddEmailScreen -> goToAddEmail()
+            GoToEditEmailScreen -> goToEditEmail()
+
             is GoToPortal -> {
                 globalActivityStarter.start(
                     this,
@@ -208,6 +224,17 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         )
     }
 
+    private fun goToLearnMore() {
+        globalActivityStarter.start(
+            context = this,
+            params = SubscriptionsWebViewActivityWithParams(
+                url = LEARN_MORE_URL,
+                screenTitle = "",
+                defaultToolbar = false,
+            ),
+        )
+    }
+
     private fun goToPurchasePage() {
         globalActivityStarter.start(
             context = this,
@@ -219,8 +246,33 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         )
     }
 
+    private fun goToEditEmail() {
+        globalActivityStarter.start(
+            this,
+            SubscriptionsWebViewActivityWithParams(
+                url = MANAGE_URL,
+                screenTitle = getString(string.manageEmail),
+                defaultToolbar = false,
+            ),
+        )
+    }
+
+    private fun goToAddEmail() {
+        globalActivityStarter.start(
+            this,
+            SubscriptionsWebViewActivityWithParams(
+                url = ADD_EMAIL_URL,
+                screenTitle = getString(string.addEmailText),
+                defaultToolbar = false,
+            ),
+        )
+    }
+
     companion object {
         const val URL = "https://play.google.com/store/account/subscriptions?sku=%s&package=%s"
+        const val ADD_EMAIL_URL = "https://duckduckgo.com/subscriptions/add-email"
+        const val MANAGE_URL = "https://duckduckgo.com/subscriptions/manage"
+        const val LEARN_MORE_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/adding-email"
         data object SubscriptionsSettingsScreenWithEmptyParams : GlobalActivityStarter.ActivityParams
     }
 }

@@ -104,10 +104,6 @@ enum class SubscriptionPixel(
         baseName = "m_privacy-pro_welcome_add-device_click",
         type = UNIQUE,
     ),
-    SETTINGS_ADD_DEVICE_CLICK(
-        baseName = "m_privacy-pro_settings_add-device_click",
-        type = COUNT,
-    ),
     ADD_DEVICE_ENTER_EMAIL_CLICK(
         baseName = "m_privacy-pro_add-device_enter-email_click",
         type = COUNT,
