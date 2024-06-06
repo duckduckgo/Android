@@ -29,5 +29,8 @@ interface InternalANRDao {
     fun getAnrs(): Flow<List<AnrInternalEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAnr(anr: AnrInternalEntity)
+    suspend fun insertAnr(anr: AnrInternalEntity)
+
+    @Query("DELETE FROM anr_events where timestamp < :removeBeforeTimestamp")
+    suspend fun removeOldAnrs(removeBeforeTimestamp: String)
 }

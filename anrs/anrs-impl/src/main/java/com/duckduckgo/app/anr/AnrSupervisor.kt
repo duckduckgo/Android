@@ -62,7 +62,6 @@ class AnrSupervisorRunnable @Inject constructor(
     private val webViewVersionProvider: WebViewVersionProvider,
     private val customTabDetector: CustomTabDetector,
     anrsDatabase: AnrsDatabase,
-    private val plugins: PluginPoint<AnrObserverPlugin>,
 ) : Runnable {
 
     private val anrDao = anrsDatabase.arnDao()
@@ -94,9 +93,8 @@ class AnrSupervisorRunnable @Inject constructor(
                         val e = AnrException(handler.looper.thread)
                         logcat { "In custom tab: ${customTabDetector.isCustomTab()}. ANR Detected: ${e.threadStateMap}." }
 
-                        val anr = e.asAnrData(webViewVersionProvider.getFullVersion(), customTabDetector.isCustomTab())
-                        anrDao.insert(anr.asAnrEntity())
-                        notifyANRDetected(anr)
+                        anrDao.insert(e.asAnrData(webViewVersionProvider.getFullVersion(), customTabDetector.isCustomTab()).asAnrEntity())
+
                         // wait until thread responds again
                         callback.wait()
                     }
@@ -130,14 +128,6 @@ class AnrSupervisorRunnable @Inject constructor(
             if (stopped.get()) {
                 throw InterruptedException()
             }
-        }
-    }
-
-    private fun notifyANRDetected(anr: AnrData) {
-        val observers = plugins.getPlugins()
-        if (observers.isNotEmpty()) {
-            val anrEvent = anr.asAnrEvent()
-            observers.forEach { it.onAnrDetected(anrEvent) }
         }
     }
 

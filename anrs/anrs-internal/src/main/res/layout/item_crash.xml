@@ -16,8 +16,8 @@
 
 <com.duckduckgo.common.ui.view.listitem.TwoLineListItem xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/anrItem"
+    android:id="@+id/crashItem"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:primaryTextTruncated="false"
-    app:primaryText="ANR" />
+    app:primaryText="Crash"/>

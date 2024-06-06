@@ -25,10 +25,14 @@ import androidx.room.migration.Migration
 @Database(
     exportSchema = true,
     version = 1,
-    entities = [AnrInternalEntity::class],
+    entities = [
+        AnrInternalEntity::class,
+        CrashInternalEntity::class,
+    ],
 )
 abstract class CrashANRsInternalDatabase : RoomDatabase() {
-    abstract fun arnDao(): InternalANRDao
+    abstract fun anrDao(): InternalANRDao
+    abstract fun crashDao(): InternalCrashDao
 
     companion object {
         val ALL_MIGRATIONS = emptyArray<Migration>()
@@ -37,8 +41,26 @@ abstract class CrashANRsInternalDatabase : RoomDatabase() {
 
 @Entity(tableName = "anr_events")
 data class AnrInternalEntity(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    @PrimaryKey val hash: String,
+    val message: String,
+    val name: String,
+    val file: String?,
+    val lineNumber: Int,
     val stackTrace: String,
+    val timestamp: String,
+    val webView: String,
+    val customTab: Boolean,
+)
+
+@Entity(tableName = "crash_events")
+data class CrashInternalEntity(
+    @PrimaryKey val hash: String,
+    val shortName: String,
+    val processName: String,
+    val message: String,
+    val stackTrace: String,
+    val version: String,
+    val timestamp: String,
     val webView: String,
     val customTab: Boolean,
 )

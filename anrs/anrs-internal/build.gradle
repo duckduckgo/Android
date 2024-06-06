@@ -59,6 +59,7 @@ dependencies {
     implementation "com.squareup.logcat:logcat:_"
 
     testImplementation Testing.junit4
+    testImplementation AndroidX.test.ext.junit
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation project(':common-test')
     testImplementation project(':feature-toggles-test')
