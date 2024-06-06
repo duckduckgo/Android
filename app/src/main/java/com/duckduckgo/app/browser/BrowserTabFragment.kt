@@ -2264,6 +2264,7 @@ class BrowserTabFragment :
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun configureWebView() {
+        Thread.sleep(7000)
         binding.daxDialogOnboardingCtaContent.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
 
         webView = layoutInflater.inflate(
