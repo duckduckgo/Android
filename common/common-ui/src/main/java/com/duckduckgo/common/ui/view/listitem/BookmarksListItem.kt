@@ -14,25 +14,25 @@
  * limitations under the License.
  */
 
-@file:Suppress("MemberVisibilityCanBePrivate")
-
-package com.duckduckgo.app.bookmarks.ui
+package com.duckduckgo.common.ui.view.listitem
 
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.widget.ImageView
-import com.duckduckgo.app.browser.databinding.ViewBookmarkTwoLineItemBinding
 import com.duckduckgo.common.ui.view.SwitchView
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.R
+import com.duckduckgo.mobile.android.databinding.ViewBookmarkTwoLineItemBinding
 
-class BookmarkTwoLineListItem @JvmOverloads constructor(
+class BookmarksListItem @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = R.attr.twoLineListItemStyle,
-) : BookmarkListItem(context, attrs, defStyleAttr) {
+) : DaxListItem(context, attrs, defStyleAttr) {
 
     private val binding: ViewBookmarkTwoLineItemBinding by viewBinding()
 
@@ -51,14 +51,26 @@ class BookmarkTwoLineListItem @JvmOverloads constructor(
         get() = binding.trailingIconContainer
     override val trailingSwitch: SwitchView
         get() = binding.trailingSwitch
-    override val favoriteStar: ImageView
-        get() = binding.favoriteStar
+    override val betaPill: ImageView?
+        get() = null
 
     override val itemContainer: View
         get() = binding.itemContainer
 
     override val verticalPadding: Int
         get() = R.dimen.twoLineItemVerticalPadding
+
+    val favoriteStar: ImageView?
+        get() = binding.favoriteStar
+
+    /** Sets the favorite star visibility */
+    fun setFavoriteStarVisible(isVisible: Boolean) {
+        if (isVisible) {
+            favoriteStar?.show()
+        } else {
+            favoriteStar?.gone()
+        }
+    }
 
     init {
         context.obtainStyledAttributes(
@@ -98,8 +110,7 @@ class BookmarkTwoLineListItem @JvmOverloads constructor(
             }
 
             if (hasValue(R.styleable.TwoLineListItem_leadingIconSize)) {
-                val imageSize =
-                    LeadingIconSize.from(getInt(R.styleable.TwoLineListItem_leadingIconSize, 1))
+                val imageSize = LeadingIconSize.from(getInt(R.styleable.TwoLineListItem_leadingIconSize, 1))
                 setLeadingIconSize(imageSize)
             }
 
