@@ -55,8 +55,8 @@
     <string name="openAutoCompleteSettings">Open Settings</string>
 
     <!-- Force Dark Mode -->
-    <string name="appearanceNightModeTitle">Force Experimental Dark Mode</string>
-    <string name="appearanceNightModeSecondary">Websites render with the styling modified to dark colors by an algorithm if allowed by the content author.</string>
-    <string name="appearanceNightModeWarning">These changes will take effect the next time you relaunch Brave or a New Tab is created</string>
+    <string name="appearanceNightModeTitle">Auto Dark Mode on Web Sites (experimental)</string>
+    <string name="appearanceNightModeSecondary">Display websites in a dark theme if allowed by the website.</string>
+    <string name="appearanceNightModeWarning">These changes will take effect the next time you relaunch DuckDuckGo or create a New Tab</string>
 
 </resources>
