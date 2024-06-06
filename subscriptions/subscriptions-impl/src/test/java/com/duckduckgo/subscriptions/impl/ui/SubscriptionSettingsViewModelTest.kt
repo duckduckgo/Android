@@ -15,6 +15,7 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Comman
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPortal
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Yearly
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.ViewState.Ready
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -71,7 +72,7 @@ class SubscriptionSettingsViewModelTest {
         viewModel.onCreate(mock())
         flowTest.emit(AUTO_RENEWABLE)
         viewModel.viewState.test {
-            assertEquals("December 04, 2023", awaitItem().date)
+            assertEquals("December 04, 2023", (awaitItem() as Ready).date)
         }
     }
 
@@ -98,7 +99,7 @@ class SubscriptionSettingsViewModelTest {
         viewModel.onCreate(mock())
         flowTest.emit(AUTO_RENEWABLE)
         viewModel.viewState.test {
-            assertEquals(Monthly, awaitItem().duration)
+            assertEquals(Monthly, (awaitItem() as Ready).duration)
         }
     }
 
@@ -125,7 +126,7 @@ class SubscriptionSettingsViewModelTest {
         viewModel.onCreate(mock())
         flowTest.emit(AUTO_RENEWABLE)
         viewModel.viewState.test {
-            assertEquals(Yearly, awaitItem().duration)
+            assertEquals(Yearly, (awaitItem() as Ready).duration)
         }
     }
 
@@ -154,6 +155,25 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenOnEmailButtonClickedAndEmailNotPresentThenSendGoToAddEmailScreenCommand() = runTest {
+        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowOf(AUTO_RENEWABLE))
+
+        whenever(subscriptionsManager.getSubscription()).thenReturn(
+            Subscription(
+                productId = SubscriptionsConstants.MONTHLY_PLAN,
+                startedAt = 1234,
+                expiresOrRenewsAt = 1701694623000,
+                status = AUTO_RENEWABLE,
+                platform = "android",
+                entitlements = emptyList(),
+            ),
+        )
+
+        whenever(subscriptionsManager.getAccount()).thenReturn(
+            Account(email = null, externalId = "external_id"),
+        )
+
+        viewModel.onCreate(mock())
+
         viewModel.commands().test {
             viewModel.onEmailButtonClicked()
             assertEquals(GoToAddEmailScreen, awaitItem())
@@ -191,6 +211,25 @@ class SubscriptionSettingsViewModelTest {
 
     @Test
     fun whenOnEmailButtonClickedThenPixelIsSent() = runTest {
+        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowOf(AUTO_RENEWABLE))
+
+        whenever(subscriptionsManager.getSubscription()).thenReturn(
+            Subscription(
+                productId = SubscriptionsConstants.MONTHLY_PLAN,
+                startedAt = 1234,
+                expiresOrRenewsAt = 1701694623000,
+                status = AUTO_RENEWABLE,
+                platform = "android",
+                entitlements = emptyList(),
+            ),
+        )
+
+        whenever(subscriptionsManager.getAccount()).thenReturn(
+            Account(email = "test@example.com", externalId = "external_id"),
+        )
+
+        viewModel.onCreate(mock())
+
         viewModel.commands().test {
             viewModel.onEmailButtonClicked()
             verify(pixelSender).reportAddDeviceEnterEmailClick()

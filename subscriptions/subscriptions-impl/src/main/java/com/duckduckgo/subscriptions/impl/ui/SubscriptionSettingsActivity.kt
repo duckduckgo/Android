@@ -50,6 +50,7 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Comman
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.ViewState
 import javax.inject.Inject
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -81,9 +82,10 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
 
-        viewModel.viewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach {
-            renderView(it)
-        }.launchIn(lifecycleScope)
+        viewModel.viewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .filterIsInstance(ViewState.Ready::class)
+            .onEach { renderView(it) }
+            .launchIn(lifecycleScope)
 
         binding.removeDevice.setClickListener {
             TextAlertDialogBuilder(this)
@@ -132,7 +134,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         lifecycle.removeObserver(viewModel)
     }
 
-    private fun renderView(viewState: ViewState) {
+    private fun renderView(viewState: ViewState.Ready) {
         if (viewState.status in listOf(INACTIVE, EXPIRED)) {
             binding.subscriptionDuration.isVisible = false
             binding.descriptionExpiredIcon.isVisible = true
@@ -155,7 +157,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             }
             binding.description.text = getString(string.subscriptionsData, status, viewState.date)
 
-            when (viewState.platform?.lowercase()) {
+            when (viewState.platform.lowercase()) {
                 "apple", "ios" ->
                     binding.changePlan.setClickListener {
                         pixelSender.reportSubscriptionSettingsChangePlanOrBillingClick()
