@@ -63,10 +63,8 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 
 @InjectWith(ViewScope::class)
@@ -187,7 +185,10 @@ class RemoteMessageView @JvmOverloads constructor(
         }
     }
 
-    private fun launchSharePromoRMFPageChooser(url: String, shareTitle: String) {
+    private fun launchSharePromoRMFPageChooser(
+        url: String,
+        shareTitle: String,
+    ) {
         val share = Intent().apply {
             action = Intent.ACTION_SEND
             putExtra(Intent.EXTRA_TEXT, url)
@@ -227,16 +228,9 @@ class RemoteMessageNewTabSectionPlugin @Inject constructor(
         return RemoteMessageView(context)
     }
 
-    // this plugin is always enabled
     override suspend fun isUserEnabled(): Boolean {
-        var hasMessage = false
-        runBlocking {
-            remoteMessageModel.getActiveMessages().collectLatest { message ->
-                Timber.d("New Tab: RMF isUserEnabled $message")
-                hasMessage = message != null
-            }
-        }
-
-        return hasMessage
+        val message = remoteMessageModel.getActiveMessage()
+        Timber.d("New Tab: RMF isUserEnabled $message")
+        return message != null
     }
 }

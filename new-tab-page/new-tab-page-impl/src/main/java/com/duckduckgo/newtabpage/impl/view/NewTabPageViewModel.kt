@@ -29,9 +29,10 @@ import com.duckduckgo.newtabpage.api.NewTabPageSectionProvider
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import logcat.logcat
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
@@ -41,23 +42,22 @@ class NewTabPageViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel(), DefaultLifecycleObserver {
 
-    data class ViewState(val sections: List<NewTabPageSectionPlugin> = emptyList(), val loading: Boolean = true)
+    data class ViewState(
+        val sections: List<NewTabPageSectionPlugin> = emptyList(),
+        val loading: Boolean = true,
+    )
 
     private val _viewState = MutableStateFlow(ViewState())
     val viewState = _viewState.asStateFlow()
 
     override fun onResume(owner: LifecycleOwner) {
-        configureViews()
+        refreshViews()
     }
 
-    private fun configureViews() {
-        viewModelScope.launch(dispatcherProvider.io()) {
-            newTabSectionsProvider.provideSections().collect { sections ->
-                logcat { "New Tab: Sections $sections" }
-                withContext(dispatcherProvider.main()) {
-                    _viewState.update { ViewState(sections, false) }
-                }
-            }
-        }
+    fun refreshViews() {
+        newTabSectionsProvider.provideSections().map { sections ->
+            logcat { "New Tab: Sections $sections" }
+            _viewState.update { ViewState(sections, false) }
+        }.flowOn(dispatcherProvider.io()).launchIn(viewModelScope)
     }
 }

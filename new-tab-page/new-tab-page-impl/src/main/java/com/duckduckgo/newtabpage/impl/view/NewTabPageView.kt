@@ -19,6 +19,7 @@ package com.duckduckgo.newtabpage.impl.view
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
+import android.view.View
 import android.widget.LinearLayout
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
@@ -41,6 +42,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import logcat.logcat
 
 @InjectWith(ViewScope::class)
 class NewTabPageView @JvmOverloads constructor(
@@ -79,13 +81,35 @@ class NewTabPageView @JvmOverloads constructor(
         binding.newTabEdit.setOnClickListener {
             globalActivityStarter.start(context, NewTabSettingsScreenNoParams)
         }
+
+        binding.newTabSectionsContent.setOnHierarchyChangeListener(object : OnHierarchyChangeListener {
+            override fun onChildViewAdded(
+                p0: View?,
+                p1: View?,
+            ) {
+                logcat { "New Tab: view added child count ${binding.newTabSectionsContent.childCount}" }
+            }
+
+            override fun onChildViewRemoved(
+                p0: View?,
+                p1: View?,
+            ) {
+                val childCount = binding.newTabSectionsContent.childCount
+                logcat { "New Tab: view removed child count $childCount" }
+                if (childCount == 0) {
+                    viewModel.refreshViews()
+                }
+            }
+        },)
     }
 
     private fun render(viewState: ViewState) {
+        logcat { "New Tab: render $$viewState" }
         if (viewState.loading) {
             binding.newTabContentShimmer.startShimmer()
         } else {
             if (viewState.sections.isEmpty()) {
+                binding.newTabContentShimmer.gone()
                 binding.newTabSectionsContent.gone()
                 binding.ddgLogo.show()
             } else {

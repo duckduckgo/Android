@@ -40,6 +40,9 @@ abstract class RemoteMessagesDao {
     abstract fun updateState(id: String, newState: Status)
 
     @Query("select * from remote_message where status = \"SCHEDULED\"")
+    abstract fun message(): RemoteMessageEntity?
+
+    @Query("select * from remote_message where status = \"SCHEDULED\"")
     abstract fun messagesFlow(): Flow<RemoteMessageEntity?>
 
     @Query("DELETE FROM remote_message WHERE status = \"SCHEDULED\"")

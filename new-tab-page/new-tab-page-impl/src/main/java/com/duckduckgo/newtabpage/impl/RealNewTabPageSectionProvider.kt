@@ -43,6 +43,7 @@ class RealNewTabPageSectionProvider @Inject constructor(
         // store can be empty the first time we check it, so we make sure the content is initialised
         val sectionSettingsPlugins = newTabSectionsSettingsPlugins.getPlugins().filter { it.isActive() }
         if (sectionSettingsPlugins.isNotEmpty()) {
+            logcat { "New Tab: Initialising section settings" }
             if (newTabSettingsStore.sectionSettings.isEmpty()) {
                 val userSections = sectionSettingsPlugins.map { it.name }
                 logcat { "New Tab: User Sections initialised to $userSections" }
@@ -64,6 +65,8 @@ class RealNewTabPageSectionProvider @Inject constructor(
                     logcat { "New Tab: User Sections updated to $updatedShortcuts" }
                     newTabSettingsStore.sectionSettings = updatedShortcuts
                 }
+
+                logcat { "New Tab: Current section settings ${newTabSettingsStore.sectionSettings}" }
             }
         }
 
