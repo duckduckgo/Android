@@ -78,6 +78,6 @@ private fun Placeholder.drawable(): Int {
         CRITICAL_UPDATE -> R.drawable.ic_critical_update
         APP_UPDATE -> R.drawable.ic_app_update
         MAC_AND_WINDOWS -> R.drawable.desktop_promo_artwork
-        PRIVACY_SHIELD -> com.duckduckgo.subscriptions.impl.R.drawable.ic_privacy_pro
+        PRIVACY_SHIELD -> R.drawable.ic_privacy_pro
     }
 }
