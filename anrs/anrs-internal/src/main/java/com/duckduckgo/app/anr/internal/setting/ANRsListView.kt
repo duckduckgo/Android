@@ -18,7 +18,6 @@ package com.duckduckgo.app.anr.internal.setting
 
 import android.content.Context
 import android.util.AttributeSet
-import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -136,8 +135,7 @@ class ANRAdapterList() : Adapter<RecyclerView.ViewHolder>() {
         viewHolder: ANRViewHolder,
     ) {
         with(viewHolder) {
-            val decodedANR = String(Base64.decode(anr.stackTrace, Base64.NO_WRAP)).take(500)
-            binding.anrItem.setPrimaryText(decodedANR)
+            binding.anrItem.setPrimaryText(anr.stackTrace.take(500))
         }
     }
 
